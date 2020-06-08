@@ -1,0 +1,95 @@
+<resources>
+    <string name="app_name">Brave DNS</string>
+    <string name="app_name_brave">Brave</string>
+    <string name="title_internet_manager">Internet \n Manager</string>
+    <string name="title_permission_manager">Permission \n Manager</string>
+    <string name="title_settings">Settings</string>
+    <string name="txt_im_topic">Internet Manager</string>
+    <string name="txt_im_adfree_internet">AD Free Internet</string>
+    <string name="txt_im_adfree_internet_desc">Removes the ad across all the applications</string>
+    <string name="txt_im_censor_internet">Censor Free Internet</string>
+    <string name="txt_im_censor_internet_desc">Content Blocking across the applications</string>
+    <string name="txt_im_tip">Tip : Firewall prevents apps from accessing the Internet over Wifi or Mobile data. Since most forms of surveillance require the data to be sent over to a central repository, firewalling them effectively mitigates the threat. \n\nThere\'s a class of apps that require Internet connection all day, and those are usually communication apps like Gmail and messenger apps like WhatsApp. Firewalling them might not be an option, and that\'s why we built content blockers. </string>
+
+    <string name="txt_pm_topic">Permission Manager</string>
+
+    <string name="action_automatic">Auto Remove and Auto Grant</string>
+    <string name="action_revoke_only">Auto Revoke</string>
+    <string name="action_do_nothing">Do Nothing</string>
+
+    <string name="device_admin_receiver">
+        Content Blocker
+    </string>
+    <string name="device_admin_receiver_description">
+        This permission is required to programmatically set DNS for your device. Think of DNS as
+        an address book for the internet: It translates domains (for example, dns.google.com) to valid
+        IP addresses (for example, 8.8.8.8). Setting it allows us to control out-going connections
+        from any app on your device, thereby effectively preventing connections to blacklisted domains.
+    </string>
+    <string name="add_admin_extra_app_text">
+        Helps automatically set a DNS based content blocker which helps with blocking trackers
+        across the device.
+    </string>
+    <string name="activity_device_admin">
+        Content Blocker
+    </string>
+    <string name="admin_receiver_status_enabled">
+        Ready to set dns based content blocker.
+    </string>
+    <string name="admin_receiver_status_disabled">
+        Content blocker no longer in effect.
+    </string>
+
+    <!-- Permission Manager -->
+    <string name="accessibility_service_description">
+        We use accessibility to automate frequent actions
+        to manage security and privacy related settings on your phone.
+    </string>
+
+    <string name="accessibility_service_label">
+        Automate Permissions Management
+    </string>
+
+    <string name="next">NEXT</string>
+    <string name="skip">SKIP</string>
+    <string name="start">START</string>
+
+    <string name="slide_1_title">AD Free Internet!</string>
+    <string name="slide_1_desc">Removes the ad across all the applications!</string>
+
+    <string name="slide_2_title">Censor Free Internet</string>
+    <string name="slide_2_desc">Filter your network traffic with blacklists that power popular ad-blokers!</string>
+
+    <string name="slide_3_title">Permission Manager</string>
+    <string name="slide_3_desc">Automatically revoke the permissions to restrict their abuse by apps</string>
+
+    <string name="slide_4_title">Report Center</string>
+    <string name="slide_4_desc">Pay attention to permissions and network usage, keep abreast with privacy breaches, and evaluate the apps behaviour!</string>
+
+    <string-array name="interface_address_prefixes">
+        <item>192.168.0/24</item>
+        <item>172.18.234/12</item>
+        <item>10.18.234/8</item>
+    </string-array>
+
+    <string name="warning_title" description="Status indicator text shown in a warning notification.">
+    Warning: BraveDNS has been deactivated
+  </string>
+
+    <string name="notification_content"
+        description="Indicates what will happen if the user taps the notification.">
+    Tap to change DNS protection setting
+  </string>
+
+    <string name="warning_channel_name"
+        description="This is the name of the class of notifications that show warnings.  It's only
+  visible in the system's advanced notifications settings page.">
+    Warning
+  </string>
+
+    <string name="warning_channel_description"
+        description="This is the explanatory text describing the 'Warning' notification class.  It's
+  only visible in the system's advanced notifications settings page.">
+    Shown when Brave has encountered a problem.
+  </string>
+</resources>
