@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="8dp"
+    >
+    <TextView
+        android:id="@+id/textView"
+        android:layout_marginTop="8dp"
+        android:text="@string/action_automatic"
+        android:layout_margin="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        style="@style/ActionItem"
+
+        />
+    <TextView
+        android:id="@+id/textView2"
+        android:text="@string/action_revoke_only"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="2dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        style="@style/ActionItem"
+        />
+    <TextView
+        android:id="@+id/textView3"
+        android:text="@string/action_do_nothing"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_margin="2dp"
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        style="@style/ActionItem"
+        />
+   <!-- <TextView
+        android:id="@+id/textView4"
+
+        android:text="@string/action_print"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3"
+        style="@style/ActionItem"
+        />-->
+</androidx.constraintlayout.widget.ConstraintLayout>

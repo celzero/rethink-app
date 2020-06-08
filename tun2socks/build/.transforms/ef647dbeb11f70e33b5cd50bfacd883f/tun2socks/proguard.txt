@@ -1,0 +1,7 @@
+-keep class go.** { *; }
+-keep class tun2socks.** { *; }
+-keep class tunnel.** { *; }
+-keep class intra.** { *; }
+-keep class doh.** { *; }
+-keep class split.** { *; }
+-keep class protect.** { *; }

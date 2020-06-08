@@ -1,0 +1,495 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<LinearLayout
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:weightSum="3"
+    android:layout_height="match_parent"
+    android:background="@color/pale_white">
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:weightSum="3"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_marginBottom="5dp"
+            android:orientation="vertical"
+            android:background="@color/pale_white">
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="160 Apps\nInstalled"
+                android:padding="5dp"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textColor="@color/positive"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:layout_margin="5dp"
+            android:orientation="vertical"
+            android:background="@color/pale_white">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:textColor="@color/textColorMain"
+                android:text="@string/app_name_brave"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:textSize="32sp"
+                />
+            <RelativeLayout
+                android:id="@+id/fhs_rl_dns_service"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/fhs_app_icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_shield_on_purple" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fhs_vpn_on_off_txt"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="OFF"
+                    android:layout_alignLeft="@id/fhs_app_icon"
+                    android:layout_alignRight="@id/fhs_app_icon"
+                    android:layout_alignTop="@id/fhs_app_icon"
+                    android:layout_alignBottom="@id/fhs_app_icon"
+                    android:textColor="@color/colorRed_900"
+                    android:gravity="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:padding="5dp"
+                    android:layout_gravity="fill" />
+            </RelativeLayout>
+
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_marginBottom="5dp"
+            android:orientation="vertical"
+            android:background="@color/pale_white">
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="30%\nStorage"
+                android:padding="5dp"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textColor="@color/positive"/>
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Your Security Level : "
+        android:textSize="24dp"
+        android:textColor="@color/black"/>
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Medium"
+            android:textSize="24dp"
+            android:textColor="@color/neutral"/>
+
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:weightSum="2"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_height="wrap_content"
+        android:background="@color/dividerColor">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:weightSum="2"
+            android:layout_height="match_parent"
+            android:layout_marginRight="1dp"
+            android:layout_weight="1">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_height="match_parent"
+                android:background="@color/pale_white"
+                android:layout_marginBottom="1dp"
+                android:gravity="center_horizontal"
+                android:layout_weight="1">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_firewall" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:weightSum="2">
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Firewall"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:layout_weight="1.8"
+                    android:padding="5dp"
+                    android:textColor="@color/black"/>
+
+                <RadioGroup
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:visibility="gone"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/outline"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="1dp"
+                        android:layout_marginStart="1dp"
+                        android:layout_marginTop="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/switch_off"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:padding="@dimen/radio_margin"
+                        android:text="Off"
+                        android:textColor="@drawable/switch_text" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="1dp"
+                        android:layout_marginEnd="1dp"
+                        android:layout_marginTop="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/switch_on"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:padding="@dimen/radio_margin"
+                        android:text="On "
+                        android:textColor="@drawable/switch_text" />
+                </RadioGroup>
+                </LinearLayout>
+
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/fhs_ll_app_mgr"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_height="match_parent"
+                android:background="@color/pale_white"
+                android:gravity="center_horizontal"
+                android:layout_weight="1">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_application_manager" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:weightSum="2">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:weightSum="2">
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:padding="5dp"
+                    android:gravity="center"
+                    android:layout_weight="1.8"
+                    android:text="Application\nManager"
+                    android:textColor="@color/black"/>
+                <RadioGroup
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:visibility="gone"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/outline"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="1dp"
+                        android:layout_marginStart="1dp"
+                        android:layout_marginTop="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/switch_off"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:padding="@dimen/radio_margin"
+                        android:text="Off"
+                        android:textColor="@drawable/switch_text" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="1dp"
+                        android:layout_marginEnd="1dp"
+                        android:layout_marginTop="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/switch_on"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:padding="@dimen/radio_margin"
+                        android:text="On "
+                        android:textColor="@drawable/switch_text" />
+                </RadioGroup>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_height="match_parent"
+                android:background="@color/pale_white"
+                android:gravity="center_horizontal"
+                android:layout_marginBottom="1dp"
+                android:layout_weight="1">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_wifi" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingLeft="10dp"
+                    android:gravity="center_vertical"
+                    android:weightSum="2">
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Internet\nManager"
+                    android:layout_weight="1.8"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"/>
+
+                    <RadioGroup
+                        android:layout_width="wrap_content"
+                        android:visibility="gone"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center_vertical|right"
+                        android:layout_margin="10dp"
+                        android:background="@drawable/outline"
+                        android:gravity="right"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="1dp"
+                            android:layout_marginTop="1dp"
+                            android:layout_marginBottom="1dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/switch_off"
+                            android:button="@null"
+                            android:gravity="center"
+                            android:padding="@dimen/radio_margin"
+                            android:text="Off"
+                            android:textColor="@drawable/switch_text" />
+
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="1dp"
+                            android:layout_marginEnd="1dp"
+                            android:layout_marginBottom="1dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/switch_on"
+                            android:button="@null"
+                            android:gravity="center"
+                            android:padding="@dimen/radio_margin"
+                            android:text="On "
+                            android:textColor="@drawable/switch_text" />
+                    </RadioGroup>
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/fhs_ll_perm_mgr"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_height="match_parent"
+                android:background="@color/pale_white"
+                android:gravity="center_horizontal"
+                android:layout_weight="1">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_permission_manager" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingLeft="10dp"
+                    android:gravity="center_vertical"
+                    android:weightSum="2">
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Permission\nManager"
+                    android:layout_weight="1.8"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:textColor="@color/black"/>
+
+                <RadioGroup
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_margin="10dp"
+                    android:visibility="gone"
+                    android:layout_gravity="center_vertical|right"
+                    android:background="@drawable/outline"
+                    android:orientation="horizontal">
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="1dp"
+                        android:layout_marginStart="1dp"
+                        android:layout_marginTop="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/switch_off"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:padding="@dimen/radio_margin"
+                        android:text="Off"
+                        android:textColor="@drawable/switch_text" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="1dp"
+                        android:layout_marginEnd="1dp"
+                        android:layout_marginTop="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/switch_on"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:padding="@dimen/radio_margin"
+                        android:text="On "
+                        android:textColor="@drawable/switch_text" />
+                </RadioGroup>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:paddingLeft="20dp"
+        android:paddingTop="20dp"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Manage"
+            android:textSize="16sp"
+            android:padding="5dp"
+            android:background="@color/pale_white"
+            android:textStyle="italic|bold"
+            android:textColor="@color/black"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Configure Firewall"
+            android:gravity="center_vertical"
+            android:drawablePadding="15dp"
+            android:drawableLeft="@drawable/ic_firewall_small"
+            android:drawableRight="@drawable/ic_right_arrow_small"
+            android:padding="10dp"
+            android:textColor="@color/black"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Configure Internet Manager"
+            android:gravity="center_vertical"
+            android:drawablePadding="15dp"
+            android:drawableLeft="@drawable/ic_wifi_small"
+            android:drawableRight="@drawable/ic_right_arrow_small"
+            android:padding="10dp"
+            android:textColor="@color/black"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Configure Application Manager"
+            android:gravity="center_vertical"
+            android:drawablePadding="15dp"
+            android:drawableLeft="@drawable/ic_application_manager_small"
+            android:drawableRight="@drawable/ic_right_arrow_small"
+            android:padding="10dp"
+            android:textColor="@color/black"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Configure Permission Manager"
+            android:gravity="center_vertical"
+            android:drawablePadding="15dp"
+            android:drawableLeft="@drawable/ic_permission_manager_small"
+            android:drawableRight="@drawable/ic_right_arrow_small"
+            android:padding="10dp"
+            android:textColor="@color/black"/>
+
+    </LinearLayout>
+
+</LinearLayout>
+</androidx.core.widget.NestedScrollView>
