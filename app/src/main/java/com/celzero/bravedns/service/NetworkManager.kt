@@ -12,6 +12,7 @@ import android.util.Log
 import java.net.InetAddress
 import java.util.*
 
+
 class NetworkManager(context: Context, networkListener: NetworkListener) {
 
     private var connectivityManager: ConnectivityManager? = null
@@ -44,6 +45,7 @@ class NetworkManager(context: Context, networkListener: NetworkListener) {
         }
     }*/
 
+
     init {
         applicationContext = context.applicationContext
         connectivityManager = applicationContext!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -52,11 +54,13 @@ class NetworkManager(context: Context, networkListener: NetworkListener) {
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
         broadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
+                Log.i("BraveVPN","Network Change Received")
                 connectivityChanged(intent)
             }
         }
-        applicationContext!!.registerReceiver(this.broadcastReceiver, intentFilter)
 
+        applicationContext!!.registerReceiver(this.broadcastReceiver, intentFilter)
+        Log.i("BraveVPN","Network Change Register Completed")
         // Fire onNetworkConnected listener immediately if we are online.
         val networkInfo: NetworkInfo = connectivityManager!!.getActiveNetworkInfo()
         if (networkInfo != null && networkInfo.isConnected) {
@@ -80,7 +84,7 @@ class NetworkManager(context: Context, networkListener: NetworkListener) {
 
     private fun connectivityChanged(intent: Intent) {
         val activeNetworkInfo = connectivityManager!!.activeNetworkInfo
-        val intentNetworkInfo =
+        val intentNetworkInfo = 
             intent.getParcelableExtra<NetworkInfo>("networkInfo")
         Log.v("NetworkManager", "ACTIVE NETWORK $activeNetworkInfo")
         Log.v("NetworkManager", "INTENT NETWORK $intentNetworkInfo")

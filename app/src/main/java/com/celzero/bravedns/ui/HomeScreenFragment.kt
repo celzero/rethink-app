@@ -17,16 +17,21 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.celzero.bravedns.R
+import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.util.ApkUtilities.Companion.isServiceRunning
 
 class HomeScreenFragment : Fragment(){
 
 
     lateinit var vpnOnOffTxt : TextView
     lateinit var appManagerLL : LinearLayout
-    lateinit var permManagerLL : LinearLayout
+    private lateinit var permManagerLL : LinearLayout
+    private lateinit var queryViewerLL : LinearLayout
     //Removed code for VPN
-    //var isServiceRunning : Boolean = false
+    private var isServiceRunning : Boolean = false
+
+    private var REQUEST_CODE : Int = 100
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,16 +44,17 @@ class HomeScreenFragment : Fragment(){
         vpnOnOffTxt = view.findViewById(R.id.fhs_vpn_on_off_txt)
         appManagerLL = view.findViewById(R.id.fhs_ll_app_mgr)
         permManagerLL = view.findViewById(R.id.fhs_ll_perm_mgr)
+        queryViewerLL = view.findViewById(R.id.fhs_ll_query)
 
-        //isServiceRunning = isServiceRunning(requireContext(),DnsService::class.java)
+        isServiceRunning = isServiceRunning(requireContext(),BraveVPNService::class.java)
         //Removed code for VPN
-        /*if(isServiceRunning){
+        if(isServiceRunning){
             vpnOnOffTxt.setText("ON")
             vpnOnOffTxt.setTextColor( resources.getColor(R.color.colorGreen_900))
         }else{
             vpnOnOffTxt.setText("OFF")
             vpnOnOffTxt.setTextColor( resources.getColor(R.color.colorRed_900))
-        }*/
+        }
 
         //TODO: Organize the onClick listeners
         //TODO : Look into options for text and text color change.
@@ -57,7 +63,16 @@ class HomeScreenFragment : Fragment(){
 
             //Removed code for VPN
             //startVpn()
-            prepareAndStartDnsVpn()
+            isServiceRunning = isServiceRunning(requireContext(),BraveVPNService::class.java)
+            if(isServiceRunning){
+                vpnOnOffTxt.setText("OFF")
+                vpnOnOffTxt.setTextColor( resources.getColor(R.color.colorRed_900))
+                stopDnsVpnService()
+            }
+            else {
+
+                prepareAndStartDnsVpn()
+            }
         })
 
         appManagerLL.setOnClickListener(View.OnClickListener {
@@ -68,7 +83,16 @@ class HomeScreenFragment : Fragment(){
             startPermissionManagerActivity()
         })
 
+        queryViewerLL.setOnClickListener(View.OnClickListener {
+            startQueryListener()
+        })
+
         return view
+    }
+
+    private fun startQueryListener() {
+        val intent = Intent(requireContext(), QueryDetailActivity::class.java)
+        startActivity(intent)
     }
 
     private fun prepareAndStartDnsVpn() {
@@ -81,10 +105,18 @@ class HomeScreenFragment : Fragment(){
         }
     }
 
+    private fun stopDnsVpnService() {
+        Log.e("BraveDNS", "stopDnsVpnService")
+        VpnController.getInstance()!!.stop(context)
+    }
+
     private fun startDnsVpnService() {
+        //isServiceRunning = true
+        vpnOnOffTxt.setText("ON")
+        vpnOnOffTxt.setTextColor( resources.getColor(R.color.colorGreen_900))
         Log.e("BraveDNS", "startDnsVpnService")
-        var vpnController=VpnController()
-        vpnController.getInstance()?.start(context!!)
+        //var vpnController=VpnController()
+        VpnController.getInstance()?.start(context!!)
     }
 
     // Returns whether the device supports the tunnel VPN service.
@@ -108,7 +140,7 @@ class HomeScreenFragment : Fragment(){
             Log.i("BraveVPN", "Prepare VPN with activity")
             startActivityForResult(
                 prepareVpnIntent,
-                100
+                REQUEST_CODE
             )
             //TODO
             //syncDnsStatus() // Set DNS status to off in case the user does not grant VPN permissions
@@ -168,7 +200,7 @@ class HomeScreenFragment : Fragment(){
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.e("BraveDNS","OnActivityResult - RequestCode: "+requestCode + " - ResultCode :"+resultCode)
-        if (requestCode == 100 && resultCode == Activity.RESULT_OK) {
+        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             startDnsVpnService()
         }
     }

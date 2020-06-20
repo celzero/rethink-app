@@ -18,6 +18,8 @@ package com.celzero.bravedns.net.doh;
 /**
  * A prober can perform asynchronous checks to determine whether a DOH server is working.
  */
+
+//TODO : Understand this class ????
 public abstract class Prober {
 
   protected static final byte[] QUERY_DATA = {

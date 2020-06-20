@@ -42,6 +42,8 @@ class HomeScreenActivity : AppCompatActivity() {
     companion object {
         lateinit var dbHandler : DatabaseHandler
 
+
+        //TODO : Check for the functionality of the method and uses
         fun openAppIntent(context: Context, appExtras:Bundle? = null):Intent {
              return   Intent(context, HomeScreenActivity::class.java).apply {
                     if(appExtras != null) putExtras(appExtras)
@@ -50,6 +52,8 @@ class HomeScreenActivity : AppCompatActivity() {
 
     }
 
+    //TODO : Remove the unwanted data and the assignments happening
+    //TODO : Create methods and segregate the data.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -73,11 +77,15 @@ class HomeScreenActivity : AppCompatActivity() {
         //startVpn()
         //actionOnService(Actions.START)
 
-        if (hasPermissions() && hasPermissionToReadNetworkHistory()) {
-            fillNetworkStatsPackage(10134)
+        /*if (hasPermissions() && hasPermissionToReadNetworkHistory()) {
+            //TODO : Check for the below code and the user ID to watch out.
+            //TODO : ALso need to check for the various uid's
+            //TODO : Why we need this
+
+            //fillNetworkStatsPackage(10134)
         }else{
             requestPermissions()
-        }
+        }*/
 
 
     }
@@ -139,6 +147,7 @@ class HomeScreenActivity : AppCompatActivity() {
         }
     }*/
 
+    //TODO : Check for the requirement of the method.
     @TargetApi(Build.VERSION_CODES.M)
     private fun fillNetworkStatsPackage(uid: Int ) {
         val networkStatsManager =

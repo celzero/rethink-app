@@ -1,3 +1,4 @@
+/*
 package com.celzero.bravedns.net.dns
 
 import okhttp3.Dns
@@ -46,6 +47,64 @@ class DnsPacket(data: ByteArray?) {
     private lateinit var additional: ArrayList<DnsRecord>
 
 
+    //TODO : Check why it has no calling method. It should have a calling method.
+    //TODO : If not then find all the reference and do the appropriate changes
+    @Throws(ProtocolException::class)
+    fun Constructor(data: ByteArray?) {
+        this.data = data!!
+        val buffer = ByteBuffer.wrap(data)
+        try {
+            id = buffer.short
+            // First flag byte: QR, Opcode (4 bits), AA, RD, RA
+            val flags1 = buffer.get()
+            val QR_BIT = 7
+            val OPCODE_SIZE = 4
+            val OPCODE_START = 3
+            val AA_BIT = 2
+            val TC_BIT = 1
+            val RD_BIT = 0
+            qr = getBit(flags1, QR_BIT)
+            opcode = getBits(flags1, OPCODE_START, OPCODE_SIZE)
+            aa = getBit(flags1, AA_BIT)
+            tc = getBit(flags1, TC_BIT)
+            rd = getBit(flags1, RD_BIT)
+
+            // Second flag byte: RA, 0, 0, 0, Rcode
+            val RA_BIT = 7
+            val ZEROS_START = 4
+            val ZEROS_SIZE = 3
+            val RCODE_START = 0
+            val RCODE_SIZE = 4
+            val flags2 = buffer.get()
+            ra = getBit(flags2, RA_BIT)
+            z = getBits(flags2, ZEROS_START, ZEROS_SIZE)
+            rcode = getBits(flags2, RCODE_START, RCODE_SIZE)
+            val numQuestions = buffer.short
+            val numAnswers = buffer.short
+            val numAuthorities = buffer.short
+            val numAdditional = buffer.short
+            // var dnsQuestionArray = DnsQuestion()
+            //var question : Array<DnsPacket.DnsQuestion> ?= null
+            var question = ArrayList<DnsQuestion>(numQuestions.toInt())
+            for (i in 0 until numQuestions) {
+                question[i] = DnsQuestion()
+                question[i].name = readName(buffer)
+                question[i].qtype = buffer.short
+                question[i].qclass = buffer.short
+            }
+            answer = readRecords(buffer, numAnswers)
+            authority = readRecords(buffer, numAuthorities)
+            additional = readRecords(buffer, numAdditional)
+        } catch (e: BufferUnderflowException) {
+            val p = ProtocolException("Packet too short")
+            p.initCause(e)
+            throw p
+        }
+    }
+
+
+
+    //TODO: Find a way to change the throws exception
     @Throws(BufferUnderflowException::class, ProtocolException::class)
     private fun readName(buffer: ByteBuffer): String {
         val nameBuffer = StringBuilder()
@@ -114,67 +173,18 @@ class DnsPacket(data: ByteArray?) {
         return ((src.toInt() ushr start) and mask) as Byte
     }
 
-    @Throws(ProtocolException::class)
-    fun Constructor(data: ByteArray?) {
-        this.data = data!!
-        val buffer = ByteBuffer.wrap(data)
-        try {
-            id = buffer.short
-            // First flag byte: QR, Opcode (4 bits), AA, RD, RA
-            val flags1 = buffer.get()
-            val QR_BIT = 7
-            val OPCODE_SIZE = 4
-            val OPCODE_START = 3
-            val AA_BIT = 2
-            val TC_BIT = 1
-            val RD_BIT = 0
-            qr = getBit(flags1, QR_BIT)
-            opcode = getBits(flags1, OPCODE_START, OPCODE_SIZE)
-            aa = getBit(flags1, AA_BIT)
-            tc = getBit(flags1, TC_BIT)
-            rd = getBit(flags1, RD_BIT)
 
-            // Second flag byte: RA, 0, 0, 0, Rcode
-            val RA_BIT = 7
-            val ZEROS_START = 4
-            val ZEROS_SIZE = 3
-            val RCODE_START = 0
-            val RCODE_SIZE = 4
-            val flags2 = buffer.get()
-            ra = getBit(flags2, RA_BIT)
-            z = getBits(flags2, ZEROS_START, ZEROS_SIZE)
-            rcode = getBits(flags2, RCODE_START, RCODE_SIZE)
-            val numQuestions = buffer.short
-            val numAnswers = buffer.short
-            val numAuthorities = buffer.short
-            val numAdditional = buffer.short
-           // var dnsQuestionArray = DnsQuestion()
-            //var question : Array<DnsPacket.DnsQuestion> ?= null
-            var question = ArrayList<DnsQuestion>(numQuestions.toInt())
-            for (i in 0 until numQuestions) {
-                question[i] = DnsQuestion()
-                question[i].name = readName(buffer)
-                question[i].qtype = buffer.short
-                question[i].qclass = buffer.short
-            }
-            answer = readRecords(buffer, numAnswers)
-            authority = readRecords(buffer, numAuthorities)
-            additional = readRecords(buffer, numAdditional)
-        } catch (e: BufferUnderflowException) {
-            val p = ProtocolException("Packet too short")
-            p.initCause(e)
-            throw p
-        }
-    }
-
+    //TODO : Check why
     fun getId(): Short {
         return id
     }
 
+    //TODO : Check why
     fun isNormalQuery(): Boolean {
         return !qr && question.size > 0 && z.toInt() == 0 && authority.size == 0 && answer.size == 0
     }
 
+    //TODO : Check why
     fun isResponse(): Boolean {
         return qr
     }
@@ -191,6 +201,7 @@ class DnsPacket(data: ByteArray?) {
         } else 0
     }
 
+    //TODO : Check why
     fun getResponseAddresses(): List<InetAddress>? {
         val addresses: MutableList<InetAddress> =
             ArrayList()
@@ -211,3 +222,4 @@ class DnsPacket(data: ByteArray?) {
     }
 
 }
+*/

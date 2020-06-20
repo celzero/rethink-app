@@ -1,6 +1,7 @@
 package com.celzero.bravedns.service
 
 import android.app.*
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -11,15 +12,18 @@ import android.net.NetworkInfo
 import android.net.VpnService
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
+import android.os.SystemClock
 import android.preference.PreferenceManager
+import android.service.quicksettings.TileService
 import android.text.TextUtils
 import android.util.Log
 import androidx.annotation.GuardedBy
 import androidx.annotation.WorkerThread
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.celzero.bravedns.R
+import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.ui.HomeScreenActivity
-import com.celzero.bravedns.ui.HomeScreenFragment
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.internal.synchronized
 import protect.Protector
@@ -28,17 +32,21 @@ import java.util.*
 class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector , OnSharedPreferenceChangeListener {
 
 
-    private val LOG_TAG = "BraveVPNService"
-    private val SERVICE_ID = 1 // Only has to be unique within this app.
 
-    private val MAIN_CHANNEL_ID = "vpn"
-    private val WARNING_CHANNEL_ID = "warning"
-    private val NO_PENDING_CONNECTION = "This value is not a possible URL."
 
     @GuardedBy("vpnController")
     private var networkManager: NetworkManager? = null
 
-    private val vpnController : VpnController ?= VpnController().getInstance()
+    companion object{
+        private const val LOG_TAG = "BraveVPNService"
+        private const val SERVICE_ID = 1 // Only has to be unique within this app.
+
+        private const val MAIN_CHANNEL_ID = "vpn"
+        private const val WARNING_CHANNEL_ID = "warning"
+        private const val NO_PENDING_CONNECTION = "This value is not a possible URL."
+        private val vpnController : VpnController ?= VpnController.getInstance()
+    }
+
 
     @GuardedBy("vpnController")
     private var url : String ?= null
@@ -70,6 +78,8 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
     fun isOn(): Boolean {
         return vpnAdapter != null
     }
+
+
 
 
     fun newBuilder(): Builder? {
@@ -107,15 +117,17 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
 
     @InternalCoroutinesApi
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        url = "https://fast.bravedns.com/hussain1"
+
         Log.i("VpnService",String.format("Starting DNS VPN service, url=%s", url))
         val persistantState = PersistantState()
         //vpnController = vpnController!!.getInstance()
         if (vpnController != null) {
             synchronized(vpnController){
                 Log.i("VpnService",String.format("Starting DNS VPN service, url=%s", url))
+                //TODO Move this hardcoded url to Persistent state
                 url = persistantState.getServerUrl(this)
-
+                url = "https://fast.bravedns.com/hussain1"
+                Log.i("VpnService",String.format("Starting DNS VPN service, url=%s", url))
                 // Registers this class as a listener for user preference changes.
                 PreferenceManager.getDefaultSharedPreferences(this)
                     .registerOnSharedPreferenceChangeListener(this)
@@ -146,7 +158,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
                 val mainActivityIntent = PendingIntent.getActivity(
                     this,
                     0,
-                    Intent(this, HomeScreenFragment::class.java),
+                    Intent(this, HomeScreenActivity::class.java),
                     PendingIntent.FLAG_UPDATE_CURRENT
                 )
 
@@ -180,7 +192,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
                     }
                 }
 
-                builder.setSmallIcon(R.drawable.ic_firewall)
+                builder.setSmallIcon(R.drawable.shield_green)
                     .setContentTitle(resources.getText(R.string.notification_content))
                     .setContentText(resources.getText(R.string.notification_content))
                     .setContentIntent(mainActivityIntent)
@@ -218,6 +230,41 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
     @WorkerThread
     private fun updateServerConnection() {
         vpnAdapter!!.updateDohUrl()
+    }
+
+
+    fun recordTransaction(transaction: Transaction) {
+        Log.i("BraveDNS","New Transaction : " + transaction.name)
+        transaction.responseTime = SystemClock.elapsedRealtime()
+        transaction.responseCalendar = Calendar.getInstance()
+        getTracker()!!.recordTransaction(this, transaction)
+        val intent = Intent(InternalNames.RESULT.name)
+        intent.putExtra(InternalNames.TRANSACTION.name, transaction)
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+        if (!networkConnected) {
+            // No need to update the user-visible connection state while there is no network.
+            return
+        }
+
+        // Update the connection state.  If the transaction succeeded, then the connection is working.
+        // If the transaction failed, then the connection is not working.
+        // If the transaction was canceled, then we don't have any new information about the status
+        // of the connection, so we don't send an update.
+        if (transaction.status === Transaction.Status.COMPLETE) {
+            vpnController!!.onConnectionStateChanged(
+                this,
+                State.WORKING
+            )
+        } else if (transaction.status !== Transaction.Status.CANCELED) {
+            vpnController!!.onConnectionStateChanged(
+                this,
+               State.FAILING
+            )
+        }
+    }
+
+    private fun getTracker(): QueryTracker? {
+        return vpnController!!.getTracker(this)
     }
 
     @InternalCoroutinesApi
@@ -270,7 +317,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
             val mainActivityIntent = PendingIntent.getActivity(
                 this, 0, Intent(this, HomeScreenActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT
             )
-            builder.setSmallIcon(R.drawable.ic_firewall)
+            builder.setSmallIcon(R.drawable.shield_green)
                 .setContentTitle(resources.getText(R.string.warning_title))
                 .setContentText(resources.getText(R.string.notification_content))
                 .setFullScreenIntent(mainActivityIntent, true) // Open the main UI if possible.
@@ -282,7 +329,16 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
         }
         stopVpnAdapter()
         stopSelf()
-        //updateQuickSettingsTile()
+        updateQuickSettingsTile()
+    }
+
+    private fun updateQuickSettingsTile() {
+        if (VERSION.SDK_INT >= VERSION_CODES.N) {
+            TileService.requestListeningState(
+                this,
+                ComponentName(this, BraveTileService::class.java)
+            )
+        }
     }
 
 

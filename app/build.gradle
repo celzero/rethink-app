@@ -32,7 +32,10 @@ android {
 
 dependencies {
     def room_version = "2.2.3"
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: [
+            'guava-28.2-android.jar',
+            'failureaccess-1.0.1.jar' // Dependency of Guava
+    ], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.core:core-ktx:1.0.2'
@@ -48,7 +51,7 @@ dependencies {
     implementation 'org.minidns:minidns-core:0.3.4'
     implementation 'org.minidns:minidns-hla:0.3.4'
 
-    implementation 'com.squareup.okhttp3:okhttp:4.3.1'
+
 
     implementation 'com.google.code.gson:gson:2.8.6'
 

@@ -92,4 +92,37 @@
   only visible in the system's advanced notifications settings page.">
     Shown when Brave has encountered a problem.
   </string>
+
+    <string name="unknown_server"
+        description="This is a placeholder, used when the server address is unknown.">
+    (unknown server)
+  </string>
+
+    <string name="query_label"
+        description="This text appears under the domain name for which a DNS query was issued.">
+    Query
+  </string>
+
+    <string name="type_label"
+        description="This text appears under the type of query that was issued ('A' or 'AAAA').">
+    Type
+  </string>
+
+    <string name="latency_label"
+        description="This text appears under a measurement of network latency, like '923 ms'.">
+    Latency
+  </string>
+
+    <string name="resolver_label"
+        description="This text appears under a two-letter ISO country code, indicating the country where the
+  DNS resolver is located.">
+    Resolver location
+  </string>
+
+    <string name="destination_label"
+        description="This text appears under a two-letter ISO country code, indicating the country where the
+  resolved domain's IP address is located.">
+    Destination server
+  </string>
+
 </resources>

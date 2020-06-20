@@ -8,8 +8,11 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.celzero.bravedns.R
+import com.celzero.bravedns.net.doh.Transaction
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
+import java.net.InetAddress
+import java.util.*
 
 class ApplicationManagerApk (packageInfo: PackageInfo, context : Context) : AbstractItem<ApplicationManagerApk.ViewHolder>() {
 
@@ -65,4 +68,7 @@ class ApplicationManagerApk (packageInfo: PackageInfo, context : Context) : Abst
         }
 
     }
+
+
+
 }

@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="1dp"
+    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+    android:layout_marginRight="@dimen/activity_horizontal_margin"
+    android:layout_marginBottom="1dp"
+    android:animateLayoutChanges="true"
+    android:orientation="vertical"
+    android:background="@color/cardview_dark_background">
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      tools:background="@color/cardview_dark_background"
+      android:orientation="horizontal">
+
+    <TextView
+            android:id="@+id/flag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:layout_margin="8dp"
+            android:layout_gravity="start|center_vertical"
+            android:ellipsize="none"
+            android:minWidth="40dp"
+            android:singleLine="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textSize="30sp"
+            tools:text="🇩🇪" />
+
+    <TextView
+        android:id="@+id/hostname"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|center_vertical"
+        android:layout_weight="1"
+        android:ellipsize="start"
+        android:singleLine="true"
+        tools:text="longlonglonglonglonglonglonglongexample.com"/>
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.1"/>
+
+    <TextView
+        android:id="@+id/response_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|center_vertical"
+        android:layout_weight="0"
+        android:singleLine="true"
+        android:textColor="@color/accent_good"
+        tools:text="17:54:11"/>
+
+    <!-- This button's background image is set by Java code as a workaround for lack of support
+    for vector background drawables on pre-Lollipop Android.  See
+    https://medium.com/@ferrand.d/can-you-and-should-you-use-vector-drawables-a-cheatsheet-32a2e1cc2ecf-->
+    <ToggleButton
+        android:id="@+id/expand"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="end|center_vertical"
+        android:layout_margin="10dp"
+        android:layout_weight="0"
+        android:scrollbars="none"
+        android:textOff=""
+        android:textOn="" />
+  </LinearLayout>
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+      android:id="@+id/details"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:paddingBottom="8dp"
+      android:paddingLeft="8dp"
+      android:paddingRight="8dp"
+      android:visibility="gone"
+      tools:visibility="visible">
+
+    <View
+        android:id="@+id/query_spacer"
+        android:layout_width="2dp"
+        android:layout_height="72dp"
+        android:background="@color/accent_good"
+        app:layout_constraintEnd_toEndOf="@id/query_icon"
+        app:layout_constraintStart_toStartOf="@id/query_icon"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <ImageView
+        android:id="@+id/query_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:tint="@color/accent_good"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/query_spacer"
+        app:srcCompat="@drawable/ic_dns"
+        tools:ignore="ContentDescription"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/query_label"
+        app:layout_constraintBottom_toTopOf="@+id/fqdn"
+        app:layout_constraintStart_toStartOf="@+id/fqdn"/>
+
+    <TextView
+        android:id="@+id/fqdn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="none"
+        android:scrollbars="horizontal"
+        android:singleLine="true"
+        android:textAppearance="@android:style/TextAppearance.Large"
+        android:textIsSelectable="true"
+        app:layout_constraintBottom_toBottomOf="@+id/query_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/query_icon"
+        app:layout_constraintTop_toTopOf="@+id/query_icon"
+        android:textAlignment="viewStart"
+        android:layout_gravity="start"
+        tools:text="longlonglonglonglonglongexample.com"/>
+
+    <View
+        android:id="@+id/type_spacer"
+        android:layout_width="2dp"
+        android:layout_height="72dp"
+        android:background="@color/accent_good"
+        app:layout_constraintEnd_toEndOf="@id/query_icon"
+        app:layout_constraintStart_toStartOf="@id/query_icon"
+        app:layout_constraintTop_toBottomOf="@+id/query_icon"/>
+
+    <ImageView
+        android:id="@+id/type_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:tint="@color/accent_good"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/type_spacer"
+        app:srcCompat="@drawable/ic_pageview_black_24dp"
+        tools:ignore="ContentDescription"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/type_label"
+        app:layout_constraintBottom_toTopOf="@+id/qtype"
+        app:layout_constraintStart_toStartOf="@+id/qtype"/>
+
+    <TextView
+        android:id="@+id/qtype"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@android:style/TextAppearance.Large"
+        app:layout_constraintBottom_toBottomOf="@+id/type_icon"
+        app:layout_constraintStart_toEndOf="@+id/type_icon"
+        app:layout_constraintTop_toTopOf="@+id/type_icon"
+        tools:text="AAAA"/>
+
+    <View
+        android:id="@+id/latency_spacer"
+        android:layout_width="2dip"
+        android:layout_height="72dp"
+        android:background="@color/accent_good"
+        app:layout_constraintEnd_toEndOf="@id/query_icon"
+        app:layout_constraintStart_toStartOf="@id/query_icon"
+        app:layout_constraintTop_toBottomOf="@+id/type_icon"/>
+
+    <ImageView
+        android:id="@+id/latency_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:tint="@color/accent_good"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/latency_spacer"
+        app:srcCompat="@drawable/ic_access_time_black_24dp"
+        tools:ignore="ContentDescription"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/latency_label"
+        app:layout_constraintBottom_toTopOf="@+id/latency_small"
+        app:layout_constraintStart_toStartOf="@+id/latency_small"/>
+
+    <TextView
+        android:id="@+id/latency_small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@android:style/TextAppearance.Large"
+        app:layout_constraintBottom_toBottomOf="@id/latency_icon"
+        app:layout_constraintStart_toEndOf="@id/latency_icon"
+        app:layout_constraintTop_toTopOf="@id/latency_icon"
+        tools:text="72 ms"/>
+
+    <View
+        android:id="@+id/resolver_spacer"
+        android:layout_width="2dp"
+        android:layout_height="72dp"
+        android:background="@color/accent_good"
+        app:layout_constraintEnd_toEndOf="@id/query_icon"
+        app:layout_constraintStart_toStartOf="@id/query_icon"
+        app:layout_constraintTop_toBottomOf="@id/latency_icon"/>
+
+    <ImageView
+        android:id="@+id/resolver_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:tint="@color/accent_good"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/resolver_spacer"
+        app:srcCompat="@drawable/ic_server"
+        tools:ignore="ContentDescription"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/resolver_label"
+        app:layout_constraintBottom_toTopOf="@id/resolver"
+        app:layout_constraintStart_toStartOf="@id/resolver"/>
+
+    <TextView
+        android:id="@+id/resolver"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="none"
+        android:scrollbars="horizontal"
+        android:singleLine="true"
+        android:textAppearance="@android:style/TextAppearance.Large"
+        android:textIsSelectable="true"
+        app:layout_constraintBottom_toBottomOf="@id/resolver_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@id/resolver_icon"
+        app:layout_constraintTop_toTopOf="@id/resolver_icon"
+        android:textAlignment="viewStart"
+        android:layout_gravity="start"
+        tools:text="AU (2404:6800:4006:809::200e)"/>
+
+    <View
+        android:id="@+id/response_spacer"
+        android:layout_width="2dp"
+        android:layout_height="72dp"
+        android:background="@color/accent_good"
+        app:layout_constraintEnd_toEndOf="@id/query_icon"
+        app:layout_constraintStart_toStartOf="@id/query_icon"
+        app:layout_constraintTop_toBottomOf="@id/resolver_icon"/>
+
+    <ImageView
+        android:id="@+id/response_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:tint="@color/accent_good"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/response_spacer"
+        app:srcCompat="@drawable/ic_location_on_black_24dp"
+        tools:ignore="ContentDescription"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/destination_label"
+        app:layout_constraintBottom_toTopOf="@id/response"
+        app:layout_constraintStart_toStartOf="@id/response"/>
+
+    <TextView
+        android:id="@+id/response"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="none"
+        android:scrollbars="horizontal"
+        android:singleLine="true"
+        android:textAppearance="@android:style/TextAppearance.Large"
+        android:textIsSelectable="true"
+        app:layout_constraintBottom_toBottomOf="@id/response_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@id/response_icon"
+        app:layout_constraintTop_toTopOf="@id/response_icon"
+        android:textAlignment="viewStart"
+        android:layout_gravity="start"
+        tools:text="US (192.0.2.1)"/>
+  </androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

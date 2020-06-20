@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <color name="accent_good">#536dfe</color>
+    <color name="accent_bad">#ff4081</color>
+    <color name="background">#202124</color>
+    <color name="floating">#2d2d2d</color>
+    <color name="light">#393939</color>
+    <color name="indicator">#deffffff</color>
+
     <color name="colorPrimary">#6339AA</color>
     <color name="colorPrimaryDark">#6339AA</color>
     <color name="lightColorPrimary">#C5CAE9</color>

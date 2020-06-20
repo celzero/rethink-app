@@ -112,9 +112,10 @@ public class GoVpnAdapter {
     // Strip leading "/" from ip:port string.
     listener = new GoIntraListener(vpnService);
     PersistantState persistentState  = new PersistantState();
-    VpnController vpnController = new VpnController();
-    String dohURL = persistentState.getServerUrl(vpnService);
-
+    //VpnController vpnController = new VpnController();
+    //TODO : The below statement in correct, adding the dohURL as const for testing
+    //String dohURL = persistentState.getServerUrl(vpnService);
+    String dohURL = "https://fast.bravedns.com/hussain1";
     try {
       Log.d("VPN Tag", "Starting go-tun2socks");
       Transport transport = makeDohTransport(dohURL);
@@ -123,7 +124,7 @@ public class GoVpnAdapter {
     } catch (Exception e) {
       Log.d("VPN Tag",e.getMessage());
       tunnel = null;
-      vpnController.getInstance().onConnectionStateChanged(vpnService, BraveVPNService.State.FAILING);
+      VpnController.Companion.getInstance().onConnectionStateChanged(vpnService, BraveVPNService.State.FAILING);
     }
   }
 
@@ -200,13 +201,15 @@ public class GoVpnAdapter {
     PersistantState persistentState  = new PersistantState();
     VpnController vpnController = new VpnController();
     String url = persistentState.getServerUrl(vpnService);
+    //TODO : Change the hardcode value
+    url = "https://fast.bravedns.com/hussain1";
     try {
       tunnel.setDNS(makeDohTransport(url));
     } catch (Exception e) {
       Log.d("VPN Tag",e.getMessage());
       tunnel.disconnect();
       tunnel = null;
-      vpnController.getInstance().onConnectionStateChanged(vpnService, BraveVPNService.State.FAILING);
+      VpnController.Companion.getInstance().onConnectionStateChanged(vpnService, BraveVPNService.State.FAILING);
     }
   }
 
