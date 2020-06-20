@@ -153,6 +153,6 @@ public class GoIntraListener implements tunnel.IntraListener {
     transaction.status = goStatusMap.get(summary.getStatus());
     transaction.responseCalendar = Calendar.getInstance();
 
-    //vpnService.recordTransaction(transaction);
+    vpnService.recordTransaction(transaction);
   }
 }

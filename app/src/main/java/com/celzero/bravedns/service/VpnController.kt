@@ -4,14 +4,29 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 class VpnController {
 
-    private var dnsVpnServiceState: VpnController? = null
 
-    private var braveVpnService : BraveVPNService ?= null
-    private var connectionState: BraveVPNService.State? = null
+
+    companion object{
+        private var dnsVpnServiceState: VpnController? = null
+        private var braveVpnService : BraveVPNService ? = null
+        private var connectionState: BraveVPNService.State? = null
+        private var tracker: QueryTracker? = null
+
+        @Synchronized
+        fun getInstance(): VpnController? {
+            if (dnsVpnServiceState == null) {
+                dnsVpnServiceState = VpnController()
+            }
+            return dnsVpnServiceState
+        }
+    }
+
+
     //private val tracker: QueryTracker? = null
 
     @Throws(CloneNotSupportedException::class)
@@ -19,25 +34,19 @@ class VpnController {
         throw CloneNotSupportedException()
     }
 
-    @Synchronized
-    fun getInstance(): VpnController? {
-        if (dnsVpnServiceState == null) {
-            dnsVpnServiceState = VpnController()
-        }
-        return dnsVpnServiceState
-    }
+
 
 
 
     fun setBraveVpnService(braveVpnService: BraveVPNService?) {
         if (braveVpnService != null) {
-            this.braveVpnService = braveVpnService
+            VpnController.braveVpnService = braveVpnService
         }
     }
 
 
     fun getBraveVpnService(): BraveVPNService? {
-            return this.braveVpnService
+            return braveVpnService
     }
 
 
@@ -66,9 +75,9 @@ class VpnController {
     @Synchronized
     fun start(context: Context) {
         Log.e("BraveDNS","Controller onStart called")
-        /*if (braveVpnService != null) {
+        if (braveVpnService != null) {
             return
-        }*/
+        }
         val persistantState = PersistantState()
         persistantState.setVpnEnabled(context, true)
         stateChanged(context)
@@ -95,13 +104,18 @@ class VpnController {
 
     @Synchronized
     fun stop(context: Context?) {
+        Log.e("BraveDNS", "Vpn Controller Stop")
         val persistantState = PersistantState()
         persistantState.setVpnEnabled(context!!, false)
         connectionState = null
+        Log.e("BraveDNS", "Vpn Controller Stop 1")
         if (braveVpnService != null) {
+            Toast.makeText(context,"BraveDNS Stopped",Toast.LENGTH_SHORT).show()
             braveVpnService!!.signalStopService(true)
+            braveVpnService = null
         }
-        braveVpnService?.let {braveVPNService ->null   }
+
+        //braveVpnService?.let {braveVPNService ->null   }
         stateChanged(context!!)
     }
 
@@ -111,6 +125,14 @@ class VpnController {
         val requested: Boolean = persistantState.getVpnEnabled(context!!)
         val on = braveVpnService != null && braveVpnService!!.isOn()
         return VpnState(requested, on, connectionState)
+    }
+
+    @Synchronized
+    fun getTracker(context: Context?): QueryTracker? {
+        if (tracker == null) {
+            tracker = QueryTracker(context)
+        }
+        return tracker
     }
 
 

@@ -39,7 +39,7 @@ public class GoProber extends Prober {
 
   @Override
   public void probe(String url, Callback callback) {
-    VpnController vpnController = new VpnController().getInstance();
+    VpnController vpnController = VpnController.Companion.getInstance();
     new Thread(() -> {
       String dohIPs = GoVpnAdapter.getIpString(context, url);
       try {

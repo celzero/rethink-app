@@ -23,6 +23,8 @@ import com.celzero.bravedns.net.go.GoProber;
  * This class performs parallel probes to all of the specified servers and calls the listener when
  * the fastest probe succeeds or all probes have failed.  Each instance can only be used once.
  */
+
+//TODO : Why you are not using it ???????
 public class Race {
 
   public interface Listener {

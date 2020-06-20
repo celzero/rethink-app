@@ -139,6 +139,7 @@
             android:layout_marginRight="1dp"
             android:layout_weight="1">
             <LinearLayout
+                android:id="@+id/fhs_ll_firewall"
                 android:layout_width="match_parent"
                 android:orientation="vertical"
                 android:layout_height="match_parent"
@@ -288,6 +289,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1">
             <LinearLayout
+                android:id="@+id/fhs_ll_query"
                 android:layout_width="match_parent"
                 android:orientation="vertical"
                 android:layout_height="match_parent"
@@ -310,7 +312,7 @@
                 <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Internet\nManager"
+                    android:text="Recent\nQueries"
                     android:layout_weight="1.8"
                     android:gravity="center"
                     android:padding="5dp"
