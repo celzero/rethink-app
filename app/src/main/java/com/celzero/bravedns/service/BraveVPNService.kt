@@ -23,22 +23,23 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.net.go.GoVpnAdapter
+import com.celzero.bravedns.net.manager.ConnectionTracer
 import com.celzero.bravedns.ui.HomeScreenActivity
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.internal.synchronized
 import protect.Protector
+import protect.Blocker;
 import java.util.*
 
-class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector , OnSharedPreferenceChangeListener {
-
-
-
+class BraveVPNService:
+    VpnService(), NetworkManager.NetworkListener, Protector, Blocker, OnSharedPreferenceChangeListener {
 
     @GuardedBy("vpnController")
     private var networkManager: NetworkManager? = null
 
     companion object{
         private const val LOG_TAG = "BraveVPNService"
+        private const val DEBUG = false
         private const val SERVICE_ID = 1 // Only has to be unique within this app.
 
         private const val MAIN_CHANNEL_ID = "vpn"
@@ -46,7 +47,6 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
         private const val NO_PENDING_CONNECTION = "This value is not a possible URL."
         private val vpnController : VpnController ?= VpnController.getInstance()
     }
-
 
     @GuardedBy("vpnController")
     private var url : String ?= null
@@ -56,8 +56,35 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
 
     private var networkConnected = false
 
+    private lateinit var connTracer: ConnectionTracer
+
     enum class State {
         NEW, WORKING, FAILING
+    }
+
+    override fun block(protocol: Int, sourceAddress: String, destAddress: String): Boolean {
+        val first = sourceAddress.split(":")
+        val second = destAddress.split(":")
+        try {
+            val uid = connTracer.getUidQ(
+                protocol,
+                first[0],
+                first[first.size-1].toInt(),
+                second[0],
+                second[second.size-1].toInt()
+            )
+            return isUidBlocked(uid)
+        } catch (iex: Exception) {
+            Log.e(LOG_TAG, iex.message, iex)
+        }
+        return false
+    }
+
+    private fun isUidBlocked(uid: Int): Boolean {
+        val packageName = packageManager.getNameForUid(uid)
+        if (DEBUG) Log.d(LOG_TAG, "uid: $uid / packageName: $packageName")
+        // TODO: Implementation pending
+        return false
     }
 
     override fun getResolvers(): String {
@@ -77,9 +104,6 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
     fun isOn(): Boolean {
         return vpnAdapter != null
     }
-
-
-
 
     fun newBuilder(): Builder? {
         var builder = Builder()
@@ -103,11 +127,9 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
         return builder
     }
 
-
     override fun onCreate() {
-
+        connTracer = ConnectionTracer(this)
         vpnController!!.setBraveVpnService(this)
-
     }
 
     @InternalCoroutinesApi
@@ -117,7 +139,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
         //val persistantState = PersistantState()
         //vpnController = vpnController!!.getInstance()
         if (vpnController != null) {
-            synchronized(vpnController){
+            synchronized(vpnController) {
                 Log.i("VpnService",String.format("Starting DNS VPN service, url=%s", url))
                 //TODO Move this hardcoded url to Persistent state
                 //url = persistantState.getServerUrl(this)
@@ -213,7 +235,6 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
         vpnAdapter!!.updateDohUrl()
     }
 
-
     fun recordTransaction(transaction: Transaction) {
         Log.i("BraveDNS","New Transaction : " + transaction.name)
         transaction.responseTime = SystemClock.elapsedRealtime()
@@ -261,7 +282,6 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
             spawnServerUpdate()
         }
     }
-
 
     fun signalStopService(userInitiated: Boolean) {
         Log.i("VpnService",String.format("Received stop signal. User initiated: %b", userInitiated))
@@ -312,7 +332,6 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
             TileService.requestListeningState(this,ComponentName(this, BraveTileService::class.java))
         }
     }
-
 
     private fun stopVpnAdapter() {
         if (vpnController != null) {
@@ -413,7 +432,6 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
             }
         }
     }
-
 
     override fun onDestroy() {
         kotlin.synchronized(vpnController!!) {
