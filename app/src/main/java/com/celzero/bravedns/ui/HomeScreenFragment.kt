@@ -1,8 +1,6 @@
 package com.celzero.bravedns.ui
 
-//Removed code for VPN
-//import com.celzero.bravedns.service.DnsService
-//import com.celzero.bravedns.service.DnsService.Companion.startVpn
+
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -28,16 +26,13 @@ class HomeScreenFragment : Fragment(){
     lateinit var appManagerLL : LinearLayout
     private lateinit var permManagerLL : LinearLayout
     private lateinit var queryViewerLL : LinearLayout
+    private lateinit var firewallLL : LinearLayout
     //Removed code for VPN
     private var isServiceRunning : Boolean = false
 
-    private var REQUEST_CODE : Int = 100
+    private var REQUEST_CODE_PREPARE_VPN : Int = 100
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         val view: View = inflater.inflate(R.layout.fragment_home_screen,container,false)
         //contextVal = context!!
@@ -45,6 +40,7 @@ class HomeScreenFragment : Fragment(){
         appManagerLL = view.findViewById(R.id.fhs_ll_app_mgr)
         permManagerLL = view.findViewById(R.id.fhs_ll_perm_mgr)
         queryViewerLL = view.findViewById(R.id.fhs_ll_query)
+        firewallLL = view.findViewById(R.id.fhs_ll_firewall)
 
         isServiceRunning = isServiceRunning(requireContext(),BraveVPNService::class.java)
         //Removed code for VPN
@@ -87,11 +83,20 @@ class HomeScreenFragment : Fragment(){
             startQueryListener()
         })
 
+        firewallLL.setOnClickListener(View.OnClickListener{
+            startFirewallActivity()
+        })
+
         return view
     }
 
     private fun startQueryListener() {
         val intent = Intent(requireContext(), QueryDetailActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun startFirewallActivity(){
+        val intent = Intent(requireContext(), FirewallActivity::class.java)
         startActivity(intent)
     }
 
@@ -138,11 +143,8 @@ class HomeScreenFragment : Fragment(){
         if (prepareVpnIntent != null) {
 
             Log.i("BraveVPN", "Prepare VPN with activity")
-            startActivityForResult(
-                prepareVpnIntent,
-                REQUEST_CODE
-            )
-            //TODO
+            startActivityForResult( prepareVpnIntent, REQUEST_CODE_PREPARE_VPN)
+            //TODO - Check the below code
             //syncDnsStatus() // Set DNS status to off in case the user does not grant VPN permissions
             return false
         }
@@ -200,8 +202,10 @@ class HomeScreenFragment : Fragment(){
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.e("BraveDNS","OnActivityResult - RequestCode: "+requestCode + " - ResultCode :"+resultCode)
-        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+        if (requestCode == REQUEST_CODE_PREPARE_VPN && resultCode == Activity.RESULT_OK) {
             startDnsVpnService()
+        }else{
+            stopDnsVpnService()
         }
     }
 

@@ -9,8 +9,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 class VpnController {
 
-
-
     companion object{
         private var dnsVpnServiceState: VpnController? = null
         private var braveVpnService : BraveVPNService ? = null
@@ -51,10 +49,7 @@ class VpnController {
 
 
     @Synchronized
-    fun onConnectionStateChanged(
-        context: Context?,
-        state: BraveVPNService.State?
-    ) {
+    fun onConnectionStateChanged(context: Context?, state: BraveVPNService.State? ) {
         if (braveVpnService == null) {
             // User clicked disable while the connection state was changing.
             return
@@ -112,9 +107,9 @@ class VpnController {
         if (braveVpnService != null) {
             Toast.makeText(context,"BraveDNS Stopped",Toast.LENGTH_SHORT).show()
             braveVpnService!!.signalStopService(true)
-            braveVpnService = null
+            //braveVpnService = null
         }
-
+        braveVpnService = null
         //braveVpnService?.let {braveVPNService ->null   }
         stateChanged(context!!)
     }

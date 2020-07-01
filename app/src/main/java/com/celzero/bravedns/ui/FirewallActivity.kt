@@ -70,7 +70,7 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
                 allPackages.forEach {
                     val firewallApk = FirewallApk(it,context )
                     //if((applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0){
-                    PermissionsManager.packageRules[it.packageName] = PermissionsManager.Rules.NONE
+                    //PermissionsManager.packageRules[it.packageName] = PermissionsManager.Rules.NONE
                     //PermissionsManager.packageRules.put(it.packageName, PermissionsManager.Rules.NONE)
                     HomeScreenActivity.dbHandler.updatePackage(it.packageName,0)
                     context.apkList.add(firewallApk)

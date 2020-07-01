@@ -61,8 +61,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
     }
 
     override fun getResolvers(): String {
-        val ips: MutableList<String?> =
-            ArrayList()
+        val ips: MutableList<String?> = ArrayList()
         val ipsList = networkManager!!.getSystemResolvers()
         if (ipsList != null) {
             for (ip in ipsList) {
@@ -98,11 +97,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
                 builder = builder.addDisallowedApplication("com.android.vending")
             } catch (e: PackageManager.NameNotFoundException) {
                 //LogWrapper.logException(e)
-                Log.e(
-                   LOG_TAG,
-                    "Failed to exclude an app",
-                    e
-                )
+                Log.e(LOG_TAG,"Failed to exclude an app",e)
             }
         }
         return builder
@@ -119,13 +114,13 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         Log.i("VpnService",String.format("Starting DNS VPN service, url=%s", url))
-        val persistantState = PersistantState()
+        //val persistantState = PersistantState()
         //vpnController = vpnController!!.getInstance()
         if (vpnController != null) {
             synchronized(vpnController){
                 Log.i("VpnService",String.format("Starting DNS VPN service, url=%s", url))
                 //TODO Move this hardcoded url to Persistent state
-                url = persistantState.getServerUrl(this)
+                //url = persistantState.getServerUrl(this)
                 url = "https://fast.bravedns.com/hussain1"
                 Log.i("VpnService",String.format("Starting DNS VPN service, url=%s", url))
                 // Registers this class as a listener for user preference changes.
@@ -168,21 +163,11 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
                     val description = getString(R.string.notification_content)
                     // LOW is the lowest importance that is allowed with startForeground in Android O.
                     val importance = NotificationManager.IMPORTANCE_LOW
-                    val channel = NotificationChannel(
-                        MAIN_CHANNEL_ID,
-                        name,
-                        importance
-                    )
+                    val channel = NotificationChannel(MAIN_CHANNEL_ID,name,importance)
                     channel.description = description
-                    val notificationManager =
-                        getSystemService(
-                            NotificationManager::class.java
-                        )
+                    val notificationManager = getSystemService(NotificationManager::class.java)
                     notificationManager.createNotificationChannel(channel)
-                    builder = Notification.Builder(
-                        this,
-                        MAIN_CHANNEL_ID
-                    )
+                    builder = Notification.Builder(this, MAIN_CHANNEL_ID)
                 } else {
                     builder = Notification.Builder(this)
                     if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
@@ -193,7 +178,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
                 }
 
                 builder.setSmallIcon(R.drawable.shield_green)
-                    .setContentTitle(resources.getText(R.string.notification_content))
+                    .setContentTitle(resources.getText(R.string.notification_title))
                     .setContentText(resources.getText(R.string.notification_content))
                     .setContentIntent(mainActivityIntent)
 
@@ -204,20 +189,16 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
                 }
 
                 startForeground(SERVICE_ID, builder.notification)
-
+                updateQuickSettingsTile()
             }
         }
-
-
-
-
-        return super.onStartCommand(intent, flags, startId)
+        return Service.START_REDELIVER_INTENT
     }
 
     @InternalCoroutinesApi
     private fun spawnServerUpdate() {
         if (vpnController != null) {
-            synchronized(vpnController!!) {
+            synchronized(vpnController) {
                 if (networkManager != null) {
                     Thread(
                         Runnable { updateServerConnection() }, "updateServerConnection-onStartCommand"
@@ -269,6 +250,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
 
     @InternalCoroutinesApi
     override fun onSharedPreferenceChanged(preferences: SharedPreferences?, key: String?) {
+        //TODO Check on the PersistantState variable
         val persistantState = PersistantState()
         if (persistantState.APPS_KEY.equals(key) && vpnAdapter != null) {
             // Restart the VPN so the new app exclusion choices take effect immediately.
@@ -293,19 +275,12 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
                 val name: CharSequence = getString(R.string.warning_channel_name)
                 val description = getString(R.string.warning_channel_description)
                 val importance = NotificationManager.IMPORTANCE_HIGH
-                val channel = NotificationChannel(
-                    WARNING_CHANNEL_ID,
-                    name,
-                    importance
-                )
+                val channel = NotificationChannel( WARNING_CHANNEL_ID, name, importance)
                 channel.description = description
                 channel.enableVibration(true)
                 channel.vibrationPattern = vibrationPattern
                 notificationManager.createNotificationChannel(channel)
-                builder = Notification.Builder(
-                    this,
-                     WARNING_CHANNEL_ID
-                )
+                builder = Notification.Builder(this,WARNING_CHANNEL_ID)
             } else {
                 builder = Notification.Builder(this)
                 builder.setVibrate(vibrationPattern)
@@ -334,10 +309,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
 
     private fun updateQuickSettingsTile() {
         if (VERSION.SDK_INT >= VERSION_CODES.N) {
-            TileService.requestListeningState(
-                this,
-                ComponentName(this, BraveTileService::class.java)
-            )
+            TileService.requestListeningState(this,ComponentName(this, BraveTileService::class.java))
         }
     }
 
@@ -374,28 +346,29 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
     }
 
     private fun makeVpnAdapter(): GoVpnAdapter? {
-        GoVpnAdapter.establish(this)
+        //GoVpnAdapter.establish(this)
         return GoVpnAdapter.establish(this)
     }
 
     override fun onNetworkConnected(networkInfo: NetworkInfo?) {
+        Log.i("VpnService",String.format("Connected event."))
         setNetworkConnected(true)
-        // This code is used to start the VPN for the first time, but startVpn is idempotent, so we can
-        // call it every time. startVpn performs network activity so it has to run on a separate thread.
+
         // This code is used to start the VPN for the first time, but startVpn is idempotent, so we can
         // call it every time. startVpn performs network activity so it has to run on a separate thread.
         Thread(
             object : Runnable {
                 override fun run() {
+                    //TODO Work on the order of the function call.
                     startVpn()
                     updateServerConnection()
-
                 }
             }, "startVpn-onNetworkConnected"
         ).start()
     }
 
     override fun onNetworkDisconnected() {
+        Log.i("VpnService",String.format("Disconnected event."))
         setNetworkConnected(false)
         vpnController!!.onConnectionStateChanged(this, null)
     }
@@ -429,22 +402,44 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
     private fun startVpnAdapter() {
         kotlin.synchronized(vpnController!!) {
             if (vpnAdapter == null) {
-                Log.w(
-                   LOG_TAG,
-                    "Starting VPN adapter"
-                )
+                Log.w(LOG_TAG,"Starting VPN adapter")
                 vpnAdapter = makeVpnAdapter()
                 if (vpnAdapter != null) {
                     vpnAdapter!!.start()
                     //analytics.logStartVPN(vpnAdapter.getClass().getSimpleName())
                 } else {
-                    Log.w(
-                       LOG_TAG,
-                        "Failed to start VPN adapter!"
-                    )
+                    Log.w(LOG_TAG,"Failed to start VPN adapter!")
                 }
             }
         }
+    }
+
+
+    override fun onDestroy() {
+        kotlin.synchronized(vpnController!!) {
+            Log.w(LOG_TAG,"Destroying DNS VPN service")
+
+            PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this)
+            if (networkManager != null) {
+                networkManager!!.destroy()
+            }
+            vpnController!!.setBraveVpnService(null)
+            stopForeground(true)
+            if (vpnAdapter != null) {
+                signalStopService(false)
+            }
+        }
+    }
+
+    override fun onRevoke() {
+        Log.w(LOG_TAG,"VPN service revoked.")
+
+        stopSelf()
+
+        //TODO Check the below code
+        // Disable autostart if VPN permission is revoked.
+        //PersistentState.setVpnEnabled(this, false)
     }
 
 
