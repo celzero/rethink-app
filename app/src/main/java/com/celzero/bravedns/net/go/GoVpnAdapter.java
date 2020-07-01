@@ -185,6 +185,7 @@ public class GoVpnAdapter {
    */
   public synchronized void updateDohUrl() {
     if (tunFd == null) {
+      Log.w("BraveVPN","Tunnel FD is null");
       // Adapter is closed.
       return;
     }
@@ -199,7 +200,7 @@ public class GoVpnAdapter {
     // old transport may be using sockets on a deleted interface, which may block until they time
     // out.
     PersistantState persistentState  = new PersistantState();
-    VpnController vpnController = new VpnController();
+    //VpnController vpnController = new VpnController();
     String url = persistentState.getServerUrl(vpnService);
     //TODO : Change the hardcode value
     url = "https://fast.bravedns.com/hussain1";

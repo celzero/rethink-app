@@ -74,19 +74,6 @@ class HomeScreenActivity : AppCompatActivity() {
         navView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
 
         getAppInfo()
-        //startVpn()
-        //actionOnService(Actions.START)
-
-        /*if (hasPermissions() && hasPermissionToReadNetworkHistory()) {
-            //TODO : Check for the below code and the user ID to watch out.
-            //TODO : ALso need to check for the various uid's
-            //TODO : Why we need this
-
-            //fillNetworkStatsPackage(10134)
-        }else{
-            requestPermissions()
-        }*/
-
 
     }
 

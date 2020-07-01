@@ -125,4 +125,9 @@
     Destination server
   </string>
 
+    <string name="notification_title"
+        description="Status indicator text shown in a persistent notification.">
+    DNS protection is active
+  </string>
+
 </resources>

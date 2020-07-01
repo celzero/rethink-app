@@ -106,11 +106,15 @@ class NetworkManager(context: Context, networkListener: NetworkListener) {
     }
 
     // Returns true if the supplied network is connected and available
+    //TODO : Lookout for ConnectivityManager.NetworkCallback API instead of NetworkInfo
     private fun isConnectedNetwork(networkInfo: NetworkInfo?): Boolean {
         return if (networkInfo == null) {
             false
         } else networkInfo.isConnectedOrConnecting && networkInfo.isAvailable
+
     }
+
+
 
 
     fun getSystemResolvers(): List<InetAddress>? {
