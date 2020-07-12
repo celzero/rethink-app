@@ -10,3 +10,4 @@
 .DS_Store
 /build
 /captures
+/tun2socks/build/
