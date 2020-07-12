@@ -1,3 +1,4 @@
+
 <resources>
     <string name="app_name">Brave DNS</string>
     <string name="app_name_brave">Brave</string>
@@ -128,6 +129,90 @@
     <string name="notification_title"
         description="Status indicator text shown in a persistent notification.">
     DNS protection is active
+  </string>
+
+
+    <string name="status_waiting"
+        description="This text appears during the connection process if Intra needs user permission or the phone is offline.">
+    Waiting&#8230;
+  </string>
+
+    <string name="status_failing"
+        description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">
+    Failing
+  </string>
+
+    <string name="explanation_offline"
+        description="Status indicator shown when there is no network connection.">
+    Your device is offline.  Intra is waiting for a network connection.
+  </string>
+
+    <string name="explanation_vpn"
+        description="Warning text shown on the main screen before the user starts Intra">
+    Brave has detected another VPN on your device.  If you enable Intra, that VPN will be disabled.
+    Brave is not as secure as a trusted VPN.
+  </string>
+
+    <string name="explanation_failing">
+    Warning: Queries are failing.  You may want to choose a different server or restart Intra.
+  </string>
+
+    <string name="status_starting"
+        description="This text briefly appears while starting.">
+    Starting
+  </string>
+
+    <string name="explanation_starting"
+        description="Corresponds to status_starting">
+    Hang tight.  Intra is establishing a server connection.
+  </string>
+
+  <string name="system_details"
+        description="This is the title of a section containing information on the system configuration and
+  status.">
+    System details
+  </string>
+
+    <string name="status_protected"
+        description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">
+    Protected
+  </string>
+
+    <string name="explanation_protected"
+        description="Expanded form of status_protected">
+    Your connection is protected from DNS attacks.
+  </string>
+
+    <string name="status_upgraded"
+        description="This is similar to status_exposed, and indicates weak protection that an attacker could disable.">
+    Vulnerable
+  </string>
+
+    <string name="explanation_upgraded"
+        description="Corresponds to status_upgraded.">
+    Your connection is currently protected by Android Private DNS, but an attacker could disable
+    or undermine this protection.
+  </string>
+
+    <string name="status_strict"
+        description="This is similar to dns_on, but the protection is being provided by the operating system, not by Intra.  It is not color-highlighted.">
+    Protected by Android
+  </string>
+
+    <string name="explanation_strict"
+        description="Explanation on the main screen for users who have Private DNS strict mode enabled at the OS level.">
+    Brave has detected that the Android Private DNS setting is enabled.  This means your DNS
+    queries are already protected, so there\'s no need to enable Intra.
+  </string>
+
+    <string name="status_exposed"
+        description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">
+    Exposed
+  </string>
+
+    <string name="explanation_exposed"
+        description="Expanded form of status_exposed">
+    Your connection is exposed to DNS attacks.
   </string>
 
 </resources>

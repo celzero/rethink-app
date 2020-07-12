@@ -1,7 +1,5 @@
 package com.celzero.bravedns.database
 
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 

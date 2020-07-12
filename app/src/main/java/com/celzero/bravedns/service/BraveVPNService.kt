@@ -1,3 +1,19 @@
+/*
+Copyright 2019 Jigsaw Operations LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package com.celzero.bravedns.service
 
 import android.app.*
@@ -86,11 +102,11 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
         if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
             // Some WebRTC apps rely on the ability to bind to specific interfaces, which is only
             // possible if we allow bypass.
-            var persistantState = PersistantState()
+
             builder = builder.allowBypass()
             try {
                 // Workaround for any app incompatibility bugs.
-                for (packageName in persistantState.getExcludedPackages(this)!!) {
+                for (packageName in PersistantState.getExcludedPackages(this)!!) {
                     builder = builder.addDisallowedApplication(packageName)
                 }
                 // Play Store incompatibility is a known issue, so always exclude it.
@@ -251,13 +267,13 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
     @InternalCoroutinesApi
     override fun onSharedPreferenceChanged(preferences: SharedPreferences?, key: String?) {
         //TODO Check on the PersistantState variable
-        val persistantState = PersistantState()
-        if (persistantState.APPS_KEY.equals(key) && vpnAdapter != null) {
+        //val persistantState = PersistantState()
+        if (PersistantState.APPS_KEY.equals(key) && vpnAdapter != null) {
             // Restart the VPN so the new app exclusion choices take effect immediately.
             restartVpn()
         }
-        if (persistantState.URL_KEY.equals(key)) {
-            url = persistantState.getServerUrl(this)
+        if (PersistantState.URL_KEY.equals(key)) {
+            url = PersistantState.getServerUrl(this)
             spawnServerUpdate()
         }
     }
@@ -295,7 +311,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener,  Protector
             builder.setSmallIcon(R.drawable.shield_green)
                 .setContentTitle(resources.getText(R.string.warning_title))
                 .setContentText(resources.getText(R.string.notification_content))
-                .setFullScreenIntent(mainActivityIntent, true) // Open the main UI if possible.
+                .setContentIntent(mainActivityIntent) // Open the main UI if possible.
                 .setAutoCancel(true)
             if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
                 builder.setCategory(Notification.CATEGORY_ERROR)

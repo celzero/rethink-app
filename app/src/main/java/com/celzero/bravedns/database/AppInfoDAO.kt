@@ -11,6 +11,9 @@ interface AppInfoDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(appInfo: AppInfo)
 
+    @Delete
+    fun delete(appInfo : AppInfo)
+
     @Query("select * from AppInfo")
     fun getAllAppDetails(): List<AppInfo>
 

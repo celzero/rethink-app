@@ -87,6 +87,7 @@ public class GoVpnAdapter {
 
   public static GoVpnAdapter establish(@NonNull BraveVPNService vpnService) {
     ParcelFileDescriptor tunFd = establishVpn(vpnService);
+
     if (tunFd == null) {
       return null;
     }
@@ -111,13 +112,10 @@ public class GoVpnAdapter {
 
     // Strip leading "/" from ip:port string.
     listener = new GoIntraListener(vpnService);
-    PersistantState persistentState  = new PersistantState();
-    //VpnController vpnController = new VpnController();
     //TODO : The below statement in correct, adding the dohURL as const for testing
     //String dohURL = persistentState.getServerUrl(vpnService);
     String dohURL = "https://fast.bravedns.com/hussain1";
     try {
-      Log.d("VPN Tag", "Starting go-tun2socks");
       Transport transport = makeDohTransport(dohURL);
       tunnel = Tun2socks.connectIntraTunnel(tunFd.getFd(), fakeDns,
           transport, getProtector(), listener);
@@ -131,7 +129,7 @@ public class GoVpnAdapter {
   private static ParcelFileDescriptor establishVpn(BraveVPNService vpnService) {
     try {
       VpnService.Builder builder = vpnService.newBuilder()
-          .setSession("Intra go-tun2socks VPN")
+          .setSession("Brave VPN")
           .setMtu(VPN_INTERFACE_MTU)
           .addAddress(LanIp.GATEWAY.make(IPV4_TEMPLATE), IPV4_PREFIX_LENGTH)
           .addRoute("0.0.0.0", 0)
@@ -171,9 +169,10 @@ public class GoVpnAdapter {
   }
 
   private doh.Transport makeDohTransport(@Nullable String url) throws Exception {
-    PersistantState persistentState  = new PersistantState();
-    VpnController vpnController = new VpnController();
-    @NonNull String realUrl = persistentState.expandUrl(vpnService, url);
+    //PersistantState persistentState  = new PersistantState();
+    //VpnController vpnController = new VpnController();
+    //TODO : Check the below code
+    @NonNull String realUrl = PersistantState.Companion.expandUrl(vpnService, url);
     String dohIPs = getIpString(vpnService, realUrl);
     return Tun2socks.newDoHTransport(realUrl, dohIPs, getProtector(), listener);
   }
@@ -185,7 +184,6 @@ public class GoVpnAdapter {
    */
   public synchronized void updateDohUrl() {
     if (tunFd == null) {
-      Log.w("BraveVPN","Tunnel FD is null");
       // Adapter is closed.
       return;
     }
@@ -199,11 +197,11 @@ public class GoVpnAdapter {
     // is called on network changes, and it's important to switch to a fresh transport because the
     // old transport may be using sockets on a deleted interface, which may block until they time
     // out.
-    PersistantState persistentState  = new PersistantState();
-    //VpnController vpnController = new VpnController();
-    String url = persistentState.getServerUrl(vpnService);
+    //TODO : URL change
     //TODO : Change the hardcode value
-    url = "https://fast.bravedns.com/hussain1";
+    //String url = PersistantState.getServerUrl(vpnService);
+    String url = "https://fast.bravedns.com/hussain1";
+    //url = "https://fast.bravedns.com/hussain1";
     try {
       tunnel.setDNS(makeDohTransport(url));
     } catch (Exception e) {

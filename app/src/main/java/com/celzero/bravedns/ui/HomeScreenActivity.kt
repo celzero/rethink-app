@@ -91,31 +91,36 @@ class HomeScreenActivity : AppCompatActivity() {
                 context.packageManager?.getInstalledPackages(PackageManager.GET_META_DATA )!!
             var count : Int = 0
             allPackages.forEach {
-                launch(Dispatchers.Default) {
+                if((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0) {
 
-                    val applicationInfo: ApplicationInfo = it.applicationInfo
-                    val appInfo = AppInfo()
-                    appInfo.appName = context.packageManager.getApplicationLabel(applicationInfo).toString()
-                    appInfo.appCategory = applicationInfo.category
-                    appInfo.isDataEnabled = true
-                    appInfo.isWifiEnabled = true
-                    appInfo.mobileDataUsed = 0
-                    appInfo.packageInfo = applicationInfo.packageName
-                    appInfo.trackers = 0
-                    appInfo.wifiDataUsed = 0
-                    appInfo.uid = applicationInfo.uid
+                    launch(Dispatchers.Default) {
 
-                    appSample = appInfo
-                    //println("doInBackground apkList: " + appInfo.appName)
-                    appInfoRepository.insertAsync(appInfo,this)
-                    count = count + 1
-                    Log.w("DB Inserts","App Size : " + appInfo.packageInfo +": "+appInfo.uid)
+                        val applicationInfo: ApplicationInfo = it.applicationInfo
+                        val appInfo = AppInfo()
+                        appInfo.appName =
+                            context.packageManager.getApplicationLabel(applicationInfo).toString()
+                        appInfo.appCategory = applicationInfo.category
+                        appInfo.isDataEnabled = true
+                        appInfo.isWifiEnabled = true
+                        appInfo.mobileDataUsed = 0
+                        appInfo.packageInfo = applicationInfo.packageName
+                        appInfo.trackers = 0
+                        appInfo.wifiDataUsed = 0
+                        appInfo.uid = applicationInfo.uid
+
+                        appSample = appInfo
+                        appInfoRepository.insertAsync(appInfo, this)
+                        if ((applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0) {
+                            count = count + 1
+                        }
+                        //Log.w("DB Inserts","App Size : " + appInfo.packageInfo +": "+appInfo.uid)
+                    }
                 }
 
             }
                 //delay(1 * 60 * 100)
         }
-            Log.w("DB","End of the loop for the DB")
+            //Log.w("DB","End of the loop for the DB")
     }
 
 

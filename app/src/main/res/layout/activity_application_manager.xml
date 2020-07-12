@@ -4,12 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/pale_white"
     tools:context=".ui.ApplicationManagerActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar_application_manager"
         android:layout_width="match_parent"
         android:layout_height="150dp"
+        android:background="@color/colorPrimary"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -63,6 +65,55 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/am_search"
-        android:id="@+id/permission_manager_recycler_view"/>
+        android:id="@+id/application_manager_recycler_view"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/am_fab_add_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_margin="40dp"
+        android:src="@drawable/ic_fab_without_border"
+        android:tint="@color/lightColorPrimary"
+        app:backgroundTint="@color/colorPrimary"
+        app:fabSize="normal"
+        app:rippleColor="@color/indicator"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_anchor="@id/app_bar_application_manager"
+        app:layout_anchorGravity="bottom|end" />
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/am_fab_uninstall_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginRight="48dp"
+        android:layout_marginBottom="100dp"
+        android:src="@drawable/ic_fab_uninstall"
+        android:tint="@color/lightColorPrimary"
+        app:backgroundTint="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:fabSize="mini"
+        app:rippleColor="@color/indicator" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/am_fab_appinfo_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="48dp"
+        android:layout_marginBottom="150dp"
+        android:src="@drawable/ic_fab_appinfo"
+        android:tint="@color/lightColorPrimary"
+        app:backgroundTint="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:fabSize="mini"
+        app:rippleColor="@color/indicator" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
