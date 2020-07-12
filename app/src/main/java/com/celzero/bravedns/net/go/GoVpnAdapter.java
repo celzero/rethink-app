@@ -36,9 +36,12 @@ import java.util.Locale;
 
 //import app.intra.sys.firebase.LogWrapper;
 import doh.Transport;
+import protect.Blocker;
 import protect.Protector;
 import tun2socks.Tun2socks;
 import tunnel.IntraTunnel;
+import settings.TunMode;
+import settings.Settings;
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
@@ -72,7 +75,7 @@ public class GoVpnAdapter {
       return String.format(Locale.ROOT, template, value);
     }
   }
-
+  
   public static final String FAKE_DNS_IP = LanIp.DNS.make(IPV4_TEMPLATE);
 
   // Service context in which the VPN is running.
@@ -118,7 +121,8 @@ public class GoVpnAdapter {
     try {
       Transport transport = makeDohTransport(dohURL);
       tunnel = Tun2socks.connectIntraTunnel(tunFd.getFd(), fakeDns,
-          transport, getProtector(), listener);
+          transport, getProtector(), getBlocker(), listener);
+      tunnel.setTunMode(Settings.DNSModePort, Settings.BlockModeFilter);
     } catch (Exception e) {
       Log.d("VPN Tag",e.getMessage());
       tunnel = null;
@@ -151,6 +155,10 @@ public class GoVpnAdapter {
       // "addDisallowedApplication" effectively protects all sockets in this app.
       return null;
     }
+    return vpnService;
+  }
+
+  Blocker getBlocker() {
     return vpnService;
   }
 
@@ -208,7 +216,8 @@ public class GoVpnAdapter {
       Log.d("VPN Tag",e.getMessage());
       tunnel.disconnect();
       tunnel = null;
-      VpnController.Companion.getInstance().onConnectionStateChanged(vpnService, BraveVPNService.State.FAILING);
+      VpnController.Companion.getInstance().onConnectionStateChanged(
+              vpnService, BraveVPNService.State.FAILING);
     }
   }
 
