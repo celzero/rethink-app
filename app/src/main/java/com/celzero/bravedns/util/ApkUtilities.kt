@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
+import com.google.common.net.InternetDomainName
 
 
 class ApkUtilities {
@@ -105,6 +106,35 @@ class ApkUtilities {
             return false
         }
 
+
+
+    // Convert an FQDN like "www.example.co.uk." to an eTLD + 1 like "example.co.uk".
+    fun getETldPlus1(fqdn: String): String? {
+        return try {
+            val name: InternetDomainName = InternetDomainName.from(fqdn)
+            try {
+                name.topPrivateDomain().toString()
+            } catch (e: IllegalStateException) {
+                // The name doesn't end in a recognized TLD.  This can happen for randomly generated
+                // names, or when new TLDs are introduced.
+                val parts: List<String> = name.parts()
+                val size = parts.size
+                if (size >= 2) {
+                    parts[size - 2] + "." + parts[size - 1]
+                } else if (size == 1) {
+                    parts[0]
+                } else {
+                    // Empty input?
+                    fqdn
+                }
+            }
+        } catch (e: IllegalArgumentException) {
+            // If fqdn is not a valid domain name, InternetDomainName.from() will throw an
+            // exception.  Since this function is only for aesthetic purposes, we can
+            // return the input unmodified in this case.
+            fqdn
+        }
+    }
     }
 }
 

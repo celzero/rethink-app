@@ -13,11 +13,12 @@
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/pale_white"
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/am_status_indicator"
-                android:layout_width="10dp"
+                android:layout_width="3dp"
                 android:layout_height="match_parent"
                 android:background="@color/colorGreen_A400"/>
 
@@ -58,10 +59,10 @@
                             android:layout_marginStart="10dp"
                             android:layout_toEndOf="@id/am_apk_icon_iv"
                             android:ellipsize="end"
-                            android:fontFamily="sans-serif-light"
+                            android:fontFamily="sans-serif-medium"
                             android:maxLines="1"
                             android:text="Dummy Label"
-                            android:textColor="@android:color/white"
+                            android:textColor="@color/text_color_blue"
                             android:textSize="16sp" />
 
                         <TextView
@@ -73,20 +74,20 @@
                             android:layout_toEndOf="@id/am_apk_icon_iv"
                             android:layout_marginStart="10dp"
                             android:ellipsize="end"
-                            android:fontFamily="sans-serif-thin"
+                            android:fontFamily="sans-serif-light"
                             android:maxLines="1"
                             android:text="Data Usage : 50 MB   Storage : 78 MB"
-                            android:textColor="@android:color/white"
+                            android:textColor="@color/negative"
                             android:textSize="14sp" />
 
 
-
-
                         <androidx.appcompat.widget.AppCompatCheckBox
-                            android:id="@+id/am_action_item"
+                            android:fallbackLineSpacing="true"
+                            android:id="@+id/am_action_item_checkbox"
                             android:layout_width="40dp"
+                            android:buttonTint="@color/cardview_dark_background"
                             android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
+                            android:layout_centerInParent="true"
                             android:layout_margin="5dp"
                             android:layout_alignParentEnd="true"/>
 
@@ -94,7 +95,7 @@
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
-            <androidx.appcompat.widget.LinearLayoutCompat
+           <!-- <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:weightSum="1"
@@ -103,6 +104,7 @@
                 android:orientation="horizontal">
 
                 <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/am_force_stop_tv"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="0.5"
@@ -113,6 +115,7 @@
 
 
                 <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/am_uninstall_tv"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
@@ -121,7 +124,7 @@
                     android:layout_margin="2dp"
                     android:background="@color/secondaryText"
                     android:text="Uninstall"/>
-            </androidx.appcompat.widget.LinearLayoutCompat>
+            </androidx.appcompat.widget.LinearLayoutCompat>-->
         </androidx.appcompat.widget.LinearLayoutCompat>
             </androidx.appcompat.widget.LinearLayoutCompat>
 

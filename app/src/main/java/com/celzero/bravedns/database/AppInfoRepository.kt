@@ -13,9 +13,14 @@ class AppInfoRepository  (private val appInfoDAO: AppInfoDAO){
         }
     }
 
+    fun deleteAsync(appInfo : AppInfo, coroutineScope: CoroutineScope= GlobalScope){
+        coroutineScope.launch {
+            appInfoDAO.delete(appInfo)
+        }
+    }
+
     fun insertAsync(appInfo : AppInfo, coroutineScope: CoroutineScope = GlobalScope){
         coroutineScope.launch {
-            Log.w("DB Save","App Info :"+appInfo.appName)
             appInfoDAO.insert(appInfo)
         }
     }

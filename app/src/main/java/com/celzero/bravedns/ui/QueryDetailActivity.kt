@@ -23,23 +23,9 @@ class QueryDetailActivity  : AppCompatActivity() {
 
 
     private var recyclerView: RecyclerView? = null
-    private var adapter: QueryAdapter? = null
+
     private var layoutManager: RecyclerView.LayoutManager? = null
 
-    private val messageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            Log.i("BraveDNS","Message Received : Broadcast")
-            if (InternalNames.RESULT.name.equals(intent.action)) {
-                updateStatsDisplay(
-                    getNumRequests(),
-                    intent.getSerializableExtra(InternalNames.TRANSACTION.name) as Transaction
-                )
-            } else if (InternalNames.DNS_STATUS.name.equals(intent.action)) {
-                //TODO : Work on this later
-                //syncDnsStatus()
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,25 +38,24 @@ class QueryDetailActivity  : AppCompatActivity() {
         adapter = QueryAdapter(this)
         adapter!!.reset(getHistory())
         recyclerView!!.setAdapter(adapter)
+    }
 
+  companion object {
+        private var adapter: QueryAdapter? = null
 
-        // Register broadcast receiver
-        val intentFilter = IntentFilter(InternalNames.RESULT.name)
-        intentFilter.addAction(InternalNames.DNS_STATUS.name)
-        LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, intentFilter)
-        Log.i("BraveDNS","LocalBroadcastManager Registered")
+        fun updateStatsDisplay(numRequests: Long, transaction: Transaction) {
+            showTransaction(transaction)
+        }
+
+        fun showTransaction(transaction: Transaction) {
+            if(adapter != null) {
+                adapter!!.add(transaction)
+                adapter!!.notifyDataSetChanged()
+            }
+        }
     }
 
 
-
-    private fun updateStatsDisplay(numRequests: Long,transaction: Transaction) {
-        showTransaction(transaction)
-    }
-
-    private fun showTransaction(transaction: Transaction) {
-        adapter!!.add(transaction)
-        adapter!!.notifyDataSetChanged()
-    }
 
     private fun getHistory(): Queue<Transaction?>? {
         val controller = VpnController.getInstance()
@@ -83,7 +68,7 @@ class QueryDetailActivity  : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageReceiver)
+
         super.onDestroy()
     }
 

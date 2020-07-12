@@ -14,6 +14,7 @@ import com.celzero.bravedns.net.dns.DnsPacket
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.ui.QueryDetailActivity
+import com.celzero.bravedns.util.ApkUtilities
 import com.google.common.net.InternetDomainName
 import java.io.IOException
 import java.net.InetAddress
@@ -236,7 +237,7 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
 
             // Human-readable representation of this transaction.
             fqdn = transaction.name
-            hostname = getETldPlus1(transaction.name)
+            hostname = ApkUtilities.getETldPlus1(transaction.name)
 
             val hour :Int ?= transaction.responseCalendar[Calendar.HOUR_OF_DAY]
             val minute :Int ?= transaction.responseCalendar[Calendar.MINUTE]
@@ -388,33 +389,7 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
     }
 
 
-    // Convert an FQDN like "www.example.co.uk." to an eTLD + 1 like "example.co.uk".
-    private fun getETldPlus1(fqdn: String): String? {
-        return try {
-            val name: InternetDomainName = InternetDomainName.from(fqdn)
-            try {
-                name.topPrivateDomain().toString()
-            } catch (e: IllegalStateException) {
-                // The name doesn't end in a recognized TLD.  This can happen for randomly generated
-                // names, or when new TLDs are introduced.
-                val parts: List<String> = name.parts()
-                val size = parts.size
-                if (size >= 2) {
-                    parts[size - 2] + "." + parts[size - 1]
-                } else if (size == 1) {
-                    parts[0]
-                } else {
-                    // Empty input?
-                    fqdn
-                }
-            }
-        } catch (e: IllegalArgumentException) {
-            // If fqdn is not a valid domain name, InternetDomainName.from() will throw an
-            // exception.  Since this function is only for aesthetic purposes, we can
-            // return the input unmodified in this case.
-            fqdn
-        }
-    }
+
 
     // Return a two-letter ISO country code, or null if that fails.
     private fun getCountryCode(address: InetAddress): String {
