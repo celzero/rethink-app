@@ -7,6 +7,8 @@ import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ProgressBar
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,6 +20,7 @@ import com.celzero.bravedns.automaton.PermissionsManager
 import com.celzero.bravedns.database.AppDatabase
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
+import kotlinx.android.synthetic.main.app_scroll_list.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -30,6 +33,7 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
     private lateinit var recycle : RecyclerView
     internal val apkList = ArrayList<FirewallApk>()
     lateinit var itemAdapter: ItemAdapter<FirewallApk>
+    private lateinit var progressBar : ProgressBar
     
     private var editSearch: SearchView? = null
     private lateinit var context : Context
@@ -58,6 +62,8 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         fastAdapter = FastAdapter.with(itemAdapter)
         editSearch = includeView.findViewById(R.id.search)
 
+        progressBar = includeView.findViewById(R.id.firewall_progress)
+
         editSearch!!.setOnQueryTextListener(this)
 
         recycle.adapter = fastAdapter
@@ -67,16 +73,35 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
     private fun updateAppList() = GlobalScope.launch ( Dispatchers.Default ){
         val mDb = AppDatabase.invoke(context.applicationContext)
         val appInfoRepository = mDb.appInfoRepository()
+        //TODO Global scope variable is not updated properly. Work on that variable
+        // Work on the below code.
+       /* if(HomeScreenActivity.GlobalVariable.appList.size > 0){
+            HomeScreenActivity.GlobalVariable.appList.forEach{
+                val firewallApk = FirewallApk(packageManager.getPackageInfo(it.packageInfo,0), it.isWifiEnabled, it.isDataEnabled,
+                    it.isSystemApp, it.isScreenOff, it.isInternet, it.isBackgroundEnabled, context)
+                apkList.add(firewallApk)
+            }
+        }else{
+            val appList = appInfoRepository.getAppInfoAsync()
+            Log.w("DB","App list from DB Size: "+appList.size)
+            appList.forEach{
+                val firewallApk = FirewallApk(packageManager.getPackageInfo(it.packageInfo,0), it.isWifiEnabled, it.isDataEnabled,
+                    it.isSystemApp, it.isScreenOff, it.isInternet, it.isBackgroundEnabled, context)
+                apkList.add(firewallApk)
+            }
+        }*/
         val appList = appInfoRepository.getAppInfoAsync()
         Log.w("DB","App list from DB Size: "+appList.size)
         appList.forEach{
-
-            val firewallApk = FirewallApk(packageManager.getPackageInfo(it.packageInfo,0), context)
+            val firewallApk = FirewallApk(packageManager.getPackageInfo(it.packageInfo,0), it.isWifiEnabled, it.isDataEnabled,
+                it.isSystemApp, it.isScreenOff, it.isInternet, it.isBackgroundEnabled, context)
             apkList.add(firewallApk)
         }
+
         withContext(Dispatchers.Main.immediate) {
             itemAdapter.add(apkList)
             fastAdapter.notifyDataSetChanged()
+            progressBar.visibility = View.GONE
         }
     }
 

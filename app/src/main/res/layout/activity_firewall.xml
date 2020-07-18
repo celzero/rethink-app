@@ -33,7 +33,7 @@
                 android:layout_height="100dp"
                 android:background="@color/colorPrimary"
                 android:scaleType="fitCenter"
-                android:src="@drawable/lock_red"
+                android:src="@drawable/brave_app_icon_bg_48px"
                 app:layout_collapseMode="parallax"
                 app:layout_collapseParallaxMultiplier="0.7"
                 android:contentDescription="TODO" />
@@ -57,7 +57,7 @@
                 app:popupTheme="@style/AppTheme" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
-
     </com.google.android.material.appbar.AppBarLayout>
+
     <include layout="@layout/firewall_scroll_list" android:id="@+id/app_scrolling_incl_firewall"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

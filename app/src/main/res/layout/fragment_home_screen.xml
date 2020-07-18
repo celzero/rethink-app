@@ -104,11 +104,12 @@
         android:textSize="24dp"
         android:textColor="@color/black"/>
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/fhs_protection_level_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Medium"
+            android:text="Exposed"
             android:textSize="24dp"
-            android:textColor="@color/neutral"/>
+            android:textColor="@color/negative"/>
 
     </LinearLayout>
     <LinearLayout
@@ -515,7 +516,7 @@
 
     </LinearLayout>
 
-    <androidx.appcompat.widget.AppCompatTextView
+    <!--<androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/brave_status_text_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -533,7 +534,7 @@
         android:gravity="center_vertical"
         android:drawablePadding="10dp"
         android:padding="5dp"
-        android:textColor="@color/black"/>
+        android:textColor="@color/black"/>-->
 
 </LinearLayout>
 </androidx.core.widget.NestedScrollView>

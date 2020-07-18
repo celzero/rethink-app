@@ -43,8 +43,8 @@ import com.celzero.bravedns.net.manager.ConnectionTracer
 import com.celzero.bravedns.ui.HomeScreenActivity
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.internal.synchronized
+import protect.Blocker
 import protect.Protector
-import protect.Blocker;
 import java.util.*
 
 class BraveVPNService:
@@ -131,10 +131,18 @@ class BraveVPNService:
             try {
                 // Workaround for any app incompatibility bugs.
                 for (packageName in PersistantState.getExcludedPackages(this)!!) {
-                    builder = builder.addDisallowedApplication(packageName)
+                    if(PersistantState.getFirewallMode(this) == 2) {
+                        Log.w("BraveVPN","Allowed Apps in sink hole:"+packageName)
+                        builder = builder.addAllowedApplication(packageName)
+                    }
+                    else
+                        builder = builder.addDisallowedApplication(packageName)
                 }
                 // Play Store incompatibility is a known issue, so always exclude it.
-                builder = builder.addDisallowedApplication("com.android.vending")
+                if(PersistantState.getFirewallMode(this) != 2) {
+                    builder = builder.addDisallowedApplication("com.android.vending")
+                    builder = builder.addDisallowedApplication(this.getPackageName())
+                }
             } catch (e: PackageManager.NameNotFoundException) {
                 //LogWrapper.logException(e)
                 Log.e(LOG_TAG,"Failed to exclude an app",e)
@@ -159,7 +167,7 @@ class BraveVPNService:
                 Log.i("VpnService",String.format("Starting DNS VPN service, url=%s", url))
                 //TODO Move this hardcoded url to Persistent state
                 //url = persistantState.getServerUrl(this)
-                url = "https://fast.bravedns.com/hussain1"
+                url = PersistantState.getServerUrl(this)
                 Log.i("VpnService",String.format("Starting DNS VPN service, url=%s", url))
                 // Registers this class as a listener for user preference changes.
                 PreferenceManager.getDefaultSharedPreferences(this)
@@ -248,7 +256,7 @@ class BraveVPNService:
 
     @WorkerThread
     private fun updateServerConnection() {
-        vpnAdapter!!.updateDohUrl()
+        vpnAdapter!!.updateDohUrl(HomeScreenActivity.GlobalVariable.dnsMode,HomeScreenActivity.GlobalVariable.firewallMode)
     }
 
     fun recordTransaction(transaction: Transaction) {
@@ -291,6 +299,11 @@ class BraveVPNService:
         //val persistantState = PersistantState()
         if (PersistantState.APPS_KEY.equals(key) && vpnAdapter != null) {
             // Restart the VPN so the new app exclusion choices take effect immediately.
+            restartVpn()
+        }
+        if((PersistantState.DNS_MODE.equals(key) || PersistantState.FIREWALL_MODE.equals(key))&&vpnAdapter != null){
+            HomeScreenActivity.GlobalVariable.dnsMode = PersistantState.getDnsMode(this)
+            HomeScreenActivity.GlobalVariable.firewallMode = PersistantState.getFirewallMode(this)
             restartVpn()
         }
         if (PersistantState.URL_KEY.equals(key)) {
@@ -371,7 +384,7 @@ class BraveVPNService:
                 vpnAdapter = makeVpnAdapter()
                 oldAdapter!!.close()
                 if (vpnAdapter != null) {
-                    vpnAdapter!!.start()
+                    vpnAdapter!!.start(HomeScreenActivity.GlobalVariable.dnsMode,HomeScreenActivity.GlobalVariable.firewallMode)
                 } else {
                     Log.i("VpnService",String.format("Restart failed"))
 
@@ -426,7 +439,7 @@ class BraveVPNService:
                 return
             }
             startVpnAdapter()
-            vpnController!!.onStartComplete(this, vpnAdapter != null)
+            vpnController.onStartComplete(this, vpnAdapter != null)
             if (vpnAdapter == null) {
                 Log.w(LOG_TAG,"Failed to startVpn VPN adapter")
                 stopSelf()
@@ -440,7 +453,7 @@ class BraveVPNService:
                 Log.w(LOG_TAG,"Starting VPN adapter")
                 vpnAdapter = makeVpnAdapter()
                 if (vpnAdapter != null) {
-                    vpnAdapter!!.start()
+                    vpnAdapter!!.start(HomeScreenActivity.GlobalVariable.dnsMode,HomeScreenActivity.GlobalVariable.firewallMode)
                     //analytics.logStartVPN(vpnAdapter.getClass().getSimpleName())
                 } else {
                     Log.w(LOG_TAG,"Failed to start VPN adapter!")

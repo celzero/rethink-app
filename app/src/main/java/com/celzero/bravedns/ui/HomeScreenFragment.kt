@@ -50,8 +50,9 @@ class HomeScreenFragment : Fragment(){
     private lateinit var recentQuery2TV : TextView
     private lateinit var recentQuery3TV : TextView
     private lateinit var recentQuery4TV : TextView
-    private lateinit var statusTextTV : TextView
-    private lateinit var explainationTextTV  : TextView
+    //private lateinit var statusTextTV : TextView
+    //private lateinit var explainationTextTV  : TextView
+    private lateinit var protectionLevelTxt : TextView
 
     //Removed code for VPN
     private var isServiceRunning : Boolean = false
@@ -78,8 +79,10 @@ class HomeScreenFragment : Fragment(){
         recentQuery3TV = view.findViewById(R.id.recent_queries_3_tv)
         recentQuery4TV = view.findViewById(R.id.recent_queries_4_tv)
 
-        statusTextTV = view.findViewById(R.id.brave_status_text_tv)
-        explainationTextTV = view.findViewById(R.id.brave_status_exp_text_tv)
+        //statusTextTV = view.findViewById(R.id.brave_status_text_tv)
+        //explainationTextTV = view.findViewById(R.id.brave_status_exp_text_tv)
+
+        protectionLevelTxt = view.findViewById(R.id.fhs_protection_level_txt)
 
         isServiceRunning = isServiceRunning(requireContext(),BraveVPNService::class.java)
         //Removed code for VPN
@@ -150,6 +153,10 @@ class HomeScreenFragment : Fragment(){
         return view
     }
 
+
+    fun updateView(){
+        noOfAppsTV.setText(context!!.packageManager.getInstalledPackages(PackageManager.GET_META_DATA).size.toString()+" Apps\n" + HomeScreenActivity.GlobalVariable.installedAppCount + " Installed")
+    }
 
     private val messageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -340,7 +347,7 @@ class HomeScreenFragment : Fragment(){
         }
         val colorId: Int
         colorId = if (status.on) {
-            if (status.connectionState !== BraveVPNService.State.FAILING) R.color.accent_good else R.color.accent_bad
+            if (status.connectionState !== BraveVPNService.State.FAILING) R.color.positive else R.color.accent_bad
         } else if (privateDnsMode == PrivateDnsMode.STRICT) {
             // If the VPN is off but we're in strict mode, show the status in white.  This isn't a bad
             // state, but Intra isn't helping.
@@ -352,9 +359,9 @@ class HomeScreenFragment : Fragment(){
         //val statusText: TextView = controlView.findViewById(R.id.status)
         //val explanationText: TextView = controlView.findViewById(R.id.explanation)
         val color = ContextCompat.getColor(context!!, colorId)
-        statusTextTV.setTextColor(color)
-        statusTextTV.setText(statusId)
-        explainationTextTV.setText(explanationId)
+        protectionLevelTxt.setTextColor(color)
+        protectionLevelTxt.setText(statusId)
+        //explainationTextTV.setText(explanationId)
 
     }
 

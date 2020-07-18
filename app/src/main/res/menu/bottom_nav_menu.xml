@@ -4,7 +4,7 @@
     <item
             android:id="@+id/navigation_internet_manager"
             android:icon="@drawable/ic_home_black_24dp"
-            android:title="@string/title_internet_manager"/>
+            android:title="@string/txt_home"/>
 
     <item
             android:id="@+id/navigation_permission_manager"

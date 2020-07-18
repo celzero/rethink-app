@@ -119,7 +119,7 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
         val intent : Intent = Intent(Intent.ACTION_DELETE,packageURI)
         intent.putExtra("packageName",app.packageName)
         startActivity(intent)
-        apkList.remove(app)
+        //apkList.remove(app)
         fastAdapter.notifyAdapterDataSetChanged()
         GlobalScope.launch(Dispatchers.IO) {
             val mDb = AppDatabase.invoke(applicationContext)

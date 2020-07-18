@@ -12,7 +12,14 @@ class AppInfo {
     var trackers : Int = 0
     var isWifiEnabled : Boolean = true
     var isDataEnabled : Boolean = true
+    var isSystemApp : Boolean = false
+    var isScreenOff : Boolean = false
+    var isInternet : Boolean = true
+    var isBackgroundEnabled : Boolean = true
     var appCategory : Int = 0
     var wifiDataUsed : Long = 0
     var mobileDataUsed : Long = 0
+
+
+
 }

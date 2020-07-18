@@ -39,7 +39,7 @@ class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ApkListViewHolder {
         return ApkListViewHolder(
-            LayoutInflater.from(context).inflate(R.layout.apk_list_item, parent, false),
+            LayoutInflater.from(context).inflate(R.layout.layout_apk_item, parent, false),
             context,
             apkList
         )
@@ -52,7 +52,7 @@ class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) 
         //holder.mLabelTextView.text =
           //  context.packageManager.getApplicationLabel(apkList.get(position).appInfo).toString()
         //holder.mPackageTextView.text = "Tap for more Info"
-        if(position < 3 ) {
+        /*if(position < 3 ) {
             holder.mIconIndicator.setBackgroundResource(R.color.colorRed_900)
             val anim: Animation = AlphaAnimation(0.0f, 1.0f)
             anim.setDuration(1000) //You can manage the blinking time with this parameter
@@ -61,7 +61,7 @@ class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) 
             anim.setRepeatMode(Animation.REVERSE)
             anim.setRepeatCount(Animation.INFINITE)
             holder.mIconIndicator.startAnimation(anim)
-        }
+        }*/
 
     }
 
@@ -97,7 +97,7 @@ class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) 
         val mIconImageView: ImageView = view.findViewById(R.id.apk_icon_iv)
         val mLabelTextView: TextView = view.findViewById(R.id.apk_label_tv)
         val mPackageTextView: TextView = view.findViewById(R.id.apk_package_tv)
-        val mIconIndicator : TextView = view.findViewById(R.id.status_indicator)
+        //val mIconIndicator : TextView = view.findViewById(R.id.status_indicator)
 
         init {
             //var permissionList : String = ""
