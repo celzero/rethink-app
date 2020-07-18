@@ -81,11 +81,20 @@ class ApplicationManagerApk (packageInfo: PackageInfo, context : Context) : Abst
         override fun bindView(permissionManagerApk:  ApplicationManagerApk, payloads: MutableList<Any>) {
             mIconImageView.setImageDrawable(permissionManagerApk.appIcon)
             mLabelTextView.setText(permissionManagerApk.appName)
-            mCheckBox.isChecked = permissionManagerApk.isChecked
-            mCheckBox.setOnCheckedChangeListener(null)
 
+            mCheckBox.setOnCheckedChangeListener(null)
+            mCheckBox.isChecked = permissionManagerApk.isSelected
             mCheckBox.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
-                if(permissionManagerApk.isChecked && b) {
+               if(b){
+                   addedList.add(permissionManagerApk)
+                   permissionManagerApk.isChecked = true
+                   permissionManagerApk.isSelected = true
+               }else{
+                   addedList.remove(permissionManagerApk)
+                   permissionManagerApk.isChecked = false
+                   permissionManagerApk.isSelected = false
+               }
+                /*if(permissionManagerApk.isChecked && b) {
                     addedList.remove(permissionManagerApk)
                     permissionManagerApk.isChecked = false
                     mCheckBox.isChecked = false
@@ -93,7 +102,7 @@ class ApplicationManagerApk (packageInfo: PackageInfo, context : Context) : Abst
                     addedList.add(permissionManagerApk)
                     permissionManagerApk.isChecked = true
                     mCheckBox.isChecked = b
-                }
+                }*/
             }
         }
 

@@ -55,9 +55,9 @@
     <androidx.appcompat.widget.SearchView
         android:id="@+id/am_search"
         android:layout_width="match_parent"
+        android:background="@color/colorPrimary"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="8dp"
         app:layout_constraintTop_toBottomOf="@id/app_bar_application_manager" />
 

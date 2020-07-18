@@ -6,7 +6,7 @@ import android.net.Uri
 import android.preference.PreferenceManager
 import android.util.Log
 import com.celzero.bravedns.R
-import java.util.*
+
 
 class PersistantState {
 
@@ -16,6 +16,8 @@ class PersistantState {
 
         val APPS_KEY = "pref_apps"
         val URL_KEY = "pref_server_url"
+        val DNS_MODE = "dns_mode"
+        val FIREWALL_MODE = "firewall_mode"
 
         private val APPROVED_KEY = "approved"
         private val ENABLED_KEY = "enabled"
@@ -108,7 +110,7 @@ class PersistantState {
 
         fun getServerUrl(context: Context?): String? {
             val urlTemplate: String = getUserPreferences(context!!)!!.getString(URL_KEY, null)
-                ?: return null
+                ?: return context.resources.getString(R.string.url0)
             return strip(urlTemplate)
         }
 
@@ -120,10 +122,52 @@ class PersistantState {
             )
         }
 
+        fun setExcludedPackages(packages : Set<String?>, context : Context?){
+
+            //TODO : hardcode value for testing. Need to modify
+            var sets: MutableSet<String> = HashSet()
+            sets.add("in.swiggy.android")
+            getUserPreferences(context!!)!!.edit().putStringSet(APPS_KEY, sets).apply()
+
+            //sets = getUserPreferences(context!!)!!.getStringSet(APPS_KEY, HashSet<String>())!!
+            var newSet: MutableSet<String> = HashSet(getUserPreferences(context!!)!!.getStringSet(APPS_KEY, HashSet<String>()))
+            newSet.add("org.mozilla.firefox");
+            getUserPreferences(context!!)!!.edit().putStringSet(APPS_KEY,newSet).apply()
+
+/*
+
+            val editor: SharedPreferences.Editor =
+                getUserPreferences(context!!)!!.edit()
+            editor.putStringSet(APPS_KEY, packages)
+            editor.apply()*/
+        }
+
         fun strip(template: String): String? {
             return template.replace("\\{[^}]*\\}".toRegex(), "")
         }
 
+
+        fun setDnsMode(context: Context, mode : Int){
+            val editor: SharedPreferences.Editor =
+                getUserPreferences(context!!)!!.edit()
+            editor.putInt(DNS_MODE, mode)
+            editor.apply()
+        }
+
+        fun getDnsMode(context: Context):Int {
+            return getUserPreferences(context!!)!!.getInt(DNS_MODE, 2)
+        }
+
+        fun setFirewallMode(context: Context, mode : Int){
+            val editor: SharedPreferences.Editor =
+                getUserPreferences(context!!)!!.edit()
+            editor.putInt(FIREWALL_MODE, mode)
+            editor.apply()
+        }
+
+        fun getFirewallMode(context: Context):Int {
+            return getUserPreferences(context!!)!!.getInt(FIREWALL_MODE, 0)
+        }
 
     }
 }

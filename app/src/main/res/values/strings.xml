@@ -18,6 +18,12 @@
     <string name="action_revoke_only">Auto Revoke</string>
     <string name="action_do_nothing">Do Nothing</string>
 
+    <string name="mode_dns">DNS</string>
+    <string name="mode_dns_firewall">DNS + Firewall</string>
+    <string name="mode_firewall">Firewall</string>
+
+    <string name="txt_home">Home</string>
+
     <string name="device_admin_receiver">
         Content Blocker
     </string>
@@ -71,6 +77,19 @@
         <item>192.168.0/24</item>
         <item>172.18.234/12</item>
         <item>10.18.234/8</item>
+    </string-array>
+
+    <string-array name="adguard_name">
+        <item>Default</item>
+        <item>Family protection</item>
+        <item>Malware Blocking</item>
+    </string-array>
+
+    <string-array name="adguard_url">
+        <item>https://dns.adguard.com/dns-query</item>
+        <item>https://dns-family.adguard.com/dns-query</item>
+        <!--https://family.cloudflare-dns.com/dns-query-->
+        <item>https://security.cloudflare-dns.com/dns-query</item>
     </string-array>
 
     <string name="warning_title" description="Status indicator text shown in a warning notification.">

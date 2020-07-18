@@ -18,8 +18,8 @@
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/status_indicator"
-                android:layout_width="10dp"
+                android:id="@+id/firewall_status_indicator"
+                android:layout_width="3dp"
                 android:layout_height="match_parent"
                 android:background="@color/colorGreen_A400"/>
 
@@ -39,7 +39,7 @@
                 android:layout_height="80dp">
 
                 <ImageView
-                    android:id="@+id/apk_icon_iv"
+                    android:id="@+id/firewall_apk_icon_iv"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_centerVertical="true"
@@ -50,12 +50,12 @@
                     tools:src="@color/colorPrimary" />
 
                 <TextView
-                    android:id="@+id/apk_label_tv"
+                    android:id="@+id/firewall_apk_label_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignTop="@+id/apk_icon_iv"
+                    android:layout_alignTop="@+id/firewall_apk_icon_iv"
                     android:layout_marginStart="16dp"
-                    android:layout_toEndOf="@+id/apk_icon_iv"
+                    android:layout_toEndOf="@+id/firewall_apk_icon_iv"
                     android:ellipsize="end"
                     android:fontFamily="sans-serif-light"
                     android:maxLines="1"
@@ -64,22 +64,22 @@
                     android:textSize="14sp" />
 
                 <TextView
-                    android:id="@+id/apk_package_tv"
+                    android:id="@+id/firewall_apk_package_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/apk_label_tv"
+                    android:layout_below="@+id/firewall_apk_label_tv"
                     android:layout_marginStart="16dp"
-                    android:layout_toEndOf="@+id/apk_icon_iv"
+                    android:layout_toEndOf="@+id/firewall_apk_icon_iv"
                     android:ellipsize="end"
                     android:fontFamily="sans-serif-thin"
                     android:maxLines="1"
-                    android:text=""
+                    android:text="Category : "
                     android:textColor="@color/black"
                     android:textSize="14sp" />
 
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/toggle_wifi"
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/firewall_toggle_mobile_data"
                     android:layout_width="65dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -87,23 +87,23 @@
                     android:layout_margin="5dp"
                     android:gravity="center"
                     android:textColor="@color/black"
-                    android:drawableBottom="@android:drawable/button_onoff_indicator_on"
+                    android:src="@drawable/data_on"
                     android:layout_marginRight="5dp"
-                    android:text="Data" />
+                    android:text="" />
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/toggle_mobile_data"
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/firewall_toggle_wifi"
                     android:layout_width="65dp"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_margin="5dp"
                     android:gravity="center"
-                    android:drawableBottom="@android:drawable/button_onoff_indicator_on"
+                    android:src="@drawable/wifi_on"
                     android:layout_marginLeft="15dp"
                     android:textColor="@color/black"
-                    android:layout_toLeftOf="@id/toggle_wifi"
+                    android:layout_toLeftOf="@id/firewall_toggle_mobile_data"
                     android:textAlignment="center"
-                    android:text="WiFi" />
+                    android:text="" />
 
             </RelativeLayout>
 
@@ -119,6 +119,7 @@
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/firewall_background_txt"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="0.33"
@@ -130,6 +131,7 @@
                 android:text="Background"/>
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/firewall_screenOff_txt"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
@@ -139,6 +141,7 @@
                 android:background="@color/bg_screen2"
                 android:text="Screen Off"/>
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/firewall_always_txt"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"

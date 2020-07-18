@@ -1,25 +1,24 @@
 package com.celzero.bravedns.ui
 
 import android.annotation.TargetApi
-import android.app.*
+import android.app.AppOpsManager
+import android.app.Fragment
 import android.app.usage.NetworkStatsManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.graphics.Color
-import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
 import android.os.Process
 import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfo
+import com.celzero.bravedns.service.PersistantState
 import com.celzero.bravedns.util.ApkUtilities.Companion.hasPermissionToReadPhoneStats
 import com.celzero.bravedns.util.ApkUtilities.Companion.requestPhoneStateStats
 import com.celzero.bravedns.util.DatabaseHandler
@@ -30,15 +29,27 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 
-
 class HomeScreenActivity : AppCompatActivity() {
 
     lateinit var internetManagerFragment: InternetManagerFragment
     lateinit var permissionManagerFragment : PermissionManagerFragment
-    lateinit var applicationManagerFragment : ApplicationManagerFragment
+    lateinit var settingsFragment : SettingsFragment
     lateinit var homeScreenFragment: HomeScreenFragment
     lateinit var context: Context
     lateinit var appSample : AppInfo
+
+    /*TODO : This task need to be completed.
+             Add all the appinfo in the global variable during appload
+             Handle those things in the application instead of reaching to DB every time
+             Call the coroutine scope to insert/update/delete the values*/
+
+    object GlobalVariable{
+        var appList : HashSet<AppInfo> = HashSet()
+        var dnsMode = 0
+        var firewallMode : Int = 0
+        var installedAppCount : Int = 0
+    }
+
     companion object {
         lateinit var dbHandler : DatabaseHandler
 
@@ -49,6 +60,7 @@ class HomeScreenActivity : AppCompatActivity() {
                     if(appExtras != null) putExtras(appExtras)
                 }
         }
+
 
     }
 
@@ -72,6 +84,9 @@ class HomeScreenActivity : AppCompatActivity() {
                 .commit()
         }
         navView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
+
+        GlobalVariable.dnsMode = PersistantState.getDnsMode(this)
+        GlobalVariable.firewallMode = PersistantState.getFirewallMode(this)
 
         getAppInfo()
 
@@ -102,6 +117,14 @@ class HomeScreenActivity : AppCompatActivity() {
                         appInfo.appCategory = applicationInfo.category
                         appInfo.isDataEnabled = true
                         appInfo.isWifiEnabled = true
+                        appInfo.isSystemApp  = false
+                        if ((applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0) {
+                            count += 1
+                            appInfo.isSystemApp = true
+                        }
+                        appInfo.isScreenOff = false
+                        appInfo.isInternet  = false
+                        appInfo.isBackgroundEnabled  = false
                         appInfo.mobileDataUsed = 0
                         appInfo.packageInfo = applicationInfo.packageName
                         appInfo.trackers = 0
@@ -109,10 +132,10 @@ class HomeScreenActivity : AppCompatActivity() {
                         appInfo.uid = applicationInfo.uid
 
                         appSample = appInfo
+                        //TODO HHandle this Global scope variable properly. Only half done.
+                        GlobalVariable.appList.add(appInfo)
+                        GlobalVariable.installedAppCount = count
                         appInfoRepository.insertAsync(appInfo, this)
-                        if ((applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0) {
-                            count = count + 1
-                        }
                         //Log.w("DB Inserts","App Size : " + appInfo.packageInfo +": "+appInfo.uid)
                     }
                 }
@@ -121,6 +144,17 @@ class HomeScreenActivity : AppCompatActivity() {
                 //delay(1 * 60 * 100)
         }
             //Log.w("DB","End of the loop for the DB")
+    }
+
+    fun updateFragments() {
+        runOnUiThread(Runnable {
+            val allFragments: MutableList<androidx.fragment.app.Fragment> =
+                supportFragmentManager.fragments
+            if (allFragments == null || allFragments.isEmpty()) return@Runnable
+            for (fragment in allFragments) {
+                if (fragment.isVisible) (fragment as HomeScreenFragment).updateView()
+            }
+        })
     }
 
 
@@ -207,8 +241,8 @@ class HomeScreenActivity : AppCompatActivity() {
             }
             R.id.navigation_settings -> {
                 println("Settings")
-                applicationManagerFragment = ApplicationManagerFragment()
-                supportFragmentManager.beginTransaction().replace(R.id.fragment_container, applicationManagerFragment, applicationManagerFragment.javaClass.getSimpleName())
+                settingsFragment = SettingsFragment()
+                supportFragmentManager.beginTransaction().replace(R.id.fragment_container, settingsFragment, settingsFragment.javaClass.getSimpleName())
                     .commit()
                 return@OnNavigationItemSelectedListener true
             }

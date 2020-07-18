@@ -29,7 +29,7 @@ public class ConnectionTracer {
         if (cm == null) return MISSING_UID;
 
         // https://android.googlesource.com/platform/development/+/da84168fb2f5eb5ca012c3f430f701bc64472f34/ndk/platforms/android-21/include/linux/in.h
-        if (protocol != 6 /* TCP */ && protocol != 17 /* UDP */) return MISSING_UID;
+        if (protocol != 6 /* TCP */ || protocol != 17 /* UDP */) return MISSING_UID;
 
         InetSocketAddress local;
         InetSocketAddress remote;
