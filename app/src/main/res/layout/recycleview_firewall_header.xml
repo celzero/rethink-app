@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/firewall_header_ll"
+    android:layout_margin="1dp"
+    android:background="@color/colorPrimary"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+<androidx.cardview.widget.CardView
+    android:layout_width="match_parent"
+    app:cardElevation="@dimen/activity_horizontal_margin"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:padding="3dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/textView_category_name"
+        android:layout_width="wrap_content"
+        android:textSize="@dimen/fab_margin"
+        android:padding="5dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.8"
+        android:textColor="@color/primaryText"
+        android:text="TextView" />
+
+        <TextView
+            android:id="@+id/textView_app_count"
+            android:layout_width="wrap_content"
+            android:textSize="12sp"
+            android:paddingLeft="12dp"
+            android:layout_below="@id/textView_category_name"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.8"
+            android:textColor="@color/primaryText"
+            android:text="TextView" />
+
+    <androidx.appcompat.widget.AppCompatToggleButton
+        android:id="@+id/checkbox"
+        android:layout_width="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.2"
+        android:layout_centerVertical="true"
+        android:textOn="DisAllowed"
+        android:textOff="Allowed" />
+
+        <LinearLayout
+            android:id="@+id/imageLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textView_app_count"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="10dp"
+            android:orientation="horizontal">
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imageLayout_1"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="5dp"
+                android:src="@color/bg_screen4"/>
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imageLayout_2"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="5dp"
+                android:src="@color/bg_screen4"/>
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imageLayout_3"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="5dp"
+                android:src="@color/bg_screen4"/>
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imageLayout_4"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="5dp"
+                android:src="@color/bg_screen4"/>
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/action_right">
+
+            </ImageView>
+        </LinearLayout>
+
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>
+
+</LinearLayout>

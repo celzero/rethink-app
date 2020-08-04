@@ -24,7 +24,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 
-class ApplicationManagerApk (packageInfo: PackageInfo, context : Context) : AbstractItem<ApplicationManagerApk.ViewHolder>() {
+class ApplicationManagerApk (packageInfo: PackageInfo,  var category: String, context : Context) : AbstractItem<ApplicationManagerApk.ViewHolder>() {
 
     var appInfo: ApplicationInfo?= null
     var appName: String ?= null
@@ -70,6 +70,7 @@ class ApplicationManagerApk (packageInfo: PackageInfo, context : Context) : Abst
     }
 
     inner class ViewHolder (itemView: View): FastAdapter.ViewHolder<ApplicationManagerApk>(itemView) {
+        private val llFirwallBg : androidx.appcompat.widget.LinearLayoutCompat = itemView.findViewById(R.id.am_list_ll_bg)
         private val mIconImageView: ImageView = itemView.findViewById(R.id.am_apk_icon_iv)
         private val mLabelTextView: TextView = itemView.findViewById(R.id.am_apk_label_tv)
         private val mCheckBox : CheckBox = itemView.findViewById(R.id.am_action_item_checkbox)
@@ -81,9 +82,14 @@ class ApplicationManagerApk (packageInfo: PackageInfo, context : Context) : Abst
         override fun bindView(permissionManagerApk:  ApplicationManagerApk, payloads: MutableList<Any>) {
             mIconImageView.setImageDrawable(permissionManagerApk.appIcon)
             mLabelTextView.setText(permissionManagerApk.appName)
-
+            mPackageTextView.text = permissionManagerApk.category
             mCheckBox.setOnCheckedChangeListener(null)
             mCheckBox.isChecked = permissionManagerApk.isSelected
+
+           /* if(this.layoutPosition%2 == 0){
+                llFirwallBg.setBackgroundColor(context!!.getColor(R.color.colorPrimaryDark))
+            }*/
+
             mCheckBox.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
                if(b){
                    addedList.add(permissionManagerApk)

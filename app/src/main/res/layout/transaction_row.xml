@@ -1,61 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="1dp"
-    android:layout_marginLeft="@dimen/activity_horizontal_margin"
-    android:layout_marginRight="@dimen/activity_horizontal_margin"
-    android:layout_marginBottom="1dp"
+    android:layout_margin="1dp"
+    app:cardElevation="@dimen/activity_horizontal_margin"
     android:animateLayoutChanges="true"
-    android:orientation="vertical"
-    android:background="@color/cardview_dark_background">
+    android:orientation="vertical">
 
+  <LinearLayout
+      android:id="@+id/query_screen_ll"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:background="@color/colorPrimary"
+    android:orientation="vertical">
   <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      tools:background="@color/cardview_dark_background"
+      android:weightSum="1"
+      android:gravity="center"
+      android:paddingRight="2dp"
+      android:paddingTop="10dp"
+      android:paddingBottom="10dp"
       android:orientation="horizontal">
 
+  <LinearLayout
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="5dp"
+      android:visibility="gone"
+      tools:background="@color/cardview_dark_background"
+      android:orientation="vertical">
     <TextView
-            android:id="@+id/flag"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0"
-            android:layout_margin="8dp"
-            android:layout_gravity="start|center_vertical"
-            android:ellipsize="none"
-            android:minWidth="40dp"
-            android:singleLine="true"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            android:textSize="30sp"
-            tools:text="🇩🇪" />
-
-    <TextView
-        android:id="@+id/hostname"
-        android:layout_width="0dp"
+        android:id="@+id/type_text"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:paddingRight="5dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="start|center_vertical"
-        android:layout_weight="1"
-        android:ellipsize="start"
-        android:singleLine="true"
-        tools:text="longlonglonglonglonglonglonglongexample.com"/>
+        android:text="@string/type_label"
+        app:layout_constraintBottom_toTopOf="@+id/qtype1"
+        app:layout_constraintStart_toStartOf="@+id/qtype1"/>
 
-    <Space
+    <TextView
+        android:id="@+id/qtype"
+        android:paddingRight="5dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="0.1"/>
+        android:textColor="@color/primaryText"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium"
+        app:layout_constraintBottom_toBottomOf="@+id/type_text"
+        android:layout_gravity="center_horizontal"
+        tools:text="AAAA"/>
+  </LinearLayout>
 
     <TextView
+        android:id="@+id/flag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:layout_gravity="start"
+        android:ellipsize="none"
+        android:padding="5dp"
+        android:minWidth="40dp"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:textSize="30sp"
+        tools:text="" />
+
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:paddingLeft="5dp"
+    android:orientation="vertical">
+  <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/query_label"
+      android:visibility="gone"
+      android:paddingTop="5dp"
+      />
+    <TextView
+        android:id="@+id/fqdn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium"
+        android:layout_gravity="start|center_vertical"
+        android:textColor="@color/primaryText"
+        android:ellipsize="start"
+        android:singleLine="true"
+        tools:text="longlongongexample.com"/>
+</LinearLayout>
+      <LinearLayout
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:padding="5dp"
+          android:orientation="vertical">
+          <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="@string/latency_label"
+              android:visibility="gone"
+              android:layout_gravity="center_horizontal"
+              />
+      <TextView
+          android:id="@+id/latency_val"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center_horizontal"
+          android:layout_weight="0"
+          android:singleLine="true"
+          android:textAppearance="@android:style/TextAppearance.Material.Medium"
+          android:textColor="@color/primaryText"
+          tools:text="10(ms)"/>
+      </LinearLayout>
+
+      <LinearLayout
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:padding="5dp"
+          android:layout_marginLeft="5dp"
+          android:orientation="vertical">
+          <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="Time"
+              android:visibility="gone"
+              android:layout_gravity="center_horizontal"
+              />
+      <TextView
         android:id="@+id/response_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end|center_vertical"
+          android:layout_gravity="center_horizontal"
         android:layout_weight="0"
+          android:textAppearance="@android:style/TextAppearance.Material.Medium"
         android:singleLine="true"
-        android:textColor="@color/accent_good"
+        android:textColor="@color/primaryText"
         tools:text="17:54:11"/>
+      </LinearLayout>
 
     <!-- This button's background image is set by Java code as a workaround for lack of support
     for vector background drawables on pre-Lollipop Android.  See
@@ -67,54 +153,55 @@
         android:layout_gravity="end|center_vertical"
         android:layout_margin="10dp"
         android:layout_weight="0"
+        android:visibility="gone"
         android:scrollbars="none"
         android:textOff=""
         android:textOn="" />
   </LinearLayout>
 
-  <androidx.constraintlayout.widget.ConstraintLayout
+  <LinearLayout
       android:id="@+id/details"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:orientation="vertical"
+      android:orientation="horizontal"
       android:paddingBottom="8dp"
-      android:paddingLeft="8dp"
-      android:paddingRight="8dp"
-      android:visibility="gone"
-      tools:visibility="visible">
+      android:paddingTop="8dp"
+      android:visibility="gone">
+   <!-- <TextView
+        android:id="@+id/flag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:layout_gravity="start"
+        android:ellipsize="none"
+        android:padding="5dp"
+        android:minWidth="40dp"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:textSize="30sp"
+        tools:text="" />-->
 
-    <View
-        android:id="@+id/query_spacer"
-        android:layout_width="2dp"
-        android:layout_height="72dp"
-        android:background="@color/accent_good"
-        app:layout_constraintEnd_toEndOf="@id/query_icon"
-        app:layout_constraintStart_toStartOf="@id/query_icon"
-        app:layout_constraintTop_toTopOf="parent"/>
 
     <ImageView
         android:id="@+id/query_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="8dp"
+        android:visibility="gone"
         android:tint="@color/accent_good"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/query_spacer"
         app:srcCompat="@drawable/ic_dns"
         tools:ignore="ContentDescription"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/query_label"
-        app:layout_constraintBottom_toTopOf="@+id/fqdn"
-        app:layout_constraintStart_toStartOf="@+id/fqdn"/>
+
 
     <TextView
-        android:id="@+id/fqdn"
+        android:id="@+id/fqdn1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:ellipsize="none"
+        android:visibility="gone"
         android:scrollbars="horizontal"
         android:singleLine="true"
         android:textAppearance="@android:style/TextAppearance.Large"
@@ -128,51 +215,20 @@
         android:layout_gravity="start"
         tools:text="longlonglonglonglonglongexample.com"/>
 
-    <View
-        android:id="@+id/type_spacer"
-        android:layout_width="2dp"
-        android:layout_height="72dp"
-        android:background="@color/accent_good"
-        app:layout_constraintEnd_toEndOf="@id/query_icon"
-        app:layout_constraintStart_toStartOf="@id/query_icon"
-        app:layout_constraintTop_toBottomOf="@+id/query_icon"/>
+
 
     <ImageView
         android:id="@+id/type_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="8dp"
+        android:visibility="gone"
         android:tint="@color/accent_good"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/type_spacer"
         app:srcCompat="@drawable/ic_pageview_black_24dp"
         tools:ignore="ContentDescription"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/type_label"
-        app:layout_constraintBottom_toTopOf="@+id/qtype"
-        app:layout_constraintStart_toStartOf="@+id/qtype"/>
-
-    <TextView
-        android:id="@+id/qtype"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="@android:style/TextAppearance.Large"
-        app:layout_constraintBottom_toBottomOf="@+id/type_icon"
-        app:layout_constraintStart_toEndOf="@+id/type_icon"
-        app:layout_constraintTop_toTopOf="@+id/type_icon"
-        tools:text="AAAA"/>
-
-    <View
-        android:id="@+id/latency_spacer"
-        android:layout_width="2dip"
-        android:layout_height="72dp"
-        android:background="@color/accent_good"
-        app:layout_constraintEnd_toEndOf="@id/query_icon"
-        app:layout_constraintStart_toStartOf="@id/query_icon"
-        app:layout_constraintTop_toBottomOf="@+id/type_icon"/>
 
     <ImageView
         android:id="@+id/latency_icon"
@@ -180,33 +236,80 @@
         android:layout_height="wrap_content"
         android:padding="8dp"
         android:tint="@color/accent_good"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/latency_spacer"
         app:srcCompat="@drawable/ic_access_time_black_24dp"
         tools:ignore="ContentDescription"/>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="5dp"
+        android:layout_weight="0.9"
+        android:layout_gravity="center_vertical"
+        android:orientation="vertical">
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/destination_label"
+          android:visibility="visible"
+        />
+
+      <TextView
+          android:id="@+id/response"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:ellipsize="none"
+          android:visibility="visible"
+          android:textColor="@color/primaryText"
+          android:scrollbars="horizontal"
+          android:singleLine="true"
+          android:textAppearance="@android:style/TextAppearance.Material.Medium"
+          android:textIsSelectable="true"
+          app:layout_constraintBottom_toBottomOf="@id/response_icon"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintHorizontal_bias="0.0"
+          app:layout_constraintStart_toEndOf="@id/response_icon"
+          app:layout_constraintTop_toTopOf="@id/response_icon"
+          android:textAlignment="viewStart"
+          android:layout_gravity="start"
+          tools:text="US (192.0.2.1)"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="2dp"
+        android:layout_gravity="right|center_vertical"
+      android:orientation="vertical">
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/latency_label"
-        app:layout_constraintBottom_toTopOf="@+id/latency_small"
-        app:layout_constraintStart_toStartOf="@+id/latency_small"/>
+        android:visibility="visible"
+        android:layout_gravity="end|center" />
 
     <TextView
         android:id="@+id/latency_small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@android:style/TextAppearance.Large"
+        android:visibility="visible"
+        android:layout_gravity="end|center"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium"
         app:layout_constraintBottom_toBottomOf="@id/latency_icon"
         app:layout_constraintStart_toEndOf="@id/latency_icon"
         app:layout_constraintTop_toTopOf="@id/latency_icon"
+        android:textColor="@color/primaryText"
         tools:text="72 ms"/>
-
+    </LinearLayout>
     <View
         android:id="@+id/resolver_spacer"
         android:layout_width="2dp"
         android:layout_height="72dp"
         android:background="@color/accent_good"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@id/query_icon"
         app:layout_constraintStart_toStartOf="@id/query_icon"
         app:layout_constraintTop_toBottomOf="@id/latency_icon"/>
@@ -216,6 +319,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="8dp"
+        android:visibility="gone"
         android:tint="@color/accent_good"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/resolver_spacer"
@@ -225,6 +329,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:text="@string/resolver_label"
         app:layout_constraintBottom_toTopOf="@id/resolver"
         app:layout_constraintStart_toStartOf="@id/resolver"/>
@@ -234,6 +339,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:ellipsize="none"
+        android:visibility="gone"
         android:scrollbars="horizontal"
         android:singleLine="true"
         android:textAppearance="@android:style/TextAppearance.Large"
@@ -251,6 +357,7 @@
         android:id="@+id/response_spacer"
         android:layout_width="2dp"
         android:layout_height="72dp"
+        android:visibility="gone"
         android:background="@color/accent_good"
         app:layout_constraintEnd_toEndOf="@id/query_icon"
         app:layout_constraintStart_toStartOf="@id/query_icon"
@@ -261,6 +368,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="8dp"
+        android:visibility="gone"
         android:tint="@color/accent_good"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/response_spacer"
@@ -271,14 +379,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/destination_label"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/response"
         app:layout_constraintStart_toStartOf="@id/response"/>
 
     <TextView
-        android:id="@+id/response"
+        android:id="@+id/response1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:ellipsize="none"
+        android:visibility="gone"
         android:scrollbars="horizontal"
         android:singleLine="true"
         android:textAppearance="@android:style/TextAppearance.Large"
@@ -291,5 +401,6 @@
         android:textAlignment="viewStart"
         android:layout_gravity="start"
         tools:text="US (192.0.2.1)"/>
-  </androidx.constraintlayout.widget.ConstraintLayout>
-</LinearLayout>
+  </LinearLayout>
+  </LinearLayout>
+</androidx.cardview.widget.CardView>

@@ -5,7 +5,12 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/accent_bad</item>
+        <item name="colorSwitchThumbNormal">@color/neutral</item>
+        <item name="android:buttonStyleToggle">@android:style/Widget.Material.Button.Toggle</item>
+        <item name="chipStyle">@style/Widget.MaterialComponents.Chip.Action</item>
+        <item name="android:splitMotionEvents">false</item>
+        <item name="android:windowEnableSplitTouch">false</item>
     </style>
 
     <style name="ActionItem">
@@ -21,6 +26,11 @@
         <item name="android:textColor">@color/light_bg</item>
     </style>
 
+    <style name="AppTheme.Toggle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="colorControlNormal">@color/neutral</item>
+        <item name="colorAccent">@color/accent_good</item>
+    </style>
+
     <style name="BottomSheet" parent="@style/Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/bg_bottom_sheet_dialog_fragment</item>
     </style>
@@ -32,5 +42,9 @@
 
     <style name="BottomSheetDialogTheme" parent="BaseBottomSheetDialog" />
 
+<!--    <style name="BraveModeSpinnerTheme" parent="Widget.AppCompat.DropDownItem.Spinner">
+        <item name="android:spinnerDropDownItemStyle">@style/Widget.AppCompat.TextView.SpinnerItem</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Body1</item>
+    </style>-->
 
 </resources>

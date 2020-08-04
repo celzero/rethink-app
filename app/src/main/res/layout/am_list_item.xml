@@ -8,12 +8,14 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp">
+        android:elevation="@dimen/activity_horizontal_margin"
+        android:layout_margin="1dp">
 
         <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/am_list_ll_bg"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/pale_white"
+            android:background="@color/colorPrimary"
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -62,7 +64,7 @@
                             android:fontFamily="sans-serif-medium"
                             android:maxLines="1"
                             android:text="Dummy Label"
-                            android:textColor="@color/text_color_blue"
+                            android:textColor="@color/secondaryText"
                             android:textSize="16sp" />
 
                         <TextView
@@ -77,7 +79,7 @@
                             android:fontFamily="sans-serif-light"
                             android:maxLines="1"
                             android:text="Data Usage : 50 MB   Storage : 78 MB"
-                            android:textColor="@color/negative"
+                            android:textColor="@color/primaryText"
                             android:textSize="14sp" />
 
 
@@ -85,7 +87,7 @@
                             android:fallbackLineSpacing="true"
                             android:id="@+id/am_action_item_checkbox"
                             android:layout_width="40dp"
-                            android:buttonTint="@color/cardview_dark_background"
+                            android:buttonTint="@color/primaryText"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:layout_margin="5dp"

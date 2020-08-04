@@ -33,15 +33,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:background="@color/secondaryText"
+        android:padding="5dp"
         android:visibility="gone"
         android:layout_alignParentRight="true"
         android:text="@string/next"
-        style="@style/AppTheme.Button"
         android:textColor="@android:color/white" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/btn_skip"
-        style="@style/AppTheme.Button"
+        android:background="@color/secondaryText"
         android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

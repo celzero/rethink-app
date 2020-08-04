@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+  <string name="default_dummy_domain" translatable="false">cloudflare-dns.com</string>
+  <string name="default_dummy_url" translatable="false">https://cloudflare-dns.com/dns-query</string>
+
   <!-- Each DOH server is defined by a URL (which is the actual DOH endpoint).  However, Google DNS
    was previously configured by domain, in early versions of Intra.-->
   <string name="legacy_domain0" translatable="false">dns.google.com</string>

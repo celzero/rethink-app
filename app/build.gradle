@@ -12,14 +12,22 @@ android {
         minSdkVersion 26
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0"
-
+        versionName "0.1"
+       /* splits {
+             abi {
+                 enable true
+                 reset()
+                 include 'x86_64', 'x86', 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'mips'
+                 universalApk false
+             }
+         }*/
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         compileOptions {
@@ -50,8 +58,6 @@ dependencies {
 
     implementation 'org.minidns:minidns-core:0.3.4'
     implementation 'org.minidns:minidns-hla:0.3.4'
-
-
 
     implementation 'com.google.code.gson:gson:2.8.6'
 

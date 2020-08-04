@@ -2,14 +2,18 @@ package com.celzero.bravedns.util
 
 
 import android.Manifest
+import android.accessibilityservice.AccessibilityService
+import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo
 import android.graphics.Color
 import android.os.Environment
 import android.view.View
+import android.view.accessibility.AccessibilityManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -17,7 +21,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.common.net.InternetDomainName
 
 
-class ApkUtilities {
+class Utilities {
 
 
     companion object {
@@ -135,6 +139,24 @@ class ApkUtilities {
             fqdn
         }
     }
+
+        fun isAccessibilityServiceEnabled(
+            context: Context,
+            service: Class<out AccessibilityService?>
+        ): Boolean {
+            val am =
+                context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+            val enabledServices =
+                am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
+            for (enabledService in enabledServices) {
+                val enabledServiceInfo: ServiceInfo = enabledService.resolveInfo.serviceInfo
+                if (enabledServiceInfo.packageName.equals(context.packageName) && enabledServiceInfo.name.equals(
+                        service.name
+                    )
+                ) return true
+            }
+            return false
+        }
     }
 }
 

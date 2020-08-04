@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/light"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:showIn="@layout/activity_query_detail">
+
+    <RelativeLayout
+        android:id="@+id/settings_rl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/setting_url_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:background="@color/recycler_selected"
+            android:layout_marginRight="2dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:weightSum="1"
+                android:gravity="center"
+                android:orientation="horizontal">
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Protection level"
+                    android:layout_weight="0.42"
+                    android:textSize="16sp"
+                    android:textAllCaps="true"
+                    style="@style/TextAppearance.AppCompat.Headline"
+                    android:padding="5dp"
+                    android:textColor="@color/primaryText"/>
+
+                <androidx.appcompat.widget.AppCompatSpinner
+                    android:id="@+id/setting_url_spinner"
+                    android:padding="5dp"
+                    android:layout_gravity="center_vertical"
+                    android:isScrollContainer="true"
+                    android:dropDownSelector="@color/dividerColor"
+                    android:layout_width="0dp"
+                    android:layout_weight="0.58"
+                    android:layout_height="wrap_content" />
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_below="@id/setting_url_ll"
+            android:id="@+id/top_layout_query_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:padding="5dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:layout_margin="2dp"
+            android:elevation="@dimen/activity_horizontal_margin"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="1"
+                android:background="@color/colorPrimaryDark"
+                android:padding="5dp"
+                android:orientation="horizontal">
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/latency_txt"
+                    android:layout_width="wrap_content"
+                    android:textSize="@dimen/activity_horizontal_margin"
+                    android:layout_gravity="left|center"
+                    android:text="Latency: "
+                    android:textColor="@color/primaryText"
+                    android:layout_height="wrap_content"/>
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/total_queries_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:textSize="@dimen/activity_horizontal_margin"
+                    android:layout_gravity="end|center_vertical"
+
+                    android:textColor="@color/primaryText"
+                    android:text="Lifetime Queries: "
+                    android:layout_height="wrap_content"/>
+
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/query_list_recycler_heading"
+            android:layout_below="@id/top_layout_query_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="@dimen/activity_horizontal_margin"
+            android:background="@color/colorPrimary"
+            android:padding="10dp"
+            android:weightSum="4"
+            android:layout_margin="2dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/secondaryText"
+                android:layout_weight="0.5"/>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Query"
+                android:textColor="@color/secondaryText"
+                android:layout_weight="2.25"/>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Latency"
+                android:textColor="@color/secondaryText"
+                android:layout_weight="0.75"/>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Time"
+                android:textColor="@color/secondaryText"
+                android:layout_weight="0.5"/>
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_below="@id/query_list_recycler_heading"
+            android:id="@+id/recycler_query"
+            android:orientation="vertical"
+            android:layout_margin="2dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <FrameLayout
+            android:id="@+id/query_progressBarHolder"
+            android:layout_below="@id/top_layout_query_list"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:gravity="center_horizontal"
+                android:textColor="@color/primaryText"
+                android:textSize="@dimen/dots_margin_bottom"
+                android:fontFamily="sans-serif-smallcaps"
+                android:text="@string/brave_dns_connect_prompt_query"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:id="@+id/firewall_progress"
+                android:src="@drawable/illustration_enable_vpn_message"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:layout_gravity="center" />
+        </FrameLayout>
+
+
+    </RelativeLayout>
+</LinearLayout>

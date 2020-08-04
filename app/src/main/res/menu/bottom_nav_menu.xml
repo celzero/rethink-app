@@ -6,14 +6,14 @@
             android:icon="@drawable/ic_home_black_24dp"
             android:title="@string/txt_home"/>
 
-    <item
+   <!-- <item
             android:id="@+id/navigation_permission_manager"
             android:icon="@drawable/ic_dashboard_black_24dp"
-            android:title="@string/title_permission_manager"/>
+            android:title="@string/title_tools"/>-->
 
     <item
             android:id="@+id/navigation_settings"
-            android:icon="@drawable/ic_notifications_black_24dp"
+            android:icon="@drawable/ic_dashboard_black_24dp"
             android:title="@string/title_settings"/>
 
 </menu>

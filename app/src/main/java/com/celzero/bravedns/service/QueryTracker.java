@@ -17,12 +17,18 @@ package com.celzero.bravedns.service;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.celzero.bravedns.net.doh.Transaction;
+import com.celzero.bravedns.ui.HomeScreenActivity;
+import com.google.common.collect.Iterables;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 
 import static android.content.Context.MODE_PRIVATE;
@@ -35,18 +41,20 @@ import static android.content.Context.MODE_PRIVATE;
  */
 public class QueryTracker {
 
-  private static final String NUM_REQUESTS = "numRequests";
+  public static final String NUM_REQUESTS = "numRequests";
 
-  private static final int HISTORY_SIZE = 100;
-  private static final int ACTIVITY_MEMORY_MS = 60 * 1000;  // One minute
+  private static final int HISTORY_SIZE = 100000;
+  //private static final int ACTIVITY_MEMORY_MS = 60 * 1000;  // One minute
 
   private long numRequests = 0;
   private Queue<Transaction> recentTransactions = new LinkedList<>();
   private Queue<Long> recentActivity = new LinkedList<>();
+  private SortedSet<Integer> queryList = new TreeSet();
   private boolean historyEnabled = true;
+  private Transaction transaction = null;
 
   QueryTracker(Context context) {
-    sync(context);
+    sync(context, transaction);
   }
 
   public synchronized long getNumRequests() {
@@ -60,7 +68,7 @@ public class QueryTracker {
   /**
    * Provide the receiver with temporary read-only access to the recent activity time-sequence.
    */
-    public synchronized void showActivity(ActivityReceiver receiver) {
+  public synchronized void showActivity(ActivityReceiver receiver) {
     receiver.receive(Collections.unmodifiableCollection(recentActivity));
   }
 
@@ -92,20 +100,20 @@ public class QueryTracker {
 
   synchronized void recordTransaction(Context context, Transaction transaction) {
     // Increment request counter on each successful resolution
-    if (transaction.status == Transaction.Status.COMPLETE) {
+    //if (transaction.status == Transaction.Status.) {
       ++numRequests;
-
-      if (numRequests % HISTORY_SIZE == 0) {
+      // HomeScreenActivity.GlobalVariable.INSTANCE.setLifeTimeQueries(numRequests);
+      if (numRequests % HISTORY_SIZE != 0) {
         // Avoid losing too many requests in case of an unclean shutdown, but also avoid
         // excessive disk I/O from syncing the counter to disk after every request.
-        sync(context);
+        sync(context, transaction);
       }
-    }
+    //}
 
     recentActivity.add(transaction.queryTime);
-    while (recentActivity.peek() + ACTIVITY_MEMORY_MS < transaction.queryTime) {
+    /*while (recentActivity.peek() + ACTIVITY_MEMORY_MS < transaction.queryTime) {
       recentActivity.remove();
-    }
+    }*/
 
     if (historyEnabled) {
       recentTransactions.add(transaction);
@@ -115,19 +123,22 @@ public class QueryTracker {
     }
   }
 
-  public synchronized void sync(Context context) {
+  public synchronized void sync(Context context, Transaction transaction) {
     // Restore number of requests from storage, or 0 if it isn't defined yet.
-    SharedPreferences settings =
-        context.getSharedPreferences(QueryTracker.class.getSimpleName(), MODE_PRIVATE);
-    long storedNumRequests = settings.getLong(NUM_REQUESTS, 0);
-    if (storedNumRequests >= numRequests) {
-      numRequests = storedNumRequests;
-    } else {
-      // Save the request counter.
-      SharedPreferences.Editor editor = settings.edit();
-      editor.putLong(NUM_REQUESTS, numRequests);
-      editor.apply();
+    numRequests = PersistentState.Companion.getNumOfReq(context );
+
+    if (transaction != null) {
+      if (numRequests > HISTORY_SIZE) {
+        int val = queryList.first();
+        queryList.remove(val);
+      }
+      int val = (int) (transaction.responseTime - transaction.queryTime);
+      queryList.add(val);
+      int positionP50 = (int) (queryList.size() * 0.50);
+      val = Iterables.get(queryList, positionP50);
+      PersistentState.Companion.setMedianLatency(context, val);
+      PersistentState.Companion.setNumOfReq(context);
     }
   }
-
 }
+

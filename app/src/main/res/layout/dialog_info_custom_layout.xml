@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/info_dialog_cancel_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:layout_gravity="right">
+    </ImageView>
+
+    <TextView
+        style="@style/Widget.AppCompat.TextView"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/spinner_dns"
+        android:drawablePadding="20dp"
+        android:padding="10dp"
+        android:text="@string/dns_mode_info_title" />
+
+    <TextView
+        style="@style/Widget.AppCompat.TextView"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:lineSpacingExtra="5dp"
+        android:padding="10dp"
+        android:text="@string/dns_mode_info_explanation" />
+
+    <TextView
+        style="@style/Widget.AppCompat.TextView"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:layout_width="wrap_content"
+        android:padding="10dp"
+        android:drawableLeft="@drawable/spinner_firewall"
+        android:drawablePadding="20dp"
+        android:layout_height="wrap_content"
+        android:text="@string/firewall_mode_info_title" />
+
+    <TextView
+        style="@style/Widget.AppCompat.TextView"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:lineSpacingExtra="5dp"
+        android:padding="10dp"
+        android:text="@string/firewall_mode_info_explanation" />
+
+    <TextView
+        style="@style/Widget.AppCompat.TextView"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:drawablePadding="20dp"
+        android:drawableLeft="@drawable/spinner_both"
+        android:text="@string/hybrid_mode_info_title" />
+    <TextView
+        style="@style/Widget.AppCompat.TextView"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawablePadding="20dp"
+        android:lineSpacingExtra="5dp"
+        android:padding="10dp"
+        android:text="@string/hybrid_mode_info_explanation" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/info_dialog_cancel_btn"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="right"
+        style="@style/TextAppearance.AppCompat.Widget.Button"
+        android:background="@drawable/button_background_ripple"
+        android:text="Ok"/>
+</androidx.appcompat.widget.LinearLayoutCompat>

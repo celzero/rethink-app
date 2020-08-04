@@ -15,7 +15,6 @@ limitations under the License.
 */
 package com.celzero.bravedns.net.go;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.net.VpnService;
@@ -29,8 +28,9 @@ import androidx.annotation.Nullable;
 
 import com.celzero.bravedns.R;
 import com.celzero.bravedns.service.BraveVPNService;
-import com.celzero.bravedns.service.PersistantState;
+import com.celzero.bravedns.service.PersistentState;
 import com.celzero.bravedns.service.VpnController;
+import com.celzero.bravedns.ui.HomeScreenActivity;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -39,10 +39,9 @@ import java.util.Locale;
 import doh.Transport;
 import protect.Blocker;
 import protect.Protector;
+import settings.Settings;
 import tun2socks.Tun2socks;
 import tunnel.IntraTunnel;
-import settings.TunMode;
-import settings.Settings;
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
@@ -89,6 +88,9 @@ public class GoVpnAdapter {
   private IntraTunnel tunnel;
   private GoIntraListener listener;
 
+  private long dnsMode = Settings.DNSModeIP;
+  private long blockMode = Settings.BlockModeFilter;
+
   public static GoVpnAdapter establish(@NonNull BraveVPNService vpnService) {
     ParcelFileDescriptor tunFd = establishVpn(vpnService);
 
@@ -107,7 +109,7 @@ public class GoVpnAdapter {
     connectTunnel(dnsMode, blockMode);
   }
 
-  private void connectTunnel(int dnsMode, int blockMode) {
+  private void connectTunnel(int iDnsMode, int iBlockMode) {
     if (tunnel != null) {
       return;
     }
@@ -117,7 +119,7 @@ public class GoVpnAdapter {
     // Strip leading "/" from ip:port string.
     listener = new GoIntraListener(vpnService);
     //TODO : The below statement is incorrect, adding the dohURL as const for testing
-    String dohURL = PersistantState.Companion.getServerUrl(vpnService);
+    String dohURL = PersistentState.Companion.getServerUrl(vpnService);
     //String dohURL = "https://fast.bravedns.com/hussain1";
     try {
       Transport transport = makeDohTransport(dohURL);
@@ -125,13 +127,24 @@ public class GoVpnAdapter {
           transport, getProtector(), getBlocker(), listener);
 
       //tunnel.setTunMode(Settings.DNSModePort, Settings.BlockModeFilter);
-      Log.w("BraveVPN","DNS Mode : "+dnsMode +" block Mode: "+ blockMode);
-      tunnel.setTunMode(dnsMode, blockMode);
+      Log.w("BraveVPN","DNS Mode : "+iDnsMode +" block Mode: "+ iBlockMode);
+      //TODO : Value is harcoded in the setTunMode
+      tunnel.setTunMode(iDnsMode, iBlockMode);
     } catch (Exception e) {
       Log.d("VPN Tag",e.getMessage());
       tunnel = null;
       VpnController.Companion.getInstance().onConnectionStateChanged(vpnService, BraveVPNService.State.FAILING);
     }
+  }
+
+  public void setSinkTunnelMode(){
+    this.blockMode = Settings.BlockModeSink;
+    tunnel.setTunMode(this.dnsMode, this.blockMode);
+  }
+
+  public void setFilterTunnelMode(){
+    this.blockMode = Settings.BlockModeFilter;
+    tunnel.setTunMode(this.dnsMode,this.blockMode);
   }
 
   private static ParcelFileDescriptor establishVpn(BraveVPNService vpnService) {
@@ -143,8 +156,11 @@ public class GoVpnAdapter {
           .addRoute("0.0.0.0", 0)
           .addDnsServer(LanIp.DNS.make(IPV4_TEMPLATE));
       if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
-        if(PersistantState.Companion.getFirewallMode(vpnService) != 2)
+        Log.w("BraveVPN","Allowed Apps in sink hole*************");
+        if(PersistentState.Companion.getFirewallMode(vpnService) != 2) {
           builder.addDisallowedApplication(vpnService.getPackageName());
+          Log.w("BraveVPN","Allowed Apps in sink hole addDisallowedApplication*************");
+        }
       }
       return builder.establish();
     } catch (Exception e) {
@@ -185,7 +201,7 @@ public class GoVpnAdapter {
     //PersistantState persistentState  = new PersistantState();
     //VpnController vpnController = new VpnController();
     //TODO : Check the below code
-    @NonNull String realUrl = PersistantState.Companion.expandUrl(vpnService, url);
+    @NonNull String realUrl = PersistentState.Companion.expandUrl(vpnService, url);
     String dohIPs = getIpString(vpnService, realUrl);
     return Tun2socks.newDoHTransport(realUrl, dohIPs, getProtector(), listener);
   }
@@ -212,10 +228,11 @@ public class GoVpnAdapter {
     // out.
     //TODO : URL change
     //TODO : Change the hardcode value
-    String url = PersistantState.Companion.getServerUrl(vpnService);
+    String url = PersistentState.Companion.getServerUrl(vpnService);
     //String url = "https://fast.bravedns.com/hussain1";
     //url = "https://fast.bravedns.com/hussain1";
     try {
+      connectTunnel(dnsMode,blockMode);
       tunnel.setDNS(makeDohTransport(url));
     } catch (Exception e) {
       Log.d("VPN Tag",e.getMessage());

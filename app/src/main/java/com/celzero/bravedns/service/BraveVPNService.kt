@@ -17,15 +17,13 @@ limitations under the License.
 package com.celzero.bravedns.service
 
 import android.app.*
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.net.VpnService
+import android.os.Build
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.SystemClock
@@ -37,14 +35,18 @@ import androidx.annotation.GuardedBy
 import androidx.annotation.WorkerThread
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.celzero.bravedns.R
+import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.net.manager.ConnectionTracer
 import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.dnsMode
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.firewallMode
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.internal.synchronized
 import protect.Blocker
 import protect.Protector
+import settings.Settings
 import java.util.*
 
 class BraveVPNService:
@@ -53,24 +55,51 @@ class BraveVPNService:
     @GuardedBy("vpnController")
     private var networkManager: NetworkManager? = null
 
-    companion object{
-        private const val LOG_TAG = "BraveVPNService"
-        private const val DEBUG = false
-        private const val SERVICE_ID = 1 // Only has to be unique within this app.
-
-        private const val MAIN_CHANNEL_ID = "vpn"
-        private const val WARNING_CHANNEL_ID = "warning"
-        private const val NO_PENDING_CONNECTION = "This value is not a possible URL."
-        private val vpnController : VpnController ?= VpnController.getInstance()
-    }
-
-    @GuardedBy("vpnController")
-    private var url : String ?= null
 
     @GuardedBy("vpnController")
     private var vpnAdapter: GoVpnAdapter? = null
 
+    companion object{
+
+
+        private const val LOG_TAG = "BraveVPNService"
+        private const val DEBUG = false
+        private const val SERVICE_ID = 1 // Only has to be unique within this app.
+
+        var braveScreenStateReceiver = BraveScreenStateReceiver()
+        var braveAutoStartReceiver = BraveAutoStartReceiver()
+        private const val MAIN_CHANNEL_ID = "vpn"
+        private const val WARNING_CHANNEL_ID = "warning"
+        private const val NO_PENDING_CONNECTION = "This value is not a possible URL."
+        val vpnController : VpnController ?= VpnController.getInstance()
+    }
+
+    @GuardedBy("vpnController")
+    private var url : String ?= null
     private var networkConnected = false
+
+    fun blockTraffic(){
+        vpnAdapter!!.setSinkTunnelMode()
+        restartVpn(dnsMode , Settings.BlockModeSink.toInt())
+    }
+
+    /*
+    TODO : This is not a valid method to use.
+        Implemented for testing the service restart while
+        testing for the Persistence state change
+        Modify the whole app update and the firewall UI update.
+        Along with multiple updates in the UI thread.
+     */
+
+    fun restarVPNfromExternalForce(){
+        startVpn()
+    }
+
+    @InternalCoroutinesApi
+    fun resumeTraffic(){
+        vpnAdapter!!.setFilterTunnelMode()
+        restartVpn(dnsMode, firewallMode )
+    }
 
     private lateinit var connTracer: ConnectionTracer
 
@@ -96,11 +125,22 @@ class BraveVPNService:
         return false
     }
 
+
     private fun isUidBlocked(uid: Int): Boolean {
         val packageName = packageManager.getNameForUid(uid)
         if (DEBUG) Log.d(LOG_TAG, "uid: $uid / packageName: $packageName")
         // TODO: Implementation pending
-        return false
+        var isBlocked : Boolean
+        try{
+            isBlocked = FirewallManager.checkInternetPermission(packageName!!)
+        }catch (e : Exception ){
+            //Log.d("BraveDNS" , "Exception in isUidBlocked : "+packageName)
+            isBlocked = false
+        }
+
+        //Log.d("BraveDNS" , "packageName : "+packageName +" - isUidBlocked : " + isBlocked)
+        return isBlocked
+        //return false
     }
 
     override fun getResolvers(): String {
@@ -130,16 +170,23 @@ class BraveVPNService:
             builder = builder.allowBypass()
             try {
                 // Workaround for any app incompatibility bugs.
-                for (packageName in PersistantState.getExcludedPackages(this)!!) {
-                    if(PersistantState.getFirewallMode(this) == 2) {
+                //TODO : As of now the wifi  packages are considered for blocking the entire traffic
+                if(PersistentState.getFirewallMode(this) == 2) {
+                    /*builder= builder.addAllowedApplication("com.ubercab")
+                    for (packageName in PersistentState.getExcludedPackagesWifi(this)!!) {
                         Log.w("BraveVPN","Allowed Apps in sink hole:"+packageName)
                         builder = builder.addAllowedApplication(packageName)
+                    }*/
+                    HomeScreenActivity.GlobalVariable.appList.forEach{
+                        if(it.value.isInternetAllowed){
+                            builder = builder.addDisallowedApplication(it.key)
+                        }
                     }
-                    else
-                        builder = builder.addDisallowedApplication(packageName)
+                   /* else
+                        builder = builder.addDisallowedApplication(packageName)*/
                 }
                 // Play Store incompatibility is a known issue, so always exclude it.
-                if(PersistantState.getFirewallMode(this) != 2) {
+                else if(PersistentState.getFirewallMode(this) != 2) {
                     builder = builder.addDisallowedApplication("com.android.vending")
                     builder = builder.addDisallowedApplication(this.getPackageName())
                 }
@@ -154,6 +201,19 @@ class BraveVPNService:
     override fun onCreate() {
         connTracer = ConnectionTracer(this)
         vpnController!!.setBraveVpnService(this)
+        registerReceiversForScreenState()
+    }
+
+    private fun registerReceiversForScreenState(){
+        val filter = IntentFilter()
+        filter.addAction(Intent.ACTION_SCREEN_OFF)
+        filter.addAction(Intent.ACTION_SCREEN_ON)
+        filter.addAction(Intent.ACTION_PACKAGE_ADDED)
+        filter.addAction(Intent.ACTION_PACKAGE_REMOVED)
+        registerReceiver(braveScreenStateReceiver, filter)
+        val autoStartFilter = IntentFilter()
+        autoStartFilter.addAction(Intent.ACTION_BOOT_COMPLETED)
+        registerReceiver(braveAutoStartReceiver, autoStartFilter)
     }
 
     @InternalCoroutinesApi
@@ -167,7 +227,7 @@ class BraveVPNService:
                 Log.i("VpnService",String.format("Starting DNS VPN service, url=%s", url))
                 //TODO Move this hardcoded url to Persistent state
                 //url = persistantState.getServerUrl(this)
-                url = PersistantState.getServerUrl(this)
+                url = PersistentState.getServerUrl(this)
                 Log.i("VpnService",String.format("Starting DNS VPN service, url=%s", url))
                 // Registers this class as a listener for user preference changes.
                 PreferenceManager.getDefaultSharedPreferences(this)
@@ -223,16 +283,14 @@ class BraveVPNService:
                     }
                 }
 
-                builder.setSmallIcon(R.drawable.shield_green)
+                builder.setSmallIcon(R.drawable.dns_icon)
                     .setContentTitle(resources.getText(R.string.notification_title))
-                    .setContentText(resources.getText(R.string.notification_content))
+                    //.setContentText(resources.getText(R.string.notification_content))
                     .setContentIntent(mainActivityIntent)
 
-                if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
-                    // Secret notifications are not shown on the lock screen.  No need for this app to show there.
-                    // Only available in API >= 21
-                    builder = builder.setVisibility(Notification.VISIBILITY_SECRET)
-                }
+                // Secret notifications are not shown on the lock screen.  No need for this app to show there.
+                // Only available in API >= 21
+                builder = builder.setVisibility(Notification.VISIBILITY_SECRET)
 
                 startForeground(SERVICE_ID, builder.notification)
                 updateQuickSettingsTile()
@@ -260,7 +318,7 @@ class BraveVPNService:
     }
 
     fun recordTransaction(transaction: Transaction) {
-        Log.i("BraveDNS","New Transaction : " + transaction.name)
+        //Log.i("BraveDNS","New Transaction : " + transaction.name)
         transaction.responseTime = SystemClock.elapsedRealtime()
         transaction.responseCalendar = Calendar.getInstance()
         getTracker()!!.recordTransaction(this, transaction)
@@ -295,19 +353,36 @@ class BraveVPNService:
 
     @InternalCoroutinesApi
     override fun onSharedPreferenceChanged(preferences: SharedPreferences?, key: String?) {
-        //TODO Check on the PersistantState variable
+        /*TODO Check on the Persistent State variable
+            Check on updating the values for Package change and for mode change.
+           As of now handled manually*/
         //val persistantState = PersistantState()
-        if (PersistantState.APPS_KEY.equals(key) && vpnAdapter != null) {
+       /* if (PersistentState.APPS_KEY_WIFI == key && vpnAdapter != null) {
             // Restart the VPN so the new app exclusion choices take effect immediately.
+            if(firewallMode == 2)
+                restartVpn()
+        }*/
+        /*if((PersistentState.DNS_MODE == key) && vpnAdapter != null){
+            dnsMode = PersistentState.getDnsMode(this)
+            Log.w("BraveDNS","onSharedPreferenceChanged - DNS_MODE -  $dnsMode")
             restartVpn()
         }
-        if((PersistantState.DNS_MODE.equals(key) || PersistantState.FIREWALL_MODE.equals(key))&&vpnAdapter != null){
-            HomeScreenActivity.GlobalVariable.dnsMode = PersistantState.getDnsMode(this)
-            HomeScreenActivity.GlobalVariable.firewallMode = PersistantState.getFirewallMode(this)
+        if((PersistentState.FIREWALL_MODE == key) && vpnAdapter != null){
+            firewallMode = PersistentState.getFirewallMode(this)
+            Log.w("BraveDNS","onSharedPreferenceChanged - Firewall - $firewallMode")
             restartVpn()
+        }*/
+
+        if((PersistentState.BRAVE_MODE == key) && vpnAdapter != null){
+            firewallMode = PersistentState.getFirewallMode(this)
+            dnsMode = PersistentState.getDnsMode(this)
+            Log.w("BraveDNS","onSharedPreferenceChanged - BRAVE_MODE - $key")
+            restartVpn(dnsMode, firewallMode)
+            //startVpn()
         }
-        if (PersistantState.URL_KEY.equals(key)) {
-            url = PersistantState.getServerUrl(this)
+
+        if (PersistentState.URL_KEY == key) {
+            url = PersistentState.getServerUrl(this)
             spawnServerUpdate()
         }
     }
@@ -341,7 +416,7 @@ class BraveVPNService:
             val mainActivityIntent = PendingIntent.getActivity(
                 this, 0, Intent(this, HomeScreenActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT
             )
-            builder.setSmallIcon(R.drawable.shield_green)
+            builder.setSmallIcon(R.drawable.dns_icon)
                 .setContentTitle(resources.getText(R.string.warning_title))
                 .setContentText(resources.getText(R.string.notification_content))
                 .setContentIntent(mainActivityIntent) // Open the main UI if possible.
@@ -374,8 +449,8 @@ class BraveVPNService:
         }
     }
 
-    @InternalCoroutinesApi
-    private fun restartVpn() {
+    @OptIn(InternalCoroutinesApi::class)
+    private fun restartVpn(dnsModeL : Int, firewallModeL : Int) {
         if (vpnController != null) {
             synchronized(vpnController) {
 
@@ -384,17 +459,20 @@ class BraveVPNService:
                 vpnAdapter = makeVpnAdapter()
                 oldAdapter!!.close()
                 if (vpnAdapter != null) {
-                    vpnAdapter!!.start(HomeScreenActivity.GlobalVariable.dnsMode,HomeScreenActivity.GlobalVariable.firewallMode)
+                    vpnAdapter!!.start(dnsModeL, firewallModeL)
                 } else {
                     Log.i("VpnService",String.format("Restart failed"))
 
                 }
             }
+        }else{
+            Log.i("VpnService",String.format("vpnController is null"))
         }
     }
 
     private fun makeVpnAdapter(): GoVpnAdapter? {
         //GoVpnAdapter.establish(this)
+        Log.i("VpnService",String.format("makeVpnAdapter"))
         return GoVpnAdapter.establish(this)
     }
 
@@ -423,7 +501,7 @@ class BraveVPNService:
 
     private fun setNetworkConnected(connected: Boolean) {
         networkConnected = connected
-        if (VERSION.SDK_INT >= VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.M) {
             // Indicate that traffic will be sent over the current active network.
             // See e.g. https://issuetracker.google.com/issues/68657525
             val activeNetwork =
@@ -463,6 +541,8 @@ class BraveVPNService:
     }
 
     override fun onDestroy() {
+        unregisterReceiver(braveScreenStateReceiver)
+        unregisterReceiver(braveAutoStartReceiver)
         kotlin.synchronized(vpnController!!) {
             Log.w(LOG_TAG,"Destroying DNS VPN service")
 
@@ -486,7 +566,7 @@ class BraveVPNService:
 
         //TODO Check the below code
         // Disable autostart if VPN permission is revoked.
-        //PersistentState.setVpnEnabled(this, false)
+        PersistentState.setVpnEnabled(this, false)
     }
 
 

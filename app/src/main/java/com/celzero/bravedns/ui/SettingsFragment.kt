@@ -1,5 +1,6 @@
 package com.celzero.bravedns.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,57 +11,49 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.fragment.app.Fragment
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.PersistantState
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.VpnState
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
+import com.celzero.bravedns.ui.HomeScreenFragment.Companion.DNS_FIREWALL_MODE
+import com.celzero.bravedns.ui.HomeScreenFragment.Companion.FIREWALL_MODE
 
 
 class SettingsFragment : Fragment() {
 
+    //private lateinit var recentQuery1TV : TextView
+    private lateinit var  appManagerBtn : Button
+    private lateinit var  viewQueriesBtn : Button
+    private lateinit var settingsBtn : Button
+    private lateinit var firewallConfigBtn : AppCompatButton
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        val view: View = inflater!!.inflate(R.layout.fragment_settings,container,false)
+        val view: View = inflater.inflate(R.layout.fragment_settings,container,false)
         initView(view)
         return view
     }
 
     private fun initView(view : View){
-        val urlName = resources.getStringArray(R.array.adguard_name)
-        val urlValues = resources.getStringArray(R.array.adguard_url)
-        var urlSpinner = view.findViewById<AppCompatSpinner>(R.id.setting_url_spinner)
-        var appModeRadioGroup = view.findViewById<RadioGroup>(R.id.setting_app_mode_radio_group)
 
-        val btnApply = view.findViewById<AppCompatButton>(R.id.setting_apply)
+        //val urlSpinner = view.findViewById<AppCompatSpinner>(R.id.setting_url_spinner)
+        //val appModeRadioGroup = view.findViewById<RadioGroup>(R.id.setting_app_mode_radio_group)
 
-        if (urlSpinner != null) {
-            val adapter = ArrayAdapter(context!!,
-                android.R.layout.simple_spinner_dropdown_item, urlName)
-            urlSpinner.adapter = adapter
-            Log.w("BraveDNS","Persistance URL: "+ PersistantState.getServerUrl(context!!))
-            val url = PersistantState.getServerUrl(context!!)
-            if (url != null) {
-                //val spinnerPosition = adapter.getPosition(url)
-                urlSpinner.setSelection(getIndex(urlSpinner, url))
-            }
+        firewallConfigBtn = view.findViewById(R.id.configure_firewall_btn)
+        appManagerBtn = view.findViewById(R.id.configure_app_mgr_btn)
+        viewQueriesBtn = view.findViewById(R.id.view_queries_btn)
+        settingsBtn = view.findViewById(R.id.configure_settings_btn)
 
-            urlSpinner.onItemSelectedListener = object :
-                AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(parent: AdapterView<*>,
-                                            view: View, position: Int, id: Long) {
-                    PersistantState.setServerUrl(context, urlValues[position])
-                }
+        //val btnApply = view.findViewById<AppCompatButton>(R.id.setting_apply)
 
-                override fun onNothingSelected(parent: AdapterView<*>) {
-                    // write code to perform some action
-                    PersistantState.setServerUrl(context, urlValues[0])
-                }
-            }
-        }
-        Log.w("BraveDNS","Persistance mode: "+ PersistantState.getDnsMode(context!!))
-        if(PersistantState.getDnsMode(context!!) == 0)
+
+
+        /*if(PersistentState.getDnsMode(context!!) == 0)
             appModeRadioGroup.check(R.id.radio_button_1)
-        else if(PersistantState.getDnsMode(context!!) == 1)
+        else if(PersistentState.getDnsMode(context!!) == 1)
             appModeRadioGroup.check(R.id.radio_button_2)
         else
-            appModeRadioGroup.check(R.id.radio_button_3)
+            appModeRadioGroup.check(R.id.radio_button_3)*/
 
         /*appModeRadioGroup.setOnCheckedChangeListener { group, checkedId ->
             val radio: RadioButton = view.findViewById(checkedId)
@@ -69,7 +62,7 @@ class SettingsFragment : Fragment() {
         }*/
 
         // Get radio group selected status and text using button click event
-        btnApply.setOnClickListener{
+       /* btnApply.setOnClickListener{
             // Get the checked radio button id from radio group
             val id: Int = appModeRadioGroup.checkedRadioButtonId
             if (id!=-1){ // If any radio button checked from radio group
@@ -77,49 +70,84 @@ class SettingsFragment : Fragment() {
                 val radio:RadioButton = view.findViewById(id)
                 when (radio.text) {
                     getString(R.string.mode_dns) -> {
-                        PersistantState.setDnsMode(context!!,1)
-                        PersistantState.setFirewallMode(context!!, 0)
+                        PersistentState.setDnsMode(context!!,1)
+                        PersistentState.setFirewallMode(context!!, 0)
                     }
                     getString(R.string.mode_dns_firewall) -> {
-                        PersistantState.setDnsMode(context!!,1)
-                        PersistantState.setFirewallMode(context!!, 1)
+                        PersistentState.setDnsMode(context!!,1)
+                        PersistentState.setFirewallMode(context!!, 1)
                     }
                     else -> {
-                        PersistantState.setDnsMode(context!!,1)
-                        PersistantState.setFirewallMode(context!!, 2)
+                        PersistentState.setDnsMode(context!!,1)
+                        PersistentState.setFirewallMode(context!!, 2)
                     }
                 }
-                Toast.makeText(context,"Values Updated!",
-                    Toast.LENGTH_SHORT).show()
+
             }else{
                 // If no radio button checked in this radio group
                 Toast.makeText(context,"Please select a mode",
                     Toast.LENGTH_SHORT).show()
             }
+        }*/
+
+        appManagerBtn.setOnClickListener {
+            startAppManagerActivity()
+        }
+
+        settingsBtn.setOnClickListener {
+            startPermissionManagerActivity()
+        }
+
+        viewQueriesBtn.setOnClickListener {
+            startQueryListener()
+        }
+
+        firewallConfigBtn.setOnClickListener{
+            startFirewallActivity()
         }
 
 
     }
 
-    private fun getIndex(spinner: Spinner, myString: String): Int {
-        //val urlName = resources.getStringArray(R.array.adguard_name)
-        val urlValues = resources.getStringArray(R.array.adguard_url)
-
-        for(i in urlValues.indices){
-            Log.w("BraveDNS","Persistance URL: "+ i + "---"+myString)
-            if(urlValues[i] == myString)
-                return i
-        }/*
-        for (i in 0 until spinner.count) {
-            Log.w("BraveDNS","Persistance URL: "+ spinner.getItemAtPosition(i).toString())
-            if (spinner.getItemAtPosition(i).toString() == myString) {
-                Log.w("BraveDNS","Persistance URL: "+ spinner.getItemAtPosition(i).toString())
-                return i
+    private fun startQueryListener() {
+        val status: VpnState? = VpnController.getInstance()!!.getState(context!!)
+        if((status!!.activationRequested)) {
+            if(braveMode == DNS_FIREWALL_MODE || braveMode == HomeScreenFragment.DNS_MODE) {
+                val intent = Intent(requireContext(), QueryDetailActivity::class.java)
+                startActivity(intent)
+            }else{
+                Toast.makeText(context!!, resources.getText(R.string.brave_dns_connect_mode_change_dns).toString().capitalize(),Toast.LENGTH_SHORT ).show()
             }
-        }*/
-        // Check for this when you set the position.
-        return -1
+        }else{
+            Toast.makeText(context!!, resources.getText(R.string.brave_dns_connect_prompt_query).toString().capitalize(),Toast.LENGTH_SHORT ).show()
+        }
     }
+
+    private fun startFirewallActivity(){
+        val status: VpnState? = VpnController.getInstance()!!.getState(context!!)
+        if((status!!.activationRequested) ) {
+            if(braveMode == DNS_FIREWALL_MODE || braveMode == FIREWALL_MODE) {
+                val intent = Intent(requireContext(), FirewallActivity::class.java)
+                startActivity(intent)
+            }else{
+                Toast.makeText(context!!, resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(),Toast.LENGTH_SHORT ).show()
+            }
+        }else{
+            Toast.makeText(context!!, resources.getText(R.string.brave_dns_connect_prompt_firewall).toString().capitalize(),Toast.LENGTH_SHORT ).show()
+        }
+    }
+    private fun startAppManagerActivity() {
+        val intent = Intent(requireContext(), ApplicationManagerActivity::class.java)
+        startActivity(intent)
+    }
+
+
+    private fun startPermissionManagerActivity() {
+        val intent = Intent(requireContext(), PermissionManagerActivity::class.java)
+        startActivity(intent)
+    }
+
+
 
 
 }

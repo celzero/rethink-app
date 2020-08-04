@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_screen4"
+    android:background="@color/pale_white"
     tools:context=".ui.FirewallActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="150dp"
         app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/illustration_firewall_bg"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         android:fitsSystemWindows="true"
@@ -22,6 +23,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
+            app:expandedTitleTextAppearance="@style/TextAppearance.AppCompat.Headline"
+
             app:title="Firewall"
             app:collapsedTitleGravity="center_vertical"
             app:contentScrim="?attr/colorPrimary"
@@ -33,7 +36,8 @@
                 android:layout_height="100dp"
                 android:background="@color/colorPrimary"
                 android:scaleType="fitCenter"
-                android:src="@drawable/brave_app_icon_bg_48px"
+                android:visibility="gone"
+                android:src="@drawable/firewall_white"
                 app:layout_collapseMode="parallax"
                 app:layout_collapseParallaxMultiplier="0.7"
                 android:contentDescription="TODO" />

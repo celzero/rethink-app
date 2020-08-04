@@ -3,60 +3,226 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-
     tools:showIn="@layout/activity_firewall">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
         android:orientation="vertical">
     <LinearLayout
+        android:id="@+id/firewall_scroll_connect_check"
         android:layout_width="match_parent"
+        android:layout_marginTop="2dp"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:orientation="horizontal">
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/firewall_universal_top_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.9"
+            android:layout_marginTop="2dp"
+            android:fontFamily="sans-serif-smallcaps"
+            android:textSize="@dimen/slide_desc"
+            android:padding="10dp"
+            android:drawableRight="@drawable/ic_keyboard_arrow_up_gray_24dp"
+            android:background="@color/colorPrimaryDark"
+            android:textColor="@color/secondaryText"
+            android:text="Universal Firewall" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:padding="10dp"
+            android:text="@string/universal_firewall_explanation"
+            android:textColor="@color/primaryText"
+            android:textSize="14sp"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/firewall_screen_ll"
+            android:layout_width="match_parent"
+            android:layout_marginTop="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/firewall_all_apps_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.9"
+                android:textSize="@dimen/sub_heading"
+                android:padding="10dp"
+                android:textColor="@color/primaryText"
+                android:text="All Apps when device is locked" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/firwall_all_apps_check"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                 />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/firewall_background_ll"
+            android:layout_width="match_parent"
+            android:layout_marginTop="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/firewall_background_mode_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.9"
+                android:textSize="@dimen/sub_heading"
+                android:padding="10dp"
+                android:textColor="@color/primaryText"
+                android:text="Any app not in use" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/firewall_background_mode_check"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                />
+
+
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/firewall_category_show_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.9"
+            android:layout_marginTop="2dp"
+            android:background="@color/colorPrimaryDark"
+            android:drawableRight="@drawable/ic_keyboard_arrow_down_gray_24dp"
+            android:fontFamily="sans-serif-smallcaps"
+            android:textSize="@dimen/slide_desc"
+            android:padding="10dp"
+            android:textColor="@color/secondaryText"
+            android:text="By Category" />
+
+        <TextView
+           android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/primaryText"
+            android:padding="10dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginLeft="2dp"
+            android:textSize="@dimen/activity_horizontal_margin"
+            android:drawableRight="@drawable/ic_keyboard_arrow_down_gray_24dp"
+            android:text="Firewall Applications by Category" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:padding="10dp"
+            android:textColor="@color/primaryText"
+            android:textSize="14sp"
+            android:text="@string/category_firewall_explanation" />
+
+        <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_header"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:layout_margin="2dp" />
+
+        <TextView
+            android:id="@+id/firewall_apps_show_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.9"
+            android:layout_marginTop="2dp"
+            android:fontFamily="sans-serif-smallcaps"
+            android:textSize="@dimen/slide_desc"
+            android:background="@color/colorPrimaryDark"
+            android:padding="10dp"
+            android:textColor="@color/secondaryText"
+            android:drawableRight="@drawable/ic_keyboard_arrow_down_gray_24dp"
+            android:text="By Specific Apps" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:padding="10dp"
+            android:textColor="@color/primaryText"
+            android:textSize="14sp"
+            android:text="@string/application_firewall_explanation" />
 
         <androidx.appcompat.widget.SearchView
             android:id="@+id/search"
+            android:visibility="gone"
             android:backgroundTintMode="src_atop"
-            android:backgroundTint="@color/colorPrimary"
+            android:backgroundTint="@color/colorPrimaryDark"
             android:background="@color/colorPrimary"
-            android:layout_width="wrap_content"
-            android:layout_margin="5dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0.85"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
             android:iconifiedByDefault="false"
             android:orientation="horizontal"
-            tools:ignore="MissingConstraints"
             tools:layout_editor_absoluteX="4dp">
 
             <requestFocus />
         </androidx.appcompat.widget.SearchView>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+             />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/filter_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:layout_gravity="end"
-            android:src="@drawable/filter_blue">
-
-        </androidx.appcompat.widget.AppCompatImageView>
     </LinearLayout>
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp" />
+        <FrameLayout
+            android:id="@+id/firewall_progressBarHolder"
+            android:animateLayoutChanges="true"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/firewall_enable_vpn_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:visibility="gone"
+                android:gravity="center_horizontal"
+                android:textColor="@color/primaryText"
+                android:textSize="@dimen/dots_margin_bottom"
+                android:fontFamily="sans-serif-smallcaps"
+                android:text="@string/brave_dns_connect_prompt_firewall"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:id="@+id/firewall_progress"
+                android:src="@drawable/ic_illustrations_loading"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:layout_gravity="center" />
+        </FrameLayout>
+        <androidx.core.widget.ContentLoadingProgressBar
+            android:id="@+id/firewall_update_progress"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.ProgressBar"/>
 
-    <ProgressBar
-        android:id="@+id/firewall_progress"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_centerInParent="true"
-        android:indeterminateTint="@color/colorPrimary"
-        android:visibility="visible"/>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
