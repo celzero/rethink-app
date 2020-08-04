@@ -96,7 +96,7 @@ class WelcomeActivity  : AppCompatActivity() {
                 if(position == layout.size - 1){
                     buttonNext.setText(R.string.start)
                     buttonSkip.visibility=View.GONE
-                    buttonNext.visibility = View.VISIBLE
+                    //buttonNext.visibility = View.VISIBLE
 
                 }else{
                     buttonNext.setText(R.string.next)

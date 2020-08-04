@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="1dp"
+    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+    android:layout_marginRight="@dimen/activity_horizontal_margin"
+    android:layout_marginBottom="1dp"
+    android:animateLayoutChanges="true"
+    android:orientation="vertical"
+    android:background="@color/floating">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/detailss"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="8dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <View
+            android:id="@+id/query_spacers"
+            android:layout_width="2dp"
+            android:layout_height="72dp"
+            android:background="@color/accent_good"
+            app:layout_constraintEnd_toEndOf="@id/query_icons"
+            app:layout_constraintStart_toStartOf="@id/query_icons"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <ImageView
+            android:id="@+id/query_icons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:tint="@color/accent_good"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/query_spacer"
+            app:srcCompat="@drawable/ic_dns"
+            tools:ignore="ContentDescription"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/query_label"
+            app:layout_constraintBottom_toTopOf="@+id/fqdns"
+            app:layout_constraintStart_toStartOf="@+id/fqdns"/>
+
+        <TextView
+            android:id="@+id/fqdns"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="none"
+            android:scrollbars="horizontal"
+            android:singleLine="true"
+            android:textAppearance="@android:style/TextAppearance.Large"
+            android:textIsSelectable="true"
+            app:layout_constraintBottom_toBottomOf="@+id/query_icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/query_icon"
+            app:layout_constraintTop_toTopOf="@+id/query_icon"
+            android:textAlignment="viewStart"
+            android:layout_gravity="start"
+            tools:text="longlonglonglonglonglongexample.com"/>
+
+        <View
+            android:id="@+id/type_spacers"
+            android:layout_width="2dp"
+            android:layout_height="72dp"
+            android:background="@color/accent_good"
+            app:layout_constraintEnd_toEndOf="@id/query_icons"
+            app:layout_constraintStart_toStartOf="@id/query_icons"
+            app:layout_constraintTop_toBottomOf="@+id/query_icons"/>
+
+        <ImageView
+            android:id="@+id/type_icons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:tint="@color/accent_good"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/type_spacers"
+            app:srcCompat="@drawable/ic_pageview_black_24dp"
+            tools:ignore="ContentDescription"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/type_label"
+            app:layout_constraintBottom_toTopOf="@+id/qtypes"
+            app:layout_constraintStart_toStartOf="@+id/qtypes"/>
+
+        <TextView
+            android:id="@+id/qtypes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@android:style/TextAppearance.Large"
+            app:layout_constraintBottom_toBottomOf="@+id/type_icons"
+            app:layout_constraintStart_toEndOf="@+id/type_icons"
+            app:layout_constraintTop_toTopOf="@+id/type_icons"
+            tools:text="AAAA"/>
+
+        <View
+            android:id="@+id/latency_spacers"
+            android:layout_width="2dip"
+            android:layout_height="72dp"
+            android:background="@color/accent_good"
+            app:layout_constraintEnd_toEndOf="@id/query_icons"
+            app:layout_constraintStart_toStartOf="@id/query_icons"
+            app:layout_constraintTop_toBottomOf="@+id/type_icons"/>
+
+        <ImageView
+            android:id="@+id/latency_icons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:tint="@color/accent_good"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/latency_spacers"
+            app:srcCompat="@drawable/ic_access_time_black_24dp"
+            tools:ignore="ContentDescription"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/latency_label"
+            app:layout_constraintBottom_toTopOf="@+id/latency_smalls"
+            app:layout_constraintStart_toStartOf="@+id/latency_smalls"/>
+
+        <TextView
+            android:id="@+id/latency_smalls"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@android:style/TextAppearance.Large"
+            app:layout_constraintBottom_toBottomOf="@id/latency_icons"
+            app:layout_constraintStart_toEndOf="@id/latency_icons"
+            app:layout_constraintTop_toTopOf="@id/latency_icons"
+            tools:text="72 ms"/>
+
+        <View
+            android:id="@+id/resolver_spacers"
+            android:layout_width="2dp"
+            android:layout_height="72dp"
+            android:background="@color/accent_good"
+            app:layout_constraintEnd_toEndOf="@id/query_icons"
+            app:layout_constraintStart_toStartOf="@id/query_icons"
+            app:layout_constraintTop_toBottomOf="@id/latency_icons"/>
+
+        <ImageView
+            android:id="@+id/resolver_icons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:tint="@color/accent_good"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/resolver_spacers"
+            app:srcCompat="@drawable/ic_server"
+            tools:ignore="ContentDescription"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/resolver_label"
+            app:layout_constraintBottom_toTopOf="@id/resolvers"
+            app:layout_constraintStart_toStartOf="@id/resolvers"/>
+
+        <TextView
+            android:id="@+id/resolvers"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="none"
+            android:scrollbars="horizontal"
+            android:singleLine="true"
+            android:textAppearance="@android:style/TextAppearance.Large"
+            android:textIsSelectable="true"
+            app:layout_constraintBottom_toBottomOf="@id/resolver_icons"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/resolver_icons"
+            app:layout_constraintTop_toTopOf="@id/resolver_icons"
+            android:textAlignment="viewStart"
+            android:layout_gravity="start"
+            tools:text="AU (2404:6800:4006:809::200e)"/>
+
+        <View
+            android:id="@+id/response_spacers"
+            android:layout_width="2dp"
+            android:layout_height="72dp"
+            android:background="@color/accent_good"
+            app:layout_constraintEnd_toEndOf="@id/query_icons"
+            app:layout_constraintStart_toStartOf="@id/query_icons"
+            app:layout_constraintTop_toBottomOf="@id/resolver_icons"/>
+
+        <ImageView
+            android:id="@+id/response_icons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:tint="@color/accent_good"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/response_spacers"
+            app:srcCompat="@drawable/ic_location_on_black_24dp"
+            tools:ignore="ContentDescription"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/destination_label"
+            app:layout_constraintBottom_toTopOf="@id/responses"
+            app:layout_constraintStart_toStartOf="@id/responses"/>
+
+        <TextView
+            android:id="@+id/responses"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="none"
+            android:scrollbars="horizontal"
+            android:singleLine="true"
+            android:textAppearance="@android:style/TextAppearance.Large"
+            android:textIsSelectable="true"
+            app:layout_constraintBottom_toBottomOf="@id/response_icons"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/response_icons"
+            app:layout_constraintTop_toTopOf="@id/response_icons"
+            android:textAlignment="viewStart"
+            android:layout_gravity="start"
+            tools:text="US (192.0.2.1)"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

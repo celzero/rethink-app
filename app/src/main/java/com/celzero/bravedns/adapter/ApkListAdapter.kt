@@ -6,18 +6,13 @@ import android.content.pm.PackageInfo
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AlphaAnimation
-import android.view.animation.Animation
-import android.widget.Filter
-import android.widget.Filterable
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.celzero.bravedns.adapter.Apk
 import com.celzero.bravedns.R
 import com.celzero.bravedns.ui.BottomSheetFragment
-import com.celzero.bravedns.util.ApkUtilities
+import com.celzero.bravedns.util.Utilities
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -102,7 +97,7 @@ class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) 
         init {
             //var permissionList : String = ""
             view.setOnClickListener{
-                val permissionDetails  = ApkUtilities.getPermissionDetails(
+                val permissionDetails  = Utilities.getPermissionDetails(
                     context,
                     apkList[adapterPosition].packageName
                 )

@@ -1,78 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    app:layout_scrollFlags="scroll|enterAlways"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/app_bar_setting"
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:fitsSystemWindows="true"
-        android:theme="@style/AppTheme" >
 
-        <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/settings_toolbar_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fitsSystemWindows="true"
-            app:title="Settings"
-            app:collapsedTitleGravity="center_vertical"
-            app:contentScrim="?attr/colorPrimary"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+ <LinearLayout
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+     app:layout_behavior="@string/appbar_scrolling_view_behavior"
+     android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/expandedImage"
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:background="@color/colorPrimary"
-                android:scaleType="fitCenter"
-                android:src="@drawable/brave_app_icon_bg_48px"
-                app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.7"
-                android:contentDescription="TODO" />
+     <LinearLayout
+         android:orientation="horizontal"
+         android:layout_width="match_parent"
+         android:weightSum="1"
+         android:padding="15dp"
+         android:layout_height="wrap_content">
+         <LinearLayout
+             android:layout_width="0dp"
+             android:layout_height="match_parent"
+             android:layout_weight="0.33"
+             android:gravity="center"
+             android:orientation="vertical"/>
+         <LinearLayout
+             android:layout_width="0dp"
+             android:layout_height="match_parent"
+             android:layout_weight="0.33"
+             android:gravity="center"
+             android:orientation="vertical">
 
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/settings_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin"
-                app:popupTheme="@style/AppTheme" />
+             <androidx.appcompat.widget.AppCompatImageView
+                 android:id="@+id/settings_app_icon"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_gravity="center"
+                 android:padding="5dp"
+                 android:src="@drawable/conf_dns_icon_black" />
 
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-    </com.google.android.material.appbar.AppBarLayout>
+         </LinearLayout>
+         <LinearLayout
+             android:layout_width="0dp"
+             android:layout_height="match_parent"
+             android:layout_weight="0.33"
+             android:gravity="center"
+             android:orientation="vertical"/>
 
-    <LinearLayout
-        android:id="@+id/setting_url_ll"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="10dp"
-        android:layout_margin="10dp"
-        tools:layout_editor_absoluteX="8dp"
-        app:layout_constraintTop_toBottomOf="@id/app_bar_setting">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Select URL: "
-            android:textColor="@color/primaryText"
-            android:textSize="25dp"/>
-
-        <androidx.appcompat.widget.AppCompatSpinner
-            android:id="@+id/setting_url_spinner"
-            android:padding="5dp"
-            android:isScrollContainer="true"
-             android:dropDownSelector="@color/dividerColor"
-            android:background="@color/dividerColor"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-    </LinearLayout>
+     </LinearLayout>
 
     <RadioGroup
         android:id="@+id/setting_app_mode_radio_group"
@@ -80,9 +57,9 @@
         android:layout_width="match_parent"
         app:layout_constraintTop_toBottomOf="@id/setting_url_ll"
         android:padding="10dp"
+        android:visibility="gone"
         android:layout_margin="10dp"
         android:backgroundTintMode="src_in"
-        android:background="@color/pale_white"
         android:layout_height="wrap_content">
         <RadioButton
             android:id="@+id/radio_button_1"
@@ -105,7 +82,242 @@
 
     </RadioGroup>
 
-    <androidx.appcompat.widget.AppCompatButton
+    <androidx.cardview.widget.CardView
+        android:id="@+id/setting_firewall_layout"
+        app:layout_constraintTop_toBottomOf="@id/setting_app_mode_radio_group"
+        android:layout_width="match_parent"
+        android:layout_margin="10dp"
+        app:cardElevation="@dimen/activity_horizontal_margin"
+        app:cardCornerRadius="10dp"
+        android:elevation="10dp"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:padding="10dp"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Firewall"
+                android:textSize="20sp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                style="@style/TextAppearance.AppCompat.Headline"
+                android:paddingTop="5dp"
+                android:textColor="@color/secondaryText"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:text="@string/firewall_explanation_text"
+                android:lineSpacingExtra="5dp"
+                android:gravity="center_vertical"
+                android:paddingLeft="30dp"
+                android:paddingRight="20dp"
+                android:paddingTop="25dp"
+                />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/configure_firewall_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Configure Firewall"
+                android:gravity="center"
+                android:padding="10dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/button_background_ripple"
+                style="@style/TextAppearance.AppCompat.Widget.Button"
+                android:textColor="@color/primaryText"/>
+
+
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/settings_app_mgr_layout"
+        app:layout_constraintTop_toBottomOf="@id/setting_firewall_layout"
+        android:layout_width="match_parent"
+        app:cardCornerRadius="10dp"
+        android:layout_margin="10dp"
+        app:cardElevation="@dimen/activity_horizontal_margin"
+        android:visibility="gone"
+        android:elevation="10dp"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:padding="10dp"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Application Manager"
+                style="@style/TextAppearance.AppCompat.Headline"
+                android:textSize="20sp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="5dp"
+                android:textColor="@color/secondaryText"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/app_mgr_explanation_text"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:gravity="center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:paddingLeft="30dp"
+                android:paddingRight="20dp"
+                android:paddingTop="25dp"
+                android:textColor="@color/primaryText"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/configure_app_mgr_btn"
+                android:visibility="visible"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Configure App Manager"
+                android:gravity="center"
+                android:padding="10dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="10dp"
+                android:textColor="@color/primaryText"
+                android:background="@drawable/button_background_ripple"
+                style="@style/TextAppearance.AppCompat.Widget.Button.Colored"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/settings_view_logs_layout"
+        app:layout_constraintTop_toBottomOf="@id/settings_app_mgr_layout"
+        android:layout_width="match_parent"
+        app:cardCornerRadius="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        app:cardElevation="@dimen/activity_horizontal_margin"
+        android:elevation="10dp"
+        android:layout_marginBottom="60dp"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:padding="10dp"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="DNS"
+                android:textSize="20sp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="5dp"
+                style="@style/TextAppearance.AppCompat.Headline"
+                android:textColor="@color/secondaryText"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:lineSpacingExtra="5dp"
+                android:text="@string/network_queries_explanation_text"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:gravity="center_vertical"
+                android:paddingLeft="30dp"
+                android:paddingRight="20dp"
+                android:paddingTop="25dp"
+                android:textColor="@color/primaryText"/>
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/view_queries_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/TextAppearance.AppCompat.Widget.Button.Colored"
+                android:text="View logs"
+                android:gravity="center"
+                android:padding="10dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="30dp"
+                android:background="@drawable/button_background_ripple"
+                android:textColor="@color/primaryText"/>
+
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+
+
+    <androidx.cardview.widget.CardView
+        app:layout_constraintTop_toBottomOf="@id/settings_app_mgr_layout"
+        android:layout_width="match_parent"
+        android:layout_margin="10dp"
+        android:visibility="gone"
+        app:cardElevation="@dimen/activity_horizontal_margin"
+        app:cardCornerRadius="10dp"
+        android:elevation="10dp"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:orientation="vertical"
+            android:visibility="visible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Settings"
+                style="@style/TextAppearance.AppCompat.Headline"
+                android:textSize="20sp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="5dp"
+                android:textColor="@color/secondaryText"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_explanation_text"
+                android:gravity="center_vertical"
+                style="@style/TextAppearance.AppCompat.Body1"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="5dp"
+                android:textColor="@color/primaryText"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/configure_settings_btn"
+                android:layout_width="match_parent"
+                style="@style/TextAppearance.AppCompat.Widget.Button.Colored"
+                android:layout_height="wrap_content"
+                android:text="Settings"
+                android:gravity="center"
+                android:padding="10dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/button_background_ripple"
+                android:textColor="@color/primaryText"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!--<androidx.appcompat.widget.AppCompatButton
         android:id="@+id/setting_apply"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -116,5 +328,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_margin="40dp"
-        app:layout_constraintTop_toBottomOf="@id/setting_url_ll"/>
-</androidx.constraintlayout.widget.ConstraintLayout>
+        app:layout_constraintTop_toBottomOf="@id/setting_url_ll"/>-->
+
+ </LinearLayout>
+</androidx.core.widget.NestedScrollView>

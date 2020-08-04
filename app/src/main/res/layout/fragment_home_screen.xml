@@ -1,543 +1,468 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/pale_white"
+    android:background="@color/light"
+    android:orientation="vertical"
+    android:fillViewport="true"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 <LinearLayout
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:weightSum="3"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:weightSum="1"
     android:layout_height="match_parent"
-    android:background="@color/pale_white">
+    >
 
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:weightSum="3"
+        android:weightSum="1"
+        android:padding="15dp"
         android:layout_height="wrap_content">
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="0.33"
             android:gravity="center"
-            android:layout_marginBottom="5dp"
-            android:orientation="vertical"
-            android:background="@color/pale_white">
+            android:orientation="vertical"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.33"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/fhs_app_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:padding="5dp"
+                android:src="@drawable/dns_icon_black" />
+
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_app_installed"
                 android:layout_width="wrap_content"
+                android:visibility="gone"
                 android:layout_height="wrap_content"
                 android:text="160 Apps\nInstalled"
                 android:padding="5dp"
                 android:gravity="center"
                 android:textStyle="bold"
-                android:textColor="@color/positive"/>
+                android:textColor="@color/primaryText"/>
         </LinearLayout>
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:layout_margin="5dp"
-            android:orientation="vertical"
-            android:background="@color/pale_white">
-
-            <!--<TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:textColor="@color/textColorMain"
-                android:text="@string/app_name_brave"
-                android:gravity="center"
-                android:textStyle="bold"
-                android:layout_gravity="center_horizontal|center_vertical"
-                android:textSize="32sp"
-                />-->
-            <RelativeLayout
-                android:id="@+id/fhs_rl_dns_service"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/fhs_app_icon"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="5dp"
-                    android:src="@drawable/brave_icon_new_removebg_144" />
-
-            </RelativeLayout>
-
-
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="0.33"
             android:gravity="center"
-            android:layout_marginBottom="5dp"
-            android:orientation="vertical"
-            android:background="@color/pale_white">
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/memory_space_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="30%\nStorage"
-                android:padding="5dp"
-                android:gravity="center"
-                android:textStyle="bold"
-                android:textColor="@color/positive"/>
-        </LinearLayout>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="20dp"
-        android:gravity="center"
-        android:orientation="horizontal">
-    <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Your Security Level : "
-        android:textSize="24dp"
-        android:textColor="@color/black"/>
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/fhs_protection_level_txt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Exposed"
-            android:textSize="24dp"
-            android:textColor="@color/negative"/>
+            android:orientation="vertical"/>
 
     </LinearLayout>
+
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:weightSum="2"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
         android:layout_height="wrap_content"
-        android:background="@color/dividerColor">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:orientation="vertical"
-            android:weightSum="2"
+        android:gravity="center"
+        android:padding="15dp"
+        android:layout_margin="5dp"
+        android:weightSum="1"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatSpinner
+            android:id="@+id/fhs_brave_mode_spinner"
+            android:layout_width="0dp"
+            android:layout_weight="0.8"
+            android:layout_gravity="center"
+            android:backgroundTint="@color/secondaryText"
+            android:gravity="center"
+            android:layout_height="wrap_content"/>
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/fhs_dns_mode_info"
+            android:layout_width="0dp"
+            android:layout_weight="0.2"
             android:layout_height="match_parent"
-            android:layout_marginRight="1dp"
+            android:layout_gravity="center"
+            android:padding="5dp"
+            android:src="@drawable/brave_mode_info" />
+
+
+    </LinearLayout>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_margin="10dp"
+        app:cardElevation="@dimen/activity_horizontal_margin"
+        android:layout_weight="0.27"
+        android:layout_height="0dp">
+    <LinearLayout
+        android:orientation="vertical"
+        android:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:weightSum="2"
+        android:layout_margin="5dp"
+        android:layout_height="wrap_content"
+        >
+        <LinearLayout
+            android:id="@+id/fhs_tile_show_firewall"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:weightSum="3"
+            android:layout_height="match_parent"
             android:layout_weight="1">
             <LinearLayout
                 android:id="@+id/fhs_ll_firewall"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:orientation="vertical"
+                android:padding="10dp"
                 android:layout_height="match_parent"
-                android:background="@color/pale_white"
-                android:layout_marginBottom="1dp"
                 android:gravity="center_horizontal"
                 android:layout_weight="1">
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:src="@drawable/ic_firewall" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:weightSum="2">
                 <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fhs_tile_firewall_apps_txt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Firewall"
-                    android:textStyle="bold"
-                    android:gravity="center"
-                    android:layout_weight="1.8"
-                    android:padding="5dp"
-                    android:textColor="@color/black"/>
+                    android:textSize="28sp"
+                    android:textColor="@color/secondaryText"
+                    android:text="4/327" />
 
-                <RadioGroup
-                    android:layout_width="wrap_content"
-                    android:layout_height="30dp"
-                    android:visibility="gone"
-                    android:layout_margin="10dp"
-                    android:background="@drawable/outline"
-                    android:orientation="horizontal">
-
-                    <RadioButton
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginBottom="1dp"
-                        android:layout_marginStart="1dp"
-                        android:layout_marginTop="1dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/switch_off"
-                        android:button="@null"
+                        android:layout_height="wrap_content"
+                        android:text="apps blocked"
+                        android:fontFamily="sans-serif-smallcaps"
                         android:gravity="center"
-                        android:padding="@dimen/radio_margin"
-                        android:text="Off"
-                        android:textColor="@drawable/switch_text" />
+                        android:textColor="@color/primaryText"/>
 
-                    <RadioButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginBottom="1dp"
-                        android:layout_marginEnd="1dp"
-                        android:layout_marginTop="1dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/switch_on"
-                        android:button="@null"
-                        android:gravity="center"
-                        android:padding="@dimen/radio_margin"
-                        android:text="On "
-                        android:textColor="@drawable/switch_text" />
-                </RadioGroup>
-                </LinearLayout>
 
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/fhs_ll_app_mgr"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:orientation="vertical"
+                android:padding="10dp"
+                android:visibility="visible"
                 android:layout_height="match_parent"
-                android:background="@color/pale_white"
                 android:gravity="center_horizontal"
                 android:layout_weight="1">
-                <androidx.appcompat.widget.AppCompatImageView
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fhs_tile_firewall_category_txt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:src="@drawable/ic_application_manager" />
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:weightSum="2">
+                    android:textColor="@color/secondaryText"
+                    android:text="2"
+                    android:textSize="28sp"
+                     />
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:fontFamily="sans-serif-smallcaps"
+                            android:text="categories blocked"
+                            android:textColor="@color/primaryText"/>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center"
-                        android:weightSum="2">
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:orientation="vertical"
+                android:padding="10dp"
+                android:visibility="visible"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal"
+                android:layout_weight="1">
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fhs_tile_firewall_universal_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/secondaryText"
+                    android:text="0"
+                    android:textSize="28sp"
+                    />
                 <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textStyle="bold"
-                    android:padding="5dp"
                     android:gravity="center"
-                    android:layout_weight="1.8"
-                    android:text="Application\nManager"
-                    android:textColor="@color/black"/>
-                <RadioGroup
-                    android:layout_width="wrap_content"
-                    android:layout_height="30dp"
-                    android:visibility="gone"
-                    android:layout_margin="10dp"
-                    android:background="@drawable/outline"
-                    android:orientation="horizontal">
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:text="universal firewall"
+                    android:textColor="@color/primaryText"/>
 
-                    <RadioButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginBottom="1dp"
-                        android:layout_marginStart="1dp"
-                        android:layout_marginTop="1dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/switch_off"
-                        android:button="@null"
-                        android:gravity="center"
-                        android:padding="@dimen/radio_margin"
-                        android:text="Off"
-                        android:textColor="@drawable/switch_text" />
-
-                    <RadioButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginBottom="1dp"
-                        android:layout_marginEnd="1dp"
-                        android:layout_marginTop="1dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/switch_on"
-                        android:button="@null"
-                        android:gravity="center"
-                        android:padding="@dimen/radio_margin"
-                        android:text="On "
-                        android:textColor="@drawable/switch_text" />
-                </RadioGroup>
-                    </LinearLayout>
-                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
         <LinearLayout
+            android:id="@+id/fhs_tile_show_dns"
             android:layout_width="match_parent"
-            android:orientation="vertical"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:orientation="horizontal"
+            android:visibility="visible"
+            android:weightSum="3"
+            android:layout_height="match_parent">
             <LinearLayout
-                android:id="@+id/fhs_ll_query"
-                android:layout_width="match_parent"
+                android:id="@+id/fhs_tile_dns_ll"
+                android:layout_width="0dp"
                 android:orientation="vertical"
+                android:padding="10dp"
+                android:layout_weight="1"
                 android:layout_height="match_parent"
-                android:background="@color/pale_white"
-                android:gravity="center_horizontal"
-                android:layout_marginBottom="1dp"
-                android:layout_weight="1">
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:src="@drawable/ic_wifi" />
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingLeft="10dp"
-                    android:gravity="center_vertical"
-                    android:weightSum="2">
+                android:gravity="center_horizontal">
                 <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fhs_tile_dns_lifetime_txt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Recent\nQueries"
-                    android:layout_weight="1.8"
-                    android:gravity="center"
-                    android:padding="5dp"
-                    android:textStyle="bold"
-                    android:textColor="@color/black"/>
+                    android:textColor="@color/secondaryText"
+                    android:text="35%"
+                    android:textSize="28sp"
+                     />
 
-                    <RadioGroup
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"
-                        android:visibility="gone"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center_vertical|right"
-                        android:layout_margin="10dp"
-                        android:background="@drawable/outline"
-                        android:gravity="right"
-                        android:orientation="horizontal">
+                        android:layout_height="wrap_content"
+                        android:text="lifetime queries"
+                        android:gravity="center"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:textColor="@color/primaryText"/>
 
-                        <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_marginStart="1dp"
-                            android:layout_marginTop="1dp"
-                            android:layout_marginBottom="1dp"
-                            android:layout_weight="1"
-                            android:background="@drawable/switch_off"
-                            android:button="@null"
-                            android:gravity="center"
-                            android:padding="@dimen/radio_margin"
-                            android:text="Off"
-                            android:textColor="@drawable/switch_text" />
 
-                        <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_marginTop="1dp"
-                            android:layout_marginEnd="1dp"
-                            android:layout_marginBottom="1dp"
-                            android:layout_weight="1"
-                            android:background="@drawable/switch_on"
-                            android:button="@null"
-                            android:gravity="center"
-                            android:padding="@dimen/radio_margin"
-                            android:text="On "
-                            android:textColor="@drawable/switch_text" />
-                    </RadioGroup>
-                </LinearLayout>
             </LinearLayout>
             <LinearLayout
-                android:id="@+id/fhs_ll_perm_mgr"
-                android:layout_width="match_parent"
+                android:id="@+id/fhs_tile_dns_median_latency_ll"
+                android:layout_width="0dp"
                 android:orientation="vertical"
+                android:visibility="visible"
                 android:layout_height="match_parent"
-                android:background="@color/pale_white"
                 android:gravity="center_horizontal"
+                android:padding="10dp"
                 android:layout_weight="1">
-                <androidx.appcompat.widget.AppCompatImageView
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fhs_tile_dns_median_latency_txt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:src="@drawable/ic_permission_manager" />
+                    android:textColor="@color/secondaryText"
+                    android:text="23 ms"
+                    android:textSize="28sp"
+                     />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="median latency"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:gravity="center"
+                        android:textColor="@color/primaryText"/>
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:orientation="vertical"
+                android:visibility="visible"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal"
+                android:padding="10dp"
+                android:layout_weight="1">
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fhs_tile_dns_trackers_blocked_txt"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingLeft="10dp"
-                    android:gravity="center_vertical"
-                    android:weightSum="2">
+                    android:textColor="@color/secondaryText"
+                    android:text="2.5%"
+                    android:textSize="28sp"
+                    />
+
                 <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Permission\nManager"
-                    android:layout_weight="1.8"
-                    android:textStyle="bold"
+                    android:text="trackers blocked"
+                    android:fontFamily="sans-serif-smallcaps"
                     android:gravity="center"
-                    android:padding="5dp"
-                    android:textColor="@color/black"/>
+                    android:textColor="@color/primaryText"/>
 
-                <RadioGroup
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/fhs_tile_show_dns_firewall"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:visibility="visible"
+            android:weightSum="3"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:orientation="vertical"
+                android:padding="10dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal">
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fhs_tile_dns_firewall_apps_blocked_txt"
                     android:layout_width="wrap_content"
-                    android:layout_height="30dp"
-                    android:layout_margin="10dp"
-                    android:visibility="gone"
-                    android:layout_gravity="center_vertical|right"
-                    android:background="@drawable/outline"
-                    android:orientation="horizontal">
-                    <RadioButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginBottom="1dp"
-                        android:layout_marginStart="1dp"
-                        android:layout_marginTop="1dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/switch_off"
-                        android:button="@null"
-                        android:gravity="center"
-                        android:padding="@dimen/radio_margin"
-                        android:text="Off"
-                        android:textColor="@drawable/switch_text" />
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/secondaryText"
+                    android:text="33"
+                    android:textSize="28sp"
+                    />
 
-                    <RadioButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginBottom="1dp"
-                        android:layout_marginEnd="1dp"
-                        android:layout_marginTop="1dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/switch_on"
-                        android:button="@null"
-                        android:gravity="center"
-                        android:padding="@dimen/radio_margin"
-                        android:text="On "
-                        android:textColor="@drawable/switch_text" />
-                </RadioGroup>
-                </LinearLayout>
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="apps blocked"
+                    android:gravity="center"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:textColor="@color/primaryText"/>
+
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:orientation="vertical"
+                android:visibility="visible"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal"
+                android:padding="10dp"
+                android:layout_weight="1">
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fhs_tile_dns_firewall_median_latency_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/secondaryText"
+                    android:text="2.5%"
+                    android:textSize="28sp"
+                    />
+
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="median latency"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:gravity="center"
+                    android:textColor="@color/primaryText"/>
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:orientation="vertical"
+                android:visibility="visible"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal"
+                android:padding="10dp"
+                android:layout_weight="1">
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fhs_tile_dns_firewall_trackers_blocked_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/secondaryText"
+                    android:text="2.5%"
+                    android:textSize="28sp"
+                    />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="trackers blocked"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:gravity="center"
+                    android:textColor="@color/primaryText"/>
+
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/fhs_dns_on_off_img"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:src="@drawable/ic_dns_off" />
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/fhs_dns_on_off_txt"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text=" Off"
-            android:layout_centerInParent="true"
-            android:textColor="@color/colorRed_A400"
-            android:gravity="center"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:padding="5dp" />
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="DNS"
-            android:layout_marginLeft="100dp"
-            android:textColor="@color/text_color_blue"
-            android:layout_centerVertical="true"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:padding="5dp" />
+    </androidx.cardview.widget.CardView>
 
-
-    </RelativeLayout>
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:paddingLeft="20dp"
-        android:paddingTop="20dp"
-        android:layout_height="wrap_content">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:weightSum="1">
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_configure_firewall"
+            android:layout_width="0dp"
+            style="@style/Widget.MaterialComponents.Chip.Action"
             android:layout_height="wrap_content"
-            android:text="Recent Queries"
-            android:textSize="16sp"
+            android:layout_weight="0.5"
             android:padding="5dp"
-            android:background="@color/pale_white"
-            android:textStyle="italic|bold"
-            android:textColor="@color/black"/>
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/recent_queries_1_tv"
-            android:layout_width="match_parent"
+            android:textColor="@color/secondaryText"
+            app:chipBackgroundColor="@color/colorPrimaryDark"
+            android:textAlignment="center"
+            android:layout_marginRight="10dp"
+            android:text="Configure firewall"/>
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_view_logs"
+            android:layout_width="0dp"
+            style="@style/Widget.MaterialComponents.Chip.Action"
+            app:chipBackgroundColor="@color/colorPrimaryDark"
+            android:textAlignment="center"
+            android:padding="5dp"
             android:layout_height="wrap_content"
-            android:text="Configure Firewall"
-            android:gravity="center_vertical"
-            android:drawablePadding="10dp"
-            android:drawableRight="@drawable/ic_right_arrow_small"
-            android:padding="5dp"
-            android:textColor="@color/black"/>
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/recent_queries_2_tv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Configure Internet Manager"
-            android:gravity="center_vertical"
-            android:drawablePadding="10dp"
-            android:drawableRight="@drawable/ic_right_arrow_small"
-            android:padding="5dp"
-            android:textColor="@color/black"/>
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/recent_queries_3_tv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Configure Application Manager"
-            android:gravity="center_vertical"
-            android:drawablePadding="10dp"
-            android:drawableRight="@drawable/ic_right_arrow_small"
-            android:padding="5dp"
-            android:textColor="@color/black"/>
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/recent_queries_4_tv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Configure Permission Manager"
-            android:gravity="center_vertical"
-            android:drawablePadding="10dp"
-            android:drawableRight="@drawable/ic_right_arrow_small"
-            android:padding="5dp"
-            android:textColor="@color/black"/>
-
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/secondaryText"
+            android:layout_weight="0.5"
+            android:text="View logs"/>
     </LinearLayout>
 
-    <!--<androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/brave_status_text_tv"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Configure Permission Manager"
-        android:gravity="center_vertical"
-        android:drawablePadding="10dp"
-        android:padding="5dp"
-        android:textColor="@color/black"/>
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:gravity="bottom|center"
+        android:layout_weight="0.5"
+        android:orientation="vertical">
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/fhs_protection_level_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-smallcaps"
+            android:text="not connected"
+            android:textColor="@color/accent_bad"
+            android:textSize="16dp" />
+        <com.celzero.bravedns.animation.RippleBackground
+            android:id="@+id/content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:rb_color="@color/rippleColor"
+            app:rb_duration="6000"
+            app:rb_radius="26dp"
+            app:rb_rippleAmount="3"
+            app:rb_scale="3"
+            app:rb_type="fillRipple">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/brave_status_exp_text_tv"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Configure Permission Manager"
-        android:gravity="center_vertical"
-        android:drawablePadding="10dp"
-        android:padding="5dp"
-        android:textColor="@color/black"/>-->
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fhs_dns_on_off_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/ic_icon_circle"
+                android:gravity="center"
+                android:text="Connect"
+                android:textColor="@color/primaryText"
+                android:textSize="20sp"
+                android:textStyle="normal" />
+        </com.celzero.bravedns.animation.RippleBackground>
 
-</LinearLayout>
-</androidx.core.widget.NestedScrollView>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/fhs_app_connected_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-smallcaps"
+            android:text="@string/dns_explanation_disconnected"
+            android:textColor="@color/primaryText"
+            android:textSize="16sp" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/fhs_app_uptime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="uptime"
+            android:fontFamily="sans-serif-smallcaps"
+            android:textColor="@color/secondaryText"
+            android:textSize="16sp" />
+    </LinearLayout>
+    </LinearLayout>
+</androidx.appcompat.widget.LinearLayoutCompat>
 
 
     <!--android:drawableLeft="@drawable/ic_permission_manager_small"-->

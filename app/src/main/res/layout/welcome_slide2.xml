@@ -2,46 +2,44 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_screen2">
+    android:background="@color/colorPrimary">
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:weightSum="0.99"
+        android:weightSum="1"
         android:layout_centerInParent="true"
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
-            android:layout_weight="0.33"
-            android:layout_margin="30dp"
+            android:layout_weight="0.2"
             android:gravity="center"
             android:layout_height="wrap_content"
             android:text="@string/slide_2_title"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/secondaryText"
             android:textSize="@dimen/slide_title"
-            android:textStyle="bold" />
+            style="@style/TextAppearance.AppCompat.Headline" />
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="@dimen/img_width_height"
-            android:layout_weight="0.33"
+            android:layout_weight="0.5"
             android:layout_gravity="center"
             android:layout_height="@dimen/img_width_height"
-            android:src="@drawable/shield_green" />
+            android:src="@drawable/illustrations_firewall" />
 
 
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.33"
-            android:layout_marginTop="20dp"
-            android:paddingLeft="@dimen/desc_padding"
-            android:paddingRight="@dimen/desc_padding"
+            android:layout_weight="0.3"
             android:text="@string/slide_2_desc"
             android:textAlignment="center"
-            android:textColor="@color/colorPrimaryDark"
+            android:gravity="center_vertical"
+            style="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="@color/secondaryText"
             android:textSize="@dimen/slide_desc" />
 
     </LinearLayout>

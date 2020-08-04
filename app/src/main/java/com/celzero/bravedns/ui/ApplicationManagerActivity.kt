@@ -6,6 +6,7 @@ import android.app.ActivityManager
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -33,11 +34,11 @@ import java.io.UncheckedIOException
 
 class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextListener{
 
-    private lateinit var fastAdapter: FastAdapter<ApplicationManagerApk>
-    private lateinit var recycle : RecyclerView
-    private val apkList = ArrayList<ApplicationManagerApk>()
-    lateinit var itemAdapter: ItemAdapter<ApplicationManagerApk>
-    private lateinit var context : Context
+
+
+
+
+
     private lateinit var fabAddIcon : FloatingActionButton
     private lateinit var fabUninstallIcon : FloatingActionButton
     private lateinit var fabAppInfoIcon : FloatingActionButton
@@ -105,7 +106,7 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
 
         fabAppInfoIcon.setOnClickListener{
             val list = ApplicationManagerApk.getAddedList(this)
-            if(list.size > 1){
+            if(list.size >= 1){
                 list.get(list.size - 1).packageName?.let { it1 -> appInfoForPackage(it1) }
             }
         }
@@ -114,21 +115,57 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
     }
 
 
+    companion object{
+        private lateinit var recycle : RecyclerView
+        lateinit var itemAdapter: ItemAdapter<ApplicationManagerApk>
+        private lateinit var fastAdapter: FastAdapter<ApplicationManagerApk>
+        private lateinit var context : Context
+        private val apkList = ArrayList<ApplicationManagerApk>()
+        fun updateUI(packageName : String, isAdded : Boolean){
+            Log.d("BraveDNS","Refresh list called : package Name :-" + packageName)
+            //val packageName = packageName.removePrefix("package:").toString()
+            fastAdapter = FastAdapter.with(itemAdapter)
+            if(isAdded){
+                val packageInfo = context.packageManager.getPackageInfo(packageName,0)
+                ApplicationInfo.getCategoryTitle(context,packageInfo.applicationInfo.category)
+                if(packageInfo.packageName != "com.celzero.bravedns" ) {
+                    val userApk =  ApplicationManagerApk(packageInfo, "", context)
+                    apkList.add(userApk)
+                }
+            }else{
+                var apkDetail : ApplicationManagerApk? = null
+                apkList.forEach {
+                    if(it.packageName.equals(packageName)) {
+                        apkDetail = it
+                    }
+                }
+                if(apkDetail != null) {
+                    Log.d("BraveDNS","apkDetail Removed  :-" + packageName)
+                    apkList.remove(apkDetail!!)
+                }else{
+                    Log.d("BraveDNS","apkDetail is null  :-" + packageName)
+                }
+            }
+            if(fastAdapter != null) {
+                Log.d("BraveDNS","fastAdapter notified  :-" + packageName)
+                itemAdapter.clear()
+                recycle.adapter = fastAdapter
+                itemAdapter.add(apkList)
+                fastAdapter.notifyAdapterDataSetChanged()
+                fastAdapter.notifyDataSetChanged()
+            }else{
+                Log.d("BraveDNS","fastAdapter is null  :-" + packageName)
+            }
+        }
+    }
+
     private fun uninstallPackage(app : ApplicationManagerApk){
         val packageURI = Uri.parse("package:"+app.packageName)
         val intent : Intent = Intent(Intent.ACTION_DELETE,packageURI)
         intent.putExtra("packageName",app.packageName)
         startActivity(intent)
         //apkList.remove(app)
-        fastAdapter.notifyAdapterDataSetChanged()
-        GlobalScope.launch(Dispatchers.IO) {
-            val mDb = AppDatabase.invoke(applicationContext)
-            //val appInfoDAO  = mDb.appInfoDAO()
-            val appInfoRepository = mDb.appInfoRepository()
-            val appInfo = AppInfo()
-            appInfo.packageInfo = packageName
-            appInfoRepository.deleteAsync(appInfo, this)
-        }
+
     }
 
     private fun appInfoForPackage(packageName : String){
@@ -158,7 +195,7 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
         appList.forEach{
             val packageInfo = packageManager.getPackageInfo(it.packageInfo,0)
             if(packageInfo.packageName != "com.celzero.bravedns" ) {
-                val userApk =  ApplicationManagerApk(packageManager.getPackageInfo(it.packageInfo, 0), context)
+                val userApk =  ApplicationManagerApk(packageManager.getPackageInfo(it.packageInfo, 0), it.appCategory, context)
                 apkList.add(userApk)
             }
         }

@@ -3,8 +3,6 @@ package com.celzero.bravedns.service
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.util.Log
-import android.widget.Toast
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 class VpnController {
@@ -64,7 +62,7 @@ class VpnController {
         /*if (braveVpnService != null) {
             return
         }*/
-        PersistantState.setVpnEnabled(context, true)
+        PersistentState.setVpnEnabled(context, true)
         stateChanged(context)
         val startServiceIntent = Intent(context, BraveVPNService::class.java)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -87,7 +85,7 @@ class VpnController {
 
     @Synchronized
     fun stop(context: Context?) {
-        PersistantState.setVpnEnabled(context!!, false)
+        PersistentState.setVpnEnabled(context!!, false)
         connectionState = null
         if (braveVpnService != null) {
             braveVpnService!!.signalStopService(true)
@@ -98,7 +96,7 @@ class VpnController {
 
     @Synchronized
     fun getState(context: Context?): VpnState? {
-        val requested: Boolean = PersistantState.getVpnEnabled(context!!)
+        val requested: Boolean = PersistentState.getVpnEnabled(context!!)
         val on = braveVpnService != null && braveVpnService!!.isOn()
         return VpnState(requested, on, connectionState)
     }

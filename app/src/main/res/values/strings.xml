@@ -4,7 +4,8 @@
     <string name="app_name_brave">Brave</string>
     <string name="title_internet_manager">Internet \n Manager</string>
     <string name="title_permission_manager">Permission \n Manager</string>
-    <string name="title_settings">Settings</string>
+    <string name="title_tools">Tools</string>
+    <string name="title_settings">Configure</string>
     <string name="txt_im_topic">Internet Manager</string>
     <string name="txt_im_adfree_internet">AD Free Internet</string>
     <string name="txt_im_adfree_internet_desc">Removes the ad across all the applications</string>
@@ -54,24 +55,24 @@
     </string>
 
     <string name="accessibility_service_label">
-        Automate Permissions Management
+        Brave DNS
     </string>
 
-    <string name="next">NEXT</string>
-    <string name="skip">SKIP</string>
-    <string name="start">START</string>
+    <string name="next">Next</string>
+    <string name="skip">Skip</string>
+    <string name="start">Done</string>
 
-    <string name="slide_1_title">AD Free Internet!</string>
-    <string name="slide_1_desc">Removes the ad across all the applications!</string>
+    <string name="slide_1_title">Secure Browsing</string>
+    <string name="slide_1_desc">Refuse connections to malicious websites and servers: Fake websites often steal critical personal information like bank accounts and passwords to emails.</string>
 
-    <string name="slide_2_title">Censor Free Internet</string>
-    <string name="slide_2_desc">Filter your network traffic with blacklists that power popular ad-blokers!</string>
+    <string name="slide_2_title">Firewall</string>
+    <string name="slide_2_desc">Firewall prevents apps from accessing the Internet over Wifi or Mobile data. Since most forms of surveillance require the data to be sent over to a central repository, firewalling them effectively mitigates the threat</string>
 
     <string name="slide_3_title">Permission Manager</string>
-    <string name="slide_3_desc">Automatically revoke the permissions to restrict their abuse by apps</string>
+    <string name="slide_3_desc">Apps are often granted permissions to access location or storage, for instance, that could be revoked once they have served the purpose. This is tedious; however, to do it manually. Permissions Manager helps with automating this task.</string>
 
     <string name="slide_4_title">Report Center</string>
-    <string name="slide_4_desc">Pay attention to permissions and network usage, keep abreast with privacy breaches, and evaluate the apps behaviour!</string>
+    <string name="slide_4_desc"> View reports on your Phone or on your PC. Since most forms of data collection involve sharing it to a central repository, this capbility might be handy to verify for yourself to single out behaviour of such apps.</string>
 
     <string-array name="interface_address_prefixes">
         <item>192.168.0/24</item>
@@ -79,26 +80,27 @@
         <item>10.18.234/8</item>
     </string-array>
 
-    <string-array name="adguard_name">
-        <item>Default</item>
-        <item>Family protection</item>
-        <item>Malware Blocking</item>
+    <string-array name="cloudflare_name">
+        <item>No filter</item>
+        <item>Family</item>
+        <item>Malware</item>
+        <item>Ads and Tracker (coming soon)</item>
     </string-array>
 
-    <string-array name="adguard_url">
-        <item>https://dns.adguard.com/dns-query</item>
-        <item>https://dns-family.adguard.com/dns-query</item>
-        <!--https://family.cloudflare-dns.com/dns-query-->
+    <string-array name="cloudflare_url">
+        <item>https://cloudflare-dns.com/dns-query</item>
+        <item>https://family.cloudflare-dns.com/dns-query</item>
         <item>https://security.cloudflare-dns.com/dns-query</item>
+        <item>https://cloudflare-dns.com/dns-query</item>
     </string-array>
 
     <string name="warning_title" description="Status indicator text shown in a warning notification.">
-    Warning: BraveDNS has been deactivated
+    Exposed: BraveDNS has been deactivated
   </string>
 
     <string name="notification_content"
         description="Indicates what will happen if the user taps the notification.">
-    Tap to change DNS protection setting
+    Tap to change protection setting
   </string>
 
     <string name="warning_channel_name"
@@ -147,7 +149,7 @@
 
     <string name="notification_title"
         description="Status indicator text shown in a persistent notification.">
-    DNS protection is active
+    Protected! Connected to Fast and Secure DNS.
   </string>
 
 
@@ -226,12 +228,116 @@
 
     <string name="status_exposed"
         description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">
-    Exposed
+    not connected
   </string>
 
     <string name="explanation_exposed"
         description="Expanded form of status_exposed">
     Your connection is exposed to DNS attacks.
   </string>
+
+    <string name="dns_explanation_connected" description= "The message will be shown when the DNS is connected">
+        connected to bravedns and firewall
+    </string>
+
+    <string name="dns_explanation_disconnected" description="This message will be shown to user in main screen when the DNS is not connected">
+        disconnected from bravedns and firewall
+    </string>
+
+    <string name="firewall_explanation_text" description="Explanation on the main screen for the users about what the firewall does.">
+        Block apps or a category of apps from connecting to the Internet in response to device events: Limiting access to the Internet helps prevent unwarranted data usage as well as conserves battery.
+    </string>
+
+    <string name="app_mgr_explanation_text" description="Explanation on the main screen for the users about what the application manager does.">
+        Check which apps consume your data. Streamline your Android smartphone or tablet. Quickly and easily uninstall multiple unwanted applications.
+    </string>
+
+    <string name="network_queries_explanation_text" description="Explanation on the main screen for the users about network queries">
+        View DNS queries this device has requested. Typically, one request is sent for each Internet connection established by any app: For example, loading a web page can result in tens of DNS queries.
+    </string>
+
+    <string name="settings_explanation_text" description="Explanation on the main screen for the users for settings screen.">
+        A firewall to isolate apps completely from the Internet, or prevent them from making connections. Limiting access to the Internet helps prevent unwarranted data usage, as well as conserves battery.
+    </string>
+    <string name="screen_off_firewall_explanation">
+        All the applications will be firewalled when the phone is locked : Limiting background access to the Internet helps prevent unwarranted data usage as well as conserves battery.
+    </string>
+    <string name="universal_firewall_explanation">
+        Apply firewall rules on all installed applications based on device events, for example, firewall when the device is locked or when a particular app is not in use.
+    </string>
+
+    <string name="category_firewall_explanation">
+        Choose application categories to firewall, for example, disallow the \'Games\' category to block internet access to all game apps. Note: These rules are applied independently of \'Universal Firewall\'.
+    </string>
+
+    <string name="application_firewall_explanation">
+        Choose individually among installed applications to firewall, for example, firewall the \'Calculator\' app to disallow all internet access to it. Note: These rules are applied independently of \'Universal Firewall\'.
+    </string>
+
+    <string-array name="brave_dns_mode_names">
+        <item>DNS</item>
+        <item>Firewall</item>
+        <item>DNS + Firewall</item>
+    </string-array>
+
+    <integer-array name="brave_dns_mode_icons">
+        <item>@drawable/spinner_dns</item>
+        <item>@drawable/spinner_firewall</item>
+        <item>@drawable/spinner_both</item>
+    </integer-array>
+
+
+    <string name="brave_mode_not_supported">
+        DNS+Firewall mode is not supported in your version of Android.
+    </string>
+
+    <string name="dns_mode_info_title">
+        DNS
+    </string>
+
+    <string name="dns_mode_info_explanation">
+        Filters your network traffic with blacklists that power popular ad-blockers. Communication or messaging apps, for instance, can\'t be firewalled altogether, but can be, instead, blocked from accessing certain server endpoints of known ad networks and trackers.
+    </string>
+
+
+    <string name="firewall_mode_info_title">
+        Firewall
+    </string>
+
+    <string name="firewall_mode_info_explanation">
+        Blocks apps from connecting to the Internet. Since most forms of surveillance require the data sent over the network to a server, firewalling them effectively mitigates the threat.
+    </string>
+
+
+    <string name="hybrid_mode_info_title">
+        DNS + Firewall
+    </string>
+
+    <string name="hybrid_mode_info_explanation">
+        Filters your network traffic and blocks apps from connecting to Internet. This mode is available only on Android 10 and above version.
+    </string>
+
+    <string name="alert_permission_accessibility">
+        Permission - Accessibility
+    </string>
+
+    <string name="alert_permission_accessibility_explanation">
+        We use accessibility to automate frequent actions to manage security and privacy related settings on your phone.
+    </string>
+
+    <string name="brave_dns_connect_prompt_firewall">
+        Firewall mode is not enabled
+    </string>
+    <string name="brave_dns_connect_prompt_query">
+       DNS mode is not enabled
+    </string>
+
+    <string name="brave_dns_connect_mode_change_firewall">
+       Cannot configure: Firewall Mode not active.
+    </string>
+
+    <string name="brave_dns_connect_mode_change_dns">
+       Cannot view logs: DNS Mode not active.
+    </string>
 
 </resources>

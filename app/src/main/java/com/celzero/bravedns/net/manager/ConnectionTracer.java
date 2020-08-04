@@ -26,10 +26,15 @@ public class ConnectionTracer {
 
     @TargetApi(Build.VERSION_CODES.Q)
     public int getUidQ(int protocol, String sourceIp, int sourcePort, String destIp, int destPort) {
-        if (cm == null) return MISSING_UID;
+        if (cm == null ){
+            return MISSING_UID;
+        }
 
         // https://android.googlesource.com/platform/development/+/da84168fb2f5eb5ca012c3f430f701bc64472f34/ndk/platforms/android-21/include/linux/in.h
-        if (protocol != 6 /* TCP */ || protocol != 17 /* UDP */) return MISSING_UID;
+        if (protocol != 6 /* TCP */ && protocol != 17 /* UDP */) {
+            //if (DEBUG) Log.d(TAG, "protocol is not valid : "+protocol);
+            return MISSING_UID;
+        }
 
         InetSocketAddress local;
         InetSocketAddress remote;

@@ -1,21 +1,25 @@
 package com.celzero.bravedns.adapter
 
+import android.app.AlertDialog
 import android.os.Build
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
+import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.ToggleButton
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.net.dns.DnsPacket
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.net.doh.Transaction
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.QueryDetailActivity
-import com.celzero.bravedns.util.ApkUtilities
-import com.google.common.net.InternetDomainName
+import com.celzero.bravedns.util.Utilities
 import java.io.IOException
 import java.net.InetAddress
 import java.net.ProtocolException
@@ -24,12 +28,7 @@ import java.util.*
 
 class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    val condensedColor : Int = activity.getResources().getColor(R.color.light)
-    val expandedColor : Int = activity.getResources().getColor(R.color.light)
-
-
-
-    private var countryMap: CountryMap? = null
+   private var countryMap: CountryMap? = null
 
     private val transactions: MutableList<QueryAdapter.TransactionView> =  mutableListOf()
 
@@ -61,7 +60,7 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
         } else*/
         if (holder is TransactionViewHolder) {
             val transaction: TransactionView? = getItem(position)
-            holder.update(transaction!!)
+            holder.update(transaction!!,position)
         } else {
             throw java.lang.AssertionError(
                 String.format(
@@ -88,8 +87,6 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
                 parent, false
             )
 
-            Log.i("BraveDNS", "Query List size : "+transactions.size)
-
             // Workaround for lack of vector drawable background support in pre-Lollipop Android.
             val expand = v.findViewById<View>(R.id.expand)
             // getDrawable automatically rasterizes vector drawables as needed on pre-Lollipop Android.
@@ -115,7 +112,6 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
     }
 
     private fun getItem(position: Int): QueryAdapter.TransactionView? {
-        Log.i("BraveDNS", "Query List size : "+transactions.size  + " -- Position : "+position)
         return transactions[(transactions.size-1) - position]
     }
 
@@ -129,7 +125,7 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
         private var hostnameView: TextView? = null
         private var timeView: TextView? = null
         private var flagView: TextView? = null
-        private var expandButton: ToggleButton? = null
+        //private var expandButton: ToggleButton? = null
 
         // Contents of the expanded details view
         private var detailsView: View? = null
@@ -138,48 +134,130 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
         private var latencyView: TextView? = null
         private var resolverView: TextView? = null
         private var responseView: TextView? = null
+        private var queryLayoutLL : LinearLayout ?= null
 
         init{
             rowView = itemView
 
-            hostnameView = itemView.findViewById(R.id.hostname)
+            hostnameView = itemView.findViewById(R.id.fqdn1)
             timeView = itemView.findViewById(R.id.response_time)
             flagView = itemView.findViewById(R.id.flag)
-            expandButton = itemView.findViewById(R.id.expand)
+            //expandButton = itemView.findViewById(R.id.expand)
 
-            expandButton!!.setOnClickListener(this)
+            //expandButton!!.setOnClickListener(this)
 
             detailsView = itemView.findViewById(R.id.details)
             fqdnView = itemView.findViewById(R.id.fqdn)
             typeView = itemView.findViewById(R.id.qtype)
-            latencyView = itemView.findViewById(R.id.latency_small)
+            latencyView = itemView.findViewById(R.id.latency_val)
             resolverView = itemView.findViewById(R.id.resolver)
             responseView = itemView.findViewById(R.id.response)
+            queryLayoutLL = itemView.findViewById(R.id.query_screen_ll)
+            queryLayoutLL!!.setOnClickListener(this)
         }
 
         override fun onClick(view: View?) {
-            val position = this.adapterPosition
+            /*val position = this.adapterPosition
             val transaction: TransactionView? = getItem(position)
-            transaction!!.expanded = ! transaction.expanded
-            notifyItemChanged(position)
+            //transaction!!.expanded = ! transaction.expanded
+            notifyItemChanged(position)*/
+            val position = this.adapterPosition
+            //showDialogQuery(position)
         }
 
-        fun update(transaction : TransactionView) {
+        private fun showDialogQuery(positions : Int) {
+            /*  val builderSingle: AlertDialog.Builder = AlertDialog.Builder(FirewallHeader.context)
+              builderSingle.setIcon(R.drawable.ic_launcher)
+              builderSingle.setTitle("Brave DNS Modes")
+              builderSingle.show()
+      */
+            val dialog: AlertDialog.Builder = AlertDialog.Builder(activity)
+            val view: View = LayoutInflater.from(activity).inflate(R.layout.query_detail_dialog, null)
+            val position1 = positions
+            val transaction: TransactionView? = getItem(position1)
+            //val dialog = Dialog(activity)
+            //dialog.setTitle("Query")
+
+            /*dialog.setCanceledOnTouchOutside(true)
+            dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)*/
+            val metrics: DisplayMetrics = activity.getResources().getDisplayMetrics()
+            val DeviceTotalWidth = metrics.widthPixels
+            val DeviceTotalHeight = metrics.heightPixels
+            /*dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+
+            dialog.setContentView(R.layout.query_detail_dialog)
+            dialog.window!!.setLayout(DeviceTotalWidth, DeviceTotalHeight)*/
+
+            var detailsView1 = view.findViewById(R.id.detailss) as ConstraintLayout
+            var fqdnView1 = view.findViewById(R.id.fqdns) as TextView
+            var typeView1 = view.findViewById(R.id.qtypes) as TextView
+            var latencyView1 = view.findViewById(R.id.latency_smalls) as TextView
+            var resolverView1 = view.findViewById(R.id.resolvers) as TextView
+            var responseView1 = view.findViewById(R.id.responses) as TextView
+
+
+            // Make sure the details are up to date.
+            fqdnView1!!.text = transaction!!.fqdn
+            typeView1!!.text = transaction!!.typename
+            latencyView1!!.text = transaction!!.latency
+            if (transaction!!.resolver != null) {
+                resolverView1!!.text = transaction!!.resolver
+            } else {
+                resolverView1!!.setText(R.string.unknown_server)
+            }
+            responseView1!!.text = transaction!!.response
+
+            dialog.setView(view)
+            //dialog.setCancelable(false)
+            val alert = dialog.create()
+            alert.window!!.setLayout(DeviceTotalWidth, DeviceTotalHeight)
+            alert.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+            /*val okBtn = dialog.findViewById(R.id.info_dialog_cancel_btn) as Button
+            okBtn.setOnClickListener {
+                dialog.dismiss()
+            }*/
+            alert.show()
+            //dialog.show()
+
+        }
+
+        fun update(transaction : TransactionView, position: Int) {
             // This function can be run up to a dozen times while blocking rendering, so it needs to be
             // as brief as possible.
             this.transaction = transaction
-            hostnameView!!.setText(transaction.hostname)
+            hostnameView!!.setText(transaction.fqdn)
             timeView!!.setText(transaction.time)
             flagView!!.setText(transaction.flag)
-            setExpanded(transaction.expanded)
+            fqdnView!!.setText(transaction!!.hostname)
+            typeView!!.setText(transaction!!.typename)
+            latencyView!!.setText(transaction!!.latency)
+            if (transaction!!.resolver != null) {
+                resolverView!!.setText(transaction!!.resolver)
+            } else {
+                resolverView!!.setText(R.string.unknown_server)
+            }
+            responseView!!.setText(transaction!!.response)
+            /*if(position % 2 ==0 )
+                queryLayoutLL!!.setBackgroundColor(activity.getColor(R.color.colorPrimaryDark))*/
+            //setExpanded(transaction.expanded)
         }
 
 
-        private fun setExpanded(expanded: Boolean) {
+        /*private fun setExpanded(expanded: Boolean) {
             detailsView!!.setVisibility(if (expanded) View.VISIBLE else View.GONE)
             rowView!!.setBackgroundColor(if (expanded) expandedColor else condensedColor)
-            expandButton!!.setChecked(expanded)
-            if (expanded) {
+            //expandButton!!.setChecked(expanded)
+            fqdnView!!.setText(transaction!!.fqdn)
+            typeView!!.setText(transaction!!.typename)
+            latencyView!!.setText(transaction!!.latency)
+            if (transaction!!.resolver != null) {
+                resolverView!!.setText(transaction!!.resolver)
+            } else {
+                resolverView!!.setText(R.string.unknown_server)
+            }
+            responseView!!.setText(transaction!!.response)
+            *//*if (expanded) {
                 // Make sure the details are up to date.
                 fqdnView!!.setText(transaction!!.fqdn)
                 typeView!!.setText(transaction!!.typename)
@@ -190,8 +268,8 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
                     resolverView!!.setText(R.string.unknown_server)
                 }
                 responseView!!.setText(transaction!!.response)
-            }
-        }
+            }*//*
+        }*/
 
     }
 
@@ -226,26 +304,28 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
         var hostname : String? = null
         var time : String? = null
         var flag : String? = null
-        val template : String ?= "(30) ms"
+        val template : String = "30 ms"
         var resolver : String? = null
         var response : String? = null
         var latency : String? = null
         var typename : String? = null
-            init{
+
+        init{
             // If true, the panel is expanded to show details.
 
 
             // Human-readable representation of this transaction.
             fqdn = transaction.name
-            hostname = ApkUtilities.getETldPlus1(transaction.name)
+            hostname = Utilities.getETldPlus1(transaction.name)
 
             val hour :Int ?= transaction.responseCalendar[Calendar.HOUR_OF_DAY]
             val minute :Int ?= transaction.responseCalendar[Calendar.MINUTE]
             val second :Int ?= transaction.responseCalendar[Calendar.SECOND]
             time  =  String.format(Locale.ROOT, "%02d:%02d:%02d", hour, minute, second)
 
-
-            latency  = java.lang.String.format(template!!, transaction.responseTime - transaction.queryTime)
+            //Log.d("BraveDNS","Transaction - transaction.responseTime :"+transaction.responseTime + " - transaction.queryTime : "+transaction.queryTime)
+            //latency  = String.format(template, transaction.responseTime - transaction.queryTime)
+            latency  = (transaction.responseTime - transaction.queryTime).toString() + " ms"
             typename = getTypeName(transaction.type.toInt())
 
             var serverAddress : InetAddress?= null
@@ -297,6 +377,9 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
                 } else {
                     "\u26a0" // Warning sign
                 }
+            }
+            if(response!!.contains("ZZ")){
+                PersistentState.setBlockedReq(activity)
             }
         }
 
@@ -397,7 +480,6 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
         return (if (countryMap == null) {
             null
         } else {
-            Log.i("BraveDNS","Country Map : getCountryCode")
             countryMap!!.getCountryCode(address)
         })!!
     }
@@ -407,13 +489,7 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
             return
         }
         try {
-            Log.i("BraveDNS","Country Map 1")
             countryMap = CountryMap(activity.getAssets())
-            if(countryMap == null){
-                Log.i("BraveDNS","Country Map is null??")
-            }else{
-                Log.i("BraveDNS","Country Map is not null??")
-            }
         } catch (e: IOException) {
             Log.e("BraveDNS Exception",e.message)
         }

@@ -1,8 +1,8 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="112dp"
-    android:height="112dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="32"
+    android:viewportHeight="32">
   <path
       android:pathData="M7,14C5.8954,14 5,13.1046 5,12C5,10.8954 5.8954,10 7,10C8.1046,10 9,10.8954 9,12C9,13.1046 8.1046,14 7,14Z"
       android:strokeLineJoin="miter"

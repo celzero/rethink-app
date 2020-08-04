@@ -2,10 +2,10 @@ package com.celzero.bravedns.ui
 
 import android.annotation.TargetApi
 import android.app.AppOpsManager
-import android.app.Fragment
 import android.app.usage.NetworkStatsManager
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -16,11 +16,14 @@ import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.celzero.bravedns.R
+import com.celzero.bravedns.adapter.FirewallHeader
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.service.PersistantState
-import com.celzero.bravedns.util.ApkUtilities.Companion.hasPermissionToReadPhoneStats
-import com.celzero.bravedns.util.ApkUtilities.Companion.requestPhoneStateStats
+import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
+import com.celzero.bravedns.util.Utilities.Companion.hasPermissionToReadPhoneStats
+import com.celzero.bravedns.util.Utilities.Companion.requestPhoneStateStats
 import com.celzero.bravedns.util.DatabaseHandler
 import com.celzero.bravedns.util.NetworkStatsHelper
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -44,10 +47,16 @@ class HomeScreenActivity : AppCompatActivity() {
              Call the coroutine scope to insert/update/delete the values*/
 
     object GlobalVariable{
-        var appList : HashSet<AppInfo> = HashSet()
+        var braveMode : Int = 0
+        var appList : MutableMap<String, AppInfo> = HashMap()
+        var categoryList : HashMap<String, FirewallHeader> = HashMap()
         var dnsMode = 0
         var firewallMode : Int = 0
+        var lifeTimeQueries : Int = 0
         var installedAppCount : Int = 0
+        var medianP90 : Long = 0
+        var appStartTime : Long = System.currentTimeMillis()
+        var isBackgroundEnabled : Boolean = false
     }
 
     companion object {
@@ -85,15 +94,33 @@ class HomeScreenActivity : AppCompatActivity() {
         }
         navView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
 
-        GlobalVariable.dnsMode = PersistantState.getDnsMode(this)
-        GlobalVariable.firewallMode = PersistantState.getFirewallMode(this)
+        GlobalVariable.dnsMode = PersistentState.getDnsMode(this)
+        GlobalVariable.firewallMode = PersistentState.getFirewallMode(this)
+        GlobalVariable.isBackgroundEnabled = PersistentState.getBackgroundEnabled(this)
 
+        //registerReceiversForScreenState()
         getAppInfo()
 
     }
 
 
+ /*   private fun registerReceiversForScreenState(){
+        val filter = IntentFilter()
+        filter.addAction(Intent.ACTION_SCREEN_OFF)
+        filter.addAction(Intent.ACTION_SCREEN_ON)
+        filter.addAction(Intent.ACTION_PACKAGE_ADDED)
+        filter.addAction(Intent.ACTION_PACKAGE_REMOVED)
+        registerReceiver(BraveVPNService.braveScreenStateReceiver, filter)
+        val autoStartFilter = IntentFilter()
+        autoStartFilter.addAction(Intent.ACTION_BOOT_COMPLETED)
+        registerReceiver(BraveVPNService.braveAutoStartReceiver, autoStartFilter)
+    }
+*/
 
+    override fun onDestroy() {
+        super.onDestroy()
+        //unregisterReceiver(BraveVPNService.braveScreenStateReceiver)
+    }
 
 
     private fun getAppInfo() {
@@ -104,9 +131,11 @@ class HomeScreenActivity : AppCompatActivity() {
             val appInfoRepository = mDb.appInfoRepository()//AppInfoRepository(appInfoDAO)
             val allPackages: List<PackageInfo> =
                 context.packageManager?.getInstalledPackages(PackageManager.GET_META_DATA )!!
-            var count : Int = 0
+            var count = 0
+            if(appList.isEmpty()){
+                Log.d("BraveDNS","Inside isEmpty")
             allPackages.forEach {
-                if((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0) {
+                if ((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0) {
 
                     launch(Dispatchers.Default) {
 
@@ -114,48 +143,70 @@ class HomeScreenActivity : AppCompatActivity() {
                         val appInfo = AppInfo()
                         appInfo.appName =
                             context.packageManager.getApplicationLabel(applicationInfo).toString()
-                        appInfo.appCategory = applicationInfo.category
+                        val category =
+                            ApplicationInfo.getCategoryTitle(context, applicationInfo.category)
+                        if (category != null)
+                            appInfo.appCategory = category.toString()
+                        else
+                            appInfo.appCategory = "Unknown Category"
+
                         appInfo.isDataEnabled = true
                         appInfo.isWifiEnabled = true
-                        appInfo.isSystemApp  = false
+                        appInfo.isSystemApp = false
+                        count += 1
                         if ((applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0) {
-                            count += 1
-                            appInfo.isSystemApp = true
+                            //count += 1
+                            appInfo.isSystemApp = false
                         }
                         appInfo.isScreenOff = false
-                        appInfo.isInternet  = false
-                        appInfo.isBackgroundEnabled  = false
-                        appInfo.mobileDataUsed = 0
                         appInfo.packageInfo = applicationInfo.packageName
+                        appInfo.isInternetAllowed = PersistentState.isWifiAllowed(appInfo.packageInfo,context)
+                        appInfo.isBackgroundEnabled = false
+                        appInfo.mobileDataUsed = 0
+
                         appInfo.trackers = 0
                         appInfo.wifiDataUsed = 0
                         appInfo.uid = applicationInfo.uid
 
                         appSample = appInfo
-                        //TODO HHandle this Global scope variable properly. Only half done.
-                        GlobalVariable.appList.add(appInfo)
+                        //TODO Handle this Global scope variable properly. Only half done.
+                        appList[applicationInfo.packageName] = appInfo
                         GlobalVariable.installedAppCount = count
                         appInfoRepository.insertAsync(appInfo, this)
                         //Log.w("DB Inserts","App Size : " + appInfo.packageInfo +": "+appInfo.uid)
                     }
                 }
-
             }
+
+            }else{
+                Log.d("BraveDNS","Inside else***")
+                appList.forEach{
+                    it.value.isInternetAllowed = PersistentState.isWifiAllowed(it.value.packageInfo,context)
+                    Log.d("BraveDNS","isInternetAllowed : "+it.value.isInternetAllowed + "package : ${it.key}")
+                    appList.put(it.key, it.value)
+                }
+            }
+
+
+            //appList.entries.sortedWith(compareBy { it.value.appCategory })
+
+            //updateFragments()
                 //delay(1 * 60 * 100)
         }
             //Log.w("DB","End of the loop for the DB")
     }
 
-    fun updateFragments() {
+    /*private fun updateFragments() {
         runOnUiThread(Runnable {
             val allFragments: MutableList<androidx.fragment.app.Fragment> =
                 supportFragmentManager.fragments
-            if (allFragments == null || allFragments.isEmpty()) return@Runnable
+            if (allFragments.isEmpty()) return@Runnable
             for (fragment in allFragments) {
+                Log.d("BraveDNS","UpdateView from Activity :" + GlobalVariable.installedAppCount)
                 if (fragment.isVisible) (fragment as HomeScreenFragment).updateView()
             }
         })
-    }
+    }*/
 
 
     /*private fun actionOnService(action: Actions) {
@@ -231,14 +282,14 @@ class HomeScreenActivity : AppCompatActivity() {
                     .commit()
                 return@OnNavigationItemSelectedListener true
             }
-            R.id.navigation_permission_manager -> {
+            /*R.id.navigation_permission_manager -> {
                 println("Permission Manager")
 
                 permissionManagerFragment = PermissionManagerFragment()
                 supportFragmentManager.beginTransaction().replace(R.id.fragment_container, permissionManagerFragment, permissionManagerFragment.javaClass.getSimpleName())
                     .commit()
                 return@OnNavigationItemSelectedListener true
-            }
+            }*/
             R.id.navigation_settings -> {
                 println("Settings")
                 settingsFragment = SettingsFragment()
