@@ -22,7 +22,7 @@
     <color name="pale_white">#FDFDFD</color>
     <color name="grey">#FD974F</color>
     <color name="light_bg">#ACBDBA</color>
-    <color name="black">#000000</color>
+    <color name="black">#333333</color>
     <color name="recycler_selected">#6E7069</color>
 
     <color name="primaryText">#FDFDFD</color>

@@ -24,5 +24,6 @@
         android:textSize="@dimen/text_size_large"
         android:layout_gravity="center|center_vertical"
         android:text="asdasd" />
+
 </androidx.appcompat.widget.LinearLayoutCompat>
 

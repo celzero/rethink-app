@@ -42,7 +42,7 @@ public class ConnectionTracer {
         if (DEBUG) Log.d(TAG, sourceIp +  " [" + sourcePort + "] to " + destIp + " [" + destPort + "]");
 
         if (TextUtils.isEmpty(sourceIp) || sourceIp.split("\\.").length < 4) {
-            Log.w(TAG, "empty/invalid sourceIp " + sourceIp);
+            //Log.w(TAG, "empty/invalid sourceIp " + sourceIp);
             local = new InetSocketAddress(sourcePort);
         } else {
             local = new InetSocketAddress(sourceIp, sourcePort);

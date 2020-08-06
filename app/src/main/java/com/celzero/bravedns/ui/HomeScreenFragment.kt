@@ -3,7 +3,6 @@ package com.celzero.bravedns.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.AlertDialog
 import android.app.Dialog
 import android.content.*
 import android.content.pm.PackageManager
@@ -16,7 +15,6 @@ import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
-import android.os.SystemClock
 import android.text.format.DateUtils
 import android.text.format.DateUtils.FORMAT_ABBREV_RELATIVE
 import android.text.format.DateUtils.MINUTE_IN_MILLIS
@@ -26,14 +24,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.*
-import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.FirewallHeader
 import com.celzero.bravedns.adapter.SpinnerArrayAdapter
 import com.celzero.bravedns.animation.RippleBackground
 import com.celzero.bravedns.data.BraveMode
@@ -44,16 +40,15 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.dnsMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.firewallMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.medianP90
-import com.celzero.bravedns.util.Utilities.Companion.isServiceRunning
 import com.google.android.material.chip.Chip
-import kotlinx.coroutines.InternalCoroutinesApi
-import org.w3c.dom.Text
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import settings.Settings
 import java.io.File
 import java.net.NetworkInterface
 import java.net.SocketException
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 
 class HomeScreenFragment : Fragment(){
@@ -113,7 +108,7 @@ class HomeScreenFragment : Fragment(){
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        Log.w("BraveDNS","onCreateView ")
+        //Log.w("BraveDNS","onCreateView ")
         val view: View = inflater.inflate(R.layout.fragment_home_screen,container,false)
         //contextVal = context!!
         initView(view)
@@ -178,9 +173,12 @@ class HomeScreenFragment : Fragment(){
 
         braveModeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                braveMode = 0
+                braveMode = DNS_MODE
             }
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                /*if(position == 1)
+                    return*/
+                braveModeSpinner.isEnabled = false
                 if(position == 2)
                     braveMode = if(VERSION.SDK_INT < VERSION_CODES.Q){
                         Toast.makeText(context, R.string.brave_mode_not_supported,Toast.LENGTH_LONG).show()
@@ -278,6 +276,8 @@ class HomeScreenFragment : Fragment(){
             tileShowFirewallLL.visibility = View.GONE
             tileShowDnsFirewallLL.visibility = View.VISIBLE
         }
+
+        braveModeSpinner.isEnabled = true
     }
 
     private fun startQueryListener() {
@@ -292,8 +292,8 @@ class HomeScreenFragment : Fragment(){
         }else{
             Toast.makeText(context!!, resources.getText(R.string.brave_dns_connect_prompt_query).toString().capitalize(),Toast.LENGTH_SHORT ).show()
         }
-
-
+        /*val intent = Intent(requireContext(), QueryDetailActivity::class.java)
+        startActivity(intent)*/
     }
 
     private fun startFirewallActivity(){
@@ -308,6 +308,8 @@ class HomeScreenFragment : Fragment(){
         }else{
             Toast.makeText(context!!, resources.getText(R.string.brave_dns_connect_prompt_firewall).toString().capitalize(),Toast.LENGTH_SHORT ).show()
         }
+        /*val intent = Intent(requireContext(), FirewallActivity::class.java)
+        startActivity(intent)*/
     }
 
 
@@ -326,9 +328,13 @@ class HomeScreenFragment : Fragment(){
             firewallMode = Settings.BlockModeFilter.toInt()
             braveMode = DNS_FIREWALL_MODE
         }
-        PersistentState.setDnsMode(context!!, dnsMode)
-        PersistentState.setFirewallMode(context!!, firewallMode)
-        PersistentState.setBraveMode(context!!,braveMode)
+
+
+            PersistentState.setDnsMode(context!!, dnsMode)
+            PersistentState.setFirewallMode(context!!, firewallMode)
+            PersistentState.setBraveMode(context!!, braveMode)
+
+
 
         if(VpnController.getInstance()!!.getState(context!!)!!.activationRequested) {
             if (braveMode == 0)
@@ -338,6 +344,8 @@ class HomeScreenFragment : Fragment(){
             else
                 protectionDescTxt.setText(getString(R.string.dns_explanation_connected))
         }
+
+        braveModeSpinner.isEnabled = true
     }
 
     private fun showDialogForBraveModeInfo() {
@@ -406,11 +414,11 @@ class HomeScreenFragment : Fragment(){
             tileFUniversalBlockedTxt.setText(numUniversalBlock.toString())
 
             tileDFAppsBlockedTxt.setText(PersistentState.getExcludedPackagesWifi(context!!)!!.size.toString())
-            tileDFMedianTxt.setText(medianP90.toString()+ " ms")
+            tileDFMedianTxt.setText(medianP90.toString()+ "ms")
             tileDFTrackersBlockedtxt.setText(percentage.toInt().toString() +"%")
 
             updateUptime()
-            timerHandler.postDelayed(updater, 500)
+            timerHandler.postDelayed(updater, 1000)
 
         }
         timerHandler.post(updater)

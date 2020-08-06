@@ -29,7 +29,7 @@ class WelcomeActivity  : AppCompatActivity() {
     private lateinit var viewPager : ViewPager
     private lateinit var dotsLayout: LinearLayout
     private lateinit var dots : Array<TextView?>
-    internal val layout : IntArray = intArrayOf(R.layout.welcome_slide1,R.layout.welcome_slide2,R.layout.welcome_slide3,R.layout.welcome_slide4)
+    internal val layout : IntArray = intArrayOf(R.layout.welcome_slide1,R.layout.welcome_slide2)
 
     private lateinit var buttonNext : TextView
     private lateinit var buttonSkip : TextView
@@ -67,7 +67,6 @@ class WelcomeActivity  : AppCompatActivity() {
 
         buttonNext.setOnClickListener {
             var currentItem = getItem(1)
-            Log.w("TAG","Value:"+currentItem + " :: Layout size: "+layout.size)
             if(currentItem < layout.size)
                 viewPager.setCurrentItem(currentItem)
             else

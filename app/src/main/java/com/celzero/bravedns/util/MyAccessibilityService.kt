@@ -85,9 +85,9 @@ class MyAccessibilityService : AccessibilityService() {
             else -> "Default: "
         } + event.contentDescription + " " + event.text
 
-        Log.w("______","onAEvent: sourcepack " + event.source?.packageName + " text? " +
+       /* Log.w("______","onAEvent: sourcepack " + event.source?.packageName + " text? " +
                 eventText + " class? " + event.className +
-                " package? ppp " + event.packageName)
+                " package? ppp " + event.packageName)*/
         for (i in 0 until event.recordCount) {
             val r: AccessibilityRecord = event.getRecord(i)
             //Log.w("PermissionsManager", "_____ record record $$$$ ______ ${r.source} ${r.className} ${r.contentDescription}")
@@ -112,10 +112,10 @@ class MyAccessibilityService : AccessibilityService() {
     }
 
     override fun onServiceConnected() {
-        Log.w("______", "accessibility service connected")
+        //Log.w("______", "accessibility service connected")
     }
 
     override fun onInterrupt() {
-        Log.w("______","Interrupted")
+        //Log.w("______","Interrupted")
     }
 }

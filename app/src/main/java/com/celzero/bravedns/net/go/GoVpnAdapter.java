@@ -127,11 +127,11 @@ public class GoVpnAdapter {
           transport, getProtector(), getBlocker(), listener);
 
       //tunnel.setTunMode(Settings.DNSModePort, Settings.BlockModeFilter);
-      Log.w("BraveVPN","DNS Mode : "+iDnsMode +" block Mode: "+ iBlockMode);
+      //Log.w("BraveVPN","DNS Mode : "+iDnsMode +" block Mode: "+ iBlockMode);
       //TODO : Value is harcoded in the setTunMode
       tunnel.setTunMode(iDnsMode, iBlockMode);
     } catch (Exception e) {
-      Log.d("VPN Tag",e.getMessage());
+      //Log.d("VPN Tag",e.getMessage());
       tunnel = null;
       VpnController.Companion.getInstance().onConnectionStateChanged(vpnService, BraveVPNService.State.FAILING);
     }
@@ -156,10 +156,10 @@ public class GoVpnAdapter {
           .addRoute("0.0.0.0", 0)
           .addDnsServer(LanIp.DNS.make(IPV4_TEMPLATE));
       if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
-        Log.w("BraveVPN","Allowed Apps in sink hole*************");
+       // Log.w("BraveVPN","Allowed Apps in sink hole*************");
         if(PersistentState.Companion.getFirewallMode(vpnService) != 2) {
           builder.addDisallowedApplication(vpnService.getPackageName());
-          Log.w("BraveVPN","Allowed Apps in sink hole addDisallowedApplication*************");
+         // Log.w("BraveVPN","Allowed Apps in sink hole addDisallowedApplication*************");
         }
       }
       return builder.establish();

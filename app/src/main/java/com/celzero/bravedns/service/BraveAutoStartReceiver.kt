@@ -11,7 +11,7 @@ class BraveAutoStartReceiver  : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
 
         if (intent!!.action.equals(Intent.ACTION_BOOT_COMPLETED)) {
-            Log.i("BraveVPN",String.format("ACTION_BOOT_COMPLETED from boot receiver"))
+            //Log.i("BraveVPN",String.format("ACTION_BOOT_COMPLETED from boot receiver"))
             var prepareVpnIntent: Intent? = null
             prepareVpnIntent = try {
                 VpnService.prepare(context)
@@ -20,7 +20,7 @@ class BraveAutoStartReceiver  : BroadcastReceiver() {
                 return
             }
             if(prepareVpnIntent != null) {
-                Log.i("BraveVPN",String.format("Starting DNS VPN service from boot receiver"))
+                //Log.i("BraveVPN",String.format("Starting DNS VPN service from boot receiver"))
                 VpnController.getInstance()?.start(context!!)
             }else
                 VpnController.getInstance()?.start(context!!)
