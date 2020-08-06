@@ -127,10 +127,12 @@ public class QueryTracker {
     if (transaction != null) {
       // Restore number of requests from storage, or 0 if it isn't defined yet.
       numRequests = PersistentState.Companion.getNumOfReq(context);
-      if (numRequests > HISTORY_SIZE) {
-        int val = queryList.first();
-        queryList.remove(val);
-      }
+      if (!queryList.isEmpty()){
+        if (queryList.size() > HISTORY_SIZE) {
+          int val = queryList.first();
+          queryList.remove(val);
+        }
+    }
       int val = (int) (transaction.responseTime - transaction.queryTime);
       queryList.add(val);
       int positionP50 = (int) (queryList.size() * 0.50);
