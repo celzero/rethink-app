@@ -43,7 +43,7 @@ public class QueryTracker {
 
   public static final String NUM_REQUESTS = "numRequests";
 
-  private static final int HISTORY_SIZE = 100000;
+  private static final int HISTORY_SIZE = 1000;
   //private static final int ACTIVITY_MEMORY_MS = 60 * 1000;  // One minute
 
   private long numRequests = 0;
@@ -124,10 +124,9 @@ public class QueryTracker {
   }
 
   public synchronized void sync(Context context, Transaction transaction) {
-    // Restore number of requests from storage, or 0 if it isn't defined yet.
-    numRequests = PersistentState.Companion.getNumOfReq(context );
-
     if (transaction != null) {
+      // Restore number of requests from storage, or 0 if it isn't defined yet.
+      numRequests = PersistentState.Companion.getNumOfReq(context);
       if (numRequests > HISTORY_SIZE) {
         int val = queryList.first();
         queryList.remove(val);

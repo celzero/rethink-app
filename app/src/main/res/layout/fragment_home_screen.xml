@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/light"
     android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    app:layout_scrollFlags="scroll|enterAlways"
     android:fillViewport="true"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 <LinearLayout
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:weightSum="1"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
 
     <LinearLayout
@@ -76,7 +75,6 @@
             android:layout_width="0dp"
             android:layout_weight="0.8"
             android:layout_gravity="center"
-            android:backgroundTint="@color/secondaryText"
             android:gravity="center"
             android:layout_height="wrap_content"/>
         <androidx.appcompat.widget.AppCompatImageView
@@ -95,8 +93,8 @@
         android:layout_width="match_parent"
         android:layout_margin="10dp"
         app:cardElevation="@dimen/activity_horizontal_margin"
-        android:layout_weight="0.27"
-        android:layout_height="0dp">
+
+        android:layout_height="wrap_content">
     <LinearLayout
         android:orientation="vertical"
         android:visibility="visible"
@@ -408,8 +406,9 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
+        android:layout_marginBottom="60dp"
         android:gravity="bottom|center"
-        android:layout_weight="0.5"
+        android:layout_weight="0.3"
         android:orientation="vertical">
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/fhs_protection_level_txt"
@@ -462,7 +461,7 @@
             android:textSize="16sp" />
     </LinearLayout>
     </LinearLayout>
-</androidx.appcompat.widget.LinearLayoutCompat>
+</androidx.core.widget.NestedScrollView>
 
 
     <!--android:drawableLeft="@drawable/ic_permission_manager_small"-->

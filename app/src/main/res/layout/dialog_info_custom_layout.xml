@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="20dp"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    app:layout_scrollFlags="scroll|enterAlways"
     android:orientation="vertical">
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:orientation="vertical">
     <ImageView
         android:id="@+id/info_dialog_cancel_img"
         android:layout_width="wrap_content"
@@ -80,4 +89,5 @@
         style="@style/TextAppearance.AppCompat.Widget.Button"
         android:background="@drawable/button_background_ripple"
         android:text="Ok"/>
-</androidx.appcompat.widget.LinearLayoutCompat>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

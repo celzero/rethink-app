@@ -61,7 +61,7 @@ class AppPermissions(private val packageManager: PackageManager, packageInfo: Pa
             return
         }
 
-        Log.w("PermisionsManager", "bbbb __________ bbbb " + permission)
+        //Log.w("PermisionsManager", "bbbb __________ bbbb " + permission)
         val group = AppPermissionGroup.create(
             packageManager,
             packageInfo, permission

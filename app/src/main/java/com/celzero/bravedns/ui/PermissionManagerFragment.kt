@@ -88,7 +88,7 @@ class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener{
             val mDb = AppDatabase.invoke(contextVal.applicationContext)
             val appInfoRepository = mDb.appInfoRepository()
             val appList = appInfoRepository.getAppInfoAsync()
-            Log.w("DB","App list from DB Size: "+appList.size)
+            //Log.w("DB","App list from DB Size: "+appList.size)
             appList.forEach{
                 val userApk = Apk(it.appName,it.appName,it.packageInfo,it.uid.toString())
                 apkList.add(userApk)

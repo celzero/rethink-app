@@ -36,7 +36,7 @@
              <androidx.appcompat.widget.AppCompatImageView
                  android:id="@+id/settings_app_icon"
                  android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
+                 android:layout_height="match_parent"
                  android:layout_gravity="center"
                  android:padding="5dp"
                  android:src="@drawable/conf_dns_icon_black" />
@@ -88,7 +88,6 @@
         android:layout_width="match_parent"
         android:layout_margin="10dp"
         app:cardElevation="@dimen/activity_horizontal_margin"
-        app:cardCornerRadius="10dp"
         android:elevation="10dp"
         android:layout_height="wrap_content">
         <LinearLayout
@@ -204,7 +203,6 @@
         android:id="@+id/settings_view_logs_layout"
         app:layout_constraintTop_toBottomOf="@id/settings_app_mgr_layout"
         android:layout_width="match_parent"
-        app:cardCornerRadius="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
@@ -269,8 +267,6 @@
         android:layout_margin="10dp"
         android:visibility="gone"
         app:cardElevation="@dimen/activity_horizontal_margin"
-        app:cardCornerRadius="10dp"
-        android:elevation="10dp"
         android:layout_height="wrap_content">
         <LinearLayout
             android:orientation="vertical"

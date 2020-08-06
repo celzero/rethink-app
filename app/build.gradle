@@ -3,12 +3,34 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+try {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+} catch (Exception ex) {
+    logger.warn("No keys.  Release disabled: $ex.message")
+    keystoreProperties['keyAlias'] = ''
+    keystoreProperties['keyPassword'] = ''
+    keystoreProperties['storeFile'] = '/dev/null'
+    keystoreProperties['storePassword'] = ''
+}
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
 
+    signingConfigs {
+        config {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+
     defaultConfig {
         applicationId "com.celzero.bravedns"
+        vectorDrawables.useSupportLibrary = true
         minSdkVersion 26
         targetSdkVersion 29
         versionCode 1

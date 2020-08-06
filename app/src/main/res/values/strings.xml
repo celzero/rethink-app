@@ -62,7 +62,7 @@
     <string name="skip">Skip</string>
     <string name="start">Done</string>
 
-    <string name="slide_1_title">Secure Browsing</string>
+    <string name="slide_1_title">Safe Browsing</string>
     <string name="slide_1_desc">Refuse connections to malicious websites and servers: Fake websites often steal critical personal information like bank accounts and passwords to emails.</string>
 
     <string name="slide_2_title">Firewall</string>
@@ -83,14 +83,14 @@
     <string-array name="cloudflare_name">
         <item>No filter</item>
         <item>Family</item>
-        <item>Malware</item>
-        <item>Ads and Tracker (coming soon)</item>
+        <item>Ads and Trackers</item>
+        <item>Configurable Filters*</item>
     </string-array>
 
     <string-array name="cloudflare_url">
         <item>https://cloudflare-dns.com/dns-query</item>
         <item>https://family.cloudflare-dns.com/dns-query</item>
-        <item>https://security.cloudflare-dns.com/dns-query</item>
+        <item>https://dns.adguard.com/dns-query</item>
         <item>https://cloudflare-dns.com/dns-query</item>
     </string-array>
 
@@ -296,7 +296,7 @@
     </string>
 
     <string name="dns_mode_info_explanation">
-        Filters your network traffic with blacklists that power popular ad-blockers. Communication or messaging apps, for instance, can\'t be firewalled altogether, but can be, instead, blocked from accessing certain server endpoints of known ad networks and trackers.
+        Protects from DNS manipulation attacks which is the most common way Internet is censored. Filters your network traffic with blacklists that power popular ad-blockers. Communication or messaging apps, for instance, can\'t be firewalled altogether, but can be, instead, blocked from accessing certain server endpoints of known ad networks and trackers.
     </string>
 
 
@@ -314,7 +314,7 @@
     </string>
 
     <string name="hybrid_mode_info_explanation">
-        Filters your network traffic and blocks apps from connecting to Internet. This mode is available only on Android 10 and above version.
+        Filters your network traffic and blocks apps from connecting to Internet. This mode is available only on devices with Android 10 or higher versions.
     </string>
 
     <string name="alert_permission_accessibility">

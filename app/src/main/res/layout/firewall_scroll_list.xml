@@ -61,7 +61,7 @@
                 android:textSize="@dimen/sub_heading"
                 android:padding="10dp"
                 android:textColor="@color/primaryText"
-                android:text="All Apps when device is locked" />
+                android:text="All apps when device is locked" />
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/firwall_all_apps_check"

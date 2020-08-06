@@ -47,7 +47,7 @@ class FirewallManager {
             //GlobalScope.launch ( Dispatchers.Default ) {
                 val appInfo = GlobalVariable.appList.get(packageName)
                 if(appInfo != null){
-                    Log.w("BraveDNS", "updateInternetBackground : $packageName and internet isAllowed $isAllowed" )
+                    //Log.w("BraveDNS", "updateInternetBackground : $packageName and internet isAllowed $isAllowed" )
                     appInfo.isInternetAllowed = isAllowed
                     GlobalVariable.appList.set(packageName,appInfo)
                 }
@@ -58,10 +58,10 @@ class FirewallManager {
 
         fun updateInternetBackground(packageName: String, isAllowed: Boolean){
             //GlobalScope.launch ( Dispatchers.Default ) {
-                Log.w("BraveDNS", "Before updateInternetBackground : $packageName and internet isAllowed $isAllowed" )
+                //Log.w("BraveDNS", "Before updateInternetBackground : $packageName and internet isAllowed $isAllowed" )
                 val appInfo = GlobalVariable.appList.get(packageName)
                 if(appInfo != null){
-                    Log.w("BraveDNS", "updateInternetBackground : $packageName and internet isAllowed $isAllowed" )
+                    //Log.w("BraveDNS", "updateInternetBackground : $packageName and internet isAllowed $isAllowed" )
                     appInfo.isInternetAllowed = isAllowed
                     GlobalVariable.appList.set(packageName,appInfo)
                 }
@@ -162,7 +162,7 @@ class FirewallManager {
                 }
                 latestTrackedPackage = event.packageName.toString()
 
-                Log.w(TAG, "bbbbb............... Added package to the stack: ${eventPackageName} size: ${packagesStack.size}")
+               // Log.w(TAG, "bbbbb............... Added package to the stack: ${eventPackageName} size: ${packagesStack.size}")
             }/* else if (isPackageInstaller(eventPackageName) && isGrant()) {
                 // if content-disappeared and there's nothing to track
                 // make sure to untrack PERMISSIONS_GRANT state set below
@@ -176,7 +176,7 @@ class FirewallManager {
             // https://stackoverflow.com/a/27642535
             // top window is launcher? try revoke queued up permissions
             // FIXME: Figure out a fool-proof way to determine is launcher visible
-            Log.d("BraveDNS","isPackageLauncher : ${isPackageLauncher(packageName)}")
+            //Log.d("BraveDNS","isPackageLauncher : ${isPackageLauncher(packageName)}")
             if (isPackageLauncher(packageName)) {
 
                 // TODO: revoke permissions only if there are any to revoke
@@ -205,7 +205,7 @@ class FirewallManager {
         if (packagesStack.isNullOrEmpty()) {
             return
         }else {
-            Log.w(TAG, "bbbbb ____ revokePermissions :" + packagesStack.elementAt(0))
+            //Log.w(TAG, "bbbbb ____ revokePermissions :" + packagesStack.elementAt(0))
             val currentPackage = packagesStack.elementAt(0)
             packagesStack.remove(currentPackage)
             packageElect = currentPackage

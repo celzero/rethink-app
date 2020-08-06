@@ -7,6 +7,7 @@ import android.preference.PreferenceManager
 import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.ui.HomeScreenActivity
+//
 import settings.Settings
 
 
@@ -181,6 +182,7 @@ class PersistentState {
 
 
         fun setBraveMode(context: Context , mode: Int){
+
             val editor: SharedPreferences.Editor =
                 getUserPreferences(context)!!.edit()
             editor.putInt(BRAVE_MODE, mode)
@@ -209,7 +211,7 @@ class PersistentState {
                 getUserPreferences(context)!!.edit()
             editor.putInt(FIREWALL_MODE, fwMode)
             editor.apply()
-            Log.d("Temp","setFirewallMode - $fwMode")
+           // Log.d("Temp","setFirewallMode - $fwMode")
         }
 
         //TODO : Modify the hardcoded value

@@ -133,56 +133,59 @@ class HomeScreenActivity : AppCompatActivity() {
                 context.packageManager?.getInstalledPackages(PackageManager.GET_META_DATA )!!
             var count = 0
             if(appList.isEmpty()){
-                Log.d("BraveDNS","Inside isEmpty")
+                //Log.d("BraveDNS","Inside isEmpty")
             allPackages.forEach {
                 if ((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0) {
+                    if (it.applicationInfo.packageName != applicationContext.packageName) {
+                        launch(Dispatchers.Default) {
 
-                    launch(Dispatchers.Default) {
+                            val applicationInfo: ApplicationInfo = it.applicationInfo
+                            val appInfo = AppInfo()
+                            appInfo.appName =
+                                context.packageManager.getApplicationLabel(applicationInfo)
+                                    .toString()
+                            val category =
+                                ApplicationInfo.getCategoryTitle(context, applicationInfo.category)
+                            if (category != null)
+                                appInfo.appCategory = category.toString()
+                            else
+                                appInfo.appCategory = "Unknown Category"
 
-                        val applicationInfo: ApplicationInfo = it.applicationInfo
-                        val appInfo = AppInfo()
-                        appInfo.appName =
-                            context.packageManager.getApplicationLabel(applicationInfo).toString()
-                        val category =
-                            ApplicationInfo.getCategoryTitle(context, applicationInfo.category)
-                        if (category != null)
-                            appInfo.appCategory = category.toString()
-                        else
-                            appInfo.appCategory = "Unknown Category"
-
-                        appInfo.isDataEnabled = true
-                        appInfo.isWifiEnabled = true
-                        appInfo.isSystemApp = false
-                        count += 1
-                        if ((applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0) {
-                            //count += 1
+                            appInfo.isDataEnabled = true
+                            appInfo.isWifiEnabled = true
                             appInfo.isSystemApp = false
+                            count += 1
+                            if ((applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0) {
+                                //count += 1
+                                appInfo.isSystemApp = false
+                            }
+                            appInfo.isScreenOff = false
+                            appInfo.packageInfo = applicationInfo.packageName
+                            appInfo.isInternetAllowed =
+                                PersistentState.isWifiAllowed(appInfo.packageInfo, context)
+                            appInfo.isBackgroundEnabled = false
+                            appInfo.mobileDataUsed = 0
+
+                            appInfo.trackers = 0
+                            appInfo.wifiDataUsed = 0
+                            appInfo.uid = applicationInfo.uid
+
+                            appSample = appInfo
+                            //TODO Handle this Global scope variable properly. Only half done.
+                            appList[applicationInfo.packageName] = appInfo
+                            GlobalVariable.installedAppCount = count
+                            appInfoRepository.insertAsync(appInfo, this)
+                            //Log.w("DB Inserts","App Size : " + appInfo.packageInfo +": "+appInfo.uid)
                         }
-                        appInfo.isScreenOff = false
-                        appInfo.packageInfo = applicationInfo.packageName
-                        appInfo.isInternetAllowed = PersistentState.isWifiAllowed(appInfo.packageInfo,context)
-                        appInfo.isBackgroundEnabled = false
-                        appInfo.mobileDataUsed = 0
-
-                        appInfo.trackers = 0
-                        appInfo.wifiDataUsed = 0
-                        appInfo.uid = applicationInfo.uid
-
-                        appSample = appInfo
-                        //TODO Handle this Global scope variable properly. Only half done.
-                        appList[applicationInfo.packageName] = appInfo
-                        GlobalVariable.installedAppCount = count
-                        appInfoRepository.insertAsync(appInfo, this)
-                        //Log.w("DB Inserts","App Size : " + appInfo.packageInfo +": "+appInfo.uid)
                     }
                 }
             }
 
             }else{
-                Log.d("BraveDNS","Inside else***")
+               // Log.d("BraveDNS","Inside else***")
                 appList.forEach{
                     it.value.isInternetAllowed = PersistentState.isWifiAllowed(it.value.packageInfo,context)
-                    Log.d("BraveDNS","isInternetAllowed : "+it.value.isInternetAllowed + "package : ${it.key}")
+                    //Log.d("BraveDNS","isInternetAllowed : "+it.value.isInternetAllowed + "package : ${it.key}")
                     appList.put(it.key, it.value)
                 }
             }
@@ -231,11 +234,11 @@ class HomeScreenActivity : AppCompatActivity() {
             applicationContext.getSystemService(Context.NETWORK_STATS_SERVICE) as NetworkStatsManager
         val networkStatsHelper = NetworkStatsHelper(networkStatsManager, uid)
         val mobileWifiRx = networkStatsHelper.getPackageRxBytesMobile(this) + networkStatsHelper.packageRxBytesWifi
-        Log.w("NetworkStat","$mobileWifiRx B")
+        //Log.w("NetworkStat","$mobileWifiRx B")
         //networkStatsPackageRx.setText("$mobileWifiRx B")
         val mobileWifiTx = networkStatsHelper.getPackageTxBytesMobile(this) + networkStatsHelper.packageTxBytesWifi
         //networkStatsPackageTx.setText("$mobileWifiTx B")
-        Log.w("NetworkStat","$mobileWifiTx B")
+        //Log.w("NetworkStat","$mobileWifiTx B")
     }
 
 

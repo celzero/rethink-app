@@ -76,7 +76,7 @@ class PermissionManagerActivity: AppCompatActivity(), SearchView.OnQueryTextList
         val mDb = AppDatabase.invoke(context.applicationContext)
         val appInfoRepository = mDb.appInfoRepository()
         val appList = appInfoRepository.getAppInfoAsync()
-        Log.w("DB","App list from DB Size: "+appList.size)
+        //Log.w("DB","App list from DB Size: "+appList.size)
         appList.forEach{
 
             val userApk = PermissionManagerApk(packageManager.getPackageInfo(it.packageInfo,0), context)

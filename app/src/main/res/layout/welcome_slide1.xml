@@ -43,7 +43,7 @@
             android:text="@string/slide_1_desc"
             android:textAlignment="center"
             android:gravity="center_vertical"
-            android:textColor="@color/secondaryText"
+            android:textColor="@color/primaryText"
             style="@style/TextAppearance.AppCompat.Body1"
             android:textSize="@dimen/slide_desc" />
 

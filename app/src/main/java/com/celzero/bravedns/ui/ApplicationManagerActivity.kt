@@ -122,7 +122,7 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
         private lateinit var context : Context
         private val apkList = ArrayList<ApplicationManagerApk>()
         fun updateUI(packageName : String, isAdded : Boolean){
-            Log.d("BraveDNS","Refresh list called : package Name :-" + packageName)
+            //Log.d("BraveDNS","Refresh list called : package Name :-" + packageName)
             //val packageName = packageName.removePrefix("package:").toString()
             fastAdapter = FastAdapter.with(itemAdapter)
             if(isAdded){
@@ -140,21 +140,21 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
                     }
                 }
                 if(apkDetail != null) {
-                    Log.d("BraveDNS","apkDetail Removed  :-" + packageName)
+                    //Log.d("BraveDNS","apkDetail Removed  :-" + packageName)
                     apkList.remove(apkDetail!!)
                 }else{
-                    Log.d("BraveDNS","apkDetail is null  :-" + packageName)
+                    //Log.d("BraveDNS","apkDetail is null  :-" + packageName)
                 }
             }
             if(fastAdapter != null) {
-                Log.d("BraveDNS","fastAdapter notified  :-" + packageName)
+                //Log.d("BraveDNS","fastAdapter notified  :-" + packageName)
                 itemAdapter.clear()
                 recycle.adapter = fastAdapter
                 itemAdapter.add(apkList)
                 fastAdapter.notifyAdapterDataSetChanged()
                 fastAdapter.notifyDataSetChanged()
             }else{
-                Log.d("BraveDNS","fastAdapter is null  :-" + packageName)
+                //Log.d("BraveDNS","fastAdapter is null  :-" + packageName)
             }
         }
     }
@@ -191,7 +191,7 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
         val mDb = AppDatabase.invoke(context.applicationContext)
         val appInfoRepository = mDb.appInfoRepository()
         val appList = appInfoRepository.getAppInfoAsync()
-        Log.w("DB","App list from DB Size: "+appList.size)
+        //Log.w("DB","App list from DB Size: "+appList.size)
         appList.forEach{
             val packageInfo = packageManager.getPackageInfo(it.packageInfo,0)
             if(packageInfo.packageName != "com.celzero.bravedns" ) {

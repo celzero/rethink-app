@@ -23,7 +23,7 @@ object PackageManagerHelper {
         try {
             val packageInfo =
                 packageManager.getPackageInfo(packageName, PackageManager.GET_META_DATA)
-            Log.d("PackageMgr", packageInfo.packageName)
+            //Log.d("PackageMgr", packageInfo.packageName)
             uid = packageInfo.applicationInfo.uid
         } catch (e: PackageManager.NameNotFoundException) {
         }

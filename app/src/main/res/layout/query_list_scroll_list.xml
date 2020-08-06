@@ -124,12 +124,15 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Latency"
+                android:gravity="center"
+                android:paddingRight="3dp"
                 android:textColor="@color/secondaryText"
                 android:layout_weight="0.75"/>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Time"
+                android:gravity="right"
                 android:textColor="@color/secondaryText"
                 android:layout_weight="0.5"/>
         </LinearLayout>

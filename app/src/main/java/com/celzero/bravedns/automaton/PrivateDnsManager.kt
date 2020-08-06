@@ -41,10 +41,10 @@ class PrivateDnsManager(private val accessibilityService: MyAccessibilityService
             packageName == "com.android.settings" &&
             isDashboard()) {
             val list: List<AccessibilityNodeInfo> = event.source.findAccessibilityNodeInfosByText("Private DNS")
-            Log.w(TAG, "ppppp ____dashboard_____ ${list.size}")
+            //Log.w(TAG, "ppppp ____dashboard_____ ${list.size}")
             for (node in list) {
                 val perf: Boolean? = node.parent?.parent?.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-                Log.w(TAG, "ppppp ________ $perf node ${node.parent?.parent}")
+                //Log.w(TAG, "ppppp ________ $perf node ${node.parent?.parent}")
                 nextState = AutoState.DIALOG_DNS
             }
 
@@ -66,11 +66,11 @@ class PrivateDnsManager(private val accessibilityService: MyAccessibilityService
                 prov = event.source.findAccessibilityNodeInfosByViewId(privateDnsModeOffViewId)
             }
 
-            Log.w(TAG, "ppppp _____privatednsmode____ ${prov.size}")
+            //Log.w(TAG, "ppppp _____privatednsmode____ ${prov.size}")
             for (node in prov) {
                 val perf: Boolean = node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
                 val perf2: Boolean = node.performAction(AccessibilityNodeInfo.ACTION_SELECT)
-                Log.w(TAG, "ppppp ________ cli: $perf sel: $perf2 node $node")
+                //Log.w(TAG, "ppppp ________ cli: $perf sel: $perf2 node $node")
                 break
             }
             /*}
@@ -86,7 +86,7 @@ class PrivateDnsManager(private val accessibilityService: MyAccessibilityService
             val save: List<AccessibilityNodeInfo> =
                 event.source.findAccessibilityNodeInfosByViewId(saveViewId)
 
-            Log.w(TAG, "ppppp _____privatednsmode____ ${list.size} ${save.size}")
+            //Log.w(TAG, "ppppp _____privatednsmode____ ${list.size} ${save.size}")
 
             if (MyAccessibilityService.isSetPrivateDnsMode()) {
                 nextState = AutoState.TEXT_ENTRY
@@ -94,7 +94,7 @@ class PrivateDnsManager(private val accessibilityService: MyAccessibilityService
                     val arguments = Bundle()
                     arguments.putString(AccessibilityNodeInfoCompat.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, dns)
                     val perf2: Boolean = node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments)
-                    Log.w(TAG, "ppppp ________ text: $perf2 node $node")
+                    //Log.w(TAG, "ppppp ________ text: $perf2 node $node")
                     break
                 }
             }
@@ -102,7 +102,7 @@ class PrivateDnsManager(private val accessibilityService: MyAccessibilityService
             nextState = AutoState.BUTTON_SAVE
             for (node in save) {
                 val perf2: Boolean = node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-                Log.w(TAG, "ppppp ________ text: $perf2 node $node")
+                //Log.w(TAG, "ppppp ________ text: $perf2 node $node")
                 break
             }
 

@@ -313,7 +313,7 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
             }
         }else{
             val appList = appInfoRepository.getAppInfoAsync()
-            Log.w("DB","App list from DB Size: "+appList.size)
+            //Log.w("DB","App list from DB Size: "+appList.size)
             appList.forEach{
                 if(it.packageInfo != "com.celzero.bravedns" ) {
                     val firewallApk = FirewallApk(
@@ -346,7 +346,7 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
             }
 
             itemAdapter.add(apkList)
-            Log.d("BraveDNS","firewallHeader size : "+headerList.size)
+            //Log.d("BraveDNS","firewallHeader size : "+headerList.size)
             //fastAdapter.notifyAdapterItemRangeChanged(0,apkList.size,null)
             fastAdapter.notifyAdapterDataSetChanged()
             fastAdapter.notifyDataSetChanged()

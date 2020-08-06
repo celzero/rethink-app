@@ -118,7 +118,7 @@ class PermissionsManager {
 
         val packageName = event.packageName?.toString() ?: return
 
-        Log.w(TAG,"___### bbbb eventpkg $eventPackageName -- sourcepkg $packageName")
+        //Log.w(TAG,"___### bbbb eventpkg $eventPackageName -- sourcepkg $packageName")
 
         //val info = packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
         //Log.d(TAG, "$$$" + Arrays.toString(info.requestedPermissions))
@@ -130,7 +130,7 @@ class PermissionsManager {
             // deny anyway dialog is here?
             if (event.className == "android.app.AlertDialog") {
                 currentAutoState = AutoState.PERMISSIONS_PAGE_DIALOG
-                Log.w(TAG, "bbbb ____ content change type pane dis alertdialog deny ${event.source.className}")
+                //Log.w(TAG, "bbbb ____ content change type pane dis alertdialog deny ${event.source.className}")
                 clickDenyIfPresent(event)
             } /*else if (event.className == "android.widget.ListView") {
                 currentAutoState = AutoState.PERMISSIONS_PAGE
@@ -158,7 +158,7 @@ class PermissionsManager {
             if (isPackageLauncher(packageName)) {
                 // TODO: revoke permissions only if there are any to revoke
                 revokePermissions()
-                Log.w(TAG, "bbbbb ____ revokePermissions " + packagesStack.size)
+                //Log.w(TAG, "bbbbb ____ revokePermissions " + packagesStack.size)
             } else if (packageRules.contains(packageName)) {
                 // track latest event as it might represent the top window
                 // of a package we need to revoke permissions later

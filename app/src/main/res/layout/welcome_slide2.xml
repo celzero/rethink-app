@@ -39,7 +39,7 @@
             android:textAlignment="center"
             android:gravity="center_vertical"
             style="@style/TextAppearance.AppCompat.Body1"
-            android:textColor="@color/secondaryText"
+            android:textColor="@color/primaryText"
             android:textSize="@dimen/slide_desc" />
 
     </LinearLayout>

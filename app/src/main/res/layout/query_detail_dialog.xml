@@ -40,7 +40,7 @@
             android:padding="8dp"
             android:tint="@color/accent_good"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/query_spacer"
+            app:layout_constraintTop_toBottomOf="@+id/query_spacers"
             app:srcCompat="@drawable/ic_dns"
             tools:ignore="ContentDescription"/>
 
@@ -60,11 +60,11 @@
             android:singleLine="true"
             android:textAppearance="@android:style/TextAppearance.Large"
             android:textIsSelectable="true"
-            app:layout_constraintBottom_toBottomOf="@+id/query_icon"
+            app:layout_constraintBottom_toBottomOf="@+id/query_icons"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toEndOf="@+id/query_icon"
-            app:layout_constraintTop_toTopOf="@+id/query_icon"
+            app:layout_constraintStart_toEndOf="@+id/query_icons"
+            app:layout_constraintTop_toTopOf="@+id/query_icons"
             android:textAlignment="viewStart"
             android:layout_gravity="start"
             tools:text="longlonglonglonglonglongexample.com"/>

@@ -42,7 +42,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/btn_skip"
-        android:background="@color/secondaryText"
+        android:background="@color/primaryText"
         android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
