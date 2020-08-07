@@ -69,7 +69,7 @@ class PersistentState {
 
         fun expandUrl(context: Context, url: String?): String {
             return if (url == null || url.isEmpty()) {
-                context.resources.getString(R.string.default_dummy_url)
+                context.resources.getStringArray(R.array.cloudflare_name).get(2)
             } else url
         }
 
@@ -128,7 +128,7 @@ class PersistentState {
         fun getServerUrl(context: Context?): String? {
             val urlTemplate: String = getUserPreferences(context!!)!!.getString(URL_KEY, null)
                 //?: return context.resources.getString(R.string.url0)
-                ?: return context.resources.getString(R.string.default_dummy_url)
+                ?: return context.resources.getStringArray(R.array.cloudflare_url).get(2)
             return strip(urlTemplate)
         }
 

@@ -85,7 +85,7 @@ class QueryDetailActivity  : AppCompatActivity() {
             if (url != null) {
                 urlSpinner.setSelection(getIndex(url))
             }else
-                urlSpinner.setSelection(0)
+                urlSpinner.setSelection(3)
 
             urlSpinner.onItemSelectedListener = object :
                 AdapterView.OnItemSelectedListener {
@@ -106,7 +106,7 @@ class QueryDetailActivity  : AppCompatActivity() {
 
                 override fun onNothingSelected(parent: AdapterView<*>) {
                     // write code to perform some action
-                    PersistentState.setServerUrl(context, urlValues[0])
+                    PersistentState.setServerUrl(context, url)
                 }
             }
 
