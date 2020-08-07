@@ -167,6 +167,8 @@ class HomeScreenFragment : Fragment(){
         braveMode = PersistentState.getBraveMode(context!!)
 
 
+
+
         //Show Tile
        showTileForMode()
         if(braveMode == -1 && VERSION.SDK_INT >= VERSION_CODES.Q)
@@ -197,6 +199,7 @@ class HomeScreenFragment : Fragment(){
         braveModeInfoIcon.setOnClickListener{
             showDialogForBraveModeInfo()
         }
+
 
        /* //TODO : Check this below isServiceRunning method and do the changes.
         isServiceRunning = isServiceRunning(requireContext(),BraveVPNService::class.java)
