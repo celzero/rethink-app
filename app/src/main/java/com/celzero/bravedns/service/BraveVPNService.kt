@@ -40,6 +40,7 @@ import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.net.manager.ConnectionTracer
 import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.dnsMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.firewallMode
 import kotlinx.coroutines.Dispatchers
@@ -67,7 +68,7 @@ class BraveVPNService:
 
         private const val LOG_TAG = "BraveVPNService"
         private const val DEBUG = false
-        private const val SERVICE_ID = 1 // Only has to be unique within this app.
+        const val SERVICE_ID = 1 // Only has to be unique within this app.
 
         var braveScreenStateReceiver = BraveScreenStateReceiver()
         var braveAutoStartReceiver = BraveAutoStartReceiver()
@@ -75,6 +76,9 @@ class BraveVPNService:
         private const val WARNING_CHANNEL_ID = "warning"
         private const val NO_PENDING_CONNECTION = "This value is not a possible URL."
         val vpnController : VpnController ?= VpnController.getInstance()
+
+
+
     }
 
     @GuardedBy("vpnController")
@@ -177,10 +181,10 @@ class BraveVPNService:
                 if(PersistentState.getFirewallMode(this) == 2) {
                     //builder= builder.addAllowedApplication("com.ubercab")
                     if(PersistentState.getExcludedPackagesWifi(this)!!.isEmpty()){
-                        builder.addAllowedApplication("com.android.settings")
+                        builder.addAllowedApplication("")
+                        //builder.addAllowedApplication("com.android.settings")
                     }else {
                         for (packageName in PersistentState.getExcludedPackagesWifi(this)!!) {
-                            Log.w("BraveVPN","Allowed Apps in sink hole:"+packageName)
                             builder = builder.addAllowedApplication(packageName)
                         }
                     }
@@ -223,6 +227,55 @@ class BraveVPNService:
         registerReceiver(braveAutoStartReceiver, autoStartFilter)
     }
 
+
+    fun updateBuilder(context : Context) : Notification.Builder {
+        val mainActivityIntent = PendingIntent.getActivity(
+            context,
+            0,
+            Intent(context, HomeScreenActivity::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        var builder: Notification.Builder
+        if (VERSION.SDK_INT >= VERSION_CODES.O) {
+            val name: CharSequence = context.resources.getString(R.string.app_name_brave)
+            val description =context.resources.getString(R.string.notification_content)
+            // LOW is the lowest importance that is allowed with startForeground in Android O.
+            val importance = NotificationManager.IMPORTANCE_LOW
+            val channel = NotificationChannel(MAIN_CHANNEL_ID,name,importance)
+            channel.description = description
+            val notificationManager = context.getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
+            builder = Notification.Builder(context, MAIN_CHANNEL_ID)
+        } else {
+            builder = Notification.Builder(context)
+            if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
+                // Min-priority notifications don't show an icon in the notification bar, reducing clutter.
+                // Only available in API >= 16.  Deprecated in API 26.
+                builder = builder.setPriority(Notification.PRIORITY_MIN)
+            }
+        }
+
+        var contentTitle : String =  if(braveMode == 0)
+            context.resources.getString(R.string.dns_mode_notification_title)
+        else if(braveMode == 1)
+            context.resources.getString(R.string.firewall_mode_notification_title)
+        else if(braveMode == 2)
+            context.resources.getString(R.string.hybrid_mode_notification_title)
+        else
+            context.resources.getString(R.string.notification_title)
+
+        builder.setSmallIcon(R.drawable.dns_icon)
+            .setContentTitle(contentTitle)
+            //.setContentText(resources.getText(R.string.notification_content))
+            .setContentIntent(mainActivityIntent)
+
+        // Secret notifications are not shown on the lock screen.  No need for this app to show there.
+        // Only available in API >= 21
+        builder = builder.setVisibility(Notification.VISIBILITY_SECRET)
+        builder.build()
+        return builder
+    }
+
     @InternalCoroutinesApi
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
@@ -231,7 +284,7 @@ class BraveVPNService:
         //vpnController = vpnController!!.getInstance()
         if (vpnController != null) {
             synchronized(vpnController) {
-               // Log.i("VpnService",String.format("Starting DNS VPN service, url=%s", url))
+                // Log.i("VpnService",String.format("Starting DNS VPN service, url=%s", url))
                 //TODO Move this hardcoded url to Persistent state
                 //url = persistantState.getServerUrl(this)
                 url = PersistentState.getServerUrl(this)
@@ -263,41 +316,8 @@ class BraveVPNService:
                 // survives under memory pressure.  Since this is a VPN service, it is presumably protected
                 // anyway, but the foreground service mechanism allows us to set a persistent notification,
                 // which helps users understand what's going on, and return to the app if they want.
-                val mainActivityIntent = PendingIntent.getActivity(
-                    this,
-                    0,
-                    Intent(this, HomeScreenActivity::class.java),
-                    PendingIntent.FLAG_UPDATE_CURRENT
-                )
 
-                var builder: Notification.Builder
-                if (VERSION.SDK_INT >= VERSION_CODES.O) {
-                    val name: CharSequence = getString(R.string.app_name_brave)
-                    val description = getString(R.string.notification_content)
-                    // LOW is the lowest importance that is allowed with startForeground in Android O.
-                    val importance = NotificationManager.IMPORTANCE_LOW
-                    val channel = NotificationChannel(MAIN_CHANNEL_ID,name,importance)
-                    channel.description = description
-                    val notificationManager = getSystemService(NotificationManager::class.java)
-                    notificationManager.createNotificationChannel(channel)
-                    builder = Notification.Builder(this, MAIN_CHANNEL_ID)
-                } else {
-                    builder = Notification.Builder(this)
-                    if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
-                        // Min-priority notifications don't show an icon in the notification bar, reducing clutter.
-                        // Only available in API >= 16.  Deprecated in API 26.
-                        builder = builder.setPriority(Notification.PRIORITY_MIN)
-                    }
-                }
-
-                builder.setSmallIcon(R.drawable.dns_icon)
-                    .setContentTitle(resources.getText(R.string.notification_title))
-                    //.setContentText(resources.getText(R.string.notification_content))
-                    .setContentIntent(mainActivityIntent)
-
-                // Secret notifications are not shown on the lock screen.  No need for this app to show there.
-                // Only available in API >= 21
-                builder = builder.setVisibility(Notification.VISIBILITY_SECRET)
+                val builder = updateBuilder(this)
 
                 startForeground(SERVICE_ID, builder.notification)
                 updateQuickSettingsTile()
@@ -305,6 +325,7 @@ class BraveVPNService:
         }
         return Service.START_REDELIVER_INTENT
     }
+
 
     @InternalCoroutinesApi
     private fun spawnServerUpdate() {

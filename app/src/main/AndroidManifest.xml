@@ -40,6 +40,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.AppInfoActivity"
+        android:theme="@style/AppTheme"/>
+        <activity android:name=".ui.FaqWebViewActivity"
             android:theme="@style/AppTheme"/>
 
         <!--<receiver

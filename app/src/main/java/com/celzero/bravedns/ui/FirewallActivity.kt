@@ -6,19 +6,24 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.View
-import android.widget.*
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.ContentLoadingProgressBar
+import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallApk
 import com.celzero.bravedns.adapter.FirewallHeader
-import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
@@ -65,6 +70,10 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
     private var appAppsState : Boolean = false
     private var universalState : Boolean = false
 
+    private lateinit var scrollView : NestedScrollView
+
+    private lateinit var smoothScroller: SmoothScroller
+
     @InternalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,11 +97,15 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 
         val includeView = findViewById<View>(R.id.app_scrolling_incl_firewall)
 
+        scrollView = includeView as NestedScrollView
+
         firewallNotEnabledLL = includeView.findViewById(R.id.firewall_scroll_connect_check)
         progressBarHolder = includeView.findViewById(R.id.firewall_progressBarHolder)
         progressImageView = includeView.findViewById(R.id.firewall_progress)
         firewallEnableTxt = includeView.findViewById(R.id.firewall_enable_vpn_txt)
         loadingProgressBar = includeView.findViewById(R.id.firewall_update_progress)
+
+
 
         universalFirewallTxt = includeView.findViewById(R.id.firewall_universal_top_text)
         screenLockLL = includeView.findViewById(R.id.firewall_screen_ll)
@@ -147,6 +160,12 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
             //FirewallManager.updateInternetPermissionForAllApp( b, context)
         }
 
+        smoothScroller = object : LinearSmoothScroller(context) {
+            override fun getVerticalSnapPreference(): Int {
+                return SNAP_TO_ANY
+            }
+        }
+
         firewallAllAppsTxt.setOnClickListener {
             if(PersistentState.getFirewallModeForScreenState(context)){
                 firewallAllAppsToggle.isChecked = false
@@ -157,6 +176,14 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
                 PersistentState.setFirewallModeForScreenState(context, true)
                 //FirewallManager.updateInternetPermissionForAllApp(true, context)
             }
+        }
+
+
+
+        editSearch!!.setOnClickListener{
+            Log.d("BraveDNS","Click Came")
+            editSearch!!.requestFocus()
+            editSearch!!.onActionViewExpanded()
         }
 
         //Background mode toggle
@@ -189,11 +216,16 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         }
 
         appAppsShowTxt.setOnClickListener{
-
             if(!appAppsState) {
+                updateUI()
                 editSearch!!.visibility = View.VISIBLE
-                appAppsState = true
                 recycle.visibility = View.VISIBLE
+                    recycle.post {
+                        var y = recycle.getY() + 100;
+                        scrollView.smoothScrollTo(0,  y.toInt())
+                    }
+                editSearch!!.requestFocus()
+                appAppsState = true
                 appAppsShowTxt.setCompoundDrawablesWithIntrinsicBounds(null,null,context.getDrawable(R.drawable.ic_keyboard_arrow_up_gray_24dp), null)
             }else {
                 recycle.visibility = View.GONE
@@ -219,6 +251,7 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 
         FirewallHeader.setContextVal(this)
     }
+
 
     private fun showAlertForPermission() : Boolean {
         var isAllowed  = false
@@ -250,6 +283,7 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 
 
     fun updateUI(){
+        progressBarHolder.visibility = View.VISIBLE
         itemAdapter =  ItemAdapter()
         headerAdapter = ItemAdapter()
         itemAdapter.clear()
@@ -273,7 +307,7 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         //TODO Global scope variable is not updated properly. Work on that variable
         // Work on the below code.
        if(GlobalVariable.appList.isNotEmpty()){
-           var firewallHeader  = FirewallHeader("",true)
+           var firewallHeader  = FirewallHeader("")
            var prevVal = ""
 
           /* headerAdapter.adapterItems.clear()
@@ -303,8 +337,8 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 
                     if(prevVal != it.value.appCategory && !isUpdate){
                         //Log.d("BraveDNS","appCategory : "+ it.value.appCategory + "List: "+ firewallHeaderApps.size)
-                        firewallHeader = FirewallHeader(it.value.appCategory, FirewallManager.isCategoryInternetAllowed(it.value.appCategory))
-                        GlobalVariable.categoryList.put(it.value.appCategory , firewallHeader)
+                        firewallHeader = FirewallHeader(it.value.appCategory)
+                        GlobalVariable.categoryList.add(it.value.appCategory)
                         headerList.add(firewallHeader)
                         //firewallHeaderApps.clear()
                     }
@@ -344,7 +378,6 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
                 headerAdapter.add(headerList)
                 fastAdapterHeader.notifyDataSetChanged()
             }
-
             itemAdapter.add(apkList)
             //Log.d("BraveDNS","firewallHeader size : "+headerList.size)
             //fastAdapter.notifyAdapterItemRangeChanged(0,apkList.size,null)

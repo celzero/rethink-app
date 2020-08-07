@@ -147,7 +147,7 @@ open class FirewallApk(packageInfo: PackageInfo , var isWifiEnabled : Boolean, v
             firewallApk.isWifiEnabled = isInternetAllowed
             firewallApk.isInternetAllowed = isInternetAllowed
             HomeScreenActivity.GlobalVariable.appList.get(firewallApk.packageName!!)!!.isInternetAllowed = isInternetAllowed
-            PersistentState.setExcludedPackagesWifi(firewallApk.packageName!!, isInternetAllowed ,context)
+            PersistentState.setExcludedPackagesWifi(firewallApk.packageName!!, isInternetAllowed ,context!!)
             FirewallManager.updateAppInternetPermission(firewallApk.packageName!!, isInternetAllowed)
             if(isInternetAllowed)
                 mIconIndicator.setBackgroundColor(context!!.getColor(R.color.colorGreen_900))

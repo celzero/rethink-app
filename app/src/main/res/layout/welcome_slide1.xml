@@ -36,13 +36,11 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingLeft="@dimen/desc_padding"
             android:layout_weight="0.3"
+            android:paddingLeft="@dimen/desc_padding"
             android:paddingRight="@dimen/desc_padding"
             android:text="@string/slide_1_desc"
-            android:textAlignment="center"
-            android:gravity="center_vertical"
+            android:gravity="top"
             android:textColor="@color/primaryText"
             style="@style/TextAppearance.AppCompat.Body1"
             android:textSize="@dimen/slide_desc" />

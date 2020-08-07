@@ -23,8 +23,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
+                android:padding="5dp"
                 android:weightSum="1"
                 android:gravity="center"
                 android:orientation="horizontal">
@@ -33,23 +32,25 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:text="Protection level"
-                    android:layout_weight="0.42"
+                    android:layout_weight="0.45"
                     android:textSize="16sp"
                     android:textAllCaps="true"
                     style="@style/TextAppearance.AppCompat.Headline"
-                    android:padding="5dp"
                     android:textColor="@color/primaryText"/>
 
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorPrimaryDark"
+                    android:layout_weight="0.55">
                 <androidx.appcompat.widget.AppCompatSpinner
                     android:id="@+id/setting_url_spinner"
-                    android:padding="5dp"
                     android:layout_gravity="center_vertical"
                     android:isScrollContainer="true"
                     android:dropDownSelector="@color/dividerColor"
-                    android:layout_width="0dp"
-                    android:layout_weight="0.58"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
-
+                </LinearLayout>
 
             </LinearLayout>
 

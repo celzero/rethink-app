@@ -11,6 +11,7 @@
         <item name="chipStyle">@style/Widget.MaterialComponents.Chip.Action</item>
         <item name="android:splitMotionEvents">false</item>
         <item name="android:windowEnableSplitTouch">false</item>
+        <item name="searchViewStyle">@style/SearchView_custom</item>
     </style>
 
     <style name="ActionItem">
@@ -41,6 +42,11 @@
     </style>
 
     <style name="BottomSheetDialogTheme" parent="BaseBottomSheetDialog" />
+
+    <style name="SearchView_custom" parent="Widget.AppCompat.SearchView">
+        <item name="searchViewStyle">@style/Widget.AppCompat.Light.SearchView</item>
+        <item name="android:maxWidth">@dimen/maxSize</item>
+    </style>
 
 <!--    <style name="BraveModeSpinnerTheme" parent="Widget.AppCompat.DropDownItem.Spinner">
         <item name="android:spinnerDropDownItemStyle">@style/Widget.AppCompat.TextView.SpinnerItem</item>

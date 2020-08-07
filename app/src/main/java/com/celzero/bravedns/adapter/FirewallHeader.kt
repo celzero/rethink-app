@@ -3,11 +3,9 @@ package com.celzero.bravedns.adapter
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
+import android.util.Log
 import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.CompoundButton
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatToggleButton
 import androidx.core.content.ContextCompat.getColor
@@ -24,7 +22,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.withContext
 
 
-class FirewallHeader(var categoryName : String, var isInternet : Boolean): AbstractItem<FirewallHeader.ViewHolder>() {
+class FirewallHeader(var categoryName : String): AbstractItem<FirewallHeader.ViewHolder>() {
 
     val debug = true
 
@@ -44,6 +42,7 @@ class FirewallHeader(var categoryName : String, var isInternet : Boolean): Abstr
         private val imageHolder2 : AppCompatImageView = itemView.findViewById(R.id.imageLayout_2)
         private val imageHolder3 : AppCompatImageView = itemView.findViewById(R.id.imageLayout_3)
         private val imageHolder4 : AppCompatImageView = itemView.findViewById(R.id.imageLayout_4)
+        private val progressBar : ProgressBar = itemView.findViewById(R.id.header_progress)
 
 
         @InternalCoroutinesApi
@@ -109,11 +108,16 @@ class FirewallHeader(var categoryName : String, var isInternet : Boolean): Abstr
             //FirewallManager.printAllAppStatus()
             internetChk.setOnCheckedChangeListener(null)
             internetChk.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
+                Log.d("BraveDNS","-------------------OnCheck : ${item} , block : $b")
+                progressBar.visibility = View.VISIBLE
+                internetChk.visibility = View.GONE
                 internetChk.isEnabled = false
                 internetChk.isClickable  = false
                 FirewallManager.updateCategoryAppsInternetPermission(item.categoryName, !b,context)
                 internetChk.isEnabled = true
                 internetChk.isClickable  = true
+                progressBar.visibility = View.GONE
+                internetChk.visibility = View.VISIBLE
                 //firewallActivity.showProgress(false)
                 //FirewallManager.printAllAppStatus()
             }
@@ -122,6 +126,7 @@ class FirewallHeader(var categoryName : String, var isInternet : Boolean): Abstr
 
         override fun unbindView(item: FirewallHeader) {
         }
+
 
     }
 

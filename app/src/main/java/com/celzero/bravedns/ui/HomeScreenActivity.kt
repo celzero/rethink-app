@@ -47,16 +47,18 @@ class HomeScreenActivity : AppCompatActivity() {
              Call the coroutine scope to insert/update/delete the values*/
 
     object GlobalVariable{
-        var braveMode : Int = 0
+        var braveMode : Int = -1
         var appList : MutableMap<String, AppInfo> = HashMap()
-        var categoryList : HashMap<String, FirewallHeader> = HashMap()
-        var dnsMode = 0
-        var firewallMode : Int = 0
-        var lifeTimeQueries : Int = 0
-        var installedAppCount : Int = 0
-        var medianP90 : Long = 0
+        var categoryList : HashSet<String> = HashSet()
+        var dnsMode = -1
+        var firewallMode : Int = -1
+        var lifeTimeQueries : Int = -1
+        var installedAppCount : Int = -1
+        var medianP90 : Long = -1
         var appStartTime : Long = System.currentTimeMillis()
         var isBackgroundEnabled : Boolean = false
+        var blockedCategoryList : MutableSet<String> = HashSet<String>()
+        var excludedPackageList : MutableSet<String> = HashSet<String>()
     }
 
     companion object {
@@ -98,13 +100,13 @@ class HomeScreenActivity : AppCompatActivity() {
         GlobalVariable.firewallMode = PersistentState.getFirewallMode(this)
         GlobalVariable.isBackgroundEnabled = PersistentState.getBackgroundEnabled(this)
 
-        //registerReceiversForScreenState()
+        registerReceiversForScreenState()
         getAppInfo()
 
     }
 
 
- /*   private fun registerReceiversForScreenState(){
+    private fun registerReceiversForScreenState(){
         val filter = IntentFilter()
         filter.addAction(Intent.ACTION_SCREEN_OFF)
         filter.addAction(Intent.ACTION_SCREEN_ON)
@@ -115,11 +117,12 @@ class HomeScreenActivity : AppCompatActivity() {
         autoStartFilter.addAction(Intent.ACTION_BOOT_COMPLETED)
         registerReceiver(BraveVPNService.braveAutoStartReceiver, autoStartFilter)
     }
-*/
+
 
     override fun onDestroy() {
         super.onDestroy()
-        //unregisterReceiver(BraveVPNService.braveScreenStateReceiver)
+        unregisterReceiver(BraveVPNService.braveScreenStateReceiver)
+        unregisterReceiver(BraveVPNService.braveAutoStartReceiver)
     }
 
 
@@ -161,8 +164,7 @@ class HomeScreenActivity : AppCompatActivity() {
                             }
                             appInfo.isScreenOff = false
                             appInfo.packageInfo = applicationInfo.packageName
-                            appInfo.isInternetAllowed =
-                                PersistentState.isWifiAllowed(appInfo.packageInfo, context)
+                            appInfo.isInternetAllowed = PersistentState.isWifiAllowed(appInfo.packageInfo, context)
                             appInfo.isBackgroundEnabled = false
                             appInfo.mobileDataUsed = 0
 

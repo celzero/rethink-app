@@ -2,8 +2,7 @@ package com.celzero.bravedns.ui
 
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.Dialog
+import android.app.*
 import android.content.*
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
@@ -95,6 +94,8 @@ class HomeScreenFragment : Fragment(){
     private lateinit var protectionDescTxt  : TextView
     private lateinit var protectionLevelTxt : TextView
 
+    private val MAIN_CHANNEL_ID = "vpn"
+
     //Removed code for VPN
     private var isServiceRunning : Boolean = false
 
@@ -168,8 +169,10 @@ class HomeScreenFragment : Fragment(){
 
         //Show Tile
        showTileForMode()
-
-        braveModeSpinner.setSelection(braveMode)
+        if(braveMode == -1 && VERSION.SDK_INT >= VERSION_CODES.Q)
+            braveModeSpinner.setSelection(2)
+        else
+            braveModeSpinner.setSelection(braveMode)
 
         braveModeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -278,6 +281,49 @@ class HomeScreenFragment : Fragment(){
         }
 
         braveModeSpinner.isEnabled = true
+
+    }
+
+    fun updateBuilder()  {
+        val mainActivityIntent = PendingIntent.getActivity(
+            context,
+            0,
+            Intent(context, HomeScreenActivity::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        var builder: Notification.Builder
+
+
+            val name: CharSequence = context!!.resources.getString(R.string.app_name_brave)
+            val description =context!!.resources.getString(R.string.notification_content)
+            // LOW is the lowest importance that is allowed with startForeground in Android O.
+            val importance = NotificationManager.IMPORTANCE_LOW
+            val notificationManager = context!!.getSystemService(NotificationManager::class.java)
+            val channel = NotificationChannel(MAIN_CHANNEL_ID,name,importance)
+            channel.description = description
+            notificationManager.createNotificationChannel(channel)
+            builder = Notification.Builder(context, MAIN_CHANNEL_ID)
+
+
+        var contentTitle : String =  if(braveMode == 0)
+            context!!.resources.getString(R.string.dns_mode_notification_title)
+        else if(braveMode == 1)
+            context!!.resources.getString(R.string.firewall_mode_notification_title)
+        else if(braveMode == 2)
+            context!!.resources.getString(R.string.hybrid_mode_notification_title)
+        else
+            context!!.resources.getString(R.string.notification_title)
+
+        builder.setSmallIcon(R.drawable.dns_icon)
+            .setContentTitle(contentTitle)
+            //.setContentText(resources.getText(R.string.notification_content))
+            .setContentIntent(mainActivityIntent)
+
+        // Secret notifications are not shown on the lock screen.  No need for this app to show there.
+        // Only available in API >= 21
+        builder = builder.setVisibility(Notification.VISIBILITY_SECRET)
+
+        notificationManager!!.notify(BraveVPNService.SERVICE_ID,builder.build())
     }
 
     private fun startQueryListener() {
@@ -337,6 +383,7 @@ class HomeScreenFragment : Fragment(){
 
 
         if(VpnController.getInstance()!!.getState(context!!)!!.activationRequested) {
+            updateBuilder()
             if (braveMode == 0)
                 protectionDescTxt.setText("connected to bravedns")
             else if (braveMode == 1)
@@ -406,11 +453,13 @@ class HomeScreenFragment : Fragment(){
 
             tileFAppsBlockedTxt.setText(PersistentState.getExcludedPackagesWifi(context!!)!!.size.toString())
             tileFCategoryBlockedTxt.setText(PersistentState.getCategoriesBlocked(context!!)!!.size.toString())
-            var numUniversalBlock : Int = 0
-            if(PersistentState.getBackgroundEnabled(context!!))
-                numUniversalBlock =+1
-            if(PersistentState.getFirewallModeForScreenState(context!!))
-                numUniversalBlock =+1
+            var numUniversalBlock = 0
+            if(PersistentState.getBackgroundEnabled(context!!)) {
+                numUniversalBlock += 1
+            }
+            if(PersistentState.getFirewallModeForScreenState(context!!)) {
+                numUniversalBlock += 1
+            }
             tileFUniversalBlockedTxt.setText(numUniversalBlock.toString())
 
             tileDFAppsBlockedTxt.setText(PersistentState.getExcludedPackagesWifi(context!!)!!.size.toString())
@@ -418,7 +467,7 @@ class HomeScreenFragment : Fragment(){
             tileDFTrackersBlockedtxt.setText(percentage.toInt().toString() +"%")
 
             updateUptime()
-            timerHandler.postDelayed(updater, 1000)
+            timerHandler.postDelayed(updater,1500)
 
         }
         timerHandler.post(updater)
