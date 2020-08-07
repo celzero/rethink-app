@@ -80,14 +80,13 @@ class FirewallManager {
                         PersistentState.setExcludedPackagesWifi(it.key, isAllowed, context)
                     }
                 }
-                val firewallHeader = FirewallHeader(categoryName, isAllowed)
-                GlobalVariable.categoryList.put(categoryName, firewallHeader)
+                //val firewallHeader = FirewallHeader(categoryName, isAllowed)
+                //GlobalVariable.categoryList.put(categoryName, firewallHeader)
                 PersistentState.setCategoriesBlocked(categoryName, isAllowed, FirewallHeader.context)
                 if(GlobalVariable.firewallMode == 2)
                     BraveVPNService.vpnController!!.getBraveVpnService()!!.restarVPNfromExternalForce()
                // withContext(Dispatchers.Main.immediate) {
-                    val firewallActivity: FirewallActivity = FirewallHeader.context as FirewallActivity
-                    firewallActivity.updateUI()
+
                 //}
             //}
         }
@@ -124,7 +123,7 @@ class FirewallManager {
             }
         }
 
-        fun isCategoryInternetAllowed(categoryName : String ) : Boolean{
+        /*fun isCategoryInternetAllowed(categoryName : String ) : Boolean{
             val categoryDetail = GlobalVariable.categoryList.get(categoryName)
             if(categoryDetail == null)
                 return true
@@ -133,7 +132,7 @@ class FirewallManager {
                 return true
             }
             return false
-        }
+        }*/
 
     }
 
@@ -162,7 +161,7 @@ class FirewallManager {
                 }
                 latestTrackedPackage = event.packageName.toString()
 
-               // Log.w(TAG, "bbbbb............... Added package to the stack: ${eventPackageName} size: ${packagesStack.size}")
+               Log.w(TAG, "bbbbb............... Added package to the stack: ${eventPackageName} size: ${packagesStack.size}")
             }/* else if (isPackageInstaller(eventPackageName) && isGrant()) {
                 // if content-disappeared and there's nothing to track
                 // make sure to untrack PERMISSIONS_GRANT state set below
@@ -171,18 +170,19 @@ class FirewallManager {
         }
 
 
-        var packageName =  eventPackageName
+        val packageName =  event.packageName?.toString() ?: return
         if (event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
             // https://stackoverflow.com/a/27642535
             // top window is launcher? try revoke queued up permissions
             // FIXME: Figure out a fool-proof way to determine is launcher visible
             //Log.d("BraveDNS","isPackageLauncher : ${isPackageLauncher(packageName)}")
             if (isPackageLauncher(packageName)) {
-
+                Log.d("BraveDNS","add package to firewall : $packageName and eventPack : $eventPackageName")
                 // TODO: revoke permissions only if there are any to revoke
                 addOrRemovePackageForBackground(false)
             }
         }else{
+            Log.d("BraveDNS","remove package to firewall : $packageName and eventPack : $eventPackageName")
             addOrRemovePackageForBackground(true)
         }
 
@@ -205,7 +205,7 @@ class FirewallManager {
         if (packagesStack.isNullOrEmpty()) {
             return
         }else {
-            //Log.w(TAG, "bbbbb ____ revokePermissions :" + packagesStack.elementAt(0))
+            Log.w(TAG, "bbbbb ____ revokePermissions :" + packagesStack.elementAt(0))
             val currentPackage = packagesStack.elementAt(0)
             packagesStack.remove(currentPackage)
             packageElect = currentPackage

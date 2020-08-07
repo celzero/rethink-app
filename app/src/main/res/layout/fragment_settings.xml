@@ -46,8 +46,18 @@
              android:layout_width="0dp"
              android:layout_height="match_parent"
              android:layout_weight="0.33"
-             android:gravity="center"
-             android:orientation="vertical"/>
+             android:weightSum="1"
+             android:orientation="vertical">
+
+             <androidx.appcompat.widget.AppCompatTextView
+                 android:id="@+id/settings_app_faq_icon"
+                 android:layout_width="wrap_content"
+                 android:layout_height="match_parent"
+                 android:layout_gravity="right"
+                 android:padding="5dp"
+                 android:drawableTop="@drawable/ic_faq" />
+
+         </LinearLayout>
 
      </LinearLayout>
 

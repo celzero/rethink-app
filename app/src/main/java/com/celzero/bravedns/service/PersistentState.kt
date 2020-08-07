@@ -7,6 +7,13 @@ import android.preference.PreferenceManager
 import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.blockedCategoryList
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.dnsMode
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.excludedPackageList
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.firewallMode
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.isBackgroundEnabled
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.medianP90
 //
 import settings.Settings
 
@@ -127,25 +134,42 @@ class PersistentState {
 
 
         fun getExcludedPackagesWifi(context: Context?): Set<String?>? {
+            if(excludedPackageList.isNotEmpty())
+                return excludedPackageList
             return getUserPreferences(context!!)?.getStringSet(
                APPS_KEY_WIFI,
                 HashSet<String>()
             )
         }
 
-        fun setExcludedPackagesWifi(packageName : String, toRemove : Boolean , context : Context?){
+        fun setExcludedPackagesWifi(packageName : String, toRemove : Boolean , context : Context){
+
+            //Log.d("BraveDNS","-----------*****setExcludedPackagesWifi $packageName value : $toRemove")
+
+            if(toRemove){
+                if(excludedPackageList.contains(packageName))
+                        excludedPackageList.remove(packageName)
+            }else{
+                excludedPackageList.add(packageName)
+            }
+            if(excludedPackageList.isNotEmpty())
+                getUserPreferences(context)!!.edit().putStringSet(APPS_KEY_WIFI,excludedPackageList).commit()
+
 
             //TODO : hardcode value for testing. Need to modify
 
             //sets = getUserPreferences(context!!)!!.getStringSet(APPS_KEY, HashSet<String>())!!
-            val newSet: MutableSet<String> = HashSet(getUserPreferences(context!!)!!.getStringSet(APPS_KEY_WIFI, HashSet<String>()))
+            /*val newSet: MutableSet<String> = HashSet(getUserPreferences(context!!)!!.getStringSet(APPS_KEY_WIFI, HashSet<String>()))
             if(toRemove) newSet.removeIf{newSet.contains(packageName)}
             else newSet.add(packageName)
-            getUserPreferences(context)!!.edit().putStringSet(APPS_KEY_WIFI,newSet).apply()
+            getUserPreferences(context)!!.edit().putStringSet(APPS_KEY_WIFI,newSet).commit()*/
 
         }
 
         fun isWifiAllowed(packageName : String, context: Context) : Boolean{
+            if(excludedPackageList.isNotEmpty())
+                if(excludedPackageList.contains(packageName))
+                    return true
             return !getUserPreferences(context)?.getStringSet(APPS_KEY_WIFI,HashSet<String>())!!.contains(packageName)
         }
 
@@ -162,7 +186,10 @@ class PersistentState {
             //TODO : hardcode value for testing. Need to modify
             // sets = getUserPreferences(context!!)!!.getStringSet(APPS_KEY, HashSet<String>())!!
             val newSet: MutableSet<String> = HashSet(getUserPreferences(context!!)!!.getStringSet(APPS_KEY_DATA, HashSet<String>()))
-            if(toRemove)    newSet.removeIf{newSet.contains(packageName)}
+            if(toRemove){
+                if(newSet.contains(packageName))
+                    newSet.remove(packageName)
+            }
             else  newSet.add(packageName)
             getUserPreferences(context)!!.edit().putStringSet(APPS_KEY_DATA,newSet).apply()
 
@@ -190,7 +217,10 @@ class PersistentState {
         }
 
         fun getBraveMode(context: Context) : Int{
-            return getUserPreferences(context)!!.getInt(BRAVE_MODE, 0)
+            if(braveMode == -1)
+                return getUserPreferences(context)!!.getInt(BRAVE_MODE, -1)
+            else
+                return  braveMode
         }
 
         fun setDnsMode(context: Context, mode : Int){
@@ -202,8 +232,10 @@ class PersistentState {
 
         //TODO : Modify the hardcoded value
         fun getDnsMode(context: Context):Int {
-            //return Settings.DNSModePort.toInt()
-            return getUserPreferences(context)!!.getInt(DNS_MODE, 1)
+            if(dnsMode == -1)
+                return getUserPreferences(context)!!.getInt(DNS_MODE, 1)
+            else
+                return dnsMode
         }
 
         fun setFirewallMode(context: Context, fwMode : Int){
@@ -216,8 +248,10 @@ class PersistentState {
 
         //TODO : Modify the hardcoded value
         fun getFirewallMode(context: Context):Int {
-            //return Settings.BlockModeFilter.toInt()
-            return getUserPreferences(context)!!.getInt(FIREWALL_MODE, 1)
+            if(firewallMode == -1)
+                return getUserPreferences(context)!!.getInt(FIREWALL_MODE, 1)
+            else
+                return firewallMode
         }
 
 
@@ -235,38 +269,58 @@ class PersistentState {
 
 
         fun getCategoriesBlocked(context: Context?): Set<String?>? {
-            return getUserPreferences(context!!)?.getStringSet(
-                CATEGORY_DATA,
-                HashSet<String>()
-            )
+            if(blockedCategoryList.isEmpty()){
+                return getUserPreferences(context!!)?.getStringSet(
+                    CATEGORY_DATA,
+                    HashSet<String>()
+                )
+            }else
+                return blockedCategoryList
         }
 
-        fun setCategoriesBlocked(categoryName : String, toRemove : Boolean , context : Context?){
+        fun setCategoriesBlocked(categoryName : String, toRemove : Boolean , context : Context){
 
-            //TODO : hardcode value for testing. Need to modify
+            Log.d("BraveDNS","-----------*****setCategoriesBlocked $categoryName value : $toRemove")
+
+            if(toRemove){
+                if(blockedCategoryList.contains(categoryName))
+                    blockedCategoryList.remove(categoryName)
+            }else{
+                blockedCategoryList.add(categoryName)
+            }
+            if(blockedCategoryList.isNotEmpty())
+                getUserPreferences(context)!!.edit().putStringSet(CATEGORY_DATA,blockedCategoryList).commit()
+            /*//TODO : hardcode value for testing. Need to modify
             //sets = getUserPreferences(context!!)!!.getStringSet(APPS_KEY, HashSet<String>())!!
             val newSet: MutableSet<String> = HashSet(getUserPreferences(context!!)!!.getStringSet(CATEGORY_DATA, HashSet<String>()))
             //Log.d("BraveDNS" ,"isCategoryBlocked : "+categoryName +"toRemove : "+ toRemove + "-- Contains : "+newSet.contains(categoryName))
             if(toRemove) newSet.removeIf{newSet.contains(categoryName)}
             else newSet.add(categoryName)
-
-            getUserPreferences(context)!!.edit().putStringSet(CATEGORY_DATA,newSet).apply()
+            getUserPreferences(context)!!.edit().putStringSet(CATEGORY_DATA,newSet).apply()*/
 
         }
 
         fun isCategoryBlocked(categoryName: String, context: Context) : Boolean{
-            return getUserPreferences(context)?.getStringSet(CATEGORY_DATA,HashSet<String>())!!.contains(categoryName)
+            if(blockedCategoryList.isEmpty()){
+                blockedCategoryList = getUserPreferences(context)?.getStringSet(CATEGORY_DATA,HashSet<String>())!!
+            }
+            var isBlocked = blockedCategoryList.contains(categoryName)
+            Log.d("BraveDNS","Category : $categoryName isBlocked : $isBlocked")
+            return isBlocked
         }
 
         fun setMedianLatency(context: Context, medianP90 : Long){
-            HomeScreenActivity.GlobalVariable.lifeTimeQueries = medianP90.toInt()
+            HomeScreenActivity.GlobalVariable.medianP90 = medianP90
             val editor: SharedPreferences.Editor = getUserPreferences(context)!!.edit()
             editor.putLong(MEDIAN_90, medianP90)
             editor.apply()
         }
 
         fun getMedianLatency(context: Context) : Long{
-            return getUserPreferences(context)?.getLong(MEDIAN_90,0L)!!
+            if(medianP90 == (-1).toLong())
+                return getUserPreferences(context)?.getLong(MEDIAN_90,0L)!!
+            else
+                return medianP90
         }
 
         fun setNumOfReq(context : Context){
@@ -275,6 +329,7 @@ class PersistentState {
                 getUserPreferences(context)!!.edit()
             editor.putInt(NUMBER_REQUEST, numReq+1)
             editor.apply()
+            HomeScreenActivity.GlobalVariable.lifeTimeQueries = numReq+1
         }
 
         fun getNumOfReq(context: Context) : Int{

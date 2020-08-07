@@ -35,9 +35,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.3"
+            android:paddingLeft="@dimen/desc_padding"
+            android:paddingRight="@dimen/desc_padding"
             android:text="@string/slide_2_desc"
-            android:textAlignment="center"
-            android:gravity="center_vertical"
+            android:gravity="top"
             style="@style/TextAppearance.AppCompat.Body1"
             android:textColor="@color/primaryText"
             android:textSize="@dimen/slide_desc" />

@@ -1,6 +1,7 @@
 package com.celzero.bravedns.ui
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.*
@@ -15,8 +16,9 @@ import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Utilities
-import java.security.AccessController.getContext
+import com.google.android.material.snackbar.Snackbar
 import java.util.*
+
 
 class QueryDetailActivity  : AppCompatActivity() {
 
@@ -90,9 +92,14 @@ class QueryDetailActivity  : AppCompatActivity() {
                 override fun onItemSelected(parent: AdapterView<*>,
                                             view: View, position: Int, id: Long) {
                     if(position == 3) {
-                        Toast.makeText(context, "Ads and Tracker Filters (coming soon)", Toast.LENGTH_LONG).show()
-                        urlSpinner.setSelection(0)
-                        PersistentState.setServerUrl(context, urlValues[0])
+                        val snackbar = Snackbar.make(view, "Ads and Tracker Filters (coming soon)", Snackbar.LENGTH_LONG).setAction("SUBSCRIBE") {
+                            val intent = Intent(context, FaqWebViewActivity::class.java)
+                            intent.putExtra("url","https://www.bravedns.com/#subsec")
+                            startActivity(intent)
+                        }
+                        snackbar.show()
+                        //Toast.makeText(context, "Ads and Tracker Filters (coming soon)", Toast.LENGTH_LONG).show()
+                        urlSpinner.setSelection(getIndex(PersistentState.getServerUrl(context)!!))
                     }else
                         PersistentState.setServerUrl(context, urlValues[position])
                 }

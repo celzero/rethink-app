@@ -1,6 +1,7 @@
 package com.celzero.bravedns.ui
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatSpinner
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.Fragment
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
@@ -26,6 +28,7 @@ class SettingsFragment : Fragment() {
     private lateinit var  viewQueriesBtn : Button
     private lateinit var settingsBtn : Button
     private lateinit var firewallConfigBtn : AppCompatButton
+    private lateinit var faqTxt : AppCompatTextView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
@@ -43,6 +46,7 @@ class SettingsFragment : Fragment() {
         appManagerBtn = view.findViewById(R.id.configure_app_mgr_btn)
         viewQueriesBtn = view.findViewById(R.id.view_queries_btn)
         settingsBtn = view.findViewById(R.id.configure_settings_btn)
+        faqTxt = view.findViewById(R.id.settings_app_faq_icon)
 
         //val btnApply = view.findViewById<AppCompatButton>(R.id.setting_apply)
 
@@ -106,7 +110,17 @@ class SettingsFragment : Fragment() {
             startFirewallActivity()
         }
 
+        faqTxt.setOnClickListener{
+            startWebViewIntent()
+        }
 
+    }
+
+    private fun startWebViewIntent(){
+       /* val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.bravedns.com/faq"));
+        startActivity(browserIntent)*/
+        val intent = Intent(requireContext(), FaqWebViewActivity::class.java)
+        startActivity(intent)
     }
 
     private fun startQueryListener() {

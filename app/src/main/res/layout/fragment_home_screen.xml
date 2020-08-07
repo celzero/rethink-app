@@ -282,7 +282,7 @@
             android:id="@+id/fhs_tile_show_dns_firewall"
             android:layout_width="match_parent"
             android:orientation="horizontal"
-            android:visibility="visible"
+            android:visibility="gone"
             android:weightSum="3"
             android:layout_height="match_parent">
             <LinearLayout
@@ -406,7 +406,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginBottom="60dp"
+        android:layout_marginBottom="80dp"
         android:gravity="bottom|center"
         android:layout_weight="0.3"
         android:orientation="vertical">

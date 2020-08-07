@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/firewall_scroll_view"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -170,18 +171,23 @@
         <androidx.appcompat.widget.SearchView
             android:id="@+id/search"
             android:visibility="gone"
+            android:clickable="true"
+            style="@style/SearchView_custom"
+            android:maxWidth="10000dp"
+            app:queryHint="Search Apps by Names"
+            app:queryBackground="@color/colorPrimaryDark"
             android:backgroundTintMode="src_atop"
             android:backgroundTint="@color/colorPrimaryDark"
             android:background="@color/colorPrimary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
             android:layout_marginLeft="2dp"
             android:layout_marginRight="2dp"
             android:iconifiedByDefault="false"
             android:orientation="horizontal"
             tools:layout_editor_absoluteX="4dp">
-
             <requestFocus />
         </androidx.appcompat.widget.SearchView>
         <androidx.recyclerview.widget.RecyclerView

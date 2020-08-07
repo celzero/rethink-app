@@ -1,6 +1,6 @@
 
 <resources>
-    <string name="app_name">Brave DNS</string>
+    <string name="app_name">BraveDNS</string>
     <string name="app_name_brave">Brave</string>
     <string name="title_internet_manager">Internet \n Manager</string>
     <string name="title_permission_manager">Permission \n Manager</string>
@@ -151,6 +151,18 @@
         description="Status indicator text shown in a persistent notification.">
     Protected! Connected to Fast and Secure DNS.
   </string>
+
+    <string name="dns_mode_notification_title">
+        Protected! Connected to Fast and Secure DNS.
+    </string>
+
+    <string name="firewall_mode_notification_title">
+        Protected! Connected to Firewall.
+    </string>
+
+    <string name="hybrid_mode_notification_title">
+        Protected! Connected to DNS + Firewall.
+    </string>
 
 
     <string name="status_waiting"
@@ -338,6 +350,10 @@
 
     <string name="brave_dns_connect_mode_change_dns">
        Cannot view logs: DNS Mode not active.
+    </string>
+
+    <string name="faq_web_link">
+        https://www.bravedns.com/faq
     </string>
 
 </resources>
