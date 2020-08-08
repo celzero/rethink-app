@@ -111,6 +111,7 @@ public class QueryTracker {
     //}
 
     recentActivity.add(transaction.queryTime);
+    PersistentState.Companion.setNumOfReq(context);
     /*while (recentActivity.peek() + ACTIVITY_MEMORY_MS < transaction.queryTime) {
       recentActivity.remove();
     }*/
@@ -129,7 +130,7 @@ public class QueryTracker {
       numRequests = PersistentState.Companion.getNumOfReq(context);
       if (!queryList.isEmpty()){
         if (queryList.size() > HISTORY_SIZE) {
-          int val = queryList.first();
+          int val = queryList.last();
           queryList.remove(val);
         }
     }
@@ -138,7 +139,7 @@ public class QueryTracker {
       int positionP50 = (int) (queryList.size() * 0.50);
       val = Iterables.get(queryList, positionP50);
       PersistentState.Companion.setMedianLatency(context, val);
-      PersistentState.Companion.setNumOfReq(context);
+
     }
   }
 }

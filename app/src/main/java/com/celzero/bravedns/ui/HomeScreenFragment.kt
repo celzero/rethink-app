@@ -443,8 +443,9 @@ class HomeScreenFragment : Fragment(){
             val numReq = PersistentState.getNumOfReq(context!!).toDouble()
             val blockedReq = PersistentState.getBlockedReq(context!!).toDouble()
             var percentage : Double = 0.0
+            Log.d("BraveDNS","Blocked : $blockedReq   num : $numReq ")
             if(numReq > blockedReq) {
-                //Log.d("BraveDNS","Blocked : "+blockedReq + " - num : "+numReq)
+                Log.d("BraveDNS","Blocked : $blockedReq   num : $numReq ")
                 percentage = (blockedReq / numReq) * 100
             }
             HomeScreenActivity.GlobalVariable.lifeTimeQueries = PersistentState.getNumOfReq(context!!)
@@ -489,7 +490,7 @@ class HomeScreenFragment : Fragment(){
         override fun onReceive(context: Context, intent: Intent) {
             //Log.i("BraveDNS","Message Received : Broadcast")
             if (InternalNames.RESULT.name.equals(intent.action)) {
-                updateStatsDisplay(getNumRequests(),intent.getSerializableExtra(InternalNames.TRANSACTION.name) as Transaction)
+                updateStatsDisplay(PersistentState.getNumOfReq(context).toLong(),intent.getSerializableExtra(InternalNames.TRANSACTION.name) as Transaction)
 
             } else if (InternalNames.DNS_STATUS.name.equals(intent.action)) {
                 syncDnsStatus()
@@ -498,7 +499,7 @@ class HomeScreenFragment : Fragment(){
     }
 
     private fun updateStatsDisplay(numRequests: Long,transaction: Transaction) {
-        HomeScreenActivity.GlobalVariable.lifeTimeQueries = numRequests.toInt()
+        //HomeScreenActivity.GlobalVariable.lifeTimeQueries = numRequests.toInt()
         QueryDetailActivity.updateStatsDisplay(numRequests,transaction)
         //showTransaction(transaction)
     }

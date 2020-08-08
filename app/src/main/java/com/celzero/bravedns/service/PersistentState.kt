@@ -13,6 +13,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.dnsMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.excludedPackageList
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.firewallMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.isBackgroundEnabled
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.lifeTimeQueries
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.medianP90
 //
 import settings.Settings
@@ -134,8 +135,8 @@ class PersistentState {
 
 
         fun getExcludedPackagesWifi(context: Context?): Set<String?>? {
-            if(excludedPackageList.isNotEmpty())
-                return excludedPackageList
+            /*if(excludedPackageList.isNotEmpty())
+                return excludedPackageList*/
             return getUserPreferences(context!!)?.getStringSet(
                APPS_KEY_WIFI,
                 HashSet<String>()
@@ -143,17 +144,24 @@ class PersistentState {
         }
 
         fun setExcludedPackagesWifi(packageName : String, toRemove : Boolean , context : Context){
+            val newSet: MutableSet<String> = HashSet(getUserPreferences(context!!)!!.getStringSet(APPS_KEY_WIFI, HashSet<String>()))
+            if(toRemove) {
+                if (newSet.contains(packageName)) {
+                    newSet.remove(packageName)
+                }
+            }
+            else newSet.add(packageName)
 
-            //Log.d("BraveDNS","-----------*****setExcludedPackagesWifi $packageName value : $toRemove")
+            getUserPreferences(context)!!.edit().putStringSet(APPS_KEY_WIFI,newSet).commit()
 
-            if(toRemove){
+          /*  if(toRemove){
                 if(excludedPackageList.contains(packageName))
                         excludedPackageList.remove(packageName)
             }else{
                 excludedPackageList.add(packageName)
             }
-            if(excludedPackageList.isNotEmpty())
-                getUserPreferences(context)!!.edit().putStringSet(APPS_KEY_WIFI,excludedPackageList).commit()
+            if(excludedPackageList.size > 0)
+                getUserPreferences(context)!!.edit().putStringSet(APPS_KEY_WIFI,excludedPackageList).commit()*/
 
 
             //TODO : hardcode value for testing. Need to modify
@@ -167,9 +175,6 @@ class PersistentState {
         }
 
         fun isWifiAllowed(packageName : String, context: Context) : Boolean{
-            if(excludedPackageList.isNotEmpty())
-                if(excludedPackageList.contains(packageName))
-                    return true
             return !getUserPreferences(context)?.getStringSet(APPS_KEY_WIFI,HashSet<String>())!!.contains(packageName)
         }
 
@@ -329,18 +334,20 @@ class PersistentState {
                 getUserPreferences(context)!!.edit()
             editor.putInt(NUMBER_REQUEST, numReq+1)
             editor.apply()
-            HomeScreenActivity.GlobalVariable.lifeTimeQueries = numReq+1
+            lifeTimeQueries = numReq+1
         }
 
         fun getNumOfReq(context: Context) : Int{
+            if(lifeTimeQueries >=0 )
+                return lifeTimeQueries
             return getUserPreferences(context)?.getInt(NUMBER_REQUEST,0)!!
         }
 
         fun setBlockedReq(context : Context){
-            val numReq =  getUserPreferences(context)?.getInt(BLOCKED_COUNT,0)!!
+            val blockCount =  getUserPreferences(context)?.getInt(BLOCKED_COUNT,0)!!
             val editor: SharedPreferences.Editor =
                 getUserPreferences(context)!!.edit()
-            editor.putInt(BLOCKED_COUNT, numReq+1)
+            editor.putInt(BLOCKED_COUNT, blockCount+1)
             editor.apply()
         }
 
