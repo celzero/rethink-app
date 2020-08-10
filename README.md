@@ -45,21 +45,21 @@ We aren't there yet, may never will be but these are some tenents for the projec
 
 - Make it right, make it secure, make it resilient, make it fast. In that order.
 - Easy to use, no-root, no-gimmicks features that are anti-censorship and anti-surveillance.
--- Easy to use: Any of the 2B+ Android users must be able to use it. Think CleanMaster / Instagram levels of ease-of-use. 
--- no-root: Shouldn't require root-access for any functionality added to it.
--- no-gimmicks: Misleading material bordering on scareware, for example.
--- anti-censorship: Features focused on helping bring an open internet to everyone, preferably in the most efficient way possible (both monetairly and technically).
--- anti-surveillance: As above, but features that further limit (may not necessairly eliminate) surveillance by apps.
+  - Easy to use: Any of the 2B+ Android users must be able to use it. Think CleanMaster / Instagram levels of ease-of-use. 
+  - no-root: Shouldn't require root-access for any functionality added to it.
+  - no-gimmicks: Misleading material bordering on scareware, for example.
+  - anti-censorship: Features focused on helping bring an open internet to everyone, preferably in the most efficient way possible (both monetairly and technically).
+ - anti-surveillance: As above, but features that further limit (may not necessairly eliminate) surveillance by apps.
 - Incremental changes in balance with newer features.
--- For example, work on nagging UI issues or OEM specific bugs, must be taken up on equal weight to newer features, and a release must probably establish a good balance between the two. However; working on only incremental changes for a release is fine.
+  - For example, work on nagging UI issues or OEM specific bugs, must be taken up on equal weight to newer features, and a release must probably establish a good balance between the two. However; working on only incremental changes for a release is fine.
 - Opinionated. Chip-away complexity. Do not expect users to require a PhD in Computer Science to use the app.
--- No duplicate functionality.
--- A concerted effort to not provide too many tunable knobs and settings. To err on the side of easy over simple.
+  - No duplicate functionality.
+  - A concerted effort to not provide too many tunable knobs and settings. To err on the side of easy over simple.
 - Ignore all tenents.
--- Common sense always takes over when tenents get in the way.
+  - Common sense always takes over when tenents get in the way.
 - Must be distributable on the PlayStore, at least some toned down version of it. 
--- [blokada](https://github.com/blokadaorg/blokada) has the right idea!
--- This unfortunately means on-device blocklists aren't possible; however, [https://www.cloudflare.com/teams-gateway/](Cloudflare Gateway)-esque cloud-based per-user blocklists get us the same functionality.
+  - [blokada](https://github.com/blokadaorg/blokada) has the right idea!
+  - This unfortunately means on-device blocklists aren't possible; however, [Cloudflare Gateway](https://www.cloudflare.com/teams-gateway/)-esque cloud-based per-user blocklists get us the same functionality.
 - Practice what you preach: Be obsessively private and secure.
 
 ## Backstory
@@ -67,4 +67,4 @@ Internet censorship (sometimes ISP-enforced and often times government-enforced)
 
 ## License
 
-[Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+[Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
