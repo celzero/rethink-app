@@ -486,15 +486,15 @@ class BraveVPNService:
 
                 // Attempt seamless handoff as described in the docs for VpnService.Builder.establish().
                 val oldAdapter: GoVpnAdapter? = vpnAdapter
+                oldAdapter?.close()
                 vpnAdapter = makeVpnAdapter()
-                oldAdapter!!.close()
                 if (vpnAdapter != null) {
                     vpnAdapter!!.start(dnsModeL, firewallModeL)
                 } else {
                     Log.i("VpnService",String.format("Restart failed"))
                 }
             }
-        }else{
+        } else {
             Log.i("VpnService",String.format("vpnController is null"))
         }
     }
