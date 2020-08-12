@@ -6,9 +6,9 @@ In other words, BraveDNS has two primary modes, DNS and Firewall. The DNS mode r
 
 ### Firewall
 
-The firewall is it doesn't really care about the connections per se rather what's making those connections. This is different from the traditional firewalls but in-line with [Little Snitch](https://www.obdev.at/products/littlesnitch/index.html), [LuLu](https://objective-see.com/products/lulu.html), [Glasswire](https://glasswire.com/) and others.
+The firewall doesn't really care about the connections per se rather what's making those connections. This is different from the traditional firewalls but in-line with [Little Snitch](https://www.obdev.at/products/littlesnitch/index.html), [LuLu](https://objective-see.com/products/lulu.html), [Glasswire](https://glasswire.com/) and others.
 
-Currently, per app connection mapping is implemented by capturing UDP and TCP connections managed by tun2socks-layer (written in golang) and asking [ConnectivityService for the owner](https://developer.android.com/about/versions/10/privacy/changes#proc-net-filesystem). No `procfs` business here yet to track per-app connections like [NetGuard](https://github.com/M66B/NetGuard/) or OpenSnitch, but it is in the works. This means, both firewall and DNS are supported only on Android 10 and above until `procfs` tracking is added.
+Currently, per app connection mapping is implemented by capturing `udp` and `tcp` connections managed by `outline-go-tun2socks`-layer (written in golang) and asking [ConnectivityService for the owner](https://developer.android.com/about/versions/10/privacy/changes#proc-net-filesystem), an API available only on Android 10 or higher. `procfs` (`/proc/net/tcp` and `/proc/net/udp`) is read on-demand to track per-app connections like [NetGuard](https://github.com/M66B/NetGuard/) or OpenSnitch do on Android 9 and lower versions. Tracking `tcp` connections like this works fine whilst tracking `udp` doesn't.
 
 ### Network Monitor
 
@@ -16,7 +16,7 @@ Not implemented yet, but it is almost done-- just a clean UI stands in the way (
 
 ### DNS over HTTPS client
 
-Almost all of the network related code, including DNS over HTTPS split tunnel, is a very minimal fork of the excellent [Jigsaw-Code/outline-go-tun2socks](https://github.com/Jigsaw-Code/outline-go-tun2socks) written in golang. A majority of work is on the UI with other parts remaining same as on [Jigsaw-Code/Intra](https://github.com/Jigsaw-Code/Intra/), and so the functionality underneath is pretty much the same. The split-tunnel traps requests sent to the VPN's DNS endpoint and relays it to a DNS over HTTPS endpoint of the user's choosing (currently limited to Cloudflare's 1.1.1.1 and AdGuard DNS; but BraveDNS' own resolver will soon follow suit) and logs the end-to-end latency, time, the request query and it answer.
+Almost all of the network related code, including DNS over HTTPS split tunnel, is a very minimal fork of the excellent [Jigsaw-Code/outline-go-tun2socks](https://github.com/Jigsaw-Code/outline-go-tun2socks) written in golang. A majority of work is on the UI with other parts remaining same as on [Jigsaw-Code/Intra](https://github.com/Jigsaw-Code/Intra/), and so the implementation underneath is pretty much the same. A split-tunnel traps requests sent to the VPN's DNS endpoint and relays it to a DNS over HTTPS endpoint of the user's choosing (currently limited to Cloudflare's 1.1.1.1 and AdGuard DNS; but BraveDNS' own resolver will soon follow suit) and logs the end-to-end latency, time, the request query and it answer.
 
 ### What BraveDNS is not
 
@@ -36,8 +36,8 @@ To deliver the promise of open-internet for all: With the inevitable ESNI standa
 1. Feel free to fork and send along a pull request for any reproducible bug fixes.
   1. The codebase is raw and is lacking documentation and comprehensive tests. If you need help, feel free to create a Wikipage to highlight the pain with building, testing, writing, committing code.
   2. Write descriptive commit messages that explain concisely the changes made. 
-  3. Each commit must reference an open issue on the project. Again, this is to avoid duplicate work more than anything else.
-2. If you plan to work on a feature, please create a github issue on the project first to kickstart the discussion before committing to doing any work. This is to make sure there isn't duplicated effort more than anything else.
+  3. Each commit must reference an open issue on the project. This is to make sure there isn't duplicated effort more than anything else.
+2. If you plan to work on a feature, please create a github issue on the project first to kickstart the discussion before committing to doing any work. Again, this is to avoid duplicate work more than anything else. 
 3. Release cycles are undecided, but we're leaning towards bi-weekly once automated tests are up, whenever that may be.
 
 ## Tenents (unless you know better ones)
@@ -49,7 +49,7 @@ We aren't there yet, may never will be but these are some tenents for the projec
   - no-root: Shouldn't require root-access for any functionality added to it.
   - no-gimmicks: Misleading material bordering on scareware, for example.
   - anti-censorship: Features focused on helping bring an open internet to everyone, preferably in the most efficient way possible (both monetairly and technically).
- - anti-surveillance: As above, but features that further limit (may not necessairly eliminate) surveillance by apps.
+ - Anti-surveillance: As above, but features that further limit (may not necessairly eliminate) surveillance by apps.
 - Incremental changes in balance with newer features.
   - For example, work on nagging UI issues or OEM specific bugs, must be taken up on equal weight to newer features, and a release must probably establish a good balance between the two. However; working on only incremental changes for a release is fine.
 - Opinionated. Chip-away complexity. Do not expect users to require a PhD in Computer Science to use the app.
@@ -63,7 +63,7 @@ We aren't there yet, may never will be but these are some tenents for the projec
 - Practice what you preach: Be obsessively private and secure.
 
 ## Backstory
-Internet censorship (sometimes ISP-enforced and often times government-enforced), unabated dragnet surveillance (by pretty much every company and app) stirred us upon this path. The three of us university classmates, [Mohammed](https://www.linkedin.com/in/hussain-mohammed-2525a626/), [Murtaza](https://www.linkedin.com/in/murtaza-aliakbar/), [Santhosh](https://www.linkedin.com/in/santhosh-ponnusamy-2b781244/), got together in late 2019 in the sleepy town of Coimbatore, India to do something about it. Our main gripe was there were all these wonderful tools that people could use but couldn't, either due to cost or due to inability to grok Computer specific jargon. A lot has happened since we started and a lot has changed but our focus has always been on Android and its 2B+ unsuspecting users. The current idea is a year old, and has been in the works for about 4 months now, with the pandemic derailing a bit of progress, and a bit of snafu with abandoning our previous version in favour of the current fork, which we aren't proud of yet, but it is a start. All's good now that we've won a grant from the [Mozilla Builders MVP program](https://builders.mozilla.community/) to go ahead and build this thing that we wanted to... do so faster... and not simply sleep our way through the execution. I hope you're excited but not as much as us that you quit your jobs for this like we did.
+Internet censorship (sometimes ISP-enforced and often times government-enforced), unabated dragnet surveillance (by pretty much every company and app) stirred us upon this path. The three of us university classmates, [Mohammed](https://www.linkedin.com/in/hussain-mohammed-2525a626/), [Murtaza](https://www.linkedin.com/in/murtaza-aliakbar/), [Santhosh](https://www.linkedin.com/in/santhosh-ponnusamy-2b781244/) got together in late 2019 in the sleepy town of Coimbatore, India to do something about it. Our main gripe was there were all these wonderful tools that people could use but couldn't, either due to cost or due to inability to grok Computer-specific jargon. A lot has happened since we started and a lot has changed but our focus has always been on Android and its 2B+ unsuspecting users. The current idea is a year old, and has been in the works for about 4 months now, with the pandemic derailing a bit of progress, and a bit of snafu with abandoning our previous version in favour of the current fork, which we aren't proud of yet, but it is a start. All's good now that we've won a grant from the [Mozilla Builders MVP program](https://builders.mozilla.community/) to go ahead and build this thing that we wanted to... do so faster... and not simply sleep our way through the execution. I hope you're excited but not as much as us that you quit your jobs for this like we did.
 
 ## License
 
