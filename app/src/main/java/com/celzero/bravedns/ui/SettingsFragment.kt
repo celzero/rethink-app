@@ -13,6 +13,7 @@ import androidx.appcompat.widget.AppCompatSpinner
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.Fragment
 import com.celzero.bravedns.R
+import com.celzero.bravedns.sample.SampleExpandable
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.VpnState
@@ -29,6 +30,8 @@ class SettingsFragment : Fragment() {
     private lateinit var settingsBtn : Button
     private lateinit var firewallConfigBtn : AppCompatButton
     private lateinit var faqTxt : AppCompatTextView
+
+    //private lateinit var sampleTest : AppCompatButton
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
@@ -47,6 +50,8 @@ class SettingsFragment : Fragment() {
         viewQueriesBtn = view.findViewById(R.id.view_queries_btn)
         settingsBtn = view.findViewById(R.id.configure_settings_btn)
         faqTxt = view.findViewById(R.id.settings_app_faq_icon)
+
+       // sampleTest = view.findViewById(R.id.sample_test)
 
         //val btnApply = view.findViewById<AppCompatButton>(R.id.setting_apply)
 
@@ -114,6 +119,15 @@ class SettingsFragment : Fragment() {
             startWebViewIntent()
         }
 
+       /* sampleTest.setOnClickListener{
+            startSampleExpandable()
+        }*/
+
+    }
+
+    private fun startSampleExpandable() {
+        val intent = Intent(requireContext(), SampleExpandable::class.java)
+        startActivity(intent)
     }
 
     private fun startWebViewIntent(){

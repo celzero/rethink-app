@@ -33,7 +33,7 @@
             android:drawableRight="@drawable/ic_keyboard_arrow_up_gray_24dp"
             android:background="@color/colorPrimaryDark"
             android:textColor="@color/secondaryText"
-            android:text="Universal Firewall" />
+            android:text="universal firewall" />
 
         <TextView
             android:layout_width="match_parent"
@@ -62,7 +62,7 @@
                 android:textSize="@dimen/sub_heading"
                 android:padding="10dp"
                 android:textColor="@color/primaryText"
-                android:text="All apps when device is locked" />
+                android:text="Block all apps when device is locked" />
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/firwall_all_apps_check"
@@ -90,7 +90,7 @@
                 android:textSize="@dimen/sub_heading"
                 android:padding="10dp"
                 android:textColor="@color/primaryText"
-                android:text="Any app not in use" />
+                android:text="Block any app not in use" />
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/firewall_background_mode_check"
@@ -115,7 +115,7 @@
             android:textSize="@dimen/slide_desc"
             android:padding="10dp"
             android:textColor="@color/secondaryText"
-            android:text="By Category" />
+            android:text="by category" />
 
         <TextView
            android:visibility="gone"
@@ -157,7 +157,7 @@
             android:padding="10dp"
             android:textColor="@color/secondaryText"
             android:drawableRight="@drawable/ic_keyboard_arrow_down_gray_24dp"
-            android:text="By Specific Apps" />
+            android:text="by specific apps" />
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

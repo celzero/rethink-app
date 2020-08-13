@@ -39,15 +39,14 @@ import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.net.manager.ConnectionTracer
+import com.celzero.bravedns.receiver.BraveAutoStartReceiver
+import com.celzero.bravedns.receiver.BraveScreenStateReceiver
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.dnsMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.firewallMode
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.internal.synchronized
-import kotlinx.coroutines.launch
 import protect.Blocker
 import protect.Protector
 import settings.Settings
@@ -85,10 +84,20 @@ class BraveVPNService:
     private var url : String ?= null
     private var networkConnected = false
 
+    @InternalCoroutinesApi
     fun blockTraffic(){
-        vpnAdapter!!.setSinkTunnelMode()
+        //vpnAdapter!!.setSinkTunnelMode()
         restartVpn(dnsMode , Settings.BlockModeSink.toInt())
+        //restartVpn(Settings.DNSModeIP.toInt() , Settings.BlockModeNone.toInt())
     }
+
+    @InternalCoroutinesApi
+    fun resumeTraffic(){
+        //vpnAdapter!!.setFilterTunnelMode()
+        restartVpn(dnsMode, firewallMode )
+        //restartVpn(Settings.DNSModeIP.toInt() , Settings.BlockModeNone.toInt())
+    }
+
 
     /*
     TODO : This is not a valid method to use.
@@ -97,16 +106,12 @@ class BraveVPNService:
         Modify the whole app update and the firewall UI update.
         Along with multiple updates in the UI thread.
      */
-
+    @InternalCoroutinesApi
     fun restarVPNfromExternalForce(){
         restartVpn(dnsMode, firewallMode)
     }
 
-    @InternalCoroutinesApi
-    fun resumeTraffic(){
-        vpnAdapter!!.setFilterTunnelMode()
-        restartVpn(dnsMode, firewallMode )
-    }
+
 
     private lateinit var connTracer: ConnectionTracer
 
@@ -114,10 +119,21 @@ class BraveVPNService:
         NEW, WORKING, FAILING
     }
 
-    override fun block(protocol: Int, sourceAddress: String, destAddress: String): Boolean {
+    override fun block(protocol: Int, uid: Long, sourceAddress: String, destAddress: String): Boolean {
         val first = sourceAddress.split(":")
         val second = destAddress.split(":")
         try {
+
+            if(VERSION.SDK_INT >= VERSION_CODES.O && VERSION.SDK_INT < VERSION_CODES.Q) {
+                if(braveMode == 2){
+                    //Settings.
+                    Log.d("BraveDNS","UID : $uid -- packageName :"+packageManager.getNameForUid(uid.toInt()))
+                    Log.d("BraveDNS","Source : $sourceAddress, Destination: $destAddress, protocol : $protocol")
+                    return false
+                }
+                return false
+            }
+
             val uid = connTracer.getUidQ(
                 protocol,
                 first[0],
@@ -125,6 +141,7 @@ class BraveVPNService:
                 second[0],
                 second[second.size-1].toInt()
             )
+
             return isUidBlocked(uid)
         } catch (iex: Exception) {
             Log.e(LOG_TAG, iex.message, iex)
@@ -178,7 +195,7 @@ class BraveVPNService:
             try {
                 // Workaround for any app incompatibility bugs.
                 //TODO : As of now the wifi  packages are considered for blocking the entire traffic
-                if(PersistentState.getFirewallMode(this) == 2) {
+                if(PersistentState.getFirewallMode(this) == 2 ) {
                     //builder= builder.addAllowedApplication("com.ubercab")
                     if(PersistentState.getExcludedPackagesWifi(this)!!.isEmpty()){
                         builder.addAllowedApplication("")
@@ -201,6 +218,7 @@ class BraveVPNService:
                     builder = builder.addDisallowedApplication("com.android.vending")
                     builder = builder.addDisallowedApplication(this.getPackageName())
                 }
+
             } catch (e: PackageManager.NameNotFoundException) {
                 //LogWrapper.logException(e)
                 Log.e(LOG_TAG,"Failed to exclude an app",e)
@@ -218,7 +236,7 @@ class BraveVPNService:
     private fun registerReceiversForScreenState(){
         val filter = IntentFilter()
         filter.addAction(Intent.ACTION_SCREEN_OFF)
-        filter.addAction(Intent.ACTION_SCREEN_ON)
+        filter.addAction(Intent.ACTION_USER_PRESENT)
         filter.addAction(Intent.ACTION_PACKAGE_ADDED)
         filter.addAction(Intent.ACTION_PACKAGE_REMOVED)
         registerReceiver(braveScreenStateReceiver, filter)
@@ -342,7 +360,11 @@ class BraveVPNService:
 
     @WorkerThread
     private fun updateServerConnection() {
-        vpnAdapter!!.updateDohUrl(HomeScreenActivity.GlobalVariable.dnsMode,HomeScreenActivity.GlobalVariable.firewallMode)
+        if(vpnAdapter != null)
+            vpnAdapter!!.updateDohUrl(dnsMode, firewallMode)
+        else{
+            startVpn()
+        }
     }
 
     fun recordTransaction(transaction: Transaction) {
@@ -478,16 +500,16 @@ class BraveVPNService:
         }
     }
 
-    @OptIn(InternalCoroutinesApi::class)
-    //@InternalCoroutinesApi
+    //@OptIn(InternalCoroutinesApi::class)
+    @InternalCoroutinesApi
     private fun restartVpn(dnsModeL : Int, firewallModeL : Int) {
         if (vpnController != null) {
             synchronized(vpnController) {
-
                 // Attempt seamless handoff as described in the docs for VpnService.Builder.establish().
                 val oldAdapter: GoVpnAdapter? = vpnAdapter
+                if(oldAdapter != null)
+                    oldAdapter.close()
                 vpnAdapter = makeVpnAdapter()
-                oldAdapter!!.close()
                 if (vpnAdapter != null) {
                     vpnAdapter!!.start(dnsModeL, firewallModeL)
                 } else {
@@ -560,7 +582,7 @@ class BraveVPNService:
                 //Log.w(LOG_TAG,"Starting VPN adapter")
                 vpnAdapter = makeVpnAdapter()
                 if (vpnAdapter != null) {
-                    vpnAdapter!!.start(HomeScreenActivity.GlobalVariable.dnsMode,HomeScreenActivity.GlobalVariable.firewallMode)
+                    vpnAdapter!!.start(dnsMode,firewallMode)
                     //analytics.logStartVPN(vpnAdapter.getClass().getSimpleName())
                 } else {
                     Log.w(LOG_TAG,"Failed to start VPN adapter!")

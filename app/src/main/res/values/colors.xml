@@ -28,6 +28,7 @@
     <color name="primaryText">#FDFDFD</color>
     <color name="secondaryText">#05dfd7</color>
     <color name="dividerColor">#BDBDBD</color>
+    <color name="borderColor">#444444</color>
 
     <color name="textColorMain">#6F2BD4</color>
 

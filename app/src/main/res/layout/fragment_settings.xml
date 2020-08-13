@@ -269,7 +269,12 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-
+     <androidx.appcompat.widget.AppCompatButton
+     android:id="@+id/sample_test"
+     android:visibility="gone"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         android:text="Test"/>
 
     <androidx.cardview.widget.CardView
         app:layout_constraintTop_toBottomOf="@id/settings_app_mgr_layout"

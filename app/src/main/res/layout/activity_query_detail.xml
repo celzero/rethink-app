@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/pale_white"
     tools:context=".ui.FirewallActivity">
 
   <com.google.android.material.appbar.AppBarLayout
@@ -24,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        app:title="DNS logs"
+        app:title="DNS"
         app:expandedTitleTextAppearance="@style/TextAppearance.AppCompat.Headline"
         app:collapsedTitleGravity="center_vertical"
         app:contentScrim="?attr/colorPrimary"

@@ -95,7 +95,7 @@ class VpnController {
     }
 
     // FIXME: Should this be synchronized? Causes ANRs.
-    // @Synchronized
+    @Synchronized
     fun getState(context: Context?): VpnState? {
         val requested: Boolean = PersistentState.getVpnEnabled(context!!)
         val on = braveVpnService != null && braveVpnService!!.isOn()

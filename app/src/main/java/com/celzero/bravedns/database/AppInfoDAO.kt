@@ -8,7 +8,7 @@ interface AppInfoDAO {
     @Update
     fun update(appInfo: AppInfo)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(appInfo: AppInfo)
 
     @Delete
@@ -16,5 +16,8 @@ interface AppInfoDAO {
 
     @Query("select * from AppInfo")
     fun getAllAppDetails(): List<AppInfo>
+
+    @Query("select * from AppInfo where packageInfo like :packageName")
+    fun getAppDetailByName(packageName : String ): AppInfo
 
 }

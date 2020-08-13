@@ -108,7 +108,7 @@ class FirewallHeader(var categoryName : String): AbstractItem<FirewallHeader.Vie
             //FirewallManager.printAllAppStatus()
             internetChk.setOnCheckedChangeListener(null)
             internetChk.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
-                Log.d("BraveDNS","-------------------OnCheck : ${item} , block : $b")
+               //Log.d("BraveDNS","-------------------OnCheck : ${item} , block : $b")
                 progressBar.visibility = View.VISIBLE
                 internetChk.visibility = View.GONE
                 internetChk.isEnabled = false
