@@ -1,10 +1,17 @@
 package com.celzero.bravedns.service
 
+import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
 import android.preference.PreferenceManager
 import android.util.Log
+import android.view.View
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import com.celzero.bravedns.R
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.blockedCategoryList
@@ -15,8 +22,11 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.firewallMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.isBackgroundEnabled
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.lifeTimeQueries
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.medianP90
+import com.celzero.bravedns.viewmodel.FirewallViewModel
+import io.sentry.config.FileResourceLoader
 //
 import settings.Settings
+import java.lang.Exception
 
 
 class PersistentState {
@@ -34,6 +44,10 @@ class PersistentState {
         const val BRAVE_MODE = "brave_mode"
         private const val BACKGROUND_MODE = "background_mode"
         private const val SCREEN_STATE = "screen_state"
+
+        private const val IS_SCREEN_OFF = "screen_off"
+        private const val CUSTOM_URL_BOOLEAN = "custom_url_boolean"
+        private const val CUSTOM_URL = "custom_url"
 
         private const val APPROVED_KEY = "approved"
         private const val ENABLED_KEY = "enabled"
@@ -137,10 +151,23 @@ class PersistentState {
         fun getExcludedPackagesWifi(context: Context?): Set<String?>? {
             /*if(excludedPackageList.isNotEmpty())
                 return excludedPackageList*/
-            return getUserPreferences(context!!)?.getStringSet(
-               APPS_KEY_WIFI,
-                HashSet<String>()
-            )
+            val excludedList = getUserPreferences(context!!)?.getStringSet(APPS_KEY_WIFI,HashSet<String>())
+
+            //val factory  = FirewallViewModelFactory(context!!.applicationContext as Application)
+            //var model = context.let { ViewModelProviders.of(it) [FirewallViewModel::class.java]} ?: throw Exception("Wrong Call")
+            //ViewModelProvider(context!!, factory).get(FirewallViewModel::class.java)
+            //model = ViewModelProviders.of(context!! as Fragment).get(FirewallViewModel::class.java)
+
+            //val model = ViewModelProvider.AndroidViewModelFactory.getInstance(context!!.applicationContext as Application).create(FirewallViewModel::class.java)
+            //if(context is androidx.fragment.app.Fragment) {
+               // val s =ViewModelProvider.AndroidViewModelFactory.getInstance(context.applicationContext as Application).create(FirewallViewModel::class.java)
+                    //ViewModelProviders.of(context!! as Activity).get(FirewallViewModel::class.java)
+                //Log.d("BraveDNS", "postValue in getExcludedWifi")
+               // s.appsBlockedCount.postValue(excludedList!!.size.toString())
+            //}
+                //.get(FirewallViewModel::class.java)
+           //model.setAppsBlockedCount(excludedList!!.size)
+            return excludedList
         }
 
         fun setExcludedPackagesWifi(packageName : String, toRemove : Boolean , context : Context){
@@ -261,8 +288,7 @@ class PersistentState {
 
 
         fun setFirewallModeForScreenState(context : Context , state : Boolean) {
-            val editor: SharedPreferences.Editor =
-                getUserPreferences(context)!!.edit()
+            val editor: SharedPreferences.Editor = getUserPreferences(context)!!.edit()
             editor.putBoolean(SCREEN_STATE, state)
             editor.apply()
         }
@@ -275,18 +301,13 @@ class PersistentState {
 
         fun getCategoriesBlocked(context: Context?): Set<String?>? {
             if(blockedCategoryList.isEmpty()){
-                return getUserPreferences(context!!)?.getStringSet(
-                    CATEGORY_DATA,
-                    HashSet<String>()
-                )
+                return getUserPreferences(context!!)?.getStringSet(CATEGORY_DATA, HashSet<String>())
             }else
                 return blockedCategoryList
         }
 
         fun setCategoriesBlocked(categoryName : String, toRemove : Boolean , context : Context){
-
-            Log.d("BraveDNS","-----------*****setCategoriesBlocked $categoryName value : $toRemove")
-
+            //Log.d("BraveDNS","-----------*****setCategoriesBlocked $categoryName value : $toRemove")
             if(toRemove){
                 if(blockedCategoryList.contains(categoryName))
                     blockedCategoryList.remove(categoryName)
@@ -330,8 +351,7 @@ class PersistentState {
 
         fun setNumOfReq(context : Context){
             val numReq =  getUserPreferences(context)?.getInt(NUMBER_REQUEST,0)!!
-            val editor: SharedPreferences.Editor =
-                getUserPreferences(context)!!.edit()
+            val editor: SharedPreferences.Editor = getUserPreferences(context)!!.edit()
             editor.putInt(NUMBER_REQUEST, numReq+1)
             editor.apply()
             lifeTimeQueries = numReq+1
@@ -345,8 +365,7 @@ class PersistentState {
 
         fun setBlockedReq(context : Context){
             val blockCount =  getUserPreferences(context)?.getInt(BLOCKED_COUNT,0)!!
-            val editor: SharedPreferences.Editor =
-                getUserPreferences(context)!!.edit()
+            val editor: SharedPreferences.Editor = getUserPreferences(context)!!.edit()
             editor.putInt(BLOCKED_COUNT, blockCount+1)
             editor.apply()
         }
@@ -365,5 +384,38 @@ class PersistentState {
             editor.putBoolean(BACKGROUND_MODE, isEnabled)
             editor.apply()
         }
+
+        fun setScreenLockData(context: Context, isEnabled : Boolean) {
+            val editor: SharedPreferences.Editor =
+                getUserPreferences(context)!!.edit()
+            editor.putBoolean(IS_SCREEN_OFF, isEnabled)
+            editor.apply()
+        }
+
+        fun getScreenLockData(context: Context) : Boolean{
+            return getUserPreferences(context)?.getBoolean(IS_SCREEN_OFF,false)!!
+        }
+
+        fun setCustomURLBool(context: Context, isEnabled: Boolean) {
+            val editor: SharedPreferences.Editor = getUserPreferences(context)!!.edit()
+            editor.putBoolean(CUSTOM_URL_BOOLEAN, isEnabled)
+            editor.apply()
+        }
+
+        fun getCustomURLBool(context: Context): Boolean {
+            return getUserPreferences(context)?.getBoolean(CUSTOM_URL_BOOLEAN, false)!!
+        }
+
+        fun setCustomURLVal(context: Context, url: String) {
+            val editor: SharedPreferences.Editor = getUserPreferences(context)!!.edit()
+            editor.putString(CUSTOM_URL, url)
+            editor.apply()
+        }
+
+        fun getCustomURLVal(context: Context): String {
+            return getUserPreferences(context)?.getString(CUSTOM_URL, "https://")!!
+        }
+
+
     }
 }

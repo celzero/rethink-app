@@ -33,8 +33,8 @@ android {
         vectorDrawables.useSupportLibrary = true
         minSdkVersion 26
         targetSdkVersion 29
-        versionCode 1
-        versionName "0.1"
+        versionCode 2
+        versionName "0.2"
        /* splits {
              abi {
                  enable true
@@ -61,6 +61,7 @@ android {
 }
 
 dependencies {
+
     def room_version = "2.2.3"
     implementation fileTree(include: [
             'guava-28.2-android.jar',
@@ -88,6 +89,13 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-coroutines:2.1.0-alpha04"
+
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
+
+    // https://mvnrepository.com/artifact/org.jsoup/jsoup
+    implementation group: 'org.jsoup', name: 'jsoup', version: '1.8.3'
+
 
     // For go-tun2socks
     implementation project(":tun2socks")

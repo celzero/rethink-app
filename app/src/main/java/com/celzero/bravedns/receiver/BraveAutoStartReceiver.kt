@@ -1,10 +1,12 @@
-package com.celzero.bravedns.service
+package com.celzero.bravedns.receiver
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import android.util.Log
+import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.ui.HomeScreenActivity
 
 class BraveAutoStartReceiver  : BroadcastReceiver() {
 
@@ -21,9 +23,13 @@ class BraveAutoStartReceiver  : BroadcastReceiver() {
             }
             if(prepareVpnIntent != null) {
                 //Log.i("BraveVPN",String.format("Starting DNS VPN service from boot receiver"))
-                VpnController.getInstance()?.start(context!!)
+                val startIntent = Intent(context, HomeScreenActivity::class.java)
+                startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                context!!.startActivity(startIntent)
+                return
             }else
-                VpnController.getInstance()?.start(context!!)
+                VpnController.getInstance()
+                    ?.start(context!!)
 
         }
     }

@@ -30,6 +30,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.jsoup.Jsoup
+import java.lang.Exception
 
 
 class HomeScreenActivity : AppCompatActivity() {
@@ -48,6 +50,7 @@ class HomeScreenActivity : AppCompatActivity() {
 
     object GlobalVariable{
         var braveMode : Int = -1
+        //var appListSample =  HashMap<String, List<AppInfo>>()
         var appList : MutableMap<String, AppInfo> = HashMap()
         var categoryList : HashSet<String> = HashSet()
         var dnsMode = -1
@@ -63,16 +66,6 @@ class HomeScreenActivity : AppCompatActivity() {
 
     companion object {
         lateinit var dbHandler : DatabaseHandler
-
-
-        //TODO : Check for the functionality of the method and uses
-        fun openAppIntent(context: Context, appExtras:Bundle? = null):Intent {
-             return   Intent(context, HomeScreenActivity::class.java).apply {
-                    if(appExtras != null) putExtras(appExtras)
-                }
-        }
-
-
     }
 
     //TODO : Remove the unwanted data and the assignments happening
@@ -84,15 +77,13 @@ class HomeScreenActivity : AppCompatActivity() {
         context = this
         dbHandler = DatabaseHandler(this)
 
-
         internetManagerFragment = InternetManagerFragment()
         homeScreenFragment = HomeScreenFragment()
 
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
 
         if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, homeScreenFragment, homeScreenFragment.javaClass.getSimpleName())
-                .commit()
+            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, homeScreenFragment, homeScreenFragment.javaClass.getSimpleName()).commit()
         }
         navView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
 
@@ -105,38 +96,28 @@ class HomeScreenActivity : AppCompatActivity() {
 
     }
 
-
     private fun registerReceiversForScreenState(){
         val filter = IntentFilter()
-        filter.addAction(Intent.ACTION_SCREEN_OFF)
-        filter.addAction(Intent.ACTION_SCREEN_ON)
         filter.addAction(Intent.ACTION_PACKAGE_ADDED)
         filter.addAction(Intent.ACTION_PACKAGE_REMOVED)
         registerReceiver(BraveVPNService.braveScreenStateReceiver, filter)
-        val autoStartFilter = IntentFilter()
-        autoStartFilter.addAction(Intent.ACTION_BOOT_COMPLETED)
-        registerReceiver(BraveVPNService.braveAutoStartReceiver, autoStartFilter)
     }
 
 
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(BraveVPNService.braveScreenStateReceiver)
-        unregisterReceiver(BraveVPNService.braveAutoStartReceiver)
+        //unregisterReceiver(BraveVPNService.braveAutoStartReceiver)
     }
 
 
     private fun getAppInfo() {
         GlobalScope.launch(Dispatchers.IO) {
-            //val mDb = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java,"brave.db").build()
             val mDb = AppDatabase.invoke(context.applicationContext)
-            //val appInfoDAO  = mDb.appInfoDAO()
             val appInfoRepository = mDb.appInfoRepository()//AppInfoRepository(appInfoDAO)
-            val allPackages: List<PackageInfo> =
-                context.packageManager?.getInstalledPackages(PackageManager.GET_META_DATA )!!
+            val allPackages: List<PackageInfo> = context.packageManager?.getInstalledPackages(PackageManager.GET_META_DATA )!!
             var count = 0
             if(appList.isEmpty()){
-                //Log.d("BraveDNS","Inside isEmpty")
             allPackages.forEach {
                 if ((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0) {
                     if (it.applicationInfo.packageName != applicationContext.packageName) {
@@ -144,11 +125,8 @@ class HomeScreenActivity : AppCompatActivity() {
 
                             val applicationInfo: ApplicationInfo = it.applicationInfo
                             val appInfo = AppInfo()
-                            appInfo.appName =
-                                context.packageManager.getApplicationLabel(applicationInfo)
-                                    .toString()
-                            val category =
-                                ApplicationInfo.getCategoryTitle(context, applicationInfo.category)
+                            appInfo.appName = context.packageManager.getApplicationLabel(applicationInfo).toString()
+                            val category = ApplicationInfo.getCategoryTitle(context, applicationInfo.category)
                             if (category != null)
                                 appInfo.appCategory = category.toString()
                             else
@@ -177,21 +155,20 @@ class HomeScreenActivity : AppCompatActivity() {
                             appList[applicationInfo.packageName] = appInfo
                             GlobalVariable.installedAppCount = count
                             appInfoRepository.insertAsync(appInfo, this)
-                            //Log.w("DB Inserts","App Size : " + appInfo.packageInfo +": "+appInfo.uid)
                         }
                     }
                 }
             }
 
             }else{
-               // Log.d("BraveDNS","Inside else***")
                 appList.forEach{
                     it.value.isInternetAllowed = PersistentState.isWifiAllowed(it.value.packageInfo,context)
-                    //Log.d("BraveDNS","isInternetAllowed : "+it.value.isInternetAllowed + "package : ${it.key}")
                     appList.put(it.key, it.value)
                 }
             }
 
+
+           // updateAppCategory()
 
             //appList.entries.sortedWith(compareBy { it.value.appCategory })
 
@@ -201,46 +178,26 @@ class HomeScreenActivity : AppCompatActivity() {
             //Log.w("DB","End of the loop for the DB")
     }
 
-    /*private fun updateFragments() {
-        runOnUiThread(Runnable {
-            val allFragments: MutableList<androidx.fragment.app.Fragment> =
-                supportFragmentManager.fragments
-            if (allFragments.isEmpty()) return@Runnable
-            for (fragment in allFragments) {
-                Log.d("BraveDNS","UpdateView from Activity :" + GlobalVariable.installedAppCount)
-                if (fragment.isVisible) (fragment as HomeScreenFragment).updateView()
-            }
-        })
-    }*/
+    private fun updateAppCategory() {
+        val googlePlayStoreURL : String = "https://play.google.com/store/apps/details?id="
 
-
-    /*private fun actionOnService(action: Actions) {
-        if (getServiceState(this.applicationContext) == ServiceState.STOPPED && action == Actions.STOP) return
-        Log.w("Service","Starting the service")
-        Intent(this.applicationContext, DnsService::class.java).also {
-            Log.w("Service","Starting the service in >=26 Mode")
-            it.action = action.name
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                this.applicationContext.startForegroundService(it)
-                return
+        appList.forEach {
+            val finalURl = googlePlayStoreURL + it.key
+            try {
+                Log.d("BraveDNS","finalURl:$finalURl")
+                val doc = Jsoup.connect(finalURl).get()
+                Log.d("BraveDNS","Doc: "+ doc.toString())
+                val link = doc.select("span[itemprop=genre]").first()
+                Log.d("BraveDNS","link: "+link.toString())
+                /*it.value.appCategory = link.text()
+                Log.d("BraveDNS","App Category -- :${it.key} -- ${it.value.appCategory}")
+                appList.put(it.key,it.value)*/
+            } catch (exception: Exception) {
+                Log.d("BraveDNS", "Exception in updateAppCategory : " + exception.message)
             }
-            Log.w("Service","Starting the service in < 26 Mode")
-            this.applicationContext.startService(it)
         }
-    }*/
 
-    //TODO : Check for the requirement of the method.
-    @TargetApi(Build.VERSION_CODES.M)
-    private fun fillNetworkStatsPackage(uid: Int ) {
-        val networkStatsManager =
-            applicationContext.getSystemService(Context.NETWORK_STATS_SERVICE) as NetworkStatsManager
-        val networkStatsHelper = NetworkStatsHelper(networkStatsManager, uid)
-        val mobileWifiRx = networkStatsHelper.getPackageRxBytesMobile(this) + networkStatsHelper.packageRxBytesWifi
-        //Log.w("NetworkStat","$mobileWifiRx B")
-        //networkStatsPackageRx.setText("$mobileWifiRx B")
-        val mobileWifiTx = networkStatsHelper.getPackageTxBytesMobile(this) + networkStatsHelper.packageTxBytesWifi
-        //networkStatsPackageTx.setText("$mobileWifiTx B")
-        //Log.w("NetworkStat","$mobileWifiTx B")
+
     }
 
 

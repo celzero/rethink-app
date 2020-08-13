@@ -226,10 +226,10 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
             // This function can be run up to a dozen times while blocking rendering, so it needs to be
             // as brief as possible.
             this.transaction = transaction
-            hostnameView!!.setText(transaction.fqdn)
+            hostnameView!!.setText(transaction.hostname)
             timeView!!.setText(transaction.time)
             flagView!!.setText(transaction.flag)
-            fqdnView!!.setText(transaction!!.hostname)
+            fqdnView!!.setText(transaction!!.fqdn)
             typeView!!.setText(transaction!!.typename)
             latencyView!!.setText(transaction!!.latency)
             if (transaction!!.resolver != null) {
@@ -304,7 +304,7 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
         var hostname : String? = null
         var time : String? = null
         var flag : String? = null
-        val template : String = "30 ms"
+        val template : String = "30ms"
         var resolver : String? = null
         var response : String? = null
         var latency : String? = null
@@ -325,7 +325,7 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
 
             //Log.d("BraveDNS","Transaction - transaction.responseTime :"+transaction.responseTime + " - transaction.queryTime : "+transaction.queryTime)
             //latency  = String.format(template, transaction.responseTime - transaction.queryTime)
-            latency  = (transaction.responseTime - transaction.queryTime).toString() + " ms"
+            latency  = (transaction.responseTime - transaction.queryTime).toString() + "ms"
             typename = getTypeName(transaction.type.toInt())
 
             var serverAddress : InetAddress?= null

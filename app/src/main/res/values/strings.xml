@@ -83,14 +83,16 @@
     <string-array name="cloudflare_name">
         <item>No filter</item>
         <item>Family</item>
-        <item>Ads and Trackers</item>
-        <item>Configurable Filters*</item>
+        <item>Ads (Default)</item>
+        <item>Custom</item>
+        <item>BraveDNS*</item>
     </string-array>
 
     <string-array name="cloudflare_url">
         <item>https://cloudflare-dns.com/dns-query</item>
         <item>https://family.cloudflare-dns.com/dns-query</item>
         <item>https://dns.adguard.com/dns-query</item>
+        <item>https://cloudflare-dns.com</item>
         <item>https://cloudflare-dns.com/dns-query</item>
     </string-array>
 
@@ -167,12 +169,12 @@
 
     <string name="status_waiting"
         description="This text appears during the connection process if Intra needs user permission or the phone is offline.">
-    Waiting&#8230;
+    waiting
   </string>
 
     <string name="status_failing"
         description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">
-    Failing
+    failing
   </string>
 
     <string name="explanation_offline"
@@ -192,7 +194,7 @@
 
     <string name="status_starting"
         description="This text briefly appears while starting.">
-    Starting
+    starting
   </string>
 
     <string name="explanation_starting"
@@ -208,7 +210,7 @@
 
     <string name="status_protected"
         description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">
-    Protected
+    protected
   </string>
 
     <string name="explanation_protected"
@@ -218,7 +220,7 @@
 
     <string name="status_upgraded"
         description="This is similar to status_exposed, and indicates weak protection that an attacker could disable.">
-    Vulnerable
+    vulnerable
   </string>
 
     <string name="explanation_upgraded"
@@ -229,7 +231,7 @@
 
     <string name="status_strict"
         description="This is similar to dns_on, but the protection is being provided by the operating system, not by Intra.  It is not color-highlighted.">
-    Protected by Android
+    protected by android
   </string>
 
     <string name="explanation_strict"
@@ -326,7 +328,7 @@
     </string>
 
     <string name="hybrid_mode_info_explanation">
-        Filters your network traffic and blocks apps from connecting to Internet. This mode is available only on devices with Android 10 or higher versions.
+        Filters your network traffic and blocks apps from connecting to Internet.
     </string>
 
     <string name="alert_permission_accessibility">
@@ -338,22 +340,37 @@
     </string>
 
     <string name="brave_dns_connect_prompt_firewall">
-        Firewall mode is not enabled
+        Start Firewall Mode / DNS+Firewall Mode to configure Apps.
     </string>
     <string name="brave_dns_connect_prompt_query">
-       DNS mode is not enabled
+       Start DNS / DNS+Firewall Mode to view logs
     </string>
 
     <string name="brave_dns_connect_mode_change_firewall">
-       Cannot configure: Firewall Mode not active.
+       Start Firewall Mode / DNS+Firewall Mode to configure Apps.
     </string>
 
     <string name="brave_dns_connect_mode_change_dns">
-       Cannot view logs: DNS Mode not active.
+        Start DNS / DNS+Firewall Mode to view logs
     </string>
 
     <string name="faq_web_link">
         https://www.bravedns.com/faq
     </string>
+
+    <string name="dns_mode_0">No Filter</string>
+    <string name="dns_mode_1">Family</string>
+    <string name="dns_mode_2">Ads</string>
+    <string name="dns_mode_3">Custom</string>
+    <string name="dns_mode_4">BraveDNS</string>
+
+    <string name="dns_mode_0_explanation">Does not block any DNS requests. Uses Cloudflare\'s 1.1.1.1 DNS endpoint.</string>
+    <string name="dns_mode_1_explanation">Blocks malware and adult content. Uses Cloudflare\'s 1.1.1.3 DNS endpoint.</string>
+    <string name="dns_mode_2_explanation">Blocks malware and ads. Uses AdGuard\'s DNS endpoint.</string>
+    <string name="dns_mode_3_explanation">Set your own custom DNS-over-HTTPS endpoint.</string>
+    <string name="dns_mode_4_explanation">Blocks malware, ads, trackers. Provides in-depth analytics of your Internet traffic. Allows you to set custom blocklists and more. Coming Soon.</string>
+
+
+
 
 </resources>

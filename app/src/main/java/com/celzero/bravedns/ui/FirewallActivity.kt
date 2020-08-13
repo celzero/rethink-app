@@ -1,5 +1,6 @@
 package com.celzero.bravedns.ui
 
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -17,6 +18,8 @@ import androidx.appcompat.widget.SwitchCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.ContentLoadingProgressBar
 import androidx.core.widget.NestedScrollView
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
@@ -25,11 +28,13 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallApk
 import com.celzero.bravedns.adapter.FirewallHeader
 import com.celzero.bravedns.database.AppDatabase
+import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable
 import com.celzero.bravedns.util.BackgroundAccessibilityService
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.viewmodel.FirewallViewModel
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import kotlinx.coroutines.*
@@ -61,6 +66,8 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
     private lateinit var  appAppsShowTxt : TextView
     private lateinit var firewallEnableTxt : TextView
     private lateinit var  firewallNotEnabledLL : LinearLayout
+
+    private lateinit var backgoundModeToggleTxt : TextView
     private lateinit var backgoundModeToggle : SwitchCompat
     
     private var editSearch: SearchView? = null
@@ -104,6 +111,14 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         progressImageView = includeView.findViewById(R.id.firewall_progress)
         firewallEnableTxt = includeView.findViewById(R.id.firewall_enable_vpn_txt)
         loadingProgressBar = includeView.findViewById(R.id.firewall_update_progress)
+
+
+        //TODO -  Delete the below code
+
+        val s =  ViewModelProviders.of(this, defaultViewModelProviderFactory).get(FirewallViewModel::class.java)
+        val modelFirewall = ViewModelProvider.AndroidViewModelFactory.getInstance(context.applicationContext as Application).create(FirewallViewModel::class.java)
+        s.getAppsBlockedCount()
+        modelFirewall.getAppsBlockedCount()
 
 
 
@@ -151,6 +166,7 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         firewallAllAppsToggle = includeView.findViewById(R.id.firwall_all_apps_check)
         firewallAllAppsTxt = includeView.findViewById(R.id.firewall_all_apps_txt)
         backgoundModeToggle = includeView.findViewById(R.id.firewall_background_mode_check)
+        backgoundModeToggleTxt = includeView.findViewById(R.id.firewall_background_mode_txt)
 
         firewallAllAppsToggle.isChecked = PersistentState.getFirewallModeForScreenState(context)
         backgoundModeToggle.isChecked = PersistentState.getBackgroundEnabled(context)
@@ -181,12 +197,25 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 
 
         editSearch!!.setOnClickListener{
-            Log.d("BraveDNS","Click Came")
+            //Log.d("BraveDNS","Click Came")
             editSearch!!.requestFocus()
             editSearch!!.onActionViewExpanded()
         }
 
         //Background mode toggle
+
+        backgoundModeToggleTxt.setOnClickListener {
+            var checkedVal = backgoundModeToggle.isChecked
+            if (Utilities.isAccessibilityServiceEnabled(context, BackgroundAccessibilityService::class.java)) {
+                GlobalVariable.isBackgroundEnabled = !checkedVal
+                PersistentState.setBackgroundEnabled(context, !checkedVal)
+                backgoundModeToggle.isChecked = !checkedVal
+            } else {
+                if (!showAlertForPermission()) {
+                    backgoundModeToggle.isChecked = false
+                }
+            }
+        }
 
         backgoundModeToggle.setOnCheckedChangeListener { compoundButton, b ->
             if(Utilities.isAccessibilityServiceEnabled(context, BackgroundAccessibilityService::class.java)){
@@ -315,6 +344,8 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
            //headerList.clear()
            apkList.clear()
            //Log.d("BraveDNS","Local App List - Size : "+ GlobalVariable.appList.size)
+           val sampleApps = ArrayList<AppInfo>()
+
            val sortedVal =
                GlobalVariable.appList.entries.sortedWith(compareBy { it.value.appCategory })
            //var firewallHeaderApps  = ArrayList<FirewallApk>()
@@ -332,14 +363,18 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
                         it.value.appCategory,
                         context
                     )
+
                     //firewallHeaderApps.add(firewallApk)
                     apkList.add(firewallApk)
+                    sampleApps.add(it.value)
 
                     if(prevVal != it.value.appCategory && !isUpdate){
-                        //Log.d("BraveDNS","appCategory : "+ it.value.appCategory + "List: "+ firewallHeaderApps.size)
+                        //Log.d("BraveDNS","appCategory : "+ it.value.appCategory + "List: "+ sampleApps.size)
                         firewallHeader = FirewallHeader(it.value.appCategory)
                         GlobalVariable.categoryList.add(it.value.appCategory)
                         headerList.add(firewallHeader)
+                        //appListSample.put(it.value.appCategory ,sampleApps )
+                        sampleApps.clear()
                         //firewallHeaderApps.clear()
                     }
                     prevVal = it.value.appCategory

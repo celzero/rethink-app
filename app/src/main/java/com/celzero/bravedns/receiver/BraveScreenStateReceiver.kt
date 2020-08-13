@@ -1,16 +1,17 @@
-package com.celzero.bravedns.service
+package com.celzero.bravedns.receiver
 
+import android.app.KeyguardManager
+import android.app.admin.DevicePolicyManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.util.Log
-import android.view.View
-import android.widget.Toast
-import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfo
+import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.ApplicationManagerActivity
 import com.celzero.bravedns.ui.HomeScreenActivity
 import kotlinx.coroutines.*
@@ -20,16 +21,50 @@ class BraveScreenStateReceiver : BroadcastReceiver() {
 
     @InternalCoroutinesApi
     override fun onReceive(context: Context?, intent: Intent?) {
+
+        /*if(intent!!.action.equals(ScreenLockService.ACTION_CHECK_LOCK)){
+            val newIntent = Intent(context, ScreenLockService::class.java)
+            newIntent.action = ScreenLockService.ACTION_CHECK_LOCK
+            newIntent.putExtra(ScreenLockService.EXTRA_STATE, intent.action)
+            context!!.startService(newIntent)
+        }*/
+
         if (intent!!.action.equals(Intent.ACTION_SCREEN_OFF)) {
-            println("ACTION_SCREEN_OFF:" + PersistentState.getFirewallModeForScreenState(context!!))
-            if(PersistentState.getFirewallModeForScreenState(context!!)) {
+            //println("ACTION_SCREEN_OFF")
+            //Thread.sleep(2000)
+            //val dpm = context!!.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+            //val timeOutString = "lock_screen_lock_after_timeout"//android.provider.Settings.System.LOCK_SCREEN_LOCK_AFTER_TIMEOUT
+            //val timeOut = android.provider.Settings.System.getInt(context.contentResolver, timeOutString)
+           // val timeOut = android.provider.Settings.Secure.getInt(context.contentResolver, timeOutString)
+
+            //val timeOut = dpm.getMaximumTimeToLock()
+
+            //val keyguardManager = context!!.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+            //Log.d("BraveDNS","ACTION_SCREEN_OFF - isKeyguardLocked")
+            //Log.d("BraveDNS", "PersistentState.getFirewallModeForScreenState(context!!) && getScreenLockEnabled(context)):"+!PersistentState.getScreenLockData(context!!)
+            //+"---"+PersistentState.getFirewallModeForScreenState(context!!))
+
+            if(PersistentState.getFirewallModeForScreenState(context!!) && !PersistentState.getScreenLockData(context)) {
+                //FirewallManager.modifyInternetPermissionForAllApps(false)
+                val newIntent = Intent(context, ScreenLockService::class.java)
+                newIntent.action = ScreenLockService.ACTION_CHECK_LOCK
+                newIntent.putExtra(ScreenLockService.EXTRA_STATE, intent.action)
+                context.startService(newIntent)
+            }
+
+
+
+
+            //println("ACTION_SCREEN_OFF:" + PersistentState.getFirewallModeForScreenState(context!!))
+            /*if(PersistentState.getFirewallModeForScreenState(context!!)) {
                 //FirewallManager.modifyInternetPermissionForAllApps(false)
                 BraveVPNService.vpnController!!.getBraveVpnService()!!.blockTraffic()
-            }
-        } else if (intent.action.equals(Intent.ACTION_SCREEN_ON)) {
-            println("ACTION_SCREEN_ON:" + PersistentState.getFirewallModeForScreenState(context!!))
+            }*/
+        } else if (intent.action.equals(Intent.ACTION_USER_PRESENT)) {
+            println("ACTION_SCREEN_ON")
             if(PersistentState.getFirewallModeForScreenState(context!!)) {
                 //FirewallManager.modifyInternetPermissionForAllApps(true)
+                PersistentState.setScreenLockData(context,false)
                 BraveVPNService.vpnController!!.getBraveVpnService()!!.resumeTraffic()
             }
         } else if (intent.action.equals(Intent.ACTION_PACKAGE_ADDED)) {
@@ -66,10 +101,7 @@ class BraveScreenStateReceiver : BroadcastReceiver() {
             val appInfoRepository = mDb.appInfoRepository()//AppInfoRepository(appInfoDAO)
             try {
                 var details =
-                    context.packageManager.getApplicationInfo(
-                        packageName,
-                        PackageManager.GET_META_DATA
-                    )
+                    context.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
                 if (details != null) {
                     if ((details.flags and ApplicationInfo.FLAG_SYSTEM) == 0) {
 
@@ -77,11 +109,8 @@ class BraveScreenStateReceiver : BroadcastReceiver() {
 
                             val applicationInfo: ApplicationInfo = details
                             val appInfo = AppInfo()
-                            appInfo.appName =
-                                context.packageManager.getApplicationLabel(applicationInfo)
-                                    .toString()
-                            val category =
-                                ApplicationInfo.getCategoryTitle(context, applicationInfo.category)
+                            appInfo.appName = context.packageManager.getApplicationLabel(applicationInfo).toString()
+                            val category = ApplicationInfo.getCategoryTitle(context, applicationInfo.category)
                             if (category != null)
                                 appInfo.appCategory = category.toString()
                             else
@@ -104,10 +133,8 @@ class BraveScreenStateReceiver : BroadcastReceiver() {
                             appInfo.uid = applicationInfo.uid
 
                             //TODO Handle this Global scope variable properly. Only half done.
-                            HomeScreenActivity.GlobalVariable.appList[applicationInfo.packageName] =
-                                appInfo
-                            HomeScreenActivity.GlobalVariable.installedAppCount =
-                                HomeScreenActivity.GlobalVariable.installedAppCount + 1
+                            HomeScreenActivity.GlobalVariable.appList[applicationInfo.packageName] = appInfo
+                            HomeScreenActivity.GlobalVariable.installedAppCount = HomeScreenActivity.GlobalVariable.installedAppCount + 1
                             appInfoRepository.insertAsync(appInfo, this)
                             //Log.w("DB Inserts","App Size : " + appInfo.packageInfo +": "+appInfo.uid)
                         }
@@ -117,7 +144,7 @@ class BraveScreenStateReceiver : BroadcastReceiver() {
                     }
                 }
             }catch(e: PackageManager.NameNotFoundException){
-                Log.e("BraveDNS","Package Not Foundation received from the receiver")
+                Log.e("BraveDNS","Package Not Found received from the receiver")
             }
         }
 

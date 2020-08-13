@@ -28,12 +28,12 @@ class SpinnerArrayAdapter(context: Context,  braveModeList : ArrayList<BraveMode
             val braveMode = getItem(position)
 
             val view = recycledView ?: LayoutInflater.from(context).inflate(R.layout.spinner_custom_list, parent,false)
-            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && position == 2){
+            /*if(Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && position == 2){
                 view.modeImage.setImageResource(braveMode!!.icon)
                 view.modeText.text = braveMode.modeName
-                view.alpha = 0.5F
-                view.background = context.resources.getDrawable(R.color.colorAccent)
-            }
+                //view.alpha = 0.5F
+                //view.background = context.resources.getDrawable(R.color.colorAccent)
+            }*/
 
             view.modeImage.setImageResource(braveMode!!.icon)
             view.modeText.text = braveMode!!.modeName

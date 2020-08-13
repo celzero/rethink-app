@@ -93,7 +93,6 @@
         android:layout_width="match_parent"
         android:layout_margin="10dp"
         app:cardElevation="@dimen/activity_horizontal_margin"
-
         android:layout_height="wrap_content">
     <LinearLayout
         android:orientation="vertical"
@@ -398,7 +397,7 @@
             android:layout_marginLeft="10dp"
             android:textColor="@color/secondaryText"
             android:layout_weight="0.5"
-            android:text="View logs"/>
+            android:text="View DNS logs"/>
     </LinearLayout>
 
     <LinearLayout
@@ -435,10 +434,11 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:background="@drawable/ic_icon_circle"
+                android:fontFamily="sans-serif-smallcaps"
                 android:gravity="center"
-                android:text="Connect"
+                android:text="start"
                 android:textColor="@color/primaryText"
-                android:textSize="20sp"
+                android:textSize="30sp"
                 android:textStyle="normal" />
         </com.celzero.bravedns.animation.RippleBackground>
 
