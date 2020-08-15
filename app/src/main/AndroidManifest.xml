@@ -128,7 +128,7 @@
         </service>
 
         <service
-            android:name=".receiver.ScreenLockService"
+            android:name=".receiver.DeviceLockService"
             android:enabled="true"
             android:exported="false"
             android:stopWithTask="false">

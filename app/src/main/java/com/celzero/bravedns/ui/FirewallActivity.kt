@@ -6,10 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -50,7 +47,7 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
     lateinit var itemAdapter: ItemAdapter<FirewallApk>
     lateinit var headerAdapter : ItemAdapter<FirewallHeader>
     private lateinit var progressImageView: ImageView
-    private lateinit var loadingProgressBar: ContentLoadingProgressBar
+    private lateinit var loadingProgressBar: ProgressBar
 
     private lateinit var firewallAllAppsToggle : SwitchCompat
     private lateinit var firewallAllAppsTxt : TextView
@@ -116,7 +113,7 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         }else{
             firewallNotEnabledLL.visibility = View.VISIBLE
             firewallEnableTxt.visibility = View.GONE
-            progressImageView.setImageDrawable(getDrawable(R.drawable.ic_illustrations_loading))
+            //progressImageView.setImageDrawable(getDrawable(R.drawable.ic_illustrations_loading))
         }
 
         categoryState = false
@@ -287,7 +284,8 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 
 
     fun updateUI(){
-        progressBarHolder.visibility = View.VISIBLE
+        loadingProgressBar.visibility = View.VISIBLE
+        //progressBarHolder.visibility = View.VISIBLE
         itemAdapter =  ItemAdapter()
         headerAdapter = ItemAdapter()
         itemAdapter.clear()
@@ -366,8 +364,8 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
             itemAdapter.add(apkList)
             fastAdapter.notifyAdapterDataSetChanged()
             fastAdapter.notifyDataSetChanged()
-
-            progressBarHolder.visibility = View.GONE
+            loadingProgressBar.visibility = View.GONE
+            //progressBarHolder.visibility = View.GONE
         }
     }
 

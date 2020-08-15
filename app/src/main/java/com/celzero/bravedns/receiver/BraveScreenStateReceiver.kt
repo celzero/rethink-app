@@ -8,7 +8,6 @@ import android.content.pm.PackageManager
 import android.util.Log
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.ApplicationManagerActivity
 import com.celzero.bravedns.ui.HomeScreenActivity
@@ -21,9 +20,9 @@ class BraveScreenStateReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent!!.action.equals(Intent.ACTION_SCREEN_OFF)) {
             if(PersistentState.getFirewallModeForScreenState(context!!) && !PersistentState.getScreenLockData(context)) {
-                val newIntent = Intent(context, ScreenLockService::class.java)
-                newIntent.action = ScreenLockService.ACTION_CHECK_LOCK
-                newIntent.putExtra(ScreenLockService.EXTRA_STATE, intent.action)
+                val newIntent = Intent(context, DeviceLockService::class.java)
+                newIntent.action = DeviceLockService.ACTION_CHECK_LOCK
+                newIntent.putExtra(DeviceLockService.EXTRA_STATE, intent.action)
                 context.startService(newIntent)
             }
         } else if (intent.action.equals(Intent.ACTION_USER_PRESENT)) {

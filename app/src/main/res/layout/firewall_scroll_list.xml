@@ -218,12 +218,11 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:id="@+id/firewall_progress"
-                android:src="@drawable/ic_illustrations_loading"
                 android:layout_height="wrap_content"
                 android:indeterminate="true"
                 android:layout_gravity="center" />
         </FrameLayout>
-        <androidx.core.widget.ContentLoadingProgressBar
+        <ProgressBar
             android:id="@+id/firewall_update_progress"
             android:layout_width="match_parent"
             android:visibility="gone"
