@@ -83,17 +83,17 @@
     <string-array name="cloudflare_name">
         <item>No filter</item>
         <item>Family</item>
-        <item>Ads (Default)</item>
+        <item>BraveDNS Basic (default)</item>
         <item>Custom</item>
-        <item>BraveDNS*</item>
+        <item>BraveDNS Pro*</item>
     </string-array>
 
     <string-array name="cloudflare_url">
         <item>https://cloudflare-dns.com/dns-query</item>
         <item>https://family.cloudflare-dns.com/dns-query</item>
-        <item>https://dns.adguard.com/dns-query</item>
+        <item>https://free.bravedns.com/dns-query</item>
         <item>https://cloudflare-dns.com</item>
-        <item>https://cloudflare-dns.com/dns-query</item>
+        <item>https://free.bravedns.com/dns-query</item>
     </string-array>
 
     <string name="warning_title" description="Status indicator text shown in a warning notification.">
@@ -242,7 +242,7 @@
 
     <string name="status_exposed"
         description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">
-    not connected
+    not protected
   </string>
 
     <string name="explanation_exposed"
@@ -339,19 +339,23 @@
         We use accessibility to automate frequent actions to manage security and privacy related settings on your phone.
     </string>
 
+    <string name="alert_firewall_accessibility_explanation">
+        BraveDNS uses accessibility service to track which apps are in use(foreground) vs those that are not in use(background).
+    </string>
+
     <string name="brave_dns_connect_prompt_firewall">
-        Start Firewall Mode / DNS+Firewall Mode to configure Apps.
+        Start Firewall / DNS+Firewall to configure apps.
     </string>
     <string name="brave_dns_connect_prompt_query">
-       Start DNS / DNS+Firewall Mode to view logs
+       Start DNS / DNS+Firewall to view logs
     </string>
 
     <string name="brave_dns_connect_mode_change_firewall">
-       Start Firewall Mode / DNS+Firewall Mode to configure Apps.
+       Start Firewall / DNS+Firewall to configure apps.
     </string>
 
     <string name="brave_dns_connect_mode_change_dns">
-        Start DNS / DNS+Firewall Mode to view logs
+        Start DNS / DNS+Firewall to view logs
     </string>
 
     <string name="faq_web_link">
@@ -360,17 +364,21 @@
 
     <string name="dns_mode_0">No Filter</string>
     <string name="dns_mode_1">Family</string>
-    <string name="dns_mode_2">Ads</string>
+    <string name="dns_mode_2">BraveDNS Basic</string>
     <string name="dns_mode_3">Custom</string>
-    <string name="dns_mode_4">BraveDNS</string>
+    <string name="dns_mode_4">BraveDNS Pro</string>
 
     <string name="dns_mode_0_explanation">Does not block any DNS requests. Uses Cloudflare\'s 1.1.1.1 DNS endpoint.</string>
     <string name="dns_mode_1_explanation">Blocks malware and adult content. Uses Cloudflare\'s 1.1.1.3 DNS endpoint.</string>
-    <string name="dns_mode_2_explanation">Blocks malware and ads. Uses AdGuard\'s DNS endpoint.</string>
+    <string name="dns_mode_2_explanation">Blocks malware, ads, and trackers. Uses BraveDNS\'s non-configurable basic endpoint.</string>
     <string name="dns_mode_3_explanation">Set your own custom DNS-over-HTTPS endpoint.</string>
-    <string name="dns_mode_4_explanation">Blocks malware, ads, trackers. Provides in-depth analytics of your Internet traffic. Allows you to set custom blocklists and more. Coming Soon.</string>
+    <string name="dns_mode_4_explanation">Blocks malware, ads, trackers. Provides in-depth analytics of your Internet traffic. Allows you to set custom blocklists and more. Coming soon.</string>
+
+    <string name="custom_url_error_host_failed">Host connection failed. Try again.</string>
+    <string name="custom_url_error_invalid_url">Invalid URL</string>
+    <string name="custom_url_connection_successfull">Connected to custom DNS endpoint.</string>
 
 
-
+    <string name="brave_launching_soon">"BraveDNS Pro launching soon. Subscribe for early access."</string>
 
 </resources>

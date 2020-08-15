@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -15,7 +14,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SwitchCompat
-import androidx.core.view.isVisible
 import androidx.core.widget.ContentLoadingProgressBar
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.ViewModelProvider
@@ -88,14 +86,7 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 
         initView()
 
-        /*val task = MyAsyncAppDetailsTask(this)
-        task.execute(1)*/
-        /*var inAnimation = AlphaAnimation(0f, 1f)
-        inAnimation.setDuration(200)
-        progressBarHolder.animation = inAnimation*/
         progressBarHolder.visibility = View.VISIBLE
-
-
     }
 
     @InternalCoroutinesApi
@@ -111,16 +102,6 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         progressImageView = includeView.findViewById(R.id.firewall_progress)
         firewallEnableTxt = includeView.findViewById(R.id.firewall_enable_vpn_txt)
         loadingProgressBar = includeView.findViewById(R.id.firewall_update_progress)
-
-
-        //TODO -  Delete the below code
-
-        val s =  ViewModelProviders.of(this, defaultViewModelProviderFactory).get(FirewallViewModel::class.java)
-        val modelFirewall = ViewModelProvider.AndroidViewModelFactory.getInstance(context.applicationContext as Application).create(FirewallViewModel::class.java)
-        s.getAppsBlockedCount()
-        modelFirewall.getAppsBlockedCount()
-
-
 
         universalFirewallTxt = includeView.findViewById(R.id.firewall_universal_top_text)
         screenLockLL = includeView.findViewById(R.id.firewall_screen_ll)
@@ -173,7 +154,6 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 
         firewallAllAppsToggle.setOnCheckedChangeListener { compoundButton, b ->
             PersistentState.setFirewallModeForScreenState(context, b)
-            //FirewallManager.updateInternetPermissionForAllApp( b, context)
         }
 
         smoothScroller = object : LinearSmoothScroller(context) {
@@ -186,18 +166,15 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
             if(PersistentState.getFirewallModeForScreenState(context)){
                 firewallAllAppsToggle.isChecked = false
                 PersistentState.setFirewallModeForScreenState(context, false)
-                //FirewallManager.updateInternetPermissionForAllApp(false,context)
             }else{
                 firewallAllAppsToggle.isChecked = true
                 PersistentState.setFirewallModeForScreenState(context, true)
-                //FirewallManager.updateInternetPermissionForAllApp(true, context)
             }
         }
 
 
 
         editSearch!!.setOnClickListener{
-            //Log.d("BraveDNS","Click Came")
             editSearch!!.requestFocus()
             editSearch!!.onActionViewExpanded()
         }
@@ -232,7 +209,6 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 
 
         categoryShowTxt.setOnClickListener{
-            //categoryShowTxt.state
             if(!categoryState) {
                 categoryState = true
                 recyclerHeader.visibility = View.VISIBLE
@@ -288,7 +264,7 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         //set title for alert dialog
         builder.setTitle(R.string.alert_permission_accessibility)
         //set message for alert dialog
-        builder.setMessage(R.string.alert_permission_accessibility_explanation)
+        builder.setMessage(R.string.alert_firewall_accessibility_explanation)
         builder.setIcon(android.R.drawable.ic_dialog_alert)
 
         //performing positive action
@@ -300,7 +276,6 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 
         //performing negative action
         builder.setNegativeButton("Deny"){dialogInterface, which ->
-            //Toast.makeText(applicationContext,"clicked No",Toast.LENGTH_LONG).show()
         }
         // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()
@@ -318,17 +293,8 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         itemAdapter.clear()
         fastAdapter = FastAdapter.with(itemAdapter)
         recycle.adapter = fastAdapter
-        //recyclerHeader.adapter = fastAdapterHeader
-        //fastAdapterHeader = FastAdapter.with(headerAdapter)
         updateAppList(true)
     }
-
-    /*fun showProgress(showProgress : Boolean){
-        if(showProgress){
-            loadingProgressBar.show()
-        }else
-            loadingProgressBar.hide()
-    }*/
 
     private fun updateAppList(isUpdate : Boolean) = GlobalScope.launch ( Dispatchers.Default ){
         val mDb = AppDatabase.invoke(context.applicationContext)
@@ -339,16 +305,12 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
            var firewallHeader  = FirewallHeader("")
            var prevVal = ""
 
-          /* headerAdapter.adapterItems.clear()
-           itemAdapter.adapterItems.clear()*/
-           //headerList.clear()
            apkList.clear()
-           //Log.d("BraveDNS","Local App List - Size : "+ GlobalVariable.appList.size)
            val sampleApps = ArrayList<AppInfo>()
 
            val sortedVal =
                GlobalVariable.appList.entries.sortedWith(compareBy { it.value.appCategory })
-           //var firewallHeaderApps  = ArrayList<FirewallApk>()
+
            sortedVal.forEach{
                 if(it.value.packageInfo != "com.celzero.bravedns" ) {
 
@@ -364,25 +326,20 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
                         context
                     )
 
-                    //firewallHeaderApps.add(firewallApk)
                     apkList.add(firewallApk)
                     sampleApps.add(it.value)
 
                     if(prevVal != it.value.appCategory && !isUpdate){
-                        //Log.d("BraveDNS","appCategory : "+ it.value.appCategory + "List: "+ sampleApps.size)
                         firewallHeader = FirewallHeader(it.value.appCategory)
                         GlobalVariable.categoryList.add(it.value.appCategory)
                         headerList.add(firewallHeader)
-                        //appListSample.put(it.value.appCategory ,sampleApps )
                         sampleApps.clear()
-                        //firewallHeaderApps.clear()
                     }
                     prevVal = it.value.appCategory
                 }
             }
         }else{
             val appList = appInfoRepository.getAppInfoAsync()
-            //Log.w("DB","App list from DB Size: "+appList.size)
             appList.forEach{
                 if(it.packageInfo != "com.celzero.bravedns" ) {
                     val firewallApk = FirewallApk(
@@ -400,13 +357,6 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
                 }
             }
         }
-        /*val appList = appInfoRepository.getAppInfoAsync()
-        Log.w("DB","App list from DB Size: "+appList.size)
-        appList.forEach{
-            val firewallApk = FirewallApk(packageManager.getPackageInfo(it.packageInfo,0), it.isWifiEnabled, it.isDataEnabled,
-                it.isSystemApp, it.isScreenOff, it.isInternet, it.isBackgroundEnabled, context)
-            apkList.add(firewallApk)
-        }*/
 
         withContext(Dispatchers.Main.immediate) {
             if(!isUpdate){
@@ -414,16 +364,10 @@ class FirewallActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
                 fastAdapterHeader.notifyDataSetChanged()
             }
             itemAdapter.add(apkList)
-            //Log.d("BraveDNS","firewallHeader size : "+headerList.size)
-            //fastAdapter.notifyAdapterItemRangeChanged(0,apkList.size,null)
             fastAdapter.notifyAdapterDataSetChanged()
             fastAdapter.notifyDataSetChanged()
 
-            /*var outAnimation = AlphaAnimation(1f, 0f)
-            outAnimation.setDuration(200)
-            progressBarHolder.animation = outAnimation*/
             progressBarHolder.visibility = View.GONE
-            //progressBar.visibility = View.GONE
         }
     }
 
