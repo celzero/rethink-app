@@ -1,6 +1,7 @@
 package com.celzero.bravedns.adapter
 
 import android.app.AlertDialog
+import android.content.Context
 import android.os.Build
 import android.util.DisplayMetrics
 import android.util.Log
@@ -28,7 +29,7 @@ import java.util.*
 
 class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-   private var countryMap: CountryMap? = null
+
 
     private val transactions: MutableList<QueryAdapter.TransactionView> =  mutableListOf()
 
@@ -47,28 +48,11 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         //TODO Commented this piece of code for the control view for the type Controls. Check that and modify based on it.
-        /*if (holder is ControlViewHolder) {
-            if (position != 0) {
-                throw java.lang.AssertionError(
-                    String.format(
-                        Locale.ROOT,
-                        "Cannot show control view holder at index %d",
-                        position
-                    )
-                )
-            }
-        } else*/
         if (holder is TransactionViewHolder) {
             val transaction: TransactionView? = getItem(position)
             holder.update(transaction!!,position)
         } else {
-            throw java.lang.AssertionError(
-                String.format(
-                    Locale.ROOT,
-                    "Unknown holder %s",
-                    holder.javaClass.toString()
-                )
-            )
+            throw java.lang.AssertionError(String.format(Locale.ROOT, "Unknown holder %s", holder.javaClass.toString()))
         }
     }
 
@@ -101,13 +85,7 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
             }
             TransactionViewHolder(v)
         } else {
-            throw AssertionError(
-                String.format(
-                    Locale.ROOT,
-                    "Unknown viewType %d",
-                    viewType
-                )
-            )
+            throw AssertionError(String.format(Locale.ROOT, "Unknown viewType %d", viewType))
         }
     }
 
@@ -115,17 +93,15 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
         return transactions[(transactions.size-1) - position]
     }
 
-    inner class TransactionViewHolder (itemView: View): RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    inner class TransactionViewHolder (itemView: View): RecyclerView.ViewHolder(itemView) {
 
         private var transaction: QueryAdapter.TransactionView? = null
         // Overall view
         private var rowView: View? = null
-
         // Contents of the condensed view
         private var hostnameView: TextView? = null
         private var timeView: TextView? = null
         private var flagView: TextView? = null
-        //private var expandButton: ToggleButton? = null
 
         // Contents of the expanded details view
         private var detailsView: View? = null
@@ -135,6 +111,7 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
         private var resolverView: TextView? = null
         private var responseView: TextView? = null
         private var queryLayoutLL : LinearLayout ?= null
+        private var queryIndicator : TextView ?=  null
 
         init{
             rowView = itemView
@@ -142,9 +119,6 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
             hostnameView = itemView.findViewById(R.id.fqdn1)
             timeView = itemView.findViewById(R.id.response_time)
             flagView = itemView.findViewById(R.id.flag)
-            //expandButton = itemView.findViewById(R.id.expand)
-
-            //expandButton!!.setOnClickListener(this)
 
             detailsView = itemView.findViewById(R.id.details)
             fqdnView = itemView.findViewById(R.id.fqdn)
@@ -153,24 +127,22 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
             resolverView = itemView.findViewById(R.id.resolver)
             responseView = itemView.findViewById(R.id.response)
             queryLayoutLL = itemView.findViewById(R.id.query_screen_ll)
-            queryLayoutLL!!.setOnClickListener(this)
+
+            queryIndicator = itemView.findViewById(R.id.query_log_indicator)
+
         }
 
-        override fun onClick(view: View?) {
-            /*val position = this.adapterPosition
-            val transaction: TransactionView? = getItem(position)
-            //transaction!!.expanded = ! transaction.expanded
-            notifyItemChanged(position)*/
-            val position = this.adapterPosition
-            //showDialogQuery(position)
-        }
-
-        private fun showDialogQuery(positions : Int) {
-            /*  val builderSingle: AlertDialog.Builder = AlertDialog.Builder(FirewallHeader.context)
+        /**
+         *  TODO Dialog for showing complete message details on the resolver's IP,
+         *  and other detail of the query log.
+         *  Not in use for now.
+         */
+        /*private fun showDialogQuery(positions : Int) {
+            *//*  val builderSingle: AlertDialog.Builder = AlertDialog.Builder(FirewallHeader.context)
               builderSingle.setIcon(R.drawable.ic_launcher)
               builderSingle.setTitle("Brave DNS Modes")
               builderSingle.show()
-      */
+      *//*
             val dialog: AlertDialog.Builder = AlertDialog.Builder(activity)
             val view: View = LayoutInflater.from(activity).inflate(R.layout.query_detail_dialog, null)
             val position1 = positions
@@ -178,15 +150,15 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
             //val dialog = Dialog(activity)
             //dialog.setTitle("Query")
 
-            /*dialog.setCanceledOnTouchOutside(true)
-            dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)*/
+            *//*dialog.setCanceledOnTouchOutside(true)
+            dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)*//*
             val metrics: DisplayMetrics = activity.getResources().getDisplayMetrics()
             val DeviceTotalWidth = metrics.widthPixels
             val DeviceTotalHeight = metrics.heightPixels
-            /*dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            *//*dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
 
             dialog.setContentView(R.layout.query_detail_dialog)
-            dialog.window!!.setLayout(DeviceTotalWidth, DeviceTotalHeight)*/
+            dialog.window!!.setLayout(DeviceTotalWidth, DeviceTotalHeight)*//*
 
             var detailsView1 = view.findViewById(R.id.detailss) as ConstraintLayout
             var fqdnView1 = view.findViewById(R.id.fqdns) as TextView
@@ -213,14 +185,14 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
             alert.window!!.setLayout(DeviceTotalWidth, DeviceTotalHeight)
             alert.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 
-            /*val okBtn = dialog.findViewById(R.id.info_dialog_cancel_btn) as Button
+            *//*val okBtn = dialog.findViewById(R.id.info_dialog_cancel_btn) as Button
             okBtn.setOnClickListener {
                 dialog.dismiss()
-            }*/
+            }*//*
             alert.show()
             //dialog.show()
 
-        }
+        }*/
 
         fun update(transaction : TransactionView, position: Int) {
             // This function can be run up to a dozen times while blocking rendering, so it needs to be
@@ -229,48 +201,22 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
             hostnameView!!.setText(transaction.hostname)
             timeView!!.setText(transaction.time)
             flagView!!.setText(transaction.flag)
-            fqdnView!!.setText(transaction!!.fqdn)
-            typeView!!.setText(transaction!!.typename)
-            latencyView!!.setText(transaction!!.latency)
-            if (transaction!!.resolver != null) {
-                resolverView!!.setText(transaction!!.resolver)
+            fqdnView!!.setText(transaction.fqdn)
+            typeView!!.setText(transaction.typename)
+            latencyView!!.setText(transaction.latency)
+            if (transaction.resolver != null) {
+                resolverView!!.setText(transaction.resolver)
             } else {
                 resolverView!!.setText(R.string.unknown_server)
             }
-            responseView!!.setText(transaction!!.response)
-            /*if(position % 2 ==0 )
-                queryLayoutLL!!.setBackgroundColor(activity.getColor(R.color.colorPrimaryDark))*/
-            //setExpanded(transaction.expanded)
+            responseView!!.setText(transaction.response)
+
+            if(transaction.isBlocked){
+                queryIndicator!!.visibility = View.VISIBLE
+            }else{
+                queryIndicator!!.visibility = View.INVISIBLE
+            }
         }
-
-
-        /*private fun setExpanded(expanded: Boolean) {
-            detailsView!!.setVisibility(if (expanded) View.VISIBLE else View.GONE)
-            rowView!!.setBackgroundColor(if (expanded) expandedColor else condensedColor)
-            //expandButton!!.setChecked(expanded)
-            fqdnView!!.setText(transaction!!.fqdn)
-            typeView!!.setText(transaction!!.typename)
-            latencyView!!.setText(transaction!!.latency)
-            if (transaction!!.resolver != null) {
-                resolverView!!.setText(transaction!!.resolver)
-            } else {
-                resolverView!!.setText(R.string.unknown_server)
-            }
-            responseView!!.setText(transaction!!.response)
-            *//*if (expanded) {
-                // Make sure the details are up to date.
-                fqdnView!!.setText(transaction!!.fqdn)
-                typeView!!.setText(transaction!!.typename)
-                latencyView!!.setText(transaction!!.latency)
-                if (transaction!!.resolver != null) {
-                    resolverView!!.setText(transaction!!.resolver)
-                } else {
-                    resolverView!!.setText(R.string.unknown_server)
-                }
-                responseView!!.setText(transaction!!.response)
-            }*//*
-        }*/
-
     }
 
     /**
@@ -299,21 +245,18 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
 
     inner class TransactionView(transaction : Transaction) {
 
-        var expanded = false
         var fqdn : String? = null
         var hostname : String? = null
         var time : String? = null
         var flag : String? = null
-        val template : String = "30ms"
         var resolver : String? = null
         var response : String? = null
         var latency : String? = null
         var typename : String? = null
+        var isBlocked : Boolean = false
 
         init{
             // If true, the panel is expanded to show details.
-
-
             // Human-readable representation of this transaction.
             fqdn = transaction.name
             hostname = Utilities.getETldPlus1(transaction.name)
@@ -323,8 +266,6 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
             val second :Int ?= transaction.responseCalendar[Calendar.SECOND]
             time  =  String.format(Locale.ROOT, "%02d:%02d:%02d", hour, minute, second)
 
-            //Log.d("BraveDNS","Transaction - transaction.responseTime :"+transaction.responseTime + " - transaction.queryTime : "+transaction.queryTime)
-            //latency  = String.format(template, transaction.responseTime - transaction.queryTime)
             latency  = (transaction.responseTime - transaction.queryTime).toString() + "ms"
             typename = getTypeName(transaction.type.toInt())
 
@@ -339,7 +280,7 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
 
 
             if (serverAddress != null) {
-                val countryCode: String = getCountryCode(serverAddress) //TODO: Country code things
+                val countryCode: String = getCountryCode(serverAddress , activity) //TODO: Country code things
                 resolver = makeAddressPair(countryCode, serverAddress.getHostAddress())
             } else {
                 resolver = transaction.serverIp
@@ -359,8 +300,10 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
                     val addresses: List<InetAddress> = packet.getResponseAddresses()
                     if (addresses.size > 0) {
                         val destination = addresses[0]
-                        val countryCode: String = getCountryCode(destination) //TODO : Check on the country code stuff
+                        val countryCode: String = getCountryCode(destination,activity as Context) //TODO : Check on the country code stuff
                         response = makeAddressPair(countryCode, destination.hostAddress)
+                        if(destination.hostAddress.contains("0.0.0.0"))
+                            isBlocked = true
                         flag = getFlag(countryCode)
                     } else {
                         response = "NXDOMAIN"
@@ -378,11 +321,30 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
                     "\u26a0" // Warning sign
                 }
             }
-            if(response!!.contains("ZZ")){
-                PersistentState.setBlockedReq(activity)
-            }
         }
+    }
 
+    private var countryMap: CountryMap? = null
+
+    // Return a two-letter ISO country code, or null if that fails.
+    fun getCountryCode(address: InetAddress, context: Context): String {
+        activateCountryMap(context)
+        return (if (countryMap == null) {
+            null
+        } else {
+            countryMap!!.getCountryCode(address)
+        })!!
+    }
+
+    private fun activateCountryMap(context: Context) {
+        if (countryMap != null) {
+            return
+        }
+        try {
+            countryMap = CountryMap(context.getAssets())
+        } catch (e: IOException) {
+            Log.e("BraveDNS Exception", e.message, e)
+        }
     }
 
 
@@ -471,29 +433,6 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
         )
     }
 
-
-
-
-    // Return a two-letter ISO country code, or null if that fails.
-    private fun getCountryCode(address: InetAddress): String {
-        activateCountryMap()
-        return (if (countryMap == null) {
-            null
-        } else {
-            countryMap!!.getCountryCode(address)
-        })!!
-    }
-
-    private fun activateCountryMap() {
-        if (countryMap != null) {
-            return
-        }
-        try {
-            countryMap = CountryMap(activity.getAssets())
-        } catch (e: IOException) {
-            Log.e("BraveDNS Exception",e.message)
-        }
-    }
 
     private fun makeAddressPair(
         countryCode: String?,

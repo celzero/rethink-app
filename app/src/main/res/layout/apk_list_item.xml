@@ -22,7 +22,7 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/firewall_status_indicator"
-                android:layout_width="3dp"
+                android:layout_width="2dp"
                 android:layout_height="match_parent"
                 android:background="@color/colorGreen_A400"/>
 

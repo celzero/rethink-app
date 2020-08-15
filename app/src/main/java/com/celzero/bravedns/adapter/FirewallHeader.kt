@@ -43,13 +43,21 @@ class FirewallHeader(var categoryName : String): AbstractItem<FirewallHeader.Vie
         private val imageHolder3 : AppCompatImageView = itemView.findViewById(R.id.imageLayout_3)
         private val imageHolder4 : AppCompatImageView = itemView.findViewById(R.id.imageLayout_4)
         private val progressBar : ProgressBar = itemView.findViewById(R.id.header_progress)
+        private val indicatorTV : TextView = itemView.findViewById(R.id.header_category_indicator)
 
 
         @InternalCoroutinesApi
         override fun bindView(item: FirewallHeader, payloads: MutableList<Any>) {
             categoryNameTV.text = item.categoryName
             //internetChk.isChecked = !FirewallManager.isCategoryInternetAllowed(item.categoryName)//item.isInternet
-            internetChk.isChecked = isCategoryBlocked(item.categoryName, context)
+            val isBlocked = isCategoryBlocked(item.categoryName, context)
+            internetChk.isChecked = isBlocked
+            if(isBlocked) {
+                indicatorTV.visibility = View.VISIBLE
+            }
+            else {
+                indicatorTV.visibility = View.INVISIBLE
+            }
 
             if(this.layoutPosition%2 == 0){
                 val layoutLL : LinearLayout = itemView.findViewById(type)
@@ -104,11 +112,14 @@ class FirewallHeader(var categoryName : String): AbstractItem<FirewallHeader.Vie
             imageHolderLL.setOnClickListener{
                 showDialog(packageName, item.categoryName)
             }
-            //if(debug) Log.d("BraveDNS", "FirewallManager.isCategoryInternetAllowed() :  "+item.categoryName+ FirewallManager.isCategoryInternetAllowed(item.categoryName))
-            //FirewallManager.printAllAppStatus()
+
             internetChk.setOnCheckedChangeListener(null)
             internetChk.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
-               //Log.d("BraveDNS","-------------------OnCheck : ${item} , block : $b")
+                if(b){
+                    indicatorTV.visibility = View.VISIBLE
+                }else{
+                    indicatorTV.visibility = View.INVISIBLE
+                }
                 progressBar.visibility = View.VISIBLE
                 internetChk.visibility = View.GONE
                 internetChk.isEnabled = false
@@ -118,8 +129,6 @@ class FirewallHeader(var categoryName : String): AbstractItem<FirewallHeader.Vie
                 internetChk.isClickable  = true
                 progressBar.visibility = View.GONE
                 internetChk.visibility = View.VISIBLE
-                //firewallActivity.showProgress(false)
-                //FirewallManager.printAllAppStatus()
             }
 
         }
@@ -148,10 +157,6 @@ class FirewallHeader(var categoryName : String): AbstractItem<FirewallHeader.Vie
                 val builderInner: AlertDialog.Builder = AlertDialog.Builder(context)
                 builderInner.setMessage(strName)
                 builderInner.setTitle("App List")
-               /* builderInner.setPositiveButton(
-                    "Ok",
-                    DialogInterface.OnClickListener { dialog, which -> dialog.dismiss() })*/
-                //builderInner.show()
             })
         builderSingle.show()
     }

@@ -1,32 +1,17 @@
 package com.celzero.bravedns.service
 
-import android.app.Activity
-import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
 import android.preference.PreferenceManager
-import android.util.Log
-import android.view.View
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import com.celzero.bravedns.R
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.blockedCategoryList
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.dnsMode
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.excludedPackageList
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.firewallMode
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.isBackgroundEnabled
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.lifeTimeQueries
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.medianP90
-import com.celzero.bravedns.viewmodel.FirewallViewModel
-import io.sentry.config.FileResourceLoader
-//
-import settings.Settings
-import java.lang.Exception
 
 
 class PersistentState {
@@ -224,15 +209,6 @@ class PersistentState {
             }
             else  newSet.add(packageName)
             getUserPreferences(context)!!.edit().putStringSet(APPS_KEY_DATA,newSet).apply()
-
-
-
-/*
-
-            val editor: SharedPreferences.Editor =
-                getUserPreferences(context!!)!!.edit()
-            editor.putStringSet(APPS_KEY, packages)
-            editor.apply()*/
         }
 
         private fun strip(template: String): String? {
@@ -275,7 +251,6 @@ class PersistentState {
                 getUserPreferences(context)!!.edit()
             editor.putInt(FIREWALL_MODE, fwMode)
             editor.apply()
-           // Log.d("Temp","setFirewallMode - $fwMode")
         }
 
         //TODO : Modify the hardcoded value
@@ -307,7 +282,6 @@ class PersistentState {
         }
 
         fun setCategoriesBlocked(categoryName : String, toRemove : Boolean , context : Context){
-            //Log.d("BraveDNS","-----------*****setCategoriesBlocked $categoryName value : $toRemove")
             if(toRemove){
                 if(blockedCategoryList.contains(categoryName))
                     blockedCategoryList.remove(categoryName)
@@ -316,23 +290,13 @@ class PersistentState {
             }
             if(blockedCategoryList.isNotEmpty())
                 getUserPreferences(context)!!.edit().putStringSet(CATEGORY_DATA,blockedCategoryList).commit()
-            /*//TODO : hardcode value for testing. Need to modify
-            //sets = getUserPreferences(context!!)!!.getStringSet(APPS_KEY, HashSet<String>())!!
-            val newSet: MutableSet<String> = HashSet(getUserPreferences(context!!)!!.getStringSet(CATEGORY_DATA, HashSet<String>()))
-            //Log.d("BraveDNS" ,"isCategoryBlocked : "+categoryName +"toRemove : "+ toRemove + "-- Contains : "+newSet.contains(categoryName))
-            if(toRemove) newSet.removeIf{newSet.contains(categoryName)}
-            else newSet.add(categoryName)
-            getUserPreferences(context)!!.edit().putStringSet(CATEGORY_DATA,newSet).apply()*/
-
         }
 
         fun isCategoryBlocked(categoryName: String, context: Context) : Boolean{
             if(blockedCategoryList.isEmpty()){
                 blockedCategoryList = getUserPreferences(context)?.getStringSet(CATEGORY_DATA,HashSet<String>())!!
             }
-            var isBlocked = blockedCategoryList.contains(categoryName)
-            Log.d("BraveDNS","Category : $categoryName isBlocked : $isBlocked")
-            return isBlocked
+            return blockedCategoryList.contains(categoryName)
         }
 
         fun setMedianLatency(context: Context, medianP90 : Long){

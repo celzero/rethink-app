@@ -23,18 +23,18 @@ class ScreenLockService  : Service(){
     private var checkLockTask: CheckLockTask? = null
 
     override fun onBind(p0: Intent?): IBinder? {
-
         return null
     }
 
+    @InternalCoroutinesApi
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if(intent != null && intent.action == ACTION_CHECK_LOCK){
             checkLock(intent)
         }
-        return START_STICKY
+        return super.onStartCommand(intent, flags, startId)
     }
 
-    @OptIn(InternalCoroutinesApi::class)
+    @InternalCoroutinesApi
     private fun checkLock(intent: Intent) {
         val keyguardManager  =  getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
@@ -43,10 +43,10 @@ class ScreenLockService  : Service(){
         val isLocked = keyguardManager.inKeyguardRestrictedInputMode()
         val isInteractive = powerManager.isInteractive
         val delayIndex: Int =  getSafeCheckLockDelay(intent.getIntExtra(EXTRA_CHECK_LOCK_DELAY_INDEX, -1))
-       /* Log.i("BraveDNS", java.lang.String.format("LM.checkLock with state=%s, isProtected=%b, isLocked=%b, isInteractive=%b, delay=%d",
+        /*Log.i("BraveDNS", java.lang.String.format("LM.checkLock with state=%s, isProtected=%b, isLocked=%b, isInteractive=%b, delay=%d",
                 if (intent != null) intent.getStringExtra(EXTRA_STATE) else "",
-                isProtected, isLocked, isInteractive, checkLockDelays.get(delayIndex)))
-*/
+                isProtected, isLocked, isInteractive, checkLockDelays.get(delayIndex)))*/
+
         if (checkLockTask != null) {
             //Log.i("BraveDNS", String.format("LM.checkLock: cancelling CheckLockTask[%x]", System.identityHashCode(checkLockTask)))
             checkLockTask!!.cancel()
@@ -57,17 +57,13 @@ class ScreenLockService  : Service(){
             /*Log.i("BraveDNS", java.lang.String.format("LM.checkLock: scheduling CheckLockTask[%x] for %d ms",
                     System.identityHashCode(checkLockTask), checkLockDelays.get(delayIndex)))*/
             val task = CheckLockTask(this , checkLockDelays.get(delayIndex))
-            timer.schedule(task,5000)
-            //timer.schedule(checkLockTask, checkLockDelays.get(delayIndex))
+            timer.schedule(task, checkLockDelays.get(delayIndex).toLong())
         } else {
             //Log.d("BraveDNS", "LM.checkLock: no need to schedule CheckLockTask")
             if (isProtected && isLocked) {
                 //Log.e("BraveDNS", "Block Traffic Now!")
-                if(PersistentState.getFirewallModeForScreenState(this)) {
-                    //FirewallManager.modifyInternetPermissionForAllApps(false)
+                if(PersistentState.getFirewallModeForScreenState(this) && !PersistentState.getScreenLockData(this)) {
                     PersistentState.setScreenLockData(this,true)
-                    BraveVPNService.vpnController!!.getBraveVpnService()!!.blockTraffic()
-
                 }
             }
         }
@@ -105,7 +101,6 @@ class ScreenLockService  : Service(){
         } else {
             delayIndex
         }
-        //Log.v("BraveDNS", String.format("getSafeCheckLockDelay(%d) returns %d", delayIndex, safeDelayIndex))
         return safeDelayIndex
     }
     }
@@ -113,8 +108,6 @@ class ScreenLockService  : Service(){
 
     class CheckLockTask(val context: Context, val delayIndex: Int) : TimerTask() {
         override fun run() {
-           /* Log.i("BraveDNS",String.format("CLT.run [%x]: redirect intent to LockMonitor",
-                    System.identityHashCode(this)))*/
             val newIntent = Intent(context, ScreenLockService::class.java)
             newIntent.action = ACTION_CHECK_LOCK
             newIntent.putExtra(EXTRA_CHECK_LOCK_DELAY_INDEX, getSafeCheckLockDelay(delayIndex + 1))

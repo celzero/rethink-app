@@ -30,12 +30,9 @@ import com.celzero.bravedns.R;
 import com.celzero.bravedns.service.BraveVPNService;
 import com.celzero.bravedns.service.PersistentState;
 import com.celzero.bravedns.service.VpnController;
-import com.celzero.bravedns.ui.HomeScreenActivity;
-
 import java.io.IOException;
 import java.util.Locale;
 
-//import app.intra.sys.firebase.LogWrapper;
 import doh.Transport;
 import protect.Blocker;
 import protect.Protector;
@@ -48,8 +45,6 @@ import tunnel.IntraTunnel;
  * custom logic for Intra.
  */
 public class GoVpnAdapter {
-  //private static final String LOG_TAG = "GoVpnAdapter";
-
   // This value must match the hardcoded MTU in outline-go-tun2socks.
   // TODO: Make outline-go-tun2socks's MTU configurable.
   private static final int VPN_INTERFACE_MTU = 1500;
@@ -95,10 +90,8 @@ public class GoVpnAdapter {
     ParcelFileDescriptor tunFd = establishVpn(vpnService);
 
     if (tunFd == null) {
-      //Log.d("BraveDNS","tunFd received from VPNService ---*** tunnel value is null");
       return null;
     }
-    //Log.d("BraveDNS","tunFd received from VPNService");
     return new GoVpnAdapter(vpnService, tunFd);
   }
 
@@ -108,47 +101,47 @@ public class GoVpnAdapter {
   }
 
   public synchronized void start(int dnsMode, int blockMode) {
-    //Log.d("BraveDNS","start connectTunnel --- DNS Mode: "+dnsMode+" Firewall Mode: "+blockMode);
     connectTunnel(dnsMode, blockMode);
   }
 
   private void connectTunnel(int iDnsMode, int iBlockMode) {
     if (tunnel != null) {
-      //Log.d("BraveDNS","start connectTunnel --- tunnel is not null ");
       return;
     }
     // VPN parameters
     final String fakeDns = FAKE_DNS_IP + ":" + DNS_DEFAULT_PORT;
 
     // Strip leading "/" from ip:port string.
-    //Log.d("BraveDNS","start connectTunnel - Before GoIntraListener");
     listener = new GoIntraListener(vpnService);
     //TODO : The below statement is incorrect, adding the dohURL as const for testing
     String dohURL = PersistentState.Companion.getServerUrl(vpnService);
-    //Log.d("BraveDNS","start connectTunnel - dohURL : "+dohURL);
-    //String dohURL = "https://fast.bravedns.com/hussain1";
     try {
       Transport transport = makeDohTransport(dohURL);
+
       tunnel = Tun2socks.connectIntraTunnel(tunFd.getFd(), fakeDns,
           transport, getProtector(), getBlocker(), listener);
-      //Log.d("BraveDNS","tunnel connected****");
-      //tunnel.setTunMode(Settings.DNSModePort, Settings.BlockModeFilter);
-      //Log.w("BraveVPN","DNS Mode : "+iDnsMode +" block Mode: "+ iBlockMode);
+
       //TODO : Value is harcoded in the setTunMode
       tunnel.setTunMode(iDnsMode, iBlockMode);
-      //Log.d("BraveDNS","tunnel set to DNS mode : "+iDnsMode +"Firewall Mode:"+iBlockMode);
     } catch (Exception e) {
       Log.e("VPN Exception Tag",e.getMessage(),e);
-      //tunnel = null;
       VpnController.Companion.getInstance().onConnectionStateChanged(vpnService, BraveVPNService.State.FAILING);
     }
   }
 
+  /**
+   * When the tunnel is set with BlockmodeSink,
+   * all the traffic flowing through the VPN will be dropped.
+   */
   public void setSinkTunnelMode(){
     this.blockMode = Settings.BlockModeSink;
     tunnel.setTunMode(this.dnsMode, this.blockMode);
   }
 
+  /**
+   * When the tunnel is set with BlockModeFilter,
+   * all the traffic flowing through the VPN will be filtered, with the configuration.
+   */
   public void setFilterTunnelMode(){
     this.blockMode = Settings.BlockModeFilter;
     tunnel.setTunMode(this.dnsMode,this.blockMode);
@@ -162,10 +155,6 @@ public class GoVpnAdapter {
           .addAddress(LanIp.GATEWAY.make(IPV4_TEMPLATE), IPV4_PREFIX_LENGTH)
           .addRoute("0.0.0.0", 0)
           .addDnsServer(LanIp.DNS.make(IPV4_TEMPLATE));
-        /*if(PersistentState.Companion.getFirewallMode(vpnService) != 2) {
-          builder.addDisallowedApplication(vpnService.getPackageName());
-      }*/
-      //Log.d("BraveDNS","Builder creation completed ***  VPNService establish is called from builder");
       return builder.establish();
     } catch (Exception e) {
       Log.e("VPN Tag",e.getMessage(),e);
@@ -210,15 +199,7 @@ public class GoVpnAdapter {
     //TODO : Check the below code
     @NonNull String realUrl = PersistentState.Companion.expandUrl(vpnService, url);
     String dohIPs = getIpString(vpnService, realUrl);
-    //Log.d("BraveDNS","start makeDohTransport - realUrl : "+realUrl);
-    //Log.d("BraveDNS","start makeDohTransport - dohIPs : "+dohIPs);
-    try{
-      return Tun2socks.newDoHTransport(realUrl, dohIPs, getProtector(), listener);
-    }catch(Exception e){
-      Log.e("BraveVPN","Exception : "+e.getMessage(),e);
-      VpnController.Companion.getInstance().onConnectionStateChanged(vpnService, BraveVPNService.State.FAILING);
-    }
-    return null;
+    return Tun2socks.newDoHTransport(realUrl, dohIPs, getProtector(), listener);
   }
 
   /**
@@ -227,7 +208,6 @@ public class GoVpnAdapter {
    * has no effect.
    */
   public synchronized void updateDohUrl(int dnsMode, int blockMode) {
-    //Log.d("VPN Tag","updateDohUrl call** DNS mode: "+dnsMode + " firewall mode: "+blockMode );
     if (tunFd == null) {
       // Adapter is closed.
       return;
@@ -253,14 +233,12 @@ public class GoVpnAdapter {
       //So handling the exception in makeDohTransport and not resetting the tunnel. Below is the exception thrown from Tun2socks.aar
       //I/GoLog: Failed to read packet from TUN: read : bad file descriptor
       doh.Transport dohTransport = makeDohTransport(url);
-      if(dohTransport != null)
-          tunnel.setDNS(dohTransport);
+      tunnel.setDNS(dohTransport);
     } catch (Exception e) {
       Log.e("VPN Tag",e.getMessage(),e);
       tunnel.disconnect();
       tunnel = null;
-      VpnController.Companion.getInstance().onConnectionStateChanged(
-              vpnService, BraveVPNService.State.FAILING);
+      VpnController.Companion.getInstance().onConnectionStateChanged(vpnService, BraveVPNService.State.FAILING);
     }
   }
 

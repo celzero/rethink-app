@@ -24,14 +24,13 @@
         android:layout_marginRight="40dp"
         android:layout_marginBottom="10dp"
         android:padding="5dp"
-        android:textColor="@color/colorAccent"
         android:text="Enter a valid DNS-over-HTTPS endpoint"
+        android:textColor="@color/colorAccent"
         app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_top" />
 
     <EditText
         android:id="@+id/dialog_custom_url_edit_text"
         style="@style/Widget.AppCompat.EditText"
-        app:layout_constraintRight_toLeftOf="parent"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="40dp"
@@ -42,7 +41,23 @@
         android:hint="Enter Custom DNS URL"
         android:padding="10dp"
         android:text="https://"
+        app:layout_constraintRight_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_text" />
+
+    <TextView
+        android:id="@+id/dialog_custom_url_failure_text"
+        style="@style/TextAppearance.AppCompat.Body1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="10dp"
+        android:padding="5dp"
+        android:visibility="gone"
+        android:text="Host connection failed. Try again."
+        android:textColor="@color/colorRed_A400"
+        app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_edit_text" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/dialog_custom_url_ok_btn"
@@ -54,7 +69,7 @@
         android:layout_marginBottom="10dp"
         android:text="Accept"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_edit_text" />
+        app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_failure_text" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/dialog_custom_url_cancel_btn"
@@ -67,6 +82,18 @@
         android:text="Cancel"
         android:textColor="@color/colorAccent"
         app:layout_constraintRight_toLeftOf="@id/dialog_custom_url_ok_btn"
-        app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_edit_text" />
+        app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_failure_text" />
+
+    <ProgressBar
+        android:id="@+id/dialog_custom_url_loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="60dp"
+        android:layout_marginBottom="10dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_failure_text" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

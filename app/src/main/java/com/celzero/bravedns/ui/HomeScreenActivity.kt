@@ -37,7 +37,6 @@ import java.lang.Exception
 class HomeScreenActivity : AppCompatActivity() {
 
     lateinit var internetManagerFragment: InternetManagerFragment
-    lateinit var permissionManagerFragment : PermissionManagerFragment
     lateinit var settingsFragment : SettingsFragment
     lateinit var homeScreenFragment: HomeScreenFragment
     lateinit var context: Context
@@ -50,7 +49,6 @@ class HomeScreenActivity : AppCompatActivity() {
 
     object GlobalVariable{
         var braveMode : Int = -1
-        //var appListSample =  HashMap<String, List<AppInfo>>()
         var appList : MutableMap<String, AppInfo> = HashMap()
         var categoryList : HashSet<String> = HashSet()
         var dnsMode = -1
@@ -61,7 +59,6 @@ class HomeScreenActivity : AppCompatActivity() {
         var appStartTime : Long = System.currentTimeMillis()
         var isBackgroundEnabled : Boolean = false
         var blockedCategoryList : MutableSet<String> = HashSet<String>()
-        var excludedPackageList : MutableSet<String> = HashSet<String>()
     }
 
     companion object {
@@ -107,7 +104,6 @@ class HomeScreenActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(BraveVPNService.braveScreenStateReceiver)
-        //unregisterReceiver(BraveVPNService.braveAutoStartReceiver)
     }
 
 
@@ -137,7 +133,6 @@ class HomeScreenActivity : AppCompatActivity() {
                             appInfo.isSystemApp = false
                             count += 1
                             if ((applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0) {
-                                //count += 1
                                 appInfo.isSystemApp = false
                             }
                             appInfo.isScreenOff = false
@@ -167,15 +162,7 @@ class HomeScreenActivity : AppCompatActivity() {
                 }
             }
 
-
-           // updateAppCategory()
-
-            //appList.entries.sortedWith(compareBy { it.value.appCategory })
-
-            //updateFragments()
-                //delay(1 * 60 * 100)
         }
-            //Log.w("DB","End of the loop for the DB")
     }
 
     private fun updateAppCategory() {
@@ -184,20 +171,12 @@ class HomeScreenActivity : AppCompatActivity() {
         appList.forEach {
             val finalURl = googlePlayStoreURL + it.key
             try {
-                Log.d("BraveDNS","finalURl:$finalURl")
                 val doc = Jsoup.connect(finalURl).get()
-                Log.d("BraveDNS","Doc: "+ doc.toString())
                 val link = doc.select("span[itemprop=genre]").first()
-                Log.d("BraveDNS","link: "+link.toString())
-                /*it.value.appCategory = link.text()
-                Log.d("BraveDNS","App Category -- :${it.key} -- ${it.value.appCategory}")
-                appList.put(it.key,it.value)*/
             } catch (exception: Exception) {
                 Log.d("BraveDNS", "Exception in updateAppCategory : " + exception.message)
             }
         }
-
-
     }
 
 
@@ -237,21 +216,11 @@ class HomeScreenActivity : AppCompatActivity() {
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.navigation_internet_manager -> {
-                println("Internet Manager")
-                /*supportFragmentManager.beginTransaction().replace(R.id.fragment_container, internetManagerFragment, internetManagerFragment.javaClass.getSimpleName())
-                    .commit()*/
                 supportFragmentManager.beginTransaction().replace(R.id.fragment_container, homeScreenFragment, homeScreenFragment.javaClass.getSimpleName())
                     .commit()
                 return@OnNavigationItemSelectedListener true
             }
-            /*R.id.navigation_permission_manager -> {
-                println("Permission Manager")
 
-                permissionManagerFragment = PermissionManagerFragment()
-                supportFragmentManager.beginTransaction().replace(R.id.fragment_container, permissionManagerFragment, permissionManagerFragment.javaClass.getSimpleName())
-                    .commit()
-                return@OnNavigationItemSelectedListener true
-            }*/
             R.id.navigation_settings -> {
                 println("Settings")
                 settingsFragment = SettingsFragment()

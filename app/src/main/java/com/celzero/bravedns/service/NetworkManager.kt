@@ -54,17 +54,17 @@ class NetworkManager(context: Context, networkListener: NetworkListener) {
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
         broadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                //Log.i("BraveVPN","Network Change Received")
                 connectivityChanged(intent)
             }
         }
 
         applicationContext!!.registerReceiver(this.broadcastReceiver, intentFilter)
-        //Log.i("BraveVPN","Network Change Register Completed")
         // Fire onNetworkConnected listener immediately if we are online.
-        val networkInfo: NetworkInfo = connectivityManager!!.getActiveNetworkInfo()
-        if (networkInfo != null && networkInfo.isConnected) {
-            networkListener.onNetworkConnected(networkInfo)
+        if(connectivityManager!!.getActiveNetworkInfo() != null) {
+            val networkInfo: NetworkInfo = connectivityManager!!.getActiveNetworkInfo()
+            if (networkInfo != null && networkInfo.isConnected) {
+                networkListener.onNetworkConnected(networkInfo)
+            }
         }
     }
 
@@ -86,8 +86,6 @@ class NetworkManager(context: Context, networkListener: NetworkListener) {
         val activeNetworkInfo = connectivityManager!!.activeNetworkInfo
         val intentNetworkInfo = 
             intent.getParcelableExtra<NetworkInfo>("networkInfo")
-        //Log.v("NetworkManager", "ACTIVE NETWORK $activeNetworkInfo")
-        //Log.v("NetworkManager", "INTENT NETWORK $intentNetworkInfo")
         if (networkListener == null) {
             return
         }

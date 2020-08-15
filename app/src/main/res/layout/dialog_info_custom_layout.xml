@@ -67,6 +67,7 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:drawablePadding="20dp"
+        android:visibility="gone"
         android:drawableLeft="@drawable/spinner_both"
         android:text="@string/hybrid_mode_info_title" />
     <TextView
@@ -75,6 +76,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:drawablePadding="20dp"
+        android:visibility="gone"
         android:lineSpacingExtra="5dp"
         android:padding="10dp"
         android:text="@string/hybrid_mode_info_explanation" />
