@@ -33,8 +33,8 @@ android {
         vectorDrawables.useSupportLibrary = true
         minSdkVersion 26
         targetSdkVersion 29
-        versionCode 2
-        versionName "0.2"
+        versionCode 3
+        versionName "0.3"
        /* splits {
              abi {
                  enable true
@@ -56,6 +56,10 @@ android {
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8
         }
+
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
     }
 
 }
