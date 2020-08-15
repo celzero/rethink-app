@@ -16,7 +16,15 @@ Not implemented yet, but it is almost done-- just a clean UI stands in the way (
 
 ### DNS over HTTPS client
 
-Almost all of the network related code, including DNS over HTTPS split tunnel, is a very minimal fork of the excellent [Jigsaw-Code/outline-go-tun2socks](https://github.com/Jigsaw-Code/outline-go-tun2socks) written in golang. A majority of work is on the UI with other parts remaining same as on [Jigsaw-Code/Intra](https://github.com/Jigsaw-Code/Intra/), and so the implementation underneath is pretty much the same. A split-tunnel traps requests sent to the VPN's DNS endpoint and relays it to a DNS over HTTPS endpoint of the user's choosing (currently limited to Cloudflare's 1.1.1.1 and AdGuard DNS; but BraveDNS' own resolver will soon follow suit) and logs the end-to-end latency, time, the request query and it answer.
+Almost all of the network related code, including DNS over HTTPS split tunnel, is a very minimal fork of the excellent [Jigsaw-Code/outline-go-tun2socks](https://github.com/Jigsaw-Code/outline-go-tun2socks) written in golang. A majority of work is on the UI with other parts remaining same as on [Jigsaw-Code/Intra](https://github.com/Jigsaw-Code/Intra/), and so the implementation underneath is pretty much the same. A split-tunnel traps requests sent to the VPN's DNS endpoint and relays it to a DNS over HTTPS endpoint of the user's choosing and logs the end-to-end latency, time, the request query and its answer.
+
+### BraveDNS Resolver
+
+A malware and ad-blocking DNS over HTTPS resolver run by BraveDNS (deployed to 200+ locations world-wide) is the default DNS endpoint on the app, though the user is free to change that. A configurable DNS resolver that lets users add or remove blacklists and whitelists, add rewrites, analyse DNS requests is launching late August, 2020.
+
+### Community
+- Join us on telegram: [t.me/bravedns](https://t.me/bravedns).
+- Email us: [hello@celzero.com](mailto:hello@celzero.com).
 
 ### What BraveDNS is not
 
