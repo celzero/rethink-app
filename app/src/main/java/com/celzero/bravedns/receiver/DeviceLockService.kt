@@ -2,22 +2,16 @@ package com.celzero.bravedns.receiver
 
 import android.app.KeyguardManager
 import android.app.Service
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import android.os.PowerManager
-import android.os.ResultReceiver
-import android.util.Log
-import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
-import kotlinx.coroutines.InternalCoroutinesApi
-import java.sql.Time
 import java.util.*
 
 
 
-class ScreenLockService  : Service(){
+class DeviceLockService  : Service(){
 
     private val timer = Timer()
     private var checkLockTask: CheckLockTask? = null
@@ -26,7 +20,6 @@ class ScreenLockService  : Service(){
         return null
     }
 
-    @InternalCoroutinesApi
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if(intent != null && intent.action == ACTION_CHECK_LOCK){
             checkLock(intent)
@@ -34,7 +27,6 @@ class ScreenLockService  : Service(){
         return super.onStartCommand(intent, flags, startId)
     }
 
-    @InternalCoroutinesApi
     private fun checkLock(intent: Intent) {
         val keyguardManager  =  getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
@@ -56,14 +48,17 @@ class ScreenLockService  : Service(){
             checkLockTask = CheckLockTask(this, delayIndex)
             /*Log.i("BraveDNS", java.lang.String.format("LM.checkLock: scheduling CheckLockTask[%x] for %d ms",
                     System.identityHashCode(checkLockTask), checkLockDelays.get(delayIndex)))*/
-            val task = CheckLockTask(this , checkLockDelays.get(delayIndex))
-            timer.schedule(task, checkLockDelays.get(delayIndex).toLong())
+            //val task = CheckLockTask(this , checkLockDelays.get(delayIndex))
+            timer.schedule(checkLockTask, checkLockDelays.get(delayIndex).toLong())
+            this.stopSelf()
         } else {
-            //Log.d("BraveDNS", "LM.checkLock: no need to schedule CheckLockTask")
             if (isProtected && isLocked) {
                 //Log.e("BraveDNS", "Block Traffic Now!")
                 if(PersistentState.getFirewallModeForScreenState(this) && !PersistentState.getScreenLockData(this)) {
                     PersistentState.setScreenLockData(this,true)
+                    checkLockTask?.cancel()
+                    timer.cancel()
+                    this.stopSelf()
                 }
             }
         }
@@ -108,7 +103,7 @@ class ScreenLockService  : Service(){
 
     class CheckLockTask(val context: Context, val delayIndex: Int) : TimerTask() {
         override fun run() {
-            val newIntent = Intent(context, ScreenLockService::class.java)
+            val newIntent = Intent(context, DeviceLockService::class.java)
             newIntent.action = ACTION_CHECK_LOCK
             newIntent.putExtra(EXTRA_CHECK_LOCK_DELAY_INDEX, getSafeCheckLockDelay(delayIndex + 1))
             context.startService(newIntent)
