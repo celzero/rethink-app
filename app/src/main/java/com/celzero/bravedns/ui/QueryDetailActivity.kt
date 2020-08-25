@@ -4,8 +4,11 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.os.Handler
+import android.os.SystemClock
 import android.util.Log
+import android.view.KeyEvent
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -21,8 +24,10 @@ import com.celzero.bravedns.net.dns.DnsPacket
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.PersistentState.Companion.getMedianLatency
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.VpnState
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.median50
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.snackbar.Snackbar
 import java.net.InetAddress
@@ -105,8 +110,6 @@ class QueryDetailActivity  : AppCompatActivity() {
             topLayoutRL.visibility = View.VISIBLE
         }
 
-
-
         currentDNSUrl.text = PersistentState.getServerUrl(this)
 
         if (urlSpinner != null) {
@@ -133,13 +136,21 @@ class QueryDetailActivity  : AppCompatActivity() {
 
             urlSpinner.onItemSelectedListener = object :
                 AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(parent: AdapterView<*>,view: View,position: Int, id: Long) {
+                override fun onItemSelected(
+                    parent: AdapterView<*>,
+                    view: View,
+                    position: Int,
+                    id: Long
+                ) {
+
                     if (position == SPINNER_VALUE_BRAVE_COMING_SOON) {
-                        val snackbar = Snackbar.make(view, resources.getString(R.string.brave_launching_soon),
-                            Snackbar.LENGTH_INDEFINITE).setAction("SUBSCRIBE") {
-                                val intent = Intent(context, FaqWebViewActivity::class.java)
-                                intent.putExtra("url", "https://www.bravedns.com/#subsec")
-                                startActivity(intent)
+                        val snackbar = Snackbar.make(
+                            view, resources.getString(R.string.brave_launching_soon),
+                            Snackbar.LENGTH_INDEFINITE
+                        ).setAction("SUBSCRIBE") {
+                            val intent = Intent(context, FaqWebViewActivity::class.java)
+                            intent.putExtra("url", "https://www.bravedns.com/#subsec")
+                            startActivity(intent)
                         }
                         snackbar.show()
                         if (PersistentState.getCustomURLBool(context)) {
@@ -164,6 +175,17 @@ class QueryDetailActivity  : AppCompatActivity() {
                         PersistentState.setCustomURLBool(context, false)
                         currentDNSUrl.text = urlValues[position]
                     }
+
+                    object : CountDownTimer(1000, 500) {
+                        override fun onTick(millisUntilFinished: Long) {
+                            urlSpinner.isEnabled = false
+                        }
+
+                        override fun onFinish() {
+                            urlSpinner.isEnabled = true
+                        }
+                    }.start()
+
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>) {
@@ -176,7 +198,11 @@ class QueryDetailActivity  : AppCompatActivity() {
             showDialogForDNSInfo()
         }
 
-        latencyTxt.setText("Latency: " + PersistentState.getMedianLatency(this) + "ms")
+        median50.observe(this, androidx.lifecycle.Observer {
+            latencyTxt.setText("Latency: "+median50.value.toString() + "ms")
+        })
+
+        //latencyTxt.setText("Latency: " + getMedianLatency(this) + "ms")
         queryCountTxt.setText("Lifetime Queries: " + PersistentState.getNumOfReq(this))
 
     }
@@ -335,7 +361,7 @@ class QueryDetailActivity  : AppCompatActivity() {
 
     companion object {
         private var adapter: QueryAdapter? = null
-        private const val BLOCKED_RESPONSE_TYPE = "0.0.0.0"
+
 
         fun updateStatsDisplay(numRequests: Long, transaction: Transaction) {
             showTransaction(transaction)
@@ -343,25 +369,6 @@ class QueryDetailActivity  : AppCompatActivity() {
 
         private fun showTransaction(transaction: Transaction) {
             if(adapter != null) {
-                var packet: DnsPacket? = null
-                try {
-                    if(transaction.response != null)
-                       packet = DnsPacket(transaction.response)
-                } catch (e: ProtocolException) {
-                    Log.e("BraveDNS ProtocolException", e.message, e)
-                }
-
-                if (packet != null) {
-                    val addresses: List<InetAddress> = packet.getResponseAddresses()
-                    if (addresses.size > 0) {
-                        val destination = addresses[0]
-                        //val countryCode: String = getCountryCode(destination, adapter!!.activity)
-                        if (destination.hostAddress.contains(BLOCKED_RESPONSE_TYPE)) {
-                            transaction.response
-                            PersistentState.setBlockedReq(adapter!!.activity)
-                        }
-                    }
-                }
                 adapter!!.add(transaction)
                 adapter!!.notifyDataSetChanged()
             }
@@ -381,6 +388,15 @@ class QueryDetailActivity  : AppCompatActivity() {
                 return i
         }
         return -1
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        finish()
+        return super.onKeyDown(keyCode, event)
+    }
+
+    override fun onBackPressed() {
+        finish()
     }
 
 }

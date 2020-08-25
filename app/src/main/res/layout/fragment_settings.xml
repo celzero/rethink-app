@@ -2,344 +2,379 @@
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    app:layout_scrollFlags="scroll|enterAlways"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    app:layout_scrollFlags="scroll|enterAlways">
 
 
- <LinearLayout
-     android:layout_width="match_parent"
-     android:layout_height="match_parent"
-     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-     android:orientation="vertical">
-
-     <LinearLayout
-         android:orientation="horizontal"
-         android:layout_width="match_parent"
-         android:weightSum="1"
-         android:padding="15dp"
-         android:layout_height="wrap_content">
-         <LinearLayout
-             android:layout_width="0dp"
-             android:layout_height="match_parent"
-             android:layout_weight="0.33"
-             android:gravity="center"
-             android:orientation="vertical"/>
-         <LinearLayout
-             android:layout_width="0dp"
-             android:layout_height="match_parent"
-             android:layout_weight="0.33"
-             android:gravity="center"
-             android:orientation="vertical">
-
-             <androidx.appcompat.widget.AppCompatImageView
-                 android:id="@+id/settings_app_icon"
-                 android:layout_width="wrap_content"
-                 android:layout_height="match_parent"
-                 android:layout_gravity="center"
-                 android:padding="5dp"
-                 android:src="@drawable/conf_dns_icon_black" />
-
-         </LinearLayout>
-         <LinearLayout
-             android:layout_width="0dp"
-             android:layout_height="match_parent"
-             android:layout_weight="0.33"
-             android:weightSum="1"
-             android:orientation="vertical">
-
-             <androidx.appcompat.widget.AppCompatTextView
-                 android:id="@+id/settings_app_faq_icon"
-                 android:layout_width="wrap_content"
-                 android:layout_height="match_parent"
-                 android:layout_gravity="right"
-                 android:padding="5dp"
-                 android:drawableTop="@drawable/ic_faq" />
-
-         </LinearLayout>
-
-     </LinearLayout>
-
-    <RadioGroup
-        android:id="@+id/setting_app_mode_radio_group"
-        android:checkedButton="@+id/radio_button_1"
+    <LinearLayout
         android:layout_width="match_parent"
-        app:layout_constraintTop_toBottomOf="@id/setting_url_ll"
-        android:padding="10dp"
-        android:visibility="gone"
-        android:layout_margin="10dp"
-        android:backgroundTintMode="src_in"
-        android:layout_height="wrap_content">
-        <RadioButton
-            android:id="@+id/radio_button_1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textColor="@color/primaryText"
-            android:text="@string/mode_dns"/>
-        <RadioButton
-            android:id="@+id/radio_button_2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textColor="@color/primaryText"
-            android:text="@string/mode_dns_firewall"/>
-        <RadioButton
-            android:id="@+id/radio_button_3"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textColor="@color/primaryText"
-            android:text="@string/mode_firewall"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    </RadioGroup>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/setting_firewall_layout"
-        app:layout_constraintTop_toBottomOf="@id/setting_app_mode_radio_group"
-        android:layout_width="match_parent"
-        android:layout_margin="10dp"
-        app:cardElevation="@dimen/activity_horizontal_margin"
-        android:elevation="10dp"
-        android:layout_height="wrap_content">
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:padding="10dp"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="15dp"
+            android:weightSum="1">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Firewall"
-                android:textSize="20sp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                style="@style/TextAppearance.AppCompat.Headline"
-                android:paddingTop="5dp"
-                android:textColor="@color/secondaryText"/>
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/TextAppearance.AppCompat.Subhead"
-                android:text="@string/firewall_explanation_text"
-                android:lineSpacingExtra="5dp"
-                android:gravity="center_vertical"
-                android:paddingLeft="30dp"
-                android:paddingRight="20dp"
-                android:paddingTop="25dp"
-                />
-
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/configure_firewall_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Configure Firewall"
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.33"
                 android:gravity="center"
-                android:padding="10dp"
-                android:layout_marginTop="30dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/button_background_ripple"
-                style="@style/TextAppearance.AppCompat.Widget.Button"
-                android:textColor="@color/primaryText"/>
+                android:orientation="vertical" />
 
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.33"
+                android:gravity="center"
+                android:orientation="vertical">
 
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/settings_app_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:padding="5dp"
+                    android:src="@drawable/conf_dns_icon_black" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.33"
+                android:orientation="vertical"
+                android:weightSum="1">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/settings_app_faq_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="right"
+                    android:drawableTop="@drawable/ic_faq"
+                    android:padding="5dp" />
+
+            </LinearLayout>
 
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/settings_app_mgr_layout"
-        app:layout_constraintTop_toBottomOf="@id/setting_firewall_layout"
-        android:layout_width="match_parent"
-        app:cardCornerRadius="10dp"
-        android:layout_margin="10dp"
-        app:cardElevation="@dimen/activity_horizontal_margin"
-        android:visibility="gone"
-        android:elevation="10dp"
-        android:layout_height="wrap_content">
-        <LinearLayout
-            android:orientation="vertical"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/setting_firewall_layout"
             android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:padding="10dp"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:elevation="10dp"
+            app:cardElevation="@dimen/activity_horizontal_margin">
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Application Manager"
-                style="@style/TextAppearance.AppCompat.Headline"
-                android:textSize="20sp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:paddingTop="5dp"
-                android:textColor="@color/secondaryText"/>
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="10dp">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/app_mgr_explanation_text"
-                style="@style/TextAppearance.AppCompat.Subhead"
-                android:gravity="center_vertical"
-                android:lineSpacingExtra="5dp"
-                android:paddingLeft="30dp"
-                android:paddingRight="20dp"
-                android:paddingTop="25dp"
-                android:textColor="@color/primaryText"/>
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.AppCompat.Headline"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="20dp"
+                    android:paddingTop="5dp"
+                    android:paddingRight="20dp"
+                    android:text="Firewall"
+                    android:textColor="@color/secondaryText"
+                    android:textSize="20sp" />
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/configure_app_mgr_btn"
-                android:visibility="visible"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Configure App Manager"
-                android:gravity="center"
-                android:padding="10dp"
-                android:layout_marginTop="30dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginBottom="10dp"
-                android:textColor="@color/primaryText"
-                android:background="@drawable/button_background_ripple"
-                style="@style/TextAppearance.AppCompat.Widget.Button.Colored"/>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:lineSpacingExtra="5dp"
+                    android:paddingLeft="30dp"
+                    android:paddingTop="25dp"
+                    android:paddingRight="20dp"
+                    android:text="@string/firewall_explanation_text" />
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/settings_view_logs_layout"
-        app:layout_constraintTop_toBottomOf="@id/settings_app_mgr_layout"
-        android:layout_width="match_parent"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        app:cardElevation="@dimen/activity_horizontal_margin"
-        android:elevation="10dp"
-        android:layout_marginBottom="60dp"
-        android:layout_height="wrap_content">
-        <LinearLayout
-            android:orientation="vertical"
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/configure_firewall_btn"
+                    style="@style/TextAppearance.AppCompat.Widget.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/button_background_ripple"
+                    android:backgroundTint="@color/button_background_tint"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="Configure Firewall"
+                    android:textColor="@color/primaryText" />
+
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/settings_app_mgr_layout"
             android:layout_width="match_parent"
-            android:padding="10dp"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:elevation="10dp"
+            android:visibility="gone"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="@dimen/activity_horizontal_margin"
+            app:layout_constraintTop_toBottomOf="@id/setting_firewall_layout">
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="DNS"
-                android:textSize="20sp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:paddingTop="5dp"
-                style="@style/TextAppearance.AppCompat.Headline"
-                android:textColor="@color/secondaryText"/>
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="10dp">
 
-            <androidx.appcompat.widget.AppCompatTextView
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.AppCompat.Headline"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="20dp"
+                    android:paddingTop="5dp"
+                    android:paddingRight="20dp"
+                    android:text="Application Manager"
+                    android:textColor="@color/secondaryText"
+                    android:textSize="20sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:lineSpacingExtra="5dp"
+                    android:paddingLeft="30dp"
+                    android:paddingTop="25dp"
+                    android:paddingRight="20dp"
+                    android:text="@string/app_mgr_explanation_text"
+                    android:textColor="@color/primaryText" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/configure_app_mgr_btn"
+                    style="@style/TextAppearance.AppCompat.Widget.Button.Colored"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/button_background_ripple"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="Configure App Manager"
+                    android:textColor="@color/primaryText"
+                    android:visibility="visible" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/settings_view_logs_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:elevation="10dp"
+            app:cardElevation="@dimen/activity_horizontal_margin"
+            app:layout_constraintTop_toBottomOf="@id/settings_app_mgr_layout">
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:lineSpacingExtra="5dp"
-                android:text="@string/network_queries_explanation_text"
-                style="@style/TextAppearance.AppCompat.Subhead"
-                android:gravity="center_vertical"
-                android:paddingLeft="30dp"
-                android:paddingRight="20dp"
-                android:paddingTop="25dp"
-                android:textColor="@color/primaryText"/>
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.AppCompat.Headline"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="20dp"
+                    android:paddingTop="5dp"
+                    android:paddingRight="20dp"
+                    android:text="DNS"
+                    android:textColor="@color/secondaryText"
+                    android:textSize="20sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:lineSpacingExtra="5dp"
+                    android:paddingLeft="30dp"
+                    android:paddingTop="25dp"
+                    android:paddingRight="20dp"
+                    android:text="@string/network_queries_explanation_text"
+                    android:textColor="@color/primaryText" />
 
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/view_queries_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/TextAppearance.AppCompat.Widget.Button.Colored"
-                android:text="View logs"
-                android:gravity="center"
-                android:padding="10dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginBottom="10dp"
-                android:layout_marginTop="30dp"
-                android:background="@drawable/button_background_ripple"
-                android:textColor="@color/primaryText"/>
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/view_queries_btn"
+                    style="@style/TextAppearance.AppCompat.Widget.Button.Colored"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/button_background_ripple"
+                    android:backgroundTint="@color/button_background_tint"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="View DNS logs"
+                    android:textColor="@color/primaryText" />
 
 
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
-     <androidx.appcompat.widget.AppCompatButton
-     android:id="@+id/sample_test"
-     android:visibility="gone"
-         android:layout_width="match_parent"
-         android:layout_height="match_parent"
-         android:text="Test"/>
-
-    <androidx.cardview.widget.CardView
-        app:layout_constraintTop_toBottomOf="@id/settings_app_mgr_layout"
-        android:layout_width="match_parent"
-        android:layout_margin="10dp"
-        android:visibility="gone"
-        app:cardElevation="@dimen/activity_horizontal_margin"
-        android:layout_height="wrap_content">
-        <LinearLayout
-            android:orientation="vertical"
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="80dp"
+            android:elevation="10dp"
             android:visibility="visible"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            app:cardElevation="@dimen/activity_horizontal_margin"
+            app:layout_constraintTop_toBottomOf="@id/view_queries_btn">
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Settings"
-                style="@style/TextAppearance.AppCompat.Headline"
-                android:textSize="20sp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:paddingTop="5dp"
-                android:textColor="@color/secondaryText"/>
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/settings_explanation_text"
-                android:gravity="center_vertical"
-                style="@style/TextAppearance.AppCompat.Body1"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:paddingTop="5dp"
-                android:textColor="@color/primaryText"/>
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/configure_settings_btn"
-                android:layout_width="match_parent"
-                style="@style/TextAppearance.AppCompat.Widget.Button.Colored"
-                android:layout_height="wrap_content"
-                android:text="Settings"
-                android:gravity="center"
+                android:orientation="vertical"
                 android:padding="10dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginBottom="10dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/button_background_ripple"
-                android:textColor="@color/primaryText"/>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+                android:visibility="visible">
 
-    <!--<androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/setting_apply"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Apply"
-        android:background="@color/colorPrimary"
-        android:backgroundTint="@color/colorPrimaryDark"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_margin="40dp"
-        app:layout_constraintTop_toBottomOf="@id/setting_url_ll"/>-->
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.AppCompat.Headline"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="20dp"
+                    android:paddingTop="5dp"
+                    android:paddingRight="20dp"
+                    android:text="Network Monitor"
+                    android:textColor="@color/secondaryText"
+                    android:textSize="20sp" />
 
- </LinearLayout>
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:lineSpacingExtra="5dp"
+                    android:paddingLeft="30dp"
+                    android:paddingTop="25dp"
+                    android:paddingRight="20dp"
+                    android:text="@string/settings_connection_tracker_explanation_text"
+                    android:textColor="@color/primaryText" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/configure_conn_tracker_btn"
+                    style="@style/TextAppearance.AppCompat.Widget.Button.Colored"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/button_background_ripple"
+                    android:backgroundTint="@color/button_background_tint"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="View Network Logs"
+                    android:textColor="@color/primaryText" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/sample_test"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Test"
+            android:visibility="gone" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:visibility="gone"
+            app:cardElevation="@dimen/activity_horizontal_margin"
+            app:layout_constraintTop_toBottomOf="@id/settings_app_mgr_layout">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.AppCompat.Headline"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="20dp"
+                    android:paddingTop="5dp"
+                    android:paddingRight="20dp"
+                    android:text="Settings"
+                    android:textColor="@color/secondaryText"
+                    android:textSize="20sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.AppCompat.Body1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="20dp"
+                    android:paddingTop="5dp"
+                    android:paddingRight="20dp"
+                    android:text="@string/settings_explanation_text"
+                    android:textColor="@color/primaryText" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/configure_settings_btn"
+                    style="@style/TextAppearance.AppCompat.Widget.Button.Colored"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/button_background_ripple"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="Settings"
+                    android:textColor="@color/primaryText" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!--<androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/setting_apply"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Apply"
+            android:background="@color/colorPrimary"
+            android:backgroundTint="@color/colorPrimaryDark"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_margin="40dp"
+            app:layout_constraintTop_toBottomOf="@id/setting_url_ll"/>-->
+
+    </LinearLayout>
 </androidx.core.widget.NestedScrollView>

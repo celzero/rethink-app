@@ -19,12 +19,18 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.celzero.bravedns.net.dns.DnsPacket;
 import com.celzero.bravedns.net.doh.Transaction;
 import com.celzero.bravedns.ui.HomeScreenActivity;
 import com.google.common.collect.Iterables;
+import com.google.common.math.Quantiles;
 
+import java.net.InetAddress;
+import java.net.ProtocolException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -49,7 +55,7 @@ public class QueryTracker {
   private long numRequests = 0;
   private Queue<Transaction> recentTransactions = new LinkedList<>();
   private Queue<Long> recentActivity = new LinkedList<>();
-  private SortedSet<Integer> queryList = new TreeSet();
+  private List<Integer> queryList = new ArrayList<Integer>();
   private boolean historyEnabled = true;
   private Transaction transaction = null;
 
@@ -112,9 +118,24 @@ public class QueryTracker {
 
     recentActivity.add(transaction.queryTime);
     PersistentState.Companion.setNumOfReq(context);
-    /*while (recentActivity.peek() + ACTIVITY_MEMORY_MS < transaction.queryTime) {
-      recentActivity.remove();
-    }*/
+    DnsPacket packet = null;
+    String BLOCKED_RESPONSE_TYPE = "0.0.0.0";
+    try {
+      if (transaction.response != null)
+        packet = new DnsPacket(transaction.response);
+    } catch (ProtocolException e) {
+      Log.e("BraveDNS ProtocolException", e.getMessage(), e);
+    }
+    if (packet != null) {
+      List<InetAddress> addresses  = packet.getResponseAddresses();
+      if (addresses.size() > 0) {
+        InetAddress destination = addresses.get(0);
+        //val countryCode: String = getCountryCode(destination, adapter!!.activity)
+        if (destination.getHostAddress().contains(BLOCKED_RESPONSE_TYPE)) {
+          PersistentState.Companion.setBlockedReq(context);
+        }
+      }
+    }
 
     if (historyEnabled) {
       recentTransactions.add(transaction);
@@ -130,16 +151,16 @@ public class QueryTracker {
       numRequests = PersistentState.Companion.getNumOfReq(context);
       if (!queryList.isEmpty()){
         if (queryList.size() > HISTORY_SIZE) {
-          int val = queryList.last();
+          int val = queryList.size()-1;
           queryList.remove(val);
         }
     }
       int val = (int) (transaction.responseTime - transaction.queryTime);
       queryList.add(val);
+      Collections.sort(queryList);
       int positionP50 = (int) (queryList.size() * 0.50);
-      val = Iterables.get(queryList, positionP50);
+      val = queryList.get(positionP50);
       PersistentState.Companion.setMedianLatency(context, val);
-
     }
   }
 }

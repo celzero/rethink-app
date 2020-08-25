@@ -5,12 +5,10 @@
     <string name="title_internet_manager">Internet \n Manager</string>
     <string name="title_permission_manager">Permission \n Manager</string>
     <string name="title_tools">Tools</string>
+    <string name="title_about">About</string>
     <string name="title_settings">Configure</string>
     <string name="txt_im_topic">Internet Manager</string>
-    <string name="txt_im_adfree_internet">AD Free Internet</string>
-    <string name="txt_im_adfree_internet_desc">Removes the ad across all the applications</string>
-    <string name="txt_im_censor_internet">Censor Free Internet</string>
-    <string name="txt_im_censor_internet_desc">Content Blocking across the applications</string>
+
     <string name="txt_im_tip">Tip : Firewall prevents apps from accessing the Internet over Wifi or Mobile data. Since most forms of surveillance require the data to be sent over to a central repository, firewalling them effectively mitigates the threat. \n\nThere\'s a class of apps that require Internet connection all day, and those are usually communication apps like Gmail and messenger apps like WhatsApp. Firewalling them might not be an option, and that\'s why we built content blockers. </string>
 
     <string name="txt_pm_topic">Permission Manager</string>
@@ -62,11 +60,11 @@
     <string name="skip">Skip</string>
     <string name="start">Done</string>
 
-    <string name="slide_1_title">Safe Browsing</string>
-    <string name="slide_1_desc">Refuse connections to malicious websites and servers: Fake websites often steal critical personal information like bank accounts and passwords to emails.</string>
+    <string name="slide_2_title">Welcome</string>
+    <string name="slide_2_desc">BraveDNS is the easiest way to monitor app activity, circumvent Internet censorship, and firewall apps on your Android device.</string>
 
-    <string name="slide_2_title">Firewall</string>
-    <string name="slide_2_desc">Firewall prevents apps from accessing the Internet over Wifi or Mobile data. Since most forms of surveillance require the data to be sent over to a central repository, firewalling them effectively mitigates the threat</string>
+    <string name="slide_1_title">Welcome</string>
+    <string name="slide_1_desc">Say hello to a safer, transparent, and secure Android.</string>
 
     <string name="slide_3_title">Permission Manager</string>
     <string name="slide_3_desc">Apps are often granted permissions to access location or storage, for instance, that could be revoked once they have served the purpose. This is tedious; however, to do it manually. Permissions Manager helps with automating this task.</string>
@@ -270,6 +268,10 @@
         View DNS queries this device has requested. Typically, one request is sent for each Internet connection established by any app: For example, loading a web page can result in tens of DNS queries.
     </string>
 
+    <string name="settings_connection_tracker_explanation_text" description="Explanation on the main screen about connection tracking screen">
+        Keep tabs on incoming and outgoing Internet traffic. BraveDNS firewall when enabled keeps track of connections an app makes to various endpoints on the Internet.
+    </string>
+
     <string name="settings_explanation_text" description="Explanation on the main screen for the users for settings screen.">
         A firewall to isolate apps completely from the Internet, or prevent them from making connections. Limiting access to the Internet helps prevent unwarranted data usage, as well as conserves battery.
     </string>
@@ -277,15 +279,11 @@
         All the applications will be firewalled when the phone is locked : Limiting background access to the Internet helps prevent unwarranted data usage as well as conserves battery.
     </string>
     <string name="universal_firewall_explanation">
-        Apply firewall rules on all installed applications based on device events, for example, firewall when the device is locked or when a particular app is not in use.
+        Apply firewall rules on all applications based on device events, for example, firewall when the device is locked or when a particular app is not in use.
     </string>
 
     <string name="category_firewall_explanation">
-        Choose application categories to firewall, for example, disallow the \'Games\' category to block internet access to all game apps. Note: These rules are applied independently of \'Universal Firewall\'.
-    </string>
-
-    <string name="application_firewall_explanation">
-        Choose individually among installed applications to firewall, for example, firewall the \'Calculator\' app to disallow all internet access to it. Note: These rules are applied independently of \'Universal Firewall\'.
+        Choose application categories to firewall: Disallow a category to block internet access to all apps in that category, or block them individually. Note: These rules are applied independently of \'Universal Firewall\'.
     </string>
 
     <string-array name="brave_dns_mode_names">
@@ -310,7 +308,7 @@
     </string>
 
     <string name="dns_mode_info_explanation">
-        Protects from DNS manipulation attacks which is the most common way Internet is censored. Filters your network traffic with blacklists that power popular ad-blockers. Communication or messaging apps, for instance, can\'t be firewalled altogether, but can be, instead, blocked from accessing certain server endpoints of known ad networks and trackers.
+        \u00BB Circumvent Internet censorship.\n\u00BB Prevent DNS manipulation attacks with encrypted DNS.\n\u00BB First line of defence against malware and other security threats.\n\u00BB Monitor DNS traffic.
     </string>
 
 
@@ -319,7 +317,7 @@
     </string>
 
     <string name="firewall_mode_info_explanation">
-        Blocks apps from connecting to the Internet. Since most forms of surveillance require the data sent over the network to a server, firewalling them effectively mitigates the threat.
+        \u00BB Firewall select apps from connecting to the Internet.\n\u00BB Monitor network activity of all apps.\n\u00BB Note: This feature may consume extra battery.
     </string>
 
 
@@ -340,7 +338,7 @@
     </string>
 
     <string name="alert_firewall_accessibility_explanation">
-        BraveDNS uses accessibility service to track which apps are in use(foreground) vs those that are not in use(background).
+        BraveDNS uses accessibility service to track which apps are in-use (foreground) versus those that are not in-use (background).
     </string>
 
     <string name="brave_dns_connect_prompt_firewall">
@@ -351,12 +349,16 @@
     </string>
 
     <string name="brave_dns_connect_mode_change_firewall">
-       Start Firewall / DNS+Firewall to configure apps.
+       Start Firewall / DNS+Firewall to configure Firewall.
     </string>
 
     <string name="brave_dns_connect_mode_change_dns">
-        Start DNS / DNS+Firewall to view logs
+        Start DNS / DNS+Firewall to view logs.
     </string>
+
+    <string name="brave_dns_connect_mode_change_connection">
+         Start Firewall / DNS+Firewall to view network logs.
+     </string>
 
     <string name="faq_web_link">
         https://www.bravedns.com/faq
@@ -370,9 +372,9 @@
 
     <string name="dns_mode_0_explanation">Does not block any DNS requests. Uses Cloudflare\'s 1.1.1.1 DNS endpoint.</string>
     <string name="dns_mode_1_explanation">Blocks malware and adult content. Uses Cloudflare\'s 1.1.1.3 DNS endpoint.</string>
-    <string name="dns_mode_2_explanation">Blocks malware, ads, and trackers. Uses BraveDNS\'s non-configurable basic endpoint.</string>
+    <string name="dns_mode_2_explanation">Blocks malware and more. Uses BraveDNS\'s non-configurable basic endpoint.</string>
     <string name="dns_mode_3_explanation">Set your own custom DNS-over-HTTPS endpoint.</string>
-    <string name="dns_mode_4_explanation">Blocks malware, ads, trackers. Provides in-depth analytics of your Internet traffic. Allows you to set custom blocklists and more. Coming soon.</string>
+    <string name="dns_mode_4_explanation">Configurable DNS endpoint: Provides in-depth analytics of your Internet traffic, allows you to set custom rules and more. Coming soon.</string>
 
     <string name="custom_url_error_host_failed">Host connection failed. Try again.</string>
     <string name="custom_url_error_invalid_url">Invalid URL</string>
@@ -380,5 +382,20 @@
 
 
     <string name="brave_launching_soon">"BraveDNS Pro launching soon. Subscribe for early access."</string>
+
+
+    <string name="about_bravedns_explantion">BraveDNS is the easiest way to monitor app activity, circumvent Internet censorship, and firewall apps on your Android device. </string>
+    <string name="about_bravedns_whoarewe">BraveDNS is a free and open-source project, led by ex-engineers from Amazon, IBM, and Scientific Games.</string>
+    <string name="about_bravedns_toreport_text">to report bugs and suggest features.</string>
+    <string name="about_join_telegram">Join the BraveDNS group on Telegram</string>
+    <string name="about_web">Links</string>
+    <string name="about_website">Visit bravedns.com</string>
+    <string name="about_github">Contribute on GitHub</string>
+    <string name="about_faq">View FAQs</string>
+    <string name="about_blog">Read our blog</string>
+    <string name="about_connect">Contact</string>
+    <string name="about_email">Email us</string>
+    <string name="about_twitter">Follow us on Twitter</string>
+    <string name="about_mozilla">BraveDNS is part of Mozilla Builders MVP program.</string>
 
 </resources>

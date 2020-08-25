@@ -1,465 +1,508 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
     android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    app:layout_scrollFlags="scroll|enterAlways"
-    android:fillViewport="true"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-<LinearLayout
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+    app:layout_scrollFlags="scroll|enterAlways">
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:weightSum="1"
-        android:padding="15dp"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.33"
-            android:gravity="center"
-            android:orientation="vertical"/>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="15dp"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.33"
+                android:gravity="center"
+                android:orientation="vertical" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.33"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/fhs_app_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:padding="5dp"
+                    android:src="@drawable/dns_icon_black" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_app_installed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="160 Apps\nInstalled"
+                    android:textColor="@color/primaryText"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.33"
+                android:gravity="center"
+                android:orientation="vertical" />
+
+        </LinearLayout>
+
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.33"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:padding="15dp"
+            android:weightSum="1">
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/fhs_brave_mode_spinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.8"
+                android:gravity="center" />
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/fhs_app_icon"
-                android:layout_width="wrap_content"
+                android:id="@+id/fhs_dns_mode_info"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
+                android:layout_weight="0.2"
                 android:padding="5dp"
-                android:src="@drawable/dns_icon_black" />
+                android:src="@drawable/brave_mode_info" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_app_installed"
-                android:layout_width="wrap_content"
-                android:visibility="gone"
-                android:layout_height="wrap_content"
-                android:text="160 Apps\nInstalled"
-                android:padding="5dp"
-                android:gravity="center"
-                android:textStyle="bold"
-                android:textColor="@color/primaryText"/>
+
         </LinearLayout>
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.33"
-            android:gravity="center"
-            android:orientation="vertical"/>
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="15dp"
-        android:layout_margin="5dp"
-        android:weightSum="1"
-        android:orientation="horizontal">
-
-        <androidx.appcompat.widget.AppCompatSpinner
-            android:id="@+id/fhs_brave_mode_spinner"
-            android:layout_width="0dp"
-            android:layout_weight="0.8"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:layout_height="wrap_content"/>
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/fhs_dns_mode_info"
-            android:layout_width="0dp"
-            android:layout_weight="0.2"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:padding="5dp"
-            android:src="@drawable/brave_mode_info" />
-
-
-    </LinearLayout>
-
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_margin="10dp"
-        app:cardElevation="@dimen/activity_horizontal_margin"
-        android:layout_height="wrap_content">
-    <LinearLayout
-        android:orientation="vertical"
-        android:visibility="visible"
-        android:layout_width="match_parent"
-        android:layout_weight="1"
-        android:weightSum="2"
-        android:layout_margin="5dp"
-        android:layout_height="wrap_content"
-        >
-        <LinearLayout
-            android:id="@+id/fhs_tile_show_firewall"
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:orientation="horizontal"
-            android:visibility="gone"
-            android:weightSum="3"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            app:cardElevation="@dimen/activity_horizontal_margin">
+
             <LinearLayout
-                android:id="@+id/fhs_ll_firewall"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
                 android:orientation="vertical"
-                android:padding="10dp"
-                android:layout_height="match_parent"
-                android:gravity="center_horizontal"
-                android:layout_weight="1">
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/fhs_tile_firewall_apps_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="28sp"
-                    android:textColor="@color/secondaryText"
-                    android:text="4/327" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="apps blocked"
-                        android:fontFamily="sans-serif-smallcaps"
-                        android:gravity="center"
-                        android:textColor="@color/primaryText"/>
-
-
-            </LinearLayout>
-            <LinearLayout
-                android:id="@+id/fhs_ll_app_mgr"
-                android:layout_width="0dp"
-                android:orientation="vertical"
-                android:padding="10dp"
                 android:visibility="visible"
-                android:layout_height="match_parent"
-                android:gravity="center_horizontal"
-                android:layout_weight="1">
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/fhs_tile_firewall_category_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/secondaryText"
-                    android:text="2"
-                    android:textSize="28sp"
-                     />
+                android:weightSum="2">
+
+                <LinearLayout
+                    android:id="@+id/fhs_tile_show_firewall"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    android:weightSum="3">
+
+                    <LinearLayout
+                        android:id="@+id/fhs_ll_firewall"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:padding="10dp">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/fhs_tile_firewall_apps_txt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="-"
+                            android:textColor="@color/secondaryText"
+                            android:textSize="28sp"
+                            android:tooltipText="Number of apps in the firewall blocklist" />
+
                         <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="center"
                             android:fontFamily="sans-serif-smallcaps"
+                            android:gravity="center"
+                            android:text="apps blocked"
+                            android:textColor="@color/primaryText"
+                            android:tooltipText="Number of apps in the firewall blocklist" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/fhs_ll_app_mgr"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:padding="10dp"
+                        android:visibility="visible">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/fhs_tile_firewall_category_txt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="2"
+                            android:textColor="@color/secondaryText"
+                            android:textSize="28sp"
+                            android:tooltipText="Number of app categories in the firewall blocklist" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-smallcaps"
+                            android:gravity="center"
                             android:text="categories blocked"
-                            android:textColor="@color/primaryText"/>
+                            android:textColor="@color/primaryText"
+                            android:tooltipText="Number of app categories in the firewall blocklist" />
 
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="0dp"
-                android:orientation="vertical"
-                android:padding="10dp"
-                android:visibility="visible"
-                android:layout_height="match_parent"
-                android:gravity="center_horizontal"
-                android:layout_weight="1">
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/fhs_tile_firewall_universal_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/secondaryText"
-                    android:text="0"
-                    android:textSize="28sp"
-                    />
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:text="universal firewall"
-                    android:textColor="@color/primaryText"/>
+                    </LinearLayout>
 
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:padding="10dp"
+                        android:visibility="visible">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/fhs_tile_firewall_universal_txt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:tooltipText="Number of active Universal Firewall rules"
+                            android:textColor="@color/secondaryText"
+                            android:textSize="28sp" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-smallcaps"
+                            android:tooltipText="Number of active Universal Firewall rules"
+                            android:gravity="center"
+                            android:text="universal firewall"
+                            android:textColor="@color/primaryText" />
+
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/fhs_tile_show_dns"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:visibility="visible"
+                    android:weightSum="3">
+
+                    <LinearLayout
+                        android:id="@+id/fhs_tile_dns_ll"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:padding="10dp">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/fhs_tile_dns_lifetime_txt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="-"
+                            android:textColor="@color/secondaryText"
+                            android:textSize="28sp"
+                            android:tooltipText="Total DNS queries requested" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-smallcaps"
+                            android:gravity="center"
+                            android:text="lifetime Qs"
+                            android:textColor="@color/primaryText"
+                            android:tooltipText="Total DNS queries requested" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/fhs_tile_dns_median_latency_ll"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:padding="10dp"
+                        android:visibility="visible">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/fhs_tile_dns_median_latency_txt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="-"
+                            android:textColor="@color/secondaryText"
+                            android:textSize="28sp"
+                            android:tooltipText="End-to-end median DNS request latency" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-smallcaps"
+                            android:gravity="center"
+                            android:text="latency"
+                            android:textColor="@color/primaryText"
+                            android:tooltipText="End-to-end median DNS request latency" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:padding="10dp"
+                        android:visibility="visible">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/fhs_tile_dns_trackers_blocked_txt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="-"
+                            android:textColor="@color/secondaryText"
+                            android:textSize="28sp"
+                            android:tooltipText="Total unresolved, unanswered queries" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-smallcaps"
+                            android:gravity="center"
+                            android:text="unresolved Qs"
+                            android:textColor="@color/primaryText"
+                            android:tooltipText="Total unresolved, unanswered queries" />
+
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/fhs_tile_show_dns_firewall"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    android:weightSum="3">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:padding="10dp">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/fhs_tile_dns_firewall_apps_blocked_txt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="-"
+                            android:textColor="@color/secondaryText"
+                            android:textSize="28sp"
+                            android:tooltipText="Number of apps in the firewall blocklist" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-smallcaps"
+                            android:gravity="center"
+                            android:text="apps blocked"
+                            android:textColor="@color/primaryText"
+                            android:tooltipText="Number of apps in the firewall blocklist" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:padding="10dp"
+                        android:visibility="visible">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/fhs_tile_dns_firewall_median_latency_txt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="-"
+                            android:tooltipText="End-to-end median DNS request latency"
+                            android:textColor="@color/secondaryText"
+                            android:textSize="28sp" />
+
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-smallcaps"
+                            android:gravity="center"
+                            android:tooltipText="End-to-end median DNS request latency"
+                            android:text="latency"
+                            android:textColor="@color/primaryText" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:padding="10dp"
+                        android:visibility="visible">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/fhs_tile_dns_firewall_trackers_blocked_txt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="-%"
+                            android:textColor="@color/secondaryText"
+                            android:textSize="28sp"
+                            android:tooltipText="Total unresolved, unanswered queries" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-smallcaps"
+                            android:gravity="center"
+                            android:text="unresolved qs"
+                            android:textColor="@color/primaryText"
+                            android:tooltipText="Total unresolved, unanswered queries" />
+
+                    </LinearLayout>
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
         <LinearLayout
-            android:id="@+id/fhs_tile_show_dns"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:orientation="horizontal"
-            android:visibility="visible"
-            android:weightSum="3"
-            android:layout_height="match_parent">
-            <LinearLayout
-                android:id="@+id/fhs_tile_dns_ll"
+            android:weightSum="1">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_configure_firewall"
+                style="@style/Widget.MaterialComponents.Chip.Action"
                 android:layout_width="0dp"
-                android:orientation="vertical"
-                android:padding="10dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:gravity="center_horizontal">
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/fhs_tile_dns_lifetime_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/secondaryText"
-                    android:text="35%"
-                    android:textSize="28sp"
-                     />
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:layout_weight="0.5"
+                android:padding="5dp"
+                android:text="Configure firewall"
+                android:textAlignment="center"
+                android:textColor="@color/secondaryText"
+                app:chipBackgroundColor="@color/colorPrimaryDark" />
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="lifetime queries"
-                        android:gravity="center"
-                        android:fontFamily="sans-serif-smallcaps"
-                        android:textColor="@color/primaryText"/>
-
-
-            </LinearLayout>
-            <LinearLayout
-                android:id="@+id/fhs_tile_dns_median_latency_ll"
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_view_logs"
+                style="@style/Widget.MaterialComponents.Chip.Action"
                 android:layout_width="0dp"
-                android:orientation="vertical"
-                android:visibility="visible"
-                android:layout_height="match_parent"
-                android:gravity="center_horizontal"
-                android:padding="10dp"
-                android:layout_weight="1">
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/fhs_tile_dns_median_latency_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/secondaryText"
-                    android:text="23 ms"
-                    android:textSize="28sp"
-                     />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="median latency"
-                        android:fontFamily="sans-serif-smallcaps"
-                        android:gravity="center"
-                        android:textColor="@color/primaryText"/>
-
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="0dp"
-                android:orientation="vertical"
-                android:visibility="visible"
-                android:layout_height="match_parent"
-                android:gravity="center_horizontal"
-                android:padding="10dp"
-                android:layout_weight="1">
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/fhs_tile_dns_trackers_blocked_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/secondaryText"
-                    android:text="2.5%"
-                    android:textSize="28sp"
-                    />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="trackers blocked"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:gravity="center"
-                    android:textColor="@color/primaryText"/>
-
-            </LinearLayout>
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="0.5"
+                android:padding="5dp"
+                android:text="View DNS logs"
+                android:textAlignment="center"
+                android:textColor="@color/secondaryText"
+                app:chipBackgroundColor="@color/colorPrimaryDark" />
         </LinearLayout>
+
         <LinearLayout
-            android:id="@+id/fhs_tile_show_dns_firewall"
             android:layout_width="match_parent"
-            android:orientation="horizontal"
-            android:visibility="gone"
-            android:weightSum="3"
-            android:layout_height="match_parent">
-            <LinearLayout
-                android:layout_width="0dp"
-                android:orientation="vertical"
-                android:padding="10dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:gravity="center_horizontal">
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/fhs_tile_dns_firewall_apps_blocked_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/secondaryText"
-                    android:text="33"
-                    android:textSize="28sp"
-                    />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="apps blocked"
-                    android:gravity="center"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:textColor="@color/primaryText"/>
-
-
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="0dp"
-                android:orientation="vertical"
-                android:visibility="visible"
-                android:layout_height="match_parent"
-                android:gravity="center_horizontal"
-                android:padding="10dp"
-                android:layout_weight="1">
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/fhs_tile_dns_firewall_median_latency_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/secondaryText"
-                    android:text="2.5%"
-                    android:textSize="28sp"
-                    />
-
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="median latency"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:gravity="center"
-                    android:textColor="@color/primaryText"/>
-
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="0dp"
-                android:orientation="vertical"
-                android:visibility="visible"
-                android:layout_height="match_parent"
-                android:gravity="center_horizontal"
-                android:padding="10dp"
-                android:layout_weight="1">
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/fhs_tile_dns_firewall_trackers_blocked_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/secondaryText"
-                    android:text="2.5%"
-                    android:textSize="28sp"
-                    />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="trackers blocked"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:gravity="center"
-                    android:textColor="@color/primaryText"/>
-
-            </LinearLayout>
-        </LinearLayout>
-    </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:weightSum="1">
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_configure_firewall"
-            android:layout_width="0dp"
-            style="@style/Widget.MaterialComponents.Chip.Action"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:padding="5dp"
-            android:textColor="@color/secondaryText"
-            app:chipBackgroundColor="@color/colorPrimaryDark"
-            android:textAlignment="center"
-            android:layout_marginRight="10dp"
-            android:text="Configure firewall"/>
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_view_logs"
-            android:layout_width="0dp"
-            style="@style/Widget.MaterialComponents.Chip.Action"
-            app:chipBackgroundColor="@color/colorPrimaryDark"
-            android:textAlignment="center"
-            android:padding="5dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:textColor="@color/secondaryText"
-            android:layout_weight="0.5"
-            android:text="View DNS logs"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="80dp"
-        android:gravity="bottom|center"
-        android:layout_weight="0.3"
-        android:orientation="vertical">
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/fhs_protection_level_txt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-smallcaps"
-            android:text="not connected"
-            android:textColor="@color/accent_bad"
-            android:textSize="16dp" />
-        <com.celzero.bravedns.animation.RippleBackground
-            android:id="@+id/content"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:rb_color="@color/rippleColor"
-            app:rb_duration="6000"
-            app:rb_radius="26dp"
-            app:rb_rippleAmount="3"
-            app:rb_scale="3"
-            app:rb_type="fillRipple">
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="80dp"
+            android:layout_weight="0.3"
+            android:gravity="bottom|center"
+            android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/fhs_dns_on_off_btn"
+                android:id="@+id/fhs_protection_level_txt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:background="@drawable/ic_icon_circle"
                 android:fontFamily="sans-serif-smallcaps"
-                android:gravity="center"
-                android:text="start"
-                android:textColor="@color/primaryText"
-                android:textSize="30sp"
-                android:textStyle="normal" />
-        </com.celzero.bravedns.animation.RippleBackground>
+                android:text="not connected"
+                android:textColor="@color/accent_bad"
+                android:textSize="16dp" />
+
+            <com.celzero.bravedns.animation.RippleBackground
+                android:id="@+id/content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:rb_color="@color/rippleColor"
+                app:rb_duration="6000"
+                app:rb_radius="26dp"
+                app:rb_rippleAmount="3"
+                app:rb_scale="3"
+                app:rb_type="fillRipple">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fhs_dns_on_off_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:background="@drawable/ic_icon_circle"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:gravity="center"
+                    android:text="start"
+                    android:textColor="@color/primaryText"
+                    android:textSize="30sp"
+                    android:textStyle="normal" />
+            </com.celzero.bravedns.animation.RippleBackground>
 
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/fhs_app_connected_desc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-smallcaps"
-            android:text="@string/dns_explanation_disconnected"
-            android:textColor="@color/primaryText"
-            android:textSize="16sp" />
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/fhs_app_uptime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="uptime"
-            android:fontFamily="sans-serif-smallcaps"
-            android:textColor="@color/secondaryText"
-            android:textSize="16sp" />
-    </LinearLayout>
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fhs_app_connected_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-smallcaps"
+                android:text="@string/dns_explanation_disconnected"
+                android:textColor="@color/textColorMain"
+                android:textSize="16sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fhs_app_uptime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-smallcaps"
+                android:text="uptime"
+                android:textColor="@color/textColorMain"
+                android:textSize="16sp" />
+        </LinearLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
 

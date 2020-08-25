@@ -11,36 +11,30 @@
         android:id="@+id/app_bar_permission_bouncer"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/illustration_firewall_bg"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
         android:fitsSystemWindows="true"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/toolbar_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
-            app:expandedTitleTextAppearance="@style/TextAppearance.AppCompat.Headline"
-
-            app:title="Firewall"
             app:collapsedTitleGravity="center_vertical"
             app:contentScrim="?attr/colorPrimary"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            app:expandedTitleTextAppearance="@style/TextAppearance.AppCompat.Headline"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:title="Firewall">
 
-            <ImageView
-                android:id="@+id/expandedImage"
+            <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:background="@color/colorPrimary"
-                android:scaleType="fitCenter"
-                android:visibility="gone"
-                android:src="@drawable/firewall_white"
-                app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.7"
-                android:contentDescription="TODO" />
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/illustration_firewall_bg"
+                android:tint="#959595"
+                android:tintMode="multiply" />
 
             <!-- <TextView
                   android:layout_width="match_parent"
@@ -63,5 +57,7 @@
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/firewall_scroll_list" android:id="@+id/app_scrolling_incl_firewall"/>
+    <include
+        android:id="@+id/app_scrolling_incl_firewall"
+        layout="@layout/firewall_scroll_list" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

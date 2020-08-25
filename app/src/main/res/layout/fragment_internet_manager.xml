@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:padding="5dp"
             android:textColor="@android:color/white"
-            android:text="@string/txt_im_adfree_internet"
+            android:text="a"
             android:textStyle="bold"
             android:textSize="18sp"
             />
@@ -64,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:padding="5dp"
                 android:textColor="@android:color/white"
-                android:text="@string/txt_im_adfree_internet_desc"
+                android:text="a"
                 android:textSize="14sp"
                 />
         </LinearLayout>
@@ -99,7 +99,7 @@
                 android:layout_height="wrap_content"
                 android:padding="5dp"
                 android:textColor="@android:color/white"
-                android:text="@string/txt_im_censor_internet"
+                android:text="a"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 />
@@ -108,7 +108,7 @@
                 android:layout_height="wrap_content"
                 android:padding="5dp"
                 android:textColor="@android:color/white"
-                android:text="@string/txt_im_censor_internet_desc"
+                android:text="a"
                 android:textSize="14sp"
                 />
         </LinearLayout>

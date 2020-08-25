@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/apk_parent"
-    android:layout_margin="1dp"
+    android:layout_margin="5dp"
+    android:background="@color/childListColor"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -17,7 +18,8 @@
             android:id="@+id/firewall_apk_list_top_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/colorPrimary"
+            android:background="@color/childListColor"
+
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -31,7 +33,8 @@
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
             android:orientation="vertical">
 
             <RelativeLayout
@@ -41,37 +44,40 @@
 
                 <ImageView
                     android:id="@+id/firewall_apk_icon_iv"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="10dp"
-                    android:layout_marginTop="10dp"
+
+                    android:layout_marginBottom="10dp"
                     android:maxWidth="60dp"
                     android:maxHeight="60dp"
                     tools:src="@color/primaryText" />
 
                 <TextView
                     android:id="@+id/firewall_apk_label_tv"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignTop="@+id/firewall_apk_icon_iv"
-                    android:layout_marginStart="16dp"
+                    android:layout_toStartOf="@id/firewall_toggle_wifi"
+                    android:layout_marginLeft="15dp"
                     android:layout_toEndOf="@+id/firewall_apk_icon_iv"
-                    android:ellipsize="end"
                     android:fontFamily="sans-serif-light"
-                    android:maxLines="1"
+                    android:padding="5dp"
                     android:text="Dummy Label"
                     android:textColor="@color/primaryText"
                     android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/firewall_apk_package_tv"
+                    android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/firewall_apk_label_tv"
                     android:layout_marginStart="16dp"
                     android:layout_toEndOf="@+id/firewall_apk_icon_iv"
                     android:ellipsize="end"
+                    android:padding="5dp"
                     android:fontFamily="sans-serif-thin"
                     android:maxLines="1"
                     android:text="Category : "
@@ -104,6 +110,15 @@
                     android:layout_alignParentRight="true"
                     android:textAlignment="center"
                     android:text="" />
+
+                <ProgressBar
+                    android:id="@+id/firewall_apk_progress_bar"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="8dp"
+                    android:gravity="center" />
 
             </RelativeLayout>
 

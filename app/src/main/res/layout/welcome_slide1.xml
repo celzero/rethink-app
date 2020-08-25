@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/light">
 
     <LinearLayout
@@ -10,40 +10,38 @@
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
         android:gravity="center_horizontal"
-        android:weightSum="1"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:weightSum="1">
 
         <androidx.appcompat.widget.AppCompatTextView
+            style="@style/TextAppearance.AppCompat.Headline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="0.2"
             android:gravity="center"
             android:text="@string/slide_1_title"
-            android:textColor="@color/secondaryText"
-            android:layout_weight="0.2"
-            android:textSize="@dimen/slide_title"
-            style="@style/TextAppearance.AppCompat.Headline"
-             />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/img_width_height"
-            android:layout_gravity="center"
-            android:layout_weight="0.5"
-            android:src="@drawable/illustrations_content_blocker" />
-
-
+            android:textColor="@color/textColorMain"
+            android:textSize="@dimen/slide_title" />
 
         <androidx.appcompat.widget.AppCompatTextView
+            style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.3"
+            android:layout_weight="0.1"
+            android:gravity="top|center"
             android:paddingLeft="@dimen/desc_padding"
             android:paddingRight="@dimen/desc_padding"
             android:text="@string/slide_1_desc"
-            android:gravity="top"
             android:textColor="@color/primaryText"
-            style="@style/TextAppearance.AppCompat.Body1"
-            android:textSize="@dimen/slide_desc" />
+            android:textSize="@dimen/activity_horizontal_margin" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="330dp"
+            android:layout_height="@dimen/img_width_height"
+            android:layout_gravity="center"
+            android:layout_weight="0.5"
+            android:src="@drawable/illustrations_welcome_1" />
+
 
     </LinearLayout>
 </RelativeLayout>
