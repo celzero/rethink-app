@@ -133,9 +133,10 @@ public class GoVpnAdapter {
    * When the tunnel is set with BlockmodeSink,
    * all the traffic flowing through the VPN will be dropped.
    */
-  public void setSinkTunnelMode(){
-    this.blockMode = Settings.BlockModeSink;
-    tunnel.setTunMode(this.dnsMode, this.blockMode);
+  public void setDNSTunnelMode(){
+    dnsMode = Settings.DNSModeIP;
+    blockMode = Settings.BlockModeNone;
+    tunnel.setTunMode(dnsMode, blockMode);
   }
 
   /**
@@ -143,8 +144,11 @@ public class GoVpnAdapter {
    * all the traffic flowing through the VPN will be filtered, with the configuration.
    */
   public void setFilterTunnelMode(){
-    this.blockMode = Settings.BlockModeFilter;
-    tunnel.setTunMode(this.dnsMode,this.blockMode);
+    if (VERSION.SDK_INT >= VERSION_CODES.O && VERSION.SDK_INT < VERSION_CODES.Q)
+      blockMode = Settings.BlockModeFilterProc;
+    else
+      blockMode = Settings.BlockModeFilter;
+    tunnel.setTunMode(dnsMode,blockMode);
   }
 
   private static ParcelFileDescriptor establishVpn(BraveVPNService vpnService) {

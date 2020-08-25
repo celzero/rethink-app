@@ -13,6 +13,7 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
+        android:usesCleartextTraffic="true"
         android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
@@ -21,6 +22,7 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.PermissionManagerActivity"
+            android:launchMode="singleInstance"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.HomeScreenActivity"
@@ -32,7 +34,9 @@
         <activity
             android:name=".ui.QueryDetailActivity"
             android:theme="@style/AppTheme"/>
+
         <activity android:name=".ui.WelcomeActivity"
+            android:launchMode="singleTask"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -40,11 +44,17 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.AppInfoActivity"
+            android:launchMode="singleInstance"
         android:theme="@style/AppTheme"/>
         <activity android:name=".ui.FaqWebViewActivity"
+            android:launchMode="singleInstance"
             android:theme="@style/AppTheme"/>
         <activity android:name=".sample.SampleExpandable"
-                    android:theme="@style/AppTheme"/>
+            android:launchMode="singleInstance"
+            android:theme="@style/AppTheme"/>
+        <activity
+            android:name=".ui.ConnectionTrackerActivity"
+            android:theme="@style/AppTheme" />
 
 
         <!--<receiver
@@ -133,7 +143,7 @@
             android:exported="false"
             android:stopWithTask="false">
             <intent-filter>
-                <action android:name="com.celzero.bravedns.Receiver.ScreenLockService.ACTION_START_SERVICE"/>
+                <action android:name="com.celzero.bravedns.receiver.DeviceLockService.ACTION_START_SERVICE"/>
             </intent-filter>
         </service>
 

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.celzero.bravedns.data.IPDetails
 
 class VpnController {
 
@@ -12,6 +13,7 @@ class VpnController {
         private var braveVpnService : BraveVPNService ? = null
         private var connectionState: BraveVPNService.State? = null
         private var tracker: QueryTracker? = null
+        private var ipTracker : IPTracker ?= null
 
         @Synchronized
         fun getInstance(): VpnController? {
@@ -108,5 +110,13 @@ class VpnController {
             tracker = QueryTracker(context)
         }
         return tracker
+    }
+
+    @Synchronized
+    fun getIPTracker(context : Context?): IPTracker? {
+        if(ipTracker == null){
+            ipTracker = IPTracker(context)
+        }
+        return ipTracker
     }
 }

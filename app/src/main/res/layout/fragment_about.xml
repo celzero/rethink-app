@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    app:layout_scrollFlags="scroll|enterAlways">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:weightSum="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="15dp"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.33"
+                android:gravity="center"
+                android:orientation="vertical" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.33"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/settings_app_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_about_icon" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.33"
+                android:orientation="vertical"
+                android:weightSum="1">
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@color/colorPrimaryDark"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:paddingLeft="20dp"
+                android:paddingTop="10dp"
+                android:paddingRight="20dp"
+                android:text="@string/about_bravedns_explantion" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:background="@color/colorPrimaryDark"
+                android:gravity="center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="@string/about_bravedns_whoarewe" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:background="@color/colorPrimaryDark"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_telegram"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/button_background_ripple"
+                android:backgroundTint="@color/button_background_tint"
+                android:drawableLeft="@drawable/ic_telegram"
+                android:drawablePadding="10dp"
+                android:gravity="center"
+                android:lineSpacingExtra="5dp"
+                android:padding="10dp"
+                android:text="@string/about_join_telegram" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingTop="3dp"
+                android:paddingBottom="10dp"
+                android:text="@string/about_bravedns_toreport_text"
+                android:textColor="@color/textColorMain" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:background="@color/colorPrimaryDark"
+            android:orientation="vertical"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:layout_marginLeft="20dp"
+                android:padding="5dp"
+                android:text="@string/about_web"
+                android:textColor="@color/secondaryText" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_website"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="80dp"
+                android:drawableLeft="@drawable/ic_website"
+                android:drawablePadding="20dp"
+                android:gravity="start"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/about_website"
+                android:textColor="@color/primaryText" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_github"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="80dp"
+                android:drawableLeft="@drawable/ic_github"
+                android:drawablePadding="20dp"
+                android:gravity="start"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/about_github" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_faq"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="80dp"
+                android:drawableLeft="@drawable/ic_faq"
+                android:drawablePadding="20dp"
+                android:gravity="start"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/about_faq" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_blog"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="80dp"
+                android:drawableLeft="@drawable/ic_blog"
+                android:drawablePadding="20dp"
+                android:gravity="start"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/about_blog" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:background="@color/colorPrimaryDark"
+            android:orientation="vertical"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:layout_marginLeft="20dp"
+                android:padding="5dp"
+                android:text="@string/about_connect"
+                android:textColor="@color/secondaryText" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_mail"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="80dp"
+                android:drawableLeft="@drawable/ic_mail"
+                android:drawablePadding="20dp"
+                android:gravity="start"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/about_email" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_twitter"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="80dp"
+                android:layout_marginBottom="5dp"
+                android:drawableLeft="@drawable/ic_twitter"
+                android:drawablePadding="20dp"
+                android:gravity="start"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/about_twitter" />
+
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/mozilla_img"
+            android:layout_width="200dp"
+            android:layout_marginTop="20dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:src="@drawable/mozilla" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="50dp"
+            android:layout_marginBottom="50dp"
+            android:text="@string/about_mozilla"
+            android:textColor="@color/textColorMain" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

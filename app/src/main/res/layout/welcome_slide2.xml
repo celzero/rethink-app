@@ -18,30 +18,32 @@
             android:gravity="center"
             android:layout_height="wrap_content"
             android:text="@string/slide_2_title"
-            android:textColor="@color/secondaryText"
+            android:textColor="@color/textColorMain"
             android:textSize="@dimen/slide_title"
             style="@style/TextAppearance.AppCompat.Headline" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="@dimen/img_width_height"
-            android:layout_weight="0.5"
-            android:layout_gravity="center"
-            android:layout_height="@dimen/img_width_height"
-            android:src="@drawable/illustrations_firewall" />
+
 
 
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.3"
+            android:layout_weight="0.1"
             android:paddingLeft="@dimen/desc_padding"
             android:paddingRight="@dimen/desc_padding"
             android:text="@string/slide_2_desc"
-            android:gravity="top"
+            android:gravity="top|center"
             style="@style/TextAppearance.AppCompat.Body1"
             android:textColor="@color/primaryText"
             android:textSize="@dimen/slide_desc" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="330dp"
+                    android:layout_weight="0.5"
+                    android:layout_gravity="center"
+                    android:layout_height="@dimen/img_width_height"
+                    android:src="@drawable/illustrations_welcome_2" />
 
     </LinearLayout>
 

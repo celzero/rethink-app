@@ -4,10 +4,7 @@ package com.celzero.bravedns.ui
 import android.annotation.SuppressLint
 import android.app.*
 import android.content.*
-import android.content.pm.PackageManager
 import android.icu.text.CompactDecimalFormat
-import android.icu.text.DecimalFormat
-import android.icu.text.NumberFormat
 import android.net.ConnectivityManager
 import android.net.LinkProperties
 import android.net.NetworkCapabilities
@@ -15,6 +12,7 @@ import android.net.VpnService
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.os.Handler
 import android.text.format.DateUtils
 import android.text.format.DateUtils.FORMAT_ABBREV_RELATIVE
@@ -29,22 +27,27 @@ import androidx.appcompat.widget.AppCompatSpinner
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.SpinnerArrayAdapter
 import com.celzero.bravedns.animation.RippleBackground
 import com.celzero.bravedns.data.BraveMode
+import com.celzero.bravedns.data.IPDetails
+import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.*
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appStartTime
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appsBlocked
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.blockedCount
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.dnsMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.firewallMode
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.medianP90
-import com.celzero.bravedns.viewmodel.FirewallViewModel
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.lifeTimeQ
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.lifeTimeQueries
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.median50
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.numUniversalBlock
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.InternalCoroutinesApi
 import settings.Settings
@@ -115,9 +118,9 @@ class HomeScreenFragment : Fragment() {
 
         //Show Tile
         showTileForMode()
-        updateTime()
+        //updateTime()
+        updateUptime()
         registerForBroadCastReceivers()
-
         return view
     }
 
@@ -128,6 +131,7 @@ class HomeScreenFragment : Fragment() {
         // Register broadcast receiver
         val intentFilter = IntentFilter(InternalNames.RESULT.name)
         intentFilter.addAction(InternalNames.DNS_STATUS.name)
+        intentFilter.addAction(InternalNames.TRACKER.name)
         LocalBroadcastManager.getInstance(context!!).registerReceiver(messageReceiver, intentFilter)
     }
 
@@ -152,10 +156,11 @@ class HomeScreenFragment : Fragment() {
             braveModeSpinner.setSelection(braveMode)
         }
 
-
-
-        HomeScreenActivity.GlobalVariable.lifeTimeQueries = PersistentState.getNumOfReq(context!!)
-
+        lifeTimeQueries = PersistentState.getNumOfReq(context!!)
+        //var lifeTimeQ : MutableLiveData<Int> = MutableLiveData()
+        val aList = PersistentState.getExcludedPackagesWifi(context!!)
+        appsBlocked.postValue(aList!!.size)
+        blockedCount.postValue(PersistentState.getBlockedReq(context!!))
     }
 
 
@@ -209,7 +214,17 @@ class HomeScreenFragment : Fragment() {
                 braveModeSpinner.isEnabled = false
                 modifyBraveMode(position)
                 showTileForMode()
+                object : CountDownTimer(1000, 500) {
+                    override fun onTick(millisUntilFinished: Long) {
+                        braveModeSpinner.isEnabled = false
+                    }
+                    override fun onFinish() {
+                        braveModeSpinner.isEnabled = true
+                    }
+                }.start()
             }
+
+
         }
 
         // Brave Mode Information Icon which shows the dialog - explanation
@@ -241,6 +256,38 @@ class HomeScreenFragment : Fragment() {
                 prepareAndStartDnsVpn()
             }
         })
+
+        val mDb = AppDatabase.invoke(context!!.applicationContext)
+        val categoryInfoRepository = mDb.categoryInfoRepository()
+        categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, Observer {
+            val list = it.filter { a -> a.isInternetBlocked }
+            tileFCategoryBlockedTxt.setText(list.size.toString())
+        })
+
+        median50.observe(viewLifecycleOwner, Observer {
+            tileDmedianTxt.setText(median50.value.toString()+"ms")
+            tileDFMedianTxt.setText(median50.value.toString() + "ms")
+         })
+
+        lifeTimeQ.observe(viewLifecycleOwner, Observer {
+            val lifeTimeConversion =  CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT).format(lifeTimeQ.value)
+            tileDLifetimeQueriesTxt.setText(lifeTimeConversion)
+         })
+
+         blockedCount.observe(viewLifecycleOwner, Observer {
+             val blocked = CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT).format(blockedCount.value)
+             tileDFTrackersBlockedtxt.setText(blocked)
+             tileDtrackersBlockedTxt.setText(blocked)
+          })
+
+        appsBlocked.observe(viewLifecycleOwner, Observer {
+            tileFAppsBlockedTxt.setText(appsBlocked.value.toString())
+            tileDFAppsBlockedTxt.setText(appsBlocked.value.toString())
+         })
+
+        numUniversalBlock.observe(viewLifecycleOwner, Observer {
+            tileFUniversalBlockedTxt.setText(numUniversalBlock.value.toString())
+         })
 
     }
 
@@ -319,6 +366,7 @@ class HomeScreenFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         syncDnsStatus()
+        updateUptime()
     }
 
 
@@ -415,56 +463,55 @@ class HomeScreenFragment : Fragment() {
     }
 
     //TODO - Remove the below code and modify it to LiveData
-    var updater: Runnable? = null
+    /*var updater: Runnable? = null
     val timerHandler = Handler()
 
     fun updateTime() {
         updater = Runnable {
-            val numReq = PersistentState.getNumOfReq(context!!).toDouble()
-            val blockedReq = PersistentState.getBlockedReq(context!!).toDouble()
 
-            HomeScreenActivity.GlobalVariable.lifeTimeQueries =
-                PersistentState.getNumOfReq(context!!)
-            medianP90 = PersistentState.getMedianLatency(context!!)
+            //val numReq = PersistentState.getNumOfReq(context!!).toDouble()
+asa
+           *//* lifeTimeQueries = PersistentState.getNumOfReq(context!!)
+            val lifeTimeConversion =  CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT).format(lifeTimeQueries)
+            tileDLifetimeQueriesTxt.setText(lifeTimeConversion)*//*
 
-            tileDLifetimeQueriesTxt.setText((HomeScreenActivity.GlobalVariable.lifeTimeQueries).toString())
-            tileDmedianTxt.setText(medianP90.toString() + "ms")
+            //val blockedReq = PersistentState.getBlockedReq(context!!).toDouble()
+            //val blocked = CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT).format(blockedReq)
 
-            val blocked = CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT).format(blockedReq)
+            //tileDFTrackersBlockedtxt.setText(blocked)
+            //tileDtrackersBlockedTxt.setText(blocked)
 
-            tileDFTrackersBlockedtxt.setText(blocked)
-            tileDtrackersBlockedTxt.setText(blocked)
+            //tileFAppsBlockedTxt.setText(PersistentState.getExcludedPackagesWifi(context!!)!!.size.toString())
 
-            tileFAppsBlockedTxt.setText(PersistentState.getExcludedPackagesWifi(context!!)!!.size.toString())
-
-            tileFCategoryBlockedTxt.setText(PersistentState.getCategoriesBlocked(context!!)!!.size.toString())
-            var numUniversalBlock = 0
+            *//*var numUniversalBlock = 0
             if (PersistentState.getBackgroundEnabled(context!!)) {
                 numUniversalBlock += 1
             }
             if (PersistentState.getFirewallModeForScreenState(context!!)) {
                 numUniversalBlock += 1
             }
-            tileFUniversalBlockedTxt.setText(numUniversalBlock.toString())
+            tileFUniversalBlockedTxt.setText(numUniversalBlock.toString())*//*
 
-            tileDFAppsBlockedTxt.setText(PersistentState.getExcludedPackagesWifi(context!!)!!.size.toString())
-            tileDFMedianTxt.setText(medianP90.toString() + "ms")
+
+
 
             updateUptime()
             timerHandler.postDelayed(updater, 1500)
 
+
         }
         timerHandler.post(updater!!)
-    }
+    }*/
 
     override fun onDestroyView() {
         super.onDestroyView()
-        timerHandler.removeCallbacks(updater!!);
+        //timerHandler.removeCallbacks(updater!!);
     }
 
 
     private val messageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
+            //Log.d("BraveDNS","messageReceiver Request ${intent.action}")
             if (InternalNames.RESULT.name.equals(intent.action)) {
                 updateStatsDisplay(
                     PersistentState.getNumOfReq(context).toLong(),
@@ -473,6 +520,8 @@ class HomeScreenFragment : Fragment() {
 
             } else if (InternalNames.DNS_STATUS.name.equals(intent.action)) {
                 syncDnsStatus()
+            } else if(InternalNames.TRACKER.name.equals((intent.action))){
+                syncIPTrackerData(intent.getSerializableExtra(InternalNames.IPTRACKER.name) as IPDetails)
             }
         }
     }
@@ -481,8 +530,13 @@ class HomeScreenFragment : Fragment() {
         QueryDetailActivity.updateStatsDisplay(numRequests, transaction)
     }
 
+    private fun syncIPTrackerData(ipDetails: IPDetails){
+        ConnectionTrackerActivity.updateApplication(ipDetails)
+    }
+
     override fun onDestroy() {
         LocalBroadcastManager.getInstance(context!!).unregisterReceiver(messageReceiver)
+        //timerHandler.removeCallbacks(updater!!)
         super.onDestroy()
     }
 
@@ -559,7 +613,7 @@ class HomeScreenFragment : Fragment() {
 
         var status = VpnController.getInstance()!!.getState(context!!)
 
-        if (status!!.activationRequested || status.connectionState === BraveVPNService.State.WORKING) {
+        if (status!!.activationRequested || status.connectionState == BraveVPNService.State.WORKING) {
             rippleRRLayout.stopRippleAnimation()
             dnsOnOffBtn.text = "stop"
             if (braveMode == 0)
@@ -626,8 +680,9 @@ class HomeScreenFragment : Fragment() {
         } else {
             R.color.accent_bad
         }
-        if (braveMode == FIREWALL_MODE && VpnController.getInstance()!!.getState(context!!)!!.activationRequested)
+        if (braveMode == FIREWALL_MODE && status.activationRequested)
             colorId = R.color.positive
+
 
         val color = ContextCompat.getColor(context!!, colorId)
         protectionLevelTxt.setTextColor(color)

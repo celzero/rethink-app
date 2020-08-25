@@ -27,7 +27,6 @@ import android.os.Build
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.SystemClock
-import android.preference.PreferenceManager
 import android.service.quicksettings.TileService
 import android.text.TextUtils
 import android.util.Log
@@ -36,6 +35,7 @@ import androidx.annotation.WorkerThread
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
+import com.celzero.bravedns.data.IPDetails
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.net.manager.ConnectionTracer
@@ -45,6 +45,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.dnsMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.firewallMode
+import com.celzero.bravedns.ui.HomeScreenFragment
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.internal.synchronized
 import protect.Blocker
@@ -61,6 +62,8 @@ class BraveVPNService:
 
     @GuardedBy("vpnController")
     private var vpnAdapter: GoVpnAdapter? = null
+
+    private val DNS_REQUEST_ID = "53"
 
     companion object{
 
@@ -113,38 +116,51 @@ class BraveVPNService:
         NEW, WORKING, FAILING
     }
 
-    override fun block(protocol: Int, uid: Long, sourceAddress: String, destAddress: String): Boolean {
+    override fun block(protocol: Int, _uid: Long, sourceAddress: String, destAddress: String): Boolean {
+        var isBlocked  = false
+        var uid = _uid.toInt()
         val first = sourceAddress.split(":")
         val second = destAddress.split(":")
+        var ipDetails : IPDetails ?= null
         try {
             if(PersistentState.getScreenLockData(this))
                 return true
             if(VERSION.SDK_INT >= VERSION_CODES.O && VERSION.SDK_INT < VERSION_CODES.Q) {
-                return false
+                if(uid != 0 || uid != -1) {
+                    isBlocked = isUidBlocked(uid)
+                }else{
+                    isBlocked = false
+                }
+
+            }else {
+                uid = connTracer.getUidQ(protocol, first[0], first[first.size - 1].toInt(),second[0], second[second.size - 1].toInt())
+                isBlocked = isUidBlocked(uid)
             }
-
-            val uid = connTracer.getUidQ(
-                protocol,
-                first[0],
-                first[first.size-1].toInt(),
-                second[0],
-                second[second.size-1].toInt()
-            )
-
-            return isUidBlocked(uid)
+            //Don't include DNS request in the list
+            if(second[second.size - 1] != DNS_REQUEST_ID){
+                ipDetails  = IPDetails(uid,first[0],first[first.size-1], second[0], second[second.size-1], System.currentTimeMillis(),isBlocked, protocol)
+                sendConnTracking(ipDetails)
+            }
+            return isBlocked
         } catch (iex: Exception) {
             Log.e(LOG_TAG, iex.message, iex)
         }
-        return false
+        return isBlocked
+    }
+
+    private fun sendConnTracking(ipDetails: IPDetails){
+        getIPTracker()!!.recordTransaction(this, ipDetails)
+        val intent = Intent(InternalNames.TRACKER.name)
+        intent.putExtra(InternalNames.IPTRACKER.name, ipDetails)
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
 
     private fun isUidBlocked(uid: Int): Boolean {
-        val packageName = packageManager.getNameForUid(uid)
         // TODO: Implementation pending
         var isBlocked : Boolean
         try{
-            isBlocked = FirewallManager.checkInternetPermission(packageName!!)
+            isBlocked = FirewallManager.checkInternetPermission(uid)
         }catch (e : Exception ){
             isBlocked = false
         }
@@ -271,7 +287,7 @@ class BraveVPNService:
                 //TODO Move this hardcoded url to Persistent state
                 url = PersistentState.getServerUrl(this)
 
-                PreferenceManager.getDefaultSharedPreferences(this)
+                PersistentState.getUserPreferences(this)
                     .registerOnSharedPreferenceChangeListener(this)
 
                 if (networkManager != null) {
@@ -363,6 +379,10 @@ class BraveVPNService:
         return vpnController!!.getTracker(this)
     }
 
+    private fun getIPTracker(): IPTracker? {
+        return vpnController!!.getIPTracker(this)
+    }
+
     @InternalCoroutinesApi
     override fun onSharedPreferenceChanged(preferences: SharedPreferences?, key: String?) {
         /*TODO Check on the Persistent State variable
@@ -373,7 +393,11 @@ class BraveVPNService:
             var context = this
             firewallMode = PersistentState.getFirewallMode(context)
             dnsMode = PersistentState.getDnsMode(context)
-            restartVpn(dnsMode, firewallMode)
+            if(braveMode == HomeScreenFragment.DNS_MODE)
+                vpnAdapter!!.setDNSTunnelMode()
+            else
+                vpnAdapter!!.setFilterTunnelMode()
+            //restartVpn(dnsMode, firewallMode)
         }
 
         if (PersistentState.URL_KEY == key) {
@@ -437,6 +461,7 @@ class BraveVPNService:
                 if (vpnAdapter != null) {
                     vpnAdapter!!.close()
                     vpnAdapter = null
+                    //vpnController.getState(this)!!.activationRequested = false
                     vpnController.onConnectionStateChanged(this, null)
                 }
             }
@@ -531,8 +556,7 @@ class BraveVPNService:
         unregisterReceiver(braveAutoStartReceiver)
         kotlin.synchronized(vpnController!!) {
             Log.w(LOG_TAG,"Destroying DNS VPN service")
-
-            PreferenceManager.getDefaultSharedPreferences(this)
+            PersistentState.getUserPreferences(this)
                 .unregisterOnSharedPreferenceChangeListener(this)
             if (networkManager != null) {
                 networkManager!!.destroy()

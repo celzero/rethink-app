@@ -32,28 +32,21 @@ class DeviceLockService  : Service(){
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
 
         val isProtected = keyguardManager.isKeyguardSecure
-        val isLocked = keyguardManager.inKeyguardRestrictedInputMode()
+        val isLocked = keyguardManager.isKeyguardLocked
         val isInteractive = powerManager.isInteractive
         val delayIndex: Int =  getSafeCheckLockDelay(intent.getIntExtra(EXTRA_CHECK_LOCK_DELAY_INDEX, -1))
-        /*Log.i("BraveDNS", java.lang.String.format("LM.checkLock with state=%s, isProtected=%b, isLocked=%b, isInteractive=%b, delay=%d",
-                if (intent != null) intent.getStringExtra(EXTRA_STATE) else "",
-                isProtected, isLocked, isInteractive, checkLockDelays.get(delayIndex)))*/
+
 
         if (checkLockTask != null) {
-            //Log.i("BraveDNS", String.format("LM.checkLock: cancelling CheckLockTask[%x]", System.identityHashCode(checkLockTask)))
             checkLockTask!!.cancel()
         }
 
         if (isProtected && !isLocked && !isInteractive) {
             checkLockTask = CheckLockTask(this, delayIndex)
-            /*Log.i("BraveDNS", java.lang.String.format("LM.checkLock: scheduling CheckLockTask[%x] for %d ms",
-                    System.identityHashCode(checkLockTask), checkLockDelays.get(delayIndex)))*/
-            //val task = CheckLockTask(this , checkLockDelays.get(delayIndex))
             timer.schedule(checkLockTask, checkLockDelays.get(delayIndex).toLong())
             this.stopSelf()
         } else {
             if (isProtected && isLocked) {
-                //Log.e("BraveDNS", "Block Traffic Now!")
                 if(PersistentState.getFirewallModeForScreenState(this) && !PersistentState.getScreenLockData(this)) {
                     PersistentState.setScreenLockData(this,true)
                     checkLockTask?.cancel()
@@ -69,9 +62,9 @@ class DeviceLockService  : Service(){
     // It also includes an initial offset and some extra times (for safety)
 
     companion object{
-        val ACTION_CHECK_LOCK  = "com.celzero.bravedns.receiver.ScreenLockService.ACTION_CHECK_LOCK"
-        val EXTRA_CHECK_LOCK_DELAY_INDEX ="com.celzero.bravedns.receiver.ScreenLockService.EXTRA_CHECK_LOCK_DELAY_INDEX"
-        val EXTRA_STATE = "com.celzero.bravedns.receiver.ScreenLockService.EXTRA_STATE"
+        val ACTION_CHECK_LOCK  = "com.celzero.bravedns.receiver.DeviceLockService.ACTION_START_SERVICE"
+        val EXTRA_CHECK_LOCK_DELAY_INDEX ="com.celzero.bravedns.receiver.DeviceLockService.EXTRA_CHECK_LOCK_DELAY_INDEX"
+        val EXTRA_STATE = "com.celzero.bravedns.receiver.DeviceLockService..EXTRA_STATE"
 
         const val SECOND = 1000
         const val MINUTE = 60 * SECOND

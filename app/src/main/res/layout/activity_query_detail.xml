@@ -14,7 +14,6 @@
       app:layout_constraintTop_toTopOf="parent"
       app:layout_constraintRight_toRightOf="parent"
       app:layout_constraintLeft_toLeftOf="parent"
-      android:background="@drawable/illustration_app_mgr_bg"
       android:fitsSystemWindows="true"
       android:theme="@style/AppTheme" >
 
@@ -29,18 +28,13 @@
         app:contentScrim="?attr/colorPrimary"
         app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-      <ImageView
-          android:id="@+id/expandedImage"
-          android:visibility="gone"
-          android:layout_width="match_parent"
-          android:layout_height="100dp"
-          android:background="@color/colorPrimary"
-          android:scaleType="fitCenter"
-          android:src="@drawable/illustration_settings"
-          app:layout_collapseMode="parallax"
-          app:layout_collapseParallaxMultiplier="0.7"
-          android:contentDescription="TODO" />
-
+      <androidx.appcompat.widget.AppCompatImageView
+                 android:layout_width="match_parent"
+                 android:layout_height="match_parent"
+                 android:scaleType="centerCrop"
+                 android:tint="#959595"
+                 android:tintMode="multiply"
+                 android:src="@drawable/illustration_app_mgr_bg"/>
       <!-- <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

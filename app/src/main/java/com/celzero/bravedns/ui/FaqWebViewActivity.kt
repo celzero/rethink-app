@@ -1,6 +1,7 @@
 package com.celzero.bravedns.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -16,25 +17,31 @@ class FaqWebViewActivity  : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_faq_webview_layout)
         faqWebView = findViewById(R.id.faq_webview)
-        faqWebView.getSettings().setDomStorageEnabled(true)
-        faqWebView.getSettings().setSaveFormData(true)
-        faqWebView.getSettings().setAllowContentAccess(true)
-        faqWebView.getSettings().setAllowFileAccess(true)
+        faqWebView.settings.domStorageEnabled = true
+        faqWebView.settings.allowContentAccess = true
+        faqWebView.settings.allowFileAccess = true
         faqWebView.getSettings().setJavaScriptEnabled(true);
-        faqWebView.getSettings().setAllowFileAccessFromFileURLs(true)
-        faqWebView.getSettings().setAllowUniversalAccessFromFileURLs(true)
-        faqWebView.getSettings().setSupportZoom(true)
-        faqWebView.setWebViewClient(WebViewClient())
+        faqWebView.settings.allowFileAccessFromFileURLs = true
+        faqWebView.settings.allowUniversalAccessFromFileURLs = true
+        faqWebView.settings.setSupportZoom(true)
+        faqWebView.webViewClient = WebViewClient()
         faqWebView.clearCache(true)
         faqWebView.clearHistory()
-        faqWebView.setClickable(true)
-        faqWebView.setWebChromeClient(WebChromeClient())
+        faqWebView.isClickable = true
+        faqWebView.webChromeClient = WebChromeClient()
         val url = intent.getStringExtra("url")
         if(url == null) {
             faqWebView.loadUrl(this.resources.getString(R.string.faq_web_link))
         }else{
             faqWebView.loadUrl(url)
         }
+    }
+
+    override fun onDestroy() {
+        Log.d("BraveDNS","onDestroy")
+        faqWebView.destroy()
+        super.onDestroy()
+
     }
 
 }

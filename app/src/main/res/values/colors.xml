@@ -11,9 +11,11 @@
 
     <color name="button_background">#006f67</color>
     <color name="button_background_end">#006f67</color>
+    <color name="button_background_tint">#004E4B</color>
 
     <color name="colorPrimary">#393939</color>
     <color name="colorPrimaryDark">#444444</color>
+    <color name="childListColor">#2d2c2c</color>
     <color name="lightColorPrimary">#C5CAE9</color>
     <color name="colorAccent">#BDBDBD</color>
     <color name="positive">#05dfd7</color>
@@ -25,12 +27,15 @@
     <color name="black">#333333</color>
     <color name="recycler_selected">#6E7069</color>
 
+    <color name="color_welcome_screen">#d81e5b</color>
+
     <color name="primaryText">#FDFDFD</color>
     <color name="secondaryText">#05dfd7</color>
     <color name="dividerColor">#BDBDBD</color>
+
     <color name="borderColor">#444444</color>
 
-    <color name="textColorMain">#6F2BD4</color>
+    <color name="textColorMain">#BDBDBD</color>
 
     <color name="text_color_blue">#2329D6</color>
 
@@ -40,7 +45,7 @@
     <color name="colorPurple_900">#4A148C</color>
 
     <!-- 2nd Gradient color -->
-    <color name="colorAmber_A400">#FFC400</color>
+    <color name="colorAmber_A400">#FFA500</color>
     <color name="colorAmber_900">#FF1744</color>
 
     <!-- 3rd Gradient color -->

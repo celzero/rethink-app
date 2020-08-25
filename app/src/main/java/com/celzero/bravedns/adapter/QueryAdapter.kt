@@ -1,24 +1,17 @@
 package com.celzero.bravedns.adapter
 
-import android.app.AlertDialog
 import android.content.Context
-import android.os.Build
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.net.dns.DnsPacket
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.net.doh.Transaction
-import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.QueryDetailActivity
 import com.celzero.bravedns.util.Utilities
 import java.io.IOException
@@ -72,17 +65,17 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
             )
 
             // Workaround for lack of vector drawable background support in pre-Lollipop Android.
-            val expand = v.findViewById<View>(R.id.expand)
+            //val expand = v.findViewById<View>(R.id.expand)
             // getDrawable automatically rasterizes vector drawables as needed on pre-Lollipop Android.
             // See https://stackoverflow.com/questions/29041027/android-getresources-getdrawable-deprecated-api-22
-            val expander = ContextCompat.getDrawable(activity, R.drawable.expander)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            //val expander = ContextCompat.getDrawable(activity, R.drawable.expander)
+            /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 // Only available in API 16+.
                 expand.background = expander
             } else {
                 // Deprecated starting in API 16.
                 expand.setBackgroundDrawable(expander)
-            }
+            }*/
             TransactionViewHolder(v)
         } else {
             throw AssertionError(String.format(Locale.ROOT, "Unknown viewType %d", viewType))
@@ -131,68 +124,6 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
             queryIndicator = itemView.findViewById(R.id.query_log_indicator)
 
         }
-
-        /**
-         *  TODO Dialog for showing complete message details on the resolver's IP,
-         *  and other detail of the query log.
-         *  Not in use for now.
-         */
-        /*private fun showDialogQuery(positions : Int) {
-            *//*  val builderSingle: AlertDialog.Builder = AlertDialog.Builder(FirewallHeader.context)
-              builderSingle.setIcon(R.drawable.ic_launcher)
-              builderSingle.setTitle("Brave DNS Modes")
-              builderSingle.show()
-      *//*
-            val dialog: AlertDialog.Builder = AlertDialog.Builder(activity)
-            val view: View = LayoutInflater.from(activity).inflate(R.layout.query_detail_dialog, null)
-            val position1 = positions
-            val transaction: TransactionView? = getItem(position1)
-            //val dialog = Dialog(activity)
-            //dialog.setTitle("Query")
-
-            *//*dialog.setCanceledOnTouchOutside(true)
-            dialog.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)*//*
-            val metrics: DisplayMetrics = activity.getResources().getDisplayMetrics()
-            val DeviceTotalWidth = metrics.widthPixels
-            val DeviceTotalHeight = metrics.heightPixels
-            *//*dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-
-            dialog.setContentView(R.layout.query_detail_dialog)
-            dialog.window!!.setLayout(DeviceTotalWidth, DeviceTotalHeight)*//*
-
-            var detailsView1 = view.findViewById(R.id.detailss) as ConstraintLayout
-            var fqdnView1 = view.findViewById(R.id.fqdns) as TextView
-            var typeView1 = view.findViewById(R.id.qtypes) as TextView
-            var latencyView1 = view.findViewById(R.id.latency_smalls) as TextView
-            var resolverView1 = view.findViewById(R.id.resolvers) as TextView
-            var responseView1 = view.findViewById(R.id.responses) as TextView
-
-
-            // Make sure the details are up to date.
-            fqdnView1!!.text = transaction!!.fqdn
-            typeView1!!.text = transaction!!.typename
-            latencyView1!!.text = transaction!!.latency
-            if (transaction!!.resolver != null) {
-                resolverView1!!.text = transaction!!.resolver
-            } else {
-                resolverView1!!.setText(R.string.unknown_server)
-            }
-            responseView1!!.text = transaction!!.response
-
-            dialog.setView(view)
-            //dialog.setCancelable(false)
-            val alert = dialog.create()
-            alert.window!!.setLayout(DeviceTotalWidth, DeviceTotalHeight)
-            alert.getWindow()!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-
-            *//*val okBtn = dialog.findViewById(R.id.info_dialog_cancel_btn) as Button
-            okBtn.setOnClickListener {
-                dialog.dismiss()
-            }*//*
-            alert.show()
-            //dialog.show()
-
-        }*/
 
         fun update(transaction : TransactionView, position: Int) {
             // This function can be run up to a dozen times while blocking rendering, so it needs to be
@@ -277,16 +208,12 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
                     serverAddress = null
                 }
 
-
-
             if (serverAddress != null) {
                 val countryCode: String = getCountryCode(serverAddress , activity) //TODO: Country code things
                 resolver = makeAddressPair(countryCode, serverAddress.getHostAddress())
             } else {
                 resolver = transaction.serverIp
             }
-
-
 
             if (transaction.status === Transaction.Status.COMPLETE) {
                 var packet: DnsPacket? = null

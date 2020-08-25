@@ -4,5 +4,7 @@ enum class InternalNames {
     CUSTOM_SERVER,
     DNS_STATUS,
     RESULT,
-    TRANSACTION
+    TRANSACTION,
+    TRACKER,
+    IPTRACKER
 }

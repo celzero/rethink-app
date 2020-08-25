@@ -3,29 +3,20 @@ package com.celzero.bravedns.ui
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.opengl.Visibility
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
-import android.util.Log
 import android.view.*
-import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.TextViewCompat
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
-import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import com.celzero.bravedns.R
-import com.celzero.bravedns.util.PrefManager
-
-
-
+import com.celzero.bravedns.service.PersistentState
 
 class WelcomeActivity  : AppCompatActivity() {
 
-    private lateinit var prefManager : PrefManager
     private lateinit var viewPager : ViewPager
     private lateinit var dotsLayout: LinearLayout
     private lateinit var dots : Array<TextView?>
@@ -38,16 +29,12 @@ class WelcomeActivity  : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        this.prefManager = PrefManager(this)
-        if(!prefManager.isFirstTimeLaunch()){
+        if (!PersistentState.isFirstTimeLaunch(this)) {
             launchHomeScreen()
         }
 
-        if (Build.VERSION.SDK_INT >= 21) {
-            window.decorView.systemUiVisibility =
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-        }
         setContentView(R.layout.activity_welcome)
+
 
         viewPager = findViewById(R.id.view_pager)
         dotsLayout =  findViewById(R.id.layoutDots)
@@ -75,7 +62,7 @@ class WelcomeActivity  : AppCompatActivity() {
 
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {
-                if(ViewPager.SCROLL_STATE_DRAGGING == state){
+                if(ViewPager.SCROLLBAR_POSITION_RIGHT == state+1){
                     if(getItem(1) == layout.size)
                         launchHomeScreen()
                 }
@@ -91,16 +78,6 @@ class WelcomeActivity  : AppCompatActivity() {
 
             override fun onPageSelected(position: Int) {
                 addBottomDots(position)
-
-                if(position == layout.size - 1){
-                    buttonNext.setText(R.string.start)
-                    buttonSkip.visibility=View.GONE
-                    //buttonNext.visibility = View.VISIBLE
-
-                }else{
-                    buttonNext.setText(R.string.next)
-                    //buttonSkip.visibility  = View.VISIBLE
-                }
             }
 
         })
@@ -139,7 +116,7 @@ class WelcomeActivity  : AppCompatActivity() {
     }
 
     private fun launchHomeScreen() {
-        this.prefManager.setFirstTimeLaunch(false)
+        PersistentState.setFirstTimeLaunch(this,false)
         startActivity(Intent(this, HomeScreenActivity::class.java))
         finish()
     }
@@ -168,8 +145,7 @@ class WelcomeActivity  : AppCompatActivity() {
 
 
         override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
-            //container.removeViewAt(position)
-            //super.destroyItem(container, position, `object`)
+
         }
 
     }
