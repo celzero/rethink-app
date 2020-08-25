@@ -12,7 +12,7 @@ Currently, per app connection mapping is implemented by capturing `udp` and `tcp
 
 ### Network Monitor
 
-Not implemented yet, but it is almost done-- just a clean UI stands in the way (well, clean by our standards). A network monitor is a per-app report-card of sorts on when connections were made, how many were made, and to where. Tracking TCP has turned out to be so far straight-forward. DNS packets are trickier to track, and so a rough heuristic is used for now, which may not hold good in all cases. Coming soon.
+A network monitor is a per-app report-card of sorts on when connections were made, how many were made, and to where. Tracking TCP has turned out to be so far straight-forward. DNS packets are trickier to track, and so a rough heuristic is used for now, which may not hold good in all cases.
 
 ### DNS over HTTPS client
 
