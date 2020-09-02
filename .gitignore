@@ -11,3 +11,5 @@
 /build
 /captures
 /tun2socks/build/
+/app/debug
+/app/release
