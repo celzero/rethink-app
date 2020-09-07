@@ -33,8 +33,8 @@ android {
         vectorDrawables.useSupportLibrary = true
         minSdkVersion 26
         targetSdkVersion 29
-        versionCode 6
-        versionName "0.4.2"
+        versionCode 8
+        versionName "0.4.4"
        /* splits {
              abi {
                  enable true
@@ -67,6 +67,8 @@ android {
 dependencies {
 
     def room_version = "2.2.3"
+    def paging_version = "2.1.2"
+
     implementation fileTree(include: [
             'guava-28.2-android.jar',
             'failureaccess-1.0.1.jar' // Dependency of Guava
@@ -99,6 +101,11 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.8.3'
+
+    //For paging - connection tracker
+    //implementation "androidx.paging:paging-runtime:$paging_version"
+    implementation "androidx.paging:paging-runtime-ktx:$paging_version"
+    implementation "androidx.fragment:fragment-ktx:1.2.2"
 
     // For go-tun2socks
     implementation project(":tun2socks")
