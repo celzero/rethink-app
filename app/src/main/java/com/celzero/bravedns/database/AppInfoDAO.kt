@@ -39,4 +39,7 @@ interface AppInfoDAO {
     @Query("select count(appCategory) from AppInfo where appCategory = :categoryName")
     fun getAppCountForCategory(categoryName : String) : Int
 
+    @Query ("select packageInfo from AppInfo where appName = :appName")
+    fun getPackageNameForAppName(appName: String): String
+
 }

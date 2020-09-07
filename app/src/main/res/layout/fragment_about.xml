@@ -130,6 +130,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:background="@color/colorPrimaryDark"
+            android:layoutDirection="ltr"
             android:orientation="vertical"
             android:paddingTop="10dp"
             android:paddingBottom="10dp">
@@ -204,6 +205,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
+            android:layoutDirection="ltr"
             android:background="@color/colorPrimaryDark"
             android:orientation="vertical"
             android:paddingTop="10dp"

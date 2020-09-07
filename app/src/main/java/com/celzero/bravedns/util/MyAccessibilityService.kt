@@ -116,6 +116,6 @@ class MyAccessibilityService : AccessibilityService() {
     }
 
     override fun onInterrupt() {
-        //Log.w("______","Interrupted")
+        Log.w("______","Interrupted")
     }
 }

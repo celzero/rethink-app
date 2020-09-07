@@ -14,10 +14,10 @@ import androidx.appcompat.widget.SwitchCompat
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.Observer
 import com.celzero.bravedns.R
+import com.celzero.bravedns.adapter.FirewallAppListAdapter
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.CategoryInfo
-import com.celzero.bravedns.adapter.FirewallAppListAdapter
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable
@@ -32,7 +32,7 @@ class FirewallActivity : AppCompatActivity() , SearchView.OnQueryTextListener {
     private var firewallExpandableList: ExpandableListView ?= null
     private var adapterList: ExpandableListAdapter ?= null
     private var titleList: List<CategoryInfo>? = ArrayList()
-    private var listData: HashMap<CategoryInfo, List<AppInfo>> = HashMap()
+    private var listData: HashMap<CategoryInfo, ArrayList<AppInfo>> = HashMap()
 
     private lateinit var loadingProgressBar: ProgressBar
 
@@ -63,6 +63,10 @@ class FirewallActivity : AppCompatActivity() , SearchView.OnQueryTextListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_firewall)
         initView()
+    }
+
+    override fun onResume() {
+        super.onResume()
         observersForUI()
     }
 
@@ -108,9 +112,13 @@ class FirewallActivity : AppCompatActivity() , SearchView.OnQueryTextListener {
             adapterList = FirewallAppListAdapter(this, titleList as ArrayList<CategoryInfo>, listData!!)
             firewallExpandableList!!.setAdapter(adapterList)
 
-            firewallExpandableList!!.setOnGroupClickListener(ExpandableListView.OnGroupClickListener { expandableListView, view, i, l ->
+            firewallExpandableList!!.setOnGroupClickListener { expandableListView, view, i, l ->
                 false
-             })
+            }
+
+            firewallExpandableList!!.setOnGroupExpandListener { it ->
+                listData[titleList!![it]]!!.sortBy  { it.isInternetAllowed }
+            }
 
         }
 
@@ -180,10 +188,10 @@ class FirewallActivity : AppCompatActivity() , SearchView.OnQueryTextListener {
             if(!categoryState) {
                 categoryState = true
                 firewallExpandableList!!.visibility = View.VISIBLE
-                categoryShowTxt.setCompoundDrawablesWithIntrinsicBounds(null,null,context.getDrawable(R.drawable.ic_keyboard_arrow_up_gray_24dp), null)
+                categoryShowTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, context.getDrawable(R.drawable.ic_keyboard_arrow_up_gray_24dp), null)
             }else {
                 firewallExpandableList!!.visibility = View.GONE
-                categoryShowTxt.setCompoundDrawablesWithIntrinsicBounds(null,null,context.getDrawable(R.drawable.ic_keyboard_arrow_down_gray_24dp),null)
+                categoryShowTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, context.getDrawable(R.drawable.ic_keyboard_arrow_down_gray_24dp), null)
                 categoryState = false
             }
         }
@@ -193,12 +201,12 @@ class FirewallActivity : AppCompatActivity() , SearchView.OnQueryTextListener {
                 universalState = false
                 allAppBgLL.visibility = View.VISIBLE
                 screenLockLL.visibility = View.VISIBLE
-                universalFirewallTxt.setCompoundDrawablesWithIntrinsicBounds(null,null,context.getDrawable(R.drawable.ic_keyboard_arrow_up_gray_24dp), null)
+                universalFirewallTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, context.getDrawable(R.drawable.ic_keyboard_arrow_up_gray_24dp), null)
             }else{
                 universalState = true
                 allAppBgLL.visibility = View.GONE
                 screenLockLL.visibility = View.GONE
-                universalFirewallTxt.setCompoundDrawablesWithIntrinsicBounds(null,null,context.getDrawable(R.drawable.ic_keyboard_arrow_down_gray_24dp), null)
+                universalFirewallTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, context.getDrawable(R.drawable.ic_keyboard_arrow_down_gray_24dp), null)
             }
         }
 
@@ -216,10 +224,10 @@ class FirewallActivity : AppCompatActivity() , SearchView.OnQueryTextListener {
                     it.numOfAppsBlocked = count.size
                     if (categoryList.size == count.size)
                         it.isInternetBlocked = true
-                    listData.put(it, categoryList)
+                    listData.put(it, categoryList as java.util.ArrayList<AppInfo>)
                 }
                 if (adapterList != null) {
-                    (adapterList as FirewallAppListAdapter).updateData(titleList!!, listData, list)
+                    (adapterList as FirewallAppListAdapter).updateData(titleList!!, listData, list as ArrayList<AppInfo>)
                     if (HomeScreenActivity.isLoadingComplete) {
                         setListViewHeight(firewallExpandableList!!, 1)
                         loadingProgressBar.visibility = View.GONE
@@ -232,7 +240,7 @@ class FirewallActivity : AppCompatActivity() , SearchView.OnQueryTextListener {
 
             val categoryInfoRepository = mDb.categoryInfoRepository()
             categoryInfoRepository.getAppCategoryForLiveData().observe(this, Observer {
-                 titleList = it
+                titleList = it
             })
     }
 
@@ -256,7 +264,7 @@ class FirewallActivity : AppCompatActivity() , SearchView.OnQueryTextListener {
                         listItem.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED)
                         totalHeight += listItem.measuredHeight
                     }
-                   /* for (j in 0 until listAdapter.getChildrenCount(i)) {
+                   /*for (j in 0 until listAdapter.getChildrenCount(i)) {
                         val listItem = listAdapter.getChildView(
                             i, j, false, null, listView)
                         listItem.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED)
@@ -284,14 +292,14 @@ class FirewallActivity : AppCompatActivity() , SearchView.OnQueryTextListener {
         builder.setIcon(android.R.drawable.ic_dialog_alert)
 
         //performing positive action
-        builder.setPositiveButton("Allow"){dialogInterface, which ->
+        builder.setPositiveButton("Allow"){ dialogInterface, which ->
             isAllowed = true
             val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
             startActivityForResult(intent, 0)
         }
 
         //performing negative action
-        builder.setNegativeButton("Deny"){dialogInterface, which ->
+        builder.setNegativeButton("Deny"){ dialogInterface, which ->
         }
         // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()

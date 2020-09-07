@@ -10,6 +10,7 @@
     app:cardElevation="@dimen/activity_horizontal_margin">
 
     <LinearLayout
+        android:id="@+id/connection_parent_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
@@ -144,7 +145,7 @@
                         tools:text="ss" />
 
                     <TextView
-                        android:id="@+id/connection_latency_val"
+                        android:id="@+id/conn_latency_txt"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:gravity="center"

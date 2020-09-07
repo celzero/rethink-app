@@ -1,10 +1,11 @@
 package com.celzero.bravedns.util
 
 import android.util.Log
+import com.celzero.bravedns.ui.HomeScreenActivity
 
 
 enum class FileSystemUID(val uid : Int) {
-        ROOT(0),
+        ANDROID(0),//Modified as ANDROID instead of ROOT
         DAEMON(1),
         BIN(2),
         SYSTEM(1000),
@@ -175,8 +176,15 @@ enum class FileSystemUID(val uid : Int) {
             private val map = FileSystemUID.values().associateBy(FileSystemUID::uid)
 
             fun fromFileSystemUID(uid: Int): FileSystemUID {
-                Log.d("BraveDNS","UID: $uid, hashed val : ${uid.hashCode()}, map Vale: ${map[uid.hashCode()]}")
+                if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d("BraveDNS","UID: $uid, hashed val : ${uid.hashCode()}, map Vale: ${map[uid.hashCode()]}")
                 return map[uid.hashCode()] ?: FileSystemUID.OTHER
+            }
+
+            fun isUIDAppRange(uid: Int): Boolean {
+                if (uid >= APP_START.uid && uid <= APP_END.uid) {
+                        return true
+                }
+                return false
             }
         }
 

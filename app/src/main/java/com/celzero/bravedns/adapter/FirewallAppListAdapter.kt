@@ -1,6 +1,5 @@
 package com.celzero.bravedns.adapter
 
-import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.os.CountDownTimer
@@ -12,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatToggleButton
 import androidx.appcompat.widget.LinearLayoutCompat
@@ -32,12 +32,12 @@ import kotlinx.coroutines.launch
 class FirewallAppListAdapter internal constructor(
     private val context: Context,
     private var titleList: List<CategoryInfo>,
-    private var dataList: HashMap<CategoryInfo, List<AppInfo>>
+    private var dataList: HashMap<CategoryInfo, ArrayList<AppInfo>>
 ) : BaseExpandableListAdapter() {
 
         var completeList : List<AppInfo> = ArrayList<AppInfo>()
         var originalTitleList : List<CategoryInfo> = ArrayList()
-        var originalDataList : HashMap<CategoryInfo, List<AppInfo>> = HashMap()
+        var originalDataList : HashMap<CategoryInfo, ArrayList<AppInfo>> = HashMap()
 
         override fun getChild(listPosition: Int, expandedListPosition: Int): AppInfo {
             return this.dataList.get(this.titleList.get(listPosition))!![expandedListPosition]
@@ -47,11 +47,7 @@ class FirewallAppListAdapter internal constructor(
             return expandedListPosition.toLong()
         }
 
-        fun updateData(
-            title: List<CategoryInfo>,
-            list: HashMap<CategoryInfo, List<AppInfo>>,
-            completeList: List<AppInfo>
-        ){
+        fun updateData(title: List<CategoryInfo>, list: HashMap<CategoryInfo, ArrayList<AppInfo>>, completeList: ArrayList<AppInfo>){
             this.completeList = completeList
             titleList = title
             dataList = list
@@ -76,7 +72,7 @@ class FirewallAppListAdapter internal constructor(
                         titleList = titleList.filter { titleList -> titleList.categoryName.contains(
                             it.key.categoryName
                         ) }
-                        searchResult.put(titleList.get(0), normalList)
+                        searchResult.put(titleList.get(0), normalList as java.util.ArrayList<AppInfo>)
                     }
                 }
                 if(searchResult.isNotEmpty())
@@ -86,10 +82,7 @@ class FirewallAppListAdapter internal constructor(
         }
 
 
-        override fun getChildView(
-            listPosition: Int, expandedListPosition: Int, isLastChild: Boolean,
-            convertView: View?, parent: ViewGroup
-        ): View {
+        override fun getChildView(listPosition: Int, expandedListPosition: Int, isLastChild: Boolean, convertView: View?, parent: ViewGroup): View {
             var convertView = convertView
             val appInfoDetail = getChild(listPosition, expandedListPosition)
             if (convertView == null) {
@@ -108,14 +101,19 @@ class FirewallAppListAdapter internal constructor(
 
             val fwWifiImg: SwitchCompat = convertView.findViewById(R.id.firewall_toggle_wifi)
             val firewallApkProgressBar: ProgressBar = convertView.findViewById(R.id.firewall_apk_progress_bar)
-
-            val appIcon = context.packageManager.getApplicationIcon(appInfoDetail.packageInfo)
-            mIconImageView.setImageDrawable(appIcon)
+            //var appIcon = context.resources.getDrawable(android.R.drawable.)
+            try {
+                val appIcon = context.packageManager.getApplicationIcon(appInfoDetail.packageInfo)
+                mIconImageView.setImageDrawable(appIcon)
+            }catch (e: Exception){
+                mIconImageView.setImageDrawable(context.getDrawable(R.drawable.default_app_icon))
+                Log.e("BraveDNS","Application Icon not available for package: ${appInfoDetail.packageInfo}"+e.message,e)
+            }
             mLabelTextView.text = appInfoDetail.appName
 
             firewallApkProgressBar.visibility = View.GONE
             mPackageTextView.text = appInfoDetail.packageInfo
-
+            //fwWifiImg.visibility = View.VISIBLE
             //For WiFi
             if (appInfoDetail.isInternetAllowed) {
                 fwWifiImg.isChecked = false
@@ -136,7 +134,7 @@ class FirewallAppListAdapter internal constructor(
                 }
 
                 if(appUIDList.size <= 1 || blockAllApps) {
-                    object : CountDownTimer(1000, 500) {
+                    object : CountDownTimer(500, 250) {
                         override fun onTick(millisUntilFinished: Long) {
                             fwWifiImg.visibility = View.GONE
                             firewallApkProgressBar.visibility = View.VISIBLE
@@ -159,22 +157,10 @@ class FirewallAppListAdapter internal constructor(
                     fwWifiImg.isEnabled = true
                     CoroutineScope(Dispatchers.IO).launch {
                         appUIDList.forEach{
-                            HomeScreenActivity.GlobalVariable.appList.get(it.packageInfo!!)!!.isInternetAllowed =
-                                isInternetAllowed
-                            PersistentState.setExcludedPackagesWifi(
-                                it.packageInfo,
-                                !isInternetAllowed,
-                                context
-                            )
-                            FirewallManager.updateAppInternetPermission(
-                                it.packageInfo,
-                                !isInternetAllowed
-                            )
-
-                            FirewallManager.updateAppInternetPermissionByUID(
-                                it.uid,
-                                !isInternetAllowed
-                            )
+                            HomeScreenActivity.GlobalVariable.appList.get(it.packageInfo!!)!!.isInternetAllowed = isInternetAllowed
+                            PersistentState.setExcludedPackagesWifi(it.packageInfo, !isInternetAllowed, context)
+                            FirewallManager.updateAppInternetPermission(it.packageInfo, !isInternetAllowed)
+                            FirewallManager.updateAppInternetPermissionByUID(it.uid, !isInternetAllowed)
                         }
                         val temp = appInfoDetail.appCategory
                         var list: CategoryInfo? = null
@@ -210,6 +196,11 @@ class FirewallAppListAdapter internal constructor(
         }
 
         override fun getGroupCount(): Int {
+            if(titleList.isEmpty()){
+                val mDb = AppDatabase.invoke(context.applicationContext)
+                val appInfoRepository = mDb.appInfoRepository()
+                appInfoRepository.getAllAppDetailsForLiveData()
+            }
             return this.titleList.size
         }
 
@@ -241,6 +232,7 @@ class FirewallAppListAdapter internal constructor(
             val imageHolder4 : AppCompatImageView = convertView.findViewById(R.id.imageLayout_4)
             val progressBar : ProgressBar = convertView.findViewById(R.id.expand_header_progress)
             val indicatorTV : TextView = convertView.findViewById(R.id.expand_header_category_indicator)
+            val sysAppWarning : TextView = convertView.findViewById(R.id.expand_system_apps_warning)
 
             categoryNameTV.text = listTitle.categoryName
             val isInternetAllowed = !listTitle.isInternetBlocked
@@ -266,44 +258,54 @@ class FirewallAppListAdapter internal constructor(
                 indicatorTV.visibility = View.VISIBLE
             }
 
-            val numberofApps = listTitle.numberOFApps
-            if(isInternetAllowed){
-                appCountTV.setText(listTitle.numOfAppsBlocked.toString() + "/" + numberofApps.toString() + " apps blocked")
+            if(listTitle.categoryName.equals("System Apps")){
+                sysAppWarning.visibility = View.VISIBLE
             }else{
-                appCountTV.setText(numberofApps.toString() + "/" + numberofApps.toString() + " apps blocked")
+                sysAppWarning.visibility = View.GONE
+            }
+
+            val numberOfApps = listTitle.numberOFApps
+            if(isInternetAllowed){
+                appCountTV.setText(listTitle.numOfAppsBlocked.toString() + "/" + numberOfApps.toString() + " apps blocked")
+            }else{
+                appCountTV.setText(numberOfApps.toString() + "/" + numberOfApps.toString() + " apps blocked")
             }
 
             //TODO - Dirty code - Change the logic for adding the imageview in the list instead of separate imageview
             var list = dataList[listTitle]
-            if(list!= null && list!!.isNotEmpty()) {
-                if (numberofApps != 0) {
-                    if (numberofApps >= 4) {
-                        imageHolder1.setImageDrawable(context.packageManager.getApplicationIcon(list!![0].packageInfo))
-                        imageHolder2.setImageDrawable(context.packageManager.getApplicationIcon(list!![1].packageInfo))
-                        imageHolder3.setImageDrawable(context.packageManager.getApplicationIcon(list!![2].packageInfo))
-                        imageHolder4.setImageDrawable(context.packageManager.getApplicationIcon(list!![3].packageInfo))
-                    } else if (numberofApps == 3) {
-                        imageHolder1.setImageDrawable(context.packageManager.getApplicationIcon(list!![0].packageInfo))
-                        imageHolder2.setImageDrawable(context.packageManager.getApplicationIcon(list!![1].packageInfo))
-                        imageHolder3.setImageDrawable(context.packageManager.getApplicationIcon(list!![2].packageInfo))
-                        imageHolder4.visibility = View.GONE
-                    } else if (numberofApps == 2) {
-                        imageHolder1.setImageDrawable(context.packageManager.getApplicationIcon(list!![0].packageInfo))
-                        imageHolder2.setImageDrawable(context.packageManager.getApplicationIcon(list!![1].packageInfo))
-                        imageHolder3.visibility = View.GONE
-                        imageHolder4.visibility = View.GONE
+            try{
+                if(list!= null && list!!.isNotEmpty()) {
+                    if (numberOfApps != 0) {
+                        if (numberOfApps >= 4) {
+                            imageHolder1.setImageDrawable(context.packageManager.getApplicationIcon(list[0].packageInfo))
+                            imageHolder2.setImageDrawable(context.packageManager.getApplicationIcon(list[1].packageInfo))
+                            imageHolder3.setImageDrawable(context.packageManager.getApplicationIcon(list[2].packageInfo))
+                            imageHolder4.setImageDrawable(context.packageManager.getApplicationIcon(list[3].packageInfo))
+                        } else if (numberOfApps == 3) {
+                            imageHolder1.setImageDrawable(context.packageManager.getApplicationIcon(list[0].packageInfo))
+                            imageHolder2.setImageDrawable(context.packageManager.getApplicationIcon(list[1].packageInfo))
+                            imageHolder3.setImageDrawable(context.packageManager.getApplicationIcon(list[2].packageInfo))
+                            imageHolder4.visibility = View.GONE
+                        } else if (numberOfApps == 2) {
+                            imageHolder1.setImageDrawable(context.packageManager.getApplicationIcon(list[0].packageInfo))
+                            imageHolder2.setImageDrawable(context.packageManager.getApplicationIcon(list[1].packageInfo))
+                            imageHolder3.visibility = View.GONE
+                            imageHolder4.visibility = View.GONE
+                        } else {
+                            imageHolder1.setImageDrawable(context.packageManager.getApplicationIcon(list[0].packageInfo))
+                            imageHolder2.visibility = View.GONE
+                            imageHolder3.visibility = View.GONE
+                            imageHolder4.visibility = View.GONE
+                        }
                     } else {
-                        imageHolder1.setImageDrawable(context.packageManager.getApplicationIcon(list!![0].packageInfo))
+                        imageHolder1.visibility = View.GONE
                         imageHolder2.visibility = View.GONE
                         imageHolder3.visibility = View.GONE
                         imageHolder4.visibility = View.GONE
                     }
-                } else {
-                    imageHolder1.visibility = View.GONE
-                    imageHolder2.visibility = View.GONE
-                    imageHolder3.visibility = View.GONE
-                    imageHolder4.visibility = View.GONE
                 }
+            }catch (e: Exception){
+                Log.e("BraveDNS","One or more application icons are not available"+e.message,e)
             }
             internetChk.setOnClickListener{
                 object : CountDownTimer(1000, 500) {
@@ -331,16 +333,9 @@ class FirewallAppListAdapter internal constructor(
                 GlobalScope.launch(Dispatchers.IO) {
                     val mDb = AppDatabase.invoke(context.applicationContext)
                     val appInfoRepository = mDb.appInfoRepository()
-                    val categoryInfoRepository =
-                        mDb.categoryInfoRepository()
-                    categoryInfoRepository.updateCategoryInternet(
-                        listTitle.categoryName,
-                        isInternet
-                    )
-                    appInfoRepository.updateInternetForAppCategory(
-                        listTitle.categoryName,
-                        !isInternet
-                    )
+                    val categoryInfoRepository = mDb.categoryInfoRepository()
+                    categoryInfoRepository.updateCategoryInternet(listTitle.categoryName, isInternet)
+                    appInfoRepository.updateInternetForAppCategory(listTitle.categoryName, !isInternet)
                 }
             }
             internetChk.setOnCheckedChangeListener(null)
@@ -408,7 +403,7 @@ class FirewallAppListAdapter internal constructor(
            })
 
        val alertDialog : AlertDialog = builderSingle.show()
-       alertDialog.getListView().setOnItemClickListener({ adapterView, subview, i, l -> })
+       alertDialog.listView.setOnItemClickListener { adapterView, subview, i, l -> }
        alertDialog.setCancelable(false)
        try {
            Looper.loop()

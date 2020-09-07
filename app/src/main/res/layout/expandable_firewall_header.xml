@@ -11,8 +11,8 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:cardMaxElevation="@dimen/activity_horizontal_margin"
-        app:cardElevation="@dimen/activity_horizontal_margin">
+        app:cardElevation="@dimen/activity_horizontal_margin"
+        app:cardMaxElevation="@dimen/activity_horizontal_margin">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -33,13 +33,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="25dp"
+                android:fontFamily="sans-serif-smallcaps"
                 android:paddingTop="15dp"
                 android:paddingBottom="5dp"
                 android:text="TextView"
-                android:fontFamily="sans-serif-smallcaps"
                 android:textColor="@color/primaryText"
-                android:textStyle="bold"
-                android:textSize="@dimen/fab_margin" />
+                android:textSize="@dimen/fab_margin"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/expand_textView_app_count"
@@ -56,12 +56,12 @@
                 android:id="@+id/expand_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="10dp"
                 android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
+                android:layout_weight="0.2"
                 android:drawableLeft="@drawable/allowed"
                 android:drawablePadding="10dp"
-                android:layout_centerVertical="true"
-                android:layout_weight="0.2"
                 android:padding="10dp"
                 android:textOff="Unblocked"
                 android:textOn="Blocked" />
@@ -71,8 +71,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_marginRight="40dp"
                 android:layout_centerVertical="true"
+                android:layout_marginRight="40dp"
                 android:layout_weight="0.2"
                 android:visibility="gone" />
 
@@ -84,36 +84,36 @@
                 android:layout_below="@id/expand_textView_app_count"
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="15dp"
-                android:paddingBottom="15dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingBottom="15dp">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/imageLayout_1"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
                     android:layout_margin="5dp"
-                    android:src="@color/bg_screen4" />
+                    android:src="@drawable/ic_launcher_foreground" />
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/imageLayout_2"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
                     android:layout_margin="5dp"
-                    android:src="@color/bg_screen4" />
+                    android:src="@drawable/ic_launcher_foreground" />
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/imageLayout_3"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
                     android:layout_margin="5dp"
-                    android:src="@color/bg_screen4" />
+                    android:src="@drawable/ic_launcher_foreground" />
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/imageLayout_4"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
                     android:layout_margin="5dp"
-                    android:src="@color/bg_screen4" />
+                    android:src="@drawable/ic_launcher_foreground" />
 
                 <ImageView
                     android:layout_width="40dp"
@@ -123,6 +123,17 @@
 
                 </ImageView>
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/expand_system_apps_warning"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/imageLayout"
+                android:padding="10dp"
+                android:visibility="gone"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:text="@string/system_apps_warning"/>
 
 
         </RelativeLayout>

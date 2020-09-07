@@ -466,6 +466,7 @@
                 app:rb_color="@color/rippleColor"
                 app:rb_duration="6000"
                 app:rb_radius="26dp"
+                android:layoutDirection="ltr"
                 app:rb_rippleAmount="3"
                 app:rb_scale="3"
                 app:rb_type="fillRipple">

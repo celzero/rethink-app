@@ -13,7 +13,6 @@ import com.celzero.bravedns.net.dns.DnsPacket
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.ui.QueryDetailActivity
-import com.celzero.bravedns.util.Utilities
 import java.io.IOException
 import java.net.InetAddress
 import java.net.ProtocolException
@@ -92,35 +91,23 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
         // Overall view
         private var rowView: View? = null
         // Contents of the condensed view
-        private var hostnameView: TextView? = null
         private var timeView: TextView? = null
         private var flagView: TextView? = null
 
         // Contents of the expanded details view
-        private var detailsView: View? = null
         private var fqdnView: TextView? = null
-        private var typeView: TextView? = null
         private var latencyView: TextView? = null
-        private var resolverView: TextView? = null
-        private var responseView: TextView? = null
         private var queryLayoutLL : LinearLayout ?= null
         private var queryIndicator : TextView ?=  null
 
         init{
             rowView = itemView
 
-            hostnameView = itemView.findViewById(R.id.fqdn1)
             timeView = itemView.findViewById(R.id.response_time)
             flagView = itemView.findViewById(R.id.flag)
-
-            detailsView = itemView.findViewById(R.id.details)
             fqdnView = itemView.findViewById(R.id.fqdn)
-            typeView = itemView.findViewById(R.id.qtype)
             latencyView = itemView.findViewById(R.id.latency_val)
-            resolverView = itemView.findViewById(R.id.resolver)
-            responseView = itemView.findViewById(R.id.response)
             queryLayoutLL = itemView.findViewById(R.id.query_screen_ll)
-
             queryIndicator = itemView.findViewById(R.id.query_log_indicator)
 
         }
@@ -129,24 +116,17 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
             // This function can be run up to a dozen times while blocking rendering, so it needs to be
             // as brief as possible.
             this.transaction = transaction
-            hostnameView!!.setText(transaction.hostname)
             timeView!!.setText(transaction.time)
             flagView!!.setText(transaction.flag)
             fqdnView!!.setText(transaction.fqdn)
-            typeView!!.setText(transaction.typename)
             latencyView!!.setText(transaction.latency)
-            if (transaction.resolver != null) {
-                resolverView!!.setText(transaction.resolver)
-            } else {
-                resolverView!!.setText(R.string.unknown_server)
-            }
-            responseView!!.setText(transaction.response)
 
             if(transaction.isBlocked){
                 queryIndicator!!.visibility = View.VISIBLE
             }else{
                 queryIndicator!!.visibility = View.INVISIBLE
             }
+
         }
     }
 
@@ -177,7 +157,7 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
     inner class TransactionView(transaction : Transaction) {
 
         var fqdn : String? = null
-        var hostname : String? = null
+        //var hostname : String? = null
         var time : String? = null
         var flag : String? = null
         var resolver : String? = null
@@ -190,7 +170,7 @@ class QueryAdapter(val activity : QueryDetailActivity) : RecyclerView.Adapter<Re
             // If true, the panel is expanded to show details.
             // Human-readable representation of this transaction.
             fqdn = transaction.name
-            hostname = Utilities.getETldPlus1(transaction.name)
+            //hostname = Utilities.getETldPlus1(transaction.name)
 
             val hour :Int ?= transaction.responseCalendar[Calendar.HOUR_OF_DAY]
             val minute :Int ?= transaction.responseCalendar[Calendar.MINUTE]

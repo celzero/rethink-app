@@ -32,9 +32,11 @@ class PersistentState {
         private const val BACKGROUND_MODE = "background_mode"
         private const val SCREEN_STATE = "screen_state"
 
-        private const val IS_SCREEN_OFF = "screen_off"
+        const val IS_SCREEN_OFF = "screen_off"
         private const val CUSTOM_URL_BOOLEAN = "custom_url_boolean"
         private const val CUSTOM_URL = "custom_url"
+
+        private const val pref_auto_start_bootup = "auto_start_on_boot"
 
         private const val APPROVED_KEY = "approved"
         private const val ENABLED_KEY = "enabled"
@@ -337,6 +339,7 @@ class PersistentState {
         }
 
         fun setScreenLockData(context: Context, isEnabled : Boolean) {
+            HomeScreenActivity.GlobalVariable.isScreenLocked = isEnabled
             val editor: SharedPreferences.Editor =
                 getUserPreferences(context)!!.edit()
             editor.putBoolean(IS_SCREEN_OFF, isEnabled)
@@ -344,8 +347,21 @@ class PersistentState {
         }
 
         fun getScreenLockData(context: Context) : Boolean{
-            return getUserPreferences(context)?.getBoolean(IS_SCREEN_OFF,false)!!
+            return getUserPreferences(context).getBoolean(IS_SCREEN_OFF, false)
         }
+
+
+        fun setPrefAutoStartBootup(context: Context, isEnabled: Boolean) {
+            val editor: SharedPreferences.Editor =
+                getUserPreferences(context).edit()
+            editor.putBoolean(pref_auto_start_bootup, isEnabled)
+            editor.apply()
+        }
+
+        fun getPrefAutoStartBootUp(context: Context): Boolean {
+            return getUserPreferences(context).getBoolean(pref_auto_start_bootup, false)
+        }
+
 
         fun setCustomURLBool(context: Context, isEnabled: Boolean) {
             val editor: SharedPreferences.Editor = getUserPreferences(context)!!.edit()

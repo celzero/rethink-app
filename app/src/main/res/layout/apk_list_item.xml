@@ -48,11 +48,11 @@
                     android:layout_height="36dp"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="10dp"
-
+                    android:src="@drawable/ic_launcher_foreground"
                     android:layout_marginBottom="10dp"
                     android:maxWidth="60dp"
                     android:maxHeight="60dp"
-                    tools:src="@color/primaryText" />
+                     />
 
                 <TextView
                     android:id="@+id/firewall_apk_label_tv"

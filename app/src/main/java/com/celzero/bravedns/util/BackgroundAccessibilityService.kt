@@ -5,14 +5,12 @@ import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityEvent.*
 import com.celzero.bravedns.automaton.FirewallManager
-import com.celzero.bravedns.automaton.PermissionsManager
-import kotlinx.coroutines.InternalCoroutinesApi
 
 class BackgroundAccessibilityService  : AccessibilityService() {
 
     private val firewallManager = FirewallManager(this)
     override fun onInterrupt() {
-        TODO("Not yet implemented")
+        Log.w("______","Interrupted")
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {

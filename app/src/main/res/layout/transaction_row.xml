@@ -34,37 +34,6 @@
                 android:visibility="invisible"
                 tools:text="" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="5dp"
-                android:visibility="gone"
-                tools:background="@color/cardview_dark_background">
-
-                <TextView
-                    android:id="@+id/type_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:paddingRight="5dp"
-                    android:text="@string/type_label"
-                    app:layout_constraintBottom_toTopOf="@+id/qtype1"
-                    app:layout_constraintStart_toStartOf="@+id/qtype1" />
-
-                <TextView
-                    android:id="@+id/qtype"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:paddingRight="5dp"
-                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                    android:textColor="@color/primaryText"
-                    app:layout_constraintBottom_toBottomOf="@+id/type_text"
-                    tools:text="AAAA" />
-            </LinearLayout>
-
-
             <TextView
                 android:id="@+id/flag"
                 android:layout_width="wrap_content"
@@ -86,12 +55,6 @@
                 android:orientation="vertical"
                 android:paddingLeft="5dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="5dp"
-                    android:text="@string/query_label"
-                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/fqdn"
@@ -116,12 +79,6 @@
                 android:orientation="vertical"
                 android:padding="5dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:text="@string/latency_label"
-                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/latency_val"
@@ -144,13 +101,6 @@
                 android:padding="5dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:text="Time"
-                    android:visibility="gone" />
-
-                <TextView
                     android:id="@+id/response_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -162,263 +112,6 @@
                     tools:text="17:54:11" />
             </LinearLayout>
 
-            <!-- This button's background image is set by Java code as a workaround for lack of support
-            for vector background drawables on pre-Lollipop Android.  See
-            https://medium.com/@ferrand.d/can-you-and-should-you-use-vector-drawables-a-cheatsheet-32a2e1cc2ecf-->
-            <ToggleButton
-                android:id="@+id/expand"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="end|center_vertical"
-                android:layout_margin="10dp"
-                android:layout_weight="0"
-                android:scrollbars="none"
-                android:textOff=""
-                android:textOn=""
-                android:visibility="gone" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/details"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:visibility="gone">
-            <!-- <TextView
-                 android:id="@+id/flag"
-                 android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 android:layout_weight="0"
-                 android:layout_gravity="start"
-                 android:ellipsize="none"
-                 android:padding="5dp"
-                 android:minWidth="40dp"
-                 android:singleLine="true"
-                 android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-                 android:textSize="30sp"
-                 tools:text="" />-->
-
-
-            <ImageView
-                android:id="@+id/query_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:tint="@color/accent_good"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/query_spacer"
-                app:srcCompat="@drawable/ic_dns"
-                tools:ignore="ContentDescription" />
-
-
-            <TextView
-                android:id="@+id/fqdn1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:ellipsize="none"
-                android:scrollbars="horizontal"
-                android:singleLine="true"
-                android:textAlignment="viewStart"
-                android:textAppearance="@android:style/TextAppearance.Large"
-                android:textIsSelectable="true"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@+id/query_icon"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/query_icon"
-                app:layout_constraintTop_toTopOf="@+id/query_icon"
-                tools:text="longlonglonglonglonglongexample.com" />
-
-
-            <ImageView
-                android:id="@+id/type_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:tint="@color/accent_good"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/type_spacer"
-                app:srcCompat="@drawable/ic_pageview_black_24dp"
-                tools:ignore="ContentDescription" />
-
-
-            <ImageView
-                android:id="@+id/latency_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:tint="@color/accent_good"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/latency_spacer"
-                app:srcCompat="@drawable/ic_access_time_black_24dp"
-                tools:ignore="ContentDescription" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="0.9"
-                android:orientation="vertical"
-                android:paddingLeft="5dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/destination_label"
-                    android:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/response"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:ellipsize="none"
-                    android:scrollbars="horizontal"
-                    android:singleLine="true"
-                    android:textAlignment="viewStart"
-                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                    android:textColor="@color/primaryText"
-                    android:textIsSelectable="true"
-                    android:visibility="visible"
-                    app:layout_constraintBottom_toBottomOf="@id/response_icon"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toEndOf="@id/response_icon"
-                    app:layout_constraintTop_toTopOf="@id/response_icon"
-                    tools:text="US (192.0.2.1)" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right|center_vertical"
-                android:orientation="vertical"
-                android:paddingRight="2dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end|center"
-                    android:text="@string/latency_label"
-                    android:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/latency_small"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end|center"
-                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                    android:textColor="@color/primaryText"
-                    android:visibility="visible"
-                    app:layout_constraintBottom_toBottomOf="@id/latency_icon"
-                    app:layout_constraintStart_toEndOf="@id/latency_icon"
-                    app:layout_constraintTop_toTopOf="@id/latency_icon"
-                    tools:text="72 ms" />
-            </LinearLayout>
-
-            <View
-                android:id="@+id/resolver_spacer"
-                android:layout_width="2dp"
-                android:layout_height="72dp"
-                android:background="@color/accent_good"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="@id/query_icon"
-                app:layout_constraintStart_toStartOf="@id/query_icon"
-                app:layout_constraintTop_toBottomOf="@id/latency_icon" />
-
-            <ImageView
-                android:id="@+id/resolver_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:tint="@color/accent_good"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/resolver_spacer"
-                app:srcCompat="@drawable/ic_server"
-                tools:ignore="ContentDescription" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/resolver_label"
-                android:visibility="gone"
-                app:layout_constraintBottom_toTopOf="@id/resolver"
-                app:layout_constraintStart_toStartOf="@id/resolver" />
-
-            <TextView
-                android:id="@+id/resolver"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:ellipsize="none"
-                android:scrollbars="horizontal"
-                android:singleLine="true"
-                android:textAlignment="viewStart"
-                android:textAppearance="@android:style/TextAppearance.Large"
-                android:textIsSelectable="true"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@id/resolver_icon"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@id/resolver_icon"
-                app:layout_constraintTop_toTopOf="@id/resolver_icon"
-                tools:text="AU (2404:6800:4006:809::200e)" />
-
-            <View
-                android:id="@+id/response_spacer"
-                android:layout_width="2dp"
-                android:layout_height="72dp"
-                android:background="@color/accent_good"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="@id/query_icon"
-                app:layout_constraintStart_toStartOf="@id/query_icon"
-                app:layout_constraintTop_toBottomOf="@id/resolver_icon" />
-
-            <ImageView
-                android:id="@+id/response_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:tint="@color/accent_good"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/response_spacer"
-                app:srcCompat="@drawable/ic_location_on_black_24dp"
-                tools:ignore="ContentDescription" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/destination_label"
-                android:visibility="gone"
-                app:layout_constraintBottom_toTopOf="@id/response"
-                app:layout_constraintStart_toStartOf="@id/response" />
-
-            <TextView
-                android:id="@+id/response1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:ellipsize="none"
-                android:scrollbars="horizontal"
-                android:singleLine="true"
-                android:textAlignment="viewStart"
-                android:textAppearance="@android:style/TextAppearance.Large"
-                android:textIsSelectable="true"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@id/response_icon"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@id/response_icon"
-                app:layout_constraintTop_toTopOf="@id/response_icon"
-                tools:text="US (192.0.2.1)" />
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
