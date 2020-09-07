@@ -11,22 +11,24 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
+import com.celzero.bravedns.automaton.FirewallRules
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.CategoryInfo
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.blockedUID
-import com.celzero.bravedns.util.PlayStoreCategory
 import com.celzero.bravedns.util.DatabaseHandler
+import com.celzero.bravedns.util.PlayStoreCategory
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.common.collect.HashMultimap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jsoup.Jsoup
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 
@@ -47,6 +49,7 @@ class HomeScreenActivity : AppCompatActivity() {
     object GlobalVariable{
         var braveMode : Int = -1
         var appList : MutableMap<String, AppInfo> = HashMap()
+        var backgroundAllowedUID : MutableMap<Int,Boolean> = HashMap()
         var blockedUID : MutableMap<Int,Boolean> = HashMap()
         var dnsMode = -1
         var firewallMode : Int = -1
@@ -59,11 +62,15 @@ class HomeScreenActivity : AppCompatActivity() {
         var numUniversalBlock : MutableLiveData<Int> = MutableLiveData()
         var appStartTime : Long = System.currentTimeMillis()
         var isBackgroundEnabled : Boolean = false
+        var firewallRules : HashMultimap<Int, String> = HashMultimap.create()
+        var DEBUG = true
+        var isScreenLocked : Boolean = false
     }
 
     companion object {
         lateinit var dbHandler : DatabaseHandler
         var isLoadingComplete : Boolean = false
+        const val DAYS_TO_MAINTAIN_NETWORK_LOG = 2
     }
 
     //TODO : Remove the unwanted data and the assignments happening
@@ -88,17 +95,38 @@ class HomeScreenActivity : AppCompatActivity() {
         GlobalVariable.dnsMode = PersistentState.getDnsMode(this)
         GlobalVariable.firewallMode = PersistentState.getFirewallMode(this)
         GlobalVariable.isBackgroundEnabled = PersistentState.getBackgroundEnabled(this)
-
+        GlobalVariable.isScreenLocked = PersistentState.getScreenLockData(this)
+        //refreshDatabase()
         registerReceiversForScreenState()
-        getAppInfo()
+
+        var firewallRules = FirewallRules.getInstance()
+        firewallRules.loadFirewallRules(this)
+        deleteOlderDataFromNetworkLogs()
 
         //getAppDetails()
+    }
+
+    private fun deleteOlderDataFromNetworkLogs() {
+        GlobalScope.launch(Dispatchers.IO) {
+            val mDb = AppDatabase.invoke(context.applicationContext)
+            val connTrackerRepository = mDb.connectionTrackerRepository()
+            var DAY_IN_MS = 1000 * 60 * 60 * 24
+            var date = System.currentTimeMillis() - (DAYS_TO_MAINTAIN_NETWORK_LOG * DAY_IN_MS)
+            if(DEBUG) Log.d("BraveDNS","Time: ${System.currentTimeMillis()}, dateVal: $date")
+            connTrackerRepository.deleteOlderData(date)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshDatabase()
     }
 
     private fun registerReceiversForScreenState(){
         val filter = IntentFilter()
         filter.addAction(Intent.ACTION_PACKAGE_ADDED)
         filter.addAction(Intent.ACTION_PACKAGE_REMOVED)
+        filter.addDataScheme("package")
         registerReceiver(BraveVPNService.braveScreenStateReceiver, filter)
     }
 
@@ -106,6 +134,34 @@ class HomeScreenActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(BraveVPNService.braveScreenStateReceiver)
+    }
+
+
+    /**
+     * Need to rewrite the logic for adding the apps in the database and removing it during uninstall.
+     */
+    private fun refreshDatabase(){
+        GlobalScope.launch(Dispatchers.IO) {
+            val mDb = AppDatabase.invoke(context.applicationContext)
+            val appInfoRepository = mDb.appInfoRepository()//AppInfoRepository(appInfoDAO)
+            //val allPackages: List<PackageInfo> = context.packageManager?.getInstalledPackages(PackageManager.GET_META_DATA)!!
+            val appListDB = appInfoRepository.getAppInfoAsync()
+            if(appListDB.isNotEmpty()){
+                appListDB.forEach{
+                    try{
+                        val packageName = context.packageManager.getPackageInfo(it.packageInfo, PackageManager.GET_META_DATA)
+                        if(packageName.applicationInfo == null){
+                            appInfoRepository.deleteAsync(it)
+                        }
+                    }catch (e : Exception){
+                        Log.e("BraveDNS","Application not available ${it.appName}"+e.message,e)
+                        appInfoRepository.deleteAsync(it)
+                    }
+                }
+            }
+            getAppInfo()
+        }
+
     }
 
     private fun getAppInfo() {
@@ -116,7 +172,6 @@ class HomeScreenActivity : AppCompatActivity() {
             val appInfoRepository = mDb.appInfoRepository()//AppInfoRepository(appInfoDAO)
             val allPackages: List<PackageInfo> = context.packageManager?.getInstalledPackages(PackageManager.GET_META_DATA)!!
             val appDetailsFromDB = appInfoRepository.getAppInfoAsync()
-            var count = 0
             if (appDetailsFromDB.isEmpty() || appDetailsFromDB.size != allPackages.size-1) {
                 allPackages.forEach {
                     if (it.applicationInfo.packageName != applicationContext.packageName) {
@@ -131,6 +186,7 @@ class HomeScreenActivity : AppCompatActivity() {
                             appInfo.appCategory = category
                         else if ((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) {
                             appInfo.appCategory = "System Apps"
+                            appInfo.isSystemApp = true
                         } else {
                             val temp = ApplicationInfo.getCategoryTitle(context, applicationInfo.category)
                             if (temp != null)
@@ -142,8 +198,8 @@ class HomeScreenActivity : AppCompatActivity() {
                             appInfo.appCategory = appInfo.appCategory.replace("_"," ").toLowerCase()
                         appInfo.isDataEnabled = true
                         appInfo.isWifiEnabled = true
-                        appInfo.isSystemApp = true
-                        count += 1
+
+                        //count += 1
                         if ((applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0) {
                             appInfo.isSystemApp = false
                         }
@@ -160,7 +216,6 @@ class HomeScreenActivity : AppCompatActivity() {
                         appInfoRepository.insertAsync(appInfo, this)
                     }
                 }
-                updateCategoryInDB()
             }else{
                 appList.clear()
                 appDetailsFromDB.forEach {
@@ -170,7 +225,7 @@ class HomeScreenActivity : AppCompatActivity() {
                     }
                 }
             }
-
+            updateCategoryInDB()
             isLoadingComplete = true
         }
     }
@@ -186,17 +241,17 @@ class HomeScreenActivity : AppCompatActivity() {
         val mDb = AppDatabase.invoke(context.applicationContext)
         val appInfoRepository = mDb.appInfoRepository()//AppInfoRepository(appInfoDAO)
         val categoryInfoRepository = mDb.categoryInfoRepository()
-        val categoryDetailsFromDB = categoryInfoRepository.getAppCategoryList()
+        //val categoryDetailsFromDB = categoryInfoRepository.getAppCategoryList()
         var categoryListFromAppList = appInfoRepository.getAppCategoryList()
-        if (categoryDetailsFromDB.isEmpty() || categoryDetailsFromDB.size != categoryListFromAppList.size) {
+        //if (categoryDetailsFromDB.isEmpty() || categoryDetailsFromDB.size != categoryListFromAppList.size) {
             categoryListFromAppList.forEach {
                 val categoryInfo = CategoryInfo()
                 categoryInfo.categoryName = it //.replace("_"," ").toLowerCase()
                 categoryInfo.numberOFApps = appInfoRepository.getAppCountForCategory(it)
-                categoryInfo.isInternetBlocked = false
+                //categoryInfo.isInternetBlocked = false
                 categoryInfoRepository.insertAsync(categoryInfo)
             }
-        }
+        //}
     }
 
     /**

@@ -16,14 +16,10 @@ limitations under the License.
 package com.celzero.bravedns.service;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.celzero.bravedns.net.dns.DnsPacket;
 import com.celzero.bravedns.net.doh.Transaction;
-import com.celzero.bravedns.ui.HomeScreenActivity;
-import com.google.common.collect.Iterables;
-import com.google.common.math.Quantiles;
 
 import java.net.InetAddress;
 import java.net.ProtocolException;
@@ -32,12 +28,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-
-import static android.content.Context.MODE_PRIVATE;
 
 /**
  * A class for tracking DNS transactions.  This class counts the number of successful transactions,
@@ -52,7 +42,7 @@ public class QueryTracker {
   private static final int HISTORY_SIZE = 1000;
   //private static final int ACTIVITY_MEMORY_MS = 60 * 1000;  // One minute
 
-  private long numRequests = 0;
+  //private long numRequests = 0;
   private Queue<Transaction> recentTransactions = new LinkedList<>();
   private Queue<Long> recentActivity = new LinkedList<>();
   private List<Integer> queryList = new ArrayList<Integer>();
@@ -63,9 +53,9 @@ public class QueryTracker {
     sync(context, transaction);
   }
 
-  public synchronized long getNumRequests() {
+  /*public synchronized long getNumRequests() {
     return numRequests;
-  }
+  }*/
 
   public synchronized Queue<Transaction> getRecentTransactions() {
     return new LinkedList<>(recentTransactions);
@@ -107,15 +97,15 @@ public class QueryTracker {
   synchronized void recordTransaction(Context context, Transaction transaction) {
     // Increment request counter on each successful resolution
     //if (transaction.status == Transaction.Status.) {
-      ++numRequests;
+      /*++numRequests;
       // HomeScreenActivity.GlobalVariable.INSTANCE.setLifeTimeQueries(numRequests);
       if (numRequests % HISTORY_SIZE != 0) {
         // Avoid losing too many requests in case of an unclean shutdown, but also avoid
         // excessive disk I/O from syncing the counter to disk after every request.
-        sync(context, transaction);
-      }
-    //}
 
+      }*/
+    //}
+    sync(context, transaction);
     recentActivity.add(transaction.queryTime);
     PersistentState.Companion.setNumOfReq(context);
     DnsPacket packet = null;
@@ -148,20 +138,21 @@ public class QueryTracker {
   public synchronized void sync(Context context, Transaction transaction) {
     if (transaction != null) {
       // Restore number of requests from storage, or 0 if it isn't defined yet.
-      numRequests = PersistentState.Companion.getNumOfReq(context);
-      if (!queryList.isEmpty()){
-        if (queryList.size() > HISTORY_SIZE) {
-          int val = queryList.size()-1;
-          queryList.remove(val);
+      //numRequests = PersistentState.Companion.getNumOfReq(context);
+      if (!queryList.isEmpty()) {
+        if (queryList.size() >= HISTORY_SIZE) {
+          queryList.remove(0);
         }
-    }
+      }
       int val = (int) (transaction.responseTime - transaction.queryTime);
       queryList.add(val);
-      Collections.sort(queryList);
-      int positionP50 = (int) (queryList.size() * 0.50);
-      val = queryList.get(positionP50);
+      List<Integer> _queryList = new ArrayList<Integer>(queryList);
+      Collections.sort(_queryList);
+      int positionP50 = (int) (_queryList.size() * 0.50);
+      val = _queryList.get(positionP50);
       PersistentState.Companion.setMedianLatency(context, val);
     }
   }
+
 }
 

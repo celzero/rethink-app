@@ -169,7 +169,6 @@
                    android:layout_height="wrap_content"
                    android:divider="@color/childListColor"
                    android:childDivider="@color/colorPrimary"
-                    android:transcriptMode="disabled"
                    android:nestedScrollingEnabled="true"
                    android:scrollbars="none"
                    android:dividerHeight="3dp" />

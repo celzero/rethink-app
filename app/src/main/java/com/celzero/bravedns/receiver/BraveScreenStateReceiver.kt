@@ -9,9 +9,11 @@ import android.util.Log
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.ApplicationManagerActivity
 import com.celzero.bravedns.ui.HomeScreenActivity
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.launch
 
 
 class BraveScreenStateReceiver : BroadcastReceiver() {
@@ -26,7 +28,6 @@ class BraveScreenStateReceiver : BroadcastReceiver() {
                 context.startService(newIntent)
             }
         } else if (intent.action.equals(Intent.ACTION_USER_PRESENT)) {
-            println("ACTION_SCREEN_ON")
             if(PersistentState.getFirewallModeForScreenState(context!!)) {
                 var state = PersistentState.getScreenLockData(context)
                 if(state) {
@@ -43,23 +44,25 @@ class BraveScreenStateReceiver : BroadcastReceiver() {
     }
 
     private fun removePackageFromList(pacakgeName :String? , context : Context){
+        if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d("BraveDNS", "RemovePackage: $pacakgeName")
         GlobalScope.launch(Dispatchers.IO){
             val packageName = pacakgeName!!.removePrefix("package:")
             val mDb = AppDatabase.invoke(context.applicationContext)
             val appInfoRepository = mDb.appInfoRepository()
             appInfoRepository.removeUninstalledPackage(pacakgeName)
-            withContext(Dispatchers.Main.immediate) {
-                ApplicationManagerActivity.updateUI(packageName, false)
-            }
+            HomeScreenActivity.GlobalVariable.appList.remove(pacakgeName)
+            PersistentState.setExcludedPackagesWifi(packageName, true, context)
         }
 
 
     }
 
     private fun addPackagetoList(packageName: String, context: Context) {
+        if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d("BraveDNS", "Add Package: $packageName")
         GlobalScope.launch(Dispatchers.IO) {
             val mDb = AppDatabase.invoke(context.applicationContext)
             val appInfoRepository = mDb.appInfoRepository()
+            val packageName = packageName!!.removePrefix("package:")
             try {
                 var details =
                     context.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
@@ -72,7 +75,7 @@ class BraveScreenStateReceiver : BroadcastReceiver() {
                         if (category != null)
                             appInfo.appCategory = category.toString()
                         else
-                            appInfo.appCategory = "Unknown Category"
+                            appInfo.appCategory = "Other"
                         appInfo.isDataEnabled = true
                         appInfo.isWifiEnabled = true
                         appInfo.isSystemApp = false
@@ -89,13 +92,10 @@ class BraveScreenStateReceiver : BroadcastReceiver() {
                         appInfo.uid = applicationInfo.uid
 
                         //TODO Handle this Global scope variable properly. Only half done.
-                        //HomeScreenActivity.GlobalVariable.appList[applicationInfo.packageName] = appInfo
+                        HomeScreenActivity.GlobalVariable.appList[applicationInfo.packageName] = appInfo
                         //HomeScreenActivity.GlobalVariable.installedAppCount = HomeScreenActivity.GlobalVariable.installedAppCount + 1
                         appInfoRepository.insertAsync(appInfo, this)
                     }
-                }
-                withContext(Dispatchers.Main.immediate) {
-                    ApplicationManagerActivity.updateUI(packageName!!, true)
                 }
             }catch(e: PackageManager.NameNotFoundException){
                 Log.e("BraveDNS","Package Not Found received from the receiver")

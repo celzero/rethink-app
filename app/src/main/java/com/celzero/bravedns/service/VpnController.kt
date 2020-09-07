@@ -3,8 +3,8 @@ package com.celzero.bravedns.service
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.celzero.bravedns.data.IPDetails
 
 class VpnController {
 
@@ -36,19 +36,21 @@ class VpnController {
     }
 
     fun getBraveVpnService(): BraveVPNService? {
-            return braveVpnService
+        return braveVpnService
     }
 
     @Synchronized
-    fun onConnectionStateChanged(context: Context?, state: BraveVPNService.State? ) {
+    fun onConnectionStateChanged(context: Context, state: BraveVPNService.State? ) {
         if (braveVpnService == null) {
             // User clicked disable while the connection state was changing.
             return
         }
         connectionState = state
-        if (context != null) {
-            stateChanged(context)
-        }
+        //TODO Changes done to remove the check of context
+        stateChanged(context)
+        /*if (context != null) {
+
+        }*/
     }
 
 
@@ -60,10 +62,11 @@ class VpnController {
 
     @Synchronized
     fun start(context: Context) {
-        //TODO : Code modified to remove the check of null reference
-        /*if (braveVpnService != null) {
+        //TODO : Code modified to remove the check of null reference - MODIFIED check??
+        if (braveVpnService != null) {
+            Log.d("BraveDNS","braveVPNService is not null")
             return
-        }*/
+        }
         PersistentState.setVpnEnabled(context, true)
         stateChanged(context)
         val startServiceIntent = Intent(context, BraveVPNService::class.java)
@@ -87,6 +90,7 @@ class VpnController {
 
     @Synchronized
     fun stop(context: Context?) {
+        Log.e("BraveDNS", "VPN controller stop called")
         PersistentState.setVpnEnabled(context!!, false)
         connectionState = null
         if (braveVpnService != null) {

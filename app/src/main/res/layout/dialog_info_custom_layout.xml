@@ -23,7 +23,7 @@
     </ImageView>
 
     <TextView
-        style="@style/Widget.AppCompat.TextView"
+        style="@style/Widget.AppCompat.TextView.SpinnerItem"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -33,7 +33,7 @@
         android:text="@string/dns_mode_info_title" />
 
     <TextView
-        style="@style/Widget.AppCompat.TextView"
+        style="@style/Widget.AppCompat.TextView.SpinnerItem"
         android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,7 +42,7 @@
         android:text="@string/dns_mode_info_explanation" />
 
     <TextView
-        style="@style/Widget.AppCompat.TextView"
+        style="@style/Widget.AppCompat.TextView.SpinnerItem"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         android:layout_width="wrap_content"
         android:padding="10dp"
@@ -52,7 +52,7 @@
         android:text="@string/firewall_mode_info_title" />
 
     <TextView
-        style="@style/Widget.AppCompat.TextView"
+        style="@style/Widget.AppCompat.TextView.SpinnerItem"
         android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -61,7 +61,7 @@
         android:text="@string/firewall_mode_info_explanation" />
 
     <TextView
-        style="@style/Widget.AppCompat.TextView"
+        style="@style/Widget.AppCompat.TextView.SpinnerItem"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -70,16 +70,6 @@
         android:visibility="gone"
         android:drawableLeft="@drawable/spinner_both"
         android:text="@string/hybrid_mode_info_title" />
-    <TextView
-        style="@style/Widget.AppCompat.TextView"
-        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:drawablePadding="20dp"
-        android:visibility="gone"
-        android:lineSpacingExtra="5dp"
-        android:padding="10dp"
-        android:text="@string/hybrid_mode_info_explanation" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/info_dialog_cancel_btn"

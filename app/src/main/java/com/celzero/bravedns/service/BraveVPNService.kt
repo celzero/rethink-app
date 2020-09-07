@@ -35,6 +35,8 @@ import androidx.annotation.WorkerThread
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
+import com.celzero.bravedns.automaton.FirewallRules
+import com.celzero.bravedns.data.ConnectionRules
 import com.celzero.bravedns.data.IPDetails
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.net.go.GoVpnAdapter
@@ -42,10 +44,14 @@ import com.celzero.bravedns.net.manager.ConnectionTracer
 import com.celzero.bravedns.receiver.BraveAutoStartReceiver
 import com.celzero.bravedns.receiver.BraveScreenStateReceiver
 import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.backgroundAllowedUID
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.dnsMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.firewallMode
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.isScreenLocked
 import com.celzero.bravedns.ui.HomeScreenFragment
+import com.celzero.bravedns.util.FileSystemUID
+import com.celzero.bravedns.util.Protocol
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.internal.synchronized
 import protect.Blocker
@@ -64,12 +70,13 @@ class BraveVPNService:
     private var vpnAdapter: GoVpnAdapter? = null
 
     private val DNS_REQUEST_ID = "53"
+    private val PRIVATE_DNS_ID = "853"
 
     companion object{
 
-
+        var firewallRules = FirewallRules.getInstance()
         private const val LOG_TAG = "BraveVPNService"
-        private const val DEBUG = false
+        private const val DEBUG = true
         const val SERVICE_ID = 1 // Only has to be unique within this app.
 
         var braveScreenStateReceiver = BraveScreenStateReceiver()
@@ -119,12 +126,37 @@ class BraveVPNService:
     override fun block(protocol: Int, _uid: Long, sourceAddress: String, destAddress: String): Boolean {
         var isBlocked  = false
         var uid = _uid.toInt()
+
         val first = sourceAddress.split(":")
         val second = destAddress.split(":")
-        var ipDetails : IPDetails ?= null
+        var ipDetails: IPDetails?
         try {
-            if(PersistentState.getScreenLockData(this))
+            if(PersistentState.getScreenLockData(this)){
+                if (VERSION.SDK_INT >= VERSION_CODES.Q) {
+                    uid = connTracer.getUidQ(protocol, first[0], first[first.size - 1].toInt(), second[0], second[second.size - 1].toInt())
+                }
+                if (DEBUG) Log.d("BraveDNS", "isScreenLocked: $uid, ${second[second.size-1]}")
+                //Don't include DNS and private DNS request in the list
+                if (second[second.size - 1] != DNS_REQUEST_ID && second[second.size-1] != PRIVATE_DNS_ID) {
+                    ipDetails  = IPDetails(uid,first[0],first[first.size-1], second[0], second[second.size-1], System.currentTimeMillis(),true, protocol)
+                    sendConnTracking(ipDetails)
+                }
                 return true
+            } else if (PersistentState.getBackgroundEnabled(this)) {
+                if (VERSION.SDK_INT >= VERSION_CODES.Q) {
+                    uid = connTracer.getUidQ(protocol, first[0], first[first.size - 1].toInt(), second[0], second[second.size - 1].toInt())
+                }
+                if ((uid != 0 || uid != -1) && FileSystemUID.isUIDAppRange(uid)) {
+                    if (DEBUG) Log.d("BraveDNS", "Background: $uid")
+                    if (!backgroundAllowedUID.containsKey(uid)) {
+                        if (second[second.size - 1] != DNS_REQUEST_ID && second[second.size-1] != PRIVATE_DNS_ID) {
+                            ipDetails = IPDetails(uid, first[0], first[first.size - 1], second[0], second[second.size - 1], System.currentTimeMillis(), true, protocol)
+                            sendConnTracking(ipDetails)
+                        }
+                        return true
+                    }
+                }
+            }
             if(VERSION.SDK_INT >= VERSION_CODES.O && VERSION.SDK_INT < VERSION_CODES.Q) {
                 if(uid != 0 || uid != -1) {
                     isBlocked = isUidBlocked(uid)
@@ -136,8 +168,12 @@ class BraveVPNService:
                 uid = connTracer.getUidQ(protocol, first[0], first[first.size - 1].toInt(),second[0], second[second.size - 1].toInt())
                 isBlocked = isUidBlocked(uid)
             }
-            //Don't include DNS request in the list
-            if(second[second.size - 1] != DNS_REQUEST_ID){
+
+            if(!isBlocked){
+                var connectionRules = ConnectionRules(second[0], second[second.size-1].toInt(), Protocol.getProtocolName(protocol).name)
+                isBlocked = firewallRules.checkRules(uid, connectionRules)
+            }
+            if (second[second.size - 1] != DNS_REQUEST_ID && second[second.size-1] != PRIVATE_DNS_ID) {
                 ipDetails  = IPDetails(uid,first[0],first[first.size-1], second[0], second[second.size-1], System.currentTimeMillis(),isBlocked, protocol)
                 sendConnTracking(ipDetails)
             }
@@ -150,21 +186,15 @@ class BraveVPNService:
 
     private fun sendConnTracking(ipDetails: IPDetails){
         getIPTracker()!!.recordTransaction(this, ipDetails)
-        val intent = Intent(InternalNames.TRACKER.name)
-        intent.putExtra(InternalNames.IPTRACKER.name, ipDetails)
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
 
     private fun isUidBlocked(uid: Int): Boolean {
-        // TODO: Implementation pending
-        var isBlocked : Boolean
-        try{
-            isBlocked = FirewallManager.checkInternetPermission(uid)
+        return try{
+            FirewallManager.checkInternetPermission(uid)
         }catch (e : Exception ){
-            isBlocked = false
+            false
         }
-        return isBlocked
     }
 
     override fun getResolvers(): String {
@@ -224,12 +254,15 @@ class BraveVPNService:
     }
 
     private fun registerReceiversForScreenState(){
+        val actionFilter = IntentFilter()
         val filter = IntentFilter()
-        filter.addAction(Intent.ACTION_SCREEN_OFF)
-        filter.addAction(Intent.ACTION_USER_PRESENT)
+        actionFilter.addAction(Intent.ACTION_SCREEN_OFF)
+        actionFilter.addAction(Intent.ACTION_USER_PRESENT)
         filter.addAction(Intent.ACTION_PACKAGE_ADDED)
         filter.addAction(Intent.ACTION_PACKAGE_REMOVED)
+        filter.addDataScheme("package")
         registerReceiver(braveScreenStateReceiver, filter)
+        registerReceiver(braveScreenStateReceiver,actionFilter)
         val autoStartFilter = IntentFilter()
         autoStartFilter.addAction(Intent.ACTION_BOOT_COMPLETED)
         registerReceiver(braveAutoStartReceiver, autoStartFilter)
@@ -404,6 +437,10 @@ class BraveVPNService:
             url = PersistentState.getServerUrl(this)
             spawnServerUpdate()
         }
+
+        if(PersistentState.IS_SCREEN_OFF == key){
+            isScreenLocked = PersistentState.getScreenLockData(this)
+        }
     }
 
     fun signalStopService(userInitiated: Boolean) {
@@ -461,10 +498,13 @@ class BraveVPNService:
                 if (vpnAdapter != null) {
                     vpnAdapter!!.close()
                     vpnAdapter = null
-                    //vpnController.getState(this)!!.activationRequested = false
+                    vpnController.stop(this)
+                    vpnController.getState(this)!!.activationRequested = false
                     vpnController.onConnectionStateChanged(this, null)
                 }
             }
+        }else{
+            Log.e("BraveDNS","Stop Called with VPN Controller as null")
         }
     }
 
@@ -527,9 +567,9 @@ class BraveVPNService:
     @WorkerThread
     private fun startVpn() {
         kotlin.synchronized(vpnController!!) {
-            if (vpnAdapter != null) {
+            /*if (vpnAdapter != null) {
                 return
-            }
+            }*/
             startVpnAdapter()
             vpnController.onStartComplete(this, vpnAdapter != null)
             if (vpnAdapter == null) {
@@ -561,7 +601,7 @@ class BraveVPNService:
             if (networkManager != null) {
                 networkManager!!.destroy()
             }
-            vpnController!!.setBraveVpnService(null)
+            vpnController.setBraveVpnService(null)
             stopForeground(true)
             if (vpnAdapter != null) {
                 signalStopService(false)
@@ -570,12 +610,9 @@ class BraveVPNService:
     }
 
     override fun onRevoke() {
-
         stopSelf()
-
-        //TODO Check the below code
         // Disable autostart if VPN permission is revoked.
-        //PersistentState.setVpnEnabled(this, false)
+        PersistentState.setVpnEnabled(this, false)
     }
 
 

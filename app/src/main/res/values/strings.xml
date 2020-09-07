@@ -229,7 +229,7 @@
 
     <string name="status_strict"
         description="This is similar to dns_on, but the protection is being provided by the operating system, not by Intra.  It is not color-highlighted.">
-    protected by android
+    private dns is enabled
   </string>
 
     <string name="explanation_strict"
@@ -247,6 +247,9 @@
         description="Expanded form of status_exposed">
     Your connection is exposed to DNS attacks.
   </string>
+
+  <string name="dns_explanation_dns_connected">connected to bravedns</string>
+    <string name="dns_explanation_firewall_connected">connected to firewall</string>
 
     <string name="dns_explanation_connected" description= "The message will be shown when the DNS is connected">
         connected to bravedns and firewall
@@ -397,5 +400,38 @@
     <string name="about_email">Email us</string>
     <string name="about_twitter">Follow us on Twitter</string>
     <string name="about_mozilla">BraveDNS is part of Mozilla Builders MVP program.</string>
+
+    <string name="conn_track_clear_logs_title">Clear network logs?</string>
+    <string name="conn_track_clear_logs_message">All the network logs will be cleared</string>
+
+    <string name="bsct_kill">Kill app</string>
+    <string name="bsct_clear">Clear all rules</string>
+    <string name="bsct_block_all">Block &lt;u>all apps&lt;/u> from connecting to this IP</string>
+    <string name="bsct_block_app">Block &lt;u>this app&lt;/u> from connecting to this IP</string>
+    <string name="bsct_block">Block &lt;u>this app&lt;/u> from connecting to the Internet</string>
+    <string name="bsct_unblock">Unblock App</string>
+    <string name="bsct_conn_details">Connection Details</string>
+    <string name="bsct_conn_block_desc">blocked %1$s by </string>
+    <string name="bsct_conn_unblock_desc">allowed %1$s.</string>
+    <string name="bsct_conn_conn_desc">%1$s attempted connection to IP address &lt;big>&lt;u>%2$s&lt;/u>&lt;/big> on port %3$s (%4$s).</string>
+    <string name="bsct_ip_heading">IP</string>
+    <string name="bsct_block_conn_type_block">Block connection</string>
+    <string name="bsct_block_conn_type_unblock">Unblock connection</string>
+    <string name="bsct_block_conn_status_block_app">Connection Blocked for this app</string>
+    <string name="bsct_block_conn_status_unblock_app">Connection Unblocked for this app</string>
+    <string name="bsct_block_conn_status_success_all">Connection Blocked for all apps</string>
+    <string name="bsct_alert_message_clear_rules">All rules related to this app will be cleared</string>
+    <string name="bsct_alert_message_clear_rules_heading">Clear rules</string>
+    <string name="bsct_rules_cleared_toast">All rules related to this app is cleared</string>
+
+    <string name="private_dns_toast">Turn off "Private DNS" in Android network settings to use BraveDNS</string>
+    <string name="always_on_dialog_heading">Disable Always-on VPN</string>
+    <string name="always_on_dialog">\"Always-On VPN\" is enabled on this device. To start BraveDNS, please go to Settings app and disable \"Always-on VPN\".</string>
+    <string name="always_on_toast">Another VPN is set as Always-on VPN</string>
+    <string name="always_on_dialog_positive_btn">Go to Settings</string>
+    <string name="always_on_dialog_negative_btn">Cancel</string>
+    <string name="always_on_lock_down_toast">Turn off "Block connections without VPN" in Android VPN settings</string>
+
+    <string name="system_apps_warning">Some system apps are critical to proper functioning of a device. Block them only if you know what you are doing.</string>
 
 </resources>

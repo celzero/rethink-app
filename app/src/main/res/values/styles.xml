@@ -19,7 +19,8 @@
         <item name="android:drawablePadding">@dimen/drawable_padding</item>
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:padding">@dimen/normal_padding</item>
+        <item name="android:textColor">@color/primaryText</item>
+
     </style>
 
     <style name="AppTheme.Button" parent="Widget.AppCompat.Button.Colored">
@@ -41,16 +42,44 @@
         <item name="bottomSheetStyle">@style/BottomSheet</item>
     </style>
 
-    <style name="BottomSheetDialogTheme" parent="BaseBottomSheetDialog" />
+    <style name="BottomSheetDialogTheme" parent="BaseBottomSheetDialog">
+        <!-- Active thumb color & Active track color(30% transparency) -->
+        <item name="colorControlActivated">@color/accent_bad</item>
+        <!-- Inactive thumb color -->
+        <item name="colorSwitchThumbNormal">@color/neutral</item>
+        <!-- Inactive track color(30% transparency) -->
+        <item name="android:colorForeground">@color/neutral</item>
+    </style>
 
     <style name="SearchView_custom" parent="Widget.AppCompat.SearchView">
         <item name="searchViewStyle">@style/Widget.AppCompat.Light.SearchView</item>
         <item name="android:maxWidth">@dimen/maxSize</item>
     </style>
 
-<!--    <style name="BraveModeSpinnerTheme" parent="Widget.AppCompat.DropDownItem.Spinner">
-        <item name="android:spinnerDropDownItemStyle">@style/Widget.AppCompat.TextView.SpinnerItem</item>
-        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Body1</item>
-    </style>-->
+    <style name="SwitchCompat_theme" parent="Theme.MaterialComponents.NoActionBar">
+        <!-- Active thumb color & Active track color(30% transparency) -->
+        <item name="colorControlActivated">@color/accent_bad</item>
+        <!-- Inactive thumb color -->
+        <item name="colorSwitchThumbNormal">@color/neutral</item>
+        <!-- Inactive track color(30% transparency) -->
+        <item name="android:colorForeground">@color/neutral</item>
+    </style>
+
+    <style name="DialogTheme" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowCloseOnTouchOutside">false</item>
+        <item name="background">@color/colorPrimaryDark</item>
+        <item name="backgroundTint">@color/colorPrimaryDark</item>
+        <item name="android:layout_margin">5dp</item>
+        <item name="colorAccent">@color/colorPrimaryDark</item>
+        <item name="android:borderlessButtonStyle">@style/Widget.AppCompat.Button.Borderless</item>
+    </style>
+
+
+
+    <!--    <style name="BraveModeSpinnerTheme" parent="Widget.AppCompat.DropDownItem.Spinner">
+            <item name="android:spinnerDropDownItemStyle">@style/Widget.AppCompat.TextView.SpinnerItem</item>
+            <item name="android:textAppearance">@style/TextAppearance.AppCompat.Body1</item>
+        </style>-->
 
 </resources>

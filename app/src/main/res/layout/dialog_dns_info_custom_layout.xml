@@ -23,7 +23,7 @@
             android:src="@android:drawable/ic_menu_close_clear_cancel"></ImageView>
 
         <TextView
-            style="@style/Widget.AppCompat.TextView"
+            style="@style/Widget.AppCompat.TextView.SpinnerItem"
             android:layout_width="wrap_content"
             android:drawableLeft="@drawable/dns_no_filter"
             android:layout_height="wrap_content"
@@ -33,7 +33,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
         <TextView
-            style="@style/Widget.AppCompat.TextView"
+            style="@style/Widget.AppCompat.TextView.SpinnerItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:lineSpacingExtra="5dp"
@@ -42,7 +42,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
         <TextView
-            style="@style/Widget.AppCompat.TextView"
+            style="@style/Widget.AppCompat.TextView.SpinnerItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawablePadding="20dp"
@@ -52,7 +52,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
         <TextView
-            style="@style/Widget.AppCompat.TextView"
+            style="@style/Widget.AppCompat.TextView.SpinnerItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:lineSpacingExtra="5dp"
@@ -61,7 +61,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
         <TextView
-            style="@style/Widget.AppCompat.TextView"
+            style="@style/Widget.AppCompat.TextView.SpinnerItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawablePadding="20dp"
@@ -71,7 +71,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
         <TextView
-            style="@style/Widget.AppCompat.TextView"
+            style="@style/Widget.AppCompat.TextView.SpinnerItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawablePadding="20dp"
@@ -81,7 +81,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
         <TextView
-            style="@style/Widget.AppCompat.TextView"
+            style="@style/Widget.AppCompat.TextView.SpinnerItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawablePadding="20dp"
@@ -91,7 +91,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
         <TextView
-            style="@style/Widget.AppCompat.TextView"
+            style="@style/Widget.AppCompat.TextView.SpinnerItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawablePadding="20dp"
@@ -101,7 +101,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
         <TextView
-            style="@style/Widget.AppCompat.TextView"
+            style="@style/Widget.AppCompat.TextView.SpinnerItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawablePadding="20dp"
@@ -111,7 +111,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
         <TextView
-            style="@style/Widget.AppCompat.TextView"
+            style="@style/Widget.AppCompat.TextView.SpinnerItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawablePadding="20dp"

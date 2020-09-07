@@ -30,16 +30,20 @@ class AppInfoRepository  (private val appInfoDAO: AppInfoDAO){
     }
 
 
-    fun updateInternetForuid(uid : Int, isInternetAllowed : Boolean){
-        return appInfoDAO.updateInternetPermissionForAlluid(uid, isInternetAllowed)
+    fun updateInternetForuid(uid : Int, isInternetAllowed : Boolean, coroutineScope: CoroutineScope = GlobalScope){
+        coroutineScope.launch {
+            appInfoDAO.updateInternetPermissionForAlluid(uid, isInternetAllowed)
+        }
     }
 
     fun getAppListForUID(uid:Int) : List<AppInfo>{
         return appInfoDAO.getAppListForUID(uid)
     }
 
-    fun updateInternetForAppCategory(categoryName : String, isInternetAllowed: Boolean){
-        return appInfoDAO.updateInternetPermissionForCategory(categoryName,isInternetAllowed)
+    fun updateInternetForAppCategory(categoryName : String, isInternetAllowed: Boolean, coroutineScope: CoroutineScope = GlobalScope){
+        coroutineScope.launch {
+            appInfoDAO.updateInternetPermissionForCategory(categoryName,isInternetAllowed)
+        }
     }
 
     fun getAllAppDetailsForLiveData(): LiveData<List<AppInfo>>{
@@ -56,6 +60,10 @@ class AppInfoRepository  (private val appInfoDAO: AppInfoDAO){
 
     fun getAppCountForCategory(categoryName : String): Int {
         return appInfoDAO.getAppCountForCategory(categoryName)
+    }
+
+    fun getPackageNameForAppName(appName : String) : String {
+        return appInfoDAO.getPackageNameForAppName(appName)
     }
 
 }

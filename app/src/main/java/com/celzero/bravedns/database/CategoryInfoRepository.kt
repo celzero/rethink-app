@@ -1,15 +1,10 @@
 package com.celzero.bravedns.database
 
-import android.util.Log
 import androidx.lifecycle.LiveData
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 class CategoryInfoRepository  (private val categoryInfoDAO: CategoryInfoDAO){
 
     fun updateAsync(categoryInfo: CategoryInfo){
-        Log.d("BraveDNS","updateAsync: ${categoryInfo.categoryName}, ${categoryInfo.isInternetBlocked} ")
         categoryInfoDAO.update(categoryInfo)
     }
 

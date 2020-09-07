@@ -40,21 +40,34 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="start"
-                        android:layout_weight="1"
-                        app:queryHint="Search by application name"
+                        android:layout_weight="0.80"
                         android:fontFamily="sans-serif"
-                        android:isScrollContainer="true" >
-                        <requestFocus/>
+                        android:isScrollContainer="true"
+                        app:queryHint="Search by app name or IP">
+
+                        <requestFocus />
                     </androidx.appcompat.widget.SearchView>
 
                     <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/connection_dns_info_icon"
+                        android:id="@+id/connection_filter_icon"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_gravity="right"
-                        android:visibility="gone"
-                        android:layout_weight="0.15"
-                        android:src="@drawable/filter" />
+                        android:layout_gravity="center"
+                        android:layout_weight="0.10"
+                        android:padding="5dp"
+                        android:src="@drawable/ic_filter"
+                        android:visibility="visible" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/connection_delete_icon"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:layout_weight="0.10"
+                        android:padding="5dp"
+                        android:layout_marginBottom="2dp"
+                        android:src="@drawable/ic_delete"
+                        android:visibility="visible" />
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -64,7 +77,6 @@
         <LinearLayout
             android:id="@+id/connection_list_recycler_heading"
             android:layout_width="match_parent"
-            android:visibility="gone"
             android:layout_height="wrap_content"
             android:layout_below="@id/connection_card_view_top"
             android:layout_marginLeft="10dp"
@@ -73,6 +85,7 @@
             android:elevation="@dimen/activity_horizontal_margin"
             android:orientation="horizontal"
             android:padding="10dp"
+            android:visibility="gone"
             android:weightSum="4">
 
             <TextView
@@ -127,8 +140,7 @@
             android:layout_below="@id/connection_list_recycler_heading"
             android:layout_margin="5dp"
             android:orientation="vertical"
-            android:paddingBottom="60dp" />
-
+            android:layout_marginBottom="?attr/actionBarSize" />
 
     </RelativeLayout>
 </LinearLayout>

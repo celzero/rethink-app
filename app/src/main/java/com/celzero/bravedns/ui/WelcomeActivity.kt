@@ -68,11 +68,7 @@ class WelcomeActivity  : AppCompatActivity() {
                 }
             }
 
-            override fun onPageScrolled(
-                position: Int,
-                positionOffset: Float,
-                positionOffsetPixels: Int
-            ) {
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
 
             }
 
@@ -134,11 +130,8 @@ class WelcomeActivity  : AppCompatActivity() {
         }
 
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
-
             layoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-
-            val view: View =
-                layoutInflater.inflate(layout.get(position), container, false)
+            val view: View = layoutInflater.inflate(layout.get(position), container, false)
             container.addView(view)
             return view
         }

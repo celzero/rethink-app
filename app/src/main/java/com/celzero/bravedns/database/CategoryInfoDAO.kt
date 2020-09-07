@@ -9,7 +9,7 @@ interface CategoryInfoDAO {
     @Update
     fun update(categoryInfo: CategoryInfo)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(categoryInfo: CategoryInfo)
 
     @Delete

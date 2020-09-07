@@ -4,28 +4,31 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.text.TextUtils
+import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.backgroundAllowedUID
 import com.celzero.bravedns.util.BackgroundAccessibilityService
-import kotlinx.coroutines.*
+import com.celzero.bravedns.util.FileSystemUID
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.launch
 
 /*TODO : Initial check is for firewall app completely
            Later modification required for Data, WiFi, ScreenOn/Off, Background
            Lot of redundant code - streamline the code.
            */
 
-class FirewallManager {
+class FirewallManager(service: BackgroundAccessibilityService) {
 
-    private val accessibilityService: BackgroundAccessibilityService
+    private val accessibilityService: BackgroundAccessibilityService = service
     private lateinit var packageManager: PackageManager
     private val packagesStack = LinkedHashSet<String>()
     private var latestTrackedPackage: String? = null
     private var packageElect: String? = null
-
-    constructor(service: BackgroundAccessibilityService) {
-        accessibilityService = service
-    }
 
     val TAG = "BraveDNS"
 
@@ -42,27 +45,38 @@ class FirewallManager {
         }
 
         @OptIn(InternalCoroutinesApi::class)
-        fun updateAppInternetPermission(packageName : String, isAllowed : Boolean){
-                val appInfo = GlobalVariable.appList.get(packageName)
-                if(appInfo != null){
-                    appInfo.isInternetAllowed = isAllowed
-                    GlobalVariable.appList.set(packageName,appInfo)
-                }
+        fun updateAppInternetPermission(packageName: String, isAllowed: Boolean) {
+            val appInfo = GlobalVariable.appList.get(packageName)
+            if (appInfo != null) {
+                appInfo.isInternetAllowed = isAllowed
+                GlobalVariable.appList.set(packageName, appInfo)
+            }
         }
 
         fun updateAppInternetPermissionByUID(uid: Int, isInternetAllowed : Boolean){
             if(isInternetAllowed)
                 GlobalVariable.blockedUID.remove(uid)
             else
-                GlobalVariable.blockedUID.put(uid,isInternetAllowed)
+                GlobalVariable.blockedUID[uid] = isInternetAllowed
         }
 
-        @OptIn(InternalCoroutinesApi::class)
         fun updateInternetBackground(packageName: String, isAllowed: Boolean){
             val appInfo = GlobalVariable.appList.get(packageName)
             if(appInfo != null){
-                appInfo.isInternetAllowed = isAllowed
-                GlobalVariable.appList.set(packageName,appInfo)
+                if(DEBUG) Log.d("BraveDNS","Update Internet Permission from background: ${appInfo.appName}, ${appInfo.isInternetAllowed}")
+                //appInfo.isInternetAllowed = isAllowed
+                //GlobalVariable.appList.set(packageName,appInfo)
+                backgroundAllowedUID.clear()
+                if(isAllowed && FileSystemUID.isUIDAppRange(appInfo.uid)){
+                    backgroundAllowedUID[appInfo.uid] = isAllowed
+                    //backgroundAllowed = appInfo.uid
+                }else{
+                    backgroundAllowedUID.remove(appInfo.uid)
+                    //backgroundAllowed = 0
+                }
+                backgroundAllowedUID.forEach{
+                    if(DEBUG) Log.d("BraveDNS","UID - Allowed - ${it.key}, ${it.value}")
+                }
             }
         }
 
@@ -70,9 +84,9 @@ class FirewallManager {
         fun updateCategoryAppsInternetPermission(categoryName : String, isAllowed: Boolean, context: Context ){
             GlobalScope.launch ( Dispatchers.IO ) {
                 GlobalVariable.appList.forEach {
-                    if (it.value.appCategory.equals(categoryName)) {
+                    if (it.value.appCategory == categoryName) {
                         it.value.isInternetAllowed = isAllowed
-                        GlobalVariable.appList.put(it.key, it.value)
+                        GlobalVariable.appList[it.key] = it.value
                         PersistentState.setExcludedPackagesWifi(it.key, isAllowed, context)
                         updateAppInternetPermissionByUID(it.value.uid, isAllowed)
                     }
@@ -113,11 +127,14 @@ class FirewallManager {
             // https://stackoverflow.com/a/27642535
             // top window is launcher? try revoke queued up permissions
             // FIXME: Figure out a fool-proof way to determine is launcher visible
-            if (isPackageLauncher(packageName)) {
+           // if(DEBUG) Log.d("BraveDNS","AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -- isPackageLauncher: ${packageName}")
+            if (!isPackageLauncher(packageName)) {
                 // TODO: revoke permissions only if there are any to revoke
+                //if(DEBUG) Log.d("BraveDNS","isPackageLauncher: ${packageName}, false")
                 addOrRemovePackageForBackground(false)
             }
         }else{
+            //if(DEBUG) Log.d("BraveDNS","addOrRemovePackageForBackground:isPackageLauncher ${packageName}, true")
             addOrRemovePackageForBackground(true)
         }
 
@@ -134,6 +151,7 @@ class FirewallManager {
 
 
     private fun addOrRemovePackageForBackground(isAllowed: Boolean){
+        //if(DEBUG) Log.d("BraveDNS","isBackgroundEnabled: ${GlobalVariable.isBackgroundEnabled}")
         if(!GlobalVariable.isBackgroundEnabled)
             return
         if (packagesStack.isNullOrEmpty()) {
