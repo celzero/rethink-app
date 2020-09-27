@@ -20,7 +20,7 @@ Almost all of the network related code, including DNS over HTTPS split tunnel, i
 
 ### BraveDNS Resolver
 
-A malware and ad-blocking DNS over HTTPS resolver run by BraveDNS (deployed to 200+ locations world-wide) is the default DNS endpoint on the app, though the user is free to change that. A configurable DNS resolver that lets users add or remove blacklists and whitelists, add rewrites, analyse DNS requests is launching late August, 2020.
+A malware and ad-blocking DNS over HTTPS resolver at `https://free.bravedns.com/dns-query` (deployed to 200+ locations world-wide) is the default DNS endpoint on the app, though the user is free to change that. A configurable DNS resolver that lets users add or remove blacklists and whitelists, add rewrites, analyse DNS requests is launching late October, 2020. Right now, a free-to-use DNS over HTTPS endpoint with custom blocklists can be setup here: [bravedns.com/configure](https://bravedns.com/configure).
 
 ### Community
 - Join us on telegram: [t.me/bravedns](https://t.me/bravedns).
