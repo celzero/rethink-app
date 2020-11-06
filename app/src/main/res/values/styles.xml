@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.NoActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.NoActionBar.Bridge">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -23,14 +23,14 @@
 
     </style>
 
-    <style name="AppTheme.Button" parent="Widget.AppCompat.Button.Colored">
-        <item name="colorButtonNormal">@color/colorPrimary</item>
-        <item name="android:textColor">@color/light_bg</item>
+    <style name="CustomWidget.MaterialComponents.CompoundButton.Switch" parent="Widget.MaterialComponents.CompoundButton.Switch">
+        <item name="materialThemeOverlay">@style/CustomCompoundButton_Switch</item>
     </style>
 
-    <style name="AppTheme.Toggle" parent="Widget.AppCompat.DrawerArrowToggle">
-        <item name="colorControlNormal">@color/neutral</item>
-        <item name="colorAccent">@color/accent_good</item>
+    <style name="CustomCompoundButton_Switch">
+        <item name="colorSurface">@color/neutral</item>
+        <item name="colorOnSurface">@color/neutral</item>
+        <item name="colorControlActivated">@color/accent_good</item>
     </style>
 
     <style name="BottomSheet" parent="@style/Widget.Design.BottomSheet.Modal">
@@ -48,7 +48,8 @@
         <!-- Inactive thumb color -->
         <item name="colorSwitchThumbNormal">@color/neutral</item>
         <!-- Inactive track color(30% transparency) -->
-        <item name="android:colorForeground">@color/neutral</item>
+        <item name="android:colorForeground">@color/primaryText</item>
+        <item name="android:textColor">@color/neutral</item>
     </style>
 
     <style name="SearchView_custom" parent="Widget.AppCompat.SearchView">
@@ -56,7 +57,7 @@
         <item name="android:maxWidth">@dimen/maxSize</item>
     </style>
 
-    <style name="SwitchCompat_theme" parent="Theme.MaterialComponents.NoActionBar">
+    <style name="SwitchCompat_theme" parent="Theme.MaterialComponents.NoActionBar.Bridge">
         <!-- Active thumb color & Active track color(30% transparency) -->
         <item name="colorControlActivated">@color/accent_bad</item>
         <!-- Inactive thumb color -->
@@ -65,16 +66,19 @@
         <item name="android:colorForeground">@color/neutral</item>
     </style>
 
-    <style name="DialogTheme" parent="Theme.AppCompat.Dialog.Alert">
-        <item name="windowNoTitle">true</item>
-        <item name="android:windowCloseOnTouchOutside">false</item>
-        <item name="background">@color/colorPrimaryDark</item>
-        <item name="backgroundTint">@color/colorPrimaryDark</item>
-        <item name="android:layout_margin">5dp</item>
-        <item name="colorAccent">@color/colorPrimaryDark</item>
-        <item name="android:borderlessButtonStyle">@style/Widget.AppCompat.Button.Borderless</item>
+    <style name="ThinnerChip" parent="Widget.MaterialComponents.Chip.Filter">
+        <item name="chipCornerRadius">12dp</item>
+        <item name="chipMinHeight">24dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="chipMinTouchTargetSize">30dp</item>
     </style>
 
+    <style name="ThinnerChip_action" parent="Widget.MaterialComponents.Chip.Action">
+            <item name="chipCornerRadius">12dp</item>
+            <item name="chipMinHeight">24dp</item>
+            <item name="android:textSize">12sp</item>
+            <item name="chipMinTouchTargetSize">30dp</item>
+        </style>
 
 
     <!--    <style name="BraveModeSpinnerTheme" parent="Widget.AppCompat.DropDownItem.Spinner">

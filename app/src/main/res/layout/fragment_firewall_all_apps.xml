@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <TextView
+        android:id="@+id/firewall_category_show_txt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:background="@color/colorPrimaryDark"
+        android:fontFamily="sans-serif-smallcaps"
+        android:padding="10dp"
+        android:text="by category"
+        android:textColor="@color/secondaryText"
+        android:textSize="@dimen/slide_desc"
+        android:visibility="gone"
+        app:drawableRightCompat="@drawable/ic_keyboard_arrow_up_gray_24dp" />
+
+
+    <TextView
+        android:id="@+id/firewall_category_explain_txt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/firewall_category_show_txt"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:padding="10dp"
+        android:text="@string/settings_explanation_text"
+        android:textColor="@color/neutral"
+        android:textSize="14sp" />
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/firewall_category_search"
+        style="@style/SearchView_custom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="2dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="2dp"
+        android:layout_marginBottom="5dp"
+        android:background="@color/colorPrimary"
+        android:backgroundTint="@color/colorPrimaryDark"
+        android:backgroundTintMode="src_atop"
+        android:clickable="true"
+        android:iconifiedByDefault="false"
+        android:maxWidth="10000dp"
+        android:orientation="horizontal"
+        android:visibility="visible"
+        android:layout_below="@id/firewall_category_explain_txt"
+        app:queryBackground="@color/colorPrimaryDark"
+        app:queryHint="Search apps"
+        tools:layout_editor_absoluteX="4dp">
+
+        <requestFocus />
+    </androidx.appcompat.widget.SearchView>
+
+    <ExpandableListView
+        android:id="@+id/firewall_expandable_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/firewall_category_search"
+        android:childDivider="@color/colorPrimary"
+        android:nestedScrollingEnabled="true"
+        android:divider="@color/childListColor"
+        android:scrollbars="none"
+        android:layout_marginStart="2dp"
+        android:layout_marginEnd="2dp"
+        android:dividerHeight="3dp"
+        android:groupIndicator="@null" />
+
+
+
+    <ProgressBar
+        android:id="@+id/firewall_update_progress"
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:layout_below="@id/firewall_category_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible" />
+</RelativeLayout>

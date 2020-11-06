@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/am_apk_parent"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimaryDark"
+    android:layout_marginBottom="1dp"
+
+    android:paddingEnd="10dp">
+
+        <RelativeLayout
+            android:id="@+id/univ_whitelist_container"
+            android:layout_width="match_parent"
+            android:layout_marginStart="5dp"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/univ_whitelist_apk_icon_iv"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_margin="5dp"
+                android:layout_marginStart="10dp"
+                android:maxWidth="40dp"
+                android:maxHeight="40dp"
+                tools:src="@color/colorPrimary" />
+
+            <TextView
+                android:id="@+id/univ_whitelist_apk_label_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="10dp"
+                android:layout_toEndOf="@id/univ_whitelist_apk_icon_iv"
+                android:layout_toStartOf="@id/univ_whitelist_checkbox"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:text="Dummy Label"
+                android:textColor="@color/primaryText"
+                android:textSize="16sp" />
+
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/univ_whitelist_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
+                android:buttonTint="@color/primaryText"
+                android:foregroundTint="@color/secondaryText"
+                android:layout_margin="10dp" />
+
+        </RelativeLayout>
+
+</RelativeLayout>

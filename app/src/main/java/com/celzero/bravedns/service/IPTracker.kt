@@ -1,3 +1,19 @@
+/*
+Copyright 2020 RethinkDNS and its authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package com.celzero.bravedns.service
 
 import android.content.Context
@@ -8,6 +24,9 @@ import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.FileSystemUID
 import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
 import com.celzero.bravedns.util.Utilities.Companion.getFlag
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.net.InetAddress
 import java.util.*
 
@@ -27,57 +46,85 @@ class IPTracker(var context: Context?) {
 
         @Synchronized
         fun recordTransaction(context: Context?, ipDetails: IPDetails ) {
+            if(context != null) {
+                insertToDB(context, ipDetails)
+            }
             //recentIPActivity.add(ipDetails.timeStamp)
-            //if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d("BraveDNS","Record Transaction")
-            insertToDB(context!!, ipDetails)
-            if (historyEnabled) {
+            //if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG,"Record Transaction")
+            /*if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(Constants.LOG_TAG, "Conn tracker Record Transaction: ${ipDetails.uid},${recentTrackers.size}")
+            if(context != null) {
+                if (PersistentState.getBackgroundEnabled(context)) {
+                    recentTrackers.add(ipDetails)
+
+                    if (recentTrackers.size >= 10) {
+                        val insertValues = recentTrackers
+                        insertToDB(context, insertValues)
+                        //recentTrackers.clear()
+                    }
+                } else {
+                    recentTrackers.add(ipDetails)
+                    insertToDB(context, recentTrackers)
+                    //recentTrackers.clear()
+                }
+            }*/
+            /*if (historyEnabled) {
                 recentTrackers.add(ipDetails)
                 if (recentTrackers.size > HISTORY_SIZE) {
                     recentTrackers.remove()
                 }
-            }
+            }*/
         }
 
-        private fun insertToDB(context:Context, ipDetails: IPDetails){
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val connTrackRepository = mDb.connectionTrackerRepository()
-            val connTracker = ConnectionTracker()
-            connTracker.ipAddress = ipDetails.destIP
-            connTracker.isBlocked = ipDetails.isBlocked
-            connTracker.uid = ipDetails.uid
-            connTracker.port = ipDetails.destPort.toInt()
-            connTracker.protocol = ipDetails.protocol
-            connTracker.timeStamp = ipDetails.timeStamp
+        private fun insertToDB(context:Context, ipDetails : IPDetails ){
+            GlobalScope.launch(Dispatchers.IO) {
+                val mDb = AppDatabase.invoke(context.applicationContext)
+                val appInfoRepository = mDb.appInfoRepository()
+                val connTrackRepository = mDb.connectionTrackerRepository()
+                //var connTrackerList: MutableList<ConnectionTracker> = ArrayList()
+                //ipDetailsList.forEach { ipDetails ->
+                    val connTracker = ConnectionTracker()
+                    connTracker.ipAddress = ipDetails.destIP
+                    connTracker.isBlocked = ipDetails.isBlocked
+                    connTracker.uid = ipDetails.uid
+                    connTracker.port = ipDetails.destPort.toInt()
+                    connTracker.protocol = ipDetails.protocol
+                    connTracker.timeStamp = ipDetails.timeStamp
+                    connTracker.blockedByRule = ipDetails.blockedByRule
 
-            var serverAddress: InetAddress? = null
-            //var resolver : String? = null
+                    var serverAddress: InetAddress? = null
+                    //var resolver : String? = null
 
-            if (ipDetails.destIP != null) {
-                serverAddress = InetAddress.getByName(ipDetails.destIP)
-            } else {
-                serverAddress = null
-            }
-            val countryCode: String = getCountryCode(serverAddress!!, context)
-            connTracker.flag =  getFlag(countryCode)
+                    serverAddress = InetAddress.getByName(ipDetails.destIP)
+                    val countryCode: String = getCountryCode(serverAddress!!, context)
+                    connTracker.flag = getFlag(countryCode)
 
+                    //appname
+                    var packageName = context.packageManager.getPackagesForUid(ipDetails.uid)
 
-            //appname
-            var packageName = context.packageManager.getPackagesForUid(ipDetails.uid)
-
-            if (packageName != null) {
-                HomeScreenActivity.GlobalVariable.appList.forEach {
-                    if (it.value.uid == ipDetails.uid) {
-                        connTracker.appName = it.value.appName
+                    if (packageName != null) {
+                        HomeScreenActivity.GlobalVariable.appList.forEach {
+                            if (it.value.uid == ipDetails.uid) {
+                                connTracker.appName = it.value.appName
+                            }
+                        }
+                        if (connTracker.appName.isNullOrBlank()) {
+                            connTracker.appName = appInfoRepository.getAppNameForUID(ipDetails.uid)
+                        }
+                    } else {
+                        val fileSystemUID = FileSystemUID.fromFileSystemUID(ipDetails.uid)
+                        if (fileSystemUID.uid == -1)
+                            connTracker.appName = "Unknown"
+                        else
+                            connTracker.appName = fileSystemUID.name
                     }
+                    //connTrackerList.add(connTracker)
+                    connTrackRepository.insertAsync(connTracker)
                 }
-            } else {
-                var packageName = FileSystemUID.fromFileSystemUID(ipDetails.uid)
-                if (packageName.uid == -1)
-                    connTracker.appName = "Unknown"
-                else
-                    connTracker.appName = packageName.name
-            }
 
-            connTrackRepository.insertAsync(connTracker)
+                //connTrackRepository.insertBulkAsync(connTrackerList as ArrayList<ConnectionTracker>)
+
+                //mDb.close()
+
+
         }
 }

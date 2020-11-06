@@ -18,6 +18,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp"
             android:background="@color/light"
             android:orientation="vertical">
 
@@ -43,7 +45,7 @@
                         android:layout_weight="0.80"
                         android:fontFamily="sans-serif"
                         android:isScrollContainer="true"
-                        app:queryHint="Search by app name or IP">
+                        app:queryHint="Search apps or IPs">
 
                         <requestFocus />
                     </androidx.appcompat.widget.SearchView>
@@ -54,7 +56,7 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:layout_weight="0.10"
-                        android:padding="5dp"
+                        android:padding="8dp"
                         android:src="@drawable/ic_filter"
                         android:visibility="visible" />
 
@@ -64,8 +66,7 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:layout_weight="0.10"
-                        android:padding="5dp"
-                        android:layout_marginBottom="2dp"
+                        android:padding="8dp"
                         android:src="@drawable/ic_delete"
                         android:visibility="visible" />
 
@@ -137,8 +138,11 @@
             android:id="@+id/recycler_connection"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:nestedScrollingEnabled="true"
             android:layout_below="@id/connection_list_recycler_heading"
-            android:layout_margin="5dp"
+            android:layout_margin="2dp"
+            android:clickable="true"
+            android:focusable="true"
             android:orientation="vertical"
             android:layout_marginBottom="?attr/actionBarSize" />
 

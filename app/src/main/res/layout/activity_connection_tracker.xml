@@ -5,10 +5,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.FirewallActivity">
+    tools:context=".ui.UniversalFirewallFragment">
 
   <com.google.android.material.appbar.AppBarLayout
       android:id="@+id/app_bar_connection_tracker"
+      android:visibility="gone"
       android:layout_width="match_parent"
       android:layout_height="150dp"
       app:layout_constraintTop_toTopOf="parent"

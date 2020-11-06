@@ -29,6 +29,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import static com.celzero.bravedns.util.Constants.LOG_TAG;
+
 /**
  * A class for tracking DNS transactions.  This class counts the number of successful transactions,
  * records the last minute of query timestamps, and optionally maintains a history of recent
@@ -114,7 +116,7 @@ public class QueryTracker {
       if (transaction.response != null)
         packet = new DnsPacket(transaction.response);
     } catch (ProtocolException e) {
-      Log.e("BraveDNS ProtocolException", e.getMessage(), e);
+      Log.e(LOG_TAG, e.getMessage(), e);
     }
     if (packet != null) {
       List<InetAddress> addresses  = packet.getResponseAddresses();
@@ -139,18 +141,20 @@ public class QueryTracker {
     if (transaction != null) {
       // Restore number of requests from storage, or 0 if it isn't defined yet.
       //numRequests = PersistentState.Companion.getNumOfReq(context);
-      if (!queryList.isEmpty()) {
-        if (queryList.size() >= HISTORY_SIZE) {
-          queryList.remove(0);
+      if(transaction.blockList.isEmpty() && !transaction.serverIp.isEmpty()) {
+        if (!queryList.isEmpty()) {
+          if (queryList.size() >= HISTORY_SIZE) {
+            queryList.remove(0);
+          }
         }
+        int val = (int) (transaction.responseTime - transaction.queryTime);
+        queryList.add(val);
+        List<Integer> _queryList = new ArrayList<Integer>(queryList);
+        Collections.sort(_queryList);
+        int positionP50 = (int) (_queryList.size() * 0.50);
+        val = _queryList.get(positionP50);
+        PersistentState.Companion.setMedianLatency(context, val);
       }
-      int val = (int) (transaction.responseTime - transaction.queryTime);
-      queryList.add(val);
-      List<Integer> _queryList = new ArrayList<Integer>(queryList);
-      Collections.sort(_queryList);
-      int positionP50 = (int) (_queryList.size() * 0.50);
-      val = _queryList.get(positionP50);
-      PersistentState.Companion.setMedianLatency(context, val);
     }
   }
 

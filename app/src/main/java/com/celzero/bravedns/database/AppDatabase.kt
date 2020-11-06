@@ -1,3 +1,18 @@
+/*
+Copyright 2020 RethinkDNS developers
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package com.celzero.bravedns.database
 
 import android.content.Context
@@ -7,12 +22,12 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-
-@Database(entities = [AppInfo::class, CategoryInfo::class, ConnectionTracker::class, BlockedConnections::class],version = 3,exportSchema = false)
+@Database(entities = [AppInfo::class, CategoryInfo::class, ConnectionTracker::class, BlockedConnections::class, DoHEndpoint::class
+, DNSCryptEndpoint::class, DNSProxyEndpoint::class, DNSCryptRelayEndpoint::class,ProxyEndpoint::class],version = 5,exportSchema = false)
 abstract class AppDatabase : RoomDatabase(){
 
     companion object {
-        const val currentVersion:Int = 3
+        const val currentVersion:Int = 5
 
         @Volatile private var instance: AppDatabase? = null
            private val LOCK = Any()
@@ -27,10 +42,12 @@ abstract class AppDatabase : RoomDatabase(){
             .allowMainThreadQueries()
             .addMigrations(MIGRATION_1_2)
             .addMigrations(MIGRATION_2_3)
+            .addMigrations(MIGRATION_3_4)
+            .addMigrations(MIGRATION_4_5)
             .build()
 
-        fun getDatabase(): AppDatabase {
-            return instance!!
+        fun getDatabase(): AppDatabase? {
+            return instance
         }
 
         private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
@@ -52,17 +69,71 @@ abstract class AppDatabase : RoomDatabase(){
             }
         }
 
+        private val MIGRATION_3_4 : Migration = object  : Migration(3,4){
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE BlockedConnections ADD COLUMN isActive INTEGER DEFAULT 1 NOT NULL")
+                database.execSQL("ALTER TABLE BlockedConnections ADD COLUMN ruleType TEXT DEFAULT 'RULE4' NOT NULL")
+                database.execSQL("ALTER TABLE BlockedConnections ADD COLUMN modifiedDateTime INTEGER DEFAULT 0  NOT NULL")
+                database.execSQL("UPDATE BlockedConnections set ruleType = 'RULE5' where uid = -1000")
+                database.execSQL("ALTER TABLE ConnectionTracker ADD COLUMN blockedByRule TEXT")
+                database.execSQL("UPDATE ConnectionTracker set blockedByRule = 'RULE4' where uid <> -1000 and isBlocked = 1")
+                database.execSQL("UPDATE ConnectionTracker set blockedByRule = 'RULE5' where uid = -1000  and isBlocked = 1")
+                database.execSQL("ALTER TABLE AppInfo add column whiteListUniv1 INTEGER DEFAULT 0 NOT NULL")
+                database.execSQL("ALTER TABLE AppInfo add column whiteListUniv2 INTEGER DEFAULT 0 NOT NULL")
+                database.execSQL("ALTER TABLE AppInfo add column isExcluded INTEGER DEFAULT 0 NOT NULL")
+                database.execSQL("CREATE TABLE 'DoHEndpoint' ( 'id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'dohName' TEXT NOT NULL, 'dohURL' TEXT NOT NULL,'dohExplanation' TEXT, 'isSelected' INTEGER NOT NULL, 'isCustom' INTEGER NOT NULL,'modifiedDataTime' INTEGER NOT NULL, 'latency' INTEGER NOT NULL) ")
+                database.execSQL("CREATE TABLE 'DNSCryptEndpoint' ( 'id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'dnsCryptName' TEXT NOT NULL, 'dnsCryptURL' TEXT NOT NULL,'dnsCryptExplanation' TEXT, 'isSelected' INTEGER NOT NULL, 'isCustom' INTEGER NOT NULL,'modifiedDataTime' INTEGER NOT NULL, 'latency' INTEGER NOT NULL) ")
+                database.execSQL("CREATE TABLE 'DNSCryptRelayEndpoint' ( 'id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'dnsCryptRelayName' TEXT NOT NULL, 'dnsCryptRelayURL' TEXT NOT NULL,'dnsCryptRelayExplanation' TEXT, 'isSelected' INTEGER NOT NULL, 'isCustom' INTEGER NOT NULL,'modifiedDataTime' INTEGER NOT NULL, 'latency' INTEGER NOT NULL) ")
+                database.execSQL("CREATE TABLE 'DNSProxyEndpoint' ( 'id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'proxyName' TEXT NOT NULL, 'proxyType' TEXT NOT NULL,'proxyAppName' TEXT , 'proxyIP' TEXT, 'proxyPort' INTEGER NOT NULL, 'isSelected' INTEGER NOT NULL, 'isCustom' INTEGER NOT NULL,'modifiedDataTime' INTEGER NOT NULL, 'latency' INTEGER NOT NULL) ")
+                database.execSQL("CREATE TABLE 'ProxyEndpoint' ( 'id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'proxyName' TEXT NOT NULL,'proxyMode' INTEGER NOT NULL, 'proxyType' TEXT NOT NULL,'proxyAppName' TEXT , 'proxyIP' TEXT, 'userName' TEXT , 'password' TEXT, 'proxyPort' INTEGER NOT NULL, 'isSelected' INTEGER NOT NULL, 'isCustom' INTEGER NOT NULL , 'isUDP' INTEGER NOT NULL,'modifiedDataTime' INTEGER NOT NULL, 'latency' INTEGER NOT NULL) ")
+                //Perform insert of endpoints
+                //database.execSQL("INSERT INTO DoHEndpoint(id,dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values(1,'No filter','https://cloudflare-dns.com/dns-query','Does not block any DNS requests. Uses Cloudflare''s 1.1.1.1 DNS endpoint.',0,0,0,0)")
+                //database.execSQL("INSERT INTO DoHEndpoint(id,dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values(2,'Family','https://family.cloudflare-dns.com/dns-query','Blocks malware and adult content. Uses Cloudflare''s 1.1.1.3 DNS endpoint.',0,0,0,0)")
+                //database.execSQL("INSERT INTO DoHEndpoint(id,dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values(3,'RethinkDNS Basic (default)','https://free.bravedns.com/dns-query','Blocks malware and more. Uses RethinkDNS''s non-configurable basic endpoint.',1,0,0,0)")
+                //database.execSQL("INSERT INTO DoHEndpoint(id,dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values(4,'RethinkDNS Pro','https://free.bravedns.com/dns-query','Configurable DNS endpoint: Provides in-depth analytics of your Internet traffic, allows you to set custom rules and more. Coming soon.',0,0,0,0)")
+            }
+        }
+
+        private val MIGRATION_4_5 : Migration = object  : Migration(4,5) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("DELETE from DNSProxyEndpoint")
+                database.execSQL("UPDATE DoHEndpoint set dohURL  = 'https://basic.bravedns.com/1:wBdgAIoBoB02kIAA5HI=' where id = 3")
+                database.execSQL("UPDATE DNSCryptEndpoint set dnsCryptName='Quad9', dnsCryptURL='sdns://AQYAAAAAAAAAEzE0OS4xMTIuMTEyLjEwOjg0NDMgZ8hHuMh1jNEgJFVDvnVnRt803x2EwAuMRwNo34Idhj4ZMi5kbnNjcnlwdC1jZXJ0LnF1YWQ5Lm5ldA',dnsCryptExplanation='Quad9 (anycast) no-dnssec/no-log/no-filter 9.9.9.10 / 149.112.112.10' where id=5")
+                database.execSQL("INSERT into DNSProxyEndpoint values (1,'Google','External','Nobody','8.8.8.8',53,0,0,0,0)")
+                database.execSQL("INSERT into DNSProxyEndpoint values (2,'Cloudflare','External','Nobody','1.1.1.1',53,0,0,0,0)")
+                database.execSQL("INSERT into DNSProxyEndpoint values (3,'Quad9','External','Nobody','9.9.9.9',53,0,0,0,0)")
+                database.execSQL("UPDATE DNSCryptEndpoint set dnsCryptName ='Cleanbrowsing family' where id = 1")
+                database.execSQL("UPDATE DNSCryptEndpoint set dnsCryptName ='Adguard' where id = 2")
+                database.execSQL("UPDATE DNSCryptEndpoint set dnsCryptName ='Adguard family' where id = 3")
+                database.execSQL("UPDATE DNSCryptEndpoint set dnsCryptName ='Cleanbrowsing Security' where id = 4")
+                database.execSQL("UPDATE DNSCryptRelayEndpoint set dnsCryptRelayName ='Anon-AMS-NL' where id = 1")
+                database.execSQL("UPDATE DNSCryptRelayEndpoint set dnsCryptRelayName ='Anon-CS-FR' where id = 2")
+                database.execSQL("UPDATE DNSCryptRelayEndpoint set dnsCryptRelayName ='Anon-CS-SE' where id = 3")
+                database.execSQL("UPDATE DNSCryptRelayEndpoint set dnsCryptRelayName ='Anon-CS-USCA' where id = 4")
+                database.execSQL("UPDATE DNSCryptRelayEndpoint set dnsCryptRelayName ='Anon-Tiarap' where id = 5")
+            }
+        }
+
     }
 
     abstract fun appInfoDAO(): AppInfoDAO
     abstract fun categoryInfoDAO(): CategoryInfoDAO
     abstract fun connectionTrackerDAO() : ConnectionTrackerDAO
     abstract fun blockedConnectionsDAO() : BlockedConnectionsDAO
+    abstract fun dohEndpointsDAO () : DoHEndpointDAO
+    abstract fun dnsCryptEndpointDAO() : DNSCryptEndpointDAO
+    abstract fun dnsCryptRelayEndpointDAO() : DNSCryptRelayEndpointDAO
+    abstract fun dnsProxyEndpointDAO() : DNSProxyEndpointDAO
+    abstract fun proxyEndpointDAO() : ProxyEndpointDAO
 
     fun appInfoRepository() = AppInfoRepository(appInfoDAO())
     fun categoryInfoRepository() = CategoryInfoRepository(categoryInfoDAO())
     fun connectionTrackerRepository() = ConnectionTrackerRepository(connectionTrackerDAO())
     fun blockedConnectionRepository() = BlockedConnectionsRepository(blockedConnectionsDAO())
-
+    fun doHEndpointsRepository() = DoHEndpointRepository(dohEndpointsDAO())
+    fun dnsCryptEndpointsRepository() = DNSCryptEndpointRepository(dnsCryptEndpointDAO())
+    fun dnsCryptRelayEndpointsRepository() = DNSCryptRelayEndpointRepository(dnsCryptRelayEndpointDAO())
+    fun dnsProxyEndpointRepository() = DNSProxyEndpointRepository(dnsProxyEndpointDAO())
+    fun proxyEndpointRepository() = ProxyEndpointRepository(proxyEndpointDAO())
 
 }

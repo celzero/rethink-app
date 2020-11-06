@@ -19,13 +19,13 @@
             android:id="@+id/query_info_dialog_cancel_img"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"></ImageView>
+            android:layout_gravity="end"
+            android:src="@android:drawable/ic_menu_close_clear_cancel" />
 
         <TextView
             style="@style/Widget.AppCompat.TextView.SpinnerItem"
             android:layout_width="wrap_content"
-            android:drawableLeft="@drawable/dns_no_filter"
+            android:drawableStart="@drawable/dns_no_filter"
             android:layout_height="wrap_content"
             android:drawablePadding="20dp"
             android:padding="10dp"
@@ -48,7 +48,7 @@
             android:drawablePadding="20dp"
             android:padding="10dp"
             android:text="@string/dns_mode_1"
-            android:drawableLeft="@drawable/dns_family"
+            android:drawableStart="@drawable/dns_family"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
         <TextView
@@ -67,7 +67,7 @@
             android:drawablePadding="20dp"
             android:padding="10dp"
             android:text="@string/dns_mode_2"
-            android:drawableLeft="@drawable/idns_ad_malware"
+            android:drawableStart="@drawable/idns_ad_malware"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
         <TextView
@@ -87,7 +87,7 @@
             android:drawablePadding="20dp"
             android:padding="10dp"
             android:text="@string/dns_mode_3"
-            android:drawableLeft="@drawable/dns_custom_url"
+            android:drawableStart="@drawable/dns_custom_url"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
         <TextView
@@ -107,7 +107,7 @@
             android:drawablePadding="20dp"
             android:padding="10dp"
             android:text="@string/dns_mode_4"
-            android:drawableLeft="@drawable/dns_bravedns"
+            android:drawableStart="@drawable/dns_bravedns"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
         <TextView
@@ -125,7 +125,7 @@
             style="@style/TextAppearance.AppCompat.Widget.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
+            android:layout_gravity="end"
             android:layout_marginTop="20dp"
             android:background="@drawable/button_background_ripple"
             android:text="Ok"

@@ -15,10 +15,10 @@ limitations under the License.
 */
 package com.celzero.bravedns.net.doh;
 
+import com.celzero.bravedns.net.dns.DnsPacket;
+
 import java.io.Serializable;
 import java.util.Calendar;
-
-import com.celzero.bravedns.net.dns.DnsPacket;
 
 /**
  * A representation of a complete DNS transaction, whether it succeeded or failed.
@@ -48,4 +48,7 @@ public class Transaction implements Serializable {
   public byte[] response;
   public Calendar responseCalendar;
   public String serverIp;
+  public String blockList;
+  public String relayIp;
+  public boolean isDNSCrypt;
 }

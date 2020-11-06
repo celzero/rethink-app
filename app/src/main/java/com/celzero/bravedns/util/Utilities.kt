@@ -1,3 +1,18 @@
+/*
+Copyright 2020 RethinkDNS and its authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package com.celzero.bravedns.util
 
 
@@ -13,12 +28,16 @@ import android.content.pm.ServiceInfo
 import android.graphics.Color
 import android.os.Environment
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.view.accessibility.AccessibilityManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.net.doh.CountryMap
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.google.android.material.snackbar.Snackbar
 import com.google.common.net.InternetDomainName
 import java.io.IOException
@@ -155,10 +174,8 @@ class Utilities {
                 am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
             for (enabledService in enabledServices) {
                 val enabledServiceInfo: ServiceInfo = enabledService.resolveInfo.serviceInfo
-                if (enabledServiceInfo.packageName.equals(context.packageName) && enabledServiceInfo.name.equals(
-                        service.name
-                    )
-                ) return true
+                if (enabledServiceInfo.packageName == context.packageName && enabledServiceInfo.name == service.name)
+                 return true
             }
             return false
         }
@@ -219,6 +236,50 @@ class Utilities {
             val format = SimpleDateFormat("HH:mm:ss", Locale.US)
             return format.format(date)
         }
+
+        fun prepareServersToRemove(servers: String, liveServers: String): String{
+            val serverList  = servers.split(",")
+            val liveServerList = liveServers.split(",")
+            if(DEBUG) Log.d(LOG_TAG, "Servers to remove - $serverList -- $liveServerList")
+            var serversToSend : String =""
+            serverList.forEach{
+                if(!liveServerList.contains(it)){
+                    serversToSend += "$it,"
+                }
+            }
+            if(DEBUG) Log.d(LOG_TAG, "Servers to remove - $serversToSend")
+            serversToSend = serversToSend.dropLast(1)
+            return serversToSend
+        }
+
+        fun showToastInMidLayout(context: Context, message: String, toastLength: Int){
+            val toast = Toast.makeText(context, message, toastLength)
+            toast.setGravity(Gravity.CENTER, 0, 0)
+            toast.show()
+        }
+
+        //Check app is installed via playstore -
+        //https://stackoverflow.com/questions/37539949/detect-if-an-app-is-installed-from-play-store
+        fun verifyInstallerId(context: Context): Boolean {
+            // A list with valid installers package name
+            val validInstallers: List<String> = ArrayList(listOf("com.android.vending", "com.google.android.feedback"))
+            // The package name of the app that has installed your app
+            val installer = context.packageManager.getInstallerPackageName(context.packageName)
+            // true if your app has been downloaded from Play Store
+            return installer != null && validInstallers.contains(installer)
+        }
+
+        fun isIPLocal(ipAddress: String): Boolean{
+            return try{
+                val ip = InetAddress.getByName(ipAddress)
+                val regex = Regex("(^127\\.0\\.0\\.1)|(^10\\.)|(^172\\.1[6-9]\\.)|(^172\\.2[0-9]\\.)|(^172\\.3[0-1]\\.)|(^192\\.168\\.)")
+                ip.isAnyLocalAddress || ipAddress.matches(regex) || ipAddress == "0.0.0.0"
+            }catch (e : Exception){
+                Log.w(LOG_TAG, "Exception while converting string to inetaddress, ${e.message}",e)
+                false
+            }
+        }
+
     }
 }
 
