@@ -1,7 +1,23 @@
+/*
+Copyright 2020 RethinkDNS and its authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package com.celzero.bravedns.util
 
 import android.util.Log
 import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 
 
 enum class FileSystemUID(val uid : Int) {
@@ -176,15 +192,15 @@ enum class FileSystemUID(val uid : Int) {
             private val map = FileSystemUID.values().associateBy(FileSystemUID::uid)
 
             fun fromFileSystemUID(uid: Int): FileSystemUID {
-                if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d("BraveDNS","UID: $uid, hashed val : ${uid.hashCode()}, map Vale: ${map[uid.hashCode()]}")
-                return map[uid.hashCode()] ?: FileSystemUID.OTHER
+                if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG,"UID: $uid, hashed val : ${uid.hashCode()}, map Vale: ${map[uid.hashCode()]}")
+                return map[uid.hashCode()] ?: OTHER
             }
 
             fun isUIDAppRange(uid: Int): Boolean {
-                if (uid >= APP_START.uid && uid <= APP_END.uid) {
-                        return true
-                }
-                return false
+                    if (uid >= APP_START.uid && uid <= APP_END.uid) {
+                            return true
+                    }
+                    return false
             }
         }
 

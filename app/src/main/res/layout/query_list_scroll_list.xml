@@ -4,244 +4,220 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_query_detail">
 
     <RelativeLayout
         android:id="@+id/query_list_rl"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
+        android:layout_height="match_parent"
+        android:layout_marginTop="2dp">
 
         <LinearLayout
             android:id="@+id/query_card_view_top"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/light"
+            android:background="@color/childListColor"
+            android:gravity="center"
             android:orientation="vertical"
-            android:padding="5dp">
+            android:paddingTop="20dp"
+            android:paddingBottom="10dp">
 
-            <androidx.cardview.widget.CardView
+            <TextView
+                android:id="@+id/connected_status_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:elevation="10dp">
+                android:gravity="center"
+                android:text="@string/configure_dns_connected_doh_status"
+                android:textColor="@color/primaryText"
+                android:textSize="16sp" />
 
-                <LinearLayout
-                    android:id="@+id/setting_url_ll"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:orientation="horizontal"
-                    android:padding="10dp"
-                    android:weightSum="1">
-
-                    <androidx.appcompat.widget.AppCompatSpinner
-                        android:id="@+id/setting_url_spinner"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="left"
-                        android:layout_weight="0.75"
-                        android:fontFamily="sans-serif"
-                        android:isScrollContainer="true" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/query_dns_info_icon"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="right"
-                        android:layout_weight="0.25"
-                        android:padding="5dp"
-                        android:src="@drawable/brave_mode_info" />
-
-
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            <TextView
+                android:id="@+id/connected_status_title_url"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-smallcaps"
+                android:gravity="center"
+                android:padding="5dp"
+                android:textColor="@color/textColorMain"
+                android:textSize="14sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="2dp"
-                android:elevation="@dimen/activity_horizontal_margin"
-                android:gravity="center_vertical"
+                android:layout_marginTop="5dp"
                 android:orientation="horizontal"
-
-                android:padding="2dp"
                 android:weightSum="1">
 
                 <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/latency_txt"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="left|center_vertical"
-                    android:layout_weight="0.45"
+                    android:layout_gravity="start|center"
+                    android:layout_weight="0.50"
                     android:fontFamily="sans-serif"
-                    android:paddingLeft="5dp"
-                    android:singleLine="true"
-                    android:text="Current Resolver: "
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="Latency: "
                     android:textColor="@color/dividerColor"
-                    android:textSize="@dimen/sub_heading"
-                    android:visibility="gone" />
+                    android:textSize="@dimen/sub_heading" />
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/query_current_url_txt"
+                    android:id="@+id/total_queries_txt"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_gravity="end|center_vertical"
-                    android:layout_weight="1"
-                    android:ellipsize="start"
-                    android:paddingLeft="5dp"
-                    android:singleLine="true"
-                    android:text=""
+                    android:layout_weight="0.50"
+                    android:fontFamily="sans-serif"
+                    android:gravity="end"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="Lifetime Queries: "
                     android:textColor="@color/dividerColor"
                     android:textSize="@dimen/sub_heading" />
 
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/top_layout_query_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/setting_url_ll"
-                android:layout_marginTop="2dp"
-                android:layout_marginLeft="2dp"
-                android:layout_marginRight="2dp"
-                android:elevation="@dimen/activity_horizontal_margin"
-                android:orientation="vertical"
-                android:padding="3dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:weightSum="1">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/latency_txt"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="left|center"
-                        android:layout_weight="0.50"
-                        android:fontFamily="sans-serif"
-                        android:paddingLeft="5dp"
-                        android:text="Latency: "
-                        android:textColor="@color/dividerColor"
-                        android:textSize="@dimen/sub_heading" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/total_queries_txt"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_weight="0.50"
-                        android:fontFamily="sans-serif"
-
-                        android:gravity="right"
-                        android:text="Lifetime Queries: "
-                        android:textColor="@color/dividerColor"
-                        android:textSize="@dimen/sub_heading" />
-
-                </LinearLayout>
-            </LinearLayout>
-
-
         </LinearLayout>
 
-
+        <TextView
+            android:id="@+id/dns_log_no_log_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/query_card_view_top"
+            android:layout_margin="20dp"
+            android:gravity="center"
+            android:padding="20dp"
+            android:text="@string/dns_logs_not_available_text"
+            android:textColor="@color/textColorMain" />
 
         <LinearLayout
             android:id="@+id/query_list_recycler_heading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/query_card_view_top"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginTop="2dp"
+            android:background="@color/childListColor"
             android:elevation="@dimen/activity_horizontal_margin"
             android:orientation="horizontal"
-            android:padding="10dp"
-            android:weightSum="4">
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:visibility="visible"
+            android:weightSum="1">
+
+
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:text=""
-                android:textColor="@color/secondaryText" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2.25"
+                android:layout_weight="0.64"
                 android:fontFamily="sans-serif"
                 android:text="Query"
+                android:gravity="start"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
                 android:textColor="@color/secondaryText" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.75"
+                android:layout_weight="0.21"
                 android:fontFamily="sans-serif"
-                android:gravity="right"
-                android:paddingRight="3dp"
+                android:gravity="end"
+                android:paddingStart="3dp"
+                android:paddingEnd="3dp"
                 android:text="Latency"
                 android:textColor="@color/secondaryText" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="0.5"
+                android:layout_gravity="end"
+                android:layout_weight="0.15"
                 android:fontFamily="sans-serif"
-                android:gravity="right"
+                android:gravity="center"
                 android:text="Time"
                 android:textColor="@color/secondaryText" />
         </LinearLayout>
-        <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_below="@id/query_list_recycler_heading"
-                    android:layout_margin="2dp"
-                    android:paddingTop="5dp"
-                    android:background="@color/borderColor"
-                    android:text="" />
+
+
+        <LinearLayout
+            android:id="@+id/log_query_screen_lls"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/query_card_view_top"
+            android:layout_marginTop="2dp"
+            android:background="@color/childListColor"
+            android:weightSum="1"
+            android:visibility="gone"
+            android:orientation="horizontal"
+            android:baselineAligned="false">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.8"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start|center"
+                        android:layout_marginEnd="5dp"
+                        android:gravity="center"
+                        android:textColor="@color/secondaryText"
+                        tools:text="Query" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.1"
+                    android:orientation="vertical"
+                    android:padding="5dp">
+
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:singleLine="true"
+                        android:textColor="@color/secondaryText"
+                        tools:text="Latency" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_weight="0.1"
+                    android:orientation="vertical"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:singleLine="true"
+                        android:textColor="@color/secondaryText"
+                        tools:text="Time" />
+                </LinearLayout>
+        </LinearLayout>
+
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_query"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/query_list_recycler_heading"
-            android:layout_margin="2dp"
+            android:layout_marginTop="2dp"
+            android:background="@color/childListColor"
+            android:nestedScrollingEnabled="true"
             android:orientation="vertical"
-            android:padding="5dp" />
-
-        <FrameLayout
-            android:id="@+id/query_progressBarHolder"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/query_card_view_top"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-smallcaps"
-                android:gravity="center_horizontal"
-                android:padding="10dp"
-                android:text="@string/brave_dns_connect_prompt_query"
-                android:textColor="@color/primaryText"
-                android:textSize="@dimen/dots_margin_bottom" />
-
-            <ImageView
-                android:id="@+id/firewall_progress"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:indeterminate="true"
-                android:src="@drawable/illustration_enable_vpn_message" />
-        </FrameLayout>
-
+            android:padding="1dp" />
 
     </RelativeLayout>
 </LinearLayout>

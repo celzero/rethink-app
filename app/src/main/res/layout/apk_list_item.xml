@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/apk_parent"
-    android:layout_margin="5dp"
-    android:background="@color/childListColor"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/apk_parent"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:background="@color/childListColor">
+
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="@dimen/activity_horizontal_margin"
-        >
+        android:elevation="@dimen/activity_horizontal_margin">
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/firewall_apk_list_top_layout"
@@ -26,103 +26,102 @@
                 android:id="@+id/firewall_status_indicator"
                 android:layout_width="2dp"
                 android:layout_height="match_parent"
-                android:background="@color/colorGreen_A400"/>
+                android:background="@color/colorGreen_A400" />
 
 
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
-            android:orientation="vertical">
-
-            <RelativeLayout
-                android:id="@+id/container"
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp">
 
-                <ImageView
-                    android:id="@+id/firewall_apk_icon_iv"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="10dp"
-                    android:src="@drawable/ic_launcher_foreground"
-                    android:layout_marginBottom="10dp"
-                    android:maxWidth="60dp"
-                    android:maxHeight="60dp"
-                     />
-
-                <TextView
-                    android:id="@+id/firewall_apk_label_tv"
+                <RelativeLayout
+                    android:id="@+id/container"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignTop="@+id/firewall_apk_icon_iv"
-                    android:layout_toStartOf="@id/firewall_toggle_wifi"
-                    android:layout_marginLeft="15dp"
-                    android:layout_toEndOf="@+id/firewall_apk_icon_iv"
-                    android:fontFamily="sans-serif-light"
-                    android:padding="5dp"
-                    android:text="Dummy Label"
-                    android:textColor="@color/primaryText"
-                    android:textSize="18sp" />
+                    android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/firewall_apk_package_tv"
-                    android:visibility="gone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/firewall_apk_label_tv"
-                    android:layout_marginStart="16dp"
-                    android:layout_toEndOf="@+id/firewall_apk_icon_iv"
-                    android:ellipsize="end"
-                    android:padding="5dp"
-                    android:fontFamily="sans-serif-thin"
-                    android:maxLines="1"
-                    android:text="Category : "
-                    android:textColor="@color/primaryText"
-                    android:textSize="14sp" />
+                    <ImageView
+                        android:id="@+id/firewall_apk_icon_iv"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:maxWidth="60dp"
+                        android:maxHeight="60dp"
+                        android:src="@drawable/ic_launcher_foreground" />
+
+                    <TextView
+                        android:id="@+id/firewall_apk_label_tv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignTop="@+id/firewall_apk_icon_iv"
+                        android:layout_marginStart="15dp"
+                        android:layout_toStartOf="@id/firewall_toggle_wifi"
+                        android:layout_toEndOf="@+id/firewall_apk_icon_iv"
+                        android:fontFamily="sans-serif-light"
+                        android:gravity="bottom"
+                        android:padding="5dp"
+                        android:text="Dummy Label"
+                        android:textColor="@color/primaryText"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/firewall_apk_package_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/firewall_apk_label_tv"
+                        android:layout_marginStart="15dp"
+                        android:layout_toEndOf="@+id/firewall_apk_icon_iv"
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif-thin"
+                        android:maxLines="1"
+                        android:padding="5dp"
+                        android:text="Category : "
+                        android:textColor="@color/textColorMain"
+                        android:textSize="14sp"
+                        android:visibility="visible" />
 
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/firewall_toggle_mobile_data"
-                    android:layout_width="65dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:layout_margin="5dp"
-                    android:visibility="gone"
-                    android:gravity="center"
-                    android:src="@drawable/data_on"
-                    android:text="" />
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/firewall_toggle_mobile_data"
+                        android:layout_width="65dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="5dp"
+                        android:gravity="center"
+                        android:src="@drawable/data_on"
+                        android:text=""
+                        android:visibility="gone" />
 
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/firewall_toggle_wifi"
-                    android:layout_width="65dp"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_margin="5dp"
-                    android:gravity="center"
-                    android:src="@drawable/ic_dns_off"
-                    android:layout_marginLeft="15dp"
-                    android:textColor="@color/primaryText"
-                    android:layout_alignParentRight="true"
-                    android:textAlignment="center"
-                    android:text="" />
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/firewall_toggle_wifi"
+                        android:layout_width="65dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="5dp"
+                        android:layout_marginStart="15dp"
+                        android:gravity="center"
+                        android:src="@drawable/ic_dns_off"
+                        android:text=""
+                        android:textAlignment="center"
+                        android:textColor="@color/primaryText" />
 
-                <ProgressBar
-                    android:id="@+id/firewall_apk_progress_bar"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="8dp"
-                    android:gravity="center" />
+                    <ProgressBar
+                        android:id="@+id/firewall_apk_progress_bar"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="8dp"
+                        android:gravity="center" />
 
-            </RelativeLayout>
+                </RelativeLayout>
 
-        </androidx.appcompat.widget.LinearLayoutCompat>
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
 
         </androidx.appcompat.widget.LinearLayoutCompat>

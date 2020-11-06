@@ -16,25 +16,9 @@
     <item>@string/url12</item>
     <item>@string/url13</item>
     <item>@string/url14</item>
+    <item>@string/url15</item>
   </string-array>
-  <string-array name="names">
-    <item>@string/name0</item>
-    <item>@string/name1</item>
-    <item>@string/name2</item>
-    <item>@string/name3</item>
-    <item>@string/name4</item>
-    <item>@string/name5</item>
-    <item>@string/name6</item>
-    <item>@string/name7</item>
-    <item>@string/name8</item>
-    <item>@string/name9</item>
-    <item>@string/name10</item>
-    <item>@string/name11</item>
-    <item>@string/name12</item>
-    <item>@string/name13</item>
-    <item>@string/name14</item>
-  </string-array>
-  <string-array name="ips">
+    <string-array name="ips">
     <item>@string/ips0</item>
     <item>@string/ips1</item>
     <item>@string/ips2</item>
@@ -50,39 +34,6 @@
     <item>@string/ips12</item>
     <item>@string/ips13</item>
     <item>@string/ips14</item>
-  </string-array>
-  <string-array name="descriptions">
-    <item>@string/description0</item>
-    <item>@string/description1</item>
-    <item>@string/description2</item>
-    <item>@string/description3</item>
-    <item>@string/description4</item>
-    <item>@string/description5</item>
-    <item>@string/description6</item>
-    <item>@string/description7</item>
-    <item>@string/description8</item>
-    <item>@string/description9</item>
-    <item>@string/description10</item>
-    <item>@string/description11</item>
-    <item>@string/description12</item>
-    <item>@string/description13</item>
-    <item>@string/description14</item>
-  </string-array>
-  <string-array name="server_websites">
-    <item>@string/website0</item>
-    <item>@string/website1</item>
-    <item>@string/website2</item>
-    <item>@string/website3</item>
-    <item>@string/website4</item>
-    <item>@string/website5</item>
-    <item>@string/website6</item>
-    <item>@string/website7</item>
-    <item>@string/website8</item>
-    <item>@string/website9</item>
-    <item>@string/website10</item>
-    <item>@string/website11</item>
-    <item>@string/website12</item>
-    <item>@string/website13</item>
-    <item>@string/website14</item>
+    <item>@string/ips15</item>
   </string-array>
 </resources>

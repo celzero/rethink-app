@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/doh_endpoint_list_parent"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="1dp"
+    android:background="?android:attr/selectableItemBackground"
+    android:elevation="@dimen/activity_horizontal_margin">
+
+
+    <RelativeLayout
+        android:id="@+id/dns_crypt_endpoint_list_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:padding="5dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_toStartOf="@id/dns_crypt_endpoint_list_action_image"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/dns_crypt_endpoint_list_url_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-light"
+                android:text="Dummy Label"
+                android:textColor="@color/primaryText"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/dns_crypt_endpoint_list_url_explanation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-light"
+                android:text="Dummy Label"
+                android:textColor="@color/textColorMain"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/dns_crypt_endpoint_list_info_image"
+            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerInParent="true"
+            android:layout_marginEnd="10dp"
+            android:layout_toStartOf="@id/dns_crypt_endpoint_list_action_image"
+            android:padding="10dp"
+            android:src="@drawable/ic_fab_appinfo"
+            android:text="delete" />
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/dns_crypt_endpoint_list_action_image"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentEnd="true"
+            android:gravity="center"
+            android:text="@null"
+            android:padding="10dp" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_below="@id/dns_crypt_endpoint_list_container"
+        android:background="@color/borderblack"/>
+
+</RelativeLayout>

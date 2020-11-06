@@ -1,44 +1,19 @@
 
 <resources>
-    <string name="app_name">BraveDNS</string>
-    <string name="app_name_brave">Brave</string>
-    <string name="title_internet_manager">Internet \n Manager</string>
-    <string name="title_permission_manager">Permission \n Manager</string>
-    <string name="title_tools">Tools</string>
+    <string name="app_name">RethinkDNS</string>
+    <string name="app_name_brave">RethinkDNS</string>
     <string name="title_about">About</string>
-    <string name="title_settings">Configure</string>
+    <string name="title_settings">Settings</string>
     <string name="txt_im_topic">Internet Manager</string>
 
     <string name="txt_im_tip">Tip : Firewall prevents apps from accessing the Internet over Wifi or Mobile data. Since most forms of surveillance require the data to be sent over to a central repository, firewalling them effectively mitigates the threat. \n\nThere\'s a class of apps that require Internet connection all day, and those are usually communication apps like Gmail and messenger apps like WhatsApp. Firewalling them might not be an option, and that\'s why we built content blockers. </string>
-
-    <string name="txt_pm_topic">Permission Manager</string>
 
     <string name="action_automatic">Auto Remove and Auto Grant</string>
     <string name="action_revoke_only">Auto Revoke</string>
     <string name="action_do_nothing">Do Nothing</string>
 
-    <string name="mode_dns">DNS</string>
-    <string name="mode_dns_firewall">DNS + Firewall</string>
-    <string name="mode_firewall">Firewall</string>
-
     <string name="txt_home">Home</string>
 
-    <string name="device_admin_receiver">
-        Content Blocker
-    </string>
-    <string name="device_admin_receiver_description">
-        This permission is required to programmatically set DNS for your device. Think of DNS as
-        an address book for the internet: It translates domains (for example, dns.google.com) to valid
-        IP addresses (for example, 8.8.8.8). Setting it allows us to control out-going connections
-        from any app on your device, thereby effectively preventing connections to blacklisted domains.
-    </string>
-    <string name="add_admin_extra_app_text">
-        Helps automatically set a DNS based content blocker which helps with blocking trackers
-        across the device.
-    </string>
-    <string name="activity_device_admin">
-        Content Blocker
-    </string>
     <string name="admin_receiver_status_enabled">
         Ready to set dns based content blocker.
     </string>
@@ -48,54 +23,61 @@
 
     <!-- Permission Manager -->
     <string name="accessibility_service_description">
-        We use accessibility to automate frequent actions
-        to manage security and privacy related settings on your phone.
+        RethinkDNS uses accessibility service to detect and firewall background applications.
+        RethinkDNS does not collect or sell any information.
     </string>
 
     <string name="accessibility_service_label">
-        Brave DNS
+        RethinkDNS
     </string>
 
     <string name="next">Next</string>
     <string name="skip">Skip</string>
-    <string name="start">Done</string>
 
     <string name="slide_2_title">Welcome</string>
-    <string name="slide_2_desc">BraveDNS is the easiest way to monitor app activity, circumvent Internet censorship, and firewall apps on your Android device.</string>
+    <string name="slide_2_desc">RethinkDNS is the easiest way to monitor app activity, circumvent Internet censorship, and firewall apps on your Android device.</string>
 
     <string name="slide_1_title">Welcome</string>
     <string name="slide_1_desc">Say hello to a safer, transparent, and secure Android.</string>
 
-    <string name="slide_3_title">Permission Manager</string>
-    <string name="slide_3_desc">Apps are often granted permissions to access location or storage, for instance, that could be revoked once they have served the purpose. This is tedious; however, to do it manually. Permissions Manager helps with automating this task.</string>
-
-    <string name="slide_4_title">Report Center</string>
-    <string name="slide_4_desc"> View reports on your Phone or on your PC. Since most forms of data collection involve sharing it to a central repository, this capbility might be handy to verify for yourself to single out behaviour of such apps.</string>
-
-    <string-array name="interface_address_prefixes">
-        <item>192.168.0/24</item>
-        <item>172.18.234/12</item>
-        <item>10.18.234/8</item>
-    </string-array>
-
-    <string-array name="cloudflare_name">
-        <item>No filter</item>
-        <item>Family</item>
-        <item>BraveDNS Basic (default)</item>
+    <string-array name="doh_endpoint_names">
+        <item>Cloudflare</item>
+        <item>Cloudflare Family</item>
+        <item>Cloudflare Security</item>
+        <item>RethinkDNS Basic (default)</item>
         <item>Custom</item>
-        <item>BraveDNS Pro*</item>
+        <item>RethinkDNS Plus</item>
     </string-array>
 
-    <string-array name="cloudflare_url">
+    <string-array name="doh_endpoint_urls">
         <item>https://cloudflare-dns.com/dns-query</item>
         <item>https://family.cloudflare-dns.com/dns-query</item>
-        <item>https://free.bravedns.com/dns-query</item>
-        <item>https://cloudflare-dns.com</item>
-        <item>https://free.bravedns.com/dns-query</item>
+        <item>https://security.cloudflare-dns.com/dns-query</item>
+        <item>https://basic.bravedns.com/1:wBdgAIoBoB02kIAA5HI=</item>
+        <item>https://cloudflare-dns.com/</item>
+        <item>https://basic.bravedns.com/</item>
+    </string-array>
+
+    <string-array name="dns_endpoint_modes">
+        <item>DNS over HTTPS</item>
+        <item>DNSCrypt</item>
+        <item>DNS Proxy</item>
+    </string-array>
+
+    <string-array name="dns_proxy_names">
+        <item>Google</item>
+        <item>Cloudflare</item>
+        <item>Quad9</item>
+    </string-array>
+
+    <string-array name="dns_proxy_ips">
+        <item>8.8.8.8</item>
+        <item>1.1.1.1</item>
+        <item>9.9.9.9</item>
     </string-array>
 
     <string name="warning_title" description="Status indicator text shown in a warning notification.">
-    Exposed: BraveDNS has been deactivated
+    Warning: RethinkDNS has been deactivated
   </string>
 
     <string name="notification_content"
@@ -112,39 +94,7 @@
     <string name="warning_channel_description"
         description="This is the explanatory text describing the 'Warning' notification class.  It's
   only visible in the system's advanced notifications settings page.">
-    Shown when Brave has encountered a problem.
-  </string>
-
-    <string name="unknown_server"
-        description="This is a placeholder, used when the server address is unknown.">
-    (unknown server)
-  </string>
-
-    <string name="query_label"
-        description="This text appears under the domain name for which a DNS query was issued.">
-    Query
-  </string>
-
-    <string name="type_label"
-        description="This text appears under the type of query that was issued ('A' or 'AAAA').">
-    Type
-  </string>
-
-    <string name="latency_label"
-        description="This text appears under a measurement of network latency, like '923 ms'.">
-    Latency
-  </string>
-
-    <string name="resolver_label"
-        description="This text appears under a two-letter ISO country code, indicating the country where the
-  DNS resolver is located.">
-    Resolver location
-  </string>
-
-    <string name="destination_label"
-        description="This text appears under a two-letter ISO country code, indicating the country where the
-  resolved domain's IP address is located.">
-    Destination server
+    Shown when RethinkDNS has encountered a problem.
   </string>
 
     <string name="notification_title"
@@ -182,8 +132,8 @@
 
     <string name="explanation_vpn"
         description="Warning text shown on the main screen before the user starts Intra">
-    Brave has detected another VPN on your device.  If you enable Intra, that VPN will be disabled.
-    Brave is not as secure as a trusted VPN.
+    RethinkDNS has detected another VPN on your device.  If you enable Rethink, that VPN will be disabled.
+    RethinkDNS is not as secure as a trusted VPN.
   </string>
 
     <string name="explanation_failing">
@@ -200,12 +150,6 @@
     Hang tight.  Intra is establishing a server connection.
   </string>
 
-  <string name="system_details"
-        description="This is the title of a section containing information on the system configuration and
-  status.">
-    System details
-  </string>
-
     <string name="status_protected"
         description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">
     protected
@@ -216,11 +160,6 @@
     Your connection is protected from DNS attacks.
   </string>
 
-    <string name="status_upgraded"
-        description="This is similar to status_exposed, and indicates weak protection that an attacker could disable.">
-    vulnerable
-  </string>
-
     <string name="explanation_upgraded"
         description="Corresponds to status_upgraded.">
     Your connection is currently protected by Android Private DNS, but an attacker could disable
@@ -228,14 +167,14 @@
   </string>
 
     <string name="status_strict"
-        description="This is similar to dns_on, but the protection is being provided by the operating system, not by Intra.  It is not color-highlighted.">
+        description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">
     private dns is enabled
   </string>
 
     <string name="explanation_strict"
         description="Explanation on the main screen for users who have Private DNS strict mode enabled at the OS level.">
-    Brave has detected that the Android Private DNS setting is enabled.  This means your DNS
-    queries are already protected, so there\'s no need to enable Intra.
+    RethinkDNS has detected that the Android Private DNS setting is enabled.  This means your DNS
+    queries are already protected, so there\'s no need to enable Rethink.
   </string>
 
     <string name="status_exposed"
@@ -248,15 +187,15 @@
     Your connection is exposed to DNS attacks.
   </string>
 
-  <string name="dns_explanation_dns_connected">connected to bravedns</string>
+  <string name="dns_explanation_dns_connected">connected to rethinkdns</string>
     <string name="dns_explanation_firewall_connected">connected to firewall</string>
 
     <string name="dns_explanation_connected" description= "The message will be shown when the DNS is connected">
-        connected to bravedns and firewall
+        connected to rethinkdns and firewall
     </string>
 
     <string name="dns_explanation_disconnected" description="This message will be shown to user in main screen when the DNS is not connected">
-        disconnected from bravedns and firewall
+        disconnected from rethinkdns and firewall
     </string>
 
     <string name="firewall_explanation_text" description="Explanation on the main screen for the users about what the firewall does.">
@@ -272,21 +211,22 @@
     </string>
 
     <string name="settings_connection_tracker_explanation_text" description="Explanation on the main screen about connection tracking screen">
-        Keep tabs on incoming and outgoing Internet traffic. BraveDNS firewall when enabled keeps track of connections an app makes to various endpoints on the Internet.
+        Keep tabs on incoming and outgoing Internet traffic. RethinkDNS firewall when enabled keeps track of connections an app makes to various endpoints on the Internet.
     </string>
 
     <string name="settings_explanation_text" description="Explanation on the main screen for the users for settings screen.">
-        A firewall to isolate apps completely from the Internet, or prevent them from making connections. Limiting access to the Internet helps prevent unwarranted data usage, as well as conserves battery.
-    </string>
-    <string name="screen_off_firewall_explanation">
-        All the applications will be firewalled when the phone is locked : Limiting background access to the Internet helps prevent unwarranted data usage as well as conserves battery.
+        Block apps from connecting to the Internet. Limiting access to the Internet helps prevent unwarranted data usage, as well as conserve battery.
     </string>
     <string name="universal_firewall_explanation">
         Apply firewall rules on all applications based on device events, for example, firewall when the device is locked or when a particular app is not in use.
     </string>
 
     <string name="category_firewall_explanation">
-        Choose application categories to firewall: Disallow a category to block internet access to all apps in that category, or block them individually. Note: These rules are applied independently of \'Universal Firewall\'.
+        Applications added to whitelist will be exempt from all firewall rules.
+    </string>
+
+    <string name="ip_details_list_explanation">
+        All connections to these IPs are blocked for all apps except the ones in the whitelist.
     </string>
 
     <string-array name="brave_dns_mode_names">
@@ -302,13 +242,11 @@
     </integer-array>
 
 
-    <string name="brave_mode_not_supported">
-        DNS+Firewall mode is not supported in your version of Android.
-    </string>
-
     <string name="dns_mode_info_title">
         DNS
     </string>
+
+    <string name="firewall_rules">Firewall Rules</string>
 
     <string name="dns_mode_info_explanation">
         \u00BB Circumvent Internet censorship.\n\u00BB Prevent DNS manipulation attacks with encrypted DNS.\n\u00BB First line of defence against malware and other security threats.\n\u00BB Monitor DNS traffic.
@@ -328,20 +266,12 @@
         DNS + Firewall
     </string>
 
-    <string name="hybrid_mode_info_explanation">
-        Filters your network traffic and blocks apps from connecting to Internet.
-    </string>
-
     <string name="alert_permission_accessibility">
         Permission - Accessibility
     </string>
 
-    <string name="alert_permission_accessibility_explanation">
-        We use accessibility to automate frequent actions to manage security and privacy related settings on your phone.
-    </string>
-
     <string name="alert_firewall_accessibility_explanation">
-        BraveDNS uses accessibility service to track which apps are in-use (foreground) versus those that are not in-use (background).
+        RethinkDNS uses accessibility service to track which apps are in-use (foreground) versus those that are not in-use (background).
     </string>
 
     <string name="brave_dns_connect_prompt_firewall">
@@ -369,69 +299,212 @@
 
     <string name="dns_mode_0">No Filter</string>
     <string name="dns_mode_1">Family</string>
-    <string name="dns_mode_2">BraveDNS Basic</string>
-    <string name="dns_mode_3">Custom</string>
-    <string name="dns_mode_4">BraveDNS Pro</string>
+    <string name="dns_mode_2">Security</string>
+    <string name="dns_mode_3">RethinkDNS Basic</string>
+    <string name="dns_mode_4">Custom</string>
+    <string name="dns_mode_5">RethinkDNS Plus</string>
 
     <string name="dns_mode_0_explanation">Does not block any DNS requests. Uses Cloudflare\'s 1.1.1.1 DNS endpoint.</string>
     <string name="dns_mode_1_explanation">Blocks malware and adult content. Uses Cloudflare\'s 1.1.1.3 DNS endpoint.</string>
-    <string name="dns_mode_2_explanation">Blocks malware and more. Uses BraveDNS\'s non-configurable basic endpoint.</string>
-    <string name="dns_mode_3_explanation">Set your own custom DNS-over-HTTPS endpoint.</string>
-    <string name="dns_mode_4_explanation">Configurable DNS endpoint: Provides in-depth analytics of your Internet traffic, allows you to set custom rules and more. Coming soon.</string>
+    <string name="dns_mode_2_explanation">Blocks malicious content. Uses Cloudflare\'s 1.1.1.2 DNS endpoint.</string>
+    <string name="dns_mode_3_explanation">Blocks malware and more. Uses RethinkDNS\'s non-configurable basic endpoint.</string>
+    <string name="dns_mode_4_explanation">Set your own custom DNS-over-HTTPS endpoint.</string>
+    <string name="dns_mode_5_explanation">Configurable DNS endpoint: Provides in-depth analytics of your Internet traffic, allows you to set custom rules and more.</string>
 
     <string name="custom_url_error_host_failed">Host connection failed. Try again.</string>
     <string name="custom_url_error_invalid_url">Invalid URL</string>
-    <string name="custom_url_connection_successfull">Connected to custom DNS endpoint.</string>
+    <string name="custom_url_added_successfully">New custom DNS endpoint added.</string>
 
 
-    <string name="brave_launching_soon">"BraveDNS Pro launching soon. Subscribe for early access."</string>
-
-
-    <string name="about_bravedns_explantion">BraveDNS is the easiest way to monitor app activity, circumvent Internet censorship, and firewall apps on your Android device. </string>
-    <string name="about_bravedns_whoarewe">BraveDNS is a free and open-source project, led by ex-engineers from Amazon, IBM, and Scientific Games.</string>
+    <string name="about_bravedns_explantion">RethinkDNS is the easiest way to monitor app activity, circumvent Internet censorship, and firewall apps on your Android device. </string>
+    <string name="about_bravedns_whoarewe">RethinkDNS is a free and open-source project, led by ex-engineers from Amazon, IBM, and Scientific Games.</string>
     <string name="about_bravedns_toreport_text">to report bugs and suggest features.</string>
-    <string name="about_join_telegram">Join the BraveDNS group on Telegram</string>
+    <string name="about_join_telegram">Join the RethinkDNS group on Telegram</string>
     <string name="about_web">Links</string>
-    <string name="about_website">Visit bravedns.com</string>
+    <string name="about_website">Visit rethinkdns.com</string>
     <string name="about_github">Contribute on GitHub</string>
     <string name="about_faq">View FAQs</string>
     <string name="about_blog">Read our blog</string>
     <string name="about_connect">Contact</string>
+    <string name="about_app">App</string>
     <string name="about_email">Email us</string>
+    <string name="about_whats_new">What\'s new</string>
     <string name="about_twitter">Follow us on Twitter</string>
-    <string name="about_mozilla">BraveDNS is part of Mozilla Builders MVP program.</string>
+    <string name="about_mozilla">RethinkDNS is part of Mozilla Builders MVP program.</string>
+    <string name="about_app_update_check">Check for app updates</string>
 
-    <string name="conn_track_clear_logs_title">Clear network logs?</string>
-    <string name="conn_track_clear_logs_message">All the network logs will be cleared</string>
+    <string name="conn_track_clear_logs_title">Delete all network logs?</string>
+    <string name="conn_track_clear_logs_message">This only deletes network logs but not firewall rules. This operation is not reversible. Do you want to proceed?</string>
 
     <string name="bsct_kill">Kill app</string>
     <string name="bsct_clear">Clear all rules</string>
-    <string name="bsct_block_all">Block &lt;u>all apps&lt;/u> from connecting to this IP</string>
+    <string name="bsct_block_all">Block &lt;u>all apps&lt;/u> from connecting to &lt;u>this IP&lt;/u></string>
     <string name="bsct_block_app">Block &lt;u>this app&lt;/u> from connecting to this IP</string>
     <string name="bsct_block">Block &lt;u>this app&lt;/u> from connecting to the Internet</string>
-    <string name="bsct_unblock">Unblock App</string>
-    <string name="bsct_conn_details">Connection Details</string>
-    <string name="bsct_conn_block_desc">blocked %1$s by </string>
-    <string name="bsct_conn_unblock_desc">allowed %1$s.</string>
-    <string name="bsct_conn_conn_desc">%1$s attempted connection to IP address &lt;big>&lt;u>%2$s&lt;/u>&lt;/big> on port %3$s (%4$s).</string>
-    <string name="bsct_ip_heading">IP</string>
-    <string name="bsct_block_conn_type_block">Block connection</string>
-    <string name="bsct_block_conn_type_unblock">Unblock connection</string>
-    <string name="bsct_block_conn_status_block_app">Connection Blocked for this app</string>
-    <string name="bsct_block_conn_status_unblock_app">Connection Unblocked for this app</string>
-    <string name="bsct_block_conn_status_success_all">Connection Blocked for all apps</string>
+    <string name="bsct_conn_block_desc">blocked %1$s %2$s</string>
+    <string name="bsct_conn_conn_desc_allowed">allowed on &lt;u>%1$s:%2$s&lt;/u> %3$s.\u0020</string>
+    <string name="bsct_conn_conn_desc_blocked">blocked on &lt;u>%1$s/%2$s&lt;/u> %3$s by&#160;</string>
+    <string name="bsct_conn_rule_explanation">
+        \u00BB &lt;u>Rule #1&lt;/u>: Blocks an app from connecting to the Internet.
+        \n \u00BB &lt;u>Rule #2&lt;/u>: Blocks any app from connecting to a particular IP.
+        \n \u00BB &lt;u>Rule #3&lt;/u>: Blocks all connections when device locked (Universal Firewall).
+        \n \u00BB &lt;u>Rule #4&lt;/u>: Blocks any app not in use (Universal Firewall).
+        \n \u00BB &lt;u>Rule #5&lt;/u>: Blocks connections when source app unknown (Universal Firewall).
+        \n \u00BB &lt;u>Rule #6&lt;/u>: Blocks all UDP traffic except DNS (Universal Firewall).
+        </string>
+    <string name="univ_block_unknown_connections">Block connections when source app is unknown</string>
     <string name="bsct_alert_message_clear_rules">All rules related to this app will be cleared</string>
     <string name="bsct_alert_message_clear_rules_heading">Clear rules</string>
     <string name="bsct_rules_cleared_toast">All rules related to this app is cleared</string>
+    <string name="bsct_firewall_not_available_whitelist">App is added to whitelist. Cannot firewall</string>
+    <string name="bsct_firewall_not_available_excluded">App is added to excluded list. Cannot firewall</string>
 
-    <string name="private_dns_toast">Turn off "Private DNS" in Android network settings to use BraveDNS</string>
+    <string name="private_dns_toast">"Private DNS" is on in Android network settings</string>
     <string name="always_on_dialog_heading">Disable Always-on VPN</string>
-    <string name="always_on_dialog">\"Always-On VPN\" is enabled on this device. To start BraveDNS, please go to Settings app and disable \"Always-on VPN\".</string>
-    <string name="always_on_toast">Another VPN is set as Always-on VPN</string>
+    <string name="always_on_dialog">\"Always-On VPN\" is enabled on this device. To start RethinkDNS, please go to Settings app and disable \"Always-on VPN\".</string>
     <string name="always_on_dialog_positive_btn">Go to Settings</string>
     <string name="always_on_dialog_negative_btn">Cancel</string>
-    <string name="always_on_lock_down_toast">Turn off "Block connections without VPN" in Android VPN settings</string>
 
     <string name="system_apps_warning">Some system apps are critical to proper functioning of a device. Block them only if you know what you are doing.</string>
+    <string name="system_components_warning">Some system components are critical to proper functioning of a device. Block them only if you know what you are doing.</string>
+
+    <string name="firewall_act_universal_tab">Universal</string>
+    <string name="firewall_act_apps_tab">All apps</string>
+    <string name="firewall_act_network_monitor_tab">Network log</string>
+
+    <string name="dns_act_configure_tab">Configure</string>
+    <string name="dns_act_log">Logs</string>
+
+
+    <string name="univ_firewall_dialog_title">Delete IP Rule?</string>
+    <string name="univ_firewall_dialog_message">Deleting this rule would allow any app to connect to this IP. Do you want to proceed?</string>
+    <string name="univ_firewall_no_ip_message">No IPs blocked. Tap on entries in the "Network Log" screen to block individual IP addresses.</string>
+
+    <string name="univ_delete_firewall_dialog_title">Delete all IP Rules?</string>
+    <string name="univ_delete_firewall_dialog_message">Deleting these rules would allow any application to connect to the currently blocked IPs.</string>
+
+    <string name="doh_custom_url_remove_dialog_title">Delete DoH endpoint?</string>
+    <string name="doh_custom_url_remove_dialog_message">Delete the DNS over Https endpoint from saved configuration.</string>
+
+    <string name="dns_crypt_custom_url_remove_dialog_title">Delete DNSCrypt resolver?</string>
+    <string name="dns_crypt_url_remove_dialog_message">Delete the DNSCrypt resolver from saved configuration.</string>
+
+    <string name="dns_crypt_relay_remove_dialog_title">Delete DNSCrypt Relay?</string>
+    <string name="dns_crypt_relay_remove_dialog_message">Delete the DNSCrypt relay from saved configuration.</string>
+
+    <string name="dns_proxy_remove_dialog_title">Delete DNS Proxy?</string>
+    <string name="dns_proxy_remove_dialog_message">Delete the DNS Proxy from saved configuration.</string>
+
+    <string name="doh_brave_pro_configure">Configure RethinkDNS Plus</string>
+    <string name="doh_brave_pro_configure_desc">Choose from 170+ blocklists to configure RethinkDNS Plus.</string>
+
+    <string name="local_blocklist_download">Download Blocklists</string>
+    <string name="local_blocklist_download_desc">Download blocklists (around 40MB) to use this feature?</string>
+
+    <string name="webview_no_stamp_change_title">Quit?</string>
+    <string name="webview_no_stamp_change_desc">Currently, %1$s blocklist(s) in-use. No additional blocklists have been set. Do you want to quit anyway?</string>
+    <string name="webview_no_stamp_change_remote">No change in the current configuration. Do you want to quit anyway?</string>
+
+    <string name="webview_error_title">Error</string>
+    <string name="webview_error_message">Something went wrong. Please try again later.</string>
+
+    <string name="dns_proxy_no_proxy">Set up a DNS Proxy by clicking on the ADD button below.</string>
+
+
+    <string-array name="dns_crypt_endpoint_names">
+        <item>Cleanbrowsing family</item>
+        <item>Adguard</item>
+        <item>Adguard family</item>
+        <item>Cleanbrowsing Security</item>
+        <item>Quad9</item>
+    </string-array>
+
+    <string-array name="dns_crypt_endpoint_urls">
+        <item>sdns://AQMAAAAAAAAAFDE4NS4yMjguMTY4LjE2ODo4NDQzILysMvrVQ2kXHwgy1gdQJ8MgjO7w6OmflBjcd2Bl1I8pEWNsZWFuYnJvd3Npbmcub3Jn</item>
+        <item>sdns://AQIAAAAAAAAAFDE3Ni4xMDMuMTMwLjEzMDo1NDQzINErR_JS3PLCu_iZEIbq95zkSV2LFsigxDIuUso_OQhzIjIuZG5zY3J5cHQuZGVmYXVsdC5uczEuYWRndWFyZC5jb20</item>
+        <item>sdns://AQIAAAAAAAAAFDE3Ni4xMDMuMTMwLjEzMjo1NDQzILgxXdexS27jIKRw3C7Wsao5jMnlhvhdRUXWuMm1AFq6ITIuZG5zY3J5cHQuZmFtaWx5Lm5zMS5hZGd1YXJkLmNvbQ</item>
+        <item>sdns://AQMAAAAAAAAAEjE4NS4yMjguMTY4Ljk6ODQ0MyC8rDL61UNpFx8IMtYHUCfDIIzu8Ojpn5QY3HdgZdSPKRFjbGVhbmJyb3dzaW5nLm9yZw</item>
+        <item>sdns://AQYAAAAAAAAAEzE0OS4xMTIuMTEyLjEwOjg0NDMgZ8hHuMh1jNEgJFVDvnVnRt803x2EwAuMRwNo34Idhj4ZMi5kbnNjcnlwdC1jZXJ0LnF1YWQ5Lm5ldA</item>
+    </string-array>
+
+    <string-array name="dns_crypt_endpoint_desc">
+        <item>Blocks access to all adult, pornographic and explicit sites. It also
+        blocks proxy and VPN domains that are used to bypass the filters.
+        Mixed content sites (like Reddit) are also blocked. Google, Bing and
+        Youtube are set to the Safe Mode.</item>
+        <item>Protects your device from malware and more.</item>
+        <item>Adguard DNS with safe-search and adult content blocking.</item>
+        <item>Block access to phishing, malware, and malicious domains. It does not block adult content.</item>
+        <item>Quad9 (anycast) no-dnssec/no-log/no-filter 9.9.9.10 / 149.112.112.10</item>
+    </string-array>
+
+
+    <string-array name="dns_crypt_relay_endpoint_names">
+            <item>Anon-AMS-NL</item>
+            <item>Anon-CS-FR</item>
+            <item>Anon-CS-SE</item>
+            <item>Anon-CS-USCA</item>
+            <item>Anon-Tiarap</item>
+        </string-array>
+
+        <string-array name="dns_crypt_relay_endpoint_urls">
+            <item>sdns://gRI1MS4xNS4xMjQuMjA4OjQzNDM</item>
+            <item>sdns://gREyMTIuMTI5LjQ2LjMyOjQ0Mw</item>
+            <item>sdns://gRMxMjguMTI3LjEwNC4xMDg6NDQz</item>
+            <item>sdns://gRAyMy4xOS42Ny4xMTY6NDQz</item>
+            <item>sdns://gRMxNzQuMTM4LjI5LjE3NToxNDQz</item>
+        </string-array>
+
+        <string-array name="dns_crypt_relay_endpoint_desc">
+            <item>Anonymized DNS relay hosted in Netherlands.</item>
+            <item>Anonymized DNS relay hosted in Paris, France provided by https://cryptostorm.is/.</item>
+            <item>Anonymized DNS relay hosted in Stockholm, Sweden provided by https://cryptostorm.is/.</item>
+            <item>Anonymized DNS relay hosted in US - Los Angeles, CA provided by https://cryptostorm.is/.</item>
+            <item>Anonymized DNS relay hosted in Singapore.</item>
+        </string-array>
+
+    <string name="configure_dns_connected_doh_status">dns over https</string>
+    <string name="configure_dns_connected_dns_crypt_status">dnscrypt</string>
+    <string name="configure_dns_connected_dns_proxy_status">dns proxy</string>
+    <string name="configure_dns_connection_name">Connected to  </string>
+
+    <string name="firewall_app_added_in_whitelist">whitelisted app</string>
+    <string name="firewall_app_added_in_excluded_list">excluded app</string>
+
+    <string name="dns_logs_not_available_text">Logs not captured when connected to DNS Proxy.</string>
+
+    <string name="http_proxy_dialog_heading">Set HTTP(S) Proxy</string>
+    <string name="http_proxy_dialog_desc">HTTP(S) Proxy settings are only a hint to applications but they may or may not use it; however, browsers like Chrome and Firefox do use these.</string>
+
+    <string name="univ_firewall_rules_6">Block all UDP traffic except DNS</string>
+
+    <string name="download_update_dialog_title">New Update!</string>
+    <string name="download_update_dialog_message">A version of the app is available for download from the website. Do you want to proceed?</string>
+    <string name="download_update_dialog_message_ok_title">Up-to-date!</string>
+    <string name="download_update_dialog_message_ok">You are already on the latest version.</string>
+    <string name="download_update_dialog_failure_title">Something went wrong!</string>
+    <string name="download_update_dialog_failure_message">Either our servers are down or connection could not be established. Please try again after sometime.</string>
+
+    <string name="whats_new_version_name">BraveDNS is now RethinkDNS</string>
+    <string name="whats_new_version_update">DNS:\n\n
+    \u00BB Support for RethinkDNS+ (a configurable DNS resolver with custom blocklists) deployed to 200+ locations world-wide.\n
+        \u00BB Support for DNSCrypt v2 with Anonymized Relays.\n
+        \u00BB Support to forward DNS requests to other apps like Nebulo or PDNSF.\n\n
+    Firewall:\n\n
+        \u00BB Support for \"Always-on VPN\" and \"Block connections without VPN\" (this is enforced by Android and is full-proof in that it blocks all internet traffic that bypasses VPN ensuring nothing escapes the RethinkDNS firewall).\n
+        \u00BB Exclude apps from VPN, that is from the RethinkDNS firewall altogether.\n
+        \u00BB Whitelist apps from RethinkDNS firewall rules (but not DNS).\n
+        \u00BB Block all connections when source app is unknown (this occasionally happens with UDP traffic that the source app cannot be determined at times).\n
+        \u00BB Block all UDP traffic except DNS traffic.\n
+        \u00BB Block IP addresses apps are connecting to individually from the \"Network Log\" screen.\n\n
+    UI:\n\n
+        \u00BB DNS Firewall screens see a major UI overhaul.\n
+        \u00BB A bottom sheet in \"Network Log\" now shows some relevant actions (block app, block IP, kill app).\n
+        \u00BB A tap on DNS logs entries now shows more information including blocklists.\n
+        \u00BB Select and copy app names and IP addresses from both \"DNS Logs\" screen and \"Network Logs\".\n
+        \u00BB A search bar in all firewall screens.\n\n
+    Proxies:\n\n
+        \u00BB Forward TCP connections to any SOCKS5 endpoint.\n
+        \u00BB Set a HTTP/S proxy endpoint.\n</string>
 
 </resources>

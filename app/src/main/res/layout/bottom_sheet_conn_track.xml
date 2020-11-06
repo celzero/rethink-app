@@ -2,10 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bs_conn_top_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:clickable="true"
     android:orientation="vertical"
-    android:paddingBottom="80dp">
+    android:paddingBottom="40dp">
 
     <TextView
         style="@style/ActionItem"
@@ -14,8 +16,23 @@
         android:layout_marginLeft="40dp"
         android:layout_marginTop="10dp"
         android:layout_marginRight="40dp"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="20dp"
         android:background="@color/recycler_selected" />
+
+    <com.google.android.material.chip.Chip
+        android:id="@+id/bs_conn_track_app_kill"
+        style="@style/ThinnerChip_action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginEnd="25dp"
+        android:padding="5dp"
+        android:text="@string/bsct_kill"
+        android:textColor="@color/accent_bad"
+        android:textSize="16sp"
+        android:visibility="visible"
+        app:chipBackgroundColor="@color/colorPrimaryDark" />
+
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -41,10 +58,49 @@
             android:layout_centerVertical="true"
             android:layout_margin="2dp"
             android:layout_marginTop="8dp"
-            android:textSize="22sp"
             android:layout_toEndOf="@id/bs_conn_track_app_icon"
-            android:paddingLeft="10dp"
-            android:text="@string/action_automatic" />
+            android:gravity="center"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="@string/action_automatic"
+            android:textIsSelectable="true"
+            android:textSize="22sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/bs_conn_connection_flag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:ellipsize="none"
+            android:gravity="center"
+            android:minWidth="35dp"
+            android:singleLine="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textSize="30sp"
+            tools:text="" />
+
+        <TextView
+            android:id="@+id/bs_conn_connection_type_heading"
+            style="@style/ActionItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="2dp"
+            android:layout_toEndOf="@id/bs_conn_connection_flag"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="1.1.1.1"
+            android:textIsSelectable="true"
+            android:textSize="22sp" />
+
+
     </RelativeLayout>
 
     <LinearLayout
@@ -60,9 +116,19 @@
             style="@style/ActionItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="5dp"
             android:text="@string/bsct_conn_block_desc"
             android:textColor="@color/textColorMain"
-            android:padding="5dp"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/bs_conn_connection_details"
+            style="@style/ActionItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/bsct_conn_conn_desc_allowed"
+            android:textColor="@color/textColorMain"
             android:textSize="14sp" />
 
         <TextView
@@ -76,9 +142,33 @@
             android:text="Rule1"
             android:textColor="@color/textColorMain"
             android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/bs_conn_info_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:src="@drawable/brave_mode_info" />
     </LinearLayout>
 
     <TextView
+        android:id="@+id/bs_conn_connection_details1"
+        style="@style/ActionItem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
+        android:padding="5dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:text="@string/bsct_conn_conn_desc_allowed"
+        android:textColor="@color/textColorMain"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/bs_conn_blocked_rule1_txt"
         style="@style/ActionItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -92,6 +182,7 @@
         android:textSize="14sp" />
 
     <LinearLayout
+        android:id="@+id/bs_conn_blocked_rule1_header_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="2dp"
@@ -114,6 +205,7 @@
             style="@style/SwitchCompat_theme"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:padding="5dp" />
 
     </LinearLayout>
@@ -122,58 +214,13 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="3dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        android:background="@color/childListColor" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center">
-
-        <TextView
-            android:id="@+id/bs_conn_connection_flag"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:ellipsize="none"
-            android:gravity="center"
-            android:minWidth="35dp"
-            android:singleLine="true"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            android:textSize="30sp"
-            tools:text="" />
-
-        <TextView
-            android:id="@+id/bs_conn_connection_type_heading"
-            style="@style/ActionItem"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/bs_conn_connection_flag"
-            android:layout_centerVertical="true"
-            android:layout_marginTop="2dp"
-            android:paddingLeft="10dp"
-            android:textSize="22sp"
-            android:text="1.1.1.1" />
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@color/childListColor"
+        android:visibility="gone" />
 
 
-    </RelativeLayout>
-
-    <TextView
-        android:id="@+id/bs_conn_connection_details"
-        style="@style/ActionItem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:gravity="center"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:layout_marginBottom="20dp"
-        android:text="@string/bsct_conn_conn_desc"
-        android:textColor="@color/textColorMain"
-        android:textSize="14sp" />
-
-    <TextView
+    <!--<TextView
         style="@style/ActionItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -212,18 +259,19 @@
             android:layout_height="wrap_content"
             android:padding="5dp" />
 
-    </LinearLayout>
+    </LinearLayout>-->
 
     <TextView
         style="@style/ActionItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
         android:background="@drawable/drawable_purple_gradient"
         android:gravity="start"
         android:padding="7dp"
-        android:text="Rule #3"
+        android:text="Rule #2"
         android:textColor="@color/textColorMain"
         android:textSize="14sp" />
 
@@ -232,9 +280,9 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"
-        android:paddingBottom="5dp"
         android:paddingStart="20dp"
-        android:paddingEnd="20dp">
+        android:paddingEnd="20dp"
+        android:paddingBottom="5dp">
 
         <TextView
             android:id="@+id/bs_conn_block_conn_all_txt"
@@ -251,6 +299,7 @@
             style="@style/SwitchCompat_theme"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:padding="5dp" />
 
     </LinearLayout>
@@ -260,25 +309,14 @@
         android:layout_height="3dp"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"
-        android:background="@color/childListColor" />
+        android:background="@color/childListColor"
+        android:visibility="gone" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:weightSum="1">
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/bs_conn_track_app_kill"
-            style="@style/Widget.MaterialComponents.Chip.Action"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:layout_weight="0.5"
-            android:text="@string/bsct_kill"
-            android:textAlignment="center"
-            android:textColor="@color/accent_bad"
-            android:visibility="visible"
-            app:chipBackgroundColor="@color/colorPrimaryDark" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/bs_conn_track_app_clear_rules"
@@ -290,8 +328,21 @@
             android:text="@string/bsct_clear"
             android:textAlignment="center"
             android:textColor="@color/accent_bad"
-            android:visibility="visible"
+            android:visibility="gone"
             app:chipBackgroundColor="@color/colorPrimaryDark" />
     </LinearLayout>
+
+    <TextView
+        style="@style/ActionItem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:padding="5dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:text="@string/bsct_conn_rule_explanation"
+        android:textColor="@color/accent_bad"
+        android:textSize="14sp"
+        android:visibility="gone" />
 
 </LinearLayout>

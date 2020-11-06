@@ -1,3 +1,18 @@
+/*
+Copyright 2020 RethinkDNS and its authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package com.celzero.bravedns.util
 
 import android.accessibilityservice.AccessibilityService
@@ -5,12 +20,13 @@ import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityEvent.*
 import com.celzero.bravedns.automaton.FirewallManager
+import com.celzero.bravedns.service.BraveVPNService
 
 class BackgroundAccessibilityService  : AccessibilityService() {
 
     private val firewallManager = FirewallManager(this)
     override fun onInterrupt() {
-        Log.w("______","Interrupted")
+        Log.w("BraveDNS","BackgroundAccessibilityService Interrupted")
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
@@ -66,8 +82,9 @@ class BackgroundAccessibilityService  : AccessibilityService() {
         /*Log.w("______","onAEvent: sourcepack " + event.source?.packageName + " text? " +
                 eventText + " class? " + event.className +
                 " package? ppp " + event.packageName)*/
-
-        firewallManager.onAccessibilityEvent(event, this)
+        if(BraveVPNService.isBackgroundEnabled) {
+            firewallManager.onAccessibilityEvent(event, this)
+        }
     }
 
 }

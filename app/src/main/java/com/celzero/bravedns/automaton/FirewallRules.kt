@@ -1,3 +1,18 @@
+/*
+Copyright 2020 RethinkDNS and its authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package com.celzero.bravedns.automaton
 
 import android.content.Context
@@ -5,8 +20,10 @@ import android.util.Log
 import com.celzero.bravedns.data.ConnectionRules
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.BlockedConnections
+import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.firewallRules
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -33,31 +50,33 @@ class FirewallRules {
             blockedConnectionsRepository.clearFirewallRules(uid)
         }
         firewallRules.removeAll(uid)
-        if (DEBUG) printFirewallRules()
     }
 
-    fun removeFirewallRules(uid: Int, ipAddress: String, context: Context) {
-        if(DEBUG) Log.d("BraveDNS","Remove Firewall: $uid, $ipAddress")
+    fun removeFirewallRules(uid: Int, ipAddress: String, ruleType: String, context: Context) {
+        if(DEBUG) Log.d(LOG_TAG,"Remove Firewall: $uid, $ipAddress")
         GlobalScope.launch(Dispatchers.IO) {
             val mDb = AppDatabase.invoke(context.applicationContext)
             val blockedConnectionsRepository = mDb.blockedConnectionRepository()
-            val blockedConnection = constructBlockedConnections(uid, ipAddress)
-            blockedConnectionsRepository.deleteAsync(blockedConnection)
+            //val blockedConnection = constructBlockedConnections(uid, ipAddress,ruleType)
+            if(uid == ConnTrackerBottomSheetFragment.UNIVERSAL_RULES_UID)
+                blockedConnectionsRepository.deleteIPRulesUniversal(ipAddress)
+            else
+                blockedConnectionsRepository.deleteIPRulesForUID(uid, ipAddress)
+            //mDb.close()
         }
         firewallRules.remove(uid, ipAddress)
-        if (DEBUG) printFirewallRules()
     }
 
-    fun addFirewallRules(uid: Int, ipAddress: String, context: Context) {
-        if(DEBUG) Log.d("BraveDNS","addFirewallRules: $uid, $ipAddress")
+    fun addFirewallRules(uid: Int, ipAddress: String, ruleType: String, context: Context) {
+        if(DEBUG) Log.d(LOG_TAG,"addFirewallRules: $uid, $ipAddress")
         GlobalScope.launch(Dispatchers.IO) {
             val mDb = AppDatabase.invoke(context.applicationContext)
             val blockedConnectionsRepository = mDb.blockedConnectionRepository()
-            val blockedConnection = constructBlockedConnections(uid, ipAddress)
+            val blockedConnection = constructBlockedConnections(uid, ipAddress,ruleType)
             blockedConnectionsRepository.insertAsync(blockedConnection)
+            //mDb.close()
         }
         firewallRules.put(uid, ipAddress)
-        if (DEBUG) printFirewallRules()
     }
 
     /**
@@ -68,11 +87,11 @@ class FirewallRules {
          var rule = firewallRules[uid]
          rule?.forEach {
              if (it!! == connectionRules) {
-                 if (DEBUG) Log.d("BraveDNS", "Check Rules : True ${it.protocol}, ${it.ipAddress}, ${it.port}")
+                 if (DEBUG) Log.d(LOG_TAG, "Check Rules : True ${it.protocol}, ${it.ipAddress}, ${it.port}")
                  return true
              }
          }
-         if (DEBUG) Log.d("BraveDNS", "Check Rules : False ${connectionRules.protocol}, ${connectionRules.ipAddress}, ${connectionRules.port}")
+         if (DEBUG) Log.d(LOG_TAG, "Check Rules : False ${connectionRules.protocol}, ${connectionRules.ipAddress}, ${connectionRules.port}")
          return false
      }*/
 
@@ -80,22 +99,14 @@ class FirewallRules {
         var rule = firewallRules[uid]
         rule?.forEach {
             if (it!! == connectionRules.ipAddress) {
-                //if (DEBUG) Log.d("BraveDNS", "Check Rules : True ${it.protocol}, ${it.ipAddress}, ${it.port}")
+                //if (DEBUG) Log.d(LOG_TAG, "Check Rules : True ${it.protocol}, ${it.ipAddress}, ${it.port}")
                 return true
             }
         }
-        //if (DEBUG) Log.d("BraveDNS", "Check Rules : False ${connectionRules.protocol}, ${connectionRules.ipAddress}, ${connectionRules.port}")
+        //if (DEBUG) Log.d(LOG_TAG, "Check Rules : False ${connectionRules.protocol}, ${connectionRules.ipAddress}, ${connectionRules.port}")
         return false
     }
 
-    private fun printFirewallRules() {
-        firewallRules.asMap().forEach {
-            var key = it.key
-            it.value.forEach {
-                Log.d("BraveDNS", "Rule uid: ${key} ipAddress: ${it}")
-            }
-        }
-    }
 
     fun loadFirewallRules(context: Context) {
         GlobalScope.launch(Dispatchers.IO) {
@@ -107,16 +118,20 @@ class FirewallRules {
                 val connRules = ConnectionRules(it.ipAddress!!, it.port, it.protocol!!)
                 firewallRules.put(key, it.ipAddress)
             }
+            //mDb.close()
         }
     }
 
-    private fun constructBlockedConnections(uid: Int, ipAddress: String): BlockedConnections {
+    private fun constructBlockedConnections(uid: Int, ipAddress: String, ruleType : String): BlockedConnections {
         val blockedConnections = BlockedConnections()
         blockedConnections.ipAddress = ipAddress
+        /*blockedConnections.port = connectionRules.port
+         blockedConnections.protocol = connectionRules.protocol*/
         blockedConnections.port = 0
         blockedConnections.protocol = ""
-        /*blockedConnections.port = connectionRules.port
-        blockedConnections.protocol = connectionRules.protocol*/
+        blockedConnections.isActive = true
+        blockedConnections.modifiedDateTime = System.currentTimeMillis()
+        blockedConnections.ruleType = ruleType
         blockedConnections.uid = uid
         return blockedConnections
     }

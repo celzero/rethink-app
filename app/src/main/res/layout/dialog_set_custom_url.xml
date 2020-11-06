@@ -11,78 +11,98 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:text="Custom DNS"
+        android:text="Add DNS over HTTPS"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/dialog_custom_url_text"
-        style="@style/TextAppearance.AppCompat.Body1"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/text_input_layout_name"
+        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_height="wrap_content"
+        android:hint="Resolver Name"
+        app:hintTextColor="@color/secondaryText"
+        app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_top">
+
+        <EditText
+            android:id="@+id/dialog_custom_name_edit_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:inputType="none"
+            android:padding="10dp"
+            android:textColor="@color/primaryText"
+            android:textSize="16sp"
+            app:layout_constraintRight_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_top" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/text_input_layout1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="40dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="40dp"
-        android:layout_marginBottom="10dp"
-        android:padding="5dp"
-        android:text="Enter a valid DNS-over-HTTPS endpoint"
-        android:textColor="@color/colorAccent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_top" />
+        android:hint="Resolver URL"
+        app:hintTextColor="@color/secondaryText"
+        app:layout_constraintTop_toBottomOf="@id/text_input_layout_name">
 
-    <EditText
-        android:id="@+id/dialog_custom_url_edit_text"
-        style="@style/Widget.AppCompat.EditText"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="40dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="40dp"
-        android:layout_marginBottom="10dp"
-        android:background="@color/colorPrimary"
-        android:inputType="textPersonName"
-        android:hint="Enter Custom DNS URL"
-        android:padding="10dp"
-        android:text="https://"
-        app:layout_constraintRight_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_text" />
+        <EditText
+            android:id="@+id/dialog_custom_url_edit_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:inputType="textPersonName"
+            android:padding="10dp"
+            android:textSize="16sp"
+            android:text="https://"
+            android:textColor="@color/primaryText"
+            app:layout_constraintRight_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_input_layout_name" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
         android:id="@+id/dialog_custom_url_failure_text"
         style="@style/TextAppearance.AppCompat.Body1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="40dp"
+        android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
-        android:layout_marginRight="40dp"
+        android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
         android:padding="5dp"
-        android:visibility="gone"
         android:text="Host connection failed. Try again."
         android:textColor="@color/colorRed_A400"
-        app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_edit_text" />
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@id/text_input_layout1" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/dialog_custom_url_ok_btn"
+        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="40dp"
+        android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
-        android:layout_marginRight="40dp"
+        android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
-        android:text="Accept"
+        android:text="Add"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_failure_text" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/dialog_custom_url_cancel_btn"
+        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         android:gravity="center"
         android:text="Cancel"
-        android:textColor="@color/colorAccent"
-        app:layout_constraintRight_toLeftOf="@id/dialog_custom_url_ok_btn"
+        app:layout_constraintEnd_toStartOf="@id/dialog_custom_url_ok_btn"
         app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_failure_text" />
 
     <ProgressBar
@@ -91,7 +111,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="40dp"
         android:layout_marginTop="10dp"
-        android:layout_marginRight="60dp"
+        android:layout_marginRight="20dp"
         android:layout_marginBottom="10dp"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"

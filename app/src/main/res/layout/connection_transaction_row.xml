@@ -6,6 +6,8 @@
     android:layout_height="wrap_content"
     android:layout_margin="1dp"
     android:animateLayoutChanges="true"
+    android:background="@color/colorPrimary"
+    android:backgroundTint="@color/colorPrimary"
     android:orientation="vertical"
     app:cardElevation="@dimen/activity_horizontal_margin">
 
@@ -19,23 +21,23 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/connection_status_indicator"
             android:layout_width="1dp"
-            android:padding="5dp"
             android:layout_height="match_parent"
-            android:background="@color/colorRed_A400" />
+            android:background="@color/colorRed_A400"
+            android:padding="5dp" />
 
         <ImageView
             android:id="@+id/connection_app_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_margin="10dp"
             android:layout_gravity="center"
+            android:layout_margin="10dp"
             android:src="@android:drawable/sym_def_app_icon" />
 
         <LinearLayout
             android:id="@+id/connection_screen_ll"
-            android:layout_width="match_parent"
-            android:layout_weight="1"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:background="@color/colorPrimary"
             android:orientation="vertical">
 
@@ -62,7 +64,7 @@
                         android:ellipsize="start"
                         android:marqueeRepeatLimit="marquee_forever"
                         android:scrollHorizontally="true"
-                        android:singleLine="true"
+                        android:singleLine="false"
                         android:textAppearance="@android:style/TextAppearance.Material.Body1"
                         android:textColor="@color/textColorMain"
                         tools:text="longlongongexaasdsa" />
@@ -78,7 +80,7 @@
                         android:id="@+id/connection_response_time"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="right"
+                        android:layout_gravity="end"
                         android:layout_weight="0"
                         android:padding="5dp"
                         android:singleLine="true"
@@ -92,7 +94,7 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginStart="5dp"
                     android:layout_weight="0.15"
                     android:orientation="vertical">
 
@@ -123,23 +125,23 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:weightSum="1"
-                    android:paddingTop="5dp"
+                    android:orientation="horizontal"
                     android:paddingBottom="5dp"
-                    android:orientation="horizontal">
+                    android:weightSum="1">
 
                     <TextView
                         android:id="@+id/connection_ip_address"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="start|center_vertical"
+                        android:layout_marginEnd="5dp"
                         android:layout_weight="0.65"
                         android:ellipsize="start"
                         android:focusable="true"
-                        android:paddingLeft="10dp"
-                        android:layout_marginRight="5dp"
                         android:focusableInTouchMode="true"
                         android:marqueeRepeatLimit="marquee_forever"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
                         android:textAppearance="@android:style/TextAppearance.Material.Subhead"
                         android:textColor="@color/primaryText"
                         tools:text="ss" />
@@ -148,11 +150,11 @@
                         android:id="@+id/conn_latency_txt"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
+                        android:layout_marginEnd="5dp"
                         android:layout_weight="0.2"
-                        android:layout_marginRight="5dp"
-                        android:padding="5dp"
                         android:background="@drawable/drawable_purple_gradient"
+                        android:gravity="center"
+                        android:padding="5dp"
                         android:singleLine="true"
                         android:textAppearance="@android:style/TextAppearance.Material.Body1"
                         android:textColor="@color/primaryText"
@@ -162,7 +164,6 @@
                         android:id="@+id/connection_type"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-
                         android:layout_gravity="end"
                         android:layout_weight="0.15"
                         android:background="@drawable/drawable_purple_gradient"

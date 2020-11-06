@@ -1,5 +1,22 @@
+/*
+Copyright 2020 RethinkDNS and its authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package com.celzero.bravedns.adapter
 
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -7,16 +24,20 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTracker
-import com.celzero.bravedns.ui.ConnectionTrackerActivity
+import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
 
-class ConnectionTrackerAdapter(val activity : ConnectionTrackerActivity) : PagedListAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(DIFF_CALLBACK) {
+class ConnectionTrackerAdapter(val context : Context) : PagedListAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(DIFF_CALLBACK) {
 
 
     companion object {
@@ -82,32 +103,49 @@ class ConnectionTrackerAdapter(val activity : ConnectionTrackerActivity) : Paged
 
         fun update(connTracker: ConnectionTracker?, position: Int) {
             if(connTracker != null){
-                var time = Utilities.convertLongToTime(connTracker.timeStamp)
+                val time = Utilities.convertLongToTime(connTracker.timeStamp)
                 timeView!!.text = time
                 flagView!!.text = connTracker.flag
                 ipView!!.text = connTracker.ipAddress
                 latencyTxt!!.text = connTracker.port.toString()
                 fqdnView!!.text = connTracker.appName
                 connectionType!!.text = Protocol.getProtocolName(connTracker.protocol).name
-                if (connTracker.isBlocked)
+                if (connTracker.isBlocked) {
                     connectionIndicator!!.visibility = View.VISIBLE
-                else
+                    connectionIndicator!!.setBackgroundColor(ContextCompat.getColor(context, R.color.colorRed_A400))
+                }else if(connTracker.blockedByRule.equals(BraveVPNService.BlockedRuleNames.RULE7.ruleName)){
+                    connectionIndicator!!.visibility = View.VISIBLE
+                    connectionIndicator!!.setBackgroundColor(ContextCompat.getColor(context, R.color.dividerColor))
+                }
+                else {
                     connectionIndicator!!.visibility = View.INVISIBLE
+                }
                 if (connTracker.appName != "Unknown") {
                     try {
-                        var appArray = activity.packageManager.getPackagesForUid(connTracker!!.uid)
-                        appIcon!!.setImageDrawable(activity.packageManager.getApplicationIcon(appArray?.get(0)!!))
+                        val appArray = context.packageManager.getPackagesForUid(connTracker.uid)
+                        val appCount = (appArray?.size)?.minus(1)
+                        if (appArray?.size!! > 2) {
+                            fqdnView!!.text = "${connTracker.appName} + $appCount other apps"
+                        } else if (appArray.size == 2) {
+                            fqdnView!!.text = "${connTracker.appName} + $appCount other app"
+                        }
+                        appIcon!!.setImageDrawable(context.packageManager.getApplicationIcon(appArray.get(0)!!))
                     } catch (e: Exception) {
-                        appIcon!!.setImageDrawable(activity.getDrawable(R.drawable.default_app_icon))
-                        Log.e("BraveDNS", "Package Not Found - " + e.message, e)
+                        appIcon!!.setImageDrawable(context.getDrawable(R.drawable.default_app_icon))
+                        Log.e(LOG_TAG, "Package Not Found - " + e.message, e)
                     }
+                }else{
+                    appIcon!!.setImageDrawable(context.getDrawable(R.drawable.default_app_icon))
                 }
 
-                /*parentView!!.setOnClickListener {
-                    val bottomSheetFragment = ConnTrackerBottomSheetFragment(activity, connTracker)
-                    val frag = activity as FragmentActivity
+                parentView!!.setOnClickListener {
+                    parentView!!.isEnabled = false
+                    val bottomSheetFragment = ConnTrackerBottomSheetFragment(context, connTracker)
+                    val frag = context as FragmentActivity
                     bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
-                }*/
+                    parentView!!.isEnabled = true
+                }
+
             }
 
         }

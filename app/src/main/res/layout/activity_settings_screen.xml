@@ -1,0 +1,609 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="15dp"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.33"
+                android:gravity="center"
+                android:orientation="vertical" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.33"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/settings_app_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:padding="5dp"
+                    android:src="@drawable/conf_dns_icon_black" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.33"
+                android:orientation="vertical"
+                android:weightSum="1">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/settings_app_faq_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="end"
+                    android:drawableTop="@drawable/ic_faq"
+                    android:padding="5dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/settings_heading_firewall"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-smallcaps"
+            android:padding="10dp"
+            android:text="Firewall"
+            android:textColor="@color/secondaryText" />
+
+        <RelativeLayout
+            android:id="@+id/settings_activity_kill_app_rl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:paddingStart="20dp"
+            android:paddingTop="18dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="15dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/settings_activity_kill_app_switch"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/gen_settings_kill_app_txt"
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Kill app when firewalled (experimental)" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:text="Some stubborn apps persistently try to connect to the internet even when firewalled. Enable this setting to kill such apps." />
+            </LinearLayout>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/settings_activity_kill_app_switch"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:padding="10dp" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/settings_heading_dns"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-smallcaps"
+            android:padding="10dp"
+            android:text="DNS"
+            android:textColor="@color/secondaryText" />
+
+        <RelativeLayout
+            android:id="@+id/settings_activity_on_device_block_rl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:paddingStart="20dp"
+            android:paddingTop="15dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="15dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+
+                android:layout_toStartOf="@id/settings_activity_on_device_block_switch"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Enable on-device blocklists" />
+
+                <TextView
+                    android:id="@+id/settings_activity_on_device_block_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:text="Choose from 170+ blocklists." />
+            </LinearLayout>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/settings_activity_on_device_block_switch"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:padding="10dp" />
+
+            <ProgressBar
+                android:id="@+id/settings_activity_on_device_block_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="10dp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/settings_activity_on_device_block_configure_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/settings_activity_on_device_block_switch"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="3dp"
+                android:layout_marginEnd="3dp"
+                android:padding="13dp"
+                android:text="configure"
+                android:textColor="@color/accent_good"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/settings_activity_on_device_block_refresh_btn"
+                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/settings_activity_on_device_block_switch"
+                android:layout_marginEnd="10dp"
+                android:layout_toStartOf="@id/settings_activity_on_device_block_configure_btn"
+                android:padding="10dp"
+                android:text="Update"
+                android:textColor="@color/primaryText"
+                android:visibility="visible" />
+        </RelativeLayout>
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-smallcaps"
+            android:padding="10dp"
+            android:text="VPN"
+            android:textColor="@color/secondaryText" />
+
+
+        <RelativeLayout
+            android:id="@+id/settings_activity_exclude_apps_rl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:paddingStart="20dp"
+            android:paddingTop="15dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="15dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/settings_activity_exclude_apps_img"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Exclude apps from Firewall and DNS" />
+
+                <TextView
+                    android:id="@+id/settings_activity_exclude_apps_count_text"
+                    style="@style/TextAppearance.AppCompat.Body1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="2dp"
+                    android:text="asdad"
+                    android:textColor="@color/textColorMain" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="2dp"
+                    android:text="Connections from excluded apps will not monitored or blocked." />
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/settings_activity_exclude_apps_img"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:padding="10dp"
+                android:src="@drawable/ic_right_arrow_small" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/settings_activity_allow_bypass_rl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:paddingStart="20dp"
+            android:paddingTop="15dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="15dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/settings_activity_allow_bypass_switch"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Allow Bypass" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:text="Allow requesting apps to bypass RethinkDNS firewall on-demand. Some audio/video conference apps like Zoom and WhatsApp may require an on-demand bypass to function properly." />
+            </LinearLayout>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/settings_activity_allow_bypass_switch"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:padding="10dp" />
+
+            <ProgressBar
+                android:id="@+id/settings_activity_allow_bypass_progress"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:padding="10dp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/settings_activity_always_on_vpn_rl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:background="@color/colorPrimary"
+            android:padding="10dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/settings_activity_always_on_vpn_switch"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Always On VPN" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Blocks the private settings screen" />
+            </LinearLayout>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/settings_activity_always_on_vpn_switch"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:padding="10dp" />
+        </RelativeLayout>
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-smallcaps"
+            android:padding="10dp"
+            android:text="Proxy (experimental)"
+            android:textColor="@color/secondaryText" />
+
+        <RelativeLayout
+            android:id="@+id/settings_activity_socks5_rl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:paddingStart="20dp"
+            android:paddingTop="15dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="15dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/settings_activity_socks5_switch"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Enable SOCKS5 (TCP) Proxy" />
+
+                <TextView
+                    android:id="@+id/settings_activity_socks5_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:text="Forward connections to SOCKS5 endpoint." />
+            </LinearLayout>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/settings_activity_socks5_switch"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:padding="10dp" />
+
+            <ProgressBar
+                android:id="@+id/settings_activity_socks5_progress"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:padding="10dp" />
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/settings_activity_http_proxy_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:paddingStart="20dp"
+            android:paddingTop="15dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="20dp"
+            android:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@+id/settings_activity_http_proxy_switch"
+                android:baselineAligned="true"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Enable HTTP(S) Proxy" />
+
+                <TextView
+                    android:id="@+id/settings_activity_http_proxy_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="fill"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:text="This setting is only a recommendation and it is possible that apps will ignore it." />
+            </LinearLayout>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/settings_activity_http_proxy_switch"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:padding="10dp" />
+
+            <ProgressBar
+                android:id="@+id/settings_activity_http_proxy_progress"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:padding="10dp" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/settings_heading"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-smallcaps"
+            android:padding="10dp"
+            android:text="General"
+            android:textColor="@color/secondaryText" />
+
+        <RelativeLayout
+            android:id="@+id/settings_activity_refresh_data_rl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:paddingStart="20dp"
+            android:paddingTop="15dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="15dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/settings_activity_refresh_data_img"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:text="Refresh Data" />
+
+                <TextView
+                    android:id="@+id/settings_activity_refresh_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Re-sync application list." />
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/settings_activity_refresh_data_img"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="10dp"
+                android:padding="10dp"
+                android:src="@drawable/ic_refresh" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/settings_activity_private_dns_rl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:paddingStart="20dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="5dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/settings_activity_private_dns_switch"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/gen_settings_block_private_txt"
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Block Private DNS" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Blocks the private settings screen" />
+            </LinearLayout>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/settings_activity_private_dns_switch"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:padding="10dp" />
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/settings_activity_auto_start_rl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="80dp"
+            android:background="@color/colorPrimary"
+            android:paddingStart="20dp"
+            android:paddingTop="15dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="15dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/settings_activity_auto_start_switch"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/gen_settings_auto_start_txt"
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Auto-start on bootup (experimental)" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:text="Start RethinkDNS if it was running before device bootup." />
+            </LinearLayout>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/settings_activity_auto_start_switch"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:padding="10dp" />
+        </RelativeLayout>
+
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

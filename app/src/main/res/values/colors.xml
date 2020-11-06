@@ -4,8 +4,6 @@
 
     <color name="accent_good">#05dfd7</color>
     <color name="accent_bad">#ff4081</color>
-    <color name="background">#202124</color>
-    <color name="floating">#2d2d2d</color>
     <color name="light">#393939</color>
     <color name="indicator">#deffffff</color>
 
@@ -17,35 +15,25 @@
     <color name="colorPrimaryDark">#444444</color>
     <color name="childListColor">#2d2c2c</color>
     <color name="lightColorPrimary">#C5CAE9</color>
-    <color name="colorAccent">#BDBDBD</color>
     <color name="positive">#05dfd7</color>
     <color name="negative">#DF3520</color>
     <color name="neutral">#959595</color>
-    <color name="pale_white">#FDFDFD</color>
-    <color name="grey">#FD974F</color>
-    <color name="light_bg">#ACBDBA</color>
-    <color name="black">#333333</color>
+    <color name="black">#2F2F2F</color>
     <color name="recycler_selected">#6E7069</color>
-
-    <color name="color_welcome_screen">#d81e5b</color>
 
     <color name="primaryText">#FDFDFD</color>
     <color name="secondaryText">#05dfd7</color>
     <color name="dividerColor">#BDBDBD</color>
 
     <color name="borderColor">#444444</color>
+    <color name="borderblack">#2B2A2A</color>
 
     <color name="textColorMain">#BDBDBD</color>
 
-    <color name="text_color_blue">#2329D6</color>
-
 
     <!-- 1st Gradient color -->
-    <color name="colorPurple_A400">#D500F9</color>
-    <color name="colorPurple_900">#4A148C</color>
 
     <!-- 2nd Gradient color -->
-    <color name="colorAmber_A400">#FFA500</color>
     <color name="colorAmber_900">#FF1744</color>
 
     <!-- 3rd Gradient color -->
@@ -55,14 +43,9 @@
 
     <!-- 4th Gradient color -->
     <color name="colorRed_A400">#FF1744</color>
-    <color name="colorRed_900">#B71C1C</color>
 
 
     <!-- Screens background color-->
-    <color name="bg_screen1">#FFFFFF</color>
-    <color name="bg_screen2">#FFFFFF</color>
-    <color name="bg_screen3">#FFFFFF</color>
-    <color name="bg_screen4">#FFFFFF</color>
 
     <!-- dots inactive colors -->
     <color name="dot_dark_screen1">#2278d4</color>

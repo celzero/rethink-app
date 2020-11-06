@@ -1,3 +1,19 @@
+/*
+Copyright 2020 RethinkDNS and its authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package com.celzero.bravedns.receiver
 
 import android.content.BroadcastReceiver
@@ -10,6 +26,7 @@ import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -27,24 +44,24 @@ class BraveScreenStateReceiver : BroadcastReceiver() {
                 newIntent.putExtra(DeviceLockService.EXTRA_STATE, intent.action)
                 context.startService(newIntent)
             }
-        } else if (intent.action.equals(Intent.ACTION_USER_PRESENT)) {
+        } else if (intent.action.equals(Intent.ACTION_USER_PRESENT) || intent.action.equals(Intent.ACTION_SCREEN_ON)) {
             if(PersistentState.getFirewallModeForScreenState(context!!)) {
-                var state = PersistentState.getScreenLockData(context)
+                val state = PersistentState.getScreenLockData(context)
                 if(state) {
                     PersistentState.setScreenLockData(context, false)
                 }
             }
-        } else if (intent.action.equals(Intent.ACTION_PACKAGE_ADDED)) {
+        } /*else if (intent.action.equals(Intent.ACTION_PACKAGE_ADDED)) {
             val packageName = intent.dataString
             addPackagetoList(packageName!!,context!!)
         } else if (intent.action.equals(Intent.ACTION_PACKAGE_REMOVED)) {
             val packageName = intent.dataString
             removePackageFromList(packageName, context!!)
-        }
+        }*/
     }
 
     private fun removePackageFromList(pacakgeName :String? , context : Context){
-        if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d("BraveDNS", "RemovePackage: $pacakgeName")
+        if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "RemovePackage: $pacakgeName")
         GlobalScope.launch(Dispatchers.IO){
             val packageName = pacakgeName!!.removePrefix("package:")
             val mDb = AppDatabase.invoke(context.applicationContext)
@@ -52,13 +69,14 @@ class BraveScreenStateReceiver : BroadcastReceiver() {
             appInfoRepository.removeUninstalledPackage(pacakgeName)
             HomeScreenActivity.GlobalVariable.appList.remove(pacakgeName)
             PersistentState.setExcludedPackagesWifi(packageName, true, context)
+            //mDb.close()
         }
 
 
     }
 
     private fun addPackagetoList(packageName: String, context: Context) {
-        if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d("BraveDNS", "Add Package: $packageName")
+        if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "Add Package: $packageName")
         GlobalScope.launch(Dispatchers.IO) {
             val mDb = AppDatabase.invoke(context.applicationContext)
             val appInfoRepository = mDb.appInfoRepository()
@@ -79,8 +97,12 @@ class BraveScreenStateReceiver : BroadcastReceiver() {
                         appInfo.isDataEnabled = true
                         appInfo.isWifiEnabled = true
                         appInfo.isSystemApp = false
-                        if ((applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0) {
-                            appInfo.isSystemApp = false
+                        appInfo.whiteListUniv1 = false
+                        appInfo.whiteListUniv2 = false
+                        if ((applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) {
+                            appInfo.isSystemApp = true
+                            appInfo.whiteListUniv1 = true
+                            appInfo.whiteListUniv2 = true
                         }
                         appInfo.isScreenOff = false
                         appInfo.isInternetAllowed = true
@@ -89,6 +111,7 @@ class BraveScreenStateReceiver : BroadcastReceiver() {
                         appInfo.packageInfo = applicationInfo.packageName
                         appInfo.trackers = 0
                         appInfo.wifiDataUsed = 0
+
                         appInfo.uid = applicationInfo.uid
 
                         //TODO Handle this Global scope variable properly. Only half done.
@@ -98,7 +121,7 @@ class BraveScreenStateReceiver : BroadcastReceiver() {
                     }
                 }
             }catch(e: PackageManager.NameNotFoundException){
-                Log.e("BraveDNS","Package Not Found received from the receiver")
+                Log.e(LOG_TAG,"Package Not Found received from the receiver")
             }
         }
 

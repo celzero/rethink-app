@@ -6,6 +6,8 @@
     android:layout_height="wrap_content"
     android:layout_margin="1dp"
     android:animateLayoutChanges="true"
+    android:background="@color/colorPrimary"
+    android:backgroundTint="@color/colorPrimary"
     android:orientation="vertical"
     app:cardElevation="@dimen/activity_horizontal_margin">
 
@@ -21,7 +23,6 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="horizontal"
-
             android:weightSum="1">
 
             <TextView
@@ -53,7 +54,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:paddingLeft="5dp">
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp">
 
 
                 <TextView
@@ -61,7 +63,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="start|center_vertical"
-                    android:layout_marginRight="5dp"
+                    android:layout_marginEnd="5dp"
                     android:ellipsize="start"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
@@ -95,7 +97,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
+                android:layout_marginStart="5dp"
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:padding="5dp">

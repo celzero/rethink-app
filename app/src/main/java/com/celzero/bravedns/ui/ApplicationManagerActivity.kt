@@ -1,3 +1,18 @@
+/*
+Copyright 2020 RethinkDNS and its authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package com.celzero.bravedns.ui
 
 
@@ -10,18 +25,14 @@ import android.content.pm.ApplicationInfo
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ApplicationManagerApk
 import com.celzero.bravedns.animation.ViewAnimation
 import com.celzero.bravedns.database.AppDatabase
-import com.celzero.bravedns.database.AppInfo
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
@@ -29,15 +40,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.UncheckedIOException
 
 
 class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextListener{
-
-
-
-
-
 
     private lateinit var fabAddIcon : FloatingActionButton
     private lateinit var fabUninstallIcon : FloatingActionButton
@@ -45,9 +50,7 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
 
     private var editSearch: SearchView? = null
 
-    private val UNINSTALL_REQUEST_CODE = 111
-
-    var isRotate : Boolean = false
+    private var isRotate : Boolean = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,9 +59,6 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
         setContentView(R.layout.activity_application_manager)
 
         initView()
-
-        //val task = MyAsyncAppDetailsTaskAM(this)
-        //task.execute(1)
         updateAppList()
 
     }
@@ -110,8 +110,6 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
                 list.get(list.size - 1).packageName?.let { it1 -> appInfoForPackage(it1) }
             }
         }
-
-
     }
 
 
@@ -122,8 +120,6 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
         private lateinit var context : Context
         private val apkList = ArrayList<ApplicationManagerApk>()
         fun updateUI(packageName : String, isAdded : Boolean){
-            //Log.d("BraveDNS","Refresh list called : package Name :-" + packageName)
-            //val packageName = packageName.removePrefix("package:").toString()
             fastAdapter = FastAdapter.with(itemAdapter)
             if(isAdded){
                 val packageInfo = context.packageManager.getPackageInfo(packageName,0)
@@ -140,36 +136,27 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
                     }
                 }
                 if(apkDetail != null) {
-                    //Log.d("BraveDNS","apkDetail Removed  :-" + packageName)
+                    //Log.d(LOG_TAG,"apkDetail Removed  :-" + packageName)
                     apkList.remove(apkDetail!!)
-                }else{
-                    //Log.d("BraveDNS","apkDetail is null  :-" + packageName)
                 }
             }
-            if(fastAdapter != null) {
-                //Log.d("BraveDNS","fastAdapter notified  :-" + packageName)
-                itemAdapter.clear()
-                recycle.adapter = fastAdapter
-                itemAdapter.add(apkList)
-                fastAdapter.notifyAdapterDataSetChanged()
-                fastAdapter.notifyDataSetChanged()
-            }else{
-                //Log.d("BraveDNS","fastAdapter is null  :-" + packageName)
-            }
+            itemAdapter.clear()
+            recycle.adapter = fastAdapter
+            itemAdapter.add(apkList)
+            fastAdapter.notifyAdapterDataSetChanged()
+            fastAdapter.notifyDataSetChanged()
         }
     }
 
     private fun uninstallPackage(app : ApplicationManagerApk){
         val packageURI = Uri.parse("package:"+app.packageName)
-        val intent : Intent = Intent(Intent.ACTION_DELETE,packageURI)
+        val intent = Intent(Intent.ACTION_DELETE,packageURI)
         intent.putExtra("packageName",app.packageName)
         startActivity(intent)
-        //apkList.remove(app)
-
     }
 
     private fun appInfoForPackage(packageName : String){
-        val activityManager : ActivityManager = context!!.getSystemService(Activity.ACTIVITY_SERVICE) as ActivityManager
+        val activityManager : ActivityManager = context.getSystemService(Activity.ACTIVITY_SERVICE) as ActivityManager
         activityManager.killBackgroundProcesses(packageName)
 
         try {
@@ -182,8 +169,6 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
             val intent = Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS)
             startActivity(intent)
         }
-
-
     }
 
 
@@ -191,7 +176,6 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
         val mDb = AppDatabase.invoke(context.applicationContext)
         val appInfoRepository = mDb.appInfoRepository()
         val appList = appInfoRepository.getAppInfoAsync()
-        //Log.w("DB","App list from DB Size: "+appList.size)
         appList.forEach{
             val packageInfo = packageManager.getPackageInfo(it.packageInfo,0)
             if(packageInfo.packageName != "com.celzero.bravedns" ) {
@@ -203,6 +187,7 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
             itemAdapter.add(apkList)
             fastAdapter.notifyDataSetChanged()
         }
+        //mDb.close()
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
@@ -220,23 +205,5 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
         }
         return true
     }
-
-
-    /*override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == UNINSTALL_REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                Toast.makeText(this, "Uninstall Successfull", Toast.LENGTH_SHORT)
-                Log.d("TAG", "onActivityResult: user accepted the (un)install")
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                Toast.makeText(this, "Uninstall Cancelled", Toast.LENGTH_SHORT)
-                Log.d("TAG", "onActivityResult: user canceled the (un)install")
-            } else if (resultCode == Activity.RESULT_FIRST_USER) {
-                Toast.makeText(this, "Failed to (Un)install", Toast.LENGTH_SHORT)
-                Log.d("TAG", "onActivityResult: failed to (un)install")
-            }
-        }
-    }*/
-
 }
 

@@ -1,3 +1,19 @@
+/*
+Copyright 2020 RethinkDNS and its authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package com.celzero.bravedns.receiver
 
 import android.content.BroadcastReceiver
@@ -8,27 +24,27 @@ import android.util.Log
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 
 class BraveAutoStartReceiver  : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
 
         if (intent!!.action.equals(Intent.ACTION_BOOT_COMPLETED) || intent.action.equals(Intent.ACTION_REBOOT)) {
-            if (PersistentState.getPrefAutoStartBootUp(context!!)) {
-                var prepareVpnIntent: Intent? = null
-                prepareVpnIntent = try {
+            if (PersistentState.getPrefAutoStartBootUp(context!!) && PersistentState.getVpnEnabled(context)) {
+                val prepareVpnIntent: Intent? = try {
                     VpnService.prepare(context)
                 } catch (e: NullPointerException) {
-                    Log.e("BraveVPN", "Device does not support system-wide VPN mode.")
+                    Log.w(LOG_TAG, "Device does not support system-wide VPN mode.")
                     return
                 }
                 if (prepareVpnIntent != null) {
                     val startIntent = Intent(context, HomeScreenActivity::class.java)
                     startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    context!!.startActivity(startIntent)
+                    context.startActivity(startIntent)
                     return
                 } else {
-                    VpnController.getInstance()?.start(context!!)
+                    VpnController.getInstance()?.start(context)
                 }
             }
         }

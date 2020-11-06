@@ -10,6 +10,7 @@ import android.util.Log;
 import java.net.InetSocketAddress;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
+import static com.celzero.bravedns.util.Constants.LOG_TAG;
 
 public class ConnectionTracer {
     private static final String TAG = "ConnTracer";
@@ -54,8 +55,13 @@ public class ConnectionTracer {
         } else {
             remote = new InetSocketAddress(destIp, destPort);
         }
+        int uid = -1;
+        try{
+            uid = cm.getConnectionOwnerUid(protocol, local, remote);
+        }catch(SecurityException secEx){
+            Log.e(LOG_TAG,"NETWORK_STACK permission - "+secEx.getMessage());
+        }
 
-        int uid = cm.getConnectionOwnerUid(protocol, local, remote);
 
         if (DEBUG) Log.d(TAG, "GetUidQ(" + local + "," + remote + "): " + uid);
 

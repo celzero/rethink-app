@@ -1,3 +1,19 @@
+/*
+Copyright 2020 RethinkDNS and its authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package com.celzero.bravedns.automaton
 
 import android.content.Context
@@ -8,13 +24,12 @@ import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.backgroundAllowedUID
 import com.celzero.bravedns.util.BackgroundAccessibilityService
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.FileSystemUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 
 /*TODO : Initial check is for firewall app completely
@@ -30,8 +45,6 @@ class FirewallManager(service: BackgroundAccessibilityService) {
     private var latestTrackedPackage: String? = null
     private var packageElect: String? = null
 
-    val TAG = "BraveDNS"
-
     companion object{
 
         fun checkInternetPermission(packageName : String) : Boolean{
@@ -44,7 +57,7 @@ class FirewallManager(service: BackgroundAccessibilityService) {
             return true
         }
 
-        @OptIn(InternalCoroutinesApi::class)
+
         fun updateAppInternetPermission(packageName: String, isAllowed: Boolean) {
             val appInfo = GlobalVariable.appList.get(packageName)
             if (appInfo != null) {
@@ -61,30 +74,28 @@ class FirewallManager(service: BackgroundAccessibilityService) {
         }
 
         fun updateInternetBackground(packageName: String, isAllowed: Boolean){
-            val appInfo = GlobalVariable.appList.get(packageName)
+            val appInfo = GlobalVariable.appList[packageName]
             if(appInfo != null){
-                if(DEBUG) Log.d("BraveDNS","Update Internet Permission from background: ${appInfo.appName}, ${appInfo.isInternetAllowed}")
+                //if(DEBUG) Log.d(LOG_TAG,"AccessibilityEvent: Update Internet Permission from background: ${appInfo.appName}, ${appInfo.isInternetAllowed}")
                 //appInfo.isInternetAllowed = isAllowed
                 //GlobalVariable.appList.set(packageName,appInfo)
-                backgroundAllowedUID.clear()
                 if(isAllowed && FileSystemUID.isUIDAppRange(appInfo.uid)){
+                    //if(DEBUG) Log.d(LOG_TAG,"AccessibilityEvent: ${appInfo.appName} is in foreground")
                     backgroundAllowedUID[appInfo.uid] = isAllowed
                     //backgroundAllowed = appInfo.uid
                 }else{
                     backgroundAllowedUID.remove(appInfo.uid)
+                    //if(DEBUG) Log.d(LOG_TAG,"AccessibilityEvent: ${appInfo.appName} removed from foreground")
                     //backgroundAllowed = 0
                 }
-                backgroundAllowedUID.forEach{
-                    if(DEBUG) Log.d("BraveDNS","UID - Allowed - ${it.key}, ${it.value}")
-                }
+
             }
         }
 
-        @OptIn(InternalCoroutinesApi::class)
         fun updateCategoryAppsInternetPermission(categoryName : String, isAllowed: Boolean, context: Context ){
             GlobalScope.launch ( Dispatchers.IO ) {
                 GlobalVariable.appList.forEach {
-                    if (it.value.appCategory == categoryName) {
+                    if (it.value.appCategory == categoryName && !it.value.whiteListUniv1 ) {
                         it.value.isInternetAllowed = isAllowed
                         GlobalVariable.appList[it.key] = it.value
                         PersistentState.setExcludedPackagesWifi(it.key, isAllowed, context)
@@ -100,7 +111,11 @@ class FirewallManager(service: BackgroundAccessibilityService) {
         packageManager = accessibilityService.packageManager
         val eventPackageName = event.packageName?.toString()
 
-        val hasContentDisappeared = event.eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED
+        val hasContentDisappeared = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            event.eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED
+        } else {
+            event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
+        }
         // is the package showing content and being backgrounded?
         if (hasContentDisappeared) {
             if (GlobalVariable.appList.containsKey(eventPackageName)){//PermissionsManager.packageRules.contains(eventPackageName)) {
@@ -127,17 +142,27 @@ class FirewallManager(service: BackgroundAccessibilityService) {
             // https://stackoverflow.com/a/27642535
             // top window is launcher? try revoke queued up permissions
             // FIXME: Figure out a fool-proof way to determine is launcher visible
-           // if(DEBUG) Log.d("BraveDNS","AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -- isPackageLauncher: ${packageName}")
+            //if(DEBUG) Log.d(LOG_TAG,"AccessibilityEvent: AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -- isPackageLauncher: ${packageName}, ${isPackageLauncher(packageName)}")
             if (!isPackageLauncher(packageName)) {
                 // TODO: revoke permissions only if there are any to revoke
-                //if(DEBUG) Log.d("BraveDNS","isPackageLauncher: ${packageName}, false")
+                //if(DEBUG) Log.d(LOG_TAG,"AccessibilityEvent: isPackageLauncher: ${packageName}, false")
                 addOrRemovePackageForBackground(false)
+            }else{
+                backgroundAllowedUID.clear()
             }
+            //printAllowedUID()
         }else{
-            //if(DEBUG) Log.d("BraveDNS","addOrRemovePackageForBackground:isPackageLauncher ${packageName}, true")
+            //if(DEBUG) Log.d(LOG_TAG,"addOrRemovePackageForBackground:isPackageLauncher ${packageName}, true")
             addOrRemovePackageForBackground(true)
         }
 
+    }
+
+    private fun printAllowedUID() {
+        Log.d(LOG_TAG,"AccessibilityEvent: printAllowedUID UID: --------")
+        backgroundAllowedUID.forEach{
+            Log.d(LOG_TAG,"AccessibilityEvent: printAllowedUID UID: ${it.key}, ${it.value}")
+        }
     }
 
     private fun isPackageLauncher(packageName: String?): Boolean {
@@ -151,7 +176,7 @@ class FirewallManager(service: BackgroundAccessibilityService) {
 
 
     private fun addOrRemovePackageForBackground(isAllowed: Boolean){
-        //if(DEBUG) Log.d("BraveDNS","isBackgroundEnabled: ${GlobalVariable.isBackgroundEnabled}")
+        //if(DEBUG) Log.d(LOG_TAG,"isBackgroundEnabled: ${GlobalVariable.isBackgroundEnabled}")
         if(!GlobalVariable.isBackgroundEnabled)
             return
         if (packagesStack.isNullOrEmpty()) {

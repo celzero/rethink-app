@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="default_margin">16dp</dimen>
     <dimen name="drawable_padding">24dp</dimen>
     <dimen name="text_size">16sp</dimen>
+    <dimen name="sub_heading">14sp</dimen>
     <dimen name="text_size_large">20sp</dimen>
-    <dimen name="normal_padding">16dp</dimen>
+    <dimen name="text_size_heading">24sp</dimen>
     <dimen name="bottom_sheet_corner_radius">16dp</dimen>
     <dimen name="bottom_sheet_top_padding">8dp</dimen>
-
-    <dimen name="sub_heading">14dp</dimen>
+    <dimen name="sub_heading_small">11sp</dimen>
     <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="radio_margin">5dp</dimen>
     <dimen name="dots_height">30dp</dimen>
     <dimen name="dots_margin_bottom">20dp</dimen>
     <dimen name="img_width_height">150dp</dimen>

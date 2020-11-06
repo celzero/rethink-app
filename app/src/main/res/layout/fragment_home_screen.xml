@@ -20,46 +20,52 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="15dp"
+            android:visibility="visible"
             android:weightSum="1">
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.33"
+                android:layout_weight="0"
                 android:gravity="center"
                 android:orientation="vertical" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.33"
+                android:layout_weight="1"
+                android:paddingTop="10dp"
                 android:gravity="center"
                 android:orientation="vertical">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/fhs_app_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:padding="5dp"
-                    android:src="@drawable/dns_icon_black" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tv_app_installed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:padding="5dp"
-                    android:text="160 Apps\nInstalled"
-                    android:textColor="@color/primaryText"
-                    android:textStyle="bold"
-                    android:visibility="gone" />
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:text="rethinkdns"
+                    android:letterSpacing="0.2"
+                    android:textColor="@color/textColorMain"
+                    android:textSize="@dimen/text_size_heading"
+                    android:visibility="visible" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_app_"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:text="Backed by Mozilla Builders Incubator"
+                    android:textColor="@color/textColorMain"
+                    android:textSize="@dimen/sub_heading_small"
+                    android:visibility="visible" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.33"
+                android:layout_weight="0"
                 android:gravity="center"
                 android:orientation="vertical" />
 
@@ -68,10 +74,10 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
+            android:layout_margin="10dp"
             android:gravity="center"
             android:orientation="horizontal"
-            android:padding="15dp"
+            android:paddingTop="15dp"
             android:weightSum="1">
 
             <androidx.appcompat.widget.AppCompatSpinner
@@ -418,10 +424,10 @@
                 style="@style/Widget.MaterialComponents.Chip.Action"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="10dp"
+                android:layout_marginEnd="10dp"
                 android:layout_weight="0.5"
                 android:padding="5dp"
-                android:text="Configure firewall"
+                android:text="Firewall"
                 android:textAlignment="center"
                 android:textColor="@color/secondaryText"
                 app:chipBackgroundColor="@color/colorPrimaryDark" />
@@ -431,14 +437,52 @@
                 style="@style/Widget.MaterialComponents.Chip.Action"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
                 android:layout_weight="0.5"
                 android:padding="5dp"
-                android:text="View DNS logs"
+                android:text="DNS"
                 android:textAlignment="center"
                 android:textColor="@color/secondaryText"
                 app:chipBackgroundColor="@color/colorPrimaryDark" />
         </LinearLayout>
+
+        <LinearLayout
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:layout_marginLeft="20dp"
+                   android:layout_marginTop="10dp"
+                   android:layout_marginRight="20dp"
+                   android:orientation="horizontal"
+                   android:weightSum="1">
+
+                   <com.google.android.material.chip.Chip
+                       android:id="@+id/chip_network_monitor"
+                       style="@style/Widget.MaterialComponents.Chip.Action"
+                       android:layout_width="0dp"
+                       android:layout_height="wrap_content"
+                       android:layout_marginEnd="10dp"
+                       android:layout_weight="0.5"
+                       android:padding="5dp"
+                       android:text="Network monitor"
+                       android:textAlignment="center"
+                       android:visibility="gone"
+                       android:textColor="@color/secondaryText"
+                       app:chipBackgroundColor="@color/colorPrimaryDark" />
+
+                   <com.google.android.material.chip.Chip
+                       android:id="@+id/chip_settings"
+                       style="@style/Widget.MaterialComponents.Chip.Action"
+                       android:layout_width="0dp"
+                       android:layout_height="wrap_content"
+                       android:layout_marginStart="10dp"
+                       android:layout_weight="0.5"
+                       android:padding="5dp"
+                       android:text="Settings"
+                       android:visibility="gone"
+                       android:textAlignment="center"
+                       android:textColor="@color/secondaryText"
+                       app:chipBackgroundColor="@color/colorPrimaryDark" />
+               </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

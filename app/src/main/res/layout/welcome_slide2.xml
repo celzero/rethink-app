@@ -36,7 +36,7 @@
             android:gravity="top|center"
             style="@style/TextAppearance.AppCompat.Body1"
             android:textColor="@color/primaryText"
-            android:textSize="@dimen/slide_desc" />
+            android:textSize="@dimen/activity_horizontal_margin" />
 
         <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="330dp"

@@ -1,3 +1,18 @@
+/*
+Copyright 2020 RethinkDNS and its authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package com.celzero.bravedns.ui
 
 import android.app.Dialog
@@ -7,24 +22,27 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import com.celzero.bravedns.adapter.Apk
 import com.celzero.bravedns.R
+import com.celzero.bravedns.adapter.Apk
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
+/**
+ * Experimental BottomSheetFragment.
+ * Implemented for the Permission Manager,
+ * whether to auto remove, auto revoke and do nothing
+ * for the permissions.
+ */
 class BottomSheetFragment(context : Context, apkItem : Apk) : BottomSheetDialogFragment() {
 
     private var fragmentView: View? = null
-    var contextV : Context  ?= null
-    val SHARED_PREF : String = "GZERO_PACKAGE_RULES_PREF"
 
-    var apkVal : Apk = apkItem
+    private var apkVal : Apk = apkItem
 
-    lateinit var txtAutoRemove : TextView
-    lateinit var txtAutoRevoke : TextView
-    lateinit var txtDoNothing : TextView
+    private lateinit var txtAutoRemove : TextView
+    private lateinit var txtAutoRevoke : TextView
+    private lateinit var txtDoNothing : TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        this.contextV = context
         super.onCreate(savedInstanceState)
     }
 
@@ -32,7 +50,6 @@ class BottomSheetFragment(context : Context, apkItem : Apk) : BottomSheetDialogF
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         fragmentView = inflater.inflate(R.layout.bottom_sheet_permission_manager, container, false)
-        //initView(fragmentView)
         return fragmentView
     }
 
@@ -54,33 +71,30 @@ class BottomSheetFragment(context : Context, apkItem : Apk) : BottomSheetDialogF
         txtDoNothing = view.findViewById(R.id.textView3)
 
         if(rule == 0){
-            txtDoNothing?.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ok,0)
-            txtAutoRemove?.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
-            txtAutoRevoke?.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
+            txtDoNothing.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ok,0)
+            txtAutoRemove.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
+            txtAutoRevoke.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
         }else if(rule == 1){
-            txtAutoRevoke?.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ok,0)
-            txtAutoRemove?.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
-            txtDoNothing?.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
+            txtAutoRevoke.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ok,0)
+            txtAutoRemove.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
+            txtDoNothing.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
         }else if(rule == 2){
-            txtAutoRemove?.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ok,0)
-            txtAutoRevoke?.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
-            txtDoNothing?.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
+            txtAutoRemove.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ok,0)
+            txtAutoRevoke.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
+            txtDoNothing.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
         }
 
-        txtAutoRemove!!.setOnClickListener{
-            //Toast.makeText(contextV,"Package Name :"+apkVal.packageName,Toast.LENGTH_SHORT).show()
+        txtAutoRemove.setOnClickListener{
             HomeScreenActivity.dbHandler.updatePackage(apkVal.packageName , 2)
             print(apkVal.packageName)
             this.dismiss()
         }
-        txtAutoRevoke!!.setOnClickListener{
-            //Toast.makeText(contextV,"Package Name :"+apkVal.packageName,Toast.LENGTH_SHORT).show()
+        txtAutoRevoke.setOnClickListener{
             HomeScreenActivity.dbHandler.updatePackage(apkVal.packageName , 1)
             print(apkVal.packageName)
             this.dismiss()
         }
-        txtDoNothing!!.setOnClickListener{
-            //Toast.makeText(contextV,"Package Name :"+apkVal.packageName,Toast.LENGTH_SHORT).show()
+        txtDoNothing.setOnClickListener{
             HomeScreenActivity.dbHandler.updatePackage(apkVal.packageName , 0)
             print(apkVal.packageName)
             this.dismiss()

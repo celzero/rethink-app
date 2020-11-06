@@ -58,7 +58,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:background="@color/colorPrimaryDark"
+            android:background="@color/colorPrimary"
             android:orientation="vertical"
             android:padding="5dp">
 
@@ -79,7 +79,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:background="@color/colorPrimaryDark"
+                android:background="@color/colorPrimary"
                 android:gravity="center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:paddingLeft="20dp"
@@ -93,7 +93,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:background="@color/colorPrimaryDark"
+            android:background="@color/colorPrimary"
             android:orientation="vertical"
             android:padding="5dp">
 
@@ -106,7 +106,7 @@
                 android:layout_gravity="center"
                 android:background="@drawable/button_background_ripple"
                 android:backgroundTint="@color/button_background_tint"
-                android:drawableLeft="@drawable/ic_telegram"
+                android:drawableStart="@drawable/ic_telegram"
                 android:drawablePadding="10dp"
                 android:gravity="center"
                 android:lineSpacingExtra="5dp"
@@ -123,38 +123,89 @@
                 android:text="@string/about_bravedns_toreport_text"
                 android:textColor="@color/textColorMain" />
 
+
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:background="@color/colorPrimaryDark"
-            android:layoutDirection="ltr"
+            android:background="@color/colorPrimary"
             android:orientation="vertical"
             android:paddingTop="10dp"
-            android:paddingBottom="10dp">
+            android:paddingBottom="15dp">
 
             <androidx.appcompat.widget.AppCompatTextView
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
                 android:gravity="center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:layout_marginLeft="20dp"
+                android:padding="5dp"
+                android:text="@string/about_app"
+                android:textColor="@color/secondaryText" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_whats_new"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="80dp"
+                android:drawableStart="@drawable/ic_whats_new"
+                android:drawablePadding="20dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/about_whats_new" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_app_update"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="80dp"
+                android:drawableStart="@drawable/ic_app_update"
+                android:drawablePadding="20dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/about_app_update_check"
+                android:textColor="@color/primaryText" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:background="@color/colorPrimary"
+            android:orientation="vertical"
+            android:paddingTop="10dp"
+            android:paddingBottom="15dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:gravity="center_vertical"
+                android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/about_web"
                 android:textColor="@color/secondaryText" />
+
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_website"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="80dp"
-                android:drawableLeft="@drawable/ic_website"
+                android:layout_marginStart="80dp"
+                android:drawableStart="@drawable/ic_website"
                 android:drawablePadding="20dp"
-                android:gravity="start"
+                android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/about_website"
@@ -165,10 +216,10 @@
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="80dp"
-                android:drawableLeft="@drawable/ic_github"
+                android:layout_marginStart="80dp"
+                android:drawableStart="@drawable/ic_github"
                 android:drawablePadding="20dp"
-                android:gravity="start"
+                android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/about_github" />
@@ -178,10 +229,10 @@
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="80dp"
-                android:drawableLeft="@drawable/ic_faq"
+                android:layout_marginStart="80dp"
+                android:drawableStart="@drawable/ic_faq"
                 android:drawablePadding="20dp"
-                android:gravity="start"
+                android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/about_faq" />
@@ -191,10 +242,10 @@
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="80dp"
-                android:drawableLeft="@drawable/ic_blog"
+                android:layout_marginStart="80dp"
+                android:drawableStart="@drawable/ic_blog"
                 android:drawablePadding="20dp"
-                android:gravity="start"
+                android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/about_blog" />
@@ -205,8 +256,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:layoutDirection="ltr"
-            android:background="@color/colorPrimaryDark"
+            android:background="@color/colorPrimary"
             android:orientation="vertical"
             android:paddingTop="10dp"
             android:paddingBottom="10dp">
@@ -215,9 +265,9 @@
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
                 android:gravity="center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:layout_marginLeft="20dp"
                 android:padding="5dp"
                 android:text="@string/about_connect"
                 android:textColor="@color/secondaryText" />
@@ -227,10 +277,10 @@
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="80dp"
-                android:drawableLeft="@drawable/ic_mail"
+                android:layout_marginStart="80dp"
+                android:drawableStart="@drawable/ic_mail"
                 android:drawablePadding="20dp"
-                android:gravity="start"
+                android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/about_email" />
@@ -240,11 +290,11 @@
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="80dp"
+                android:layout_marginStart="80dp"
                 android:layout_marginBottom="5dp"
-                android:drawableLeft="@drawable/ic_twitter"
+                android:drawableStart="@drawable/ic_twitter"
                 android:drawablePadding="20dp"
-                android:gravity="start"
+                android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/about_twitter" />
@@ -255,9 +305,9 @@
         <ImageView
             android:id="@+id/mozilla_img"
             android:layout_width="200dp"
-            android:layout_marginTop="20dp"
             android:layout_height="40dp"
             android:layout_gravity="center"
+            android:layout_marginTop="20dp"
             android:src="@drawable/mozilla" />
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -265,9 +315,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:paddingBottom="50dp"
-            android:layout_marginBottom="50dp"
             android:text="@string/about_mozilla"
             android:textColor="@color/textColorMain" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/about_app_version"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="50dp"
+            android:gravity="center"
+            android:paddingTop="30dp"
+            android:paddingBottom="50dp"
+            android:textColor="@color/textColorMain" />
+
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
