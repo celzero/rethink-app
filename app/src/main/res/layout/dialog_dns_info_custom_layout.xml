@@ -30,6 +30,7 @@
             android:drawablePadding="20dp"
             android:padding="10dp"
             android:text="@string/dns_mode_0"
+            android:textSize="@dimen/heading_font_text_view"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
         <TextView
@@ -38,6 +39,7 @@
             android:layout_height="wrap_content"
             android:lineSpacingExtra="5dp"
             android:padding="10dp"
+            android:textSize="@dimen/large_font_text_view"
             android:text="@string/dns_mode_0_explanation"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
@@ -48,6 +50,7 @@
             android:drawablePadding="20dp"
             android:padding="10dp"
             android:text="@string/dns_mode_1"
+            android:textSize="@dimen/heading_font_text_view"
             android:drawableStart="@drawable/dns_family"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
@@ -57,6 +60,7 @@
             android:layout_height="wrap_content"
             android:lineSpacingExtra="5dp"
             android:padding="10dp"
+            android:textSize="@dimen/large_font_text_view"
             android:text="@string/dns_mode_1_explanation"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
@@ -67,6 +71,7 @@
             android:drawablePadding="20dp"
             android:padding="10dp"
             android:text="@string/dns_mode_2"
+            android:textSize="@dimen/heading_font_text_view"
             android:drawableStart="@drawable/idns_ad_malware"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
@@ -77,6 +82,7 @@
             android:drawablePadding="20dp"
             android:lineSpacingExtra="5dp"
             android:padding="10dp"
+            android:textSize="@dimen/large_font_text_view"
             android:text="@string/dns_mode_2_explanation"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
@@ -87,6 +93,7 @@
             android:drawablePadding="20dp"
             android:padding="10dp"
             android:text="@string/dns_mode_3"
+            android:textSize="@dimen/heading_font_text_view"
             android:drawableStart="@drawable/dns_custom_url"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
@@ -97,6 +104,7 @@
             android:drawablePadding="20dp"
             android:lineSpacingExtra="5dp"
             android:padding="10dp"
+            android:textSize="@dimen/large_font_text_view"
             android:text="@string/dns_mode_3_explanation"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
@@ -107,6 +115,7 @@
             android:drawablePadding="20dp"
             android:padding="10dp"
             android:text="@string/dns_mode_4"
+            android:textSize="@dimen/heading_font_text_view"
             android:drawableStart="@drawable/dns_bravedns"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
@@ -117,6 +126,7 @@
             android:drawablePadding="20dp"
             android:lineSpacingExtra="5dp"
             android:padding="10dp"
+            android:textSize="@dimen/large_font_text_view"
             android:text="@string/dns_mode_4_explanation"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
@@ -129,6 +139,7 @@
             android:layout_marginTop="20dp"
             android:background="@drawable/button_background_ripple"
             android:text="Ok"
+            android:textSize="@dimen/large_font_text_view"
             android:visibility="gone" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

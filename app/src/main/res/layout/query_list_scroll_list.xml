@@ -31,7 +31,7 @@
                 android:gravity="center"
                 android:text="@string/configure_dns_connected_doh_status"
                 android:textColor="@color/primaryText"
-                android:textSize="16sp" />
+                android:textSize="@dimen/large_font_text_view" />
 
             <TextView
                 android:id="@+id/connected_status_title_url"
@@ -41,7 +41,7 @@
                 android:gravity="center"
                 android:padding="5dp"
                 android:textColor="@color/textColorMain"
-                android:textSize="14sp" />
+                android:textSize="@dimen/default_font_text_view" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -61,7 +61,7 @@
                     android:paddingEnd="5dp"
                     android:text="Latency: "
                     android:textColor="@color/dividerColor"
-                    android:textSize="@dimen/sub_heading" />
+                    android:textSize="@dimen/default_font_text_view" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/total_queries_txt"
@@ -74,7 +74,7 @@
                     android:paddingEnd="5dp"
                     android:text="Lifetime Queries: "
                     android:textColor="@color/dividerColor"
-                    android:textSize="@dimen/sub_heading" />
+                    android:textSize="@dimen/default_font_text_view" />
 
             </LinearLayout>
 
@@ -88,6 +88,7 @@
             android:layout_margin="20dp"
             android:gravity="center"
             android:padding="20dp"
+            android:textSize="@dimen/large_font_text_view"
             android:text="@string/dns_logs_not_available_text"
             android:textColor="@color/textColorMain" />
 
@@ -113,6 +114,7 @@
                 android:layout_weight="0.64"
                 android:fontFamily="sans-serif"
                 android:text="Query"
+                android:textSize="@dimen/default_font_text_view"
                 android:gravity="start"
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp"
@@ -127,6 +129,7 @@
                 android:paddingStart="3dp"
                 android:paddingEnd="3dp"
                 android:text="Latency"
+                android:textSize="@dimen/default_font_text_view"
                 android:textColor="@color/secondaryText" />
 
             <TextView
@@ -137,74 +140,8 @@
                 android:fontFamily="sans-serif"
                 android:gravity="center"
                 android:text="Time"
+                android:textSize="@dimen/default_font_text_view"
                 android:textColor="@color/secondaryText" />
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:id="@+id/log_query_screen_lls"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/query_card_view_top"
-            android:layout_marginTop="2dp"
-            android:background="@color/childListColor"
-            android:weightSum="1"
-            android:visibility="gone"
-            android:orientation="horizontal"
-            android:baselineAligned="false">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="0.8"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:paddingStart="5dp"
-                    android:paddingEnd="5dp">
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="start|center"
-                        android:layout_marginEnd="5dp"
-                        android:gravity="center"
-                        android:textColor="@color/secondaryText"
-                        tools:text="Query" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.1"
-                    android:orientation="vertical"
-                    android:padding="5dp">
-
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:singleLine="true"
-                        android:textColor="@color/secondaryText"
-                        tools:text="Latency" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:layout_weight="0.1"
-                    android:orientation="vertical"
-                    android:padding="5dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:singleLine="true"
-                        android:textColor="@color/secondaryText"
-                        tools:text="Time" />
-                </LinearLayout>
         </LinearLayout>
 
 

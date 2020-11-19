@@ -69,14 +69,14 @@
     <style name="ThinnerChip" parent="Widget.MaterialComponents.Chip.Filter">
         <item name="chipCornerRadius">12dp</item>
         <item name="chipMinHeight">24dp</item>
-        <item name="android:textSize">12sp</item>
+        <item name="android:textSize">11sp</item>
         <item name="chipMinTouchTargetSize">30dp</item>
     </style>
 
     <style name="ThinnerChip_action" parent="Widget.MaterialComponents.Chip.Action">
             <item name="chipCornerRadius">12dp</item>
             <item name="chipMinHeight">24dp</item>
-            <item name="android:textSize">12sp</item>
+            <item name="android:textSize">11sp</item>
             <item name="chipMinTouchTargetSize">30dp</item>
         </style>
 

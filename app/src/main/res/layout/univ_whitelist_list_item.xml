@@ -38,7 +38,7 @@
                 android:fontFamily="sans-serif-medium"
                 android:text="Dummy Label"
                 android:textColor="@color/primaryText"
-                android:textSize="16sp" />
+                android:textSize="@dimen/large_font_text_view" />
 
 
             <androidx.appcompat.widget.AppCompatCheckBox

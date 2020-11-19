@@ -30,7 +30,7 @@
                 android:padding="10dp"
                 android:text="universal firewall"
                 android:textColor="@color/secondaryText"
-                android:textSize="@dimen/slide_desc"
+                android:textSize="@dimen/large_font_text_view"
                 android:visibility="gone" />
 
             <TextView
@@ -41,7 +41,7 @@
                 android:padding="10dp"
                 android:text="@string/universal_firewall_explanation"
                 android:textColor="@color/neutral"
-                android:textSize="14sp"
+                android:textSize="@dimen/default_font_text_view"
                 android:visibility="visible" />
 
             <LinearLayout
@@ -61,7 +61,7 @@
                     android:padding="10dp"
                     android:text="Block all apps when device is locked"
                     android:textColor="@color/primaryText"
-                    android:textSize="@dimen/sub_heading" />
+                    android:textSize="@dimen/large_font_text_view" />
 
                 <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/firewall_all_apps_check"
@@ -89,7 +89,7 @@
                     android:padding="10dp"
                     android:text="Block any app not in use (experimental)"
                     android:textColor="@color/primaryText"
-                    android:textSize="@dimen/sub_heading" />
+                    android:textSize="@dimen/large_font_text_view" />
 
                 <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/firewall_background_mode_check"
@@ -117,7 +117,7 @@
                     android:padding="10dp"
                     android:text="@string/univ_block_unknown_connections"
                     android:textColor="@color/primaryText"
-                    android:textSize="@dimen/sub_heading" />
+                    android:textSize="@dimen/large_font_text_view" />
 
                 <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/firewall_unknown_connection_mode_check"
@@ -144,7 +144,7 @@
                     android:padding="10dp"
                     android:text="@string/univ_firewall_rules_6"
                     android:textColor="@color/primaryText"
-                    android:textSize="@dimen/sub_heading" />
+                    android:textSize="@dimen/large_font_text_view" />
 
                 <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/firewall_udp_connection_mode_check"
@@ -183,6 +183,7 @@
                         android:gravity="center_vertical"
                         android:paddingTop="5dp"
                         android:paddingBottom="5dp"
+                        android:textSize="@dimen/large_font_text_view"
                         android:text="Whitelist Apps"
                         android:textStyle="bold" />
 
@@ -193,7 +194,7 @@
                         android:paddingTop="2dp"
                         android:paddingBottom="2dp"
                         android:textColor="@color/neutral"
-                        android:textSize="14sp" />
+                        android:textSize="@dimen/default_font_text_view" />
 
 
                     <TextView
@@ -204,7 +205,7 @@
                         android:paddingBottom="5dp"
                         android:text="@string/category_firewall_explanation"
                         android:textColor="@color/neutral"
-                        android:textSize="14sp" />
+                        android:textSize="@dimen/default_font_text_view" />
                 </LinearLayout>
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -233,7 +234,7 @@
             android:paddingBottom="5dp"
             android:text="View Blocked IPs"
             android:textColor="@color/primaryText"
-            android:textSize="16sp"
+            android:textSize="@dimen/large_font_text_view"
             android:textStyle="bold"
             android:visibility="visible"
             app:drawableRightCompat="@drawable/ic_keyboard_arrow_up_gray_24dp" />
@@ -250,7 +251,7 @@
             android:paddingBottom="15dp"
             android:text="@string/ip_details_list_explanation"
             android:textColor="@color/neutral"
-            android:textSize="14sp"
+            android:textSize="@dimen/default_font_text_view"
             android:visibility="visible" />
 
         <LinearLayout
@@ -292,15 +293,23 @@
                         <requestFocus />
                     </androidx.appcompat.widget.SearchView>
 
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/firewall_search_add_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:layout_weight="0.05"
+                        android:padding="5dp"
+                        android:src="@drawable/ic_add" />
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/firewall_search_delete_icon"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:layout_marginBottom="2dp"
-                        android:layout_weight="0.10"
-                        android:padding="5dp"
+                        android:layout_weight="0.05"
+                        android:padding="2dp"
                         android:src="@drawable/ic_delete" />
 
                 </LinearLayout>
@@ -320,6 +329,7 @@
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp"
                 android:gravity="center"
+                android:textSize="@dimen/default_font_text_view"
                 android:text="@string/univ_firewall_no_ip_message"
                 android:textColor="@color/textColorMain"
                 android:visibility="invisible" />

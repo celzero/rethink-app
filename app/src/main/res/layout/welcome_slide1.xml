@@ -33,7 +33,7 @@
             android:paddingRight="@dimen/desc_padding"
             android:text="@string/slide_1_desc"
             android:textColor="@color/primaryText"
-            android:textSize="@dimen/activity_horizontal_margin" />
+            android:textSize="@dimen/large_font_text_view" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="330dp"

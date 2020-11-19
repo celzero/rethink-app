@@ -71,6 +71,7 @@
                     android:scrollHorizontally="true"
                     android:textAppearance="@android:style/TextAppearance.Material.Body1"
                     android:textColor="@color/primaryText"
+                    android:textSize="@dimen/large_font_text_view"
                     tools:text="longlongongexaasdsadsdsdasdasdsmple.com" />
             </LinearLayout>
 
@@ -89,6 +90,7 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_weight="0"
                     android:singleLine="true"
+                    android:textSize="@dimen/default_font_text_view"
                     android:textAppearance="@android:style/TextAppearance.Material.Body1"
                     android:textColor="@color/primaryText"
                     tools:text="10(ms)" />
@@ -109,6 +111,7 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_weight="0"
                     android:singleLine="true"
+                    android:textSize="@dimen/default_font_text_view"
                     android:textAppearance="@android:style/TextAppearance.Material.Body1"
                     android:textColor="@color/primaryText"
                     tools:text="17:54:11" />

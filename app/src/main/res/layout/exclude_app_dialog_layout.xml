@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp"
+        android:textSize="@dimen/large_font_text_view"
         android:text="Exclude app from DNS and Firewall"
         android:textColor="@color/secondaryText" />
 
@@ -71,7 +72,7 @@
             android:layout_alignParentStart="true"
             android:layout_toStartOf="@id/exclude_app_select_all_text"
             android:textColor="@color/primaryText"
-            android:textSize="@dimen/sub_heading" />
+            android:textSize="@dimen/default_font_text_view" />
 
         <TextView
             android:id="@+id/exclude_app_select_all_text"
@@ -81,7 +82,7 @@
             android:layout_toStartOf="@id/exclude_app_select_all_option_checkbox"
             android:fontFamily="sans-serif-smallcaps"
             android:text="select all"
-            android:textSize="@dimen/text_size" />
+            android:textSize="@dimen/large_font_text_view" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/exclude_app_select_all_option_checkbox"
@@ -109,6 +110,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
+        android:textSize="@dimen/large_font_text_view"
         android:text="Go back"
         android:textColor="@color/accent_bad" />
 

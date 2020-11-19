@@ -139,7 +139,7 @@
                             android:layout_height="wrap_content"
                             android:text="-"
                             android:textColor="@color/secondaryText"
-                            android:textSize="28sp"
+                            android:textSize="@dimen/home_screen_stat_text"
                             android:tooltipText="Number of apps in the firewall blocklist" />
 
                         <androidx.appcompat.widget.AppCompatTextView
@@ -149,6 +149,7 @@
                             android:gravity="center"
                             android:text="apps blocked"
                             android:textColor="@color/primaryText"
+                            android:textSize="@dimen/default_font_text_view"
                             android:tooltipText="Number of apps in the firewall blocklist" />
 
 
@@ -170,7 +171,7 @@
                             android:layout_height="wrap_content"
                             android:text="2"
                             android:textColor="@color/secondaryText"
-                            android:textSize="28sp"
+                            android:textSize="@dimen/home_screen_stat_text"
                             android:tooltipText="Number of app categories in the firewall blocklist" />
 
                         <androidx.appcompat.widget.AppCompatTextView
@@ -180,6 +181,7 @@
                             android:gravity="center"
                             android:text="categories blocked"
                             android:textColor="@color/primaryText"
+                            android:textSize="@dimen/default_font_text_view"
                             android:tooltipText="Number of app categories in the firewall blocklist" />
 
                     </LinearLayout>
@@ -200,7 +202,7 @@
                             android:text="0"
                             android:tooltipText="Number of active Universal Firewall rules"
                             android:textColor="@color/secondaryText"
-                            android:textSize="28sp" />
+                            android:textSize="@dimen/home_screen_stat_text" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
@@ -209,6 +211,7 @@
                             android:tooltipText="Number of active Universal Firewall rules"
                             android:gravity="center"
                             android:text="universal firewall"
+                            android:textSize="@dimen/default_font_text_view"
                             android:textColor="@color/primaryText" />
 
                     </LinearLayout>
@@ -237,7 +240,7 @@
                             android:layout_height="wrap_content"
                             android:text="-"
                             android:textColor="@color/secondaryText"
-                            android:textSize="28sp"
+                            android:textSize="@dimen/home_screen_stat_text"
                             android:tooltipText="Total DNS queries requested" />
 
                         <androidx.appcompat.widget.AppCompatTextView
@@ -246,6 +249,7 @@
                             android:fontFamily="sans-serif-smallcaps"
                             android:gravity="center"
                             android:text="lifetime Qs"
+                            android:textSize="@dimen/default_font_text_view"
                             android:textColor="@color/primaryText"
                             android:tooltipText="Total DNS queries requested" />
 
@@ -268,7 +272,7 @@
                             android:layout_height="wrap_content"
                             android:text="-"
                             android:textColor="@color/secondaryText"
-                            android:textSize="28sp"
+                            android:textSize="@dimen/home_screen_stat_text"
                             android:tooltipText="End-to-end median DNS request latency" />
 
                         <androidx.appcompat.widget.AppCompatTextView
@@ -277,6 +281,7 @@
                             android:fontFamily="sans-serif-smallcaps"
                             android:gravity="center"
                             android:text="latency"
+                            android:textSize="@dimen/default_font_text_view"
                             android:textColor="@color/primaryText"
                             android:tooltipText="End-to-end median DNS request latency" />
 
@@ -297,7 +302,7 @@
                             android:layout_height="wrap_content"
                             android:text="-"
                             android:textColor="@color/secondaryText"
-                            android:textSize="28sp"
+                            android:textSize="@dimen/home_screen_stat_text"
                             android:tooltipText="Total unresolved, unanswered queries" />
 
                         <androidx.appcompat.widget.AppCompatTextView
@@ -306,6 +311,7 @@
                             android:fontFamily="sans-serif-smallcaps"
                             android:gravity="center"
                             android:text="unresolved Qs"
+                            android:textSize="@dimen/default_font_text_view"
                             android:textColor="@color/primaryText"
                             android:tooltipText="Total unresolved, unanswered queries" />
 
@@ -334,7 +340,7 @@
                             android:layout_height="wrap_content"
                             android:text="-"
                             android:textColor="@color/secondaryText"
-                            android:textSize="28sp"
+                            android:textSize="@dimen/home_screen_stat_text"
                             android:tooltipText="Number of apps in the firewall blocklist" />
 
                         <androidx.appcompat.widget.AppCompatTextView
@@ -343,6 +349,7 @@
                             android:fontFamily="sans-serif-smallcaps"
                             android:gravity="center"
                             android:text="apps blocked"
+                            android:textSize="@dimen/default_font_text_view"
                             android:textColor="@color/primaryText"
                             android:tooltipText="Number of apps in the firewall blocklist" />
 
@@ -365,7 +372,7 @@
                             android:text="-"
                             android:tooltipText="End-to-end median DNS request latency"
                             android:textColor="@color/secondaryText"
-                            android:textSize="28sp" />
+                            android:textSize="@dimen/home_screen_stat_text" />
 
 
                         <androidx.appcompat.widget.AppCompatTextView
@@ -375,6 +382,7 @@
                             android:gravity="center"
                             android:tooltipText="End-to-end median DNS request latency"
                             android:text="latency"
+                            android:textSize="@dimen/default_font_text_view"
                             android:textColor="@color/primaryText" />
 
                     </LinearLayout>
@@ -394,7 +402,7 @@
                             android:layout_height="wrap_content"
                             android:text="-%"
                             android:textColor="@color/secondaryText"
-                            android:textSize="28sp"
+                            android:textSize="@dimen/home_screen_stat_text"
                             android:tooltipText="Total unresolved, unanswered queries" />
 
                         <androidx.appcompat.widget.AppCompatTextView
@@ -403,6 +411,7 @@
                             android:fontFamily="sans-serif-smallcaps"
                             android:gravity="center"
                             android:text="unresolved qs"
+                            android:textSize="@dimen/default_font_text_view"
                             android:textColor="@color/primaryText"
                             android:tooltipText="Total unresolved, unanswered queries" />
 
@@ -428,6 +437,7 @@
                 android:layout_weight="0.5"
                 android:padding="5dp"
                 android:text="Firewall"
+                android:textSize="@dimen/large_font_text_view"
                 android:textAlignment="center"
                 android:textColor="@color/secondaryText"
                 app:chipBackgroundColor="@color/colorPrimaryDark" />
@@ -441,6 +451,7 @@
                 android:layout_weight="0.5"
                 android:padding="5dp"
                 android:text="DNS"
+                android:textSize="@dimen/large_font_text_view"
                 android:textAlignment="center"
                 android:textColor="@color/secondaryText"
                 app:chipBackgroundColor="@color/colorPrimaryDark" />
@@ -501,7 +512,7 @@
                 android:fontFamily="sans-serif-smallcaps"
                 android:text="not connected"
                 android:textColor="@color/accent_bad"
-                android:textSize="16dp" />
+                android:textSize="@dimen/heading_font_text_view" />
 
             <com.celzero.bravedns.animation.RippleBackground
                 android:id="@+id/content"
@@ -509,13 +520,13 @@
                 android:layout_height="wrap_content"
                 app:rb_color="@color/rippleColor"
                 app:rb_duration="6000"
-                app:rb_radius="26dp"
+                app:rb_radius="18dp"
                 android:layoutDirection="ltr"
                 app:rb_rippleAmount="3"
                 app:rb_scale="3"
                 app:rb_type="fillRipple">
 
-                <androidx.appcompat.widget.AppCompatTextView
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/fhs_dns_on_off_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -525,7 +536,7 @@
                     android:gravity="center"
                     android:text="start"
                     android:textColor="@color/primaryText"
-                    android:textSize="30sp"
+                    android:textSize="@dimen/home_screen_stat_text"
                     android:textStyle="normal" />
             </com.celzero.bravedns.animation.RippleBackground>
 
@@ -537,7 +548,7 @@
                 android:fontFamily="sans-serif-smallcaps"
                 android:text="@string/dns_explanation_disconnected"
                 android:textColor="@color/textColorMain"
-                android:textSize="16sp" />
+                android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/fhs_app_uptime"
@@ -546,7 +557,7 @@
                 android:fontFamily="sans-serif-smallcaps"
                 android:text="uptime"
                 android:textColor="@color/textColorMain"
-                android:textSize="16sp" />
+                android:textSize="@dimen/default_font_text_view" />
         </LinearLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

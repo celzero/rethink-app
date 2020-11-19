@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
+        android:textSize="@dimen/large_font_text_view"
         android:text="Add DNS over HTTPS"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -31,10 +32,11 @@
             android:layout_marginTop="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
-            android:inputType="none"
+            android:inputType="textNoSuggestions"
             android:padding="10dp"
+            android:maxLines="2"
             android:textColor="@color/primaryText"
-            android:textSize="16sp"
+            android:textSize="@dimen/large_font_text_view"
             app:layout_constraintRight_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_top" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -57,8 +59,9 @@
             android:layout_marginBottom="10dp"
             android:inputType="textPersonName"
             android:padding="10dp"
-            android:textSize="16sp"
+            android:textSize="@dimen/large_font_text_view"
             android:text="https://"
+            android:maxLines="2"
             android:textColor="@color/primaryText"
             app:layout_constraintRight_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/text_input_layout_name" />
@@ -75,6 +78,7 @@
         android:layout_marginBottom="10dp"
         android:padding="5dp"
         android:text="Host connection failed. Try again."
+        android:textSize="@dimen/default_font_text_view"
         android:textColor="@color/colorRed_A400"
         android:visibility="invisible"
         app:layout_constraintTop_toBottomOf="@id/text_input_layout1" />
@@ -89,6 +93,7 @@
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
         android:text="Add"
+        android:textSize="@dimen/large_font_text_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_failure_text" />
 
@@ -102,6 +107,7 @@
         android:layout_marginBottom="10dp"
         android:gravity="center"
         android:text="Cancel"
+        android:textSize="@dimen/large_font_text_view"
         app:layout_constraintEnd_toStartOf="@id/dialog_custom_url_ok_btn"
         app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_failure_text" />
 

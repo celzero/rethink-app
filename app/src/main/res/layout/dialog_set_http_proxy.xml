@@ -12,6 +12,8 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:text="@string/http_proxy_dialog_heading"
+        android:maxLines="1"
+        android:textSize="@dimen/large_font_text_view"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout
@@ -33,7 +35,8 @@
             android:inputType="none"
             android:padding="10dp"
             android:text=""
-            android:textSize="16sp"
+            android:maxLines="1"
+            android:textSize="@dimen/large_font_text_view"
             app:layout_constraintRight_toLeftOf="parent" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -53,9 +56,10 @@
             android:layout_marginTop="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
+            android:maxLines="1"
             android:inputType="number"
             android:padding="10dp"
-            android:textSize="16sp"
+            android:textSize="@dimen/large_font_text_view"
             app:layout_constraintRight_toLeftOf="parent" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -69,6 +73,7 @@
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
         android:padding="5dp"
+        android:textSize="@dimen/default_font_text_view"
         android:text="@string/http_proxy_dialog_desc"
         android:textColor="@color/textColorMain"
         android:visibility="visible"
@@ -84,6 +89,7 @@
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
         android:padding="5dp"
+        android:textSize="@dimen/default_font_text_view"
         android:text="Host connection failed. Try again."
         android:textColor="@color/colorRed_A400"
         android:visibility="gone"
@@ -99,6 +105,7 @@
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
         android:text="Set"
+        android:textSize="@dimen/large_font_text_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_http_proxy_failure_text" />
 
@@ -111,6 +118,7 @@
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         android:gravity="center"
+        android:textSize="@dimen/large_font_text_view"
         android:text="Cancel"
         app:layout_constraintEnd_toStartOf="@id/dialog_http_proxy_ok_btn"
         app:layout_constraintTop_toBottomOf="@id/dialog_http_proxy_failure_text" />

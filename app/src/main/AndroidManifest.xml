@@ -39,7 +39,12 @@
         <activity
             android:name=".ui.HomeScreenActivity"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ui.ApplicationManagerActivity"
             android:theme="@style/AppTheme" />
@@ -51,11 +56,6 @@
             android:name=".ui.WelcomeActivity"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".ui.AppInfoActivity"

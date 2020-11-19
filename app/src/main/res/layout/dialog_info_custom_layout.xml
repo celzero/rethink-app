@@ -30,6 +30,7 @@
         android:drawableStart="@drawable/spinner_dns"
         android:drawablePadding="20dp"
         android:padding="10dp"
+        android:textSize="@dimen/heading_font_text_view"
         android:text="@string/dns_mode_info_title" />
 
     <TextView
@@ -39,6 +40,7 @@
         android:layout_height="wrap_content"
         android:lineSpacingExtra="5dp"
         android:padding="10dp"
+        android:textSize="@dimen/large_font_text_view"
         android:text="@string/dns_mode_info_explanation" />
 
     <TextView
@@ -48,6 +50,7 @@
         android:padding="10dp"
         android:drawableStart="@drawable/spinner_firewall"
         android:drawablePadding="20dp"
+        android:textSize="@dimen/heading_font_text_view"
         android:layout_height="wrap_content"
         android:text="@string/firewall_mode_info_title" />
 
@@ -58,6 +61,7 @@
         android:layout_height="wrap_content"
         android:lineSpacingExtra="5dp"
         android:padding="10dp"
+        android:textSize="@dimen/large_font_text_view"
         android:text="@string/firewall_mode_info_explanation" />
 
     <TextView
@@ -68,6 +72,7 @@
         android:padding="10dp"
         android:drawablePadding="20dp"
         android:visibility="gone"
+        android:textSize="@dimen/heading_font_text_view"
         android:drawableStart="@drawable/spinner_both"
         android:text="@string/hybrid_mode_info_title" />
 
@@ -78,6 +83,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_gravity="end"
+        android:textSize="@dimen/large_font_text_view"
         style="@style/TextAppearance.AppCompat.Widget.Button"
         android:background="@drawable/button_background_ripple"
         android:text="Ok"/>

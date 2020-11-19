@@ -65,7 +65,7 @@
                         android:padding="5dp"
                         android:text="Dummy Label"
                         android:textColor="@color/primaryText"
-                        android:textSize="18sp" />
+                        android:textSize="@dimen/large_font_text_view" />
 
                     <TextView
                         android:id="@+id/firewall_apk_package_tv"
@@ -80,7 +80,7 @@
                         android:padding="5dp"
                         android:text="Category : "
                         android:textColor="@color/textColorMain"
-                        android:textSize="14sp"
+                        android:textSize="@dimen/default_font_text_view"
                         android:visibility="visible" />
 
 

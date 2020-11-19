@@ -16,7 +16,7 @@
         android:padding="10dp"
         android:text="by category"
         android:textColor="@color/secondaryText"
-        android:textSize="@dimen/slide_desc"
+        android:textSize="@dimen/large_font_text_view"
         android:visibility="gone"
         app:drawableRightCompat="@drawable/ic_keyboard_arrow_up_gray_24dp" />
 
@@ -31,7 +31,7 @@
         android:padding="10dp"
         android:text="@string/settings_explanation_text"
         android:textColor="@color/neutral"
-        android:textSize="14sp" />
+        android:textSize="@dimen/default_font_text_view" />
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/firewall_category_search"

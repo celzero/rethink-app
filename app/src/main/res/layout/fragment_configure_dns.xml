@@ -28,7 +28,7 @@
             android:gravity="center"
             android:text="@string/configure_dns_connected_doh_status"
             android:textColor="@color/primaryText"
-            android:textSize="16sp" />
+            android:textSize="@dimen/large_font_text_view" />
 
         <TextView
             android:id="@+id/configure_connected_status_url"
@@ -37,7 +37,7 @@
             android:gravity="center"
             android:padding="5dp"
             android:textColor="@color/primaryText"
-            android:textSize="14sp" />
+            android:textSize="@dimen/default_font_text_view" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -57,7 +57,7 @@
                 android:paddingEnd="5dp"
                 android:text="Latency: "
                 android:textColor="@color/dividerColor"
-                android:textSize="@dimen/sub_heading" />
+                android:textSize="@dimen/default_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/configure_total_queries_txt"
@@ -70,7 +70,7 @@
                 android:paddingEnd="5dp"
                 android:text="Lifetime Queries: "
                 android:textColor="@color/dividerColor"
-                android:textSize="@dimen/sub_heading" />
+                android:textSize="@dimen/default_font_text_view" />
 
         </LinearLayout>
 
@@ -163,7 +163,7 @@
                         android:padding="5dp"
                         android:text="resolvers"
                         android:textColor="@color/secondaryText"
-                        android:textSize="18sp"
+                        android:textSize="@dimen/heading_font_text_view"
                         android:visibility="visible" />
 
                     <androidx.recyclerview.widget.RecyclerView
@@ -190,7 +190,7 @@
                         android:text="relays"
                         android:background="@color/childListColor"
                         android:textColor="@color/secondaryText"
-                        android:textSize="18sp"
+                        android:textSize="@dimen/heading_font_text_view"
                         android:visibility="visible" />
 
                     <androidx.recyclerview.widget.RecyclerView
@@ -217,6 +217,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:layout_marginTop="15dp"
+                        android:textSize="@dimen/large_font_text_view"
                         android:text="@string/dns_proxy_no_proxy"
                         android:textColor="@color/textColorMain" />
 
@@ -242,9 +243,11 @@
         android:layout_centerHorizontal="true"
         android:layout_margin="20dp"
         android:text="Add"
+        android:drawablePadding="10dp"
         android:textColor="@color/accent_good"
         app:backgroundTint="@color/colorPrimaryDark"
         app:fabSize="normal"
+        android:textSize="@dimen/default_font_text_view"
         app:icon="@drawable/ic_fab_without_border"
         app:iconTint="@color/accent_good" />
 </RelativeLayout>

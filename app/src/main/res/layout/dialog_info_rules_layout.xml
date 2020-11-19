@@ -30,6 +30,7 @@
             android:drawablePadding="20dp"
             android:padding="10dp"
             android:text="@string/firewall_rules"
+            android:textSize="@dimen/heading_font_text_view"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
         <TextView
@@ -40,6 +41,7 @@
             android:lineSpacingExtra="5dp"
             android:padding="10dp"
             android:layout_marginTop="20dp"
+            android:textSize="@dimen/large_font_text_view"
             android:text="@string/bsct_conn_rule_explanation"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 

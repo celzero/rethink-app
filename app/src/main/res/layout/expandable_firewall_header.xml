@@ -33,6 +33,7 @@
                     android:layout_marginEnd="5dp"
                     android:background="@color/colorAmber_900"
                     android:text="TextView1"
+                    android:textSize="@dimen/large_font_text_view"
                     android:textColor="@color/colorAmber_900" />
 
                 <TextView
@@ -45,7 +46,7 @@
                     android:paddingBottom="5dp"
                     android:text="TextView"
                     android:textColor="@color/primaryText"
-                    android:textSize="@dimen/fab_margin"
+                    android:textSize="@dimen/large_font_text_view"
                     android:textStyle="bold" />
 
                 <TextView
@@ -57,7 +58,7 @@
                     android:layout_weight="0.8"
                     android:text="TextView"
                     android:textColor="@color/textColorMain"
-                    android:textSize="12sp" />
+                    android:textSize="@dimen/default_font_text_view" />
 
                 <androidx.appcompat.widget.AppCompatToggleButton
                     android:id="@+id/expand_checkbox"
@@ -69,6 +70,7 @@
                     android:drawableStart="@drawable/allowed"
                     android:drawablePadding="10dp"
                     android:padding="10dp"
+                    android:textSize="@dimen/large_font_text_view"
                     android:textOff="Unblocked"
                     android:textOn="Blocked" />
 
@@ -101,30 +103,30 @@
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/imageLayout_2"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
                         android:layout_margin="5dp"
                         android:src="@drawable/ic_launcher_foreground" />
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/imageLayout_3"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
                         android:layout_margin="5dp"
                         android:src="@drawable/ic_launcher_foreground"
                         android:visibility="gone" />
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/imageLayout_4"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
                         android:layout_margin="5dp"
                         android:src="@drawable/ic_launcher_foreground"
                         android:visibility="gone" />
 
                     <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
                         android:layout_gravity="center_vertical"
                         android:src="@drawable/action_right" />
                 </LinearLayout>
@@ -139,6 +141,7 @@
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
                     android:paddingBottom="20dp"
+                    android:textSize="@dimen/default_font_text_view"
                     android:text="@string/system_apps_warning"
                     android:visibility="gone" />
 

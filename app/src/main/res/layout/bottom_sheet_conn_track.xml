@@ -27,9 +27,9 @@
         android:layout_gravity="end"
         android:layout_marginEnd="25dp"
         android:padding="5dp"
-        android:text="@string/bsct_kill"
+        android:text="@string/bsct_app_info"
         android:textColor="@color/accent_bad"
-        android:textSize="16sp"
+        android:textSize="@dimen/large_font_text_view"
         android:visibility="visible"
         app:chipBackgroundColor="@color/colorPrimaryDark" />
 
@@ -64,7 +64,7 @@
             android:paddingEnd="10dp"
             android:text="@string/action_automatic"
             android:textIsSelectable="true"
-            android:textSize="22sp" />
+            android:textSize="@dimen/heading_font_text_view" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -83,7 +83,7 @@
             android:minWidth="35dp"
             android:singleLine="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            android:textSize="30sp"
+            android:textSize="26sp"
             tools:text="" />
 
         <TextView
@@ -98,7 +98,7 @@
             android:paddingEnd="10dp"
             android:text="1.1.1.1"
             android:textIsSelectable="true"
-            android:textSize="22sp" />
+            android:textSize="@dimen/heading_font_text_view" />
 
 
     </RelativeLayout>
@@ -119,7 +119,7 @@
             android:padding="5dp"
             android:text="@string/bsct_conn_block_desc"
             android:textColor="@color/textColorMain"
-            android:textSize="14sp"
+            android:textSize="@dimen/default_font_text_view"
             android:visibility="gone" />
 
         <TextView
@@ -129,7 +129,7 @@
             android:layout_height="wrap_content"
             android:text="@string/bsct_conn_conn_desc_allowed"
             android:textColor="@color/textColorMain"
-            android:textSize="14sp" />
+            android:textSize="@dimen/default_font_text_view" />
 
         <TextView
             android:id="@+id/bs_conn_blocked_desc_2"
@@ -141,7 +141,7 @@
             android:padding="7dp"
             android:text="Rule1"
             android:textColor="@color/textColorMain"
-            android:textSize="14sp" />
+            android:textSize="@dimen/default_font_text_view" />
 
         <ImageView
             android:id="@+id/bs_conn_info_image"
@@ -164,7 +164,7 @@
         android:paddingEnd="20dp"
         android:text="@string/bsct_conn_conn_desc_allowed"
         android:textColor="@color/textColorMain"
-        android:textSize="14sp"
+        android:textSize="@dimen/default_font_text_view"
         android:visibility="gone" />
 
     <TextView
@@ -179,7 +179,7 @@
         android:padding="7dp"
         android:text="Rule #1"
         android:textColor="@color/textColorMain"
-        android:textSize="14sp" />
+        android:textSize="@dimen/default_font_text_view" />
 
     <LinearLayout
         android:id="@+id/bs_conn_blocked_rule1_header_ll"
@@ -198,7 +198,7 @@
             android:padding="5dp"
             android:text="@string/bsct_block"
             android:textColor="@color/primaryText"
-            android:textSize="@dimen/sub_heading" />
+            android:textSize="@dimen/large_font_text_view" />
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/bs_conn_block_app_check"
@@ -217,6 +217,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:background="@color/childListColor"
+        android:textSize="@dimen/default_font_text_view"
         android:visibility="gone" />
 
 
@@ -273,7 +274,7 @@
         android:padding="7dp"
         android:text="Rule #2"
         android:textColor="@color/textColorMain"
-        android:textSize="14sp" />
+        android:textSize="@dimen/default_font_text_view" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -292,7 +293,7 @@
             android:padding="5dp"
             android:text="@string/bsct_block_all"
             android:textColor="@color/primaryText"
-            android:textSize="@dimen/sub_heading" />
+            android:textSize="@dimen/large_font_text_view" />
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/bs_conn_block_conn_all_switch"
@@ -310,6 +311,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"
         android:background="@color/childListColor"
+        android:textSize="@dimen/large_font_text_view"
         android:visibility="gone" />
 
     <LinearLayout
@@ -332,17 +334,5 @@
             app:chipBackgroundColor="@color/colorPrimaryDark" />
     </LinearLayout>
 
-    <TextView
-        style="@style/ActionItem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:padding="5dp"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:text="@string/bsct_conn_rule_explanation"
-        android:textColor="@color/accent_bad"
-        android:textSize="14sp"
-        android:visibility="gone" />
 
 </LinearLayout>
