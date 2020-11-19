@@ -69,6 +69,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-smallcaps"
             android:padding="10dp"
+            android:textSize="@dimen/large_font_text_view"
             android:text="Firewall"
             android:textColor="@color/secondaryText" />
 
@@ -94,12 +95,14 @@
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/large_font_text_view"
                     android:text="Kill app when firewalled (experimental)" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="5dp"
+                    android:textSize="@dimen/default_font_text_view"
                     android:text="Some stubborn apps persistently try to connect to the internet even when firewalled. Enable this setting to kill such apps." />
             </LinearLayout>
 
@@ -121,6 +124,7 @@
             android:fontFamily="sans-serif-smallcaps"
             android:padding="10dp"
             android:text="DNS"
+            android:textSize="@dimen/large_font_text_view"
             android:textColor="@color/secondaryText" />
 
         <RelativeLayout
@@ -137,7 +141,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-
                 android:layout_toStartOf="@id/settings_activity_on_device_block_switch"
                 android:orientation="vertical">
 
@@ -145,6 +148,7 @@
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/large_font_text_view"
                     android:text="Enable on-device blocklists" />
 
                 <TextView
@@ -152,6 +156,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="5dp"
+                    android:textSize="@dimen/default_font_text_view"
                     android:text="Choose from 170+ blocklists." />
             </LinearLayout>
 
@@ -181,6 +186,7 @@
                 android:layout_marginEnd="3dp"
                 android:padding="13dp"
                 android:text="configure"
+                android:textSize="@dimen/default_font_text_view"
                 android:textColor="@color/accent_good"
                 android:visibility="visible" />
 
@@ -194,6 +200,7 @@
                 android:layout_toStartOf="@id/settings_activity_on_device_block_configure_btn"
                 android:padding="10dp"
                 android:text="Update"
+                android:textSize="@dimen/default_font_text_view"
                 android:textColor="@color/primaryText"
                 android:visibility="visible" />
         </RelativeLayout>
@@ -204,6 +211,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-smallcaps"
             android:padding="10dp"
+            android:textSize="@dimen/large_font_text_view"
             android:text="VPN"
             android:textColor="@color/secondaryText" />
 
@@ -229,6 +237,7 @@
                 <TextView
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
+                    android:textSize="@dimen/large_font_text_view"
                     android:layout_height="wrap_content"
                     android:text="Exclude apps from Firewall and DNS" />
 
@@ -240,12 +249,14 @@
                     android:paddingTop="5dp"
                     android:paddingBottom="2dp"
                     android:text="asdad"
+                    android:textSize="@dimen/default_font_text_view"
                     android:textColor="@color/textColorMain" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="2dp"
+                    android:textSize="@dimen/default_font_text_view"
                     android:text="Connections from excluded apps will not monitored or blocked." />
             </LinearLayout>
 
@@ -281,12 +292,14 @@
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/large_font_text_view"
                     android:text="Allow Bypass" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="5dp"
+                    android:textSize="@dimen/default_font_text_view"
                     android:text="Allow requesting apps to bypass RethinkDNS firewall on-demand. Some audio/video conference apps like Zoom and WhatsApp may require an on-demand bypass to function properly." />
             </LinearLayout>
 
@@ -331,11 +344,13 @@
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/large_font_text_view"
                     android:text="Always On VPN" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/default_font_text_view"
                     android:text="Blocks the private settings screen" />
             </LinearLayout>
 
@@ -355,6 +370,7 @@
             android:fontFamily="sans-serif-smallcaps"
             android:padding="10dp"
             android:text="Proxy (experimental)"
+            android:textSize="@dimen/large_font_text_view"
             android:textColor="@color/secondaryText" />
 
         <RelativeLayout
@@ -378,6 +394,7 @@
                 <TextView
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
+                    android:textSize="@dimen/large_font_text_view"
                     android:layout_height="wrap_content"
                     android:text="Enable SOCKS5 (TCP) Proxy" />
 
@@ -386,6 +403,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="5dp"
+                    android:textSize="@dimen/default_font_text_view"
                     android:text="Forward connections to SOCKS5 endpoint." />
             </LinearLayout>
 
@@ -434,6 +452,7 @@
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/large_font_text_view"
                     android:text="Enable HTTP(S) Proxy" />
 
                 <TextView
@@ -443,6 +462,7 @@
                     android:layout_gravity="fill"
                     android:paddingTop="5dp"
                     android:paddingBottom="5dp"
+                    android:textSize="@dimen/default_font_text_view"
                     android:text="This setting is only a recommendation and it is possible that apps will ignore it." />
             </LinearLayout>
 
@@ -474,6 +494,7 @@
             android:fontFamily="sans-serif-smallcaps"
             android:padding="10dp"
             android:text="General"
+            android:textSize="@dimen/large_font_text_view"
             android:textColor="@color/secondaryText" />
 
         <RelativeLayout
@@ -499,12 +520,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="5dp"
+                    android:textSize="@dimen/large_font_text_view"
                     android:text="Refresh Data" />
 
                 <TextView
                     android:id="@+id/settings_activity_refresh_desc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/default_font_text_view"
                     android:text="Re-sync application list." />
             </LinearLayout>
 
@@ -542,11 +565,13 @@
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/large_font_text_view"
                     android:text="Block Private DNS" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/default_font_text_view"
                     android:text="Blocks the private settings screen" />
             </LinearLayout>
 
@@ -585,12 +610,14 @@
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/large_font_text_view"
                     android:text="Auto-start on bootup (experimental)" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="5dp"
+                    android:textSize="@dimen/default_font_text_view"
                     android:text="Start RethinkDNS if it was running before device bootup." />
             </LinearLayout>
 

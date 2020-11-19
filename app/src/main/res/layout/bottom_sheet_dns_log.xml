@@ -43,7 +43,7 @@
                 android:paddingEnd="10dp"
                 android:text="@string/action_automatic"
                 android:textIsSelectable="true"
-                android:textSize="20sp" />
+                android:textSize="@dimen/heading_font_text_view" />
         </RelativeLayout>
 
 
@@ -64,7 +64,7 @@
                 android:minWidth="30dp"
                 android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-                android:textSize="30sp" />
+                android:textSize="26sp" />
 
             <TextView
                 android:id="@+id/dns_block_ip_address"
@@ -78,7 +78,7 @@
                 android:paddingEnd="10dp"
                 android:text="1.1.1.1"
                 android:textIsSelectable="true"
-                android:textSize="16sp" />
+                android:textSize="@dimen/large_font_text_view" />
 
             <TextView
                 android:id="@+id/dns_block_ip_latency"
@@ -91,7 +91,7 @@
                 android:padding="7dp"
                 android:text="Rule1"
                 android:textColor="@color/textColorMain"
-                android:textSize="14sp" />
+                android:textSize="@dimen/default_font_text_view" />
 
 
         </RelativeLayout>
@@ -106,7 +106,7 @@
             android:padding="5dp"
             android:text="@string/bsct_conn_block_desc"
             android:textColor="@color/textColorMain"
-            android:textSize="14sp"
+            android:textSize="@dimen/default_font_text_view"
             android:visibility="visible" />
 
         <TextView
@@ -120,7 +120,7 @@
             android:padding="5dp"
             android:text="@string/bsct_conn_block_desc"
             android:textColor="@color/textColorMain"
-            android:textSize="14sp" />
+            android:textSize="@dimen/default_font_text_view" />
 
         <TextView
             android:id="@+id/dns_block_latency"
@@ -133,12 +133,13 @@
             android:padding="5dp"
             android:text=""
             android:textColor="@color/textColorMain"
-            android:textSize="16sp" />
+            android:textSize="@dimen/default_font_text_view" />
 
         <TextView
             android:id="@+id/dns_block_place_holder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="@dimen/default_font_text_view"
             android:layout_below="@id/dns_block_latency"
             android:paddingBottom="60dp" />
 
@@ -156,7 +157,7 @@
                 android:padding="10dp"
                 android:text="Blocklists"
                 android:textColor="@color/primaryText"
-                android:textSize="16sp" />
+                android:textSize="@dimen/large_font_text_view" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/dns_block_recyclerview"

@@ -27,7 +27,7 @@
                 android:fontFamily="sans-serif-medium"
                 android:text="Dummy Label"
                 android:textColor="@color/primaryText"
-                android:textSize="16sp" />
+                android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatButton
                 style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
@@ -35,6 +35,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="delete"
+                android:textSize="@dimen/large_font_text_view"
                 android:layout_alignParentEnd="true"
                 android:layout_centerInParent="true" />
 

@@ -33,7 +33,7 @@
                 android:fontFamily="sans-serif-light"
                 android:text="Dummy Label"
                 android:textColor="@color/primaryText"
-                android:textSize="16sp" />
+                android:textSize="@dimen/large_font_text_view" />
 
             <TextView
                 android:id="@+id/dns_crypt_endpoint_list_url_explanation"
@@ -43,7 +43,7 @@
                 android:fontFamily="sans-serif-light"
                 android:text="Dummy Label"
                 android:textColor="@color/textColorMain"
-                android:textSize="12sp" />
+                android:textSize="@dimen/default_font_text_view" />
 
         </LinearLayout>
 

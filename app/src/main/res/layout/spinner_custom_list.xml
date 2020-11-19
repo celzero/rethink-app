@@ -21,7 +21,7 @@
         android:textColor="@color/primaryText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/text_size_large"
+        android:textSize="@dimen/extra_large_font_text_view"
         android:layout_gravity="center|center_vertical"
         android:text="asdasd" />
 

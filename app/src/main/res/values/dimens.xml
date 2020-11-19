@@ -18,7 +18,14 @@
     <dimen name="desc_padding">30dp</dimen>
 
     <dimen name="rippleStrokeWidth">1dp</dimen>
-    <dimen name="rippleRadius">32dp</dimen>
+    <dimen name="rippleRadius">16dp</dimen>
     <dimen name="maxSize">1000dp</dimen>
+
+    <dimen name="default_font_text_view">12sp</dimen>
+    <dimen name="large_font_text_view">14sp</dimen>
+    <dimen name="extra_large_font_text_view">16sp</dimen>
+    <dimen name="heading_font_text_view">18sp</dimen>
+    <dimen name="home_screen_stat_text">24sp</dimen>
+
 
 </resources>

@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:text="DNSCrypt"
+        android:textSize="@dimen/large_font_text_view"
+        android:text="Add DNSCrypt Resolver or Relay"
         app:layout_constraintTop_toTopOf="parent" />
 
 
@@ -29,6 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
+            android:textSize="@dimen/large_font_text_view"
             android:text="Resolver" />
 
         <com.google.android.material.radiobutton.MaterialRadioButton
@@ -36,6 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
+            android:textSize="@dimen/large_font_text_view"
             android:text="Relay" />
     </RadioGroup>
 
@@ -49,6 +52,9 @@
         <EditText
             android:id="@+id/dialog_dns_crypt_name"
             android:layout_width="match_parent"
+            android:textSize="@dimen/large_font_text_view"
+            android:maxLines="1"
+            android:inputType="textNoSuggestions"
             android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -62,6 +68,8 @@
         <EditText
             android:id="@+id/dialog_dns_crypt_url"
             android:layout_width="match_parent"
+            android:textSize="@dimen/large_font_text_view"
+            android:maxLines="2"
             android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -75,6 +83,9 @@
         <EditText
             android:id="@+id/dialog_dns_crypt_desc"
             android:layout_width="match_parent"
+            android:textSize="@dimen/large_font_text_view"
+            android:maxLines="2"
+            android:inputType="textNoSuggestions"
             android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -83,6 +94,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="2dp"
+        android:textSize="@dimen/default_font_text_view"
         app:layout_constraintTop_toBottomOf="@id/text_input_layout3"/>
 
 
@@ -94,6 +106,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:text="Add"
+        android:textSize="@dimen/large_font_text_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_dns_crypt_error_txt" />
 
@@ -107,6 +120,7 @@
         android:layout_marginBottom="10dp"
         android:gravity="center"
         android:text="Cancel"
+        android:textSize="@dimen/large_font_text_view"
         app:layout_constraintEnd_toStartOf="@id/dialog_dns_crypt_ok_btn"
         app:layout_constraintTop_toBottomOf="@id/dialog_dns_crypt_error_txt" />
 

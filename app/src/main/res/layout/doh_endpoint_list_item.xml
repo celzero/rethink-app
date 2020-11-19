@@ -34,7 +34,7 @@
                 android:fontFamily="sans-serif-light"
                 android:text="Dummy Label"
                 android:textColor="@color/primaryText"
-                android:textSize="16sp" />
+                android:textSize="@dimen/large_font_text_view" />
 
             <TextView
                 android:id="@+id/doh_endpoint_list_url_explanation"
@@ -44,7 +44,7 @@
                 android:fontFamily="sans-serif-light"
                 android:text="Dummy Label"
                 android:textColor="@color/textColorMain"
-                android:textSize="12sp" />
+                android:textSize="@dimen/default_font_text_view" />
 
         </LinearLayout>
 
@@ -82,6 +82,7 @@
         android:layout_marginBottom="5dp"
         android:padding="10dp"
         android:text="configure"
+        android:textSize="@dimen/large_font_text_view"
         android:textColor="@color/secondaryText" />
 
     <TextView

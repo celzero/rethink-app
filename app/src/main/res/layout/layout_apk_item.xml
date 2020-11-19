@@ -36,7 +36,7 @@
                     android:maxLines="1"
                     android:text="Dummy Label"
                     android:textColor="@android:color/white"
-                    android:textSize="14sp" />
+                    android:textSize="@dimen/large_font_text_view" />
 
             <TextView
                     android:id="@+id/apk_package_tv"
@@ -50,7 +50,7 @@
                     android:maxLines="1"
                     android:text="Dummy Package"
                     android:textColor="@android:color/white"
-                    android:textSize="14sp" />
+                    android:textSize="@dimen/default_font_text_view" />
 
 
         </RelativeLayout>

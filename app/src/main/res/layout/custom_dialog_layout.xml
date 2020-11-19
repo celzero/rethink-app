@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:padding="5dp"
         android:text="Whitelist Applications"
+        android:textSize="@dimen/large_font_text_view"
         android:textColor="@color/secondaryText" />
 
     <LinearLayout
@@ -72,7 +73,7 @@
             android:layout_toStartOf="@id/custom_select_all_text"
             android:text="0/100 apps selected"
             android:textColor="@color/primaryText"
-            android:textSize="@dimen/sub_heading" />
+            android:textSize="@dimen/default_font_text_view" />
 
         <TextView
             android:id="@+id/custom_select_all_text"
@@ -82,7 +83,7 @@
             android:layout_toStartOf="@id/custom_select_all_option_checkbox"
             android:fontFamily="sans-serif-smallcaps"
             android:text="select all"
-            android:textSize="@dimen/text_size" />
+            android:textSize="@dimen/large_font_text_view" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/custom_select_all_option_checkbox"
@@ -111,6 +112,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:text="Go back"
+        android:textSize="@dimen/large_font_text_view"
         android:textColor="@color/accent_bad" />
 
 

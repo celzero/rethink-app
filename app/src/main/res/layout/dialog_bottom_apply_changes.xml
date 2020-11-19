@@ -13,6 +13,7 @@
         android:layout_marginStart="30dp"
         android:layout_marginEnd="30dp"
         android:text="cancel"
+        android:textSize="@dimen/large_font_text_view"
         android:textColor="@color/accent_bad" />
 
     <com.google.android.material.button.MaterialButton
@@ -23,6 +24,7 @@
         android:layout_marginStart="30dp"
         android:layout_marginEnd="30dp"
         android:text="apply"
+        android:textSize="@dimen/large_font_text_view"
         android:textColor="@color/accent_bad" />
 
 
