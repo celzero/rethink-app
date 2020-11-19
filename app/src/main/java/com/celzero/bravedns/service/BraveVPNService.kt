@@ -51,7 +51,6 @@ import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.backgroundAllowedUID
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
-import com.celzero.bravedns.ui.HomeScreenFragment
 import com.celzero.bravedns.util.BackgroundAccessibilityService
 import com.celzero.bravedns.util.FileSystemUID
 import com.celzero.bravedns.util.Protocol
@@ -64,8 +63,6 @@ import kotlinx.coroutines.launch
 import protect.Blocker
 import protect.Protector
 import settings.Settings
-import java.net.Inet4Address
-import java.net.InetAddress
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -128,6 +125,7 @@ class BraveVPNService :
         var isBlocked = false
         val first = sourceAddress.split(":")
         val second = destAddress.split(":")
+
         isBlocked = checkConnectionBlocked(uid.toInt(), protocol, first[0], first[first.size - 1].toInt(), second[0], second[second.size - 1].toInt())
         return isBlocked
     }
@@ -160,6 +158,7 @@ class BraveVPNService :
                     return true
                 }
             }*/
+            //Cif(DEBUG) Log.i(LOG_TAG, "Thread: ${Thread.currentThread().id}, name: ${Thread.currentThread().name}, uid: $uid, ip: $sourceIp, $destIp, port: $sourcePort, $destPort, $protocol")
 
             if (appWhiteList.containsKey(uid)) {
                 if ((destPort != DNS_REQUEST_PORT && destIp != GoVpnAdapter.FAKE_DNS_IP)) {
@@ -196,9 +195,6 @@ class BraveVPNService :
                         ipDetails = IPDetails(uid, sourceIp, sourcePort, destIp, destPort, System.currentTimeMillis(), true, BlockedRuleNames.RULE3.ruleName, protocol)
                         sendConnTracking(ipDetails)
                     }
-                    /*if (PersistentState.getKillAppOnFirewall(this)) {
-                        killFirewalledApplication(uid)
-                    }*/
                     return true
                 }
             } else if (isBackgroundEnabled) { //Check whether the background is enabled and act based on it
@@ -209,13 +205,9 @@ class BraveVPNService :
                                 ipDetails = IPDetails(uid, sourceIp, sourcePort, destIp, destPort, System.currentTimeMillis(), true, BlockedRuleNames.RULE4.ruleName, protocol)
                                 sendConnTracking(ipDetails)
                             }
-                            /*if (PersistentState.getKillAppOnFirewall(this)) {
-                                killFirewalledApplication(uid)
-                            }*/
                             if (DEBUG) Log.d(LOG_TAG, "AccessibilityEvent: Background blocked: $uid")
                             return true
                         }
-                    //}
                 }
             }
             //Check whether any rules are set block the IP/App.
@@ -237,10 +229,6 @@ class BraveVPNService :
                 isBlocked = firewallRules.checkRules(UNIVERSAL_RULES_UID, connectionRules)
                 if (isBlocked)
                     blockedBy = BlockedRuleNames.RULE2.ruleName
-               /* else {
-                    if (firewallRules.checkRules(UNIVERSAL_RULES_UID, connectionRules))
-                        blockedBy = BlockedRuleNames.RULE2.ruleName
-                }*/
             }
             if ((destPort != DNS_REQUEST_PORT && destIp != GoVpnAdapter.FAKE_DNS_IP)) {
                 ipDetails = IPDetails(uid, sourceIp, sourcePort, destIp, destPort, System.currentTimeMillis(), isBlocked, blockedBy, protocol)
@@ -250,49 +238,6 @@ class BraveVPNService :
             Log.e(LOG_TAG, iex.message, iex)
         }
         return isBlocked
-    }
-
-    private fun getDns(context: Context?): List<InetAddress?>? {
-        val listDns: MutableList<InetAddress> = ArrayList()
-        val sysDns: List<String> = getDefaultDNS(context!!)!!
-
-        for (def_dns in sysDns) try {
-            val ddns: InetAddress = InetAddress.getByName(def_dns)
-            if (!listDns.contains(ddns) &&
-                !(ddns.isLoopbackAddress || ddns.isAnyLocalAddress) &&
-                (ddns is Inet4Address)
-            ) listDns.add(ddns)
-        } catch (ex: Throwable) {
-            Log.e(LOG_TAG, "getDNS", ex)
-        }
-
-        Log.i(LOG_TAG, "Get DNS=" + TextUtils.join(",", listDns))
-
-        return listDns
-    }
-
-
-    private fun getDefaultDNS(context: Context): List<String>? {
-        val listDns: MutableList<String> = ArrayList()
-        if (VERSION.SDK_INT >= VERSION_CODES.O) {
-            val cm = context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-            val an = cm.allNetworks
-            if (an != null) {
-                var i = 0
-                an.forEach {
-                    val lp = cm.getLinkProperties(an[i])
-                    if (lp != null) {
-                        val dns = lp.dnsServers
-                        for (d in dns) {
-                            Log.i(LOG_TAG, "DNS from LP: " + d.hostAddress)
-                            listDns.add(d.hostAddress.split("%".toRegex()).toTypedArray()[0])
-                        }
-                    }
-                    i++
-                }
-            }
-        }
-        return listDns
     }
 
     private fun killFirewalledApplication(uid: Int) {
@@ -311,7 +256,6 @@ class BraveVPNService :
                 }
             }
         }
-        //mDb.close()
     }
 
     /**
@@ -339,7 +283,7 @@ class BraveVPNService :
         if (ipsList != null) {
             for (ip in ipsList) {
                 val address = ip.hostAddress
-                if (!GoVpnAdapter.FAKE_DNS_IP.equals(address)) {
+                if (GoVpnAdapter.FAKE_DNS_IP != address) {
                     ips.add(address)
                 }
             }
@@ -354,22 +298,13 @@ class BraveVPNService :
     fun newBuilder(): Builder? {
         var builder = Builder()
         if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
-            // Some WebRTC apps rely on the ability to bind to specific interfaces, which is only
-            // possible if we allow bypass.
-
-            if(PersistentState.getBraveMode(this) == HomeScreenFragment.FIREWALL_MODE){
-                val dnsList = getDns(this)
-                dnsList?.forEach{
-                    builder.addDnsServer(it!!)
-                }
-            }
 
             if (VERSION.SDK_INT >= VERSION_CODES.Q) {
-                if(DEBUG) Log.d(LOG_TAG, "isLockdownEnabled - ${this.isLockdownEnabled}, ${this.isAlwaysOn}")
+                if(DEBUG) Log.d(LOG_TAG, "isLockDownEnabled - ${this.isLockdownEnabled}, ${this.isAlwaysOn}")
                 val alwaysOn = android.provider.Settings.Secure.getString(this.contentResolver, "always_on_vpn_app")
-                val lockdown = android.provider.Settings.Secure.getInt(contentResolver, "always_on_vpn_lockdown", 0)
-                if(DEBUG) Log.d(LOG_TAG, "isLockdownEnabled - $lockdown , $alwaysOn")
-                if (TextUtils.isEmpty(alwaysOn) && lockdown == 0) {
+                val lockDown = android.provider.Settings.Secure.getInt(contentResolver, "always_on_vpn_lockdown", 0)
+                if(DEBUG) Log.d(LOG_TAG, "isLockDownEnabled - $lockDown , $alwaysOn")
+                if (TextUtils.isEmpty(alwaysOn) && lockDown == 0) {
                     if (PersistentState.getAllowByPass(this)) {
                         Log.d(LOG_TAG, "getAllowByPass - true")
                         builder = builder.allowBypass()
@@ -382,6 +317,7 @@ class BraveVPNService :
             if (VERSION.SDK_INT >= VERSION_CODES.Q) {
                 builder.setMetered(false)
             }
+
             if (VERSION.SDK_INT >= VERSION_CODES.Q) {
                 if (PersistentState.getHttpProxyEnabled(this)) {
                     val host = PersistentState.getHttpProxyHostAddress(this)
@@ -409,7 +345,7 @@ class BraveVPNService :
                         builder = builder.addDisallowedApplication(it)
                         Log.d(LOG_TAG, "Excluded package - $it")
                     }
-                    builder = builder.addDisallowedApplication("com.android.vending")
+                    //builder = builder.addDisallowedApplication("com.android.vending")
                     builder = builder.addDisallowedApplication(this.packageName)
                 }
                 Log.i(LOG_TAG, "Proxy mode set to Socks5 ${appMode?.getProxyMode()}")
@@ -420,7 +356,6 @@ class BraveVPNService :
                     val socks5ProxyEndpointRepository = mDb.proxyEndpointRepository()
                     val socks5ProxyEndpoint = socks5ProxyEndpointRepository.getConnectedProxy()
                     if (socks5ProxyEndpoint != null) {
-                        Log.i(LOG_TAG, "Proxy mode set to Socks5 ${socks5ProxyEndpoint.proxyAppName}----socks5ProxyEndpoint not null----")
                         if(!socks5ProxyEndpoint.proxyAppName.isNullOrEmpty()  && socks5ProxyEndpoint.proxyAppName != "Nobody"){
                             Log.i(LOG_TAG, "Proxy mode set to Socks5 with the app - ${socks5ProxyEndpoint.proxyAppName!!}- added to excluded list")
                             builder = builder.addDisallowedApplication(socks5ProxyEndpoint.proxyAppName!!)
@@ -428,11 +363,6 @@ class BraveVPNService :
                     }else{
                         Log.i(LOG_TAG, "Proxy mode not set to Socks5 with the app - null - added to excluded list")
                     }
-                }
-                if(isBackgroundEnabled){
-                    //Google play service framework and Google Play services
-                    builder = builder.addDisallowedApplication("com.google.android.gms")
-                    builder = builder.addDisallowedApplication("com.google.android.gsf")
                 }
 
                 if(appMode?.getDNSType() == 3){
@@ -450,8 +380,6 @@ class BraveVPNService :
                     //mDb.close()
                 }
 
-
-
             } catch (e: PackageManager.NameNotFoundException) {
                 Log.e(LOG_TAG, "Failed to exclude an app", e)
             }
@@ -467,13 +395,8 @@ class BraveVPNService :
 
     private fun registerReceiversForScreenState() {
         val actionFilter = IntentFilter()
-        //val filter = IntentFilter()
         actionFilter.addAction(Intent.ACTION_SCREEN_OFF)
         actionFilter.addAction(Intent.ACTION_USER_PRESENT)
-        /*filter.addAction(Intent.ACTION_PACKAGE_ADDED)
-        filter.addAction(Intent.ACTION_PACKAGE_REMOVED)
-        filter.addDataScheme("package")
-        registerReceiver(braveScreenStateReceiver, filter)*/
         registerReceiver(braveScreenStateReceiver, actionFilter)
         val autoStartFilter = IntentFilter()
         autoStartFilter.addAction(Intent.ACTION_BOOT_COMPLETED)
@@ -516,7 +439,6 @@ class BraveVPNService :
 
         builder.setSmallIcon(R.drawable.dns_icon)
             .setContentTitle(contentTitle)
-            //.setContentText(resources.getText(R.string.notification_content))
             .setContentIntent(mainActivityIntent)
 
         // Secret notifications are not shown on the lock screen.  No need for this app to show there.
@@ -729,7 +651,6 @@ class BraveVPNService :
             if (appMode == null) {
                 appMode = AppMode.getInstance(this)
             }
-            //isScreenLocked = PersistentState.getScreenLockData(this)
             isScreenLockedEnabled = PersistentState.getScreenLockData(this)
             Log.i(LOG_TAG, "preference for screen off mode is modified - $isScreenLockedEnabled")
         }
@@ -750,10 +671,8 @@ class BraveVPNService :
         }
 
         if (PersistentState.LOCAL_BLOCK_LIST == key) {
-            //if(PersistentState.isLocalBlockListEnabled(this)){
             Log.i(LOG_TAG, "preference for local block list is changed - restart vpn")
             spawnServerUpdate()
-            //}
         }
 
         if(PersistentState.LOCAL_BLOCK_LIST_STAMP == key){
@@ -830,9 +749,6 @@ class BraveVPNService :
 
         Log.d(LOG_TAG,"Stop Foreground")
         updateQuickSettingsTile()
-        //stopForeground(true)
-        //onDestroy()
-
     }
 
     private fun updateQuickSettingsTile() {
@@ -978,10 +894,5 @@ class BraveVPNService :
         /*stopForeground(true)
         onDestroy()*/
     }
-
-  /*  fun test() {
-        vpnAdapter!!.test()
-    }*/
-
 
 }
