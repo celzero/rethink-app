@@ -103,7 +103,7 @@ class HomeScreenActivity : AppCompatActivity() {
         var appStartTime: Long = System.currentTimeMillis()
         var isBackgroundEnabled: Boolean = false
         var firewallRules: HashMultimap<Int, String> = HashMultimap.create()
-        var DEBUG = false
+        var DEBUG = true
         //Screen off - whether the screen preference is set 0-off, 1- on. -1 not initialized
         var isUserInitiatedUpdateCheck = false
 
@@ -132,6 +132,11 @@ class HomeScreenActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_home_screen)
+
+        if (PersistentState.isFirstTimeLaunch(this)) {
+            launchOnBoardingActivity()
+        }
+
         context = this
         dbHandler = DatabaseHandler(this)
 
@@ -166,6 +171,10 @@ class HomeScreenActivity : AppCompatActivity() {
         showNewFeaturesDialog()
         updateInstallSource()
         //getAppDetails()
+    }
+
+    private fun launchOnBoardingActivity() {
+        startActivity(Intent(this, WelcomeActivity::class.java))
     }
 
     private fun updateInstallSource() {
