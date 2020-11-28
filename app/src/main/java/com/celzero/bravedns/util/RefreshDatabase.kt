@@ -19,6 +19,7 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.os.Build
 import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.*
@@ -88,7 +89,6 @@ class RefreshDatabase(var context: Context) {
                             appInfo.isWifiEnabled = dbAppInfo.isWifiEnabled
                             appInfo.isScreenOff = dbAppInfo.isScreenOff
                             appInfo.isBackgroundEnabled = dbAppInfo.isBackgroundEnabled
-
                             appInfo.whiteListUniv2 = dbAppInfo.whiteListUniv2
                             appInfo.mobileDataUsed = dbAppInfo.mobileDataUsed
                             appInfo.trackers = dbAppInfo.trackers
@@ -100,6 +100,7 @@ class RefreshDatabase(var context: Context) {
                             appInfo.isScreenOff = false
                             appInfo.isBackgroundEnabled = false
                             appInfo.whiteListUniv2 = false
+                            appInfo.whiteListUniv1 = ((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) && !FileSystemUID.isUIDAppRange(appInfo.uid)
                             appInfo.mobileDataUsed = 0
                             appInfo.trackers = 0
                             appInfo.wifiDataUsed = 0
@@ -114,16 +115,19 @@ class RefreshDatabase(var context: Context) {
                         } else if (((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0)){
                             appInfo.appCategory = Constants.APP_CAT_SYSTEM_COMPONENTS
                             appInfo.isSystemApp = true
-                            appInfo.whiteListUniv1 = true
                         } else {
-                            val temp = ApplicationInfo.getCategoryTitle(context, applicationInfo.category)
+                            val temp = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                ApplicationInfo.getCategoryTitle(context, applicationInfo.category)
+                            } else {
+                                Constants.INSTALLED_CAT_APPS
+                            }
                             if (temp != null)
                                 appInfo.appCategory = temp.toString()
                             else
                                 appInfo.appCategory = Constants.APP_CAT_OTHER
                         }
                         if (appInfo.appCategory.contains("_"))
-                            appInfo.appCategory = appInfo.appCategory.replace("_", " ").toLowerCase()
+                            appInfo.appCategory = appInfo.appCategory.replace("_", " ").toLowerCase(Locale.ROOT)
 
                         //appInfo.uid = context.packageManager.getPackageUid(appInfo.packageInfo, PackageManager.GET_META_DATA)
                         appInfo.isInternetAllowed = PersistentState.isWifiAllowed(appInfo.packageInfo, context)
@@ -264,16 +268,22 @@ class RefreshDatabase(var context: Context) {
      */
     private fun fetchCategory(packageName: String): String {
         return PlayStoreCategory.OTHER.name
-       /* try {
-            val url = "$APP_URL$packageName&hl=en" //https://play.google.com/store/apps/details?id=com.example.app&hl=en
-            //Log.d(LOG_TAG,"Insert Category: $packageName")
-            val categoryRaw = parseAndExtractCategory(url)
-            //Log.d(LOG_TAG,"Insert Category2: $packageName")
-            val storeCategory = PlayStoreCategory.fromCategoryName(categoryRaw ?: PlayStoreCategory.OTHER.name)
-            return storeCategory.name
-        } catch (e: Exception) {
-            Log.e(LOG_TAG, "Exception:" + e.message, e)
+        /*if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             return PlayStoreCategory.OTHER.name
+        }else {
+            try {
+                val url =
+                    "$APP_URL$packageName&hl=en" //https://play.google.com/store/apps/details?id=com.example.app&hl=en
+                //Log.d(LOG_TAG,"Insert Category: $packageName")
+                val categoryRaw = parseAndExtractCategory(url)
+                //Log.d(LOG_TAG,"Insert Category2: $packageName")
+                val storeCategory =
+                    PlayStoreCategory.fromCategoryName(categoryRaw ?: PlayStoreCategory.OTHER.name)
+                return storeCategory.name
+            } catch (e: Exception) {
+                Log.w(LOG_TAG, "Exception while fetching the category:" + e.message, e)
+                return PlayStoreCategory.OTHER.name
+            }
         }*/
 
     }
@@ -289,7 +299,7 @@ class RefreshDatabase(var context: Context) {
                 PlayStoreCategory.OTHER.name
             }
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "Parse Category" + e.message, e)
+            Log.w(LOG_TAG, "Parse Category" + e.message, e)
             //TODO handle error
             PlayStoreCategory.OTHER.name
         }
