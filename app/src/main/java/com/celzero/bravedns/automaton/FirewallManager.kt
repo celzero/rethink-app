@@ -24,6 +24,7 @@ import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.backgroundAllowedUID
 import com.celzero.bravedns.util.BackgroundAccessibilityService
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
@@ -76,16 +77,16 @@ class FirewallManager(service: BackgroundAccessibilityService) {
         fun updateInternetBackground(packageName: String, isAllowed: Boolean){
             val appInfo = GlobalVariable.appList[packageName]
             if(appInfo != null){
-                //if(DEBUG) Log.d(LOG_TAG,"AccessibilityEvent: Update Internet Permission from background: ${appInfo.appName}, ${appInfo.isInternetAllowed}")
+                if(DEBUG) Log.d(LOG_TAG,"FirewallManager: AccessibilityEvent: Update Internet Permission from background: ${appInfo.appName}, ${appInfo.isInternetAllowed}")
                 //appInfo.isInternetAllowed = isAllowed
                 //GlobalVariable.appList.set(packageName,appInfo)
                 if(isAllowed && FileSystemUID.isUIDAppRange(appInfo.uid)){
-                    //if(DEBUG) Log.d(LOG_TAG,"AccessibilityEvent: ${appInfo.appName} is in foreground")
+                    if(DEBUG) Log.d(LOG_TAG,"FirewallManager: AccessibilityEvent: ${appInfo.appName},${appInfo.packageInfo} is in foreground")
                     backgroundAllowedUID[appInfo.uid] = isAllowed
                     //backgroundAllowed = appInfo.uid
                 }else{
                     backgroundAllowedUID.remove(appInfo.uid)
-                    //if(DEBUG) Log.d(LOG_TAG,"AccessibilityEvent: ${appInfo.appName} removed from foreground")
+                    if(DEBUG) Log.d(LOG_TAG,"FirewallManager: AccessibilityEvent: ${appInfo.appName},${appInfo.packageInfo} removed from foreground")
                     //backgroundAllowed = 0
                 }
 
@@ -112,10 +113,11 @@ class FirewallManager(service: BackgroundAccessibilityService) {
         val eventPackageName = event.packageName?.toString()
 
         val hasContentDisappeared = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-            event.eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED
+            event.eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED ||  event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
         } else {
             event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
         }
+        if(DEBUG) Log.d(LOG_TAG,"FirewallManager: onAccessibilityEvent: $eventPackageName, ${event.eventType}, $hasContentDisappeared")
         // is the package showing content and being backgrounded?
         if (hasContentDisappeared) {
             if (GlobalVariable.appList.containsKey(eventPackageName)){//PermissionsManager.packageRules.contains(eventPackageName)) {
@@ -138,7 +140,7 @@ class FirewallManager(service: BackgroundAccessibilityService) {
             }
         }
         val packageName =  event.packageName?.toString() ?: return
-        if (event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
+        if (event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED || event.eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED ) {
             // https://stackoverflow.com/a/27642535
             // top window is launcher? try revoke queued up permissions
             // FIXME: Figure out a fool-proof way to determine is launcher visible
@@ -146,7 +148,7 @@ class FirewallManager(service: BackgroundAccessibilityService) {
             if (!isPackageLauncher(packageName)) {
                 // TODO: revoke permissions only if there are any to revoke
                 //if(DEBUG) Log.d(LOG_TAG,"AccessibilityEvent: isPackageLauncher: ${packageName}, false")
-                addOrRemovePackageForBackground(false)
+                addOrRemovePackageForBackground(true)
             }else{
                 backgroundAllowedUID.clear()
             }
@@ -176,13 +178,14 @@ class FirewallManager(service: BackgroundAccessibilityService) {
 
 
     private fun addOrRemovePackageForBackground(isAllowed: Boolean){
-        //if(DEBUG) Log.d(LOG_TAG,"isBackgroundEnabled: ${GlobalVariable.isBackgroundEnabled}")
+        if(DEBUG) Log.d(LOG_TAG,"FirewallManager: isBackgroundEnabled: ${GlobalVariable.isBackgroundEnabled}")
         if(!GlobalVariable.isBackgroundEnabled)
             return
         if (packagesStack.isNullOrEmpty()) {
             return
         }else {
             val currentPackage = packagesStack.elementAt(0)
+            if(DEBUG) Log.d(LOG_TAG,"FirewallManager: Package: $currentPackage, $isAllowed")
             packagesStack.remove(currentPackage)
             packageElect = currentPackage
             updateInternetBackground(currentPackage,isAllowed)

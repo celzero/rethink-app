@@ -211,7 +211,7 @@ class DNSProxyEndpointAdapter(val context: Context, val listener: UIUpdateInterf
                 }.start()
 
 
-                Toast.makeText(context, "End point removed from the list", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.dns_proxy_remove_success, Toast.LENGTH_SHORT).show()
             }
 
             //performing negative action

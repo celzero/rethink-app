@@ -74,6 +74,7 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
     private lateinit var ipRulesExpTxt : TextView
     private lateinit var ipRulesNoRulesSetTxt : TextView
     private lateinit var ipRulesDeleteBtn : ImageView
+    private lateinit var ipRulesAddBtn : ImageView
     private lateinit var ipSearchCardContainer : CardView
 
     private lateinit var  firewallNotEnabledLL : LinearLayout
@@ -132,6 +133,7 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
         ipSearchViewContainer = includeView.findViewById(R.id.firewall_search_view_top)
         ipRulesExpTxt = includeView.findViewById(R.id.firewall_univ_whitelist_rules_exp_txt)
         ipRulesNoRulesSetTxt = includeView.findViewById(R.id.firewall_no_rules_set_txt)
+        ipRulesAddBtn = includeView.findViewById(R.id.firewall_search_add_icon)
         ipRulesDeleteBtn = includeView.findViewById(R.id.firewall_search_delete_icon)
         ipSearchCardContainer = includeView.findViewById(R.id.firewall_search_container)
 
@@ -177,6 +179,7 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
         udpBlockToggleText = includeView.findViewById(R.id.firewall_udp_connection_mode_txt)
 
         firewallAllAppsToggle.isChecked = PersistentState.getFirewallModeForScreenState(requireContext())
+
         if(Utilities.isAccessibilityServiceEnabled(requireContext(), BackgroundAccessibilityService::class.java)){
             if(DEBUG) Log.d(LOG_TAG,"Background - onLoad accessibility is true")
             backgroundModeToggle.isChecked = PersistentState.getBackgroundEnabled(requireContext())
@@ -219,6 +222,10 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
         udpBlockToggleText.setOnClickListener{
             PersistentState.setUDPBlockedSettings(requireContext(), !udpBlockToggle.isChecked)
             udpBlockToggle.isChecked = !udpBlockToggle.isChecked
+        }
+
+        ipRulesAddBtn.setOnClickListener{
+            Utilities.showToastInMidLayout(requireContext(),"Yet to implement",Toast.LENGTH_SHORT)
         }
 
         //Background mode toggle
@@ -340,7 +347,7 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
 
                 blockedConnectionsRepository.deleteAllIPRulesUniversal()
                 GlobalVariable.firewallRules.clear()
-                Toast.makeText(context, "Deleted all IP rules.", Toast.LENGTH_SHORT).show()
+                Utilities.showToastInMidLayout(requireContext(), "Deleted all IP rules.", Toast.LENGTH_SHORT)
             }
 
             //performing negative action
@@ -352,7 +359,7 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
             alertDialog.setCancelable(true)
             alertDialog.show()
         }else{
-            Toast.makeText(requireContext(),"No IP rules set",Toast.LENGTH_SHORT).show()
+            Utilities.showToastInMidLayout(requireContext(),"No IP rules set",Toast.LENGTH_SHORT)
         }
     }
 

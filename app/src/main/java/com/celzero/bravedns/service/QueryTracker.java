@@ -39,66 +39,63 @@ import static com.celzero.bravedns.util.Constants.LOG_TAG;
  */
 public class QueryTracker {
 
-  public static final String NUM_REQUESTS = "numRequests";
+    public static final String NUM_REQUESTS = "numRequests";
 
-  private static final int HISTORY_SIZE = 1000;
-  //private static final int ACTIVITY_MEMORY_MS = 60 * 1000;  // One minute
+    private static final int HISTORY_SIZE = 1000;
+    //private static final int ACTIVITY_MEMORY_MS = 60 * 1000;  // One minute
 
-  //private long numRequests = 0;
-  private Queue<Transaction> recentTransactions = new LinkedList<>();
-  private Queue<Long> recentActivity = new LinkedList<>();
-  private List<Integer> queryList = new ArrayList<Integer>();
-  private boolean historyEnabled = true;
-  private Transaction transaction = null;
+    //private long numRequests = 0;
+    private Queue<Transaction> recentTransactions = new LinkedList<>();
+    private Queue<Long> recentActivity = new LinkedList<>();
+    private List<Integer> queryList = new ArrayList<Integer>();
+    private boolean historyEnabled = true;
+    private Transaction transaction = null;
 
-  QueryTracker(Context context) {
-    sync(context, transaction);
-  }
-
-  /*public synchronized long getNumRequests() {
-    return numRequests;
-  }*/
-
-  public synchronized Queue<Transaction> getRecentTransactions() {
-    return new LinkedList<>(recentTransactions);
-  }
-
-  /**
-   * Provide the receiver with temporary read-only access to the recent activity time-sequence.
-   */
-  public synchronized void showActivity(ActivityReceiver receiver) {
-    receiver.receive(Collections.unmodifiableCollection(recentActivity));
-  }
-
-  public synchronized int countQueriesSince(long startTime) {
-    // Linearly scan recent activity.  Due to the small scale (N ~ 300), a more efficient algorithm
-    // does not appear to be necessary.
-    int queries = recentActivity.size();
-    for (long time : recentActivity) {
-      if (time < startTime) {
-        --queries;
-      } else {
-        break;
-      }
+    QueryTracker(Context context) {
+        sync(context, transaction);
     }
-    return queries;
-  }
 
-  public synchronized void setHistoryEnabled(boolean enabled) {
-    historyEnabled = enabled;
-    if (!enabled) {
-      recentTransactions.clear();
+
+    public synchronized Queue<Transaction> getRecentTransactions() {
+        return new LinkedList<>(recentTransactions);
     }
-  }
 
-  public boolean isHistoryEnabled() {
-    // No synchronization needed because booleans are atomic in Java.
-    return historyEnabled;
-  }
+    /**
+     * Provide the receiver with temporary read-only access to the recent activity time-sequence.
+     */
+    public synchronized void showActivity(ActivityReceiver receiver) {
+        receiver.receive(Collections.unmodifiableCollection(recentActivity));
+    }
 
-  synchronized void recordTransaction(Context context, Transaction transaction) {
-    // Increment request counter on each successful resolution
-    //if (transaction.status == Transaction.Status.) {
+    public synchronized int countQueriesSince(long startTime) {
+        // Linearly scan recent activity.  Due to the small scale (N ~ 300), a more efficient algorithm
+        // does not appear to be necessary.
+        int queries = recentActivity.size();
+        for (long time : recentActivity) {
+            if (time < startTime) {
+                --queries;
+            } else {
+                break;
+            }
+        }
+        return queries;
+    }
+
+    public synchronized void setHistoryEnabled(boolean enabled) {
+        historyEnabled = enabled;
+        if (!enabled) {
+            recentTransactions.clear();
+        }
+    }
+
+    public boolean isHistoryEnabled() {
+        // No synchronization needed because booleans are atomic in Java.
+        return historyEnabled;
+    }
+
+    synchronized void recordTransaction(Context context, Transaction transaction) {
+        // Increment request counter on each successful resolution
+        //if (transaction.status == Transaction.Status.) {
       /*++numRequests;
       // HomeScreenActivity.GlobalVariable.INSTANCE.setLifeTimeQueries(numRequests);
       if (numRequests % HISTORY_SIZE != 0) {
@@ -106,57 +103,57 @@ public class QueryTracker {
         // excessive disk I/O from syncing the counter to disk after every request.
 
       }*/
-    //}
-    sync(context, transaction);
-    recentActivity.add(transaction.queryTime);
-    PersistentState.Companion.setNumOfReq(context);
-    DnsPacket packet = null;
-    String BLOCKED_RESPONSE_TYPE = "0.0.0.0";
-    try {
-      if (transaction.response != null)
-        packet = new DnsPacket(transaction.response);
-    } catch (ProtocolException e) {
-      Log.e(LOG_TAG, e.getMessage(), e);
-    }
-    if (packet != null) {
-      List<InetAddress> addresses  = packet.getResponseAddresses();
-      if (addresses.size() > 0) {
-        InetAddress destination = addresses.get(0);
-        //val countryCode: String = getCountryCode(destination, adapter!!.activity)
-        if (destination.getHostAddress().contains(BLOCKED_RESPONSE_TYPE)) {
-          PersistentState.Companion.setBlockedReq(context);
+        //}
+        sync(context, transaction);
+
+        //recentActivity.add(transaction.queryTime);
+        PersistentState.Companion.setNumOfReq(context);
+        DnsPacket packet = null;
+        String BLOCKED_RESPONSE_TYPE = "0.0.0.0";
+        try {
+            if (transaction.response != null)
+                packet = new DnsPacket(transaction.response);
+        } catch (ProtocolException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
         }
-      }
-    }
-
-    if (historyEnabled) {
-      recentTransactions.add(transaction);
-      if (recentTransactions.size() > HISTORY_SIZE) {
-        recentTransactions.remove();
-      }
-    }
-  }
-
-  public synchronized void sync(Context context, Transaction transaction) {
-    if (transaction != null) {
-      // Restore number of requests from storage, or 0 if it isn't defined yet.
-      //numRequests = PersistentState.Companion.getNumOfReq(context);
-      if(transaction.blockList.isEmpty() && !transaction.serverIp.isEmpty()) {
-        if (!queryList.isEmpty()) {
-          if (queryList.size() >= HISTORY_SIZE) {
-            queryList.remove(0);
-          }
+        if (packet != null) {
+            List<InetAddress> addresses = packet.getResponseAddresses();
+            if (addresses.size() > 0) {
+                InetAddress destination = addresses.get(0);
+                //val countryCode: String = getCountryCode(destination, adapter!!.activity)
+                if (destination.getHostAddress().contains(BLOCKED_RESPONSE_TYPE)) {
+                    PersistentState.Companion.setBlockedReq(context);
+                }
+            }
         }
-        int val = (int) (transaction.responseTime - transaction.queryTime);
-        queryList.add(val);
-        List<Integer> _queryList = new ArrayList<Integer>(queryList);
-        Collections.sort(_queryList);
-        int positionP50 = (int) (_queryList.size() * 0.50);
-        val = _queryList.get(positionP50);
-        PersistentState.Companion.setMedianLatency(context, val);
-      }
-    }
-  }
 
+        if (historyEnabled) {
+            recentTransactions.add(transaction);
+            if (recentTransactions.size() > HISTORY_SIZE) {
+                recentTransactions.remove();
+            }
+        }
+    }
+
+    public synchronized void sync(Context context, Transaction transaction) {
+        if (transaction != null) {
+            // Restore number of requests from storage, or 0 if it isn't defined yet.
+            //numRequests = PersistentState.Companion.getNumOfReq(context);
+            if (transaction.blockList.isEmpty() && !transaction.serverIp.isEmpty()) {
+                if (!queryList.isEmpty()) {
+                    if (queryList.size() >= HISTORY_SIZE) {
+                        queryList.remove(0);
+                    }
+                }
+                int val = (int) (transaction.responseTime - transaction.queryTime);
+                queryList.add(val);
+                List<Integer> _queryList = new ArrayList<Integer>(queryList);
+                Collections.sort(_queryList);
+                int positionP50 = (int) (_queryList.size() * 0.50);
+                val = _queryList.get(positionP50);
+                PersistentState.Companion.setMedianLatency(context, val);
+            }
+        }
+    }
 }
 

@@ -248,7 +248,7 @@
                     android:layout_height="wrap_content"
                     android:paddingTop="5dp"
                     android:paddingBottom="2dp"
-                    android:text="asdad"
+                    android:text=""
                     android:textSize="@dimen/default_font_text_view"
                     android:textColor="@color/textColorMain" />
 

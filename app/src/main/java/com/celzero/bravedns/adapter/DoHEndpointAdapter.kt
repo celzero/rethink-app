@@ -237,7 +237,7 @@ class DoHEndpointAdapter(val context: Context, val listener: UIUpdateInterface) 
                 GlobalScope.launch(Dispatchers.IO) {
                     doHEndpointRepository.deleteDoHEndpoint(doHEndpoint.dohURL)
                 }
-                Toast.makeText(context, "End point removed from the list", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.doh_custom_url_remove_success, Toast.LENGTH_SHORT).show()
             }
 
             //performing negative action

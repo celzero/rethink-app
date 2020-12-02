@@ -69,46 +69,6 @@
             android:name=".ui.DNSConfigureWebViewActivity"
             android:launchMode="singleInstance"
             android:theme="@style/AppTheme" />
-        <!--<activity
-            android:name=".ui.ConnectionTrackerActivity"
-            android:launchMode="singleTask"
-            android:theme="@style/AppTheme" />-->
-
-        <!--
-<receiver
-            android:name=".AdminReceiver"
-            android:description="@string/device_admin_receiver_description"
-            android:label="@string/device_admin_receiver"
-            android:permission="android.permission.BIND_DEVICE_ADMIN">
-            <meta-data
-                android:name="android.app.device_admin"
-                android:resource="@xml/device_admin" />
-            <intent-filter>
-                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
-            </intent-filter>
-        </receiver>
-        -->
-        <!--
-<receiver android:enabled="true" android:name=".service.StartReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-            </intent-filter>
-        </receiver>
-        -->
-        <!--
-<service
-            android:name=".util.MyAccessibilityService"
-            android:label="@string/accessibility_service_label"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
-            <intent-filter>
-                <action android:name="android.accessibilityservice.AccessibilityService" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.accessibilityservice"
-                android:resource="@xml/accessibility_service_config" />
-        </service>
-        -->
         <service
             android:name=".util.BackgroundAccessibilityService"
             android:label="@string/accessibility_service_label"
@@ -135,20 +95,11 @@
             android:label="@string/app_name">
             <intent-filter android:priority="999">
                 <data android:scheme="package" />
-
+                <action android:name="android.intent.action.USER_PRESENT"/>
                 <action android:name="android.intent.action.ACTION_SCREEN_OFF" />
                 <action android:name="android.intent.action.ACTION_SCREEN_ON" />
-                <!-- <action android:name="android.intent.action.ACTION_PACKAGE_ADDED" />
-                 <action android:name="android.intent.action.ACTION_PACKAGE_REMOVED" />-->
             </intent-filter>
         </receiver>
-        <!--
-<service
-            android:name=".service.BackgroundService"
-            android:enabled="true"
-            android:exported="false">
-        </service>
-        -->
         <service
             android:name=".service.BraveVPNService"
             android:permission="android.permission.BIND_VPN_SERVICE"
@@ -156,11 +107,6 @@
             <intent-filter>
                 <action android:name="android.net.VpnService" />
             </intent-filter>
-            <!--
-                 <meta-data
-                 android:name="android.net.VpnService.SUPPORTS_ALWAYS_ON"
-                 android:value="true"/>
-            -->
         </service>
         <service
             android:name=".receiver.DeviceLockService"

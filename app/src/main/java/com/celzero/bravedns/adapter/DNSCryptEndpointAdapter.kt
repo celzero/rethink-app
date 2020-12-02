@@ -172,7 +172,7 @@ class DNSCryptEndpointAdapter(val context: Context, var listener : UIUpdateInter
                         dnsCryptEndpointRepository.deleteDNSCryptEndpoint(dnsCryptEndpoint.dnsCryptURL)
                     }
                 }
-                //Toast.makeText(context, "DNS Crypt server removed from saved co", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.dns_crypt_url_remove_success, Toast.LENGTH_SHORT).show()
             }
 
             //performing negative action

@@ -86,6 +86,7 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
         recyclerAdapter = ConnectionTrackerAdapter(requireContext())
         viewModel.connectionTrackerList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(recyclerAdapter!!::submitList))
         recyclerView!!.adapter = recyclerAdapter
+        recyclerView!!.setItemViewCacheSize(100)
 
         editSearchView!!.setOnQueryTextListener(this)
         editSearchView!!.setOnClickListener {
@@ -116,7 +117,7 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private fun showDialogForFilter() {
 
-        val singleItems = arrayOf("Blocked connections", "All connections")
+        val singleItems = arrayOf(getString(R.string.filter_network_blocked_connections), getString(R.string.filter_network_all_connections))
 
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Select filter")
@@ -149,7 +150,7 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
         //performing positive action
         builder.setPositiveButton("Delete logs") { _, _ ->
             GlobalScope.launch(Dispatchers.IO) {
-                val mDb = AppDatabase.invoke(ConnectionTrackerViewModel.contextVal.applicationContext)
+                val mDb = AppDatabase.invoke(requireContext().applicationContext)
                 val connectionTrackerDAO = mDb.connectionTrackerDAO()
                 connectionTrackerDAO.clearAllData()
             }

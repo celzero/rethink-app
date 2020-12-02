@@ -22,10 +22,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import android.os.PowerManager
+import android.util.Log
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import java.util.*
-
-
 
 class DeviceLockService  : Service(){
 
@@ -44,13 +45,13 @@ class DeviceLockService  : Service(){
     }
 
     private fun checkLock(intent: Intent) {
-        val keyguardManager  =  getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
 
         val isProtected = keyguardManager.isKeyguardSecure
         val isLocked = keyguardManager.isKeyguardLocked
         val isInteractive = powerManager.isInteractive
-        val delayIndex: Int =  getSafeCheckLockDelay(intent.getIntExtra(EXTRA_CHECK_LOCK_DELAY_INDEX, -1))
+        val delayIndex: Int = getSafeCheckLockDelay(intent.getIntExtra(EXTRA_CHECK_LOCK_DELAY_INDEX, -1))
 
 
         if (checkLockTask != null) {
@@ -59,31 +60,29 @@ class DeviceLockService  : Service(){
 
         if (isProtected && !isLocked && !isInteractive) {
             checkLockTask = CheckLockTask(this, delayIndex)
-            timer.schedule(checkLockTask, checkLockDelays.get(delayIndex).toLong())
+            timer.schedule(checkLockTask, checkLockDelays[delayIndex].toLong())
             this.stopSelf()
         } else {
             if (isProtected && isLocked) {
-                if(PersistentState.getFirewallModeForScreenState(this) && !PersistentState.getScreenLockData(this)) {
-                    PersistentState.setScreenLockData(this,true)
+                if (PersistentState.getFirewallModeForScreenState(this) && !PersistentState.getScreenLockData(this)) {
+                    if(DEBUG) Log.d(LOG_TAG,"DeviceLockService : Screen lock detected at $delayIndex")
+                    PersistentState.setScreenLockData(this, true)
                     checkLockTask?.cancel()
                     timer.cancel()
                     this.stopSelf()
                 }
             }
         }
-
     }
 
-    // This tracks the deltas between the actual options of 5s, 15s, 30s, 1m, 2m, 5m, 10m
-    // It also includes an initial offset and some extra times (for safety)
 
     companion object{
-        val ACTION_CHECK_LOCK  = "com.celzero.bravedns.receiver.DeviceLockService.ACTION_START_SERVICE"
-        val EXTRA_CHECK_LOCK_DELAY_INDEX ="com.celzero.bravedns.receiver.DeviceLockService.EXTRA_CHECK_LOCK_DELAY_INDEX"
-        val EXTRA_STATE = "com.celzero.bravedns.receiver.DeviceLockService..EXTRA_STATE"
+        const val ACTION_CHECK_LOCK  = "com.celzero.bravedns.receiver.DeviceLockService.ACTION_START_SERVICE"
+        const val EXTRA_CHECK_LOCK_DELAY_INDEX ="com.celzero.bravedns.receiver.DeviceLockService.EXTRA_CHECK_LOCK_DELAY_INDEX"
+        const val EXTRA_STATE = "com.celzero.bravedns.receiver.DeviceLockService..EXTRA_STATE"
 
-        const val SECOND = 1000
-        const val MINUTE = 60 * SECOND
+        private const val SECOND = 1000
+        private const val MINUTE = 60 * SECOND
         val checkLockDelays = intArrayOf(
             1 * SECOND,
             5 * SECOND,
@@ -97,20 +96,18 @@ class DeviceLockService  : Service(){
             30 * MINUTE
         )
 
-    fun getSafeCheckLockDelay(delayIndex: Int): Int {
-        val safeDelayIndex: Int = if (delayIndex >= checkLockDelays.size) {
-            checkLockDelays.size - 1
-        } else if (delayIndex < 0) {
-            0
-        } else {
-            delayIndex
+        fun getSafeCheckLockDelay(delayIndex: Int): Int {
+            return if (delayIndex >= checkLockDelays.size) {
+                checkLockDelays.size - 1
+            } else if (delayIndex < 0) {
+                0
+            } else {
+                delayIndex
+            }
         }
-        return safeDelayIndex
-    }
     }
 
-
-    class CheckLockTask(val context: Context, val delayIndex: Int) : TimerTask() {
+    class CheckLockTask(val context: Context, private val delayIndex: Int) : TimerTask() {
         override fun run() {
             val newIntent = Intent(context, DeviceLockService::class.java)
             newIntent.action = ACTION_CHECK_LOCK

@@ -188,7 +188,7 @@ class DNSCryptRelayEndpointAdapter(val context: Context) : PagedListAdapter<DNSC
                         dnsCryptRelayEndpointRepository.deleteDNSCryptRelayEndpoint(dnsCryptRelayEndpoint.dnsCryptRelayURL)
                     }
                 }
-                Toast.makeText(context, "DNSCrypt relay removed from the configuration", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.dns_crypt_relay_remove_success, Toast.LENGTH_SHORT).show()
             }
 
             //performing negative action

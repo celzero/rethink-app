@@ -31,6 +31,7 @@ class VpnController {
         private var connectionState: BraveVPNService.State? = null
         private var tracker: QueryTracker? = null
         private var ipTracker : IPTracker ?= null
+        private var dnsLogTracker : DNSLogTracker ?= null
 
         @Synchronized
         fun getInstance(): VpnController? {
@@ -110,7 +111,7 @@ class VpnController {
     fun stop(context: Context?) {
         Log.i(LOG_TAG,"VPN Controller stop - ${context!!}")
         PersistentState.setVpnEnabled(context, false)
-        connectionState = null
+        connectionState = null //BraveVPNService.State.STOP
         if (braveVpnService != null) {
             braveVpnService!!.signalStopService(true)
         }
@@ -118,11 +119,13 @@ class VpnController {
         stateChanged(context)
     }
 
-    // FIXME: Should this be synchronized? Causes ANRs.
     //@Synchronized
     fun getState(context: Context?): VpnState? {
         val requested: Boolean = PersistentState.getVpnEnabled(context!!)
         val on = braveVpnService != null && braveVpnService!!.isOn()
+        /*if(connectionState == null){
+            connectionState = BraveVPNService.State.NEW
+        }*/
         return VpnState(requested, on, connectionState)
     }
 
@@ -140,6 +143,18 @@ class VpnController {
             ipTracker = IPTracker(context)
         }
         return ipTracker
+    }
+
+    /**
+     * DNS Log tracker will record the dns transactions in database.
+     * This method will return the DNSLogTracker object.
+     */
+    @Synchronized
+    fun getDNSLogTracker(context: Context): DNSLogTracker? {
+        if(dnsLogTracker == null){
+            dnsLogTracker = DNSLogTracker(context)
+        }
+        return dnsLogTracker
     }
 
     /*fun test(){

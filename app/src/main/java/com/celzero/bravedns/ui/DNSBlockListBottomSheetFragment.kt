@@ -18,7 +18,6 @@ package com.celzero.bravedns.ui
 import android.content.Context
 import android.os.Bundle
 import android.text.Html
-import android.text.Spanned
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -29,11 +28,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DNSBottomSheetBlockAdapter
-import com.celzero.bravedns.adapter.DNSQueryAdapter
+import com.celzero.bravedns.database.DNSLogs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 
-class DNSBlockListBottomSheetFragment(private var contextVal: Context, private var transaction: DNSQueryAdapter.TransactionView)  : BottomSheetDialogFragment() {
+class DNSBlockListBottomSheetFragment(private var contextVal: Context, private var transaction: DNSLogs)  : BottomSheetDialogFragment() {
 
     private lateinit var fragmentView: View
     private lateinit var dnsBlockRecyclerView: RecyclerView
@@ -78,12 +77,12 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        urlTxt.text = transaction.fqdn
+        urlTxt.text = transaction.queryStr
         ipAddressTxt.text = transaction.response
         flagTxt.text = transaction.flag
         //latencyTxt.text = "Latency: "+transaction.latency
         latencyTxt.visibility = View.GONE
-        latencyChipTxt.text = transaction.latency
+        latencyChipTxt.text = transaction.latency.toString() +"ms"
         if(!transaction.serverIP.isNullOrEmpty()) {
             resolverTxt.visibility = View.VISIBLE
             resolverTxt.text = "Resolver (${transaction.serverIP})"
@@ -91,13 +90,18 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
         }else{
             resolverTxt.visibility = View.GONE
         }
-        val upTime = DateUtils.getRelativeTimeSpanString(transaction.responseTime!!, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE)
+        val upTime = DateUtils.getRelativeTimeSpanString(transaction.time, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE)
         if(transaction.isBlocked){
             blockedDescTxt.text = "blocked $upTime by ${transaction.serverIP}"
         }else{
             if(!transaction.serverIP.isNullOrEmpty() && !transaction.relayIP.isNullOrEmpty()) {
+                var styledText= ""
                 val text = "resolved <u>anonymously</u> $upTime by ${transaction.serverIP}"
-                var styledText: Spanned = Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY)
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    styledText = Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY).toString()
+                } else {
+                    styledText = Html.fromHtml(text).toString()
+                }
                 blockedDescTxt.text = styledText
             }else if(!transaction.serverIP.isNullOrEmpty()){
                 blockedDescTxt.text = "resolved $upTime by ${transaction.serverIP}"
@@ -106,7 +110,7 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
                 blockedDescTxt.text = "resolved $upTime"
             }
         }
-        if(transaction.blockList.isNullOrEmpty()){
+        if(transaction.blockLists.isEmpty()){
             dnsBlockContainerRL.visibility = View.GONE
             placeHolderTxt.visibility = View.VISIBLE
         }else{
@@ -117,7 +121,7 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
             }
 
             //blockedDescTxt.text = "blocked " + upTime
-            val blockLists = transaction.blockList?.split(",")
+            val blockLists = transaction.blockLists.split(",")
             if (blockLists != null) {
                 //placeHolderTxt.visibility = View.GONE
                 dnsBlockRecyclerView.layoutManager = LinearLayoutManager(contextVal)

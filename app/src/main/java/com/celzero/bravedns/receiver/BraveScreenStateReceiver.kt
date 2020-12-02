@@ -19,18 +19,11 @@ package com.celzero.bravedns.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
 import android.util.Log
-import com.celzero.bravedns.database.AppDatabase
-import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.launch
 
 
 class BraveScreenStateReceiver : BroadcastReceiver() {
@@ -38,13 +31,16 @@ class BraveScreenStateReceiver : BroadcastReceiver() {
     @InternalCoroutinesApi
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent!!.action.equals(Intent.ACTION_SCREEN_OFF)) {
+            if(DEBUG) Log.d(LOG_TAG,"BraveScreenStateReceiver : Action_screen_off detected from the receiver")
             if(PersistentState.getFirewallModeForScreenState(context!!) && !PersistentState.getScreenLockData(context)) {
+                if(DEBUG) Log.d(LOG_TAG,"BraveSCreenStateReceiver : Screen lock data not true, calling DeviceLockService service")
                 val newIntent = Intent(context, DeviceLockService::class.java)
                 newIntent.action = DeviceLockService.ACTION_CHECK_LOCK
                 newIntent.putExtra(DeviceLockService.EXTRA_STATE, intent.action)
                 context.startService(newIntent)
             }
         } else if (intent.action.equals(Intent.ACTION_USER_PRESENT) || intent.action.equals(Intent.ACTION_SCREEN_ON)) {
+            if(DEBUG) Log.d(LOG_TAG,"BraveScreenStateReceiver : ACTION_USER_PRESENT/ACTION_SCREEN_ON detected from the receiver")
             if(PersistentState.getFirewallModeForScreenState(context!!)) {
                 val state = PersistentState.getScreenLockData(context)
                 if(state) {
@@ -60,7 +56,7 @@ class BraveScreenStateReceiver : BroadcastReceiver() {
         }*/
     }
 
-    private fun removePackageFromList(pacakgeName :String? , context : Context){
+    /*private fun removePackageFromList(pacakgeName :String? , context : Context){
         if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "RemovePackage: $pacakgeName")
         GlobalScope.launch(Dispatchers.IO){
             val packageName = pacakgeName!!.removePrefix("package:")
@@ -71,8 +67,6 @@ class BraveScreenStateReceiver : BroadcastReceiver() {
             PersistentState.setExcludedPackagesWifi(packageName, true, context)
             //mDb.close()
         }
-
-
     }
 
     private fun addPackagetoList(packageName: String, context: Context) {
@@ -125,5 +119,5 @@ class BraveScreenStateReceiver : BroadcastReceiver() {
             }
         }
 
-    }
+    }*/
 }

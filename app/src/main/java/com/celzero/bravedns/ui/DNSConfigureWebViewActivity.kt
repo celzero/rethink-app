@@ -122,6 +122,9 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
         }
         dnsConfigureWebView?.removeJavascriptInterface("JSInterface")
         dnsConfigureWebView?.removeAllViews()
+        dnsConfigureWebView?.clearCache(true)
+        dnsConfigureWebView?.clearFormData()
+        dnsConfigureWebView?.clearHistory()
         dnsConfigureWebView?.destroy()
         dnsConfigureWebView = null
 
@@ -273,8 +276,11 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
         dnsConfigureWebView?.settings!!.javaScriptEnabled = true
         dnsConfigureWebView?.settings!!.loadWithOverviewMode = true
         dnsConfigureWebView?.settings!!.useWideViewPort = true
-        dnsConfigureWebView?.settings!!.domStorageEnabled = true
-        dnsConfigureWebView?.setRendererPriorityPolicy(RENDERER_PRIORITY_BOUND, true)
+        //dnsConfigureWebView?.settings!!.domStorageEnabled = true
+        //dnsConfigureWebView?.settings!!.cacheMode = LOAD_NO_CACHE
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            dnsConfigureWebView?.setRendererPriorityPolicy(RENDERER_PRIORITY_BOUND, true)
+        }
         context  = this
         dnsConfigureWebView?.webViewClient = object : WebViewClient() {
             override
@@ -289,20 +295,25 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
             }
 
             override fun onRenderProcessGone(view: WebView?, detail: RenderProcessGoneDetail?): Boolean {
-                if (!detail?.didCrash()!!) {
-                    // Renderer was killed because the system ran out of memory.
-                    // The app can recover gracefully by creating a new WebView instance
-                    // in the foreground.
-                    Log.e(LOG_TAG, ("Webview: System killed the WebView rendering process Recreating..."))
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    if (!detail?.didCrash()!!) {
+                        // Renderer was killed because the system ran out of memory.
+                        // The app can recover gracefully by creating a new WebView instance
+                        // in the foreground.
+                        Log.e(
+                            LOG_TAG,
+                            ("Webview: System killed the WebView rendering process Recreating...")
+                        )
 
-                    view?.also { webView ->
-                        webView.destroy()
+                        view?.also { webView ->
+                            webView.destroy()
+                        }
+
+                        // By this point, the instance variable "mWebView" is guaranteed
+                        // to be null, so it's safe to reinitialize it.
+
+                        return true // The app continues executing.
                     }
-
-                    // By this point, the instance variable "mWebView" is guaranteed
-                    // to be null, so it's safe to reinitialize it.
-
-                    return true // The app continues executing.
                 }
 
                 // Renderer crashed because of an internal error, such as a memory
@@ -332,7 +343,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
 
             //dnsConfigureWebView?.loadUrl(pageUrl)
         }catch (e: Exception){
-            Log.e(LOG_TAG, "Webview: Issue while loading url: ${e.message}", e)
+            Log.e(LOG_TAG, "Web view: Issue while loading url: ${e.message}", e)
             showDialogOnError(null)
         }
     }

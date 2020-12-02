@@ -13,7 +13,6 @@ import static android.content.Context.CONNECTIVITY_SERVICE;
 import static com.celzero.bravedns.util.Constants.LOG_TAG;
 
 public class ConnectionTracer {
-    private static final String TAG = "ConnTracer";
     private static final boolean DEBUG = false;
     private static final int MISSING_UID = -2000;
     private final Context context;
@@ -40,7 +39,7 @@ public class ConnectionTracer {
         InetSocketAddress local;
         InetSocketAddress remote;
 
-        if (DEBUG) Log.d(TAG, sourceIp +  " [" + sourcePort + "] to " + destIp + " [" + destPort + "]");
+        if (DEBUG) Log.d(LOG_TAG, sourceIp +  " [" + sourcePort + "] to " + destIp + " [" + destPort + "]");
 
         if (TextUtils.isEmpty(sourceIp) || sourceIp.split("\\.").length < 4) {
             //Log.w(TAG, "empty/invalid sourceIp " + sourceIp);
@@ -50,7 +49,7 @@ public class ConnectionTracer {
         }
 
         if (TextUtils.isEmpty(destIp) || destIp.split("\\.").length < 4) {
-            Log.w(TAG, "empty/invalid destIp " + destIp);
+            Log.w(LOG_TAG, "empty/invalid destIp " + destIp);
             remote = new InetSocketAddress(destPort);
         } else {
             remote = new InetSocketAddress(destIp, destPort);
@@ -63,7 +62,7 @@ public class ConnectionTracer {
         }
 
 
-        if (DEBUG) Log.d(TAG, "GetUidQ(" + local + "," + remote + "): " + uid);
+        if (DEBUG) Log.d(LOG_TAG, "GetUidQ(" + local + "," + remote + "): " + uid);
 
         return uid;
     }

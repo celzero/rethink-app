@@ -20,15 +20,19 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DNSQueryAdapter
-import com.celzero.bravedns.net.doh.Transaction
+import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
@@ -38,13 +42,16 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.median50
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.viewmodel.DNSLogViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import settings.Settings
 import java.net.MalformedURLException
 import java.net.URL
-import java.util.*
 
 
-class DNSLogFragment  : Fragment() {
+class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
 
     private val SPINNER_VALUE_NO_FILTER = 0
     private val SPINNER_VALUE_FAMILY = 1
@@ -58,6 +65,7 @@ class DNSLogFragment  : Fragment() {
     private var recyclerView: RecyclerView? = null
     //private lateinit var context: Context
     private var layoutManager: RecyclerView.LayoutManager? = null
+    private var recyclerAdapter: DNSQueryAdapter? = null
 
     //private lateinit var loadingIllustration: FrameLayout
     private lateinit var latencyTxt: TextView
@@ -65,14 +73,23 @@ class DNSLogFragment  : Fragment() {
     private lateinit var currentDNSStatus: TextView
     private lateinit var currentDNSURL : TextView
 
+    private var editSearchView: SearchView? = null
+    private lateinit var filterIcon: ImageView
+    private lateinit var deleteIcon: ImageView
+
     private lateinit var recyclerHeadingLL : LinearLayout
     private lateinit var noLogsTxt : TextView
     private lateinit var topLayoutRL: RelativeLayout
+
+    private val viewModel: DNSLogViewModel by viewModels()
+    private var checkedItem = 1
+    private lateinit var filterValue: String
 
     lateinit var urlName: Array<String>
     lateinit var urlValues: Array<String>
     var prevSpinnerSelection: Int = 2
     var check = 2
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreate(savedInstanceState)
@@ -91,48 +108,58 @@ class DNSLogFragment  : Fragment() {
     private fun initView(view : View) {
         if(DEBUG) Log.d(LOG_TAG,"InitView from DNSLogFragment")
         //context = this
+        latencyTxt = view.findViewById(R.id.latency_txt)
+        queryCountTxt = view.findViewById(R.id.total_queries_txt)
+        currentDNSStatus = view.findViewById(R.id.connected_status_title)
+        currentDNSURL = view.findViewById(R.id.connected_status_title_url)
+
+        //components from the included view.
         val includeView = view.findViewById<View>(R.id.query_list_scroll_list)
         // Set up the recycler
         recyclerView = includeView.findViewById<View>(R.id.recycler_query) as RecyclerView
-       //loadingIllustration = includeView.findViewById(R.id.query_progressBarHolder)
         topLayoutRL = includeView.findViewById(R.id.query_list_rl)
-
-        latencyTxt = includeView.findViewById(R.id.latency_txt)
-
-        queryCountTxt = includeView.findViewById(R.id.total_queries_txt)
-        //urlSpinner = includeView.findViewById(R.id.setting_url_spinner)
-
-        currentDNSStatus = includeView.findViewById(R.id.connected_status_title)
-        currentDNSURL = includeView.findViewById(R.id.connected_status_title_url)
+        editSearchView = includeView.findViewById(R.id.query_list_search)
+        filterIcon = includeView.findViewById(R.id.query_list_filter_icon)
+        deleteIcon = includeView.findViewById(R.id.query_list_delete_icon)
 
         recyclerHeadingLL = includeView.findViewById(R.id.query_list_recycler_heading)
         noLogsTxt = includeView.findViewById(R.id.dns_log_no_log_text)
-        //dnsSelectorInfoIcon = includeView.findViewById(R.id.query_dns_info_icon)
 
         recyclerView!!.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(requireContext())
         recyclerView!!.layoutManager = layoutManager
-        adapterDNS = DNSQueryAdapter(requireContext())
-        adapterDNS!!.reset(getHistory())
-        recyclerView!!.adapter = adapterDNS
+        DNSLogViewModel.setContext(requireContext())
 
+        recyclerAdapter = DNSQueryAdapter(requireContext())
+        viewModel.dnsLogsList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(recyclerAdapter!!::submitList))
+        recyclerView!!.adapter = recyclerAdapter
 
         val isServiceRunning = Utilities.isServiceRunning(requireContext(), BraveVPNService::class.java)
         if (!isServiceRunning) {
-            //loadingIllustration.visibility = View.VISIBLE
             topLayoutRL.visibility = View.GONE
         } else {
-            //loadingIllustration.visibility = View.GONE
             topLayoutRL.visibility = View.VISIBLE
         }
 
         median50.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
-            latencyTxt.setText("Latency: "+median50.value.toString() + "ms")
+            latencyTxt.text = "Latency: "+median50.value.toString() + "ms"
         })
 
-        //latencyTxt.setText("Latency: " + getMedianLatency(this) + "ms")
-        queryCountTxt.setText("Lifetime Queries: " + PersistentState.getNumOfReq(requireContext()))
+        queryCountTxt.text = "Lifetime Queries: " + PersistentState.getNumOfReq(requireContext())
 
+        editSearchView!!.setOnQueryTextListener(this)
+        editSearchView!!.setOnClickListener {
+            editSearchView!!.requestFocus()
+            editSearchView!!.onActionViewExpanded()
+        }
+
+        filterIcon.setOnClickListener {
+            showDialogForFilter()
+        }
+
+        deleteIcon.setOnClickListener {
+            showDialogForDelete()
+        }
     }
 
     override fun onResume() {
@@ -161,6 +188,52 @@ class DNSLogFragment  : Fragment() {
             recyclerView?.visibility = View.GONE
             noLogsTxt.visibility = View.VISIBLE
         }
+    }
+
+    private fun showDialogForFilter() {
+        val singleItems = arrayOf(getString(R.string.filter_dns_blocked_connections), getString(R.string.filter_dns_all_connections))
+
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Select filter")
+
+        // Single-choice items (initialized with checked item)
+        builder.setSingleChoiceItems(singleItems, checkedItem) { dialog, which ->
+            // Respond to item chosen
+            filterValue = if (which == 0) "isFilter"
+            else ""
+            checkedItem = which
+            if (DEBUG) Log.d(LOG_TAG, "Filter Option selected: $filterValue")
+            viewModel.setFilterBlocked(filterValue)
+            dialog.dismiss()
+        }
+        builder.show()
+    }
+
+
+    private fun showDialogForDelete() {
+        val builder = AlertDialog.Builder(requireContext())
+        //set title for alert dialog
+        builder.setTitle(R.string.dns_query_clear_logs_title)
+        //set message for alert dialog
+        builder.setMessage(R.string.dns_query_clear_logs_message)
+        builder.setIcon(android.R.drawable.ic_dialog_alert)
+        builder.setCancelable(true)
+        //performing positive action
+        builder.setPositiveButton("Delete logs") { _, _ ->
+            GlobalScope.launch(Dispatchers.IO) {
+                val mDb = AppDatabase.invoke(requireContext().applicationContext)
+                val dnsLogDAO = mDb.dnsLogDAO()
+                dnsLogDAO.clearAllData()
+            }
+        }
+        //performing negative action
+        builder.setNegativeButton("Cancel") { _, _ ->
+        }
+        // Create the AlertDialog
+        val alertDialog: AlertDialog = builder.create()
+        // Set other dialog properties
+        alertDialog.setCancelable(true)
+        alertDialog.show()
     }
 
     // Check that the URL is a plausible DOH server: https with a domain, a path (at least "/"),
@@ -192,37 +265,17 @@ class DNSLogFragment  : Fragment() {
 
 
     companion object {
-        private var adapterDNS: DNSQueryAdapter? = null
-
         fun newInstance() = DNSLogFragment()
-
-        fun updateStatsDisplay(numRequests: Long, transaction: Transaction) {
-            showTransaction(transaction)
-        }
-
-        private fun showTransaction(transaction: Transaction) {
-            if(DEBUG) Log.d(LOG_TAG,"showTransaction from DNSLogFragment - ${transaction.name}")
-            if(DEBUG) Log.d(LOG_TAG,"Show BlockList: ${transaction.blockList}")
-            if(adapterDNS != null) {
-                adapterDNS?.add(transaction)
-                adapterDNS?.notifyDataSetChanged()
-            }
-        }
     }
 
-    private fun getHistory(): Queue<Transaction?>? {
-        val controller = VpnController.getInstance()
-        return controller!!.getTracker(requireContext())!!.recentTransactions
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        viewModel.setFilter(query!!)
+        return true
     }
 
-    private fun getIndex(url: String): Int {
-        val urlValues = resources.getStringArray(R.array.doh_endpoint_urls)
-
-        for(i in urlValues.indices){
-            if(urlValues[i] == url)
-                return i
-        }
-        return -1
+    override fun onQueryTextChange(query: String?): Boolean {
+        viewModel.setFilter(query!!)
+        return true
     }
 
 }

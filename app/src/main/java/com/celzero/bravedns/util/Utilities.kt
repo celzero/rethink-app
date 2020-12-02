@@ -51,38 +51,20 @@ class Utilities {
 
     companion object {
 
-        val STORAGE_PERMISSION_CODE = 1008
+        private const val STORAGE_PERMISSION_CODE = 1008
         private const val READ_PHONE_STATE_REQUEST = 37
 
         fun checkPermission(activity: AppCompatActivity): Boolean {
             var permissionGranted = false
 
-            if (ContextCompat.checkSelfPermission(
-                    activity,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(
-                        activity,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                    )
-                ) {
-                    val rootView: View =
-                        (activity).window.decorView.findViewById(android.R.id.content)
-                    Snackbar.make(rootView, "Storage permission required", Snackbar.LENGTH_LONG)
-                        .setAction("Allow") {
-                            ActivityCompat.requestPermissions(
-                                activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                                STORAGE_PERMISSION_CODE
-                            )
-                        }
-                        .setActionTextColor(Color.WHITE)
-                        .show()
+            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    val rootView: View = (activity).window.decorView.findViewById(android.R.id.content)
+                    Snackbar.make(rootView, "Storage permission required", Snackbar.LENGTH_LONG).setAction("Allow") {
+                            ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_PERMISSION_CODE)
+                        }.setActionTextColor(Color.WHITE).show()
                 } else {
-                    ActivityCompat.requestPermissions(
-                        activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                        STORAGE_PERMISSION_CODE
-                    )
+                    ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_PERMISSION_CODE)
                 }
             } else {
                 permissionGranted = true
@@ -92,16 +74,14 @@ class Utilities {
         }
 
         fun checkExternalStorage(): Boolean {
-            return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)
+            return Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
         }
 
 
         fun getPermissionDetails(activity: Context, packageName: String): PackageInfo {
-
             var appInstall: PackageInfo
             var p = activity.packageManager
             appInstall = p.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
-
             return appInstall
         }
 
@@ -121,12 +101,8 @@ class Utilities {
             )
         }
 
-        fun isServiceRunning(
-            c: Context,
-            serviceClass: Class<*>
-        ): Boolean {
-            val manager =
-                c.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        fun isServiceRunning(c: Context, serviceClass: Class<*>): Boolean {
+            val manager = c.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
             for (service in manager.getRunningServices(Int.MAX_VALUE)) {
                 if (serviceClass.name == service.service.className) {
                     return true
@@ -164,22 +140,16 @@ class Utilities {
             }
         }
 
-        fun isAccessibilityServiceEnabled(
-            context: Context,
-            service: Class<out AccessibilityService?>
-        ): Boolean {
-            val am =
-                context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
-            val enabledServices =
-                am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
+        fun isAccessibilityServiceEnabled(context: Context, service: Class<out AccessibilityService?>): Boolean {
+            val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+            val enabledServices = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
             for (enabledService in enabledServices) {
                 val enabledServiceInfo: ServiceInfo = enabledService.resolveInfo.serviceInfo
-                if (enabledServiceInfo.packageName == context.packageName && enabledServiceInfo.name == service.name)
-                 return true
+                if (enabledServiceInfo.packageName == context.packageName && enabledServiceInfo.name == service.name) return true
             }
+            if(DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled failure: ${context.packageName},  ${service.name}, return size: ${enabledServices.size}")
             return false
         }
-
 
         private var countryMap: CountryMap? = null
 
@@ -204,7 +174,7 @@ class Utilities {
             }
         }
 
-        fun getFlag(countryCode: String?): String? {
+        fun getFlag(countryCode: String?): String {
             if (countryCode == null) {
                 return ""
             }
@@ -225,7 +195,7 @@ class Utilities {
             )
         }
 
-        fun makeAddressPair(countryCode: String?, ipAddress: String): String? {
+        fun makeAddressPair(countryCode: String?, ipAddress: String): String {
             return if (countryCode == null) {
                 ipAddress
             } else String.format("%s (%s)", countryCode, ipAddress)
@@ -278,6 +248,19 @@ class Utilities {
                 Log.w(LOG_TAG, "Exception while converting string to inetaddress, ${e.message}",e)
                 false
             }
+        }
+
+
+        fun getTypeName(type: Int): String {
+            // From https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-4
+            val names = arrayOf("0", "A", "NS", "MD", "MF", "CNAME", "SOA", "MB", "MG", "MR", "NULL", "WKS",
+            "PTR", "HINFO", "MINFO", "MX", "TXT", "RP", "AFSDB", "X25", "ISDN", "RT", "NSAP", "NSAP+PTR",
+            "SIG", "KEY", "PX", "GPOS", "AAAA", "LOC", "NXT", "EID", "NIMLOC", "SRV", "ATMA", "NAPTR", "KX",
+             "CERT", "A6", "DNAME", "SINK", "OPT", "APL", "DS", "SSHFP", "IPSECKEY", "RRSIG", "NSEC", "DNSKEY",
+              "DHCID", "NSEC3", "NSEC3PARAM", "TLSA", "SMIMEA")
+            return if (type < names.size) {
+                names[type]
+            } else String.format(Locale.ROOT, "%d", type)
         }
 
     }
