@@ -222,8 +222,8 @@
     </string>
 
     <string name="category_firewall_explanation">
-        Applications added to whitelist will be exempt from all firewall rules.
-    </string>
+        Whitelisted applications are exempt from all firewall rules.
+    </string> <!--Applications added to whitelist will be exempt from all firewall rules.-->
 
     <string name="ip_details_list_explanation">
         All connections to these IPs are blocked for all apps except the ones in the whitelist.
@@ -286,7 +286,7 @@
     </string>
 
     <string name="brave_dns_connect_mode_change_dns">
-        Start DNS / DNS+Firewall to view logs.
+        Start DNS / DNS+Firewall to configure DNS.
     </string>
 
     <string name="brave_dns_connect_mode_change_connection">
@@ -336,7 +336,17 @@
     <string name="conn_track_clear_logs_title">Delete all network logs?</string>
     <string name="conn_track_clear_logs_message">This only deletes network logs but not firewall rules. This operation is not reversible. Do you want to proceed?</string>
 
+    <string name="dns_query_clear_logs_title">Delete all DNS logs?</string>
+    <string name="dns_query_clear_logs_message">This deletes all the DNS logs. This operation is not reversible. Do you want to proceed?</string>
+
+    <string name="filter_dns_blocked_connections">Blocked connections</string>
+    <string name="filter_dns_all_connections">All connections</string>
+
+    <string name="filter_network_blocked_connections">Blocked connections</string>
+    <string name="filter_network_all_connections">All connections</string>
+
     <string name="bsct_kill">Kill app</string>
+    <string name="bsct_app_info">App Info</string>
     <string name="bsct_clear">Clear all rules</string>
     <string name="bsct_block_all">Block &lt;u>all apps&lt;/u> from connecting to &lt;u>this IP&lt;/u></string>
     <string name="bsct_block_app">Block &lt;u>this app&lt;/u> from connecting to this IP</string>
@@ -356,8 +366,8 @@
     <string name="bsct_alert_message_clear_rules">All rules related to this app will be cleared</string>
     <string name="bsct_alert_message_clear_rules_heading">Clear rules</string>
     <string name="bsct_rules_cleared_toast">All rules related to this app is cleared</string>
-    <string name="bsct_firewall_not_available_whitelist">App is added to whitelist. Cannot firewall</string>
-    <string name="bsct_firewall_not_available_excluded">App is added to excluded list. Cannot firewall</string>
+    <string name="bsct_firewall_not_available_whitelist">Whitelisted apps cannot be blocked.</string>
+    <string name="bsct_firewall_not_available_excluded">Excluded apps cannot be blocked.</string>
 
     <string name="private_dns_toast">"Private DNS" is on in Android network settings</string>
     <string name="always_on_dialog_heading">Disable Always-on VPN</string>
@@ -385,15 +395,19 @@
 
     <string name="doh_custom_url_remove_dialog_title">Delete DoH endpoint?</string>
     <string name="doh_custom_url_remove_dialog_message">Delete the DNS over Https endpoint from saved configuration.</string>
+    <string name="doh_custom_url_remove_success">Endpoint deleted.</string>
 
     <string name="dns_crypt_custom_url_remove_dialog_title">Delete DNSCrypt resolver?</string>
     <string name="dns_crypt_url_remove_dialog_message">Delete the DNSCrypt resolver from saved configuration.</string>
+    <string name="dns_crypt_url_remove_success">DNSCrypt resolver deleted.</string>
 
     <string name="dns_crypt_relay_remove_dialog_title">Delete DNSCrypt Relay?</string>
     <string name="dns_crypt_relay_remove_dialog_message">Delete the DNSCrypt relay from saved configuration.</string>
+    <string name="dns_crypt_relay_remove_success">DNSCrypt Relay deleted.</string>
 
     <string name="dns_proxy_remove_dialog_title">Delete DNS Proxy?</string>
     <string name="dns_proxy_remove_dialog_message">Delete the DNS Proxy from saved configuration.</string>
+    <string name="dns_proxy_remove_success">DNS Proxy deleted.</string>
 
     <string name="doh_brave_pro_configure">Configure RethinkDNS Plus</string>
     <string name="doh_brave_pro_configure_desc">Choose from 170+ blocklists to configure RethinkDNS Plus.</string>
@@ -412,9 +426,9 @@
 
 
     <string-array name="dns_crypt_endpoint_names">
-        <item>Cleanbrowsing family</item>
+        <item>Cleanbrowsing Family</item>
         <item>Adguard</item>
-        <item>Adguard family</item>
+        <item>Adguard Family</item>
         <item>Cleanbrowsing Security</item>
         <item>Quad9</item>
     </string-array>

@@ -207,7 +207,20 @@ class ExcludeAppDialog(var activity: Context, internal var adapter: RecyclerView
                         filterCategories.remove(categoryName)
                     }
                 }
-                val filterString = filterCategories.stream().collect(Collectors.joining(","))
+                val filterString =
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        filterCategories.stream().collect(Collectors.joining(","))
+                    } else {
+                        var catTitle = ""
+                        filterCategories.forEach {
+                            catTitle = it + "," + catTitle
+                        }
+                        if (catTitle.length > 1) {
+                            catTitle.substring(0, catTitle.length - 1)
+                        } else {
+                            catTitle
+                        }
+                    }
                 if (filterString.isNotEmpty()) {
                     if (DEBUG) Log.d(LOG_TAG, "category - $filterString")
                     viewModel.setFilter("category:$filterString")

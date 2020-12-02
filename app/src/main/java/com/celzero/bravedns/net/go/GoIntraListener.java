@@ -1,4 +1,6 @@
 /*
+Copyright 2020 RethinkDNS developers
+
 Copyright 2019 Jigsaw Operations LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,8 +35,6 @@ import doh.Token;
 import intra.TCPSocketSummary;
 import intra.UDPSocketSummary;
 
-/*import com.google.firebase.perf.FirebasePerformance;
-import com.google.firebase.perf.metrics.HttpMetric;*/
 
 /**
  * This is a callback class that is passed to our go-tun2socks code.  Go calls this class's methods
@@ -50,48 +50,18 @@ public class GoIntraListener implements tunnel.IntraListener {
 
     private final BraveVPNService vpnService;
 
-    //private final AnalyticsWrapper analytics;
     GoIntraListener(BraveVPNService vpnService) {
         this.vpnService = vpnService;
-        //analytics = AnalyticsWrapper.get(vpnService);
     }
 
     @Override
     public void onTCPSocketClosed(TCPSocketSummary summary) {
-    /*analytics.logTCP(
-        summary.getUploadBytes(),
-        summary.getDownloadBytes(),
-        summary.getServerPort(),
-        summary.getSynack(),
-        summary.getDuration());
 
-    RetryStats retry = summary.getRetry();
-    if (retry != null) {
-      // Connection was eligible for split-retry.
-      if (retry.getSplit() == 0) {
-        // Split-retry was not attempted.
-        return;
-      }
-      boolean success = summary.getDownloadBytes() > 0;
-      analytics.logEarlyReset(
-          retry.getBytes(),
-          retry.getChunks(),
-          retry.getTimeout(),
-          retry.getSplit(),
-          success);
-    }*/
     }
 
     @Override
     public void onUDPSocketClosed(UDPSocketSummary summary) {
-    /*long totalBytes = summary.getUploadBytes() + summary.getDownloadBytes();
-    if (totalBytes < UDP_THRESHOLD_BYTES) {
-      return;
-    }
-    analytics.logUDP(
-        summary.getUploadBytes(),
-        summary.getDownloadBytes(),
-        summary.getDuration());*/
+
     }
 
     private static final LongSparseArray<Status> goStatusMap = new LongSparseArray<>();
@@ -124,17 +94,6 @@ public class GoIntraListener implements tunnel.IntraListener {
         dnscryptStatusMap.put(Dnscrypt.InternalError, Status.INTERNAL_ERROR);
     }
 
-    // Wrapping HttpMetric into a doh.Token allows us to get paired query and response notifications
-    // from Go without reverse-binding any Java APIs into Go.  Pairing these notifications is
-    // required by the structure of the HttpMetric API (which does not have any other way to record
-    // latency), and reverse binding is worth avoiding, especially because it's not compatible with
-    // the Go module system (https://github.com/golang/go/issues/27234).
-  /*private class Metric implements doh.Token {
-    final HttpMetric metric;
-    Metric(String url) {
-      metric = FirebasePerformance.getInstance().newHttpMetric(url, "POST");
-    }
-  }*/
 
     @Override
     public boolean onDNSCryptQuery(String s) {
@@ -166,8 +125,6 @@ public class GoIntraListener implements tunnel.IntraListener {
 
     @Override
     public Token onQuery(String url) {
-        //Metric m = new Metric(url);
-        //m.metric.start();
         return null;
     }
 
@@ -177,15 +134,6 @@ public class GoIntraListener implements tunnel.IntraListener {
 
     @Override
     public void onResponse(Token token, doh.Summary summary) {
-    /*if (summary.getHTTPStatus() != 0 && token != null) {
-      // HTTP transaction completed.  Report performance metrics.
-      Metric m = (Metric)token;
-      m.metric.setRequestPayloadSize(len(summary.getQuery()));
-      m.metric.setHttpResponseCode((int)summary.getHTTPStatus());
-      m.metric.setResponsePayloadSize(len(summary.getResponse()));
-      m.metric.stop();  // Finalizes the metric and queues it for upload.
-    }*/
-
         final DnsPacket query;
         try {
             query = new DnsPacket(summary.getQuery());

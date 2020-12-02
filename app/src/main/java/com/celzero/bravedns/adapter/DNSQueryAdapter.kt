@@ -17,60 +17,66 @@ limitations under the License.
 package com.celzero.bravedns.adapter
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
+import androidx.paging.PagedListAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.net.dns.DnsPacket
-import com.celzero.bravedns.net.doh.CountryMap
-import com.celzero.bravedns.net.doh.Transaction
+import com.celzero.bravedns.database.DNSLogs
 import com.celzero.bravedns.ui.DNSBlockListBottomSheetFragment
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
-import java.io.IOException
-import java.net.InetAddress
-import java.net.ProtocolException
+import java.text.SimpleDateFormat
 import java.util.*
 
 
-class DNSQueryAdapter(val context: Context) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQueryAdapter.TransactionViewHolder>(DIFF_CALLBACK){
 
 
-    private val transactions: MutableList<DNSQueryAdapter.TransactionView> = mutableListOf()
+   // private val transactions: MutableList<DNSQueryAdapter.TransactionView> = mutableListOf()
 
     companion object {
         const val TYPE_CONTROLS: Int = 0
         const val TYPE_TRANSACTION: Int = 1
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DNSLogs>() {
+            // Concert details may have changed if reloaded from the database,
+            // but ID is fixed.
+            override fun areItemsTheSame(oldConnection: DNSLogs, newConnection: DNSLogs) = oldConnection.id == newConnection.id
+
+            override fun areContentsTheSame(oldConnection: DNSLogs, newConnection: DNSLogs) = oldConnection == newConnection
+        }
     }
 
     init {
 
     }
 
-    override fun getItemCount(): Int {
+   /* override fun getItemCount(): Int {
         return (transactions.size)
-    }
+    }*/
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        //TODO Commented this piece of code for the control view for the type Controls. Check that and modify based on it.
-        if (holder is TransactionViewHolder) {
+    override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
+        val transaction : DNSLogs? = getItem(position)
+        holder.update(transaction, position)
+
+
+        /*//TODO Commented this piece of code for the control view for the type Controls. Check that and modify based on it.
+        if (true) {
             val transaction: TransactionView? = getItem(position)
             holder.update(transaction!!, position)
         } else {
             throw java.lang.AssertionError(String.format(Locale.ROOT, "Unknown holder %s", holder.javaClass.toString()))
-        }
+        }*/
     }
 
     override fun getItemViewType(position: Int): Int {
         return TYPE_TRANSACTION
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
         return /*if (viewType == TYPE_CONTROLS) {
                //TODO Commented this piece of code for the control view for the type Controls. Check that and modify based on it.
             val v: View = activity.getControlView(parent)
@@ -99,13 +105,13 @@ class DNSQueryAdapter(val context: Context) : RecyclerView.Adapter<RecyclerView.
         }
     }
 
-    private fun getItem(position: Int): DNSQueryAdapter.TransactionView? {
+    /*private fun getItem(position: Int): DNSQueryAdapter.TransactionView? {
         return transactions[(transactions.size - 1) - position]
-    }
+    }*/
 
     inner class TransactionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        private var transaction: DNSQueryAdapter.TransactionView? = null
+        //private var transaction: DNSQueryAdapter.TransactionView? = null
 
         // Overall view
         private var rowView: View? = null
@@ -129,46 +135,53 @@ class DNSQueryAdapter(val context: Context) : RecyclerView.Adapter<RecyclerView.
             latencyView = itemView.findViewById(R.id.latency_val)
             queryLayoutLL = itemView.findViewById(R.id.query_screen_ll)
             queryIndicator = itemView.findViewById(R.id.query_log_indicator)
-
         }
 
-        fun update(transaction: TransactionView, position: Int) {
+        fun update(transaction: DNSLogs?, position: Int) {
             // This function can be run up to a dozen times while blocking rendering, so it needs to be
             // as brief as possible.
-            this.transaction = transaction
-            timeView!!.text = transaction.time
-            flagView!!.text = transaction.flag
-            //fqdnView!!.text = Utilities.getETldPlus1(transaction.fqdn!!)
-            fqdnView!!.text = transaction.fqdn!!
-            latencyView!!.text = transaction.latency
+            //this.transaction = transaction
+            if(transaction != null) {
+                timeView!!.text = convertLongToTime(transaction.time)
+                flagView!!.text = transaction.flag
+                //fqdnView!!.text = Utilities.getETldPlus1(transaction.fqdn!!)
+                fqdnView!!.text = transaction.queryStr
+                latencyView!!.text = transaction.latency.toString() + "ms"
 
-            if (transaction.isBlocked) {
-                queryIndicator!!.visibility = View.VISIBLE
-            } else {
-                queryIndicator!!.visibility = View.INVISIBLE
-            }
-            rowView?.setOnClickListener {
-                //if (!transaction.blockList.isNullOrEmpty()) {
-                rowView?.isEnabled = false
-                openBottomSheet(transaction)
-                rowView?.isEnabled = true
-                //}
+                if (transaction.isBlocked) {
+                    queryIndicator!!.visibility = View.VISIBLE
+                } else {
+                    queryIndicator!!.visibility = View.INVISIBLE
+                }
+                rowView?.setOnClickListener {
+                    //if (!transaction.blockList.isNullOrEmpty()) {
+                    rowView?.isEnabled = false
+                    openBottomSheet(transaction)
+                    rowView?.isEnabled = true
+                    //}
+                }
             }
 
         }
     }
 
-    fun openBottomSheet(transaction: TransactionView){
+    fun openBottomSheet(transaction: DNSLogs){
         val bottomSheetFragment = DNSBlockListBottomSheetFragment(context, transaction)
         val frag = context as FragmentActivity
         bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
+    }
+
+    fun convertLongToTime(time: Long): String {
+        val date = Date(time)
+        val format = SimpleDateFormat("HH:mm:ss")
+        return format.format(date)
     }
 
     /**
      * Replace the current list of transactions with these.
      * A null argument is treated as an empty list.
      */
-    fun reset(transactions: Queue<Transaction?>?) {
+    /*fun reset(transactions: Queue<Transaction?>?) {
         this.transactions.clear()
         if (transactions != null) {
             for (t in transactions) {
@@ -178,17 +191,17 @@ class DNSQueryAdapter(val context: Context) : RecyclerView.Adapter<RecyclerView.
             countryMap = null
         }
         notifyDataSetChanged()
-    }
+    }*/
 
     /**
      * Add a new transaction to the top of the displayed list
      */
-    fun add(transaction: Transaction?) {
+   /* fun add(transaction: Transaction?) {
         transactions.add(TransactionView(transaction!!))
         notifyItemInserted(1)
-    }
+    }*/
 
-    inner class TransactionView(transaction: Transaction) {
+    /*inner class TransactionView(transaction: Transaction) {
 
         var fqdn: String? = null
 
@@ -290,9 +303,9 @@ class DNSQueryAdapter(val context: Context) : RecyclerView.Adapter<RecyclerView.
                 }
             }
         }
-    }
+    }*/
 
-    private var countryMap: CountryMap? = null
+    /*private var countryMap: CountryMap? = null
 
     // Return a two-letter ISO country code, or null if that fails.
     fun getCountryCode(address: InetAddress, context: Context): String {
@@ -409,7 +422,7 @@ class DNSQueryAdapter(val context: Context) : RecyclerView.Adapter<RecyclerView.
         return if (countryCode == null) {
             ipAddress
         } else String.format("%s (%s)", countryCode, ipAddress)
-    }
+    }*/
 
 
 }

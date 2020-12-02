@@ -30,7 +30,7 @@ android {
 
     defaultConfig {
         applicationId "com.celzero.bravedns"
-        minSdkVersion 26
+        minSdkVersion 23
         targetSdkVersion 29
         versionCode 10
         versionName "0.5.2"
@@ -47,7 +47,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled true //Disabled this option for open testing to get more log details
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -72,6 +72,7 @@ dependencies {
             'guava-28.2-android.jar',
             'failureaccess-1.0.1.jar' // Dependency of Guava
     ], dir: 'libs')
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.core:core-ktx:1.3.2'
@@ -83,8 +84,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.1'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
-
-    implementation 'org.minidns:minidns-core:0.3.4'
+    implementation 'org.minidns:minidns-core:1.0.0'
     implementation 'org.minidns:minidns-hla:0.3.4'
 
     implementation 'com.google.code.gson:gson:2.8.6'
@@ -113,4 +113,5 @@ dependencies {
 
     // For go-tun2socks
     implementation project(":tun2socks")
+
 }

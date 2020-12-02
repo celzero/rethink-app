@@ -41,8 +41,8 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatSpinner
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -53,7 +53,6 @@ import com.celzero.bravedns.adapter.SpinnerArrayAdapter
 import com.celzero.bravedns.animation.RippleBackground
 import com.celzero.bravedns.data.BraveMode
 import com.celzero.bravedns.database.AppDatabase
-import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.*
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
@@ -65,6 +64,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.lifeTimeQueries
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.median50
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.numUniversalBlock
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Utilities
 import com.google.android.material.chip.Chip
 import settings.Settings
 import java.net.NetworkInterface
@@ -88,7 +88,7 @@ class HomeScreenFragment : Fragment() {
     private lateinit var braveModeSpinner: AppCompatSpinner
     private lateinit var braveModeInfoIcon: ImageView
 
-    private lateinit var dnsOnOffBtn: AppCompatTextView
+    private lateinit var dnsOnOffBtn: AppCompatButton
     private lateinit var rippleRRLayout: RippleBackground
 
     private lateinit var tileDLifetimeQueriesTxt: TextView
@@ -115,9 +115,6 @@ class HomeScreenFragment : Fragment() {
 
     private val MAIN_CHANNEL_ID = "vpn"
 
-    //Removed code for VPN
-    private var isServiceRunning: Boolean = false
-
     private var REQUEST_CODE_PREPARE_VPN: Int = 100
 
     companion object {
@@ -127,7 +124,11 @@ class HomeScreenFragment : Fragment() {
         const val DNS_FIREWALL_MODE = 2
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val view: View = inflater.inflate(R.layout.fragment_home_screen, container, false)
         initView(view)
         syncDnsStatus()
@@ -147,10 +148,13 @@ class HomeScreenFragment : Fragment() {
      */
     private fun registerForBroadCastReceivers() {
         // Register broadcast receiver
-        val intentFilter = IntentFilter(InternalNames.RESULT.name)
-        intentFilter.addAction(InternalNames.DNS_STATUS.name)
+        val intentFilter = IntentFilter(InternalNames.DNS_STATUS.name)
+        //intentFilter.addAction(InternalNames.DNS_STATUS.name)
         //intentFilter.addAction(InternalNames.TRACKER.name)
-        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(messageReceiver, intentFilter)
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(
+            messageReceiver,
+            intentFilter
+        )
     }
 
     /*
@@ -230,7 +234,12 @@ class HomeScreenFragment : Fragment() {
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 braveMode = DNS_FIREWALL_MODE
             }
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
                 braveModeSpinner.isEnabled = false
                 modifyBraveMode(position)
                 showTileForMode()
@@ -282,9 +291,11 @@ class HomeScreenFragment : Fragment() {
         dnsOnOffBtn.setOnClickListener(View.OnClickListener {
             dnsOnOffBtn.isEnabled = false
             //TODO : check for the service already running
-            val status = VpnController.getInstance()!!.getState(requireContext())
+            //val status = VpnController.getInstance()!!.getState(requireContext())
+            val status = PersistentState.getVpnEnabled(requireContext())
             if (!checkForPrivateDNSandAlwaysON()) {
-                if (status!!.activationRequested) {
+                //if (status!!.activationRequested) {
+                if (status) {
                     appStartTime = System.currentTimeMillis()
                     dnsOnOffBtn.setText("start")
                     rippleRRLayout.startRippleAnimation()
@@ -292,19 +303,25 @@ class HomeScreenFragment : Fragment() {
                     stopDnsVpnService()
                 } else {
                     appStartTime = System.currentTimeMillis()
-                    if(DEBUG) Log.d(LOG_TAG,"VPN service start initiated with time $appStartTime")
-                    if(VpnController.getInstance()?.getBraveVpnService() != null){
+                    if (DEBUG) Log.d(LOG_TAG, "VPN service start initiated with time $appStartTime")
+                    if (VpnController.getInstance()?.getBraveVpnService() != null) {
                         VpnController.getInstance()?.stop(requireContext())
-                        if(DEBUG) Log.d(LOG_TAG,"VPN service start initiated but the brave service is already running - so stop called")
-                    }else{
-                        if(DEBUG) Log.d(LOG_TAG,"VPN service start initiated")
+                        if (DEBUG) Log.d(
+                            LOG_TAG,
+                            "VPN service start initiated but the brave service is already running - so stop called"
+                        )
+                    } else {
+                        if (DEBUG) Log.d(LOG_TAG, "VPN service start initiated")
                     }
                     prepareAndStartDnsVpn()
                 }
-            }else if(status?.connectionState == BraveVPNService.State.WORKING){
-                Toast.makeText(requireContext(),"Always-on enabled for RethinkDNS", Toast.LENGTH_SHORT).show()
+            } else if (status) {
+                Utilities.showToastInMidLayout(
+                    requireContext(),
+                    "Always-on enabled for RethinkDNS",
+                    Toast.LENGTH_SHORT
+                )
             }
-            if(DEBUG) Log.d(LOG_TAG,"${checkForPrivateDNSandAlwaysON()}, ${status?.connectionState} ")
 
             Handler().postDelayed({ dnsOnOffBtn.isEnabled = true }, 500)
 
@@ -323,12 +340,30 @@ class HomeScreenFragment : Fragment() {
         })
 
         lifeTimeQ.observe(viewLifecycleOwner, Observer {
-            val lifeTimeConversion = CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT).format(lifeTimeQ.value)
+            val lifeTimeConversion =
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    CompactDecimalFormat.getInstance(
+                        Locale.US,
+                        CompactDecimalFormat.CompactStyle.SHORT
+                    ).format(lifeTimeQ.value)
+                } else {
+                    // FIXME: 19-11-2020 - Format the number similar to CompctDecimalFormat 
+                    lifeTimeQ.value.toString()
+                }
             tileDLifetimeQueriesTxt.text = lifeTimeConversion
         })
 
          blockedCount.observe(viewLifecycleOwner, Observer {
-             val blocked = CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT).format(blockedCount.value)
+             val blocked =
+                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                     CompactDecimalFormat.getInstance(
+                         Locale.US,
+                         CompactDecimalFormat.CompactStyle.SHORT
+                     ).format(blockedCount.value)
+                 } else {
+                     // FIXME: 19-11-2020 - Format the number similar to CompctDecimalFormat
+                     blockedCount.value.toString()
+                 }
              tileDFTrackersBlockedtxt.text = blocked
              tileDtrackersBlockedTxt.text = blocked
          })
@@ -351,6 +386,7 @@ class HomeScreenFragment : Fragment() {
 
     }
 
+
     private fun startBottomSheetForSettings() {
         val bottomSheetFragment = SettingsBottomSheetFragment()
         val frag = activity as FragmentActivity
@@ -364,22 +400,38 @@ class HomeScreenFragment : Fragment() {
         startActivity(intent)
     }*/
 
+    // FIXME: 19-11-2020 - Check the below code for all the edge cases.
     private fun checkForPrivateDNSandAlwaysON() : Boolean {
-        val status: VpnState? = VpnController.getInstance()!!.getState(context)
-        val alwaysOn = android.provider.Settings.Secure.getString(context?.contentResolver, "always_on_vpn_app")
-        if (!TextUtils.isEmpty(alwaysOn)) if (context?.packageName == alwaysOn) {
-            val lockDown = android.provider.Settings.Secure.getInt(context?.contentResolver, "always_on_vpn_lockdown", 0)
-            if (lockDown != 0 && status?.connectionState != BraveVPNService.State.WORKING) {
+        //val status: VpnState? = VpnController.getInstance()!!.getState(context)
+        val stats = PersistentState.getVpnEnabled(requireContext())
+        val alwaysOn = android.provider.Settings.Secure.getString(
+            context?.contentResolver,
+            "always_on_vpn_app"
+        )
+        if (!TextUtils.isEmpty(alwaysOn)) {
+            if (context?.packageName == alwaysOn) {
+               /* val lockDown = android.provider.Settings.Secure.getInt(
+                    context?.contentResolver,
+                    "always_on_vpn_lockdown",
+                    0
+                )*/
+                //if (lockDown != 0 && status?.connectionState != BraveVPNService.State.WORKING) {
+                if (DEBUG) Log.i(LOG_TAG, "Status: $stats , alwaysOn: $alwaysOn - lockdown")
+                /*if(lockDown !=0 && !stats) {
+                showDialogForAlwaysOn()
+                return true
+            }*/
+                return true
+            } //else if(status?.connectionState != BraveVPNService.State.WORKING){
+            else if (!stats) {
+                if (DEBUG) Log.i(LOG_TAG, "Status: $stats , alwaysOn: $alwaysOn - stats value")
                 showDialogForAlwaysOn()
                 return true
             }
-        } else if(status?.connectionState != BraveVPNService.State.WORKING){
-            showDialogForAlwaysOn()
-            return true
         }
-
+        if(DEBUG) Log.i(LOG_TAG, "Status: $stats , alwaysOn: $alwaysOn")
         if (getPrivateDnsMode() == PrivateDnsMode.STRICT) {
-            Toast.makeText(context, R.string.private_dns_toast, Toast.LENGTH_SHORT).show()
+            Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.private_dns_toast).toString(), Toast.LENGTH_SHORT)
             return false
         }
         return false
@@ -393,12 +445,24 @@ class HomeScreenFragment : Fragment() {
                     startActivity(intent)
                 }else{
                     if(getPrivateDnsMode() == PrivateDnsMode.STRICT){
-                        Toast.makeText(context, resources.getText(R.string.private_dns_toast).toString().capitalize(), Toast.LENGTH_SHORT).show()
+                        Utilities.showToastInMidLayout(
+                            requireContext(),
+                            resources.getText(R.string.private_dns_toast).toString().capitalize(),
+                            Toast.LENGTH_SHORT
+                        )
                     }
-                    Toast.makeText(context, resources.getText(R.string.brave_dns_connect_mode_change_connection).toString().capitalize(), Toast.LENGTH_SHORT).show()
+                    Utilities.showToastInMidLayout(requireContext(),
+                        resources.getText(R.string.brave_dns_connect_mode_change_dns)
+                            .toString().capitalize(),
+                        Toast.LENGTH_SHORT
+                    )
                 }
             }else{
-                Toast.makeText(context, resources.getText(R.string.brave_dns_connect_prompt_firewall).toString().capitalize(), Toast.LENGTH_SHORT).show()
+                Utilities.showToastInMidLayout(requireContext(),
+                    resources.getText(R.string.brave_dns_connect_mode_change_dns).toString()
+                        .capitalize(),
+                    Toast.LENGTH_SHORT
+                )
             }
         }
 
@@ -483,10 +547,18 @@ class HomeScreenFragment : Fragment() {
                 val intent = Intent(requireContext(), FirewallActivity::class.java)
                 startActivity(intent)
             } else {
-                Toast.makeText(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(), Toast.LENGTH_SHORT).show()
+                Utilities.showToastInMidLayout(requireContext(),
+                    resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString()
+                        .capitalize(),
+                    Toast.LENGTH_SHORT
+                )
             }
         }else {
-            Toast.makeText(requireContext(), resources.getText(R.string.brave_dns_connect_prompt_firewall).toString().capitalize(), Toast.LENGTH_SHORT).show()
+             Utilities.showToastInMidLayout(requireContext(),
+                resources.getText(R.string.brave_dns_connect_prompt_firewall).toString()
+                    .capitalize(),
+                Toast.LENGTH_SHORT
+            )
         }
     }
 
@@ -497,19 +569,22 @@ class HomeScreenFragment : Fragment() {
             firewallMode = Settings.BlockModeNone
             braveMode = DNS_MODE
         } else if (position == 1) {
-            firewallMode = if (VERSION.SDK_INT >= VERSION_CODES.O && VERSION.SDK_INT < VERSION_CODES.Q)
+            firewallMode = if (VERSION.SDK_INT >= VERSION_CODES.M && VERSION.SDK_INT < VERSION_CODES.Q)
                 Settings.BlockModeFilterProc
             else
                 Settings.BlockModeFilter
             braveMode = FIREWALL_MODE
         } else if (position == 2) {
-            firewallMode = if(VERSION.SDK_INT >= VERSION_CODES.O && VERSION.SDK_INT < VERSION_CODES.Q)
+            firewallMode = if(VERSION.SDK_INT >= VERSION_CODES.M && VERSION.SDK_INT < VERSION_CODES.Q)
                 Settings.BlockModeFilterProc
             else
                 Settings.BlockModeFilter
             braveMode = DNS_FIREWALL_MODE
         }
-
+        if(DEBUG) Log.d(
+            LOG_TAG,
+            "Firewall mode : $firewallMode, braveMode: $braveMode, SDK_Version: ${VERSION_CODES.M} == ${VERSION.SDK_INT}"
+        )
         appMode?.setFirewallMode(firewallMode)
 
         if(braveMode == FIREWALL_MODE){
@@ -579,36 +654,24 @@ class HomeScreenFragment : Fragment() {
     private val messageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             //Log.d(LOG_TAG,"messageReceiver Request ${intent.action}")
-            if (InternalNames.RESULT.name.equals(intent.action)) {
-                updateStatsDisplay(
-                    PersistentState.getNumOfReq(context).toLong(),
-                    intent.getSerializableExtra(InternalNames.TRANSACTION.name) as Transaction
-                )
-
-            } else if (InternalNames.DNS_STATUS.name.equals(intent.action)) {
+          if (InternalNames.DNS_STATUS.name == intent.action) {
                 syncDnsStatus()
-            } /*else if(InternalNames.TRACKER.name.equals((intent.action))){
-                //syncIPTrackerData(intent.getSerializableExtra(InternalNames.IPTRACKER.name) as IPDetails)
-            }*/
+            }
         }
     }
 
-    private fun updateStatsDisplay(numRequests: Long, transaction: Transaction) {
-        DNSLogFragment.updateStatsDisplay(numRequests, transaction)
-    }
-
-    /*private fun syncIPTrackerData(ipDetails: IPDetails){
-        ConnectionTrackerActivity.updateApplication(ipDetails)
-    }*/
-
     override fun onDestroy() {
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(messageReceiver)
-        //timerHandler.removeCallbacks(updater!!)
         super.onDestroy()
     }
 
     private fun updateUptime() {
-        val upTime = DateUtils.getRelativeTimeSpanString(appStartTime, System.currentTimeMillis(), MINUTE_IN_MILLIS, FORMAT_ABBREV_RELATIVE)
+        val upTime = DateUtils.getRelativeTimeSpanString(
+            appStartTime,
+            System.currentTimeMillis(),
+            MINUTE_IN_MILLIS,
+            FORMAT_ABBREV_RELATIVE
+        )
         appUpTimeTxt.setText("(" + upTime + ")")
     }
 
@@ -619,7 +682,7 @@ class HomeScreenFragment : Fragment() {
                 dnsOnOffBtn.setText("stop")
                 rippleRRLayout.stopRippleAnimation()
                 startDnsVpnService()
-                if(DEBUG) Log.d(LOG_TAG,"VPN service start initiated - startDnsVpnService()")
+                if(DEBUG) Log.d(LOG_TAG, "VPN service start initiated - startDnsVpnService()")
             }
         } else {
             Log.e("BraveVPN", "Device does not support system-wide VPN mode.")
@@ -680,21 +743,21 @@ class HomeScreenFragment : Fragment() {
     // Sets the UI DNS status on/off.
     private fun syncDnsStatus() {
 
-        var status = VpnController.getInstance()!!.getState(requireContext())
+        val status = VpnController.getInstance()!!.getState(requireContext())
 
         if (status!!.activationRequested || status.connectionState == BraveVPNService.State.WORKING) {
             rippleRRLayout.stopRippleAnimation()
             dnsOnOffBtn.text = "stop"
             if (braveMode == 0)
-                protectionDescTxt.setText(getString(R.string.dns_explanation_dns_connected))
+                protectionDescTxt.text = getString(R.string.dns_explanation_dns_connected)
             else if (braveMode == 1)
-                protectionDescTxt.setText(getString(R.string.dns_explanation_firewall_connected))
+                protectionDescTxt.text = getString(R.string.dns_explanation_firewall_connected)
             else
-                protectionDescTxt.setText(getString(R.string.dns_explanation_connected))
+                protectionDescTxt.text = getString(R.string.dns_explanation_connected)
         } else {
             rippleRRLayout.startRippleAnimation()
             dnsOnOffBtn.text = "start"
-            protectionDescTxt.setText(getString(R.string.dns_explanation_disconnected))
+            protectionDescTxt.text = getString(R.string.dns_explanation_disconnected)
         }
 
         // Change status and explanation text
@@ -733,7 +796,10 @@ class HomeScreenFragment : Fragment() {
                 explanationId = R.string.explanation_exposed
             }
         }
-        if(DEBUG) Log.d(LOG_TAG,"Status - ${status.activationRequested}, ${status.connectionState}")
+        if(DEBUG) Log.d(
+            LOG_TAG,
+            "Status - ${status.activationRequested}, ${status.connectionState}"
+        )
 
         if(status.connectionState == BraveVPNService.State.WORKING){
             statusId = R.string.status_protected
@@ -760,7 +826,6 @@ class HomeScreenFragment : Fragment() {
         if (braveMode == FIREWALL_MODE && status.activationRequested)
             colorId = R.color.positive
 
-        //if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG,"Sync - statusId: $statusId, status!!.activationRequested: ${status!!.activationRequested}, status.connectionState: ${status.connectionState}  ")
         val color = ContextCompat.getColor(requireContext(), colorId)
         protectionLevelTxt.setTextColor(color)
         protectionLevelTxt.setText(statusId)

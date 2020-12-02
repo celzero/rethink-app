@@ -19,15 +19,18 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
 import android.app.Dialog
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import android.provider.Settings
 import android.text.Html
 import android.text.Html.FROM_HTML_MODE_LEGACY
-import android.text.Spanned
 import android.text.format.DateUtils
 import android.util.Log
 import android.view.LayoutInflater
@@ -46,6 +49,7 @@ import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.FileSystemUID
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -161,15 +165,27 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         txtFlag.text = ipDetails.flag.toString()
 
         var _text = getString(R.string.bsct_block)
-        var _styledText: Spanned = Html.fromHtml(_text, FROM_HTML_MODE_LEGACY)
+        var _styledText: String = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            Html.fromHtml(_text, FROM_HTML_MODE_LEGACY).toString()
+        } else {
+            Html.fromHtml(_text).toString()
+        }
         txtRule1.text = _styledText
 
         _text = getString(R.string.bsct_block_app)
-        _styledText = Html.fromHtml(_text, FROM_HTML_MODE_LEGACY)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            _styledText = Html.fromHtml(_text, FROM_HTML_MODE_LEGACY).toString()
+        }else{
+            _styledText= Html.fromHtml(_text).toString()
+        }
         //txtRule2.text = _styledText
 
         _text = getString(R.string.bsct_block_all)
-        _styledText = Html.fromHtml(_text, FROM_HTML_MODE_LEGACY)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            _styledText = Html.fromHtml(_text, FROM_HTML_MODE_LEGACY).toString()
+        }else{
+            _styledText = Html.fromHtml(_text).toString()
+        }
         txtRule3.text = _styledText
 
 
@@ -218,11 +234,15 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
 
         switchBlockApp.setOnCheckedChangeListener(null)
         switchBlockApp.setOnClickListener {
-            if(ipDetails.uid == 0){
+            if(ipDetails.uid == 0 || !FileSystemUID.isUIDAppRange(ipDetails.uid)){
                 switchBlockApp.isChecked = false
                 Utilities.showToastInMidLayout(contextVal, "Android cannot be firewalled", Toast.LENGTH_SHORT)
             } else if (ipDetails.appName != "Unknown") {
-                firewallApp(FirewallManager.checkInternetPermission(ipDetails.uid))
+                if(FileSystemUID.isUIDAppRange(ipDetails.uid)) {
+                    firewallApp(FirewallManager.checkInternetPermission(ipDetails.uid))
+                }else{
+                    switchBlockApp.isChecked = false
+                }
             }else{
                 if(DEBUG) Log.d(LOG_TAG,"setBlockUnknownConnections - ${switchBlockApp.isChecked} ")
                 PersistentState.setBlockUnknownConnections(contextVal, switchBlockApp.isChecked)
@@ -241,7 +261,11 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
             txtAppBlock.text = styledText*/
             txtAppBlockDesc.text = ipDetails.blockedByRule
             _text = getString(R.string.bsct_conn_conn_desc_blocked, protocol, ipDetails.port.toString(), time)
-            _styledText = Html.fromHtml(_text, FROM_HTML_MODE_LEGACY)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                _styledText = Html.fromHtml(_text, FROM_HTML_MODE_LEGACY).toString()
+            }else{
+                _styledText = Html.fromHtml(_text).toString()
+            }
             txtConnDetails.text = _styledText
             rulesInfoImg.visibility = View.VISIBLE
             //txtConnDetails.visibility = View.GONE
@@ -252,7 +276,11 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
                 txtAppBlockDesc.visibility = View.VISIBLE
                 txtAppBlockDesc.text = "Whitelisted"
             }
-            _styledText = Html.fromHtml(_text, FROM_HTML_MODE_LEGACY)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                _styledText = Html.fromHtml(_text, FROM_HTML_MODE_LEGACY).toString()
+            }else{
+                _styledText = Html.fromHtml(_text).toString()
+            }
             txtConnDetails.text = _styledText
             //val text = getString(R.string.bsct_conn_unblock_desc, time)
            /* txtAppBlock.text = text*/
@@ -328,11 +356,13 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
                     val appInfoRepository = mDb.appInfoRepository()
                     if (ipDetails.appName != null || ipDetails.appName!!.equals("Unknown")) {
                         val packageName = appInfoRepository.getPackageNameForAppName(ipDetails.appName!!)
+                        appInfoForPackage(packageName)
+                        /*val packageName = appInfoRepository.getPackageNameForAppName(ipDetails.appName!!)
                         activityManager.killBackgroundProcesses(packageName)
                         Toast.makeText(contextVal, "${ipDetails.appName} app killed.", Toast.LENGTH_SHORT).show()
-                        if (DEBUG) Log.d(LOG_TAG, "App kill - $packageName")
+                        if (DEBUG) Log.d(LOG_TAG, "App kill - $packageName")*/
                     } else {
-                        Toast.makeText(contextVal, "Can't able to kill the app", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(contextVal, "Cannot kill the app", Toast.LENGTH_SHORT).show()
                     }
                 }/*else if(appUIDList.size == 2){
                     appUIDList.forEach{
@@ -363,15 +393,32 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         }
     }
 
+    private fun appInfoForPackage(packageName: String) {
+        val activityManager: ActivityManager =
+            contextVal.getSystemService(Activity.ACTIVITY_SERVICE) as ActivityManager
+        activityManager.killBackgroundProcesses(packageName)
+
+        try {
+            //Open the specific App Info page:
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            intent.data = Uri.parse("package:$packageName")
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            //Open the generic Apps page:
+            val intent = Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS)
+            startActivity(intent)
+        }
+    }
+
     private fun firewallApp(isBlocked: Boolean) {
         var blockAllApps = false
         val appUIDList = appInfoRepository.getAppListForUID(ipDetails.uid)
         if(appUIDList[0].whiteListUniv1){
-            Toast.makeText(contextVal, getString(R.string.bsct_firewall_not_available_whitelist), Toast.LENGTH_SHORT).show()
+            Utilities.showToastInMidLayout(contextVal, getString(R.string.bsct_firewall_not_available_whitelist), Toast.LENGTH_SHORT)
             switchBlockApp.isChecked = false
             return
         }else if(appUIDList[0].isExcluded){
-            Toast.makeText(contextVal, getString(R.string.bsct_firewall_not_available_excluded), Toast.LENGTH_SHORT).show()
+            Utilities.showToastInMidLayout(contextVal, getString(R.string.bsct_firewall_not_available_excluded), Toast.LENGTH_SHORT)
             switchBlockApp.isChecked = false
             return
         }

@@ -17,6 +17,7 @@ limitations under the License.
 package com.celzero.bravedns.service
 
 import android.content.Context
+import android.content.pm.PackageManager
 import com.celzero.bravedns.data.IPDetails
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.ConnectionTracker
@@ -45,8 +46,8 @@ class IPTracker(var context: Context?) {
 
 
         @Synchronized
-        fun recordTransaction(context: Context?, ipDetails: IPDetails ) {
-            if(context != null) {
+        fun recordTransaction(context: Context?, ipDetails: IPDetails? ) {
+            if(context != null && ipDetails != null) {
                 insertToDB(context, ipDetails)
             }
             //recentIPActivity.add(ipDetails.timeStamp)
@@ -86,7 +87,7 @@ class IPTracker(var context: Context?) {
                     connTracker.ipAddress = ipDetails.destIP
                     connTracker.isBlocked = ipDetails.isBlocked
                     connTracker.uid = ipDetails.uid
-                    connTracker.port = ipDetails.destPort.toInt()
+                    connTracker.port = ipDetails.destPort
                     connTracker.protocol = ipDetails.protocol
                     connTracker.timeStamp = ipDetails.timeStamp
                     connTracker.blockedByRule = ipDetails.blockedByRule
@@ -99,16 +100,27 @@ class IPTracker(var context: Context?) {
                     connTracker.flag = getFlag(countryCode)
 
                     //appname
-                    var packageName = context.packageManager.getPackagesForUid(ipDetails.uid)
+                    var packageNameList = context.packageManager.getPackagesForUid(ipDetails.uid)
+                    //val appName = context.packageManager.getNameForUid(ipDetails.uid)
 
-                    if (packageName != null) {
-                        HomeScreenActivity.GlobalVariable.appList.forEach {
+                    if (packageNameList != null) {
+                        //connTracker.appName = appName
+                        val packageName = packageNameList[0]
+                        val appDetails = HomeScreenActivity.GlobalVariable.appList[packageName]
+                        if(appDetails != null){
+                            connTracker.appName = appDetails.appName
+                        }
+                        /*HomeScreenActivity.GlobalVariable.appList.forEach {
                             if (it.value.uid == ipDetails.uid) {
                                 connTracker.appName = it.value.appName
                             }
-                        }
+                        }*/
                         if (connTracker.appName.isNullOrBlank()) {
                             connTracker.appName = appInfoRepository.getAppNameForUID(ipDetails.uid)
+                        }
+                        if(connTracker.appName.isNullOrEmpty()){
+                            val appInfo = context.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+                            connTracker.appName = context.packageManager.getApplicationLabel(appInfo).toString()
                         }
                     } else {
                         val fileSystemUID = FileSystemUID.fromFileSystemUID(ipDetails.uid)

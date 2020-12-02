@@ -23,7 +23,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(entities = [AppInfo::class, CategoryInfo::class, ConnectionTracker::class, BlockedConnections::class, DoHEndpoint::class
-, DNSCryptEndpoint::class, DNSProxyEndpoint::class, DNSCryptRelayEndpoint::class,ProxyEndpoint::class],version = 5,exportSchema = false)
+, DNSCryptEndpoint::class, DNSProxyEndpoint::class, DNSCryptRelayEndpoint::class,ProxyEndpoint::class,DNSLogs::class],version = 6,exportSchema = false)
 abstract class AppDatabase : RoomDatabase(){
 
     companion object {
@@ -44,6 +44,7 @@ abstract class AppDatabase : RoomDatabase(){
             .addMigrations(MIGRATION_2_3)
             .addMigrations(MIGRATION_3_4)
             .addMigrations(MIGRATION_4_5)
+            .addMigrations(MIGRATION_5_6)
             .build()
 
         fun getDatabase(): AppDatabase? {
@@ -102,15 +103,24 @@ abstract class AppDatabase : RoomDatabase(){
                 database.execSQL("INSERT into DNSProxyEndpoint values (1,'Google','External','Nobody','8.8.8.8',53,0,0,0,0)")
                 database.execSQL("INSERT into DNSProxyEndpoint values (2,'Cloudflare','External','Nobody','1.1.1.1',53,0,0,0,0)")
                 database.execSQL("INSERT into DNSProxyEndpoint values (3,'Quad9','External','Nobody','9.9.9.9',53,0,0,0,0)")
-                database.execSQL("UPDATE DNSCryptEndpoint set dnsCryptName ='Cleanbrowsing family' where id = 1")
+                database.execSQL("UPDATE DNSCryptEndpoint set dnsCryptName ='Cleanbrowsing Family' where id = 1")
                 database.execSQL("UPDATE DNSCryptEndpoint set dnsCryptName ='Adguard' where id = 2")
-                database.execSQL("UPDATE DNSCryptEndpoint set dnsCryptName ='Adguard family' where id = 3")
+                database.execSQL("UPDATE DNSCryptEndpoint set dnsCryptName ='Adguard Family' where id = 3")
                 database.execSQL("UPDATE DNSCryptEndpoint set dnsCryptName ='Cleanbrowsing Security' where id = 4")
                 database.execSQL("UPDATE DNSCryptRelayEndpoint set dnsCryptRelayName ='Anon-AMS-NL' where id = 1")
                 database.execSQL("UPDATE DNSCryptRelayEndpoint set dnsCryptRelayName ='Anon-CS-FR' where id = 2")
                 database.execSQL("UPDATE DNSCryptRelayEndpoint set dnsCryptRelayName ='Anon-CS-SE' where id = 3")
                 database.execSQL("UPDATE DNSCryptRelayEndpoint set dnsCryptRelayName ='Anon-CS-USCA' where id = 4")
                 database.execSQL("UPDATE DNSCryptRelayEndpoint set dnsCryptRelayName ='Anon-Tiarap' where id = 5")
+            }
+        }
+
+        private val MIGRATION_5_6 : Migration = object : Migration(5,6){
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE 'DNSLogs' ('id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'query' TEXT NOT NULL, 'time' INTEGER NOT NULL, 'flag' TEXT NOT NULL, 'resolver' TEXT NOT NULL, 'latency' INTEGER NOT NULL, 'typeName' TEXT NOT NULL, 'isBlocked' INTEGER NOT NULL, 'blockLists' LONGTEXT NOT NULL,  'serverIP' TEXT NOT NULL, 'relayIP' TEXT NOT NULL, 'responseTime' INTEGER NOT NULL, 'response' TEXT NOT NULL, 'status' TEXT NOT NULL,'dnsType' INTEGER NOT NULL) ")
+                //https://basic.bravedns.com/1:YBIgACABAHAgAA== - New block list configured
+                database.execSQL("UPDATE DoHEndpoint set dohURL  = 'https://basic.bravedns.com/1:YBIgACABAHAgAA==' where id = 3")
+                database.execSQL("UPDATE DNSProxyEndpoint set  proxyIP = '9.9.9.10' where id = 3")
             }
         }
 
@@ -125,6 +135,7 @@ abstract class AppDatabase : RoomDatabase(){
     abstract fun dnsCryptRelayEndpointDAO() : DNSCryptRelayEndpointDAO
     abstract fun dnsProxyEndpointDAO() : DNSProxyEndpointDAO
     abstract fun proxyEndpointDAO() : ProxyEndpointDAO
+    abstract fun dnsLogDAO() : DNSLogDAO
 
     fun appInfoRepository() = AppInfoRepository(appInfoDAO())
     fun categoryInfoRepository() = CategoryInfoRepository(categoryInfoDAO())
@@ -135,5 +146,6 @@ abstract class AppDatabase : RoomDatabase(){
     fun dnsCryptRelayEndpointsRepository() = DNSCryptRelayEndpointRepository(dnsCryptRelayEndpointDAO())
     fun dnsProxyEndpointRepository() = DNSProxyEndpointRepository(dnsProxyEndpointDAO())
     fun proxyEndpointRepository() = ProxyEndpointRepository(proxyEndpointDAO())
+    fun dnsLogRepository() = DNSLogRepository(dnsLogDAO())
 
 }

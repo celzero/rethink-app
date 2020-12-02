@@ -42,7 +42,7 @@ class AppMode(val context: Context) {
 
     fun getDNSMode(): Long {
         if (appDNSMode == -1L) {
-            var dnsType = PersistentState.getDNSType(context)
+            val dnsType = PersistentState.getDNSType(context)
             if (dnsType == 1) {
                 if (PersistentState.getAllDNSTraffic(context)) {
                     appDNSMode = Settings.DNSModePort
