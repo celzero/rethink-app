@@ -477,7 +477,7 @@ class PersistentState {
             editor.apply()
         }
 
-        fun setAllowByPass(context: Context, isEnabled : Boolean){
+        fun setAllowByPass(context: Context, isEnabled: Boolean){
             val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
             editor.putBoolean(ALLOW_BYPASS, isEnabled)
             editor.apply()

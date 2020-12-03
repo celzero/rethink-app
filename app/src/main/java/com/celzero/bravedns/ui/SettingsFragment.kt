@@ -99,6 +99,7 @@ class SettingsFragment : Fragment() {
     private lateinit var autoStartSwitch: SwitchCompat
     private lateinit var killAppSwitch: SwitchCompat
     private lateinit var allowByPassSwitch: SwitchCompat
+    private lateinit var allowByPassDescText : TextView
     private lateinit var allowByPassProgressBar: ProgressBar
 
     //private lateinit var alwaysOnSwitch: SwitchCompat
@@ -144,6 +145,7 @@ class SettingsFragment : Fragment() {
     companion object {
         var enqueue: Long = 0
         var downloadInProgress = -1
+        private const val FILE_LOG_TAG = "Settings"
     }
 
     private fun initView(view: View) {
@@ -179,6 +181,7 @@ class SettingsFragment : Fragment() {
         autoStartSwitch = view.findViewById(R.id.settings_activity_auto_start_switch)
         killAppSwitch = view.findViewById(R.id.settings_activity_kill_app_switch)
         allowByPassSwitch = view.findViewById(R.id.settings_activity_allow_bypass_switch)
+        allowByPassDescText = view.findViewById(R.id.settings_activity_allow_bypass_desc)
         allowByPassProgressBar = view.findViewById(R.id.settings_activity_allow_bypass_progress)
         allowByPassProgressBar.visibility = View.GONE
         //alwaysOnSwitch = view.findViewById(R.id.settings_activity_always_on_vpn_switch)
@@ -206,7 +209,7 @@ class SettingsFragment : Fragment() {
         } else {
             httpProxyContainer.visibility = View.GONE
         }
-
+        allowByPassSwitch.isChecked = PersistentState.getAllowByPass(requireContext())
         timeStamp = PersistentState.getLocalBlockListDownloadTime(requireContext())
 
         if(PersistentState.getDownloadSource(requireContext()) == DOWNLOAD_SOURCE_OTHERS){
@@ -241,7 +244,7 @@ class SettingsFragment : Fragment() {
         privateDNSSwitch.isChecked = PersistentState.getAllowPrivateDNS(requireContext())
         autoStartSwitch.isChecked = PersistentState.getPrefAutoStartBootUp(requireContext())
         killAppSwitch.isChecked = PersistentState.getKillAppOnFirewall(requireContext())
-        allowByPassSwitch.isChecked = PersistentState.getAllowByPass(requireContext())
+
         socks5Switch.isChecked = PersistentState.getSocks5Enabled(requireContext())
         if (socks5Switch.isChecked) {
             val sock5Proxy = proxyEndpointRepository.getConnectedProxy()
@@ -279,6 +282,22 @@ class SettingsFragment : Fragment() {
             excludeListCountText.text = "$it/$appCount apps excluded."
         })
 
+
+    }
+
+    private fun detectLockDownMode() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val alwaysOn = android.provider.Settings.Secure.getString(requireContext().contentResolver, "always_on_vpn_app")
+            val lockDown = android.provider.Settings.Secure.getInt(requireContext().contentResolver, "always_on_vpn_lockdown", 0)
+            if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG isLockDownEnabled - $lockDown , $alwaysOn")
+            if (lockDown != 0 && context?.packageName == alwaysOn) {
+                allowByPassSwitch.isEnabled = false
+                allowByPassDescText.text = getString(R.string.settings_allow_bypass_lockdown_desc)
+            } else {
+                allowByPassSwitch.isEnabled = true
+                allowByPassDescText.text = getString(R.string.settings_allow_bypass_desc)
+            }
+        }
 
     }
 
@@ -438,6 +457,7 @@ class SettingsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        detectLockDownMode()
         if (PersistentState.isLocalBlockListEnabled(requireContext()) && PersistentState.isBlockListFilesDownloaded(requireContext()) && PersistentState.getLocalBlockListStamp(requireContext()).isNullOrEmpty()) {
             onDeviceBlockListDesc.text = "Configure blocklists"
             onDeviceBlockListProgress.visibility = View.GONE
