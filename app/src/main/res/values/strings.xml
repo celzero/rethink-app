@@ -375,6 +375,9 @@
     <string name="always_on_dialog_positive_btn">Go to Settings</string>
     <string name="always_on_dialog_negative_btn">Cancel</string>
 
+    <string name="settings_allow_bypass_desc">Allow requesting apps to bypass RethinkDNS firewall on-demand. Some audio/video conference apps like Zoom and WhatsApp may require an on-demand bypass to function properly.</string>
+    <string name="settings_allow_bypass_lockdown_desc">"Disabled. Settings->VPN->Block connections without VPN" is enabled for RethinkDNS, enabling the feature will block the internet connection of the apps which are trying to bypass the VPN.</string>
+
     <string name="system_apps_warning">Some system apps are critical to proper functioning of a device. Block them only if you know what you are doing.</string>
     <string name="system_components_warning">Some system components are critical to proper functioning of a device. Block them only if you know what you are doing.</string>
 

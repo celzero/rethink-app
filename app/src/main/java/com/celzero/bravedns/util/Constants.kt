@@ -63,7 +63,7 @@ class Constants {
 
         const val DELAY_FOR_BLOCK_RESPONSE : Long = 30000
         const val BACKGROUND_DELAY_CHECK : Long = 3000
-        const val BACKGROUND_DELAY_CHECK_REMAINING : Long = 27000
+        const val BACKGROUND_DELAY_CHECK_REMAINING : Long = 24000
         const val BACKGROUND_DELAY_CHECK_3 : Long = 12000
 
         const val DNS_TYPE_DOH = 1
