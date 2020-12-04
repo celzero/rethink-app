@@ -204,7 +204,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                 //Don't include DNS and private DNS request in the list
                 // FIXME: 04-12-2020 Removed the app range check for testing.
                 //if ((uid != 0 || uid != -1) && FileSystemUID.isUIDAppRange(uid)) {
-                if ((uid != -1 && uid == -2000)) {
+                if ((uid != -1 && uid != -2000)) {
                     if ((destIp != GoVpnAdapter.FAKE_DNS_IP && destPort != DNS_REQUEST_PORT)) {
                         ipDetails.isBlocked = true
                         ipDetails.blockedByRule = BlockedRuleNames.RULE3.ruleName
@@ -218,7 +218,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
             } else if (isBackgroundEnabled) { //Check whether the background is enabled and act based on it
                 // FIXME: 04-12-2020 Removed the app range check for testing.
                 //if ((uid != 0 || uid != -1) && FileSystemUID.isUIDAppRange(uid)) {
-                if ((uid != -1 && uid == -2000)) {
+                if ((uid != -1 && uid != -2000)) {
                     var isBGBlock = true
                     if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Background blocked $uid, $destIp, before sleep: $uid, $destIp, $isBGBlock, ${System.currentTimeMillis()}")
                     for (i in 2 downTo 1) {
@@ -249,7 +249,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
 
             //Check whether any rules are set block the IP/App.
             var blockedBy = ""
-            if (uid != -1 && uid == -2000) {
+            if (uid != -1 && uid != -2000) {
                 isBlocked = isUidBlocked(uid)
                 if (isBlocked) {
                     blockedBy = BlockedRuleNames.RULE1.ruleName
