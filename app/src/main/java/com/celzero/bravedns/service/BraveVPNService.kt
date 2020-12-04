@@ -52,9 +52,12 @@ import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.backgroundAllowedUID
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
-import com.celzero.bravedns.util.*
+import com.celzero.bravedns.util.BackgroundAccessibilityService
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.BACKGROUND_DELAY_CHECK_REMAINING
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Protocol
+import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -175,7 +178,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
             }
 
             if (PersistentState.getBlockUnknownConnections(this) && destIp != GoVpnAdapter.FAKE_DNS_IP) {
-                if (uid == -1) {
+                if (uid == -1 || uid == -2000)  {
                     if ((destIp != GoVpnAdapter.FAKE_DNS_IP && destPort != DNS_REQUEST_PORT)) {
                         ipDetails.isBlocked = true
                         ipDetails.blockedByRule = BlockedRuleNames.RULE5.ruleName
@@ -199,7 +202,9 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
             if(DEBUG) Log.d(LOG_TAG,"$FILE_LOG_TAG : isScreenLockEnabled: $isScreenLocked")
             if (isScreenLocked) {
                 //Don't include DNS and private DNS request in the list
-                if ((uid != 0 || uid != -1) && FileSystemUID.isUIDAppRange(uid)) {
+                // FIXME: 04-12-2020 Removed the app range check for testing.
+                //if ((uid != 0 || uid != -1) && FileSystemUID.isUIDAppRange(uid)) {
+                if ((uid != -1 && uid == -2000)) {
                     if ((destIp != GoVpnAdapter.FAKE_DNS_IP && destPort != DNS_REQUEST_PORT)) {
                         ipDetails.isBlocked = true
                         ipDetails.blockedByRule = BlockedRuleNames.RULE3.ruleName
@@ -211,7 +216,9 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                 }
 
             } else if (isBackgroundEnabled) { //Check whether the background is enabled and act based on it
-                if ((uid != 0 || uid != -1) && FileSystemUID.isUIDAppRange(uid)) {
+                // FIXME: 04-12-2020 Removed the app range check for testing.
+                //if ((uid != 0 || uid != -1) && FileSystemUID.isUIDAppRange(uid)) {
+                if ((uid != -1 && uid == -2000)) {
                     var isBGBlock = true
                     if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Background blocked $uid, $destIp, before sleep: $uid, $destIp, $isBGBlock, ${System.currentTimeMillis()}")
                     for (i in 2 downTo 1) {
@@ -226,20 +233,23 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                     }
                     if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Background blocked $uid, $destIp, after sleep: $uid, $destIp, $isBGBlock, ${System.currentTimeMillis()}")
                     if (isBGBlock) {
-                        if ((destIp != GoVpnAdapter.FAKE_DNS_IP && destPort != DNS_REQUEST_PORT)) {
-                            ipDetails.isBlocked = true
-                            ipDetails.blockedByRule = BlockedRuleNames.RULE4.ruleName
-                            sendConnTracking(ipDetails)
-                        }
                         Thread.sleep(BACKGROUND_DELAY_CHECK_REMAINING)
-                        return isBGBlock
+                        if (!backgroundAllowedUID.containsKey(uid)) {
+                            if ((destIp != GoVpnAdapter.FAKE_DNS_IP && destPort != DNS_REQUEST_PORT)) {
+                                ipDetails.isBlocked = true
+                                ipDetails.blockedByRule = BlockedRuleNames.RULE4.ruleName
+                                sendConnTracking(ipDetails)
+                            }
+                            return isBGBlock
+                        }
+
                     }
                 }
             }
 
             //Check whether any rules are set block the IP/App.
             var blockedBy = ""
-            if (uid != 0 || uid != -1) {
+            if (uid != -1 && uid == -2000) {
                 isBlocked = isUidBlocked(uid)
                 if (isBlocked) {
                     blockedBy = BlockedRuleNames.RULE1.ruleName
