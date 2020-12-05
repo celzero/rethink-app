@@ -20,6 +20,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.VpnService
+import android.text.TextUtils
 import android.util.Log
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
@@ -29,9 +30,15 @@ import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 class BraveAutoStartReceiver  : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
-
+        val alwaysOnPackage = android.provider.Settings.Secure.getString(context?.contentResolver, "always_on_vpn_app")
+        var isAlwaysOnEnabled = false
+        if (!TextUtils.isEmpty(alwaysOnPackage)) {
+            if (context?.packageName == alwaysOnPackage) {
+                isAlwaysOnEnabled = true
+            }
+        }
         if (intent!!.action.equals(Intent.ACTION_BOOT_COMPLETED) || intent.action.equals(Intent.ACTION_REBOOT)) {
-            if (PersistentState.getPrefAutoStartBootUp(context!!) && PersistentState.getVpnEnabled(context)) {
+            if (PersistentState.getPrefAutoStartBootUp(context!!) && PersistentState.getVpnEnabled(context) && !isAlwaysOnEnabled) {
                 val prepareVpnIntent: Intent? = try {
                     VpnService.prepare(context)
                 } catch (e: NullPointerException) {
