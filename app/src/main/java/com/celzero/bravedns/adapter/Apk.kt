@@ -1,4 +1,3 @@
-package com.celzero.bravedns.adapter
 /*
 Copyright 2020 RethinkDNS and its authors
 
@@ -14,6 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+package com.celzero.bravedns.adapter
+
 //TODO : IS THIS REQUIRED??
 data class Apk(val appInfo: String,
                val appName: String,

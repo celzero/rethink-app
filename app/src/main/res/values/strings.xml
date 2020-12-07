@@ -413,7 +413,7 @@
     <string name="dns_proxy_remove_success">DNS Proxy deleted.</string>
 
     <string name="doh_brave_pro_configure">Configure RethinkDNS Plus</string>
-    <string name="doh_brave_pro_configure_desc">Choose from 170+ blocklists to configure RethinkDNS Plus.</string>
+    <string name="doh_brave_pro_configure_desc">Configure RethinkDNS Plus to block adult content, dating and gambling websites, malware, spyware and more.</string>
 
     <string name="local_blocklist_download">Download Blocklists</string>
     <string name="local_blocklist_download_desc">Download blocklists (around 40MB) to use this feature?</string>

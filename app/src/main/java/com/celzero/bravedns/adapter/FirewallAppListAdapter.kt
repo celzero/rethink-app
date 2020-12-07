@@ -29,10 +29,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatToggleButton
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.SwitchCompat
+import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.database.AppDatabase
@@ -139,10 +141,14 @@ class FirewallAppListAdapter internal constructor(
 
 
         try {
-            val appIcon = context.packageManager.getApplicationIcon(appInfoDetail.packageInfo)
-            mIconImageView.setImageDrawable(appIcon)
+           /* val appIcon = context.packageManager.getApplicationIcon(appInfoDetail.packageInfo)
+            mIconImageView.setImageDrawable(appIcon)*/
+            Glide.with(context).load(context.packageManager.getApplicationIcon(appInfoDetail.packageInfo))
+                .into(mIconImageView)
         } catch (e: Exception) {
-            mIconImageView.setImageDrawable(context.getDrawable(R.drawable.default_app_icon))
+            //mIconImageView.setImageDrawable(context.getDrawable(R.drawable.default_app_icon))
+            Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                .into(mIconImageView)
             Log.e(LOG_TAG, "Application Icon not available for package: ${appInfoDetail.packageInfo}" + e.message, e)
         }
         mLabelTextView.text = appInfoDetail.appName
@@ -370,23 +376,15 @@ class FirewallAppListAdapter internal constructor(
         try {
             if (list != null && list.isNotEmpty()) {
                 if (numberOfApps != 0) {
-                    if (numberOfApps >= 4) {
-                        imageHolder1.setImageDrawable(context.packageManager.getApplicationIcon(list[0].packageInfo))
-                        imageHolder2.setImageDrawable(context.packageManager.getApplicationIcon(list[1].packageInfo))
-                        //imageHolder3.setImageDrawable(context.packageManager.getApplicationIcon(list[2].packageInfo))
-                        //imageHolder4.setImageDrawable(context.packageManager.getApplicationIcon(list[3].packageInfo))
-                    } else if (numberOfApps == 3) {
-                        imageHolder1.setImageDrawable(context.packageManager.getApplicationIcon(list[0].packageInfo))
-                        imageHolder2.setImageDrawable(context.packageManager.getApplicationIcon(list[1].packageInfo))
-                        //imageHolder3.setImageDrawable(context.packageManager.getApplicationIcon(list[2].packageInfo))
-                        //imageHolder4.visibility = View.GONE
-                    } else if (numberOfApps == 2) {
-                        imageHolder1.setImageDrawable(context.packageManager.getApplicationIcon(list[0].packageInfo))
-                        imageHolder2.setImageDrawable(context.packageManager.getApplicationIcon(list[1].packageInfo))
-                        //imageHolder3.visibility = View.GONE
-                        //imageHolder4.visibility = View.GONE
+                    if (numberOfApps >= 2) {
+                        Glide.with(context).load(context.packageManager.getApplicationIcon(list[0].packageInfo))
+                            .into(imageHolder1)
+                        Glide.with(context).load(context.packageManager.getApplicationIcon(list[1].packageInfo))
+                            .into(imageHolder2)
                     } else {
-                        imageHolder1.setImageDrawable(context.packageManager.getApplicationIcon(list[0].packageInfo))
+                        Glide.with(context).load(context.packageManager.getApplicationIcon(list[0].packageInfo))
+                            .into(imageHolder1)
+                        //imageHolder1.setImageDrawable(context.packageManager.getApplicationIcon(list[0].packageInfo))
                         imageHolder2.visibility = View.GONE
                         //imageHolder3.visibility = View.GONE
                         //imageHolder4.visibility = View.GONE

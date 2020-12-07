@@ -24,11 +24,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.service.BraveVPNService
@@ -129,13 +131,18 @@ class ConnectionTrackerAdapter(val context : Context) : PagedListAdapter<Connect
                         } else if (appArray.size == 2) {
                             fqdnView!!.text = "${connTracker.appName} + $appCount other app"
                         }
-                        appIcon!!.setImageDrawable(context.packageManager.getApplicationIcon(appArray.get(0)!!))
+                        Glide.with(context)
+                            .load(context.packageManager.getApplicationIcon(appArray[0]!!))
+                            .into(appIcon!!)
                     } catch (e: Exception) {
-                        appIcon!!.setImageDrawable(context.getDrawable(R.drawable.default_app_icon))
+                        Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                            .into(appIcon!!)
                         Log.e(LOG_TAG, "Package Not Found - " + e.message, e)
                     }
                 }else{
-                    appIcon!!.setImageDrawable(context.getDrawable(R.drawable.default_app_icon))
+                    Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                        .onlyRetrieveFromCache(true)
+                        .into(appIcon!!)
                 }
 
                 parentView!!.setOnClickListener {
@@ -149,6 +156,7 @@ class ConnectionTrackerAdapter(val context : Context) : PagedListAdapter<Connect
             }
 
         }
+
 
     }
 

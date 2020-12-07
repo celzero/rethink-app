@@ -21,12 +21,15 @@ import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.Activity
 import android.app.ActivityManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.graphics.Color
 import android.os.Environment
+import android.provider.Settings
+import android.text.TextUtils.SimpleStringSplitter
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -86,19 +89,12 @@ class Utilities {
         }
 
         fun hasPermissionToReadPhoneStats(context: Context): Boolean {
-            return ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.READ_PHONE_STATE
-            ) != PackageManager.PERMISSION_DENIED
+            return ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_DENIED
         }
 
 
         fun requestPhoneStateStats(context: Activity) {
-            ActivityCompat.requestPermissions(
-                context,
-                arrayOf(Manifest.permission.READ_PHONE_STATE),
-                READ_PHONE_STATE_REQUEST
-            )
+            ActivityCompat.requestPermissions(context, arrayOf(Manifest.permission.READ_PHONE_STATE), READ_PHONE_STATE_REQUEST)
         }
 
         fun isServiceRunning(c: Context, serviceClass: Class<*>): Boolean {
@@ -140,7 +136,7 @@ class Utilities {
             }
         }
 
-        fun isAccessibilityServiceEnabled(context: Context, service: Class<out AccessibilityService?>): Boolean {
+        private fun isAccessibilityServiceEnabled(context: Context, service: Class<out AccessibilityService?>): Boolean {
             val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
             val enabledServices = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
             for (enabledService in enabledServices) {
@@ -150,6 +146,26 @@ class Utilities {
             if(DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled failure: ${context.packageName},  ${service.name}, return size: ${enabledServices.size}")
             return false
         }
+
+
+        fun isAccessibilityServiceEnabledEnhanced(context: Context, accessibilityService: Class<out AccessibilityService?>): Boolean {
+            try {
+                val expectedComponentName = ComponentName(context, accessibilityService)
+                val enabledServicesSetting: String = Settings.Secure.getString(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES) ?: return false
+                val colonSplitter = SimpleStringSplitter(':')
+                colonSplitter.setString(enabledServicesSetting)
+                while (colonSplitter.hasNext()) {
+                    val componentNameString = colonSplitter.next()
+                    val enabledService = ComponentName.unflattenFromString(componentNameString)
+                    if (enabledService != null && enabledService == expectedComponentName) return true
+                }
+                return false
+            }catch (e: Exception){
+                return isAccessibilityServiceEnabled(context, accessibilityService)
+            }
+        }
+
+
 
         private var countryMap: CountryMap? = null
 
@@ -188,11 +204,7 @@ class Utilities {
             val offset = flagBase - alphaBase
             val firstHalf = Character.codePointAt(countryCode, 0) + offset
             val secondHalf = Character.codePointAt(countryCode, 1) + offset
-            return String(Character.toChars(firstHalf)) + String(
-                Character.toChars(
-                    secondHalf
-                )
-            )
+            return String(Character.toChars(firstHalf)) + String(Character.toChars(secondHalf))
         }
 
         fun makeAddressPair(countryCode: String?, ipAddress: String): String {
@@ -244,8 +256,8 @@ class Utilities {
                 val ip = InetAddress.getByName(ipAddress)
                 val regex = Regex("(^127\\.0\\.0\\.1)|(^10\\.)|(^172\\.1[6-9]\\.)|(^172\\.2[0-9]\\.)|(^172\\.3[0-1]\\.)|(^192\\.168\\.)")
                 ip.isAnyLocalAddress || ipAddress.matches(regex) || ipAddress == "0.0.0.0"
-            }catch (e : Exception){
-                Log.w(LOG_TAG, "Exception while converting string to inetaddress, ${e.message}",e)
+            }catch (e: Exception){
+                Log.w(LOG_TAG, "Exception while converting string to inetaddress, ${e.message}", e)
                 false
             }
         }
@@ -253,11 +265,7 @@ class Utilities {
 
         fun getTypeName(type: Int): String {
             // From https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-4
-            val names = arrayOf("0", "A", "NS", "MD", "MF", "CNAME", "SOA", "MB", "MG", "MR", "NULL", "WKS",
-            "PTR", "HINFO", "MINFO", "MX", "TXT", "RP", "AFSDB", "X25", "ISDN", "RT", "NSAP", "NSAP+PTR",
-            "SIG", "KEY", "PX", "GPOS", "AAAA", "LOC", "NXT", "EID", "NIMLOC", "SRV", "ATMA", "NAPTR", "KX",
-             "CERT", "A6", "DNAME", "SINK", "OPT", "APL", "DS", "SSHFP", "IPSECKEY", "RRSIG", "NSEC", "DNSKEY",
-              "DHCID", "NSEC3", "NSEC3PARAM", "TLSA", "SMIMEA")
+            val names = arrayOf("0", "A", "NS", "MD", "MF", "CNAME", "SOA", "MB", "MG", "MR", "NULL", "WKS", "PTR", "HINFO", "MINFO", "MX", "TXT", "RP", "AFSDB", "X25", "ISDN", "RT", "NSAP", "NSAP+PTR", "SIG", "KEY", "PX", "GPOS", "AAAA", "LOC", "NXT", "EID", "NIMLOC", "SRV", "ATMA", "NAPTR", "KX", "CERT", "A6", "DNAME", "SINK", "OPT", "APL", "DS", "SSHFP", "IPSECKEY", "RRSIG", "NSEC", "DNSKEY", "DHCID", "NSEC3", "NSEC3PARAM", "TLSA", "SMIMEA")
             return if (type < names.size) {
                 names[type]
             } else String.format(Locale.ROOT, "%d", type)

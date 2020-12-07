@@ -109,9 +109,13 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:1.1.0-alpha01"
 
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
-    implementation 'com.google.android.play:core:1.8.3'//for new version updater
+    implementation 'com.google.android.play:core:1.9.0'//for new version updater
 
     // For go-tun2socks
     implementation project(":tun2socks")
+
+    //Glide implementation
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 
 }
