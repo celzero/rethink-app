@@ -59,11 +59,13 @@ class Constants {
         //Network monitor
         const val FIREWALL_CONNECTIONS_IN_DB = 2500
 
+        const val MISSING_UID = -2000
+
         const val RETHINK_DNS_PLUS = "RethinkDNS Plus"
 
         const val DELAY_FOR_BLOCK_RESPONSE : Long = 30000
-        const val BACKGROUND_DELAY_CHECK : Long = 3000
-        const val BACKGROUND_DELAY_CHECK_REMAINING : Long = 24000
+        const val BACKGROUND_DELAY_CHECK : Long = 4000
+        const val BACKGROUND_DELAY_CHECK_REMAINING : Long = 22000
         const val BACKGROUND_DELAY_CHECK_3 : Long = 12000
 
         const val DNS_TYPE_DOH = 1

@@ -259,7 +259,7 @@ class DoHEndpointAdapter(val context: Context, val listener: UIUpdateInterface) 
             builder.setMessage(R.string.doh_brave_pro_configure_desc)
             builder.setCancelable(true)
             //performing positive action
-            builder.setPositiveButton("Proceed") { dialogInterface, which ->
+            builder.setPositiveButton("configure") { dialogInterface, which ->
                 val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
                 intent.putExtra("location",DNSConfigureWebViewActivity.REMOTE)
                 intent.putExtra("stamp", "")

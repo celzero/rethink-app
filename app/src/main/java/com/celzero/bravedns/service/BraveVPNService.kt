@@ -56,6 +56,7 @@ import com.celzero.bravedns.util.BackgroundAccessibilityService
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.BACKGROUND_DELAY_CHECK_REMAINING
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
@@ -178,7 +179,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
             }
 
             if (PersistentState.getBlockUnknownConnections(this) && destIp != GoVpnAdapter.FAKE_DNS_IP) {
-                if (uid == -1 || uid == -2000)  {
+                if (uid == -1 || uid == MISSING_UID)  {
                     if ((destIp != GoVpnAdapter.FAKE_DNS_IP && destPort != DNS_REQUEST_PORT)) {
                         ipDetails.isBlocked = true
                         ipDetails.blockedByRule = BlockedRuleNames.RULE5.ruleName
@@ -204,7 +205,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                 //Don't include DNS and private DNS request in the list
                 // FIXME: 04-12-2020 Removed the app range check for testing.
                 //if ((uid != 0 || uid != -1) && FileSystemUID.isUIDAppRange(uid)) {
-                if ((uid != -1 && uid != -2000)) {
+                if ((uid != -1 && uid != MISSING_UID)) {
                     if ((destIp != GoVpnAdapter.FAKE_DNS_IP && destPort != DNS_REQUEST_PORT)) {
                         ipDetails.isBlocked = true
                         ipDetails.blockedByRule = BlockedRuleNames.RULE3.ruleName
@@ -218,7 +219,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
             } else if (isBackgroundEnabled) { //Check whether the background is enabled and act based on it
                 // FIXME: 04-12-2020 Removed the app range check for testing.
                 //if ((uid != 0 || uid != -1) && FileSystemUID.isUIDAppRange(uid)) {
-                if ((uid != -1 && uid != -2000)) {
+                if ((uid != -1 && uid != MISSING_UID)) {
                     var isBGBlock = true
                     if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Background blocked $uid, $destIp, before sleep: $uid, $destIp, $isBGBlock, ${System.currentTimeMillis()}")
                     for (i in 2 downTo 1) {
@@ -249,7 +250,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
 
             //Check whether any rules are set block the IP/App.
             var blockedBy = ""
-            if (uid != -1 && uid != -2000) {
+            if (uid != -1 && uid != MISSING_UID) {
                 isBlocked = isUidBlocked(uid)
                 if (isBlocked) {
                     blockedBy = BlockedRuleNames.RULE1.ruleName
@@ -502,7 +503,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         blockUDPTraffic = PersistentState.getUDPBlockedSettings(this)
         privateDNSOverride = PersistentState.getAllowPrivateDNS(this)
         isScreenLocked = PersistentState.getScreenLockData(this)
-        isBackgroundEnabled = PersistentState.getBackgroundEnabled(this) && Utilities.isAccessibilityServiceEnabled(this, BackgroundAccessibilityService::class.java)
+        isBackgroundEnabled = PersistentState.getBackgroundEnabled(this) && Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
         privateDNSOverride = PersistentState.getAllowPrivateDNS(this)
 
         registerReceiversForScreenState()
@@ -692,7 +693,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
             if (appMode == null) {
                 appMode = AppMode.getInstance(this)
             }
-            isBackgroundEnabled = PersistentState.getBackgroundEnabled(this) && Utilities.isAccessibilityServiceEnabled(this, BackgroundAccessibilityService::class.java)
+            isBackgroundEnabled = PersistentState.getBackgroundEnabled(this) && Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
             Log.i(LOG_TAG, "$FILE_LOG_TAG preference for background mode is modified - $isBackgroundEnabled")
             if (isBackgroundEnabled) {
                 restartVpn(appMode?.getDNSMode()!!, appMode?.getFirewallMode()!!, appMode?.getProxyMode()!!)

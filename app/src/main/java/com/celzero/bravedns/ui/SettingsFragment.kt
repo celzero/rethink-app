@@ -714,7 +714,7 @@ class SettingsFragment : Fragment() {
         builder.setMessage(R.string.local_blocklist_download_desc)
         builder.setCancelable(false)
         //performing positive action
-        builder.setPositiveButton("Proceed") { dialogInterface, which ->
+        builder.setPositiveButton("Download") { dialogInterface, which ->
             downloadInProgress = 0
             onDeviceBlockListDesc.text = "Download in progress..."
             onDeviceBlockListSwitch.visibility = View.GONE

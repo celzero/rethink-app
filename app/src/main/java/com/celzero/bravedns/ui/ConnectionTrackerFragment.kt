@@ -86,7 +86,7 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
         recyclerAdapter = ConnectionTrackerAdapter(requireContext())
         viewModel.connectionTrackerList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(recyclerAdapter!!::submitList))
         recyclerView!!.adapter = recyclerAdapter
-        recyclerView!!.setItemViewCacheSize(100)
+        //recyclerView!!.setItemViewCacheSize(100)
 
         editSearchView!!.setOnQueryTextListener(this)
         editSearchView!!.setOnClickListener {

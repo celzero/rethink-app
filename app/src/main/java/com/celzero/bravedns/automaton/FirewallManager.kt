@@ -117,7 +117,7 @@ class FirewallManager(service: BackgroundAccessibilityService) {
         } else {
             event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
         }
-        if(DEBUG) Log.d(LOG_TAG,"FirewallManager: onAccessibilityEvent: $eventPackageName, ${event.eventType}, $hasContentDisappeared")
+        if(DEBUG) Log.d(LOG_TAG,"FirewallManager: onAccessibilityEvent: ${event.packageName}, ${event.eventType}, $hasContentDisappeared")
         // is the package showing content and being backgrounded?
         if (hasContentDisappeared) {
             if (GlobalVariable.appList.containsKey(eventPackageName)){//PermissionsManager.packageRules.contains(eventPackageName)) {
@@ -152,9 +152,9 @@ class FirewallManager(service: BackgroundAccessibilityService) {
             }else{
                 backgroundAllowedUID.clear()
             }
-            //printAllowedUID()
+            printAllowedUID()
         }else{
-            //if(DEBUG) Log.d(LOG_TAG,"addOrRemovePackageForBackground:isPackageLauncher ${packageName}, true")
+            if(DEBUG) Log.d(LOG_TAG,"addOrRemovePackageForBackground:isPackageLauncher ${packageName}, true")
             addOrRemovePackageForBackground(true)
         }
 

@@ -21,7 +21,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -53,15 +52,6 @@ import java.net.URL
 
 class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
 
-    private val SPINNER_VALUE_NO_FILTER = 0
-    private val SPINNER_VALUE_FAMILY = 1
-    private val SPINNER_VALUE_FREE_BRAVE_DNS = 2
-    private val SPINNER_VALUE_CUSTOM_FILTER = 3
-    private val SPINNER_VALUE_BRAVE_COMING_SOON = 4
-
-
-
-
     private var recyclerView: RecyclerView? = null
     //private lateinit var context: Context
     private var layoutManager: RecyclerView.LayoutManager? = null
@@ -77,7 +67,7 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
     private lateinit var filterIcon: ImageView
     private lateinit var deleteIcon: ImageView
 
-    private lateinit var recyclerHeadingLL : LinearLayout
+   // private lateinit var recyclerHeadingLL : LinearLayout
     private lateinit var noLogsTxt : TextView
     private lateinit var topLayoutRL: RelativeLayout
 
@@ -122,7 +112,7 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
         filterIcon = includeView.findViewById(R.id.query_list_filter_icon)
         deleteIcon = includeView.findViewById(R.id.query_list_delete_icon)
 
-        recyclerHeadingLL = includeView.findViewById(R.id.query_list_recycler_heading)
+        //recyclerHeadingLL = includeView.findViewById(R.id.query_list_recycler_heading)
         noLogsTxt = includeView.findViewById(R.id.dns_log_no_log_text)
 
         recyclerView!!.setHasFixedSize(true)
@@ -170,21 +160,21 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
             val dohDetail = appMode?.getDOHDetails()
             currentDNSURL.text = resources.getString(R.string.configure_dns_connected_doh_status)
             currentDNSStatus.text = resources.getString(R.string.configure_dns_connection_name) + " "+ dohDetail?.dohName
-            recyclerHeadingLL.visibility = View.VISIBLE
+            //recyclerHeadingLL.visibility = View.GONE
             recyclerView?.visibility = View.VISIBLE
             noLogsTxt.visibility = View.GONE
         } else if (dnsType == 2) {
             val cryptDetails = appMode?.getDNSCryptServerCount()
             currentDNSStatus.text = resources.getString(R.string.configure_dns_connection_name) + " DNSCrypt resolvers: $cryptDetails"
             currentDNSURL.text = resources.getString(R.string.configure_dns_connected_dns_crypt_status)
-            recyclerHeadingLL.visibility = View.VISIBLE
+            //recyclerHeadingLL.visibility = View.GONE
             recyclerView?.visibility = View.VISIBLE
             noLogsTxt.visibility = View.GONE
         } else {
             val proxyDetails = appMode?.getDNSProxyServerDetails()
             currentDNSURL.text = resources.getString(R.string.configure_dns_connected_dns_proxy_status)
             currentDNSStatus.text = resources.getString(R.string.configure_dns_connection_name) + " "+ proxyDetails?.proxyName
-            recyclerHeadingLL.visibility = View.GONE
+            //recyclerHeadingLL.visibility = View.GONE
             recyclerView?.visibility = View.GONE
             noLogsTxt.visibility = View.VISIBLE
         }

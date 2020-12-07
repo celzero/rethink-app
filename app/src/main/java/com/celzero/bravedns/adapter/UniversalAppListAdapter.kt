@@ -30,11 +30,12 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatCheckBox
-import androidx.core.content.ContextCompat
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.database.AppDatabase
@@ -117,10 +118,14 @@ class UniversalAppListAdapter(val context: Context)  : PagedListAdapter<AppInfo,
 
                 checkBox.isChecked = appInfo.whiteListUniv1
                 try {
-                    val icon = context.packageManager.getApplicationIcon(appInfo.packageInfo)
-                    appIcon.setImageDrawable(icon)
+                    Glide.with(context).load(context.packageManager.getApplicationIcon(appInfo.packageInfo))
+                        .into(appIcon)
+                    //val icon = context.packageManager.getApplicationIcon(appInfo.packageInfo)
+                    //appIcon.setImageDrawable(icon)
                 } catch (e: Exception) {
-                    appIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
+                    Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                        .into(appIcon)
+                    //appIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
                     Log.e(LOG_TAG, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message, e)
                 }
 

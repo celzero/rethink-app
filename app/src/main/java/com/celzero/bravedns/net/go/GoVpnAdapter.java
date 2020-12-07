@@ -1,4 +1,6 @@
 /*
+Copyright 2020 RethinkDNS developers
+
 Copyright 2019 Jigsaw Operations LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
