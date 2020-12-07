@@ -33,52 +33,82 @@
         android:textColor="@color/neutral"
         android:textSize="@dimen/default_font_text_view" />
 
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/firewall_category_search"
-        style="@style/SearchView_custom"
+
+    <LinearLayout
+        android:id="@+id/firewall_app_search_view_top"
+        android:layout_below="@id/firewall_category_explain_txt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="2dp"
-        android:layout_marginTop="5dp"
         android:layout_marginRight="2dp"
-        android:layout_marginBottom="5dp"
-        android:background="@color/colorPrimary"
-        android:backgroundTint="@color/colorPrimaryDark"
-        android:backgroundTintMode="src_atop"
-        android:clickable="true"
-        android:iconifiedByDefault="false"
-        android:maxWidth="10000dp"
-        android:orientation="horizontal"
-        android:visibility="visible"
-        android:layout_below="@id/firewall_category_explain_txt"
-        app:queryBackground="@color/colorPrimaryDark"
-        app:queryHint="Search apps"
-        tools:layout_editor_absoluteX="4dp">
+        android:background="@color/light"
+        android:orientation="vertical"
+        android:visibility="visible">
 
-        <requestFocus />
-    </androidx.appcompat.widget.SearchView>
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:elevation="10dp"
+            android:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:orientation="horizontal"
+                android:weightSum="1">
+
+                <androidx.appcompat.widget.SearchView
+                    android:id="@+id/firewall_category_search"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_weight="0.95"
+                    android:fontFamily="sans-serif"
+                    app:queryBackground="@color/colorPrimaryDark"
+                    app:queryHint="Search apps"
+                    app:iconifiedByDefault="false"
+                    android:isScrollContainer="true">
+
+                    <requestFocus />
+                </androidx.appcompat.widget.SearchView>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/firewall_app_refresh_list"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.05"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_refresh_white" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+
 
     <ExpandableListView
         android:id="@+id/firewall_expandable_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/firewall_category_search"
-        android:childDivider="@color/colorPrimary"
-        android:nestedScrollingEnabled="true"
-        android:divider="@color/childListColor"
-        android:scrollbars="none"
+        android:layout_below="@id/firewall_app_search_view_top"
         android:layout_marginStart="2dp"
         android:layout_marginEnd="2dp"
+        android:childDivider="@color/colorPrimary"
+        android:divider="@color/childListColor"
         android:dividerHeight="3dp"
-        android:groupIndicator="@null" />
-
+        android:groupIndicator="@null"
+        android:nestedScrollingEnabled="true"
+        android:scrollbars="none" />
 
 
     <ProgressBar
         android:id="@+id/firewall_update_progress"
         style="@style/Widget.AppCompat.ProgressBar"
-        android:layout_below="@id/firewall_category_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/firewall_app_search_view_top"
         android:visibility="visible" />
 </RelativeLayout>

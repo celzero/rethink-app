@@ -425,6 +425,8 @@
     <string name="webview_error_title">Error</string>
     <string name="webview_error_message">Something went wrong. Please try again later.</string>
 
+    <string name="refresh_complete">Re-sync of application list is complete.</string>
+
     <string name="dns_proxy_no_proxy">Set up a DNS Proxy by clicking on the ADD button below.</string>
 
 

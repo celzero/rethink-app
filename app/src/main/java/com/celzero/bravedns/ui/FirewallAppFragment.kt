@@ -17,13 +17,14 @@ package com.celzero.bravedns.ui
 
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ExpandableListView
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.view.animation.Animation
+import android.view.animation.RotateAnimation
+import android.widget.*
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -36,6 +37,8 @@ import com.celzero.bravedns.database.CategoryInfo
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.isSearchEnabled
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.RefreshDatabase
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.FirewallAppViewModel
 
 class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
@@ -48,6 +51,11 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
     private lateinit var categoryShowTxt: TextView
     private var categoryState: Boolean = false
     private lateinit var loadingProgressBar: ProgressBar
+    private lateinit var refreshListImageView : ImageView
+
+    private lateinit var animation: Animation
+    private lateinit var refreshDatabase: RefreshDatabase
+
     private var firewallExpandableList: ExpandableListView? = null
 
     private val firewallAppInfoViewModel : FirewallAppViewModel by viewModels()
@@ -61,6 +69,7 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
         super.onCreate(savedInstanceState)
         val view: View = inflater.inflate(R.layout.fragment_firewall_all_apps, container, false)
         initView(view)
+        initClickListeners()
         return view
     }
 
@@ -70,6 +79,7 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
         categoryState = true
         loadingProgressBar = view.findViewById(R.id.firewall_update_progress)
         firewallExpandableList = view.findViewById(R.id.firewall_expandable_list)
+        refreshListImageView = view.findViewById(R.id.firewall_app_refresh_list)
         firewallExpandableList!!.visibility = View.VISIBLE
         if (firewallExpandableList != null) {
             adapterList = FirewallAppListAdapter(requireContext(), titleList as ArrayList<CategoryInfo>, listData)
@@ -86,14 +96,18 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
         }
         loadingProgressBar.visibility = View.VISIBLE
 
-       /* if (HomeScreenActivity.isLoadingComplete) {
-            loadingProgressBar.visibility = View.GONE
-            firewallExpandableList!!.visibility = View.VISIBLE
-        }*/
-
         editSearch = view.findViewById(R.id.firewall_category_search)
-        //TODO Search
         editSearch!!.setOnQueryTextListener(this)
+
+        animation = RotateAnimation(0.0f, 360.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
+        animation.repeatCount = -1
+        animation.duration = 1000
+
+        refreshDatabase = RefreshDatabase(requireContext())
+
+    }
+
+    private fun initClickListeners() {
 
         editSearch!!.setOnClickListener {
             editSearch!!.requestFocus()
@@ -111,6 +125,12 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
                 categoryState = false
             }
         }
+
+        refreshListImageView.setOnClickListener {
+            refreshListImageView.isEnabled = false
+            refreshDatabase()
+            Handler().postDelayed({ refreshListImageView.isEnabled = true }, 4000)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -118,17 +138,30 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
         super.onViewCreated(view, savedInstanceState)
     }
 
+    private fun refreshDatabase() {
+        refreshListImageView.animation = animation
+        refreshListImageView.startAnimation(animation)
+        object : CountDownTimer(4000, 500) {
+            override fun onTick(millisUntilFinished: Long) {}
+
+            override fun onFinish() {
+                refreshListImageView.clearAnimation()
+                Utilities.showToastInMidLayout(requireContext(),getString(R.string.refresh_complete), Toast.LENGTH_SHORT)
+            }
+        }.start()
+        refreshDatabase.refreshAppInfoDatabase()
+        refreshDatabase.updateCategoryInDB()
+    }
+
     override fun onQueryTextSubmit(query: String?): Boolean {
         //(adapterList as FirewallAppListAdapter).filterData(query!!)
-        if(DEBUG) Log.d(LOG_TAG, "Category block onQueryTextSubmit: ${HomeScreenActivity.GlobalVariable.isSearchEnabled}, $query")
-        if (HomeScreenActivity.GlobalVariable.isSearchEnabled) {
+        if(DEBUG) Log.d(LOG_TAG, "Category block onQueryTextSubmit: ${isSearchEnabled}, $query")
+        if (isSearchEnabled) {
             object : CountDownTimer(500, 1000) {
-                override fun onTick(millisUntilFinished: Long) {
-
-                }
+                override fun onTick(millisUntilFinished: Long) {}
 
                 override fun onFinish() {
-                    if(DEBUG) Log.d(LOG_TAG, "Category block onQueryTextSubmit final: ${HomeScreenActivity.GlobalVariable.isSearchEnabled}, $query")
+                    if(DEBUG) Log.d(LOG_TAG, "Category block onQueryTextSubmit final: ${isSearchEnabled}, $query")
                     firewallAppInfoViewModel.setFilter(query)
                     if (query.isNullOrEmpty()) {
                         var i = 0
@@ -137,8 +170,6 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
                             i += 1
                         }
                     } else {
-                        //var i = 0
-
                         if (titleList!!.size > 0) {
                             for (i in titleList!!.indices) {
                                 if (listData[titleList!![i]] != null) {
@@ -147,11 +178,6 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
                                     }
                                 }
                             }
-
-                            /*titleList!!.forEach { _ ->
-                                firewallExpandableList!!.expandGroup(i)
-                                i += 1
-                            }*/
                         }
                         if(DEBUG) Log.d(LOG_TAG, "Category block  ${titleList!!.size}")
                     }
@@ -167,14 +193,14 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
     override fun onQueryTextChange(query: String?): Boolean {
         //(adapterList as FirewallAppListAdapter).filterData(query!!)
         //observersForUI("%$query%")
-        if(DEBUG) Log.d(LOG_TAG, "Category block onQueryTextChange : ${HomeScreenActivity.GlobalVariable.isSearchEnabled}, $query")
+        if(DEBUG) Log.d(LOG_TAG, "Category block onQueryTextChange : ${isSearchEnabled}, $query")
         if (HomeScreenActivity.GlobalVariable.isSearchEnabled) {
             object : CountDownTimer(500, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
                 }
 
                 override fun onFinish() {
-                    if(DEBUG) Log.d(LOG_TAG, "Category block onQueryTextChange final: ${HomeScreenActivity.GlobalVariable.isSearchEnabled}, $query")
+                    if (DEBUG) Log.d(LOG_TAG, "Category block onQueryTextChange final: ${isSearchEnabled}, $query")
                     firewallAppInfoViewModel.setFilter(query)
                     if (query.isNullOrEmpty()) {
                         var i = 0
@@ -185,68 +211,24 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
 
                     } else {
                         //var i = 0
-                        if(titleList!!.size > 0) {
+                        if (titleList!!.size > 0) {
 
-                            for(i in titleList!!.indices){
-                                if(listData[titleList!![i]] != null) {
+                            for (i in titleList!!.indices) {
+                                if (listData[titleList!![i]] != null) {
                                     if (listData[titleList!![i]]!!.size > 0) {
                                         firewallExpandableList!!.expandGroup(i)
                                     }
                                 }
                             }
-
-                            /*titleList!!.forEach { _ ->
-                                firewallExpandableList!!.expandGroup(i)
-                                i += 1
-                            }*/
                         }
-                        if(DEBUG) Log.d(LOG_TAG, "Category block ${titleList!!.size}")
+                        if (DEBUG) Log.d(LOG_TAG, "Category block ${titleList!!.size}")
                     }
                 }
             }.start()
         }
         return true
     }
-/*
-   private fun setListViewHeight(listView: ExpandableListView, group: Int) {
-        val listAdapter = listView.expandableListAdapter as ExpandableListAdapter
-        var totalHeight = 0
-        val desiredWidth = View.MeasureSpec.makeMeasureSpec(
-            listView.width,
-            View.MeasureSpec.EXACTLY
-        )
-        for (i in 0 until listAdapter.groupCount) {
-            val groupItem = listAdapter.getGroupView(i, false, null, listView)
-            groupItem.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED)
-            totalHeight += groupItem.measuredHeight
-            if (listView.isGroupExpanded(i) && i != group
-                || !listView.isGroupExpanded(i) && i == group
-            ) {
-                for (j in 0 until 1) {
-                    val listItem = listAdapter.getChildView(
-                        i, j, false, null, listView
-                    )
-                    listItem.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED)
-                    totalHeight += listItem.measuredHeight
-                }
-               *//* for (j in 0 until listAdapter.getChildrenCount(i)) {
-                    val listItem = listAdapter.getChildView(
-                        i, j, false, null, listView
-                    )
-                    listItem.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED)
-                    totalHeight += listItem.measuredHeight
-                }*//*
-            }
-        }
-        val params: ViewGroup.LayoutParams = listView.layoutParams
-        var height = (totalHeight
-                + listView.dividerHeight * (listAdapter.groupCount - 1))
-        if (height < 10) height = 100
-        params.height = height
-        listView.layoutParams = params
-        listView.invalidate()
-        //listView.requestLayout()
-    }*/
+
 
     override fun onResume() {
         super.onResume()
@@ -280,19 +262,7 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
                 }
             }
 
-            /*titleList!!.forEach {
-                val categoryList = list.filter { a -> a.appCategory == it.categoryName }
-                val count = categoryList.filter { a -> !a.isInternetAllowed }
-                if (categoryList.isNotEmpty()) {
-                    it.numOfAppsBlocked = count.size
-                    if (categoryList.size == count.size)
-                        it.isInternetBlocked = true
-                    listData[it] = categoryList as java.util.ArrayList<AppInfo>
-                } else {
-                    titleList!!.remove(it)
-                }
 
-            }*/
             if (adapterList != null) {
                 (adapterList as FirewallAppListAdapter).updateData(titleList!!, listData, list as ArrayList<AppInfo>)
                 loadingProgressBar.visibility = View.GONE
@@ -303,27 +273,6 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
             }
             isSearchEnabled  = true
         })
-
-        /*appInfoRepository.getAppDetailsForLiveData(input).observe(viewLifecycleOwner, Observer { itAppInfo ->
-            val list = itAppInfo!!
-            titleList!!.forEach {
-                val categoryList = list.filter { a -> a.appCategory == it.categoryName }
-                val count = categoryList.filter { a -> !a.isInternetAllowed }
-                it.numOfAppsBlocked = count.size
-                if (categoryList.size == count.size)
-                    it.isInternetBlocked = true
-                listData[it] = categoryList as java.util.ArrayList<AppInfo>
-            }
-            if (adapterList != null) {
-                (adapterList as FirewallAppListAdapter).updateData(titleList!!, listData, list as ArrayList<AppInfo>)
-                if (HomeScreenActivity.isLoadingComplete) {
-                    loadingProgressBar.visibility = View.GONE
-                    firewallExpandableList!!.visibility = View.VISIBLE
-                }
-            } else {
-                loadingProgressBar.visibility = View.GONE
-            }
-        })*/
 
 
     }

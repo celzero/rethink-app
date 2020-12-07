@@ -505,6 +505,7 @@
             android:background="@color/colorPrimary"
             android:paddingStart="20dp"
             android:paddingTop="15dp"
+            android:visibility="gone"
             android:paddingEnd="10dp"
             android:paddingBottom="15dp">
 
