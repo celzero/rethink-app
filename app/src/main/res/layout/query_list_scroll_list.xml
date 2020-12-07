@@ -43,8 +43,9 @@
                         android:layout_weight="0.80"
                         android:fontFamily="sans-serif"
                         android:isScrollContainer="true"
-                        app:queryHint="Search DNS queries or IPs">
-
+                        app:iconifiedByDefault="false"
+                        app:queryBackground="@color/colorPrimaryDark"
+                        app:queryHint="Search DNS queries or IP's">
                         <requestFocus />
                     </androidx.appcompat.widget.SearchView>
 

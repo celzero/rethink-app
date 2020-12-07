@@ -234,7 +234,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
 
         switchBlockApp.setOnCheckedChangeListener(null)
         switchBlockApp.setOnClickListener {
-            if(ipDetails.uid == 0 || !FileSystemUID.isUIDAppRange(ipDetails.uid)){
+            if(ipDetails.uid == 0){
                 switchBlockApp.isChecked = false
                 Utilities.showToastInMidLayout(contextVal, "Android cannot be firewalled", Toast.LENGTH_SHORT)
             } else if (ipDetails.appName != "Unknown") {

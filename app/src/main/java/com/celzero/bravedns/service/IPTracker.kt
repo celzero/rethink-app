@@ -124,7 +124,9 @@ class IPTracker(var context: Context?) {
                         }
                     } else {
                         val fileSystemUID = FileSystemUID.fromFileSystemUID(ipDetails.uid)
-                        if (fileSystemUID.uid == -1)
+                        if(ipDetails.uid == -1){
+                            connTracker.appName = "Unknown"
+                        } else if (fileSystemUID.uid == -1)
                             connTracker.appName = "Unnamed(${ipDetails.uid})"
                         else
                             connTracker.appName = fileSystemUID.name

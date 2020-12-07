@@ -288,8 +288,9 @@
                         android:layout_weight="0.95"
                         android:fontFamily="sans-serif"
                         android:isScrollContainer="true"
+                        app:queryBackground="@color/colorPrimaryDark"
+                        app:iconifiedByDefault="false"
                         app:queryHint="Search by IP">
-
                         <requestFocus />
                     </androidx.appcompat.widget.SearchView>
 
@@ -308,7 +309,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
-                        android:layout_marginBottom="2dp"
                         android:layout_weight="0.05"
                         android:padding="8dp"
                         android:src="@drawable/ic_delete" />
