@@ -203,6 +203,18 @@
                 android:textSize="@dimen/default_font_text_view"
                 android:textColor="@color/primaryText"
                 android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/settings_activity_on_device_last_updated_time_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.AppCompat.TextView"
+                    android:layout_marginEnd="10dp"
+                    android:layout_alignBottom="@id/settings_activity_on_device_block_refresh_btn"
+                    android:gravity="center"
+                    android:layout_below="@id/settings_activity_on_device_block_switch"
+                    android:textSize="@dimen/default_font_text_view"
+                    android:text="last check for update: 10 mins ago"/>
         </RelativeLayout>
 
         <TextView
