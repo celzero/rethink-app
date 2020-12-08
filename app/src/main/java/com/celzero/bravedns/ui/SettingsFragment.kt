@@ -90,6 +90,7 @@ class SettingsFragment : Fragment() {
     //private lateinit var blockUnknownConnRL: RelativeLayout
     private lateinit var onDeviceBlockListRL: RelativeLayout
     private lateinit var onDeviceBlockListDesc: TextView
+    private lateinit var onDeviceLastUpdatedTime : TextView
     private lateinit var dnsSettingsHeading : TextView
 
     private lateinit var refreshDataImg: AppCompatImageView
@@ -194,6 +195,7 @@ class SettingsFragment : Fragment() {
         onDeviceBlockListSwitch = view.findViewById(R.id.settings_activity_on_device_block_switch)
         onDeviceBlockListProgress = view.findViewById(R.id.settings_activity_on_device_block_progress)
         onDeviceBlockListDesc = view.findViewById(R.id.settings_activity_on_device_block_desc)
+        onDeviceLastUpdatedTime = view.findViewById(R.id.settings_activity_on_device_last_updated_time_txt)
 
         socks5DescText = view.findViewById(R.id.settings_activity_socks5_desc)
         httpProxyDescText = view.findViewById(R.id.settings_activity_http_proxy_desc)
@@ -225,11 +227,13 @@ class SettingsFragment : Fragment() {
                 if(DEBUG) Log.d(LOG_TAG, "Observer log")
                 downloadInProgress = 1
                 configureBlockListBtn.visibility = View.VISIBLE
+                onDeviceLastUpdatedTime.visibility = View.VISIBLE
                 refreshOnDeviceBlockListBtn.visibility = View.VISIBLE
                 onDeviceBlockListProgress.visibility = View.GONE
                 onDeviceBlockListSwitch.visibility = View.VISIBLE
                 onDeviceBlockListSwitch.isChecked = true
                 onDeviceBlockListDesc.text = "Download completed, Configure blocklist"
+                onDeviceLastUpdatedTime.text = Utilities.convertLongToRelativeTime(timeStamp)
                 localDownloadComplete.postValue(0)
             }
         })
@@ -261,9 +265,12 @@ class SettingsFragment : Fragment() {
         if (PersistentState.isLocalBlockListEnabled(requireContext())) {
             configureBlockListBtn.visibility = View.VISIBLE
             refreshOnDeviceBlockListBtn.visibility = View.VISIBLE
+            onDeviceLastUpdatedTime.visibility = View.VISIBLE
+            onDeviceLastUpdatedTime.text = Utilities.convertLongToRelativeTime(timeStamp)
             onDeviceBlockListSwitch.isChecked = true
         } else {
             configureBlockListBtn.visibility = View.GONE
+            onDeviceLastUpdatedTime.visibility = View.GONE
             refreshOnDeviceBlockListBtn.visibility = View.GONE
             onDeviceBlockListSwitch.isChecked = false
             onDeviceBlockListDesc.text = "Choose from 170+ blocklists."
@@ -378,6 +385,7 @@ class SettingsFragment : Fragment() {
                 removeBraveDNSLocal()
                 refreshOnDeviceBlockListBtn.visibility = View.GONE
                 configureBlockListBtn.visibility = View.GONE
+                onDeviceLastUpdatedTime.visibility = View.GONE
                 onDeviceBlockListProgress.visibility = View.GONE
                 onDeviceBlockListDesc.text = "Choose from 170+ blocklists."
             }
@@ -505,6 +513,7 @@ class SettingsFragment : Fragment() {
                 Log.d(LOG_TAG, "onFailure -  ${call.isCanceled}, ${call.isExecuted}")
                 activity?.runOnUiThread {
                     configureBlockListBtn.visibility = View.GONE
+                    onDeviceLastUpdatedTime.visibility = View.GONE
                     refreshOnDeviceBlockListBtn.visibility = View.GONE
                     onDeviceBlockListProgress.visibility = View.GONE
                     onDeviceBlockListSwitch.visibility = View.VISIBLE
@@ -537,6 +546,7 @@ class SettingsFragment : Fragment() {
                                     Utilities.showToastInMidLayout(activity as Context, "Blocklists are up-to-date.", Toast.LENGTH_SHORT)
                                 } else {
                                     configureBlockListBtn.visibility = View.GONE
+                                    onDeviceLastUpdatedTime.visibility = View.GONE
                                     refreshOnDeviceBlockListBtn.visibility = View.GONE
                                     onDeviceBlockListProgress.visibility = View.GONE
                                     onDeviceBlockListSwitch.visibility = View.VISIBLE
@@ -555,6 +565,7 @@ class SettingsFragment : Fragment() {
                 } catch (e: java.lang.Exception) {
                     Log.w(LOG_TAG,"Exception while downloading: ${e.message}",e)
                     configureBlockListBtn.visibility = View.GONE
+                    onDeviceLastUpdatedTime.visibility = View.GONE
                     refreshOnDeviceBlockListBtn.visibility = View.GONE
                     onDeviceBlockListProgress.visibility = View.GONE
                     onDeviceBlockListSwitch.visibility = View.VISIBLE
@@ -684,6 +695,8 @@ class SettingsFragment : Fragment() {
         //PersistentState.setLocalBlockListStamp(requireContext(), stamp)
         configureBlockListBtn.visibility = View.VISIBLE
         refreshOnDeviceBlockListBtn.visibility = View.VISIBLE
+        onDeviceLastUpdatedTime.visibility = View.VISIBLE
+        onDeviceLastUpdatedTime.text = Utilities.convertLongToRelativeTime(timeStamp)
         val path: String = requireContext().filesDir.canonicalPath
         if (appMode?.getBraveDNS() == null) {
             GlobalScope.launch(Dispatchers.IO) {
@@ -845,21 +858,26 @@ class SettingsFragment : Fragment() {
                                 refreshOnDeviceBlockListBtn.visibility = View.VISIBLE
                                 onDeviceBlockListProgress.visibility = View.GONE
                                 onDeviceBlockListSwitch.visibility = View.VISIBLE
+                                onDeviceLastUpdatedTime.visibility = View.VISIBLE
+                                onDeviceLastUpdatedTime.text = Utilities.convertLongToRelativeTime(timeStamp)
                                 onDeviceBlockListDesc.text = "Download completed, Configure blocklist"
                                 if (DEBUG) Log.d(LOG_TAG, "Download status : Download completed: $status")
                                 Toast.makeText(ctxt, "Blocklists downloaded successfully.", Toast.LENGTH_LONG).show()
                             } else {
                                 //Toast.makeText(ctxt, "Download complete", Toast.LENGTH_LONG).show()
                                 configureBlockListBtn.visibility = View.VISIBLE
+                                onDeviceLastUpdatedTime.visibility = View.VISIBLE
                                 refreshOnDeviceBlockListBtn.visibility = View.VISIBLE
                                 onDeviceBlockListProgress.visibility = View.GONE
                                 onDeviceBlockListSwitch.visibility = View.VISIBLE
+                                onDeviceLastUpdatedTime.text = Utilities.convertLongToRelativeTime(timeStamp)
                             }
                         } else {
                             //onDeviceBlockListDesc.text = "Error downloading file. Try again."
                             //filesDownloaded = 0
                             if (DEBUG) Log.d(LOG_TAG, "Download failed: $enqueue, $action, $downloadId")
                             configureBlockListBtn.visibility = View.GONE
+                            onDeviceLastUpdatedTime.visibility = View.GONE
                             refreshOnDeviceBlockListBtn.visibility = View.GONE
                             onDeviceBlockListProgress.visibility = View.GONE
                             onDeviceBlockListSwitch.visibility = View.VISIBLE
@@ -875,6 +893,7 @@ class SettingsFragment : Fragment() {
                     } else {
                         if (DEBUG) Log.d(LOG_TAG, "Download failed: $enqueue, $action")
                         configureBlockListBtn.visibility = View.GONE
+                        onDeviceLastUpdatedTime.visibility = View.GONE
                         refreshOnDeviceBlockListBtn.visibility = View.GONE
                         onDeviceBlockListProgress.visibility = View.GONE
                         onDeviceBlockListSwitch.visibility = View.VISIBLE
@@ -893,6 +912,7 @@ class SettingsFragment : Fragment() {
                 Log.w(LOG_TAG,"Exception while downloading: ${e.message}",e)
                 onDeviceBlockListDesc.text = "Error downloading file. Try again."
                 configureBlockListBtn.visibility = View.GONE
+                onDeviceLastUpdatedTime.visibility = View.GONE
                 refreshOnDeviceBlockListBtn.visibility = View.GONE
                 onDeviceBlockListProgress.visibility = View.GONE
                 onDeviceBlockListSwitch.visibility = View.VISIBLE

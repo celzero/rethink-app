@@ -30,6 +30,7 @@ import android.graphics.Color
 import android.os.Environment
 import android.provider.Settings
 import android.text.TextUtils.SimpleStringSplitter
+import android.text.format.DateUtils
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -217,6 +218,17 @@ class Utilities {
             val date = Date(time)
             val format = SimpleDateFormat("HH:mm:ss", Locale.US)
             return format.format(date)
+        }
+
+        fun convertLongToDate(timeStamp : Long): String{
+            val date = Date(timeStamp)
+            val format = SimpleDateFormat("MM/dd/yyyy", Locale.US)
+            return format.format(date)
+        }
+
+        fun convertLongToRelativeTime(timeStamp: Long): String{
+            return "Last updated: ${DateUtils.getRelativeTimeSpanString(timeStamp,
+                        System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE)}"
         }
 
         fun prepareServersToRemove(servers: String, liveServers: String): String{
