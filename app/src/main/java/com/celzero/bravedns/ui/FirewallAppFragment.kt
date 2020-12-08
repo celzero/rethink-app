@@ -26,6 +26,7 @@ import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.widget.*
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -101,7 +102,7 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
 
         animation = RotateAnimation(0.0f, 360.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
         animation.repeatCount = -1
-        animation.duration = 1000
+        animation.duration = 750
 
         refreshDatabase = RefreshDatabase(requireContext())
 
@@ -118,10 +119,10 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
             if (!categoryState) {
                 categoryState = true
                 firewallExpandableList!!.visibility = View.VISIBLE
-                categoryShowTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, requireContext().getDrawable(R.drawable.ic_keyboard_arrow_up_gray_24dp), null)
+                categoryShowTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(requireContext(), R.drawable.ic_keyboard_arrow_up_gray_24dp), null)
             } else {
                 firewallExpandableList!!.visibility = View.GONE
-                categoryShowTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, requireContext().getDrawable(R.drawable.ic_keyboard_arrow_down_gray_24dp), null)
+                categoryShowTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(requireContext(), R.drawable.ic_keyboard_arrow_down_gray_24dp), null)
                 categoryState = false
             }
         }

@@ -148,5 +148,17 @@
             android:orientation="vertical"
             android:padding="1dp" />
 
+        <TextView
+            android:id="@+id/query_list__logs_disabled_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:padding="10dp"
+            android:layout_below="@id/query_list_recycler_heading"
+            android:text="@string/show_logs_disabled_dns_message"
+            android:textSize="@dimen/large_font_text_view"
+            android:visibility="gone" />
+
     </RelativeLayout>
 </LinearLayout>

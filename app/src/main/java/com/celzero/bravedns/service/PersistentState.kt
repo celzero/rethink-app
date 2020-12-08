@@ -54,6 +54,7 @@ class PersistentState {
         private const val DNS_ALL_TRAFFIC = "dns_all_traffic"
         const val ALLOW_BYPASS = "allow_bypass"
         const val PRIVATE_DNS = "private_dns"
+        private const val ENABLE_LOCAL_LOGS = "local_logs"
         const val EXCLUDE_FROM_VPN = "exclude_apps_vpn"
         private const val APP_VERSION = "app_version"
 
@@ -726,5 +727,14 @@ class PersistentState {
             return getUserPreferences(context).getInt(APP_DOWNLOAD_SOURCE , 0)
         }
 
+        fun isLogsEnabled(context: Context) : Boolean {
+            return getUserPreferences(context).getBoolean(ENABLE_LOCAL_LOGS, true)
+        }
+
+        fun setLogsEnabled(context: Context, isLogsEnabled : Boolean) {
+            val editor : SharedPreferences.Editor = getUserPreferences(context).edit()
+            editor.putBoolean(ENABLE_LOCAL_LOGS, isLogsEnabled)
+            editor.apply()
+        }
     }
 }

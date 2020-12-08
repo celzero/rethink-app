@@ -21,6 +21,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
@@ -30,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ConnectionTrackerAdapter
 import com.celzero.bravedns.database.AppDatabase
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
 import kotlinx.coroutines.Dispatchers
@@ -48,8 +51,10 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
     private var recyclerView: RecyclerView? = null
     private var layoutManager: RecyclerView.LayoutManager? = null
     private var editSearchView: SearchView? = null
+    private lateinit var searchLayoutLL : LinearLayout
     private lateinit var filterIcon: ImageView
     private lateinit var deleteIcon: ImageView
+    private lateinit var disabledLogsTextView: TextView
     private var recyclerAdapter: ConnectionTrackerAdapter? = null
     private val viewModel: ConnectionTrackerViewModel by viewModels()
     private lateinit var filterValue: String
@@ -75,18 +80,28 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
         editSearchView = includeView.findViewById(R.id.connection_search)
         filterIcon = includeView.findViewById(R.id.connection_filter_icon)
         deleteIcon = includeView.findViewById(R.id.connection_delete_icon)
+        searchLayoutLL = includeView.findViewById(R.id.connection_card_view_top)
+        disabledLogsTextView = includeView.findViewById(R.id.connection_list_logs_disabled_tv)
 
+        if(PersistentState.isLogsEnabled(requireContext())){
+            disabledLogsTextView.visibility = View.GONE
+            searchLayoutLL.visibility = View.VISIBLE
 
-        recyclerView!!.setHasFixedSize(true)
-        layoutManager = LinearLayoutManager(requireContext())
-        recyclerView!!.layoutManager = layoutManager
+            recyclerView!!.setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(requireContext())
+            recyclerView!!.layoutManager = layoutManager
 
-        ConnectionTrackerViewModel.setContext(requireContext())
+            ConnectionTrackerViewModel.setContext(requireContext())
 
-        recyclerAdapter = ConnectionTrackerAdapter(requireContext())
-        viewModel.connectionTrackerList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(recyclerAdapter!!::submitList))
-        recyclerView!!.adapter = recyclerAdapter
-        //recyclerView!!.setItemViewCacheSize(100)
+            recyclerAdapter = ConnectionTrackerAdapter(requireContext())
+            viewModel.connectionTrackerList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(recyclerAdapter!!::submitList))
+            recyclerView!!.adapter = recyclerAdapter
+            //recyclerView!!.setItemViewCacheSize(100)
+        }else{
+            disabledLogsTextView.visibility = View.VISIBLE
+            searchLayoutLL.visibility = View.GONE
+        }
+
 
         editSearchView!!.setOnQueryTextListener(this)
         editSearchView!!.setOnClickListener {

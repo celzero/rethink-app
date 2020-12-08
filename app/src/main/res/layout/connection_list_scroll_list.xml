@@ -153,5 +153,17 @@
             android:orientation="vertical"
             android:layout_marginBottom="?attr/actionBarSize" />
 
+        <TextView
+            android:id="@+id/connection_list_logs_disabled_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/connection_list_recycler_heading"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:padding="10dp"
+            android:visibility="gone"
+            android:text="@string/show_logs_disabled_network_message"
+            android:textSize="@dimen/large_font_text_view" />
+
     </RelativeLayout>
 </LinearLayout>

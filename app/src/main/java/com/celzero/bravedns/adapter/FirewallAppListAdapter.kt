@@ -34,6 +34,7 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatToggleButton
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.SwitchCompat
+import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
@@ -328,14 +329,14 @@ class FirewallAppListAdapter internal constructor(
         internetChk.isChecked = !isInternetAllowed
         if (!isInternetAllowed) {
             internetChk.setCompoundDrawablesWithIntrinsicBounds(
-                context.getDrawable(R.drawable.dis_allowed),
+                ContextCompat.getDrawable(context, R.drawable.dis_allowed),
                 null,
                 null,
                 null
             )
         } else {
             internetChk.setCompoundDrawablesWithIntrinsicBounds(
-                context.getDrawable(R.drawable.allowed),
+                ContextCompat.getDrawable(context, R.drawable.allowed),
                 null,
                 null,
                 null

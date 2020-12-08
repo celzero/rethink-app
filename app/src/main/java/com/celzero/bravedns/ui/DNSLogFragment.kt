@@ -21,6 +21,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -70,6 +71,9 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
    // private lateinit var recyclerHeadingLL : LinearLayout
     private lateinit var noLogsTxt : TextView
     private lateinit var topLayoutRL: RelativeLayout
+    private lateinit var searchLayoutLL : LinearLayout
+
+    private lateinit var logsDisabledTxt : TextView
 
     private val viewModel: DNSLogViewModel by viewModels()
     private var checkedItem = 1
@@ -112,17 +116,28 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
         filterIcon = includeView.findViewById(R.id.query_list_filter_icon)
         deleteIcon = includeView.findViewById(R.id.query_list_delete_icon)
 
+        searchLayoutLL = includeView.findViewById(R.id.query_list_card_view_top)
+
+        logsDisabledTxt = includeView.findViewById(R.id.query_list__logs_disabled_tv)
+
         //recyclerHeadingLL = includeView.findViewById(R.id.query_list_recycler_heading)
         noLogsTxt = includeView.findViewById(R.id.dns_log_no_log_text)
 
-        recyclerView!!.setHasFixedSize(true)
-        layoutManager = LinearLayoutManager(requireContext())
-        recyclerView!!.layoutManager = layoutManager
-        DNSLogViewModel.setContext(requireContext())
+        if(PersistentState.isLogsEnabled(requireContext())) {
+            logsDisabledTxt.visibility = View.GONE
+            searchLayoutLL.visibility = View.VISIBLE
+            recyclerView!!.setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(requireContext())
+            recyclerView!!.layoutManager = layoutManager
+            DNSLogViewModel.setContext(requireContext())
 
-        recyclerAdapter = DNSQueryAdapter(requireContext())
-        viewModel.dnsLogsList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(recyclerAdapter!!::submitList))
-        recyclerView!!.adapter = recyclerAdapter
+            recyclerAdapter = DNSQueryAdapter(requireContext())
+            viewModel.dnsLogsList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(recyclerAdapter!!::submitList))
+            recyclerView!!.adapter = recyclerAdapter
+        }else{
+            logsDisabledTxt.visibility = View.VISIBLE
+            searchLayoutLL.visibility = View.GONE
+        }
 
         val isServiceRunning = Utilities.isServiceRunning(requireContext(), BraveVPNService::class.java)
         if (!isServiceRunning) {
