@@ -429,6 +429,9 @@
 
     <string name="dns_proxy_no_proxy">Set up a DNS Proxy by clicking on the ADD button below.</string>
 
+    <string name="show_logs_disabled_network_message">Logging of network connections is disabled. To enable, goto Settings->General-> Turn on "Enable DNS and Firewall logs"</string>
+    <string name="show_logs_disabled_dns_message">Logging of DNS connections is disabled. To enable, goto Settings->General-> Turn on "Enable DNS and Firewall logs"</string>
+
 
     <string-array name="dns_crypt_endpoint_names">
         <item>Cleanbrowsing Family</item>

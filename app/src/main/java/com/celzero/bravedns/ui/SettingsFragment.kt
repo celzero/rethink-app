@@ -78,7 +78,7 @@ class SettingsFragment : Fragment() {
     private lateinit var faqTxt: AppCompatTextView
     private lateinit var refreshDataRL: RelativeLayout
 
-    private lateinit var privateDNSRL: RelativeLayout
+    private lateinit var enableLogsRL: RelativeLayout
     private lateinit var autoStartRL: RelativeLayout
     private lateinit var killAppRL: RelativeLayout
     private lateinit var allowByPassRL: RelativeLayout
@@ -95,7 +95,7 @@ class SettingsFragment : Fragment() {
     private lateinit var refreshDataImg: AppCompatImageView
     private lateinit var refreshDataDescTxt: TextView
 
-    private lateinit var privateDNSSwitch: SwitchCompat
+    private lateinit var enableLogsSwitch: SwitchCompat
     private lateinit var autoStartSwitch: SwitchCompat
     private lateinit var killAppSwitch: SwitchCompat
     private lateinit var allowByPassSwitch: SwitchCompat
@@ -163,7 +163,7 @@ class SettingsFragment : Fragment() {
 
         refreshDataRL = view.findViewById(R.id.settings_activity_refresh_data_rl)
         refreshDataDescTxt = view.findViewById(R.id.settings_activity_refresh_desc)
-        privateDNSRL = view.findViewById(R.id.settings_activity_private_dns_rl)
+        enableLogsRL = view.findViewById(R.id.settings_activity_enable_logs_rl)
         autoStartRL = view.findViewById(R.id.settings_activity_auto_start_rl)
         killAppRL = view.findViewById(R.id.settings_activity_kill_app_rl)
         allowByPassRL = view.findViewById(R.id.settings_activity_allow_bypass_rl)
@@ -177,7 +177,7 @@ class SettingsFragment : Fragment() {
 
         refreshDataImg = view.findViewById(R.id.settings_activity_refresh_data_img)
 
-        privateDNSSwitch = view.findViewById(R.id.settings_activity_private_dns_switch)
+        enableLogsSwitch = view.findViewById(R.id.settings_activity_enable_logs_switch)
         autoStartSwitch = view.findViewById(R.id.settings_activity_auto_start_switch)
         killAppSwitch = view.findViewById(R.id.settings_activity_kill_app_switch)
         allowByPassSwitch = view.findViewById(R.id.settings_activity_allow_bypass_switch)
@@ -241,7 +241,7 @@ class SettingsFragment : Fragment() {
         val proxyEndpointRepository = mDb.proxyEndpointRepository()
         sock5Proxy = proxyEndpointRepository.getConnectedProxy()
 
-        privateDNSSwitch.isChecked = PersistentState.getAllowPrivateDNS(requireContext())
+        enableLogsSwitch.isChecked = PersistentState.isLogsEnabled(requireContext())
         autoStartSwitch.isChecked = PersistentState.getPrefAutoStartBootUp(requireContext())
         killAppSwitch.isChecked = PersistentState.getKillAppOnFirewall(requireContext())
 
@@ -310,8 +310,8 @@ class SettingsFragment : Fragment() {
             refreshDatabase()
         }
 
-        privateDNSSwitch.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
-            PersistentState.setAllowPrivateDNS(requireContext(), b)
+        enableLogsSwitch.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
+            PersistentState.setLogsEnabled(requireContext(), b)
         }
 
         autoStartSwitch.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->

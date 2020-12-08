@@ -311,7 +311,9 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
      * The logs will be shown in network monitor screen
      */
     private fun sendConnTracking(ipDetails: IPDetails?) {
-        getIPTracker()!!.recordTransaction(this, ipDetails)
+        if(PersistentState.isLogsEnabled(this)) {
+            getIPTracker()!!.recordTransaction(this, ipDetails)
+        }
     }
 
     /**
@@ -581,7 +583,9 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         transaction.responseCalendar = Calendar.getInstance()
         // All the transactions are recorded in the DNS logs.
         getTracker()!!.recordTransaction(this, transaction)
-        getDNSLogTracker()!!.recordTransaction(this, transaction)
+        if(PersistentState.isLogsEnabled(this)) {
+            getDNSLogTracker()!!.recordTransaction(this, transaction)
+        }
 
         if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Record Transaction: status- ${transaction.status}")
         // Update the connection state.  If the transaction succeeded, then the connection is working.
