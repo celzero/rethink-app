@@ -120,14 +120,14 @@ interface AppInfoDAO {
     fun getExcludedAppDetailsFilterLiveData(filter: String): DataSource.Factory<Int, AppInfo>
 
 
-    @Query("update AppInfo set isExcluded = :isExcluded, isInternetAllowed = 1 where appName != 'ANDROID'")
+    @Query("update AppInfo set isExcluded = :isExcluded, isInternetAllowed = 1, whiteListUniv1 = 0 where appName != 'ANDROID'")
     fun updateExcludedForAllApp(isExcluded: Boolean)
 
-    @Query("update AppInfo set isExcluded = :isExcluded, isInternetAllowed = 1 where appCategory = :category and appName != 'ANDROID'")
+    @Query("update AppInfo set isExcluded = :isExcluded, isInternetAllowed = 1, whiteListUniv1 = 0 where appCategory = :category and appName != 'ANDROID'")
     fun updateExcludedForCategories(category: String, isExcluded: Boolean)
 
 
-    @Query("update AppInfo set isExcluded = :isExcluded, isInternetAllowed = 1 where uid = :uid  and appName != 'ANDROID'")
+    @Query("update AppInfo set isExcluded = :isExcluded, isInternetAllowed = 1, whiteListUniv1 = 0 where uid = :uid  and appName != 'ANDROID'")
     fun updateExcludedList(uid: Int, isExcluded: Boolean)
 
     @Query("select packageInfo from AppInfo where isExcluded = 1  and appName != 'ANDROID'")
@@ -154,5 +154,8 @@ interface AppInfoDAO {
 
     @Query("select appName from AppInfo where uid = :uid")
     fun getAppNameForUID(uid : Int) : String
+
+    @Query("select count(*) from AppInfo where isExcluded= 1 and appCategory = :categoryName and appName != 'ANDROID' ")
+    fun getExcludedAppCountForCategory(categoryName: String) : Int
 
 }

@@ -54,9 +54,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/expand_textView_category_name"
-                    android:layout_marginStart="25dp"
-                    android:layout_weight="0.8"
-                    android:text="TextView"
+                    android:layout_alignStart="@id/expand_textView_category_name"
+                    android:layout_toStartOf="@id/expand_checkbox"
+                    android:layout_marginEnd="10dp"
+                    android:maxLines="3"
+                    android:text="Textview"
                     android:textColor="@color/textColorMain"
                     android:textSize="@dimen/default_font_text_view" />
 

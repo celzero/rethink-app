@@ -296,12 +296,7 @@ class FirewallAppListAdapter internal constructor(
         return listPosition.toLong()
     }
 
-    override fun getGroupView(
-        listPosition: Int,
-        isExpanded: Boolean,
-        convertView: View?,
-        parent: ViewGroup
-    ): View {
+    override fun getGroupView(listPosition: Int, isExpanded: Boolean, convertView: View?, parent: ViewGroup): View {
         var convertView = convertView
         val listTitle = getGroup(listPosition)
         if (convertView == null) {
@@ -366,13 +361,14 @@ class FirewallAppListAdapter internal constructor(
         }
 
         val numberOfApps = listTitle.numberOFApps
-        if (isInternetAllowed) {
+        /*if (isInternetAllowed) {
             appCountTV.text = listTitle.numOfAppsBlocked.toString() + "/" + numberOfApps.toString() + " apps blocked"
         } else {
             appCountTV.text = numberOfApps.toString() + "/" + numberOfApps.toString() + " apps blocked"
-        }
+        }*/
+        appCountTV.text = "Number of Apps: ${listTitle.numberOFApps}\n${listTitle.numOfAppsBlocked} blocked, ${listTitle.numOfAppWhitelisted} whitelisted, ${listTitle.numOfAppsExcluded} excluded"
+        //appCountTV.text = "Blocked: ${listTitle.numOfAppsBlocked}, Whitelisted: ${listTitle.numOfAppWhitelisted},\nExcluded: ${listTitle.numOfAppsExcluded}, Total Apps: ${listTitle.numberOFApps} "
 
-        //TODO - Dirty code - Change the logic for adding the imageview in the list instead of separate imageview
         val list = dataList[listTitle]
         try {
             if (list != null && list.isNotEmpty()) {
@@ -385,16 +381,11 @@ class FirewallAppListAdapter internal constructor(
                     } else {
                         Glide.with(context).load(context.packageManager.getApplicationIcon(list[0].packageInfo))
                             .into(imageHolder1)
-                        //imageHolder1.setImageDrawable(context.packageManager.getApplicationIcon(list[0].packageInfo))
                         imageHolder2.visibility = View.GONE
-                        //imageHolder3.visibility = View.GONE
-                        //imageHolder4.visibility = View.GONE
                     }
                 } else {
                     imageHolder1.visibility = View.GONE
                     imageHolder2.visibility = View.GONE
-                    //imageHolder3.visibility = View.GONE
-                    //imageHolder4.visibility = View.GONE
                 }
             }
         } catch (e: Exception) {
@@ -406,10 +397,10 @@ class FirewallAppListAdapter internal constructor(
             val mDb = AppDatabase.invoke(context.applicationContext)
             val appInfoRepository = mDb.appInfoRepository()
             var proceedBlock = false
-            if (listTitle.categoryName == APP_CAT_SYSTEM_APPS && isInternetAllowed) {
-                proceedBlock = showDialogForSystemAppBlock(false)
+            proceedBlock = if (listTitle.categoryName == APP_CAT_SYSTEM_APPS && isInternetAllowed) {
+                showDialogForSystemAppBlock(false)
             }else{
-                proceedBlock = true
+                true
             }
             if(listTitle.categoryName == APP_CAT_SYSTEM_COMPONENTS && isInternetAllowed){
                 val count = appInfoRepository.getWhitelistCount(listTitle.categoryName)

@@ -181,8 +181,10 @@ class UniversalAppListAdapter(val context: Context)  : PagedListAdapter<AppInfo,
                     }
                     appInfoRepository.updateWhiteList(appInfo.uid, status)
                     val countBlocked = appInfoRepository.getBlockedCountForCategory(appInfo.appCategory)
+                    val countWhitelisted = appInfoRepository.getWhitelistCount(appInfo.appCategory)
                     val categoryInfoRepository = mDb.categoryInfoRepository()
                     categoryInfoRepository.updateBlockedCount(appInfo.appCategory, countBlocked)
+                    categoryInfoRepository.updateWhitelistCount(appInfo.appCategory, countWhitelisted)
                 }
             }else{
                 checkBox.isChecked = !status

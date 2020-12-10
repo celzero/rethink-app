@@ -26,6 +26,8 @@ class CategoryInfo{
     var categoryName: String = ""
     var numberOFApps: Int = 0
     var numOfAppsBlocked : Int = 0
+    var numOfAppWhitelisted : Int = 0
+    var numOfAppsExcluded : Int = 0
     var isInternetBlocked: Boolean = false
 
 }

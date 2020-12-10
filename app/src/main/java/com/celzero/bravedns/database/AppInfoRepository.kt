@@ -176,5 +176,9 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.getAppNameForUID(uid)
     }
 
+    fun getExcludedAppCountForCategory(categoryName: String) : Int{
+        return appInfoDAO.getExcludedAppCountForCategory(categoryName)
+    }
+
 
 }

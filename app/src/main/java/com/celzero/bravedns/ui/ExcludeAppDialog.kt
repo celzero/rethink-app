@@ -122,11 +122,20 @@ class ExcludeAppDialog(var activity: Context, internal var adapter: RecyclerView
     private fun modifyAppsInExcludedAppList(checked: Boolean) {
         val mDb = AppDatabase.invoke(context.applicationContext)
         val appInfoRepository = mDb.appInfoRepository()
+        val categoryInfoRepository = mDb.categoryInfoRepository()
         if(filterCategories.isNullOrEmpty()){
             appInfoRepository.updateExcludedForAllApp(checked)
+            categoryInfoRepository.updateExcludedCountForAllApp(checked)
+            if(checked) {
+                categoryInfoRepository.updateWhitelistCountForAll(!checked)
+            }
         }else{
             filterCategories.forEach{
                 appInfoRepository.updateExcludedForCategories(it, checked)
+                categoryInfoRepository.updateExcludedCountForCategory(it, checked)
+                if(checked) {
+                    categoryInfoRepository.updateWhitelistForCategory(it, !checked)
+                }
             }
         }
     }
