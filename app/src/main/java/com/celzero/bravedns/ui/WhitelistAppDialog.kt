@@ -134,13 +134,16 @@ class WhitelistAppDialog(var activity: Context, internal var adapter: RecyclerVi
                 categoryInfoRepository.updateBlockedCount(it, countBlocked)
                 Log.d(LOG_TAG,"All Category $it with block count as $countBlocked")
             }
+            categoryInfoRepository.updateWhitelistCountForAll(checked)
         }else{
             filterCategories.forEach{
                 val update = appInfoRepository.updateWhiteListForCategories(it, checked)
+                categoryInfoRepository.updateWhitelistForCategory(it,checked)
                 val countBlocked = appInfoRepository.getBlockedCountForCategory(it)
                 categoryInfoRepository.updateBlockedCount(it, countBlocked)
                 Log.d(LOG_TAG,"Category $it with block count as $countBlocked")
             }
+
         }
     }
 

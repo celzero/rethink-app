@@ -145,10 +145,12 @@ class ExcludedAppListAdapter(val context: Context) : PagedListAdapter<AppInfo, E
                     appInfoRepository.updateExcludedList(appInfo.uid, status)
                     val categoryInfoRepository = mDb.categoryInfoRepository()
                     val count = appInfoRepository.getBlockedCountForCategory(appInfo.appCategory)
+                    val excludedCount = appInfoRepository.getExcludedAppCountForCategory(appInfo.appCategory)
+                    val whitelistCount = appInfoRepository.getBlockedCountForCategory(appInfo.appCategory)
                     categoryInfoRepository.updateBlockedCount(appInfo.appCategory, count)
+                    categoryInfoRepository.updateExcludedCount(appInfo.appCategory, excludedCount)
+                    categoryInfoRepository.updateWhitelistCount(appInfo.appCategory,whitelistCount)
                 }
-
-
                 //excludedAppsFromVPN[appInfo.packageInfo] = status
                 if(DEBUG) Log.d(LOG_TAG,"Apps excluded - ${appInfo.appName}, $status")
             } else {

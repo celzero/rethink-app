@@ -89,5 +89,48 @@ class CategoryInfoRepository  (private val categoryInfoDAO: CategoryInfoDAO){
         }
     }
 
+    fun updateWhitelistCountForAll(checked : Boolean){
+        if(checked){
+            categoryInfoDAO.updateWhitelistCountForAll()
+        }else{
+            categoryInfoDAO.clearWhitelistCountForAll()
+        }
 
+    }
+
+    fun updateWhitelistForCategory(categoryName : String, checked: Boolean){
+        if(checked){
+            categoryInfoDAO.updateWhitelistForCategory(categoryName)
+        }else{
+            categoryInfoDAO.clearWhitelistForCategory(categoryName)
+        }
+
+    }
+
+    fun updateWhitelistCount(categoryName: String, whitelistCount : Int){
+        categoryInfoDAO.updateWhitelistCount(categoryName, whitelistCount)
+    }
+
+
+    fun updateExcludedCount(categoryName: String, excludedCount : Int){
+        categoryInfoDAO.updateExcludedCount(categoryName, excludedCount)
+    }
+
+    fun updateExcludedCountForAllApp(checked: Boolean){
+        if(checked){
+            categoryInfoDAO.updateExcludedCountForAllApp()
+        }else{
+            categoryInfoDAO.clearExcludedCountForAllApp()
+        }
+
+    }
+
+    fun updateExcludedCountForCategory(categoryName: String, checked: Boolean){
+        if(checked){
+            categoryInfoDAO.updateExcludedCountForCategory(categoryName)
+        }else{
+            categoryInfoDAO.clearExcludedCountForCategory(categoryName)
+        }
+
+    }
 }

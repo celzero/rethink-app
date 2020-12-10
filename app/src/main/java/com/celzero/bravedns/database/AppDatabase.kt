@@ -121,6 +121,8 @@ abstract class AppDatabase : RoomDatabase(){
                 //https://basic.bravedns.com/1:YBIgACABAHAgAA== - New block list configured
                 database.execSQL("UPDATE DoHEndpoint set dohURL  = 'https://basic.bravedns.com/1:YBIgACABAHAgAA==' where id = 3")
                 database.execSQL("UPDATE DNSProxyEndpoint set  proxyIP = '9.9.9.10' where id = 3")
+                database.execSQL("ALTER TABLE CategoryInfo add column numOfAppWhitelisted INTEGER DEFAULT 0 NOT NULL")
+                database.execSQL("ALTER TABLE CategoryInfo add column numOfAppsExcluded INTEGER DEFAULT 0 NOT NULL")
             }
         }
 
