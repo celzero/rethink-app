@@ -49,7 +49,6 @@ import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
-import com.celzero.bravedns.util.FileSystemUID
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -206,7 +205,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
                     chipKillApp.visibility = View.GONE
                 }
 
-                imgAppIcon.setImageDrawable(contextVal.packageManager.getApplicationIcon(appArray?.get(0)!!))
+                imgAppIcon.setImageDrawable(contextVal.packageManager.getApplicationIcon(appArray[0]!!))
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "Package Not Found - " + e.message, e)
             }
@@ -238,11 +237,11 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
                 switchBlockApp.isChecked = false
                 Utilities.showToastInMidLayout(contextVal, "Android cannot be firewalled", Toast.LENGTH_SHORT)
             } else if (ipDetails.appName != "Unknown") {
-                if(FileSystemUID.isUIDAppRange(ipDetails.uid)) {
+                //if(FileSystemUID.isUIDAppRange(ipDetails.uid)) {
                     firewallApp(FirewallManager.checkInternetPermission(ipDetails.uid))
-                }else{
-                    switchBlockApp.isChecked = false
-                }
+                //}else{
+                //    switchBlockApp.isChecked = false
+                //}
             }else{
                 if(DEBUG) Log.d(LOG_TAG,"setBlockUnknownConnections - ${switchBlockApp.isChecked} ")
                 PersistentState.setBlockUnknownConnections(contextVal, switchBlockApp.isChecked)
@@ -304,12 +303,12 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
                 if (DEBUG) Log.d(LOG_TAG, "Universal Remove - ${connRules.ipAddress}, ${BraveVPNService.BlockedRuleNames.RULE2.ruleName}")
                 firewallRules.removeFirewallRules(UNIVERSAL_RULES_UID, connRules.ipAddress, BraveVPNService.BlockedRuleNames.RULE2.ruleName, contextVal)
                 isRuleUniversal = false
-                Toast.makeText(contextVal, "Unblocked ${connRules.ipAddress}", Toast.LENGTH_SHORT).show()
+                Utilities.showToastInMidLayout(contextVal, "Unblocked ${connRules.ipAddress}", Toast.LENGTH_SHORT)
             } else {
                 if (DEBUG) Log.d(LOG_TAG, "Universal Add - ${connRules.ipAddress}, ${BraveVPNService.BlockedRuleNames.RULE2.ruleName}")
                 firewallRules.addFirewallRules(UNIVERSAL_RULES_UID, connRules.ipAddress, BraveVPNService.BlockedRuleNames.RULE2.ruleName, contextVal)
                 isRuleUniversal = true
-                Toast.makeText(contextVal, "Blocking all connections to ${connRules.ipAddress}", Toast.LENGTH_SHORT).show()
+                Utilities.showToastInMidLayout(contextVal, "Blocking all connections to ${connRules.ipAddress}", Toast.LENGTH_SHORT)
             }
             switchBlockConnAll.isChecked = isRuleUniversal
         }
@@ -362,7 +361,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
                         Toast.makeText(contextVal, "${ipDetails.appName} app killed.", Toast.LENGTH_SHORT).show()
                         if (DEBUG) Log.d(LOG_TAG, "App kill - $packageName")*/
                     } else {
-                        Toast.makeText(contextVal, "Cannot kill the app", Toast.LENGTH_SHORT).show()
+                        Utilities.showToastInMidLayout(contextVal, "App Info not available", Toast.LENGTH_SHORT)
                     }
                 }/*else if(appUIDList.size == 2){
                     appUIDList.forEach{
@@ -380,11 +379,11 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
                 }*/
 
                 else {
-                    Toast.makeText(contextVal, "System app - kill denied", Toast.LENGTH_SHORT).show()
+                    Utilities.showToastInMidLayout(contextVal, "App Info not available", Toast.LENGTH_SHORT)
                 }
                 //mDb.close()
             } catch (e: java.lang.Exception) {
-                Toast.makeText(contextVal, "Can't able to kill the app", Toast.LENGTH_SHORT).show()
+                Utilities.showToastInMidLayout(contextVal, "App Info not available", Toast.LENGTH_SHORT)
             }
         }
 
@@ -458,7 +457,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
             blockAllApps = showDialog(appUIDList, ipDetails.appName!!, title, positiveText)
             if (blockAllApps) {
                 firewallRules.clearFirewallRules(ipDetails.uid, contextVal)
-                Toast.makeText(contextVal, getString(R.string.bsct_rules_cleared_toast), Toast.LENGTH_SHORT).show()
+                Utilities.showToastInMidLayout(contextVal, getString(R.string.bsct_rules_cleared_toast), Toast.LENGTH_SHORT)
             }
         } else {
             showAlertForClearRules()
@@ -477,7 +476,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         builder.setPositiveButton("Clear") { dialogInterface, which ->
             firewallRules.clearFirewallRules(ipDetails.uid, contextVal)
             //switchBlockConnApp.isChecked = false
-            Toast.makeText(contextVal, getString(R.string.bsct_rules_cleared_toast), Toast.LENGTH_SHORT).show()
+            Utilities.showToastInMidLayout(contextVal, getString(R.string.bsct_rules_cleared_toast), Toast.LENGTH_SHORT)
         }
 
         //performing negative action

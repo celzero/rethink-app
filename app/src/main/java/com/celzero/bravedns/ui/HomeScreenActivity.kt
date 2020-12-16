@@ -61,6 +61,8 @@ import okhttp3.*
 import org.json.JSONObject
 import java.io.File
 import java.io.IOException
+import java.util.*
+import kotlin.collections.HashMap
 
 
 class HomeScreenActivity : AppCompatActivity() {
@@ -94,6 +96,7 @@ class HomeScreenActivity : AppCompatActivity() {
         var median50: MutableLiveData<Long> = MutableLiveData()
         var blockedCount: MutableLiveData<Int> = MutableLiveData()
         var dnsType : MutableLiveData<Int> = MutableLiveData()
+        var braveModeToggler : MutableLiveData<Int> = MutableLiveData()
         //var cryptModeInProgress : Int = 0
         var cryptRelayToRemove : String = ""
 
@@ -181,7 +184,7 @@ class HomeScreenActivity : AppCompatActivity() {
         val packageManager = packageManager
         try {
             val applicationInfo: ApplicationInfo = packageManager.getApplicationInfo(packageName, 0)
-            if(DEBUG) Log.d(LOG_TAG,"Install location: ${packageManager.getInstallerPackageName(applicationInfo.packageName)}")
+            if(DEBUG) Log.d(LOG_TAG, "Install location: ${packageManager.getInstallerPackageName(applicationInfo.packageName)}")
             if ("com.android.vending" == packageManager.getInstallerPackageName(applicationInfo.packageName)) {
                 // App was installed by Play Store
                 PersistentState.setDownloadSource(context, Constants.DOWNLOAD_SOURCE_PLAY_STORE)
@@ -234,20 +237,26 @@ class HomeScreenActivity : AppCompatActivity() {
         val currentTime = System.currentTimeMillis()
         val diff = currentTime - time
         val numOfDays = (diff / (1000 * 60 * 60 * 24)).toInt()
-        if (numOfDays > 0 ) {
-            Log.i(LOG_TAG, "App update check initiated, number of days: $numOfDays")
-            checkForAppUpdate()
-            checkForBlockListUpdate()
-        } else {
-            Log.i(LOG_TAG, "App update check not initiated")
+        val calendar: Calendar = Calendar.getInstance()
+        val day: Int = calendar.get(Calendar.DAY_OF_WEEK)
+        if(day == Calendar.FRIDAY || day == Calendar.SATURDAY) {
+            if (numOfDays > 0) {
+                Log.i(LOG_TAG, "App update check initiated, number of days: $numOfDays")
+                checkForAppUpdate()
+                checkForBlockListUpdate()
+            } else {
+                Log.i(LOG_TAG, "App update check not initiated")
+            }
         }
     }
 
     private fun checkForBlockListUpdate() {
-        val blockListTimeStamp = PersistentState.getLocalBlockListDownloadTime(this)
-        val appVersionCode = PersistentState.getAppVersion(this)
-        val url = "$REFRESH_BLOCKLIST_URL$blockListTimeStamp&$APPEND_VCODE$appVersionCode"
-        serverCheckForBlocklistUpdate(url)
+        if(PersistentState.isLocalBlockListEnabled(this)) {
+            val blockListTimeStamp = PersistentState.getLocalBlockListDownloadTime(this)
+            val appVersionCode = PersistentState.getAppVersion(this)
+            val url = "$REFRESH_BLOCKLIST_URL$blockListTimeStamp&$APPEND_VCODE$appVersionCode"
+            serverCheckForBlocklistUpdate(url)
+        }
     }
 
     fun checkForAppUpdate() : Boolean {
@@ -266,8 +275,7 @@ class HomeScreenActivity : AppCompatActivity() {
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
                 appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE /*AppUpdateType.IMMEDIATE*/)) {
                 try {
-                    appUpdateManager.startUpdateFlowForResult(
-                        appUpdateInfo, AppUpdateType.FLEXIBLE /*AppUpdateType.IMMEDIATE*/, this, version)
+                    appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.FLEXIBLE /*AppUpdateType.IMMEDIATE*/, this, version)
                 } catch (e: IntentSender.SendIntentException) {
                     appUpdateManager.unregisterListener(installStateUpdatedListener)
                     Log.e(LOG_TAG, "SendIntentException: ${e.message} ", e)
@@ -378,7 +386,7 @@ class HomeScreenActivity : AppCompatActivity() {
                 val responseVersion = jsonObject.getInt("version")
                 val updateValue = jsonObject.getBoolean("update")
                 timeStamp = jsonObject.getLong("latest")
-                PersistentState.setLastAppUpdateCheckTime(context, timeStamp)
+                PersistentState.setLastAppUpdateCheckTime(context, System.currentTimeMillis())
                 Log.i(LOG_TAG, "Server response for the new version download is $updateValue, response version number- $responseVersion, timestamp- $timeStamp")
                 if (responseVersion == 1) {
                     //PersistentState.setLocalBlockListDownloadTime(context, timeStamp)
@@ -435,7 +443,7 @@ class HomeScreenActivity : AppCompatActivity() {
                     }
                 }
             }catch (e: Exception) {
-                Log.e(LOG_TAG, "Error downloading filetag.json file: ${e.message}",e)
+                Log.e(LOG_TAG, "Error downloading filetag.json file: ${e.message}", e)
             }
         }
     }
@@ -497,7 +505,7 @@ class HomeScreenActivity : AppCompatActivity() {
             appUpdateManager.unregisterListener(installStateUpdatedListener)
             context.unregisterReceiver(onComplete)
         } catch (e: IllegalArgumentException) {
-            Log.w(LOG_TAG,"Unregister receiver exception")
+            Log.w(LOG_TAG, "Unregister receiver exception")
         }
 
     }
@@ -546,22 +554,19 @@ class HomeScreenActivity : AppCompatActivity() {
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.navigation_internet_manager -> {
-                supportFragmentManager.beginTransaction().replace(R.id.fragment_container, homeScreenFragment, homeScreenFragment.javaClass.simpleName)
-                    .commit()
+                supportFragmentManager.beginTransaction().replace(R.id.fragment_container, homeScreenFragment, homeScreenFragment.javaClass.simpleName).commit()
                 return@OnNavigationItemSelectedListener true
             }
 
             R.id.navigation_settings -> {
                 settingsFragment = SettingsFragment()
-                supportFragmentManager.beginTransaction().replace(R.id.fragment_container, settingsFragment, settingsFragment.javaClass.simpleName)
-                    .commit()
+                supportFragmentManager.beginTransaction().replace(R.id.fragment_container, settingsFragment, settingsFragment.javaClass.simpleName).commit()
                 return@OnNavigationItemSelectedListener true
             }
 
             R.id.navigation_about -> {
                 aboutFragment = AboutFragment()
-                supportFragmentManager.beginTransaction().replace(R.id.fragment_container, aboutFragment, aboutFragment.javaClass.simpleName)
-                    .commit()
+                supportFragmentManager.beginTransaction().replace(R.id.fragment_container, aboutFragment, aboutFragment.javaClass.simpleName).commit()
                 return@OnNavigationItemSelectedListener true
             }
         }

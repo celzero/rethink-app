@@ -52,6 +52,9 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.getAllAppDetails()
     }
 
+    fun getNonAppCount() : Int{
+        return appInfoDAO.getNonAppCount()
+    }
 
     fun updateInternetForuid(uid: Int, isInternetAllowed: Boolean, coroutineScope: CoroutineScope = GlobalScope) {
         //coroutineScope.launch {

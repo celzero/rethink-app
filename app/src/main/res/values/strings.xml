@@ -462,11 +462,11 @@
 
 
     <string-array name="dns_crypt_relay_endpoint_names">
-            <item>Anon-AMS-NL</item>
-            <item>Anon-CS-FR</item>
-            <item>Anon-CS-SE</item>
-            <item>Anon-CS-USCA</item>
-            <item>Anon-Tiarap</item>
+            <item>Netherlands</item>
+            <item>France</item>
+            <item>Sweden</item>
+            <item>US - Los Angeles, CA</item>
+            <item>Singapore</item>
         </string-array>
 
         <string-array name="dns_crypt_relay_endpoint_urls">

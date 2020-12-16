@@ -58,7 +58,7 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:layout_weight="0.10"
-                        android:padding="8dp"
+                        android:padding="5dp"
                         android:src="@drawable/ic_filter"
                         android:visibility="visible" />
 
@@ -68,7 +68,7 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:layout_weight="0.10"
-                        android:padding="8dp"
+                        android:padding="5dp"
                         android:src="@drawable/ic_delete"
                         android:visibility="visible" />
 

@@ -243,15 +243,14 @@ class PersistentState {
 
         fun setBraveMode(context: Context , mode: Int){
 
-            val editor: SharedPreferences.Editor =
-                getUserPreferences(context)!!.edit()
+            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
             editor.putInt(BRAVE_MODE, mode)
             editor.apply()
         }
 
         fun getBraveMode(context: Context) : Int{
             if(braveMode == -1)
-                return getUserPreferences(context)!!.getInt(BRAVE_MODE, -1)
+                return getUserPreferences(context).getInt(BRAVE_MODE, 2)
             else
                 return  braveMode
         }

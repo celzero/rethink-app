@@ -160,7 +160,7 @@ class Utilities {
                     val enabledService = ComponentName.unflattenFromString(componentNameString)
                     if (enabledService != null && enabledService == expectedComponentName) return true
                 }
-                return false
+                return isAccessibilityServiceEnabled(context, accessibilityService)
             }catch (e: Exception){
                 return isAccessibilityServiceEnabled(context, accessibilityService)
             }

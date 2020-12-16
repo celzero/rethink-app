@@ -47,7 +47,7 @@ class RefreshDatabase(var context: Context) {
             val appListDB = appInfoRepository.getAppInfoAsync()
             if (appListDB.isNotEmpty()) {
                 appListDB.forEach {
-                    if(it.appName != "ANDROID") {
+                    if(it.appName != "ANDROID" && it.packageInfo != Constants.NO_PACKAGE) {
                         try {
                             val packageName = context.packageManager.getPackageInfo(it.packageInfo, PackageManager.GET_META_DATA)
                             if (packageName.applicationInfo == null) {
@@ -72,8 +72,9 @@ class RefreshDatabase(var context: Context) {
             val appInfoRepository = mDb.appInfoRepository()//AppInfoRepository(appInfoDAO)
             val allPackages: List<PackageInfo> = context.packageManager?.getInstalledPackages(PackageManager.GET_META_DATA)!!
             val appDetailsFromDB = appInfoRepository.getAppInfoAsync()
+            val nonAppsCount = appInfoRepository.getNonAppCount()
             val isRootAvailable = insertRootAndroid(appInfoRepository)
-            if (appDetailsFromDB.isEmpty() || appDetailsFromDB.size != allPackages.size-1  || isRootAvailable) {
+            if (appDetailsFromDB.isEmpty() || (appDetailsFromDB.size-nonAppsCount) != allPackages.size-1  || isRootAvailable) {
                 allPackages.forEach {
                     if (it.applicationInfo.packageName != context.applicationContext.packageName) {
                         val applicationInfo: ApplicationInfo = it.applicationInfo
@@ -159,7 +160,7 @@ class RefreshDatabase(var context: Context) {
         if(isRootInfo == null || isRootInfo.isBlank()){
             val appInfo = AppInfo()
             appInfo.appName = "ANDROID"
-            appInfo.packageInfo = "no_package"
+            appInfo.packageInfo = Constants.NO_PACKAGE
             appInfo.appCategory = Constants.APP_CAT_SYSTEM_COMPONENTS
             appInfo.isSystemApp = true
             appInfo.isDataEnabled = true
@@ -182,6 +183,29 @@ class RefreshDatabase(var context: Context) {
             if(DEBUG) Log.d(LOG_TAG,"Root already available")
             return false
         }
+    }
+
+    fun insertNonAppToAppInfo(uid : Int, appName : String){
+        val mDb = AppDatabase.invoke(context.applicationContext)
+        val appInfoRepository = mDb.appInfoRepository()
+        val appInfo = AppInfo()
+        appInfo.appName = appName
+        appInfo.packageInfo = "no_package"
+        appInfo.appCategory = Constants.APP_NON_APP
+        appInfo.isSystemApp = true
+        appInfo.isDataEnabled = true
+        appInfo.isWifiEnabled = true
+        appInfo.isScreenOff = false
+        appInfo.uid = uid
+        appInfo.isInternetAllowed = PersistentState.isWifiAllowed(appInfo.packageInfo, context)
+        appInfo.isBackgroundEnabled = false
+        appInfo.whiteListUniv1 = false
+        appInfo.whiteListUniv2 = false
+        appInfo.mobileDataUsed = 0
+        appInfo.trackers = 0
+        appInfo.wifiDataUsed = 0
+        appInfoRepository.insertAsync(appInfo)
+        updateCategoryInDB()
     }
 
     private fun insertDefaultDNSProxy() {

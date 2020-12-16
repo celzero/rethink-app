@@ -28,6 +28,7 @@ import com.celzero.bravedns.database.*
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import java.util.concurrent.ConcurrentHashMap
 
 
 class IPAppListBottomSheetFragment(private var contextVal: Context, private var appInfo: AppInfo)  : BottomSheetDialogFragment() {
@@ -41,7 +42,7 @@ class IPAppListBottomSheetFragment(private var contextVal: Context, private var 
     lateinit var txtView : TextView
 
     private var titleList: List<ConnectionTracker>? = ArrayList()
-    private var ipDetailsMap : HashMap<String, CustomList> = HashMap()
+    private var ipDetailsMap : ConcurrentHashMap<String, CustomList> = ConcurrentHashMap()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

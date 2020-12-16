@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bs_conn_top_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:orientation="vertical"
+    android:paddingBottom="40dp">
+
+    <TextView
+        style="@style/ActionItem"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="20dp"
+        android:background="@color/recycler_selected" />
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp">
+
+        <TextView
+            android:id="@+id/bs_home_screen_heading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_margin="2dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="Choose Rethink Mode"
+            android:textIsSelectable="true"
+            android:textSize="@dimen/heading_font_text_view" />
+    </RelativeLayout>
+
+    <RadioGroup
+        android:id="@+id/bs_home_screen_radio_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="20dp">
+
+        <androidx.appcompat.widget.AppCompatRadioButton
+            style="@style/SwitchCompat_theme"
+            android:id="@+id/bs_home_screen_radio_dns"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="DNS"
+            android:textColor="@color/primaryText"
+            android:textSize="@dimen/large_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatRadioButton
+            style="@style/SwitchCompat_theme"
+            android:id="@+id/bs_home_screen_radio_firewall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="Firewall"
+            android:textColor="@color/primaryText"
+            android:textSize="@dimen/large_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatRadioButton
+            style="@style/SwitchCompat_theme"
+            android:id="@+id/bs_home_screen_radio_dns_firewall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="DNS + Firewall"
+            android:textColor="@color/primaryText"
+            android:textSize="@dimen/large_font_text_view" />
+
+
+    </RadioGroup>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/bs_home_screen_connected_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:fontFamily="sans-serif-smallcaps"
+            android:layout_margin="10dp"
+            android:text="1.1.1.1"
+            android:textIsSelectable="true"
+            android:textSize="@dimen/heading_font_text_view" />
+
+        <TextView
+            android:id="@+id/bs_home_screen_app_uptime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bs_home_screen_connected_status"
+            android:fontFamily="sans-serif-smallcaps"
+            android:gravity="center"
+            android:layout_margin="10dp"
+            android:text="sdad"
+            android:textSize="@dimen/default_font_text_view" />
+
+    </RelativeLayout>
+
+</LinearLayout>

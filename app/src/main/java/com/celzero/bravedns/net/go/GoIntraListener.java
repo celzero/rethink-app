@@ -34,6 +34,8 @@ import doh.Doh;
 import doh.Token;
 import intra.TCPSocketSummary;
 import intra.UDPSocketSummary;
+import tunnel.IntraListener;
+//import intra.IntraListener;
 
 
 /**
@@ -41,7 +43,7 @@ import intra.UDPSocketSummary;
  * when a socket has concluded, with performance metrics for that socket, and this class forwards
  * those metrics to Firebase.
  */
-public class GoIntraListener implements tunnel.IntraListener {
+public class GoIntraListener implements IntraListener {
 
     // UDP is often used for one-off messages and pings.  The relative overhead of reporting metrics
     // on these short messages would be large, so we only report metrics on sockets that transfer at
