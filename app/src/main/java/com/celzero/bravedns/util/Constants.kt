@@ -36,7 +36,7 @@ class Constants {
         const val JSON_DOWNLOAD_BASIC_TRIE_LINK = "https://download.bravedns.com/trie"
         const val REFRESH_BLOCKLIST_URL = "https://download.bravedns.com/update/blocklists?tstamp="
         const val APP_DOWNLOAD_AVAILABLE_CHECK = "https://download.bravedns.com/update/app?vcode="
-        const val CONFIGURE_BLOCKLIST_URL = "https://bravedns.com/configure?v=app"
+        const val CONFIGURE_BLOCKLIST_URL = "https://bravedns.com/configure?v=app&tstamp="
 
         const val APP_DOWNLOAD_LINK = "https://bravedns.com/downloads"
 
@@ -47,7 +47,11 @@ class Constants {
         const val APP_CAT_SYSTEM_COMPONENTS = "System Components"
         const val APP_CAT_SYSTEM_APPS = "System Apps"
         const val APP_CAT_OTHER = "Other"
+        const val APP_NON_APP = "Non-App System "
         const val INSTALLED_CAT_APPS = "Installed Apps"
+
+        //No package applications
+        const val NO_PACKAGE = "no_package"
 
         //Whitelist
         const val RECOMMENDED  = " [Recommended]"

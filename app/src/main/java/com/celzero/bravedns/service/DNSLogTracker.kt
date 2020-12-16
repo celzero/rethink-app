@@ -22,6 +22,8 @@ import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.DNSLogs
 import com.celzero.bravedns.net.dns.DnsPacket
 import com.celzero.bravedns.net.doh.Transaction
+import com.celzero.bravedns.service.PersistentState.Companion.setBlockedReq
+import com.celzero.bravedns.service.PersistentState.Companion.setNumOfReq
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.DNS_TYPE_DNS_CRYPT
 import com.celzero.bravedns.util.Constants.Companion.DNS_TYPE_DOH
@@ -40,7 +42,7 @@ class DNSLogTracker(var context: Context?) {
 
     var mDb : AppDatabase ?= null
 
-   private fun getDBInstance(context : Context): AppDatabase? {
+   private fun getDBInstance(context: Context): AppDatabase? {
        if(mDb == null) {
            mDb = AppDatabase.invoke(context.applicationContext)
        }
@@ -90,7 +92,7 @@ class DNSLogTracker(var context: Context?) {
                     dnsLogs.resolver = transaction.serverIp
                 }
             }catch (e: Exception){
-                Log.w(LOG_TAG,"DNSLogTracker - exception while fetching the resolver: ${e.message}",e)
+                Log.w(LOG_TAG, "DNSLogTracker - exception while fetching the resolver: ${e.message}", e)
                 dnsLogs.resolver = transaction.serverIp
             }
 
@@ -138,6 +140,10 @@ class DNSLogTracker(var context: Context?) {
                     "\u26a0" // Warning sign
                 }
             }
+            if(dnsLogs.isBlocked){
+                setBlockedReq(context)
+            }
+            setNumOfReq(context)
             dnsLogRepository.insertAsync(dnsLogs)
         }
     }

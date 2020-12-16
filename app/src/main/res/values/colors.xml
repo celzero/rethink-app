@@ -24,12 +24,14 @@
     <color name="primaryText">#FDFDFD</color>
     <color name="secondaryText">#05dfd7</color>
     <color name="dividerColor">#BDBDBD</color>
+    <color name="white">#FFFFFF</color>
 
     <color name="borderColor">#444444</color>
     <color name="borderblack">#2B2A2A</color>
 
     <color name="textColorMain">#BDBDBD</color>
-
+    <color name="blue_background">#405de6</color>
+    <color name="blue_background_dark">#458eff</color>
 
     <!-- 1st Gradient color -->
 

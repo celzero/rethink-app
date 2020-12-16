@@ -30,37 +30,58 @@
                 android:gravity="center"
                 android:orientation="vertical" />
 
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:paddingTop="10dp"
                 android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingTop="10dp">
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/tv_app_installed"
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/shimmer_view_heading"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:text="rethinkdns"
-                    android:letterSpacing="0.2"
-                    android:textColor="@color/textColorMain"
-                    android:textSize="@dimen/text_size_heading"
-                    android:visibility="visible" />
+                    app:shimmer_base_color="@color/primaryText"
+                    app:shimmer_duration="25000"
+                    app:shimmer_colored="true"
+                    app:shimmer_shape="radial"
+                    app:shimmer_auto_start="true">
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/tv_app_"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:layout_gravity="center"
-                    android:text="Backed by Mozilla Builders Incubator"
-                    android:textColor="@color/textColorMain"
-                    android:textSize="@dimen/sub_heading_small"
-                    android:visibility="visible" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_app_installed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:fontFamily="sans-serif-smallcaps"
+                            android:gravity="center"
+                            android:letterSpacing="0.2"
+                            android:text="rethinkdns"
+                            android:textColor="@color/textColorMain"
+                            android:textSize="@dimen/text_size_heading"
+                            android:visibility="visible" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_app_"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:text="Backed by Mozilla Builders Incubator"
+                            android:textColor="@color/textColorMain"
+                            android:textSize="@dimen/sub_heading_small"
+                            android:visibility="visible" />
+                    </LinearLayout>
+                </com.facebook.shimmer.ShimmerFrameLayout>
             </LinearLayout>
+
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -78,6 +99,7 @@
             android:gravity="center"
             android:orientation="horizontal"
             android:paddingTop="15dp"
+            android:visibility="gone"
             android:weightSum="1">
 
             <androidx.appcompat.widget.AppCompatSpinner
@@ -101,9 +123,11 @@
         </LinearLayout>
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/fhs_card_home_top_tile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
+            android:visibility="visible"
             app:cardElevation="@dimen/activity_horizontal_margin">
 
             <LinearLayout
@@ -200,19 +224,19 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0"
-                            android:tooltipText="Number of active Universal Firewall rules"
                             android:textColor="@color/secondaryText"
-                            android:textSize="@dimen/home_screen_stat_text" />
+                            android:textSize="@dimen/home_screen_stat_text"
+                            android:tooltipText="Number of active Universal Firewall rules" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-smallcaps"
-                            android:tooltipText="Number of active Universal Firewall rules"
                             android:gravity="center"
                             android:text="universal firewall"
+                            android:textColor="@color/primaryText"
                             android:textSize="@dimen/default_font_text_view"
-                            android:textColor="@color/primaryText" />
+                            android:tooltipText="Number of active Universal Firewall rules" />
 
                     </LinearLayout>
                 </LinearLayout>
@@ -249,8 +273,8 @@
                             android:fontFamily="sans-serif-smallcaps"
                             android:gravity="center"
                             android:text="lifetime Qs"
-                            android:textSize="@dimen/default_font_text_view"
                             android:textColor="@color/primaryText"
+                            android:textSize="@dimen/default_font_text_view"
                             android:tooltipText="Total DNS queries requested" />
 
 
@@ -281,8 +305,8 @@
                             android:fontFamily="sans-serif-smallcaps"
                             android:gravity="center"
                             android:text="latency"
-                            android:textSize="@dimen/default_font_text_view"
                             android:textColor="@color/primaryText"
+                            android:textSize="@dimen/default_font_text_view"
                             android:tooltipText="End-to-end median DNS request latency" />
 
                     </LinearLayout>
@@ -311,8 +335,8 @@
                             android:fontFamily="sans-serif-smallcaps"
                             android:gravity="center"
                             android:text="unresolved Qs"
-                            android:textSize="@dimen/default_font_text_view"
                             android:textColor="@color/primaryText"
+                            android:textSize="@dimen/default_font_text_view"
                             android:tooltipText="Total unresolved, unanswered queries" />
 
                     </LinearLayout>
@@ -349,8 +373,8 @@
                             android:fontFamily="sans-serif-smallcaps"
                             android:gravity="center"
                             android:text="apps blocked"
-                            android:textSize="@dimen/default_font_text_view"
                             android:textColor="@color/primaryText"
+                            android:textSize="@dimen/default_font_text_view"
                             android:tooltipText="Number of apps in the firewall blocklist" />
 
 
@@ -370,9 +394,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="-"
-                            android:tooltipText="End-to-end median DNS request latency"
                             android:textColor="@color/secondaryText"
-                            android:textSize="@dimen/home_screen_stat_text" />
+                            android:textSize="@dimen/home_screen_stat_text"
+                            android:tooltipText="End-to-end median DNS request latency" />
 
 
                         <androidx.appcompat.widget.AppCompatTextView
@@ -380,10 +404,10 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-smallcaps"
                             android:gravity="center"
-                            android:tooltipText="End-to-end median DNS request latency"
                             android:text="latency"
+                            android:textColor="@color/primaryText"
                             android:textSize="@dimen/default_font_text_view"
-                            android:textColor="@color/primaryText" />
+                            android:tooltipText="End-to-end median DNS request latency" />
 
                     </LinearLayout>
 
@@ -411,8 +435,8 @@
                             android:fontFamily="sans-serif-smallcaps"
                             android:gravity="center"
                             android:text="unresolved qs"
-                            android:textSize="@dimen/default_font_text_view"
                             android:textColor="@color/primaryText"
+                            android:textSize="@dimen/default_font_text_view"
                             android:tooltipText="Total unresolved, unanswered queries" />
 
                     </LinearLayout>
@@ -423,77 +447,80 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="start"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/chip_configure_firewall"
+                style="@android:style/Widget.TextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:textAlignment="center"
+                android:background="@color/colorPrimaryDark"
+                android:drawableStart="@drawable/spinner_firewall"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="@string/firewall_mode_info_title"
+                android:textColor="@color/primaryText" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/chip_view_logs"
+                style="@android:style/Widget.TextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_weight="0.5"
+                android:textAlignment="center"
+                android:background="@color/colorPrimaryDark"
+                android:drawableStart="@drawable/spinner_dns"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="@string/dns_mode_info_title"
+                android:textColor="@color/primaryText" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
+            android:layout_marginTop="10dp"
             android:layout_marginRight="20dp"
             android:orientation="horizontal"
             android:weightSum="1">
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/chip_configure_firewall"
+                android:id="@+id/chip_network_monitor"
                 style="@style/Widget.MaterialComponents.Chip.Action"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:layout_weight="0.5"
                 android:padding="5dp"
-                android:text="Firewall"
-                android:textSize="@dimen/large_font_text_view"
+                android:text="Network monitor"
                 android:textAlignment="center"
                 android:textColor="@color/secondaryText"
+                android:visibility="gone"
                 app:chipBackgroundColor="@color/colorPrimaryDark" />
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/chip_view_logs"
+                android:id="@+id/chip_settings"
                 style="@style/Widget.MaterialComponents.Chip.Action"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_weight="0.5"
                 android:padding="5dp"
-                android:text="DNS"
-                android:textSize="@dimen/large_font_text_view"
+                android:text="Settings"
                 android:textAlignment="center"
                 android:textColor="@color/secondaryText"
+                android:visibility="gone"
                 app:chipBackgroundColor="@color/colorPrimaryDark" />
         </LinearLayout>
 
-        <LinearLayout
-                   android:layout_width="match_parent"
-                   android:layout_height="wrap_content"
-                   android:layout_marginLeft="20dp"
-                   android:layout_marginTop="10dp"
-                   android:layout_marginRight="20dp"
-                   android:orientation="horizontal"
-                   android:weightSum="1">
-
-                   <com.google.android.material.chip.Chip
-                       android:id="@+id/chip_network_monitor"
-                       style="@style/Widget.MaterialComponents.Chip.Action"
-                       android:layout_width="0dp"
-                       android:layout_height="wrap_content"
-                       android:layout_marginEnd="10dp"
-                       android:layout_weight="0.5"
-                       android:padding="5dp"
-                       android:text="Network monitor"
-                       android:textAlignment="center"
-                       android:visibility="gone"
-                       android:textColor="@color/secondaryText"
-                       app:chipBackgroundColor="@color/colorPrimaryDark" />
-
-                   <com.google.android.material.chip.Chip
-                       android:id="@+id/chip_settings"
-                       style="@style/Widget.MaterialComponents.Chip.Action"
-                       android:layout_width="0dp"
-                       android:layout_height="wrap_content"
-                       android:layout_marginStart="10dp"
-                       android:layout_weight="0.5"
-                       android:padding="5dp"
-                       android:text="Settings"
-                       android:visibility="gone"
-                       android:textAlignment="center"
-                       android:textColor="@color/secondaryText"
-                       app:chipBackgroundColor="@color/colorPrimaryDark" />
-               </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -505,6 +532,77 @@
             android:gravity="bottom|center"
             android:orientation="vertical">
 
+
+
+
+            <!-- <com.celzero.bravedns.animation.RippleBackground
+                 android:id="@+id/content"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 app:rb_color="@color/rippleColor"
+                 app:rb_duration="6000"
+                 app:rb_radius="18dp"
+                 android:layoutDirection="ltr"
+                 app:rb_rippleAmount="3"
+                 app:rb_scale="3"
+                 app:rb_type="fillRipple">
+
+                 <androidx.appcompat.widget.AppCompatButton
+                     android:id="@+id/fhs_dns_on_off_btn"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:layout_centerHorizontal="true"
+                     android:background="@drawable/ic_icon_circle"
+                     android:fontFamily="sans-serif-smallcaps"
+                     android:gravity="center"
+                     android:text="start"
+                     android:textColor="@color/primaryText"
+                     android:textSize="@dimen/home_screen_stat_text"
+                     android:textStyle="normal" />
+
+
+             </com.celzero.bravedns.animation.RippleBackground>-->
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmer_view_container1"
+                android:layout_width="match_parent"
+                app:shimmer_duration="4000"
+                app:shimmer_dropoff="1"
+                app:shimmer_base_alpha="0.85"
+                app:shimmer_highlight_alpha="0.35"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:weightSum="1">
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/fhs_dns_on_off_btn"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.9"
+                        android:paddingStart="32dp"
+                        android:background="@color/button_background"
+                        android:fontFamily="sans-serif-condensed-medium"
+                        android:gravity="center"
+                        android:text="Start"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/home_screen_stat_text" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/home_fragment_bottom_sheet_icon"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.1"
+                        android:background="@color/button_background"
+                        android:src="@drawable/ic_arrow_down" />
+                </LinearLayout>
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/fhs_protection_level_txt"
                 android:layout_width="wrap_content"
@@ -512,34 +610,7 @@
                 android:fontFamily="sans-serif-smallcaps"
                 android:text="not connected"
                 android:textColor="@color/accent_bad"
-                android:textSize="@dimen/heading_font_text_view" />
-
-            <com.celzero.bravedns.animation.RippleBackground
-                android:id="@+id/content"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:rb_color="@color/rippleColor"
-                app:rb_duration="6000"
-                app:rb_radius="18dp"
-                android:layoutDirection="ltr"
-                app:rb_rippleAmount="3"
-                app:rb_scale="3"
-                app:rb_type="fillRipple">
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/fhs_dns_on_off_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:background="@drawable/ic_icon_circle"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:gravity="center"
-                    android:text="start"
-                    android:textColor="@color/primaryText"
-                    android:textSize="@dimen/home_screen_stat_text"
-                    android:textStyle="normal" />
-            </com.celzero.bravedns.animation.RippleBackground>
-
+                android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/fhs_app_connected_desc"
@@ -548,7 +619,8 @@
                 android:fontFamily="sans-serif-smallcaps"
                 android:text="@string/dns_explanation_disconnected"
                 android:textColor="@color/textColorMain"
-                android:textSize="@dimen/large_font_text_view" />
+                android:textSize="@dimen/large_font_text_view"
+                android:visibility="gone" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/fhs_app_uptime"
@@ -557,7 +629,8 @@
                 android:fontFamily="sans-serif-smallcaps"
                 android:text="uptime"
                 android:textColor="@color/textColorMain"
-                android:textSize="@dimen/default_font_text_view" />
+                android:textSize="@dimen/default_font_text_view"
+                android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

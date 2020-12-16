@@ -285,7 +285,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="start"
-                        android:layout_weight="0.95"
+                        android:layout_weight="0.9"
                         android:fontFamily="sans-serif"
                         android:isScrollContainer="true"
                         app:queryBackground="@color/colorPrimaryDark"
@@ -306,10 +306,10 @@
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/firewall_search_delete_icon"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
-                        android:layout_weight="0.05"
+                        android:layout_weight="0.10"
                         android:padding="8dp"
                         android:src="@drawable/ic_delete" />
 

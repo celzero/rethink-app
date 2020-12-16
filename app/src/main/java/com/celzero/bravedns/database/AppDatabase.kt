@@ -123,6 +123,11 @@ abstract class AppDatabase : RoomDatabase(){
                 database.execSQL("UPDATE DNSProxyEndpoint set  proxyIP = '9.9.9.10' where id = 3")
                 database.execSQL("ALTER TABLE CategoryInfo add column numOfAppWhitelisted INTEGER DEFAULT 0 NOT NULL")
                 database.execSQL("ALTER TABLE CategoryInfo add column numOfAppsExcluded INTEGER DEFAULT 0 NOT NULL")
+                database.execSQL("UPDATE DNSCryptRelayEndpoint set dnsCryptRelayName ='Netherlands' where id = 1")
+                database.execSQL("UPDATE DNSCryptRelayEndpoint set dnsCryptRelayName ='France' where id = 2")
+                database.execSQL("UPDATE DNSCryptRelayEndpoint set dnsCryptRelayName ='Sweden' where id = 3")
+                database.execSQL("UPDATE DNSCryptRelayEndpoint set dnsCryptRelayName ='US - Los Angeles, CA' where id = 4")
+                database.execSQL("UPDATE DNSCryptRelayEndpoint set dnsCryptRelayName ='Singapore' where id = 5")
             }
         }
 

@@ -111,7 +111,7 @@ class UniversalAppListAdapter(val context: Context)  : PagedListAdapter<AppInfo,
         fun update(appInfo: AppInfo?) {
             if(appInfo != null){
                 if(appInfo.appCategory == Constants.APP_CAT_SYSTEM_COMPONENTS){
-                    appName.text = appInfo.appName+ Constants.RECOMMENDED
+                    appName.text = appInfo.appName//+ Constants.RECOMMENDED
                 }else{
                     appName.text = appInfo.appName
                 }

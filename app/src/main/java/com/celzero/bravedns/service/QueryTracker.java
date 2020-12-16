@@ -16,20 +16,15 @@ limitations under the License.
 package com.celzero.bravedns.service;
 
 import android.content.Context;
-import android.util.Log;
 
-import com.celzero.bravedns.net.dns.DnsPacket;
 import com.celzero.bravedns.net.doh.Transaction;
+import com.celzero.bravedns.util.P2QuantileEstimation;
 
-import java.net.InetAddress;
-import java.net.ProtocolException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-
-import static com.celzero.bravedns.util.Constants.LOG_TAG;
 
 /**
  * A class for tracking DNS transactions.  This class counts the number of successful transactions,
@@ -50,6 +45,7 @@ public class QueryTracker {
     private List<Integer> queryList = new ArrayList<Integer>();
     private boolean historyEnabled = true;
     private Transaction transaction = null;
+    private static P2QuantileEstimation quantileEstimator = new P2QuantileEstimation(0.5);
 
     QueryTracker(Context context) {
         sync(context, transaction);
@@ -93,6 +89,10 @@ public class QueryTracker {
         return historyEnabled;
     }
 
+    public static void reinitializeQuantileEstimator(){
+        quantileEstimator = new P2QuantileEstimation(0.5);
+    }
+
     synchronized void recordTransaction(Context context, Transaction transaction) {
         // Increment request counter on each successful resolution
         //if (transaction.status == Transaction.Status.) {
@@ -107,8 +107,8 @@ public class QueryTracker {
         sync(context, transaction);
 
         //recentActivity.add(transaction.queryTime);
-        PersistentState.Companion.setNumOfReq(context);
-        DnsPacket packet = null;
+        //PersistentState.Companion.setNumOfReq(context);
+        /*DnsPacket packet = null;
         String BLOCKED_RESPONSE_TYPE = "0.0.0.0";
         try {
             if (transaction.response != null)
@@ -125,34 +125,45 @@ public class QueryTracker {
                     PersistentState.Companion.setBlockedReq(context);
                 }
             }
-        }
+        }*/
 
-        if (historyEnabled) {
+        /*if (historyEnabled) {
             recentTransactions.add(transaction);
             if (recentTransactions.size() > HISTORY_SIZE) {
                 recentTransactions.remove();
             }
-        }
+        }*/
     }
 
     public synchronized void sync(Context context, Transaction transaction) {
-        if (transaction != null) {
+        if (transaction != null && transaction.blockList.isEmpty() && !transaction.serverIp.isEmpty()) {
             // Restore number of requests from storage, or 0 if it isn't defined yet.
             //numRequests = PersistentState.Companion.getNumOfReq(context);
-            if (transaction.blockList.isEmpty() && !transaction.serverIp.isEmpty()) {
+            long val =  (transaction.responseTime - transaction.queryTime);
+            if(quantileEstimator == null){
+                quantileEstimator = new P2QuantileEstimation(0.5);
+            }else{
+                quantileEstimator.addValue((double)val);
+            }
+
+            long latencyVal = (long)quantileEstimator.getQuantile();
+
+            PersistentState.Companion.setMedianLatency(context, latencyVal);
+
+            /*if (transaction.blockList.isEmpty() && !transaction.serverIp.isEmpty()) {
                 if (!queryList.isEmpty()) {
                     if (queryList.size() >= HISTORY_SIZE) {
                         queryList.remove(0);
                     }
                 }
-                int val = (int) (transaction.responseTime - transaction.queryTime);
-                queryList.add(val);
+
+                queryList.add((int)val);
                 List<Integer> _queryList = new ArrayList<Integer>(queryList);
                 Collections.sort(_queryList);
                 int positionP50 = (int) (_queryList.size() * 0.50);
                 val = _queryList.get(positionP50);
                 PersistentState.Companion.setMedianLatency(context, val);
-            }
+            }*/
         }
     }
 }

@@ -109,27 +109,38 @@
         android:layout_marginBottom="20dp"
         android:gravity="center"
         android:paddingStart="20dp"
-        android:paddingEnd="20dp">
+        android:paddingEnd="20dp"
+        android:weightSum="1">
 
-        <TextView
-            android:id="@+id/bs_conn_blocked_desc"
-            style="@style/ActionItem"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="@string/bsct_conn_block_desc"
-            android:textColor="@color/textColorMain"
-            android:textSize="@dimen/default_font_text_view"
-            android:visibility="gone" />
+            android:layout_weight="0.75"
+            android:gravity="center">
 
-        <TextView
-            android:id="@+id/bs_conn_connection_details"
-            style="@style/ActionItem"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/bsct_conn_conn_desc_allowed"
-            android:textColor="@color/textColorMain"
-            android:textSize="@dimen/default_font_text_view" />
+            <TextView
+                android:id="@+id/bs_conn_blocked_desc"
+                style="@style/ActionItem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="end"
+                android:layout_gravity="fill_horizontal"
+                android:text="@string/bsct_conn_block_desc"
+                android:textColor="@color/textColorMain"
+                android:textSize="@dimen/default_font_text_view"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/bs_conn_connection_details"
+                style="@style/ActionItem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:text="@string/bsct_conn_conn_desc_allowed"
+                android:textColor="@color/textColorMain"
+                android:textSize="@dimen/default_font_text_view" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/bs_conn_blocked_desc_2"
@@ -137,9 +148,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/drawable_purple_gradient"
-            android:gravity="start"
+            android:gravity="center"
+            android:layout_gravity="start"
             android:padding="7dp"
+            android:layout_weight="0.1"
             android:text="Rule1"
+            android:visibility="visible"
             android:textColor="@color/textColorMain"
             android:textSize="@dimen/default_font_text_view" />
 
@@ -149,6 +163,9 @@
             android:layout_height="wrap_content"
             android:paddingStart="5dp"
             android:paddingEnd="5dp"
+            android:layout_gravity="center"
+            android:layout_weight="0.1"
+            android:visibility="visible"
             android:src="@drawable/brave_mode_info" />
     </LinearLayout>
 

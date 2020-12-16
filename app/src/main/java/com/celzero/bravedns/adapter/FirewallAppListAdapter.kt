@@ -318,7 +318,7 @@ class FirewallAppListAdapter internal constructor(
         val sysAppWarning: TextView = convertView.findViewById(R.id.expand_system_apps_warning)
         val placeHolder : TextView = convertView.findViewById(R.id.expand_system_place_holder)
 
-        categoryNameTV.text = listTitle.categoryName
+        categoryNameTV.text = "${listTitle.categoryName} (${listTitle.numberOFApps})"
         val isInternetAllowed = !listTitle.isInternetBlocked
 
         internetChk.isChecked = !isInternetAllowed
@@ -366,7 +366,7 @@ class FirewallAppListAdapter internal constructor(
         } else {
             appCountTV.text = numberOfApps.toString() + "/" + numberOfApps.toString() + " apps blocked"
         }*/
-        appCountTV.text = "Number of Apps: ${listTitle.numberOFApps}\n${listTitle.numOfAppsBlocked} blocked, ${listTitle.numOfAppWhitelisted} whitelisted, ${listTitle.numOfAppsExcluded} excluded"
+        appCountTV.text = "${listTitle.numOfAppsBlocked} blocked, ${listTitle.numOfAppWhitelisted} whitelisted, ${listTitle.numOfAppsExcluded} excluded"
         //appCountTV.text = "Blocked: ${listTitle.numOfAppsBlocked}, Whitelisted: ${listTitle.numOfAppWhitelisted},\nExcluded: ${listTitle.numOfAppsExcluded}, Total Apps: ${listTitle.numberOFApps} "
 
         val list = dataList[listTitle]

@@ -26,7 +26,6 @@
             app:title="App Manager"
             app:expandedTitleTextAppearance="@style/TextAppearance.AppCompat.Headline"
             app:collapsedTitleGravity="left"
-            android:background="@drawable/illustration_app_mgr_bg"
             app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 

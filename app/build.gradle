@@ -19,6 +19,7 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
 
+
     signingConfigs {
         config {
             keyAlias keystoreProperties['keyAlias']
@@ -43,6 +44,9 @@ android {
              }
          }*/
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        ndk {
+            abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
+        }
     }
 
     buildTypes {
@@ -74,9 +78,9 @@ dependencies {
     ], dir: 'libs')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.core:core-ktx:1.3.2'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
+    implementation 'androidx.appcompat:appcompat:1.3.0-alpha02'
+    implementation 'androidx.core:core-ktx:1.5.0-alpha05'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation "com.mikepenz:fastadapter:5.0.0-a04"
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
@@ -117,5 +121,8 @@ dependencies {
     //Glide implementation
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+
+    //Swipe button animation
+    implementation 'com.facebook.shimmer:shimmer:0.5.0'
 
 }
