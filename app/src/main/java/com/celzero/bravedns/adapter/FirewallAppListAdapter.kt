@@ -142,13 +142,15 @@ class FirewallAppListAdapter internal constructor(
 
 
         try {
-           /* val appIcon = context.packageManager.getApplicationIcon(appInfoDetail.packageInfo)
-            mIconImageView.setImageDrawable(appIcon)*/
+            //val appIcon = context.packageManager.getApplicationIcon(appInfoDetail.packageInfo)
+            //mIconImageView.setImageDrawable(appIcon)
             Glide.with(context).load(context.packageManager.getApplicationIcon(appInfoDetail.packageInfo))
+                .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                 .into(mIconImageView)
         } catch (e: Exception) {
-            //mIconImageView.setImageDrawable(context.getDrawable(R.drawable.default_app_icon))
+            mIconImageView.setImageDrawable(context.getDrawable(R.drawable.default_app_icon))
             Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                 .into(mIconImageView)
             Log.e(LOG_TAG, "Application Icon not available for package: ${appInfoDetail.packageInfo}" + e.message, e)
         }
@@ -311,8 +313,6 @@ class FirewallAppListAdapter internal constructor(
         val imageHolderLL: LinearLayout = convertView.findViewById(R.id.imageLayout)
         val imageHolder1: AppCompatImageView = convertView.findViewById(R.id.imageLayout_1)
         val imageHolder2: AppCompatImageView = convertView.findViewById(R.id.imageLayout_2)
-        //val imageHolder3 : AppCompatImageView = convertView.findViewById(R.id.imageLayout_3)
-        //val imageHolder4 : AppCompatImageView = convertView.findViewById(R.id.imageLayout_4)
         val progressBar: ProgressBar = convertView.findViewById(R.id.expand_header_progress)
         val indicatorTV: TextView = convertView.findViewById(R.id.expand_header_category_indicator)
         val sysAppWarning: TextView = convertView.findViewById(R.id.expand_system_apps_warning)
@@ -374,12 +374,18 @@ class FirewallAppListAdapter internal constructor(
             if (list != null && list.isNotEmpty()) {
                 if (numberOfApps != 0) {
                     if (numberOfApps >= 2) {
+                        //imageHolder1.setImageDrawable(context.packageManager.getApplicationIcon(list[0].packageInfo))
+                        //imageHolder2.setImageDrawable(context.packageManager.getApplicationIcon(list[1].packageInfo))
                         Glide.with(context).load(context.packageManager.getApplicationIcon(list[0].packageInfo))
+                            .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                             .into(imageHolder1)
                         Glide.with(context).load(context.packageManager.getApplicationIcon(list[1].packageInfo))
+                            .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                             .into(imageHolder2)
                     } else {
+                        //imageHolder1.setImageDrawable(context.packageManager.getApplicationIcon(list[0].packageInfo))
                         Glide.with(context).load(context.packageManager.getApplicationIcon(list[0].packageInfo))
+                            .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                             .into(imageHolder1)
                         imageHolder2.visibility = View.GONE
                     }

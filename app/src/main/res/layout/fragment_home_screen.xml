@@ -44,8 +44,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:shimmer_base_color="@color/primaryText"
-                    app:shimmer_duration="25000"
+                    app:shimmer_duration="30000"
+                    app:shimmer_repeat_delay="10000"
                     app:shimmer_colored="true"
+                    app:shimmer_width_ratio="1.5"
                     app:shimmer_shape="radial"
                     app:shimmer_auto_start="true">
 
@@ -459,13 +461,16 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
+                android:foreground="?attr/selectableItemBackground"
                 android:textAlignment="center"
                 android:background="@color/colorPrimaryDark"
+                android:clickable="true"
                 android:drawableStart="@drawable/spinner_firewall"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
                 android:text="@string/firewall_mode_info_title"
-                android:textColor="@color/primaryText" />
+                android:textColor="@color/primaryText"
+                android:focusable="true" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/chip_view_logs"
@@ -474,6 +479,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_weight="0.5"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
                 android:textAlignment="center"
                 android:background="@color/colorPrimaryDark"
                 android:drawableStart="@drawable/spinner_dns"
@@ -533,8 +541,6 @@
             android:orientation="vertical">
 
 
-
-
             <!-- <com.celzero.bravedns.animation.RippleBackground
                  android:id="@+id/content"
                  android:layout_width="wrap_content"
@@ -565,27 +571,23 @@
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/shimmer_view_container1"
                 android:layout_width="match_parent"
-                app:shimmer_duration="4000"
-                app:shimmer_dropoff="1"
+                android:layout_height="wrap_content"
                 app:shimmer_base_alpha="0.85"
-                app:shimmer_highlight_alpha="0.35"
-                android:layout_height="wrap_content">
+                app:shimmer_dropoff="1"
+                app:shimmer_duration="1000"
+                app:shimmer_highlight_alpha="0.35">
 
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="10dp"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:weightSum="1">
+                    android:orientation="horizontal">
 
                     <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/fhs_dns_on_off_btn"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0.9"
-                        android:paddingStart="32dp"
                         android:background="@color/button_background"
                         android:fontFamily="sans-serif-condensed-medium"
                         android:gravity="center"
@@ -595,12 +597,14 @@
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/home_fragment_bottom_sheet_icon"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="0.1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
                         android:background="@color/button_background"
+                        android:elevation="2dp"
+                        android:padding="8dp"
                         android:src="@drawable/ic_arrow_down" />
-                </LinearLayout>
+                </RelativeLayout>
             </com.facebook.shimmer.ShimmerFrameLayout>
 
             <androidx.appcompat.widget.AppCompatTextView

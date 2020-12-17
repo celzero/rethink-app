@@ -17,7 +17,10 @@ limitations under the License.
 package com.celzero.bravedns.adapter
 
 import android.app.Dialog
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
+import android.content.DialogInterface
 import android.os.CountDownTimer
 import android.view.*
 import android.widget.CheckBox
@@ -35,6 +38,7 @@ import com.celzero.bravedns.database.DNSCryptRelayEndpoint
 import com.celzero.bravedns.database.DNSCryptRelayEndpointRepository
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.cryptRelayToRemove
+import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -165,6 +169,13 @@ class DNSCryptRelayEndpointAdapter(val context: Context) : PagedListAdapter<DNSC
             //performing positive action
             builder.setPositiveButton("Ok") { dialogInterface, which ->
                 dialogInterface.dismiss()
+            }
+
+            builder.setNeutralButton("Copy") { dialogInterface: DialogInterface, i: Int ->
+                val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+                val clip = ClipData.newPlainText("URL", url)
+                clipboard?.setPrimaryClip(clip)
+                Utilities.showToastInMidLayout(context, "URL Copied.", Toast.LENGTH_SHORT)
             }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()

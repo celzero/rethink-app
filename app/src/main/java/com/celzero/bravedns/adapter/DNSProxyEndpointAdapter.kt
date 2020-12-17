@@ -16,7 +16,10 @@ limitations under the License.
 
 package com.celzero.bravedns.adapter
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
+import android.content.DialogInterface
 import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
@@ -39,6 +42,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.UIUpdateInterface
+import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -177,6 +181,12 @@ class DNSProxyEndpointAdapter(val context: Context, val listener: UIUpdateInterf
             //performing positive action
             builder.setPositiveButton("Ok") { dialogInterface, which ->
                 dialogInterface.dismiss()
+            }
+            builder.setNeutralButton("Copy") { dialogInterface: DialogInterface, i: Int ->
+                val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+                val clip = ClipData.newPlainText("URL", url)
+                clipboard?.setPrimaryClip(clip)
+                Utilities.showToastInMidLayout(context, "URL Copied.", Toast.LENGTH_SHORT)
             }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()

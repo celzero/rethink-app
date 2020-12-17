@@ -17,8 +17,7 @@ limitations under the License.
 package com.celzero.bravedns.adapter
 
 import android.app.Activity
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
@@ -44,6 +43,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_DNS_PLUS
 import com.celzero.bravedns.util.UIUpdateInterface
+import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -70,10 +70,7 @@ class DoHEndpointAdapter(val context: Context, val listener: UIUpdateInterface) 
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DoHEndpointViewHolder {
-        val v: View = LayoutInflater.from(parent.context).inflate(
-            R.layout.doh_endpoint_list_item,
-            parent, false
-        )
+        val v: View = LayoutInflater.from(parent.context).inflate(R.layout.doh_endpoint_list_item, parent, false)
         //v.setBackgroundColor(context.getColor(R.color.colorPrimary))
         return DoHEndpointViewHolder(v)
     }
@@ -112,10 +109,10 @@ class DoHEndpointAdapter(val context: Context, val listener: UIUpdateInterface) 
                 urlNameTxt.text = doHEndpoint.dohName
                 if (doHEndpoint.isSelected) {
                     urlExplanationTxt.text = "Connected."
-                    Log.d(LOG_TAG,"DOH Endpoint connected - ${doHEndpoint.dohName}")
+                    Log.d(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}")
                     if(doHEndpoint.dohName == RETHINK_DNS_PLUS){
                         val count = PersistentState.getNumberOfRemoteBlockLists(context)
-                        Log.d(LOG_TAG,"DOH Endpoint connected - ${doHEndpoint.dohName}, count- $count")
+                        Log.d(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}, count- $count")
                         if (count != 0) {
                             urlExplanationTxt.text = "Connected. $count blocklists in-use."
                         }
@@ -150,11 +147,11 @@ class DoHEndpointAdapter(val context: Context, val listener: UIUpdateInterface) 
                     var stamp = ""
                     try {
                         stamp = getBlocklistStampFromURL(doHEndpoint.dohURL)
-                        if(DEBUG) Log.d(LOG_TAG,"Configure btn click: ${doHEndpoint.dohURL}, $stamp")
+                        if(DEBUG) Log.d(LOG_TAG, "Configure btn click: ${doHEndpoint.dohURL}, $stamp")
                     } catch (e: Exception) {
-                        Log.e(LOG_TAG, "Exception while fetching stamp from Go ${e.message}",e)
+                        Log.e(LOG_TAG, "Exception while fetching stamp from Go ${e.message}", e)
                     }
-                    if(DEBUG) Log.d(LOG_TAG,"startActivityForResult - DohEndpointadapter")
+                    if(DEBUG) Log.d(LOG_TAG, "startActivityForResult - DohEndpointadapter")
                     val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
                     intent.putExtra("location", DNSConfigureWebViewActivity.REMOTE)
                     intent.putExtra("stamp", stamp)
@@ -196,26 +193,32 @@ class DoHEndpointAdapter(val context: Context, val listener: UIUpdateInterface) 
                 showDialogToDelete(doHEndpoint)
             else {
                 if (doHEndpoint.dohExplanation.isNullOrEmpty()) {
-                    showDialogExplanation(doHEndpoint.dohName, doHEndpoint.dohURL,"")
+                    showDialogExplanation(doHEndpoint.dohName, doHEndpoint.dohURL, "")
                     //Toast.makeText(context, doHEndpoint.dohURL, Toast.LENGTH_SHORT).show()
                 } else {
-                    showDialogExplanation(doHEndpoint.dohName, doHEndpoint.dohURL,doHEndpoint.dohExplanation!!)
+                    showDialogExplanation(doHEndpoint.dohName, doHEndpoint.dohURL, doHEndpoint.dohExplanation!!)
                     //Toast.makeText(context, doHEndpoint.dohExplanation, Toast.LENGTH_SHORT).show()
                 }
             }
         }
 
 
-        private fun showDialogExplanation(title: String, url : String, message:String) {
+        private fun showDialogExplanation(title: String, url: String, message: String) {
             val builder = AlertDialog.Builder(context)
             //set title for alert dialog
             builder.setTitle(title)
             //set message for alert dialog
-            builder.setMessage(url + "\n\n"+message)
+            builder.setMessage(url + "\n\n" + message)
             builder.setCancelable(true)
             //performing positive action
             builder.setPositiveButton("Ok") { dialogInterface, which ->
                 dialogInterface.dismiss()
+            }
+            builder.setNeutralButton("Copy"){ dialogInterface: DialogInterface, i: Int ->
+                val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+                val clip = ClipData.newPlainText("URL", url)
+                clipboard?.setPrimaryClip(clip)
+                Utilities.showToastInMidLayout(context,"URL Copied.",Toast.LENGTH_SHORT)
             }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
@@ -261,7 +264,7 @@ class DoHEndpointAdapter(val context: Context, val listener: UIUpdateInterface) 
             //performing positive action
             builder.setPositiveButton("configure") { dialogInterface, which ->
                 val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
-                intent.putExtra("location",DNSConfigureWebViewActivity.REMOTE)
+                intent.putExtra("location", DNSConfigureWebViewActivity.REMOTE)
                 intent.putExtra("stamp", "")
                 (context as Activity).startActivityForResult(intent, Activity.RESULT_OK)
 

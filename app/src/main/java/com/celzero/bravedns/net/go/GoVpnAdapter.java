@@ -346,9 +346,9 @@ public class GoVpnAdapter {
                         Log.d(LOG_TAG, "GoVPNAdapter Refresh LiveServers -- " + liveServers);
                     if(liveServers.isEmpty()){
                         Log.i(LOG_TAG,"GoVPNAdapter No live servers - falling back to default DoH mode");
-                        // FIXME: 15-11-2020 - Modified to check the fail open in DNSCrypt
-                        //tunnel.stopDNSCryptProxy();
-                        //dnsCryptEndpointRepository.updateFailingConnections();
+                        // FIXME: 17-12-2020 - Removed the fail open changes
+                        tunnel.stopDNSCryptProxy();
+                        dnsCryptEndpointRepository.updateFailingConnections();
                     }else{
                         tunnel.setTunMode( Settings.DNSModeCryptPort, firewallMode, proxyMode);
 
@@ -374,14 +374,14 @@ public class GoVpnAdapter {
                 }
             } catch (Exception e) {
                 Log.e(LOG_TAG, "GoVPNAdapter celzero connect-tunnel: dns crypt", e);
-                //dnsCryptEndpointRepository.updateFailingConnections();
-                //DoHEndpoint doHEndpoint = doHEndpointRepository.updateConnectionDefault();
-                //PersistentState.Companion.setDNSType(vpnService, 1);
-                //PersistentState.Companion.setConnectionModeChange(vpnService, doHEndpoint.getDohURL());
-                //AppMode appMode = HomeScreenActivity.GlobalVariable.INSTANCE.getAppMode();
-                //if(appMode != null) {
-                //    appMode.setDNSMode(Settings.DNSModePort);
-                //}
+                dnsCryptEndpointRepository.updateFailingConnections();
+                DoHEndpoint doHEndpoint = doHEndpointRepository.updateConnectionDefault();
+                PersistentState.Companion.setDNSType(vpnService, 1);
+                PersistentState.Companion.setConnectionModeChange(vpnService, doHEndpoint.getDohURL());
+                AppMode appMode = HomeScreenActivity.GlobalVariable.INSTANCE.getAppMode();
+                if(appMode != null) {
+                    appMode.setDNSMode(Settings.DNSModePort);
+                }
                 Handler handler =  new Handler(vpnService.getMainLooper());
                    handler.post( new Runnable(){
                        public void run(){

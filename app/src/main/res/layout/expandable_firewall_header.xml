@@ -67,11 +67,11 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginEnd="10dp"
+                    android:layout_marginEnd="5dp"
                     android:drawableStart="@drawable/allowed"
                     android:drawablePadding="10dp"
                     android:padding="10dp"
-                    android:textSize="@dimen/large_font_text_view"
+                    android:textSize="@dimen/default_font_text_view"
                     android:textOff="Unblocked"
                     android:textOn="Blocked" />
 

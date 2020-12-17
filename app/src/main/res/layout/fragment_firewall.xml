@@ -290,7 +290,7 @@
                         android:isScrollContainer="true"
                         app:queryBackground="@color/colorPrimaryDark"
                         app:iconifiedByDefault="false"
-                        app:queryHint="Search by IP">
+                        app:queryHint="@string/search_universal_ips">
                         <requestFocus />
                     </androidx.appcompat.widget.SearchView>
 
@@ -310,7 +310,7 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:layout_weight="0.10"
-                        android:padding="8dp"
+                        android:padding="7dp"
                         android:src="@drawable/ic_delete" />
 
                 </LinearLayout>

@@ -43,4 +43,12 @@ interface DNSLogDAO {
 
     @Query("delete from DNSLogs")
     fun clearAllData()
+
+    @Query("delete from DNSLogs where time < :date")
+    fun deleteOlderData(date : Long)
+
+    @Query("delete from DNSLogs where id <  (id - :count)")
+    fun deleteOlderDataCount(count : Int)
+
+
 }

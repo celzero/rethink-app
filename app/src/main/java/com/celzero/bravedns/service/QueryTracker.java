@@ -39,7 +39,7 @@ public class QueryTracker {
     private static final int HISTORY_SIZE = 1000;
     //private static final int ACTIVITY_MEMORY_MS = 60 * 1000;  // One minute
 
-    //private long numRequests = 0;
+    private long numRequests = 0;
     private Queue<Transaction> recentTransactions = new LinkedList<>();
     private Queue<Long> recentActivity = new LinkedList<>();
     private List<Integer> queryList = new ArrayList<Integer>();
@@ -89,20 +89,19 @@ public class QueryTracker {
         return historyEnabled;
     }
 
-    public static void reinitializeQuantileEstimator(){
+    public static
+    void reinitializeQuantileEstimator(){
         quantileEstimator = new P2QuantileEstimation(0.5);
     }
 
     synchronized void recordTransaction(Context context, Transaction transaction) {
         // Increment request counter on each successful resolution
         //if (transaction.status == Transaction.Status.) {
-      /*++numRequests;
-      // HomeScreenActivity.GlobalVariable.INSTANCE.setLifeTimeQueries(numRequests);
-      if (numRequests % HISTORY_SIZE != 0) {
-        // Avoid losing too many requests in case of an unclean shutdown, but also avoid
-        // excessive disk I/O from syncing the counter to disk after every request.
-
-      }*/
+        ++numRequests;
+        // HomeScreenActivity.GlobalVariable.INSTANCE.setLifeTimeQueries(numRequests);
+        if (numRequests % HISTORY_SIZE == 0) {
+            reinitializeQuantileEstimator();
+        }
         //}
         sync(context, transaction);
 
@@ -138,7 +137,6 @@ public class QueryTracker {
     public synchronized void sync(Context context, Transaction transaction) {
         if (transaction != null && transaction.blockList.isEmpty() && !transaction.serverIp.isEmpty()) {
             // Restore number of requests from storage, or 0 if it isn't defined yet.
-            //numRequests = PersistentState.Companion.getNumOfReq(context);
             long val =  (transaction.responseTime - transaction.queryTime);
             if(quantileEstimator == null){
                 quantileEstimator = new P2QuantileEstimation(0.5);

@@ -69,6 +69,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.median50
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.numUniversalBlock
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Utilities
+import com.facebook.shimmer.Shimmer
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.chip.Chip
 import settings.Settings
@@ -196,17 +197,17 @@ class HomeScreenFragment : Fragment() {
         //Complete UI component initialization for the view
         dnsOnOffBtn = view.findViewById(R.id.fhs_dns_on_off_btn)
 
+        /*val detectSwipe = DetectSwipe()
+        dnsOnOffBtn.setOnTouchListener(detectSwipe)*/
+
         //Shimmer Animation for the heading and start btn
         shimmerContainer = view.findViewById(R.id.shimmer_view_container1)
-
 
        /* shimmerHeaderContainer = view.findViewById(R.id.shimmer_view_heading)
         //shimmerHeaderContainer.baseAlpha = F
         shimmerHeaderContainer
 
         shimmerHeaderContainer.startShimmer()*/
-
-
 
         cardViewTileTop = view.findViewById(R.id.fhs_card_home_top_tile)
 
@@ -310,36 +311,7 @@ class HomeScreenFragment : Fragment() {
 
         // Connect/Disconnect button ==> TODO : Change the label to Start and Stop
         dnsOnOffBtn.setOnClickListener(View.OnClickListener {
-            dnsOnOffBtn.isEnabled = false
-            //TODO : check for the service already running
-            //val status = VpnController.getInstance()!!.getState(requireContext())
-            val status = PersistentState.getVpnEnabled(requireContext())
-            if (!checkForPrivateDNSandAlwaysON()) {
-                //if (status!!.activationRequested) {
-                if (status) {
-                    appStartTime = System.currentTimeMillis()
-                    dnsOnOffBtn.setText("start")
-                    updateUIForStop()
-                    //rippleRRLayout.startRippleAnimation()
-                    protectionDescTxt.setText(getString(R.string.dns_explanation_disconnected))
-                    stopDnsVpnService()
-                } else {
-                    appStartTime = System.currentTimeMillis()
-                    if (DEBUG) Log.d(LOG_TAG, "VPN service start initiated with time $appStartTime")
-                    if (VpnController.getInstance()?.getBraveVpnService() != null) {
-                        VpnController.getInstance()?.stop(requireContext())
-                        if (DEBUG) Log.d(LOG_TAG, "VPN service start initiated but the brave service is already running - so stop called")
-                    } else {
-                        if (DEBUG) Log.d(LOG_TAG, "VPN service start initiated")
-                    }
-                    prepareAndStartDnsVpn()
-                }
-            } else if (status) {
-                Utilities.showToastInMidLayout(requireContext(), "Always-on enabled for RethinkDNS", Toast.LENGTH_SHORT)
-            }
-
-            Handler().postDelayed({ dnsOnOffBtn.isEnabled = true }, 500)
-
+            handleStartBtnClickEvent()
         })
 
         val mDb = AppDatabase.invoke(requireContext().applicationContext)
@@ -395,11 +367,48 @@ class HomeScreenFragment : Fragment() {
             if (DEBUG) Log.d(LOG_TAG, "HomeScreen -> braveModeToggler -> observer")
             if (PersistentState.getVpnEnabled(requireContext())) {
                 enableBraveModeIcons()
-            }/* else {
-                disableBraveModeIcon()
-            }*/
+                showTileForMode()
+            }
         })
 
+       /* swipeDetector.observe(viewLifecycleOwner, Observer {
+            if(it) {
+                handleStartBtnClickEvent()
+            }
+         })*/
+
+    }
+
+    private fun handleStartBtnClickEvent() {
+        dnsOnOffBtn.isEnabled = false
+        //TODO : check for the service already running
+        //val status = VpnController.getInstance()!!.getState(requireContext())
+        val status = PersistentState.getVpnEnabled(requireContext())
+        if (!checkForPrivateDNSandAlwaysON()) {
+            //if (status!!.activationRequested) {
+            if (status) {
+                appStartTime = System.currentTimeMillis()
+                dnsOnOffBtn.setText("start")
+                updateUIForStop()
+                //rippleRRLayout.startRippleAnimation()
+                protectionDescTxt.setText(getString(R.string.dns_explanation_disconnected))
+                stopDnsVpnService()
+            } else {
+                appStartTime = System.currentTimeMillis()
+                if (DEBUG) Log.d(LOG_TAG, "VPN service start initiated with time $appStartTime")
+                if (VpnController.getInstance()?.getBraveVpnService() != null) {
+                    VpnController.getInstance()?.stop(requireContext())
+                    if (DEBUG) Log.d(LOG_TAG, "VPN service start initiated but the brave service is already running - so stop called")
+                } else {
+                    if (DEBUG) Log.d(LOG_TAG, "VPN service start initiated")
+                }
+                prepareAndStartDnsVpn()
+            }
+        } else if (status) {
+            Utilities.showToastInMidLayout(requireContext(), "Always-on enabled for RethinkDNS", Toast.LENGTH_SHORT)
+        }
+
+        Handler().postDelayed({ dnsOnOffBtn.isEnabled = true }, 500)
     }
 
     private fun openBottomSheet() {
@@ -562,7 +571,10 @@ class HomeScreenFragment : Fragment() {
         updateUptime()
         if (PersistentState.getVpnEnabled(requireContext())) {
             enableBraveModeIcons()
+            shimmerForStart()
             //shimmerContainer.stopShimmer()
+        }else{
+            shimmerForStop()
         }
     }
 
@@ -713,11 +725,30 @@ class HomeScreenFragment : Fragment() {
 
     private fun updateUIForStart() {
         enableBraveModeIcons()
+        shimmerForStart()
+    }
+
+    private fun shimmerForStart(){
+        val builder = Shimmer.AlphaHighlightBuilder()
+        builder.setDuration(10000)
+        builder.setBaseAlpha(0.85f)
+        builder.setDropoff(1f)
+        builder.setHighlightAlpha(0.35f)
+        shimmerContainer.setShimmer(builder.build())
+    }
+
+    private fun shimmerForStop(){
+        val builder = Shimmer.AlphaHighlightBuilder()
+        builder.setDuration(2000)
+        builder.setBaseAlpha(0.85f)
+        builder.setDropoff(1f)
+        builder.setHighlightAlpha(0.35f)
+        shimmerContainer.setShimmer(builder.build())
     }
 
     private fun updateUIForStop(){
         disableBraveModeIcon()
-        shimmerContainer.startShimmer()
+        shimmerForStop()
     }
 
     private fun stopDnsVpnService() {
