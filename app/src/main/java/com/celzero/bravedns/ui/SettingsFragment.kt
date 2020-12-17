@@ -764,7 +764,7 @@ class SettingsFragment : Fragment() {
         }.start()
 
         refreshDatabase.refreshAppInfoDatabase()
-        refreshDatabase.updateCategoryInDB()
+        //refreshDatabase.updateCategoryInDB()
     }
 
     private fun registerReceiverForDownloadManager() {

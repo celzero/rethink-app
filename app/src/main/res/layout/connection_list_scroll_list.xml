@@ -33,7 +33,7 @@
                     android:id="@+id/connection_url_ll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="left"
+                    android:gravity="start"
                     android:orientation="horizontal"
                     android:weightSum="1">
 
@@ -47,8 +47,7 @@
                         android:isScrollContainer="true"
                         app:iconifiedByDefault="false"
                         app:queryBackground="@color/colorPrimaryDark"
-                        app:queryHint="Search apps or IPs">
-
+                        app:queryHint="@string/search_firewall_network_log">
                         <requestFocus />
                     </androidx.appcompat.widget.SearchView>
 
@@ -58,7 +57,7 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:layout_weight="0.10"
-                        android:padding="5dp"
+                        android:padding="7dp"
                         android:src="@drawable/ic_filter"
                         android:visibility="visible" />
 
@@ -68,7 +67,7 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:layout_weight="0.10"
-                        android:padding="5dp"
+                        android:padding="7dp"
                         android:src="@drawable/ic_delete"
                         android:visibility="visible" />
 

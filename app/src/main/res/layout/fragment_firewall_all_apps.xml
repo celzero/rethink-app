@@ -67,7 +67,7 @@
                     android:layout_weight="0.95"
                     android:fontFamily="sans-serif"
                     app:queryBackground="@color/colorPrimaryDark"
-                    app:queryHint="Search apps"
+                    app:queryHint="@string/search_firewall_all_apps"
                     app:iconifiedByDefault="false"
                     android:isScrollContainer="true">
 

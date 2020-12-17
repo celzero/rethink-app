@@ -33,8 +33,8 @@ android {
         applicationId "com.celzero.bravedns"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 10
-        versionName "0.5.2"
+        versionCode 11 // For version name 053
+        versionName "0.5.3"
        /* splits {
              abi {
                  enable true
@@ -45,7 +45,7 @@ android {
          }*/
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         ndk {
-            abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
+            abiFilters 'x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'arm64-v8a'
         }
     }
 

@@ -115,6 +115,8 @@ class HomeScreenActivity : AppCompatActivity() {
         var isScreenLocked : Int = -1
         var localDownloadComplete : MutableLiveData<Int> = MutableLiveData()
         var isSearchEnabled : Boolean = true
+
+        var swipeDetector : MutableLiveData<Boolean> = MutableLiveData()
     }
 
     companion object {

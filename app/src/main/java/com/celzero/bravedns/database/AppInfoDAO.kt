@@ -158,7 +158,7 @@ interface AppInfoDAO {
     @Query("select count(*) from AppInfo where isExcluded= 1 and appCategory = :categoryName and appName != 'ANDROID' ")
     fun getExcludedAppCountForCategory(categoryName: String) : Int
 
-    @Query("select count(*) from AppInfo where packageInfo != 'no_package' and appName != 'ANDROID'")
+    @Query("select count(*) from AppInfo where packageInfo == 'no_package' and appName != 'ANDROID'")
     fun getNonAppCount(): Int
 
 }

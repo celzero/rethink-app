@@ -86,21 +86,24 @@ class RefreshDatabase(var context: Context) {
                         appInfo.uid = applicationInfo.uid
                         val dbAppInfo = appInfoRepository.getAppInfoForPackageName(appInfo.packageInfo)
                         if (dbAppInfo != null) {
-                            appInfo.isDataEnabled = dbAppInfo.isDataEnabled
+                            return@forEach
+                            /*appInfo.isDataEnabled = dbAppInfo.isDataEnabled
                             appInfo.isWifiEnabled = dbAppInfo.isWifiEnabled
                             appInfo.isScreenOff = dbAppInfo.isScreenOff
                             appInfo.isBackgroundEnabled = dbAppInfo.isBackgroundEnabled
                             appInfo.whiteListUniv2 = dbAppInfo.whiteListUniv2
                             appInfo.mobileDataUsed = dbAppInfo.mobileDataUsed
                             appInfo.trackers = dbAppInfo.trackers
+                            appInfo.isExcluded = dbAppInfo.isExcluded
                             appInfo.wifiDataUsed = dbAppInfo.wifiDataUsed
-                            appInfo.whiteListUniv1 = dbAppInfo.whiteListUniv1
+                            appInfo.whiteListUniv1 = dbAppInfo.whiteListUniv1*/
                         }else{
                             appInfo.isDataEnabled = true
                             appInfo.isWifiEnabled = true
                             appInfo.isScreenOff = false
                             appInfo.isBackgroundEnabled = false
                             appInfo.whiteListUniv2 = false
+                            appInfo.isExcluded = false
                             appInfo.whiteListUniv1 = ((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) && !FileSystemUID.isUIDAppRange(appInfo.uid)
                             appInfo.mobileDataUsed = 0
                             appInfo.trackers = 0
@@ -167,10 +170,11 @@ class RefreshDatabase(var context: Context) {
             appInfo.isWifiEnabled = true
             appInfo.isScreenOff = false
             appInfo.uid = 0
-            appInfo.isInternetAllowed = PersistentState.isWifiAllowed(appInfo.packageInfo, context)
+            appInfo.isInternetAllowed = true
             appInfo.isBackgroundEnabled = false
             appInfo.whiteListUniv1 = false
             appInfo.whiteListUniv2 = false
+            appInfo.isExcluded = false
             appInfo.mobileDataUsed = 0
             appInfo.trackers = 0
             appInfo.wifiDataUsed = 0
@@ -250,10 +254,12 @@ class RefreshDatabase(var context: Context) {
         GlobalScope.launch(Dispatchers.IO) {
             val mDb = AppDatabase.invoke(context.applicationContext)
             val connTrackerRepository = mDb.connectionTrackerRepository()
+            val dnsLogRepository = mDb.dnsLogRepository()
             val DAY_IN_MS = 1000 * 60 * 60 * 24
             val date = System.currentTimeMillis() - (HomeScreenActivity.DAYS_TO_MAINTAIN_NETWORK_LOG * DAY_IN_MS)
             if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "Time: ${System.currentTimeMillis()}, dateVal: $date")
             connTrackerRepository.deleteOlderData(date)
+            dnsLogRepository.deleteOlderData(date)
             //mDb.close()
         }
     }
@@ -265,6 +271,7 @@ class RefreshDatabase(var context: Context) {
     private val DEFAULT_VALUE = "OTHERS"
 
     fun updateCategoryInDB() {
+        if(DEBUG) Log.d(LOG_TAG,"RefreshDatabase - Call for updateCategoryDB")
         val mDb = AppDatabase.invoke(context.applicationContext)
         val appInfoRepository = mDb.appInfoRepository()//AppInfoRepository(appInfoDAO)
         val categoryInfoRepository = mDb.categoryInfoRepository()

@@ -561,9 +561,9 @@
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
             android:paddingStart="20dp"
-            android:paddingTop="5dp"
+            android:paddingTop="15dp"
             android:paddingEnd="10dp"
-            android:paddingBottom="5dp">
+            android:paddingBottom="15dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -584,6 +584,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
                     android:textSize="@dimen/default_font_text_view"
                     android:text="All the DNS and Firewall logs are stored locally." />
             </LinearLayout>

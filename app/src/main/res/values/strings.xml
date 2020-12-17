@@ -507,6 +507,11 @@
     <string name="download_update_dialog_failure_title">Something went wrong!</string>
     <string name="download_update_dialog_failure_message">Either our servers are down or connection could not be established. Please try again after sometime.</string>
 
+    <string name="search_firewall_network_log"><font size="12">Search apps or IP\'s</font></string>
+    <string name="search_firewall_all_apps"><font size="12">Search apps</font></string>
+    <string name="search_dns_logs"><font size="12">Search DNS queries or IP\'s</font></string>
+    <string name="search_universal_ips"><font size="12">Search by IP</font></string>
+
     <string name="whats_new_version_name">BraveDNS is now RethinkDNS</string>
     <string name="whats_new_version_update">DNS:\n\n
     \u00BB Support for RethinkDNS+ (a configurable DNS resolver with custom blocklists) deployed to 200+ locations world-wide.\n
