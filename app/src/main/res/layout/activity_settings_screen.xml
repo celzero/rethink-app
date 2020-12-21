@@ -33,13 +33,26 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/settings_app_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:padding="5dp"
-                    android:src="@drawable/conf_dns_icon_black" />
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/shimmer_view_heading"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:shimmer_auto_start="true"
+                    app:shimmer_base_color="@color/primaryText"
+                    app:shimmer_colored="true"
+                    app:shimmer_direction="top_to_bottom"
+                    app:shimmer_duration="12000"
+                    app:shimmer_shape="linear"
+                    app:shimmer_width_ratio="1.5">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/settings_app_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:padding="5dp"
+                        android:src="@drawable/conf_dns_icon_black" />
+                </com.facebook.shimmer.ShimmerFrameLayout>
 
             </LinearLayout>
 
@@ -218,6 +231,7 @@
         </RelativeLayout>
 
         <TextView
+            android:id="@+id/settings_activity_vpn_heading_text"
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -227,6 +241,21 @@
             android:text="VPN"
             android:textColor="@color/secondaryText" />
 
+        <TextView
+            android:id="@+id/settings_activity_vpn_lockdown_desc"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawablePadding="10dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:visibility="gone"
+            android:drawableStart="@drawable/dis_allowed"
+            android:background="@color/colorPrimary"
+            android:text="@string/settings_lock_down_mode_desc"
+            android:textSize="@dimen/default_font_text_view" />
 
         <RelativeLayout
             android:id="@+id/settings_activity_exclude_apps_rl"
@@ -237,6 +266,8 @@
             android:paddingTop="15dp"
             android:paddingEnd="10dp"
             android:paddingBottom="15dp">
+
+
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -313,7 +344,7 @@
                     android:layout_height="wrap_content"
                     android:paddingTop="5dp"
                     android:textSize="@dimen/default_font_text_view"
-                    android:text="Allow requesting apps to bypass RethinkDNS firewall on-demand. Some audio/video conference apps like Zoom and WhatsApp may require an on-demand bypass to function properly." />
+                    android:text="@string/settings_allow_bypass_desc" />
             </LinearLayout>
 
             <com.google.android.material.switchmaterial.SwitchMaterial
@@ -409,7 +440,7 @@
                     android:layout_width="wrap_content"
                     android:textSize="@dimen/large_font_text_view"
                     android:layout_height="wrap_content"
-                    android:text="Enable SOCKS5 (TCP) Proxy" />
+                    android:text="Setup SOCKS5 (TCP) Proxy" />
 
                 <TextView
                     android:id="@+id/settings_activity_socks5_desc"
@@ -466,7 +497,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/large_font_text_view"
-                    android:text="Enable HTTP(S) Proxy" />
+                    android:text="Setup HTTP(S) Proxy" />
 
                 <TextView
                     android:id="@+id/settings_activity_http_proxy_desc"
@@ -579,14 +610,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/large_font_text_view"
-                    android:text="Enable DNS and Firewall logs" />
+                    android:text="@string/settings_enable_logs" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="5dp"
                     android:textSize="@dimen/default_font_text_view"
-                    android:text="All the DNS and Firewall logs are stored locally." />
+                    android:text="@string/settings_enable_logs_desc" />
             </LinearLayout>
 
             <com.google.android.material.switchmaterial.SwitchMaterial

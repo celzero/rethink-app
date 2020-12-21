@@ -33,6 +33,7 @@ import android.os.SystemClock
 import android.service.quicksettings.TileService.requestListeningState
 import android.text.TextUtils
 import android.util.Log
+import android.view.accessibility.AccessibilityManager
 import androidx.annotation.GuardedBy
 import androidx.annotation.WorkerThread
 import com.celzero.bravedns.R
@@ -69,6 +70,7 @@ import protect.Protector
 import settings.Settings
 import java.util.*
 import kotlin.collections.HashMap
+
 
 class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector, Blocker,
     OnSharedPreferenceChangeListener {
@@ -200,7 +202,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
             }
 
             //Check whether the screen lock is enabled and act based on it
-            if(DEBUG) Log.d(LOG_TAG,"$FILE_LOG_TAG : isScreenLockEnabled: $isScreenLocked")
+            if(DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG : isScreenLockEnabled: $isScreenLocked")
             if (isScreenLocked) {
                 //Don't include DNS and private DNS request in the list
                 // FIXME: 04-12-2020 Removed the app range check for testing.
@@ -222,9 +224,9 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                 if ((uid != -1 && uid != MISSING_UID)) {
                     var isBGBlock = true
                     if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Background blocked $uid, $destIp, before sleep: $uid, $destIp, $isBGBlock, ${System.currentTimeMillis()}")
-                    for (i in 2 downTo 1) {
+                    for (i in 3 downTo 1) {
                         if (backgroundAllowedUID.containsKey(uid)) {
-                            if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Background blocked $uid, $destIp, AccessibilityEvent: app in foreground: $uid")
+                            if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Background not blocked $uid, $destIp, AccessibilityEvent: app in foreground: $uid")
                             isBGBlock = false
                             break
                         } else {
@@ -243,7 +245,6 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                             }
                             return isBGBlock
                         }
-
                     }
                 }
             }
@@ -345,7 +346,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         return vpnAdapter != null
     }
 
-    fun newBuilder(): Builder? {
+    fun newBuilder(): Builder {
         var builder = Builder()
         if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
             if (VERSION.SDK_INT >= VERSION_CODES.Q) {
@@ -508,6 +509,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         isBackgroundEnabled = PersistentState.getBackgroundEnabled(this) && Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
         privateDNSOverride = PersistentState.getAllowPrivateDNS(this)
 
+        registerAccessibilityServiceState()
         registerReceiversForScreenState()
         registerReceiverForBootComplete()
         if (vpnController != null) {
@@ -561,6 +563,17 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         return Service.START_REDELIVER_INTENT
     }
 
+    private fun registerAccessibilityServiceState() {
+        val am = getSystemService(ACCESSIBILITY_SERVICE) as AccessibilityManager
+        am.addAccessibilityStateChangeListener(AccessibilityManager.AccessibilityStateChangeListener { b ->
+            val isServiceEnabled = Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
+            if(!b || !isServiceEnabled){
+                isBackgroundEnabled = false
+                PersistentState.setBackgroundEnabled(this, false)
+            }
+        })
+    }
+
     @InternalCoroutinesApi private fun spawnServerUpdate() {
         if (vpnController != null) {
             synchronized(vpnController) {
@@ -600,7 +613,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
     }
 
     private fun getTracker(): QueryTracker? {
-        return vpnController!!.getTracker(this)
+        return vpnController!!.getTracker()
     }
 
     private fun getDNSLogTracker() : DNSLogTracker? {
@@ -768,9 +781,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                     builder = builder.setPriority(Notification.PRIORITY_MAX)
                 }
             }
-            val mainActivityIntent = PendingIntent.getActivity(this, 0,
-                Intent(this, HomeScreenActivity::class.java),
-                PendingIntent.FLAG_UPDATE_CURRENT)
+            val mainActivityIntent = PendingIntent.getActivity(this, 0, Intent(this, HomeScreenActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT)
             builder.setSmallIcon(R.drawable.dns_icon)
                 .setContentTitle(resources.getText(R.string.warning_title))
                 .setContentText(resources.getText(R.string.notification_content))
@@ -814,6 +825,8 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
 
     @InternalCoroutinesApi
     private fun restartVpn(dnsModeL: Long, firewallModeL: Long, proxyMode: Long) {
+        isBackgroundEnabled = PersistentState.getBackgroundEnabled(this) &&
+            Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
         if (vpnController != null) {
             synchronized(vpnController) {
                 Thread(Runnable {
@@ -868,6 +881,8 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
     }
 
     @WorkerThread private fun startVpn() {
+        isBackgroundEnabled = PersistentState.getBackgroundEnabled(this)
+            && Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
         kotlin.synchronized(vpnController!!) {
             /*if (vpnAdapter != null) {
                 return

@@ -29,6 +29,7 @@ import android.view.View
 import androidx.annotation.Nullable
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallRules
@@ -106,7 +107,7 @@ class HomeScreenActivity : AppCompatActivity() {
         var appStartTime: Long = System.currentTimeMillis()
         var isBackgroundEnabled: Boolean = false
         var firewallRules: HashMultimap<Int, String> = HashMultimap.create()
-        var DEBUG = true
+        var DEBUG = false
         //Screen off - whether the screen preference is set 0-off, 1- on. -1 not initialized
         var isUserInitiatedUpdateCheck = false
 
@@ -143,7 +144,7 @@ class HomeScreenActivity : AppCompatActivity() {
         }
 
         context = this
-        dbHandler = DatabaseHandler(this)
+        //dbHandler = DatabaseHandler(this)
 
         internetManagerFragment = InternetManagerFragment()
         homeScreenFragment = HomeScreenFragment()
@@ -172,10 +173,9 @@ class HomeScreenActivity : AppCompatActivity() {
         }
         GlobalVariable.isBackgroundEnabled = PersistentState.getBackgroundEnabled(this)
         PersistentState.setScreenLockData(this, false)
+        updateInstallSource()
         initUpdateCheck()
         showNewFeaturesDialog()
-        updateInstallSource()
-        //getAppDetails()
     }
 
     private fun launchOnBoardingActivity() {
@@ -183,19 +183,21 @@ class HomeScreenActivity : AppCompatActivity() {
     }
 
     private fun updateInstallSource() {
-        val packageManager = packageManager
-        try {
-            val applicationInfo: ApplicationInfo = packageManager.getApplicationInfo(packageName, 0)
-            if(DEBUG) Log.d(LOG_TAG, "Install location: ${packageManager.getInstallerPackageName(applicationInfo.packageName)}")
-            if ("com.android.vending" == packageManager.getInstallerPackageName(applicationInfo.packageName)) {
-                // App was installed by Play Store
-                PersistentState.setDownloadSource(context, Constants.DOWNLOAD_SOURCE_PLAY_STORE)
-            } else {
-                // App was installed from somewhere else
-                PersistentState.setDownloadSource(context, Constants.DOWNLOAD_SOURCE_OTHERS)
+        if(PersistentState.getDownloadSource(this) == 0) {
+            val packageManager = packageManager
+            try {
+                val applicationInfo: ApplicationInfo = packageManager.getApplicationInfo(packageName, 0)
+                if (DEBUG) Log.d(LOG_TAG, "Install location: ${packageManager.getInstallerPackageName(applicationInfo.packageName)}")
+                if ("com.android.vending" == packageManager.getInstallerPackageName(applicationInfo.packageName)) {
+                    // App was installed by Play Store
+                    PersistentState.setDownloadSource(context, Constants.DOWNLOAD_SOURCE_PLAY_STORE)
+                } else {
+                    // App was installed from somewhere else
+                    PersistentState.setDownloadSource(context, Constants.DOWNLOAD_SOURCE_OTHERS)
+                }
+            } catch (e: PackageManager.NameNotFoundException) {
+                e.printStackTrace()
             }
-        } catch (e: PackageManager.NameNotFoundException) {
-            e.printStackTrace()
         }
     }
 
@@ -204,9 +206,8 @@ class HomeScreenActivity : AppCompatActivity() {
         if(checkToShowNewFeatures()){
             val inflater: LayoutInflater = LayoutInflater.from(this)
             val view: View = inflater.inflate(R.layout.dialog_whatsnew, null)
-            //val builder: android.app.AlertDialog.Builder = AlertDialog.Builder(this)
             val builder = AlertDialog.Builder(this)
-            builder.setView(view).setTitle("20+ new features in v052")
+            builder.setView(view).setTitle("15+ new features in v053")
 
             builder.setPositiveButton("Let\'s Go") { dialogInterface, which ->
                 dialogInterface.dismiss()
@@ -270,21 +271,31 @@ class HomeScreenActivity : AppCompatActivity() {
                 try {
                     val pInfo: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
                     version = pInfo.versionCode
+                    PersistentState.setAppVersion(context, version)
                 } catch (e: PackageManager.NameNotFoundException) {
                     Log.e(LOG_TAG, "Error while fetching version code: ${e.message}", e)
                 }
             }
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
-                appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE /*AppUpdateType.IMMEDIATE*/)) {
+                appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
                 try {
-                    appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.FLEXIBLE /*AppUpdateType.IMMEDIATE*/, this, version)
+                    appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.FLEXIBLE, this, version)
                 } catch (e: IntentSender.SendIntentException) {
                     appUpdateManager.unregisterListener(installStateUpdatedListener)
                     Log.e(LOG_TAG, "SendIntentException: ${e.message} ", e)
                 }
-            } else if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
+            } else if(appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)){
+                try {
+                    appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.IMMEDIATE, this, version)
+                } catch (e: IntentSender.SendIntentException) {
+                    appUpdateManager.unregisterListener(installStateUpdatedListener)
+                    Log.e(LOG_TAG, "SendIntentException: ${e.message} ", e)
+                }
+            }
+            else if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
                 //CHECK THIS if AppUpdateType.FLEXIBLE, otherwise you can skip
-                showDownloadDialog(true, getString(R.string.download_update_dialog_title), getString(R.string.download_update_dialog_message))
+                //showDownloadDialog(true, getString(R.string.download_update_dialog_title), getString(R.string.download_update_dialog_message))
+                popupSnackBarForCompleteUpdate()
             } else {
                 appUpdateManager.unregisterListener(installStateUpdatedListener)
                 Log.e(LOG_TAG, "checkForAppUpdateAvailability: something else")
@@ -298,8 +309,8 @@ class HomeScreenActivity : AppCompatActivity() {
         override fun onStateUpdate(state: InstallState) {
             if (state.installStatus() == InstallStatus.DOWNLOADED) {
                 //CHECK THIS if AppUpdateType.FLEXIBLE, otherwise you can skip
-                //popupSnackBarForCompleteUpdate()
-                showDownloadDialog(true, getString(R.string.download_update_dialog_title), getString(R.string.download_update_dialog_message))
+                popupSnackBarForCompleteUpdate()
+                //showDownloadDialog(true, getString(R.string.download_update_dialog_title), getString(R.string.download_update_dialog_message))
             } else if (state.installStatus() == InstallStatus.INSTALLED) {
                 Log.i(LOG_TAG, "InstallStateUpdatedListener: state: " + state.installStatus())
                 appUpdateManager.unregisterListener(this)
@@ -311,11 +322,21 @@ class HomeScreenActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkForAppDownload(version: Int): Boolean {
-        Log.i(LOG_TAG, "App update check initiated")
-        val url = Constants.APP_DOWNLOAD_AVAILABLE_CHECK + version
-        serverCheckForAppUpdate(url)
-        return false
+    private fun popupSnackBarForCompleteUpdate() {
+        val snackbar = Snackbar.make(this.findViewById(R.id.container),
+                "New Version is downloaded.",
+                Snackbar.LENGTH_INDEFINITE)
+        snackbar.setAction("RESTART") { appUpdateManager.completeUpdate() }
+        snackbar.setActionTextColor(ContextCompat.getColor(this, R.color.textColorMain))
+        snackbar.show()
+    }
+
+    private fun checkForAppDownload(version: Int) {
+        if (PersistentState.getDownloadSource(this) == 2) {
+            Log.i(LOG_TAG, "App update check initiated")
+            val url = Constants.APP_DOWNLOAD_AVAILABLE_CHECK + version
+            serverCheckForAppUpdate(url)
+        }
     }
 
     /**

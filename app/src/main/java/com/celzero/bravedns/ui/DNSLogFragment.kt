@@ -77,7 +77,7 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
 
     private val viewModel: DNSLogViewModel by viewModels()
     private var checkedItem = 1
-    private lateinit var filterValue: String
+    private var filterValue: String = ""
 
     lateinit var urlName: Array<String>
     lateinit var urlValues: Array<String>
@@ -204,7 +204,7 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
         // Single-choice items (initialized with checked item)
         builder.setSingleChoiceItems(singleItems, checkedItem) { dialog, which ->
             // Respond to item chosen
-            filterValue = if (which == 0) "isFilter"
+            filterValue = if (which == 0) ":isFilter"
             else ""
             checkedItem = which
             if (DEBUG) Log.d(LOG_TAG, "Filter Option selected: $filterValue")
@@ -274,12 +274,12 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        viewModel.setFilter(query!!)
+        viewModel.setFilter(query!!, filterValue)
         return true
     }
 
     override fun onQueryTextChange(query: String?): Boolean {
-        viewModel.setFilter(query!!)
+        viewModel.setFilter(query!!, filterValue)
         return true
     }
 

@@ -123,7 +123,7 @@ class AboutFragment : Fragment(), View.OnClickListener {
                 startActivity(intent)
             }
             view == mozillaImg -> {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.mozilla.org/builders/"))
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://builders.mozilla.community/alumni.html"))
                 startActivity(intent)
             }
             view == appUpdateTxt ->{

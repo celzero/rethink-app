@@ -120,7 +120,7 @@ class FirewallManager(service: BackgroundAccessibilityService) {
         if(DEBUG) Log.d(LOG_TAG,"FirewallManager: onAccessibilityEvent: ${event.packageName}, ${event.eventType}, $hasContentDisappeared")
         // is the package showing content and being backgrounded?
         if (hasContentDisappeared) {
-            if (GlobalVariable.appList.containsKey(eventPackageName)){//PermissionsManager.packageRules.contains(eventPackageName)) {
+            if (GlobalVariable.appList.containsKey(eventPackageName)) {//PermissionsManager.packageRules.contains(eventPackageName)) {
                 // FIXME: Gross hack that no one likes
                 // packagesStack tracks apps that have disappeared
                 // after user interaction, and so: check for event.source
@@ -140,7 +140,7 @@ class FirewallManager(service: BackgroundAccessibilityService) {
             }
         }
         val packageName =  event.packageName?.toString() ?: return
-        if (event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED || event.eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED ) {
+        if (hasContentDisappeared) {
             // https://stackoverflow.com/a/27642535
             // top window is launcher? try revoke queued up permissions
             // FIXME: Figure out a fool-proof way to determine is launcher visible
@@ -152,8 +152,11 @@ class FirewallManager(service: BackgroundAccessibilityService) {
             }else{
                 backgroundAllowedUID.clear()
             }
-            printAllowedUID()
-        }else{
+            if(DEBUG) printAllowedUID()
+        }
+        // FIXME: 18-12-2020 - Figure out why the below code exists
+        //probably not required.
+        else{
             if(DEBUG) Log.d(LOG_TAG,"addOrRemovePackageForBackground:isPackageLauncher ${packageName}, true")
             addOrRemovePackageForBackground(true)
         }

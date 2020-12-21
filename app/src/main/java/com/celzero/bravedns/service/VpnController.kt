@@ -130,9 +130,9 @@ class VpnController {
     }
 
     @Synchronized
-    fun getTracker(context: Context?): QueryTracker? {
+    fun getTracker(): QueryTracker? {
         if (tracker == null) {
-            tracker = QueryTracker(context)
+            tracker = QueryTracker()
         }
         return tracker
     }

@@ -12,6 +12,7 @@
         android:orientation="vertical"
         android:weightSum="1">
 
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -33,14 +34,26 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/settings_app_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:padding="5dp"
-                    android:src="@drawable/ic_about_icon" />
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/shimmer_view_heading"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:shimmer_auto_start="true"
+                    app:shimmer_base_color="@color/primaryText"
+                    app:shimmer_colored="true"
+                    app:shimmer_direction="top_to_bottom"
+                    app:shimmer_duration="12000"
+                    app:shimmer_shape="linear"
+                    app:shimmer_width_ratio="1.5">
 
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/settings_app_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:padding="5dp"
+                        android:src="@drawable/ic_about_icon" />
+                </com.facebook.shimmer.ShimmerFrameLayout>
             </LinearLayout>
 
             <LinearLayout
@@ -53,6 +66,7 @@
             </LinearLayout>
 
         </LinearLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -72,8 +86,8 @@
                 android:paddingLeft="20dp"
                 android:paddingTop="10dp"
                 android:paddingRight="20dp"
-                android:textSize="@dimen/large_font_text_view"
-                android:text="@string/about_bravedns_explantion" />
+                android:text="@string/about_bravedns_explantion"
+                android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 style="@style/TextAppearance.AppCompat.Subhead"
@@ -84,9 +98,9 @@
                 android:gravity="center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:paddingLeft="20dp"
-                android:textSize="@dimen/large_font_text_view"
                 android:paddingRight="20dp"
-                android:text="@string/about_bravedns_whoarewe" />
+                android:text="@string/about_bravedns_whoarewe"
+                android:textSize="@dimen/large_font_text_view" />
 
         </LinearLayout>
 
@@ -106,17 +120,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:background="@drawable/button_background_ripple"
                 android:backgroundTint="@color/button_background_tint"
                 android:drawableStart="@drawable/ic_telegram"
                 android:drawablePadding="10dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="5dp"
                 android:gravity="center"
                 android:lineSpacingExtra="5dp"
                 android:padding="10dp"
-                android:textSize="@dimen/large_font_text_view"
-                android:text="@string/about_join_telegram" />
+                android:text="@string/about_join_telegram"
+                android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 style="@style/TextAppearance.AppCompat.Subhead"
@@ -124,10 +138,10 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:paddingTop="3dp"
-                android:textSize="@dimen/large_font_text_view"
                 android:paddingBottom="10dp"
                 android:text="@string/about_bravedns_toreport_text"
-                android:textColor="@color/textColorMain" />
+                android:textColor="@color/textColorMain"
+                android:textSize="@dimen/large_font_text_view" />
 
 
         </LinearLayout>
@@ -150,8 +164,8 @@
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/about_app"
-                android:textSize="@dimen/large_font_text_view"
-                android:textColor="@color/secondaryText" />
+                android:textColor="@color/secondaryText"
+                android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_whats_new"
@@ -164,8 +178,8 @@
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
-                android:textSize="@dimen/large_font_text_view"
-                android:text="@string/about_whats_new" />
+                android:text="@string/about_whats_new"
+                android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_app_update"
@@ -178,9 +192,9 @@
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
-                android:textSize="@dimen/large_font_text_view"
                 android:text="@string/about_app_update_check"
-                android:textColor="@color/primaryText" />
+                android:textColor="@color/primaryText"
+                android:textSize="@dimen/large_font_text_view" />
 
 
         </LinearLayout>
@@ -203,8 +217,8 @@
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/about_web"
-                android:textSize="@dimen/large_font_text_view"
-                android:textColor="@color/secondaryText" />
+                android:textColor="@color/secondaryText"
+                android:textSize="@dimen/large_font_text_view" />
 
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -218,9 +232,9 @@
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
-                android:textSize="@dimen/large_font_text_view"
                 android:text="@string/about_website"
-                android:textColor="@color/primaryText" />
+                android:textColor="@color/primaryText"
+                android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_github"
@@ -233,8 +247,8 @@
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
-                android:textSize="@dimen/large_font_text_view"
-                android:text="@string/about_github" />
+                android:text="@string/about_github"
+                android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_faq"
@@ -247,8 +261,8 @@
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
-                android:textSize="@dimen/large_font_text_view"
-                android:text="@string/about_faq" />
+                android:text="@string/about_faq"
+                android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_blog"
@@ -261,8 +275,8 @@
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
-                android:textSize="@dimen/large_font_text_view"
-                android:text="@string/about_blog" />
+                android:text="@string/about_blog"
+                android:textSize="@dimen/large_font_text_view" />
 
         </LinearLayout>
 
@@ -284,8 +298,8 @@
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/about_connect"
-                android:textSize="@dimen/large_font_text_view"
-                android:textColor="@color/secondaryText" />
+                android:textColor="@color/secondaryText"
+                android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_mail"
@@ -298,8 +312,8 @@
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
-                android:textSize="@dimen/large_font_text_view"
-                android:text="@string/about_email" />
+                android:text="@string/about_email"
+                android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_twitter"
@@ -313,8 +327,8 @@
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
-                android:textSize="@dimen/large_font_text_view"
-                android:text="@string/about_twitter" />
+                android:text="@string/about_twitter"
+                android:textSize="@dimen/large_font_text_view" />
 
 
         </LinearLayout>
@@ -332,9 +346,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:textSize="@dimen/default_font_text_view"
             android:text="@string/about_mozilla"
-            android:textColor="@color/textColorMain" />
+            android:textColor="@color/textColorMain"
+            android:textSize="@dimen/default_font_text_view" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/about_app_version"
@@ -345,8 +359,8 @@
             android:gravity="center"
             android:paddingTop="20dp"
             android:paddingBottom="40dp"
-            android:textSize="@dimen/large_font_text_view"
-            android:textColor="@color/textColorMain" />
+            android:textColor="@color/textColorMain"
+            android:textSize="@dimen/large_font_text_view" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

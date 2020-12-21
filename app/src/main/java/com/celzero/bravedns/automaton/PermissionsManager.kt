@@ -83,7 +83,7 @@ class PermissionsManager {
     private var currentAutoState: AutoState = AutoState.DORMANT
 
     init {
-        packageRules = HomeScreenActivity.dbHandler.getAllPackageDetails()
+        //packageRules = HomeScreenActivity.dbHandler.getAllPackageDetails()
     }
 
     constructor(service: MyAccessibilityService) {

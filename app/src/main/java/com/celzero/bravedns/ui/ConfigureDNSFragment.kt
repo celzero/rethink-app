@@ -35,7 +35,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.*
 import com.celzero.bravedns.database.*
-import com.celzero.bravedns.service.*
+import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.VpnState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.dnsType
@@ -846,7 +849,6 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
 
     override fun updateUIFromAdapter(dnsType: Int) {
         if(DEBUG) Log.d(LOG_TAG, "UI Update from adapter")
-        QueryTracker.reinitializeQuantileEstimator()
         val mDb = AppDatabase.invoke(requireContext().applicationContext)
         val doHEndpointRepository = mDb.doHEndpointsRepository()
         val dnsCryptEndpointRepository = mDb.dnsCryptEndpointsRepository()
