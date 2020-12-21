@@ -38,8 +38,11 @@ interface DNSLogDAO {
     @Query("select * from DNSLogs where isBlocked = 1 order by time desc")
     fun getBlockedDNSLogsLiveData() : DataSource.Factory<Int, DNSLogs>
 
-    @Query("select * from DNSLogs where queryStr like :queryString or resolver like :queryString or response like :queryString order by time desc")
-    fun getDNSLogsByQueryLiveData(queryString : String) : DataSource.Factory<Int, DNSLogs>
+    @Query("select * from DNSLogs where (queryStr like :searchString or resolver like :searchString or response like :searchString) and isBlocked = 1 order by time desc")
+    fun getBlockedDNSLogsLiveDataByName(searchString : String) : DataSource.Factory<Int, DNSLogs>
+
+    @Query("select * from DNSLogs where queryStr like :searchString or resolver like :searchString or response like :searchString order by time desc")
+    fun getDNSLogsByQueryLiveData(searchString : String) : DataSource.Factory<Int, DNSLogs>
 
     @Query("delete from DNSLogs")
     fun clearAllData()

@@ -59,7 +59,11 @@ import settings.Settings;
 import tun2socks.Tun2socks;
 import tunnel.IntraTunnel;
 
+import static com.celzero.bravedns.ui.HomeScreenFragment.DNS_MODE;
+import static com.celzero.bravedns.ui.HomeScreenFragment.FIREWALL_MODE;
 import static com.celzero.bravedns.util.Constants.LOG_TAG;
+
+//import tunnel.IntraTunnel;
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
@@ -105,6 +109,7 @@ public class GoVpnAdapter {
     private ParcelFileDescriptor tunFd;
 
     // The Intra session object from go-tun2socks.  Initially null.
+    //private Tunnel tunnel;
     private IntraTunnel tunnel;
 
     //private Boolean isAdapterAvailable = false;
@@ -414,9 +419,18 @@ public class GoVpnAdapter {
             VpnService.Builder builder = vpnService.newBuilder()
                     .setSession("RethinkDNS")
                     .setMtu(VPN_INTERFACE_MTU)
-                    .addAddress(LanIp.GATEWAY.make(IPV4_TEMPLATE), IPV4_PREFIX_LENGTH)
-                    .addRoute("0.0.0.0", 0)
-                    .addDnsServer(LanIp.DNS.make(IPV4_TEMPLATE));
+                    .addAddress(LanIp.GATEWAY.make(IPV4_TEMPLATE), IPV4_PREFIX_LENGTH);
+                    //.addRoute("0.0.0.0", 0)
+                    //.addDnsServer(LanIp.DNS.make(IPV4_TEMPLATE));
+            if(HomeScreenActivity.GlobalVariable.INSTANCE.getBraveMode() == DNS_MODE){
+                builder.addRoute(LanIp.DNS.make(IPV4_TEMPLATE),32);
+                builder.addDnsServer(LanIp.DNS.make(IPV4_TEMPLATE));
+            }else if(HomeScreenActivity.GlobalVariable.INSTANCE.getBraveMode() == FIREWALL_MODE){
+                builder.addRoute("0.0.0.0",0);
+            }else{
+                builder.addDnsServer(LanIp.DNS.make(IPV4_TEMPLATE));
+                builder.addRoute("0.0.0.0",0);
+            }
 
             return builder.establish();
         } catch (Exception e) {

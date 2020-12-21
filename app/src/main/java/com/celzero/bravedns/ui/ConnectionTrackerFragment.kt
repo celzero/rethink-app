@@ -57,7 +57,7 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
     private lateinit var disabledLogsTextView: TextView
     private var recyclerAdapter: ConnectionTrackerAdapter? = null
     private val viewModel: ConnectionTrackerViewModel by viewModels()
-    private lateinit var filterValue: String
+    private var filterValue: String = ""
     private var checkedItem = 1
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -121,12 +121,12 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        viewModel.setFilter(query!!)
+        viewModel.setFilter(query!!,filterValue)
         return true
     }
 
     override fun onQueryTextChange(query: String?): Boolean {
-        viewModel.setFilter(query!!)
+        viewModel.setFilter(query!!, filterValue)
         return true
     }
 
@@ -141,7 +141,7 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
         builder.setSingleChoiceItems(singleItems, checkedItem) { dialog, which ->
             // Respond to item chosen
             filterValue = if (which == 0)
-                "isFilter"
+                ":isFilter"
             else
                 ""
             checkedItem = which

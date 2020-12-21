@@ -175,7 +175,7 @@ class DNSCryptRelayEndpointAdapter(val context: Context) : PagedListAdapter<DNSC
                 val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
                 val clip = ClipData.newPlainText("URL", url)
                 clipboard?.setPrimaryClip(clip)
-                Utilities.showToastInMidLayout(context, "URL Copied.", Toast.LENGTH_SHORT)
+                Utilities.showToastInMidLayout(context, context.getString(R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
             }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()

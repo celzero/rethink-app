@@ -33,6 +33,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.net.InetAddress
+import java.net.UnknownHostException
 import java.util.*
 
 class IPTracker(var context: Context?) {
@@ -97,10 +98,13 @@ class IPTracker(var context: Context?) {
 
             var serverAddress: InetAddress? = null
             //var resolver : String? = null
+            try {
+                serverAddress = InetAddress.getByName(ipDetails.destIP)
+                val countryCode: String = getCountryCode(serverAddress!!, context)
+                connTracker.flag = getFlag(countryCode)
+            }catch (ex : UnknownHostException){
+            }
 
-            serverAddress = InetAddress.getByName(ipDetails.destIP)
-            val countryCode: String = getCountryCode(serverAddress!!, context)
-            connTracker.flag = getFlag(countryCode)
 
             //appname
             val packageNameList = context.packageManager.getPackagesForUid(ipDetails.uid)

@@ -61,7 +61,7 @@ class Constants {
         const val DOWNLOAD_SOURCE_OTHERS = 2
 
         //Network monitor
-        const val FIREWALL_CONNECTIONS_IN_DB = 3000
+        const val FIREWALL_CONNECTIONS_IN_DB = 21000
 
         const val MISSING_UID = -2000
 

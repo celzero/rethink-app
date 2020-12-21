@@ -137,7 +137,7 @@ class Utilities {
             }
         }
 
-        private fun isAccessibilityServiceEnabled(context: Context, service: Class<out AccessibilityService?>): Boolean {
+        fun isAccessibilityServiceEnabled(context: Context, service: Class<out AccessibilityService?>): Boolean {
             val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
             val enabledServices = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
             for (enabledService in enabledServices) {
@@ -222,7 +222,7 @@ class Utilities {
 
         fun convertLongToDate(timeStamp : Long): String{
             val date = Date(timeStamp)
-            val format = SimpleDateFormat("MM/dd/yyyy", Locale.US)
+            val format = SimpleDateFormat("yy.MM (dd)", Locale.US)
             return format.format(date)
         }
 

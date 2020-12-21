@@ -126,8 +126,8 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
         }
         dnsConfigureWebView?.removeJavascriptInterface("JSInterface")
         dnsConfigureWebView?.removeAllViews()
-        dnsConfigureWebView?.clearCache(true)
-        dnsConfigureWebView?.clearFormData()
+        /*dnsConfigureWebView?.clearCache(true)
+        dnsConfigureWebView?.clearFormData()*/
         dnsConfigureWebView?.clearHistory()
         dnsConfigureWebView?.destroy()
         dnsConfigureWebView = null

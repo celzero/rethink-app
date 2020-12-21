@@ -48,6 +48,9 @@ interface ConnectionTrackerDAO {
     @Query("select * from ConnectionTracker where isBlocked = 1 order by timeStamp desc")
     fun getConnectionBlockedConnections(): DataSource.Factory<Int,ConnectionTracker>
 
+    @Query("select * from ConnectionTracker where (appName like :searchString or ipAddress like :searchString) and isBlocked = 1 order by timeStamp desc")
+    fun getConnectionBlockedConnectionsByName(searchString: String): DataSource.Factory<Int,ConnectionTracker>
+
     @Query("delete from ConnectionTracker where timeStamp < :date")
     fun deleteOlderData(date : Long)
 

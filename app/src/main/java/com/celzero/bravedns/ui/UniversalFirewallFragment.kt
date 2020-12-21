@@ -180,15 +180,6 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
 
         firewallAllAppsToggle.isChecked = PersistentState.getFirewallModeForScreenState(requireContext())
 
-        if(Utilities.isAccessibilityServiceEnabledEnhanced(requireContext(), BackgroundAccessibilityService::class.java)){
-            if(DEBUG) Log.d(LOG_TAG,"Background - onLoad accessibility is true")
-            backgroundModeToggle.isChecked = PersistentState.getBackgroundEnabled(requireContext())
-        }else{
-            if(DEBUG) Log.d(LOG_TAG,"Background - onLoad accessibility is true, changed pref")
-            PersistentState.setBackgroundEnabled(requireContext(), false)
-            backgroundModeToggle.isChecked = false
-        }
-
         udpBlockToggle.isChecked = PersistentState.getUDPBlockedSettings(requireContext())
         unknownToggle.isChecked =  PersistentState.getBlockUnknownConnections(requireContext())
 
@@ -233,11 +224,17 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
             val checkedVal = backgroundModeToggle.isChecked
             if(!checkedVal) {
                 if (Utilities.isAccessibilityServiceEnabledEnhanced(requireContext(), BackgroundAccessibilityService::class.java)) {
+                    if(!Utilities.isAccessibilityServiceEnabled(requireContext(), BackgroundAccessibilityService::class.java)){
+                        if (!showAlertForPermission(true)) {
+                            backgroundModeToggle.isChecked = false
+                            PersistentState.setBackgroundEnabled(requireContext(), false)
+                        }
+                    }
                     GlobalVariable.isBackgroundEnabled = !checkedVal
                     PersistentState.setBackgroundEnabled(requireContext(), !checkedVal)
                     backgroundModeToggle.isChecked = !checkedVal
                 } else {
-                    if (!showAlertForPermission()) {
+                    if (!showAlertForPermission(false)) {
                         backgroundModeToggle.isChecked = false
                         PersistentState.setBackgroundEnabled(requireContext(), false)
                     }
@@ -254,11 +251,17 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
             val checkedVal = !backgroundModeToggle.isChecked
             if (!checkedVal) {
                 if (Utilities.isAccessibilityServiceEnabledEnhanced(requireContext(), BackgroundAccessibilityService::class.java)) {
+                    if(!Utilities.isAccessibilityServiceEnabled(requireContext(), BackgroundAccessibilityService::class.java)){
+                        if (!showAlertForPermission(true)) {
+                            backgroundModeToggle.isChecked = false
+                            PersistentState.setBackgroundEnabled(requireContext(), false)
+                        }
+                    }
                     GlobalVariable.isBackgroundEnabled = !checkedVal
                     PersistentState.setBackgroundEnabled(requireContext(), !checkedVal)
                     backgroundModeToggle.isChecked = !checkedVal
                 } else {
-                    if (!showAlertForPermission()) {
+                    if (!showAlertForPermission(false)) {
                         backgroundModeToggle.isChecked = false
                         PersistentState.setBackgroundEnabled(requireContext(), false)
                     }
@@ -366,15 +369,32 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
     override fun onResume() {
         super.onResume()
         unknownToggle.isChecked =  PersistentState.getBlockUnknownConnections(requireContext())
+        if (Utilities.isAccessibilityServiceEnabledEnhanced(requireContext(), BackgroundAccessibilityService::class.java)) {
+            if (DEBUG) Log.d(LOG_TAG, "Background - onLoad accessibility is true")
+            backgroundModeToggle.isChecked = PersistentState.getBackgroundEnabled(requireContext())
+        } else {
+            if (DEBUG) Log.d(LOG_TAG, "Background - onLoad accessibility is true, changed pref")
+            PersistentState.setBackgroundEnabled(requireContext(), false)
+            backgroundModeToggle.isChecked = false
+        }
     }
 
-    private fun showAlertForPermission() : Boolean {
+    private fun showAlertForPermission(isRegrant : Boolean) : Boolean {
         var isAllowed  = false
         val builder = AlertDialog.Builder(requireContext())
         //set title for alert dialog
-        builder.setTitle(R.string.alert_permission_accessibility)
+        if(isRegrant){
+            builder.setTitle(R.string.alert_permission_accessibility_regrant)
+        }else {
+            builder.setTitle(R.string.alert_permission_accessibility)
+        }
         //set message for alert dialog
-        builder.setMessage(R.string.alert_firewall_accessibility_explanation)
+        if(isRegrant){
+            builder.setMessage(R.string.alert_firewall_accessibility_regrant_explanation)
+        }else{
+            builder.setMessage(R.string.alert_firewall_accessibility_explanation)
+        }
+
         builder.setIcon(android.R.drawable.ic_dialog_alert)
         //performing positive action
         builder.setPositiveButton("Grant"){ _, _ ->
