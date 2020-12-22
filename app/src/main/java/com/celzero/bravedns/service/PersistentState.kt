@@ -131,7 +131,7 @@ class PersistentState {
 
         fun expandUrl(context: Context, url: String?): String {
             return if (url == null || url.isEmpty()) {
-                context.resources.getStringArray(R.array.doh_endpoint_names).get(2)
+                context.resources.getStringArray(R.array.doh_endpoint_names)[3]
             } else url
         }
 

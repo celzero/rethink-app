@@ -29,7 +29,6 @@ import android.net.VpnService
 import android.os.Build
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
-import android.os.SystemClock
 import android.service.quicksettings.TileService.requestListeningState
 import android.text.TextUtils
 import android.util.Log
@@ -147,6 +146,10 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         var isBlocked = false
         var uid = _uid
         try {
+            if ((destIp == GoVpnAdapter.FAKE_DNS_IP && destPort == DNS_REQUEST_PORT)) {
+                return false
+            }
+
             if (VERSION.SDK_INT >= VERSION_CODES.Q) {
                 uid = connTracer.getUidQ(protocol, sourceIp, sourcePort, destIp, destPort)
             }
@@ -166,9 +169,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
             }*/
             //Cif(DEBUG) Log.i(LOG_TAG, "Thread: ${Thread.currentThread().id}, name: ${Thread.currentThread().name}, uid: $uid, ip: $sourceIp, $destIp, port: $sourcePort, $destPort, $protocol")
 
-            if ((destIp == GoVpnAdapter.FAKE_DNS_IP && destPort == DNS_REQUEST_PORT)) {
-                return false
-            }
+
 
             if (appWhiteList.containsKey(uid)) {
                 if ((destIp != GoVpnAdapter.FAKE_DNS_IP && destPort != DNS_REQUEST_PORT)) {
@@ -348,11 +349,14 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
 
     fun newBuilder(): Builder {
         var builder = Builder()
+        var alwaysOn : String = ""
+        var lockDown = -1
+
         if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
             if (VERSION.SDK_INT >= VERSION_CODES.Q) {
                 if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG isLockDownEnabled - ${this.isLockdownEnabled}, ${this.isAlwaysOn}")
-                val alwaysOn = android.provider.Settings.Secure.getString(this.contentResolver, "always_on_vpn_app")
-                val lockDown = android.provider.Settings.Secure.getInt(contentResolver, "always_on_vpn_lockdown", 0)
+                alwaysOn = android.provider.Settings.Secure.getString(this.contentResolver, "always_on_vpn_app")
+                lockDown = android.provider.Settings.Secure.getInt(contentResolver, "always_on_vpn_lockdown", 0)
                 if (DEBUG) Log.d(LOG_TAG, "isLockDownEnabled - $lockDown , $alwaysOn")
                 if (TextUtils.isEmpty(alwaysOn) && lockDown == 0) {
                     if (PersistentState.getAllowByPass(this)) {
@@ -390,10 +394,23 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                         }
                     }
                 } else {
+                    /* The check for the apps to exclude from VPN or not.
+                       In case of lockdown mode, the excluded apps wont able to connected. so
+                       not including the apps in the excluded list if the lockdown mode is
+                       enabled. */
                     val excludedApps = PersistentState.getExcludedAppsFromVPN(this)
-                    excludedApps?.forEach {
-                        builder = builder.addDisallowedApplication(it)
-                        Log.d(LOG_TAG, "$FILE_LOG_TAG Excluded package - $it")
+                    if (VERSION.SDK_INT >= VERSION_CODES.Q) {
+                        if (TextUtils.isEmpty(alwaysOn) && lockDown == 0) {
+                            excludedApps?.forEach {
+                                builder = builder.addDisallowedApplication(it)
+                                Log.d(LOG_TAG, "$FILE_LOG_TAG Excluded package - $it")
+                            }
+                        }
+                    }else{
+                        excludedApps?.forEach {
+                            builder = builder.addDisallowedApplication(it)
+                            Log.d(LOG_TAG, "$FILE_LOG_TAG Excluded package - $it")
+                        }
                     }
                     //builder = builder.addDisallowedApplication("com.android.vending")
                     builder = builder.addDisallowedApplication(this.packageName)
@@ -436,6 +453,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         }
         return builder
     }
+
 
     override fun onCreate() {
         connTracer = ConnectionTracer(this)
@@ -592,7 +610,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
     }
 
     fun recordTransaction(transaction: Transaction) {
-        transaction.responseTime = SystemClock.elapsedRealtime()
+        //transaction.responseTime = SystemClock.elapsedRealtime()
         transaction.responseCalendar = Calendar.getInstance()
         // All the transactions are recorded in the DNS logs.
         getTracker()!!.recordTransaction(this, transaction)
