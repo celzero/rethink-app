@@ -154,7 +154,8 @@ class HomeScreenActivity : AppCompatActivity() {
         appUpdateManager = AppUpdateManagerFactory.create(this)
 
         if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, homeScreenFragment, homeScreenFragment.javaClass.getSimpleName()).commit()
+            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, homeScreenFragment,
+                homeScreenFragment.javaClass.simpleName).commit()
         }
         navView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
         appMode = AppMode.getInstance(this)
@@ -207,7 +208,7 @@ class HomeScreenActivity : AppCompatActivity() {
             val inflater: LayoutInflater = LayoutInflater.from(this)
             val view: View = inflater.inflate(R.layout.dialog_whatsnew, null)
             val builder = AlertDialog.Builder(this)
-            builder.setView(view).setTitle("15+ new features in v053")
+            builder.setView(view).setTitle(getString(R.string.whats_dialog_title))
 
             builder.setPositiveButton("Let\'s Go") { dialogInterface, which ->
                 dialogInterface.dismiss()

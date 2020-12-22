@@ -187,15 +187,15 @@
     Your connection is exposed to DNS attacks.
   </string>
 
-  <string name="dns_explanation_dns_connected">Connected to Rethinkdns</string>
+  <string name="dns_explanation_dns_connected">Connected to RethinkDNS</string>
     <string name="dns_explanation_firewall_connected">Connected to Firewall</string>
 
     <string name="dns_explanation_connected" description= "The message will be shown when the DNS is connected">
-        Connected to Rethinkdns and Firewall
+        Connected to RethinkDNS and Firewall
     </string>
 
     <string name="dns_explanation_disconnected" description="This message will be shown to user in main screen when the DNS is not connected">
-        Disconnected from Rethinkdns and Firewall
+        Disconnected from RethinkDNS and Firewall
     </string>
 
     <string name="firewall_explanation_text" description="Explanation on the main screen for the users about what the firewall does.">
@@ -290,11 +290,11 @@
     </string>
 
     <string name="brave_dns_connect_mode_change_firewall">
-       Firewall disabled. Running in battery saver mode.
+       Firewall is disabled.
     </string>
 
     <string name="brave_dns_connect_mode_change_dns">
-        DNS disabled. Running in Firewall only mode.
+        DNS is disabled.
     </string>
 
     <string name="brave_dns_connect_mode_change_connection">
@@ -540,6 +540,7 @@
 
     <string name="features_disabled">(disabled)</string>
 
+    <string name="whats_dialog_title">15+ new features in v053</string>
     <string name="whats_new_version_name">🎅 🎄 Happy New Year ❄️ 🎁 </string>
     <string name="whats_new_version_update">Android 6 and Android TV:\n\n
         \u00091. The app now runs on Android 6 and above.\n

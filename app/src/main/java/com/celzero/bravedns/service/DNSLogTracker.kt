@@ -71,7 +71,7 @@ class DNSLogTracker(var context: Context?) {
                 dnsLogs.dnsType = DNS_TYPE_DOH
                 dnsLogs.relayIP = ""
             }
-            dnsLogs.latency = transaction.responseTime - transaction.queryTime
+            dnsLogs.latency = transaction.responseTime// - transaction.queryTime
             dnsLogs.queryStr = transaction.name
             dnsLogs.blockLists = transaction.blockList
             dnsLogs.responseTime = transaction.responseTime

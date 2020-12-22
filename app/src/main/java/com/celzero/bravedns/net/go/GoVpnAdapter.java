@@ -157,7 +157,7 @@ public class GoVpnAdapter {
                 HomeScreenActivity.GlobalVariable.INSTANCE.setAppMode(AppMode.Companion.getInstance(vpnService));
                 appMode = HomeScreenActivity.GlobalVariable.INSTANCE.getAppMode();
             }
-            String dohURL = "https://free.bravedns.com/dns-query";
+            String dohURL = null;
             try{
                 dohURL = appMode.getDOHDetails().getDohURL();
             }catch(Exception e){
@@ -477,9 +477,8 @@ public class GoVpnAdapter {
         //PersistantState persistentState  = new PersistantState();
         //VpnController vpnController = new VpnController();
         //TODO : Check the below code
-        @NonNull String realUrl = PersistentState.Companion.expandUrl(vpnService, url);
-        String dohIPs = getIpString(vpnService, realUrl);
-        return Tun2socks.newDoHTransport(realUrl, dohIPs, getProtector(), listener);
+        String dohIPs = getIpString(vpnService, url);
+        return Tun2socks.newDoHTransport(url, dohIPs, getProtector(), listener);
     }
 
     /**
@@ -516,7 +515,7 @@ public class GoVpnAdapter {
             HomeScreenActivity.GlobalVariable.INSTANCE.setAppMode(AppMode.Companion.getInstance(vpnService));
             appMode = HomeScreenActivity.GlobalVariable.INSTANCE.getAppMode();
         }
-        String dohURL = "https://free.bravedns.com/dns-query";
+        String dohURL = null;
         try {
             dohURL = appMode.getDOHDetails().getDohURL();
         } catch (Exception e) {

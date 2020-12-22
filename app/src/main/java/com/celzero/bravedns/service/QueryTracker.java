@@ -50,7 +50,7 @@ public class QueryTracker {
     public synchronized void sync(Context context, Transaction transaction) {
         if (transaction != null && transaction.blockList.isEmpty() && !transaction.serverIp.isEmpty()) {
             // Restore number of requests from storage, or 0 if it isn't defined yet.
-            long val =  (transaction.responseTime - transaction.queryTime);
+            long val =  transaction.responseTime;
             if(quantileEstimator == null){
                 quantileEstimator = new P2QuantileEstimation(0.5);
             }else{
