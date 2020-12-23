@@ -18,7 +18,7 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.ui.HomeScreenActivity
