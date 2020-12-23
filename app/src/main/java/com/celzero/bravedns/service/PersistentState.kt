@@ -18,6 +18,7 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import android.util.Log
 import com.celzero.bravedns.R
@@ -119,11 +120,10 @@ class PersistentState {
         }
 
 
-        fun setFirstTimeLaunch(context: Context, isFirstTime : Boolean){
-            val editor = getUserPreferences(context).edit()
-               editor.putBoolean(IS_FIRST_LAUNCH, isFirstTime)
-               editor.apply()
-           }
+        fun setFirstTimeLaunch(context: Context, isFirstTime : Boolean) =
+            getUserPreferences(context).edit {
+                putBoolean(IS_FIRST_LAUNCH, isFirstTime)
+            }
 
            fun isFirstTimeLaunch(context:Context) : Boolean {
                return getUserPreferences(context).getBoolean(IS_FIRST_LAUNCH,true)
@@ -135,11 +135,10 @@ class PersistentState {
             } else url
         }
 
-        fun setVpnEnabled(context: Context, enabled: Boolean) {
-            val editor = getUserPreferences(context).edit()
-            editor.putBoolean(ENABLED_KEY, enabled)
-            editor.apply()
-        }
+        fun setVpnEnabled(context: Context, enabled: Boolean) =
+            getUserPreferences(context).edit {
+                putBoolean(ENABLED_KEY, enabled)
+            }
 
 
         /*fun syncLegacyState(context: Context) {
@@ -207,7 +206,7 @@ class PersistentState {
                 }
             }
             else newSet.add(packageName)
-            getUserPreferences(context).edit().putStringSet(APPS_KEY_WIFI,newSet).apply()
+            getUserPreferences(context).edit { putStringSet(APPS_KEY_WIFI,newSet) }
             //appsBlocked.postValue(newSet.size)
         }
 
@@ -233,7 +232,7 @@ class PersistentState {
                     newSet.remove(packageName)
             }
             else  newSet.add(packageName)
-            getUserPreferences(context).edit().putStringSet(APPS_KEY_DATA,newSet).apply()
+            getUserPreferences(context).edit { putStringSet(APPS_KEY_DATA,newSet) }
         }
 
         private fun strip(template: String): String {
@@ -241,12 +240,10 @@ class PersistentState {
         }
 
 
-        fun setBraveMode(context: Context , mode: Int){
-
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putInt(BRAVE_MODE, mode)
-            editor.apply()
-        }
+        fun setBraveMode(context: Context , mode: Int) =
+            getUserPreferences(context).edit {
+                putInt(BRAVE_MODE, mode)
+            }
 
         fun getBraveMode(context: Context) : Int{
             if(braveMode == -1)
@@ -270,12 +267,10 @@ class PersistentState {
                 return dnsMode
         }*/
 
-        fun setFirewallMode(context: Context, fwMode : Int){
-            val editor: SharedPreferences.Editor =
-                getUserPreferences(context).edit()
-            editor.putInt(FIREWALL_MODE, fwMode)
-            editor.apply()
-        }
+        fun setFirewallMode(context: Context, fwMode : Int) =
+            getUserPreferences(context).edit {
+                putInt(FIREWALL_MODE, fwMode)
+            }
 
         //TODO : Modify the hardcoded value
         fun getFirewallMode(context: Context):Int {
@@ -284,9 +279,9 @@ class PersistentState {
 
 
         fun setFirewallModeForScreenState(context : Context , state : Boolean) {
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putBoolean(SCREEN_STATE, state)
-            editor.apply()
+            getUserPreferences(context).edit {
+                putBoolean(SCREEN_STATE, state)
+            }
             if (state) {
                 isScreenLockedSetting = 1
                 if (getBackgroundEnabled(context)) {
@@ -318,9 +313,9 @@ class PersistentState {
         fun setMedianLatency(context: Context, medianP90 : Long){
             HomeScreenActivity.GlobalVariable.medianP90 = medianP90
             median50.postValue(medianP90)
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putLong(MEDIAN_90, medianP90)
-            editor.apply()
+            getUserPreferences(context).edit {
+                putLong(MEDIAN_90, medianP90)
+            }
         }
 
         fun getMedianLatency(context: Context) : Long{
@@ -337,9 +332,9 @@ class PersistentState {
             else {
                 numReq = getUserPreferences(context).getInt(NUMBER_REQUEST, 0) + 1
             }
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putInt(NUMBER_REQUEST, numReq)
-            editor.apply()
+            getUserPreferences(context).edit {
+                putInt(NUMBER_REQUEST, numReq)
+            }
             lifeTimeQueries = numReq
             lifeTimeQ.postValue(numReq)
         }
@@ -352,9 +347,9 @@ class PersistentState {
 
         fun setBlockedReq(context : Context){
             val bCount =  getUserPreferences(context).getInt(BLOCKED_COUNT,0) + 1
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putInt(BLOCKED_COUNT, bCount)
-            editor.apply()
+            getUserPreferences(context).edit {
+                putInt(BLOCKED_COUNT, bCount)
+            }
             blockedCount.postValue(bCount)
         }
 
@@ -367,10 +362,9 @@ class PersistentState {
         }
 
         fun setBackgroundEnabled(context: Context, isEnabled : Boolean){
-            val editor: SharedPreferences.Editor =
-                getUserPreferences(context).edit()
-            editor.putBoolean(BACKGROUND_MODE, isEnabled)
-            editor.apply()
+            getUserPreferences(context).edit {
+                putBoolean(BACKGROUND_MODE, isEnabled)
+            }
             var uValue = numUniversalBlock.value
             if(isEnabled) {
                 if (getScreenLockData(context)) {
@@ -395,10 +389,9 @@ class PersistentState {
             }else{
                 0
             }
-            val editor: SharedPreferences.Editor =
-                getUserPreferences(context).edit()
-            editor.putBoolean(IS_SCREEN_OFF, isEnabled)
-            editor.apply()
+            getUserPreferences(context).edit {
+                putBoolean(IS_SCREEN_OFF, isEnabled)
+            }
         }
 
         fun getScreenLockData(context: Context) : Boolean{
@@ -412,12 +405,11 @@ class PersistentState {
         }
 
 
-        fun setPrefAutoStartBootup(context: Context, isEnabled: Boolean) {
-            val editor: SharedPreferences.Editor =
-                getUserPreferences(context).edit()
-            editor.putBoolean(pref_auto_start_bootup, isEnabled)
-            editor.apply()
-        }
+        fun setPrefAutoStartBootup(context: Context, isEnabled: Boolean) =
+            getUserPreferences(context).edit {
+                putBoolean(IS_SCREEN_OFF, isEnabled)
+            }
+
 
         fun getPrefAutoStartBootUp(context: Context): Boolean {
             return getUserPreferences(context).getBoolean(pref_auto_start_bootup, true)
@@ -446,11 +438,10 @@ class PersistentState {
         }
 */
 
-        fun setDNSType(context : Context, type : Int){
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putInt(DNS_TYPE, type)
-            editor.apply()
-        }
+        fun setDNSType(context : Context, type : Int) =
+            getUserPreferences(context).edit {
+                putInt(DNS_TYPE, type)
+            }
 
         fun getDNSType(context: Context): Int {
             return getUserPreferences(context).getInt(DNS_TYPE, 1)
@@ -460,28 +451,25 @@ class PersistentState {
             return getUserPreferences(context).getLong(PROXY_MODE, Settings.ProxyModeNone)
         }
 
-        fun setProxyMode(context: Context , proxyMode : Long){
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putLong(PROXY_MODE, proxyMode)
-            editor.apply()
-        }
+        fun setProxyMode(context: Context, proxyMode: Long) =
+            getUserPreferences(context).edit {
+                putLong(PROXY_MODE, proxyMode)
+            }
 
         fun getAllDNSTraffic(context : Context): Boolean{
             return getUserPreferences(context).getBoolean(DNS_ALL_TRAFFIC, true)
         }
 
         // FIXME: 10-10-2020 DNS Traffic change
-        fun setAllDNSTraffic(context: Context, isSelected  :Boolean){
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putBoolean(DNS_ALL_TRAFFIC, isSelected)
-            editor.apply()
-        }
+        fun setAllDNSTraffic(context: Context, isSelected  :Boolean) =
+            getUserPreferences(context).edit {
+                putBoolean(DNS_ALL_TRAFFIC, isSelected)
+            }
 
-        fun setAllowByPass(context: Context, isEnabled: Boolean){
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putBoolean(ALLOW_BYPASS, isEnabled)
-            editor.apply()
-        }
+        fun setAllowByPass(context: Context, isEnabled: Boolean) =
+            getUserPreferences(context).edit {
+                putBoolean(ALLOW_BYPASS, isEnabled)
+            }
 
         fun getAllowByPass(context : Context): Boolean{
             return getUserPreferences(context).getBoolean(ALLOW_BYPASS, true)
@@ -491,37 +479,33 @@ class PersistentState {
             return getUserPreferences(context).getBoolean(PRIVATE_DNS, false)
         }
 
-        fun setAllowPrivateDNS(context : Context, isEnabled: Boolean){
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putBoolean(PRIVATE_DNS, isEnabled)
-            editor.apply()
-        }
+        fun setAllowPrivateDNS(context : Context, isEnabled: Boolean) =
+            getUserPreferences(context).edit {
+                putBoolean(PRIVATE_DNS, isEnabled)
+            }
 
         fun getKillAppOnFirewall(context: Context): Boolean {
             return getUserPreferences(context).getBoolean(KILL_APP_FIREWALL, true)
         }
 
-        fun setKillAppOnFirewall(context: Context, isEnabled: Boolean) {
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putBoolean(KILL_APP_FIREWALL, isEnabled)
-            editor.apply()
-        }
+        fun setKillAppOnFirewall(context: Context, isEnabled: Boolean) =
+            getUserPreferences(context).edit {
+                putBoolean(KILL_APP_FIREWALL, isEnabled)
+            }
 
         fun getSocks5Enabled(context: Context): Boolean{
             return getUserPreferences(context).getBoolean(SOCKS5, false)
         }
 
-        fun setSocks5Enabled(context: Context, isEnabled: Boolean){
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putBoolean(SOCKS5, isEnabled)
-            editor.apply()
-        }
+        fun setSocks5Enabled(context: Context, isEnabled: Boolean) =
+            getUserPreferences(context).edit {
+                putBoolean(KILL_APP_FIREWALL, isEnabled)
+            }
 
-        fun setConnectionModeChange(context: Context, url: String){
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putString(CONNECTION_CHANGE, url)
-            editor.apply()
-        }
+        fun setConnectionModeChange(context: Context, url: String) =
+            getUserPreferences(context).edit {
+                putString(CONNECTION_CHANGE, url)
+            }
 
         fun getConnectionModeChange(context: Context) : String{
             return getUserPreferences(context).getString(CONNECTION_CHANGE, "")!!
@@ -539,60 +523,54 @@ class PersistentState {
                     newSet.remove(packageName)
                 }
             } else newSet.add(packageName)*/
-            getUserPreferences(context).edit().putStringSet(EXCLUDE_FROM_VPN, newSet).apply()
+            getUserPreferences(context).edit { putStringSet(EXCLUDE_FROM_VPN, newSet) }
         }
 
-        fun setHttpProxyEnabled(context: Context, isEnabled: Boolean){
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putBoolean(HTTP_PROXY_ENABLED, isEnabled)
-            editor.apply()
-        }
+        fun setHttpProxyEnabled(context: Context, isEnabled: Boolean) =
+            getUserPreferences(context).edit {
+                putBoolean(HTTP_PROXY_ENABLED, isEnabled)
+            }
 
         fun getHttpProxyEnabled(context: Context): Boolean{
             return getUserPreferences(context).getBoolean(HTTP_PROXY_ENABLED, false)
         }
 
-        fun setHttpProxyHostAddress(context: Context, ipAddress : String){
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putString(HTTP_PROXY_IPADDRESS, ipAddress)
-            editor.apply()
-        }
+        fun setHttpProxyHostAddress(context: Context, ipAddress : String) =
+            getUserPreferences(context).edit {
+                putString(HTTP_PROXY_IPADDRESS, ipAddress)
+            }
 
         fun getHttpProxyHostAddress(context: Context) : String? {
             return getUserPreferences(context).getString(HTTP_PROXY_IPADDRESS, "")
         }
 
-        fun setHttpProxyPort(context: Context, port: Int){
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putInt(HTTP_PROXY_PORT, port)
-            editor.apply()
-        }
+        fun setHttpProxyPort(context: Context, port: Int) =
+            getUserPreferences(context).edit {
+                putInt(HTTP_PROXY_PORT, port)
+            }
 
         fun getHttpProxyPort(context: Context): Int {
             return getUserPreferences(context).getInt(HTTP_PROXY_PORT, 0)
         }
 
-        fun setLocalBlockListEnabled(context: Context, isEnabled: Boolean){
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putBoolean(LOCAL_BLOCK_LIST, isEnabled)
-            editor.apply()
-        }
+        fun setLocalBlockListEnabled(context: Context, isEnabled: Boolean) =
+            getUserPreferences(context).edit {
+                putBoolean(LOCAL_BLOCK_LIST, isEnabled)
+            }
 
-        fun setLocalBlockListDownloadTime(context: Context, time : Long){
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putLong(LOCAL_BLOCK_LIST_TIME, time)
-            editor.apply()
-        }
+        fun setLocalBlockListDownloadTime(context: Context, time : Long) =
+            getUserPreferences(context).edit {
+                putLong(LOCAL_BLOCK_LIST_TIME, time)
+            }
 
         fun getLocalBlockListDownloadTime(context: Context) : Long{
             return getUserPreferences(context).getLong(LOCAL_BLOCK_LIST_TIME, 0L)
         }
 
-        fun setRemoteBlockListDownloadTime(context: Context, time: Long) {
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putLong(REMOTE_BLOCK_LIST_TIME_MS, time)
-            editor.apply()
-        }
+        fun setRemoteBlockListDownloadTime(context: Context, time: Long) =
+            getUserPreferences(context).edit {
+                putLong(REMOTE_BLOCK_LIST_TIME_MS, time)
+            }
 
         fun getRemoteBlockListDownloadTime(context: Context): Long {
             return getUserPreferences(context).getLong(REMOTE_BLOCK_LIST_TIME_MS, 0L)
@@ -606,27 +584,25 @@ class PersistentState {
             return getUserPreferences(context).getBoolean(DOWNLOAD_BLOCK_LIST_FILES, false)
         }
 
-        fun setBlockListFilesDownloaded(context: Context, isDownloaded: Boolean){
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putBoolean(DOWNLOAD_BLOCK_LIST_FILES, isDownloaded)
-            editor.apply()
-        }
+        fun setBlockListFilesDownloaded(context: Context, isDownloaded: Boolean) =
+            getUserPreferences(context).edit {
+                putBoolean(DOWNLOAD_BLOCK_LIST_FILES, isDownloaded)
+            }
 
         fun getBlockUnknownConnections(context: Context): Boolean{
             return getUserPreferences(context).getBoolean(BLOCK_UNKNOWN_CONNECTIONS, false)
         }
 
-        fun setBlockUnknownConnections(context: Context, isEnabled: Boolean){
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putBoolean(BLOCK_UNKNOWN_CONNECTIONS, isEnabled)
-            editor.apply()
-        }
+        fun setBlockUnknownConnections(context: Context, isEnabled: Boolean) =
+            getUserPreferences(context).edit {
+                putBoolean(BLOCK_UNKNOWN_CONNECTIONS, isEnabled)
+            }
 
         fun setLocalBlockListStamp(context: Context, stamp: String) {
             if(DEBUG) Log.d(LOG_TAG,"In preference, Set local stamp: $stamp")
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putString(LOCAL_BLOCK_LIST_STAMP, stamp)
-            editor.apply()
+            getUserPreferences(context).edit {
+                putString(LOCAL_BLOCK_LIST_STAMP, stamp)
+            }
         }
 
         fun getLocalBlockListStamp(context: Context): String? {
@@ -638,27 +614,24 @@ class PersistentState {
             return getUserPreferences(context).getBoolean(REMOTE_BLOCK_COMPLETE, false)
         }
 
-        fun setRemoteBraveDNSDownloaded(context: Context, isDownloaded: Boolean){
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putBoolean(REMOTE_BLOCK_COMPLETE, isDownloaded)
-            editor.apply()
-        }
+        fun setRemoteBraveDNSDownloaded(context: Context, isDownloaded: Boolean) =
+            getUserPreferences(context).edit {
+                putBoolean(REMOTE_BLOCK_COMPLETE, isDownloaded)
+            }
 
         fun isInsertionCompleted(context:Context) : Boolean{
             return getUserPreferences(context).getBoolean(IS_INSERT_COMPLETE, false)
         }
 
-        fun setInsertionCompleted(context: Context, isComplete : Boolean){
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putBoolean(IS_INSERT_COMPLETE, isComplete)
-            editor.apply()
-        }
+        fun setInsertionCompleted(context: Context, isComplete : Boolean) =
+            getUserPreferences(context).edit {
+                putBoolean(IS_INSERT_COMPLETE, isComplete)
+            }
 
-        fun setDNSProxyIDChange(context: Context, id: Int){
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putInt(DNS_PROXY_ID, id)
-            editor.apply()
-        }
+        fun setDNSProxyIDChange(context: Context, id: Int) =
+            getUserPreferences(context).edit {
+                putInt(DNS_PROXY_ID, id)
+            }
 
         fun getDNSProxyIDChange(context: Context): Int {
             return getUserPreferences(context).getInt(DNS_PROXY_ID, 0)
@@ -668,59 +641,53 @@ class PersistentState {
             return getUserPreferences(context).getBoolean(BLOCK_UDP_OTHER_THAN_DNS, false)
         }
 
-        fun setUDPBlockedSettings(context: Context, isEnabled: Boolean) {
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putBoolean(BLOCK_UDP_OTHER_THAN_DNS, isEnabled)
-            editor.apply()
-        }
+        fun setUDPBlockedSettings(context: Context, isEnabled: Boolean) =
+            getUserPreferences(context).edit {
+                putBoolean(BLOCK_UDP_OTHER_THAN_DNS, isEnabled)
+            }
 
         fun getNumberOfLocalBlockLists(context: Context): Int{
             return getUserPreferences(context).getInt(LOCAL_BLOCK_LIST_COUNT, 0)
         }
 
-        fun setNumberOfLocalBlockLists(context: Context, blockCount : Int){
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putInt(LOCAL_BLOCK_LIST_COUNT, blockCount)
-            editor.apply()
-        }
+        fun setNumberOfLocalBlockLists(context: Context, blockCount : Int) =
+            getUserPreferences(context).edit {
+                putInt(LOCAL_BLOCK_LIST_COUNT, blockCount)
+            }
 
 
         fun getNumberOfRemoteBlockLists(context: Context): Int {
             return getUserPreferences(context).getInt(REMOTE_BLOCK_LIST_COUNT, 0)
         }
 
-        fun setNumberOfRemoteBlockLists(context: Context, blockCount: Int) {
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putInt(REMOTE_BLOCK_LIST_COUNT, blockCount)
-            editor.apply()
-        }
+        fun setNumberOfRemoteBlockLists(context: Context, blockCount: Int) =
+            getUserPreferences(context).edit {
+                putInt(REMOTE_BLOCK_LIST_COUNT, blockCount)
+            }
 
 
-        fun setLastAppUpdateCheckTime(context: Context, time : Long){
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putLong(APP_UPDATE_LAST_CHECK, time)
-            editor.apply()
-        }
+        fun setLastAppUpdateCheckTime(context: Context, time : Long) =
+            getUserPreferences(context).edit {
+                putLong(APP_UPDATE_LAST_CHECK, time)
+            }
 
         fun getLastAppUpdateCheckTime(context: Context) : Long{
             return getUserPreferences(context).getLong(APP_UPDATE_LAST_CHECK , 0)
         }
 
-        fun setAppVersion(context: Context, version: Int) {
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putInt(APP_VERSION, version)
-            editor.apply()
-        }
+        fun setAppVersion(context: Context, version: Int) =
+            getUserPreferences(context).edit {
+                putInt(APP_VERSION, version)
+            }
 
         fun getAppVersion(context: Context): Int{
             return getUserPreferences(context).getInt(APP_VERSION , 0)
         }
 
-        fun setDownloadSource(context: Context, source : Int){
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putInt(APP_DOWNLOAD_SOURCE, source)
-            editor.apply()
-        }
+        fun setDownloadSource(context: Context, source : Int) =
+            getUserPreferences(context).edit {
+                putInt(APP_DOWNLOAD_SOURCE, source)
+            }
 
         fun getDownloadSource(context: Context): Int{
             return getUserPreferences(context).getInt(APP_DOWNLOAD_SOURCE , 0)
@@ -730,10 +697,9 @@ class PersistentState {
             return getUserPreferences(context).getBoolean(ENABLE_LOCAL_LOGS, true)
         }
 
-        fun setLogsEnabled(context: Context, isLogsEnabled : Boolean) {
-            val editor : SharedPreferences.Editor = getUserPreferences(context).edit()
-            editor.putBoolean(ENABLE_LOCAL_LOGS, isLogsEnabled)
-            editor.apply()
-        }
+        fun setLogsEnabled(context: Context, isLogsEnabled : Boolean) =
+            getUserPreferences(context).edit {
+                putBoolean(ENABLE_LOCAL_LOGS, isLogsEnabled)
+            }
     }
 }
