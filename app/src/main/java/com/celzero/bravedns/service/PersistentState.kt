@@ -126,7 +126,7 @@ class PersistentState {
            }
 
            fun isFirstTimeLaunch(context:Context) : Boolean {
-               return getUserPreferences(context)!!.getBoolean(IS_FIRST_LAUNCH,true)
+               return getUserPreferences(context).getBoolean(IS_FIRST_LAUNCH,true)
            }
 
         fun expandUrl(context: Context, url: String?): String {
@@ -200,24 +200,24 @@ class PersistentState {
         }
 
         fun setExcludedPackagesWifi(packageName : String, toRemove : Boolean , context : Context){
-            val newSet: MutableSet<String> = HashSet(getUserPreferences(context!!)!!.getStringSet(APPS_KEY_WIFI, HashSet<String>()))
+            val newSet: MutableSet<String> = HashSet(getUserPreferences(context).getStringSet(APPS_KEY_WIFI, HashSet<String>()))
             if(toRemove) {
                 if (newSet.contains(packageName)) {
                     newSet.remove(packageName)
                 }
             }
             else newSet.add(packageName)
-            getUserPreferences(context)!!.edit().putStringSet(APPS_KEY_WIFI,newSet).apply()
+            getUserPreferences(context).edit().putStringSet(APPS_KEY_WIFI,newSet).apply()
             //appsBlocked.postValue(newSet.size)
         }
 
         fun isWifiAllowed(packageName : String, context: Context) : Boolean{
-            return !getUserPreferences(context)?.getStringSet(APPS_KEY_WIFI,HashSet<String>())!!.contains(packageName)
+            return !getUserPreferences(context).getStringSet(APPS_KEY_WIFI,HashSet<String>())!!.contains(packageName)
         }
 
 
         fun getExcludedPackagesData(context: Context?): Set<String?>? {
-            return getUserPreferences(context!!)?.getStringSet(
+            return getUserPreferences(context!!).getStringSet(
                 APPS_KEY_DATA,
                 HashSet<String>()
             )
@@ -227,13 +227,13 @@ class PersistentState {
 
             //TODO : hardcode value for testing. Need to modify
             // sets = getUserPreferences(context!!)!!.getStringSet(APPS_KEY, HashSet<String>())!!
-            val newSet: MutableSet<String> = HashSet(getUserPreferences(context!!)!!.getStringSet(APPS_KEY_DATA, HashSet<String>()))
+            val newSet: MutableSet<String> = HashSet(getUserPreferences(context!!).getStringSet(APPS_KEY_DATA, HashSet<String>()))
             if(toRemove){
                 if(newSet.contains(packageName))
                     newSet.remove(packageName)
             }
             else  newSet.add(packageName)
-            getUserPreferences(context)!!.edit().putStringSet(APPS_KEY_DATA,newSet).apply()
+            getUserPreferences(context).edit().putStringSet(APPS_KEY_DATA,newSet).apply()
         }
 
         private fun strip(template: String): String {
@@ -318,7 +318,7 @@ class PersistentState {
         fun setMedianLatency(context: Context, medianP90 : Long){
             HomeScreenActivity.GlobalVariable.medianP90 = medianP90
             median50.postValue(medianP90)
-            val editor: SharedPreferences.Editor = getUserPreferences(context)!!.edit()
+            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
             editor.putLong(MEDIAN_90, medianP90)
             editor.apply()
         }
@@ -335,9 +335,9 @@ class PersistentState {
             if(lifeTimeQueries > 0)
                 numReq = lifeTimeQueries + 1
             else {
-                numReq = getUserPreferences(context)?.getInt(NUMBER_REQUEST, 0)!! + 1
+                numReq = getUserPreferences(context).getInt(NUMBER_REQUEST, 0) + 1
             }
-            val editor: SharedPreferences.Editor = getUserPreferences(context)!!.edit()
+            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
             editor.putInt(NUMBER_REQUEST, numReq)
             editor.apply()
             lifeTimeQueries = numReq
@@ -347,11 +347,11 @@ class PersistentState {
         fun getNumOfReq(context: Context) : Int{
             if(lifeTimeQueries >=0 )
                 return lifeTimeQueries
-            return getUserPreferences(context)?.getInt(NUMBER_REQUEST,0)!!
+            return getUserPreferences(context).getInt(NUMBER_REQUEST, 0)
         }
 
         fun setBlockedReq(context : Context){
-            val bCount =  getUserPreferences(context)?.getInt(BLOCKED_COUNT,0) + 1
+            val bCount =  getUserPreferences(context).getInt(BLOCKED_COUNT,0) + 1
             val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
             editor.putInt(BLOCKED_COUNT, bCount)
             editor.apply()
@@ -568,7 +568,7 @@ class PersistentState {
             editor.apply()
         }
 
-        fun getHttpProxyPort(context: Context): Int?{
+        fun getHttpProxyPort(context: Context): Int {
             return getUserPreferences(context).getInt(HTTP_PROXY_PORT, 0)
         }
 
