@@ -39,6 +39,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.getSystemService
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
@@ -99,7 +100,7 @@ class Utilities {
         }
 
         fun isServiceRunning(c: Context, serviceClass: Class<*>): Boolean {
-            val manager = c.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            val manager = c.getSystemService<ActivityManager>() ?: return false
             for (service in manager.getRunningServices(Int.MAX_VALUE)) {
                 if (serviceClass.name == service.service.className) {
                     return true
@@ -138,7 +139,7 @@ class Utilities {
         }
 
         fun isAccessibilityServiceEnabled(context: Context, service: Class<out AccessibilityService?>): Boolean {
-            val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+            val am = context.getSystemService<AccessibilityManager>() ?: return false
             val enabledServices = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
             for (enabledService in enabledServices) {
                 val enabledServiceInfo: ServiceInfo = enabledService.resolveInfo.serviceInfo

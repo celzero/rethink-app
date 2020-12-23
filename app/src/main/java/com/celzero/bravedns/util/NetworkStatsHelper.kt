@@ -23,6 +23,7 @@ import android.net.ConnectivityManager
 import android.os.Build
 import android.os.RemoteException
 import android.telephony.TelephonyManager
+import androidx.core.content.getSystemService
 
 
 @TargetApi(Build.VERSION_CODES.M)
@@ -196,8 +197,7 @@ class NetworkStatsHelper {
 
     private fun getSubscriberId(context: Context, networkType: Int): String {
         if (ConnectivityManager.TYPE_MOBILE == networkType) {
-            val tm =
-                context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+            val tm = context.getSystemService<TelephonyManager>() ?: return ""
             return tm.subscriberId
         }
         return ""
