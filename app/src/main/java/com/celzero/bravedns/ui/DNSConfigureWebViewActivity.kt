@@ -40,6 +40,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.HttpRequestHelper
+import com.celzero.bravedns.util.Utilities
 import dnsx.Dnsx
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -100,11 +101,6 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
             showDialogOnError(null)
         }
         loadUrl(url)
-        if(!PersistentState.isRemoteBraveDNSDownloaded(this)) {
-            if(DEBUG) Log.d(LOG_TAG, "Webview: Download remote file - filetag")
-            registerReceiverForDownloadManager()
-            handleDownloadFiles()
-        }
 
         blockListsCount.observe(this, androidx.lifecycle.Observer {
             if (receivedIntentFrom == LOCAL) {
@@ -114,6 +110,10 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
             }
 
         })
+
+        if (DEBUG) Log.d(LOG_TAG, "Webview: Download remote file - filetag")
+
+        checkForDownload()
     }
 
     override fun onDestroy() {
@@ -441,7 +441,12 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
                         if (status == "STATUS_SUCCESSFUL") {
                             val from = File(ctxt.getExternalFilesDir(null).toString() + Constants.DOWNLOAD_PATH + Constants.FILE_TAG_NAME)
                             val to = File(ctxt.filesDir.canonicalPath + Constants.FILE_TAG_NAME)
-                            from.copyTo(to, true)
+                            val fileDownloaded = from.copyTo(to, true)
+                            if(fileDownloaded.exists()) {
+                                Utilities.deleteOldFiles(ctxt)
+                            }
+                            //val destDir = File(ctxt.filesDir.canonicalPath)
+                            //Utilities.moveTo(from, to, destDir)
                             PersistentState.setRemoteBraveDNSDownloaded(ctxt, true)
                         } else {
                             Log.e(LOG_TAG, "Webview: Error downloading filetag.json file: $status")
@@ -468,6 +473,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
     }
 
     private fun downloadBlockListFiles() {
+        registerReceiverForDownloadManager()
         if(timeStamp == 0L)
             timeStamp = PersistentState.getRemoteBlockListDownloadTime(this)
         val url = Constants.JSON_DOWNLOAD_BLOCKLIST_LINK + "/" + timeStamp

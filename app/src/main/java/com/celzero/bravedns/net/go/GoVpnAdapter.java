@@ -161,7 +161,9 @@ public class GoVpnAdapter {
             try{
                 dohURL = appMode.getDOHDetails().getDohURL();
             }catch(Exception e){
+                Utilities.Companion.showToastInMidLayout(vpnService,vpnService.getString(R.string.vpn_start_error_doh_url),Toast.LENGTH_SHORT);
                 Log.w(LOG_TAG,"GoVPNAdapter appMode.getDOHDetails() is null:" +e.getMessage() ,e);
+                return;
             }
 
             Log.i(LOG_TAG,"GoVPNAdapter DoHURL - "+dohURL);
@@ -515,11 +517,13 @@ public class GoVpnAdapter {
             HomeScreenActivity.GlobalVariable.INSTANCE.setAppMode(AppMode.Companion.getInstance(vpnService));
             appMode = HomeScreenActivity.GlobalVariable.INSTANCE.getAppMode();
         }
-        String dohURL = null;
+        String dohURL;
         try {
             dohURL = appMode.getDOHDetails().getDohURL();
         } catch (Exception e) {
+            Utilities.Companion.showToastInMidLayout(vpnService, vpnService.getString(R.string.vpn_start_error_doh_url), Toast.LENGTH_SHORT);
             Log.e(LOG_TAG, "GoVPNAdapter dohURL is null", e);
+            return;
         }
         Log.d(LOG_TAG,"GoVPNAdapter DoHURL - "+dohURL);
         try {

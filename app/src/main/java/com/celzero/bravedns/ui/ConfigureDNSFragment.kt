@@ -17,7 +17,6 @@ package com.celzero.bravedns.ui
 
 import android.app.Activity
 import android.app.Dialog
-import android.app.DownloadManager
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -56,16 +55,9 @@ import java.net.URL
 
 
 class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
-    private lateinit var urlName: Array<String>
-    private lateinit var urlValues: Array<String>
-
     private lateinit var dohRelativeLayout: RelativeLayout
     private lateinit var dnsCryptRelativeLayout: RelativeLayout
     private lateinit var dnsProxyRelativeLayout: RelativeLayout
-
-   /* private lateinit var chipDOH: MaterialRadioButton
-    private lateinit var chipDNSCrypt: MaterialRadioButton
-    private lateinit var chipDNSProxy: MaterialRadioButton*/
 
     private lateinit var dnsModeSpinner: Spinner
 
@@ -77,8 +69,6 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
     private lateinit var lifeTimeQueriesTxt: TextView
 
     private lateinit var dohCustomAddFabBtn: ExtendedFloatingActionButton
-
-    //private lateinit var dohBraveProSubscribeBtn : Button
 
     //DOH UI elements
     private var dohRecyclerView: RecyclerView? = null
@@ -107,18 +97,6 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
 
     private lateinit var spinnerAdapter : CustomSpinnerAdapter
 
-    private  var downloadManager : DownloadManager ?= null
-
-
-    private val VALUE_NO_FILTER = 0
-    private val VALUE_FAMILY = 1
-    private val VALUE_FREE_BRAVE_DNS = 2
-    private val VALUE_CUSTOM_FILTER = 3
-    private val VALUE_BRAVE_COMING_SOON = 4
-
-
-    private var previousSetDoH: Int = 2
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreate(savedInstanceState)
         return inflater.inflate(R.layout.fragment_configure_dns, container, false)
@@ -128,80 +106,14 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
         super.onViewCreated(view, savedInstanceState)
         initView(view)
         initClickListeners()
-        //initiateDownloadFileTag()
     }
 
-    /*private fun initiateDownloadFileTag() {
-        if (!PersistentState.isRemoteBraveDNSDownloaded(requireContext())) {
-            if (DEBUG) Log.d(LOG_TAG, "Download remote file - filetag")
-            registerReceiverForDownloadManager()
-            handleDownloadFiles()
-        }
-    }*/
-
-   /* private fun handleDownloadFiles() {
-        downloadBlockListFiles()
-    }
-
-    private fun registerReceiverForDownloadManager() {
-        requireContext().registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
-    }*/
-
-    /*private var onComplete: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(ctxt: Context, intent: Intent) {
-
-
-            if (DEBUG) Log.d(LOG_TAG, "Intent on receive ")
-            try {
-                val action = intent.action
-                if (DEBUG) Log.d(LOG_TAG, "Download status: $action")
-                if (DownloadManager.ACTION_DOWNLOAD_COMPLETE == action) {
-                    if (DEBUG) Log.d(LOG_TAG, "Download status: $action")
-                    //val downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0)
-                    val query = DownloadManager.Query()
-                    query.setFilterById(SettingsFragment.enqueue)
-                    val c: Cursor? = downloadManager?.query(query)
-                    if (c?.moveToFirst()!!) {
-                        //val columnIndex: Int = c.getColumnIndex(DownloadManager.COLUMN_STATUS)
-                        val status = HttpRequestHelper.checkStatus(c)
-                        if (DEBUG) Log.d(LOG_TAG, "Download status: $status,${HomeScreenActivity.GlobalVariable.filesDownloaded}")
-                        if (status == "STATUS_SUCCESSFUL") {
-                            val from = File(ctxt.getExternalFilesDir(null).toString() + Constants.DOWNLOAD_PATH + Constants.FILE_TAG_NAME)
-                            val to = File(ctxt.filesDir.canonicalPath + Constants.FILE_TAG_NAME)
-                            from.copyTo(to, true)
-                            PersistentState.setRemoteBraveDNSDownloaded(ctxt, true)
-                            PersistentState.setRemoteBlockListDownloadTime(ctxt, timeStamp)
-                        } else {
-                            Log.e(LOG_TAG, "Error downloading filetag.json file: $status")
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e(LOG_TAG, "Error downloading filetag.json file: ${e.message}", e)
-            }
-
-        }
-    }*/
-
-    /*private fun downloadBlockListFiles() {
-        downloadManager = requireContext().getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-        val timeStamp = PersistentState.getRemoteBlockListDownloadTime(requireContext())
-        val url = Constants.JSON_DOWNLOAD_BLOCKLIST_LINK+"/"+timeStamp
-        val uri: Uri = Uri.parse(url)
-        val request = DownloadManager.Request(uri)
-        request.setDestinationInExternalFilesDir(requireContext(), Constants.DOWNLOAD_PATH, Constants.FILE_TAG_NAME)
-        Log.i(LOG_TAG, "Path - ${requireContext().filesDir.canonicalPath}${Constants.DOWNLOAD_PATH}${Constants.FILE_TAG_NAME}")
-        downloadManager?.enqueue(request)
-    }*/
 
     companion object {
         fun newInstance() = ConfigureDNSFragment()
     }
 
     private fun initView(view: View) {
-
-        urlName = resources.getStringArray(R.array.doh_endpoint_names)
-        urlValues = resources.getStringArray(R.array.doh_endpoint_urls)
 
 
         val arraySpinner = requireContext().resources.getStringArray(R.array.dns_endpoint_modes).toList()
@@ -235,28 +147,24 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
 
         //DOH init views
         dohRecyclerView = view.findViewById<View>(R.id.recycler_doh_connections) as RecyclerView
-        //dohRecyclerView!!.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(requireContext())
         dohRecyclerView!!.layoutManager = layoutManager
         DoHEndpointViewModel.setContext(requireContext())
 
         //DNS Crypt init views
         dnsCryptRecyclerView = view.findViewById(R.id.recycler_dns_crypt_connections)
-        //dnsCryptRecyclerView.setHasFixedSize(true)
         dnsCryptLayoutManager = LinearLayoutManager(requireContext())
         dnsCryptRecyclerView.layoutManager = dnsCryptLayoutManager
         DNSCryptEndpointViewModel.setContext(requireContext())
 
         //DNS Crypt Relay init views
         dnsCryptRelayRecyclerView = view.findViewById(R.id.recycler_dns_crypt_relays)
-        //dnsCryptRelayRecyclerView.setHasFixedSize(true)
         dnsCryptRelayLayoutManager = LinearLayoutManager(requireContext())
         dnsCryptRelayRecyclerView.layoutManager = dnsCryptRelayLayoutManager
         DNSCryptRelayEndpointViewModel.setContext(requireContext())
 
         //Proxy init views
         dnsProxyRecyclerView = view.findViewById(R.id.recycler_dns_proxy_connections)
-        //dnsProxyRecyclerView.setHasFixedSize(true)
         dnsProxyLayoutManager = LinearLayoutManager(requireContext())
         dnsProxyRecyclerView.layoutManager = dnsProxyLayoutManager
         DNSProxyEndpointViewModel.setContext(requireContext())
@@ -283,14 +191,10 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
        val dnsValue= appMode?.getDNSType()
         if (dnsValue == 1) {
             dnsModeSpinner.setSelection(0)
-            //zdadapter.add("dns over https (connected)")
-            //adapter.remove()
+
             dohRelativeLayout.visibility = View.VISIBLE
             dnsCryptRelativeLayout.visibility = View.GONE
             dnsProxyRelativeLayout.visibility = View.GONE
-           /* val dohDetail = appMode?.getDOHDetails()
-            connectedURL.text = resources.getString(R.string.configure_dns_connected_doh_status)
-            connectedTitle.text = resources.getString(R.string.configure_dns_connection_name) + dohDetail?.dohName*/
         } else if (dnsValue == 2) {
             dnsModeSpinner.setSelection(1)
             dohRelativeLayout.visibility = View.GONE
@@ -472,7 +376,6 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
                             timerHandler.removeCallbacksAndMessages(null)
                             if (connectionStatus) {
                                 activity?.runOnUiThread {
-                                    previousSetDoH = VALUE_CUSTOM_FILTER
                                     dialog.dismiss()
                                     Toast.makeText(context, resources.getString(R.string.custom_url_added_successfully), Toast.LENGTH_SHORT).show()
                                 }

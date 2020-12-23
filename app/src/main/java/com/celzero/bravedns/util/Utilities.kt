@@ -44,7 +44,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.google.android.material.snackbar.Snackbar
 import com.google.common.net.InternetDomainName
-import java.io.IOException
+import java.io.*
 import java.net.InetAddress
 import java.text.SimpleDateFormat
 import java.util.*
@@ -220,15 +220,14 @@ class Utilities {
             return format.format(date)
         }
 
-        fun convertLongToDate(timeStamp : Long): String{
+        fun convertLongToDate(timeStamp: Long): String{
             val date = Date(timeStamp)
             val format = SimpleDateFormat("yy.MM (dd)", Locale.US)
             return format.format(date)
         }
 
         fun convertLongToRelativeTime(timeStamp: Long): String{
-            return "Last updated: ${DateUtils.getRelativeTimeSpanString(timeStamp,
-                        System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE)}"
+            return "Last updated: ${DateUtils.getRelativeTimeSpanString(timeStamp, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE)}"
         }
 
         fun prepareServersToRemove(servers: String, liveServers: String): String{
@@ -281,6 +280,56 @@ class Utilities {
             return if (type < names.size) {
                 names[type]
             } else String.format(Locale.ROOT, "%d", type)
+        }
+
+
+        /**
+        * To move the files from the the source to destination folder.
+        * Utility will be used to move the files which are downloaded as part of
+        * local/remote blocklist.*/
+        @Throws(FileNotFoundException::class, IOError::class)
+        fun moveTo(source: File, dest: File, destDirectory: File? = null) {
+
+            if (destDirectory?.exists() == false) {
+                destDirectory.mkdir()
+            }
+
+            val fis = FileInputStream(source)
+            val bufferLength = 1024
+            val buffer = ByteArray(bufferLength)
+            val fos = FileOutputStream(dest)
+            val bos = BufferedOutputStream(fos, bufferLength)
+            var read = fis.read(buffer, 0, bufferLength)
+            while (read != -1) {
+                bos.write(buffer, 0, read)
+                read = fis.read(buffer) // if read value is -1, it escapes loop.
+            }
+            fis.close()
+            bos.flush()
+            bos.close()
+
+            if (!source.delete()) {
+                Log.w(LOG_TAG, "failed to delete ${source.name}")
+            }
+        }
+
+        /**
+         * Clean up the folder which had the old download files.
+         * This was introduced in v053, before that the files downloaded as part of blocklists
+         * are stored in external files dir by the DownloadManager and moved to canonicalPath.
+         * Now in v053 we are moving the files from external dir to canonical path.
+         * So deleting the old files in the external directory.
+         */
+        fun deleteOldFiles(context : Context){
+            val dir = File(context.getExternalFilesDir(null).toString() + Constants.DOWNLOAD_PATH)
+            if (dir.isDirectory) {
+                val children = dir.list()
+                if(children != null && children.isNotEmpty()) {
+                    for (i in children.indices) {
+                        File(dir, children[i]).delete()
+                    }
+                }
+            }
         }
 
     }
