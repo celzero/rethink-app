@@ -136,7 +136,7 @@ class AboutFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    fun showNewFeaturesDialog() {
+    private fun showNewFeaturesDialog() {
         val inflater: LayoutInflater = LayoutInflater.from(requireContext())
         val view: View = inflater.inflate(R.layout.dialog_whatsnew, null)
         //val builder: android.app.AlertDialog.Builder = AlertDialog.Builder(this)

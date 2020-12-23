@@ -349,7 +349,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
 
     fun newBuilder(): Builder {
         var builder = Builder()
-        var alwaysOn : String = ""
+        var alwaysOn : String ?= null
         var lockDown = -1
 
         if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
@@ -358,7 +358,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                 alwaysOn = android.provider.Settings.Secure.getString(this.contentResolver, "always_on_vpn_app")
                 lockDown = android.provider.Settings.Secure.getInt(contentResolver, "always_on_vpn_lockdown", 0)
                 if (DEBUG) Log.d(LOG_TAG, "isLockDownEnabled - $lockDown , $alwaysOn")
-                if (TextUtils.isEmpty(alwaysOn) && lockDown == 0) {
+                if (alwaysOn.isNullOrEmpty() && lockDown == 0) {
                     if (PersistentState.getAllowByPass(this)) {
                         Log.d(LOG_TAG, "$FILE_LOG_TAG getAllowByPass - true")
                         builder = builder.allowBypass()
@@ -400,16 +400,18 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                        enabled. */
                     val excludedApps = PersistentState.getExcludedAppsFromVPN(this)
                     if (VERSION.SDK_INT >= VERSION_CODES.Q) {
-                        if (TextUtils.isEmpty(alwaysOn) && lockDown == 0) {
+                        if (alwaysOn.isNullOrEmpty()  && lockDown == 0) {
                             excludedApps?.forEach {
                                 builder = builder.addDisallowedApplication(it)
-                                Log.d(LOG_TAG, "$FILE_LOG_TAG Excluded package - $it")
+                                Log.i(LOG_TAG, "$FILE_LOG_TAG Excluded package - $it")
                             }
+                        }else{
+                            Log.i(LOG_TAG, "$FILE_LOG_TAG lockdown mode enabled, Ignoring apps to exclude")
                         }
                     }else{
                         excludedApps?.forEach {
                             builder = builder.addDisallowedApplication(it)
-                            Log.d(LOG_TAG, "$FILE_LOG_TAG Excluded package - $it")
+                            Log.i(LOG_TAG, "$FILE_LOG_TAG Excluded package - $it")
                         }
                     }
                     //builder = builder.addDisallowedApplication("com.android.vending")

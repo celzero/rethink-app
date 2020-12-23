@@ -350,20 +350,31 @@ class RefreshDatabase(var context: Context) {
         GlobalScope.launch(Dispatchers.IO) {
             val mDb = AppDatabase.invoke(context.applicationContext)
             val doHEndpointRepository = mDb.doHEndpointsRepository()
-            doHEndpointRepository.removeConnectionStatus()
-            val urlName = context.resources.getStringArray(R.array.doh_endpoint_names)
-            val urlValues = context.resources.getStringArray(R.array.doh_endpoint_urls)
+            try {
+                val isAlreadyConnectionAvailable = doHEndpointRepository.getConnectedDoH()
+                val urlName = context.resources.getStringArray(R.array.doh_endpoint_names)
+                val urlValues = context.resources.getStringArray(R.array.doh_endpoint_urls)
+                if(isAlreadyConnectionAvailable.dohName.isNullOrEmpty()){
+                    doHEndpointRepository.removeConnectionStatus()
 
-            val doHEndpoint1 = DoHEndpoint(1, urlName[0], urlValues[0], context.getString(R.string.dns_mode_0_explanation), false, false, System.currentTimeMillis(), 0)
-            val doHEndpoint2 = DoHEndpoint(2, urlName[1], urlValues[1], context.getString(R.string.dns_mode_1_explanation), false, false, System.currentTimeMillis(), 0)
-            val doHEndpoint3 = DoHEndpoint(3, urlName[2], urlValues[2], context.getString(R.string.dns_mode_2_explanation), true, false, System.currentTimeMillis(), 0)
-            val doHEndpoint4 = DoHEndpoint(4, urlName[4], urlValues[4], context.getString(R.string.dns_mode_4_explanation), false, false, System.currentTimeMillis(), 0)
+                    val doHEndpoint1 = DoHEndpoint(1, urlName[0], urlValues[0], context.getString(R.string.dns_mode_0_explanation), false, false, System.currentTimeMillis(), 0)
+                    val doHEndpoint2 = DoHEndpoint(2, urlName[1], urlValues[1], context.getString(R.string.dns_mode_1_explanation), false, false, System.currentTimeMillis(), 0)
+                    val doHEndpoint3 = DoHEndpoint(3, urlName[2], urlValues[2], context.getString(R.string.dns_mode_2_explanation), false, false, System.currentTimeMillis(), 0)
+                    val doHEndpoint4 = DoHEndpoint(4, urlName[4], urlValues[3], context.getString(R.string.dns_mode_4_explanation), true, false, System.currentTimeMillis(), 0)
 
-            doHEndpointRepository.insertWithReplaceAsync(doHEndpoint1)
-            doHEndpointRepository.insertWithReplaceAsync(doHEndpoint2)
-            doHEndpointRepository.insertWithReplaceAsync(doHEndpoint3)
-            doHEndpointRepository.insertWithReplaceAsync(doHEndpoint4)
-            //mDb.close()
+                    doHEndpointRepository.insertWithReplaceAsync(doHEndpoint1)
+                    doHEndpointRepository.insertWithReplaceAsync(doHEndpoint2)
+                    doHEndpointRepository.insertWithReplaceAsync(doHEndpoint3)
+                    doHEndpointRepository.insertWithReplaceAsync(doHEndpoint4)
+                }else{
+                    Log.i(LOG_TAG, "Refresh Database, ALready insertion done. Correct values for Cloudflare alone.")
+                    val doHEndpoint = DoHEndpoint(3, urlName[2], urlValues[2], context.getString(R.string.dns_mode_2_explanation), false, false, System.currentTimeMillis(), 0)
+                    doHEndpointRepository.insertWithReplaceAsync(doHEndpoint)
+                }
+            }catch (e : Exception){
+                Log.i(LOG_TAG, "Refresh Database, No connections available proceed insert")
+            }
+
         }
     }
 

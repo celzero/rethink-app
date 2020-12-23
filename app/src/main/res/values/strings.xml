@@ -536,6 +536,7 @@
     <string name="app_mode_dns_low_battery">DNS (battery saver)</string>
 
     <string name="app_mode_choose">Choose mode</string>
+    <string name="vpn_start_error_doh_url">Something went wrong. Cannot start VPN.</string>
 
 
     <string name="features_disabled">(disabled)</string>

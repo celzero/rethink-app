@@ -860,7 +860,10 @@ class SettingsFragment : Fragment() {
                             } else if (filesDownloaded == 4) {
                                 val from = File(ctxt.getExternalFilesDir(null).toString() + Constants.DOWNLOAD_PATH + Constants.FILE_TD_FILE)
                                 val to = File(ctxt.filesDir.canonicalPath + Constants.FILE_TD_FILE)
-                                from.copyTo(to, true)
+                                val downloadedFile = from.copyTo(to, true)
+                                if(downloadedFile.exists()) {
+                                    Utilities.deleteOldFiles(ctxt)
+                                }
                                 PersistentState.setBlockListFilesDownloaded(ctxt, true)
                                 PersistentState.setLocalBlockListEnabled(ctxt, true)
                                 //PersistentState.setLocalBlockListDownloadTime(ctxt, System.currentTimeMillis())

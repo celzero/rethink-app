@@ -34,20 +34,18 @@ import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallRules
 import com.celzero.bravedns.data.AppMode
+import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.isUserInitiatedUpdateCheck
-import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.APPEND_VCODE
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_OTHERS
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Constants.Companion.REFRESH_BLOCKLIST_URL
-import com.celzero.bravedns.util.DatabaseHandler
-import com.celzero.bravedns.util.HttpRequestHelper
 import com.celzero.bravedns.util.HttpRequestHelper.Companion.checkStatus
-import com.celzero.bravedns.util.RefreshDatabase
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.play.core.appupdate.AppUpdateManager
@@ -107,7 +105,7 @@ class HomeScreenActivity : AppCompatActivity() {
         var appStartTime: Long = System.currentTimeMillis()
         var isBackgroundEnabled: Boolean = false
         var firewallRules: HashMultimap<Int, String> = HashMultimap.create()
-        var DEBUG = false
+        var DEBUG = true
         //Screen off - whether the screen preference is set 0-off, 1- on. -1 not initialized
         var isUserInitiatedUpdateCheck = false
 
@@ -255,7 +253,14 @@ class HomeScreenActivity : AppCompatActivity() {
     }
 
     private fun checkForBlockListUpdate() {
-        if(PersistentState.isLocalBlockListEnabled(this)) {
+        val mDb = AppDatabase.invoke(context.applicationContext)
+        val doHEndpointRepository = mDb.doHEndpointsRepository()
+        val connectedDOH = doHEndpointRepository.getConnectedDoH()
+        var isRethinkPlusConnected = false
+        if(connectedDOH.dohName == Constants.RETHINK_DNS_PLUS){
+            isRethinkPlusConnected = true
+        }
+        if(PersistentState.isLocalBlockListEnabled(this) || isRethinkPlusConnected) {
             val blockListTimeStamp = PersistentState.getLocalBlockListDownloadTime(this)
             val appVersionCode = PersistentState.getAppVersion(this)
             val url = "$REFRESH_BLOCKLIST_URL$blockListTimeStamp&$APPEND_VCODE$appVersionCode"
@@ -264,45 +269,44 @@ class HomeScreenActivity : AppCompatActivity() {
     }
 
     fun checkForAppUpdate() : Boolean {
-        appUpdateManager.registerListener(installStateUpdatedListener)
-
-        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
-            var version = PersistentState.getAppVersion(context)
-            if (version == 0) {
-                try {
-                    val pInfo: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-                    version = pInfo.versionCode
-                    PersistentState.setAppVersion(context, version)
-                } catch (e: PackageManager.NameNotFoundException) {
-                    Log.e(LOG_TAG, "Error while fetching version code: ${e.message}", e)
-                }
-            }
-            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
-                appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
-                try {
-                    appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.FLEXIBLE, this, version)
-                } catch (e: IntentSender.SendIntentException) {
-                    appUpdateManager.unregisterListener(installStateUpdatedListener)
-                    Log.e(LOG_TAG, "SendIntentException: ${e.message} ", e)
-                }
-            } else if(appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)){
-                try {
-                    appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.IMMEDIATE, this, version)
-                } catch (e: IntentSender.SendIntentException) {
-                    appUpdateManager.unregisterListener(installStateUpdatedListener)
-                    Log.e(LOG_TAG, "SendIntentException: ${e.message} ", e)
-                }
-            }
-            else if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
-                //CHECK THIS if AppUpdateType.FLEXIBLE, otherwise you can skip
-                //showDownloadDialog(true, getString(R.string.download_update_dialog_title), getString(R.string.download_update_dialog_message))
-                popupSnackBarForCompleteUpdate()
-            } else {
-                appUpdateManager.unregisterListener(installStateUpdatedListener)
-                Log.e(LOG_TAG, "checkForAppUpdateAvailability: something else")
-                checkForAppDownload(version)
-            }
+        var version = 0
+        try {
+            val pInfo: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+            version = pInfo.versionCode
+            PersistentState.setAppVersion(context, version)
+        } catch (e: PackageManager.NameNotFoundException) {
+            Log.e(LOG_TAG, "Error while fetching version code: ${e.message}", e)
         }
+
+        if (PersistentState.getDownloadSource(this) == Constants.DOWNLOAD_SOURCE_PLAY_STORE) {
+            appUpdateManager.registerListener(installStateUpdatedListener)
+
+            appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
+
+                if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
+                    try {
+                        appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.FLEXIBLE, this, version)
+                    } catch (e: IntentSender.SendIntentException) {
+                        appUpdateManager.unregisterListener(installStateUpdatedListener)
+                        Log.e(LOG_TAG, "SendIntentException: ${e.message} ", e)
+                    }
+                } else if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                    try {
+                        appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.IMMEDIATE, this, version)
+                    } catch (e: IntentSender.SendIntentException) {
+                        appUpdateManager.unregisterListener(installStateUpdatedListener)
+                        Log.e(LOG_TAG, "SendIntentException: ${e.message} ", e)
+                    }
+                }  else {
+                    appUpdateManager.unregisterListener(installStateUpdatedListener)
+                    Log.e(LOG_TAG, "checkForAppUpdateAvailability: something else")
+                }
+            }
+        }else{
+            checkForAppDownload(version)
+        }
+
+
         return false
     }
 
@@ -459,8 +463,10 @@ class HomeScreenActivity : AppCompatActivity() {
                             val from = File(ctxt.getExternalFilesDir(null).toString() + Constants.DOWNLOAD_PATH + Constants.FILE_TAG_NAME)
                             val to = File(ctxt.filesDir.canonicalPath + Constants.FILE_TAG_NAME)
                             from.copyTo(to, true)
+                            /*val destDir = File(ctxt.filesDir.canonicalPath)
+                            Utilities.moveTo(from, to, destDir)*/
                             PersistentState.setRemoteBraveDNSDownloaded(ctxt, true)
-                            PersistentState.setLocalBlockListDownloadTime(context, timeStamp)
+                            PersistentState.setRemoteBlockListDownloadTime(context, timeStamp)
                         }else{
                             Log.e(LOG_TAG, "Error downloading filetag.json file: $status")
                         }

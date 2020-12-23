@@ -150,7 +150,7 @@ class DoHEndpointAdapter(val context: Context, val listener: UIUpdateInterface) 
                         stamp = getBlocklistStampFromURL(doHEndpoint.dohURL)
                         if(DEBUG) Log.d(LOG_TAG, "Configure btn click: ${doHEndpoint.dohURL}, $stamp")
                     } catch (e: Exception) {
-                        Log.e(LOG_TAG, "Exception while fetching stamp from Go ${e.message}", e)
+                        Log.w(LOG_TAG, "Exception while fetching stamp from Go ${e.message}", e)
                     }
                     if(DEBUG) Log.d(LOG_TAG, "startActivityForResult - DohEndpointadapter")
                     val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
