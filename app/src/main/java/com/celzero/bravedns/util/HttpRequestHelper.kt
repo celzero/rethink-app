@@ -55,9 +55,9 @@ class HttpRequestHelper{
                     Log.i(Constants.LOG_TAG, "Server response for the new version download is true, version number-  $updateValue")
                     if (responseVersion == 1) {
                         if (updateValue) {
-
+                            // TODO handle
                         } else {
-
+                            // TODO handle
                         }
                     }
                     response.body()!!.close()
