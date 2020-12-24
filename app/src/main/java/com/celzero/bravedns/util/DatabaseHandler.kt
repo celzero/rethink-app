@@ -96,7 +96,7 @@ class DatabaseHandler(context: Context)  : SQLiteOpenHelper(context, DATABASE_NA
 
 
     fun getSpecificPackageRule(packageName : String ):Int{
-        var packageRule : Int
+        val packageRule : Int
         val selectQuery = "SELECT  * FROM $TABLE_PERMISSION_MANAGER where $KEY_PACKAGE_NAME = '$packageName'"
         val db = this.readableDatabase
         var cursor: Cursor? = null

@@ -501,7 +501,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
             }
         }
 
-        var contentTitle: String = if (braveMode == 0) context.resources.getString(R.string.dns_mode_notification_title)
+        val contentTitle: String = if (braveMode == 0) context.resources.getString(R.string.dns_mode_notification_title)
         else if (braveMode == 1) context.resources.getString(R.string.firewall_mode_notification_title)
         else if (braveMode == 2) context.resources.getString(R.string.hybrid_mode_notification_title)
         else context.resources.getString(R.string.notification_title)

@@ -670,7 +670,7 @@ class HomeScreenFragment : Fragment() {
     private fun getAllModes(): ArrayList<BraveMode> {
         val braveNames = resources.getStringArray(R.array.brave_dns_mode_names)
         val icons = resources.obtainTypedArray(R.array.brave_dns_mode_icons)
-        var braveList = ArrayList<BraveMode>(3)
+        val braveList = ArrayList<BraveMode>(3)
         var braveModes = BraveMode(icons.getResourceId(0, -1), 0, braveNames[0])
         braveList.add(braveModes)
         braveModes = BraveMode(icons.getResourceId(1, -1), 1, braveNames[1])

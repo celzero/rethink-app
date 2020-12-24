@@ -207,7 +207,7 @@ class WhitelistAppDialog(var activity: Context, internal var adapter: RecyclerVi
             mChip.text = category
 
             mChip.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
-                var categoryName = compoundButton.text.toString()
+                val categoryName = compoundButton.text.toString()
                 if (b) {
                     filterCategories.add(categoryName)
                 } else {

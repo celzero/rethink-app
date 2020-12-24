@@ -311,10 +311,10 @@ class PermissionsManager {
 
         // findRecurisvely(event.source, viewId)
 
-        var listItems: List<AccessibilityNodeInfo> =
+        val listItems: List<AccessibilityNodeInfo> =
             source.findAccessibilityNodeInfosByViewId(permissionsListId)
 
-        var togglesRequired: ArrayList<AccessibilityNodeInfo> = ArrayList()
+        val togglesRequired: ArrayList<AccessibilityNodeInfo> = ArrayList()
 
         // TODO: verify packageElect with the title shown on the current the page
         val packageInfo = getPackageInfo(packageElect) ?: return
@@ -337,7 +337,7 @@ class PermissionsManager {
             var what = ""
             for (element in children) {
                 val item: AccessibilityNodeInfo = element
-                var switches: List<AccessibilityNodeInfo> =
+                val switches: List<AccessibilityNodeInfo> =
                     source.findAccessibilityNodeInfosByViewId(permissionsSwitchId)
                 if (switches.isEmpty()) {
                     Log.w(TAG, "____ bbbbb couldn't find toggle-switch for $item")
@@ -448,7 +448,7 @@ class PermissionsManager {
         val packageInfo = getPackageInfo(latestTrackedPackage) ?: return false
 
         val appLabel = getAppLabel(packageInfo)
-        var confirmation = event.text.contains(appLabel)
+        val confirmation = event.text.contains(appLabel)
         val appPermissions = AppPermissions(packageManager, packageInfo)
 
         val list: List<AccessibilityNodeInfo> = event.source.findAccessibilityNodeInfosByViewId(permissionsAllowButtonId)
@@ -482,7 +482,7 @@ class PermissionsManager {
         for (i in 0 until source.childCount) {
             val c = source.getChild(i)
             if (c != null) {
-                var cl: List<AccessibilityNodeInfo> = c.findAccessibilityNodeInfosByViewId(viewId)
+                val cl: List<AccessibilityNodeInfo> = c.findAccessibilityNodeInfosByViewId(viewId)
                 val w = "" + c.isCheckable + " " + c.isChecked + " " + c.viewIdResourceName + " " + c.className + " " + cl.size
                 Log.w("____", "____ children $w")
                 findRecurisvely(c, viewId)

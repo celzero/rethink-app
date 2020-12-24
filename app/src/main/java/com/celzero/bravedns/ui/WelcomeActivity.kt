@@ -68,7 +68,7 @@ class WelcomeActivity  : AppCompatActivity() {
         }
 
         buttonNext.setOnClickListener {
-            var currentItem = getItem(1)
+            val currentItem = getItem(1)
             if(currentItem < layout.size)
                 viewPager.setCurrentItem(currentItem)
             else
@@ -106,8 +106,8 @@ class WelcomeActivity  : AppCompatActivity() {
     private fun addBottomDots(currentPage: Int) {
         dots = arrayOfNulls(layout.size)
 
-        var colorActive  = (resources.getIntArray(R.array.array_dot_active))
-        var colorInActive = resources.getIntArray(R.array.array_dot_inactive)
+        val colorActive  = (resources.getIntArray(R.array.array_dot_active))
+        val colorInActive = resources.getIntArray(R.array.array_dot_inactive)
 
         dotsLayout.removeAllViews()
         for(i in dots.indices){
