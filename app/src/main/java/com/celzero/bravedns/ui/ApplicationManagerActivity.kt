@@ -108,7 +108,7 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
         fabAppInfoIcon.setOnClickListener{
             val list = ApplicationManagerApk.getAddedList(this)
             if(list.size >= 1){
-                list.get(list.size - 1).packageName?.let { it1 -> appInfoForPackage(it1) }
+                list[list.size - 1].packageName?.let { it1 -> appInfoForPackage(it1) }
             }
         }
     }

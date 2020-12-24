@@ -60,10 +60,10 @@ class FirewallManager(service: BackgroundAccessibilityService) {
 
 
         fun updateAppInternetPermission(packageName: String, isAllowed: Boolean) {
-            val appInfo = GlobalVariable.appList.get(packageName)
+            val appInfo = GlobalVariable.appList[packageName]
             if (appInfo != null) {
                 appInfo.isInternetAllowed = isAllowed
-                GlobalVariable.appList.set(packageName, appInfo)
+                GlobalVariable.appList[packageName] = appInfo
             }
         }
 

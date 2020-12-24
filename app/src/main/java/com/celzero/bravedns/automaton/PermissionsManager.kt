@@ -518,7 +518,7 @@ class PermissionsManager {
 
     private fun isAutoGrant(packageName: String?): Boolean {
         if (packageName == null) return false
-        val rule = packageRules.get(packageName)
+        val rule = packageRules[packageName]
         return Rules.BG_REMOVE_FG_ADD == rule
     }
 
