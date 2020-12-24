@@ -354,7 +354,7 @@ class RefreshDatabase(var context: Context) {
                 val isAlreadyConnectionAvailable = doHEndpointRepository.getConnectedDoH()
                 val urlName = context.resources.getStringArray(R.array.doh_endpoint_names)
                 val urlValues = context.resources.getStringArray(R.array.doh_endpoint_urls)
-                if(isAlreadyConnectionAvailable.dohName.isNullOrEmpty()){
+                if(isAlreadyConnectionAvailable.dohName.isEmpty()){
                     doHEndpointRepository.removeConnectionStatus()
 
                     val doHEndpoint1 = DoHEndpoint(1, urlName[0], urlValues[0], context.getString(R.string.dns_mode_0_explanation), false, false, System.currentTimeMillis(), 0)
