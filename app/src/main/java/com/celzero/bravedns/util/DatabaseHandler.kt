@@ -83,11 +83,11 @@ class DatabaseHandler(context: Context)  : SQLiteOpenHelper(context, DATABASE_NA
                 packageName = cursor.getString(cursor.getColumnIndex("package_name"))
                 packageRule  = cursor.getInt(cursor.getColumnIndex("package_rule"))
                 if(packageRule  == 0)
-                    packageList.put(packageName,Rules.NONE)
+                    packageList[packageName] = Rules.NONE
                 else if(packageRule == 1)
-                    packageList.put(packageName,Rules.BG_REMOVE)
+                    packageList[packageName] = Rules.BG_REMOVE
                 else
-                    packageList.put(packageName,Rules.BG_REMOVE_FG_ADD)
+                    packageList[packageName] = Rules.BG_REMOVE_FG_ADD
             } while (cursor.moveToNext())
         }
         cursor?.close()
@@ -124,11 +124,11 @@ class DatabaseHandler(context: Context)  : SQLiteOpenHelper(context, DATABASE_NA
         contentValues.put(KEY_PACKAGE_RULE,packageRule )
 
         if(packageRule  == 0)
-            PermissionsManager.packageRules.put(packageName,Rules.NONE)
+            PermissionsManager.packageRules[packageName] = Rules.NONE
         else if(packageRule == 1)
-            PermissionsManager.packageRules.put(packageName,Rules.BG_REMOVE)
+            PermissionsManager.packageRules[packageName] = Rules.BG_REMOVE
         else if(packageRule == 2){
-            PermissionsManager.packageRules.put(packageName,Rules.BG_REMOVE_FG_ADD)
+            PermissionsManager.packageRules[packageName] = Rules.BG_REMOVE_FG_ADD
         }
 
 
@@ -154,11 +154,11 @@ class DatabaseHandler(context: Context)  : SQLiteOpenHelper(context, DATABASE_NA
         contentValues.put(KEY_PACKAGE_RULE,packageRule  )
 
         if(packageRule  == 0)
-            PermissionsManager.packageRules.put(packageName,Rules.NONE)
+            PermissionsManager.packageRules[packageName] = Rules.NONE
         else if(packageRule == 1)
-            PermissionsManager.packageRules.put(packageName,Rules.BG_REMOVE)
+            PermissionsManager.packageRules[packageName] = Rules.BG_REMOVE
         else if(packageRule == 2){
-            PermissionsManager.packageRules.put(packageName,Rules.BG_REMOVE_FG_ADD)
+            PermissionsManager.packageRules[packageName] = Rules.BG_REMOVE_FG_ADD
         }
 
 
