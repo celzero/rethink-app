@@ -49,7 +49,7 @@ class DNSLogViewModel : ViewModel() {
     }
 
     var dnsLogsList = Transformations.switchMap<String, PagedList<DNSLogs>>(
-                filteredList, (Function<String, LiveData<PagedList<DNSLogs>>> { input ->
+                filteredList, Function<String, LiveData<PagedList<DNSLogs>>> { input ->
                     if (input.isBlank()) {
                         dnsLogDAO.getDNSLogsLiveData().toLiveData(pageSize = 25)
                     } else if(input.contains("isFilter")){
@@ -64,7 +64,7 @@ class DNSLogViewModel : ViewModel() {
                         if(DEBUG) Log.d(LOG_TAG,"DNS logs filter : $input")
                         dnsLogDAO.getDNSLogsByQueryLiveData("%$input%").toLiveData(25)
                     }
-                } as Function<String, LiveData<PagedList<DNSLogs>>>)
+                }
 
             )
 

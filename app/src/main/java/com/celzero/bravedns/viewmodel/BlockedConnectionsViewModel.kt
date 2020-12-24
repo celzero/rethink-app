@@ -46,15 +46,15 @@ class BlockedConnectionsViewModel : ViewModel() {
     }
 
     var blockedUnivRulesList = Transformations.switchMap<String, PagedList<BlockedConnections>>(
-                filteredList, (Function<String, LiveData<PagedList<BlockedConnections>>> { input ->
-                    if (input.isBlank()) {
-                        blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(pageSize = 50)
-                    } else if(input!! == "isFilter"){
-                        blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(pageSize = 50)
-                    }else {
-                        blockedConnectionsDAO.getUnivBlockedConnectionsByIP("%$input%").toLiveData(50)
-                    }
-                } as Function<String, LiveData<PagedList<BlockedConnections>>>)!!
+                filteredList, Function<String, LiveData<PagedList<BlockedConnections>>> { input ->
+            if (input.isBlank()) {
+                blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(pageSize = 50)
+            } else if (input!! == "isFilter") {
+                blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(pageSize = 50)
+            } else {
+                blockedConnectionsDAO.getUnivBlockedConnectionsByIP("%$input%").toLiveData(50)
+            }
+        }
 
             )
 

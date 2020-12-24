@@ -48,7 +48,7 @@ class DNSCryptRelayEndpointViewModel : ViewModel() {
     }
 
     var dnsCryptRelayEndpointList = Transformations.switchMap<String, PagedList<DNSCryptRelayEndpoint>>(
-                filteredList, (Function<String, LiveData<PagedList<DNSCryptRelayEndpoint>>> { input ->
+                filteredList, Function<String, LiveData<PagedList<DNSCryptRelayEndpoint>>> { input ->
             if (input.isBlank()) {
                 if(DEBUG) Log.d(LOG_TAG,"InputValue - NULL")
                 dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveData().toLiveData(pageSize = 50)
@@ -56,7 +56,7 @@ class DNSCryptRelayEndpointViewModel : ViewModel() {
                 if(DEBUG) Log.d(LOG_TAG,"InputValue - $input")
                 dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveDataByName("%$input%").toLiveData(pageSize = 50)
             }
-        } as androidx.arch.core.util.Function<String, LiveData<PagedList<DNSCryptRelayEndpoint>>>)
+        }
     )
 
     fun setFilter(filter: String?) {

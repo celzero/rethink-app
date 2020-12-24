@@ -45,13 +45,13 @@ class DNSCryptEndpointViewModel : ViewModel() {
     }
 
     var dnsCryptEndpointList = Transformations.switchMap<String, PagedList<DNSCryptEndpoint>>(
-                filteredList, (Function<String, LiveData<PagedList<DNSCryptEndpoint>>> { input ->
+                filteredList, Function<String, LiveData<PagedList<DNSCryptEndpoint>>> { input ->
             if (input.isBlank()) {
                 dnsCryptEndpointDAO.getDNSCryptEndpointLiveData().toLiveData(pageSize = 50)
             } else {
                 dnsCryptEndpointDAO.getDNSCryptEndpointLiveDataByName("%$input%").toLiveData(pageSize = 50)
             }
-        } as androidx.arch.core.util.Function<String, LiveData<PagedList<DNSCryptEndpoint>>>)
+        }
     )
 
     fun setFilter(filter: String?) {

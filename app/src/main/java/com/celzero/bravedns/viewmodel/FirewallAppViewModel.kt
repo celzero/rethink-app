@@ -45,10 +45,10 @@ class FirewallAppViewModel : ViewModel() {
     }
 
     var firewallAppDetailsList = Transformations.switchMap<String, List<AppInfo>>(
-        filteredList, (Function<String, LiveData<List<AppInfo>>> { input ->
+        filteredList, Function<String, LiveData<List<AppInfo>>> { input ->
             var inputTxt = "%$input%"
             appDetailsDAO.getAppDetailsForLiveData(inputTxt)
-        } as androidx.arch.core.util.Function<String,LiveData<List<AppInfo>>>)
+        }
     )
 
     /*else if (input == "isSystem") {

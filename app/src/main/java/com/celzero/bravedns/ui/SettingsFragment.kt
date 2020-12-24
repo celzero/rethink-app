@@ -270,9 +270,9 @@ class SettingsFragment : Fragment() {
             val sock5Proxy = proxyEndpointRepository.getConnectedProxy()
             if (sock5Proxy?.proxyAppName != "Nobody") {
                 val appName = appList[sock5Proxy?.proxyAppName]?.appName
-                socks5DescText.text = "Forwarding to ${sock5Proxy!!.proxyIP}:${sock5Proxy!!.proxyPort}, $appName"
+                socks5DescText.text = "Forwarding to ${sock5Proxy!!.proxyIP}:${sock5Proxy.proxyPort}, $appName"
             } else {
-                socks5DescText.text = "Forwarding to ${sock5Proxy!!.proxyIP}:${sock5Proxy!!.proxyPort}, Nobody"
+                socks5DescText.text = "Forwarding to ${sock5Proxy.proxyIP}:${sock5Proxy.proxyPort}, Nobody"
             }
         }
         socks5Progress.visibility = View.GONE

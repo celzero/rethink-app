@@ -49,7 +49,7 @@ class ConnectionTrackerViewModel : ViewModel() {
     }
 
     var connectionTrackerList = Transformations.switchMap<String, PagedList<ConnectionTracker>>(
-                filteredList, (Function<String, LiveData<PagedList<ConnectionTracker>>> { input ->
+                filteredList, Function<String, LiveData<PagedList<ConnectionTracker>>> { input ->
                     if (input.isBlank()) {
                         connectionTrackerDAO.getConnectionTrackerLiveData().toLiveData(pageSize = 25)
                     } else if(input.contains("isFilter")){
@@ -63,7 +63,7 @@ class ConnectionTrackerViewModel : ViewModel() {
                     }else {
                         connectionTrackerDAO.getConnectionTrackerByName("%$input%").toLiveData(25)
                     }
-                } as Function<String, LiveData<PagedList<ConnectionTracker>>>)
+                }
 
             )
 

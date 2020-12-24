@@ -45,13 +45,13 @@ class DNSProxyEndpointViewModel : ViewModel() {
     }
 
     var dnsProxyEndpointList = Transformations.switchMap<String, PagedList<DNSProxyEndpoint>>(
-                filteredList, (Function<String, LiveData<PagedList<DNSProxyEndpoint>>> { input ->
+                filteredList, Function<String, LiveData<PagedList<DNSProxyEndpoint>>> { input ->
             if (input.isBlank()) {
                 dnsProxyEndpointDAO.getDNSProxyEndpointLiveData().toLiveData(pageSize = 50)
             } else {
                 dnsProxyEndpointDAO.getDNSProxyEndpointLiveDataByType("%$input%").toLiveData(pageSize = 50)
             }
-        } as androidx.arch.core.util.Function<String, LiveData<PagedList<DNSProxyEndpoint>>>)
+        }
     )
 
     fun setFilter(filter: String?) {

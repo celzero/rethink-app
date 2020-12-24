@@ -50,7 +50,7 @@ class ExcludedAppViewModel : ViewModel() {
     }
 
     var excludedAppList = Transformations.switchMap<String, PagedList<AppInfo>>(
-        filteredList, (Function<String, LiveData<PagedList<AppInfo>>> { input ->
+        filteredList, Function<String, LiveData<PagedList<AppInfo>>> { input ->
             if (input.isBlank()) {
                 appDetailsDAO.getExcludedAppDetailsLiveData().toLiveData(pageSize = 50)
             } else if (input == "isSystem") {
@@ -64,7 +64,7 @@ class ExcludedAppViewModel : ViewModel() {
                 appDetailsDAO.getExcludedAppDetailsFilterLiveData("%$input%").toLiveData(pageSize = 50)
                 //appDetailsDAO.getUnivAppDetailsLiveData("%$input%").toLiveData(50)
             }
-        } as androidx.arch.core.util.Function<String, LiveData<PagedList<AppInfo>>>)
+        }
     )
 
     fun setFilter(filter: String?) {

@@ -49,7 +49,7 @@ class AppListViewModel : ViewModel() {
     }
 
     var appDetailsList = Transformations.switchMap<String, PagedList<AppInfo>>(
-        filteredList, (Function<String, LiveData<PagedList<AppInfo>>> { input ->
+        filteredList, Function<String, LiveData<PagedList<AppInfo>>> { input ->
             if (input.isBlank()) {
                 appDetailsDAO.getUnivAppDetailsLiveData().toLiveData(pageSize = 50)
             } else if (input == "isSystem") {
@@ -62,7 +62,7 @@ class AppListViewModel : ViewModel() {
             } else {
                 appDetailsDAO.getUnivAppDetailsFilterLiveData("%$input%").toLiveData(pageSize = 50)
             }
-        } as androidx.arch.core.util.Function<String, LiveData<PagedList<AppInfo>>>)
+        }
     )
 
     fun setFilter(filter: String?) {

@@ -49,7 +49,7 @@ class SpinnerArrayAdapter(context: Context,  braveModeList : ArrayList<BraveMode
             }*/
 
             view.modeImage.setImageResource(braveMode!!.icon)
-            view.modeText.text = braveMode!!.modeName
+            view.modeText.text = braveMode.modeName
             //view.background = context.resources.getDrawable(R.color.colorGreen_900)
 
             return view
