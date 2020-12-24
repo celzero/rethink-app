@@ -495,11 +495,11 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.d(LOG_TAG, "Webview: onFailure -  ${call.isCanceled}, ${call.isExecuted}")
+                Log.d(LOG_TAG, "Webview: onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val stringResponse = response.body()!!.string()
+                val stringResponse = response.body!!.string()
                 //creating json object
                 val jsonObject = JSONObject(stringResponse)
                 val version = jsonObject.getInt("version")
@@ -515,8 +515,8 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
                         }
                     }
                 }
-                response.body()!!.close()
-                client.connectionPool().evictAll()
+                response.body!!.close()
+                client.connectionPool.evictAll()
             }
         })
     }
