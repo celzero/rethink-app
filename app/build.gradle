@@ -16,7 +16,7 @@ try {
 }
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
 
@@ -32,7 +32,7 @@ android {
     defaultConfig {
         applicationId "com.celzero.bravedns"
         minSdkVersion 23
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 11 // For version name 053
         versionName "0.5.3"
        /* splits {
