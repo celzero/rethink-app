@@ -29,6 +29,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ApplicationManagerApk
 import com.celzero.bravedns.animation.ViewAnimation
@@ -124,7 +125,7 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
             if(isAdded){
                 val packageInfo = context.packageManager.getPackageInfo(packageName,0)
                 ApplicationInfo.getCategoryTitle(context,packageInfo.applicationInfo.category)
-                if(packageInfo.packageName != "com.celzero.bravedns" ) {
+                if(packageInfo.packageName != BuildConfig.APPLICATION_ID ) {
                     val userApk =  ApplicationManagerApk(packageInfo, "", context)
                     apkList.add(userApk)
                 }
@@ -178,7 +179,7 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
         val appList = appInfoRepository.getAppInfoAsync()
         appList.forEach{
             val packageInfo = packageManager.getPackageInfo(it.packageInfo,0)
-            if(packageInfo.packageName != "com.celzero.bravedns" ) {
+            if(packageInfo.packageName != BuildConfig.APPLICATION_ID ) {
                 val userApk =  ApplicationManagerApk(packageManager.getPackageInfo(it.packageInfo, 0), it.appCategory, context)
                 apkList.add(userApk)
             }
