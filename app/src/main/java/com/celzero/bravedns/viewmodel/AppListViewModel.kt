@@ -17,15 +17,11 @@ package com.celzero.bravedns.viewmodel
 
 import android.content.Context
 import android.util.Log
-import androidx.arch.core.util.Function
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.AppDatabase
-import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 
 class AppListViewModel : ViewModel() {

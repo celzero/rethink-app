@@ -26,7 +26,6 @@ import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.net.ProxyInfo
 import android.net.VpnService
-import android.os.Build
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.service.quicksettings.TileService.requestListeningState

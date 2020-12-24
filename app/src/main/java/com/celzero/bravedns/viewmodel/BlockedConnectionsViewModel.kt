@@ -16,15 +16,11 @@ limitations under the License.
 package com.celzero.bravedns.viewmodel
 
 import android.content.Context
-import androidx.arch.core.util.Function
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.AppDatabase
-import com.celzero.bravedns.database.BlockedConnections
 
 
 class BlockedConnectionsViewModel : ViewModel() {
