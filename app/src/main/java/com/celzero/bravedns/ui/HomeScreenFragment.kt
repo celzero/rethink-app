@@ -703,7 +703,7 @@ class HomeScreenFragment : Fragment() {
 
     private fun updateUptime() {
         val upTime = DateUtils.getRelativeTimeSpanString(appStartTime, System.currentTimeMillis(), MINUTE_IN_MILLIS, FORMAT_ABBREV_RELATIVE)
-        appUpTimeTxt.setText("(" + upTime + ")")
+        appUpTimeTxt.setText("($upTime)")
     }
 
 

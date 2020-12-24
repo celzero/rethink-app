@@ -220,7 +220,7 @@ class WhitelistAppDialog(var activity: Context, internal var adapter: RecyclerVi
                 } else {
                    var catTitle = ""
                    filterCategories.forEach {
-                       catTitle = it + "," + catTitle
+                       catTitle = "$it,$catTitle"
                    }
                    if (catTitle.length > 1) {
                        catTitle.substring(0, catTitle.length - 1)

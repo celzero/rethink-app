@@ -208,7 +208,7 @@ class PermissionsManager {
         }
 
         if (event.eventType == AccessibilityEvent.TYPE_WINDOWS_CHANGED) {
-            Log.w("88888","onAEvent____: window_changed " + event)
+            Log.w("88888", "onAEvent____: window_changed $event")
 
             // get the source node of the event
             event.source?.apply {
@@ -228,7 +228,7 @@ class PermissionsManager {
                 navigateToPermissionsPage(event)
             }
             else -> {
-                Log.w(TAG, "bbbb revokepermissionfirststage, but nothing to do, reset " + event)
+                Log.w(TAG, "bbbb revokepermissionfirststage, but nothing to do, reset $event")
             }
         }
     }
@@ -431,7 +431,7 @@ class PermissionsManager {
 
         Log.w(TAG, "bbbbb ____ denybuttonpresent? ${denyButtons.size}")
         for (node in denyButtons) {
-            Log.w(TAG, "_______ bbbbb node ###+++ " + node)
+            Log.w(TAG, "_______ bbbbb node ###+++ $node")
             node.performAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS)
             val performed2 = node.performAction(AccessibilityNodeInfo.ACTION_SELECT)
             val performed3 = node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
@@ -445,7 +445,7 @@ class PermissionsManager {
         // text? ContentChangeTypeDisappeared: null [Allow Uber to access this device's location?]
         // class? com.android.packageinstaller.permission.ui.GrantPermissionsActivity
 
-        Log.w(TAG, "_____ bbbb clickallow: " + latestTrackedPackage)
+        Log.w(TAG, "_____ bbbb clickallow: $latestTrackedPackage")
         val packageInfo = getPackageInfo(latestTrackedPackage) ?: return false
 
         val appLabel = getAppLabel(packageInfo)
@@ -485,7 +485,7 @@ class PermissionsManager {
             if (c != null) {
                 var cl: List<AccessibilityNodeInfo> = c.findAccessibilityNodeInfosByViewId(viewId)
                 val w = "" + c.isCheckable + " " + c.isChecked + " " + c.viewIdResourceName + " " + c.className + " " + cl.size
-                Log.w("____", "____ children " + w)
+                Log.w("____", "____ children $w")
                 findRecurisvely(c, viewId)
             } else Log.w("____", "____ children null $viewId")
         }
