@@ -124,7 +124,6 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
             fastAdapter = FastAdapter.with(itemAdapter)
             if(isAdded){
                 val packageInfo = context.packageManager.getPackageInfo(packageName,0)
-                ApplicationInfo.getCategoryTitle(context,packageInfo.applicationInfo.category)
                 if(packageInfo.packageName != BuildConfig.APPLICATION_ID ) {
                     val userApk =  ApplicationManagerApk(packageInfo, "", context)
                     apkList.add(userApk)
