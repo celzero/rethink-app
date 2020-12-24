@@ -875,12 +875,9 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
 
         // This code is used to start the VPN for the first time, but startVpn is idempotent, so we can
         // call it every time. startVpn performs network activity so it has to run on a separate thread.
-        Thread(object : Runnable {
-            override fun run() {
-                //TODO Work on the order of the function call.
-                updateServerConnection()
-                startVpn()
-            }
+        Thread({ //TODO Work on the order of the function call.
+            updateServerConnection()
+            startVpn()
         }, "startVpn-onNetworkConnected").start()
     }
 

@@ -27,11 +27,11 @@ import com.celzero.bravedns.automaton.PermissionsManager.Rules
 
 class DatabaseHandler(context: Context)  : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION){
     companion object {
-        private val DATABASE_VERSION = 1
-        private val DATABASE_NAME = "GZERO"
-        private val TABLE_PERMISSION_MANAGER = "PermissionManagerMapping"
-        private val KEY_PACKAGE_NAME = "package_name"
-        private val KEY_PACKAGE_RULE = "package_rule"
+        private const val DATABASE_VERSION = 1
+        private const val DATABASE_NAME = "GZERO"
+        private const val TABLE_PERMISSION_MANAGER = "PermissionManagerMapping"
+        private const val KEY_PACKAGE_NAME = "package_name"
+        private const val KEY_PACKAGE_RULE = "package_rule"
     }
 
 

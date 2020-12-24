@@ -335,8 +335,8 @@ class PermissionsManager {
         if (listItems != null && listItems.isNotEmpty()) {
             val children = findChildren(listItems[0])
             var what = ""
-            for (i in 0 until children.size) {
-                val item: AccessibilityNodeInfo = children[i]
+            for (element in children) {
+                val item: AccessibilityNodeInfo = element
                 var switches: List<AccessibilityNodeInfo> =
                     source.findAccessibilityNodeInfosByViewId(permissionsSwitchId)
                 if (switches.isEmpty()) {
