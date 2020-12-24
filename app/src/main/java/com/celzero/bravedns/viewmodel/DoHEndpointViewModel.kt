@@ -44,7 +44,7 @@ class DoHEndpointViewModel : ViewModel() {
         filteredList.value = ""
     }
 
-    var dohEndpointList = Transformations.switchMap<String, PagedList<DoHEndpoint>>(
+    var dohEndpointList = Transformations.switchMap(
                 filteredList, Function<String, LiveData<PagedList<DoHEndpoint>>> { input ->
             if (input.isBlank()) {
                 doHEndpointsDAO.getDoHEndpointLiveData().toLiveData(pageSize = 50)

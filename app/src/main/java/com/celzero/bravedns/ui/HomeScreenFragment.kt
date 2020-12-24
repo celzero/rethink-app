@@ -327,7 +327,7 @@ class HomeScreenFragment : Fragment() {
         })
 
         lifeTimeQ.observe(viewLifecycleOwner, Observer {
-            val lifeTimeConversion = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            val lifeTimeConversion = if (VERSION.SDK_INT >= VERSION_CODES.N) {
                 CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT).format(lifeTimeQ.value)
             } else {
                 // FIXME: 19-11-2020 - Format the number similar to CompctDecimalFormat
@@ -337,7 +337,7 @@ class HomeScreenFragment : Fragment() {
         })
 
          blockedCount.observe(viewLifecycleOwner, Observer {
-             val blocked = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+             val blocked = if (VERSION.SDK_INT >= VERSION_CODES.N) {
                  CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT).format(blockedCount.value)
              } else {
                  // FIXME: 19-11-2020 - Format the number similar to CompctDecimalFormat

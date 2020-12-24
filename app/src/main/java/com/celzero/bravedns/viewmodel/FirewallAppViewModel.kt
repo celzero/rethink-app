@@ -44,7 +44,7 @@ class FirewallAppViewModel : ViewModel() {
         filteredList.value = ""
     }
 
-    var firewallAppDetailsList = Transformations.switchMap<String, List<AppInfo>>(
+    var firewallAppDetailsList = Transformations.switchMap(
         filteredList, Function<String, LiveData<List<AppInfo>>> { input ->
             var inputTxt = "%$input%"
             appDetailsDAO.getAppDetailsForLiveData(inputTxt)

@@ -44,7 +44,7 @@ class DNSCryptEndpointViewModel : ViewModel() {
         filteredList.value = ""
     }
 
-    var dnsCryptEndpointList = Transformations.switchMap<String, PagedList<DNSCryptEndpoint>>(
+    var dnsCryptEndpointList = Transformations.switchMap(
                 filteredList, Function<String, LiveData<PagedList<DNSCryptEndpoint>>> { input ->
             if (input.isBlank()) {
                 dnsCryptEndpointDAO.getDNSCryptEndpointLiveData().toLiveData(pageSize = 50)

@@ -257,7 +257,7 @@ class RefreshDatabase(var context: Context) {
             val dnsLogRepository = mDb.dnsLogRepository()
             val DAY_IN_MS = 1000 * 60 * 60 * 24
             val date = System.currentTimeMillis() - (HomeScreenActivity.DAYS_TO_MAINTAIN_NETWORK_LOG * DAY_IN_MS)
-            if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "Time: ${System.currentTimeMillis()}, dateVal: $date")
+            if (DEBUG) Log.d(LOG_TAG, "Time: ${System.currentTimeMillis()}, dateVal: $date")
             connTrackerRepository.deleteOlderData(date)
             dnsLogRepository.deleteOlderData(date)
             //mDb.close()

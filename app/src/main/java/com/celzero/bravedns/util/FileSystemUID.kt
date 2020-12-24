@@ -189,7 +189,7 @@ enum class FileSystemUID(val uid : Int) {
 
 
     companion object {
-            private val map = FileSystemUID.values().associateBy(FileSystemUID::uid)
+            private val map = values().associateBy(FileSystemUID::uid)
 
             fun fromFileSystemUID(uid: Int): FileSystemUID {
                 if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG,"UID: $uid, hashed val : ${uid.hashCode()}, map Vale: ${map[uid.hashCode()]}")

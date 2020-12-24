@@ -1000,7 +1000,7 @@ class SettingsFragment : Fragment() {
             userNameEditText.setText(sock5Proxy.userName.toString(), TextView.BufferType.EDITABLE)
             if (sock5Proxy.proxyAppName?.isNotEmpty()!! && sock5Proxy.proxyAppName != "Nobody") {
                 val packageName = sock5Proxy.proxyAppName
-                val app = HomeScreenActivity.GlobalVariable.appList[packageName]
+                val app = appList[packageName]
                 var position = 0
                 for ((i, item) in appNames.withIndex()) {
                     if (item == app?.appName) {
@@ -1058,7 +1058,7 @@ class SettingsFragment : Fragment() {
                 errorTxt.setText("Invalid port")
                 isValid = false
             }
-            Log.d(LOG_TAG, "Pattern not matching - port- $port , ${portEditText.text.toString()}")
+            Log.d(LOG_TAG, "Pattern not matching - port- $port , ${portEditText.text}")
             if (udpBlockCheckBox.isChecked) {
                 isUDPBlock = true
             }

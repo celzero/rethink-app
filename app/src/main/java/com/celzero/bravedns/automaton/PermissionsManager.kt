@@ -29,7 +29,6 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
-import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.MyAccessibilityService
 import java.util.*
 import kotlin.collections.LinkedHashMap
@@ -348,8 +347,8 @@ class PermissionsManager {
                 val temp: List<AccessibilityNodeInfo>  = item.findAccessibilityNodeInfosByViewId("android:id/title")
 
 
-                val permissionGroup: AppPermissionGroup? = appPermissions.getPermissionGroup(temp[0]?.text)
-                what = what + permissionGroup?.label + " ${temp[0]?.text} " + switch.isChecked + " ${switches.size} granted? ${permissionGroup?.areRuntimePermissionsGranted()} ___ bbbb; "
+                val permissionGroup: AppPermissionGroup? = appPermissions.getPermissionGroup(temp[0].text)
+                what = what + permissionGroup?.label + " ${temp[0].text} " + switch.isChecked + " ${switches.size} granted? ${permissionGroup?.areRuntimePermissionsGranted()} ___ bbbb; "
 
                 if ((permissionGroup != null && permissionGroup.areRuntimePermissionsGranted())) {
                     togglesRequired.add(item)
@@ -414,7 +413,7 @@ class PermissionsManager {
 
     // com.google.android.gm
     private fun startSettingsPermissionActivity(packageName: String) {
-        currentAutoState = AutoState.SETTINGS_PAGE;
+        currentAutoState = AutoState.SETTINGS_PAGE
         Intent("android.settings.APPLICATION_DETAILS_SETTINGS").also {
             it.setPackage("com.android.settings")
             it.data = Uri.parse("package:$packageName")
@@ -461,7 +460,7 @@ class PermissionsManager {
 
         for (node in list) {
             val performed2 = node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-            Log.w(TAG, "______ bbbb clicked on allow first ${node}")
+            Log.w(TAG, "______ bbbb clicked on allow first $node")
         }
 
         return true

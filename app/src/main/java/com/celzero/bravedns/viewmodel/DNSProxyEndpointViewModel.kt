@@ -44,7 +44,7 @@ class DNSProxyEndpointViewModel : ViewModel() {
         filteredList.value = ""
     }
 
-    var dnsProxyEndpointList = Transformations.switchMap<String, PagedList<DNSProxyEndpoint>>(
+    var dnsProxyEndpointList = Transformations.switchMap(
                 filteredList, Function<String, LiveData<PagedList<DNSProxyEndpoint>>> { input ->
             if (input.isBlank()) {
                 dnsProxyEndpointDAO.getDNSProxyEndpointLiveData().toLiveData(pageSize = 50)

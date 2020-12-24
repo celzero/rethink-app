@@ -376,7 +376,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                 if (PersistentState.getHttpProxyEnabled(this)) {
                     val host = PersistentState.getHttpProxyHostAddress(this)
                     val port = PersistentState.getHttpProxyPort(this)
-                    val proxyInfo: ProxyInfo = ProxyInfo.buildDirectProxy(host!!, port!!)
+                    val proxyInfo: ProxyInfo = ProxyInfo.buildDirectProxy(host!!, port)
                     builder.setHttpProxy(proxyInfo)
                     Log.i(LOG_TAG, "$FILE_LOG_TAG Http proxy enabled - builder updated with $host, $port")
                 }
@@ -888,7 +888,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
 
     private fun setNetworkConnected(connected: Boolean) {
         networkConnected = connected
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.M) {
+        if (VERSION.SDK_INT >= VERSION_CODES.M) {
             // Indicate that traffic will be sent over the current active network.
             // See e.g. https://issuetracker.google.com/issues/68657525
             val activeNetwork = getSystemService(ConnectivityManager::class.java).activeNetwork

@@ -91,7 +91,7 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
                 false
             }
 
-            firewallExpandableList!!.setOnGroupExpandListener { it ->
+            firewallExpandableList!!.setOnGroupExpandListener {
                 //listData[titleList!![it]]!!.sortBy { it.isInternetAllowed }
             }
         }
@@ -195,7 +195,7 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
         //(adapterList as FirewallAppListAdapter).filterData(query!!)
         //observersForUI("%$query%")
         if(DEBUG) Log.d(LOG_TAG, "Category block onQueryTextChange : ${isSearchEnabled}, $query")
-        if (HomeScreenActivity.GlobalVariable.isSearchEnabled) {
+        if (isSearchEnabled) {
             object : CountDownTimer(500, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
                 }

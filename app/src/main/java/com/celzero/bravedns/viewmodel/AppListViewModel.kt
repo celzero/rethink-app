@@ -48,7 +48,7 @@ class AppListViewModel : ViewModel() {
         filteredList.value = ""
     }
 
-    var appDetailsList = Transformations.switchMap<String, PagedList<AppInfo>>(
+    var appDetailsList = Transformations.switchMap(
         filteredList, Function<String, LiveData<PagedList<AppInfo>>> { input ->
             if (input.isBlank()) {
                 appDetailsDAO.getUnivAppDetailsLiveData().toLiveData(pageSize = 50)

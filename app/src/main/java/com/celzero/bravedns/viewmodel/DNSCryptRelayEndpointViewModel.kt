@@ -47,7 +47,7 @@ class DNSCryptRelayEndpointViewModel : ViewModel() {
         filteredList.value = ""
     }
 
-    var dnsCryptRelayEndpointList = Transformations.switchMap<String, PagedList<DNSCryptRelayEndpoint>>(
+    var dnsCryptRelayEndpointList = Transformations.switchMap(
                 filteredList, Function<String, LiveData<PagedList<DNSCryptRelayEndpoint>>> { input ->
             if (input.isBlank()) {
                 if(DEBUG) Log.d(LOG_TAG,"InputValue - NULL")

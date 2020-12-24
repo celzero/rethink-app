@@ -70,7 +70,7 @@ class ExcludeAppDialog(var activity: Context, internal var adapter: RecyclerView
         window?.setLayout(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT
-        );
+        )
 
         recyclerView = findViewById(R.id.exclude_app_recycler_view_dialog)
         mLayoutManager = LinearLayoutManager(activity)

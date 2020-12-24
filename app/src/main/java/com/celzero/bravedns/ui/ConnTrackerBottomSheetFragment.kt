@@ -460,7 +460,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
             }).setNeutralButton(
             "Go Back",
             DialogInterface.OnClickListener { _: DialogInterface, _: Int ->
-                handler.sendMessage(handler.obtainMessage());
+                handler.sendMessage(handler.obtainMessage())
                 proceedBlocking = false
             })
 

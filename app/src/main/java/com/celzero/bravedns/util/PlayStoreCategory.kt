@@ -53,11 +53,11 @@ enum class PlayStoreCategory(val rawValue: Int) {
 
 
     companion object {
-        private val map = PlayStoreCategory.values().associateBy(PlayStoreCategory::rawValue)
+        private val map = values().associateBy(PlayStoreCategory::rawValue)
         const val GENERAL_GAMES_CATEGORY_NAME = "GAMES"
 
         fun fromCategoryName(name: String): PlayStoreCategory {
-            return map[name.hashCode()] ?: PlayStoreCategory.OTHER
+            return map[name.hashCode()] ?: OTHER
         }
     }
 }

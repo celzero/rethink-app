@@ -49,7 +49,7 @@ class ExcludedAppViewModel : ViewModel() {
         filteredList.value = ""
     }
 
-    var excludedAppList = Transformations.switchMap<String, PagedList<AppInfo>>(
+    var excludedAppList = Transformations.switchMap(
         filteredList, Function<String, LiveData<PagedList<AppInfo>>> { input ->
             if (input.isBlank()) {
                 appDetailsDAO.getExcludedAppDetailsLiveData().toLiveData(pageSize = 50)

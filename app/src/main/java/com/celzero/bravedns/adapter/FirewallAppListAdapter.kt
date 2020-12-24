@@ -533,7 +533,7 @@ class FirewallAppListAdapter internal constructor(
             }).setNeutralButton(
             "Go Back",
             DialogInterface.OnClickListener { dialogInterface: DialogInterface, i: Int ->
-                handler.sendMessage(handler.obtainMessage());
+                handler.sendMessage(handler.obtainMessage())
                 proceedBlocking = false
             })
 

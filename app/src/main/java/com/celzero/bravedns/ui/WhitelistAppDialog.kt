@@ -67,7 +67,7 @@ class WhitelistAppDialog(var activity: Context, internal var adapter: RecyclerVi
         window?.setLayout(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT
-        );
+        )
 
         recyclerView = recycler_view_dialog
         mLayoutManager = LinearLayoutManager(activity)

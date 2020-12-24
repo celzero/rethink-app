@@ -45,7 +45,7 @@ class BlockedConnectionsViewModel : ViewModel() {
         filteredList.value = ""
     }
 
-    var blockedUnivRulesList = Transformations.switchMap<String, PagedList<BlockedConnections>>(
+    var blockedUnivRulesList = Transformations.switchMap(
                 filteredList, Function<String, LiveData<PagedList<BlockedConnections>>> { input ->
             if (input.isBlank()) {
                 blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(pageSize = 50)
