@@ -163,7 +163,7 @@ class ExcludedAppListAdapter(val context: Context) : PagedListAdapter<AppInfo, E
         private fun showDialog(packageList: List<AppInfo>, appName: String, isInternet: Boolean): Boolean {
             //Change the handler logic into some other
             val handler: Handler = object : Handler() {
-                override fun handleMessage(mesg: Message?) {
+                override fun handleMessage(mesg: Message) {
                     throw RuntimeException()
                 }
             }

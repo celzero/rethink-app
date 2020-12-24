@@ -398,7 +398,7 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
                         }
                         count++
                         if (!connectionStatus && count <= 3) {
-                            timerHandler.postDelayed(updater, 1000)
+                            timerHandler.postDelayed(updater!!, 1000)
                         }
                     }
                 }

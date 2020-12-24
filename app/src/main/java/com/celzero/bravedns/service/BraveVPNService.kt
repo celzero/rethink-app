@@ -564,13 +564,9 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
 
                 val applicationContext = this.applicationContext
                 val connectivityManager = applicationContext!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                if (connectivityManager.getActiveNetworkInfo() != null) {
-                    val networkInfo: NetworkInfo = connectivityManager!!.getActiveNetworkInfo()
-                    if (networkInfo != null && networkInfo.isConnected) {
-                        onNetworkConnected(networkInfo)
-                    }
+                connectivityManager.activeNetworkInfo?.takeIf { it.isConnected }?.also {
+                    onNetworkConnected(it)
                 }
-
                 val builder = updateBuilder(this)
                 Log.i(LOG_TAG, "$FILE_LOG_TAG onStart command - start as foreground service. ")
                 startForeground(SERVICE_ID, builder.notification)

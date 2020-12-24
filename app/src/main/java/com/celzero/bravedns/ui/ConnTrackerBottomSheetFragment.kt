@@ -433,7 +433,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         //Change the handler logic into some other
         val handler: Handler = @SuppressLint("HandlerLeak")
         object : Handler() {
-            override fun handleMessage(mesg: Message?) {
+            override fun handleMessage(mesg: Message) {
                 throw RuntimeException()
             }
         }

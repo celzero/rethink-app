@@ -490,7 +490,7 @@ class FirewallAppListAdapter internal constructor(
     private fun showDialog(packageList: List<AppInfo>, appName: String, isInternet: Boolean): Boolean {
         //Change the handler logic into some other
         val handler: Handler = object : Handler() {
-            override fun handleMessage(mesg: Message?) {
+            override fun handleMessage(mesg: Message) {
                 throw RuntimeException()
             }
         }
@@ -551,7 +551,7 @@ class FirewallAppListAdapter internal constructor(
     private fun showDialogForSystemAppBlock(isSysComponent : Boolean): Boolean {
         //Change the handler logic into some other
         val handlerDelete: Handler = object : Handler() {
-            override fun handleMessage(mesg: Message?) {
+            override fun handleMessage(mesg: Message) {
                 throw RuntimeException()
             }
         }

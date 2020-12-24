@@ -43,8 +43,8 @@ class ApplicationManagerApk (packageInfo: PackageInfo,  var category: String, co
 
         this.appInfo = packageInfo.applicationInfo
         this.context = context
-        this.appIcon = context.packageManager.getApplicationIcon(appInfo)
-        this.appName = context.packageManager.getApplicationLabel(appInfo).toString()
+        this.appIcon = context.packageManager.getApplicationIcon(appInfo!!)
+        this.appName = context.packageManager.getApplicationLabel(appInfo!!).toString()
         this.packageName = packageInfo.packageName
         this.version = packageInfo.versionName
         addedList.clear()
