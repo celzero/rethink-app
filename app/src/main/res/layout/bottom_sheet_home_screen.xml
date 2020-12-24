@@ -7,7 +7,8 @@
     android:layout_height="wrap_content"
     android:clickable="true"
     android:orientation="vertical"
-    android:paddingBottom="40dp">
+    android:paddingBottom="40dp"
+    android:focusable="true">
 
     <TextView
         style="@style/ActionItem"
