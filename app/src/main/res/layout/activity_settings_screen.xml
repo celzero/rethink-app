@@ -252,10 +252,10 @@
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:visibility="gone"
-            android:drawableStart="@drawable/dis_allowed"
             android:background="@color/colorPrimary"
             android:text="@string/settings_lock_down_mode_desc"
-            android:textSize="@dimen/default_font_text_view" />
+            android:textSize="@dimen/default_font_text_view"
+            app:drawableStartCompat="@drawable/dis_allowed" />
 
         <RelativeLayout
             android:id="@+id/settings_activity_exclude_apps_rl"
