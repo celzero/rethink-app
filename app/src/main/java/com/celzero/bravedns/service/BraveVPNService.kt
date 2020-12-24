@@ -520,9 +520,9 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
 
         val mDb = AppDatabase.invoke(this.applicationContext)
         val appInfoRepository = mDb.appInfoRepository()
-        appInfoRepository.getUIDForUnivWhiteList().observeForever(androidx.lifecycle.Observer {
+        appInfoRepository.getUIDForUnivWhiteList().observeForever {
             appWhiteList = it.associateBy({ it }, { true }).toMutableMap()
-        })
+        }
         blockUDPTraffic = PersistentState.getUDPBlockedSettings(this)
         privateDNSOverride = PersistentState.getAllowPrivateDNS(this)
         isScreenLocked = PersistentState.getScreenLockData(this)
@@ -581,20 +581,23 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
 
     private fun registerAccessibilityServiceState() {
         val am = getSystemService(ACCESSIBILITY_SERVICE) as AccessibilityManager
-        am.addAccessibilityStateChangeListener(AccessibilityManager.AccessibilityStateChangeListener { b ->
-            val isServiceEnabled = Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
-            if(!b || !isServiceEnabled){
+        am.addAccessibilityStateChangeListener { b ->
+            val isServiceEnabled = Utilities.isAccessibilityServiceEnabledEnhanced(
+                this,
+                BackgroundAccessibilityService::class.java
+            )
+            if (!b || !isServiceEnabled) {
                 isBackgroundEnabled = false
                 PersistentState.setBackgroundEnabled(this, false)
             }
-        })
+        }
     }
 
     @InternalCoroutinesApi private fun spawnServerUpdate() {
         if (vpnController != null) {
             synchronized(vpnController) {
                 if (networkManager != null) {
-                    Thread(Runnable { updateServerConnection() }, "updateServerConnection-onStartCommand").start()
+                    Thread({ updateServerConnection() }, "updateServerConnection-onStartCommand").start()
                 }
             }
         }
@@ -845,7 +848,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
             Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
         if (vpnController != null) {
             synchronized(vpnController) {
-                Thread(Runnable {
+                Thread({
                     //updateServerConnection()
                     // Attempt seamless handoff as described in the docs for VpnService.Builder.establish().
                     val oldAdapter: GoVpnAdapter? = vpnAdapter

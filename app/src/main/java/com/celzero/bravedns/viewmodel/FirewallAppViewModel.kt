@@ -45,11 +45,11 @@ class FirewallAppViewModel : ViewModel() {
     }
 
     var firewallAppDetailsList = Transformations.switchMap(
-        filteredList, Function<String, LiveData<List<AppInfo>>> { input ->
-            var inputTxt = "%$input%"
-            appDetailsDAO.getAppDetailsForLiveData(inputTxt)
-        }
-    )
+        filteredList
+    ) { input ->
+        var inputTxt = "%$input%"
+        appDetailsDAO.getAppDetailsForLiveData(inputTxt)
+    }
 
     /*else if (input == "isSystem") {
                     appDetailsDAO.getUnivAppSystemAppsLiveData().toLiveData(pageSize = 50)

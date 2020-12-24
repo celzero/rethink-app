@@ -526,16 +526,16 @@ class FirewallAppListAdapter internal constructor(
         /*val alertDialog : AlertDialog = builderSingle.create()
         alertDialog.getListView().setOnItemClickListener({ adapterView, subview, i, l -> })*/
         builderSingle.setPositiveButton(
-            positiveTxt,
-            DialogInterface.OnClickListener { dialogInterface: DialogInterface, i: Int ->
-                proceedBlocking = true
-                handler.sendMessage(handler.obtainMessage())
-            }).setNeutralButton(
-            "Go Back",
-            DialogInterface.OnClickListener { dialogInterface: DialogInterface, i: Int ->
-                handler.sendMessage(handler.obtainMessage())
-                proceedBlocking = false
-            })
+            positiveTxt
+        ) { dialogInterface: DialogInterface, i: Int ->
+            proceedBlocking = true
+            handler.sendMessage(handler.obtainMessage())
+        }.setNeutralButton(
+            "Go Back"
+        ) { dialogInterface: DialogInterface, i: Int ->
+            handler.sendMessage(handler.obtainMessage())
+            proceedBlocking = false
+        }
 
         val alertDialog: AlertDialog = builderSingle.show()
         alertDialog.listView.setOnItemClickListener { adapterView, subview, i, l -> }
@@ -571,16 +571,16 @@ class FirewallAppListAdapter internal constructor(
 
 
         builderSingle.setPositiveButton(
-            "Proceed",
-            DialogInterface.OnClickListener { dialogInterface: DialogInterface, i: Int ->
-                proceedBlocking = true
-                handlerDelete.sendMessage(handlerDelete.obtainMessage())
-            }).setNegativeButton(
-            "Go Back",
-            DialogInterface.OnClickListener { dialogInterface: DialogInterface, i: Int ->
-                handlerDelete.sendMessage(handlerDelete.obtainMessage())
-                proceedBlocking = false
-            })
+            "Proceed"
+        ) { dialogInterface: DialogInterface, i: Int ->
+            proceedBlocking = true
+            handlerDelete.sendMessage(handlerDelete.obtainMessage())
+        }.setNegativeButton(
+            "Go Back"
+        ) { dialogInterface: DialogInterface, i: Int ->
+            handlerDelete.sendMessage(handlerDelete.obtainMessage())
+            proceedBlocking = false
+        }
 
         val alertDialog: AlertDialog = builderSingle.show()
         alertDialog.setCancelable(false)

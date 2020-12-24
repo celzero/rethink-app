@@ -146,7 +146,7 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
             topLayoutRL.visibility = View.VISIBLE
         }
 
-        median50.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+        median50.observe(viewLifecycleOwner, {
             latencyTxt.text = "Latency: "+median50.value.toString() + "ms"
         })
 

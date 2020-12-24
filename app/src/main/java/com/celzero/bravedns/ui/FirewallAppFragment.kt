@@ -242,11 +242,11 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
         //val appInfoRepository = mDb.appInfoRepository()
 
         val categoryInfoRepository = mDb.categoryInfoRepository()
-        categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, Observer {
+        categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, {
             titleList = it.toMutableList()
         })
 
-        firewallAppInfoViewModel.firewallAppDetailsList.observe(viewLifecycleOwner, Observer { itAppInfo ->
+        firewallAppInfoViewModel.firewallAppDetailsList.observe(viewLifecycleOwner, { itAppInfo ->
             isSearchEnabled  = false
             val list = itAppInfo!!
             titleList = categoryInfoRepository.getAppCategoryList().toMutableList()

@@ -49,21 +49,22 @@ class AppListViewModel : ViewModel() {
     }
 
     var appDetailsList = Transformations.switchMap(
-        filteredList, Function<String, LiveData<PagedList<AppInfo>>> { input ->
-            if (input.isBlank()) {
-                appDetailsDAO.getUnivAppDetailsLiveData().toLiveData(pageSize = 50)
-            } else if (input == "isSystem") {
-                appDetailsDAO.getUnivAppSystemAppsLiveData().toLiveData(pageSize = 50)
-            } else if (input.contains("category:")) {
-                val filterVal = input.split(":")[1]
-                val result = filterVal.split(",").map { it.trim() }
-                Log.d(LOG_TAG, "FilterVal - $filterVal")
-                appDetailsDAO.getUnivAppDetailsFilterForCategoryLiveData(result).toLiveData(pageSize = 50)
-            } else {
-                appDetailsDAO.getUnivAppDetailsFilterLiveData("%$input%").toLiveData(pageSize = 50)
-            }
+        filteredList
+    ) { input ->
+        if (input.isBlank()) {
+            appDetailsDAO.getUnivAppDetailsLiveData().toLiveData(pageSize = 50)
+        } else if (input == "isSystem") {
+            appDetailsDAO.getUnivAppSystemAppsLiveData().toLiveData(pageSize = 50)
+        } else if (input.contains("category:")) {
+            val filterVal = input.split(":")[1]
+            val result = filterVal.split(",").map { it.trim() }
+            Log.d(LOG_TAG, "FilterVal - $filterVal")
+            appDetailsDAO.getUnivAppDetailsFilterForCategoryLiveData(result)
+                .toLiveData(pageSize = 50)
+        } else {
+            appDetailsDAO.getUnivAppDetailsFilterLiveData("%$input%").toLiveData(pageSize = 50)
         }
-    )
+    }
 
     fun setFilter(filter: String?) {
         filteredList.value = filter

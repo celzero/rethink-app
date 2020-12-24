@@ -49,23 +49,24 @@ class ConnectionTrackerViewModel : ViewModel() {
     }
 
     var connectionTrackerList = Transformations.switchMap(
-                filteredList, Function<String, LiveData<PagedList<ConnectionTracker>>> { input ->
-                    if (input.isBlank()) {
-                        connectionTrackerDAO.getConnectionTrackerLiveData().toLiveData(pageSize = 25)
-                    } else if(input.contains("isFilter")){
-                        val searchText = input.split(":")[0]
-                        if(DEBUG) Log.d(LOG_TAG, "Filter option - Function - $searchText, $input")
-                        if(searchText.isEmpty()){
-                            connectionTrackerDAO.getConnectionBlockedConnections().toLiveData(pageSize = 25)
-                        }else {
-                            connectionTrackerDAO.getConnectionBlockedConnectionsByName("%$searchText%").toLiveData(pageSize = 25)
-                        }
-                    }else {
-                        connectionTrackerDAO.getConnectionTrackerByName("%$input%").toLiveData(25)
-                    }
-                }
+                filteredList
 
-            )
+    ) { input ->
+        if (input.isBlank()) {
+            connectionTrackerDAO.getConnectionTrackerLiveData().toLiveData(pageSize = 25)
+        } else if (input.contains("isFilter")) {
+            val searchText = input.split(":")[0]
+            if (DEBUG) Log.d(LOG_TAG, "Filter option - Function - $searchText, $input")
+            if (searchText.isEmpty()) {
+                connectionTrackerDAO.getConnectionBlockedConnections().toLiveData(pageSize = 25)
+            } else {
+                connectionTrackerDAO.getConnectionBlockedConnectionsByName("%$searchText%")
+                    .toLiveData(pageSize = 25)
+            }
+        } else {
+            connectionTrackerDAO.getConnectionTrackerByName("%$input%").toLiveData(25)
+        }
+    }
 
     fun setFilter(searchString: String, filter : String? ) {
         if(DEBUG) Log.d(LOG_TAG, "Filter option:$searchString, $filter ")

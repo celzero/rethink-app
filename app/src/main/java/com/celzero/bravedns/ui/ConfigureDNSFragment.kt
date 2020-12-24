@@ -138,7 +138,7 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
 
         progressBar.visibility = View.VISIBLE
 
-        HomeScreenActivity.GlobalVariable.median50.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+        HomeScreenActivity.GlobalVariable.median50.observe(viewLifecycleOwner, {
             latencyTxt.setText("Latency: " + HomeScreenActivity.GlobalVariable.median50.value.toString() + "ms")
         })
 
@@ -222,7 +222,7 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
             dnsProxyRecyclerView.visibility = View.VISIBLE
         }
 
-        dnsType.observe(viewLifecycleOwner, Observer {
+        dnsType.observe(viewLifecycleOwner, {
             updateUIFromAdapter(it!!)
         })
 

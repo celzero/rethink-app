@@ -45,14 +45,15 @@ class DNSCryptEndpointViewModel : ViewModel() {
     }
 
     var dnsCryptEndpointList = Transformations.switchMap(
-                filteredList, Function<String, LiveData<PagedList<DNSCryptEndpoint>>> { input ->
-            if (input.isBlank()) {
-                dnsCryptEndpointDAO.getDNSCryptEndpointLiveData().toLiveData(pageSize = 50)
-            } else {
-                dnsCryptEndpointDAO.getDNSCryptEndpointLiveDataByName("%$input%").toLiveData(pageSize = 50)
-            }
+                filteredList
+    ) { input ->
+        if (input.isBlank()) {
+            dnsCryptEndpointDAO.getDNSCryptEndpointLiveData().toLiveData(pageSize = 50)
+        } else {
+            dnsCryptEndpointDAO.getDNSCryptEndpointLiveDataByName("%$input%")
+                .toLiveData(pageSize = 50)
         }
-    )
+    }
 
     fun setFilter(filter: String?) {
         filteredList.value = filter

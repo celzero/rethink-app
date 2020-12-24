@@ -50,22 +50,23 @@ class ExcludedAppViewModel : ViewModel() {
     }
 
     var excludedAppList = Transformations.switchMap(
-        filteredList, Function<String, LiveData<PagedList<AppInfo>>> { input ->
-            if (input.isBlank()) {
-                appDetailsDAO.getExcludedAppDetailsLiveData().toLiveData(pageSize = 50)
-            } else if (input == "isSystem") {
-                appDetailsDAO.getExcludedAAppSystemAppsLiveData().toLiveData(pageSize = 50)
-            } else if (input.contains("category:")) {
-                val filterVal = input.split(":")[1]
-                val result = filterVal.split(",").map { it.trim() }
-                if(DEBUG) Log.d(LOG_TAG, "FilterVal - $filterVal")
-                appDetailsDAO.getExcludedAppDetailsFilterForCategoryLiveData(result).toLiveData(pageSize = 50)
-            } else {
-                appDetailsDAO.getExcludedAppDetailsFilterLiveData("%$input%").toLiveData(pageSize = 50)
-                //appDetailsDAO.getUnivAppDetailsLiveData("%$input%").toLiveData(50)
-            }
+        filteredList
+    ) { input ->
+        if (input.isBlank()) {
+            appDetailsDAO.getExcludedAppDetailsLiveData().toLiveData(pageSize = 50)
+        } else if (input == "isSystem") {
+            appDetailsDAO.getExcludedAAppSystemAppsLiveData().toLiveData(pageSize = 50)
+        } else if (input.contains("category:")) {
+            val filterVal = input.split(":")[1]
+            val result = filterVal.split(",").map { it.trim() }
+            if (DEBUG) Log.d(LOG_TAG, "FilterVal - $filterVal")
+            appDetailsDAO.getExcludedAppDetailsFilterForCategoryLiveData(result)
+                .toLiveData(pageSize = 50)
+        } else {
+            appDetailsDAO.getExcludedAppDetailsFilterLiveData("%$input%").toLiveData(pageSize = 50)
+            //appDetailsDAO.getUnivAppDetailsLiveData("%$input%").toLiveData(50)
         }
-    )
+    }
 
     fun setFilter(filter: String?) {
         filteredList.value = filter

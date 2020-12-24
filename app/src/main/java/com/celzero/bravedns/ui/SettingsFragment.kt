@@ -228,7 +228,7 @@ class SettingsFragment : Fragment() {
             dnsSettingsHeading.visibility = View.GONE
         }
 
-        localDownloadComplete.observe(viewLifecycleOwner, Observer {
+        localDownloadComplete.observe(viewLifecycleOwner, {
             if (it == 1) {
                 if(DEBUG) Log.d(LOG_TAG, "Observer log")
                 downloadInProgress = 1
@@ -244,7 +244,7 @@ class SettingsFragment : Fragment() {
             }
         })
 
-        HomeScreenActivity.GlobalVariable.braveModeToggler.observe(viewLifecycleOwner, Observer {
+        HomeScreenActivity.GlobalVariable.braveModeToggler.observe(viewLifecycleOwner, {
             if (HomeScreenActivity.GlobalVariable.braveMode == HomeScreenFragment.DNS_MODE) {
                 //disableDNSRelatedUI()
             } else if (HomeScreenActivity.GlobalVariable.braveMode == HomeScreenFragment.FIREWALL_MODE) {
@@ -301,7 +301,7 @@ class SettingsFragment : Fragment() {
         val appInfoRepository = mDb.appInfoRepository()
         val appCount = appList.size
         val act: HomeScreenActivity = requireContext() as HomeScreenActivity
-        appInfoRepository.getExcludedAppListCountLiveData().observe(act, Observer {
+        appInfoRepository.getExcludedAppListCountLiveData().observe(act, {
             excludeListCountText.text = "$it/$appCount apps excluded."
         })
 

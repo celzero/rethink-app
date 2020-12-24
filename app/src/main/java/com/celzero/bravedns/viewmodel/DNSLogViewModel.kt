@@ -49,24 +49,25 @@ class DNSLogViewModel : ViewModel() {
     }
 
     var dnsLogsList = Transformations.switchMap(
-                filteredList, Function<String, LiveData<PagedList<DNSLogs>>> { input ->
-                    if (input.isBlank()) {
-                        dnsLogDAO.getDNSLogsLiveData().toLiveData(pageSize = 25)
-                    } else if(input.contains("isFilter")){
-                        val searchString = input.split(":")[0]
-                        if(DEBUG) Log.d(LOG_TAG,"DNS logs filter : $input, $searchString")
-                        if(searchString.isEmpty()) {
-                            dnsLogDAO.getBlockedDNSLogsLiveData().toLiveData(pageSize = 25)
-                        }else{
-                            dnsLogDAO.getBlockedDNSLogsLiveDataByName("%$searchString%").toLiveData(pageSize = 25)
-                        }
-                    }else {
-                        if(DEBUG) Log.d(LOG_TAG,"DNS logs filter : $input")
-                        dnsLogDAO.getDNSLogsByQueryLiveData("%$input%").toLiveData(25)
-                    }
-                }
+                filteredList
 
-            )
+    ) { input ->
+        if (input.isBlank()) {
+            dnsLogDAO.getDNSLogsLiveData().toLiveData(pageSize = 25)
+        } else if (input.contains("isFilter")) {
+            val searchString = input.split(":")[0]
+            if (DEBUG) Log.d(LOG_TAG, "DNS logs filter : $input, $searchString")
+            if (searchString.isEmpty()) {
+                dnsLogDAO.getBlockedDNSLogsLiveData().toLiveData(pageSize = 25)
+            } else {
+                dnsLogDAO.getBlockedDNSLogsLiveDataByName("%$searchString%")
+                    .toLiveData(pageSize = 25)
+            }
+        } else {
+            if (DEBUG) Log.d(LOG_TAG, "DNS logs filter : $input")
+            dnsLogDAO.getDNSLogsByQueryLiveData("%$input%").toLiveData(25)
+        }
+    }
 
     fun setFilter(searchString: String?, filter : String ) {
         filteredList.value = "$searchString$filter"

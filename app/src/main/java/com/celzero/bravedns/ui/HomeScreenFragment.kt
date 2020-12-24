@@ -310,23 +310,23 @@ class HomeScreenFragment : Fragment() {
         }
 
         // Connect/Disconnect button ==> TODO : Change the label to Start and Stop
-        dnsOnOffBtn.setOnClickListener(View.OnClickListener {
+        dnsOnOffBtn.setOnClickListener {
             handleStartBtnClickEvent()
-        })
+        }
 
         val mDb = AppDatabase.invoke(requireContext().applicationContext)
         val categoryInfoRepository = mDb.categoryInfoRepository()
-        categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, Observer {
+        categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, {
             val list = it.filter { a -> a.isInternetBlocked }
             tileFCategoryBlockedTxt.text = list.size.toString()
         })
 
-        median50.observe(viewLifecycleOwner, Observer {
+        median50.observe(viewLifecycleOwner, {
             tileDmedianTxt.text = median50.value.toString() + "ms"
             tileDFMedianTxt.text = median50.value.toString() + "ms"
         })
 
-        lifeTimeQ.observe(viewLifecycleOwner, Observer {
+        lifeTimeQ.observe(viewLifecycleOwner, {
             val lifeTimeConversion = if (VERSION.SDK_INT >= VERSION_CODES.N) {
                 CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT).format(lifeTimeQ.value)
             } else {
@@ -336,7 +336,7 @@ class HomeScreenFragment : Fragment() {
             tileDLifetimeQueriesTxt.text = lifeTimeConversion
         })
 
-         blockedCount.observe(viewLifecycleOwner, Observer {
+         blockedCount.observe(viewLifecycleOwner, {
              val blocked = if (VERSION.SDK_INT >= VERSION_CODES.N) {
                  CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT).format(blockedCount.value)
              } else {
@@ -349,7 +349,7 @@ class HomeScreenFragment : Fragment() {
 
         //val mDb = AppDatabase.invoke(requireContext().applicationContext)
         val appInfoRepository = mDb.appInfoRepository()
-        appInfoRepository.getBlockedAppCount().observe(viewLifecycleOwner, Observer {
+        appInfoRepository.getBlockedAppCount().observe(viewLifecycleOwner, {
             tileFAppsBlockedTxt.text = it.toString()
             tileDFAppsBlockedTxt.text = it.toString()
         })
@@ -359,11 +359,11 @@ class HomeScreenFragment : Fragment() {
             tileDFAppsBlockedTxt.text = appsBlocked.value.toString()
         })*/
 
-        numUniversalBlock.observe(viewLifecycleOwner, Observer {
+        numUniversalBlock.observe(viewLifecycleOwner, {
             tileFUniversalBlockedTxt.text = numUniversalBlock.value.toString()
         })
 
-        braveModeToggler.observe(viewLifecycleOwner, Observer {
+        braveModeToggler.observe(viewLifecycleOwner, {
             if (DEBUG) Log.d(LOG_TAG, "HomeScreen -> braveModeToggler -> observer")
             if (PersistentState.getVpnEnabled(requireContext())) {
                 enableBraveModeIcons()

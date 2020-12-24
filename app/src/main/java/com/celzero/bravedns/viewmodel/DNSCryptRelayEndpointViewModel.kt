@@ -48,16 +48,17 @@ class DNSCryptRelayEndpointViewModel : ViewModel() {
     }
 
     var dnsCryptRelayEndpointList = Transformations.switchMap(
-                filteredList, Function<String, LiveData<PagedList<DNSCryptRelayEndpoint>>> { input ->
-            if (input.isBlank()) {
-                if(DEBUG) Log.d(LOG_TAG,"InputValue - NULL")
-                dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveData().toLiveData(pageSize = 50)
-            } else {
-                if(DEBUG) Log.d(LOG_TAG,"InputValue - $input")
-                dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveDataByName("%$input%").toLiveData(pageSize = 50)
-            }
+                filteredList
+    ) { input ->
+        if (input.isBlank()) {
+            if (DEBUG) Log.d(LOG_TAG, "InputValue - NULL")
+            dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveData().toLiveData(pageSize = 50)
+        } else {
+            if (DEBUG) Log.d(LOG_TAG, "InputValue - $input")
+            dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveDataByName("%$input%")
+                .toLiveData(pageSize = 50)
         }
-    )
+    }
 
     fun setFilter(filter: String?) {
         filteredList.value = filter

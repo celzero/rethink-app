@@ -236,16 +236,16 @@ class UniversalAppListAdapter(val context: Context)  : PagedListAdapter<AppInfo,
             /*val alertDialog : AlertDialog = builderSingle.create()
             alertDialog.getListView().setOnItemClickListener({ adapterView, subview, i, l -> })*/
             builderSingle.setPositiveButton(
-                positiveTxt,
-                DialogInterface.OnClickListener { dialogInterface: DialogInterface, i: Int ->
-                    proceedBlocking = true
-                    handler.sendMessage(handler.obtainMessage())
-                }).setNeutralButton(
-                "Go Back",
-                DialogInterface.OnClickListener { dialogInterface: DialogInterface, i: Int ->
-                    handler.sendMessage(handler.obtainMessage())
-                    proceedBlocking = false
-                })
+                positiveTxt
+            ) { dialogInterface: DialogInterface, i: Int ->
+                proceedBlocking = true
+                handler.sendMessage(handler.obtainMessage())
+            }.setNeutralButton(
+                "Go Back"
+            ) { dialogInterface: DialogInterface, i: Int ->
+                handler.sendMessage(handler.obtainMessage())
+                proceedBlocking = false
+            }
 
             val alertDialog: AlertDialog = builderSingle.show()
             alertDialog.listView.setOnItemClickListener { adapterView, subview, i, l -> }

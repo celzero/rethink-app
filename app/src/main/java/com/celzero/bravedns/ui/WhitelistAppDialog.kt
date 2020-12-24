@@ -87,16 +87,16 @@ class WhitelistAppDialog(var activity: Context, internal var adapter: RecyclerVi
         searchView.setOnSearchClickListener(this)
         filterCategories.clear()
 
-        searchView.setOnCloseListener(SearchView.OnCloseListener {
+        searchView.setOnCloseListener {
             showCategoryChips()
             false
-        })
+        }
 
         val mDb = AppDatabase.invoke(context.applicationContext)
         val appInfoRepository = mDb.appInfoRepository()
         val appCount = appList.size
         val act : FirewallActivity = activity as FirewallActivity
-        appInfoRepository.getWhitelistCountLiveData().observe(act, Observer {
+        appInfoRepository.getWhitelistCountLiveData().observe(act, {
             countAppsSelectedText.text = "$it/$appCount apps whitelisted"
         })
 

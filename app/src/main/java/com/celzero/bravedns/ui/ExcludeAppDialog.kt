@@ -90,16 +90,16 @@ class ExcludeAppDialog(var activity: Context, internal var adapter: RecyclerView
         searchView.setOnQueryTextListener(this)
         searchView.setOnSearchClickListener(this)
 
-        searchView.setOnCloseListener(SearchView.OnCloseListener {
+        searchView.setOnCloseListener {
             showCategoryChips()
             false
-        })
+        }
 
         val mDb = AppDatabase.invoke(context.applicationContext)
         val appInfoRepository = mDb.appInfoRepository()
         val appCount = HomeScreenActivity.GlobalVariable.appList.size
         val act: HomeScreenActivity = activity as HomeScreenActivity
-        appInfoRepository.getExcludedAppListCountLiveData().observe(act, Observer {
+        appInfoRepository.getExcludedAppListCountLiveData().observe(act, {
             countSelectedText.text = "$it/$appCount apps excluded"
         })
 

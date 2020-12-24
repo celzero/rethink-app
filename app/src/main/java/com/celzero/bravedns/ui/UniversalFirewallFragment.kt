@@ -276,7 +276,7 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
         val appInfoRepository = mDb.appInfoRepository()
         val appCount = GlobalVariable.appList.size
         val act: FirewallActivity = requireContext() as FirewallActivity
-        appInfoRepository.getWhitelistCountLiveData().observe(act, Observer {
+        appInfoRepository.getWhitelistCountLiveData().observe(act, {
             whitelistCountTxt.text = "$it/$appCount apps whitelisted."
         })
 

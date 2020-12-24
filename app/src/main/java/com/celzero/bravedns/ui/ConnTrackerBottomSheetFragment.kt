@@ -453,16 +453,16 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         builderSingle.setItems(packageNameList.toTypedArray(), null)
 
         builderSingle.setPositiveButton(
-            positiveTxt,
-            DialogInterface.OnClickListener { _: DialogInterface, _: Int ->
-                proceedBlocking = true
-                handler.sendMessage(handler.obtainMessage())
-            }).setNeutralButton(
-            "Go Back",
-            DialogInterface.OnClickListener { _: DialogInterface, _: Int ->
-                handler.sendMessage(handler.obtainMessage())
-                proceedBlocking = false
-            })
+            positiveTxt
+        ) { _: DialogInterface, _: Int ->
+            proceedBlocking = true
+            handler.sendMessage(handler.obtainMessage())
+        }.setNeutralButton(
+            "Go Back"
+        ) { _: DialogInterface, _: Int ->
+            handler.sendMessage(handler.obtainMessage())
+            proceedBlocking = false
+        }
 
         val alertDialog: AlertDialog = builderSingle.show()
         alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }

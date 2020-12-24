@@ -45,17 +45,17 @@ class DoHEndpointViewModel : ViewModel() {
     }
 
     var dohEndpointList = Transformations.switchMap(
-                filteredList, Function<String, LiveData<PagedList<DoHEndpoint>>> { input ->
-            if (input.isBlank()) {
-                doHEndpointsDAO.getDoHEndpointLiveData().toLiveData(pageSize = 50)
-            } else if (input == "isSystem") {
-                doHEndpointsDAO.getDoHEndpointLiveData().toLiveData(pageSize = 50)
-            } else {
-                doHEndpointsDAO.getDoHEndpointLiveDataByName("%$input%").toLiveData(pageSize = 50)
-                //appDetailsDAO.getUnivAppDetailsLiveData("%$input%").toLiveData(50)
-            }
+                filteredList
+    ) { input ->
+        if (input.isBlank()) {
+            doHEndpointsDAO.getDoHEndpointLiveData().toLiveData(pageSize = 50)
+        } else if (input == "isSystem") {
+            doHEndpointsDAO.getDoHEndpointLiveData().toLiveData(pageSize = 50)
+        } else {
+            doHEndpointsDAO.getDoHEndpointLiveDataByName("%$input%").toLiveData(pageSize = 50)
+            //appDetailsDAO.getUnivAppDetailsLiveData("%$input%").toLiveData(50)
         }
-    )
+    }
 
     fun setFilter(filter: String?) {
         filteredList.value = filter

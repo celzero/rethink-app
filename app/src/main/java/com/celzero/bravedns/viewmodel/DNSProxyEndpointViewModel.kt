@@ -45,14 +45,15 @@ class DNSProxyEndpointViewModel : ViewModel() {
     }
 
     var dnsProxyEndpointList = Transformations.switchMap(
-                filteredList, Function<String, LiveData<PagedList<DNSProxyEndpoint>>> { input ->
-            if (input.isBlank()) {
-                dnsProxyEndpointDAO.getDNSProxyEndpointLiveData().toLiveData(pageSize = 50)
-            } else {
-                dnsProxyEndpointDAO.getDNSProxyEndpointLiveDataByType("%$input%").toLiveData(pageSize = 50)
-            }
+                filteredList
+    ) { input ->
+        if (input.isBlank()) {
+            dnsProxyEndpointDAO.getDNSProxyEndpointLiveData().toLiveData(pageSize = 50)
+        } else {
+            dnsProxyEndpointDAO.getDNSProxyEndpointLiveDataByType("%$input%")
+                .toLiveData(pageSize = 50)
         }
-    )
+    }
 
     fun setFilter(filter: String?) {
         filteredList.value = filter
