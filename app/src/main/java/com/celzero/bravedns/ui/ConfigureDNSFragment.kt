@@ -697,9 +697,8 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
     private fun checkProxySize(): Int {
         val mDb = AppDatabase.invoke(requireContext().applicationContext)
         val dnsProxyEndpointRepository = mDb.dnsProxyEndpointRepository()
-        val count = dnsProxyEndpointRepository.getCount()
         //mDb.close()
-        return count
+        return dnsProxyEndpointRepository.getCount()
     }
 
 
