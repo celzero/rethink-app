@@ -64,7 +64,7 @@ class BottomSheetFragment(context : Context, apkItem : Apk) : BottomSheetDialogF
 
     private fun initView(view : View) {
         print("initView")
-        var rule = HomeScreenActivity.dbHandler.getSpecificPackageRule(apkVal.packageName)
+        var rule = 0//HomeScreenActivity.dbHandler.getSpecificPackageRule(apkVal.packageName)
         //Toast.makeText(contextV,"Rule:"+rule,Toast.LENGTH_SHORT).show()
         txtAutoRemove = view.findViewById(R.id.textView)
         txtAutoRevoke = view.findViewById(R.id.textView2)

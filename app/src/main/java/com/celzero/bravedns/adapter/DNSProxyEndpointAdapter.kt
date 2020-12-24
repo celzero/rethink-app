@@ -38,6 +38,7 @@ import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.DNSProxyEndpoint
 import com.celzero.bravedns.database.DNSProxyEndpointRepository
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.QueryTracker
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
@@ -186,7 +187,7 @@ class DNSProxyEndpointAdapter(val context: Context, val listener: UIUpdateInterf
                 val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
                 val clip = ClipData.newPlainText("URL", url)
                 clipboard?.setPrimaryClip(clip)
-                Utilities.showToastInMidLayout(context, "URL Copied.", Toast.LENGTH_SHORT)
+                Utilities.showToastInMidLayout(context, context.getString(R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
             }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
@@ -275,6 +276,7 @@ class DNSProxyEndpointAdapter(val context: Context, val listener: UIUpdateInterf
 
                 override fun onFinish() {
                     notifyDataSetChanged()
+                    QueryTracker.reinitializeQuantileEstimator()
                 }
             }.start()
 

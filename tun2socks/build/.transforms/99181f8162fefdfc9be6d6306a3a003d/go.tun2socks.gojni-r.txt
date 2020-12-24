@@ -1,1 +1,0 @@
-go.tun2socks.gojni

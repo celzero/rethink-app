@@ -29,6 +29,7 @@ import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
+import androidx.core.content.getSystemService
 
 class WelcomeActivity  : AppCompatActivity() {
 

@@ -37,6 +37,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.net.InetAddress
 import java.net.ProtocolException
+import java.net.UnknownHostException
 
 class DNSLogTracker(var context: Context?) {
 
@@ -70,7 +71,7 @@ class DNSLogTracker(var context: Context?) {
                 dnsLogs.dnsType = DNS_TYPE_DOH
                 dnsLogs.relayIP = ""
             }
-            dnsLogs.latency = transaction.responseTime - transaction.queryTime
+            dnsLogs.latency = transaction.responseTime// - transaction.queryTime
             dnsLogs.queryStr = transaction.name
             dnsLogs.blockLists = transaction.blockList
             dnsLogs.responseTime = transaction.responseTime
@@ -81,7 +82,11 @@ class DNSLogTracker(var context: Context?) {
 
             try {
                 val serverAddress = if (transaction.serverIp != null) {
-                    InetAddress.getByName(transaction.serverIp)
+                    try {
+                        InetAddress.getByName(transaction.serverIp)
+                    }catch(ex : UnknownHostException){
+                        null
+                    }
                 } else {
                     null
                 }

@@ -405,9 +405,8 @@ class HomeScreenFragment : Fragment() {
                 prepareAndStartDnsVpn()
             }
         } else if (status) {
-            Utilities.showToastInMidLayout(requireContext(), "Always-on enabled for RethinkDNS", Toast.LENGTH_SHORT)
+            Utilities.showToastInMidLayout(requireContext(), getString(R.string.always_on_rethink_enabled), Toast.LENGTH_SHORT)
         }
-
         Handler().postDelayed({ dnsOnOffBtn.isEnabled = true }, 500)
     }
 
@@ -596,7 +595,7 @@ class HomeScreenFragment : Fragment() {
                 Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(), Toast.LENGTH_SHORT)
             }
         }else {
-             Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_prompt_firewall).toString().capitalize(), Toast.LENGTH_SHORT)
+             Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(), Toast.LENGTH_SHORT)
         }
     }
 

@@ -33,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DNSQueryAdapter
 import com.celzero.bravedns.database.AppDatabase
+import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
@@ -77,7 +78,7 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
 
     private val viewModel: DNSLogViewModel by viewModels()
     private var checkedItem = 1
-    private lateinit var filterValue: String
+    private var filterValue: String = ""
 
     lateinit var urlName: Array<String>
     lateinit var urlValues: Array<String>
@@ -89,8 +90,8 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
         super.onCreate(savedInstanceState)
         //setContentView(R.layout.activity_query_detail)
         val view: View = inflater.inflate(R.layout.activity_query_detail, container, false)
-        urlName = resources.getStringArray(R.array.doh_endpoint_names)
-        urlValues = resources.getStringArray(R.array.doh_endpoint_urls)
+        //urlName = resources.getStringArray(R.array.doh_endpoint_names)
+        //urlValues = resources.getStringArray(R.array.doh_endpoint_urls)
         return view
     }
 
@@ -172,17 +173,20 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
         val dnsType = appMode?.getDNSType()
 
         if (dnsType == 1) {
-            val dohDetail = appMode?.getDOHDetails()
+            var dohDetail : DoHEndpoint ?= null
+            try {
+                dohDetail  = appMode?.getDOHDetails()
+            }catch (e : Exception){
+                return
+            }
             currentDNSURL.text = resources.getString(R.string.configure_dns_connected_doh_status)
             currentDNSStatus.text = resources.getString(R.string.configure_dns_connection_name) + " "+ dohDetail?.dohName
-            //recyclerHeadingLL.visibility = View.GONE
             recyclerView?.visibility = View.VISIBLE
             noLogsTxt.visibility = View.GONE
         } else if (dnsType == 2) {
             val cryptDetails = appMode?.getDNSCryptServerCount()
             currentDNSStatus.text = resources.getString(R.string.configure_dns_connection_name) + " DNSCrypt resolvers: $cryptDetails"
             currentDNSURL.text = resources.getString(R.string.configure_dns_connected_dns_crypt_status)
-            //recyclerHeadingLL.visibility = View.GONE
             recyclerView?.visibility = View.VISIBLE
             noLogsTxt.visibility = View.GONE
         } else {
@@ -204,7 +208,7 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
         // Single-choice items (initialized with checked item)
         builder.setSingleChoiceItems(singleItems, checkedItem) { dialog, which ->
             // Respond to item chosen
-            filterValue = if (which == 0) "isFilter"
+            filterValue = if (which == 0) ":isFilter"
             else ""
             checkedItem = which
             if (DEBUG) Log.d(LOG_TAG, "Filter Option selected: $filterValue")
@@ -274,12 +278,12 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        viewModel.setFilter(query!!)
+        viewModel.setFilter(query!!, filterValue)
         return true
     }
 
     override fun onQueryTextChange(query: String?): Boolean {
-        viewModel.setFilter(query!!)
+        viewModel.setFilter(query!!, filterValue)
         return true
     }
 

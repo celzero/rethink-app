@@ -53,7 +53,7 @@
         <item>https://cloudflare-dns.com/dns-query</item>
         <item>https://family.cloudflare-dns.com/dns-query</item>
         <item>https://security.cloudflare-dns.com/dns-query</item>
-        <item>https://basic.bravedns.com/1:wBdgAIoBoB02kIAA5HI=</item>
+        <item>https://basic.bravedns.com/1:YBcgAIAQIAAIAABgIAA=</item>
         <item>https://cloudflare-dns.com/</item>
         <item>https://basic.bravedns.com/</item>
     </string-array>
@@ -187,15 +187,15 @@
     Your connection is exposed to DNS attacks.
   </string>
 
-  <string name="dns_explanation_dns_connected">connected to rethinkdns</string>
-    <string name="dns_explanation_firewall_connected">connected to firewall</string>
+  <string name="dns_explanation_dns_connected">Connected to RethinkDNS</string>
+    <string name="dns_explanation_firewall_connected">Connected to Firewall</string>
 
     <string name="dns_explanation_connected" description= "The message will be shown when the DNS is connected">
-        connected to rethinkdns and firewall
+        Connected to RethinkDNS and Firewall
     </string>
 
     <string name="dns_explanation_disconnected" description="This message will be shown to user in main screen when the DNS is not connected">
-        disconnected from rethinkdns and firewall
+        Disconnected from RethinkDNS and Firewall
     </string>
 
     <string name="firewall_explanation_text" description="Explanation on the main screen for the users about what the firewall does.">
@@ -249,7 +249,7 @@
     <string name="firewall_rules">Firewall Rules</string>
 
     <string name="dns_mode_info_explanation">
-        \u00BB Circumvent Internet censorship.\n\u00BB Prevent DNS manipulation attacks with encrypted DNS.\n\u00BB First line of defence against malware and other security threats.\n\u00BB Monitor DNS traffic.
+        \u0009 Circumvent Internet censorship.\n\u0009 Prevent DNS manipulation attacks with encrypted DNS.\n\u0009 First line of defence against malware and other security threats.\n\u0009 Monitor DNS traffic.
     </string>
 
 
@@ -258,7 +258,7 @@
     </string>
 
     <string name="firewall_mode_info_explanation">
-        \u00BB Firewall select apps from connecting to the Internet.\n\u00BB Monitor network activity of all apps.\n\u00BB Note: This feature may consume extra battery.
+        \u0009 Firewall select apps from connecting to the Internet.\n\u0009 Monitor network activity of all apps.\n\u0009 Note: This feature may consume extra battery.
     </string>
 
 
@@ -270,8 +270,16 @@
         Permission - Accessibility
     </string>
 
+    <string name="alert_permission_accessibility_regrant">
+        Regrant Permission - Accessibility
+    </string>
+
     <string name="alert_firewall_accessibility_explanation">
         RethinkDNS uses accessibility service to track which apps are in-use (foreground) versus those that are not in-use (background).
+    </string>
+
+    <string name="alert_firewall_accessibility_regrant_explanation">
+        RethinkDNS accessibility service has stopped or crashed. Revoke accessibility permissions and regrant them to start it back again. RethinkDNS uses accessibility service to track which apps are in-use (foreground) versus those that are not in-use (background).
     </string>
 
     <string name="brave_dns_connect_prompt_firewall">
@@ -282,11 +290,11 @@
     </string>
 
     <string name="brave_dns_connect_mode_change_firewall">
-       Start Firewall / DNS+Firewall to configure Firewall.
+       Firewall is disabled.
     </string>
 
     <string name="brave_dns_connect_mode_change_dns">
-        Start DNS / DNS+Firewall to configure DNS.
+        DNS is disabled.
     </string>
 
     <string name="brave_dns_connect_mode_change_connection">
@@ -353,14 +361,14 @@
     <string name="bsct_block">Block &lt;u>this app&lt;/u> from connecting to the Internet</string>
     <string name="bsct_conn_block_desc">blocked %1$s %2$s</string>
     <string name="bsct_conn_conn_desc_allowed">allowed on &lt;u>%1$s:%2$s&lt;/u> %3$s.\u0020</string>
-    <string name="bsct_conn_conn_desc_blocked">blocked on &lt;u>%1$s/%2$s&lt;/u> %3$s by&#160;</string>
+    <string name="bsct_conn_conn_desc_blocked">blocked on &lt;u>%1$s/%2$s&lt;/u> %3$s</string>
     <string name="bsct_conn_rule_explanation">
-        \u00BB &lt;u>Rule #1&lt;/u>: Blocks an app from connecting to the Internet.
-        \n \u00BB &lt;u>Rule #2&lt;/u>: Blocks any app from connecting to a particular IP.
-        \n \u00BB &lt;u>Rule #3&lt;/u>: Blocks all connections when device locked (Universal Firewall).
-        \n \u00BB &lt;u>Rule #4&lt;/u>: Blocks any app not in use (Universal Firewall).
-        \n \u00BB &lt;u>Rule #5&lt;/u>: Blocks connections when source app unknown (Universal Firewall).
-        \n \u00BB &lt;u>Rule #6&lt;/u>: Blocks all UDP traffic except DNS (Universal Firewall).
+        \u0009 &lt;u>Rule #1&lt;/u>: Blocks an app from connecting to the Internet.
+        \n \u0009 &lt;u>Rule #2&lt;/u>: Blocks any app from connecting to a particular IP.
+        \n \u0009 &lt;u>Rule #3&lt;/u>: Blocks all connections when device locked (Universal Firewall).
+        \n \u0009 &lt;u>Rule #4&lt;/u>: Blocks any app not in use (Universal Firewall).
+        \n \u0009 &lt;u>Rule #5&lt;/u>: Blocks connections when source app unknown (Universal Firewall).
+        \n \u0009 &lt;u>Rule #6&lt;/u>: Blocks all UDP traffic except DNS (Universal Firewall).
         </string>
     <string name="univ_block_unknown_connections">Block connections when source app is unknown</string>
     <string name="bsct_alert_message_clear_rules">All rules related to this app will be cleared</string>
@@ -369,14 +377,16 @@
     <string name="bsct_firewall_not_available_whitelist">Whitelisted apps cannot be blocked.</string>
     <string name="bsct_firewall_not_available_excluded">Excluded apps cannot be blocked.</string>
 
-    <string name="private_dns_toast">"Private DNS" is on in Android network settings</string>
+    <string name="private_dns_toast">Private DNS has been set.</string>
     <string name="always_on_dialog_heading">Disable Always-on VPN</string>
     <string name="always_on_dialog">\"Always-On VPN\" is enabled on this device. To start RethinkDNS, please go to Settings app and disable \"Always-on VPN\".</string>
+    <string name="always_on_rethink_enabled">\"Always-on VPN\" enabled. Go to Settings app and disable \"Always-on VPN\" setting to stop RethinkDNS.</string>
     <string name="always_on_dialog_positive_btn">Go to Settings</string>
     <string name="always_on_dialog_negative_btn">Cancel</string>
 
     <string name="settings_allow_bypass_desc">Allow requesting apps to bypass RethinkDNS firewall on-demand. Some audio/video conference apps like Zoom and WhatsApp may require an on-demand bypass to function properly.</string>
     <string name="settings_allow_bypass_lockdown_desc">"Disabled. Settings->VPN->Block connections without VPN" is enabled for RethinkDNS, enabling the feature will block the internet connection of the apps which are trying to bypass the VPN.</string>
+    <string name="settings_lock_down_mode_desc">Cannot exclude apps or allow bypass because VPN is running in lockdown mode.</string>
 
     <string name="system_apps_warning">Some system apps are critical to proper functioning of a device. Block them only if you know what you are doing.</string>
     <string name="system_components_warning">Some system components are critical to proper functioning of a device. Block them only if you know what you are doing.</string>
@@ -391,7 +401,7 @@
 
     <string name="univ_firewall_dialog_title">Delete IP Rule?</string>
     <string name="univ_firewall_dialog_message">Deleting this rule would allow any app to connect to this IP. Do you want to proceed?</string>
-    <string name="univ_firewall_no_ip_message">No IPs blocked. Tap on entries in the "Network Log" screen to block individual IP addresses.</string>
+    <string name="univ_firewall_no_ip_message">No IPs found. Tap on entries in the Network Log screen to block individual IP addresses.</string>
 
     <string name="univ_delete_firewall_dialog_title">Delete all IP Rules?</string>
     <string name="univ_delete_firewall_dialog_message">Deleting these rules would allow any application to connect to the currently blocked IPs.</string>
@@ -507,31 +517,57 @@
     <string name="download_update_dialog_failure_title">Something went wrong!</string>
     <string name="download_update_dialog_failure_message">Either our servers are down or connection could not be established. Please try again after sometime.</string>
 
-    <string name="search_firewall_network_log"><font size="12">Search apps or IP\'s</font></string>
+    <string name="search_firewall_network_log"><font size="12">Search apps or IPs</font></string>
     <string name="search_firewall_all_apps"><font size="12">Search apps</font></string>
-    <string name="search_dns_logs"><font size="12">Search DNS queries or IP\'s</font></string>
-    <string name="search_universal_ips"><font size="12">Search by IP</font></string>
+    <string name="search_dns_logs"><font size="12">Search DNS queries or IPs</font></string>
+    <string name="search_universal_ips"><font size="12">Search IPs</font></string>
 
-    <string name="whats_new_version_name">BraveDNS is now RethinkDNS</string>
-    <string name="whats_new_version_update">DNS:\n\n
-    \u00BB Support for RethinkDNS+ (a configurable DNS resolver with custom blocklists) deployed to 200+ locations world-wide.\n
-        \u00BB Support for DNSCrypt v2 with Anonymized Relays.\n
-        \u00BB Support to forward DNS requests to other apps like Nebulo or PDNSF.\n\n
-    Firewall:\n\n
-        \u00BB Support for \"Always-on VPN\" and \"Block connections without VPN\" (this is enforced by Android and is full-proof in that it blocks all internet traffic that bypasses VPN ensuring nothing escapes the RethinkDNS firewall).\n
-        \u00BB Exclude apps from VPN, that is from the RethinkDNS firewall altogether.\n
-        \u00BB Whitelist apps from RethinkDNS firewall rules (but not DNS).\n
-        \u00BB Block all connections when source app is unknown (this occasionally happens with UDP traffic that the source app cannot be determined at times).\n
-        \u00BB Block all UDP traffic except DNS traffic.\n
-        \u00BB Block IP addresses apps are connecting to individually from the \"Network Log\" screen.\n\n
-    UI:\n\n
-        \u00BB DNS Firewall screens see a major UI overhaul.\n
-        \u00BB A bottom sheet in \"Network Log\" now shows some relevant actions (block app, block IP, kill app).\n
-        \u00BB A tap on DNS logs entries now shows more information including blocklists.\n
-        \u00BB Select and copy app names and IP addresses from both \"DNS Logs\" screen and \"Network Logs\".\n
-        \u00BB A search bar in all firewall screens.\n\n
-    Proxies:\n\n
-        \u00BB Forward TCP connections to any SOCKS5 endpoint.\n
-        \u00BB Set a HTTP/S proxy endpoint.\n</string>
+    <string name="app_mode_dns">DNS</string>
+    <string name="app_mode_firewall">Firewall</string>
+    <string name="app_mode_dns_firewall">DNS and Firewall</string>
+
+    <string name="settings_vpn_heading">VPN</string>
+
+    <string name="info_dialog_copy_toast_msg">URI Copied.</string>
+
+    <string name="settings_enable_logs_desc">Store DNS and Firewall logs locally on-device.</string>
+    <string name="settings_enable_logs">Enable on-device logging</string>
+
+    <string name="app_mode_dns_low_battery">DNS (battery saver)</string>
+
+    <string name="app_mode_choose">Choose mode</string>
+    <string name="vpn_start_error_doh_url">Something went wrong. Cannot start VPN.</string>
+
+
+    <string name="features_disabled">(disabled)</string>
+
+    <string name="whats_dialog_title">15+ new features in v053</string>
+    <string name="whats_new_version_name">🎅 🎄 Happy New Year ❄️ 🎁 </string>
+    <string name="whats_new_version_update">Android 6 and Android TV:\n\n
+        \u00091. The app now runs on Android 6 and above.\n
+        \u00092. Preliminary Android TV support.\n\n
+        Battery Saver Mode:\n\n
+        \u00093. The app now bundles in a battery saver mode in which only DNS works but not Firewall.\n\n
+        Homescreen:\n\n
+        \u00094. Start / Stop now looks more like a traditional button with a bottom sheet to help choose between battery-saver DNS-only mode and full-fledged DNS + Firewall mode.\n
+        \u00095. DNS and Firewall buttons on the homescreen are now more prominent.\n\n
+        Settings:\n\n
+        \u00096. Enable or disable on-device DNS and Firewall logging.\n
+        \u00097. "Refresh app list" button moved to the Firewall screen.\n\n
+        DNS:\n\n
+        \u00098. Latest 20K DNS logs are stored on-device.\n
+        \u00099. Search box and filters for DNS logs.\n\n
+        Firewall:\n\n
+        \u000910. Fix for Whitelist reverting to default.\n
+        \u000911. Fix for Exclusion list reverting to default.\n
+        \u000912. All apps tab now shows total number of app, number of apps in the whitelist / exclusion list, and number of apps blocked.\n
+        \u000913. Improve scroll performance of the Network Log screen.\n
+        \u000914. Network Log bottom sheet now slightly less cluttered: A couple of UI elements removed.\n
+        \u000915. Distinguish between "unamed" (connections from apps without a name) and "unknown" (orphan connections without an owner app) in the network logs.\n
+        \u000916. Improvements to app UX when the VPN is run in "lockdown mode" (that is, when "Block connections without VPN" is enabled from Android\'s VPN Settings page).\n
+        \u000917. Some apps retry relentlessly when their connections are firewalled: Gatekeep connections for 30 seconds to delay those fast-paced non-stop retries.\n\n
+        Universal Firewall:\n\n
+        \u00092021. "Block any app not in use" now with better heurisitcs and so should behave in less surprising ways and be more out-of-the-way.
+    </string>
 
 </resources>

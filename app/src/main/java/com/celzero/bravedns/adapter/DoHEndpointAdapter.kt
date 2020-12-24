@@ -37,6 +37,7 @@ import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.database.DoHEndpointRepository
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.QueryTracker
 import com.celzero.bravedns.ui.DNSConfigureWebViewActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
@@ -149,7 +150,7 @@ class DoHEndpointAdapter(val context: Context, val listener: UIUpdateInterface) 
                         stamp = getBlocklistStampFromURL(doHEndpoint.dohURL)
                         if(DEBUG) Log.d(LOG_TAG, "Configure btn click: ${doHEndpoint.dohURL}, $stamp")
                     } catch (e: Exception) {
-                        Log.e(LOG_TAG, "Exception while fetching stamp from Go ${e.message}", e)
+                        Log.w(LOG_TAG, "Exception while fetching stamp from Go ${e.message}", e)
                     }
                     if(DEBUG) Log.d(LOG_TAG, "startActivityForResult - DohEndpointadapter")
                     val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
@@ -218,7 +219,7 @@ class DoHEndpointAdapter(val context: Context, val listener: UIUpdateInterface) 
                 val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
                 val clip = ClipData.newPlainText("URL", url)
                 clipboard?.setPrimaryClip(clip)
-                Utilities.showToastInMidLayout(context,"URL Copied.",Toast.LENGTH_SHORT)
+                Utilities.showToastInMidLayout(context,context.getString(R.string.info_dialog_copy_toast_msg),Toast.LENGTH_SHORT)
             }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
@@ -295,6 +296,7 @@ class DoHEndpointAdapter(val context: Context, val listener: UIUpdateInterface) 
                     notifyDataSetChanged()
                     PersistentState.setDNSType(context, 1)
                     PersistentState.setConnectionModeChange(context, doHEndpoint.dohURL)
+                    QueryTracker.reinitializeQuantileEstimator()
                 }
             }.start()
             appMode?.setDNSMode(Settings.DNSModePort)

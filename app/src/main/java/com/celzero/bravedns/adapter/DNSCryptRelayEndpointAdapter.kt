@@ -29,6 +29,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.getSystemService
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -172,10 +173,10 @@ class DNSCryptRelayEndpointAdapter(val context: Context) : PagedListAdapter<DNSC
             }
 
             builder.setNeutralButton("Copy") { dialogInterface: DialogInterface, i: Int ->
-                val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+                val clipboard: ClipboardManager? = context.getSystemService()
                 val clip = ClipData.newPlainText("URL", url)
                 clipboard?.setPrimaryClip(clip)
-                Utilities.showToastInMidLayout(context, "URL Copied.", Toast.LENGTH_SHORT)
+                Utilities.showToastInMidLayout(context, context.getString(R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
             }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()

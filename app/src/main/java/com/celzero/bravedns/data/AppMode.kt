@@ -114,13 +114,15 @@ class AppMode(val context: Context) {
         val doHEndpointRepository = mDb.doHEndpointsRepository()
         val dohEndpoint = doHEndpointRepository.getConnectedDoH()
         if (dohEndpoint != null) {
-            if (dohEndpoint.dohURL.isNullOrEmpty()) {
+            if (dohEndpoint.dohURL.isEmpty()) {
                 if (HomeScreenActivity.GlobalVariable.DEBUG) {
                     Log.d(LOG_TAG, "getDOHDetails -appMode- DoH endpoint is null")
                 }
             }else{
                 if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "getDOHDetails -appMode- DoH endpoint - ${dohEndpoint.dohURL}")
             }
+        }else{
+            throw Exception()
         }
         //mDb.close()
         return dohEndpoint

@@ -29,10 +29,10 @@ import android.net.VpnService
 import android.os.Build
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
-import android.os.SystemClock
 import android.service.quicksettings.TileService.requestListeningState
 import android.text.TextUtils
 import android.util.Log
+import android.view.accessibility.AccessibilityManager
 import androidx.annotation.GuardedBy
 import androidx.annotation.WorkerThread
 import com.celzero.bravedns.R
@@ -69,6 +69,7 @@ import protect.Protector
 import settings.Settings
 import java.util.*
 import kotlin.collections.HashMap
+
 
 class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector, Blocker,
     OnSharedPreferenceChangeListener {
@@ -145,6 +146,10 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         var isBlocked = false
         var uid = _uid
         try {
+            if ((destIp == GoVpnAdapter.FAKE_DNS_IP && destPort == DNS_REQUEST_PORT)) {
+                return false
+            }
+
             if (VERSION.SDK_INT >= VERSION_CODES.Q) {
                 uid = connTracer.getUidQ(protocol, sourceIp, sourcePort, destIp, destPort)
             }
@@ -164,9 +169,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
             }*/
             //Cif(DEBUG) Log.i(LOG_TAG, "Thread: ${Thread.currentThread().id}, name: ${Thread.currentThread().name}, uid: $uid, ip: $sourceIp, $destIp, port: $sourcePort, $destPort, $protocol")
 
-            if ((destIp == GoVpnAdapter.FAKE_DNS_IP && destPort == DNS_REQUEST_PORT)) {
-                return false
-            }
+
 
             if (appWhiteList.containsKey(uid)) {
                 if ((destIp != GoVpnAdapter.FAKE_DNS_IP && destPort != DNS_REQUEST_PORT)) {
@@ -200,7 +203,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
             }
 
             //Check whether the screen lock is enabled and act based on it
-            if(DEBUG) Log.d(LOG_TAG,"$FILE_LOG_TAG : isScreenLockEnabled: $isScreenLocked")
+            if(DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG : isScreenLockEnabled: $isScreenLocked")
             if (isScreenLocked) {
                 //Don't include DNS and private DNS request in the list
                 // FIXME: 04-12-2020 Removed the app range check for testing.
@@ -222,9 +225,9 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                 if ((uid != -1 && uid != MISSING_UID)) {
                     var isBGBlock = true
                     if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Background blocked $uid, $destIp, before sleep: $uid, $destIp, $isBGBlock, ${System.currentTimeMillis()}")
-                    for (i in 2 downTo 1) {
+                    for (i in 3 downTo 1) {
                         if (backgroundAllowedUID.containsKey(uid)) {
-                            if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Background blocked $uid, $destIp, AccessibilityEvent: app in foreground: $uid")
+                            if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Background not blocked $uid, $destIp, AccessibilityEvent: app in foreground: $uid")
                             isBGBlock = false
                             break
                         } else {
@@ -243,7 +246,6 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                             }
                             return isBGBlock
                         }
-
                     }
                 }
             }
@@ -345,15 +347,18 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         return vpnAdapter != null
     }
 
-    fun newBuilder(): Builder? {
+    fun newBuilder(): Builder {
         var builder = Builder()
+        var alwaysOn : String ?= null
+        var lockDown = -1
+
         if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
             if (VERSION.SDK_INT >= VERSION_CODES.Q) {
                 if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG isLockDownEnabled - ${this.isLockdownEnabled}, ${this.isAlwaysOn}")
-                val alwaysOn = android.provider.Settings.Secure.getString(this.contentResolver, "always_on_vpn_app")
-                val lockDown = android.provider.Settings.Secure.getInt(contentResolver, "always_on_vpn_lockdown", 0)
+                alwaysOn = android.provider.Settings.Secure.getString(this.contentResolver, "always_on_vpn_app")
+                lockDown = android.provider.Settings.Secure.getInt(contentResolver, "always_on_vpn_lockdown", 0)
                 if (DEBUG) Log.d(LOG_TAG, "isLockDownEnabled - $lockDown , $alwaysOn")
-                if (TextUtils.isEmpty(alwaysOn) && lockDown == 0) {
+                if (alwaysOn.isNullOrEmpty() && lockDown == 0) {
                     if (PersistentState.getAllowByPass(this)) {
                         Log.d(LOG_TAG, "$FILE_LOG_TAG getAllowByPass - true")
                         builder = builder.allowBypass()
@@ -389,10 +394,25 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                         }
                     }
                 } else {
+                    /* The check for the apps to exclude from VPN or not.
+                       In case of lockdown mode, the excluded apps wont able to connected. so
+                       not including the apps in the excluded list if the lockdown mode is
+                       enabled. */
                     val excludedApps = PersistentState.getExcludedAppsFromVPN(this)
-                    excludedApps?.forEach {
-                        builder = builder.addDisallowedApplication(it)
-                        Log.d(LOG_TAG, "$FILE_LOG_TAG Excluded package - $it")
+                    if (VERSION.SDK_INT >= VERSION_CODES.Q) {
+                        if (alwaysOn.isNullOrEmpty()  && lockDown == 0) {
+                            excludedApps?.forEach {
+                                builder = builder.addDisallowedApplication(it)
+                                Log.i(LOG_TAG, "$FILE_LOG_TAG Excluded package - $it")
+                            }
+                        }else{
+                            Log.i(LOG_TAG, "$FILE_LOG_TAG lockdown mode enabled, Ignoring apps to exclude")
+                        }
+                    }else{
+                        excludedApps?.forEach {
+                            builder = builder.addDisallowedApplication(it)
+                            Log.i(LOG_TAG, "$FILE_LOG_TAG Excluded package - $it")
+                        }
                     }
                     //builder = builder.addDisallowedApplication("com.android.vending")
                     builder = builder.addDisallowedApplication(this.packageName)
@@ -435,6 +455,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         }
         return builder
     }
+
 
     override fun onCreate() {
         connTracer = ConnectionTracer(this)
@@ -508,6 +529,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         isBackgroundEnabled = PersistentState.getBackgroundEnabled(this) && Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
         privateDNSOverride = PersistentState.getAllowPrivateDNS(this)
 
+        registerAccessibilityServiceState()
         registerReceiversForScreenState()
         registerReceiverForBootComplete()
         if (vpnController != null) {
@@ -561,6 +583,17 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         return Service.START_REDELIVER_INTENT
     }
 
+    private fun registerAccessibilityServiceState() {
+        val am = getSystemService(ACCESSIBILITY_SERVICE) as AccessibilityManager
+        am.addAccessibilityStateChangeListener(AccessibilityManager.AccessibilityStateChangeListener { b ->
+            val isServiceEnabled = Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
+            if(!b || !isServiceEnabled){
+                isBackgroundEnabled = false
+                PersistentState.setBackgroundEnabled(this, false)
+            }
+        })
+    }
+
     @InternalCoroutinesApi private fun spawnServerUpdate() {
         if (vpnController != null) {
             synchronized(vpnController) {
@@ -579,7 +612,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
     }
 
     fun recordTransaction(transaction: Transaction) {
-        transaction.responseTime = SystemClock.elapsedRealtime()
+        //transaction.responseTime = SystemClock.elapsedRealtime()
         transaction.responseCalendar = Calendar.getInstance()
         // All the transactions are recorded in the DNS logs.
         getTracker()!!.recordTransaction(this, transaction)
@@ -600,7 +633,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
     }
 
     private fun getTracker(): QueryTracker? {
-        return vpnController!!.getTracker(this)
+        return vpnController!!.getTracker()
     }
 
     private fun getDNSLogTracker() : DNSLogTracker? {
@@ -768,9 +801,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                     builder = builder.setPriority(Notification.PRIORITY_MAX)
                 }
             }
-            val mainActivityIntent = PendingIntent.getActivity(this, 0,
-                Intent(this, HomeScreenActivity::class.java),
-                PendingIntent.FLAG_UPDATE_CURRENT)
+            val mainActivityIntent = PendingIntent.getActivity(this, 0, Intent(this, HomeScreenActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT)
             builder.setSmallIcon(R.drawable.dns_icon)
                 .setContentTitle(resources.getText(R.string.warning_title))
                 .setContentText(resources.getText(R.string.notification_content))
@@ -814,6 +845,8 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
 
     @InternalCoroutinesApi
     private fun restartVpn(dnsModeL: Long, firewallModeL: Long, proxyMode: Long) {
+        isBackgroundEnabled = PersistentState.getBackgroundEnabled(this) &&
+            Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
         if (vpnController != null) {
             synchronized(vpnController) {
                 Thread(Runnable {
@@ -868,6 +901,8 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
     }
 
     @WorkerThread private fun startVpn() {
+        isBackgroundEnabled = PersistentState.getBackgroundEnabled(this)
+            && Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
         kotlin.synchronized(vpnController!!) {
             /*if (vpnAdapter != null) {
                 return

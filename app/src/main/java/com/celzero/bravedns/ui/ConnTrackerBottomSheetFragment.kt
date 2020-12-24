@@ -16,8 +16,6 @@ limitations under the License.
 package com.celzero.bravedns.ui
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.ActivityManager
 import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -40,6 +38,7 @@ import android.view.Window
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SwitchCompat
+import androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.automaton.FirewallRules
@@ -73,14 +72,14 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
     //private lateinit var txtRule2: TextView
     private lateinit var txtRule3: TextView
 
+    private lateinit var appNameHeaderRL : RelativeLayout
+
     private lateinit var txtAppName: TextView
-    private lateinit var txtAppBlockDesc: TextView
     private lateinit var txtAppBlock: TextView
     private lateinit var txtConnDetails: TextView
     private lateinit var txtConnectionIP: TextView
     private lateinit var txtFlag: TextView
     private lateinit var imgAppIcon: ImageView
-    private lateinit var rulesInfoImg : ImageView
 
     private lateinit var rule1HeaderLL : LinearLayout
     private lateinit var rule1HeaderTxt : TextView
@@ -139,8 +138,9 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         txtRule3 = view.findViewById(R.id.bs_conn_block_conn_all_txt)
 
         txtAppBlock = view.findViewById(R.id.bs_conn_blocked_desc)
-        txtAppBlockDesc = view.findViewById(R.id.bs_conn_blocked_desc_2)
         txtConnDetails = view.findViewById(R.id.bs_conn_connection_details)
+
+        appNameHeaderRL = view.findViewById(R.id.bs_conn_track_app_name_header)
 
         txtConnectionIP = view.findViewById(R.id.bs_conn_connection_type_heading)
         txtFlag = view.findViewById(R.id.bs_conn_connection_flag)
@@ -152,40 +152,25 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         switchBlockConnAll = view.findViewById(R.id.bs_conn_block_conn_all_switch)
         //switchBlockConnApp = view.findViewById(R.id.bs_conn_block_conn_app_switch)
 
-        rulesInfoImg = view.findViewById(R.id.bs_conn_info_image)
-
-
         val protocol = Protocol.getProtocolName(ipDetails.protocol).name
-
-
-        //var time = Utilities.convertLongToTime(ipDetails!!.timeStamp)
 
         txtConnectionIP.text = ipDetails.ipAddress!!
         txtFlag.text = ipDetails.flag.toString()
 
         var _text = getString(R.string.bsct_block)
-        var _styledText: String = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            Html.fromHtml(_text, FROM_HTML_MODE_LEGACY).toString()
-        } else {
-            Html.fromHtml(_text).toString()
-        }
-        txtRule1.text = _styledText
-
-        _text = getString(R.string.bsct_block_app)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            _styledText = Html.fromHtml(_text, FROM_HTML_MODE_LEGACY).toString()
-        }else{
-            _styledText= Html.fromHtml(_text).toString()
+            txtRule1.text  = Html.fromHtml(_text, FROM_HTML_MODE_LEGACY)
+        } else {
+            txtRule1.text  = Html.fromHtml(_text)
         }
-        //txtRule2.text = _styledText
+
 
         _text = getString(R.string.bsct_block_all)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            _styledText = Html.fromHtml(_text, FROM_HTML_MODE_LEGACY).toString()
+            txtRule3.text = Html.fromHtml(_text, FROM_HTML_MODE_LEGACY)
         }else{
-            _styledText = Html.fromHtml(_text).toString()
+            txtRule3.text = Html.fromHtml(_text)
         }
-        txtRule3.text = _styledText
 
 
         val time = DateUtils.getRelativeTimeSpanString(ipDetails.timeStamp, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE)
@@ -194,7 +179,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
             try {
                 val appArray = contextVal.packageManager.getPackagesForUid(ipDetails.uid)
                 val appCount = (appArray?.size)?.minus(1)
-                txtAppName.text = ipDetails.appName
+                txtAppName.text = ipDetails.appName +"      ❯"
                 if (appArray?.size!! > 2) {
                     txtAppName.text = "${ipDetails.appName} + $appCount other apps"
                     //chipKillApp.text = "Kill all ${appCount?.plus(1)} apps"
@@ -248,42 +233,30 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
             }
         }
 
-        if(ipDetails.uid == 0){
-            //switchBlockApp.isEnabled = false
-            chipKillApp.visibility = View.GONE
-        }
-
         if (ipDetails.isBlocked) {
-            txtAppBlockDesc.visibility = View.VISIBLE
-            //val text = getString(R.string.bsct_conn_block_desc, time)
-           /* val styledText: Spanned = Html.fromHtml(text, FROM_HTML_MODE_LEGACY)
-            txtAppBlock.text = styledText*/
-            txtAppBlockDesc.text = ipDetails.blockedByRule
+            chipKillApp.visibility = View.VISIBLE
+            chipKillApp.text = ipDetails.blockedByRule
             _text = getString(R.string.bsct_conn_conn_desc_blocked, protocol, ipDetails.port.toString(), time)
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                _styledText = Html.fromHtml(_text, FROM_HTML_MODE_LEGACY).toString()
+                txtConnDetails.text = Html.fromHtml(_text, FROM_HTML_MODE_COMPACT)
             }else{
-                _styledText = Html.fromHtml(_text).toString()
+                txtConnDetails.text = Html.fromHtml(_text)
             }
-            txtConnDetails.text = _styledText
-            rulesInfoImg.visibility = View.VISIBLE
+            //chipKillApp.visibility = View.VISIBLE
             //txtConnDetails.visibility = View.GONE
         } else {
             _text = getString(R.string.bsct_conn_conn_desc_allowed,  protocol, ipDetails.port.toString(), time)
-            txtAppBlockDesc.visibility = View.GONE
+            chipKillApp.visibility = View.GONE
             if(ipDetails.blockedByRule.equals(BraveVPNService.BlockedRuleNames.RULE7.ruleName)){
-                txtAppBlockDesc.visibility = View.VISIBLE
-                txtAppBlockDesc.text = "Whitelisted"
+                chipKillApp.visibility = View.VISIBLE
+                chipKillApp.text = "Whitelisted"
             }
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                _styledText = Html.fromHtml(_text, FROM_HTML_MODE_LEGACY).toString()
+                txtConnDetails.text = Html.fromHtml(_text, FROM_HTML_MODE_LEGACY)
             }else{
-                _styledText = Html.fromHtml(_text).toString()
+                txtConnDetails.text = Html.fromHtml(_text)
             }
-            txtConnDetails.text = _styledText
-            //val text = getString(R.string.bsct_conn_unblock_desc, time)
-           /* txtAppBlock.text = text*/
-            rulesInfoImg.visibility = View.GONE
+            //chipKillApp.visibility = View.GONE
         }
 
         if (ipDetails.appName != "Unknown") {
@@ -292,7 +265,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
             switchBlockApp.isChecked = PersistentState.getBlockUnknownConnections(contextVal)
         }
 
-        rulesInfoImg.setOnClickListener{
+        chipKillApp.setOnClickListener{
             showDialogForInfo()
         }
 
@@ -313,75 +286,22 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
             switchBlockConnAll.isChecked = isRuleUniversal
         }
 
-        /*switchBlockConnApp.setOnCheckedChangeListener(null)
-        switchBlockConnApp.setOnClickListener {
-            var allApps = false
-            val appUIDList = appInfoRepository.getAppListForUID(ipDetails.uid)
-            if (appUIDList.size > 1) {
-                var title = "Adding rules for \"${ipDetails.appName}\" will also include these ${appUIDList.size} other apps"
-                var positiveText = "Apply rule"
-                if (isRuleBlocked) {
-                    title = "Removing rules for \"${ipDetails.appName}\" will also remove rules for these ${appUIDList.size} other apps"
-                }
-                allApps = showDialog(appUIDList, ipDetails.appName!!, title, positiveText)
-                if (allApps) {
-                    if (isRuleBlocked) {
-                        firewallRules.removeFirewallRules(ipDetails.uid, connRules.ipAddress, BraveVPNService.BlockedRuleNames.RULE2.ruleName, contextVal)
-                        isRuleBlocked = false
-                    } else {
-                        firewallRules.addFirewallRules(ipDetails.uid, connRules.ipAddress, BraveVPNService.BlockedRuleNames.RULE2.ruleName, contextVal)
-                        isRuleBlocked = true
-                    }
-                }
-                switchBlockConnApp.isChecked = isRuleBlocked
-            } else {
-                if (isRuleBlocked) {
-                    firewallRules.removeFirewallRules(ipDetails.uid, connRules.ipAddress, BraveVPNService.BlockedRuleNames.RULE2.ruleName, contextVal)
-                    isRuleBlocked = false
-                } else {
-                    firewallRules.addFirewallRules(ipDetails.uid, connRules.ipAddress, BraveVPNService.BlockedRuleNames.RULE2.ruleName, contextVal)
-                    isRuleBlocked = true
-                }
-                switchBlockConnApp.isChecked = isRuleBlocked
-            }
-        }*/
 
-        chipKillApp.setOnClickListener {
+        appNameHeaderRL.setOnClickListener {
             try {
                 val appUIDList = appInfoRepository.getAppListForUID(ipDetails.uid)
                 if (appUIDList.size == 1) {
-                    val activityManager: ActivityManager = contextVal.getSystemService(Activity.ACTIVITY_SERVICE) as ActivityManager
                     val mDb = AppDatabase.invoke(contextVal.applicationContext)
                     val appInfoRepository = mDb.appInfoRepository()
-                    if (ipDetails.appName != null || ipDetails.appName!!.equals("Unknown")) {
+                    if (ipDetails.appName != null || ipDetails.appName!! == "Unknown") {
                         val packageName = appInfoRepository.getPackageNameForAppName(ipDetails.appName!!)
                         appInfoForPackage(packageName)
-                        /*val packageName = appInfoRepository.getPackageNameForAppName(ipDetails.appName!!)
-                        activityManager.killBackgroundProcesses(packageName)
-                        Toast.makeText(contextVal, "${ipDetails.appName} app killed.", Toast.LENGTH_SHORT).show()
-                        if (DEBUG) Log.d(LOG_TAG, "App kill - $packageName")*/
                     } else {
                         Utilities.showToastInMidLayout(contextVal, "App Info not available", Toast.LENGTH_SHORT)
                     }
-                }/*else if(appUIDList.size == 2){
-                    appUIDList.forEach{
-                        val activityManager: ActivityManager = contextVal.getSystemService(Activity.ACTIVITY_SERVICE) as ActivityManager
-                        val mDb = AppDatabase.invoke(contextVal.applicationContext)
-                        val appInfoRepository = mDb.appInfoRepository()
-                        if (it.appName != null || it.appName == "Unknown") {
-                            activityManager.killBackgroundProcesses(it.packageInfo)
-                            Toast.makeText(contextVal, "${it.appName} app killed.", Toast.LENGTH_SHORT).show()
-                            if (DEBUG) Log.d(LOG_TAG, "App kill - $it.packageInfo")
-                        } else {
-                            Toast.makeText(contextVal, "Can't able to kill the app", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }*/
-
-                else {
+                } else {
                     Utilities.showToastInMidLayout(contextVal, "App Info not available", Toast.LENGTH_SHORT)
                 }
-                //mDb.close()
             } catch (e: java.lang.Exception) {
                 Utilities.showToastInMidLayout(contextVal, "App Info not available", Toast.LENGTH_SHORT)
             }
@@ -393,10 +313,6 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
     }
 
     private fun appInfoForPackage(packageName: String) {
-        val activityManager: ActivityManager =
-            contextVal.getSystemService(Activity.ACTIVITY_SERVICE) as ActivityManager
-        activityManager.killBackgroundProcesses(packageName)
-
         try {
             //Open the specific App Info page:
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)

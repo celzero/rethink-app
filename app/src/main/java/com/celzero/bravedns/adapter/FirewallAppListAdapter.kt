@@ -366,7 +366,7 @@ class FirewallAppListAdapter internal constructor(
         } else {
             appCountTV.text = numberOfApps.toString() + "/" + numberOfApps.toString() + " apps blocked"
         }*/
-        appCountTV.text = "${listTitle.numOfAppsBlocked} blocked, ${listTitle.numOfAppWhitelisted} whitelisted, ${listTitle.numOfAppsExcluded} excluded"
+        appCountTV.text = "${listTitle.numOfAppsBlocked} blocked, ${listTitle.numOfAppWhitelisted} whitelisted, ${listTitle.numOfAppsExcluded} excluded."
         //appCountTV.text = "Blocked: ${listTitle.numOfAppsBlocked}, Whitelisted: ${listTitle.numOfAppWhitelisted},\nExcluded: ${listTitle.numOfAppsExcluded}, Total Apps: ${listTitle.numberOFApps} "
 
         val list = dataList[listTitle]

@@ -23,6 +23,7 @@ import android.net.ConnectivityManager
 import android.os.Build
 import android.os.RemoteException
 import android.telephony.TelephonyManager
+import androidx.core.content.getSystemService
 
 
 @TargetApi(Build.VERSION_CODES.M)
@@ -102,8 +103,7 @@ class NetworkStatsHelper {
         }
 
     fun getPackageRxBytesMobile(context: Context): Long {
-        var networkStats: NetworkStats? = null
-        networkStats = try {
+        var networkStats: NetworkStats = try {
             networkStatsManager.queryDetailsForUid(
                 ConnectivityManager.TYPE_MOBILE,
                 getSubscriberId(context, ConnectivityManager.TYPE_MOBILE),
@@ -125,8 +125,7 @@ class NetworkStatsHelper {
     }
 
     fun getPackageTxBytesMobile(context: Context): Long {
-        var networkStats: NetworkStats? = null
-        networkStats = try {
+        var networkStats: NetworkStats = try {
             networkStatsManager.queryDetailsForUid(
                 ConnectivityManager.TYPE_MOBILE,
                 getSubscriberId(context, ConnectivityManager.TYPE_MOBILE),
@@ -149,8 +148,7 @@ class NetworkStatsHelper {
 
     val packageRxBytesWifi: Long
         get() {
-            var networkStats: NetworkStats? = null
-            networkStats = try {
+            var networkStats: NetworkStats = try {
                 networkStatsManager.queryDetailsForUid(
                     ConnectivityManager.TYPE_WIFI,
                     "",
@@ -173,8 +171,7 @@ class NetworkStatsHelper {
 
     val packageTxBytesWifi: Long
         get() {
-            var networkStats: NetworkStats? = null
-            networkStats = try {
+            var networkStats: NetworkStats = try {
                 networkStatsManager.queryDetailsForUid(
                     ConnectivityManager.TYPE_WIFI,
                     "",
@@ -200,8 +197,7 @@ class NetworkStatsHelper {
 
     private fun getSubscriberId(context: Context, networkType: Int): String {
         if (ConnectivityManager.TYPE_MOBILE == networkType) {
-            val tm =
-                context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+            val tm = context.getSystemService<TelephonyManager>() ?: return ""
             return tm.subscriberId
         }
         return ""
