@@ -529,7 +529,7 @@ class SettingsFragment : Fragment() {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.d(LOG_TAG, "onFailure -  ${call.isCanceled}, ${call.isExecuted}")
+                Log.d(LOG_TAG, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
                 activity?.runOnUiThread {
                     configureBlockListBtn.visibility = View.GONE
                     onDeviceLastUpdatedTime.visibility = View.GONE
@@ -544,7 +544,7 @@ class SettingsFragment : Fragment() {
 
             override fun onResponse(call: Call, response: Response) {
                 try {
-                    val stringResponse = response.body()!!.string()
+                    val stringResponse = response.body!!.string()
                     //creating json object
                     val jsonObject = JSONObject(stringResponse)
                     val version = jsonObject.getInt("version")
@@ -579,8 +579,8 @@ class SettingsFragment : Fragment() {
                             }
                         }
                     }
-                    response.body()!!.close()
-                    client.connectionPool().evictAll()
+                    response.body!!.close()
+                    client.connectionPool.evictAll()
                 } catch (e: java.lang.Exception) {
                     Log.w(LOG_TAG,"Exception while downloading: ${e.message}",e)
                     configureBlockListBtn.visibility = View.GONE
