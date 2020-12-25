@@ -357,7 +357,7 @@ class HomeScreenActivity : AppCompatActivity() {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.d(LOG_TAG, "onFailure -  ${call.isCanceled}, ${call.isExecuted}")
+                Log.d(LOG_TAG, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
                 (context as HomeScreenActivity).runOnUiThread {
                     if (isUserInitiatedUpdateCheck) {
                         showDownloadDialog(false, getString(R.string.download_update_dialog_failure_title), getString(R.string.download_update_dialog_failure_message))
@@ -368,7 +368,7 @@ class HomeScreenActivity : AppCompatActivity() {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val stringResponse = response.body()!!.string()
+                val stringResponse = response.body!!.string()
                 //creating json object
                 val jsonObject = JSONObject(stringResponse)
                 val responseVersion = jsonObject.getInt("version")
@@ -391,7 +391,7 @@ class HomeScreenActivity : AppCompatActivity() {
                     }
                 }
                 response.close()
-                client.connectionPool().evictAll()
+                client.connectionPool.evictAll()
             }
         })
     }
@@ -404,11 +404,11 @@ class HomeScreenActivity : AppCompatActivity() {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.d(LOG_TAG, "onFailure -  ${call.isCanceled}, ${call.isExecuted}")
+                Log.d(LOG_TAG, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val stringResponse = response.body()!!.string()
+                val stringResponse = response.body!!.string()
                 //creating json object
                 val jsonObject = JSONObject(stringResponse)
                 val responseVersion = jsonObject.getInt("version")
@@ -431,8 +431,8 @@ class HomeScreenActivity : AppCompatActivity() {
                         }
                     }
                 }
-                response.body()!!.close()
-                client.connectionPool().evictAll()
+                response.body!!.close()
+                client.connectionPool.evictAll()
             }
         })
     }
