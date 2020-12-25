@@ -41,6 +41,7 @@ import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.ThrowingHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -162,11 +163,7 @@ class ExcludedAppListAdapter(val context: Context) : PagedListAdapter<AppInfo, E
 
         private fun showDialog(packageList: List<AppInfo>, appName: String, isInternet: Boolean): Boolean {
             //Change the handler logic into some other
-            val handler: Handler = object : Handler() {
-                override fun handleMessage(mesg: Message) {
-                    throw RuntimeException()
-                }
-            }
+            val handler: Handler = ThrowingHandler()
             var positiveTxt = ""
             val packageNameList: List<String> = packageList.map { it.appName }
             var proceedBlocking: Boolean = false
