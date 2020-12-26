@@ -27,7 +27,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.celzero.bravedns.R
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.isUserInitiatedUpdateCheck
 
 
 class AboutFragment : Fragment(), View.OnClickListener {
@@ -98,7 +97,7 @@ class AboutFragment : Fragment(), View.OnClickListener {
                 startActivity(intent)
             }
             view == blogTxt -> {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://brave.imprint.to/"))
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://blog.rethinkdns.com/"))
                 startActivity(intent)
             }
             view == faqTxt -> {
@@ -127,8 +126,7 @@ class AboutFragment : Fragment(), View.OnClickListener {
                 startActivity(intent)
             }
             view == appUpdateTxt ->{
-                isUserInitiatedUpdateCheck = true
-                (requireContext() as HomeScreenActivity).checkForAppUpdate()
+                (requireContext() as HomeScreenActivity).checkForAppUpdate(true)
             }
             view == whatsNewTxt ->{
                 showNewFeaturesDialog()

@@ -133,7 +133,6 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
             recyclerView!!.setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
             recyclerView!!.layoutManager = layoutManager
-
             recyclerAdapter = DNSQueryAdapter(requireContext())
             viewModel.dnsLogsList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(recyclerAdapter!!::submitList))
             recyclerView!!.adapter = recyclerAdapter
@@ -197,7 +196,9 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
             currentDNSStatus.text = resources.getString(R.string.configure_dns_connection_name) + " "+ proxyDetails?.proxyName
             //recyclerHeadingLL.visibility = View.GONE
             recyclerView?.visibility = View.GONE
-            noLogsTxt.visibility = View.VISIBLE
+            if(PersistentState.isLogsEnabled(requireContext())) {
+                noLogsTxt.visibility = View.VISIBLE
+            }
         }
     }
 

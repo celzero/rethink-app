@@ -120,8 +120,6 @@ class AppMode internal constructor(
             }else{
                 if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "getDOHDetails -appMode- DoH endpoint - ${dohEndpoint.dohURL}")
             }
-        }else{
-            throw Exception()
         }
         //mDb.close()
         return dohEndpoint

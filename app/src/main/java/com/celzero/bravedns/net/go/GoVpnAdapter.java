@@ -172,13 +172,11 @@ public class GoVpnAdapter {
                 HomeScreenActivity.GlobalVariable.INSTANCE.setAppMode(appMode);
                 appMode = HomeScreenActivity.GlobalVariable.INSTANCE.getAppMode();
             }
-            String dohURL = null;
+            String dohURL = "https://free.bravedns.com/dns-query";
             try{
                 dohURL = appMode.getDOHDetails().getDohURL();
             }catch(Exception e){
-                Utilities.Companion.showToastInMidLayout(vpnService,vpnService.getString(R.string.vpn_start_error_doh_url),Toast.LENGTH_SHORT);
                 Log.w(LOG_TAG,"GoVPNAdapter appMode.getDOHDetails() is null:" +e.getMessage() ,e);
-                return;
             }
 
             Log.i(LOG_TAG,"GoVPNAdapter DoHURL - "+dohURL);
@@ -491,8 +489,9 @@ public class GoVpnAdapter {
         //PersistantState persistentState  = new PersistantState();
         //VpnController vpnController = new VpnController();
         //TODO : Check the below code
-        String dohIPs = getIpString(vpnService, url);
-        return Tun2socks.newDoHTransport(url, dohIPs, getProtector(), listener);
+        @NonNull String realUrl = PersistentState.Companion.expandUrl(vpnService, url);
+        String dohIPs = getIpString(vpnService, realUrl);
+        return Tun2socks.newDoHTransport(realUrl, dohIPs, getProtector(), listener);
     }
 
     /**
@@ -528,13 +527,11 @@ public class GoVpnAdapter {
         if (configuredAppMode == null) {
             HomeScreenActivity.GlobalVariable.INSTANCE.setAppMode(appMode);
         }
-        String dohURL;
+        String dohURL = "https://free.bravedns.com/dns-query";
         try {
             dohURL = appMode.getDOHDetails().getDohURL();
         } catch (Exception e) {
-            Utilities.Companion.showToastInMidLayout(vpnService, vpnService.getString(R.string.vpn_start_error_doh_url), Toast.LENGTH_SHORT);
             Log.e(LOG_TAG, "GoVPNAdapter dohURL is null", e);
-            return;
         }
         Log.d(LOG_TAG,"GoVPNAdapter DoHURL - "+dohURL);
         try {

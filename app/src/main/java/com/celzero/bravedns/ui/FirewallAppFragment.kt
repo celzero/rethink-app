@@ -30,6 +30,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.observe
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallAppListAdapter
 import com.celzero.bravedns.database.AppInfo
@@ -237,12 +238,12 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
 
 
     private fun observersForUI() {
-        categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, {
+        categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner) {
             titleList = it.toMutableList()
-        })
+        }
 
-        firewallAppInfoViewModel.firewallAppDetailsList.observe(viewLifecycleOwner, { itAppInfo ->
-            isSearchEnabled  = false
+        firewallAppInfoViewModel.firewallAppDetailsList.observe(viewLifecycleOwner) { itAppInfo ->
+            isSearchEnabled = false
             val list = itAppInfo!!
             titleList = categoryInfoRepository.getAppCategoryList().toMutableList()
             val iterator = titleList!!.iterator()
@@ -267,8 +268,8 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
                 loadingProgressBar.visibility = View.VISIBLE
                 firewallExpandableList!!.visibility = View.GONE
             }
-            isSearchEnabled  = true
-        })
+            isSearchEnabled = true
+        }
 
 
     }

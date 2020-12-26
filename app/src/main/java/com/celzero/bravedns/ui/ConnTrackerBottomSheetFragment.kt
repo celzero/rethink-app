@@ -178,17 +178,18 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
                 val appArray = contextVal.packageManager.getPackagesForUid(ipDetails.uid)
                 val appCount = (appArray?.size)?.minus(1)
                 txtAppName.text = ipDetails.appName +"      ❯"
-                if (appArray?.size!! > 2) {
-                    txtAppName.text = "${ipDetails.appName} + $appCount other apps"
-                    //chipKillApp.text = "Kill all ${appCount?.plus(1)} apps"
-                    chipKillApp.visibility = View.GONE
-                } else if (appArray.size == 2) {
-                    txtAppName.text = "${ipDetails.appName} + $appCount other app"
-                    //chipKillApp.text = "Kill ${appCount?.plus(1)} apps"
-                    chipKillApp.visibility = View.GONE
+                if(appArray != null) {
+                    if (appArray?.size!! > 2) {
+                        txtAppName.text = "${ipDetails.appName} + $appCount other apps"
+                        //chipKillApp.text = "Kill all ${appCount?.plus(1)} apps"
+                        chipKillApp.visibility = View.GONE
+                    } else if (appArray.size == 2) {
+                        txtAppName.text = "${ipDetails.appName} + $appCount other app"
+                        //chipKillApp.text = "Kill ${appCount?.plus(1)} apps"
+                        chipKillApp.visibility = View.GONE
+                    }
+                    imgAppIcon.setImageDrawable(contextVal.packageManager.getApplicationIcon(appArray[0]!!))
                 }
-
-                imgAppIcon.setImageDrawable(contextVal.packageManager.getApplicationIcon(appArray[0]!!))
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "Package Not Found - " + e.message, e)
             }
@@ -324,38 +325,42 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
     private fun firewallApp(isBlocked: Boolean) {
         var blockAllApps = false
         val appUIDList = appInfoRepository.getAppListForUID(ipDetails.uid)
-        if(appUIDList[0].whiteListUniv1){
-            Utilities.showToastInMidLayout(contextVal, getString(R.string.bsct_firewall_not_available_whitelist), Toast.LENGTH_SHORT)
-            switchBlockApp.isChecked = false
-            return
-        }else if(appUIDList[0].isExcluded){
-            Utilities.showToastInMidLayout(contextVal, getString(R.string.bsct_firewall_not_available_excluded), Toast.LENGTH_SHORT)
-            switchBlockApp.isChecked = false
-            return
-        }
-        if (appUIDList.size > 1) {
-            var title = "Blocking \"${ipDetails.appName}\" will also block these ${appUIDList.size} other apps"
-            var positiveText = "Block ${appUIDList.size} apps"
-            if (isBlocked) {
-                title = "Unblocking \"${ipDetails.appName}\" will also unblock these ${appUIDList.size} other apps"
-                positiveText = "Unblock ${appUIDList.size} apps"
+        if(!appUIDList.isNullOrEmpty()) {
+            if (appUIDList[0].whiteListUniv1) {
+                Utilities.showToastInMidLayout(contextVal, getString(R.string.bsct_firewall_not_available_whitelist), Toast.LENGTH_SHORT)
+                switchBlockApp.isChecked = false
+                return
+            } else if (appUIDList[0].isExcluded) {
+                Utilities.showToastInMidLayout(contextVal, getString(R.string.bsct_firewall_not_available_excluded), Toast.LENGTH_SHORT)
+                switchBlockApp.isChecked = false
+                return
             }
-            blockAllApps = showDialog(appUIDList, ipDetails.appName!!, title, positiveText)
-        }
-        if (appUIDList.size <= 1 || blockAllApps) {
-            val uid = ipDetails.uid
-            CoroutineScope(Dispatchers.IO).launch {
-                appUIDList.forEach {
-                    PersistentState.setExcludedPackagesWifi(it.packageInfo, isBlocked, contextVal)
-                    FirewallManager.updateAppInternetPermission(it.packageInfo, isBlocked)
-                    FirewallManager.updateAppInternetPermissionByUID(it.uid, isBlocked)
-                    categoryInfoRepository.updateNumberOfBlocked(it.appCategory, !isBlocked)
+            if (appUIDList.size > 1) {
+                var title = "Blocking \"${ipDetails.appName}\" will also block these ${appUIDList.size} other apps"
+                var positiveText = "Block ${appUIDList.size} apps"
+                if (isBlocked) {
+                    title = "Unblocking \"${ipDetails.appName}\" will also unblock these ${appUIDList.size} other apps"
+                    positiveText = "Unblock ${appUIDList.size} apps"
+                }
+                blockAllApps = showDialog(appUIDList, ipDetails.appName!!, title, positiveText)
+            }
+            if (appUIDList.size <= 1 || blockAllApps) {
+                val uid = ipDetails.uid
+                CoroutineScope(Dispatchers.IO).launch {
+                    appUIDList.forEach {
+                        PersistentState.setExcludedPackagesWifi(it.packageInfo, isBlocked, contextVal)
+                        FirewallManager.updateAppInternetPermission(it.packageInfo, isBlocked)
+                        FirewallManager.updateAppInternetPermissionByUID(it.uid, isBlocked)
+                        categoryInfoRepository.updateNumberOfBlocked(it.appCategory, !isBlocked)
                     if(DEBUG) Log.d(LOG_TAG,"Category block executed with blocked as $isBlocked")
                 }
                 appInfoRepository.updateInternetForuid(uid, isBlocked)
             }
         } else {
-            switchBlockApp.isChecked = isBlocked
+            switchBlockApp.isChecked = isBlocked}
+        }else{
+            Utilities.showToastInMidLayout(contextVal, getString(R.string.firewall_app_info_not_available), Toast.LENGTH_SHORT)
+            switchBlockApp.isChecked = false
         }
     }
 
