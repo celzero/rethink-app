@@ -369,7 +369,7 @@ class HomeScreenActivity : AppCompatActivity() {
 
             override fun onResponse(call: Call, response: Response) {
                 try {
-                    val stringResponse = response.body()!!.string()
+                    val stringResponse = response.body!!.string()
                     //creating json object
                     val jsonObject = JSONObject(stringResponse)
                     val responseVersion = jsonObject.getInt("version")
@@ -391,7 +391,7 @@ class HomeScreenActivity : AppCompatActivity() {
                         }
                     }
                     response.close()
-                    client.connectionPool().evictAll()
+                    client.connectionPool.evictAll()
                 } catch (e: Exception) {
                     if (isUserInitiatedUpdateCheck) {
                         showDownloadDialog(false, getString(R.string.download_update_dialog_failure_title), getString(R.string.download_update_dialog_failure_message))
@@ -413,7 +413,7 @@ class HomeScreenActivity : AppCompatActivity() {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val stringResponse = response.body()!!.string()
+                val stringResponse = response.body!!.string()
                 //creating json object
                 try {
                     val jsonObject = JSONObject(stringResponse)
@@ -440,8 +440,8 @@ class HomeScreenActivity : AppCompatActivity() {
                 } catch (e: Exception) {
                     Log.w(LOG_TAG,"HomeScreenActivity- Exception while fetching blocklist update",e)
                 }
-                response.body()!!.close()
-                client.connectionPool().evictAll()
+                response.body!!.close()
+                client.connectionPool.evictAll()
             }
         })
     }
