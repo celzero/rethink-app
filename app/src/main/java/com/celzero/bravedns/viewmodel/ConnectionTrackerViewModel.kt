@@ -51,17 +51,17 @@ class ConnectionTrackerViewModel : ViewModel() {
     var connectionTrackerList = Transformations.switchMap<String, PagedList<ConnectionTracker>>(
                 filteredList, (Function<String, LiveData<PagedList<ConnectionTracker>>> { input ->
                     if (input.isBlank()) {
-                        connectionTrackerDAO.getConnectionTrackerLiveData().toLiveData(pageSize = 25)
+                        connectionTrackerDAO.getConnectionTrackerLiveData().toLiveData(pageSize = 20)
                     } else if(input.contains("isFilter")){
                         val searchText = input.split(":")[0]
                         if(DEBUG) Log.d(LOG_TAG, "Filter option - Function - $searchText, $input")
                         if(searchText.isEmpty()){
-                            connectionTrackerDAO.getConnectionBlockedConnections().toLiveData(pageSize = 25)
+                            connectionTrackerDAO.getConnectionBlockedConnections().toLiveData(pageSize = 20)
                         }else {
-                            connectionTrackerDAO.getConnectionBlockedConnectionsByName("%$searchText%").toLiveData(pageSize = 25)
+                            connectionTrackerDAO.getConnectionBlockedConnectionsByName("%$searchText%").toLiveData(pageSize = 20)
                         }
                     }else {
-                        connectionTrackerDAO.getConnectionTrackerByName("%$input%").toLiveData(25)
+                        connectionTrackerDAO.getConnectionTrackerByName("%$input%").toLiveData(20)
                     }
                 } as Function<String, LiveData<PagedList<ConnectionTracker>>>)
 

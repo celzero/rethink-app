@@ -63,6 +63,7 @@ class DNSDetailActivity : AppCompatActivity() {
                 0 -> getString(R.string.dns_act_log)
                 else -> getString(R.string.dns_act_configure_tab)
             }
+            viewPagerDNS.setCurrentItem(tab.position, true)
         }.attach()
 
         val recyclerViewField = ViewPager2::class.java.getDeclaredField("mRecyclerView")

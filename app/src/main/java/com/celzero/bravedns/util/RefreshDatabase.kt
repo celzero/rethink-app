@@ -52,10 +52,12 @@ class RefreshDatabase(var context: Context) {
                             val packageName = context.packageManager.getPackageInfo(it.packageInfo, PackageManager.GET_META_DATA)
                             if (packageName.applicationInfo == null) {
                                 appInfoRepository.delete(it)
+                                updateCategoryInDB()
                             }
                         } catch (e: Exception) {
                             Log.e(LOG_TAG, "Application not available ${it.appName}" + e.message, e)
                             appInfoRepository.delete(it)
+                            updateCategoryInDB()
                         }
                     }
                 }
@@ -74,30 +76,20 @@ class RefreshDatabase(var context: Context) {
             val appDetailsFromDB = appInfoRepository.getAppInfoAsync()
             val nonAppsCount = appInfoRepository.getNonAppCount()
             val isRootAvailable = insertRootAndroid(appInfoRepository)
-            if (appDetailsFromDB.isEmpty() || (appDetailsFromDB.size-nonAppsCount) != allPackages.size-1  || isRootAvailable) {
+            if (appDetailsFromDB.isEmpty() || ((appDetailsFromDB.size-nonAppsCount) != (allPackages.size - 1))  || isRootAvailable) {
                 allPackages.forEach {
                     if (it.applicationInfo.packageName != context.applicationContext.packageName) {
                         val applicationInfo: ApplicationInfo = it.applicationInfo
                         val appInfo = AppInfo()
                         appInfo.appName = context.packageManager.getApplicationLabel(applicationInfo).toString()
-
-                        //ApplicationInfo.getCategoryTitle(context, applicationInfo.category)
                         appInfo.packageInfo = applicationInfo.packageName
                         appInfo.uid = applicationInfo.uid
                         val dbAppInfo = appInfoRepository.getAppInfoForPackageName(appInfo.packageInfo)
                         if (dbAppInfo != null) {
+                            HomeScreenActivity.GlobalVariable.appList[applicationInfo.packageName] = dbAppInfo
                             return@forEach
-                            /*appInfo.isDataEnabled = dbAppInfo.isDataEnabled
-                            appInfo.isWifiEnabled = dbAppInfo.isWifiEnabled
-                            appInfo.isScreenOff = dbAppInfo.isScreenOff
-                            appInfo.isBackgroundEnabled = dbAppInfo.isBackgroundEnabled
-                            appInfo.whiteListUniv2 = dbAppInfo.whiteListUniv2
-                            appInfo.mobileDataUsed = dbAppInfo.mobileDataUsed
-                            appInfo.trackers = dbAppInfo.trackers
-                            appInfo.isExcluded = dbAppInfo.isExcluded
-                            appInfo.wifiDataUsed = dbAppInfo.wifiDataUsed
-                            appInfo.whiteListUniv1 = dbAppInfo.whiteListUniv1*/
                         }else{
+                            if(DEBUG) Log.d(LOG_TAG,"Refresh Database, AppInfo - new package found ${appInfo.appName} will be inserted")
                             appInfo.isDataEnabled = true
                             appInfo.isWifiEnabled = true
                             appInfo.isScreenOff = false

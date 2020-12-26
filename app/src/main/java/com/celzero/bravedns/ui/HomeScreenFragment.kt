@@ -16,8 +16,6 @@ limitations under the License.
 package com.celzero.bravedns.ui
 
 
-import android.animation.ArgbEvaluator
-import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
@@ -41,10 +39,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
@@ -80,6 +79,8 @@ import java.util.*
 
 class HomeScreenFragment : Fragment() {
 
+    private lateinit var layoutHeaderView : TextView
+    private lateinit var layoutHeaderViewDesc : TextView
 
     private lateinit var appManagerLL: LinearLayout
 
@@ -91,13 +92,10 @@ class HomeScreenFragment : Fragment() {
     private lateinit var tileShowDnsLL: LinearLayout
     private lateinit var tileShowDnsFirewallLL: LinearLayout
 
-    private lateinit var noOfAppsTV: TextView
-
     private lateinit var braveModeSpinner: AppCompatSpinner
     private lateinit var braveModeInfoIcon: ImageView
 
     private lateinit var dnsOnOffBtn: AppCompatButton
-    //private lateinit var rippleRRLayout: RippleBackground
 
     private lateinit var tileDLifetimeQueriesTxt: TextView
     private lateinit var tileDmedianTxt: TextView
@@ -115,7 +113,7 @@ class HomeScreenFragment : Fragment() {
 
     private lateinit var chipConfigureFirewall: AppCompatButton
     private lateinit var chipViewLogs: AppCompatButton
-    private lateinit var btmSheetIcon : AppCompatImageView
+    private lateinit var btmSheetIcon : Button
     private lateinit var chipNetworkMonitor : Chip
     private lateinit var chipSettings : Chip
 
@@ -134,6 +132,7 @@ class HomeScreenFragment : Fragment() {
         const val DNS_MODE = 0
         const val FIREWALL_MODE = 1
         const val DNS_FIREWALL_MODE = 2
+        private const val GREETING_CHANNEL_ID = 2021
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -148,9 +147,44 @@ class HomeScreenFragment : Fragment() {
         //updateTime()
         updateUptime()
         registerForBroadCastReceivers()
+
+        checkForHeaderUpdate()
+
         return view
     }
 
+    /**
+    *   Function to show the new year wishes to the user,
+    *   As of now the function will check for new year time and
+    *   will turn the text heading and description.
+     */
+    private fun checkForHeaderUpdate() {
+        val currentTime = Calendar.getInstance()
+        val timeToMatch = Calendar.getInstance()
+        val timeToOverride = Calendar.getInstance()
+
+        timeToMatch[Calendar.HOUR_OF_DAY] = 17
+        timeToMatch[Calendar.MINUTE] = 55
+        timeToMatch[Calendar.SECOND] = 0
+        timeToMatch[Calendar.DAY_OF_MONTH] = 26
+        timeToMatch[Calendar.MONTH] = 11
+        timeToMatch[Calendar.YEAR] = 2020
+
+        timeToOverride[Calendar.HOUR_OF_DAY] = 18
+        timeToOverride[Calendar.MINUTE] = 55
+        timeToOverride[Calendar.SECOND] = 59
+        timeToOverride[Calendar.DAY_OF_MONTH] = 26
+        timeToOverride[Calendar.MONTH] = 11
+        timeToOverride[Calendar.YEAR] = 2020
+        if(DEBUG) Log.d(LOG_TAG, "NewYearAlarm : ${currentTime.time}, ${timeToMatch.time}, ${timeToOverride.time} ")
+        if(currentTime > timeToMatch && currentTime < timeToOverride ){
+            layoutHeaderView.text = getString(R.string.new_year)
+            layoutHeaderViewDesc.text = getString(R.string.new_year_desc)
+        }else{
+            layoutHeaderView.text = getString(R.string.app_name).toLowerCase(Locale.ROOT)
+            layoutHeaderViewDesc.text = getString(R.string.backed_by_mozilla)
+        }
+    }
 
     /*
         Registering the broadcast receiver for the DNS State and the DNS results returned
@@ -194,6 +228,10 @@ class HomeScreenFragment : Fragment() {
 
 
     private fun initView(view: View) {
+
+        layoutHeaderView = view.findViewById(R.id.fhs_title_rethink)
+        layoutHeaderViewDesc = view.findViewById(R.id.fhs_title_rethink_desc)
+
         //Complete UI component initialization for the view
         dnsOnOffBtn = view.findViewById(R.id.fhs_dns_on_off_btn)
 
@@ -214,7 +252,6 @@ class HomeScreenFragment : Fragment() {
         appManagerLL = view.findViewById(R.id.fhs_ll_app_mgr)
 
         firewallLL = view.findViewById(R.id.fhs_ll_firewall)
-        noOfAppsTV = view.findViewById(R.id.tv_app_installed)
 
         tileShowFirewallLL = view.findViewById(R.id.fhs_tile_show_firewall)
         tileShowDnsLL = view.findViewById(R.id.fhs_tile_show_dns)
@@ -305,7 +342,9 @@ class HomeScreenFragment : Fragment() {
         }
 
         btmSheetIcon.setOnClickListener{
+            btmSheetIcon.isEnabled = false
             openBottomSheet()
+            Handler().postDelayed({ btmSheetIcon.isEnabled = true }, 500)
             //startBottomSheetForSettings()
         }
 
@@ -528,7 +567,50 @@ class HomeScreenFragment : Fragment() {
 
     //https://stackoverflow.com/questions/2614545/animate-change-of-view-background-color-on-android/14467625#14467625
     private fun enableBraveModeIcons() {
-        val colorFrom = ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark)
+
+
+
+        val fadeOut: Animation = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_out)
+        //chipViewLogs.startAnimation(fadeOut)
+        val fadeIn: Animation = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in)
+        //chipViewLogs.startAnimation(fadeIn)
+
+        /*fadeOut.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation?) {}
+            override fun onAnimationEnd(animation: Animation?) {
+
+            }
+
+            override fun onAnimationRepeat(animation: Animation?) {}
+        })*/
+
+
+        if (braveMode == DNS_MODE) {
+            chipViewLogs.startAnimation(fadeOut)
+            chipViewLogs.setBackgroundResource(R.drawable.rounded_corners_button_primary)
+            chipViewLogs.startAnimation(fadeIn)
+            chipConfigureFirewall.startAnimation(fadeOut)
+            chipConfigureFirewall.setBackgroundResource(R.drawable.rounded_corners_button_accent)
+            chipConfigureFirewall.startAnimation(fadeIn)
+        } else if (braveMode == FIREWALL_MODE) {
+            chipViewLogs.startAnimation(fadeOut)
+            chipViewLogs.setBackgroundResource(R.drawable.rounded_corners_button_accent)
+            chipViewLogs.startAnimation(fadeIn)
+            chipConfigureFirewall.startAnimation(fadeOut)
+            chipConfigureFirewall.setBackgroundResource(R.drawable.rounded_corners_button_primary)
+            chipConfigureFirewall.startAnimation(fadeIn)
+        } else if (braveMode == DNS_FIREWALL_MODE) {
+            chipViewLogs.startAnimation(fadeOut)
+            chipViewLogs.setBackgroundResource(R.drawable.rounded_corners_button_primary)
+            chipViewLogs.startAnimation(fadeIn)
+
+            chipConfigureFirewall.startAnimation(fadeOut)
+            chipConfigureFirewall.setBackgroundResource(R.drawable.rounded_corners_button_primary)
+            chipConfigureFirewall.startAnimation(fadeIn)
+        }
+
+
+       /* val colorFrom = ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark)
         val colorTo =  ContextCompat.getColor(requireContext(), R.color.button_background)
         val colorAnimationEnable = ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, colorTo)
         val colorAnimationDisable = ValueAnimator.ofObject(ArgbEvaluator(), colorTo, colorFrom)
@@ -537,30 +619,39 @@ class HomeScreenFragment : Fragment() {
         if(braveMode == DNS_MODE){
             colorAnimationEnable.addUpdateListener { animator -> chipViewLogs.setBackgroundColor(animator.animatedValue as Int) }
             colorAnimationDisable.addUpdateListener { animator -> chipConfigureFirewall.setBackgroundColor(animator.animatedValue as Int) }
-            //chipViewLogs.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.button_background_tint)
             colorAnimationEnable.start()
             colorAnimationDisable.start()
         }else if(braveMode == FIREWALL_MODE){
             colorAnimationEnable.addUpdateListener { animator -> chipConfigureFirewall.setBackgroundColor(animator.animatedValue as Int) }
             colorAnimationDisable.addUpdateListener { animator -> chipViewLogs.setBackgroundColor(animator.animatedValue as Int) }
-            //chipConfigureFirewall.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.button_background_tint)
             colorAnimationEnable.start()
             colorAnimationDisable.start()
         }else if(braveMode == DNS_FIREWALL_MODE){
             colorAnimationEnable.addUpdateListener { animator -> chipViewLogs.setBackgroundColor(animator.animatedValue as Int) }
             colorAnimationEnable.addUpdateListener { animator -> chipConfigureFirewall.setBackgroundColor(animator.animatedValue as Int) }
             colorAnimationEnable.start()
-        }
+        }*/
     }
 
     private fun disableBraveModeIcon() {
-        val colorFrom = ContextCompat.getColor(requireContext(), R.color.button_background)
+        val fadeOut: Animation = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_out)
+        //chipViewLogs.startAnimation(fadeOut)
+        val fadeIn: Animation = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in)
+        chipViewLogs.startAnimation(fadeOut)
+        chipViewLogs.setBackgroundResource(R.drawable.rounded_corners_button_accent)
+        chipViewLogs.startAnimation(fadeIn)
+
+        chipConfigureFirewall.startAnimation(fadeOut)
+        chipConfigureFirewall.setBackgroundResource(R.drawable.rounded_corners_button_accent)
+        chipConfigureFirewall.startAnimation(fadeIn)
+
+       /* val colorFrom = ContextCompat.getColor(requireContext(), R.color.button_background)
         val colorTo = ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark)
         val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, colorTo)
         colorAnimation.duration = 250 // milliseconds
         colorAnimation.addUpdateListener { animator -> chipViewLogs.setBackgroundColor(animator.animatedValue as Int) }
         colorAnimation.addUpdateListener { animator -> chipConfigureFirewall.setBackgroundColor(animator.animatedValue as Int) }
-        colorAnimation.start()
+        colorAnimation.start()*/
     }
 
 
@@ -711,7 +802,7 @@ class HomeScreenFragment : Fragment() {
         if (hasVpnService()) {
             if (prepareVpnService()) {
                 dnsOnOffBtn.setText("stop")
-                dnsOnOffBtn.setBackgroundResource(R.color.colorPrimaryDark)
+                dnsOnOffBtn.setBackgroundResource(R.drawable.rounded_corners_button_accent)
                 updateUIForStart()
                 //rippleRRLayout.stopRippleAnimation()
                 startDnsVpnService()
@@ -810,8 +901,8 @@ class HomeScreenFragment : Fragment() {
 
         if (status!!.activationRequested || status.connectionState == BraveVPNService.State.WORKING) {
             //rippleRRLayout.stopRippleAnimation()
-            dnsOnOffBtn.setBackgroundResource(R.color.colorPrimaryDark)
-            btmSheetIcon.setBackgroundResource(R.color.colorPrimaryDark)
+            dnsOnOffBtn.setBackgroundResource(R.drawable.rounded_corners_button_accent)
+            //btmSheetIcon.setBackgroundResource(R.color.colorPrimaryDark)
             dnsOnOffBtn.text = "stop"
             //shimmerContainer.stopShimmer()
             //updateUIForStart()
@@ -823,8 +914,8 @@ class HomeScreenFragment : Fragment() {
                 protectionDescTxt.text = getString(R.string.dns_explanation_connected)
         } else {
             //rippleRRLayout.startRippleAnimation()
-            dnsOnOffBtn.setBackgroundResource(R.color.button_background)
-            btmSheetIcon.setBackgroundResource(R.color.button_background)
+            dnsOnOffBtn.setBackgroundResource(R.drawable.rounded_corners_button_primary)
+            //btmSheetIcon.setBackgroundResource(R.color.button_background)
             updateUIForStop()
             dnsOnOffBtn.text = "start"
             protectionDescTxt.text = getString(R.string.dns_explanation_disconnected)
