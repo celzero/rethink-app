@@ -27,11 +27,11 @@ import com.celzero.bravedns.automaton.PermissionsManager.Rules
 
 class DatabaseHandler(context: Context)  : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION){
     companion object {
-        private val DATABASE_VERSION = 1
-        private val DATABASE_NAME = "GZERO"
-        private val TABLE_PERMISSION_MANAGER = "PermissionManagerMapping"
-        private val KEY_PACKAGE_NAME = "package_name"
-        private val KEY_PACKAGE_RULE = "package_rule"
+        private const val DATABASE_VERSION = 1
+        private const val DATABASE_NAME = "GZERO"
+        private const val TABLE_PERMISSION_MANAGER = "PermissionManagerMapping"
+        private const val KEY_PACKAGE_NAME = "package_name"
+        private const val KEY_PACKAGE_RULE = "package_rule"
     }
 
 
@@ -83,11 +83,11 @@ class DatabaseHandler(context: Context)  : SQLiteOpenHelper(context, DATABASE_NA
                 packageName = cursor.getString(cursor.getColumnIndex("package_name"))
                 packageRule  = cursor.getInt(cursor.getColumnIndex("package_rule"))
                 if(packageRule  == 0)
-                    packageList.put(packageName,Rules.NONE)
+                    packageList[packageName] = Rules.NONE
                 else if(packageRule == 1)
-                    packageList.put(packageName,Rules.BG_REMOVE)
+                    packageList[packageName] = Rules.BG_REMOVE
                 else
-                    packageList.put(packageName,Rules.BG_REMOVE_FG_ADD)
+                    packageList[packageName] = Rules.BG_REMOVE_FG_ADD
             } while (cursor.moveToNext())
         }
         cursor?.close()
@@ -96,8 +96,8 @@ class DatabaseHandler(context: Context)  : SQLiteOpenHelper(context, DATABASE_NA
 
 
     fun getSpecificPackageRule(packageName : String ):Int{
-        var packageRule : Int
-        val selectQuery = "SELECT  * FROM $TABLE_PERMISSION_MANAGER where $KEY_PACKAGE_NAME = '$packageName'";
+        val packageRule : Int
+        val selectQuery = "SELECT  * FROM $TABLE_PERMISSION_MANAGER where $KEY_PACKAGE_NAME = '$packageName'"
         val db = this.readableDatabase
         var cursor: Cursor? = null
         try{
@@ -124,11 +124,11 @@ class DatabaseHandler(context: Context)  : SQLiteOpenHelper(context, DATABASE_NA
         contentValues.put(KEY_PACKAGE_RULE,packageRule )
 
         if(packageRule  == 0)
-            PermissionsManager.packageRules.put(packageName,Rules.NONE)
+            PermissionsManager.packageRules[packageName] = Rules.NONE
         else if(packageRule == 1)
-            PermissionsManager.packageRules.put(packageName,Rules.BG_REMOVE)
+            PermissionsManager.packageRules[packageName] = Rules.BG_REMOVE
         else if(packageRule == 2){
-            PermissionsManager.packageRules.put(packageName,Rules.BG_REMOVE_FG_ADD)
+            PermissionsManager.packageRules[packageName] = Rules.BG_REMOVE_FG_ADD
         }
 
 
@@ -154,11 +154,11 @@ class DatabaseHandler(context: Context)  : SQLiteOpenHelper(context, DATABASE_NA
         contentValues.put(KEY_PACKAGE_RULE,packageRule  )
 
         if(packageRule  == 0)
-            PermissionsManager.packageRules.put(packageName,Rules.NONE)
+            PermissionsManager.packageRules[packageName] = Rules.NONE
         else if(packageRule == 1)
-            PermissionsManager.packageRules.put(packageName,Rules.BG_REMOVE)
+            PermissionsManager.packageRules[packageName] = Rules.BG_REMOVE
         else if(packageRule == 2){
-            PermissionsManager.packageRules.put(packageName,Rules.BG_REMOVE_FG_ADD)
+            PermissionsManager.packageRules[packageName] = Rules.BG_REMOVE_FG_ADD
         }
 
 

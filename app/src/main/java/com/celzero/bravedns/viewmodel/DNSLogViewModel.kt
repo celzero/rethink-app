@@ -17,15 +17,11 @@ package com.celzero.bravedns.viewmodel
 
 import android.content.Context
 import android.util.Log
-import androidx.arch.core.util.Function
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.AppDatabase
-import com.celzero.bravedns.database.DNSLogs
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 
@@ -48,25 +44,26 @@ class DNSLogViewModel : ViewModel() {
         filteredList.value = ""
     }
 
-    var dnsLogsList = Transformations.switchMap<String, PagedList<DNSLogs>>(
-                filteredList, (Function<String, LiveData<PagedList<DNSLogs>>> { input ->
-                    if (input.isBlank()) {
-                        dnsLogDAO.getDNSLogsLiveData().toLiveData(pageSize = 25)
-                    } else if(input.contains("isFilter")){
-                        val searchString = input.split(":")[0]
-                        if(DEBUG) Log.d(LOG_TAG,"DNS logs filter : $input, $searchString")
-                        if(searchString.isEmpty()) {
-                            dnsLogDAO.getBlockedDNSLogsLiveData().toLiveData(pageSize = 25)
-                        }else{
-                            dnsLogDAO.getBlockedDNSLogsLiveDataByName("%$searchString%").toLiveData(pageSize = 25)
-                        }
-                    }else {
-                        if(DEBUG) Log.d(LOG_TAG,"DNS logs filter : $input")
-                        dnsLogDAO.getDNSLogsByQueryLiveData("%$input%").toLiveData(25)
-                    }
-                } as Function<String, LiveData<PagedList<DNSLogs>>>)
+    var dnsLogsList = Transformations.switchMap(
+                filteredList
 
-            )
+    ) { input ->
+        if (input.isBlank()) {
+            dnsLogDAO.getDNSLogsLiveData().toLiveData(pageSize = 25)
+        } else if (input.contains("isFilter")) {
+            val searchString = input.split(":")[0]
+            if (DEBUG) Log.d(LOG_TAG, "DNS logs filter : $input, $searchString")
+            if (searchString.isEmpty()) {
+                dnsLogDAO.getBlockedDNSLogsLiveData().toLiveData(pageSize = 25)
+            } else {
+                dnsLogDAO.getBlockedDNSLogsLiveDataByName("%$searchString%")
+                    .toLiveData(pageSize = 25)
+            }
+        } else {
+            if (DEBUG) Log.d(LOG_TAG, "DNS logs filter : $input")
+            dnsLogDAO.getDNSLogsByQueryLiveData("%$input%").toLiveData(25)
+        }
+    }
 
     fun setFilter(searchString: String?, filter : String ) {
         filteredList.value = "$searchString$filter"

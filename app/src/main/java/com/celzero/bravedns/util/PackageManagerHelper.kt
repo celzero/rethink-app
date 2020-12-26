@@ -31,7 +31,7 @@ object PackageManagerHelper {
         return true
     }
 
-    fun getPackageUid(context: Context, packageName: String?): Int {
+    fun getPackageUid(context: Context, packageName: String): Int {
         val packageManager: PackageManager = context.getPackageManager()
         var uid = -1
         try {

@@ -37,7 +37,7 @@ class DNSBottomSheetBlockAdapter(val context: Context, val data: List<String>) :
     }
 
     private fun getItem(position: Int): String? {
-        return data.get(position)
+        return data[position]
     }
 
 

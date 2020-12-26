@@ -41,7 +41,6 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ExcludedAppListAdapter
 import com.celzero.bravedns.database.AppDatabase
@@ -228,7 +227,7 @@ class SettingsFragment : Fragment() {
             dnsSettingsHeading.visibility = View.GONE
         }
 
-        localDownloadComplete.observe(viewLifecycleOwner, Observer {
+        localDownloadComplete.observe(viewLifecycleOwner, {
             if (it == 1) {
                 if(DEBUG) Log.d(LOG_TAG, "Observer log")
                 downloadInProgress = 1
@@ -244,7 +243,7 @@ class SettingsFragment : Fragment() {
             }
         })
 
-        HomeScreenActivity.GlobalVariable.braveModeToggler.observe(viewLifecycleOwner, Observer {
+        HomeScreenActivity.GlobalVariable.braveModeToggler.observe(viewLifecycleOwner, {
             if (HomeScreenActivity.GlobalVariable.braveMode == HomeScreenFragment.DNS_MODE) {
                 //disableDNSRelatedUI()
             } else if (HomeScreenActivity.GlobalVariable.braveMode == HomeScreenFragment.FIREWALL_MODE) {
@@ -270,9 +269,9 @@ class SettingsFragment : Fragment() {
             val sock5Proxy = proxyEndpointRepository.getConnectedProxy()
             if (sock5Proxy?.proxyAppName != "Nobody") {
                 val appName = appList[sock5Proxy?.proxyAppName]?.appName
-                socks5DescText.text = "Forwarding to ${sock5Proxy!!.proxyIP}:${sock5Proxy!!.proxyPort}, $appName"
+                socks5DescText.text = "Forwarding to ${sock5Proxy!!.proxyIP}:${sock5Proxy.proxyPort}, $appName"
             } else {
-                socks5DescText.text = "Forwarding to ${sock5Proxy!!.proxyIP}:${sock5Proxy!!.proxyPort}, Nobody"
+                socks5DescText.text = "Forwarding to ${sock5Proxy.proxyIP}:${sock5Proxy.proxyPort}, Nobody"
             }
         }
         socks5Progress.visibility = View.GONE
@@ -301,7 +300,7 @@ class SettingsFragment : Fragment() {
         val appInfoRepository = mDb.appInfoRepository()
         val appCount = appList.size
         val act: HomeScreenActivity = requireContext() as HomeScreenActivity
-        appInfoRepository.getExcludedAppListCountLiveData().observe(act, Observer {
+        appInfoRepository.getExcludedAppListCountLiveData().observe(act, {
             excludeListCountText.text = "$it/$appCount apps excluded."
         })
 
@@ -529,7 +528,7 @@ class SettingsFragment : Fragment() {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.d(LOG_TAG, "onFailure -  ${call.isCanceled}, ${call.isExecuted}")
+                Log.d(LOG_TAG, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
                 activity?.runOnUiThread {
                     configureBlockListBtn.visibility = View.GONE
                     onDeviceLastUpdatedTime.visibility = View.GONE
@@ -544,7 +543,7 @@ class SettingsFragment : Fragment() {
 
             override fun onResponse(call: Call, response: Response) {
                 try {
-                    val stringResponse = response.body()!!.string()
+                    val stringResponse = response.body!!.string()
                     //creating json object
                     val jsonObject = JSONObject(stringResponse)
                     val version = jsonObject.getInt("version")
@@ -579,8 +578,8 @@ class SettingsFragment : Fragment() {
                             }
                         }
                     }
-                    response.body()!!.close()
-                    client.connectionPool().evictAll()
+                    response.body!!.close()
+                    client.connectionPool.evictAll()
                 } catch (e: java.lang.Exception) {
                     Log.w(LOG_TAG,"Exception while downloading: ${e.message}",e)
                     configureBlockListBtn.visibility = View.GONE
@@ -1000,7 +999,7 @@ class SettingsFragment : Fragment() {
             userNameEditText.setText(sock5Proxy.userName.toString(), TextView.BufferType.EDITABLE)
             if (sock5Proxy.proxyAppName?.isNotEmpty()!! && sock5Proxy.proxyAppName != "Nobody") {
                 val packageName = sock5Proxy.proxyAppName
-                val app = HomeScreenActivity.GlobalVariable.appList[packageName]
+                val app = appList[packageName]
                 var position = 0
                 for ((i, item) in appNames.withIndex()) {
                     if (item == app?.appName) {
@@ -1058,7 +1057,7 @@ class SettingsFragment : Fragment() {
                 errorTxt.setText("Invalid port")
                 isValid = false
             }
-            Log.d(LOG_TAG, "Pattern not matching - port- $port , ${portEditText.text.toString()}")
+            Log.d(LOG_TAG, "Pattern not matching - port- $port , ${portEditText.text}")
             if (udpBlockCheckBox.isChecked) {
                 isUDPBlock = true
             }

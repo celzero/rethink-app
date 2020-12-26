@@ -50,10 +50,6 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
         }
     }
 
-    init {
-
-    }
-
    /* override fun getItemCount(): Int {
         return (transactions.size)
     }*/

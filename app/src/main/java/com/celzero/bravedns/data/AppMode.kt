@@ -137,9 +137,8 @@ class AppMode(val context: Context) {
     fun getDNSCryptServerCount() : Int{
         val mDb = AppDatabase.invoke(context.applicationContext)
         val dnsCryptEndpointRepository = mDb.dnsCryptEndpointsRepository()
-        val count = dnsCryptEndpointRepository.getConnectedCount()
         //mDb.close()
-        return count
+        return dnsCryptEndpointRepository.getConnectedCount()
     }
 
     fun getDNSCryptServerToRemove(): String {

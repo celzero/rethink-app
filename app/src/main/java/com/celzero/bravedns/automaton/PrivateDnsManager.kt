@@ -73,7 +73,7 @@ class PrivateDnsManager(private val accessibilityService: MyAccessibilityService
 
             nextState = AutoState.RADIO_CLICK
 
-            var prov: List<AccessibilityNodeInfo>
+            val prov: List<AccessibilityNodeInfo>
             if (MyAccessibilityService.isSetPrivateDnsMode()) {
                 prov = event.source.findAccessibilityNodeInfosByViewId(privateDnsModeProviderViewId)
             } else {

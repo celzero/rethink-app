@@ -26,7 +26,6 @@ import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.appcompat.widget.SearchView
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
@@ -67,7 +66,7 @@ class WhitelistAppDialog(var activity: Context, internal var adapter: RecyclerVi
         window?.setLayout(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT
-        );
+        )
 
         recyclerView = recycler_view_dialog
         mLayoutManager = LinearLayoutManager(activity)
@@ -87,16 +86,16 @@ class WhitelistAppDialog(var activity: Context, internal var adapter: RecyclerVi
         searchView.setOnSearchClickListener(this)
         filterCategories.clear()
 
-        searchView.setOnCloseListener(SearchView.OnCloseListener {
+        searchView.setOnCloseListener {
             showCategoryChips()
             false
-        })
+        }
 
         val mDb = AppDatabase.invoke(context.applicationContext)
         val appInfoRepository = mDb.appInfoRepository()
         val appCount = appList.size
         val act : FirewallActivity = activity as FirewallActivity
-        appInfoRepository.getWhitelistCountLiveData().observe(act, Observer {
+        appInfoRepository.getWhitelistCountLiveData().observe(act, {
             countAppsSelectedText.text = "$it/$appCount apps whitelisted"
         })
 
@@ -207,7 +206,7 @@ class WhitelistAppDialog(var activity: Context, internal var adapter: RecyclerVi
             mChip.text = category
 
             mChip.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
-                var categoryName = compoundButton.text.toString()
+                val categoryName = compoundButton.text.toString()
                 if (b) {
                     filterCategories.add(categoryName)
                 } else {
@@ -220,7 +219,7 @@ class WhitelistAppDialog(var activity: Context, internal var adapter: RecyclerVi
                 } else {
                    var catTitle = ""
                    filterCategories.forEach {
-                       catTitle = it + "," + catTitle
+                       catTitle = "$it,$catTitle"
                    }
                    if (catTitle.length > 1) {
                        catTitle.substring(0, catTitle.length - 1)

@@ -52,7 +52,7 @@ public class RippleBackground extends RelativeLayout {
     private AnimatorSet animatorSet;
     private ArrayList<Animator> animatorList;
     private LayoutParams rippleParams;
-    private ArrayList<RippleView> rippleViewList=new ArrayList<RippleView>();
+    private final ArrayList<RippleView> rippleViewList=new ArrayList<RippleView>();
 
     public RippleBackground(Context context) {
         super(context);

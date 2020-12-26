@@ -88,9 +88,9 @@
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:layout_margin="5dp"
-                            android:gravity="right"
+                            android:gravity="end"
                             android:src="@android:drawable/ic_menu_view"
-                            android:layout_marginLeft="15dp"
+                            android:layout_marginStart="15dp"
                             android:layout_alignParentEnd="true"/>
 
                     </RelativeLayout>

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -279,9 +278,9 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:lineSpacingExtra="5dp"
-                    android:paddingLeft="30dp"
+                    android:paddingStart="30dp"
                     android:paddingTop="25dp"
-                    android:paddingRight="20dp"
+                    android:paddingEnd="20dp"
                     android:text="@string/settings_connection_tracker_explanation_text"
                     android:textColor="@color/primaryText" />
 
