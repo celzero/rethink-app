@@ -16,15 +16,11 @@ limitations under the License.
 package com.celzero.bravedns.viewmodel
 
 import android.content.Context
-import androidx.arch.core.util.Function
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.AppDatabase
-import com.celzero.bravedns.database.DNSCryptEndpoint
 
 class DNSCryptEndpointViewModel : ViewModel() {
 
@@ -44,15 +40,16 @@ class DNSCryptEndpointViewModel : ViewModel() {
         filteredList.value = ""
     }
 
-    var dnsCryptEndpointList = Transformations.switchMap<String, PagedList<DNSCryptEndpoint>>(
-                filteredList, (Function<String, LiveData<PagedList<DNSCryptEndpoint>>> { input ->
-            if (input.isBlank()) {
-                dnsCryptEndpointDAO.getDNSCryptEndpointLiveData().toLiveData(pageSize = 50)
-            } else {
-                dnsCryptEndpointDAO.getDNSCryptEndpointLiveDataByName("%$input%").toLiveData(pageSize = 50)
-            }
-        } as androidx.arch.core.util.Function<String, LiveData<PagedList<DNSCryptEndpoint>>>)
-    )
+    var dnsCryptEndpointList = Transformations.switchMap(
+                filteredList
+    ) { input ->
+        if (input.isBlank()) {
+            dnsCryptEndpointDAO.getDNSCryptEndpointLiveData().toLiveData(pageSize = 50)
+        } else {
+            dnsCryptEndpointDAO.getDNSCryptEndpointLiveDataByName("%$input%")
+                .toLiveData(pageSize = 50)
+        }
+    }
 
     fun setFilter(filter: String?) {
         filteredList.value = filter

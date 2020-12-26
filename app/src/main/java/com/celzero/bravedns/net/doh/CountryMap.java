@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -93,6 +94,6 @@ public class CountryMap {
     }
     int position = low * recordSize + key.length;
     byte[] countryCode = Arrays.copyOfRange(db, position, position + COUNTRY_SIZE);
-    return new String(countryCode, Charset.forName("UTF-8"));
+    return new String(countryCode, StandardCharsets.UTF_8);
   }
 }

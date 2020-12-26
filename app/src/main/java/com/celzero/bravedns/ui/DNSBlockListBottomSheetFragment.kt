@@ -83,7 +83,7 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
         //latencyTxt.text = "Latency: "+transaction.latency
         latencyTxt.visibility = View.GONE
         latencyChipTxt.text = transaction.latency.toString() +"ms"
-        if(!transaction.serverIP.isNullOrEmpty()) {
+        if(transaction.serverIP.isNotEmpty()) {
             resolverTxt.visibility = View.VISIBLE
             resolverTxt.text = "Resolver (${transaction.serverIP})"
             resolverTxt.visibility = View.GONE
@@ -94,7 +94,7 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
         if(transaction.isBlocked){
             blockedDescTxt.text = "blocked $upTime by ${transaction.serverIP}"
         }else{
-            if(!transaction.serverIP.isNullOrEmpty() && !transaction.relayIP.isNullOrEmpty()) {
+            if(transaction.serverIP.isNotEmpty() && transaction.relayIP.isNotEmpty()) {
                 var styledText= ""
                 val text = "resolved <u>anonymously</u> $upTime by ${transaction.serverIP}"
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -103,7 +103,7 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
                     styledText = Html.fromHtml(text).toString()
                 }
                 blockedDescTxt.text = styledText
-            }else if(!transaction.serverIP.isNullOrEmpty()){
+            }else if(transaction.serverIP.isNotEmpty()){
                 blockedDescTxt.text = "resolved $upTime by ${transaction.serverIP}"
             }
             else{
@@ -114,7 +114,7 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
             dnsBlockContainerRL.visibility = View.GONE
             placeHolderTxt.visibility = View.VISIBLE
         }else{
-            if(transaction.serverIP.isNullOrEmpty()){
+            if(transaction.serverIP.isEmpty()){
                 blockedDescTxt.text = getString(R.string.bsct_conn_block_desc, upTime, " on device")
             }else{
                 blockedDescTxt.text = getString(R.string.bsct_conn_block_desc, upTime," by ${transaction.serverIP}")

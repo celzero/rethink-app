@@ -17,7 +17,6 @@
             android:id="@+id/connection_card_view_top"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_marginStart="2dp"
             android:layout_marginEnd="2dp"
             android:background="@color/light"
@@ -112,8 +111,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.75"
                 android:fontFamily="sans-serif"
-                android:gravity="right"
-                android:paddingRight="3dp"
+                android:gravity="end"
+                android:paddingEnd="3dp"
                 android:text="Latency"
                 android:textSize="@dimen/default_font_text_view"
                 android:textColor="@color/secondaryText" />
@@ -124,7 +123,7 @@
                 android:layout_gravity="center"
                 android:layout_weight="0.5"
                 android:fontFamily="sans-serif"
-                android:gravity="right"
+                android:gravity="end"
                 android:text="Time"
                 android:textSize="@dimen/default_font_text_view"
                 android:textColor="@color/secondaryText" />

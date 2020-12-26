@@ -192,7 +192,7 @@ class HomeScreenActivity : AppCompatActivity() {
                     PersistentState.setDownloadSource(context, Constants.DOWNLOAD_SOURCE_PLAY_STORE)
                 } else {
                     // App was installed from somewhere else
-                    PersistentState.setDownloadSource(context, Constants.DOWNLOAD_SOURCE_OTHERS)
+                    PersistentState.setDownloadSource(context, DOWNLOAD_SOURCE_OTHERS)
                 }
             } catch (e: PackageManager.NameNotFoundException) {
                 e.printStackTrace()

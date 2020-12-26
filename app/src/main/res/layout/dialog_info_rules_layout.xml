@@ -26,12 +26,12 @@
             style="@style/Widget.AppCompat.TextView.SpinnerItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableStart="@drawable/spinner_firewall"
             android:drawablePadding="20dp"
             android:padding="10dp"
             android:text="@string/firewall_rules"
             android:textSize="@dimen/heading_font_text_view"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            app:drawableStartCompat="@drawable/spinner_firewall" />
 
         <TextView
             android:id="@+id/info_rules_dialog_rules_desc"
@@ -51,12 +51,12 @@
             style="@style/Widget.AppCompat.TextView.SpinnerItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableStart="@drawable/spinner_both"
             android:drawablePadding="20dp"
             android:padding="10dp"
             android:text="@string/hybrid_mode_info_title"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            android:visibility="gone" />
+            android:visibility="gone"
+            app:drawableStartCompat="@drawable/spinner_both" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

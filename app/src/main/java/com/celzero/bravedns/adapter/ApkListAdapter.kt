@@ -87,7 +87,7 @@ class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) 
         println("1 apkList Filtered : "+ apkListFiltered.size)
         charText = charText.toLowerCase(Locale.getDefault())
         apkList.clear()
-        if (charText.length == 0) {
+        if (charText.isEmpty()) {
             println("apkList Filtered : "+ apkListFiltered.size)
             apkList.addAll(apkListFiltered)
         } else {
@@ -128,7 +128,7 @@ class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) 
                     pos++
                 }
 
-                val bottomSheetFragment = BottomSheetFragment(context,apkList.get(adapterPosition))
+                val bottomSheetFragment = BottomSheetFragment(context, apkList[adapterPosition])
                 val frag = context as FragmentActivity
                 bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
 
