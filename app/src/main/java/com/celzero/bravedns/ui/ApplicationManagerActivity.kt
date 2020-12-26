@@ -46,6 +46,10 @@ import org.koin.android.ext.android.inject
 
 class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextListener{
 
+    private lateinit var recycle : RecyclerView
+    private lateinit var itemAdapter: ItemAdapter<ApplicationManagerApk>
+    private lateinit var fastAdapter: FastAdapter<ApplicationManagerApk>
+    private val apkList = ArrayList<ApplicationManagerApk>()
     private lateinit var fabAddIcon : FloatingActionButton
     private lateinit var fabUninstallIcon : FloatingActionButton
     private lateinit var fabAppInfoIcon : FloatingActionButton
@@ -67,8 +71,6 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
     }
 
     private fun initView() {
-
-        context = this
         recycle = findViewById(R.id.application_manager_recycler_view)
         recycle.layoutManager = LinearLayoutManager(this)
 
@@ -115,41 +117,6 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
         }
     }
 
-
-    companion object{
-        private lateinit var recycle : RecyclerView
-        lateinit var itemAdapter: ItemAdapter<ApplicationManagerApk>
-        private lateinit var fastAdapter: FastAdapter<ApplicationManagerApk>
-        private lateinit var context : Context
-        private val apkList = ArrayList<ApplicationManagerApk>()
-        fun updateUI(packageName : String, isAdded : Boolean){
-            fastAdapter = FastAdapter.with(itemAdapter)
-            if(isAdded){
-                val packageInfo = context.packageManager.getPackageInfo(packageName,0)
-                if(packageInfo.packageName != BuildConfig.APPLICATION_ID ) {
-                    val userApk =  ApplicationManagerApk(packageInfo, "", context)
-                    apkList.add(userApk)
-                }
-            }else{
-                var apkDetail : ApplicationManagerApk? = null
-                apkList.forEach {
-                    if(it.packageName.equals(packageName)) {
-                        apkDetail = it
-                    }
-                }
-                if(apkDetail != null) {
-                    //Log.d(LOG_TAG,"apkDetail Removed  :-" + packageName)
-                    apkList.remove(apkDetail!!)
-                }
-            }
-            itemAdapter.clear()
-            recycle.adapter = fastAdapter
-            itemAdapter.add(apkList)
-            fastAdapter.notifyAdapterDataSetChanged()
-            fastAdapter.notifyDataSetChanged()
-        }
-    }
-
     private fun uninstallPackage(app : ApplicationManagerApk){
         val packageURI = Uri.parse("package:"+app.packageName)
         val intent = Intent(Intent.ACTION_DELETE,packageURI)
@@ -158,7 +125,7 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
     }
 
     private fun appInfoForPackage(packageName : String){
-        val activityManager : ActivityManager = context.getSystemService(Activity.ACTIVITY_SERVICE) as ActivityManager
+        val activityManager : ActivityManager = getSystemService(Activity.ACTIVITY_SERVICE) as ActivityManager
         activityManager.killBackgroundProcesses(packageName)
 
         try {
@@ -179,7 +146,7 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
         appList.forEach{
             val packageInfo = packageManager.getPackageInfo(it.packageInfo,0)
             if(packageInfo.packageName != BuildConfig.APPLICATION_ID ) {
-                val userApk =  ApplicationManagerApk(packageManager.getPackageInfo(it.packageInfo, 0), it.appCategory, context)
+                val userApk =  ApplicationManagerApk(packageManager.getPackageInfo(it.packageInfo, 0), it.appCategory, this@ApplicationManagerActivity)
                 apkList.add(userApk)
             }
         }
