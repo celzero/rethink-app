@@ -26,20 +26,11 @@ import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.DNSCryptRelayEndpoint
+import com.celzero.bravedns.database.DNSCryptRelayEndpointDAO
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 
-class DNSCryptRelayEndpointViewModel : ViewModel() {
-
-    companion object{
-        lateinit var contextVal : Context
-        fun setContext(context: Context){
-            this.contextVal = context
-        }
-    }
-
-    private val mDb = AppDatabase.invoke(contextVal.applicationContext)
-    private val dnsCryptRelayEndpointDAO = mDb.dnsCryptRelayEndpointDAO()
+class DNSCryptRelayEndpointViewModel(private val dnsCryptRelayEndpointDAO: DNSCryptRelayEndpointDAO) : ViewModel() {
 
     private var filteredList : MutableLiveData<String> = MutableLiveData()
 

@@ -19,6 +19,7 @@ package com.celzero.bravedns.service
 import android.content.Context
 import android.util.Log
 import com.celzero.bravedns.database.AppDatabase
+import com.celzero.bravedns.database.DNSLogRepository
 import com.celzero.bravedns.database.DNSLogs
 import com.celzero.bravedns.net.dns.DnsPacket
 import com.celzero.bravedns.net.doh.Transaction
@@ -39,28 +40,17 @@ import java.net.InetAddress
 import java.net.ProtocolException
 import java.net.UnknownHostException
 
-class DNSLogTracker(var context: Context?) {
-
-    var mDb : AppDatabase ?= null
-
-   private fun getDBInstance(context: Context): AppDatabase? {
-       if(mDb == null) {
-           mDb = AppDatabase.invoke(context.applicationContext)
-       }
-       return mDb
-   }
+class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRepository, private val context: Context) {
 
     @Synchronized
-    fun recordTransaction(context: Context?, transaction: Transaction?) {
-        if (context != null && transaction != null) {
-            insertToDB(context, transaction)
+    fun recordTransaction(transaction: Transaction?) {
+        if (transaction != null) {
+            insertToDB(transaction)
         }
     }
 
-    private fun insertToDB(context: Context, transaction: Transaction) {
+    private fun insertToDB(transaction: Transaction) {
         GlobalScope.launch(Dispatchers.IO) {
-            val mDb = getDBInstance(context)
-            val dnsLogRepository = mDb!!.dnsLogRepository()
             val dnsLogs = DNSLogs()
 
             dnsLogs.blockLists = transaction.blockList
@@ -152,8 +142,4 @@ class DNSLogTracker(var context: Context?) {
             dnsLogRepository.insertAsync(dnsLogs)
         }
     }
-
-
-
-
 }

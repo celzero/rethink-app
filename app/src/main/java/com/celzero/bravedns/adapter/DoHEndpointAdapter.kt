@@ -52,13 +52,9 @@ import settings.Settings
 import xdns.Xdns.getBlocklistStampFromURL
 
 
-class DoHEndpointAdapter(val context: Context, val listener: UIUpdateInterface) : PagedListAdapter<DoHEndpoint, DoHEndpointAdapter.DoHEndpointViewHolder>(DIFF_CALLBACK) {
-    var mDb: AppDatabase = AppDatabase.invoke(context.applicationContext)
-    var doHEndpointRepository: DoHEndpointRepository
-
-    init {
-        doHEndpointRepository = mDb.doHEndpointsRepository()
-    }
+class DoHEndpointAdapter(private val context: Context,
+                         private val doHEndpointRepository: DoHEndpointRepository,
+                         val listener: UIUpdateInterface) : PagedListAdapter<DoHEndpoint, DoHEndpointAdapter.DoHEndpointViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK = object :
@@ -164,8 +160,6 @@ class DoHEndpointAdapter(val context: Context, val listener: UIUpdateInterface) 
 
         private fun updateConnection(doHEndpoint: DoHEndpoint) {
             if(DEBUG) Log.d(LOG_TAG, "updateConnection - ${doHEndpoint.dohName}, ${doHEndpoint.dohURL}")
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val doHEndpointRepository = mDb.doHEndpointsRepository()
             doHEndpoint.dohURL = doHEndpointRepository.getConnectionURL(doHEndpoint.id)
             if (doHEndpoint.dohName == RETHINK_DNS_PLUS) {
                 var stamp = ""
@@ -283,8 +277,6 @@ class DoHEndpointAdapter(val context: Context, val listener: UIUpdateInterface) 
         }
 
         private fun updateDoHDetails(doHEndpoint: DoHEndpoint) {
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val doHEndpointRepository = mDb.doHEndpointsRepository()
             doHEndpoint.isSelected = true
             doHEndpointRepository.removeConnectionStatus()
             doHEndpointRepository.updateAsync(doHEndpoint)

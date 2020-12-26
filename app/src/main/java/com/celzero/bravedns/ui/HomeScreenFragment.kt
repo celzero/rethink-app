@@ -56,6 +56,8 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.SpinnerArrayAdapter
 import com.celzero.bravedns.data.BraveMode
 import com.celzero.bravedns.database.AppDatabase
+import com.celzero.bravedns.database.AppInfoRepository
+import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.service.*
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
@@ -72,6 +74,7 @@ import com.celzero.bravedns.util.Utilities
 import com.facebook.shimmer.Shimmer
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.chip.Chip
+import org.koin.android.ext.android.inject
 import settings.Settings
 import java.net.NetworkInterface
 import java.net.SocketException
@@ -128,6 +131,9 @@ class HomeScreenFragment : Fragment() {
     private val MAIN_CHANNEL_ID = "vpn"
 
     private var REQUEST_CODE_PREPARE_VPN: Int = 100
+
+    private val categoryInfoRepository by inject<CategoryInfoRepository>()
+    private val appInfoRepository by inject<AppInfoRepository>()
 
     companion object {
         //private
@@ -314,8 +320,6 @@ class HomeScreenFragment : Fragment() {
             handleStartBtnClickEvent()
         })
 
-        val mDb = AppDatabase.invoke(requireContext().applicationContext)
-        val categoryInfoRepository = mDb.categoryInfoRepository()
         categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, Observer {
             val list = it.filter { a -> a.isInternetBlocked }
             tileFCategoryBlockedTxt.text = list.size.toString()
@@ -348,7 +352,6 @@ class HomeScreenFragment : Fragment() {
          })
 
         //val mDb = AppDatabase.invoke(requireContext().applicationContext)
-        val appInfoRepository = mDb.appInfoRepository()
         appInfoRepository.getBlockedAppCount().observe(viewLifecycleOwner, Observer {
             tileFAppsBlockedTxt.text = it.toString()
             tileDFAppsBlockedTxt.text = it.toString()

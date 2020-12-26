@@ -39,6 +39,8 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.UniversalAppListAdapter
 import com.celzero.bravedns.adapter.UniversalBlockedRulesAdapter
 import com.celzero.bravedns.database.AppDatabase
+import com.celzero.bravedns.database.AppInfoRepository
+import com.celzero.bravedns.database.BlockedConnectionsRepository
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable
@@ -48,6 +50,9 @@ import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.AppListViewModel
 import com.celzero.bravedns.viewmodel.BlockedConnectionsViewModel
+import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 /**
@@ -92,11 +97,14 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
     private var recyclerAdapter : UniversalAppListAdapter ?= null
     private var recyclerRulesAdapter : UniversalBlockedRulesAdapter?= null
     private var layoutManager: RecyclerView.LayoutManager? = null
-    private val viewModel: BlockedConnectionsViewModel by viewModels()
-    private val appInfoViewModel : AppListViewModel by viewModels()
+    private val viewModel: BlockedConnectionsViewModel by viewModel()
+    private val appInfoViewModel : AppListViewModel by viewModel()
 
     private var universalState : Boolean = false
     private var ipListState : Boolean = false
+
+    private val appInfoRepository by inject<AppInfoRepository>()
+    private val blockedConnectionsRepository by inject<BlockedConnectionsRepository>()
 
     private lateinit var scrollView : NestedScrollView
 
@@ -156,10 +164,8 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
         recyclerView.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(requireContext())
         recyclerView.layoutManager = layoutManager
-        AppListViewModel.setContext(requireContext())
-        BlockedConnectionsViewModel.setContext(requireContext())
-        recyclerRulesAdapter = UniversalBlockedRulesAdapter(requireContext())
-        recyclerAdapter = UniversalAppListAdapter(requireContext())
+        recyclerRulesAdapter = UniversalBlockedRulesAdapter(requireContext(), blockedConnectionsRepository)
+        recyclerAdapter = UniversalAppListAdapter(requireContext(), appInfoRepository, get())
         recyclerView.adapter = recyclerRulesAdapter
         ipSearchView.requestFocus()
 
@@ -272,8 +278,6 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
             }
         }
 
-        val mDb = AppDatabase.invoke(requireContext().applicationContext)
-        val appInfoRepository = mDb.appInfoRepository()
         val appCount = GlobalVariable.appList.size
         val act: FirewallActivity = requireContext() as FirewallActivity
         appInfoRepository.getWhitelistCountLiveData().observe(act, Observer {
@@ -282,7 +286,7 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
 
         whiteListHeader.setOnClickListener{
             whiteListHeader.isEnabled = false
-            val customDialog = WhitelistAppDialog(requireContext(), recyclerAdapter!!,appInfoViewModel)
+            val customDialog = WhitelistAppDialog(requireContext(), appInfoRepository, get(), recyclerAdapter!!,appInfoViewModel)
             //if we know that the particular variable not null any time ,we can assign !!
             // (not null operator ), then  it won't check for null, if it becomes null,
             // it will throw exception
@@ -334,8 +338,6 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
     }
 
     private fun showDialogForDelete() {
-        val mDb = AppDatabase.invoke(requireContext().applicationContext)
-        val blockedConnectionsRepository = mDb.blockedConnectionRepository()
         val count = blockedConnectionsRepository.getBlockedConnectionsCount()
         if(count > 0) {
             val builder = AlertDialog.Builder(requireContext())

@@ -51,14 +51,10 @@ import kotlinx.coroutines.launch
 import settings.Settings
 
 
-class DNSCryptEndpointAdapter(val context: Context, var listener : UIUpdateInterface) : PagedListAdapter<DNSCryptEndpoint, DNSCryptEndpointAdapter.DNSCryptEndpointViewHolder>(DIFF_CALLBACK) {
-    var mDb: AppDatabase = AppDatabase.invoke(context.applicationContext)
-    var dnsCryptEndpointRepository: DNSCryptEndpointRepository
+class DNSCryptEndpointAdapter(private val context: Context,
+                              private val dnsCryptEndpointRepository:DNSCryptEndpointRepository,
+                              var listener : UIUpdateInterface) : PagedListAdapter<DNSCryptEndpoint, DNSCryptEndpointAdapter.DNSCryptEndpointViewHolder>(DIFF_CALLBACK) {
     //private var serverList : MutableList<DNSCryptEndpoint> = ArrayList()
-
-    init {
-        dnsCryptEndpointRepository = mDb.dnsCryptEndpointsRepository()
-    }
 
     companion object {
         private val DIFF_CALLBACK = object :
@@ -245,8 +241,6 @@ class DNSCryptEndpointAdapter(val context: Context, var listener : UIUpdateInter
         }
 
         private fun updateDNSCryptDetails(dnsCryptEndpoint : DNSCryptEndpoint) : Boolean{
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val dnsCryptEndpointRepository = mDb.dnsCryptEndpointsRepository()
             val list = dnsCryptEndpointRepository.getConnectedDNSCrypt()
             if(list.size == 1){
                 if(!dnsCryptEndpoint.isSelected && list[0].dnsCryptURL == dnsCryptEndpoint.dnsCryptURL){

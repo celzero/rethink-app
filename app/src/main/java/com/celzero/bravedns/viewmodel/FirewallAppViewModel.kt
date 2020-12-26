@@ -23,18 +23,9 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfo
+import com.celzero.bravedns.database.AppInfoDAO
 
-class FirewallAppViewModel : ViewModel() {
-
-    companion object{
-        lateinit var contextVal : Context
-        fun setContext(context: Context){
-            this.contextVal = context
-        }
-    }
-
-    private val mDb = AppDatabase.invoke(contextVal.applicationContext)
-    private val appDetailsDAO = mDb.appInfoDAO()
+class FirewallAppViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
     private var filteredList : MutableLiveData<String> = MutableLiveData()
 
@@ -47,7 +38,7 @@ class FirewallAppViewModel : ViewModel() {
     var firewallAppDetailsList = Transformations.switchMap<String, List<AppInfo>>(
         filteredList, (Function<String, LiveData<List<AppInfo>>> { input ->
             var inputTxt = "%$input%"
-            appDetailsDAO.getAppDetailsForLiveData(inputTxt)
+            appInfoDAO.getAppDetailsForLiveData(inputTxt)
         } as androidx.arch.core.util.Function<String,LiveData<List<AppInfo>>>)
     )
 

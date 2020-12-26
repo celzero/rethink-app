@@ -25,19 +25,10 @@ import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.BlockedConnections
+import com.celzero.bravedns.database.BlockedConnectionsDAO
 
 
-class BlockedConnectionsViewModel : ViewModel() {
-
-    companion object{
-        lateinit var contextVal : Context
-        fun setContext(context: Context){
-            this.contextVal = context
-        }
-    }
-
-    private val mDb = AppDatabase.invoke(contextVal.applicationContext)
-    private val blockedConnectionsDAO = mDb.blockedConnectionsDAO()
+class BlockedConnectionsViewModel(private val blockedConnectionsDAO: BlockedConnectionsDAO) : ViewModel() {
 
     private var filteredList : MutableLiveData<String> = MutableLiveData()
 

@@ -41,6 +41,7 @@ import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoRepository
+import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.service.BraveVPNService.Companion.appWhiteList
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
@@ -51,13 +52,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class UniversalAppListAdapter(val context: Context)  : PagedListAdapter<AppInfo, UniversalAppListAdapter.UniversalAppInfoViewHolder>(DIFF_CALLBACK) {
-    var mDb: AppDatabase = AppDatabase.invoke(context.applicationContext)
-    lateinit var appInfoRepository: AppInfoRepository
-
-    init{
-        appInfoRepository = mDb.appInfoRepository()
-    }
+class UniversalAppListAdapter(
+    private val context: Context,
+    private val appInfoRepository: AppInfoRepository,
+    private val categoryInfoRepository:CategoryInfoRepository
+)  : PagedListAdapter<AppInfo, UniversalAppListAdapter.UniversalAppInfoViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK = object :
@@ -182,7 +181,6 @@ class UniversalAppListAdapter(val context: Context)  : PagedListAdapter<AppInfo,
                     appInfoRepository.updateWhiteList(appInfo.uid, status)
                     val countBlocked = appInfoRepository.getBlockedCountForCategory(appInfo.appCategory)
                     val countWhitelisted = appInfoRepository.getWhitelistCount(appInfo.appCategory)
-                    val categoryInfoRepository = mDb.categoryInfoRepository()
                     categoryInfoRepository.updateBlockedCount(appInfo.appCategory, countBlocked)
                     categoryInfoRepository.updateWhitelistCount(appInfo.appCategory, countWhitelisted)
                 }

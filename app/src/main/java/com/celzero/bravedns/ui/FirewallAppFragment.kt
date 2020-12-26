@@ -28,19 +28,21 @@ import android.widget.*
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallAppListAdapter
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.CategoryInfo
+import com.celzero.bravedns.database.CategoryInfoRepository
+import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.isSearchEnabled
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
-import com.celzero.bravedns.util.RefreshDatabase
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.FirewallAppViewModel
+import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
 
@@ -55,12 +57,12 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
     private lateinit var refreshListImageView : ImageView
 
     private lateinit var animation: Animation
-    private lateinit var refreshDatabase: RefreshDatabase
 
     private var firewallExpandableList: ExpandableListView? = null
 
-    private val firewallAppInfoViewModel : FirewallAppViewModel by viewModels()
-
+    private val firewallAppInfoViewModel : FirewallAppViewModel by viewModel()
+    private val categoryInfoRepository by inject<CategoryInfoRepository>()
+    private val refreshDatabase by inject<RefreshDatabase>()
 
     companion object {
            fun newInstance() = FirewallAppFragment()
@@ -75,7 +77,6 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
     }
 
     private fun initView(view: View) {
-        FirewallAppViewModel.setContext(requireContext())
         categoryShowTxt = view.findViewById(R.id.firewall_category_show_txt)
         categoryState = true
         loadingProgressBar = view.findViewById(R.id.firewall_update_progress)
@@ -83,7 +84,7 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
         refreshListImageView = view.findViewById(R.id.firewall_app_refresh_list)
         firewallExpandableList!!.visibility = View.VISIBLE
         if (firewallExpandableList != null) {
-            adapterList = FirewallAppListAdapter(requireContext(), titleList as ArrayList<CategoryInfo>, listData)
+            adapterList = FirewallAppListAdapter(requireContext(), get(), categoryInfoRepository, titleList as ArrayList<CategoryInfo>, listData)
             firewallExpandableList!!.setAdapter(adapterList)
 
             firewallExpandableList!!.setOnGroupClickListener { _, view, i, l ->
@@ -103,9 +104,6 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
         animation = RotateAnimation(0.0f, 360.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
         animation.repeatCount = -1
         animation.duration = 750
-
-        refreshDatabase = RefreshDatabase(requireContext())
-
     }
 
     private fun initClickListeners() {
@@ -238,10 +236,6 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
 
 
     private fun observersForUI() {
-        val mDb = AppDatabase.invoke(requireContext().applicationContext)
-        //val appInfoRepository = mDb.appInfoRepository()
-
-        val categoryInfoRepository = mDb.categoryInfoRepository()
         categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, Observer {
             titleList = it.toMutableList()
         })

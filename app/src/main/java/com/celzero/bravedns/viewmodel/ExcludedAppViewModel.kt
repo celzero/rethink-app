@@ -26,20 +26,11 @@ import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfo
+import com.celzero.bravedns.database.AppInfoDAO
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 
-class ExcludedAppViewModel : ViewModel() {
-
-    companion object{
-        lateinit var contextVal : Context
-        fun setContext(context: Context){
-            this.contextVal = context
-        }
-    }
-
-    private val mDb = AppDatabase.invoke(contextVal.applicationContext)
-    private val appDetailsDAO = mDb.appInfoDAO()
+class ExcludedAppViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
     private var filteredList : MutableLiveData<String> = MutableLiveData()
 
@@ -52,16 +43,16 @@ class ExcludedAppViewModel : ViewModel() {
     var excludedAppList = Transformations.switchMap<String, PagedList<AppInfo>>(
         filteredList, (Function<String, LiveData<PagedList<AppInfo>>> { input ->
             if (input.isBlank()) {
-                appDetailsDAO.getExcludedAppDetailsLiveData().toLiveData(pageSize = 50)
+                appInfoDAO.getExcludedAppDetailsLiveData().toLiveData(pageSize = 50)
             } else if (input == "isSystem") {
-                appDetailsDAO.getExcludedAAppSystemAppsLiveData().toLiveData(pageSize = 50)
+                appInfoDAO.getExcludedAAppSystemAppsLiveData().toLiveData(pageSize = 50)
             } else if (input.contains("category:")) {
                 val filterVal = input.split(":")[1]
                 val result = filterVal.split(",").map { it.trim() }
                 if(DEBUG) Log.d(LOG_TAG, "FilterVal - $filterVal")
-                appDetailsDAO.getExcludedAppDetailsFilterForCategoryLiveData(result).toLiveData(pageSize = 50)
+                appInfoDAO.getExcludedAppDetailsFilterForCategoryLiveData(result).toLiveData(pageSize = 50)
             } else {
-                appDetailsDAO.getExcludedAppDetailsFilterLiveData("%$input%").toLiveData(pageSize = 50)
+                appInfoDAO.getExcludedAppDetailsFilterLiveData("%$input%").toLiveData(pageSize = 50)
                 //appDetailsDAO.getUnivAppDetailsLiveData("%$input%").toLiveData(50)
             }
         } as androidx.arch.core.util.Function<String, LiveData<PagedList<AppInfo>>>)

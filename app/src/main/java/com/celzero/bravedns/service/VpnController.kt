@@ -21,6 +21,9 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.celzero.bravedns.database.AppInfoRepository
+import com.celzero.bravedns.database.ConnectionTrackerRepository
+import com.celzero.bravedns.database.DNSLogRepository
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 
 class VpnController {
@@ -135,26 +138,6 @@ class VpnController {
             tracker = QueryTracker()
         }
         return tracker
-    }
-
-    @Synchronized
-    fun getIPTracker(context : Context?): IPTracker? {
-        if(ipTracker == null){
-            ipTracker = IPTracker(context)
-        }
-        return ipTracker
-    }
-
-    /**
-     * DNS Log tracker will record the dns transactions in database.
-     * This method will return the DNSLogTracker object.
-     */
-    @Synchronized
-    fun getDNSLogTracker(context: Context): DNSLogTracker? {
-        if(dnsLogTracker == null){
-            dnsLogTracker = DNSLogTracker(context)
-        }
-        return dnsLogTracker
     }
 
     /*fun test(){

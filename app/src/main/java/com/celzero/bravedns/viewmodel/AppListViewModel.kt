@@ -26,19 +26,10 @@ import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfo
+import com.celzero.bravedns.database.AppInfoDAO
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 
-class AppListViewModel : ViewModel() {
-
-    companion object{
-        lateinit var contextVal : Context
-        fun setContext(context: Context){
-            this.contextVal = context
-        }
-    }
-
-    private val mDb = AppDatabase.invoke(contextVal.applicationContext)
-    private val appDetailsDAO = mDb.appInfoDAO()
+class AppListViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
     private var filteredList : MutableLiveData<String> = MutableLiveData()
 
@@ -51,16 +42,16 @@ class AppListViewModel : ViewModel() {
     var appDetailsList = Transformations.switchMap<String, PagedList<AppInfo>>(
         filteredList, (Function<String, LiveData<PagedList<AppInfo>>> { input ->
             if (input.isBlank()) {
-                appDetailsDAO.getUnivAppDetailsLiveData().toLiveData(pageSize = 50)
+                appInfoDAO.getUnivAppDetailsLiveData().toLiveData(pageSize = 50)
             } else if (input == "isSystem") {
-                appDetailsDAO.getUnivAppSystemAppsLiveData().toLiveData(pageSize = 50)
+                appInfoDAO.getUnivAppSystemAppsLiveData().toLiveData(pageSize = 50)
             } else if (input.contains("category:")) {
                 val filterVal = input.split(":")[1]
                 val result = filterVal.split(",").map { it.trim() }
                 Log.d(LOG_TAG, "FilterVal - $filterVal")
-                appDetailsDAO.getUnivAppDetailsFilterForCategoryLiveData(result).toLiveData(pageSize = 50)
+                appInfoDAO.getUnivAppDetailsFilterForCategoryLiveData(result).toLiveData(pageSize = 50)
             } else {
-                appDetailsDAO.getUnivAppDetailsFilterLiveData("%$input%").toLiveData(pageSize = 50)
+                appInfoDAO.getUnivAppDetailsFilterLiveData("%$input%").toLiveData(pageSize = 50)
             }
         } as androidx.arch.core.util.Function<String, LiveData<PagedList<AppInfo>>>)
     )

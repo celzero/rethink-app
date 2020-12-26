@@ -25,18 +25,9 @@ import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.DNSProxyEndpoint
+import com.celzero.bravedns.database.DNSProxyEndpointDAO
 
-class DNSProxyEndpointViewModel : ViewModel() {
-
-    companion object{
-        lateinit var contextVal : Context
-        fun setContext(context: Context){
-            this.contextVal = context
-        }
-    }
-
-    private val mDb = AppDatabase.invoke(contextVal.applicationContext)
-    private val dnsProxyEndpointDAO = mDb.dnsProxyEndpointDAO()
+class DNSProxyEndpointViewModel(private val dnsProxyEndpointDAO: DNSProxyEndpointDAO) : ViewModel() {
 
     private var filteredList : MutableLiveData<String> = MutableLiveData()
 

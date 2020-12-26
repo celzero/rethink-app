@@ -49,14 +49,13 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import settings.Settings
 
-class DNSProxyEndpointAdapter(val context: Context, val listener: UIUpdateInterface) : PagedListAdapter<DNSProxyEndpoint, DNSProxyEndpointAdapter.DNSProxyEndpointViewHolder>(DIFF_CALLBACK) {
-    var mDb: AppDatabase = AppDatabase.invoke(context.applicationContext)
-    var dnsProxyEndpointRepository: DNSProxyEndpointRepository
+class DNSProxyEndpointAdapter(private val context: Context,
+                              private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
+                              val listener: UIUpdateInterface) : PagedListAdapter<DNSProxyEndpoint, DNSProxyEndpointAdapter.DNSProxyEndpointViewHolder>(DIFF_CALLBACK) {
     private var PROXY_TYPE_INTERNAL: String
     private var PROXY_TYPE_EXTERNAL: String
 
     init {
-        dnsProxyEndpointRepository = mDb.dnsProxyEndpointRepository()
         PROXY_TYPE_INTERNAL = "Internal"
         PROXY_TYPE_EXTERNAL = "External"
     }
@@ -264,8 +263,6 @@ class DNSProxyEndpointAdapter(val context: Context, val listener: UIUpdateInterf
         }*/
 
         private fun updateDNSProxyDetails(dnsProxyEndpoint: DNSProxyEndpoint) {
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val dnsProxyEndpointRepository = mDb.dnsProxyEndpointRepository()
             dnsProxyEndpoint.isSelected = true
             dnsProxyEndpointRepository.removeConnectionStatus()
             dnsProxyEndpointRepository.updateAsync(dnsProxyEndpoint)

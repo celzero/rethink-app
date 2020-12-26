@@ -33,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DNSQueryAdapter
 import com.celzero.bravedns.database.AppDatabase
+import com.celzero.bravedns.database.DNSLogDAO
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
@@ -47,10 +48,11 @@ import com.celzero.bravedns.viewmodel.DNSLogViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import settings.Settings
 import java.net.MalformedURLException
 import java.net.URL
-
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
 
@@ -76,7 +78,7 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
 
     private lateinit var logsDisabledTxt : TextView
 
-    private val viewModel: DNSLogViewModel by viewModels()
+    private val viewModel: DNSLogViewModel by viewModel()
     private var checkedItem = 1
     private var filterValue: String = ""
 
@@ -84,6 +86,8 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
     lateinit var urlValues: Array<String>
     var prevSpinnerSelection: Int = 2
     var check = 2
+
+    private val dnsLogDAO by inject<DNSLogDAO>()
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -130,7 +134,6 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
             recyclerView!!.setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
             recyclerView!!.layoutManager = layoutManager
-            DNSLogViewModel.setContext(requireContext())
 
             recyclerAdapter = DNSQueryAdapter(requireContext())
             viewModel.dnsLogsList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(recyclerAdapter!!::submitList))
@@ -230,8 +233,6 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
         //performing positive action
         builder.setPositiveButton("Delete logs") { _, _ ->
             GlobalScope.launch(Dispatchers.IO) {
-                val mDb = AppDatabase.invoke(requireContext().applicationContext)
-                val dnsLogDAO = mDb.dnsLogDAO()
                 dnsLogDAO.clearAllData()
             }
         }

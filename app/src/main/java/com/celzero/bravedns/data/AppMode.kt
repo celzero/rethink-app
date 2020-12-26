@@ -26,7 +26,14 @@ import dnsx.BraveDNS
 import dnsx.Dnsx
 import settings.Settings
 
-class AppMode(val context: Context) {
+class AppMode internal constructor(
+    private val context: Context,
+    private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
+    private val doHEndpointRepository: DoHEndpointRepository,
+    private val dnsCryptEndpointRepository: DNSCryptEndpointRepository,
+    private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
+    private val proxyEndpointRepository: ProxyEndpointRepository
+) {
     private var appDNSMode: Long = -1L
     private var appFirewallMode: Long = -1L
     private var appProxyMode: Long = -1L
@@ -35,10 +42,6 @@ class AppMode(val context: Context) {
     private var dnsType: Int = -1
     private var socks5ProxyEndpoint: ProxyEndpoint ?= null
     private var braveDNS : BraveDNS ?= null
-
-    companion object {
-        fun getInstance(context: Context) = AppMode(context)
-    }
 
     fun getDNSMode(): Long {
         if (appDNSMode == -1L) {
@@ -95,8 +98,6 @@ class AppMode(val context: Context) {
     }
 
     private fun getProxyModeSettings(): Long {
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val dnsProxyEndpointRepository = mDb.dnsProxyEndpointRepository()
         val dnsProxy = dnsProxyEndpointRepository.getConnectedProxy()
         appDNSMode = if (dnsProxy.proxyType == proxyTypeInternal) {
             Settings.DNSModeProxyPort
@@ -110,8 +111,6 @@ class AppMode(val context: Context) {
     }
 
     fun getDOHDetails(): DoHEndpoint {
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val doHEndpointRepository = mDb.doHEndpointsRepository()
         val dohEndpoint = doHEndpointRepository.getConnectedDoH()
         if (dohEndpoint != null) {
             if (dohEndpoint.dohURL.isEmpty()) {
@@ -129,24 +128,18 @@ class AppMode(val context: Context) {
     }
 
     fun getDNSCryptServers(): String {
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val dnsCryptEndpointRepository = mDb.dnsCryptEndpointsRepository()
         val cryptList = dnsCryptEndpointRepository.getConnectedDNSCrypt()
         //mDb.close()
         return constructServerString(cryptList)
     }
 
     fun getDNSCryptServerCount() : Int{
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val dnsCryptEndpointRepository = mDb.dnsCryptEndpointsRepository()
         val count = dnsCryptEndpointRepository.getConnectedCount()
         //mDb.close()
         return count
     }
 
     fun getDNSCryptServerToRemove(): String {
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val dnsCryptEndpointRepository = mDb.dnsCryptEndpointsRepository()
         val cryptList = dnsCryptEndpointRepository.getConnectedDNSCrypt()
         //mDb.close()
         return constructStringForRemoval(cryptList)
@@ -154,8 +147,6 @@ class AppMode(val context: Context) {
 
     fun getSocks5ProxyDetails(): ProxyEndpoint {
         if (socks5ProxyEndpoint == null) {
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val proxyEndpointRepository = mDb.proxyEndpointRepository()
             socks5ProxyEndpoint = proxyEndpointRepository.getConnectedProxy()
             //mDb.close()
         }
@@ -188,8 +179,6 @@ class AppMode(val context: Context) {
     }
 
     fun getDNSCryptRelays(): String {
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val dnsCryptRelayEndpointRepository = mDb.dnsCryptRelayEndpointsRepository()
         val relay = dnsCryptRelayEndpointRepository.getConnectedRelays()
         return constructRelayString(relay)
     }
@@ -210,8 +199,6 @@ class AppMode(val context: Context) {
     }
 
     fun getDNSProxyServerDetails(): DNSProxyEndpoint {
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val dnsProxyEndpointRepository = mDb.dnsProxyEndpointRepository()
         return dnsProxyEndpointRepository.getConnectedProxy()
     }
 

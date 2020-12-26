@@ -34,8 +34,10 @@ import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallRules
 import com.celzero.bravedns.data.AppMode
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfo
+import com.celzero.bravedns.database.BlockedConnectionsRepository
+import com.celzero.bravedns.database.DoHEndpointRepository
+import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
@@ -58,6 +60,8 @@ import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.common.collect.HashMultimap
 import okhttp3.*
 import org.json.JSONObject
+import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
 import java.io.File
 import java.io.IOException
 import java.util.*
@@ -71,11 +75,14 @@ class HomeScreenActivity : AppCompatActivity() {
     lateinit var homeScreenFragment: HomeScreenFragment
     lateinit var aboutFragment: AboutFragment
     lateinit var context: Context
-    private val refreshDatabase = RefreshDatabase(this)
+    private val refreshDatabase by inject<RefreshDatabase>()
     lateinit var appUpdateManager: AppUpdateManager
     lateinit var downloadManager : DownloadManager
     private var timeStamp  = 0L
     //lateinit var appSample : AppInfo
+
+    private val doHEndpointRepository by inject<DoHEndpointRepository>()
+    private val blockedConnectionsRepository by inject<BlockedConnectionsRepository>()
 
     /*TODO : This task need to be completed.
              Add all the appinfo in the global variable during appload
@@ -156,11 +163,11 @@ class HomeScreenActivity : AppCompatActivity() {
                 homeScreenFragment.javaClass.simpleName).commit()
         }
         navView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
-        appMode = AppMode.getInstance(this)
+        appMode = get<AppMode>() // Todo don't hold global objects across the app.
 
 
         val firewallRules = FirewallRules.getInstance()
-        firewallRules.loadFirewallRules(this)
+        firewallRules.loadFirewallRules(blockedConnectionsRepository)
 
         refreshDatabase.deleteOlderDataFromNetworkLogs()
         if (!PersistentState.isInsertionCompleted(this)) {
@@ -253,8 +260,6 @@ class HomeScreenActivity : AppCompatActivity() {
     }
 
     private fun checkForBlockListUpdate() {
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val doHEndpointRepository = mDb.doHEndpointsRepository()
         val connectedDOH = doHEndpointRepository.getConnectedDoH()
         var isRethinkPlusConnected = false
         if(connectedDOH.dohName == Constants.RETHINK_DNS_PLUS){

@@ -29,15 +29,7 @@ abstract class AppDatabase : RoomDatabase(){
     companion object {
         const val currentVersion:Int = 7
 
-        @Volatile private var instance: AppDatabase? = null
-           private val LOCK = Any()
-
-        operator fun invoke(context: Context) = instance ?: synchronized(LOCK) {
-            instance ?: buildDatabase(context).also { instance = it }
-        }
-
-
-        private fun buildDatabase(context: Context) = Room.databaseBuilder(
+        fun buildDatabase(context: Context) = Room.databaseBuilder(
             context, AppDatabase::class.java,"bravedns.db")
             .allowMainThreadQueries()
             .addMigrations(MIGRATION_1_2)
@@ -47,10 +39,6 @@ abstract class AppDatabase : RoomDatabase(){
             .addMigrations(MIGRATION_5_6)
             .addMigrations(MIGRATION_6_7)
             .build()
-
-        fun getDatabase(): AppDatabase? {
-            return instance
-        }
 
         private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {

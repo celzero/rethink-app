@@ -33,6 +33,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ApplicationManagerApk
 import com.celzero.bravedns.animation.ViewAnimation
 import com.celzero.bravedns.database.AppDatabase
+import com.celzero.bravedns.database.AppInfoRepository
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
@@ -40,6 +41,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
 
 
 class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextListener{
@@ -52,6 +54,7 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
 
     private var isRotate : Boolean = false
 
+    private val appInfoRepository by inject<AppInfoRepository>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -173,8 +176,6 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
 
 
     private fun updateAppList() = GlobalScope.launch ( Dispatchers.Default ){
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val appInfoRepository = mDb.appInfoRepository()
         val appList = appInfoRepository.getAppInfoAsync()
         appList.forEach{
             val packageInfo = packageManager.getPackageInfo(it.packageInfo,0)

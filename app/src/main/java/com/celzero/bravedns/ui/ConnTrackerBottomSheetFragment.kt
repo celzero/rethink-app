@@ -55,6 +55,7 @@ import com.google.android.material.chip.Chip
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
 /**
  * ConnectionTrackerBottomSheetFragment
@@ -108,15 +109,12 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
     }
 
     override fun getTheme(): Int = R.style.BottomSheetDialogTheme
-    lateinit var mDb: AppDatabase
-    lateinit var appInfoRepository: AppInfoRepository
-    lateinit var blockedConnectionsRepository: BlockedConnectionsRepository
+    private val appInfoRepository: AppInfoRepository by inject()
+    private val blockedConnectionsRepository: BlockedConnectionsRepository by inject()
+    private val categoryInfoRepository: CategoryInfoRepository by inject()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         fragmentView = inflater.inflate(R.layout.bottom_sheet_conn_track, container, false)
-        mDb = AppDatabase.invoke(contextVal.applicationContext)
-        appInfoRepository = mDb.appInfoRepository()
-        blockedConnectionsRepository = mDb.blockedConnectionRepository()
         return fragmentView
     }
 
@@ -274,12 +272,12 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         switchBlockConnAll.setOnClickListener {
             if (isRuleUniversal) {
                 if (DEBUG) Log.d(LOG_TAG, "Universal Remove - ${connRules.ipAddress}, ${BraveVPNService.BlockedRuleNames.RULE2.ruleName}")
-                firewallRules.removeFirewallRules(UNIVERSAL_RULES_UID, connRules.ipAddress, BraveVPNService.BlockedRuleNames.RULE2.ruleName, contextVal)
+                firewallRules.removeFirewallRules(UNIVERSAL_RULES_UID, connRules.ipAddress, BraveVPNService.BlockedRuleNames.RULE2.ruleName, blockedConnectionsRepository)
                 isRuleUniversal = false
                 Utilities.showToastInMidLayout(contextVal, "Unblocked ${connRules.ipAddress}", Toast.LENGTH_SHORT)
             } else {
                 if (DEBUG) Log.d(LOG_TAG, "Universal Add - ${connRules.ipAddress}, ${BraveVPNService.BlockedRuleNames.RULE2.ruleName}")
-                firewallRules.addFirewallRules(UNIVERSAL_RULES_UID, connRules.ipAddress, BraveVPNService.BlockedRuleNames.RULE2.ruleName, contextVal)
+                firewallRules.addFirewallRules(UNIVERSAL_RULES_UID, connRules.ipAddress, BraveVPNService.BlockedRuleNames.RULE2.ruleName, blockedConnectionsRepository)
                 isRuleUniversal = true
                 Utilities.showToastInMidLayout(contextVal, "Blocking all connections to ${connRules.ipAddress}", Toast.LENGTH_SHORT)
             }
@@ -291,8 +289,6 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
             try {
                 val appUIDList = appInfoRepository.getAppListForUID(ipDetails.uid)
                 if (appUIDList.size == 1) {
-                    val mDb = AppDatabase.invoke(contextVal.applicationContext)
-                    val appInfoRepository = mDb.appInfoRepository()
                     if (ipDetails.appName != null || ipDetails.appName!! == "Unknown") {
                         val packageName = appInfoRepository.getPackageNameForAppName(ipDetails.appName!!)
                         appInfoForPackage(packageName)
@@ -353,7 +349,6 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
                     PersistentState.setExcludedPackagesWifi(it.packageInfo, isBlocked, contextVal)
                     FirewallManager.updateAppInternetPermission(it.packageInfo, isBlocked)
                     FirewallManager.updateAppInternetPermissionByUID(it.uid, isBlocked)
-                    val categoryInfoRepository = mDb.categoryInfoRepository()
                     categoryInfoRepository.updateNumberOfBlocked(it.appCategory, !isBlocked)
                     if(DEBUG) Log.d(LOG_TAG,"Category block executed with blocked as $isBlocked")
                 }
@@ -372,7 +367,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
             val positiveText = "Clear rules"
             blockAllApps = showDialog(appUIDList, ipDetails.appName!!, title, positiveText)
             if (blockAllApps) {
-                firewallRules.clearFirewallRules(ipDetails.uid, contextVal)
+                firewallRules.clearFirewallRules(ipDetails.uid, blockedConnectionsRepository)
                 Utilities.showToastInMidLayout(contextVal, getString(R.string.bsct_rules_cleared_toast), Toast.LENGTH_SHORT)
             }
         } else {
@@ -390,7 +385,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         builder.setCancelable(true)
         //performing positive action
         builder.setPositiveButton("Clear") { dialogInterface, which ->
-            firewallRules.clearFirewallRules(ipDetails.uid, contextVal)
+            firewallRules.clearFirewallRules(ipDetails.uid, blockedConnectionsRepository)
             //switchBlockConnApp.isChecked = false
             Utilities.showToastInMidLayout(contextVal, getString(R.string.bsct_rules_cleared_toast), Toast.LENGTH_SHORT)
         }

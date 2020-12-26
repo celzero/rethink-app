@@ -40,12 +40,10 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ExcludedAppListAdapter
-import com.celzero.bravedns.database.AppDatabase
-import com.celzero.bravedns.database.ProxyEndpoint
+import com.celzero.bravedns.database.*
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
@@ -57,7 +55,6 @@ import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_OTHERS
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Constants.Companion.REFRESH_BLOCKLIST_URL
 import com.celzero.bravedns.util.HttpRequestHelper.Companion.checkStatus
-import com.celzero.bravedns.util.RefreshDatabase
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ExcludedAppViewModel
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -68,6 +65,9 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.*
 import org.json.JSONObject
+import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import settings.Settings
 import java.io.File
 import java.io.IOException
@@ -130,13 +130,17 @@ class SettingsFragment : Fragment() {
 
     //For exclude apps dialog
     private var excludeAppAdapter: ExcludedAppListAdapter? = null
-    private val excludeAppViewModel: ExcludedAppViewModel by viewModels()
+    private val excludeAppViewModel: ExcludedAppViewModel by viewModel()
     private lateinit var excludeListCountText: TextView
 
-    private lateinit var refreshDatabase: RefreshDatabase
+    private val refreshDatabase by inject<RefreshDatabase>()
     private lateinit var animation: Animation
 
     private lateinit var downloadManager: DownloadManager
+
+    private val appInfoRepository by inject<AppInfoRepository>()
+    private val proxyEndpointRepository by inject<ProxyEndpointRepository>()
+    private val categoryInfoRepository by inject<CategoryInfoRepository>()
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -162,7 +166,6 @@ class SettingsFragment : Fragment() {
         animation.repeatCount = -1
         animation.duration = 1000
 
-        refreshDatabase = RefreshDatabase(requireContext())
         faqTxt = view.findViewById(R.id.settings_app_faq_icon)
 
         refreshDataRL = view.findViewById(R.id.settings_activity_refresh_data_rl)
@@ -257,8 +260,6 @@ class SettingsFragment : Fragment() {
         configureBlockListBtn = view.findViewById(R.id.settings_activity_on_device_block_configure_btn)
         refreshOnDeviceBlockListBtn = view.findViewById(R.id.settings_activity_on_device_block_refresh_btn)
 
-        val mDb = AppDatabase.invoke(requireContext().applicationContext)
-        val proxyEndpointRepository = mDb.proxyEndpointRepository()
         sock5Proxy = proxyEndpointRepository.getConnectedProxy()
 
         enableLogsSwitch.isChecked = PersistentState.isLogsEnabled(requireContext())
@@ -293,12 +294,10 @@ class SettingsFragment : Fragment() {
         }
 
         //For exclude apps
-        ExcludedAppViewModel.setContext(requireContext())
-        excludeAppAdapter = ExcludedAppListAdapter(requireContext())
+        excludeAppAdapter = ExcludedAppListAdapter(requireContext(), appInfoRepository, categoryInfoRepository)
         excludeAppViewModel.excludedAppList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(excludeAppAdapter!!::submitList))
 
 
-        val appInfoRepository = mDb.appInfoRepository()
         val appCount = appList.size
         val act: HomeScreenActivity = requireContext() as HomeScreenActivity
         appInfoRepository.getExcludedAppListCountLiveData().observe(act, Observer {
@@ -947,7 +946,7 @@ class SettingsFragment : Fragment() {
 
 
     private fun showExcludeAppDialog(context: Context, recyclerAdapter: ExcludedAppListAdapter, excludeAppViewModel: ExcludedAppViewModel) {
-        val excludeAppDialog = ExcludeAppDialog(context, recyclerAdapter, excludeAppViewModel)
+        val excludeAppDialog = ExcludeAppDialog(context, get(), get(), recyclerAdapter, excludeAppViewModel)
         //if we know that the particular variable not null any time ,we can assign !! (not null operator ),
         // then  it won't check for null, if it becomes null, it will throw exception
         excludeAppDialog.show()
@@ -981,8 +980,6 @@ class SettingsFragment : Fragment() {
         val passwordEditText: EditText = dialog.findViewById(R.id.dialog_proxy_edit_password)
         val udpBlockCheckBox: CheckBox = dialog.findViewById(R.id.dialog_proxy_udp_check)
 
-        val mDb = AppDatabase.invoke(requireContext().applicationContext)
-        val proxyEndpointRepository = mDb.proxyEndpointRepository()
         val sock5Proxy = proxyEndpointRepository.getConnectedProxy()
 
         udpBlockCheckBox.isChecked = PersistentState.getUDPBlockedSettings(requireContext())
@@ -1030,7 +1027,7 @@ class SettingsFragment : Fragment() {
             if (appName.isEmpty() || appName == "Nobody") {
                 appPackageName = appNames[0]
             } else {
-                appPackageName = mDb.appInfoRepository().getPackageNameForAppName(appName)
+                appPackageName = appInfoRepository.getPackageNameForAppName(appName)
             }
             ip = ipAddressEditText.text.toString()
 
@@ -1084,14 +1081,10 @@ class SettingsFragment : Fragment() {
     }
 
     private fun getAppName(): MutableList<String> {
-        val mDb = AppDatabase.invoke(requireContext().applicationContext)
-        val appInfoRepository = mDb.appInfoRepository()
         return appInfoRepository.getAppNameList()
     }
 
     private fun insertProxyEndpointDB(mode: String, name: String, appName: String, ip: String, port: Int, userName: String, password: String, isUDPBlock: Boolean) {
-        val mDb = AppDatabase.invoke(requireContext().applicationContext)
-        val proxyEndpointRepository = mDb.proxyEndpointRepository()
         var proxyName = name
         if (proxyName.isEmpty() || proxyName.isBlank()) {
             if (mode == "Internal") {

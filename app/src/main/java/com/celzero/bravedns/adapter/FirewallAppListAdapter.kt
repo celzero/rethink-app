@@ -38,9 +38,7 @@ import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
-import com.celzero.bravedns.database.AppDatabase
-import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.database.CategoryInfo
+import com.celzero.bravedns.database.*
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -57,6 +55,8 @@ import java.util.*
 
 class FirewallAppListAdapter internal constructor(
     private val context: Context,
+    private val appInfoRepository:AppInfoRepository,
+    private val categoryInfoRepository:CategoryInfoRepository,
     private var titleList: List<CategoryInfo>,
     private var dataList: HashMap<CategoryInfo, ArrayList<AppInfo>>
 ) : BaseExpandableListAdapter() {
@@ -192,8 +192,6 @@ class FirewallAppListAdapter internal constructor(
         fwWifiImg.setOnClickListener {
             isSearchEnabled = false
             val isInternetAllowed = appInfoDetail.isInternetAllowed
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val appInfoRepository = mDb.appInfoRepository()
             val appUIDList = appInfoRepository.getAppListForUID(appInfoDetail.uid)
             var blockAllApps = false
             if (appUIDList.size > 1) {
@@ -230,7 +228,6 @@ class FirewallAppListAdapter internal constructor(
                         PersistentState.setExcludedPackagesWifi(it.packageInfo, !isInternetAllowed, context)
                         FirewallManager.updateAppInternetPermission(it.packageInfo, !isInternetAllowed)
                         FirewallManager.updateAppInternetPermissionByUID(it.uid, !isInternetAllowed)
-                        val categoryInfoRepository = mDb.categoryInfoRepository()
                         categoryInfoRepository.updateNumberOfBlocked(it.appCategory,isInternetAllowed)
 
                         if(PersistentState.getKillAppOnFirewall(context)) {
@@ -400,8 +397,6 @@ class FirewallAppListAdapter internal constructor(
         internetChk.setOnClickListener {
             isSearchEnabled = false
             if(DEBUG) Log.d(LOG_TAG, "Category block clicked : $isSearchEnabled")
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val appInfoRepository = mDb.appInfoRepository()
             var proceedBlock = false
             proceedBlock = if (listTitle.categoryName == APP_CAT_SYSTEM_APPS && isInternetAllowed) {
                 showDialogForSystemAppBlock(false)
@@ -446,7 +441,6 @@ class FirewallAppListAdapter internal constructor(
                 )
 
                 GlobalScope.launch(Dispatchers.IO) {
-                    val categoryInfoRepository = mDb.categoryInfoRepository()
                     val count = appInfoRepository.updateInternetForAppCategory(listTitle.categoryName, !isInternet)
                     if(DEBUG) Log.d(LOG_TAG,"Apps updated : $count, $isInternet")
                     //val count = appInfoRepository.getBlockedCountForCategory(listTitle.categoryName)

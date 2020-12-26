@@ -25,18 +25,9 @@ import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.DoHEndpoint
+import com.celzero.bravedns.database.DoHEndpointDAO
 
-class DoHEndpointViewModel : ViewModel() {
-
-    companion object{
-        lateinit var contextVal : Context
-        fun setContext(context: Context){
-            this.contextVal = context
-        }
-    }
-
-    private val mDb = AppDatabase.invoke(contextVal.applicationContext)
-    private val doHEndpointsDAO = mDb.dohEndpointsDAO()
+class DoHEndpointViewModel(private val doHEndpointDAO: DoHEndpointDAO) : ViewModel() {
 
     private var filteredList : MutableLiveData<String> = MutableLiveData()
 
@@ -47,11 +38,11 @@ class DoHEndpointViewModel : ViewModel() {
     var dohEndpointList = Transformations.switchMap<String, PagedList<DoHEndpoint>>(
                 filteredList, (Function<String, LiveData<PagedList<DoHEndpoint>>> { input ->
             if (input.isBlank()) {
-                doHEndpointsDAO.getDoHEndpointLiveData().toLiveData(pageSize = 50)
+                doHEndpointDAO.getDoHEndpointLiveData().toLiveData(pageSize = 50)
             } else if (input == "isSystem") {
-                doHEndpointsDAO.getDoHEndpointLiveData().toLiveData(pageSize = 50)
+                doHEndpointDAO.getDoHEndpointLiveData().toLiveData(pageSize = 50)
             } else {
-                doHEndpointsDAO.getDoHEndpointLiveDataByName("%$input%").toLiveData(pageSize = 50)
+                doHEndpointDAO.getDoHEndpointLiveDataByName("%$input%").toLiveData(pageSize = 50)
                 //appDetailsDAO.getUnivAppDetailsLiveData("%$input%").toLiveData(50)
             }
         } as androidx.arch.core.util.Function<String, LiveData<PagedList<DoHEndpoint>>>)

@@ -35,6 +35,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppDatabase
+import com.celzero.bravedns.database.DoHEndpointRepository
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
@@ -47,6 +48,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.*
 import org.json.JSONObject
+import org.koin.android.ext.android.inject
 import settings.Settings
 import xdns.Xdns
 import java.io.File
@@ -66,6 +68,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
     private lateinit var downloadManager : DownloadManager
     private var timeStamp : Long = 0L
     private var receivedIntentFrom : Int = 0
+    private val doHEndpointRepository by inject<DoHEndpointRepository>()
 
     companion object{
         const val LOCAL = 1
@@ -145,8 +148,6 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
         if (receivedStamp.isEmpty() || receivedStamp == "https://basic.bravedns.com/") {
             return
         }
-        val mDb = AppDatabase.invoke(this.applicationContext)
-        val doHEndpointRepository = mDb.doHEndpointsRepository()
         doHEndpointRepository.removeConnectionStatus()
         doHEndpointRepository.updateConnectionURL(receivedStamp)
 

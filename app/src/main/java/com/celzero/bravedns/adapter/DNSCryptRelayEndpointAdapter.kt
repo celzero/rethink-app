@@ -35,6 +35,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppDatabase
+import com.celzero.bravedns.database.DNSCryptEndpointRepository
 import com.celzero.bravedns.database.DNSCryptRelayEndpoint
 import com.celzero.bravedns.database.DNSCryptRelayEndpointRepository
 import com.celzero.bravedns.service.PersistentState
@@ -44,15 +45,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class DNSCryptRelayEndpointAdapter(val context: Context) : PagedListAdapter<DNSCryptRelayEndpoint, DNSCryptRelayEndpointAdapter.DNSCryptRelayEndpointViewHolder>(DIFF_CALLBACK) {
-    var mDb: AppDatabase = AppDatabase.invoke(context.applicationContext)
-    var dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository
-    //private var relayList : MutableList<DNSCryptRelayEndpoint> = ArrayList()
-
-    init {
-        dnsCryptRelayEndpointRepository = mDb.dnsCryptRelayEndpointsRepository()
-
-    }
+class DNSCryptRelayEndpointAdapter(
+    private val context: Context,
+    private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
+    private val dnsCryptEndpointRepository:DNSCryptEndpointRepository
+) : PagedListAdapter<DNSCryptRelayEndpoint, DNSCryptRelayEndpointAdapter.DNSCryptRelayEndpointViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK = object :
@@ -241,9 +238,6 @@ class DNSCryptRelayEndpointAdapter(val context: Context) : PagedListAdapter<DNSC
         }
 
         private fun updateDNSCryptRelayDetails(dnsCryptRelayEndpoint : DNSCryptRelayEndpoint) : Boolean{
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val dnsCryptEndpointRepository = mDb.dnsCryptEndpointsRepository()
-            val dnsCryptRelayEndpointRepository = mDb.dnsCryptRelayEndpointsRepository()
             if (dnsCryptEndpointRepository.getConnectedCount() > 0) {
                 dnsCryptRelayEndpointRepository.updateAsync(dnsCryptRelayEndpoint)
                 object : CountDownTimer(500, 500) {
