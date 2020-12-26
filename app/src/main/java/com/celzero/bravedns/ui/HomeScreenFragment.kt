@@ -49,7 +49,6 @@ import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.Observer
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.SpinnerArrayAdapter
@@ -349,24 +348,24 @@ class HomeScreenFragment : Fragment() {
         }
 
         // Connect/Disconnect button ==> TODO : Change the label to Start and Stop
-        dnsOnOffBtn.setOnClickListener(View.OnClickListener {
+        dnsOnOffBtn.setOnClickListener {
             handleStartBtnClickEvent()
-        })
+        }
 
         val mDb = AppDatabase.invoke(requireContext().applicationContext)
         val categoryInfoRepository = mDb.categoryInfoRepository()
-        categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, Observer {
+        categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, {
             val list = it.filter { a -> a.isInternetBlocked }
             tileFCategoryBlockedTxt.text = list.size.toString()
         })
 
-        median50.observe(viewLifecycleOwner, Observer {
+        median50.observe(viewLifecycleOwner, {
             tileDmedianTxt.text = median50.value.toString() + "ms"
             tileDFMedianTxt.text = median50.value.toString() + "ms"
         })
 
-        lifeTimeQ.observe(viewLifecycleOwner, Observer {
-            val lifeTimeConversion = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+        lifeTimeQ.observe(viewLifecycleOwner, {
+            val lifeTimeConversion = if (VERSION.SDK_INT >= VERSION_CODES.N) {
                 CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT).format(lifeTimeQ.value)
             } else {
                 // FIXME: 19-11-2020 - Format the number similar to CompctDecimalFormat
@@ -375,8 +374,8 @@ class HomeScreenFragment : Fragment() {
             tileDLifetimeQueriesTxt.text = lifeTimeConversion
         })
 
-         blockedCount.observe(viewLifecycleOwner, Observer {
-             val blocked = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+         blockedCount.observe(viewLifecycleOwner, {
+             val blocked = if (VERSION.SDK_INT >= VERSION_CODES.N) {
                  CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT).format(blockedCount.value)
              } else {
                  // FIXME: 19-11-2020 - Format the number similar to CompctDecimalFormat
@@ -388,7 +387,7 @@ class HomeScreenFragment : Fragment() {
 
         //val mDb = AppDatabase.invoke(requireContext().applicationContext)
         val appInfoRepository = mDb.appInfoRepository()
-        appInfoRepository.getBlockedAppCount().observe(viewLifecycleOwner, Observer {
+        appInfoRepository.getBlockedAppCount().observe(viewLifecycleOwner, {
             tileFAppsBlockedTxt.text = it.toString()
             tileDFAppsBlockedTxt.text = it.toString()
         })
@@ -398,11 +397,11 @@ class HomeScreenFragment : Fragment() {
             tileDFAppsBlockedTxt.text = appsBlocked.value.toString()
         })*/
 
-        numUniversalBlock.observe(viewLifecycleOwner, Observer {
+        numUniversalBlock.observe(viewLifecycleOwner, {
             tileFUniversalBlockedTxt.text = numUniversalBlock.value.toString()
         })
 
-        braveModeToggler.observe(viewLifecycleOwner, Observer {
+        braveModeToggler.observe(viewLifecycleOwner, {
             if (DEBUG) Log.d(LOG_TAG, "HomeScreen -> braveModeToggler -> observer")
             if (PersistentState.getVpnEnabled(requireContext())) {
                 enableBraveModeIcons()
@@ -512,12 +511,12 @@ class HomeScreenFragment : Fragment() {
                     startActivity(intent)
                 }else{
                     if(getPrivateDnsMode() == PrivateDnsMode.STRICT){
-                        Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.private_dns_toast).toString().capitalize(), Toast.LENGTH_SHORT)
+                        Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.private_dns_toast).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
                     }
-                    Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_dns).toString().capitalize(), Toast.LENGTH_SHORT)
+                    Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_dns).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
                 }
             }else{
-                Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_dns).toString().capitalize(), Toast.LENGTH_SHORT)
+                Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_dns).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
             }
         }
 
@@ -683,10 +682,10 @@ class HomeScreenFragment : Fragment() {
                 val intent = Intent(requireContext(), FirewallActivity::class.java)
                 startActivity(intent)
             } else {
-                Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(), Toast.LENGTH_SHORT)
+                Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
             }
         }else {
-             Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(), Toast.LENGTH_SHORT)
+             Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
         }
     }
 
@@ -761,7 +760,7 @@ class HomeScreenFragment : Fragment() {
     private fun getAllModes(): ArrayList<BraveMode> {
         val braveNames = resources.getStringArray(R.array.brave_dns_mode_names)
         val icons = resources.obtainTypedArray(R.array.brave_dns_mode_icons)
-        var braveList = ArrayList<BraveMode>(3)
+        val braveList = ArrayList<BraveMode>(3)
         var braveModes = BraveMode(icons.getResourceId(0, -1), 0, braveNames[0])
         braveList.add(braveModes)
         braveModes = BraveMode(icons.getResourceId(1, -1), 1, braveNames[1])
@@ -794,7 +793,7 @@ class HomeScreenFragment : Fragment() {
 
     private fun updateUptime() {
         val upTime = DateUtils.getRelativeTimeSpanString(appStartTime, System.currentTimeMillis(), MINUTE_IN_MILLIS, FORMAT_ABBREV_RELATIVE)
-        appUpTimeTxt.setText("(" + upTime + ")")
+        appUpTimeTxt.setText("($upTime)")
     }
 
 

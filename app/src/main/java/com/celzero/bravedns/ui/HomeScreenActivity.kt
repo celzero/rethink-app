@@ -188,7 +188,7 @@ class HomeScreenActivity : AppCompatActivity() {
                     PersistentState.setDownloadSource(context, Constants.DOWNLOAD_SOURCE_PLAY_STORE)
                 } else {
                     // App was installed from somewhere else
-                    PersistentState.setDownloadSource(context, Constants.DOWNLOAD_SOURCE_OTHERS)
+                    PersistentState.setDownloadSource(context, DOWNLOAD_SOURCE_OTHERS)
                 }
             } catch (e: PackageManager.NameNotFoundException) {
                 e.printStackTrace()
@@ -353,7 +353,7 @@ class HomeScreenActivity : AppCompatActivity() {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.d(LOG_TAG, "onFailure -  ${call.isCanceled}, ${call.isExecuted}")
+                Log.d(LOG_TAG, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
                 (context as HomeScreenActivity).runOnUiThread {
                     if (isUserInitiatedUpdateCheck) {
                         showDownloadDialog(false, getString(R.string.download_update_dialog_failure_title), getString(R.string.download_update_dialog_failure_message))
@@ -363,35 +363,30 @@ class HomeScreenActivity : AppCompatActivity() {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                try {
-                    val stringResponse = response.body()!!.string()
-                    //creating json object
-                    val jsonObject = JSONObject(stringResponse)
-                    val responseVersion = jsonObject.getInt("version")
-                    val updateValue = jsonObject.getBoolean("update")
-                    val latestVersion = jsonObject.getInt("latest")
-                    PersistentState.setLastAppUpdateCheckTime(context, System.currentTimeMillis())
-                    Log.i(LOG_TAG, "Server response for the new version download is true, version number-  $latestVersion")
-                    if (responseVersion == 1) {
-                        if (updateValue) {
-                            (context as HomeScreenActivity).runOnUiThread {
-                                showDownloadDialog(false, getString(R.string.download_update_dialog_title), getString(R.string.download_update_dialog_message))
-                            }
-                        } else {
-                            (context as HomeScreenActivity).runOnUiThread {
-                                if (isUserInitiatedUpdateCheck) {
-                                    showDownloadDialog(false, getString(R.string.download_update_dialog_message_ok_title), getString(R.string.download_update_dialog_message_ok))
-                                }
+
+                val stringResponse = response.body!!.string()
+                //creating json object
+                val jsonObject = JSONObject(stringResponse)
+                val responseVersion = jsonObject.getInt("version")
+                val updateValue = jsonObject.getBoolean("update")
+                val latestVersion = jsonObject.getInt("latest")
+                PersistentState.setLastAppUpdateCheckTime(context, System.currentTimeMillis())
+                Log.i(LOG_TAG, "Server response for the new version download is true, version number-  $latestVersion")
+                if (responseVersion == 1) {
+                    if (updateValue) {
+                        (context as HomeScreenActivity).runOnUiThread {
+                            showDownloadDialog(false, getString(R.string.download_update_dialog_title), getString(R.string.download_update_dialog_message))
+                        }
+                    } else {
+                        (context as HomeScreenActivity).runOnUiThread {
+                            if (isUserInitiatedUpdateCheck) {
+                                showDownloadDialog(false, getString(R.string.download_update_dialog_message_ok_title), getString(R.string.download_update_dialog_message_ok))
+                                isUserInitiatedUpdateCheck = false
                             }
                         }
                     }
                     response.close()
                     client.connectionPool().evictAll()
-                } catch (e: Exception) {
-                    if (isUserInitiatedUpdateCheck) {
-                        showDownloadDialog(false, getString(R.string.download_update_dialog_failure_title), getString(R.string.download_update_dialog_failure_message))
-                    }
-                }
             }
         })
     }
@@ -404,11 +399,11 @@ class HomeScreenActivity : AppCompatActivity() {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.d(LOG_TAG, "onFailure -  ${call.isCanceled}, ${call.isExecuted}")
+                Log.d(LOG_TAG, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val stringResponse = response.body()!!.string()
+                val stringResponse = response.body!!.string()
                 //creating json object
                 val jsonObject = JSONObject(stringResponse)
                 val responseVersion = jsonObject.getInt("version")
@@ -431,8 +426,8 @@ class HomeScreenActivity : AppCompatActivity() {
                         }
                     }
                 }
-                response.body()!!.close()
-                client.connectionPool().evictAll()
+                response.body!!.close()
+                client.connectionPool.evictAll()
             }
         })
     }

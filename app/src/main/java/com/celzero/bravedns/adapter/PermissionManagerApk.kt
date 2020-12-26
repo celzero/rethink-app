@@ -30,7 +30,7 @@ import com.mikepenz.fastadapter.items.AbstractItem
 
 class PermissionManagerApk (packageInfo: PackageInfo, context : Context) : AbstractItem<PermissionManagerApk.ViewHolder>() {
 
-    private var appInfo: ApplicationInfo
+    private var appInfo: ApplicationInfo = packageInfo.applicationInfo
     var appName: String ?= null
     private var packageName: String ?= null
     private var appIcon : Drawable?= null
@@ -40,7 +40,6 @@ class PermissionManagerApk (packageInfo: PackageInfo, context : Context) : Abstr
 
     init{
 
-        this.appInfo = packageInfo.applicationInfo
         this.context = context
         this.appIcon = context.packageManager.getApplicationIcon(appInfo)
         this.appName = context.packageManager.getApplicationLabel(appInfo).toString()

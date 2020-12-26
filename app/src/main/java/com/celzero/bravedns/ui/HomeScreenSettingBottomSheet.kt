@@ -77,7 +77,7 @@ class HomeScreenSettingBottomSheet(var connectedDetails : String) : BottomSheetD
     private fun updateUptime() {
         val upTime = DateUtils.getRelativeTimeSpanString(HomeScreenActivity.GlobalVariable.appStartTime,
             System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE)
-        appUpTimeTxt.text = "(" + upTime + ")"
+        appUpTimeTxt.text = "($upTime)"
     }
 
     private fun modifyBraveMode() {

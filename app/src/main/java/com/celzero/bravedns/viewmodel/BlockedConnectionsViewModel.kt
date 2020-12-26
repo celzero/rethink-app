@@ -16,15 +16,11 @@ limitations under the License.
 package com.celzero.bravedns.viewmodel
 
 import android.content.Context
-import androidx.arch.core.util.Function
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.AppDatabase
-import com.celzero.bravedns.database.BlockedConnections
 
 
 class BlockedConnectionsViewModel : ViewModel() {
@@ -45,18 +41,18 @@ class BlockedConnectionsViewModel : ViewModel() {
         filteredList.value = ""
     }
 
-    var blockedUnivRulesList = Transformations.switchMap<String, PagedList<BlockedConnections>>(
-                filteredList, (Function<String, LiveData<PagedList<BlockedConnections>>> { input ->
-                    if (input.isBlank()) {
-                        blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(pageSize = 50)
-                    } else if(input!! == "isFilter"){
-                        blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(pageSize = 50)
-                    }else {
-                        blockedConnectionsDAO.getUnivBlockedConnectionsByIP("%$input%").toLiveData(50)
-                    }
-                } as Function<String, LiveData<PagedList<BlockedConnections>>>)!!
+    var blockedUnivRulesList = Transformations.switchMap(
+                filteredList
 
-            )
+    ) { input ->
+        if (input.isBlank()) {
+            blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(pageSize = 50)
+        } else if (input!! == "isFilter") {
+            blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(pageSize = 50)
+        } else {
+            blockedConnectionsDAO.getUnivBlockedConnectionsByIP("%$input%").toLiveData(50)
+        }
+    }
 
     fun setFilter(filter: String?) {
         filteredList.value = filter

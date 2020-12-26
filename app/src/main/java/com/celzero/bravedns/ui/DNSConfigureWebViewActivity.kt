@@ -102,7 +102,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
         }
         loadUrl(url)
 
-        blockListsCount.observe(this, androidx.lifecycle.Observer {
+        blockListsCount.observe(this, {
             if (receivedIntentFrom == LOCAL) {
                 PersistentState.setNumberOfLocalBlockLists(this, it!!)
             }else{
@@ -339,11 +339,11 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
 
     private fun loadUrl(pageUrl: String) {
         try {
-            dnsConfigureWebView?.post(Runnable {
+            dnsConfigureWebView?.post {
                 run {
                     dnsConfigureWebView?.loadUrl(pageUrl)
                 }
-            })
+            }
 
             //dnsConfigureWebView?.loadUrl(pageUrl)
         }catch (e: Exception){
@@ -501,11 +501,11 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.d(LOG_TAG, "Webview: onFailure -  ${call.isCanceled}, ${call.isExecuted}")
+                Log.d(LOG_TAG, "Webview: onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val stringResponse = response.body()!!.string()
+                val stringResponse = response.body!!.string()
                 //creating json object
                 val jsonObject = JSONObject(stringResponse)
                 val version = jsonObject.getInt("version")
@@ -521,8 +521,8 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
                         }
                     }
                 }
-                response.body()!!.close()
-                client.connectionPool().evictAll()
+                response.body!!.close()
+                client.connectionPool.evictAll()
             }
         })
     }

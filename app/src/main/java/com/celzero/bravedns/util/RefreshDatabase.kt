@@ -249,7 +249,7 @@ class RefreshDatabase(var context: Context) {
             val dnsLogRepository = mDb.dnsLogRepository()
             val DAY_IN_MS = 1000 * 60 * 60 * 24
             val date = System.currentTimeMillis() - (HomeScreenActivity.DAYS_TO_MAINTAIN_NETWORK_LOG * DAY_IN_MS)
-            if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "Time: ${System.currentTimeMillis()}, dateVal: $date")
+            if (DEBUG) Log.d(LOG_TAG, "Time: ${System.currentTimeMillis()}, dateVal: $date")
             connTrackerRepository.deleteOlderData(date)
             dnsLogRepository.deleteOlderData(date)
             //mDb.close()
@@ -346,7 +346,7 @@ class RefreshDatabase(var context: Context) {
                 val isAlreadyConnectionAvailable = doHEndpointRepository.getConnectedDoH()
                 val urlName = context.resources.getStringArray(R.array.doh_endpoint_names)
                 val urlValues = context.resources.getStringArray(R.array.doh_endpoint_urls)
-                if(isAlreadyConnectionAvailable.dohName.isNullOrEmpty()){
+                if(isAlreadyConnectionAvailable.dohName.isEmpty()){
                     doHEndpointRepository.removeConnectionStatus()
 
                     val doHEndpoint1 = DoHEndpoint(1, urlName[0], urlValues[0], context.getString(R.string.dns_mode_0_explanation), false, false, System.currentTimeMillis(), 0)

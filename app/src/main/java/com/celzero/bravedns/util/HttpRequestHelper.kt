@@ -42,26 +42,26 @@ class HttpRequestHelper{
 
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
-                    Log.d(LOG_TAG, "onFailure -  ${call.isCanceled}, ${call.isExecuted}")
+                    Log.d(LOG_TAG, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
                 }
 
                 override fun onResponse(call: Call, response: Response) {
-                    val stringResponse = response.body()!!.string()
+                    val stringResponse = response.body!!.string()
                     //creating json object
                     val jsonObject = JSONObject(stringResponse)
                     val responseVersion = jsonObject.getInt("version")
                     val updateValue = jsonObject.getBoolean("update")
                     PersistentState.setLastAppUpdateCheckTime(context, System.currentTimeMillis())
-                    Log.i(Constants.LOG_TAG, "Server response for the new version download is true, version number-  $updateValue")
+                    Log.i(LOG_TAG, "Server response for the new version download is true, version number-  $updateValue")
                     if (responseVersion == 1) {
                         if (updateValue) {
-
+                            // TODO handle
                         } else {
-
+                            // TODO handle
                         }
                     }
-                    response.body()!!.close()
-                    client.connectionPool().evictAll()
+                    response.body!!.close()
+                    client.connectionPool.evictAll()
                 }
             })
         }

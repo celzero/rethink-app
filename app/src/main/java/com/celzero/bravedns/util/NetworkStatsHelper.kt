@@ -41,8 +41,7 @@ class NetworkStatsHelper {
     }
 
     fun getAllRxBytesMobile(context: Context): Long {
-        val bucket: NetworkStats.Bucket
-        bucket = try {
+        val bucket: NetworkStats.Bucket = try {
             networkStatsManager.querySummaryForDevice(
                 ConnectivityManager.TYPE_MOBILE,
                 getSubscriberId(context, ConnectivityManager.TYPE_MOBILE),
@@ -56,8 +55,7 @@ class NetworkStatsHelper {
     }
 
     fun getAllTxBytesMobile(context: Context): Long {
-        val bucket: NetworkStats.Bucket
-        bucket = try {
+        val bucket: NetworkStats.Bucket = try {
             networkStatsManager.querySummaryForDevice(
                 ConnectivityManager.TYPE_MOBILE,
                 getSubscriberId(context, ConnectivityManager.TYPE_MOBILE),
@@ -72,8 +70,7 @@ class NetworkStatsHelper {
 
     val allRxBytesWifi: Long
         get() {
-            val bucket: NetworkStats.Bucket
-            bucket = try {
+            val bucket: NetworkStats.Bucket = try {
                 networkStatsManager.querySummaryForDevice(
                     ConnectivityManager.TYPE_WIFI,
                     "",
@@ -88,8 +85,7 @@ class NetworkStatsHelper {
 
     val allTxBytesWifi: Long
         get() {
-            val bucket: NetworkStats.Bucket
-            bucket = try {
+            val bucket: NetworkStats.Bucket = try {
                 networkStatsManager.querySummaryForDevice(
                     ConnectivityManager.TYPE_WIFI,
                     "",
@@ -103,7 +99,7 @@ class NetworkStatsHelper {
         }
 
     fun getPackageRxBytesMobile(context: Context): Long {
-        var networkStats: NetworkStats = try {
+        val networkStats: NetworkStats = try {
             networkStatsManager.queryDetailsForUid(
                 ConnectivityManager.TYPE_MOBILE,
                 getSubscriberId(context, ConnectivityManager.TYPE_MOBILE),
@@ -125,7 +121,7 @@ class NetworkStatsHelper {
     }
 
     fun getPackageTxBytesMobile(context: Context): Long {
-        var networkStats: NetworkStats = try {
+        val networkStats: NetworkStats = try {
             networkStatsManager.queryDetailsForUid(
                 ConnectivityManager.TYPE_MOBILE,
                 getSubscriberId(context, ConnectivityManager.TYPE_MOBILE),
@@ -148,7 +144,7 @@ class NetworkStatsHelper {
 
     val packageRxBytesWifi: Long
         get() {
-            var networkStats: NetworkStats = try {
+            val networkStats: NetworkStats = try {
                 networkStatsManager.queryDetailsForUid(
                     ConnectivityManager.TYPE_WIFI,
                     "",
@@ -171,7 +167,7 @@ class NetworkStatsHelper {
 
     val packageTxBytesWifi: Long
         get() {
-            var networkStats: NetworkStats = try {
+            val networkStats: NetworkStats = try {
                 networkStatsManager.queryDetailsForUid(
                     ConnectivityManager.TYPE_WIFI,
                     "",
