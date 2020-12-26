@@ -173,9 +173,9 @@ class DNSProxyEndpointAdapter(private val context: Context,
             val app = appList[appName]?.appName
             //set message for alert dialog
             if(app != null && !app.isNullOrEmpty()) {
-                builder.setMessage("AppName: "+app + "\n\n" + "URL: "+url + "\n\n" + "Port: "+message)
+                builder.setMessage("AppName: $app\n\nURL: $url\n\nPort: $message")
             }else{
-                builder.setMessage("AppName: Nobody \n\n" + "URL: "+ url + "\n\n" +"Port: " + message)
+                builder.setMessage("AppName: Nobody \n\nURL: $url\n\nPort: $message")
             }
             builder.setCancelable(true)
             //performing positive action

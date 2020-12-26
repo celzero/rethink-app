@@ -25,13 +25,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:background="@color/colorPrimaryDark"
-                android:drawableRight="@drawable/ic_keyboard_arrow_up_gray_24dp"
                 android:fontFamily="sans-serif-smallcaps"
                 android:padding="10dp"
                 android:text="universal firewall"
                 android:textColor="@color/secondaryText"
                 android:textSize="@dimen/large_font_text_view"
-                android:visibility="gone" />
+                android:visibility="gone"
+                app:drawableRightCompat="@drawable/ic_keyboard_arrow_up_gray_24dp" />
 
             <TextView
                 android:layout_width="match_parent"

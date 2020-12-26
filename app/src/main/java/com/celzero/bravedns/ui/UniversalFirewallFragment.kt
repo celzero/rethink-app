@@ -32,7 +32,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
@@ -280,7 +279,7 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
 
         val appCount = GlobalVariable.appList.size
         val act: FirewallActivity = requireContext() as FirewallActivity
-        appInfoRepository.getWhitelistCountLiveData().observe(act, Observer {
+        appInfoRepository.getWhitelistCountLiveData().observe(act, {
             whitelistCountTxt.text = "$it/$appCount apps whitelisted."
         })
 

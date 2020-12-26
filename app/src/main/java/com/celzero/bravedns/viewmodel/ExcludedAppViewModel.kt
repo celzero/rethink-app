@@ -17,12 +17,9 @@ package com.celzero.bravedns.viewmodel
 
 import android.content.Context
 import android.util.Log
-import androidx.arch.core.util.Function
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfo
@@ -40,23 +37,24 @@ class ExcludedAppViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         filteredList.value = ""
     }
 
-    var excludedAppList = Transformations.switchMap<String, PagedList<AppInfo>>(
-        filteredList, (Function<String, LiveData<PagedList<AppInfo>>> { input ->
-            if (input.isBlank()) {
-                appInfoDAO.getExcludedAppDetailsLiveData().toLiveData(pageSize = 50)
-            } else if (input == "isSystem") {
-                appInfoDAO.getExcludedAAppSystemAppsLiveData().toLiveData(pageSize = 50)
-            } else if (input.contains("category:")) {
-                val filterVal = input.split(":")[1]
-                val result = filterVal.split(",").map { it.trim() }
-                if(DEBUG) Log.d(LOG_TAG, "FilterVal - $filterVal")
-                appInfoDAO.getExcludedAppDetailsFilterForCategoryLiveData(result).toLiveData(pageSize = 50)
-            } else {
-                appInfoDAO.getExcludedAppDetailsFilterLiveData("%$input%").toLiveData(pageSize = 50)
-                //appDetailsDAO.getUnivAppDetailsLiveData("%$input%").toLiveData(50)
-            }
-        } as androidx.arch.core.util.Function<String, LiveData<PagedList<AppInfo>>>)
-    )
+    var excludedAppList = Transformations.switchMap(
+        filteredList
+    ) { input ->
+        if (input.isBlank()) {
+            appInfoDAO.getExcludedAppDetailsLiveData().toLiveData(pageSize = 50)
+        } else if (input == "isSystem") {
+            appInfoDAO.getExcludedAAppSystemAppsLiveData().toLiveData(pageSize = 50)
+        } else if (input.contains("category:")) {
+            val filterVal = input.split(":")[1]
+            val result = filterVal.split(",").map { it.trim() }
+            if (DEBUG) Log.d(LOG_TAG, "FilterVal - $filterVal")
+            appInfoDAO.getExcludedAppDetailsFilterForCategoryLiveData(result)
+                .toLiveData(pageSize = 50)
+        } else {
+            appInfoDAO.getExcludedAppDetailsFilterLiveData("%$input%").toLiveData(pageSize = 50)
+            //appDetailsDAO.getUnivAppDetailsLiveData("%$input%").toLiveData(50)
+        }
+    }
 
     fun setFilter(filter: String?) {
         filteredList.value = filter

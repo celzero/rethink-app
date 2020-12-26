@@ -16,8 +16,6 @@ limitations under the License.
 package com.celzero.bravedns.viewmodel
 
 import android.content.Context
-import androidx.arch.core.util.Function
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
@@ -35,12 +33,12 @@ class FirewallAppViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         filteredList.value = ""
     }
 
-    var firewallAppDetailsList = Transformations.switchMap<String, List<AppInfo>>(
-        filteredList, (Function<String, LiveData<List<AppInfo>>> { input ->
-            var inputTxt = "%$input%"
-            appInfoDAO.getAppDetailsForLiveData(inputTxt)
-        } as androidx.arch.core.util.Function<String,LiveData<List<AppInfo>>>)
-    )
+    var firewallAppDetailsList = Transformations.switchMap(
+        filteredList
+    ) { input ->
+        var inputTxt = "%$input%"
+        appInfoDAO.getAppDetailsForLiveData(inputTxt)
+    }
 
     /*else if (input == "isSystem") {
                     appDetailsDAO.getUnivAppSystemAppsLiveData().toLiveData(pageSize = 50)

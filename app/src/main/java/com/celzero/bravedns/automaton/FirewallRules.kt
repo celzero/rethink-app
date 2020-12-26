@@ -92,7 +92,7 @@ class FirewallRules {
      }*/
 
     fun checkRules(uid: Int, connectionRules: ConnectionRules): Boolean {
-        var rule = firewallRules[uid]
+        val rule = firewallRules[uid]
         rule?.forEach {
             if (it!! == connectionRules.ipAddress) {
                 //if (DEBUG) Log.d(LOG_TAG, "Check Rules : True ${it.protocol}, ${it.ipAddress}, ${it.port}")

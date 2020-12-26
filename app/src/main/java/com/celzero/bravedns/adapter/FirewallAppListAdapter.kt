@@ -46,6 +46,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.isSearchEnabled
 import com.celzero.bravedns.util.Constants.Companion.APP_CAT_SYSTEM_APPS
 import com.celzero.bravedns.util.Constants.Companion.APP_CAT_SYSTEM_COMPONENTS
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.ThrowingHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -483,11 +484,7 @@ class FirewallAppListAdapter internal constructor(
 
     private fun showDialog(packageList: List<AppInfo>, appName: String, isInternet: Boolean): Boolean {
         //Change the handler logic into some other
-        val handler: Handler = object : Handler() {
-            override fun handleMessage(mesg: Message?) {
-                throw RuntimeException()
-            }
-        }
+        val handler: Handler = ThrowingHandler()
         var positiveTxt = ""
         val packageNameList: List<String> = packageList.map { it.appName }
         var proceedBlocking: Boolean = false
@@ -520,16 +517,16 @@ class FirewallAppListAdapter internal constructor(
         /*val alertDialog : AlertDialog = builderSingle.create()
         alertDialog.getListView().setOnItemClickListener({ adapterView, subview, i, l -> })*/
         builderSingle.setPositiveButton(
-            positiveTxt,
-            DialogInterface.OnClickListener { dialogInterface: DialogInterface, i: Int ->
-                proceedBlocking = true
-                handler.sendMessage(handler.obtainMessage())
-            }).setNeutralButton(
-            "Go Back",
-            DialogInterface.OnClickListener { dialogInterface: DialogInterface, i: Int ->
-                handler.sendMessage(handler.obtainMessage());
-                proceedBlocking = false
-            })
+            positiveTxt
+        ) { dialogInterface: DialogInterface, i: Int ->
+            proceedBlocking = true
+            handler.sendMessage(handler.obtainMessage())
+        }.setNeutralButton(
+            "Go Back"
+        ) { dialogInterface: DialogInterface, i: Int ->
+            handler.sendMessage(handler.obtainMessage())
+            proceedBlocking = false
+        }
 
         val alertDialog: AlertDialog = builderSingle.show()
         alertDialog.listView.setOnItemClickListener { adapterView, subview, i, l -> }
@@ -544,11 +541,7 @@ class FirewallAppListAdapter internal constructor(
 
     private fun showDialogForSystemAppBlock(isSysComponent : Boolean): Boolean {
         //Change the handler logic into some other
-        val handlerDelete: Handler = object : Handler() {
-            override fun handleMessage(mesg: Message?) {
-                throw RuntimeException()
-            }
-        }
+        val handlerDelete: Handler = ThrowingHandler()
         var proceedBlocking: Boolean = false
 
         val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
@@ -565,16 +558,16 @@ class FirewallAppListAdapter internal constructor(
 
 
         builderSingle.setPositiveButton(
-            "Proceed",
-            DialogInterface.OnClickListener { dialogInterface: DialogInterface, i: Int ->
-                proceedBlocking = true
-                handlerDelete.sendMessage(handlerDelete.obtainMessage())
-            }).setNegativeButton(
-            "Go Back",
-            DialogInterface.OnClickListener { dialogInterface: DialogInterface, i: Int ->
-                handlerDelete.sendMessage(handlerDelete.obtainMessage())
-                proceedBlocking = false
-            })
+            "Proceed"
+        ) { dialogInterface: DialogInterface, i: Int ->
+            proceedBlocking = true
+            handlerDelete.sendMessage(handlerDelete.obtainMessage())
+        }.setNegativeButton(
+            "Go Back"
+        ) { dialogInterface: DialogInterface, i: Int ->
+            handlerDelete.sendMessage(handlerDelete.obtainMessage())
+            proceedBlocking = false
+        }
 
         val alertDialog: AlertDialog = builderSingle.show()
         alertDialog.setCancelable(false)

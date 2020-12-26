@@ -84,8 +84,8 @@ class Utilities {
 
 
         fun getPermissionDetails(activity: Context, packageName: String): PackageInfo {
-            var appInstall: PackageInfo
-            var p = activity.packageManager
+            val appInstall: PackageInfo
+            val p = activity.packageManager
             appInstall = p.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
             return appInstall
         }

@@ -41,6 +41,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.fragment.app.viewModels
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ExcludedAppListAdapter
 import com.celzero.bravedns.database.*
@@ -231,7 +232,7 @@ class SettingsFragment : Fragment() {
             dnsSettingsHeading.visibility = View.GONE
         }
 
-        localDownloadComplete.observe(viewLifecycleOwner, Observer {
+        localDownloadComplete.observe(viewLifecycleOwner, {
             if (it == 1) {
                 if(DEBUG) Log.d(LOG_TAG, "Observer log")
                 downloadInProgress = 1
@@ -247,7 +248,7 @@ class SettingsFragment : Fragment() {
             }
         })
 
-        HomeScreenActivity.GlobalVariable.braveModeToggler.observe(viewLifecycleOwner, Observer {
+        HomeScreenActivity.GlobalVariable.braveModeToggler.observe(viewLifecycleOwner, {
             if (HomeScreenActivity.GlobalVariable.braveMode == HomeScreenFragment.DNS_MODE) {
                 //disableDNSRelatedUI()
             } else if (HomeScreenActivity.GlobalVariable.braveMode == HomeScreenFragment.FIREWALL_MODE) {
@@ -271,9 +272,9 @@ class SettingsFragment : Fragment() {
             val sock5Proxy = proxyEndpointRepository.getConnectedProxy()
             if (sock5Proxy?.proxyAppName != "Nobody") {
                 val appName = appList[sock5Proxy?.proxyAppName]?.appName
-                socks5DescText.text = "Forwarding to ${sock5Proxy!!.proxyIP}:${sock5Proxy!!.proxyPort}, $appName"
+                socks5DescText.text = "Forwarding to ${sock5Proxy!!.proxyIP}:${sock5Proxy.proxyPort}, $appName"
             } else {
-                socks5DescText.text = "Forwarding to ${sock5Proxy!!.proxyIP}:${sock5Proxy!!.proxyPort}, Nobody"
+                socks5DescText.text = "Forwarding to ${sock5Proxy.proxyIP}:${sock5Proxy.proxyPort}, Nobody"
             }
         }
         socks5Progress.visibility = View.GONE
@@ -300,7 +301,7 @@ class SettingsFragment : Fragment() {
 
         val appCount = appList.size
         val act: HomeScreenActivity = requireContext() as HomeScreenActivity
-        appInfoRepository.getExcludedAppListCountLiveData().observe(act, Observer {
+        appInfoRepository.getExcludedAppListCountLiveData().observe(act, {
             excludeListCountText.text = "$it/$appCount apps excluded."
         })
 
@@ -997,7 +998,7 @@ class SettingsFragment : Fragment() {
             userNameEditText.setText(sock5Proxy.userName.toString(), TextView.BufferType.EDITABLE)
             if (sock5Proxy.proxyAppName?.isNotEmpty()!! && sock5Proxy.proxyAppName != "Nobody") {
                 val packageName = sock5Proxy.proxyAppName
-                val app = HomeScreenActivity.GlobalVariable.appList[packageName]
+                val app = appList[packageName]
                 var position = 0
                 for ((i, item) in appNames.withIndex()) {
                     if (item == app?.appName) {
@@ -1055,7 +1056,7 @@ class SettingsFragment : Fragment() {
                 errorTxt.setText("Invalid port")
                 isValid = false
             }
-            Log.d(LOG_TAG, "Pattern not matching - port- $port , ${portEditText.text.toString()}")
+            Log.d(LOG_TAG, "Pattern not matching - port- $port , ${portEditText.text}")
             if (udpBlockCheckBox.isChecked) {
                 isUDPBlock = true
             }

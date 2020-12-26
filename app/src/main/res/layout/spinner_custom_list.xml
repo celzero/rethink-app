@@ -16,7 +16,7 @@
         app:layout_constraintTop_toTopOf="parent"/>
     <TextView
         android:id="@+id/modeText"
-        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
         android:padding="5dp"
         android:textColor="@color/primaryText"
         android:layout_width="match_parent"

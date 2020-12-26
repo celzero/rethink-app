@@ -105,7 +105,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
         }
         loadUrl(url)
 
-        blockListsCount.observe(this, androidx.lifecycle.Observer {
+        blockListsCount.observe(this, {
             if (receivedIntentFrom == LOCAL) {
                 PersistentState.setNumberOfLocalBlockLists(this, it!!)
             }else{
@@ -340,11 +340,11 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
 
     private fun loadUrl(pageUrl: String) {
         try {
-            dnsConfigureWebView?.post(Runnable {
+            dnsConfigureWebView?.post {
                 run {
                     dnsConfigureWebView?.loadUrl(pageUrl)
                 }
-            })
+            }
 
             //dnsConfigureWebView?.loadUrl(pageUrl)
         }catch (e: Exception){

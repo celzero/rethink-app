@@ -60,7 +60,7 @@ class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener{
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view: View = inflater!!.inflate(R.layout.fragment_permission_manager,container,false)
+        val view: View = inflater.inflate(R.layout.fragment_permission_manager,container,false)
 
         val includeView = view.findViewById<View>(R.id.app_scrolling_incl)
         expandableImage = view.findViewById(R.id.expandedImage)
@@ -82,16 +82,19 @@ class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener{
 
         updateAppList()
 
-        expandableImage.setOnClickListener(View.OnClickListener {
-            Toast.makeText(this.context,"Load",Toast.LENGTH_SHORT).show()
+        expandableImage.setOnClickListener {
+            Toast.makeText(this.context, "Load", Toast.LENGTH_SHORT).show()
             mAdapter.notifyDataSetChanged()
-        })
+        }
 
-        filterIcon.setOnClickListener(View.OnClickListener {
+        filterIcon.setOnClickListener {
             val bottomFilterSheetFragment = FilterAndSortBottomFragment()
             val frag = context as FragmentActivity
-            bottomFilterSheetFragment.show(frag.supportFragmentManager, bottomFilterSheetFragment.tag)
-        })
+            bottomFilterSheetFragment.show(
+                frag.supportFragmentManager,
+                bottomFilterSheetFragment.tag
+            )
+        }
 
         return view
     }

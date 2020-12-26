@@ -76,11 +76,8 @@ class NetworkManager(context: Context, networkListener: NetworkListener) {
 
         applicationContext!!.registerReceiver(this.broadcastReceiver, intentFilter)
         // Fire onNetworkConnected listener immediately if we are online.
-        if(connectivityManager!!.getActiveNetworkInfo() != null) {
-            val networkInfo: NetworkInfo = connectivityManager!!.getActiveNetworkInfo()
-            if (networkInfo != null && networkInfo.isConnected) {
-                networkListener.onNetworkConnected(networkInfo)
-            }
+        connectivityManager?.activeNetworkInfo?.takeIf { it.isConnected }?.also {
+            networkListener.onNetworkConnected(it)
         }
     }
 
@@ -113,7 +110,7 @@ class NetworkManager(context: Context, networkListener: NetworkListener) {
         } else if (!isConnectedNetwork(activeNetworkInfo)) {
             // No active network, signal disconnect event.
             networkListener!!.onNetworkDisconnected()
-        } else if (activeNetworkInfo.type != ConnectivityManager.TYPE_VPN) {
+        } else if (activeNetworkInfo!!.type != ConnectivityManager.TYPE_VPN) {
             // We have an active network, make sure it is not a VPN to signal a connected event.
             networkListener!!.onNetworkConnected(activeNetworkInfo)
         }

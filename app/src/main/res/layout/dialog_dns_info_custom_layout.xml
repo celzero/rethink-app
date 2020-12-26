@@ -25,13 +25,13 @@
         <TextView
             style="@style/Widget.AppCompat.TextView.SpinnerItem"
             android:layout_width="wrap_content"
-            android:drawableStart="@drawable/dns_no_filter"
             android:layout_height="wrap_content"
             android:drawablePadding="20dp"
             android:padding="10dp"
             android:text="@string/dns_mode_0"
             android:textSize="@dimen/heading_font_text_view"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            app:drawableStartCompat="@drawable/dns_no_filter" />
 
         <TextView
             style="@style/Widget.AppCompat.TextView.SpinnerItem"
@@ -51,8 +51,8 @@
             android:padding="10dp"
             android:text="@string/dns_mode_1"
             android:textSize="@dimen/heading_font_text_view"
-            android:drawableStart="@drawable/dns_family"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            app:drawableStartCompat="@drawable/dns_family" />
 
         <TextView
             style="@style/Widget.AppCompat.TextView.SpinnerItem"
@@ -72,8 +72,8 @@
             android:padding="10dp"
             android:text="@string/dns_mode_2"
             android:textSize="@dimen/heading_font_text_view"
-            android:drawableStart="@drawable/idns_ad_malware"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            app:drawableStartCompat="@drawable/idns_ad_malware" />
 
         <TextView
             style="@style/Widget.AppCompat.TextView.SpinnerItem"
@@ -94,8 +94,8 @@
             android:padding="10dp"
             android:text="@string/dns_mode_3"
             android:textSize="@dimen/heading_font_text_view"
-            android:drawableStart="@drawable/dns_custom_url"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            app:drawableStartCompat="@drawable/dns_custom_url" />
 
         <TextView
             style="@style/Widget.AppCompat.TextView.SpinnerItem"
@@ -116,8 +116,8 @@
             android:padding="10dp"
             android:text="@string/dns_mode_4"
             android:textSize="@dimen/heading_font_text_view"
-            android:drawableStart="@drawable/dns_bravedns"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            app:drawableStartCompat="@drawable/dns_bravedns" />
 
         <TextView
             style="@style/Widget.AppCompat.TextView.SpinnerItem"

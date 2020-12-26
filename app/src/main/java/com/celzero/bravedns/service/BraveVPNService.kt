@@ -26,7 +26,6 @@ import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.net.ProxyInfo
 import android.net.VpnService
-import android.os.Build
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.service.quicksettings.TileService.requestListeningState
@@ -383,7 +382,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                 if (PersistentState.getHttpProxyEnabled(this)) {
                     val host = PersistentState.getHttpProxyHostAddress(this)
                     val port = PersistentState.getHttpProxyPort(this)
-                    val proxyInfo: ProxyInfo = ProxyInfo.buildDirectProxy(host!!, port!!)
+                    val proxyInfo: ProxyInfo = ProxyInfo.buildDirectProxy(host!!, port)
                     builder.setHttpProxy(proxyInfo)
                     Log.i(LOG_TAG, "$FILE_LOG_TAG Http proxy enabled - builder updated with $host, $port")
                 }
@@ -504,7 +503,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
             }
         }
 
-        var contentTitle: String = if (braveMode == 0) context.resources.getString(R.string.dns_mode_notification_title)
+        val contentTitle: String = if (braveMode == 0) context.resources.getString(R.string.dns_mode_notification_title)
         else if (braveMode == 1) context.resources.getString(R.string.firewall_mode_notification_title)
         else if (braveMode == 2) context.resources.getString(R.string.hybrid_mode_notification_title)
         else context.resources.getString(R.string.notification_title)
@@ -521,9 +520,9 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
     @InternalCoroutinesApi
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        appInfoRepository.getUIDForUnivWhiteList().observeForever(androidx.lifecycle.Observer {
+        appInfoRepository.getUIDForUnivWhiteList().observeForever {
             appWhiteList = it.associateBy({ it }, { true }).toMutableMap()
-        })
+        }
         blockUDPTraffic = PersistentState.getUDPBlockedSettings(this)
         privateDNSOverride = PersistentState.getAllowPrivateDNS(this)
         isScreenLocked = PersistentState.getScreenLockData(this)
@@ -565,13 +564,9 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
 
                 val applicationContext = this.applicationContext
                 val connectivityManager = applicationContext!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                if (connectivityManager.getActiveNetworkInfo() != null) {
-                    val networkInfo: NetworkInfo = connectivityManager!!.getActiveNetworkInfo()
-                    if (networkInfo != null && networkInfo.isConnected) {
-                        onNetworkConnected(networkInfo)
-                    }
+                connectivityManager.activeNetworkInfo?.takeIf { it.isConnected }?.also {
+                    onNetworkConnected(it)
                 }
-
                 val builder = updateBuilder(this)
                 Log.i(LOG_TAG, "$FILE_LOG_TAG onStart command - start as foreground service. ")
                 startForeground(SERVICE_ID, builder.notification)
@@ -586,20 +581,23 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
 
     private fun registerAccessibilityServiceState() {
         val am = getSystemService(ACCESSIBILITY_SERVICE) as AccessibilityManager
-        am.addAccessibilityStateChangeListener(AccessibilityManager.AccessibilityStateChangeListener { b ->
-            val isServiceEnabled = Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
-            if(!b || !isServiceEnabled){
+        am.addAccessibilityStateChangeListener { b ->
+            val isServiceEnabled = Utilities.isAccessibilityServiceEnabledEnhanced(
+                this,
+                BackgroundAccessibilityService::class.java
+            )
+            if (!b || !isServiceEnabled) {
                 isBackgroundEnabled = false
                 PersistentState.setBackgroundEnabled(this, false)
             }
-        })
+        }
     }
 
     @InternalCoroutinesApi private fun spawnServerUpdate() {
         if (vpnController != null) {
             synchronized(vpnController) {
                 if (networkManager != null) {
-                    Thread(Runnable { updateServerConnection() }, "updateServerConnection-onStartCommand").start()
+                    Thread({ updateServerConnection() }, "updateServerConnection-onStartCommand").start()
                 }
             }
         }
@@ -812,7 +810,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
             Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
         if (vpnController != null) {
             synchronized(vpnController) {
-                Thread(Runnable {
+                Thread({
                     //updateServerConnection()
                     // Attempt seamless handoff as described in the docs for VpnService.Builder.establish().
                     val oldAdapter: GoVpnAdapter? = vpnAdapter
@@ -839,12 +837,9 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
 
         // This code is used to start the VPN for the first time, but startVpn is idempotent, so we can
         // call it every time. startVpn performs network activity so it has to run on a separate thread.
-        Thread(object : Runnable {
-            override fun run() {
-                //TODO Work on the order of the function call.
-                updateServerConnection()
-                startVpn()
-            }
+        Thread({ //TODO Work on the order of the function call.
+            updateServerConnection()
+            startVpn()
         }, "startVpn-onNetworkConnected").start()
     }
 
@@ -855,7 +850,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
 
     private fun setNetworkConnected(connected: Boolean) {
         networkConnected = connected
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.M) {
+        if (VERSION.SDK_INT >= VERSION_CODES.M) {
             // Indicate that traffic will be sent over the current active network.
             // See e.g. https://issuetracker.google.com/issues/68657525
             val activeNetwork = getSystemService(ConnectivityManager::class.java).activeNetwork

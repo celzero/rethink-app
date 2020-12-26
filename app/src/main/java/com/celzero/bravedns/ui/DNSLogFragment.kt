@@ -93,10 +93,9 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreate(savedInstanceState)
         //setContentView(R.layout.activity_query_detail)
-        val view: View = inflater.inflate(R.layout.activity_query_detail, container, false)
         //urlName = resources.getStringArray(R.array.doh_endpoint_names)
         //urlValues = resources.getStringArray(R.array.doh_endpoint_urls)
-        return view
+        return inflater.inflate(R.layout.activity_query_detail, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -150,7 +149,7 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
             topLayoutRL.visibility = View.VISIBLE
         }
 
-        median50.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+        median50.observe(viewLifecycleOwner, {
             latencyTxt.text = "Latency: "+median50.value.toString() + "ms"
         })
 

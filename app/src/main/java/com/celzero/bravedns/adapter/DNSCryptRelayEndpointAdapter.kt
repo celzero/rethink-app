@@ -132,7 +132,7 @@ class DNSCryptRelayEndpointAdapter(
                 }
                 imageAction.setOnClickListener {
                     dnsCryptRelayEndpoint.isSelected = imageAction.isChecked
-                    var state = updateDNSCryptRelayDetails(dnsCryptRelayEndpoint)
+                    val state = updateDNSCryptRelayDetails(dnsCryptRelayEndpoint)
                     if (imageAction.isChecked && !state) {
                         imageAction.isChecked = state
                     }

@@ -29,7 +29,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.appcompat.widget.SearchView
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
@@ -77,7 +76,7 @@ class ExcludeAppDialog(private var activity: Context,
         window?.setLayout(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT
-        );
+        )
 
         recyclerView = findViewById(R.id.exclude_app_recycler_view_dialog)
         mLayoutManager = LinearLayoutManager(activity)
@@ -97,14 +96,14 @@ class ExcludeAppDialog(private var activity: Context,
         searchView.setOnQueryTextListener(this)
         searchView.setOnSearchClickListener(this)
 
-        searchView.setOnCloseListener(SearchView.OnCloseListener {
+        searchView.setOnCloseListener {
             showCategoryChips()
             false
-        })
+        }
 
         val appCount = HomeScreenActivity.GlobalVariable.appList.size
         val act: HomeScreenActivity = activity as HomeScreenActivity
-        appInfoRepository.getExcludedAppListCountLiveData().observe(act, Observer {
+        appInfoRepository.getExcludedAppListCountLiveData().observe(act, {
             countSelectedText.text = "$it/$appCount apps excluded"
         })
 
@@ -220,7 +219,7 @@ class ExcludeAppDialog(private var activity: Context,
                     } else {
                         var catTitle = ""
                         filterCategories.forEach {
-                            catTitle = it + "," + catTitle
+                            catTitle = "$it,$catTitle"
                         }
                         if (catTitle.length > 1) {
                             catTitle.substring(0, catTitle.length - 1)

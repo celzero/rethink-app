@@ -136,7 +136,7 @@ class AppMode internal constructor(
     fun getDNSCryptServerCount() : Int{
         val count = dnsCryptEndpointRepository.getConnectedCount()
         //mDb.close()
-        return count
+        return dnsCryptEndpointRepository.getConnectedCount()
     }
 
     fun getDNSCryptServerToRemove(): String {

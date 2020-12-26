@@ -16,12 +16,9 @@ limitations under the License.
 package com.celzero.bravedns.viewmodel
 
 import android.content.Context
-import androidx.arch.core.util.Function
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.DNSProxyEndpoint
@@ -35,15 +32,16 @@ class DNSProxyEndpointViewModel(private val dnsProxyEndpointDAO: DNSProxyEndpoin
         filteredList.value = ""
     }
 
-    var dnsProxyEndpointList = Transformations.switchMap<String, PagedList<DNSProxyEndpoint>>(
-                filteredList, (Function<String, LiveData<PagedList<DNSProxyEndpoint>>> { input ->
-            if (input.isBlank()) {
-                dnsProxyEndpointDAO.getDNSProxyEndpointLiveData().toLiveData(pageSize = 50)
-            } else {
-                dnsProxyEndpointDAO.getDNSProxyEndpointLiveDataByType("%$input%").toLiveData(pageSize = 50)
-            }
-        } as androidx.arch.core.util.Function<String, LiveData<PagedList<DNSProxyEndpoint>>>)
-    )
+    var dnsProxyEndpointList = Transformations.switchMap(
+                filteredList
+    ) { input ->
+        if (input.isBlank()) {
+            dnsProxyEndpointDAO.getDNSProxyEndpointLiveData().toLiveData(pageSize = 50)
+        } else {
+            dnsProxyEndpointDAO.getDNSProxyEndpointLiveDataByType("%$input%")
+                .toLiveData(pageSize = 50)
+        }
+    }
 
     fun setFilter(filter: String?) {
         filteredList.value = filter
