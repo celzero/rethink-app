@@ -69,6 +69,7 @@ import protect.Blocker
 import protect.Protector
 import settings.Settings
 import java.util.*
+import org.koin.android.ext.android.get
 import kotlin.collections.HashMap
 
 
@@ -830,7 +831,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
     }
 
     private fun makeVpnAdapter(): GoVpnAdapter? {
-        return GoVpnAdapter.establish(this)
+        return GoVpnAdapter.establish(this, appMode, dnsProxyEndpointRepository, get(), get())
     }
 
     override fun onNetworkConnected(networkInfo: NetworkInfo?) {
