@@ -28,6 +28,7 @@
         android:largeHeap="true"
         android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
+        android:name=".RethinkDnsApplication"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <meta-data
