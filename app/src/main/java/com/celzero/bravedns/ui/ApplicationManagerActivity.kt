@@ -21,7 +21,6 @@ import android.app.ActivityManager
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ApplicationInfo
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -29,6 +28,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ApplicationManagerApk
 import com.celzero.bravedns.animation.ViewAnimation
@@ -107,7 +107,7 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
         fabAppInfoIcon.setOnClickListener{
             val list = ApplicationManagerApk.getAddedList(this)
             if(list.size >= 1){
-                list.get(list.size - 1).packageName?.let { it1 -> appInfoForPackage(it1) }
+                list[list.size - 1].packageName?.let { it1 -> appInfoForPackage(it1) }
             }
         }
     }
@@ -123,8 +123,7 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
             fastAdapter = FastAdapter.with(itemAdapter)
             if(isAdded){
                 val packageInfo = context.packageManager.getPackageInfo(packageName,0)
-                ApplicationInfo.getCategoryTitle(context,packageInfo.applicationInfo.category)
-                if(packageInfo.packageName != "com.celzero.bravedns" ) {
+                if(packageInfo.packageName != BuildConfig.APPLICATION_ID ) {
                     val userApk =  ApplicationManagerApk(packageInfo, "", context)
                     apkList.add(userApk)
                 }
@@ -178,7 +177,7 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
         val appList = appInfoRepository.getAppInfoAsync()
         appList.forEach{
             val packageInfo = packageManager.getPackageInfo(it.packageInfo,0)
-            if(packageInfo.packageName != "com.celzero.bravedns" ) {
+            if(packageInfo.packageName != BuildConfig.APPLICATION_ID ) {
                 val userApk =  ApplicationManagerApk(packageManager.getPackageInfo(it.packageInfo, 0), it.appCategory, context)
                 apkList.add(userApk)
             }

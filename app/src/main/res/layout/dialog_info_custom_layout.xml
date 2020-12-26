@@ -27,11 +27,11 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:drawableStart="@drawable/spinner_dns"
         android:drawablePadding="20dp"
         android:padding="10dp"
         android:textSize="@dimen/heading_font_text_view"
-        android:text="@string/dns_mode_info_title" />
+        android:text="@string/dns_mode_info_title"
+        app:drawableStartCompat="@drawable/spinner_dns" />
 
     <TextView
         style="@style/Widget.AppCompat.TextView.SpinnerItem"
@@ -48,11 +48,11 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         android:layout_width="wrap_content"
         android:padding="10dp"
-        android:drawableStart="@drawable/spinner_firewall"
         android:drawablePadding="20dp"
         android:textSize="@dimen/heading_font_text_view"
         android:layout_height="wrap_content"
-        android:text="@string/firewall_mode_info_title" />
+        android:text="@string/firewall_mode_info_title"
+        app:drawableStartCompat="@drawable/spinner_firewall" />
 
     <TextView
         style="@style/Widget.AppCompat.TextView.SpinnerItem"
@@ -73,8 +73,8 @@
         android:drawablePadding="20dp"
         android:visibility="gone"
         android:textSize="@dimen/heading_font_text_view"
-        android:drawableStart="@drawable/spinner_both"
-        android:text="@string/hybrid_mode_info_title" />
+        android:text="@string/hybrid_mode_info_title"
+        app:drawableStartCompat="@drawable/spinner_both" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/info_dialog_cancel_btn"

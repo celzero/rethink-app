@@ -104,8 +104,6 @@ class IPAppListBottomSheetFragment(private var contextVal: Context, private var 
         }
     }
 
-    class CustomList(var ipCount: Int, var timeStamp: Long, var isBlockedCount: Int, var isAllowedCount: Int, var currentStatus: Boolean, var ipAddress: String) {
-
-    }
+    class CustomList(var ipCount: Int, var timeStamp: Long, var isBlockedCount: Int, var isAllowedCount: Int, var currentStatus: Boolean, var ipAddress: String)
 
 }

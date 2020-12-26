@@ -29,7 +29,6 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
-import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.MyAccessibilityService
 import java.util.*
 import kotlin.collections.LinkedHashMap
@@ -208,7 +207,7 @@ class PermissionsManager {
         }
 
         if (event.eventType == AccessibilityEvent.TYPE_WINDOWS_CHANGED) {
-            Log.w("88888","onAEvent____: window_changed " + event)
+            Log.w("88888", "onAEvent____: window_changed $event")
 
             // get the source node of the event
             event.source?.apply {
@@ -228,7 +227,7 @@ class PermissionsManager {
                 navigateToPermissionsPage(event)
             }
             else -> {
-                Log.w(TAG, "bbbb revokepermissionfirststage, but nothing to do, reset " + event)
+                Log.w(TAG, "bbbb revokepermissionfirststage, but nothing to do, reset $event")
             }
         }
     }
@@ -312,10 +311,10 @@ class PermissionsManager {
 
         // findRecurisvely(event.source, viewId)
 
-        var listItems: List<AccessibilityNodeInfo> =
+        val listItems: List<AccessibilityNodeInfo> =
             source.findAccessibilityNodeInfosByViewId(permissionsListId)
 
-        var togglesRequired: ArrayList<AccessibilityNodeInfo> = ArrayList()
+        val togglesRequired: ArrayList<AccessibilityNodeInfo> = ArrayList()
 
         // TODO: verify packageElect with the title shown on the current the page
         val packageInfo = getPackageInfo(packageElect) ?: return
@@ -336,9 +335,9 @@ class PermissionsManager {
         if (listItems != null && listItems.isNotEmpty()) {
             val children = findChildren(listItems[0])
             var what = ""
-            for (i in 0 until children.size) {
-                val item: AccessibilityNodeInfo = children[i]
-                var switches: List<AccessibilityNodeInfo> =
+            for (element in children) {
+                val item: AccessibilityNodeInfo = element
+                val switches: List<AccessibilityNodeInfo> =
                     source.findAccessibilityNodeInfosByViewId(permissionsSwitchId)
                 if (switches.isEmpty()) {
                     Log.w(TAG, "____ bbbbb couldn't find toggle-switch for $item")
@@ -348,8 +347,8 @@ class PermissionsManager {
                 val temp: List<AccessibilityNodeInfo>  = item.findAccessibilityNodeInfosByViewId("android:id/title")
 
 
-                val permissionGroup: AppPermissionGroup? = appPermissions.getPermissionGroup(temp[0]?.text)
-                what = what + permissionGroup?.label + " ${temp[0]?.text} " + switch.isChecked + " ${switches.size} granted? ${permissionGroup?.areRuntimePermissionsGranted()} ___ bbbb; "
+                val permissionGroup: AppPermissionGroup? = appPermissions.getPermissionGroup(temp[0].text)
+                what = what + permissionGroup?.label + " ${temp[0].text} " + switch.isChecked + " ${switches.size} granted? ${permissionGroup?.areRuntimePermissionsGranted()} ___ bbbb; "
 
                 if ((permissionGroup != null && permissionGroup.areRuntimePermissionsGranted())) {
                     togglesRequired.add(item)
@@ -414,7 +413,7 @@ class PermissionsManager {
 
     // com.google.android.gm
     private fun startSettingsPermissionActivity(packageName: String) {
-        currentAutoState = AutoState.SETTINGS_PAGE;
+        currentAutoState = AutoState.SETTINGS_PAGE
         Intent("android.settings.APPLICATION_DETAILS_SETTINGS").also {
             it.setPackage("com.android.settings")
             it.data = Uri.parse("package:$packageName")
@@ -431,7 +430,7 @@ class PermissionsManager {
 
         Log.w(TAG, "bbbbb ____ denybuttonpresent? ${denyButtons.size}")
         for (node in denyButtons) {
-            Log.w(TAG, "_______ bbbbb node ###+++ " + node)
+            Log.w(TAG, "_______ bbbbb node ###+++ $node")
             node.performAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS)
             val performed2 = node.performAction(AccessibilityNodeInfo.ACTION_SELECT)
             val performed3 = node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
@@ -445,11 +444,11 @@ class PermissionsManager {
         // text? ContentChangeTypeDisappeared: null [Allow Uber to access this device's location?]
         // class? com.android.packageinstaller.permission.ui.GrantPermissionsActivity
 
-        Log.w(TAG, "_____ bbbb clickallow: " + latestTrackedPackage)
+        Log.w(TAG, "_____ bbbb clickallow: $latestTrackedPackage")
         val packageInfo = getPackageInfo(latestTrackedPackage) ?: return false
 
         val appLabel = getAppLabel(packageInfo)
-        var confirmation = event.text.contains(appLabel)
+        val confirmation = event.text.contains(appLabel)
         val appPermissions = AppPermissions(packageManager, packageInfo)
 
         val list: List<AccessibilityNodeInfo> = event.source.findAccessibilityNodeInfosByViewId(permissionsAllowButtonId)
@@ -461,7 +460,7 @@ class PermissionsManager {
 
         for (node in list) {
             val performed2 = node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-            Log.w(TAG, "______ bbbb clicked on allow first ${node}")
+            Log.w(TAG, "______ bbbb clicked on allow first $node")
         }
 
         return true
@@ -483,9 +482,9 @@ class PermissionsManager {
         for (i in 0 until source.childCount) {
             val c = source.getChild(i)
             if (c != null) {
-                var cl: List<AccessibilityNodeInfo> = c.findAccessibilityNodeInfosByViewId(viewId)
+                val cl: List<AccessibilityNodeInfo> = c.findAccessibilityNodeInfosByViewId(viewId)
                 val w = "" + c.isCheckable + " " + c.isChecked + " " + c.viewIdResourceName + " " + c.className + " " + cl.size
-                Log.w("____", "____ children " + w)
+                Log.w("____", "____ children $w")
                 findRecurisvely(c, viewId)
             } else Log.w("____", "____ children null $viewId")
         }
@@ -518,7 +517,7 @@ class PermissionsManager {
 
     private fun isAutoGrant(packageName: String?): Boolean {
         if (packageName == null) return false
-        val rule = packageRules.get(packageName)
+        val rule = packageRules[packageName]
         return Rules.BG_REMOVE_FG_ADD == rule
     }
 

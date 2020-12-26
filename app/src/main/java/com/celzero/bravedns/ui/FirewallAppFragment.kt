@@ -29,7 +29,6 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallAppListAdapter
 import com.celzero.bravedns.database.AppDatabase
@@ -91,7 +90,7 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
                 false
             }
 
-            firewallExpandableList!!.setOnGroupExpandListener { it ->
+            firewallExpandableList!!.setOnGroupExpandListener {
                 //listData[titleList!![it]]!!.sortBy { it.isInternetAllowed }
             }
         }
@@ -195,7 +194,7 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
         //(adapterList as FirewallAppListAdapter).filterData(query!!)
         //observersForUI("%$query%")
         if(DEBUG) Log.d(LOG_TAG, "Category block onQueryTextChange : ${isSearchEnabled}, $query")
-        if (HomeScreenActivity.GlobalVariable.isSearchEnabled) {
+        if (isSearchEnabled) {
             object : CountDownTimer(500, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
                 }
@@ -242,11 +241,11 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
         //val appInfoRepository = mDb.appInfoRepository()
 
         val categoryInfoRepository = mDb.categoryInfoRepository()
-        categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, Observer {
+        categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, {
             titleList = it.toMutableList()
         })
 
-        firewallAppInfoViewModel.firewallAppDetailsList.observe(viewLifecycleOwner, Observer { itAppInfo ->
+        firewallAppInfoViewModel.firewallAppDetailsList.observe(viewLifecycleOwner, { itAppInfo ->
             isSearchEnabled  = false
             val list = itAppInfo!!
             titleList = categoryInfoRepository.getAppCategoryList().toMutableList()

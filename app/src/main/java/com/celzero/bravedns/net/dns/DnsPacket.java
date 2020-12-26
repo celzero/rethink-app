@@ -32,7 +32,7 @@ import java.util.List;
 
 public class DnsPacket {
 
-  private byte[] data;
+  private final byte[] data;
 
   private static final short TYPE_A = 1;
   private static final short TYPE_AAAA = 28;
@@ -53,19 +53,19 @@ public class DnsPacket {
     byte[] data;
   }
 
-  private short id;
-  private boolean qr;
-  private byte opcode;
-  private boolean aa;
-  private boolean tc;
-  private boolean rd;
-  private boolean ra;
-  private byte z;
-  private byte rcode;
-  private DnsQuestion[] question;
-  private DnsRecord[] answer;
-  private DnsRecord[] authority;
-  private DnsRecord[] additional;
+  private final short id;
+  private final boolean qr;
+  private final byte opcode;
+  private final boolean aa;
+  private final boolean tc;
+  private final boolean rd;
+  private final boolean ra;
+  private final byte z;
+  private final byte rcode;
+  private final DnsQuestion[] question;
+  private final DnsRecord[] answer;
+  private final DnsRecord[] authority;
+  private final DnsRecord[] additional;
 
   private static String readName(ByteBuffer buffer) throws BufferUnderflowException,
       ProtocolException {
