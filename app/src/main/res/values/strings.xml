@@ -5,6 +5,7 @@
     <string name="title_about">About</string>
     <string name="title_settings">Settings</string>
     <string name="txt_im_topic">Internet Manager</string>
+    <string name="backed_by_mozilla">Backed by Mozilla Builders Incubator</string>
 
     <string name="txt_im_tip">Tip : Firewall prevents apps from accessing the Internet over Wifi or Mobile data. Since most forms of surveillance require the data to be sent over to a central repository, firewalling them effectively mitigates the threat. \n\nThere\'s a class of apps that require Internet connection all day, and those are usually communication apps like Gmail and messenger apps like WhatsApp. Firewalling them might not be an option, and that\'s why we built content blockers. </string>
 
@@ -519,7 +520,7 @@
 
     <string name="search_firewall_network_log"><font size="12">Search apps or IPs</font></string>
     <string name="search_firewall_all_apps"><font size="12">Search apps</font></string>
-    <string name="search_dns_logs"><font size="12">Search DNS queries or IPs</font></string>
+    <string name="search_dns_logs"><font size="12">Search domain names or IPs</font></string>
     <string name="search_universal_ips"><font size="12">Search IPs</font></string>
 
     <string name="app_mode_dns">DNS</string>
@@ -538,8 +539,12 @@
     <string name="app_mode_choose">Choose mode</string>
     <string name="vpn_start_error_doh_url">Something went wrong. Cannot start VPN.</string>
 
+    <string name="new_year">2021</string>
+    <string name="new_year_desc">Happy New Year</string>
+
 
     <string name="features_disabled">(disabled)</string>
+    <string name="firewall_app_info_not_available">Cannot block the app</string>
 
     <string name="whats_dialog_title">15+ new features in v053</string>
     <string name="whats_new_version_name">🎅 🎄 Happy New Year ❄️ 🎁 </string>

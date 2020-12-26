@@ -119,7 +119,6 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/bs_home_screen_connected_status"
             android:layout_margin="10dp"
-            android:fontFamily="sans-serif-smallcaps"
             android:gravity="center"
             android:text="sdad"
             android:textSize="@dimen/default_font_text_view" />

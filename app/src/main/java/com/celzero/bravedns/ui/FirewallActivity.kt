@@ -55,16 +55,15 @@ class FirewallActivity : AppCompatActivity() {
             }
         }
 
-        viewPagerFirewall.fakeDragBy(1000F)
+        //viewPagerFirewall.fakeDragBy(1000F)
 
-
-
-        TabLayoutMediator(tabLayoutFirewall, viewPagerFirewall) { tab, position -> // Styling each tab here
+        TabLayoutMediator(tabLayoutFirewall, viewPagerFirewall) { tab, position ->
             tab.text = when (position) {
                 0 -> getString(R.string.firewall_act_universal_tab)
                 1 -> getString(R.string.firewall_act_network_monitor_tab)
                 else -> getString(R.string.firewall_act_apps_tab)
             }
+            viewPagerFirewall.setCurrentItem(tab.position, true)
         }.attach()
 
 
@@ -75,7 +74,7 @@ class FirewallActivity : AppCompatActivity() {
         val touchSlopField = RecyclerView::class.java.getDeclaredField("mTouchSlop")
         touchSlopField.isAccessible = true
         val touchSlop = touchSlopField.get(recyclerView) as Int
-        touchSlopField.set(recyclerView, touchSlop * 2)       // "8" was obtained experimentally
+        touchSlopField.set(recyclerView, touchSlop * 3)       // "8" was obtained experimentally
 
         val mDb = AppDatabase.invoke(this.applicationContext)
         val connectionTrackerRepository = mDb.connectionTrackerRepository()

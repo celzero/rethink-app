@@ -137,7 +137,7 @@ interface AppInfoDAO {
     fun isRootAvailable(): String
 
     @Query("select * from AppInfo where packageInfo = :packageName  and appName != 'ANDROID' ")
-    fun getAppInfoForPackageName(packageName : String) : AppInfo
+    fun getAppInfoForPackageName(packageName : String) : AppInfo?
 
     @Query("select count(*) from AppInfo where isInternetAllowed = 0 and appName != 'ANDROID'")
     fun getBlockedAppCount() : LiveData<Int>

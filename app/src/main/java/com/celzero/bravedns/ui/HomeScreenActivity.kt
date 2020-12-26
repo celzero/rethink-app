@@ -39,12 +39,9 @@ import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.isUserInitiatedUpdateCheck
 import com.celzero.bravedns.util.*
-import com.celzero.bravedns.util.Constants.Companion.APPEND_VCODE
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_OTHERS
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
-import com.celzero.bravedns.util.Constants.Companion.REFRESH_BLOCKLIST_URL
 import com.celzero.bravedns.util.HttpRequestHelper.Companion.checkStatus
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
@@ -106,9 +103,8 @@ class HomeScreenActivity : AppCompatActivity() {
         var isBackgroundEnabled: Boolean = false
         var firewallRules: HashMultimap<Int, String> = HashMultimap.create()
         var DEBUG = true
-        //Screen off - whether the screen preference is set 0-off, 1- on. -1 not initialized
-        var isUserInitiatedUpdateCheck = false
 
+        //Screen off - whether the screen preference is set 0-off, 1- on. -1 not initialized
         var isScreenLockedSetting : Int = -1
         //Screen off state - set - 0 if screen is off, 1 - screen is on, -1 not initialized.
         var isScreenLocked : Int = -1
@@ -244,7 +240,7 @@ class HomeScreenActivity : AppCompatActivity() {
         if(day == Calendar.FRIDAY || day == Calendar.SATURDAY) {
             if (numOfDays > 0) {
                 Log.i(LOG_TAG, "App update check initiated, number of days: $numOfDays")
-                checkForAppUpdate()
+                checkForAppUpdate(false)
                 checkForBlockListUpdate()
             } else {
                 Log.i(LOG_TAG, "App update check not initiated")
@@ -257,18 +253,20 @@ class HomeScreenActivity : AppCompatActivity() {
         val doHEndpointRepository = mDb.doHEndpointsRepository()
         val connectedDOH = doHEndpointRepository.getConnectedDoH()
         var isRethinkPlusConnected = false
-        if(connectedDOH.dohName == Constants.RETHINK_DNS_PLUS){
-            isRethinkPlusConnected = true
+        if(connectedDOH != null) {
+            if (connectedDOH.dohName == Constants.RETHINK_DNS_PLUS) {
+                isRethinkPlusConnected = true
+            }
         }
-        if(PersistentState.isLocalBlockListEnabled(this) || isRethinkPlusConnected) {
+        if (PersistentState.isLocalBlockListEnabled(this) || isRethinkPlusConnected) {
             val blockListTimeStamp = PersistentState.getLocalBlockListDownloadTime(this)
             val appVersionCode = PersistentState.getAppVersion(this)
-            val url = "$REFRESH_BLOCKLIST_URL$blockListTimeStamp&$APPEND_VCODE$appVersionCode"
+            val url = "${Constants.REFRESH_BLOCKLIST_URL}$blockListTimeStamp&${Constants.APPEND_VCODE}$appVersionCode"
             serverCheckForBlocklistUpdate(url)
         }
     }
 
-    fun checkForAppUpdate() : Boolean {
+    fun checkForAppUpdate(isUserInitiated : Boolean) {
         var version = 0
         try {
             val pInfo: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
@@ -300,14 +298,14 @@ class HomeScreenActivity : AppCompatActivity() {
                 }  else {
                     appUpdateManager.unregisterListener(installStateUpdatedListener)
                     Log.e(LOG_TAG, "checkForAppUpdateAvailability: something else")
+                    if(isUserInitiated) {
+                        showDownloadDialog(false, getString(R.string.download_update_dialog_failure_title), getString(R.string.download_update_dialog_failure_message))
+                    }
                 }
             }
         }else{
-            checkForAppDownload(version)
+            checkForAppDownload(version, isUserInitiated)
         }
-
-
-        return false
     }
 
     private val installStateUpdatedListener: InstallStateUpdatedListener = object : InstallStateUpdatedListener {
@@ -336,12 +334,10 @@ class HomeScreenActivity : AppCompatActivity() {
         snackbar.show()
     }
 
-    private fun checkForAppDownload(version: Int) {
-        if (PersistentState.getDownloadSource(this) == 2) {
-            Log.i(LOG_TAG, "App update check initiated")
-            val url = Constants.APP_DOWNLOAD_AVAILABLE_CHECK + version
-            serverCheckForAppUpdate(url)
-        }
+    private fun checkForAppDownload(version: Int, isUserInitiated : Boolean) {
+        Log.i(LOG_TAG, "App update check initiated")
+        val url = Constants.APP_DOWNLOAD_AVAILABLE_CHECK + version
+        serverCheckForAppUpdate(url, isUserInitiated)
     }
 
     /**
@@ -349,7 +345,7 @@ class HomeScreenActivity : AppCompatActivity() {
      * HttpRequestHelper file which will return the boolean to check if there is
      * update available.
      */
-    private fun serverCheckForAppUpdate(url: String) {
+    private fun serverCheckForAppUpdate(url: String, isUserInitiatedUpdateCheck : Boolean) {
         val client = OkHttpClient()
         val request = Request.Builder()
             .url(url)
@@ -361,37 +357,41 @@ class HomeScreenActivity : AppCompatActivity() {
                 (context as HomeScreenActivity).runOnUiThread {
                     if (isUserInitiatedUpdateCheck) {
                         showDownloadDialog(false, getString(R.string.download_update_dialog_failure_title), getString(R.string.download_update_dialog_failure_message))
-                        isUserInitiatedUpdateCheck = false
                     }
                 }
                 call.cancel()
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val stringResponse = response.body()!!.string()
-                //creating json object
-                val jsonObject = JSONObject(stringResponse)
-                val responseVersion = jsonObject.getInt("version")
-                val updateValue = jsonObject.getBoolean("update")
-                val latestVersion = jsonObject.getInt("latest")
-                PersistentState.setLastAppUpdateCheckTime(context, System.currentTimeMillis())
-                Log.i(LOG_TAG, "Server response for the new version download is true, version number-  $latestVersion")
-                if (responseVersion == 1) {
-                    if (updateValue) {
-                        (context as HomeScreenActivity).runOnUiThread {
-                            showDownloadDialog(false, getString(R.string.download_update_dialog_title), getString(R.string.download_update_dialog_message))
-                        }
-                    } else {
-                        (context as HomeScreenActivity).runOnUiThread {
-                            if (isUserInitiatedUpdateCheck) {
-                                showDownloadDialog(false, getString(R.string.download_update_dialog_message_ok_title), getString(R.string.download_update_dialog_message_ok))
-                                isUserInitiatedUpdateCheck = false
+                try {
+                    val stringResponse = response.body()!!.string()
+                    //creating json object
+                    val jsonObject = JSONObject(stringResponse)
+                    val responseVersion = jsonObject.getInt("version")
+                    val updateValue = jsonObject.getBoolean("update")
+                    val latestVersion = jsonObject.getInt("latest")
+                    PersistentState.setLastAppUpdateCheckTime(context, System.currentTimeMillis())
+                    Log.i(LOG_TAG, "Server response for the new version download is true, version number-  $latestVersion")
+                    if (responseVersion == 1) {
+                        if (updateValue) {
+                            (context as HomeScreenActivity).runOnUiThread {
+                                showDownloadDialog(false, getString(R.string.download_update_dialog_title), getString(R.string.download_update_dialog_message))
+                            }
+                        } else {
+                            (context as HomeScreenActivity).runOnUiThread {
+                                if (isUserInitiatedUpdateCheck) {
+                                    showDownloadDialog(false, getString(R.string.download_update_dialog_message_ok_title), getString(R.string.download_update_dialog_message_ok))
+                                }
                             }
                         }
                     }
+                    response.close()
+                    client.connectionPool().evictAll()
+                } catch (e: Exception) {
+                    if (isUserInitiatedUpdateCheck) {
+                        showDownloadDialog(false, getString(R.string.download_update_dialog_failure_title), getString(R.string.download_update_dialog_failure_message))
+                    }
                 }
-                response.close()
-                client.connectionPool().evictAll()
             }
         })
     }

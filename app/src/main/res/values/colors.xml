@@ -21,6 +21,8 @@
     <color name="black">#2F2F2F</color>
     <color name="recycler_selected">#6E7069</color>
 
+    <color name="border_color">#757474</color>
+
     <color name="primaryText">#FDFDFD</color>
     <color name="secondaryText">#05dfd7</color>
     <color name="dividerColor">#BDBDBD</color>
