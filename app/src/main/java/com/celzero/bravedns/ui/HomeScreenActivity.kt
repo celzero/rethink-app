@@ -363,30 +363,35 @@ class HomeScreenActivity : AppCompatActivity() {
             }
 
             override fun onResponse(call: Call, response: Response) {
-
-                val stringResponse = response.body!!.string()
-                //creating json object
-                val jsonObject = JSONObject(stringResponse)
-                val responseVersion = jsonObject.getInt("version")
-                val updateValue = jsonObject.getBoolean("update")
-                val latestVersion = jsonObject.getInt("latest")
-                PersistentState.setLastAppUpdateCheckTime(context, System.currentTimeMillis())
-                Log.i(LOG_TAG, "Server response for the new version download is true, version number-  $latestVersion")
-                if (responseVersion == 1) {
-                    if (updateValue) {
-                        (context as HomeScreenActivity).runOnUiThread {
-                            showDownloadDialog(false, getString(R.string.download_update_dialog_title), getString(R.string.download_update_dialog_message))
-                        }
-                    } else {
-                        (context as HomeScreenActivity).runOnUiThread {
-                            if (isUserInitiatedUpdateCheck) {
-                                showDownloadDialog(false, getString(R.string.download_update_dialog_message_ok_title), getString(R.string.download_update_dialog_message_ok))
-                                isUserInitiatedUpdateCheck = false
+                try {
+                    val stringResponse = response.body()!!.string()
+                    //creating json object
+                    val jsonObject = JSONObject(stringResponse)
+                    val responseVersion = jsonObject.getInt("version")
+                    val updateValue = jsonObject.getBoolean("update")
+                    val latestVersion = jsonObject.getInt("latest")
+                    PersistentState.setLastAppUpdateCheckTime(context, System.currentTimeMillis())
+                    Log.i(LOG_TAG, "Server response for the new version download is true, version number-  $latestVersion")
+                    if (responseVersion == 1) {
+                        if (updateValue) {
+                            (context as HomeScreenActivity).runOnUiThread {
+                                showDownloadDialog(false, getString(R.string.download_update_dialog_title), getString(R.string.download_update_dialog_message))
+                            }
+                        } else {
+                            (context as HomeScreenActivity).runOnUiThread {
+                                if (isUserInitiatedUpdateCheck) {
+                                    showDownloadDialog(false, getString(R.string.download_update_dialog_message_ok_title), getString(R.string.download_update_dialog_message_ok))
+                                }
                             }
                         }
                     }
                     response.close()
                     client.connectionPool().evictAll()
+                } catch (e: Exception) {
+                    if (isUserInitiatedUpdateCheck) {
+                        showDownloadDialog(false, getString(R.string.download_update_dialog_failure_title), getString(R.string.download_update_dialog_failure_message))
+                    }
+                }
             }
         })
     }
@@ -403,31 +408,35 @@ class HomeScreenActivity : AppCompatActivity() {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val stringResponse = response.body!!.string()
+                val stringResponse = response.body()!!.string()
                 //creating json object
-                val jsonObject = JSONObject(stringResponse)
-                val responseVersion = jsonObject.getInt("version")
-                val updateValue = jsonObject.getBoolean("update")
-                timeStamp = jsonObject.getLong("latest")
-                PersistentState.setLastAppUpdateCheckTime(context, System.currentTimeMillis())
-                Log.i(LOG_TAG, "Server response for the new version download is $updateValue, response version number- $responseVersion, timestamp- $timeStamp")
-                if (responseVersion == 1) {
-                    //PersistentState.setLocalBlockListDownloadTime(context, timeStamp)
-                    if (updateValue) {
-                        if (PersistentState.getDownloadSource(context) == DOWNLOAD_SOURCE_OTHERS) {
-                            (context as HomeScreenActivity).runOnUiThread {
-                                popupSnackBarForBlocklistUpdate()
-                            }
-                        } else {
-                            (context as HomeScreenActivity).runOnUiThread {
-                                registerReceiverForDownloadManager(context)
-                                downloadManager = HttpRequestHelper.downloadBlockListFiles(context)
+                try {
+                    val jsonObject = JSONObject(stringResponse)
+                    val responseVersion = jsonObject.getInt("version")
+                    val updateValue = jsonObject.getBoolean("update")
+                    timeStamp = jsonObject.getLong("latest")
+                    PersistentState.setLastAppUpdateCheckTime(context, System.currentTimeMillis())
+                    Log.i(LOG_TAG, "Server response for the new version download is $updateValue, response version number- $responseVersion, timestamp- $timeStamp")
+                    if (responseVersion == 1) {
+                        //PersistentState.setLocalBlockListDownloadTime(context, timeStamp)
+                        if (updateValue) {
+                            if (PersistentState.getDownloadSource(context) == DOWNLOAD_SOURCE_OTHERS) {
+                                (context as HomeScreenActivity).runOnUiThread {
+                                    popupSnackBarForBlocklistUpdate()
+                                }
+                            } else {
+                                (context as HomeScreenActivity).runOnUiThread {
+                                    registerReceiverForDownloadManager(context)
+                                    downloadManager = HttpRequestHelper.downloadBlockListFiles(context)
+                                }
                             }
                         }
                     }
+                } catch (e: Exception) {
+                    Log.w(LOG_TAG,"HomeScreenActivity- Exception while fetching blocklist update",e)
                 }
-                response.body!!.close()
-                client.connectionPool.evictAll()
+                response.body()!!.close()
+                client.connectionPool().evictAll()
             }
         })
     }
