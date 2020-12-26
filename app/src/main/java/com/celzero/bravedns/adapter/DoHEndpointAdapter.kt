@@ -54,6 +54,7 @@ import xdns.Xdns.getBlocklistStampFromURL
 
 class DoHEndpointAdapter(private val context: Context,
                          private val doHEndpointRepository: DoHEndpointRepository,
+                         private val persistentState:PersistentState,
                          val listener: UIUpdateInterface) : PagedListAdapter<DoHEndpoint, DoHEndpointAdapter.DoHEndpointViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -108,7 +109,7 @@ class DoHEndpointAdapter(private val context: Context,
                     urlExplanationTxt.text = "Connected."
                     Log.d(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}")
                     if(doHEndpoint.dohName == RETHINK_DNS_PLUS){
-                        val count = PersistentState.getNumberOfRemoteBlockLists(context)
+                        val count = persistentState.getNumberOfRemoteBlockLists()
                         Log.d(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}, count- $count")
                         if (count != 0) {
                             urlExplanationTxt.text = "Connected. $count blocklists in-use."
@@ -286,8 +287,8 @@ class DoHEndpointAdapter(private val context: Context,
 
                 override fun onFinish() {
                     notifyDataSetChanged()
-                    PersistentState.setDNSType(context, 1)
-                    PersistentState.setConnectionModeChange(context, doHEndpoint.dohURL)
+                    persistentState.setDNSType(1)
+                    persistentState.setConnectionModeChange(doHEndpoint.dohURL)
                     QueryTracker.reinitializeQuantileEstimator()
                 }
             }.start()

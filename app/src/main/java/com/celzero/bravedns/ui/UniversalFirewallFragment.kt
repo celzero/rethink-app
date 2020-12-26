@@ -104,6 +104,7 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
 
     private val appInfoRepository by inject<AppInfoRepository>()
     private val blockedConnectionsRepository by inject<BlockedConnectionsRepository>()
+    private val persistentState by inject<PersistentState>()
 
     private lateinit var scrollView : NestedScrollView
 
@@ -164,7 +165,7 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
         layoutManager = LinearLayoutManager(requireContext())
         recyclerView.layoutManager = layoutManager
         recyclerRulesAdapter = UniversalBlockedRulesAdapter(requireContext(), blockedConnectionsRepository)
-        recyclerAdapter = UniversalAppListAdapter(requireContext(), appInfoRepository, get())
+        recyclerAdapter = UniversalAppListAdapter(requireContext(), appInfoRepository, get(), persistentState)
         recyclerView.adapter = recyclerRulesAdapter
         ipSearchView.requestFocus()
 
@@ -183,40 +184,40 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
         udpBlockToggle = includeView.findViewById(R.id.firewall_udp_connection_mode_check)
         udpBlockToggleText = includeView.findViewById(R.id.firewall_udp_connection_mode_txt)
 
-        firewallAllAppsToggle.isChecked = PersistentState.getFirewallModeForScreenState(requireContext())
+        firewallAllAppsToggle.isChecked = persistentState.getFirewallModeForScreenState()
 
-        udpBlockToggle.isChecked = PersistentState.getUDPBlockedSettings(requireContext())
-        unknownToggle.isChecked =  PersistentState.getBlockUnknownConnections(requireContext())
+        udpBlockToggle.isChecked = persistentState.getUDPBlockedSettings()
+        unknownToggle.isChecked =  persistentState.getBlockUnknownConnections()
 
         firewallAllAppsToggle.setOnCheckedChangeListener { _, b ->
-            PersistentState.setFirewallModeForScreenState(requireContext(), b)
+            persistentState.setFirewallModeForScreenState(b)
         }
 
         firewallAllAppsTxt.setOnClickListener {
-            if(PersistentState.getFirewallModeForScreenState(requireContext())){
+            if(persistentState.getFirewallModeForScreenState()){
                 firewallAllAppsToggle.isChecked = false
-                PersistentState.setFirewallModeForScreenState(requireContext(), false)
+                persistentState.setFirewallModeForScreenState(false)
             }else{
                 firewallAllAppsToggle.isChecked = true
-                PersistentState.setFirewallModeForScreenState(requireContext(), true)
+                persistentState.setFirewallModeForScreenState(true)
             }
         }
 
         unknownToggle.setOnCheckedChangeListener{ compoundButton: CompoundButton, b: Boolean ->
-            PersistentState.setBlockUnknownConnections(requireContext(), b)
+            persistentState.setBlockUnknownConnections(b)
         }
 
         unknownToggleText.setOnClickListener {
-            PersistentState.setBlockUnknownConnections(requireContext(), !unknownToggle.isChecked)
+            persistentState.setBlockUnknownConnections(!unknownToggle.isChecked)
             unknownToggle.isChecked = !unknownToggle.isChecked
         }
 
         udpBlockToggle.setOnCheckedChangeListener{ compoundButton: CompoundButton, b: Boolean ->
-            PersistentState.setUDPBlockedSettings(requireContext(), b)
+            persistentState.setUDPBlockedSettings(b)
         }
 
         udpBlockToggleText.setOnClickListener{
-            PersistentState.setUDPBlockedSettings(requireContext(), !udpBlockToggle.isChecked)
+            persistentState.setUDPBlockedSettings(!udpBlockToggle.isChecked)
             udpBlockToggle.isChecked = !udpBlockToggle.isChecked
         }
 
@@ -232,21 +233,21 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
                     if(!Utilities.isAccessibilityServiceEnabled(requireContext(), BackgroundAccessibilityService::class.java)){
                         if (!showAlertForPermission(true)) {
                             backgroundModeToggle.isChecked = false
-                            PersistentState.setBackgroundEnabled(requireContext(), false)
+                            persistentState.setBackgroundEnabled(false)
                         }
                     }
                     GlobalVariable.isBackgroundEnabled = !checkedVal
-                    PersistentState.setBackgroundEnabled(requireContext(), !checkedVal)
+                    persistentState.setBackgroundEnabled(!checkedVal)
                     backgroundModeToggle.isChecked = !checkedVal
                 } else {
                     if (!showAlertForPermission(false)) {
                         backgroundModeToggle.isChecked = false
-                        PersistentState.setBackgroundEnabled(requireContext(), false)
+                        persistentState.setBackgroundEnabled(false)
                     }
                 }
             }else{
                 backgroundModeToggle.isChecked = false
-                PersistentState.setBackgroundEnabled(requireContext(), false)
+                persistentState.setBackgroundEnabled(false)
             }
         }
 
@@ -259,21 +260,21 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
                     if(!Utilities.isAccessibilityServiceEnabled(requireContext(), BackgroundAccessibilityService::class.java)){
                         if (!showAlertForPermission(true)) {
                             backgroundModeToggle.isChecked = false
-                            PersistentState.setBackgroundEnabled(requireContext(), false)
+                            persistentState.setBackgroundEnabled(false)
                         }
                     }
                     GlobalVariable.isBackgroundEnabled = !checkedVal
-                    PersistentState.setBackgroundEnabled(requireContext(), !checkedVal)
+                    persistentState.setBackgroundEnabled(!checkedVal)
                     backgroundModeToggle.isChecked = !checkedVal
                 } else {
                     if (!showAlertForPermission(false)) {
                         backgroundModeToggle.isChecked = false
-                        PersistentState.setBackgroundEnabled(requireContext(), false)
+                        persistentState.setBackgroundEnabled(false)
                     }
                 }
             } else {
                 backgroundModeToggle.isChecked = false
-                PersistentState.setBackgroundEnabled(requireContext(), false)
+                persistentState.setBackgroundEnabled(false)
             }
         }
 
@@ -369,13 +370,13 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
 
     override fun onResume() {
         super.onResume()
-        unknownToggle.isChecked =  PersistentState.getBlockUnknownConnections(requireContext())
+        unknownToggle.isChecked =  persistentState.getBlockUnknownConnections()
         if (Utilities.isAccessibilityServiceEnabledEnhanced(requireContext(), BackgroundAccessibilityService::class.java)) {
             if (DEBUG) Log.d(LOG_TAG, "Background - onLoad accessibility is true")
-            backgroundModeToggle.isChecked = PersistentState.getBackgroundEnabled(requireContext())
+            backgroundModeToggle.isChecked = persistentState.getBackgroundEnabled()
         } else {
             if (DEBUG) Log.d(LOG_TAG, "Background - onLoad accessibility is true, changed pref")
-            PersistentState.setBackgroundEnabled(requireContext(), false)
+            persistentState.setBackgroundEnabled(false)
             backgroundModeToggle.isChecked = false
         }
     }

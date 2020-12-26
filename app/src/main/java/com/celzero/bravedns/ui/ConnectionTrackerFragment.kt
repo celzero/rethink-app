@@ -63,6 +63,7 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
     private var checkedItem = 1
 
     private val connectionTrackerDAO by inject<ConnectionTrackerDAO>()
+    private val persistentState by inject<PersistentState>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreate(savedInstanceState)
@@ -87,7 +88,7 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
         searchLayoutLL = includeView.findViewById(R.id.connection_card_view_top)
         disabledLogsTextView = includeView.findViewById(R.id.connection_list_logs_disabled_tv)
 
-        if(PersistentState.isLogsEnabled(requireContext())){
+        if(persistentState.isLogsEnabled()){
             disabledLogsTextView.visibility = View.GONE
             searchLayoutLL.visibility = View.VISIBLE
 

@@ -45,7 +45,8 @@ class RefreshDatabase internal constructor(
     private val connTrackerRepository: ConnectionTrackerRepository,
     private val dnsLogRepository: DNSLogRepository,
     private val dnsCryptEndpointRepository: DNSCryptEndpointRepository,
-    private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository
+    private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
+    private val persistentState:PersistentState
 ) {
 
     /**
@@ -139,7 +140,7 @@ class RefreshDatabase internal constructor(
                             appInfo.appCategory = appInfo.appCategory.replace("_", " ").toLowerCase(Locale.ROOT)
 
                         //appInfo.uid = context.packageManager.getPackageUid(appInfo.packageInfo, PackageManager.GET_META_DATA)
-                        appInfo.isInternetAllowed = PersistentState.isWifiAllowed(appInfo.packageInfo, context)
+                        appInfo.isInternetAllowed = persistentState.isWifiAllowed(appInfo.packageInfo)
 
 
                         //TODO Handle this Global scope variable properly. Only half done.
@@ -204,7 +205,7 @@ class RefreshDatabase internal constructor(
         appInfo.isWifiEnabled = true
         appInfo.isScreenOff = false
         appInfo.uid = uid
-        appInfo.isInternetAllowed = PersistentState.isWifiAllowed(appInfo.packageInfo, context)
+        appInfo.isInternetAllowed = persistentState.isWifiAllowed(appInfo.packageInfo)
         appInfo.isBackgroundEnabled = false
         appInfo.whiteListUniv1 = false
         appInfo.whiteListUniv2 = false

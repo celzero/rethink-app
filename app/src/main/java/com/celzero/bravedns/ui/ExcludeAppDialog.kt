@@ -48,6 +48,7 @@ import java.util.stream.Collectors
 class ExcludeAppDialog(private var activity: Context,
                        private val appInfoRepository: AppInfoRepository,
                        private val categoryInfoRepository: CategoryInfoRepository,
+                       private val persistentState:PersistentState,
                        internal var adapter: RecyclerView.Adapter<*>,
                        var viewModel: ExcludedAppViewModel) : Dialog(activity),
     View.OnClickListener, SearchView.OnQueryTextListener {
@@ -172,7 +173,7 @@ class ExcludeAppDialog(private var activity: Context,
 
     private fun applyChanges() {
         val excludedApps = appInfoRepository.getExcludedAppList()
-        PersistentState.setExcludedAppsFromVPN(excludedApps.toMutableSet(), context)
+        persistentState.setExcludedAppsFromVPN(excludedApps.toMutableSet())
         //Toast.makeText(activity,"Update Successful",Toast.LENGTH_SHORT).show()
     }
 

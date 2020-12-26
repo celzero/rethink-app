@@ -38,16 +38,16 @@ public class QueryTracker {
         numRequests = 1;
     }
 
-    synchronized void recordTransaction(Context context, Transaction transaction) {
+    synchronized void recordTransaction(PersistentState persistentState, Context context, Transaction transaction) {
         ++numRequests;
         if (numRequests % HISTORY_SIZE == 0) {
             numRequests = 1;
             reinitializeQuantileEstimator();
         }
-        sync(context, transaction);
+        sync(persistentState, context, transaction);
     }
 
-    public synchronized void sync(Context context, Transaction transaction) {
+    public synchronized void sync(PersistentState persistentState, Context context, Transaction transaction) {
         if (transaction != null && transaction.blockList.isEmpty() && !transaction.serverIp.isEmpty()) {
             // Restore number of requests from storage, or 0 if it isn't defined yet.
             long val =  transaction.responseTime;
@@ -57,7 +57,7 @@ public class QueryTracker {
                 quantileEstimator.addValue((double)val);
             }
             long latencyVal = (long)quantileEstimator.getQuantile();
-            PersistentState.Companion.setMedianLatency(context, latencyVal);
+            persistentState.setMedianLatency(latencyVal);
         }
     }
 }

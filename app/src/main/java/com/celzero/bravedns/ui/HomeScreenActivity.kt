@@ -80,6 +80,7 @@ class HomeScreenActivity : AppCompatActivity() {
 
     private val doHEndpointRepository by inject<DoHEndpointRepository>()
     private val blockedConnectionsRepository by inject<BlockedConnectionsRepository>()
+    private val persistentState by inject<PersistentState>()
 
     /*TODO : This task need to be completed.
              Add all the appinfo in the global variable during appload
@@ -135,7 +136,7 @@ class HomeScreenActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_home_screen)
 
-        if (PersistentState.isFirstTimeLaunch(this)) {
+        if (persistentState.isFirstTimeLaunch()) {
             launchOnBoardingActivity()
         }
 
@@ -161,15 +162,15 @@ class HomeScreenActivity : AppCompatActivity() {
         firewallRules.loadFirewallRules(blockedConnectionsRepository)
 
         refreshDatabase.deleteOlderDataFromNetworkLogs()
-        if (!PersistentState.isInsertionCompleted(this)) {
+        if (!persistentState.isInsertionCompleted()) {
             refreshDatabase.insertDefaultDNSList()
             refreshDatabase.insertDefaultDNSCryptList()
             refreshDatabase.insertDefaultDNSCryptRelayList()
             refreshDatabase.updateCategoryInDB()
-            PersistentState.setInsertionCompleted(this, true)
+            persistentState.setInsertionCompleted(true)
         }
-        GlobalVariable.isBackgroundEnabled = PersistentState.getBackgroundEnabled(this)
-        PersistentState.setScreenLockData(this, false)
+        GlobalVariable.isBackgroundEnabled = persistentState.getBackgroundEnabled()
+        persistentState.setScreenLockData(false)
         updateInstallSource()
         initUpdateCheck()
         showNewFeaturesDialog()
@@ -180,17 +181,17 @@ class HomeScreenActivity : AppCompatActivity() {
     }
 
     private fun updateInstallSource() {
-        if(PersistentState.getDownloadSource(this) == 0) {
+        if(persistentState.getDownloadSource() == 0) {
             val packageManager = packageManager
             try {
                 val applicationInfo: ApplicationInfo = packageManager.getApplicationInfo(packageName, 0)
                 if (DEBUG) Log.d(LOG_TAG, "Install location: ${packageManager.getInstallerPackageName(applicationInfo.packageName)}")
                 if ("com.android.vending" == packageManager.getInstallerPackageName(applicationInfo.packageName)) {
                     // App was installed by Play Store
-                    PersistentState.setDownloadSource(context, Constants.DOWNLOAD_SOURCE_PLAY_STORE)
+                    persistentState.setDownloadSource(Constants.DOWNLOAD_SOURCE_PLAY_STORE)
                 } else {
                     // App was installed from somewhere else
-                    PersistentState.setDownloadSource(context, DOWNLOAD_SOURCE_OTHERS)
+                    persistentState.setDownloadSource(DOWNLOAD_SOURCE_OTHERS)
                 }
             } catch (e: PackageManager.NameNotFoundException) {
                 e.printStackTrace()
@@ -216,7 +217,7 @@ class HomeScreenActivity : AppCompatActivity() {
     }
 
     private fun checkToShowNewFeatures(): Boolean {
-        val versionStored = PersistentState.getAppVersion(this)
+        val versionStored = persistentState.getAppVersion()
         var version = 0
         try {
             val pInfo: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
@@ -225,7 +226,7 @@ class HomeScreenActivity : AppCompatActivity() {
             Log.e(LOG_TAG, "Error while fetching version code: ${e.message}", e)
         }
         return if(version != versionStored){
-            PersistentState.setAppVersion(this, version)
+            persistentState.setAppVersion(version)
             true
         }else{
             false
@@ -233,7 +234,7 @@ class HomeScreenActivity : AppCompatActivity() {
     }
 
     private fun initUpdateCheck(){
-        val time = PersistentState.getLastAppUpdateCheckTime(this)
+        val time = persistentState.getLastAppUpdateCheckTime()
         val currentTime = System.currentTimeMillis()
         val diff = currentTime - time
         val numOfDays = (diff / (1000 * 60 * 60 * 24)).toInt()
@@ -258,9 +259,9 @@ class HomeScreenActivity : AppCompatActivity() {
                 isRethinkPlusConnected = true
             }
         }
-        if (PersistentState.isLocalBlockListEnabled(this) || isRethinkPlusConnected) {
-            val blockListTimeStamp = PersistentState.getLocalBlockListDownloadTime(this)
-            val appVersionCode = PersistentState.getAppVersion(this)
+        if (persistentState.isLocalBlockListEnabled() || isRethinkPlusConnected) {
+            val blockListTimeStamp = persistentState.getLocalBlockListDownloadTime()
+            val appVersionCode = persistentState.getAppVersion()
             val url = "${Constants.REFRESH_BLOCKLIST_URL}$blockListTimeStamp&${Constants.APPEND_VCODE}$appVersionCode"
             serverCheckForBlocklistUpdate(url)
         }
@@ -271,12 +272,12 @@ class HomeScreenActivity : AppCompatActivity() {
         try {
             val pInfo: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
             version = pInfo.versionCode
-            PersistentState.setAppVersion(context, version)
+            persistentState.setAppVersion(version)
         } catch (e: PackageManager.NameNotFoundException) {
             Log.e(LOG_TAG, "Error while fetching version code: ${e.message}", e)
         }
 
-        if (PersistentState.getDownloadSource(this) == Constants.DOWNLOAD_SOURCE_PLAY_STORE) {
+        if (persistentState.getDownloadSource() == Constants.DOWNLOAD_SOURCE_PLAY_STORE) {
             appUpdateManager.registerListener(installStateUpdatedListener)
 
             appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
@@ -370,7 +371,7 @@ class HomeScreenActivity : AppCompatActivity() {
                     val responseVersion = jsonObject.getInt("version")
                     val updateValue = jsonObject.getBoolean("update")
                     val latestVersion = jsonObject.getInt("latest")
-                    PersistentState.setLastAppUpdateCheckTime(context, System.currentTimeMillis())
+                    persistentState.setLastAppUpdateCheckTime(System.currentTimeMillis())
                     Log.i(LOG_TAG, "Server response for the new version download is true, version number-  $latestVersion")
                     if (responseVersion == 1) {
                         if (updateValue) {
@@ -415,12 +416,12 @@ class HomeScreenActivity : AppCompatActivity() {
                     val responseVersion = jsonObject.getInt("version")
                     val updateValue = jsonObject.getBoolean("update")
                     timeStamp = jsonObject.getLong("latest")
-                    PersistentState.setLastAppUpdateCheckTime(context, System.currentTimeMillis())
+                    persistentState.setLastAppUpdateCheckTime(System.currentTimeMillis())
                     Log.i(LOG_TAG, "Server response for the new version download is $updateValue, response version number- $responseVersion, timestamp- $timeStamp")
                     if (responseVersion == 1) {
                         //PersistentState.setLocalBlockListDownloadTime(context, timeStamp)
                         if (updateValue) {
-                            if (PersistentState.getDownloadSource(context) == DOWNLOAD_SOURCE_OTHERS) {
+                            if (persistentState.getDownloadSource() == DOWNLOAD_SOURCE_OTHERS) {
                                 (context as HomeScreenActivity).runOnUiThread {
                                     popupSnackBarForBlocklistUpdate()
                                 }
@@ -469,8 +470,8 @@ class HomeScreenActivity : AppCompatActivity() {
                             from.copyTo(to, true)
                             /*val destDir = File(ctxt.filesDir.canonicalPath)
                             Utilities.moveTo(from, to, destDir)*/
-                            PersistentState.setRemoteBraveDNSDownloaded(ctxt, true)
-                            PersistentState.setRemoteBlockListDownloadTime(context, timeStamp)
+                            persistentState.setRemoteBraveDNSDownloaded(true)
+                            persistentState.setRemoteBlockListDownloadTime(timeStamp)
                         }else{
                             Log.e(LOG_TAG, "Error downloading filetag.json file: $status")
                         }
@@ -557,7 +558,7 @@ class HomeScreenActivity : AppCompatActivity() {
 
     private fun handleDownloadFiles() {
         downloadManager = this.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-        val timeStamp = PersistentState.getLocalBlockListDownloadTime(this)
+        val timeStamp = persistentState.getLocalBlockListDownloadTime()
         val url = Constants.JSON_DOWNLOAD_BLOCKLIST_LINK + "/" + timeStamp
         downloadBlockListFiles(url, Constants.FILE_TAG_NAME, this)
     }

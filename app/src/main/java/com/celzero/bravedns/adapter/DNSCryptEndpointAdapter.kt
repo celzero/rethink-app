@@ -53,6 +53,7 @@ import settings.Settings
 
 class DNSCryptEndpointAdapter(private val context: Context,
                               private val dnsCryptEndpointRepository:DNSCryptEndpointRepository,
+                              private val persistentState: PersistentState,
                               var listener : UIUpdateInterface) : PagedListAdapter<DNSCryptEndpoint, DNSCryptEndpointAdapter.DNSCryptEndpointViewHolder>(DIFF_CALLBACK) {
     //private var serverList : MutableList<DNSCryptEndpoint> = ArrayList()
 
@@ -256,12 +257,12 @@ class DNSCryptEndpointAdapter(private val context: Context,
 
                 override fun onFinish() {
                     notifyDataSetChanged()
-                    PersistentState.setDNSType(context, 2)
+                    persistentState.setDNSType(2)
                     QueryTracker.reinitializeQuantileEstimator()
                 }
             }.start()
 
-            PersistentState.setConnectionModeChange(context, dnsCryptEndpoint.dnsCryptURL)
+            persistentState.setConnectionModeChange(dnsCryptEndpoint.dnsCryptURL)
             listener.updateUIFromAdapter(2)
             appMode?.setDNSMode(Settings.DNSModeCryptPort)
             //mDb.close()

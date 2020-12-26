@@ -32,7 +32,8 @@ class AppMode internal constructor(
     private val doHEndpointRepository: DoHEndpointRepository,
     private val dnsCryptEndpointRepository: DNSCryptEndpointRepository,
     private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
-    private val proxyEndpointRepository: ProxyEndpointRepository
+    private val proxyEndpointRepository: ProxyEndpointRepository,
+    private val persistentState:PersistentState
 ) {
     private var appDNSMode: Long = -1L
     private var appFirewallMode: Long = -1L
@@ -45,9 +46,9 @@ class AppMode internal constructor(
 
     fun getDNSMode(): Long {
         if (appDNSMode == -1L) {
-            val dnsType = PersistentState.getDNSType(context)
+            val dnsType = persistentState.getDNSType()
             if (dnsType == 1) {
-                if (PersistentState.getAllDNSTraffic(context)) {
+                if (persistentState.getAllDNSTraffic()) {
                     appDNSMode = Settings.DNSModePort
                 } else {
                     appDNSMode = Settings.DNSModeIP
@@ -63,7 +64,7 @@ class AppMode internal constructor(
 
     fun getFirewallMode(): Long {
         if (appFirewallMode == -1L) {
-            return PersistentState.getFirewallMode(context).toLong()
+            return persistentState.getFirewallMode().toLong()
         } else {
             return appFirewallMode
         }
@@ -71,24 +72,24 @@ class AppMode internal constructor(
 
     fun setFirewallMode(fMode: Long) {
         appFirewallMode = fMode
-        PersistentState.setFirewallMode(context, fMode.toInt())
+        persistentState.setFirewallMode(fMode.toInt())
     }
 
     fun getProxyMode(): Long {
         if (appProxyMode == -1L) {
-            return PersistentState.getProxyMode(context)
+            return persistentState.getProxyMode()
         }
         return appProxyMode
     }
 
     fun setProxyMode(proxyMode: Long) {
         appProxyMode = proxyMode
-        PersistentState.setProxyMode(context, proxyMode)
+        persistentState.setProxyMode(proxyMode)
     }
 
     fun getDNSType(): Int {
         if (dnsType == -1) {
-            return PersistentState.getDNSType(context)
+            return persistentState.getDNSType()
         }
         return dnsType
     }
@@ -205,8 +206,8 @@ class AppMode internal constructor(
     }
 
     fun getBraveDNS(): BraveDNS?{
-        if(braveDNS == null && PersistentState.isLocalBlockListEnabled(context)
-            && PersistentState.isBlockListFilesDownloaded(context) && !PersistentState.getLocalBlockListStamp(context).isNullOrEmpty()){
+        if(braveDNS == null && persistentState.isLocalBlockListEnabled()
+            && persistentState.isBlockListFilesDownloaded() && !persistentState.getLocalBlockListStamp().isNullOrEmpty()){
             val path: String = context.filesDir.canonicalPath
             if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "Local brave dns set call from AppMode")
             braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)

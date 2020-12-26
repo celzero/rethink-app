@@ -51,6 +51,7 @@ import settings.Settings
 
 class DNSProxyEndpointAdapter(private val context: Context,
                               private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
+                              private val persistentState:PersistentState,
                               val listener: UIUpdateInterface) : PagedListAdapter<DNSProxyEndpoint, DNSProxyEndpointAdapter.DNSProxyEndpointViewHolder>(DIFF_CALLBACK) {
     private var PROXY_TYPE_INTERNAL: String
     private var PROXY_TYPE_EXTERNAL: String
@@ -285,9 +286,9 @@ class DNSProxyEndpointAdapter(private val context: Context,
                 HomeScreenActivity.GlobalVariable.appMode?.setDNSMode(Settings.DNSModeProxyIP)
             }
             listener.updateUIFromAdapter(3)
-            PersistentState.setDNSType(context, 3)
-            PersistentState.setConnectionModeChange(context, dnsProxyEndpoint.proxyIP!!)
-            PersistentState.setDNSProxyIDChange(context, dnsProxyEndpoint.id)
+            persistentState.setDNSType(3)
+            persistentState.setConnectionModeChange(dnsProxyEndpoint.proxyIP!!)
+            persistentState.setDNSProxyIDChange(dnsProxyEndpoint.id)
             //mDb.close()
         }
     }

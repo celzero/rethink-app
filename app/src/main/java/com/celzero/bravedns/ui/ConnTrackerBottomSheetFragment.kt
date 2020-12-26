@@ -112,6 +112,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
     private val appInfoRepository: AppInfoRepository by inject()
     private val blockedConnectionsRepository: BlockedConnectionsRepository by inject()
     private val categoryInfoRepository: CategoryInfoRepository by inject()
+    private val persistentState by inject<PersistentState>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         fragmentView = inflater.inflate(R.layout.bottom_sheet_conn_track, container, false)
@@ -228,7 +229,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
                 //}
             }else{
                 if(DEBUG) Log.d(LOG_TAG,"setBlockUnknownConnections - ${switchBlockApp.isChecked} ")
-                PersistentState.setBlockUnknownConnections(contextVal, switchBlockApp.isChecked)
+                persistentState.setBlockUnknownConnections(switchBlockApp.isChecked)
             }
         }
 
@@ -261,7 +262,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         if (ipDetails.appName != "Unknown") {
             switchBlockApp.isChecked = isAppBlocked
         }else{
-            switchBlockApp.isChecked = PersistentState.getBlockUnknownConnections(contextVal)
+            switchBlockApp.isChecked = persistentState.getBlockUnknownConnections()
         }
 
         chipKillApp.setOnClickListener{
@@ -348,7 +349,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
                 val uid = ipDetails.uid
                 CoroutineScope(Dispatchers.IO).launch {
                     appUIDList.forEach {
-                        PersistentState.setExcludedPackagesWifi(it.packageInfo, isBlocked, contextVal)
+                        persistentState.setExcludedPackagesWifi(it.packageInfo, isBlocked)
                         FirewallManager.updateAppInternetPermission(it.packageInfo, isBlocked)
                         FirewallManager.updateAppInternetPermissionByUID(it.uid, isBlocked)
                         categoryInfoRepository.updateNumberOfBlocked(it.appCategory, !isBlocked)

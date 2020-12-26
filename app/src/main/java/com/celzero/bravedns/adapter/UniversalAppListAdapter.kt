@@ -56,7 +56,8 @@ import kotlinx.coroutines.launch
 class UniversalAppListAdapter(
     private val context: Context,
     private val appInfoRepository: AppInfoRepository,
-    private val categoryInfoRepository:CategoryInfoRepository
+    private val categoryInfoRepository:CategoryInfoRepository,
+    private val persistentState:PersistentState
 )  : PagedListAdapter<AppInfo, UniversalAppListAdapter.UniversalAppInfoViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -173,7 +174,7 @@ class UniversalAppListAdapter(
                     if (status) {
                         appUIDList.forEach {
                             HomeScreenActivity.GlobalVariable.appList[it.packageInfo]!!.isInternetAllowed = status
-                            PersistentState.setExcludedPackagesWifi(it.packageInfo, status, context)
+                            persistentState.setExcludedPackagesWifi(it.packageInfo, status)
                             FirewallManager.updateAppInternetPermission(it.packageInfo, status)
                             FirewallManager.updateAppInternetPermissionByUID(it.uid, status)
                         }

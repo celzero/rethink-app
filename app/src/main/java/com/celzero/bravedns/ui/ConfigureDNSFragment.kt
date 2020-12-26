@@ -104,6 +104,7 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
     private val dnsCryptEndpointRepository by inject<DNSCryptEndpointRepository>()
     private val dnsCryptRelayEndpointRepository by inject<DNSCryptRelayEndpointRepository>()
     private val doHEndpointRepository by inject<DoHEndpointRepository>()
+    private val persistentState by inject<PersistentState>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreate(savedInstanceState)
@@ -151,7 +152,7 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
         })
 
         //latencyTxt.setText("Latency: " + getMedianLatency(this) + "ms")
-        lifeTimeQueriesTxt.setText("Lifetime Queries: " + PersistentState.getNumOfReq(requireContext()))
+        lifeTimeQueriesTxt.setText("Lifetime Queries: " + persistentState.getNumOfReq())
 
         //DOH init views
         dohRecyclerView = view.findViewById<View>(R.id.recycler_doh_connections) as RecyclerView
@@ -174,19 +175,19 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
         dnsProxyRecyclerView.layoutManager = dnsProxyLayoutManager
         noProxyText = view.findViewById(R.id.recycler_dns_proxy_title)
 
-        dnsCryptRecyclerAdapter = DNSCryptEndpointAdapter(requireContext(), dnsCryptEndpointRepository, this)
+        dnsCryptRecyclerAdapter = DNSCryptEndpointAdapter(requireContext(), dnsCryptEndpointRepository, persistentState, this)
         dnsCryptViewModel.dnsCryptEndpointList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(dnsCryptRecyclerAdapter::submitList))
         dnsCryptRecyclerView.adapter = dnsCryptRecyclerAdapter
 
-        dnsCryptRelayRecyclerAdapter = DNSCryptRelayEndpointAdapter(requireContext(), dnsCryptRelayEndpointRepository, dnsCryptEndpointRepository)
+        dnsCryptRelayRecyclerAdapter = DNSCryptRelayEndpointAdapter(requireContext(), dnsCryptRelayEndpointRepository, persistentState, dnsCryptEndpointRepository)
         dnsCryptRelayViewModel.dnsCryptRelayEndpointList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(dnsCryptRelayRecyclerAdapter::submitList))
         dnsCryptRelayRecyclerView.adapter = dnsCryptRelayRecyclerAdapter
 
-        dohRecyclerAdapter = DoHEndpointAdapter(requireContext(), dohEndpointRepository,this)
+        dohRecyclerAdapter = DoHEndpointAdapter(requireContext(), dohEndpointRepository,persistentState, this)
         viewModel.dohEndpointList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(dohRecyclerAdapter!!::submitList))
         dohRecyclerView!!.adapter = dohRecyclerAdapter
 
-        dnsProxyRecyclerAdapter = DNSProxyEndpointAdapter(requireContext(), dnsProxyEndpointRepository, this)
+        dnsProxyRecyclerAdapter = DNSProxyEndpointAdapter(requireContext(), dnsProxyEndpointRepository, persistentState, this)
         dnsProxyViewModel.dnsProxyEndpointList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(dnsProxyRecyclerAdapter::submitList))
         dnsProxyRecyclerView.adapter = dnsProxyRecyclerAdapter
 

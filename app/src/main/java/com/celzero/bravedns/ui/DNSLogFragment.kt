@@ -88,6 +88,7 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
     var check = 2
 
     private val dnsLogDAO by inject<DNSLogDAO>()
+    private val persistentState by inject<PersistentState>()
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -127,7 +128,7 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
         //recyclerHeadingLL = includeView.findViewById(R.id.query_list_recycler_heading)
         noLogsTxt = includeView.findViewById(R.id.dns_log_no_log_text)
 
-        if(PersistentState.isLogsEnabled(requireContext())) {
+        if(persistentState.isLogsEnabled()) {
             logsDisabledTxt.visibility = View.GONE
             searchLayoutLL.visibility = View.VISIBLE
             recyclerView!!.setHasFixedSize(true)
@@ -152,7 +153,7 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
             latencyTxt.text = "Latency: "+median50.value.toString() + "ms"
         })
 
-        queryCountTxt.text = "Lifetime Queries: " + PersistentState.getNumOfReq(requireContext())
+        queryCountTxt.text = "Lifetime Queries: " + persistentState.getNumOfReq()
 
         editSearchView!!.setOnQueryTextListener(this)
         editSearchView!!.setOnClickListener {
@@ -196,7 +197,7 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
             currentDNSStatus.text = resources.getString(R.string.configure_dns_connection_name) + " "+ proxyDetails?.proxyName
             //recyclerHeadingLL.visibility = View.GONE
             recyclerView?.visibility = View.GONE
-            if(PersistentState.isLogsEnabled(requireContext())) {
+            if(persistentState.isLogsEnabled()) {
                 noLogsTxt.visibility = View.VISIBLE
             }
         }

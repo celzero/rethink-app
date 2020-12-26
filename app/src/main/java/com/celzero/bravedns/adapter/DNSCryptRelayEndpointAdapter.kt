@@ -48,6 +48,7 @@ import kotlinx.coroutines.launch
 class DNSCryptRelayEndpointAdapter(
     private val context: Context,
     private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
+    private val persistentState:PersistentState,
     private val dnsCryptEndpointRepository:DNSCryptEndpointRepository
 ) : PagedListAdapter<DNSCryptRelayEndpoint, DNSCryptRelayEndpointAdapter.DNSCryptRelayEndpointViewHolder>(DIFF_CALLBACK) {
 
@@ -248,8 +249,8 @@ class DNSCryptRelayEndpointAdapter(
                         notifyDataSetChanged()
                     }
                 }.start()
-                PersistentState.setDNSType(context, 2)
-                PersistentState.setConnectionModeChange(context, dnsCryptRelayEndpoint.dnsCryptRelayURL)
+                persistentState.setDNSType(2)
+                persistentState.setConnectionModeChange(dnsCryptRelayEndpoint.dnsCryptRelayURL)
                 //mDb.close()
                 return true
             } else {

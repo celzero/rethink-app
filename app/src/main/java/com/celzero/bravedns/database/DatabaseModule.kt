@@ -17,6 +17,7 @@ object DatabaseModule {
                 get(),
                 get(),
                 get(),
+                get(),
                 get()
             )
         }

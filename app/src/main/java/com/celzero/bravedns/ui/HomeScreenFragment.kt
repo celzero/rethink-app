@@ -131,6 +131,7 @@ class HomeScreenFragment : Fragment() {
 
     private val categoryInfoRepository by inject<CategoryInfoRepository>()
     private val appInfoRepository by inject<AppInfoRepository>()
+    private val persistentState by inject<PersistentState>()
 
     companion object {
         //private
@@ -214,7 +215,7 @@ class HomeScreenFragment : Fragment() {
         // Set Adapter to Spinner
         braveModeSpinner.adapter = spinnerAdapter
 
-        braveMode = PersistentState.getBraveMode(requireContext())
+        braveMode = persistentState.getBraveMode()
 
         if (braveMode == -1) {
             braveModeSpinner.setSelection(DNS_FIREWALL_MODE)
@@ -224,11 +225,11 @@ class HomeScreenFragment : Fragment() {
 
         modifyBraveMode(braveMode)
 
-        lifeTimeQueries = PersistentState.getNumOfReq(requireContext())
+        lifeTimeQueries = persistentState.getNumOfReq()
         //var lifeTimeQ : MutableLiveData<Int> = MutableLiveData()
         //val aList = PersistentState.getExcludedPackagesWifi(requireContext())
         //appsBlocked.postValue(aList!!.size)
-        blockedCount.postValue(PersistentState.getBlockedReq(requireContext()))
+        blockedCount.postValue(persistentState.getBlockedReq())
     }
 
 
@@ -406,7 +407,7 @@ class HomeScreenFragment : Fragment() {
 
         braveModeToggler.observe(viewLifecycleOwner, {
             if (DEBUG) Log.d(LOG_TAG, "HomeScreen -> braveModeToggler -> observer")
-            if (PersistentState.getVpnEnabled(requireContext())) {
+            if (persistentState.getVpnEnabled()) {
                 enableBraveModeIcons()
                 showTileForMode()
             }
@@ -424,7 +425,7 @@ class HomeScreenFragment : Fragment() {
         dnsOnOffBtn.isEnabled = false
         //TODO : check for the service already running
         //val status = VpnController.getInstance()!!.getState(requireContext())
-        val status = PersistentState.getVpnEnabled(requireContext())
+        val status = persistentState.getVpnEnabled()
         if (!checkForPrivateDNSandAlwaysON()) {
             //if (status!!.activationRequested) {
             if (status) {
@@ -475,7 +476,7 @@ class HomeScreenFragment : Fragment() {
     // FIXME: 19-11-2020 - Check the below code for all the edge cases.
     private fun checkForPrivateDNSandAlwaysON() : Boolean {
         //val status: VpnState? = VpnController.getInstance()!!.getState(context)
-        val stats = PersistentState.getVpnEnabled(requireContext())
+        val stats = persistentState.getVpnEnabled()
         val alwaysOn = android.provider.Settings.Secure.getString(context?.contentResolver, "always_on_vpn_app")
         if (!TextUtils.isEmpty(alwaysOn)) {
             if (context?.packageName == alwaysOn) {
@@ -661,7 +662,7 @@ class HomeScreenFragment : Fragment() {
         super.onResume()
         syncDnsStatus()
         updateUptime()
-        if (PersistentState.getVpnEnabled(requireContext())) {
+        if (persistentState.getVpnEnabled()) {
             enableBraveModeIcons()
             shimmerForStart()
             //shimmerContainer.stopShimmer()
@@ -721,7 +722,7 @@ class HomeScreenFragment : Fragment() {
         }
 
         //PersistentState.setFirewallMode(requireContext(), firewallMode)
-        PersistentState.setBraveMode(requireContext(), braveMode)
+        persistentState.setBraveMode(braveMode)
 
         if (VpnController.getInstance()!!.getState(requireContext())!!.activationRequested) {
             //updateBuilder()

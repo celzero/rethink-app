@@ -23,8 +23,6 @@ import com.celzero.bravedns.database.DNSLogRepository
 import com.celzero.bravedns.database.DNSLogs
 import com.celzero.bravedns.net.dns.DnsPacket
 import com.celzero.bravedns.net.doh.Transaction
-import com.celzero.bravedns.service.PersistentState.Companion.setBlockedReq
-import com.celzero.bravedns.service.PersistentState.Companion.setNumOfReq
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.DNS_TYPE_DNS_CRYPT
 import com.celzero.bravedns.util.Constants.Companion.DNS_TYPE_DOH
@@ -40,7 +38,9 @@ import java.net.InetAddress
 import java.net.ProtocolException
 import java.net.UnknownHostException
 
-class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRepository, private val context: Context) {
+class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRepository,
+                                         private val persistentState:PersistentState,
+                                         private val context: Context) {
 
     @Synchronized
     fun recordTransaction(transaction: Transaction?) {
@@ -136,9 +136,9 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                 }
             }
             if(dnsLogs.isBlocked){
-                setBlockedReq(context)
+                persistentState.setBlockedReq()
             }
-            setNumOfReq(context)
+            persistentState.setNumOfReq()
             dnsLogRepository.insertAsync(dnsLogs)
         }
     }
