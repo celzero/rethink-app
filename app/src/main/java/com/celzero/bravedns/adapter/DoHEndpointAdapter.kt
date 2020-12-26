@@ -55,6 +55,7 @@ import xdns.Xdns.getBlocklistStampFromURL
 class DoHEndpointAdapter(private val context: Context,
                          private val doHEndpointRepository: DoHEndpointRepository,
                          private val persistentState:PersistentState,
+                         private val queryTracker: QueryTracker,
                          val listener: UIUpdateInterface) : PagedListAdapter<DoHEndpoint, DoHEndpointAdapter.DoHEndpointViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -289,7 +290,7 @@ class DoHEndpointAdapter(private val context: Context,
                     notifyDataSetChanged()
                     persistentState.setDNSType(1)
                     persistentState.setConnectionModeChange(doHEndpoint.dohURL)
-                    QueryTracker.reinitializeQuantileEstimator()
+                    queryTracker.reinitializeQuantileEstimator()
                 }
             }.start()
             appMode?.setDNSMode(Settings.DNSModePort)

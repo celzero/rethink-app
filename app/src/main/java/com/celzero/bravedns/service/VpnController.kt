@@ -132,14 +132,6 @@ class VpnController {
         return VpnState(requested, on, connectionState)
     }
 
-    @Synchronized
-    fun getTracker(): QueryTracker? {
-        if (tracker == null) {
-            tracker = QueryTracker()
-        }
-        return tracker
-    }
-
     /*fun test(){
         braveVpnService!!.test()
     }*/
@@ -147,4 +139,5 @@ class VpnController {
 
 internal object VpnControllerHelper:KoinComponent {
     val persistentState by inject<PersistentState>()
+    val queryTracker by inject<QueryTracker>()
 }

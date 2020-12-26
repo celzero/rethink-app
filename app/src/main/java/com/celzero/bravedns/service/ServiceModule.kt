@@ -9,6 +9,7 @@ object ServiceModule {
         single { IPTracker(get(), get(), get(), androidContext()) }
         single { DNSLogTracker(get(), get(), androidContext()) }
         single { PersistentState(androidContext()) }
+        single { QueryTracker(get(), androidContext()) }
     }
 
     val modules = listOf(serviceModules)

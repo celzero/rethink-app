@@ -52,6 +52,7 @@ import settings.Settings
 class DNSProxyEndpointAdapter(private val context: Context,
                               private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
                               private val persistentState:PersistentState,
+                              private val queryTracker: QueryTracker,
                               val listener: UIUpdateInterface) : PagedListAdapter<DNSProxyEndpoint, DNSProxyEndpointAdapter.DNSProxyEndpointViewHolder>(DIFF_CALLBACK) {
     private var PROXY_TYPE_INTERNAL: String
     private var PROXY_TYPE_EXTERNAL: String
@@ -274,7 +275,7 @@ class DNSProxyEndpointAdapter(private val context: Context,
 
                 override fun onFinish() {
                     notifyDataSetChanged()
-                    QueryTracker.reinitializeQuantileEstimator()
+                    queryTracker.reinitializeQuantileEstimator()
                 }
             }.start()
 

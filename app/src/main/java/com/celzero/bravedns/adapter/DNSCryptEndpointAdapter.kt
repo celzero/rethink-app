@@ -54,6 +54,7 @@ import settings.Settings
 class DNSCryptEndpointAdapter(private val context: Context,
                               private val dnsCryptEndpointRepository:DNSCryptEndpointRepository,
                               private val persistentState: PersistentState,
+                              private val queryTracker: QueryTracker,
                               var listener : UIUpdateInterface) : PagedListAdapter<DNSCryptEndpoint, DNSCryptEndpointAdapter.DNSCryptEndpointViewHolder>(DIFF_CALLBACK) {
     //private var serverList : MutableList<DNSCryptEndpoint> = ArrayList()
 
@@ -258,7 +259,7 @@ class DNSCryptEndpointAdapter(private val context: Context,
                 override fun onFinish() {
                     notifyDataSetChanged()
                     persistentState.setDNSType(2)
-                    QueryTracker.reinitializeQuantileEstimator()
+                    queryTracker.reinitializeQuantileEstimator()
                 }
             }.start()
 

@@ -119,6 +119,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
     private val ipTracker by inject<IPTracker>()
     private val dnsLogTracker by inject<DNSLogTracker>()
     private val persistentState by inject<PersistentState>()
+    private val tracker by inject<QueryTracker>()
 
     enum class State {
         NEW, WORKING, FAILING
@@ -613,7 +614,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         //transaction.responseTime = SystemClock.elapsedRealtime()
         transaction.responseCalendar = Calendar.getInstance()
         // All the transactions are recorded in the DNS logs.
-        getTracker()!!.recordTransaction(persistentState, this, transaction)
+        tracker.recordTransaction(transaction)
         if(persistentState.isLogsEnabled()) {
             dnsLogTracker.recordTransaction(transaction)
         }
@@ -628,10 +629,6 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         } else if (transaction.status !== Transaction.Status.CANCELED) {
             vpnController!!.onConnectionStateChanged(this, State.FAILING)
         }
-    }
-
-    private fun getTracker(): QueryTracker? {
-        return vpnController!!.getTracker()
     }
 
     private fun setCryptMode() {

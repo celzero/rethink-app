@@ -48,6 +48,7 @@ import com.celzero.bravedns.viewmodel.DNSCryptRelayEndpointViewModel
 import com.celzero.bravedns.viewmodel.DNSProxyEndpointViewModel
 import com.celzero.bravedns.viewmodel.DoHEndpointViewModel
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import settings.Settings
@@ -175,7 +176,7 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
         dnsProxyRecyclerView.layoutManager = dnsProxyLayoutManager
         noProxyText = view.findViewById(R.id.recycler_dns_proxy_title)
 
-        dnsCryptRecyclerAdapter = DNSCryptEndpointAdapter(requireContext(), dnsCryptEndpointRepository, persistentState, this)
+        dnsCryptRecyclerAdapter = DNSCryptEndpointAdapter(requireContext(), dnsCryptEndpointRepository, persistentState, get(), this)
         dnsCryptViewModel.dnsCryptEndpointList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(dnsCryptRecyclerAdapter::submitList))
         dnsCryptRecyclerView.adapter = dnsCryptRecyclerAdapter
 
@@ -183,11 +184,11 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
         dnsCryptRelayViewModel.dnsCryptRelayEndpointList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(dnsCryptRelayRecyclerAdapter::submitList))
         dnsCryptRelayRecyclerView.adapter = dnsCryptRelayRecyclerAdapter
 
-        dohRecyclerAdapter = DoHEndpointAdapter(requireContext(), dohEndpointRepository,persistentState, this)
+        dohRecyclerAdapter = DoHEndpointAdapter(requireContext(), dohEndpointRepository,persistentState, get(), this)
         viewModel.dohEndpointList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(dohRecyclerAdapter!!::submitList))
         dohRecyclerView!!.adapter = dohRecyclerAdapter
 
-        dnsProxyRecyclerAdapter = DNSProxyEndpointAdapter(requireContext(), dnsProxyEndpointRepository, persistentState, this)
+        dnsProxyRecyclerAdapter = DNSProxyEndpointAdapter(requireContext(), dnsProxyEndpointRepository, persistentState,  get(),this)
         dnsProxyViewModel.dnsProxyEndpointList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(dnsProxyRecyclerAdapter::submitList))
         dnsProxyRecyclerView.adapter = dnsProxyRecyclerAdapter
 

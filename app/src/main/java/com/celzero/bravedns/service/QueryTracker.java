@@ -17,6 +17,8 @@ package com.celzero.bravedns.service;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import com.celzero.bravedns.net.doh.Transaction;
 import com.celzero.bravedns.util.P2QuantileEstimation;
 
@@ -29,25 +31,31 @@ import com.celzero.bravedns.util.P2QuantileEstimation;
 public class QueryTracker {
 
     private static final int HISTORY_SIZE = 1000;
-
     private static long numRequests = 0;
     private static P2QuantileEstimation quantileEstimator;
+    @NonNull private final Context context;
+    @NonNull private final PersistentState persistentState;
 
-    public static void reinitializeQuantileEstimator(){
+    QueryTracker(@NonNull PersistentState persistentState, @NonNull Context context) {
+        this.context = context;
+        this.persistentState = persistentState;
+    }
+
+    public void reinitializeQuantileEstimator(){
         quantileEstimator = new P2QuantileEstimation(0.5);
         numRequests = 1;
     }
 
-    synchronized void recordTransaction(PersistentState persistentState, Context context, Transaction transaction) {
+    synchronized void recordTransaction(Transaction transaction) {
         ++numRequests;
         if (numRequests % HISTORY_SIZE == 0) {
             numRequests = 1;
             reinitializeQuantileEstimator();
         }
-        sync(persistentState, context, transaction);
+        sync(transaction);
     }
 
-    public synchronized void sync(PersistentState persistentState, Context context, Transaction transaction) {
+    public synchronized void sync(Transaction transaction) {
         if (transaction != null && transaction.blockList.isEmpty() && !transaction.serverIp.isEmpty()) {
             // Restore number of requests from storage, or 0 if it isn't defined yet.
             long val =  transaction.responseTime;
