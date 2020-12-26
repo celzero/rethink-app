@@ -1,5 +1,6 @@
 package com.celzero.bravedns.database
 
+import com.celzero.bravedns.util.DatabaseHandler
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
@@ -18,6 +19,9 @@ object DatabaseModule {
                 get(),
                 get()
             )
+        }
+        single {
+            DatabaseHandler(androidContext())
         }
     }
     private val daoModule = module {

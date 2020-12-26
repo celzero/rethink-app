@@ -122,14 +122,9 @@ class HomeScreenActivity : AppCompatActivity() {
     }
 
     companion object {
-        lateinit var dbHandler: DatabaseHandler
         var isLoadingComplete: Boolean = false
         const val DAYS_TO_MAINTAIN_NETWORK_LOG = 2
-        var contextVal : Context ?= null
         var enqueue: Long = 0
-        fun getInstance() : Context? {
-            return contextVal
-        }
     }
 
 

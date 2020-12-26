@@ -33,8 +33,6 @@ class VpnController {
         private var braveVpnService : BraveVPNService ? = null
         private var connectionState: BraveVPNService.State? = null
         private var tracker: QueryTracker? = null
-        private var ipTracker : IPTracker ?= null
-        private var dnsLogTracker : DNSLogTracker ?= null
 
         @Synchronized
         fun getInstance(): VpnController? {
