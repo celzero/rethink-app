@@ -151,7 +151,7 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
             }
         }.start()
         refreshDatabase.refreshAppInfoDatabase()
-        //refreshDatabase.updateCategoryInDB()
+        refreshDatabase.updateCategoryInDB()
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {

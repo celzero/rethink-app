@@ -102,7 +102,7 @@ class HomeScreenActivity : AppCompatActivity() {
         var appStartTime: Long = System.currentTimeMillis()
         var isBackgroundEnabled: Boolean = false
         var firewallRules: HashMultimap<Int, String> = HashMultimap.create()
-        var DEBUG = true
+        var DEBUG = false
 
         //Screen off - whether the screen preference is set 0-off, 1- on. -1 not initialized
         var isScreenLockedSetting : Int = -1
@@ -178,22 +178,21 @@ class HomeScreenActivity : AppCompatActivity() {
     }
 
     private fun updateInstallSource() {
-        if(PersistentState.getDownloadSource(this) == 0) {
-            val packageManager = packageManager
-            try {
-                val applicationInfo: ApplicationInfo = packageManager.getApplicationInfo(packageName, 0)
-                if (DEBUG) Log.d(LOG_TAG, "Install location: ${packageManager.getInstallerPackageName(applicationInfo.packageName)}")
-                if ("com.android.vending" == packageManager.getInstallerPackageName(applicationInfo.packageName)) {
-                    // App was installed by Play Store
-                    PersistentState.setDownloadSource(context, Constants.DOWNLOAD_SOURCE_PLAY_STORE)
-                } else {
-                    // App was installed from somewhere else
-                    PersistentState.setDownloadSource(context, DOWNLOAD_SOURCE_OTHERS)
-                }
-            } catch (e: PackageManager.NameNotFoundException) {
-                e.printStackTrace()
+        val packageManager = packageManager
+        try {
+            val applicationInfo: ApplicationInfo = packageManager.getApplicationInfo(packageName, 0)
+            if (DEBUG) Log.d(LOG_TAG, "Install location: ${packageManager.getInstallerPackageName(applicationInfo.packageName)}")
+            if ("com.android.vending" == packageManager.getInstallerPackageName(applicationInfo.packageName)) {
+                // App was installed by Play Store
+                PersistentState.setDownloadSource(context, Constants.DOWNLOAD_SOURCE_PLAY_STORE)
+            } else {
+                // App was installed from somewhere else
+                PersistentState.setDownloadSource(context, DOWNLOAD_SOURCE_OTHERS)
             }
+        } catch (e: PackageManager.NameNotFoundException) {
+            Log.e(LOG_TAG,"Exception while fetching the app download source: ${e.message}",e)
         }
+
     }
 
 
@@ -364,7 +363,7 @@ class HomeScreenActivity : AppCompatActivity() {
 
             override fun onResponse(call: Call, response: Response) {
                 try {
-                    val stringResponse = response.body()!!.string()
+                    val stringResponse = response.body!!.string()
                     //creating json object
                     val jsonObject = JSONObject(stringResponse)
                     val responseVersion = jsonObject.getInt("version")
@@ -386,7 +385,7 @@ class HomeScreenActivity : AppCompatActivity() {
                         }
                     }
                     response.close()
-                    client.connectionPool().evictAll()
+                    client.connectionPool.evictAll()
                 } catch (e: Exception) {
                     if (isUserInitiatedUpdateCheck) {
                         showDownloadDialog(false, getString(R.string.download_update_dialog_failure_title), getString(R.string.download_update_dialog_failure_message))
@@ -408,7 +407,7 @@ class HomeScreenActivity : AppCompatActivity() {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val stringResponse = response.body()!!.string()
+                val stringResponse = response.body!!.string()
                 //creating json object
                 try {
                     val jsonObject = JSONObject(stringResponse)
@@ -435,8 +434,8 @@ class HomeScreenActivity : AppCompatActivity() {
                 } catch (e: Exception) {
                     Log.w(LOG_TAG,"HomeScreenActivity- Exception while fetching blocklist update",e)
                 }
-                response.body()!!.close()
-                client.connectionPool().evictAll()
+                response.body!!.close()
+                client.connectionPool.evictAll()
             }
         })
     }
