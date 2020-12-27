@@ -55,6 +55,10 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        leakCanary {
+            matchingFallbacks = ['debug']
+            initWith buildTypes.debug
+        }
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8
@@ -124,5 +128,7 @@ dependencies {
 
     //Swipe button animation
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
+
+    leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.6'
 
 }
