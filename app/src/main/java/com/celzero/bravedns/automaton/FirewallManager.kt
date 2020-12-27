@@ -22,6 +22,7 @@ import android.content.pm.PackageManager
 import android.text.TextUtils
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityNodeInfo
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -108,9 +109,10 @@ class FirewallManager(service: BackgroundAccessibilityService) {
     }
 
 
-    fun onAccessibilityEvent(event: AccessibilityEvent, that: BackgroundAccessibilityService){
+    fun onAccessibilityEvent(event: AccessibilityEvent, that: BackgroundAccessibilityService,rootInActiveWindow: AccessibilityNodeInfo?){
         packageManager = accessibilityService.packageManager
-        val eventPackageName = event.packageName?.toString()
+
+        val eventPackageName = getLatestPackageName(event, rootInActiveWindow)
 
         val hasContentDisappeared = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
             event.eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED ||  event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
@@ -135,11 +137,11 @@ class FirewallManager(service: BackgroundAccessibilityService) {
                 if (eventPackageName != null && event.source != null) {
                     packagesStack.add(eventPackageName)
                 }
-                latestTrackedPackage = event.packageName.toString()
+                latestTrackedPackage = getLatestPackageName(event, rootInActiveWindow)
 
             }
         }
-        val packageName =  event.packageName?.toString() ?: return
+        val packageName =  latestTrackedPackage ?: return
         if (hasContentDisappeared) {
             // https://stackoverflow.com/a/27642535
             // top window is launcher? try revoke queued up permissions
@@ -161,6 +163,21 @@ class FirewallManager(service: BackgroundAccessibilityService) {
             addOrRemovePackageForBackground(true)
         }
 
+    }
+
+    //https://stackoverflow.com/questions/45620584/event-getsource-returns-null-in-accessibility-service-catch-source-for-a-3rd-p
+    /**
+     * If the event retrieved package name is null then the check for the package name
+     * is carried out in (getRootInActiveWindow)AccessibilityNodeInfo
+     */
+    private fun getLatestPackageName(event: AccessibilityEvent, rootInActiveWindow: AccessibilityNodeInfo?): String? {
+        var packageName : String? = event.packageName?.toString()
+        if(packageName.isNullOrEmpty()){
+            packageName = rootInActiveWindow?.packageName?.toString()
+            if(DEBUG) Log.d(LOG_TAG,"AccessibilityEvent: Value from rootInActiveWindow : $packageName")
+        }
+        if(DEBUG) Log.d(LOG_TAG,"AccessibilityEvent: $packageName")
+        return packageName
     }
 
     private fun printAllowedUID() {

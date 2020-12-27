@@ -280,7 +280,7 @@ class RefreshDatabase(var context: Context) {
             categoryInfo.numOfAppsExcluded = appInfoRepository.getExcludedAppCountForCategory(it)
             categoryInfo.numOfAppWhitelisted = appInfoRepository.getWhitelistCount(it)
             //categoryInfo.isInternetBlocked = false
-            if(DEBUG) Log.d(LOG_TAG,"categoryListFromAppList - ${categoryInfo.categoryName}, ${categoryInfo.numberOFApps}, ${categoryInfo.numOfAppsBlocked}, ${categoryInfo.isInternetBlocked}")
+            Log.i(LOG_TAG,"categoryListFromAppList - ${categoryInfo.categoryName}, ${categoryInfo.numberOFApps}, ${categoryInfo.numOfAppsBlocked}, ${categoryInfo.isInternetBlocked}")
             categoryInfoRepository.insertAsync(categoryInfo)
         }
         //}

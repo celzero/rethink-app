@@ -346,7 +346,7 @@
     <string name="conn_track_clear_logs_message">This only deletes network logs but not firewall rules. This operation is not reversible. Do you want to proceed?</string>
 
     <string name="dns_query_clear_logs_title">Delete all DNS logs?</string>
-    <string name="dns_query_clear_logs_message">This deletes all the DNS logs. This operation is not reversible. Do you want to proceed?</string>
+    <string name="dns_query_clear_logs_message">This deletes on-device DNS logs. This operation is not reversible. Do you want to proceed?</string>
 
     <string name="filter_dns_blocked_connections">Blocked connections</string>
     <string name="filter_dns_all_connections">All connections</string>
@@ -548,29 +548,28 @@
 
     <string name="whats_dialog_title">15+ new features in v053</string>
     <string name="whats_new_version_name">🎅 🎄 Happy New Year ❄️ 🎁 </string>
-    <string name="whats_new_version_update">Android 6 and Android TV:\n\n
-        \u00091. The app now runs on Android 6 and above.\n
-        \u00092. Preliminary Android TV support.\n\n
+    <string name="whats_new_version_update">Android 6 and Battery Saver mode:\n\n
+        \u00091. The app now runs on Android 6 and above.\n\n
         Battery Saver Mode:\n\n
-        \u00093. The app now bundles in a battery saver mode in which only DNS works but not Firewall.\n\n
+        \u00092. The app now bundles in a battery saver mode in which only DNS works but not Firewall.\n\n
         Homescreen:\n\n
-        \u00094. Start / Stop now looks more like a traditional button with a bottom sheet to help choose between battery-saver DNS-only mode and full-fledged DNS + Firewall mode.\n
-        \u00095. DNS and Firewall buttons on the homescreen are now more prominent.\n\n
+        \u00093. Start / Stop now looks more like a traditional button with a bottom sheet to help choose between battery-saver DNS-only mode and full-fledged DNS + Firewall mode.\n
+        \u00094. DNS and Firewall buttons on the homescreen are now more prominent.\n\n
         Settings:\n\n
-        \u00096. Enable or disable on-device DNS and Firewall logging.\n
-        \u00097. "Refresh app list" button moved to the Firewall screen.\n\n
+        \u00095. Enable or disable on-device DNS and Firewall logging.\n
+        \u00096. "Refresh app list" button moved to the Firewall screen.\n\n
         DNS:\n\n
-        \u00098. Latest 20K DNS logs are stored on-device.\n
-        \u00099. Search box and filters for DNS logs.\n\n
+        \u00097. Latest 20K DNS logs are stored on-device.\n
+        \u00098. Search box and filters for DNS logs.\n\n
         Firewall:\n\n
-        \u000910. Fix for Whitelist reverting to default.\n
-        \u000911. Fix for Exclusion list reverting to default.\n
-        \u000912. All apps tab now shows total number of app, number of apps in the whitelist / exclusion list, and number of apps blocked.\n
-        \u000913. Improve scroll performance of the Network Log screen.\n
-        \u000914. Network Log bottom sheet now slightly less cluttered: A couple of UI elements removed.\n
-        \u000915. Distinguish between "unamed" (connections from apps without a name) and "unknown" (orphan connections without an owner app) in the network logs.\n
-        \u000916. Improvements to app UX when the VPN is run in "lockdown mode" (that is, when "Block connections without VPN" is enabled from Android\'s VPN Settings page).\n
-        \u000917. Some apps retry relentlessly when their connections are firewalled: Gatekeep connections for 30 seconds to delay those fast-paced non-stop retries.\n\n
+        \u00099. Fix for Whitelist reverting to default.\n
+        \u000910. Fix for Exclusion list reverting to default.\n
+        \u000911. All apps tab now shows total number of app, number of apps in the whitelist / exclusion list, and number of apps blocked.\n
+        \u000912. Improve scroll performance of the Network Log screen.\n
+        \u000913. Network Log bottom sheet now slightly less cluttered: A couple of UI elements removed.\n
+        \u000914. Distinguish between "unamed" (connections from apps without a name) and "unknown" (orphan connections without an owner app) in the network logs.\n
+        \u000915. Improvements to app UX when the VPN is run in "lockdown mode" (that is, when "Block connections without VPN" is enabled from Android\'s VPN Settings page).\n
+        \u000916. Some apps retry relentlessly when their connections are firewalled: Gatekeep connections for 30 seconds to delay those fast-paced non-stop retries.\n\n
         Universal Firewall:\n\n
         \u00092021. "Block any app not in use" now with better heurisitcs and so should behave in less surprising ways and be more out-of-the-way.
     </string>
