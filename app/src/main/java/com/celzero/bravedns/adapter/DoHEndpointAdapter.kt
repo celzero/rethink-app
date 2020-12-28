@@ -52,13 +52,11 @@ import settings.Settings
 import xdns.Xdns.getBlocklistStampFromURL
 
 
-class DoHEndpointAdapter(val context: Context, val listener: UIUpdateInterface) : PagedListAdapter<DoHEndpoint, DoHEndpointAdapter.DoHEndpointViewHolder>(DIFF_CALLBACK) {
-    var mDb: AppDatabase = AppDatabase.invoke(context.applicationContext)
-    var doHEndpointRepository: DoHEndpointRepository
-
-    init {
-        doHEndpointRepository = mDb.doHEndpointsRepository()
-    }
+class DoHEndpointAdapter(private val context: Context,
+                         private val doHEndpointRepository: DoHEndpointRepository,
+                         private val persistentState:PersistentState,
+                         private val queryTracker: QueryTracker,
+                         val listener: UIUpdateInterface) : PagedListAdapter<DoHEndpoint, DoHEndpointAdapter.DoHEndpointViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK = object :
@@ -112,7 +110,7 @@ class DoHEndpointAdapter(val context: Context, val listener: UIUpdateInterface) 
                     urlExplanationTxt.text = "Connected."
                     Log.d(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}")
                     if(doHEndpoint.dohName == RETHINK_DNS_PLUS){
-                        val count = PersistentState.getNumberOfRemoteBlockLists(context)
+                        val count = persistentState.getNumberOfRemoteBlockLists()
                         Log.d(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}, count- $count")
                         if (count != 0) {
                             urlExplanationTxt.text = "Connected. $count blocklists in-use."
@@ -164,8 +162,6 @@ class DoHEndpointAdapter(val context: Context, val listener: UIUpdateInterface) 
 
         private fun updateConnection(doHEndpoint: DoHEndpoint) {
             if(DEBUG) Log.d(LOG_TAG, "updateConnection - ${doHEndpoint.dohName}, ${doHEndpoint.dohURL}")
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val doHEndpointRepository = mDb.doHEndpointsRepository()
             doHEndpoint.dohURL = doHEndpointRepository.getConnectionURL(doHEndpoint.id)
             if (doHEndpoint.dohName == RETHINK_DNS_PLUS) {
                 var stamp = ""
@@ -283,8 +279,6 @@ class DoHEndpointAdapter(val context: Context, val listener: UIUpdateInterface) 
         }
 
         private fun updateDoHDetails(doHEndpoint: DoHEndpoint) {
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val doHEndpointRepository = mDb.doHEndpointsRepository()
             doHEndpoint.isSelected = true
             doHEndpointRepository.removeConnectionStatus()
             doHEndpointRepository.updateAsync(doHEndpoint)
@@ -294,9 +288,9 @@ class DoHEndpointAdapter(val context: Context, val listener: UIUpdateInterface) 
 
                 override fun onFinish() {
                     notifyDataSetChanged()
-                    PersistentState.setDNSType(context, 1)
-                    PersistentState.setConnectionModeChange(context, doHEndpoint.dohURL)
-                    QueryTracker.reinitializeQuantileEstimator()
+                    persistentState.setDNSType(1)
+                    persistentState.setConnectionModeChange(doHEndpoint.dohURL)
+                    queryTracker.reinitializeQuantileEstimator()
                 }
             }.start()
             appMode?.setDNSMode(Settings.DNSModePort)

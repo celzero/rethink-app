@@ -37,13 +37,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class UniversalBlockedRulesAdapter(val context: Context) : PagedListAdapter<BlockedConnections, UniversalBlockedRulesAdapter.UniversalBlockedConnViewHolder>(DIFF_CALLBACK) {
-    var mDb: AppDatabase = AppDatabase.invoke(context.applicationContext)
-    var blockedConnectionsRepository: BlockedConnectionsRepository
-
-    init {
-        blockedConnectionsRepository = mDb.blockedConnectionRepository()
-    }
+class UniversalBlockedRulesAdapter(
+    private val context: Context,
+    private val blockedConnectionsRepository: BlockedConnectionsRepository
+) : PagedListAdapter<BlockedConnections, UniversalBlockedRulesAdapter.UniversalBlockedConnViewHolder>(
+    DIFF_CALLBACK
+) {
 
     companion object {
         private val DIFF_CALLBACK = object :
@@ -111,7 +110,7 @@ class UniversalBlockedRulesAdapter(val context: Context) : PagedListAdapter<Bloc
                 GlobalScope.launch(Dispatchers.IO) {
                     if (blockedConns != null) {
                         val firewallRules = FirewallRules.getInstance()
-                        firewallRules.removeFirewallRules(ConnTrackerBottomSheetFragment.UNIVERSAL_RULES_UID, blockedConns.ipAddress!!, BraveVPNService.BlockedRuleNames.RULE2.ruleName, context)
+                        firewallRules.removeFirewallRules(ConnTrackerBottomSheetFragment.UNIVERSAL_RULES_UID, blockedConns.ipAddress!!, BraveVPNService.BlockedRuleNames.RULE2.ruleName, blockedConnectionsRepository)
                     }
                 }
                 Toast.makeText(context, "${blockedConns.ipAddress} unblocked.", Toast.LENGTH_SHORT).show()

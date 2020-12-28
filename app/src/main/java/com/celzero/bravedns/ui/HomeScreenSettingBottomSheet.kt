@@ -16,6 +16,7 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import org.koin.android.ext.android.inject
 import settings.Settings
 
 class HomeScreenSettingBottomSheet(var connectedDetails : String) : BottomSheetDialogFragment() {
@@ -26,6 +27,8 @@ class HomeScreenSettingBottomSheet(var connectedDetails : String) : BottomSheetD
     private lateinit var braveModeRadioGroup: RadioGroup
     private var firewallMode = -1L
     private val LOG_FILE = "HOMESCREEN_BTM_SHEET"
+
+    private val persistentState by inject<PersistentState>()
 
     override fun getTheme(): Int = R.style.BottomSheetDialogTheme
 
@@ -51,7 +54,7 @@ class HomeScreenSettingBottomSheet(var connectedDetails : String) : BottomSheetD
         if(selectedIndex != -1) {
             (braveModeRadioGroup.getChildAt(selectedIndex) as RadioButton).isChecked = true
         }else{
-            selectedIndex =  PersistentState.getBraveMode(requireContext())
+            selectedIndex =  persistentState.getBraveMode()
             (braveModeRadioGroup.getChildAt(selectedIndex) as RadioButton).isChecked = true
         }
     }
@@ -87,7 +90,7 @@ class HomeScreenSettingBottomSheet(var connectedDetails : String) : BottomSheetD
         } else {
             HomeScreenActivity.GlobalVariable.appMode?.setDNSMode(-1)
         }
-        PersistentState.setBraveMode(requireContext(), HomeScreenActivity.GlobalVariable.braveMode)
+        persistentState.setBraveMode(HomeScreenActivity.GlobalVariable.braveMode)
         HomeScreenActivity.GlobalVariable.braveModeToggler.postValue(HomeScreenActivity.GlobalVariable.braveMode)
         if (VpnController.getInstance()!!.getState(requireContext())!!.activationRequested) {
             if (HomeScreenActivity.GlobalVariable.braveMode == 0) {

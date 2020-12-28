@@ -23,13 +23,17 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppDatabase
+import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import org.koin.android.ext.android.inject
 
 class FirewallActivity : AppCompatActivity() {
     private lateinit var viewPagerFirewall : ViewPager2
     private lateinit var tabLayoutFirewall : TabLayout
     private val FIREWALL_TABS_COUNT = 3
+
+    private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,8 +80,6 @@ class FirewallActivity : AppCompatActivity() {
         val touchSlop = touchSlopField.get(recyclerView) as Int
         touchSlopField.set(recyclerView, touchSlop * 3)       // "8" was obtained experimentally
 
-        val mDb = AppDatabase.invoke(this.applicationContext)
-        val connectionTrackerRepository = mDb.connectionTrackerRepository()
         connectionTrackerRepository.deleteConnectionTrackerCount()
 
     }

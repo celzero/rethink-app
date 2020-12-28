@@ -26,21 +26,12 @@ import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.ConnectionTracker
+import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 
 
-class ConnectionTrackerViewModel : ViewModel() {
-
-    companion object{
-        lateinit var contextVal : Context
-        fun setContext(context: Context){
-            this.contextVal = context
-        }
-    }
-
-    private val mDb = AppDatabase.invoke(contextVal.applicationContext)
-    private val connectionTrackerDAO = mDb.connectionTrackerDAO()
+class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTrackerDAO) : ViewModel() {
 
     private var filteredList : MutableLiveData<String> = MutableLiveData()
 

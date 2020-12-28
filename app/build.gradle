@@ -72,6 +72,7 @@ android {
 }
 
 dependencies {
+    def koin_version = '2.2.2'
     def room_version = "2.2.6"
     def paging_version = "2.1.2"
 
@@ -134,4 +135,12 @@ dependencies {
 
     leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.6'
 
+    // Koin dependency injection
+    implementation "org.koin:koin-android:$koin_version"
+    // Koin AndroidX Scope features
+    implementation "org.koin:koin-androidx-scope:$koin_version"
+    // Koin AndroidX ViewModel features
+    implementation "org.koin:koin-androidx-viewmodel:$koin_version"
+    // Koin AndroidX Fragment features
+    implementation "org.koin:koin-androidx-fragment:$koin_version"
 }

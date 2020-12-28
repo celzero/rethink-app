@@ -37,13 +37,13 @@ import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import settings.Settings
 
 
-class PersistentState {
-
+class PersistentState internal constructor(context: Context) {
     companion object {
         private const val IS_FIRST_LAUNCH = "is_first_time_launch"
         private const val APPS_KEY_DATA = "pref_apps_data"
         private const val APPS_KEY_WIFI = "pref_apps_wifi"
         private const val CATEGORY_DATA = "blocked_categories"
+
         //const val URL_KEY = "pref_server_url"
         private const val DNS_MODE = "dns_mode"
         private const val FIREWALL_MODE = "firewall_mode"
@@ -67,7 +67,7 @@ class PersistentState {
         private const val KILL_APP_FIREWALL = "kill_app_on_firewall"
         private const val SOCKS5 = "socks5_proxy"
 
-        const val CONNECTION_CHANGE =  "change_in_url"
+        const val CONNECTION_CHANGE = "change_in_url"
         private const val DOWNLOAD_BLOCK_LIST_FILES = "download_block_list_files"
         const val LOCAL_BLOCK_LIST = "enable_local_list"
         private const val LOCAL_BLOCK_LIST_TIME = "local_block_list_downloaded_time"
@@ -79,7 +79,7 @@ class PersistentState {
         const val BLOCK_UNKNOWN_CONNECTIONS = "block_unknown_connections"
         private const val IS_INSERT_COMPLETE = "initial_insert_servers_complete"
         private const val APP_UPDATE_LAST_CHECK = "app_update_last_check"
-        private const val APP_DOWNLOAD_SOURCE ="app_downloaded_source"
+        private const val APP_DOWNLOAD_SOURCE = "app_downloaded_source"
 
         private const val APPROVED_KEY = "approved"
         private const val ENABLED_KEY = "enabled"
@@ -103,603 +103,607 @@ class PersistentState {
         // TODO: Unify preferences into a single file.
         private const val APPROVAL_PREFS_NAME = "IntroState"
 
-
-        /*fun getInternalState(context: Context): SharedPreferences {
-            return context.getSharedPreferences(
-                INTERNAL_STATE_NAME,
-                Context.MODE_PRIVATE
-            )
-        }*/
-
-        fun getUserPreferences(context: Context): SharedPreferences {
-            return PreferenceManager.getDefaultSharedPreferences(context)
-        }
-
-        fun getVpnEnabled(context: Context): Boolean {
-            return getUserPreferences(context).getBoolean(ENABLED_KEY, false)
-        }
-
-
-        fun setFirstTimeLaunch(context: Context, isFirstTime : Boolean) =
-            getUserPreferences(context).edit {
-                putBoolean(IS_FIRST_LAUNCH, isFirstTime)
-            }
-
-           fun isFirstTimeLaunch(context:Context) : Boolean {
-               return getUserPreferences(context).getBoolean(IS_FIRST_LAUNCH,true)
-           }
-
         fun expandUrl(context: Context, url: String?): String {
             return if (url == null || url.isEmpty()) {
                 context.resources.getStringArray(R.array.doh_endpoint_names)[3]
             } else url
         }
+    }
 
-        fun setVpnEnabled(context: Context, enabled: Boolean) =
-            getUserPreferences(context).edit {
-                putBoolean(ENABLED_KEY, enabled)
-            }
+    val userPreferences: SharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(context)
+
+    /*fun getInternalState(context: Context): SharedPreferences {
+        return context.getSharedPreferences(
+            INTERNAL_STATE_NAME,
+            Context.MODE_PRIVATE
+        )
+    }*/
+
+    fun getVpnEnabled(): Boolean {
+        return userPreferences.getBoolean(ENABLED_KEY, false)
+    }
+
+    fun setFirstTimeLaunch(isFirstTime: Boolean) =
+        userPreferences.edit {
+            putBoolean(IS_FIRST_LAUNCH, isFirstTime)
+        }
+
+    fun isFirstTimeLaunch(): Boolean {
+        return userPreferences.getBoolean(IS_FIRST_LAUNCH, true)
+    }
+
+    fun setVpnEnabled(enabled: Boolean) =
+        userPreferences.edit {
+            putBoolean(ENABLED_KEY, enabled)
+        }
 
 
-        /*fun syncLegacyState(context: Context) {
-            // Copy the domain choice into the new URL setting, if necessary.
-            if (getServerUrl(context) != null) {
-                // New server URL is already populated
+    /*fun syncLegacyState(context: Context) {
+        // Copy the domain choice into the new URL setting, if necessary.
+        if (getServerUrl(context) != null) {
+            // New server URL is already populated
+            return
+        }
+
+        // There is no URL setting, so read the legacy server name.
+        val settings: SharedPreferences = userPreferences
+        val domain =
+            settings.getString(SERVER_KEY, null)
+                ?: // Legacy setting is in the default state, so we can leave the new URL setting in the default
+                // state as well.
                 return
+        val urls = context.resources.getStringArray(R.array.urls)
+        val defaultDomain = context.resources.getString(R.string.legacy_domain0)
+        var url: String? = null
+        if (domain == defaultDomain) {
+            // Common case: the domain is dns.google.com, which now corresponds to dns.google (url 0).
+            url = urls[0]
+        } else {
+            // In practice, we expect that domain will always be cloudflare-dns.com at this point, because
+            // that was the only other option in the relevant legacy versions of Intra.
+            // Look for the corresponding URL among the builtin servers.
+            for (u in urls) {
+                val parsed = Uri.parse(u)
+                if (domain == parsed.host) {
+                    url = u
+                    break
+                }
             }
+        }
+        if (url == null) {
+            return
+        }
+        setServerUrl(context, url)
+    }*/
 
-            // There is no URL setting, so read the legacy server name.
-            val settings: SharedPreferences = getUserPreferences(context)
-            val domain =
-                settings.getString(SERVER_KEY, null)
-                    ?: // Legacy setting is in the default state, so we can leave the new URL setting in the default
-                    // state as well.
-                    return
-            val urls = context.resources.getStringArray(R.array.urls)
-            val defaultDomain = context.resources.getString(R.string.legacy_domain0)
-            var url: String? = null
-            if (domain == defaultDomain) {
-                // Common case: the domain is dns.google.com, which now corresponds to dns.google (url 0).
-                url = urls[0]
+    /* fun setServerUrl(context: Context?, url: String?) {
+         val editor: SharedPreferences.Editor =
+             userPreferences!!.edit()
+         editor.putString(URL_KEY, url)
+         editor.apply()
+     }
+
+     fun getServerUrl(context: Context?): String {
+         val urlTemplate: String = userPreferences.getString(URL_KEY, null)
+             //?: return context.resources.getString(R.string.url0)
+             ?: return context.resources.getStringArray(R.array.doh_endpoint_urls).get(2)
+         return strip(urlTemplate)
+     }*/
+
+    fun getExcludedPackagesWifi(): Set<String?>? {
+        return userPreferences.getStringSet(APPS_KEY_WIFI,HashSet())
+    }
+
+    fun setExcludedPackagesWifi(packageName : String, toRemove : Boolean){
+        val newSet: MutableSet<String> = HashSet(userPreferences.getStringSet(APPS_KEY_WIFI, HashSet<String>()))
+        if(toRemove) {
+            if (newSet.contains(packageName)) {
+                newSet.remove(packageName)
+            }
+        }
+        else newSet.add(packageName)
+        userPreferences.edit { putStringSet(APPS_KEY_WIFI,newSet) }
+        //appsBlocked.postValue(newSet.size)
+    }
+
+    fun isWifiAllowed(packageName : String) : Boolean{
+        return !userPreferences.getStringSet(APPS_KEY_WIFI,HashSet<String>())!!.contains(packageName)
+    }
+
+
+    fun getExcludedPackagesData(): Set<String?>? {
+        return userPreferences.getStringSet(
+            APPS_KEY_DATA,
+            HashSet<String>()
+        )
+    }
+
+    fun setExcludedPackagesData(packageName : String, toRemove : Boolean){
+
+        //TODO : hardcode value for testing. Need to modify
+        // sets = userPreferences!!.getStringSet(APPS_KEY, HashSet<String>())!!
+        val newSet: MutableSet<String> = HashSet(userPreferences.getStringSet(APPS_KEY_DATA, HashSet<String>()))
+        if(toRemove){
+            if(newSet.contains(packageName))
+                newSet.remove(packageName)
+        }
+        else  newSet.add(packageName)
+        userPreferences.edit { putStringSet(APPS_KEY_DATA,newSet) }
+    }
+
+    private fun strip(template: String): String {
+        return template.replace("\\{[^}]*\\}".toRegex(), "")
+    }
+
+
+    fun setBraveMode(mode: Int) =
+        userPreferences.edit {
+            putInt(BRAVE_MODE, mode)
+        }
+
+    fun getBraveMode(): Int {
+        if (braveMode == -1)
+            return userPreferences.getInt(BRAVE_MODE, 2)
+        else
+            return braveMode
+    }
+
+    /* fun setDnsMode(context: Context, mode : Int){
+         val editor: SharedPreferences.Editor =
+             userPreferences!!.edit()
+         editor.putInt(DNS_MODE, mode)
+         editor.apply()
+     }
+
+     //TODO : Modify the hardcoded value
+     fun getDnsMode(context: Context):Int {
+         if(dnsMode == -1)
+             return userPreferences!!.getInt(DNS_MODE, 1)
+         else
+             return dnsMode
+     }*/
+
+    fun setFirewallMode(fwMode: Int) =
+        userPreferences.edit {
+            putInt(FIREWALL_MODE, fwMode)
+        }
+
+    //TODO : Modify the hardcoded value
+    fun getFirewallMode(): Int {
+        return userPreferences.getInt(FIREWALL_MODE, 1)
+    }
+
+
+    fun setFirewallModeForScreenState(state : Boolean) {
+        userPreferences.edit {
+            putBoolean(SCREEN_STATE, state)
+        }
+        if (state) {
+            isScreenLockedSetting = 1
+            if (getBackgroundEnabled()) {
+                numUniversalBlock.postValue(2)
             } else {
-                // In practice, we expect that domain will always be cloudflare-dns.com at this point, because
-                // that was the only other option in the relevant legacy versions of Intra.
-                // Look for the corresponding URL among the builtin servers.
-                for (u in urls) {
-                    val parsed = Uri.parse(u)
-                    if (domain == parsed.host) {
-                        url = u
-                        break
-                    }
-                }
+                numUniversalBlock.postValue(1)
             }
-            if (url == null) {
-                return
-            }
-            setServerUrl(context, url)
-        }*/
-
-       /* fun setServerUrl(context: Context?, url: String?) {
-            val editor: SharedPreferences.Editor =
-                getUserPreferences(context!!)!!.edit()
-            editor.putString(URL_KEY, url)
-            editor.apply()
-        }
-
-        fun getServerUrl(context: Context?): String {
-            val urlTemplate: String = getUserPreferences(context!!).getString(URL_KEY, null)
-                //?: return context.resources.getString(R.string.url0)
-                ?: return context.resources.getStringArray(R.array.doh_endpoint_urls).get(2)
-            return strip(urlTemplate)
-        }*/
-
-
-        fun getExcludedPackagesWifi(context: Context?): Set<String?>? {
-            return getUserPreferences(context!!).getStringSet(APPS_KEY_WIFI,HashSet())
-        }
-
-        fun setExcludedPackagesWifi(packageName : String, toRemove : Boolean , context : Context){
-            val newSet: MutableSet<String> = HashSet(getUserPreferences(context).getStringSet(APPS_KEY_WIFI, HashSet<String>()))
-            if(toRemove) {
-                if (newSet.contains(packageName)) {
-                    newSet.remove(packageName)
-                }
-            }
-            else newSet.add(packageName)
-            getUserPreferences(context).edit { putStringSet(APPS_KEY_WIFI,newSet) }
-            //appsBlocked.postValue(newSet.size)
-        }
-
-        fun isWifiAllowed(packageName : String, context: Context) : Boolean{
-            return !getUserPreferences(context).getStringSet(APPS_KEY_WIFI,HashSet<String>())!!.contains(packageName)
-        }
-
-
-        fun getExcludedPackagesData(context: Context?): Set<String?>? {
-            return getUserPreferences(context!!).getStringSet(
-                APPS_KEY_DATA,
-                HashSet<String>()
-            )
-        }
-
-        fun setExcludedPackagesData(packageName : String, toRemove : Boolean , context : Context?){
-
-            //TODO : hardcode value for testing. Need to modify
-            // sets = getUserPreferences(context!!)!!.getStringSet(APPS_KEY, HashSet<String>())!!
-            val newSet: MutableSet<String> = HashSet(getUserPreferences(context!!).getStringSet(APPS_KEY_DATA, HashSet<String>()))
-            if(toRemove){
-                if(newSet.contains(packageName))
-                    newSet.remove(packageName)
-            }
-            else  newSet.add(packageName)
-            getUserPreferences(context).edit { putStringSet(APPS_KEY_DATA,newSet) }
-        }
-
-        private fun strip(template: String): String {
-            return template.replace("\\{[^}]*\\}".toRegex(), "")
-        }
-
-
-        fun setBraveMode(context: Context , mode: Int) =
-            getUserPreferences(context).edit {
-                putInt(BRAVE_MODE, mode)
-            }
-
-        fun getBraveMode(context: Context) : Int{
-            if(braveMode == -1)
-                return getUserPreferences(context).getInt(BRAVE_MODE, 2)
-            else
-                return  braveMode
-        }
-
-       /* fun setDnsMode(context: Context, mode : Int){
-            val editor: SharedPreferences.Editor =
-                getUserPreferences(context)!!.edit()
-            editor.putInt(DNS_MODE, mode)
-            editor.apply()
-        }
-
-        //TODO : Modify the hardcoded value
-        fun getDnsMode(context: Context):Int {
-            if(dnsMode == -1)
-                return getUserPreferences(context)!!.getInt(DNS_MODE, 1)
-            else
-                return dnsMode
-        }*/
-
-        fun setFirewallMode(context: Context, fwMode : Int) =
-            getUserPreferences(context).edit {
-                putInt(FIREWALL_MODE, fwMode)
-            }
-
-        //TODO : Modify the hardcoded value
-        fun getFirewallMode(context: Context):Int {
-            return getUserPreferences(context).getInt(FIREWALL_MODE, 1)
-        }
-
-
-        fun setFirewallModeForScreenState(context : Context , state : Boolean) {
-            getUserPreferences(context).edit {
-                putBoolean(SCREEN_STATE, state)
-            }
-            if (state) {
-                isScreenLockedSetting = 1
-                if (getBackgroundEnabled(context)) {
-                    numUniversalBlock.postValue(2)
-                } else {
-                    numUniversalBlock.postValue(1)
-                }
+        } else {
+            isScreenLockedSetting = 0
+            if (getBackgroundEnabled()) {
+                numUniversalBlock.postValue(1)
             } else {
-                isScreenLockedSetting = 0
-                if (getBackgroundEnabled(context)) {
-                    numUniversalBlock.postValue(1)
-                } else {
-                    numUniversalBlock.postValue(0)
-                }
+                numUniversalBlock.postValue(0)
             }
         }
+    }
 
 
-        fun getFirewallModeForScreenState(context : Context) : Boolean{
-            return if(isScreenLockedSetting == 0) {
-                false
-            }else if(isScreenLockedSetting == 1){
-                true
+    fun getFirewallModeForScreenState() : Boolean{
+        return if(isScreenLockedSetting == 0) {
+            false
+        }else if(isScreenLockedSetting == 1){
+            true
+        }else{
+            userPreferences.getBoolean(SCREEN_STATE,false)
+        }
+    }
+
+    fun setMedianLatency(medianP90 : Long){
+        HomeScreenActivity.GlobalVariable.medianP90 = medianP90
+        median50.postValue(medianP90)
+        userPreferences.edit {
+            putLong(MEDIAN_90, medianP90)
+        }
+    }
+
+    fun getMedianLatency() : Long{
+        if(medianP90 == (-1).toLong())
+            return userPreferences.getLong(MEDIAN_90, 0L)
+        else
+            return medianP90
+    }
+
+    fun setNumOfReq(){
+        var numReq = 0
+        if(lifeTimeQueries > 0)
+            numReq = lifeTimeQueries + 1
+        else {
+            numReq = userPreferences.getInt(NUMBER_REQUEST, 0) + 1
+        }
+        userPreferences.edit {
+            putInt(NUMBER_REQUEST, numReq)
+        }
+        lifeTimeQueries = numReq
+        lifeTimeQ.postValue(numReq)
+    }
+
+    fun getNumOfReq(): Int {
+        if (lifeTimeQueries >= 0)
+            return lifeTimeQueries
+        return userPreferences.getInt(NUMBER_REQUEST, 0)
+    }
+
+    fun setBlockedReq() {
+        val bCount = userPreferences.getInt(BLOCKED_COUNT, 0) + 1
+        userPreferences.edit {
+            putInt(BLOCKED_COUNT, bCount)
+        }
+        blockedCount.postValue(bCount)
+    }
+
+    fun getBlockedReq(): Int {
+        return userPreferences.getInt(BLOCKED_COUNT, 0)
+    }
+
+    fun getBackgroundEnabled(): Boolean {
+        return userPreferences.getBoolean(BACKGROUND_MODE, false)
+    }
+
+    fun setBackgroundEnabled(isEnabled : Boolean){
+        userPreferences.edit {
+            putBoolean(BACKGROUND_MODE, isEnabled)
+        }
+        var uValue = numUniversalBlock.value
+        if(isEnabled) {
+            if (getScreenLockData()) {
+                numUniversalBlock.postValue(2)
             }else{
-                getUserPreferences(context).getBoolean(SCREEN_STATE,false)
+                numUniversalBlock.postValue(1)
             }
-        }
-
-        fun setMedianLatency(context: Context, medianP90 : Long){
-            HomeScreenActivity.GlobalVariable.medianP90 = medianP90
-            median50.postValue(medianP90)
-            getUserPreferences(context).edit {
-                putLong(MEDIAN_90, medianP90)
-            }
-        }
-
-        fun getMedianLatency(context: Context) : Long{
-            if(medianP90 == (-1).toLong())
-                return getUserPreferences(context).getLong(MEDIAN_90, 0L)
-            else
-                return medianP90
-        }
-
-        fun setNumOfReq(context : Context){
-            var numReq = 0
-            if(lifeTimeQueries > 0)
-                numReq = lifeTimeQueries + 1
-            else {
-                numReq = getUserPreferences(context).getInt(NUMBER_REQUEST, 0) + 1
-            }
-            getUserPreferences(context).edit {
-                putInt(NUMBER_REQUEST, numReq)
-            }
-            lifeTimeQueries = numReq
-            lifeTimeQ.postValue(numReq)
-        }
-
-        fun getNumOfReq(context: Context) : Int{
-            if(lifeTimeQueries >=0 )
-                return lifeTimeQueries
-            return getUserPreferences(context).getInt(NUMBER_REQUEST, 0)
-        }
-
-        fun setBlockedReq(context : Context){
-            val bCount =  getUserPreferences(context).getInt(BLOCKED_COUNT,0) + 1
-            getUserPreferences(context).edit {
-                putInt(BLOCKED_COUNT, bCount)
-            }
-            blockedCount.postValue(bCount)
-        }
-
-        fun getBlockedReq(context: Context) : Int{
-            return getUserPreferences(context).getInt(BLOCKED_COUNT,0)
-        }
-
-        fun getBackgroundEnabled(context: Context) : Boolean{
-            return getUserPreferences(context).getBoolean(BACKGROUND_MODE,false)
-        }
-
-        fun setBackgroundEnabled(context: Context, isEnabled : Boolean){
-            getUserPreferences(context).edit {
-                putBoolean(BACKGROUND_MODE, isEnabled)
-            }
-            var uValue = numUniversalBlock.value
-            if(isEnabled) {
-                if (getScreenLockData(context)) {
-                    numUniversalBlock.postValue(2)
-                }else{
-                    numUniversalBlock.postValue(1)
-                }
+        }else{
+            if (getScreenLockData()) {
+                numUniversalBlock.postValue(1)
             }else{
-                if (getScreenLockData(context)) {
-                    numUniversalBlock.postValue(1)
-                }else{
-                    numUniversalBlock.postValue(0)
-                }
-            }
-
-        }
-
-        fun setScreenLockData(context: Context, isEnabled : Boolean) {
-            //HomeScreenActivity.GlobalVariable.isScreenLocked = isEnabled
-            isScreenLocked = if(isEnabled){
-                1
-            }else{
-                0
-            }
-            getUserPreferences(context).edit {
-                putBoolean(IS_SCREEN_OFF, isEnabled)
+                numUniversalBlock.postValue(0)
             }
         }
 
-        fun getScreenLockData(context: Context) : Boolean{
-            return if(isScreenLocked == 0){
-                false
-            } else if(isScreenLocked == 1){
-                true
-            }else {
-                getUserPreferences(context).getBoolean(IS_SCREEN_OFF, false)
-            }
+    }
+
+    fun setScreenLockData(isEnabled : Boolean) {
+        //HomeScreenActivity.GlobalVariable.isScreenLocked = isEnabled
+        isScreenLocked = if(isEnabled){
+            1
+        }else{
+            0
+        }
+        userPreferences.edit {
+            putBoolean(IS_SCREEN_OFF, isEnabled)
+        }
+    }
+
+    fun getScreenLockData(): Boolean {
+        return if (isScreenLocked == 0) {
+            false
+        } else if (isScreenLocked == 1) {
+            true
+        } else {
+            userPreferences.getBoolean(IS_SCREEN_OFF, false)
+        }
+    }
+
+
+    fun setPrefAutoStartBootup(isEnabled: Boolean) =
+        userPreferences.edit {
+            putBoolean(IS_SCREEN_OFF, isEnabled)
         }
 
 
-        fun setPrefAutoStartBootup(context: Context, isEnabled: Boolean) =
-            getUserPreferences(context).edit {
-                putBoolean(IS_SCREEN_OFF, isEnabled)
-            }
-
-
-        fun getPrefAutoStartBootUp(context: Context): Boolean {
-            return getUserPreferences(context).getBoolean(pref_auto_start_bootup, true)
-        }
+    fun getPrefAutoStartBootUp(): Boolean {
+        return userPreferences.getBoolean(pref_auto_start_bootup, true)
+    }
 
 /*
 
         fun setCustomURLBool(context: Context, isEnabled: Boolean) {
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
+            val editor: SharedPreferences.Editor = userPreferences.edit()
             editor.putBoolean(CUSTOM_URL_BOOLEAN, isEnabled)
             editor.apply()
         }
 
         fun getCustomURLBool(context: Context): Boolean {
-            return getUserPreferences(context)?.getBoolean(CUSTOM_URL_BOOLEAN, false)
+            return userPreferences?.getBoolean(CUSTOM_URL_BOOLEAN, false)
         }
 
         fun setCustomURLVal(context: Context, url: String) {
-            val editor: SharedPreferences.Editor = getUserPreferences(context).edit()
+            val editor: SharedPreferences.Editor = userPreferences.edit()
             editor.putString(CUSTOM_URL, url)
             editor.apply()
         }
 
         fun getCustomURLVal(context: Context): String {
-            return getUserPreferences(context)?.getString(CUSTOM_URL, "https://")!!
+            return userPreferences?.getString(CUSTOM_URL, "https://")!!
         }
 */
 
-        fun setDNSType(context : Context, type : Int) =
-            getUserPreferences(context).edit {
-                putInt(DNS_TYPE, type)
-            }
-
-        fun getDNSType(context: Context): Int {
-            return getUserPreferences(context).getInt(DNS_TYPE, 1)
+    fun setDNSType(type: Int) =
+        userPreferences.edit {
+            putInt(DNS_TYPE, type)
         }
 
-        fun getProxyMode(context: Context): Long{
-            return getUserPreferences(context).getLong(PROXY_MODE, Settings.ProxyModeNone)
-        }
-
-        fun setProxyMode(context: Context, proxyMode: Long) =
-            getUserPreferences(context).edit {
-                putLong(PROXY_MODE, proxyMode)
-            }
-
-        fun getAllDNSTraffic(context : Context): Boolean{
-            return getUserPreferences(context).getBoolean(DNS_ALL_TRAFFIC, true)
-        }
-
-        // FIXME: 10-10-2020 DNS Traffic change
-        fun setAllDNSTraffic(context: Context, isSelected  :Boolean) =
-            getUserPreferences(context).edit {
-                putBoolean(DNS_ALL_TRAFFIC, isSelected)
-            }
-
-        fun setAllowByPass(context: Context, isEnabled: Boolean) =
-            getUserPreferences(context).edit {
-                putBoolean(ALLOW_BYPASS, isEnabled)
-            }
-
-        fun getAllowByPass(context : Context): Boolean{
-            return getUserPreferences(context).getBoolean(ALLOW_BYPASS, true)
-        }
-
-        fun getAllowPrivateDNS(context: Context) : Boolean{
-            return getUserPreferences(context).getBoolean(PRIVATE_DNS, false)
-        }
-
-        fun setAllowPrivateDNS(context : Context, isEnabled: Boolean) =
-            getUserPreferences(context).edit {
-                putBoolean(PRIVATE_DNS, isEnabled)
-            }
-
-        fun getKillAppOnFirewall(context: Context): Boolean {
-            return getUserPreferences(context).getBoolean(KILL_APP_FIREWALL, true)
-        }
-
-        fun setKillAppOnFirewall(context: Context, isEnabled: Boolean) =
-            getUserPreferences(context).edit {
-                putBoolean(KILL_APP_FIREWALL, isEnabled)
-            }
-
-        fun getSocks5Enabled(context: Context): Boolean{
-            return getUserPreferences(context).getBoolean(SOCKS5, false)
-        }
-
-        fun setSocks5Enabled(context: Context, isEnabled: Boolean) =
-            getUserPreferences(context).edit {
-                putBoolean(KILL_APP_FIREWALL, isEnabled)
-            }
-
-        fun setConnectionModeChange(context: Context, url: String) =
-            getUserPreferences(context).edit {
-                putString(CONNECTION_CHANGE, url)
-            }
-
-        fun getConnectionModeChange(context: Context) : String{
-            return getUserPreferences(context).getString(CONNECTION_CHANGE, "")!!
-        }
-
-
-        fun getExcludedAppsFromVPN(context: Context?): MutableSet<String>? {
-            return getUserPreferences(context!!).getStringSet(EXCLUDE_FROM_VPN, HashSet())
-        }
-
-        fun setExcludedAppsFromVPN(newSet: MutableSet<String>, context: Context) {
-           /* val newSet: MutableSet<String> = HashSet(getUserPreferences(context).getStringSet(EXCLUDE_FROM_VPN, HashSet<String>())!!)
-            if (toRemove) {
-                if (newSet.contains(packageName)) {
-                    newSet.remove(packageName)
-                }
-            } else newSet.add(packageName)*/
-            getUserPreferences(context).edit { putStringSet(EXCLUDE_FROM_VPN, newSet) }
-        }
-
-        fun setHttpProxyEnabled(context: Context, isEnabled: Boolean) =
-            getUserPreferences(context).edit {
-                putBoolean(HTTP_PROXY_ENABLED, isEnabled)
-            }
-
-        fun getHttpProxyEnabled(context: Context): Boolean{
-            return getUserPreferences(context).getBoolean(HTTP_PROXY_ENABLED, false)
-        }
-
-        fun setHttpProxyHostAddress(context: Context, ipAddress : String) =
-            getUserPreferences(context).edit {
-                putString(HTTP_PROXY_IPADDRESS, ipAddress)
-            }
-
-        fun getHttpProxyHostAddress(context: Context) : String? {
-            return getUserPreferences(context).getString(HTTP_PROXY_IPADDRESS, "")
-        }
-
-        fun setHttpProxyPort(context: Context, port: Int) =
-            getUserPreferences(context).edit {
-                putInt(HTTP_PROXY_PORT, port)
-            }
-
-        fun getHttpProxyPort(context: Context): Int {
-            return getUserPreferences(context).getInt(HTTP_PROXY_PORT, 0)
-        }
-
-        fun setLocalBlockListEnabled(context: Context, isEnabled: Boolean) =
-            getUserPreferences(context).edit {
-                putBoolean(LOCAL_BLOCK_LIST, isEnabled)
-            }
-
-        fun setLocalBlockListDownloadTime(context: Context, time : Long) =
-            getUserPreferences(context).edit {
-                putLong(LOCAL_BLOCK_LIST_TIME, time)
-            }
-
-        fun getLocalBlockListDownloadTime(context: Context) : Long{
-            return getUserPreferences(context).getLong(LOCAL_BLOCK_LIST_TIME, 0L)
-        }
-
-        fun setRemoteBlockListDownloadTime(context: Context, time: Long) =
-            getUserPreferences(context).edit {
-                putLong(REMOTE_BLOCK_LIST_TIME_MS, time)
-            }
-
-        fun getRemoteBlockListDownloadTime(context: Context): Long {
-            return getUserPreferences(context).getLong(REMOTE_BLOCK_LIST_TIME_MS, 0L)
-        }
-
-        fun isLocalBlockListEnabled(context: Context): Boolean {
-            return getUserPreferences(context).getBoolean(LOCAL_BLOCK_LIST, false)
-        }
-
-        fun isBlockListFilesDownloaded(context: Context): Boolean{
-            return getUserPreferences(context).getBoolean(DOWNLOAD_BLOCK_LIST_FILES, false)
-        }
-
-        fun setBlockListFilesDownloaded(context: Context, isDownloaded: Boolean) =
-            getUserPreferences(context).edit {
-                putBoolean(DOWNLOAD_BLOCK_LIST_FILES, isDownloaded)
-            }
-
-        fun getBlockUnknownConnections(context: Context): Boolean{
-            return getUserPreferences(context).getBoolean(BLOCK_UNKNOWN_CONNECTIONS, false)
-        }
-
-        fun setBlockUnknownConnections(context: Context, isEnabled: Boolean) =
-            getUserPreferences(context).edit {
-                putBoolean(BLOCK_UNKNOWN_CONNECTIONS, isEnabled)
-            }
-
-        fun setLocalBlockListStamp(context: Context, stamp: String) {
-            if(DEBUG) Log.d(LOG_TAG,"In preference, Set local stamp: $stamp")
-            getUserPreferences(context).edit {
-                putString(LOCAL_BLOCK_LIST_STAMP, stamp)
-            }
-        }
-
-        fun getLocalBlockListStamp(context: Context): String? {
-            if(DEBUG) Log.d(LOG_TAG,"In preference, Get local stamp: ${getUserPreferences(context).getString(LOCAL_BLOCK_LIST_STAMP, "")}")
-            return getUserPreferences(context).getString(LOCAL_BLOCK_LIST_STAMP, "")
-        }
-
-        fun isRemoteBraveDNSDownloaded(context: Context) : Boolean{
-            return getUserPreferences(context).getBoolean(REMOTE_BLOCK_COMPLETE, false)
-        }
-
-        fun setRemoteBraveDNSDownloaded(context: Context, isDownloaded: Boolean) =
-            getUserPreferences(context).edit {
-                putBoolean(REMOTE_BLOCK_COMPLETE, isDownloaded)
-            }
-
-        fun isInsertionCompleted(context:Context) : Boolean{
-            return getUserPreferences(context).getBoolean(IS_INSERT_COMPLETE, false)
-        }
-
-        fun setInsertionCompleted(context: Context, isComplete : Boolean) =
-            getUserPreferences(context).edit {
-                putBoolean(IS_INSERT_COMPLETE, isComplete)
-            }
-
-        fun setDNSProxyIDChange(context: Context, id: Int) =
-            getUserPreferences(context).edit {
-                putInt(DNS_PROXY_ID, id)
-            }
-
-        fun getDNSProxyIDChange(context: Context): Int {
-            return getUserPreferences(context).getInt(DNS_PROXY_ID, 0)
-        }
-
-        fun getUDPBlockedSettings(context: Context): Boolean{
-            return getUserPreferences(context).getBoolean(BLOCK_UDP_OTHER_THAN_DNS, false)
-        }
-
-        fun setUDPBlockedSettings(context: Context, isEnabled: Boolean) =
-            getUserPreferences(context).edit {
-                putBoolean(BLOCK_UDP_OTHER_THAN_DNS, isEnabled)
-            }
-
-        fun getNumberOfLocalBlockLists(context: Context): Int{
-            return getUserPreferences(context).getInt(LOCAL_BLOCK_LIST_COUNT, 0)
-        }
-
-        fun setNumberOfLocalBlockLists(context: Context, blockCount : Int) =
-            getUserPreferences(context).edit {
-                putInt(LOCAL_BLOCK_LIST_COUNT, blockCount)
-            }
-
-
-        fun getNumberOfRemoteBlockLists(context: Context): Int {
-            return getUserPreferences(context).getInt(REMOTE_BLOCK_LIST_COUNT, 0)
-        }
-
-        fun setNumberOfRemoteBlockLists(context: Context, blockCount: Int) =
-            getUserPreferences(context).edit {
-                putInt(REMOTE_BLOCK_LIST_COUNT, blockCount)
-            }
-
-
-        fun setLastAppUpdateCheckTime(context: Context, time : Long) =
-            getUserPreferences(context).edit {
-                putLong(APP_UPDATE_LAST_CHECK, time)
-            }
-
-        fun getLastAppUpdateCheckTime(context: Context) : Long{
-            return getUserPreferences(context).getLong(APP_UPDATE_LAST_CHECK , 0)
-        }
-
-        fun setAppVersion(context: Context, version: Int) =
-            getUserPreferences(context).edit {
-                putInt(APP_VERSION, version)
-            }
-
-        fun getAppVersion(context: Context): Int{
-            return getUserPreferences(context).getInt(APP_VERSION , 0)
-        }
-
-        fun setDownloadSource(context: Context, source : Int) =
-            getUserPreferences(context).edit {
-                putInt(APP_DOWNLOAD_SOURCE, source)
-            }
-
-        fun getDownloadSource(context: Context): Int{
-            return getUserPreferences(context).getInt(APP_DOWNLOAD_SOURCE , 0)
-        }
-
-        fun isLogsEnabled(context: Context) : Boolean {
-            return getUserPreferences(context).getBoolean(ENABLE_LOCAL_LOGS, true)
-        }
-
-        fun setLogsEnabled(context: Context, isLogsEnabled : Boolean) =
-            getUserPreferences(context).edit {
-                putBoolean(ENABLE_LOCAL_LOGS, isLogsEnabled)
-            }
+    fun getDNSType(): Int {
+        return userPreferences.getInt(DNS_TYPE, 1)
     }
+
+    fun getProxyMode(): Long {
+        return userPreferences.getLong(PROXY_MODE, Settings.ProxyModeNone)
+    }
+
+    fun setProxyMode(proxyMode: Long) =
+        userPreferences.edit {
+            putLong(PROXY_MODE, proxyMode)
+        }
+
+    fun getAllDNSTraffic(): Boolean {
+        return userPreferences.getBoolean(DNS_ALL_TRAFFIC, true)
+    }
+
+    // FIXME: 10-10-2020 DNS Traffic change
+    fun setAllDNSTraffic(isSelected: Boolean) =
+        userPreferences.edit {
+            putBoolean(DNS_ALL_TRAFFIC, isSelected)
+        }
+
+    fun setAllowByPass(isEnabled: Boolean) =
+        userPreferences.edit {
+            putBoolean(ALLOW_BYPASS, isEnabled)
+        }
+
+    fun getAllowByPass(): Boolean {
+        return userPreferences.getBoolean(ALLOW_BYPASS, true)
+    }
+
+    fun getAllowPrivateDNS(): Boolean {
+        return userPreferences.getBoolean(PRIVATE_DNS, false)
+    }
+
+    fun setAllowPrivateDNS(isEnabled: Boolean) =
+        userPreferences.edit {
+            putBoolean(PRIVATE_DNS, isEnabled)
+        }
+
+    fun getKillAppOnFirewall(): Boolean {
+        return userPreferences.getBoolean(KILL_APP_FIREWALL, true)
+    }
+
+    fun setKillAppOnFirewall(isEnabled: Boolean) =
+        userPreferences.edit {
+            putBoolean(KILL_APP_FIREWALL, isEnabled)
+        }
+
+    fun getSocks5Enabled(): Boolean {
+        return userPreferences.getBoolean(SOCKS5, false)
+    }
+
+    fun setSocks5Enabled(isEnabled: Boolean) =
+        userPreferences.edit {
+            putBoolean(KILL_APP_FIREWALL, isEnabled)
+        }
+
+    fun setConnectionModeChange(url: String) =
+        userPreferences.edit {
+            putString(CONNECTION_CHANGE, url)
+        }
+
+    fun getConnectionModeChange(): String {
+        return userPreferences.getString(CONNECTION_CHANGE, "")!!
+    }
+
+
+    fun getExcludedAppsFromVPN(): MutableSet<String>? {
+        return userPreferences.getStringSet(EXCLUDE_FROM_VPN, HashSet())
+    }
+
+    fun setExcludedAppsFromVPN(newSet: MutableSet<String>) {
+        /* val newSet: MutableSet<String> = HashSet(userPreferences.getStringSet(EXCLUDE_FROM_VPN, HashSet<String>())!!)
+         if (toRemove) {
+             if (newSet.contains(packageName)) {
+                 newSet.remove(packageName)
+             }
+         } else newSet.add(packageName)*/
+        userPreferences.edit { putStringSet(EXCLUDE_FROM_VPN, newSet) }
+    }
+
+    fun setHttpProxyEnabled(isEnabled: Boolean) =
+        userPreferences.edit {
+            putBoolean(HTTP_PROXY_ENABLED, isEnabled)
+        }
+
+    fun getHttpProxyEnabled(): Boolean {
+        return userPreferences.getBoolean(HTTP_PROXY_ENABLED, false)
+    }
+
+    fun setHttpProxyHostAddress(ipAddress: String) =
+        userPreferences.edit {
+            putString(HTTP_PROXY_IPADDRESS, ipAddress)
+        }
+
+    fun getHttpProxyHostAddress(): String? {
+        return userPreferences.getString(HTTP_PROXY_IPADDRESS, "")
+    }
+
+    fun setHttpProxyPort(port: Int) =
+        userPreferences.edit {
+            putInt(HTTP_PROXY_PORT, port)
+        }
+
+    fun getHttpProxyPort(): Int {
+        return userPreferences.getInt(HTTP_PROXY_PORT, 0)
+    }
+
+    fun setLocalBlockListEnabled(isEnabled: Boolean) =
+        userPreferences.edit {
+            putBoolean(LOCAL_BLOCK_LIST, isEnabled)
+        }
+
+    fun setLocalBlockListDownloadTime(time: Long) =
+        userPreferences.edit {
+            putLong(LOCAL_BLOCK_LIST_TIME, time)
+        }
+
+    fun getLocalBlockListDownloadTime(): Long {
+        return userPreferences.getLong(LOCAL_BLOCK_LIST_TIME, 0L)
+    }
+
+    fun setRemoteBlockListDownloadTime(time: Long) =
+        userPreferences.edit {
+            putLong(REMOTE_BLOCK_LIST_TIME_MS, time)
+        }
+
+    fun getRemoteBlockListDownloadTime(): Long {
+        return userPreferences.getLong(REMOTE_BLOCK_LIST_TIME_MS, 0L)
+    }
+
+    fun isLocalBlockListEnabled(): Boolean {
+        return userPreferences.getBoolean(LOCAL_BLOCK_LIST, false)
+    }
+
+    fun isBlockListFilesDownloaded(): Boolean {
+        return userPreferences.getBoolean(DOWNLOAD_BLOCK_LIST_FILES, false)
+    }
+
+    fun setBlockListFilesDownloaded(isDownloaded: Boolean) =
+        userPreferences.edit {
+            putBoolean(DOWNLOAD_BLOCK_LIST_FILES, isDownloaded)
+        }
+
+    fun getBlockUnknownConnections(): Boolean {
+        return userPreferences.getBoolean(BLOCK_UNKNOWN_CONNECTIONS, false)
+    }
+
+    fun setBlockUnknownConnections(isEnabled: Boolean) =
+        userPreferences.edit {
+            putBoolean(BLOCK_UNKNOWN_CONNECTIONS, isEnabled)
+        }
+
+    fun setLocalBlockListStamp(stamp: String) {
+        if (DEBUG) Log.d(LOG_TAG, "In preference, Set local stamp: $stamp")
+        userPreferences.edit {
+            putString(LOCAL_BLOCK_LIST_STAMP, stamp)
+        }
+    }
+
+    fun getLocalBlockListStamp(): String? {
+        if (DEBUG) Log.d(
+            LOG_TAG,
+            "In preference, Get local stamp: ${
+                userPreferences.getString(
+                    LOCAL_BLOCK_LIST_STAMP,
+                    ""
+                )
+            }"
+        )
+        return userPreferences.getString(LOCAL_BLOCK_LIST_STAMP, "")
+    }
+
+    fun isRemoteBraveDNSDownloaded(): Boolean {
+        return userPreferences.getBoolean(REMOTE_BLOCK_COMPLETE, false)
+    }
+
+    fun setRemoteBraveDNSDownloaded(isDownloaded: Boolean) =
+        userPreferences.edit {
+            putBoolean(REMOTE_BLOCK_COMPLETE, isDownloaded)
+        }
+
+    fun isInsertionCompleted(): Boolean {
+        return userPreferences.getBoolean(IS_INSERT_COMPLETE, false)
+    }
+
+    fun setInsertionCompleted(isComplete: Boolean) =
+        userPreferences.edit {
+            putBoolean(IS_INSERT_COMPLETE, isComplete)
+        }
+
+    fun setDNSProxyIDChange(id: Int) =
+        userPreferences.edit {
+            putInt(DNS_PROXY_ID, id)
+        }
+
+    fun getDNSProxyIDChange(): Int {
+        return userPreferences.getInt(DNS_PROXY_ID, 0)
+    }
+
+    fun getUDPBlockedSettings(): Boolean {
+        return userPreferences.getBoolean(BLOCK_UDP_OTHER_THAN_DNS, false)
+    }
+
+    fun setUDPBlockedSettings(isEnabled: Boolean) =
+        userPreferences.edit {
+            putBoolean(BLOCK_UDP_OTHER_THAN_DNS, isEnabled)
+        }
+
+    fun getNumberOfLocalBlockLists(): Int {
+        return userPreferences.getInt(LOCAL_BLOCK_LIST_COUNT, 0)
+    }
+
+    fun setNumberOfLocalBlockLists(blockCount: Int) =
+        userPreferences.edit {
+            putInt(LOCAL_BLOCK_LIST_COUNT, blockCount)
+        }
+
+
+    fun getNumberOfRemoteBlockLists(): Int {
+        return userPreferences.getInt(REMOTE_BLOCK_LIST_COUNT, 0)
+    }
+
+    fun setNumberOfRemoteBlockLists(blockCount: Int) =
+        userPreferences.edit {
+            putInt(REMOTE_BLOCK_LIST_COUNT, blockCount)
+        }
+
+
+    fun setLastAppUpdateCheckTime(time: Long) =
+        userPreferences.edit {
+            putLong(APP_UPDATE_LAST_CHECK, time)
+        }
+
+    fun getLastAppUpdateCheckTime(): Long {
+        return userPreferences.getLong(APP_UPDATE_LAST_CHECK, 0)
+    }
+
+    fun setAppVersion(version: Int) =
+        userPreferences.edit {
+            putInt(APP_VERSION, version)
+        }
+
+    fun getAppVersion(): Int {
+        return userPreferences.getInt(APP_VERSION, 0)
+    }
+
+    fun setDownloadSource(source: Int) =
+        userPreferences.edit {
+            putInt(APP_DOWNLOAD_SOURCE, source)
+        }
+
+    fun getDownloadSource(): Int {
+        return userPreferences.getInt(APP_DOWNLOAD_SOURCE, 0)
+    }
+
+    fun isLogsEnabled(): Boolean {
+        return userPreferences.getBoolean(ENABLE_LOCAL_LOGS, true)
+    }
+
+    fun setLogsEnabled(isLogsEnabled: Boolean) =
+        userPreferences.edit {
+            putBoolean(ENABLE_LOCAL_LOGS, isLogsEnabled)
+        }
 }
