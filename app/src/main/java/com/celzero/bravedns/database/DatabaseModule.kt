@@ -59,7 +59,6 @@ object DatabaseModule {
         single { ConnectionTrackerRepository(get()) }
         single { DNSCryptEndpointRepository(get()) }
         single { DNSCryptRelayEndpointRepository(get()) }
-        single { DNSProxyEndpointRepository(get()) }
         single { DNSLogRepository(get()) }
         single { DNSProxyEndpointRepository(get()) }
         single { DoHEndpointRepository(get()) }
