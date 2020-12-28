@@ -110,7 +110,7 @@ class HomeScreenActivity : AppCompatActivity() {
         var appStartTime: Long = System.currentTimeMillis()
         var isBackgroundEnabled: Boolean = false
         var firewallRules: HashMultimap<Int, String> = HashMultimap.create()
-        var DEBUG = true
+        var DEBUG = false
 
         //Screen off - whether the screen preference is set 0-off, 1- on. -1 not initialized
         var isScreenLockedSetting : Int = -1
@@ -181,21 +181,19 @@ class HomeScreenActivity : AppCompatActivity() {
     }
 
     private fun updateInstallSource() {
-        if(persistentState.getDownloadSource() == 0) {
-            val packageManager = packageManager
-            try {
-                val applicationInfo: ApplicationInfo = packageManager.getApplicationInfo(packageName, 0)
-                if (DEBUG) Log.d(LOG_TAG, "Install location: ${packageManager.getInstallerPackageName(applicationInfo.packageName)}")
-                if ("com.android.vending" == packageManager.getInstallerPackageName(applicationInfo.packageName)) {
-                    // App was installed by Play Store
-                    persistentState.setDownloadSource(Constants.DOWNLOAD_SOURCE_PLAY_STORE)
-                } else {
-                    // App was installed from somewhere else
-                    persistentState.setDownloadSource(DOWNLOAD_SOURCE_OTHERS)
-                }
-            } catch (e: PackageManager.NameNotFoundException) {
-                e.printStackTrace()
+        val packageManager = packageManager
+        try {
+            val applicationInfo: ApplicationInfo = packageManager.getApplicationInfo(packageName, 0)
+            if (DEBUG) Log.d(LOG_TAG, "Install location: ${packageManager.getInstallerPackageName(applicationInfo.packageName)}")
+            if ("com.android.vending" == packageManager.getInstallerPackageName(applicationInfo.packageName)) {
+                // App was installed by Play Store
+                persistentState.setDownloadSource(Constants.DOWNLOAD_SOURCE_PLAY_STORE)
+            } else {
+                // App was installed from somewhere else
+                persistentState.setDownloadSource(DOWNLOAD_SOURCE_OTHERS)
             }
+        } catch (e: PackageManager.NameNotFoundException) {
+            Log.e(LOG_TAG,"Exception while fetching the app download source: ${e.message}",e)
         }
     }
 

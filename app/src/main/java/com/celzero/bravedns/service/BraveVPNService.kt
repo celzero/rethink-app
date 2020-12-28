@@ -48,6 +48,7 @@ import com.celzero.bravedns.receiver.BraveAutoStartReceiver
 import com.celzero.bravedns.receiver.BraveScreenStateReceiver
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment.Companion.UNIVERSAL_RULES_UID
 import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.backgroundAllowedUID
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
@@ -87,7 +88,6 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
 
         var firewallRules = FirewallRules.getInstance()
         private const val FILE_LOG_TAG = "RethinkVPNService"
-        private const val DEBUG = true
         const val SERVICE_ID = 1 // Only has to be unique within this app.
 
         var braveScreenStateReceiver = BraveScreenStateReceiver()
@@ -184,7 +184,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                     ipDetails.blockedByRule = BlockedRuleNames.RULE7.ruleName
                     sendConnTracking(ipDetails)
                 }
-                if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG appWhiteList: $uid, $destIp")
+                Log.i(LOG_TAG, "$FILE_LOG_TAG appWhiteList: $uid, $destIp")
                 return false
             }
 
@@ -251,6 +251,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                                 ipDetails.blockedByRule = BlockedRuleNames.RULE4.ruleName
                                 sendConnTracking(ipDetails)
                             }
+                            Log.i(LOG_TAG, "$FILE_LOG_TAG Background blocked $uid, $destIp, after sleep of:  ${System.currentTimeMillis()}")
                             return isBGBlock
                         }
                     }

@@ -165,23 +165,23 @@ class HomeScreenFragment : Fragment() {
     *   will turn the text heading and description.
      */
     private fun checkForHeaderUpdate() {
-        val currentTime = Calendar.getInstance()
-        val timeToMatch = Calendar.getInstance()
-        val timeToOverride = Calendar.getInstance()
+        val currentTime = Calendar.getInstance(Locale.ROOT)
+        val timeToMatch = Calendar.getInstance(Locale.ROOT)
+        val timeToOverride = Calendar.getInstance(Locale.ROOT)
 
-        timeToMatch[Calendar.HOUR_OF_DAY] = 17
-        timeToMatch[Calendar.MINUTE] = 55
-        timeToMatch[Calendar.SECOND] = 0
-        timeToMatch[Calendar.DAY_OF_MONTH] = 26
+        timeToMatch[Calendar.HOUR_OF_DAY] = 23
+        timeToMatch[Calendar.MINUTE] = 59
+        timeToMatch[Calendar.SECOND] = 59
+        timeToMatch[Calendar.DAY_OF_MONTH] = 31
         timeToMatch[Calendar.MONTH] = 11
         timeToMatch[Calendar.YEAR] = 2020
 
-        timeToOverride[Calendar.HOUR_OF_DAY] = 18
-        timeToOverride[Calendar.MINUTE] = 55
+        timeToOverride[Calendar.HOUR_OF_DAY] = 23
+        timeToOverride[Calendar.MINUTE] = 59
         timeToOverride[Calendar.SECOND] = 59
-        timeToOverride[Calendar.DAY_OF_MONTH] = 26
-        timeToOverride[Calendar.MONTH] = 11
-        timeToOverride[Calendar.YEAR] = 2020
+        timeToOverride[Calendar.DAY_OF_MONTH] = 1
+        timeToOverride[Calendar.MONTH] = 0
+        timeToOverride[Calendar.YEAR] = 2021
         if(DEBUG) Log.d(LOG_TAG, "NewYearAlarm : ${currentTime.time}, ${timeToMatch.time}, ${timeToOverride.time} ")
         if(currentTime > timeToMatch && currentTime < timeToOverride ){
             layoutHeaderView.text = getString(R.string.new_year)

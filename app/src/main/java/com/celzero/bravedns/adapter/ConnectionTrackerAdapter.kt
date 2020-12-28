@@ -133,15 +133,19 @@ class ConnectionTrackerAdapter(val context : Context) : PagedListAdapter<Connect
                         }
                         Glide.with(context)
                             .load(context.packageManager.getApplicationIcon(appArray[0]!!))
+                            .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                             .into(appIcon!!)
                     } catch (e: Exception) {
-                        Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                        Glide.with(context)
+                            .load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                            .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                             .into(appIcon!!)
                         Log.e(LOG_TAG, "Package Not Found - " + e.message, e)
                     }
                 }else{
-                    Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
-                        .onlyRetrieveFromCache(true)
+                    Glide.with(context)
+                        .load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                        .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                         .into(appIcon!!)
                 }
 

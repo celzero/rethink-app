@@ -22,7 +22,6 @@ import android.content.DialogInterface
 import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
-import android.os.Message
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -193,6 +192,7 @@ class FirewallAppListAdapter internal constructor(
 
         fwWifiImg.setOnClickListener {
             isSearchEnabled = false
+            fwWifiImg.isEnabled = false
             val isInternetAllowed = appInfoDetail.isInternetAllowed
             val appUIDList = appInfoRepository.getAppListForUID(appInfoDetail.uid)
             var blockAllApps = false
@@ -202,17 +202,15 @@ class FirewallAppListAdapter internal constructor(
 
             val activityManager: ActivityManager = context.getSystemService(Activity.ACTIVITY_SERVICE) as ActivityManager
             if (appUIDList.size <= 1 || blockAllApps) {
-                /*object : CountDownTimer(500, 250) {
+                object : CountDownTimer(500, 250) {
                     override fun onTick(millisUntilFinished: Long) {
-                        fwWifiImg.visibility = View.GONE
-                        firewallApkProgressBar.visibility = View.VISIBLE
+                        fwWifiImg.isEnabled = false
                     }
 
                     override fun onFinish() {
-                        firewallApkProgressBar.visibility = View.GONE
-                        fwWifiImg.visibility = View.VISIBLE
+                        fwWifiImg.isEnabled = true
                     }
-                }.start()*/
+                }.start()
 
                 fwWifiImg.isEnabled = false
                 fwWifiImg.isChecked = isInternetAllowed

@@ -55,6 +55,10 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        leakCanary {
+            matchingFallbacks = ['debug']
+            initWith buildTypes.debug
+        }
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8
@@ -76,6 +80,9 @@ dependencies {
             'guava-28.2-android.jar',
             'failureaccess-1.0.1.jar' // Dependency of Guava
     ], dir: 'libs')
+
+    /*implementation "com.google.guava:guava:30.1-android"
+    implementation 'com.google.guava:failureaccess:jar:1.0'*/
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.3.0-alpha02'
@@ -134,4 +141,6 @@ dependencies {
     implementation "org.koin:koin-androidx-viewmodel:$koin_version"
     // Koin AndroidX Fragment features
     implementation "org.koin:koin-androidx-fragment:$koin_version"
+
+    leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.6'
 }
