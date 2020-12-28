@@ -29,6 +29,7 @@ import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
+import org.koin.android.ext.android.inject
 
 class WelcomeActivity  : AppCompatActivity() {
 
@@ -41,10 +42,12 @@ class WelcomeActivity  : AppCompatActivity() {
     private lateinit var buttonSkip : TextView
     private lateinit var myPagerAdapter : PagerAdapter
 
+    private val persistentState by inject<PersistentState>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (!PersistentState.isFirstTimeLaunch(this)) {
+        if (!persistentState.isFirstTimeLaunch()) {
             launchHomeScreen()
         }
 
@@ -127,7 +130,7 @@ class WelcomeActivity  : AppCompatActivity() {
     }
 
     private fun launchHomeScreen() {
-        PersistentState.setFirstTimeLaunch(this,false)
+        persistentState.setFirstTimeLaunch(false)
         startActivity(Intent(this, HomeScreenActivity::class.java))
         finish()
     }

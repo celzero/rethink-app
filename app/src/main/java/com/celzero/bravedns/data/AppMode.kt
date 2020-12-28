@@ -1,18 +1,18 @@
 /*
-Copyright 2020 RethinkDNS and its authors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2020 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.celzero.bravedns.data
 
 import android.content.Context
@@ -26,7 +26,15 @@ import dnsx.BraveDNS
 import dnsx.Dnsx
 import settings.Settings
 
-class AppMode(val context: Context) {
+class AppMode internal constructor(
+    private val context: Context,
+    private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
+    private val doHEndpointRepository: DoHEndpointRepository,
+    private val dnsCryptEndpointRepository: DNSCryptEndpointRepository,
+    private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
+    private val proxyEndpointRepository: ProxyEndpointRepository,
+    private val persistentState:PersistentState
+) {
     private var appDNSMode: Long = -1L
     private var appFirewallMode: Long = -1L
     private var appProxyMode: Long = -1L
@@ -36,15 +44,11 @@ class AppMode(val context: Context) {
     private var socks5ProxyEndpoint: ProxyEndpoint ?= null
     private var braveDNS : BraveDNS ?= null
 
-    companion object {
-        fun getInstance(context: Context) = AppMode(context)
-    }
-
     fun getDNSMode(): Long {
         if (appDNSMode == -1L) {
-            val dnsType = PersistentState.getDNSType(context)
+            val dnsType = persistentState.getDNSType()
             if (dnsType == 1) {
-                if (PersistentState.getAllDNSTraffic(context)) {
+                if (persistentState.getAllDNSTraffic()) {
                     appDNSMode = Settings.DNSModePort
                 } else {
                     appDNSMode = Settings.DNSModeIP
@@ -60,7 +64,7 @@ class AppMode(val context: Context) {
 
     fun getFirewallMode(): Long {
         if (appFirewallMode == -1L) {
-            return PersistentState.getFirewallMode(context).toLong()
+            return persistentState.getFirewallMode().toLong()
         } else {
             return appFirewallMode
         }
@@ -68,24 +72,24 @@ class AppMode(val context: Context) {
 
     fun setFirewallMode(fMode: Long) {
         appFirewallMode = fMode
-        PersistentState.setFirewallMode(context, fMode.toInt())
+        persistentState.setFirewallMode(fMode.toInt())
     }
 
     fun getProxyMode(): Long {
         if (appProxyMode == -1L) {
-            return PersistentState.getProxyMode(context)
+            return persistentState.getProxyMode()
         }
         return appProxyMode
     }
 
     fun setProxyMode(proxyMode: Long) {
         appProxyMode = proxyMode
-        PersistentState.setProxyMode(context, proxyMode)
+        persistentState.setProxyMode(proxyMode)
     }
 
     fun getDNSType(): Int {
         if (dnsType == -1) {
-            return PersistentState.getDNSType(context)
+            return persistentState.getDNSType()
         }
         return dnsType
     }
@@ -95,8 +99,6 @@ class AppMode(val context: Context) {
     }
 
     private fun getProxyModeSettings(): Long {
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val dnsProxyEndpointRepository = mDb.dnsProxyEndpointRepository()
         val dnsProxy = dnsProxyEndpointRepository.getConnectedProxy()
         appDNSMode = if (dnsProxy.proxyType == proxyTypeInternal) {
             Settings.DNSModeProxyPort
@@ -105,13 +107,10 @@ class AppMode(val context: Context) {
         } else {
             Settings.DNSModeProxyPort
         }
-        //mDb.close()
         return appDNSMode
     }
 
     fun getDOHDetails(): DoHEndpoint {
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val doHEndpointRepository = mDb.doHEndpointsRepository()
         val dohEndpoint = doHEndpointRepository.getConnectedDoH()
         if (dohEndpoint != null) {
             if (dohEndpoint.dohURL.isEmpty()) {
@@ -122,39 +121,27 @@ class AppMode(val context: Context) {
                 if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "getDOHDetails -appMode- DoH endpoint - ${dohEndpoint.dohURL}")
             }
         }
-        //mDb.close()
         return dohEndpoint
     }
 
     fun getDNSCryptServers(): String {
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val dnsCryptEndpointRepository = mDb.dnsCryptEndpointsRepository()
         val cryptList = dnsCryptEndpointRepository.getConnectedDNSCrypt()
-        //mDb.close()
         return constructServerString(cryptList)
     }
 
     fun getDNSCryptServerCount() : Int{
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val dnsCryptEndpointRepository = mDb.dnsCryptEndpointsRepository()
-        //mDb.close()
+        val count = dnsCryptEndpointRepository.getConnectedCount()
         return dnsCryptEndpointRepository.getConnectedCount()
     }
 
     fun getDNSCryptServerToRemove(): String {
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val dnsCryptEndpointRepository = mDb.dnsCryptEndpointsRepository()
         val cryptList = dnsCryptEndpointRepository.getConnectedDNSCrypt()
-        //mDb.close()
         return constructStringForRemoval(cryptList)
     }
 
     fun getSocks5ProxyDetails(): ProxyEndpoint {
         if (socks5ProxyEndpoint == null) {
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val proxyEndpointRepository = mDb.proxyEndpointRepository()
             socks5ProxyEndpoint = proxyEndpointRepository.getConnectedProxy()
-            //mDb.close()
         }
         return socks5ProxyEndpoint!!
     }
@@ -185,8 +172,6 @@ class AppMode(val context: Context) {
     }
 
     fun getDNSCryptRelays(): String {
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val dnsCryptRelayEndpointRepository = mDb.dnsCryptRelayEndpointsRepository()
         val relay = dnsCryptRelayEndpointRepository.getConnectedRelays()
         return constructRelayString(relay)
     }
@@ -207,8 +192,6 @@ class AppMode(val context: Context) {
     }
 
     fun getDNSProxyServerDetails(): DNSProxyEndpoint {
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val dnsProxyEndpointRepository = mDb.dnsProxyEndpointRepository()
         return dnsProxyEndpointRepository.getConnectedProxy()
     }
 
@@ -217,8 +200,8 @@ class AppMode(val context: Context) {
     }
 
     fun getBraveDNS(): BraveDNS?{
-        if(braveDNS == null && PersistentState.isLocalBlockListEnabled(context)
-            && PersistentState.isBlockListFilesDownloaded(context) && !PersistentState.getLocalBlockListStamp(context).isNullOrEmpty()){
+        if(braveDNS == null && persistentState.isLocalBlockListEnabled()
+            && persistentState.isBlockListFilesDownloaded() && !persistentState.getLocalBlockListStamp().isNullOrEmpty()){
             val path: String = context.filesDir.canonicalPath
             if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "Local brave dns set call from AppMode")
             braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)

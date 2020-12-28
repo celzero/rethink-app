@@ -34,7 +34,7 @@ class HttpRequestHelper{
 
         //fixme - Come up with a logic where onResponse should call for an interface and proceed
         //with the result returned from server.
-        private fun serverCheckForUpdate(context: Context, url: String) {
+        private fun serverCheckForUpdate(context: Context, url: String, persistentState:PersistentState) {
             val client = OkHttpClient()
             val request = Request.Builder()
                 .url(url)
@@ -51,7 +51,7 @@ class HttpRequestHelper{
                     val jsonObject = JSONObject(stringResponse)
                     val responseVersion = jsonObject.getInt("version")
                     val updateValue = jsonObject.getBoolean("update")
-                    PersistentState.setLastAppUpdateCheckTime(context, System.currentTimeMillis())
+                    persistentState.setLastAppUpdateCheckTime(System.currentTimeMillis())
                     Log.i(LOG_TAG, "Server response for the new version download is true, version number-  $updateValue")
                     if (responseVersion == 1) {
                         if (updateValue) {

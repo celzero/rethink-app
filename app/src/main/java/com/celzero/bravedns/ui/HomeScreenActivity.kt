@@ -1,18 +1,18 @@
 /*
-Copyright 2020 RethinkDNS and its authors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2020 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.celzero.bravedns.ui
 
 import android.app.DownloadManager
@@ -34,8 +34,10 @@ import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallRules
 import com.celzero.bravedns.data.AppMode
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfo
+import com.celzero.bravedns.database.BlockedConnectionsRepository
+import com.celzero.bravedns.database.DoHEndpointRepository
+import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
@@ -55,6 +57,8 @@ import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.common.collect.HashMultimap
 import okhttp3.*
 import org.json.JSONObject
+import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
 import java.io.File
 import java.io.IOException
 import java.util.*
@@ -68,11 +72,15 @@ class HomeScreenActivity : AppCompatActivity() {
     lateinit var homeScreenFragment: HomeScreenFragment
     lateinit var aboutFragment: AboutFragment
     lateinit var context: Context
-    private val refreshDatabase = RefreshDatabase(this)
+    private val refreshDatabase by inject<RefreshDatabase>()
     lateinit var appUpdateManager: AppUpdateManager
     lateinit var downloadManager : DownloadManager
     private var timeStamp  = 0L
     //lateinit var appSample : AppInfo
+
+    private val doHEndpointRepository by inject<DoHEndpointRepository>()
+    private val blockedConnectionsRepository by inject<BlockedConnectionsRepository>()
+    private val persistentState by inject<PersistentState>()
 
     /*TODO : This task need to be completed.
              Add all the appinfo in the global variable during appload
@@ -115,14 +123,9 @@ class HomeScreenActivity : AppCompatActivity() {
     }
 
     companion object {
-        lateinit var dbHandler: DatabaseHandler
         var isLoadingComplete: Boolean = false
         const val DAYS_TO_MAINTAIN_NETWORK_LOG = 2
-        var contextVal : Context ?= null
         var enqueue: Long = 0
-        fun getInstance() : Context? {
-            return contextVal
-        }
     }
 
 
@@ -133,7 +136,7 @@ class HomeScreenActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_home_screen)
 
-        if (PersistentState.isFirstTimeLaunch(this)) {
+        if (persistentState.isFirstTimeLaunch()) {
             launchOnBoardingActivity()
         }
 
@@ -152,22 +155,22 @@ class HomeScreenActivity : AppCompatActivity() {
                 homeScreenFragment.javaClass.simpleName).commit()
         }
         navView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
-        appMode = AppMode.getInstance(this)
+        appMode = get<AppMode>() // Todo don't hold global objects across the app.
 
 
         val firewallRules = FirewallRules.getInstance()
-        firewallRules.loadFirewallRules(this)
+        firewallRules.loadFirewallRules(blockedConnectionsRepository)
 
         refreshDatabase.deleteOlderDataFromNetworkLogs()
-        if (!PersistentState.isInsertionCompleted(this)) {
+        if (!persistentState.isInsertionCompleted()) {
             refreshDatabase.insertDefaultDNSList()
             refreshDatabase.insertDefaultDNSCryptList()
             refreshDatabase.insertDefaultDNSCryptRelayList()
             refreshDatabase.updateCategoryInDB()
-            PersistentState.setInsertionCompleted(this, true)
+            persistentState.setInsertionCompleted(true)
         }
-        GlobalVariable.isBackgroundEnabled = PersistentState.getBackgroundEnabled(this)
-        PersistentState.setScreenLockData(this, false)
+        GlobalVariable.isBackgroundEnabled = persistentState.getBackgroundEnabled()
+        persistentState.setScreenLockData(false)
         updateInstallSource()
         initUpdateCheck()
         showNewFeaturesDialog()
@@ -178,16 +181,20 @@ class HomeScreenActivity : AppCompatActivity() {
     }
 
     private fun updateInstallSource() {
-        val packageManager = packageManager
-        try {
-            val applicationInfo: ApplicationInfo = packageManager.getApplicationInfo(packageName, 0)
-            if (DEBUG) Log.d(LOG_TAG, "Install location: ${packageManager.getInstallerPackageName(applicationInfo.packageName)}")
-            if ("com.android.vending" == packageManager.getInstallerPackageName(applicationInfo.packageName)) {
-                // App was installed by Play Store
-                PersistentState.setDownloadSource(context, Constants.DOWNLOAD_SOURCE_PLAY_STORE)
-            } else {
-                // App was installed from somewhere else
-                PersistentState.setDownloadSource(context, DOWNLOAD_SOURCE_OTHERS)
+        if(persistentState.getDownloadSource() == 0) {
+            val packageManager = packageManager
+            try {
+                val applicationInfo: ApplicationInfo = packageManager.getApplicationInfo(packageName, 0)
+                if (DEBUG) Log.d(LOG_TAG, "Install location: ${packageManager.getInstallerPackageName(applicationInfo.packageName)}")
+                if ("com.android.vending" == packageManager.getInstallerPackageName(applicationInfo.packageName)) {
+                    // App was installed by Play Store
+                    persistentState.setDownloadSource(Constants.DOWNLOAD_SOURCE_PLAY_STORE)
+                } else {
+                    // App was installed from somewhere else
+                    persistentState.setDownloadSource(DOWNLOAD_SOURCE_OTHERS)
+                }
+            } catch (e: PackageManager.NameNotFoundException) {
+                e.printStackTrace()
             }
         } catch (e: PackageManager.NameNotFoundException) {
             Log.e(LOG_TAG,"Exception while fetching the app download source: ${e.message}",e)
@@ -213,7 +220,7 @@ class HomeScreenActivity : AppCompatActivity() {
     }
 
     private fun checkToShowNewFeatures(): Boolean {
-        val versionStored = PersistentState.getAppVersion(this)
+        val versionStored = persistentState.getAppVersion()
         var version = 0
         try {
             val pInfo: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
@@ -222,7 +229,7 @@ class HomeScreenActivity : AppCompatActivity() {
             Log.e(LOG_TAG, "Error while fetching version code: ${e.message}", e)
         }
         return if(version != versionStored){
-            PersistentState.setAppVersion(this, version)
+            persistentState.setAppVersion(version)
             true
         }else{
             false
@@ -230,7 +237,7 @@ class HomeScreenActivity : AppCompatActivity() {
     }
 
     private fun initUpdateCheck(){
-        val time = PersistentState.getLastAppUpdateCheckTime(this)
+        val time = persistentState.getLastAppUpdateCheckTime()
         val currentTime = System.currentTimeMillis()
         val diff = currentTime - time
         val numOfDays = (diff / (1000 * 60 * 60 * 24)).toInt()
@@ -248,8 +255,6 @@ class HomeScreenActivity : AppCompatActivity() {
     }
 
     private fun checkForBlockListUpdate() {
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val doHEndpointRepository = mDb.doHEndpointsRepository()
         val connectedDOH = doHEndpointRepository.getConnectedDoH()
         var isRethinkPlusConnected = false
         if(connectedDOH != null) {
@@ -257,9 +262,9 @@ class HomeScreenActivity : AppCompatActivity() {
                 isRethinkPlusConnected = true
             }
         }
-        if (PersistentState.isLocalBlockListEnabled(this) || isRethinkPlusConnected) {
-            val blockListTimeStamp = PersistentState.getLocalBlockListDownloadTime(this)
-            val appVersionCode = PersistentState.getAppVersion(this)
+        if (persistentState.isLocalBlockListEnabled() || isRethinkPlusConnected) {
+            val blockListTimeStamp = persistentState.getLocalBlockListDownloadTime()
+            val appVersionCode = persistentState.getAppVersion()
             val url = "${Constants.REFRESH_BLOCKLIST_URL}$blockListTimeStamp&${Constants.APPEND_VCODE}$appVersionCode"
             serverCheckForBlocklistUpdate(url)
         }
@@ -270,12 +275,12 @@ class HomeScreenActivity : AppCompatActivity() {
         try {
             val pInfo: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
             version = pInfo.versionCode
-            PersistentState.setAppVersion(context, version)
+            persistentState.setAppVersion(version)
         } catch (e: PackageManager.NameNotFoundException) {
             Log.e(LOG_TAG, "Error while fetching version code: ${e.message}", e)
         }
 
-        if (PersistentState.getDownloadSource(this) == Constants.DOWNLOAD_SOURCE_PLAY_STORE) {
+        if (persistentState.getDownloadSource() == Constants.DOWNLOAD_SOURCE_PLAY_STORE) {
             appUpdateManager.registerListener(installStateUpdatedListener)
 
             appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
@@ -369,7 +374,7 @@ class HomeScreenActivity : AppCompatActivity() {
                     val responseVersion = jsonObject.getInt("version")
                     val updateValue = jsonObject.getBoolean("update")
                     val latestVersion = jsonObject.getInt("latest")
-                    PersistentState.setLastAppUpdateCheckTime(context, System.currentTimeMillis())
+                    persistentState.setLastAppUpdateCheckTime(System.currentTimeMillis())
                     Log.i(LOG_TAG, "Server response for the new version download is true, version number-  $latestVersion")
                     if (responseVersion == 1) {
                         if (updateValue) {
@@ -414,12 +419,12 @@ class HomeScreenActivity : AppCompatActivity() {
                     val responseVersion = jsonObject.getInt("version")
                     val updateValue = jsonObject.getBoolean("update")
                     timeStamp = jsonObject.getLong("latest")
-                    PersistentState.setLastAppUpdateCheckTime(context, System.currentTimeMillis())
+                    persistentState.setLastAppUpdateCheckTime(System.currentTimeMillis())
                     Log.i(LOG_TAG, "Server response for the new version download is $updateValue, response version number- $responseVersion, timestamp- $timeStamp")
                     if (responseVersion == 1) {
                         //PersistentState.setLocalBlockListDownloadTime(context, timeStamp)
                         if (updateValue) {
-                            if (PersistentState.getDownloadSource(context) == DOWNLOAD_SOURCE_OTHERS) {
+                            if (persistentState.getDownloadSource() == DOWNLOAD_SOURCE_OTHERS) {
                                 (context as HomeScreenActivity).runOnUiThread {
                                     popupSnackBarForBlocklistUpdate()
                                 }
@@ -468,8 +473,8 @@ class HomeScreenActivity : AppCompatActivity() {
                             from.copyTo(to, true)
                             /*val destDir = File(ctxt.filesDir.canonicalPath)
                             Utilities.moveTo(from, to, destDir)*/
-                            PersistentState.setRemoteBraveDNSDownloaded(ctxt, true)
-                            PersistentState.setRemoteBlockListDownloadTime(context, timeStamp)
+                            persistentState.setRemoteBraveDNSDownloaded(true)
+                            persistentState.setRemoteBlockListDownloadTime(timeStamp)
                         }else{
                             Log.e(LOG_TAG, "Error downloading filetag.json file: $status")
                         }
@@ -556,7 +561,7 @@ class HomeScreenActivity : AppCompatActivity() {
 
     private fun handleDownloadFiles() {
         downloadManager = this.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-        val timeStamp = PersistentState.getLocalBlockListDownloadTime(this)
+        val timeStamp = persistentState.getLocalBlockListDownloadTime()
         val url = Constants.JSON_DOWNLOAD_BLOCKLIST_LINK + "/" + timeStamp
         downloadBlockListFiles(url, Constants.FILE_TAG_NAME, this)
     }

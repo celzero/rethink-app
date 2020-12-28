@@ -24,7 +24,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.Apk
+import com.celzero.bravedns.util.DatabaseHandler
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import org.koin.android.ext.android.inject
 
 /**
  * Experimental BottomSheetFragment.
@@ -41,6 +43,7 @@ class BottomSheetFragment(context : Context, apkItem : Apk) : BottomSheetDialogF
     private lateinit var txtAutoRemove : TextView
     private lateinit var txtAutoRevoke : TextView
     private lateinit var txtDoNothing : TextView
+    private val dbHandler by inject<DatabaseHandler>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,17 +88,17 @@ class BottomSheetFragment(context : Context, apkItem : Apk) : BottomSheetDialogF
         }
 
         txtAutoRemove.setOnClickListener{
-            HomeScreenActivity.dbHandler.updatePackage(apkVal.packageName , 2)
+            dbHandler.updatePackage(apkVal.packageName , 2)
             print(apkVal.packageName)
             this.dismiss()
         }
         txtAutoRevoke.setOnClickListener{
-            HomeScreenActivity.dbHandler.updatePackage(apkVal.packageName , 1)
+            dbHandler.updatePackage(apkVal.packageName , 1)
             print(apkVal.packageName)
             this.dismiss()
         }
         txtDoNothing.setOnClickListener{
-            HomeScreenActivity.dbHandler.updatePackage(apkVal.packageName , 0)
+            dbHandler.updatePackage(apkVal.packageName , 0)
             print(apkVal.packageName)
             this.dismiss()
         }

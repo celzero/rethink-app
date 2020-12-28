@@ -49,14 +49,15 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import settings.Settings
 
-class DNSProxyEndpointAdapter(val context: Context, val listener: UIUpdateInterface) : PagedListAdapter<DNSProxyEndpoint, DNSProxyEndpointAdapter.DNSProxyEndpointViewHolder>(DIFF_CALLBACK) {
-    var mDb: AppDatabase = AppDatabase.invoke(context.applicationContext)
-    var dnsProxyEndpointRepository: DNSProxyEndpointRepository
+class DNSProxyEndpointAdapter(private val context: Context,
+                              private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
+                              private val persistentState:PersistentState,
+                              private val queryTracker: QueryTracker,
+                              val listener: UIUpdateInterface) : PagedListAdapter<DNSProxyEndpoint, DNSProxyEndpointAdapter.DNSProxyEndpointViewHolder>(DIFF_CALLBACK) {
     private var PROXY_TYPE_INTERNAL: String
     private var PROXY_TYPE_EXTERNAL: String
 
     init {
-        dnsProxyEndpointRepository = mDb.dnsProxyEndpointRepository()
         PROXY_TYPE_INTERNAL = "Internal"
         PROXY_TYPE_EXTERNAL = "External"
     }
@@ -264,8 +265,6 @@ class DNSProxyEndpointAdapter(val context: Context, val listener: UIUpdateInterf
         }*/
 
         private fun updateDNSProxyDetails(dnsProxyEndpoint: DNSProxyEndpoint) {
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val dnsProxyEndpointRepository = mDb.dnsProxyEndpointRepository()
             dnsProxyEndpoint.isSelected = true
             dnsProxyEndpointRepository.removeConnectionStatus()
             dnsProxyEndpointRepository.updateAsync(dnsProxyEndpoint)
@@ -276,7 +275,7 @@ class DNSProxyEndpointAdapter(val context: Context, val listener: UIUpdateInterf
 
                 override fun onFinish() {
                     notifyDataSetChanged()
-                    QueryTracker.reinitializeQuantileEstimator()
+                    queryTracker.reinitializeQuantileEstimator()
                 }
             }.start()
 
@@ -288,9 +287,9 @@ class DNSProxyEndpointAdapter(val context: Context, val listener: UIUpdateInterf
                 HomeScreenActivity.GlobalVariable.appMode?.setDNSMode(Settings.DNSModeProxyIP)
             }
             listener.updateUIFromAdapter(3)
-            PersistentState.setDNSType(context, 3)
-            PersistentState.setConnectionModeChange(context, dnsProxyEndpoint.proxyIP!!)
-            PersistentState.setDNSProxyIDChange(context, dnsProxyEndpoint.id)
+            persistentState.setDNSType(3)
+            persistentState.setConnectionModeChange(dnsProxyEndpoint.proxyIP!!)
+            persistentState.setDNSProxyIDChange(dnsProxyEndpoint.id)
             //mDb.close()
         }
     }

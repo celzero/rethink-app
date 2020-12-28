@@ -1,19 +1,19 @@
 /*
-Copyright 2020 RethinkDNS and its authors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-package com.celzero.bravedns.util
+ * Copyright 2020 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.celzero.bravedns.database
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
@@ -26,14 +26,28 @@ import com.celzero.bravedns.database.*
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.FileSystemUID
+import com.celzero.bravedns.util.PlayStoreCategory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jsoup.Jsoup
 import java.util.*
 
-class RefreshDatabase(var context: Context) {
+class RefreshDatabase internal constructor(
+    private var context: Context,
+    private val appInfoRepository: AppInfoRepository,
+    private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
+    private val categoryInfoRepository: CategoryInfoRepository,
+    private val doHEndpointRepository: DoHEndpointRepository,
+    private val connTrackerRepository: ConnectionTrackerRepository,
+    private val dnsLogRepository: DNSLogRepository,
+    private val dnsCryptEndpointRepository: DNSCryptEndpointRepository,
+    private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
+    private val persistentState:PersistentState
+) {
 
     /**
      * Need to rewrite the logic for adding the apps in the database and removing it during uninstall.
@@ -41,9 +55,6 @@ class RefreshDatabase(var context: Context) {
     fun refreshAppInfoDatabase() {
         if(DEBUG) Log.d(LOG_TAG,"Refresh database is called")
         GlobalScope.launch(Dispatchers.IO) {
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val appInfoRepository = mDb.appInfoRepository()//AppInfoRepository(appInfoDAO)
-
             val appListDB = appInfoRepository.getAppInfoAsync()
             if (appListDB.isNotEmpty()) {
                 appListDB.forEach {
@@ -70,8 +81,6 @@ class RefreshDatabase(var context: Context) {
     private fun getAppInfo() {
         HomeScreenActivity.isLoadingComplete = false
         GlobalScope.launch(Dispatchers.IO) {
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val appInfoRepository = mDb.appInfoRepository()//AppInfoRepository(appInfoDAO)
             val allPackages: List<PackageInfo> = context.packageManager?.getInstalledPackages(PackageManager.GET_META_DATA)!!
             val appDetailsFromDB = appInfoRepository.getAppInfoAsync()
             val nonAppsCount = appInfoRepository.getNonAppCount()
@@ -96,7 +105,9 @@ class RefreshDatabase(var context: Context) {
                             appInfo.isBackgroundEnabled = false
                             appInfo.whiteListUniv2 = false
                             appInfo.isExcluded = false
-                            appInfo.whiteListUniv1 = ((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) && !FileSystemUID.isUIDAppRange(appInfo.uid)
+                            appInfo.whiteListUniv1 = ((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) && !FileSystemUID.isUIDAppRange(
+                                appInfo.uid
+                            )
                             appInfo.mobileDataUsed = 0
                             appInfo.trackers = 0
                             appInfo.wifiDataUsed = 0
@@ -105,7 +116,10 @@ class RefreshDatabase(var context: Context) {
                         val category = fetchCategory(appInfo.packageInfo)
                         if (category.toLowerCase(Locale.ROOT) != PlayStoreCategory.OTHER.name.toLowerCase(Locale.ROOT)) {
                             appInfo.appCategory = category
-                        } else if (((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) && FileSystemUID.isUIDAppRange(appInfo.uid)) {
+                        } else if (((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) && FileSystemUID.isUIDAppRange(
+                                appInfo.uid
+                            )
+                        ) {
                             appInfo.appCategory = Constants.APP_CAT_SYSTEM_APPS
                             appInfo.isSystemApp = true
                         } else if (((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0)){
@@ -126,7 +140,7 @@ class RefreshDatabase(var context: Context) {
                             appInfo.appCategory = appInfo.appCategory.replace("_", " ").toLowerCase(Locale.ROOT)
 
                         //appInfo.uid = context.packageManager.getPackageUid(appInfo.packageInfo, PackageManager.GET_META_DATA)
-                        appInfo.isInternetAllowed = PersistentState.isWifiAllowed(appInfo.packageInfo, context)
+                        appInfo.isInternetAllowed = persistentState.isWifiAllowed(appInfo.packageInfo)
 
 
                         //TODO Handle this Global scope variable properly. Only half done.
@@ -182,8 +196,6 @@ class RefreshDatabase(var context: Context) {
     }
 
     fun insertNonAppToAppInfo(uid : Int, appName : String){
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val appInfoRepository = mDb.appInfoRepository()
         val appInfo = AppInfo()
         appInfo.appName = appName
         appInfo.packageInfo = "no_package"
@@ -193,7 +205,7 @@ class RefreshDatabase(var context: Context) {
         appInfo.isWifiEnabled = true
         appInfo.isScreenOff = false
         appInfo.uid = uid
-        appInfo.isInternetAllowed = PersistentState.isWifiAllowed(appInfo.packageInfo, context)
+        appInfo.isInternetAllowed = persistentState.isWifiAllowed(appInfo.packageInfo)
         appInfo.isBackgroundEnabled = false
         appInfo.whiteListUniv1 = false
         appInfo.whiteListUniv2 = false
@@ -206,8 +218,6 @@ class RefreshDatabase(var context: Context) {
 
     private fun insertDefaultDNSProxy() {
         GlobalScope.launch(Dispatchers.IO) {
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val dnsProxyEndpointRepository = mDb.dnsProxyEndpointRepository()
             val proxyURL  = context.resources.getStringArray(R.array.dns_proxy_names)
             val proxyIP  = context.resources.getStringArray(R.array.dns_proxy_ips)
             val dnsProxyEndPoint1 = DNSProxyEndpoint(1,proxyURL[0],"External","Nobody",proxyIP[0],53,false,false,0,0)
@@ -221,8 +231,6 @@ class RefreshDatabase(var context: Context) {
 
     private fun updateBraveURLToRethink() {
         GlobalScope.launch(Dispatchers.IO) {
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val doHEndpointRepository = mDb.doHEndpointsRepository()
             doHEndpointRepository.removeConnectionStatus()
             val urlName = context.resources.getStringArray(R.array.doh_endpoint_names)
             val urlValues = context.resources.getStringArray(R.array.doh_endpoint_urls)
@@ -244,9 +252,6 @@ class RefreshDatabase(var context: Context) {
 
     fun deleteOlderDataFromNetworkLogs() {
         GlobalScope.launch(Dispatchers.IO) {
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val connTrackerRepository = mDb.connectionTrackerRepository()
-            val dnsLogRepository = mDb.dnsLogRepository()
             val DAY_IN_MS = 1000 * 60 * 60 * 24
             val date = System.currentTimeMillis() - (HomeScreenActivity.DAYS_TO_MAINTAIN_NETWORK_LOG * DAY_IN_MS)
             if (DEBUG) Log.d(LOG_TAG, "Time: ${System.currentTimeMillis()}, dateVal: $date")
@@ -264,9 +269,6 @@ class RefreshDatabase(var context: Context) {
 
     fun updateCategoryInDB() {
         if(DEBUG) Log.d(LOG_TAG,"RefreshDatabase - Call for updateCategoryDB")
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val appInfoRepository = mDb.appInfoRepository()//AppInfoRepository(appInfoDAO)
-        val categoryInfoRepository = mDb.categoryInfoRepository()
         //val categoryDetailsFromDB = categoryInfoRepository.getAppCategoryList()
         categoryInfoRepository.deleteAllCategory()
         val categoryListFromAppList = appInfoRepository.getAppCategoryList()
@@ -340,8 +342,6 @@ class RefreshDatabase(var context: Context) {
     fun insertDefaultDNSList() {
         //https://basic.bravedns.com/1:wAIgAYAAAGA=
         GlobalScope.launch(Dispatchers.IO) {
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val doHEndpointRepository = mDb.doHEndpointsRepository()
             try {
                 val isAlreadyConnectionAvailable = doHEndpointRepository.getConnectedDoH()
                 val urlName = context.resources.getStringArray(R.array.doh_endpoint_names)
@@ -373,9 +373,6 @@ class RefreshDatabase(var context: Context) {
 
     fun insertDefaultDNSCryptList() {
         GlobalScope.launch(Dispatchers.IO) {
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val dnsCryptEndpointRepository = mDb.dnsCryptEndpointsRepository()
-
             val urlName = context.resources.getStringArray(R.array.dns_crypt_endpoint_names)
             val urlValues = context.resources.getStringArray(R.array.dns_crypt_endpoint_urls)
             val urlDesc = context.resources.getStringArray(R.array.dns_crypt_endpoint_desc)
@@ -396,9 +393,6 @@ class RefreshDatabase(var context: Context) {
 
     fun insertDefaultDNSCryptRelayList() {
         GlobalScope.launch(Dispatchers.IO) {
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val dnsCryptRelayEndpointRepository = mDb.dnsCryptRelayEndpointsRepository()
-
             val urlName = context.resources.getStringArray(R.array.dns_crypt_relay_endpoint_names)
             val urlValues = context.resources.getStringArray(R.array.dns_crypt_relay_endpoint_urls)
             val urlDesc = context.resources.getStringArray(R.array.dns_crypt_relay_endpoint_desc)
