@@ -35,7 +35,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.CategoryInfoRepository
-import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.PersistentStateKrate
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.viewmodel.ExcludedAppViewModel
@@ -48,7 +48,7 @@ import java.util.stream.Collectors
 class ExcludeAppDialog(private var activity: Context,
                        private val appInfoRepository: AppInfoRepository,
                        private val categoryInfoRepository: CategoryInfoRepository,
-                       private val persistentState:PersistentState,
+                       private val persistentState:PersistentStateKrate,
                        internal var adapter: RecyclerView.Adapter<*>,
                        var viewModel: ExcludedAppViewModel) : Dialog(activity),
     View.OnClickListener, SearchView.OnQueryTextListener {
@@ -173,7 +173,7 @@ class ExcludeAppDialog(private var activity: Context,
 
     private fun applyChanges() {
         val excludedApps = appInfoRepository.getExcludedAppList()
-        persistentState.setExcludedAppsFromVPN(excludedApps.toMutableSet())
+        persistentState.excludedAppsFromVPN = excludedApps.toMutableSet()
         //Toast.makeText(activity,"Update Successful",Toast.LENGTH_SHORT).show()
     }
 

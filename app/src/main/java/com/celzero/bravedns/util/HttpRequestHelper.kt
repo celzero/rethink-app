@@ -22,7 +22,7 @@ import android.database.Cursor
 import android.net.Uri
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.PersistentStateKrate
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import okhttp3.*
 import org.json.JSONObject
@@ -34,7 +34,7 @@ class HttpRequestHelper{
 
         //fixme - Come up with a logic where onResponse should call for an interface and proceed
         //with the result returned from server.
-        private fun serverCheckForUpdate(context: Context, url: String, persistentState:PersistentState) {
+        private fun serverCheckForUpdate(context: Context, url: String, persistentState:PersistentStateKrate) {
             val client = OkHttpClient()
             val request = Request.Builder()
                 .url(url)
@@ -51,7 +51,7 @@ class HttpRequestHelper{
                     val jsonObject = JSONObject(stringResponse)
                     val responseVersion = jsonObject.getInt("version")
                     val updateValue = jsonObject.getBoolean("update")
-                    persistentState.setLastAppUpdateCheckTime(System.currentTimeMillis())
+                    persistentState.lastAppUpdateCheck = System.currentTimeMillis()
                     Log.i(LOG_TAG, "Server response for the new version download is true, version number-  $updateValue")
                     if (responseVersion == 1) {
                         if (updateValue) {

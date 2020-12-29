@@ -16,9 +16,11 @@
 package com.celzero.bravedns.viewmodel
 
 import android.content.Context
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.DoHEndpoint
@@ -33,7 +35,7 @@ class DoHEndpointViewModel(private val doHEndpointDAO: DoHEndpointDAO) : ViewMod
     }
 
     var dohEndpointList = Transformations.switchMap<String, PagedList<DoHEndpoint>>(
-                filteredList, (Function<String, LiveData<PagedList<DoHEndpoint>>> { input ->
+                filteredList, (Function<String, LiveData<PagedList<DoHEndpoint>>> { input:String ->
             if (input.isBlank()) {
                 doHEndpointDAO.getDoHEndpointLiveData().toLiveData(pageSize = 50)
             } else if (input == "isSystem") {

@@ -39,7 +39,7 @@ import java.net.ProtocolException
 import java.net.UnknownHostException
 
 class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRepository,
-                                         private val persistentState:PersistentState,
+                                         private val persistentState:PersistentStateKrate,
                                          private val context: Context) {
 
     @Synchronized
@@ -136,7 +136,7 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                 }
             }
             if(dnsLogs.isBlocked){
-                persistentState.setBlockedReq()
+                persistentState.incrementBlockedReq()
             }
             persistentState.setNumOfReq()
             dnsLogRepository.insertAsync(dnsLogs)

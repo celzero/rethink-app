@@ -17,9 +17,11 @@ package com.celzero.bravedns.viewmodel
 
 import android.content.Context
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfo
@@ -36,7 +38,7 @@ class ExcludedAppViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     }
 
     var excludedAppList = Transformations.switchMap<String, PagedList<AppInfo>>(
-        filteredList, (Function<String, LiveData<PagedList<AppInfo>>> { input ->
+        filteredList, (Function<String, LiveData<PagedList<AppInfo>>> { input:String ->
             if (input.isBlank()) {
                 appInfoDAO.getExcludedAppDetailsLiveData().toLiveData(pageSize = 50)
             } else if (input == "isSystem") {

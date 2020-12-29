@@ -37,7 +37,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.DNSProxyEndpoint
 import com.celzero.bravedns.database.DNSProxyEndpointRepository
-import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.PersistentStateKrate
 import com.celzero.bravedns.service.QueryTracker
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
@@ -51,7 +51,7 @@ import settings.Settings
 
 class DNSProxyEndpointAdapter(private val context: Context,
                               private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
-                              private val persistentState:PersistentState,
+                              private val persistentState:PersistentStateKrate,
                               private val queryTracker: QueryTracker,
                               val listener: UIUpdateInterface) : PagedListAdapter<DNSProxyEndpoint, DNSProxyEndpointAdapter.DNSProxyEndpointViewHolder>(DIFF_CALLBACK) {
     private var PROXY_TYPE_INTERNAL: String
@@ -287,9 +287,9 @@ class DNSProxyEndpointAdapter(private val context: Context,
                 HomeScreenActivity.GlobalVariable.appMode?.setDNSMode(Settings.DNSModeProxyIP)
             }
             listener.updateUIFromAdapter(3)
-            persistentState.setDNSType(3)
-            persistentState.setConnectionModeChange(dnsProxyEndpoint.proxyIP!!)
-            persistentState.setDNSProxyIDChange(dnsProxyEndpoint.id)
+            persistentState.dnsType = 3
+            persistentState.connectionModeChange = dnsProxyEndpoint.proxyIP!!
+            persistentState.dnsProxyIDChange = dnsProxyEndpoint.id
             //mDb.close()
         }
     }

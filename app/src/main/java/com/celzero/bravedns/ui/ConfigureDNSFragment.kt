@@ -34,7 +34,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.*
 import com.celzero.bravedns.database.*
 import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.PersistentStateKrate
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.VpnState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -105,7 +105,7 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
     private val dnsCryptEndpointRepository by inject<DNSCryptEndpointRepository>()
     private val dnsCryptRelayEndpointRepository by inject<DNSCryptRelayEndpointRepository>()
     private val doHEndpointRepository by inject<DoHEndpointRepository>()
-    private val persistentState by inject<PersistentState>()
+    private val persistentState by inject<PersistentStateKrate>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreate(savedInstanceState)

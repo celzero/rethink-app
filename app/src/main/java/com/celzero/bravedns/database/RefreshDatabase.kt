@@ -23,7 +23,7 @@ import android.os.Build
 import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.*
-import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.PersistentStateKrate
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
@@ -46,7 +46,7 @@ class RefreshDatabase internal constructor(
     private val dnsLogRepository: DNSLogRepository,
     private val dnsCryptEndpointRepository: DNSCryptEndpointRepository,
     private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
-    private val persistentState:PersistentState
+    private val persistentState:PersistentStateKrate
 ) {
 
     /**
@@ -140,7 +140,7 @@ class RefreshDatabase internal constructor(
                             appInfo.appCategory = appInfo.appCategory.replace("_", " ").toLowerCase(Locale.ROOT)
 
                         //appInfo.uid = context.packageManager.getPackageUid(appInfo.packageInfo, PackageManager.GET_META_DATA)
-                        appInfo.isInternetAllowed = persistentState.isWifiAllowed(appInfo.packageInfo)
+                        appInfo.isInternetAllowed = persistentState.wifiAllowed(appInfo.packageInfo)
 
 
                         //TODO Handle this Global scope variable properly. Only half done.
@@ -205,7 +205,7 @@ class RefreshDatabase internal constructor(
         appInfo.isWifiEnabled = true
         appInfo.isScreenOff = false
         appInfo.uid = uid
-        appInfo.isInternetAllowed = persistentState.isWifiAllowed(appInfo.packageInfo)
+        appInfo.isInternetAllowed = persistentState.wifiAllowed(appInfo.packageInfo)
         appInfo.isBackgroundEnabled = false
         appInfo.whiteListUniv1 = false
         appInfo.whiteListUniv2 = false

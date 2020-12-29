@@ -38,7 +38,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.DNSCryptEndpoint
 import com.celzero.bravedns.database.DNSCryptEndpointRepository
-import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.PersistentStateKrate
 import com.celzero.bravedns.service.QueryTracker
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
@@ -53,7 +53,7 @@ import settings.Settings
 
 class DNSCryptEndpointAdapter(private val context: Context,
                               private val dnsCryptEndpointRepository:DNSCryptEndpointRepository,
-                              private val persistentState: PersistentState,
+                              private val persistentState: PersistentStateKrate,
                               private val queryTracker: QueryTracker,
                               var listener : UIUpdateInterface) : PagedListAdapter<DNSCryptEndpoint, DNSCryptEndpointAdapter.DNSCryptEndpointViewHolder>(DIFF_CALLBACK) {
     //private var serverList : MutableList<DNSCryptEndpoint> = ArrayList()
@@ -258,12 +258,12 @@ class DNSCryptEndpointAdapter(private val context: Context,
 
                 override fun onFinish() {
                     notifyDataSetChanged()
-                    persistentState.setDNSType(2)
+                    persistentState.dnsType = 2
                     queryTracker.reinitializeQuantileEstimator()
                 }
             }.start()
 
-            persistentState.setConnectionModeChange(dnsCryptEndpoint.dnsCryptURL)
+            persistentState.connectionModeChange = dnsCryptEndpoint.dnsCryptURL
             listener.updateUIFromAdapter(2)
             appMode?.setDNSMode(Settings.DNSModeCryptPort)
             //mDb.close()

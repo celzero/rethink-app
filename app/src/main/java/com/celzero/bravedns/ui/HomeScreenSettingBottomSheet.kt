@@ -11,7 +11,7 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.PersistentStateKrate
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
@@ -28,7 +28,7 @@ class HomeScreenSettingBottomSheet(var connectedDetails : String) : BottomSheetD
     private var firewallMode = -1L
     private val LOG_FILE = "HOMESCREEN_BTM_SHEET"
 
-    private val persistentState by inject<PersistentState>()
+    private val persistentState by inject<PersistentStateKrate>()
 
     override fun getTheme(): Int = R.style.BottomSheetDialogTheme
 

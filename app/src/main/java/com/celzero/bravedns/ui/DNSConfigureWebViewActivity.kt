@@ -36,7 +36,7 @@ import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.DoHEndpointRepository
-import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.PersistentStateKrate
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
@@ -69,7 +69,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
     private var timeStamp : Long = 0L
     private var receivedIntentFrom : Int = 0
     private val doHEndpointRepository by inject<DoHEndpointRepository>()
-    private val persistentState by inject<PersistentState>()
+    private val persistentState by inject<PersistentStateKrate>()
 
     companion object{
         const val LOCAL = 1
@@ -94,9 +94,9 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
             setWebClient()
             if (stamp != null && stamp!!.isNotEmpty()) {
                 if(receivedIntentFrom == LOCAL) {
-                    url = Constants.CONFIGURE_BLOCKLIST_URL + persistentState.getLocalBlockListDownloadTime() + "#" + stamp
+                    url = Constants.CONFIGURE_BLOCKLIST_URL + persistentState.localBlockListDownloadTime+ "#" + stamp
                 }else{
-                    url = Constants.CONFIGURE_BLOCKLIST_URL + persistentState.getRemoteBlockListDownloadTime() + "#" + stamp
+                    url = Constants.CONFIGURE_BLOCKLIST_URL + persistentState.remoteBlockListDownloadTime+ "#" + stamp
                 }
             }
             if (DEBUG) Log.d(LOG_TAG, "Webview:  - url - $url")
@@ -108,9 +108,9 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
 
         blockListsCount.observe(this, {
             if (receivedIntentFrom == LOCAL) {
-                persistentState.setNumberOfLocalBlockLists(it!!)
+                persistentState.numberOfLocalBlocklists = it!!
             }else{
-                persistentState.setNumberOfRemoteBlockLists(it!!)
+                persistentState.numberOfRemoteBlocklists = it!!
             }
 
         })
@@ -158,8 +158,8 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
 
             override fun onFinish() {
                 HomeScreenActivity.GlobalVariable.appMode?.setDNSMode(Settings.DNSModePort)
-                persistentState.setDNSType(1)
-                persistentState.setConnectionModeChange(receivedStamp)
+                persistentState.dnsType = 1
+                persistentState.connectionModeChange = receivedStamp
                 HomeScreenActivity.GlobalVariable.dnsType.postValue(1)
             }
         }.start()
@@ -243,7 +243,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
 
     private fun showDialogForExitWebView() {
         //dnsConfigureWebView.reload()
-        val count = persistentState.getNumberOfLocalBlockLists()
+        val count = persistentState.numberOfLocalBlocklists
         val builder = AlertDialog.Builder(this)
         //set title for alert dialog
         builder.setTitle(R.string.webview_no_stamp_change_title)
@@ -412,7 +412,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
     }
 
     private fun handleDownloadFiles() {
-        val timeStamp = persistentState.getRemoteBlockListDownloadTime()
+        val timeStamp = persistentState.remoteBlockListDownloadTime
         if (timeStamp == 0L) {
             checkForDownload()
         }
@@ -449,7 +449,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
                             }
                             //val destDir = File(ctxt.filesDir.canonicalPath)
                             //Utilities.moveTo(from, to, destDir)
-                            persistentState.setRemoteBraveDNSDownloaded(true)
+                            persistentState.remoteBraveDNSDownloaded = true
                         } else {
                             Log.e(LOG_TAG, "Webview: Error downloading filetag.json file: $status")
                         }
@@ -477,7 +477,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
     private fun downloadBlockListFiles() {
         registerReceiverForDownloadManager()
         if(timeStamp == 0L)
-            timeStamp = persistentState.getRemoteBlockListDownloadTime()
+            timeStamp = persistentState.remoteBlockListDownloadTime
         val url = Constants.JSON_DOWNLOAD_BLOCKLIST_LINK + "/" + timeStamp
         if(DEBUG) Log.d(LOG_TAG, "Webview: download filetag file with url: $url")
         val uri: Uri = Uri.parse(url)
@@ -488,8 +488,8 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
     }
 
     private fun checkForDownload() {
-        val blockListTimeStamp = persistentState.getRemoteBlockListDownloadTime()
-        val appVersionCode = persistentState.getAppVersion()
+        val blockListTimeStamp = persistentState.remoteBlockListDownloadTime
+        val appVersionCode = persistentState.appVersion
         val url = "${Constants.REFRESH_BLOCKLIST_URL}$blockListTimeStamp&${Constants.APPEND_VCODE}$appVersionCode"
         if (DEBUG) Log.d(LOG_TAG, "Webview: Check for local download, url - $url")
         run(url)
@@ -515,7 +515,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
                 if (version == 1) {
                     val updateValue = jsonObject.getBoolean("update")
                     timeStamp = jsonObject.getLong("latest")
-                    persistentState.setRemoteBlockListDownloadTime(timeStamp)
+                    persistentState.remoteBlockListDownloadTime = timeStamp
                     if (DEBUG) Log.d(LOG_TAG, "Webview: onResponse -  $updateValue, $timeStamp")
                     if (updateValue) {
                         (context as Activity).runOnUiThread {

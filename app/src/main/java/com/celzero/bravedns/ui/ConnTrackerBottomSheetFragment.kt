@@ -45,7 +45,7 @@ import com.celzero.bravedns.automaton.FirewallRules
 import com.celzero.bravedns.data.ConnectionRules
 import com.celzero.bravedns.database.*
 import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.PersistentStateKrate
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Protocol
@@ -112,7 +112,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
     private val appInfoRepository: AppInfoRepository by inject()
     private val blockedConnectionsRepository: BlockedConnectionsRepository by inject()
     private val categoryInfoRepository: CategoryInfoRepository by inject()
-    private val persistentState by inject<PersistentState>()
+    private val persistentState by inject<PersistentStateKrate>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         fragmentView = inflater.inflate(R.layout.bottom_sheet_conn_track, container, false)
@@ -222,7 +222,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
                 // no-op?
             } else {
                 if(DEBUG) Log.d(LOG_TAG,"setBlockUnknownConnections - ${switchBlockApp.isChecked} ")
-                persistentState.setBlockUnknownConnections(switchBlockApp.isChecked)
+                persistentState.blockUnknownConnections = switchBlockApp.isChecked
             }
         }
 
@@ -252,7 +252,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         if (ipDetails.appName != "Unknown") {
             switchBlockApp.isChecked = isAppBlocked
         }else{
-            switchBlockApp.isChecked = persistentState.getBlockUnknownConnections()
+            switchBlockApp.isChecked = persistentState.blockUnknownConnections
         }
 
         chipKillApp.setOnClickListener{
@@ -330,7 +330,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
             val uid = ipDetails.uid
             CoroutineScope(Dispatchers.IO).launch {
                 appUIDList.forEach {
-                    PersistentState.setExcludedPackagesWifi(it.packageInfo, isBlocked, contextVal)
+                    persistentState.modifyAllowedWifi(it.packageInfo, isBlocked)
                     FirewallManager.updateAppInternetPermission(it.packageInfo, isBlocked)
                     FirewallManager.updateAppInternetPermissionByUID(it.uid, isBlocked)
                     categoryInfoRepository.updateNumberOfBlocked(it.appCategory, !isBlocked)
@@ -338,23 +338,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
                 }
                 blockAllApps = showDialog(appUIDList, ipDetails.appName!!, title, positiveText)
             }
-            if (appUIDList.size <= 1 || blockAllApps) {
-                val uid = ipDetails.uid
-                CoroutineScope(Dispatchers.IO).launch {
-                    appUIDList.forEach {
-                        persistentState.setExcludedPackagesWifi(it.packageInfo, isBlocked)
-                        FirewallManager.updateAppInternetPermission(it.packageInfo, isBlocked)
-                        FirewallManager.updateAppInternetPermissionByUID(it.uid, isBlocked)
-                        val categoryInfoRepository = mDb.categoryInfoRepository()
-                        categoryInfoRepository.updateNumberOfBlocked(it.appCategory, !isBlocked)
-                        if (DEBUG) Log.d(LOG_TAG, "Category block executed with blocked as $isBlocked")
-                    }
-                    appInfoRepository.updateInternetForuid(uid, isBlocked)
-                }
-            } else {
-                switchBlockApp.isChecked = isBlocked
-            }
-        }else{
+        } else{
             Utilities.showToastInMidLayout(contextVal, getString(R.string.firewall_app_info_not_available), Toast.LENGTH_SHORT)
             switchBlockApp.isChecked = false
         }

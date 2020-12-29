@@ -36,7 +36,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.database.DoHEndpointRepository
-import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.PersistentStateKrate
 import com.celzero.bravedns.service.QueryTracker
 import com.celzero.bravedns.ui.DNSConfigureWebViewActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -54,7 +54,7 @@ import xdns.Xdns.getBlocklistStampFromURL
 
 class DoHEndpointAdapter(private val context: Context,
                          private val doHEndpointRepository: DoHEndpointRepository,
-                         private val persistentState:PersistentState,
+                         private val persistentState:PersistentStateKrate,
                          private val queryTracker: QueryTracker,
                          val listener: UIUpdateInterface) : PagedListAdapter<DoHEndpoint, DoHEndpointAdapter.DoHEndpointViewHolder>(DIFF_CALLBACK) {
 
@@ -110,7 +110,7 @@ class DoHEndpointAdapter(private val context: Context,
                     urlExplanationTxt.text = "Connected."
                     Log.d(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}")
                     if(doHEndpoint.dohName == RETHINK_DNS_PLUS){
-                        val count = persistentState.getNumberOfRemoteBlockLists()
+                        val count = persistentState.numberOfRemoteBlocklists
                         Log.d(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}, count- $count")
                         if (count != 0) {
                             urlExplanationTxt.text = "Connected. $count blocklists in-use."
@@ -288,8 +288,8 @@ class DoHEndpointAdapter(private val context: Context,
 
                 override fun onFinish() {
                     notifyDataSetChanged()
-                    persistentState.setDNSType(1)
-                    persistentState.setConnectionModeChange(doHEndpoint.dohURL)
+                    persistentState.dnsType = 1
+                    persistentState.connectionModeChange = doHEndpoint.dohURL
                     queryTracker.reinitializeQuantileEstimator()
                 }
             }.start()

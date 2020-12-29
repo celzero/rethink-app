@@ -40,7 +40,7 @@ import com.celzero.bravedns.database.DoHEndpoint;
 import com.celzero.bravedns.database.DoHEndpointRepository;
 import com.celzero.bravedns.database.ProxyEndpoint;
 import com.celzero.bravedns.service.BraveVPNService;
-import com.celzero.bravedns.service.PersistentState;
+import com.celzero.bravedns.service.PersistentStateKrate;
 import com.celzero.bravedns.service.VpnController;
 import com.celzero.bravedns.ui.HomeScreenActivity;
 import com.celzero.bravedns.util.Constants;
@@ -117,7 +117,7 @@ public class GoVpnAdapter {
     @NonNull private final DNSProxyEndpointRepository dnsProxyEndpointRepository;
     @NonNull private final DNSCryptEndpointRepository dnsCryptEndpointRepository;
     @NonNull private final DoHEndpointRepository doHEndpointRepository;
-    @NonNull private final PersistentState persistentState;
+    @NonNull private final PersistentStateKrate persistentState;
 
    /* private long dnsMode = Settings.DNSModeIP;
     private long blockMode = Settings.BlockModeFilter;
@@ -128,7 +128,7 @@ public class GoVpnAdapter {
                                          @NonNull DNSProxyEndpointRepository dnsProxyEndpointRepository,
                                          @NonNull DNSCryptEndpointRepository dnsCryptEndpointRepository,
                                          @NonNull DoHEndpointRepository doHEndpointRepository,
-                                         @NonNull PersistentState persistentState) {
+                                         @NonNull PersistentStateKrate persistentState) {
         ParcelFileDescriptor tunFd = establishVpn(vpnService);
 
         if (tunFd == null) {
@@ -144,7 +144,7 @@ public class GoVpnAdapter {
                          DNSProxyEndpointRepository dnsProxyEndpointRepository,
                          DNSCryptEndpointRepository dnsCryptEndpointRepository,
                          DoHEndpointRepository doHEndpointRepository,
-                         PersistentState persistentState) {
+                         PersistentStateKrate persistentState) {
         this.vpnService = vpnService;
         this.tunFd = tunFd;
         this.appMode = appMode;

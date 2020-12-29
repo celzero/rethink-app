@@ -33,7 +33,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ConnectionTrackerAdapter
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.ConnectionTrackerDAO
-import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.PersistentStateKrate
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
 import kotlinx.coroutines.Dispatchers
@@ -63,7 +63,7 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
     private var checkedItem = 1
 
     private val connectionTrackerDAO by inject<ConnectionTrackerDAO>()
-    private val persistentState by inject<PersistentState>()
+    private val persistentState by inject<PersistentStateKrate>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreate(savedInstanceState)
@@ -88,7 +88,7 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
         searchLayoutLL = includeView.findViewById(R.id.connection_card_view_top)
         disabledLogsTextView = includeView.findViewById(R.id.connection_list_logs_disabled_tv)
 
-        if(persistentState.isLogsEnabled()){
+        if(persistentState.logsEnabled){
             disabledLogsTextView.visibility = View.GONE
             searchLayoutLL.visibility = View.VISIBLE
 

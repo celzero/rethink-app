@@ -35,10 +35,7 @@ import com.celzero.bravedns.adapter.DNSQueryAdapter
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.DNSLogDAO
 import com.celzero.bravedns.database.DoHEndpoint
-import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.VpnState
+import com.celzero.bravedns.service.*
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.median50
@@ -88,7 +85,7 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
     var check = 2
 
     private val dnsLogDAO by inject<DNSLogDAO>()
-    private val persistentState by inject<PersistentState>()
+    private val persistentState by inject<PersistentStateKrate>()
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -128,7 +125,7 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
         //recyclerHeadingLL = includeView.findViewById(R.id.query_list_recycler_heading)
         noLogsTxt = includeView.findViewById(R.id.dns_log_no_log_text)
 
-        if(persistentState.isLogsEnabled()) {
+        if(persistentState.logsEnabled) {
             logsDisabledTxt.visibility = View.GONE
             searchLayoutLL.visibility = View.VISIBLE
             recyclerView!!.setHasFixedSize(true)
@@ -197,7 +194,7 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
             currentDNSStatus.text = resources.getString(R.string.configure_dns_connection_name) + " "+ proxyDetails?.proxyName
             //recyclerHeadingLL.visibility = View.GONE
             recyclerView?.visibility = View.GONE
-            if(persistentState.isLogsEnabled()) {
+            if(persistentState.logsEnabled) {
                 noLogsTxt.visibility = View.VISIBLE
             }
         }

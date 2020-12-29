@@ -43,7 +43,7 @@ import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.service.BraveVPNService.Companion.appWhiteList
-import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.PersistentStateKrate
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
@@ -57,7 +57,7 @@ class UniversalAppListAdapter(
     private val context: Context,
     private val appInfoRepository: AppInfoRepository,
     private val categoryInfoRepository:CategoryInfoRepository,
-    private val persistentState:PersistentState
+    private val persistentState:PersistentStateKrate
 )  : PagedListAdapter<AppInfo, UniversalAppListAdapter.UniversalAppInfoViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -174,7 +174,7 @@ class UniversalAppListAdapter(
                     if (status) {
                         appUIDList.forEach {
                             HomeScreenActivity.GlobalVariable.appList[it.packageInfo]!!.isInternetAllowed = status
-                            persistentState.setExcludedPackagesWifi(it.packageInfo, status)
+                            persistentState.modifyAllowedWifi(it.packageInfo, status)
                             FirewallManager.updateAppInternetPermission(it.packageInfo, status)
                             FirewallManager.updateAppInternetPermissionByUID(it.uid, status)
                         }

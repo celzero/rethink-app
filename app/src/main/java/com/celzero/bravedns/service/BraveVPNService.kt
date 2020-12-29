@@ -114,7 +114,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
     private val appMode by inject<AppMode>()
     private val ipTracker by inject<IPTracker>()
     private val dnsLogTracker by inject<DNSLogTracker>()
-    private val persistentState by inject<PersistentState>()
+    private val persistentState by inject<PersistentStateKrate>()
     private val tracker by inject<QueryTracker>()
 
     enum class State {
@@ -187,7 +187,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                 return false
             }
 
-            if (persistentState.getBlockUnknownConnections() && destIp != GoVpnAdapter.FAKE_DNS_IP) {
+            if (persistentState.blockUnknownConnections && destIp != GoVpnAdapter.FAKE_DNS_IP) {
                 if (uid == -1 || uid == MISSING_UID)  {
                     if ((destIp != GoVpnAdapter.FAKE_DNS_IP && destPort != DNS_REQUEST_PORT)) {
                         ipDetails.isBlocked = true
@@ -263,7 +263,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                 isBlocked = isUidBlocked(uid)
                 if (isBlocked) {
                     blockedBy = BlockedRuleNames.RULE1.ruleName
-                    if (persistentState.getKillAppOnFirewall()) {
+                    if (persistentState.killAppOnFirewall) {
                         killFirewalledApplication(uid)
                     }
                 }
@@ -318,7 +318,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
      * The logs will be shown in network monitor screen
      */
     private fun sendConnTracking(ipDetails: IPDetails?) {
-        if(persistentState.isLogsEnabled()) {
+        if(persistentState.logsEnabled) {
             ipTracker.recordTransaction(ipDetails)
         }
     }
@@ -364,7 +364,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                 lockDown = android.provider.Settings.Secure.getInt(contentResolver, "always_on_vpn_lockdown", 0)
                 if (DEBUG) Log.d(LOG_TAG, "isLockDownEnabled - $lockDown , $alwaysOn")
                 if (alwaysOn.isNullOrEmpty() && lockDown == 0) {
-                    if (persistentState.getAllowByPass()) {
+                    if (persistentState.allowByPass) {
                         Log.d(LOG_TAG, "$FILE_LOG_TAG getAllowByPass - true")
                         builder = builder.allowBypass()
                     }
@@ -378,9 +378,9 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
             }
 
             if (VERSION.SDK_INT >= VERSION_CODES.Q) {
-                if (persistentState.getHttpProxyEnabled()) {
-                    val host = persistentState.getHttpProxyHostAddress()
-                    val port = persistentState.getHttpProxyPort()
+                if (persistentState.httpProxyEnabled) {
+                    val host = persistentState.httpProxyHostAddress
+                    val port = persistentState.httpProxyPort
                     val proxyInfo: ProxyInfo = ProxyInfo.buildDirectProxy(host!!, port)
                     builder.setHttpProxy(proxyInfo)
                     Log.i(LOG_TAG, "$FILE_LOG_TAG Http proxy enabled - builder updated with $host, $port")
@@ -391,10 +391,10 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                 // Workaround for any app incompatibility bugs.
                 //TODO : As of now the wifi  packages are considered for blocking the entire traffic
                 if (appMode?.getFirewallMode() == Settings.BlockModeSink) {
-                    if (persistentState.getExcludedPackagesWifi()!!.isEmpty()) {
+                    if (persistentState.excludedPackagesWifi.isEmpty()) {
                         builder.addAllowedApplication("")
                     } else {
-                        for (packageName in persistentState.getExcludedPackagesWifi()!!) {
+                        for (packageName in persistentState.excludedPackagesWifi) {
                             builder = builder.addAllowedApplication(packageName!!)
                         }
                     }
@@ -403,7 +403,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                        In case of lockdown mode, the excluded apps wont able to connected. so
                        not including the apps in the excluded list if the lockdown mode is
                        enabled. */
-                    val excludedApps = persistentState.getExcludedAppsFromVPN()
+                    val excludedApps = persistentState.excludedAppsFromVPN
                     if (VERSION.SDK_INT >= VERSION_CODES.Q) {
                         if (alwaysOn.isNullOrEmpty()  && lockDown == 0) {
                             excludedApps?.forEach {
@@ -465,7 +465,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
     }
 
     fun setPrivateDNSOverrideFromPref(context: Context) {
-        privateDNSOverride = persistentState.getAllowPrivateDNS()
+        privateDNSOverride = persistentState.allowPrivateDNS
     }
 
     private fun registerReceiversForScreenState() {
@@ -522,15 +522,14 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
 
     @InternalCoroutinesApi
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-
-        appInfoRepository.getUIDForUnivWhiteList().observeForever(androidx.lifecycle.Observer {
+        appInfoRepository.getUIDForUnivWhiteList().observeForever({
             appWhiteList = it.associateBy({ it }, { true }).toMutableMap()
-        }
-        blockUDPTraffic = persistentState.getUDPBlockedSettings()
-        privateDNSOverride = persistentState.getAllowPrivateDNS()
+        })
+        blockUDPTraffic = persistentState.udpBlockedSettings
+        privateDNSOverride = persistentState.allowPrivateDNS
         isScreenLocked = persistentState.getScreenLockData()
-        isBackgroundEnabled = persistentState.getBackgroundEnabled() && Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
-        privateDNSOverride = persistentState.getAllowPrivateDNS()
+        isBackgroundEnabled = persistentState.backgroundEnabled && Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
+        privateDNSOverride = persistentState.allowPrivateDNS
 
         registerAccessibilityServiceState()
         registerReceiversForScreenState()
@@ -574,7 +573,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                 Log.i(LOG_TAG, "$FILE_LOG_TAG onStart command - start as foreground service. ")
                 startForeground(SERVICE_ID, builder.notification)
                 updateQuickSettingsTile()
-                persistentState.setVpnEnabled(true)
+                persistentState.vpnEnabled = true
             }
         } else {
             Log.i(LOG_TAG, "$FILE_LOG_TAG onStart command not initiated - vpnController is null ")
@@ -591,7 +590,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
             )
             if (!b || !isServiceEnabled) {
                 isBackgroundEnabled = false
-                persistentState.setBackgroundEnabled(false)
+                persistentState.setIsBackgroundEnabled(false)
             }
         }
     }
@@ -615,7 +614,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         transaction.responseCalendar = Calendar.getInstance()
         // All the transactions are recorded in the DNS logs.
         tracker.recordTransaction(transaction)
-        if(persistentState.isLogsEnabled()) {
+        if(persistentState.logsEnabled) {
             dnsLogTracker.recordTransaction(transaction)
         }
 
@@ -696,7 +695,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         }
 
         if (PersistentState.BACKGROUND_MODE == key) {
-            isBackgroundEnabled = persistentState.getBackgroundEnabled() && Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
+            isBackgroundEnabled = persistentState.backgroundEnabled && Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
             Log.i(LOG_TAG, "$FILE_LOG_TAG preference for background mode is modified - $isBackgroundEnabled")
             if (isBackgroundEnabled) {
                 restartVpn(appMode?.getDNSMode()!!, appMode?.getFirewallMode()!!, appMode?.getProxyMode()!!)
@@ -704,7 +703,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         }
         if (PersistentState.BLOCK_UNKNOWN_CONNECTIONS == key) {
             Log.i(LOG_TAG, "$FILE_LOG_TAG preference for block unknown connections is modified")
-            blockUnknownConnection = persistentState.getBlockUnknownConnections()
+            blockUnknownConnection = persistentState.blockUnknownConnections
         }
 
         if (PersistentState.LOCAL_BLOCK_LIST == key) {
@@ -723,7 +722,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         }
 
         if (PersistentState.PRIVATE_DNS == key) {
-            privateDNSOverride = persistentState.getAllowPrivateDNS()
+            privateDNSOverride = persistentState.allowPrivateDNS
         }
 
         if (PersistentState.HTTP_PROXY_ENABLED == key) {
@@ -732,7 +731,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         }
 
         if (PersistentState.BLOCK_UDP_OTHER_THAN_DNS == key) {
-            blockUDPTraffic = persistentState.getUDPBlockedSettings()
+            blockUDPTraffic = persistentState.udpBlockedSettings
         }
 
     }
@@ -805,7 +804,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
 
     @InternalCoroutinesApi
     private fun restartVpn(dnsModeL: Long, firewallModeL: Long, proxyMode: Long) {
-        isBackgroundEnabled = persistentState.getBackgroundEnabled() &&
+        isBackgroundEnabled = persistentState.backgroundEnabled &&
             Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
         if (vpnController != null) {
             synchronized(vpnController) {
@@ -858,7 +857,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
     }
 
     @WorkerThread private fun startVpn() {
-        isBackgroundEnabled = persistentState.getBackgroundEnabled()
+        isBackgroundEnabled = persistentState.backgroundEnabled
             && Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
         kotlin.synchronized(vpnController!!) {
             startVpnAdapter()
@@ -911,7 +910,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
 
     override fun onRevoke() {
         stopSelf()
-        persistentState.setVpnEnabled(false)
+        persistentState.vpnEnabled = false
     }
 
 }
