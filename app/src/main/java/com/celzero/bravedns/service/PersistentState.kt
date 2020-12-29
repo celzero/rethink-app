@@ -2,6 +2,7 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import android.util.Log
+import com.celzero.bravedns.R
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
 import com.celzero.bravedns.util.Constants
@@ -40,6 +41,12 @@ class PersistentState(context: Context):SimpleKrate(context) {
         const val HTTP_PROXY_ENABLED = "http_proxy_enabled"
         const val DNS_PROXY_ID = "dns_proxy_change"
         const val BLOCK_UDP_OTHER_THAN_DNS = "block_udp_traffic_other_than_dns"
+
+        fun expandUrl(context: Context, url: String?): String {
+            return if (url == null || url.isEmpty()) {
+                context.resources.getStringArray(R.array.doh_endpoint_names)[3]
+            } else url
+        }
     }
 
     var vpnEnabled by booleanPref("enabled", false)
