@@ -20,12 +20,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.celzero.bravedns.service.PersistentStateKrate
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import kotlinx.coroutines.InternalCoroutinesApi
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 
 class BraveScreenStateReceiver : BroadcastReceiver() {

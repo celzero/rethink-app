@@ -52,7 +52,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.SpinnerArrayAdapter
 import com.celzero.bravedns.data.BraveMode
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.service.*
@@ -130,7 +129,7 @@ class HomeScreenFragment : Fragment() {
 
     private val categoryInfoRepository by inject<CategoryInfoRepository>()
     private val appInfoRepository by inject<AppInfoRepository>()
-    private val persistentState by inject<PersistentStateKrate>()
+    private val persistentState by inject<PersistentState>()
 
     companion object {
         //private

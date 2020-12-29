@@ -34,11 +34,10 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.DNSCryptEndpointRepository
 import com.celzero.bravedns.database.DNSCryptRelayEndpoint
 import com.celzero.bravedns.database.DNSCryptRelayEndpointRepository
-import com.celzero.bravedns.service.PersistentStateKrate
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.cryptRelayToRemove
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
@@ -48,7 +47,7 @@ import kotlinx.coroutines.launch
 class DNSCryptRelayEndpointAdapter(
     private val context: Context,
     private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
-    private val persistentState:PersistentStateKrate,
+    private val persistentState:PersistentState,
     private val dnsCryptEndpointRepository:DNSCryptEndpointRepository
 ) : PagedListAdapter<DNSCryptRelayEndpoint, DNSCryptRelayEndpointAdapter.DNSCryptRelayEndpointViewHolder>(DIFF_CALLBACK) {
 

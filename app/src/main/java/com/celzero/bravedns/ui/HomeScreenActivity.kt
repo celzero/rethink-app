@@ -38,7 +38,7 @@ import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.BlockedConnectionsRepository
 import com.celzero.bravedns.database.DoHEndpointRepository
 import com.celzero.bravedns.database.RefreshDatabase
-import com.celzero.bravedns.service.PersistentStateKrate
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.util.*
@@ -80,7 +80,7 @@ class HomeScreenActivity : AppCompatActivity() {
 
     private val doHEndpointRepository by inject<DoHEndpointRepository>()
     private val blockedConnectionsRepository by inject<BlockedConnectionsRepository>()
-    private val persistentState by inject<PersistentStateKrate>()
+    private val persistentState by inject<PersistentState>()
 
     /*TODO : This task need to be completed.
              Add all the appinfo in the global variable during appload

@@ -31,17 +31,15 @@ import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.UniversalAppListAdapter
 import com.celzero.bravedns.adapter.UniversalBlockedRulesAdapter
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.BlockedConnectionsRepository
 import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.service.PersistentStateKrate
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.BackgroundAccessibilityService
@@ -104,7 +102,7 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
 
     private val appInfoRepository by inject<AppInfoRepository>()
     private val blockedConnectionsRepository by inject<BlockedConnectionsRepository>()
-    private val persistentState by inject<PersistentStateKrate>()
+    private val persistentState by inject<PersistentState>()
 
     private lateinit var scrollView : NestedScrollView
 

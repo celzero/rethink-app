@@ -18,7 +18,7 @@ package com.celzero.bravedns.data
 import android.content.Context
 import android.util.Log
 import com.celzero.bravedns.database.*
-import com.celzero.bravedns.service.PersistentStateKrate
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
@@ -33,7 +33,7 @@ class AppMode internal constructor(
     private val dnsCryptEndpointRepository: DNSCryptEndpointRepository,
     private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
     private val proxyEndpointRepository: ProxyEndpointRepository,
-    private val persistentState:PersistentStateKrate
+    private val persistentState:PersistentState
 ) {
     private var appDNSMode: Long = -1L
     private var appFirewallMode: Long = -1L

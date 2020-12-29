@@ -23,7 +23,7 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
-import com.celzero.bravedns.service.PersistentStateKrate
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.backgroundAllowedUID
@@ -94,7 +94,7 @@ class FirewallManager(service: BackgroundAccessibilityService) {
             }
         }
 
-        fun updateCategoryAppsInternetPermission(categoryName : String, isAllowed: Boolean, context: Context, persistentState: PersistentStateKrate){
+        fun updateCategoryAppsInternetPermission(categoryName : String, isAllowed: Boolean, context: Context, persistentState: PersistentState){
             GlobalScope.launch ( Dispatchers.IO ) {
                 GlobalVariable.appList.forEach {
                     if (it.value.appCategory == categoryName && !it.value.whiteListUniv1 ) {

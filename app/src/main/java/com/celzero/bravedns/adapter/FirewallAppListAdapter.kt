@@ -38,7 +38,7 @@ import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.database.*
-import com.celzero.bravedns.service.PersistentStateKrate
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.isSearchEnabled
@@ -57,7 +57,7 @@ class FirewallAppListAdapter internal constructor(
     private val context: Context,
     private val appInfoRepository:AppInfoRepository,
     private val categoryInfoRepository:CategoryInfoRepository,
-    private val persistentState: PersistentStateKrate,
+    private val persistentState: PersistentState,
     private var titleList: List<CategoryInfo>,
     private var dataList: HashMap<CategoryInfo, ArrayList<AppInfo>>
 ) : BaseExpandableListAdapter() {

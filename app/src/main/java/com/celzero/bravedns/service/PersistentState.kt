@@ -23,7 +23,7 @@ import settings.Settings
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-class PersistentStateKrate(context: Context):SimpleKrate(context) {
+class PersistentState(context: Context):SimpleKrate(context) {
     companion object {
         const val BRAVE_MODE = "brave_mode"
         const val BACKGROUND_MODE = "background_mode"

@@ -28,7 +28,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.PersistentStateKrate
+import com.celzero.bravedns.service.PersistentState
 import org.koin.android.ext.android.inject
 
 class WelcomeActivity  : AppCompatActivity() {
@@ -42,7 +42,7 @@ class WelcomeActivity  : AppCompatActivity() {
     private lateinit var buttonSkip : TextView
     private lateinit var myPagerAdapter : PagerAdapter
 
-    private val persistentState by inject<PersistentStateKrate>()
+    private val persistentState by inject<PersistentState>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

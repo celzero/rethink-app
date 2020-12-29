@@ -21,9 +21,6 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.celzero.bravedns.database.AppInfoRepository
-import com.celzero.bravedns.database.ConnectionTrackerRepository
-import com.celzero.bravedns.database.DNSLogRepository
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -138,6 +135,6 @@ class VpnController {
 }
 
 internal object VpnControllerHelper:KoinComponent {
-    val persistentState by inject<PersistentStateKrate>()
+    val persistentState by inject<PersistentState>()
     val queryTracker by inject<QueryTracker>()
 }

@@ -23,7 +23,7 @@ import android.os.Build
 import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.*
-import com.celzero.bravedns.service.PersistentStateKrate
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
@@ -46,7 +46,7 @@ class RefreshDatabase internal constructor(
     private val dnsLogRepository: DNSLogRepository,
     private val dnsCryptEndpointRepository: DNSCryptEndpointRepository,
     private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
-    private val persistentState:PersistentStateKrate
+    private val persistentState:PersistentState
 ) {
 
     /**

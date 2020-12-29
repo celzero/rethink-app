@@ -18,7 +18,6 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import android.util.Log
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.DNSLogRepository
 import com.celzero.bravedns.database.DNSLogs
 import com.celzero.bravedns.net.dns.DnsPacket
@@ -39,7 +38,7 @@ import java.net.ProtocolException
 import java.net.UnknownHostException
 
 class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRepository,
-                                         private val persistentState:PersistentStateKrate,
+                                         private val persistentState:PersistentState,
                                          private val context: Context) {
 
     @Synchronized

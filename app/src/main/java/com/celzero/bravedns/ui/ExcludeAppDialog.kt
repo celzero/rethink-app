@@ -32,23 +32,21 @@ import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.CategoryInfoRepository
-import com.celzero.bravedns.service.PersistentStateKrate
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.viewmodel.ExcludedAppViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-import org.koin.java.KoinJavaComponent.inject
 import java.util.stream.Collectors
 
 
 class ExcludeAppDialog(private var activity: Context,
                        private val appInfoRepository: AppInfoRepository,
                        private val categoryInfoRepository: CategoryInfoRepository,
-                       private val persistentState:PersistentStateKrate,
+                       private val persistentState:PersistentState,
                        internal var adapter: RecyclerView.Adapter<*>,
                        var viewModel: ExcludedAppViewModel) : Dialog(activity),
     View.OnClickListener, SearchView.OnQueryTextListener {

@@ -37,7 +37,7 @@ object ServiceModule {
     private val serviceModules = module {
         single { IPTracker(get(), get(), get(), androidContext()) }
         single { DNSLogTracker(get(), get(), androidContext()) }
-        single { PersistentStateKrate(androidContext()) }
+        single { PersistentState(androidContext()) }
         single { QueryTracker(get(), androidContext()) }
     }
 

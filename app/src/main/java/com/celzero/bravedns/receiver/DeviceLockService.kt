@@ -23,7 +23,7 @@ import android.content.Intent
 import android.os.IBinder
 import android.os.PowerManager
 import android.util.Log
-import com.celzero.bravedns.service.PersistentStateKrate
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import org.koin.android.ext.android.inject
@@ -33,7 +33,7 @@ class DeviceLockService  : Service(){
 
     private val timer = Timer()
     private var checkLockTask: CheckLockTask? = null
-    private val persistentState by inject<PersistentStateKrate>()
+    private val persistentState by inject<PersistentState>()
 
     override fun onBind(p0: Intent?): IBinder? {
         return null

@@ -43,7 +43,7 @@ import androidx.fragment.app.Fragment
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ExcludedAppListAdapter
 import com.celzero.bravedns.database.*
-import com.celzero.bravedns.service.PersistentStateKrate
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
@@ -140,7 +140,7 @@ class SettingsFragment : Fragment() {
     private val appInfoRepository by inject<AppInfoRepository>()
     private val proxyEndpointRepository by inject<ProxyEndpointRepository>()
     private val categoryInfoRepository by inject<CategoryInfoRepository>()
-    private val persistentState by inject<PersistentStateKrate>()
+    private val persistentState by inject<PersistentState>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view: View = inflater.inflate(R.layout.activity_settings_screen, container, false)
