@@ -34,9 +34,9 @@ public class QueryTracker {
     private static long numRequests = 0;
     private static P2QuantileEstimation quantileEstimator;
     @NonNull private final Context context;
-    @NonNull private final PersistentState persistentState;
+    @NonNull private final PersistentStateKrate persistentState;
 
-    QueryTracker(@NonNull PersistentState persistentState, @NonNull Context context) {
+    QueryTracker(@NonNull PersistentStateKrate persistentState, @NonNull Context context) {
         this.context = context;
         this.persistentState = persistentState;
     }
