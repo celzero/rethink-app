@@ -357,7 +357,7 @@ class HomeScreenFragment : Fragment() {
             handleStartBtnClickEvent()
         }
 
-        categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, Observer {
+        categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, {
             val list = it.filter { a -> a.isInternetBlocked }
             tileFCategoryBlockedTxt.text = list.size.toString()
         })
@@ -388,7 +388,7 @@ class HomeScreenFragment : Fragment() {
              tileDtrackersBlockedTxt.text = blocked
          })
 
-        appInfoRepository.getBlockedAppCount().observe(viewLifecycleOwner, Observer {
+        appInfoRepository.getBlockedAppCount().observe(viewLifecycleOwner, {
             tileFAppsBlockedTxt.text = it.toString()
             tileDFAppsBlockedTxt.text = it.toString()
         })

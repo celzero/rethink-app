@@ -36,8 +36,8 @@ class AppListViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         filteredList.value = ""
     }
 
-    var appDetailsList = Transformations.switchMap<String, PagedList<AppInfo>>(
-        filteredList, (Function<String, LiveData<PagedList<AppInfo>>> { input:String ->
+    var appDetailsList = Transformations.switchMap(
+        filteredList) { input:String ->
             if (input.isBlank()) {
                 appInfoDAO.getUnivAppDetailsLiveData().toLiveData(pageSize = 50)
             } else if (input == "isSystem") {
@@ -50,8 +50,7 @@ class AppListViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
             } else {
                 appInfoDAO.getUnivAppDetailsFilterLiveData("%$input%").toLiveData(pageSize = 50)
             }
-        } as androidx.arch.core.util.Function<String, LiveData<PagedList<AppInfo>>>)
-    )
+        }
 
     fun setFilter(filter: String?) {
         filteredList.value = filter

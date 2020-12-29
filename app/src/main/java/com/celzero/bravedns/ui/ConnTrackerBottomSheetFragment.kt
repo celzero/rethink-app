@@ -324,21 +324,31 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
                 switchBlockApp.isChecked = false
                 return
             }
-            blockAllApps = showDialog(appUIDList, ipDetails.appName!!, title, positiveText)
-        }
-        if (appUIDList.size <= 1 || blockAllApps) {
-            val uid = ipDetails.uid
-            CoroutineScope(Dispatchers.IO).launch {
-                appUIDList.forEach {
-                    persistentState.modifyAllowedWifi(it.packageInfo, isBlocked)
-                    FirewallManager.updateAppInternetPermission(it.packageInfo, isBlocked)
-                    FirewallManager.updateAppInternetPermissionByUID(it.uid, isBlocked)
-                    categoryInfoRepository.updateNumberOfBlocked(it.appCategory, !isBlocked)
-                    if(DEBUG) Log.d(LOG_TAG,"Category block executed with blocked as $isBlocked")
+            if (appUIDList.size > 1) {
+                var title = "Blocking \"${ipDetails.appName}\" will also block these ${appUIDList.size} other apps"
+                var positiveText = "Block ${appUIDList.size} apps"
+                if (isBlocked) {
+                    title = "Unblocking \"${ipDetails.appName}\" will also unblock these ${appUIDList.size} other apps"
+                    positiveText = "Unblock ${appUIDList.size} apps"
                 }
                 blockAllApps = showDialog(appUIDList, ipDetails.appName!!, title, positiveText)
             }
-        } else{
+            if (appUIDList.size <= 1 || blockAllApps) {
+                val uid = ipDetails.uid
+                CoroutineScope(Dispatchers.IO).launch {
+                    appUIDList.forEach {
+                        persistentState.modifyAllowedWifi(it.packageInfo, isBlocked)
+                        FirewallManager.updateAppInternetPermission(it.packageInfo, isBlocked)
+                        FirewallManager.updateAppInternetPermissionByUID(it.uid, isBlocked)
+                        categoryInfoRepository.updateNumberOfBlocked(it.appCategory, !isBlocked)
+                        if (DEBUG) Log.d(LOG_TAG, "Category block executed with blocked as $isBlocked")
+                    }
+                    appInfoRepository.updateInternetForuid(uid, isBlocked)
+                }
+            } else {
+                switchBlockApp.isChecked = isBlocked
+            }
+        }else{
             Utilities.showToastInMidLayout(contextVal, getString(R.string.firewall_app_info_not_available), Toast.LENGTH_SHORT)
             switchBlockApp.isChecked = false
         }

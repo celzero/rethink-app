@@ -31,10 +31,10 @@ class FirewallAppViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     }
 
     var firewallAppDetailsList = Transformations.switchMap<String, List<AppInfo>>(
-        filteredList, (Function<String, LiveData<List<AppInfo>>> { input:String ->
+        filteredList, ({ input:String ->
             var inputTxt = "%$input%"
             appInfoDAO.getAppDetailsForLiveData(inputTxt)
-        } as androidx.arch.core.util.Function<String,LiveData<List<AppInfo>>>)
+        })
     )
 
     fun setFilter(filter: String?) {

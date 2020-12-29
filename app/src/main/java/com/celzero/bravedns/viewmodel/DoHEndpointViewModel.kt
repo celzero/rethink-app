@@ -35,7 +35,7 @@ class DoHEndpointViewModel(private val doHEndpointDAO: DoHEndpointDAO) : ViewMod
     }
 
     var dohEndpointList = Transformations.switchMap<String, PagedList<DoHEndpoint>>(
-                filteredList, (Function<String, LiveData<PagedList<DoHEndpoint>>> { input:String ->
+                filteredList, ( { input:String ->
             if (input.isBlank()) {
                 doHEndpointDAO.getDoHEndpointLiveData().toLiveData(pageSize = 50)
             } else if (input == "isSystem") {
@@ -43,7 +43,7 @@ class DoHEndpointViewModel(private val doHEndpointDAO: DoHEndpointDAO) : ViewMod
             } else {
                 doHEndpointDAO.getDoHEndpointLiveDataByName("%$input%").toLiveData(pageSize = 50)
             }
-        } as androidx.arch.core.util.Function<String, LiveData<PagedList<DoHEndpoint>>>)
+        } )
     )
 
     fun setFilter(filter: String?) {
