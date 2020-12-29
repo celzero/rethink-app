@@ -538,7 +538,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
             synchronized(vpnController) {
 
                 if(DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Registering the shared pref changes with the vpn service")
-                persistentState.userPreferences.registerOnSharedPreferenceChangeListener(this)
+                persistentState.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
 
                 if (networkManager != null) {
                     spawnServerUpdate()
@@ -640,7 +640,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
             Check on updating the values for Package change and for mode change.
            As of now handled manually*/
 
-        if ((PersistentState.BRAVE_MODE == key) && vpnAdapter != null) {
+        if ((PersistentStateKrate.BRAVE_MODE == key) && vpnAdapter != null) {
             restartVpn(appMode?.getDNSMode()!!, appMode?.getFirewallMode()!!, appMode?.getProxyMode()!!)
 
             val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -649,7 +649,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         }
 
 
-        if (PersistentState.DNS_TYPE == key) {
+        if (PersistentStateKrate.DNS_TYPE == key) {
             Log.d(LOG_TAG, "$FILE_LOG_TAG DNSType- ${appMode?.getDNSType()}")
 
             /**
@@ -669,68 +669,68 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
             }
         }
 
-        if (PersistentState.PROXY_MODE == key) {
+        if (PersistentStateKrate.PROXY_MODE == key) {
             Log.d(LOG_TAG, "$FILE_LOG_TAG PROXY_MODE- ${appMode?.getProxyMode()}")
             restartVpn(appMode?.getDNSMode()!!, appMode?.getFirewallMode()!!, appMode?.getProxyMode()!!)
         }
 
-        if (PersistentState.CONNECTION_CHANGE == key) {
+        if (PersistentStateKrate.CONNECTION_CHANGE == key) {
             Log.d(LOG_TAG, "$FILE_LOG_TAG CONNECTION_CHANGE- ${appMode?.getDNSMode()}")
             spawnServerUpdate()
         }
 
-        if (PersistentState.DNS_PROXY_ID == key) {
+        if (PersistentStateKrate.DNS_PROXY_ID == key) {
             Log.d(LOG_TAG, "$FILE_LOG_TAG DNS PROXY CHANGE- ${appMode?.getDNSMode()!!}")
             restartVpn(appMode?.getDNSMode()!!, appMode?.getFirewallMode()!!, appMode?.getProxyMode()!!)
         }
 
-        if (PersistentState.EXCLUDE_FROM_VPN == key) {
+        if (PersistentStateKrate.EXCLUDE_FROM_VPN == key) {
             Log.d(LOG_TAG, "$FILE_LOG_TAG EXCLUDE_FROM_VPN - restartVpn- ${appMode?.getDNSMode()}")
             restartVpn(appMode?.getDNSMode()!!, appMode?.getFirewallMode()!!, appMode?.getProxyMode()!!)
         }
 
-        if (PersistentState.IS_SCREEN_OFF == key) {
+        if (PersistentStateKrate.IS_SCREEN_OFF == key) {
             isScreenLocked = persistentState.getScreenLockData()
             Log.i(LOG_TAG, "$FILE_LOG_TAG preference for screen off mode is modified - $isScreenLocked")
         }
 
-        if (PersistentState.BACKGROUND_MODE == key) {
+        if (PersistentStateKrate.BACKGROUND_MODE == key) {
             isBackgroundEnabled = persistentState.backgroundEnabled && Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
             Log.i(LOG_TAG, "$FILE_LOG_TAG preference for background mode is modified - $isBackgroundEnabled")
             if (isBackgroundEnabled) {
                 restartVpn(appMode?.getDNSMode()!!, appMode?.getFirewallMode()!!, appMode?.getProxyMode()!!)
             }
         }
-        if (PersistentState.BLOCK_UNKNOWN_CONNECTIONS == key) {
+        if (PersistentStateKrate.BLOCK_UNKNOWN_CONNECTIONS == key) {
             Log.i(LOG_TAG, "$FILE_LOG_TAG preference for block unknown connections is modified")
             blockUnknownConnection = persistentState.blockUnknownConnections
         }
 
-        if (PersistentState.LOCAL_BLOCK_LIST == key) {
+        if (PersistentStateKrate.LOCAL_BLOCK_LIST == key) {
             Log.i(LOG_TAG, "$FILE_LOG_TAG preference for local block list is changed - restart vpn")
             spawnServerUpdate()
         }
 
-        if (PersistentState.LOCAL_BLOCK_LIST_STAMP == key) {
+        if (PersistentStateKrate.LOCAL_BLOCK_LIST_STAMP == key) {
             Log.i(LOG_TAG, "$FILE_LOG_TAG configuration stamp for local block list is changed- restart vpn")
             spawnServerUpdate()
         }
 
-        if (PersistentState.ALLOW_BYPASS == key) {
+        if (PersistentStateKrate.ALLOW_BYPASS == key) {
             Log.i(LOG_TAG, "$FILE_LOG_TAG preference for allow by pass is changed - restart vpn")
             restartVpn(appMode?.getDNSMode()!!, appMode?.getFirewallMode()!!, appMode?.getProxyMode()!!)
         }
 
-        if (PersistentState.PRIVATE_DNS == key) {
+        if (PersistentStateKrate.PRIVATE_DNS == key) {
             privateDNSOverride = persistentState.allowPrivateDNS
         }
 
-        if (PersistentState.HTTP_PROXY_ENABLED == key) {
+        if (PersistentStateKrate.HTTP_PROXY_ENABLED == key) {
             Log.i(LOG_TAG, "$FILE_LOG_TAG preference for http proxy is changed - restart vpn")
             restartVpn(appMode?.getDNSMode()!!, appMode?.getFirewallMode()!!, appMode?.getProxyMode()!!)
         }
 
-        if (PersistentState.BLOCK_UDP_OTHER_THAN_DNS == key) {
+        if (PersistentStateKrate.BLOCK_UDP_OTHER_THAN_DNS == key) {
             blockUDPTraffic = persistentState.udpBlockedSettings
         }
 
@@ -891,7 +891,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
 
         kotlin.synchronized(vpnController!!) {
             Log.w(LOG_TAG, "$FILE_LOG_TAG Destroying DNS VPN service")
-            persistentState.userPreferences.unregisterOnSharedPreferenceChangeListener(this)
+            persistentState.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
             if (networkManager != null) {
                 networkManager!!.destroy()
             }
