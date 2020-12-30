@@ -31,13 +31,11 @@ import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.UniversalAppListAdapter
 import com.celzero.bravedns.adapter.UniversalBlockedRulesAdapter
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.BlockedConnectionsRepository
 import com.celzero.bravedns.service.BraveVPNService
@@ -186,8 +184,8 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
 
         firewallAllAppsToggle.isChecked = persistentState.getFirewallModeForScreenState()
 
-        udpBlockToggle.isChecked = persistentState.getUDPBlockedSettings()
-        unknownToggle.isChecked =  persistentState.getBlockUnknownConnections()
+        udpBlockToggle.isChecked = persistentState.udpBlockedSettings
+        unknownToggle.isChecked =  persistentState.blockUnknownConnections
 
         firewallAllAppsToggle.setOnCheckedChangeListener { _, b ->
             persistentState.setFirewallModeForScreenState(b)
@@ -204,20 +202,20 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
         }
 
         unknownToggle.setOnCheckedChangeListener{ compoundButton: CompoundButton, b: Boolean ->
-            persistentState.setBlockUnknownConnections(b)
+            persistentState.blockUnknownConnections = b
         }
 
         unknownToggleText.setOnClickListener {
-            persistentState.setBlockUnknownConnections(!unknownToggle.isChecked)
+            persistentState.blockUnknownConnections = !unknownToggle.isChecked
             unknownToggle.isChecked = !unknownToggle.isChecked
         }
 
         udpBlockToggle.setOnCheckedChangeListener{ compoundButton: CompoundButton, b: Boolean ->
-            persistentState.setUDPBlockedSettings(b)
+            persistentState.udpBlockedSettings = b
         }
 
         udpBlockToggleText.setOnClickListener{
-            persistentState.setUDPBlockedSettings(!udpBlockToggle.isChecked)
+            persistentState.udpBlockedSettings = !udpBlockToggle.isChecked
             udpBlockToggle.isChecked = !udpBlockToggle.isChecked
         }
 
@@ -233,21 +231,21 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
                     if(!Utilities.isAccessibilityServiceEnabled(requireContext(), BackgroundAccessibilityService::class.java)){
                         if (!showAlertForPermission(true)) {
                             backgroundModeToggle.isChecked = false
-                            persistentState.setBackgroundEnabled(false)
+                            persistentState.setIsBackgroundEnabled(false)
                         }
                     }
                     GlobalVariable.isBackgroundEnabled = !checkedVal
-                    persistentState.setBackgroundEnabled(!checkedVal)
+                    persistentState.setIsBackgroundEnabled(!checkedVal)
                     backgroundModeToggle.isChecked = !checkedVal
                 } else {
                     if (!showAlertForPermission(false)) {
                         backgroundModeToggle.isChecked = false
-                        persistentState.setBackgroundEnabled(false)
+                        persistentState.setIsBackgroundEnabled(false)
                     }
                 }
             }else{
                 backgroundModeToggle.isChecked = false
-                persistentState.setBackgroundEnabled(false)
+                persistentState.setIsBackgroundEnabled(false)
             }
         }
 
@@ -260,21 +258,21 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
                     if(!Utilities.isAccessibilityServiceEnabled(requireContext(), BackgroundAccessibilityService::class.java)){
                         if (!showAlertForPermission(true)) {
                             backgroundModeToggle.isChecked = false
-                            persistentState.setBackgroundEnabled(false)
+                            persistentState.setIsBackgroundEnabled(false)
                         }
                     }
                     GlobalVariable.isBackgroundEnabled = !checkedVal
-                    persistentState.setBackgroundEnabled(!checkedVal)
+                    persistentState.setIsBackgroundEnabled(!checkedVal)
                     backgroundModeToggle.isChecked = !checkedVal
                 } else {
                     if (!showAlertForPermission(false)) {
                         backgroundModeToggle.isChecked = false
-                        persistentState.setBackgroundEnabled(false)
+                        persistentState.setIsBackgroundEnabled(false)
                     }
                 }
             } else {
                 backgroundModeToggle.isChecked = false
-                persistentState.setBackgroundEnabled(false)
+                persistentState.setIsBackgroundEnabled(false)
             }
         }
 
@@ -370,13 +368,13 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
 
     override fun onResume() {
         super.onResume()
-        unknownToggle.isChecked =  persistentState.getBlockUnknownConnections()
+        unknownToggle.isChecked =  persistentState.blockUnknownConnections
         if (Utilities.isAccessibilityServiceEnabledEnhanced(requireContext(), BackgroundAccessibilityService::class.java)) {
             if (DEBUG) Log.d(LOG_TAG, "Background - onLoad accessibility is true")
-            backgroundModeToggle.isChecked = persistentState.getBackgroundEnabled()
+            backgroundModeToggle.isChecked = persistentState.backgroundEnabled
         } else {
             if (DEBUG) Log.d(LOG_TAG, "Background - onLoad accessibility is true, changed pref")
-            persistentState.setBackgroundEnabled(false)
+            persistentState.setIsBackgroundEnabled(false)
             backgroundModeToggle.isChecked = false
         }
     }

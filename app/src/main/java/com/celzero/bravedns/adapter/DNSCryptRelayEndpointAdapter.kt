@@ -34,7 +34,6 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.DNSCryptEndpointRepository
 import com.celzero.bravedns.database.DNSCryptRelayEndpoint
 import com.celzero.bravedns.database.DNSCryptRelayEndpointRepository
@@ -249,8 +248,8 @@ class DNSCryptRelayEndpointAdapter(
                         notifyDataSetChanged()
                     }
                 }.start()
-                persistentState.setDNSType(2)
-                persistentState.setConnectionModeChange(dnsCryptRelayEndpoint.dnsCryptRelayURL)
+                persistentState.dnsType = 2
+                persistentState.connectionModeChange = dnsCryptRelayEndpoint.dnsCryptRelayURL
                 //mDb.close()
                 return true
             } else {

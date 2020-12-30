@@ -47,7 +47,7 @@ class WelcomeActivity  : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (!persistentState.isFirstTimeLaunch()) {
+        if (!persistentState.firstTimeLaunch) {
             launchHomeScreen()
         }
 
@@ -130,7 +130,7 @@ class WelcomeActivity  : AppCompatActivity() {
     }
 
     private fun launchHomeScreen() {
-        persistentState.setFirstTimeLaunch(false)
+        persistentState.firstTimeLaunch = false
         startActivity(Intent(this, HomeScreenActivity::class.java))
         finish()
     }

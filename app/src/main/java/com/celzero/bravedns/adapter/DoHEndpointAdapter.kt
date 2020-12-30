@@ -33,7 +33,6 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.database.DoHEndpointRepository
 import com.celzero.bravedns.service.PersistentState
@@ -110,7 +109,7 @@ class DoHEndpointAdapter(private val context: Context,
                     urlExplanationTxt.text = "Connected."
                     Log.d(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}")
                     if(doHEndpoint.dohName == RETHINK_DNS_PLUS){
-                        val count = persistentState.getNumberOfRemoteBlockLists()
+                        val count = persistentState.numberOfRemoteBlocklists
                         Log.d(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}, count- $count")
                         if (count != 0) {
                             urlExplanationTxt.text = "Connected. $count blocklists in-use."
@@ -288,8 +287,8 @@ class DoHEndpointAdapter(private val context: Context,
 
                 override fun onFinish() {
                     notifyDataSetChanged()
-                    persistentState.setDNSType(1)
-                    persistentState.setConnectionModeChange(doHEndpoint.dohURL)
+                    persistentState.dnsType = 1
+                    persistentState.connectionModeChange = doHEndpoint.dohURL
                     queryTracker.reinitializeQuantileEstimator()
                 }
             }.start()

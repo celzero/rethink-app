@@ -26,12 +26,10 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ConnectionTrackerAdapter
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
@@ -88,7 +86,7 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
         searchLayoutLL = includeView.findViewById(R.id.connection_card_view_top)
         disabledLogsTextView = includeView.findViewById(R.id.connection_list_logs_disabled_tv)
 
-        if(persistentState.isLogsEnabled()){
+        if(persistentState.logsEnabled){
             disabledLogsTextView.visibility = View.GONE
             searchLayoutLL.visibility = View.VISIBLE
 

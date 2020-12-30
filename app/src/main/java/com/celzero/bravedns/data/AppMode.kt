@@ -46,9 +46,9 @@ class AppMode internal constructor(
 
     fun getDNSMode(): Long {
         if (appDNSMode == -1L) {
-            val dnsType = persistentState.getDNSType()
+            val dnsType = persistentState.dnsType
             if (dnsType == 1) {
-                if (persistentState.getAllDNSTraffic()) {
+                if (persistentState.allowDNSTraffic) {
                     appDNSMode = Settings.DNSModePort
                 } else {
                     appDNSMode = Settings.DNSModeIP
@@ -64,7 +64,7 @@ class AppMode internal constructor(
 
     fun getFirewallMode(): Long {
         if (appFirewallMode == -1L) {
-            return persistentState.getFirewallMode().toLong()
+            return persistentState.firewallMode.toLong()
         } else {
             return appFirewallMode
         }
@@ -72,24 +72,24 @@ class AppMode internal constructor(
 
     fun setFirewallMode(fMode: Long) {
         appFirewallMode = fMode
-        persistentState.setFirewallMode(fMode.toInt())
+        persistentState.firewallMode = fMode.toInt()
     }
 
     fun getProxyMode(): Long {
         if (appProxyMode == -1L) {
-            return persistentState.getProxyMode()
+            return persistentState.proxyMode
         }
         return appProxyMode
     }
 
     fun setProxyMode(proxyMode: Long) {
         appProxyMode = proxyMode
-        persistentState.setProxyMode(proxyMode)
+        persistentState.proxyMode = proxyMode
     }
 
     fun getDNSType(): Int {
         if (dnsType == -1) {
-            return persistentState.getDNSType()
+            return persistentState.dnsType
         }
         return dnsType
     }
@@ -200,8 +200,8 @@ class AppMode internal constructor(
     }
 
     fun getBraveDNS(): BraveDNS?{
-        if(braveDNS == null && persistentState.isLocalBlockListEnabled()
-            && persistentState.isBlockListFilesDownloaded() && !persistentState.getLocalBlockListStamp().isNullOrEmpty()){
+        if(braveDNS == null && persistentState.localBlocklistEnabled
+            && persistentState.blockListFilesDownloaded && !persistentState.getLocalBlockListStamp().isNullOrEmpty()){
             val path: String = context.filesDir.canonicalPath
             if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "Local brave dns set call from AppMode")
             braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
