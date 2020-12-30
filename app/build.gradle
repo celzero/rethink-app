@@ -143,4 +143,6 @@ dependencies {
     implementation "org.koin:koin-androidx-viewmodel:$koin_version"
     // Koin AndroidX Fragment features
     implementation "org.koin:koin-androidx-fragment:$koin_version"
+
+    implementation 'hu.autsoft:krate:1.0.0'
 }

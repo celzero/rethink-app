@@ -382,7 +382,7 @@ public class GoVpnAdapter {
                     dnsCryptEndpointRepository.updateFailingConnections();
                     Utilities.Companion.showToastInMidLayout(vpnService,"Error connecting to DNSCrypt server.", Toast.LENGTH_SHORT);
                     DoHEndpoint doHEndpoint = doHEndpointRepository.updateConnectionDefault();
-                    persistentState.setDNSType(1);
+                    persistentState.setDnsType(1);
                     persistentState.setConnectionModeChange(doHEndpoint.getDohURL());
                     AppMode appMode = HomeScreenActivity.GlobalVariable.INSTANCE.getAppMode();
                     appMode.setDNSMode(Settings.DNSModePort);
@@ -397,7 +397,7 @@ public class GoVpnAdapter {
                 Log.e(LOG_TAG, "GoVPNAdapter celzero connect-tunnel: dns crypt", e);
                 dnsCryptEndpointRepository.updateFailingConnections();
                 DoHEndpoint doHEndpoint = doHEndpointRepository.updateConnectionDefault();
-                persistentState.setDNSType(1);
+                persistentState.setDnsType(1);
                 persistentState.setConnectionModeChange(doHEndpoint.getDohURL());
                 AppMode appMode = HomeScreenActivity.GlobalVariable.INSTANCE.getAppMode();
                 if(appMode != null) {
@@ -590,7 +590,7 @@ public class GoVpnAdapter {
     private void setBraveDNSRemoteMode(String dohURL) {
         if (dohURL.contains(Constants.BRAVE_BASIC_URL)) {
             try {
-                if(persistentState.isRemoteBraveDNSDownloaded()) {
+                if(persistentState.getRemoteBraveDNSDownloaded()) {
                     String path = vpnService.getFilesDir().getCanonicalPath();
                     BraveDNS braveDNS = Dnsx.newBraveDNSRemote(path + Constants.FILE_TAG_NAME);
                     if (HomeScreenActivity.GlobalVariable.INSTANCE.getDEBUG())
@@ -605,7 +605,7 @@ public class GoVpnAdapter {
 
     private Boolean setBraveDNSLocalMode() {
         AppMode appMode = HomeScreenActivity.GlobalVariable.INSTANCE.getAppMode();
-        if (persistentState.isBlockListFilesDownloaded() && persistentState.isLocalBlockListEnabled()) {
+        if (persistentState.getBlockListFilesDownloaded() && persistentState.getLocalBlocklistEnabled()) {
             try {
                 if(appMode.getBraveDNS() != null) {
                     String stamp = persistentState.getLocalBlockListStamp();

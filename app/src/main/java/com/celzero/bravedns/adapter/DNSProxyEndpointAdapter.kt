@@ -34,7 +34,6 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.DNSProxyEndpoint
 import com.celzero.bravedns.database.DNSProxyEndpointRepository
 import com.celzero.bravedns.service.PersistentState
@@ -287,9 +286,9 @@ class DNSProxyEndpointAdapter(private val context: Context,
                 HomeScreenActivity.GlobalVariable.appMode?.setDNSMode(Settings.DNSModeProxyIP)
             }
             listener.updateUIFromAdapter(3)
-            persistentState.setDNSType(3)
-            persistentState.setConnectionModeChange(dnsProxyEndpoint.proxyIP!!)
-            persistentState.setDNSProxyIDChange(dnsProxyEndpoint.id)
+            persistentState.dnsType = 3
+            persistentState.connectionModeChange = dnsProxyEndpoint.proxyIP!!
+            persistentState.dnsProxyIDChange = dnsProxyEndpoint.id
             //mDb.close()
         }
     }

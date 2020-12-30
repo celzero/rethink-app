@@ -244,7 +244,7 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
     private fun observersForUI() {
         categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, Observer {
             titleList = it.toMutableList()
-        }
+        })
 
         firewallAppInfoViewModel.firewallAppDetailsList.observe(viewLifecycleOwner) { itAppInfo ->
             isSearchEnabled = false

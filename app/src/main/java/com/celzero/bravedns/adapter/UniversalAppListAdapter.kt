@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.os.Handler
 import android.os.Looper
-import android.os.Message
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -38,7 +37,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.CategoryInfoRepository
@@ -174,7 +172,7 @@ class UniversalAppListAdapter(
                     if (status) {
                         appUIDList.forEach {
                             HomeScreenActivity.GlobalVariable.appList[it.packageInfo]!!.isInternetAllowed = status
-                            persistentState.setExcludedPackagesWifi(it.packageInfo, status)
+                            persistentState.modifyAllowedWifi(it.packageInfo, status)
                             FirewallManager.updateAppInternetPermission(it.packageInfo, status)
                             FirewallManager.updateAppInternetPermissionByUID(it.uid, status)
                         }
