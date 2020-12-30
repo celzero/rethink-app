@@ -26,12 +26,14 @@ import android.util.Log
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import org.koin.android.ext.android.inject
 import java.util.*
 
 class DeviceLockService  : Service(){
 
     private val timer = Timer()
     private var checkLockTask: CheckLockTask? = null
+    private val persistentState by inject<PersistentState>()
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
@@ -64,9 +66,9 @@ class DeviceLockService  : Service(){
             this.stopSelf()
         } else {
             if (isProtected && isLocked) {
-                if (PersistentState.getFirewallModeForScreenState(this) && !PersistentState.getScreenLockData(this)) {
+                if (persistentState.getFirewallModeForScreenState() && !persistentState.getScreenLockData()) {
                     if(DEBUG) Log.d(LOG_TAG,"DeviceLockService : Screen lock detected at $delayIndex")
-                    PersistentState.setScreenLockData(this, true)
+                    persistentState.setScreenLockData(true)
                     checkLockTask?.cancel()
                     timer.cancel()
                     this.stopSelf()

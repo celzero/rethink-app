@@ -30,6 +30,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppDatabase
+import com.celzero.bravedns.database.AppInfoRepository
+import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
@@ -41,7 +43,11 @@ import kotlinx.android.synthetic.main.custom_dialog_layout.*
 import java.util.stream.Collectors
 
 
-class WhitelistAppDialog(var activity: Context, internal var adapter: RecyclerView.Adapter<*>, var viewModel: AppListViewModel) : Dialog(activity),
+class WhitelistAppDialog(private var activity: Context,
+                         private val appInfoRepository: AppInfoRepository,
+                         private val categoryInfoRepository: CategoryInfoRepository,
+                         internal var adapter: RecyclerView.Adapter<*>,
+                         var viewModel: AppListViewModel) : Dialog(activity),
     View.OnClickListener, SearchView.OnQueryTextListener {
     var dialog: Dialog? = null
 
@@ -91,8 +97,6 @@ class WhitelistAppDialog(var activity: Context, internal var adapter: RecyclerVi
             false
         }
 
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val appInfoRepository = mDb.appInfoRepository()
         val appCount = appList.size
         val act : FirewallActivity = activity as FirewallActivity
         appInfoRepository.getWhitelistCountLiveData().observe(act, {
@@ -122,9 +126,6 @@ class WhitelistAppDialog(var activity: Context, internal var adapter: RecyclerVi
 
 
     private fun modifyAppsInUniversalAppList(checked: Boolean) {
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val appInfoRepository = mDb.appInfoRepository()
-        val categoryInfoRepository = mDb.categoryInfoRepository()
         if(filterCategories.isNullOrEmpty()){
             appInfoRepository.updateWhiteListForAllApp(checked)
             val categoryList = appInfoRepository.getAppCategoryList()
@@ -148,8 +149,6 @@ class WhitelistAppDialog(var activity: Context, internal var adapter: RecyclerVi
 
 
     private fun categoryListByAppNameFromDB(name : String){
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val appInfoRepository = mDb.appInfoRepository()
         category = appInfoRepository.getAppCategoryForAppName("%$name%")
         Log.d(LOG_TAG,"Category - ${category.size}")
         setCategoryChips(category)

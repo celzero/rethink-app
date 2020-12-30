@@ -39,6 +39,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoRepository
+import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.ThrowingHandler
@@ -46,13 +47,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class ExcludedAppListAdapter(val context: Context) : PagedListAdapter<AppInfo, ExcludedAppListAdapter.ExcludedAppInfoViewHolder>(DIFF_CALLBACK) {
-    var mDb: AppDatabase = AppDatabase.invoke(context.applicationContext)
-    var appInfoRepository: AppInfoRepository
-
-    init {
-        appInfoRepository = mDb.appInfoRepository()
-    }
+class ExcludedAppListAdapter(
+    private val context: Context,
+    private val appInfoRepository: AppInfoRepository,
+    private val categoryInfoRepository: CategoryInfoRepository
+) : PagedListAdapter<AppInfo, ExcludedAppListAdapter.ExcludedAppInfoViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK = object :
@@ -144,7 +143,6 @@ class ExcludedAppListAdapter(val context: Context) : PagedListAdapter<AppInfo, E
                 checkBox.isChecked = status
                 GlobalScope.launch(Dispatchers.IO) {
                     appInfoRepository.updateExcludedList(appInfo.uid, status)
-                    val categoryInfoRepository = mDb.categoryInfoRepository()
                     val count = appInfoRepository.getBlockedCountForCategory(appInfo.appCategory)
                     val excludedCount = appInfoRepository.getExcludedAppCountForCategory(appInfo.appCategory)
                     val whitelistCount = appInfoRepository.getBlockedCountForCategory(appInfo.appCategory)

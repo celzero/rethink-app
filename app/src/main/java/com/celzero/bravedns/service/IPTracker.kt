@@ -20,13 +20,14 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
 import com.celzero.bravedns.data.IPDetails
-import com.celzero.bravedns.database.AppDatabase
+import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.ConnectionTracker
+import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.FileSystemUID
-import com.celzero.bravedns.util.RefreshDatabase
+import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
 import com.celzero.bravedns.util.Utilities.Companion.getFlag
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +37,12 @@ import java.net.InetAddress
 import java.net.UnknownHostException
 import java.util.*
 
-class IPTracker(var context: Context?) {
+class IPTracker internal constructor(
+    private val appInfoRepository: AppInfoRepository,
+    private val connectionTrackerRepository: ConnectionTrackerRepository,
+    private val refreshDatabase: RefreshDatabase,
+    private val context: Context
+) {
 
     private val HISTORY_SIZE = 10000
 
@@ -50,9 +56,9 @@ class IPTracker(var context: Context?) {
     }
 
 
-    @Synchronized fun recordTransaction(context: Context?, ipDetails: IPDetails?) {
-        if (context != null && ipDetails != null) {
-            insertToDB(context, ipDetails)
+    @Synchronized fun recordTransaction(ipDetails: IPDetails?) {
+        if (ipDetails != null) {
+            insertToDB(ipDetails)
         }
         //recentIPActivity.add(ipDetails.timeStamp)
         //if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG,"Record Transaction")
@@ -80,11 +86,8 @@ class IPTracker(var context: Context?) {
         }*/
     }
 
-    private fun insertToDB(context: Context, ipDetails: IPDetails) {
+    private fun insertToDB(ipDetails: IPDetails) {
         GlobalScope.launch(Dispatchers.IO) {
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val appInfoRepository = mDb.appInfoRepository()
-            val connTrackRepository = mDb.connectionTrackerRepository()
             //var connTrackerList: MutableList<ConnectionTracker> = ArrayList()
             //ipDetailsList.forEach { ipDetails ->
             val connTracker = ConnectionTracker()
@@ -137,18 +140,17 @@ class IPTracker(var context: Context?) {
                     connTracker.appName = "Unknown"
                 } else if (fileSystemUID.uid == -1) {
                     connTracker.appName = "Unnamed(${ipDetails.uid})"
-                    insertNonAppToAppInfo(context, ipDetails.uid, connTracker.appName.toString())
+                    insertNonAppToAppInfo(ipDetails.uid, connTracker.appName.toString())
                 } else {
                     connTracker.appName = fileSystemUID.name
-                    insertNonAppToAppInfo(context, ipDetails.uid, connTracker.appName.toString())
+                    insertNonAppToAppInfo(ipDetails.uid, connTracker.appName.toString())
                 }
             }
-            connTrackRepository.insertAsync(connTracker)
+            connectionTrackerRepository.insertAsync(connTracker)
         }
     }
 
-    private fun insertNonAppToAppInfo(context: Context, uid: Int, appName: String) {
-        val refreshDatabase = RefreshDatabase(context)
+    private fun insertNonAppToAppInfo(uid: Int, appName: String) {
         refreshDatabase.insertNonAppToAppInfo(uid, appName)
     }
 }

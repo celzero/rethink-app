@@ -55,6 +55,10 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        leakCanary {
+            matchingFallbacks = ['debug']
+            initWith buildTypes.debug
+        }
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8
@@ -68,6 +72,7 @@ android {
 }
 
 dependencies {
+    def koin_version = '2.2.2'
     def room_version = "2.2.6"
     def paging_version = "2.1.2"
 
@@ -128,4 +133,14 @@ dependencies {
     //Swipe button animation
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
 
+    leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.6'
+
+    // Koin dependency injection
+    implementation "org.koin:koin-android:$koin_version"
+    // Koin AndroidX Scope features
+    implementation "org.koin:koin-androidx-scope:$koin_version"
+    // Koin AndroidX ViewModel features
+    implementation "org.koin:koin-androidx-viewmodel:$koin_version"
+    // Koin AndroidX Fragment features
+    implementation "org.koin:koin-androidx-fragment:$koin_version"
 }

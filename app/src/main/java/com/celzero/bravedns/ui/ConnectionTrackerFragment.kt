@@ -32,13 +32,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ConnectionTrackerAdapter
 import com.celzero.bravedns.database.AppDatabase
+import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
  * Connection Tracker - Network Monitor.
@@ -56,9 +58,12 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
     private lateinit var deleteIcon: ImageView
     private lateinit var disabledLogsTextView: TextView
     private var recyclerAdapter: ConnectionTrackerAdapter? = null
-    private val viewModel: ConnectionTrackerViewModel by viewModels()
+    private val viewModel: ConnectionTrackerViewModel by viewModel()
     private var filterValue: String = ""
     private var checkedItem = 1
+
+    private val connectionTrackerDAO by inject<ConnectionTrackerDAO>()
+    private val persistentState by inject<PersistentState>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreate(savedInstanceState)
@@ -83,15 +88,13 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
         searchLayoutLL = includeView.findViewById(R.id.connection_card_view_top)
         disabledLogsTextView = includeView.findViewById(R.id.connection_list_logs_disabled_tv)
 
-        if(PersistentState.isLogsEnabled(requireContext())){
+        if(persistentState.isLogsEnabled()){
             disabledLogsTextView.visibility = View.GONE
             searchLayoutLL.visibility = View.VISIBLE
 
             recyclerView!!.setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
             recyclerView!!.layoutManager = layoutManager
-
-            ConnectionTrackerViewModel.setContext(requireContext())
 
             recyclerAdapter = ConnectionTrackerAdapter(requireContext())
             viewModel.connectionTrackerList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(recyclerAdapter!!::submitList))
@@ -165,8 +168,6 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
         //performing positive action
         builder.setPositiveButton("Delete logs") { _, _ ->
             GlobalScope.launch(Dispatchers.IO) {
-                val mDb = AppDatabase.invoke(requireContext().applicationContext)
-                val connectionTrackerDAO = mDb.connectionTrackerDAO()
                 connectionTrackerDAO.clearAllData()
             }
         }

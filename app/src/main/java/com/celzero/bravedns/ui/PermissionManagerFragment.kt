@@ -32,10 +32,12 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.Apk
 import com.celzero.bravedns.adapter.ApkListAdapter
 import com.celzero.bravedns.database.AppDatabase
+import com.celzero.bravedns.database.AppInfoRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
 
 class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener{
     private val apkList = ArrayList<Apk>()
@@ -49,6 +51,8 @@ class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener{
     private var editsearch: SearchView? = null
 
     private lateinit var filterIcon : ImageView
+
+    private val appInfoRepository by inject<AppInfoRepository>()
 
 
     override fun onCreateView(
@@ -96,8 +100,6 @@ class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener{
     }
 
     private fun updateAppList() = GlobalScope.launch ( Dispatchers.Default ){
-            val mDb = AppDatabase.invoke(contextVal.applicationContext)
-            val appInfoRepository = mDb.appInfoRepository()
             val appList = appInfoRepository.getAppInfoAsync()
             //Log.w("DB","App list from DB Size: "+appList.size)
             appList.forEach{

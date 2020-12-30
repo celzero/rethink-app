@@ -20,6 +20,7 @@ import android.util.Log
 import com.celzero.bravedns.data.ConnectionRules
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.BlockedConnections
+import com.celzero.bravedns.database.BlockedConnectionsRepository
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.firewallRules
@@ -27,6 +28,7 @@ import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.koin.java.KoinJavaComponent.get
 
 class FirewallRules {
 
@@ -43,20 +45,16 @@ class FirewallRules {
 
     }
 
-    fun clearFirewallRules(uid : Int, context: Context) {
+    fun clearFirewallRules(uid : Int, blockedConnectionsRepository:BlockedConnectionsRepository) {
         GlobalScope.launch(Dispatchers.IO) {
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val blockedConnectionsRepository = mDb.blockedConnectionRepository()
             blockedConnectionsRepository.clearFirewallRules(uid)
         }
         firewallRules.removeAll(uid)
     }
 
-    fun removeFirewallRules(uid: Int, ipAddress: String, ruleType: String, context: Context) {
+    fun removeFirewallRules(uid: Int, ipAddress: String, ruleType: String, blockedConnectionsRepository:BlockedConnectionsRepository) {
         if(DEBUG) Log.d(LOG_TAG,"Remove Firewall: $uid, $ipAddress")
         GlobalScope.launch(Dispatchers.IO) {
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val blockedConnectionsRepository = mDb.blockedConnectionRepository()
             //val blockedConnection = constructBlockedConnections(uid, ipAddress,ruleType)
             if(uid == ConnTrackerBottomSheetFragment.UNIVERSAL_RULES_UID)
                 blockedConnectionsRepository.deleteIPRulesUniversal(ipAddress)
@@ -67,11 +65,9 @@ class FirewallRules {
         firewallRules.remove(uid, ipAddress)
     }
 
-    fun addFirewallRules(uid: Int, ipAddress: String, ruleType: String, context: Context) {
+    fun addFirewallRules(uid: Int, ipAddress: String, ruleType: String, blockedConnectionsRepository:BlockedConnectionsRepository) {
         if(DEBUG) Log.d(LOG_TAG,"addFirewallRules: $uid, $ipAddress")
         GlobalScope.launch(Dispatchers.IO) {
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val blockedConnectionsRepository = mDb.blockedConnectionRepository()
             val blockedConnection = constructBlockedConnections(uid, ipAddress,ruleType)
             blockedConnectionsRepository.insertAsync(blockedConnection)
             //mDb.close()
@@ -108,10 +104,8 @@ class FirewallRules {
     }
 
 
-    fun loadFirewallRules(context: Context) {
+    fun loadFirewallRules(blockedConnectionsRepository:BlockedConnectionsRepository) {
         GlobalScope.launch(Dispatchers.IO) {
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val blockedConnectionsRepository = mDb.blockedConnectionRepository()
             val dbVal = blockedConnectionsRepository.getBlockedConnections()
             dbVal.forEach {
                 val key = it.uid
