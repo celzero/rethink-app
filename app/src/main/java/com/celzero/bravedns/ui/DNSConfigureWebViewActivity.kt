@@ -93,9 +93,10 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
             setWebClient()
             if (stamp != null && stamp!!.isNotEmpty()) {
                 if(receivedIntentFrom == LOCAL) {
-                    url = Constants.CONFIGURE_BLOCKLIST_URL + persistentState.localBlockListDownloadTime+ "#" + stamp
+                    url = Constants.CONFIGURE_BLOCKLIST_URL_LOCAL + persistentState.localBlockListDownloadTime + "#" + stamp
                 }else{
-                    url = Constants.CONFIGURE_BLOCKLIST_URL + persistentState.remoteBlockListDownloadTime+ "#" + stamp
+                    url = Constants.CONFIGURE_BLOCKLIST_URL_REMOTE + persistentState.remoteBlockListDownloadTime + "#" + stamp
+                    checkForDownload()
                 }
             }
             Log.d(LOG_TAG, "Webview:  - url - $url")
