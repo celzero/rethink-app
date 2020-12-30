@@ -146,8 +146,12 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
             override fun onTick(millisUntilFinished: Long) {}
 
             override fun onFinish() {
-                refreshListImageView.clearAnimation()
-                Utilities.showToastInMidLayout(requireContext(),getString(R.string.refresh_complete), Toast.LENGTH_SHORT)
+                if(isAdded) {
+                    refreshListImageView.clearAnimation()
+                    if(RethinkDNSApplication.context != null) {
+                        Utilities.showToastInMidLayout(RethinkDNSApplication.context!!, getString(R.string.refresh_complete), Toast.LENGTH_SHORT)
+                    }
+                }
             }
         }.start()
         refreshDatabase.refreshAppInfoDatabase()

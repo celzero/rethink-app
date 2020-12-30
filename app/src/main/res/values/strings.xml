@@ -385,9 +385,7 @@
     <string name="always_on_dialog_positive_btn">Go to Settings</string>
     <string name="always_on_dialog_negative_btn">Cancel</string>
 
-    <string name="settings_allow_bypass_desc">Allow requesting apps to bypass RethinkDNS firewall on-demand. Some audio/video conference apps like Zoom and WhatsApp may require an on-demand bypass to function properly.</string>
-    <string name="settings_allow_bypass_lockdown_desc">"Disabled. Settings->VPN->Block connections without VPN" is enabled for RethinkDNS, enabling the feature will block the internet connection of the apps which are trying to bypass the VPN.</string>
-    <string name="settings_lock_down_mode_desc">Cannot exclude apps or allow bypass because VPN is running in lockdown mode.</string>
+
 
     <string name="system_apps_warning">Some system apps are critical to proper functioning of a device. Block them only if you know what you are doing.</string>
     <string name="system_components_warning">Some system components are critical to proper functioning of a device. Block them only if you know what you are doing.</string>
@@ -573,5 +571,52 @@
         Universal Firewall:\n\n
         \u00092021. "Block any app not in use" now with better heurisitcs and so should behave in less surprising ways and be more out-of-the-way.
     </string>
+
+    <!-- DNS Log Fragment string -->
+    <string name="dns_log_latency">Latency: </string>
+    <string name="dns_log_lifetime_queries">Lifetime Queries: </string>
+
+
+    <!-- Settings Fragment strings -->
+    <string name="settings_firewall_header">Firewall</string>
+    <string name="settings_kill_app_heading">Kill app when firewalled (experimental)</string>
+    <string name="settings_kill_app_desc">Some stubborn apps persistently try to connect to the internet even when firewalled. Enable this setting to kill such apps.</string>
+
+    <string name="settings_dns_header">DNS</string>
+    <string name="settings_local_blocklist_heading">Enable on-device blocklists</string>
+    <string name="settings_local_blocklist_desc_1">Choose from 170+ blocklists.</string>
+    <string name="settings_local_blocklist_configure">configure</string>
+    <string name="settings_local_blocklist_update">Update</string>
+    <string name="settings_local_blocklist_check_time">last check for update: 10 mins ago</string>
+
+    <string name="settings_vpn_header">VPN</string>
+    <string name="settings_exclude_app_heading">Exclude apps from Firewall and DNS</string>
+    <string name="settings_exclude_app_desc">Connections from excluded apps will not monitored or blocked.</string>
+
+    <string name="settings_allow_bypass_heading">Allow Bypass</string>
+    <string name="settings_allow_bypass_desc">Allow requesting apps to bypass RethinkDNS firewall on-demand. Some audio/video conference apps like Zoom and WhatsApp may require an on-demand bypass to function properly.</string>
+    <string name="settings_allow_bypass_lockdown_desc">"Disabled. Settings->VPN->Block connections without VPN" is enabled for RethinkDNS, enabling the feature will block the internet connection of the apps which are trying to bypass the VPN.</string>
+    <string name="settings_lock_down_mode_desc">Cannot exclude apps or allow bypass because VPN is running in lockdown mode.</string>
+
+    <string name="settings_proxy_header">Proxy (experimental)</string>
+    <string name="settings_socks5_heading">Setup SOCKS5 (TCP) Proxy</string>
+    <string name="settings_socks5_desc">Forward connections to SOCKS5 endpoint.</string>
+    <string name="settings_https_heading">Setup HTTP(S) Proxy</string>
+    <string name="settings_https_desc">This setting is only a recommendation and it is possible that apps will ignore it.</string>
+
+    <string name="settings_general_header">General</string>
+    <string name="settings_refresh_heading">Refresh Data</string>
+    <string name="settings_refresh_desc">Re-sync application list.</string>
+    <string name="settings_autostart_bootup_heading">Auto-start on bootup (experimental)</string>
+    <string name="settings_autostart_bootup_desc">Start RethinkDNS if it was running before device bootup.</string>
+
+    <!-- FirewallAppFragment -->
+    <string name="apps_icon_content_desc">Application Icon</string>
+
+    <!--Connection tracker bottom sheet -->
+    <string name="ct_bs_rule_1">Rule #1</string>
+    <string name="ct_bs_rule_2">Rule #2</string>
+
+
 
 </resources>

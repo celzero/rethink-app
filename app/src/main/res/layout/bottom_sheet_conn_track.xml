@@ -52,6 +52,7 @@
             android:layout_centerVertical="true"
             android:layout_gravity="center"
             android:layout_marginEnd="10dp"
+            android:contentDescription="@string/apps_icon_content_desc"
             android:src="@drawable/ic_launcher_foreground" />
 
         <TextView
@@ -84,8 +85,7 @@
             android:minWidth="35dp"
             android:singleLine="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            android:textSize="26sp"
-            tools:text="" />
+            android:textSize="26sp" />
 
         <TextView
             android:id="@+id/bs_conn_connection_type_heading"
@@ -97,7 +97,6 @@
             android:layout_toEndOf="@id/bs_conn_connection_flag"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:text="1.1.1.1"
             android:textIsSelectable="true"
             android:textSize="@dimen/heading_font_text_view" />
 
@@ -170,7 +169,7 @@
         android:background="@drawable/drawable_purple_gradient"
         android:gravity="start"
         android:padding="7dp"
-        android:text="Rule #1"
+        android:text="@string/ct_bs_rule_1"
         android:textColor="@color/textColorMain"
         android:textSize="@dimen/default_font_text_view" />
 
@@ -213,48 +212,6 @@
         android:textSize="@dimen/default_font_text_view"
         android:visibility="gone" />
 
-
-    <!--<TextView
-        style="@style/ActionItem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/drawable_purple_gradient"
-        android:gravity="start"
-        android:padding="7dp"
-        android:text="Rule #2"
-        android:textColor="@color/textColorMain"
-        android:textSize="14sp" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="2dp"
-        android:layout_marginRight="2dp"
-        android:layout_marginBottom="20dp"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp">
-
-        <TextView
-            android:id="@+id/bs_conn_block_conn_app_txt"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.9"
-            android:padding="5dp"
-            android:text="@string/bsct_block_app"
-            android:textColor="@color/primaryText"
-            android:textSize="@dimen/sub_heading" />
-
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/bs_conn_block_conn_app_switch"
-            style="@style/SwitchCompat_theme"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp" />
-
-    </LinearLayout>-->
-
     <TextView
         style="@style/ActionItem"
         android:layout_width="wrap_content"
@@ -265,7 +222,7 @@
         android:background="@drawable/drawable_purple_gradient"
         android:gravity="start"
         android:padding="7dp"
-        android:text="Rule #2"
+        android:text="@string/ct_bs_rule_2"
         android:textColor="@color/textColorMain"
         android:textSize="@dimen/default_font_text_view" />
 

@@ -59,7 +59,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
     private lateinit var progressBar: ProgressBar
     private val MAX_PROGRESS = 100
     private var stamp : String? = ""
-    private var url : String = Constants.CONFIGURE_BLOCKLIST_URL //"https://bravedns.com/configure?v=app"
+    private var url : String = Constants.CONFIGURE_BLOCKLIST_URL_REMOTE //"https://bravedns.com/configure?v=app"
     private var receivedStamp : String = ""
     private var blockListsCount : MutableLiveData<Int> = MutableLiveData()
     private lateinit var context : Context
@@ -90,12 +90,13 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
             setWebClient()
             if (stamp != null && stamp!!.isNotEmpty()) {
                 if(receivedIntentFrom == LOCAL) {
-                    url = Constants.CONFIGURE_BLOCKLIST_URL + PersistentState.getLocalBlockListDownloadTime(this) + "#" + stamp
+                    url = Constants.CONFIGURE_BLOCKLIST_URL_LOCAL + PersistentState.getLocalBlockListDownloadTime(this) + "#" + stamp
                 }else{
-                    url = Constants.CONFIGURE_BLOCKLIST_URL + PersistentState.getRemoteBlockListDownloadTime(this) + "#" + stamp
+                    url = Constants.CONFIGURE_BLOCKLIST_URL_REMOTE + "#" + stamp
+                    checkForDownload()
                 }
             }
-            if (DEBUG) Log.d(LOG_TAG, "Webview:  - url - $url")
+            Log.d(LOG_TAG, "Webview:  - url - $url")
         }catch (e: Exception){
             Log.i(LOG_TAG, "Webview: Exception: ${e.message}", e)
             showDialogOnError(null)
@@ -113,7 +114,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
 
         if (DEBUG) Log.d(LOG_TAG, "Webview: Download remote file - filetag")
 
-        checkForDownload()
+
     }
 
     override fun onDestroy() {
@@ -489,7 +490,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
         val blockListTimeStamp = PersistentState.getRemoteBlockListDownloadTime(this)
         val appVersionCode = PersistentState.getAppVersion(this)
         val url = "${Constants.REFRESH_BLOCKLIST_URL}$blockListTimeStamp&${Constants.APPEND_VCODE}$appVersionCode"
-        if (DEBUG) Log.d(LOG_TAG, "Webview: Check for local download, url - $url")
+        Log.d(LOG_TAG, "Webview: Check for local download, url - $url")
         run(url)
     }
 
@@ -514,7 +515,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
                     val updateValue = jsonObject.getBoolean("update")
                     timeStamp = jsonObject.getLong("latest")
                     PersistentState.setRemoteBlockListDownloadTime(context, timeStamp)
-                    if (DEBUG) Log.d(LOG_TAG, "Webview: onResponse -  $updateValue, $timeStamp")
+                    Log.i(LOG_TAG, "Webview: onResponse for blocklist download -  $updateValue, $timeStamp")
                     if (updateValue) {
                         (context as Activity).runOnUiThread {
                             downloadBlockListFiles()

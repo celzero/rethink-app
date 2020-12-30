@@ -18,9 +18,9 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
-import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -499,7 +499,7 @@ class PersistentState {
 
         fun setSocks5Enabled(context: Context, isEnabled: Boolean) =
             getUserPreferences(context).edit {
-                putBoolean(KILL_APP_FIREWALL, isEnabled)
+                putBoolean(SOCKS5, isEnabled)
             }
 
         fun setConnectionModeChange(context: Context, url: String) =
