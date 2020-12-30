@@ -22,12 +22,9 @@ import android.content.Intent
 import android.net.VpnService
 import android.text.TextUtils
 import android.util.Log
-import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 class BraveAutoStartReceiver  : BroadcastReceiver() {
 
@@ -40,7 +37,7 @@ class BraveAutoStartReceiver  : BroadcastReceiver() {
             }
         }
         if (intent!!.action.equals(Intent.ACTION_BOOT_COMPLETED) || intent.action.equals(Intent.ACTION_REBOOT)) {
-            if (ReceiverHelper.persistentState.getPrefAutoStartBootUp() && ReceiverHelper.persistentState.getVpnEnabled() && !isAlwaysOnEnabled) {
+            if (ReceiverHelper.persistentState.prefAutoStartBootUp && ReceiverHelper.persistentState.vpnEnabled && !isAlwaysOnEnabled) {
                 val prepareVpnIntent: Intent? = try {
                     VpnService.prepare(context)
                 } catch (e: NullPointerException) {

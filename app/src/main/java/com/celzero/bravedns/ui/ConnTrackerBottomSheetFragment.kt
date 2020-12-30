@@ -222,7 +222,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
                 // no-op?
             } else {
                 if(DEBUG) Log.d(LOG_TAG,"setBlockUnknownConnections - ${switchBlockApp.isChecked} ")
-                persistentState.setBlockUnknownConnections(switchBlockApp.isChecked)
+                persistentState.blockUnknownConnections = switchBlockApp.isChecked
             }
         }
 
@@ -252,7 +252,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         if (ipDetails.appName != "Unknown") {
             switchBlockApp.isChecked = isAppBlocked
         }else{
-            switchBlockApp.isChecked = persistentState.getBlockUnknownConnections()
+            switchBlockApp.isChecked = persistentState.blockUnknownConnections
         }
 
         chipKillApp.setOnClickListener{
@@ -324,17 +324,12 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
                 switchBlockApp.isChecked = false
                 return
             }
-            blockAllApps = showDialog(appUIDList, ipDetails.appName!!, title, positiveText)
-        }
-        if (appUIDList.size <= 1 || blockAllApps) {
-            val uid = ipDetails.uid
-            CoroutineScope(Dispatchers.IO).launch {
-                appUIDList.forEach {
-                    PersistentState.setExcludedPackagesWifi(it.packageInfo, isBlocked, contextVal)
-                    FirewallManager.updateAppInternetPermission(it.packageInfo, isBlocked)
-                    FirewallManager.updateAppInternetPermissionByUID(it.uid, isBlocked)
-                    categoryInfoRepository.updateNumberOfBlocked(it.appCategory, !isBlocked)
-                    if(DEBUG) Log.d(LOG_TAG,"Category block executed with blocked as $isBlocked")
+            if (appUIDList.size > 1) {
+                var title = "Blocking \"${ipDetails.appName}\" will also block these ${appUIDList.size} other apps"
+                var positiveText = "Block ${appUIDList.size} apps"
+                if (isBlocked) {
+                    title = "Unblocking \"${ipDetails.appName}\" will also unblock these ${appUIDList.size} other apps"
+                    positiveText = "Unblock ${appUIDList.size} apps"
                 }
                 blockAllApps = showDialog(appUIDList, ipDetails.appName!!, title, positiveText)
             }
@@ -342,10 +337,9 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
                 val uid = ipDetails.uid
                 CoroutineScope(Dispatchers.IO).launch {
                     appUIDList.forEach {
-                        persistentState.setExcludedPackagesWifi(it.packageInfo, isBlocked)
+                        persistentState.modifyAllowedWifi(it.packageInfo, isBlocked)
                         FirewallManager.updateAppInternetPermission(it.packageInfo, isBlocked)
                         FirewallManager.updateAppInternetPermissionByUID(it.uid, isBlocked)
-                        val categoryInfoRepository = mDb.categoryInfoRepository()
                         categoryInfoRepository.updateNumberOfBlocked(it.appCategory, !isBlocked)
                         if (DEBUG) Log.d(LOG_TAG, "Category block executed with blocked as $isBlocked")
                     }

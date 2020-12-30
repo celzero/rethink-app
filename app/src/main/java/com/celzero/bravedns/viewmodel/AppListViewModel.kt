@@ -17,9 +17,11 @@ package com.celzero.bravedns.viewmodel
 
 import android.content.Context
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfo
@@ -34,8 +36,8 @@ class AppListViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         filteredList.value = ""
     }
 
-    var appDetailsList = Transformations.switchMap<String, PagedList<AppInfo>>(
-        filteredList, (Function<String, LiveData<PagedList<AppInfo>>> { input ->
+    var appDetailsList = Transformations.switchMap(
+        filteredList) { input:String ->
             if (input.isBlank()) {
                 appInfoDAO.getUnivAppDetailsLiveData().toLiveData(pageSize = 50)
             } else if (input == "isSystem") {
@@ -48,8 +50,7 @@ class AppListViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
             } else {
                 appInfoDAO.getUnivAppDetailsFilterLiveData("%$input%").toLiveData(pageSize = 50)
             }
-        } as androidx.arch.core.util.Function<String, LiveData<PagedList<AppInfo>>>)
-    )
+        }
 
     fun setFilter(filter: String?) {
         filteredList.value = filter

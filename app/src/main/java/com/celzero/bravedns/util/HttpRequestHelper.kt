@@ -51,7 +51,7 @@ class HttpRequestHelper{
                     val jsonObject = JSONObject(stringResponse)
                     val responseVersion = jsonObject.getInt("version")
                     val updateValue = jsonObject.getBoolean("update")
-                    persistentState.setLastAppUpdateCheckTime(System.currentTimeMillis())
+                    persistentState.lastAppUpdateCheck = System.currentTimeMillis()
                     Log.i(LOG_TAG, "Server response for the new version download is true, version number-  $updateValue")
                     if (responseVersion == 1) {
                         if (updateValue) {

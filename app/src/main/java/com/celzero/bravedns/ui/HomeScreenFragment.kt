@@ -52,7 +52,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.SpinnerArrayAdapter
 import com.celzero.bravedns.data.BraveMode
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.service.*
@@ -228,7 +227,7 @@ class HomeScreenFragment : Fragment() {
         //var lifeTimeQ : MutableLiveData<Int> = MutableLiveData()
         //val aList = PersistentState.getExcludedPackagesWifi(requireContext())
         //appsBlocked.postValue(aList!!.size)
-        blockedCount.postValue(persistentState.getBlockedReq())
+        blockedCount.postValue(persistentState.numberOfBlockedRequests)
     }
 
 
@@ -358,7 +357,7 @@ class HomeScreenFragment : Fragment() {
             handleStartBtnClickEvent()
         }
 
-        categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, Observer {
+        categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, {
             val list = it.filter { a -> a.isInternetBlocked }
             tileFCategoryBlockedTxt.text = list.size.toString()
         })
@@ -389,7 +388,7 @@ class HomeScreenFragment : Fragment() {
              tileDtrackersBlockedTxt.text = blocked
          })
 
-        appInfoRepository.getBlockedAppCount().observe(viewLifecycleOwner, Observer {
+        appInfoRepository.getBlockedAppCount().observe(viewLifecycleOwner, {
             tileFAppsBlockedTxt.text = it.toString()
             tileDFAppsBlockedTxt.text = it.toString()
         })
@@ -400,7 +399,7 @@ class HomeScreenFragment : Fragment() {
 
         braveModeToggler.observe(viewLifecycleOwner, {
             if (DEBUG) Log.d(LOG_TAG, "HomeScreen -> braveModeToggler -> observer")
-            if (persistentState.getVpnEnabled()) {
+            if (persistentState.vpnEnabled) {
                 enableBraveModeIcons()
                 showTileForMode()
             }
@@ -411,7 +410,7 @@ class HomeScreenFragment : Fragment() {
         dnsOnOffBtn.isEnabled = false
         //TODO : check for the service already running
         //val status = VpnController.getInstance()!!.getState(requireContext())
-        val status = persistentState.getVpnEnabled()
+        val status = persistentState.vpnEnabled
         if (!checkForPrivateDNSandAlwaysON()) {
             //if (status!!.activationRequested) {
             if (status) {
@@ -454,7 +453,7 @@ class HomeScreenFragment : Fragment() {
 
     // FIXME: 19-11-2020 - Check the below code for all the edge cases.
     private fun checkForPrivateDNSandAlwaysON() : Boolean {
-        val stats = persistentState.getVpnEnabled()
+        val stats = persistentState.vpnEnabled
         val alwaysOn = android.provider.Settings.Secure.getString(context?.contentResolver, "always_on_vpn_app")
         if (!TextUtils.isEmpty(alwaysOn)) {
             if (context?.packageName == alwaysOn) {
@@ -579,7 +578,7 @@ class HomeScreenFragment : Fragment() {
         super.onResume()
         syncDnsStatus()
         updateUptime()
-        if (persistentState.getVpnEnabled()) {
+        if (persistentState.vpnEnabled) {
             enableBraveModeIcons()
             shimmerForStart()
         }else{

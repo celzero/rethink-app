@@ -94,13 +94,13 @@ class FirewallManager(service: BackgroundAccessibilityService) {
             }
         }
 
-        fun updateCategoryAppsInternetPermission(categoryName : String, isAllowed: Boolean, context: Context, persistentState:PersistentState){
+        fun updateCategoryAppsInternetPermission(categoryName : String, isAllowed: Boolean, context: Context, persistentState: PersistentState){
             GlobalScope.launch ( Dispatchers.IO ) {
                 GlobalVariable.appList.forEach {
                     if (it.value.appCategory == categoryName && !it.value.whiteListUniv1 ) {
                         it.value.isInternetAllowed = isAllowed
                         GlobalVariable.appList[it.key] = it.value
-                        persistentState.setExcludedPackagesWifi(it.key, isAllowed)
+                        persistentState.modifyAllowedWifi(it.key, isAllowed)
                         updateAppInternetPermissionByUID(it.value.uid, isAllowed)
                     }
                 }
