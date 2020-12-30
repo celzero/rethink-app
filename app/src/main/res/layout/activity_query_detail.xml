@@ -73,7 +73,7 @@
                         android:fontFamily="sans-serif"
                         android:paddingStart="5dp"
                         android:paddingEnd="5dp"
-                        android:text="Latency: "
+                        android:text="@string/dns_log_latency"
                         android:textColor="@color/dividerColor"
                         android:textSize="@dimen/default_font_text_view" />
 
@@ -86,7 +86,7 @@
                         android:gravity="end"
                         android:paddingStart="5dp"
                         android:paddingEnd="5dp"
-                        android:text="Lifetime Queries: "
+                        android:text="@string/dns_log_lifetime_queries"
                         android:textColor="@color/dividerColor"
                         android:textSize="@dimen/default_font_text_view" />
 

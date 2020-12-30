@@ -247,9 +247,13 @@ class Utilities {
         }
 
         fun showToastInMidLayout(context: Context, message: String, toastLength: Int){
-            val toast = Toast.makeText(context, message, toastLength)
-            toast.setGravity(Gravity.CENTER, 0, 0)
-            toast.show()
+            try {
+                val toast = Toast.makeText(context, message, toastLength)
+                toast.setGravity(Gravity.CENTER, 0, 0)
+                toast.show()
+            }catch (e: java.lang.IllegalStateException){
+                Log.w(LOG_TAG,"Show Toast issue : ${e.message}",e)
+            }
         }
 
         //Check app is installed via playstore -

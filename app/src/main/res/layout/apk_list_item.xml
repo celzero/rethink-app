@@ -48,7 +48,8 @@
                         android:layout_marginBottom="10dp"
                         android:maxWidth="60dp"
                         android:maxHeight="60dp"
-                        android:src="@drawable/ic_launcher_foreground" />
+                        android:src="@drawable/ic_launcher_foreground"
+                        android:contentDescription="@string/apps_icon_content_desc" />
 
                     <TextView
                         android:id="@+id/firewall_apk_label_tv"
@@ -61,7 +62,6 @@
                         android:fontFamily="sans-serif-light"
                         android:gravity="bottom"
                         android:padding="5dp"
-                        android:text="Dummy Label"
                         android:textColor="@color/primaryText"
                         android:textSize="@dimen/large_font_text_view" />
 
@@ -76,7 +76,6 @@
                         android:fontFamily="sans-serif-thin"
                         android:maxLines="1"
                         android:padding="5dp"
-                        android:text="Category : "
                         android:textColor="@color/textColorMain"
                         android:textSize="@dimen/default_font_text_view"
                         android:visibility="visible" />
@@ -91,7 +90,6 @@
                         android:layout_margin="5dp"
                         android:gravity="center"
                         android:src="@drawable/data_on"
-                        android:text=""
                         android:visibility="gone" />
 
                     <androidx.appcompat.widget.SwitchCompat
@@ -104,7 +102,6 @@
                         android:layout_marginStart="15dp"
                         android:gravity="center"
                         android:src="@drawable/ic_dns_off"
-                        android:text=""
                         android:textAlignment="center"
                         android:textColor="@color/primaryText" />
 

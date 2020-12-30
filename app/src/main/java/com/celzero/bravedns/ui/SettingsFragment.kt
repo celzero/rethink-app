@@ -170,7 +170,6 @@ class SettingsFragment : Fragment() {
         autoStartRL = view.findViewById(R.id.settings_activity_auto_start_rl)
         killAppRL = view.findViewById(R.id.settings_activity_kill_app_rl)
         allowByPassRL = view.findViewById(R.id.settings_activity_allow_bypass_rl)
-        //alwaysOnRL = view.findViewById(R.id.settings_activity_always_on_vpn_rl)
         socks5RL = view.findViewById(R.id.settings_activity_socks5_rl)
         excludeAppsRL = view.findViewById(R.id.settings_activity_exclude_apps_rl)
         excludeListCountText = view.findViewById(R.id.settings_activity_exclude_apps_count_text)
@@ -190,7 +189,7 @@ class SettingsFragment : Fragment() {
         allowByPassDescText = view.findViewById(R.id.settings_activity_allow_bypass_desc)
         allowByPassProgressBar = view.findViewById(R.id.settings_activity_allow_bypass_progress)
         allowByPassProgressBar.visibility = View.GONE
-        //alwaysOnSwitch = view.findViewById(R.id.settings_activity_always_on_vpn_switch)
+
         socks5Switch = view.findViewById(R.id.settings_activity_socks5_switch)
         socks5Progress = view.findViewById(R.id.settings_activity_socks5_progress)
         httpProxySwitch = view.findViewById(R.id.settings_activity_http_proxy_switch)
