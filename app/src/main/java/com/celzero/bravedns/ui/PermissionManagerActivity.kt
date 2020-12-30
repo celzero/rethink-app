@@ -25,12 +25,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.PermissionManagerApk
 import com.celzero.bravedns.database.AppDatabase
+import com.celzero.bravedns.database.AppInfoRepository
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
 
 class PermissionManagerActivity: AppCompatActivity(), SearchView.OnQueryTextListener{
 
@@ -41,6 +43,8 @@ class PermissionManagerActivity: AppCompatActivity(), SearchView.OnQueryTextList
     private lateinit var context : Context
 
     private var editSearch: SearchView? = null
+
+    private val appInfoRepository by inject<AppInfoRepository>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,8 +85,6 @@ class PermissionManagerActivity: AppCompatActivity(), SearchView.OnQueryTextList
     }
 
     private fun updateAppList() = GlobalScope.launch ( Dispatchers.Default ){
-        val mDb = AppDatabase.invoke(context.applicationContext)
-        val appInfoRepository = mDb.appInfoRepository()
         val appList = appInfoRepository.getAppInfoAsync()
         //Log.w("DB","App list from DB Size: "+appList.size)
         appList.forEach{

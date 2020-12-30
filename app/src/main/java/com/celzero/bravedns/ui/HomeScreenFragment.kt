@@ -1,20 +1,19 @@
 /*
-Copyright 2020 RethinkDNS and its authors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2020 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.celzero.bravedns.ui
-
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -54,6 +53,8 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.SpinnerArrayAdapter
 import com.celzero.bravedns.data.BraveMode
 import com.celzero.bravedns.database.AppDatabase
+import com.celzero.bravedns.database.AppInfoRepository
+import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.service.*
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
@@ -70,6 +71,7 @@ import com.celzero.bravedns.util.Utilities
 import com.facebook.shimmer.Shimmer
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.chip.Chip
+import org.koin.android.ext.android.inject
 import settings.Settings
 import java.net.NetworkInterface
 import java.net.SocketException
@@ -125,6 +127,10 @@ class HomeScreenFragment : Fragment() {
     private val MAIN_CHANNEL_ID = "vpn"
 
     private var REQUEST_CODE_PREPARE_VPN: Int = 100
+
+    private val categoryInfoRepository by inject<CategoryInfoRepository>()
+    private val appInfoRepository by inject<AppInfoRepository>()
+    private val persistentState by inject<PersistentState>()
 
     companion object {
         //private
@@ -208,7 +214,7 @@ class HomeScreenFragment : Fragment() {
         // Set Adapter to Spinner
         braveModeSpinner.adapter = spinnerAdapter
 
-        braveMode = PersistentState.getBraveMode(requireContext())
+        braveMode = persistentState.getBraveMode()
 
         if (braveMode == -1) {
             braveModeSpinner.setSelection(DNS_FIREWALL_MODE)
@@ -218,11 +224,11 @@ class HomeScreenFragment : Fragment() {
 
         modifyBraveMode(braveMode)
 
-        lifeTimeQueries = PersistentState.getNumOfReq(requireContext())
+        lifeTimeQueries = persistentState.getNumOfReq()
         //var lifeTimeQ : MutableLiveData<Int> = MutableLiveData()
         //val aList = PersistentState.getExcludedPackagesWifi(requireContext())
         //appsBlocked.postValue(aList!!.size)
-        blockedCount.postValue(PersistentState.getBlockedReq(requireContext()))
+        blockedCount.postValue(persistentState.getBlockedReq())
     }
 
 
@@ -352,9 +358,7 @@ class HomeScreenFragment : Fragment() {
             handleStartBtnClickEvent()
         }
 
-        val mDb = AppDatabase.invoke(requireContext().applicationContext)
-        val categoryInfoRepository = mDb.categoryInfoRepository()
-        categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, {
+        categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, Observer {
             val list = it.filter { a -> a.isInternetBlocked }
             tileFCategoryBlockedTxt.text = list.size.toString()
         })
@@ -385,17 +389,10 @@ class HomeScreenFragment : Fragment() {
              tileDtrackersBlockedTxt.text = blocked
          })
 
-        //val mDb = AppDatabase.invoke(requireContext().applicationContext)
-        val appInfoRepository = mDb.appInfoRepository()
-        appInfoRepository.getBlockedAppCount().observe(viewLifecycleOwner, {
+        appInfoRepository.getBlockedAppCount().observe(viewLifecycleOwner, Observer {
             tileFAppsBlockedTxt.text = it.toString()
             tileDFAppsBlockedTxt.text = it.toString()
         })
-
-       /* appsBlocked.observe(viewLifecycleOwner, Observer {
-            tileFAppsBlockedTxt.text = appsBlocked.value.toString()
-            tileDFAppsBlockedTxt.text = appsBlocked.value.toString()
-        })*/
 
         numUniversalBlock.observe(viewLifecycleOwner, {
             tileFUniversalBlockedTxt.text = numUniversalBlock.value.toString()
@@ -403,25 +400,18 @@ class HomeScreenFragment : Fragment() {
 
         braveModeToggler.observe(viewLifecycleOwner, {
             if (DEBUG) Log.d(LOG_TAG, "HomeScreen -> braveModeToggler -> observer")
-            if (PersistentState.getVpnEnabled(requireContext())) {
+            if (persistentState.getVpnEnabled()) {
                 enableBraveModeIcons()
                 showTileForMode()
             }
         })
-
-       /* swipeDetector.observe(viewLifecycleOwner, Observer {
-            if(it) {
-                handleStartBtnClickEvent()
-            }
-         })*/
-
     }
 
     private fun handleStartBtnClickEvent() {
         dnsOnOffBtn.isEnabled = false
         //TODO : check for the service already running
         //val status = VpnController.getInstance()!!.getState(requireContext())
-        val status = PersistentState.getVpnEnabled(requireContext())
+        val status = persistentState.getVpnEnabled()
         if (!checkForPrivateDNSandAlwaysON()) {
             //if (status!!.activationRequested) {
             if (status) {
@@ -460,45 +450,24 @@ class HomeScreenFragment : Fragment() {
         val bottomSheetFragment = SettingsBottomSheetFragment()
         val frag = activity as FragmentActivity
         bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
-        /*val intent = Intent(requireContext(), SettingsActivity::class.java)
-        startActivity(intent)*/
     }
-
-    /*private fun startSettingsActivity(){
-        val intent = Intent(requireContext(), SettingsFragment::class.java)
-        startActivity(intent)
-    }*/
 
     // FIXME: 19-11-2020 - Check the below code for all the edge cases.
     private fun checkForPrivateDNSandAlwaysON() : Boolean {
-        //val status: VpnState? = VpnController.getInstance()!!.getState(context)
-        val stats = PersistentState.getVpnEnabled(requireContext())
+        val stats = persistentState.getVpnEnabled()
         val alwaysOn = android.provider.Settings.Secure.getString(context?.contentResolver, "always_on_vpn_app")
         if (!TextUtils.isEmpty(alwaysOn)) {
             if (context?.packageName == alwaysOn) {
-               /* val lockDown = android.provider.Settings.Secure.getInt(
-                    context?.contentResolver,
-                    "always_on_vpn_lockdown",
-                    0
-                )*/
-                //if (lockDown != 0 && status?.connectionState != BraveVPNService.State.WORKING) {
                 if (DEBUG) Log.i(LOG_TAG, "Status: $stats , alwaysOn: $alwaysOn - lockdown")
-                /*if(lockDown !=0 && !stats) {
-                showDialogForAlwaysOn()
-                return true
-            }*/
-                return true
-            } //else if(status?.connectionState != BraveVPNService.State.WORKING){
-            else if (!stats) {
+            } else if (!stats) {
                 if (DEBUG) Log.i(LOG_TAG, "Status: $stats , alwaysOn: $alwaysOn - stats value")
                 showDialogForAlwaysOn()
-                return true
             }
+            return true
         }
-        if(DEBUG) Log.i(LOG_TAG, "Status: $stats , alwaysOn: $alwaysOn")
+        if (DEBUG) Log.i(LOG_TAG, "Status: $stats , alwaysOn: $alwaysOn")
         if (getPrivateDnsMode() == PrivateDnsMode.STRICT) {
             Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.private_dns_toast).toString(), Toast.LENGTH_SHORT)
-            return false
         }
         return false
     }
@@ -561,28 +530,12 @@ class HomeScreenFragment : Fragment() {
             tileShowDnsFirewallLL.visibility = View.VISIBLE
         }
         braveModeSpinner.isEnabled = true
-        //enableBraveModeIcons()
     }
 
     //https://stackoverflow.com/questions/2614545/animate-change-of-view-background-color-on-android/14467625#14467625
     private fun enableBraveModeIcons() {
-
-
-
         val fadeOut: Animation = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_out)
-        //chipViewLogs.startAnimation(fadeOut)
         val fadeIn: Animation = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in)
-        //chipViewLogs.startAnimation(fadeIn)
-
-        /*fadeOut.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation?) {}
-            override fun onAnimationEnd(animation: Animation?) {
-
-            }
-
-            override fun onAnimationRepeat(animation: Animation?) {}
-        })*/
-
 
         if (braveMode == DNS_MODE) {
             chipViewLogs.startAnimation(fadeOut)
@@ -607,34 +560,10 @@ class HomeScreenFragment : Fragment() {
             chipConfigureFirewall.setBackgroundResource(R.drawable.rounded_corners_button_primary)
             chipConfigureFirewall.startAnimation(fadeIn)
         }
-
-
-       /* val colorFrom = ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark)
-        val colorTo =  ContextCompat.getColor(requireContext(), R.color.button_background)
-        val colorAnimationEnable = ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, colorTo)
-        val colorAnimationDisable = ValueAnimator.ofObject(ArgbEvaluator(), colorTo, colorFrom)
-        colorAnimationEnable.duration = 250 // milliseconds
-        colorAnimationDisable.duration = 250 // milliseconds
-        if(braveMode == DNS_MODE){
-            colorAnimationEnable.addUpdateListener { animator -> chipViewLogs.setBackgroundColor(animator.animatedValue as Int) }
-            colorAnimationDisable.addUpdateListener { animator -> chipConfigureFirewall.setBackgroundColor(animator.animatedValue as Int) }
-            colorAnimationEnable.start()
-            colorAnimationDisable.start()
-        }else if(braveMode == FIREWALL_MODE){
-            colorAnimationEnable.addUpdateListener { animator -> chipConfigureFirewall.setBackgroundColor(animator.animatedValue as Int) }
-            colorAnimationDisable.addUpdateListener { animator -> chipViewLogs.setBackgroundColor(animator.animatedValue as Int) }
-            colorAnimationEnable.start()
-            colorAnimationDisable.start()
-        }else if(braveMode == DNS_FIREWALL_MODE){
-            colorAnimationEnable.addUpdateListener { animator -> chipViewLogs.setBackgroundColor(animator.animatedValue as Int) }
-            colorAnimationEnable.addUpdateListener { animator -> chipConfigureFirewall.setBackgroundColor(animator.animatedValue as Int) }
-            colorAnimationEnable.start()
-        }*/
     }
 
     private fun disableBraveModeIcon() {
         val fadeOut: Animation = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_out)
-        //chipViewLogs.startAnimation(fadeOut)
         val fadeIn: Animation = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in)
         chipViewLogs.startAnimation(fadeOut)
         chipViewLogs.setBackgroundResource(R.drawable.rounded_corners_button_accent)
@@ -643,14 +572,6 @@ class HomeScreenFragment : Fragment() {
         chipConfigureFirewall.startAnimation(fadeOut)
         chipConfigureFirewall.setBackgroundResource(R.drawable.rounded_corners_button_accent)
         chipConfigureFirewall.startAnimation(fadeIn)
-
-       /* val colorFrom = ContextCompat.getColor(requireContext(), R.color.button_background)
-        val colorTo = ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark)
-        val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, colorTo)
-        colorAnimation.duration = 250 // milliseconds
-        colorAnimation.addUpdateListener { animator -> chipViewLogs.setBackgroundColor(animator.animatedValue as Int) }
-        colorAnimation.addUpdateListener { animator -> chipConfigureFirewall.setBackgroundColor(animator.animatedValue as Int) }
-        colorAnimation.start()*/
     }
 
 
@@ -658,10 +579,9 @@ class HomeScreenFragment : Fragment() {
         super.onResume()
         syncDnsStatus()
         updateUptime()
-        if (PersistentState.getVpnEnabled(requireContext())) {
+        if (persistentState.getVpnEnabled()) {
             enableBraveModeIcons()
             shimmerForStart()
-            //shimmerContainer.stopShimmer()
         }else{
             shimmerForStop()
         }
@@ -670,13 +590,12 @@ class HomeScreenFragment : Fragment() {
 
 
 
-    /*
-        Start the Firewall activity from the chip
+    /**
+     * Start the Firewall activity from the chip
      */
     private fun startFirewallActivity() {
         val status: VpnState? = VpnController.getInstance()!!.getState(requireContext())
         if(DEBUG) Log.d(LOG_TAG, "Status : ${status?.on!!} , BraveMode: $braveMode")
-        //if ( status!!.activationRequested) {
          if(status?.on!!){
             if (braveMode == DNS_FIREWALL_MODE || braveMode == FIREWALL_MODE) {
                 val intent = Intent(requireContext(), FirewallActivity::class.java)
@@ -718,10 +637,9 @@ class HomeScreenFragment : Fragment() {
         }
 
         //PersistentState.setFirewallMode(requireContext(), firewallMode)
-        PersistentState.setBraveMode(requireContext(), braveMode)
+        persistentState.setBraveMode(braveMode)
 
         if (VpnController.getInstance()!!.getState(requireContext())!!.activationRequested) {
-            //updateBuilder()
             if (braveMode == 0){
                 protectionDescTxt.setText(getString(R.string.dns_explanation_dns_connected))
             }else if (braveMode == 1) {
@@ -729,17 +647,15 @@ class HomeScreenFragment : Fragment() {
             } else {
                 protectionDescTxt.setText(getString(R.string.dns_explanation_connected))
             }
-            //enableBraveModeIcons()
         }
 
         braveModeSpinner.isEnabled = true
     }
 
-    /*
-        Show the Info dialog for various modes in Brave
+    /**
+     * Show the Info dialog for various modes in Brave
      */
     private fun showDialogForBraveModeInfo() {
-
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setTitle("BraveDNS Modes")
@@ -750,12 +666,9 @@ class HomeScreenFragment : Fragment() {
             dialog.dismiss()
         }
         dialog.show()
-
     }
 
-    /*
-        TODO : The data has been hardcoded need to modify
-     */
+    // TODO : The data has been hardcoded need to modify
     @SuppressLint("ResourceType")
     private fun getAllModes(): ArrayList<BraveMode> {
         val braveNames = resources.getStringArray(R.array.brave_dns_mode_names)
@@ -773,13 +686,11 @@ class HomeScreenFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        //timerHandler.removeCallbacks(updater!!);
     }
 
 
     private val messageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            //Log.d(LOG_TAG,"messageReceiver Request ${intent.action}")
           if (InternalNames.DNS_STATUS.name == intent.action) {
                 syncDnsStatus()
             }
@@ -796,14 +707,12 @@ class HomeScreenFragment : Fragment() {
         appUpTimeTxt.setText("($upTime)")
     }
 
-
     private fun prepareAndStartDnsVpn() {
         if (hasVpnService()) {
             if (prepareVpnService()) {
                 dnsOnOffBtn.setText("stop")
                 dnsOnOffBtn.setBackgroundResource(R.drawable.rounded_corners_button_accent)
                 updateUIForStart()
-                //rippleRRLayout.stopRippleAnimation()
                 startDnsVpnService()
                 if(DEBUG) Log.d(LOG_TAG, "VPN service start initiated - startDnsVpnService()")
             }
@@ -853,7 +762,6 @@ class HomeScreenFragment : Fragment() {
         } else {
             protectionDescTxt.setText(getString(R.string.dns_explanation_connected))
         }
-        //enableBraveModeIcons()
     }
 
     // Returns whether the device supports the tunnel VPN service.
@@ -881,7 +789,6 @@ class HomeScreenFragment : Fragment() {
         return true
     }
 
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_PREPARE_VPN && resultCode == Activity.RESULT_OK) {
@@ -891,20 +798,14 @@ class HomeScreenFragment : Fragment() {
         }
     }
 
-
-
     // Sets the UI DNS status on/off.
     private fun syncDnsStatus() {
 
         val status = VpnController.getInstance()!!.getState(requireContext())
 
         if (status!!.activationRequested || status.connectionState == BraveVPNService.State.WORKING) {
-            //rippleRRLayout.stopRippleAnimation()
             dnsOnOffBtn.setBackgroundResource(R.drawable.rounded_corners_button_accent)
-            //btmSheetIcon.setBackgroundResource(R.color.colorPrimaryDark)
             dnsOnOffBtn.text = "stop"
-            //shimmerContainer.stopShimmer()
-            //updateUIForStart()
             if (braveMode == 0)
                 protectionDescTxt.text = getString(R.string.dns_explanation_dns_connected)
             else if (braveMode == 1)
@@ -912,9 +813,7 @@ class HomeScreenFragment : Fragment() {
             else
                 protectionDescTxt.text = getString(R.string.dns_explanation_connected)
         } else {
-            //rippleRRLayout.startRippleAnimation()
             dnsOnOffBtn.setBackgroundResource(R.drawable.rounded_corners_button_primary)
-            //btmSheetIcon.setBackgroundResource(R.color.button_background)
             updateUIForStop()
             dnsOnOffBtn.text = "start"
             protectionDescTxt.text = getString(R.string.dns_explanation_disconnected)
@@ -935,10 +834,8 @@ class HomeScreenFragment : Fragment() {
                 statusId = R.string.status_protected
                 explanationId = R.string.explanation_protected
             } else {
-                // status.connectionState == ServerConnection.State.FAILING
                 statusId = R.string.status_failing
                 explanationId = R.string.explanation_failing
-                //changeServerButton.visibility = View.VISIBLE
             }
         } else if (isAnotherVpnActive()) {
             statusId = R.string.status_exposed
