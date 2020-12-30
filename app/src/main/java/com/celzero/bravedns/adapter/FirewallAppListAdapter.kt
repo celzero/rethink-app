@@ -57,7 +57,7 @@ class FirewallAppListAdapter internal constructor(
     private val context: Context,
     private val appInfoRepository:AppInfoRepository,
     private val categoryInfoRepository:CategoryInfoRepository,
-    private val persistentState:PersistentState,
+    private val persistentState: PersistentState,
     private var titleList: List<CategoryInfo>,
     private var dataList: HashMap<CategoryInfo, ArrayList<AppInfo>>
 ) : BaseExpandableListAdapter() {
@@ -225,12 +225,12 @@ class FirewallAppListAdapter internal constructor(
                 CoroutineScope(Dispatchers.IO).launch {
                     appUIDList.forEach {
                         HomeScreenActivity.GlobalVariable.appList[it.packageInfo]!!.isInternetAllowed = isInternetAllowed
-                        persistentState.setExcludedPackagesWifi(it.packageInfo, !isInternetAllowed)
+                        persistentState.modifyAllowedWifi(it.packageInfo, !isInternetAllowed)
                         FirewallManager.updateAppInternetPermission(it.packageInfo, !isInternetAllowed)
                         FirewallManager.updateAppInternetPermissionByUID(it.uid, !isInternetAllowed)
                         categoryInfoRepository.updateNumberOfBlocked(it.appCategory,isInternetAllowed)
 
-                        if(persistentState.getKillAppOnFirewall()) {
+                        if(persistentState.killAppOnFirewall) {
                             try {
                                 activityManager.killBackgroundProcesses(it.packageInfo)
                             } catch (e: Exception) {

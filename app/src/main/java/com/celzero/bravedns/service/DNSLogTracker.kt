@@ -18,7 +18,6 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import android.util.Log
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.DNSLogRepository
 import com.celzero.bravedns.database.DNSLogs
 import com.celzero.bravedns.net.dns.DnsPacket
@@ -136,7 +135,7 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                 }
             }
             if(dnsLogs.isBlocked){
-                persistentState.setBlockedReq()
+                persistentState.incrementBlockedReq()
             }
             persistentState.setNumOfReq()
             dnsLogRepository.insertAsync(dnsLogs)

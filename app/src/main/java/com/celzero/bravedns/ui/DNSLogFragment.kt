@@ -27,18 +27,13 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DNSQueryAdapter
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.DNSLogDAO
 import com.celzero.bravedns.database.DoHEndpoint
-import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.VpnState
+import com.celzero.bravedns.service.*
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.median50
@@ -128,7 +123,7 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
         //recyclerHeadingLL = includeView.findViewById(R.id.query_list_recycler_heading)
         noLogsTxt = includeView.findViewById(R.id.dns_log_no_log_text)
 
-        if(persistentState.isLogsEnabled()) {
+        if(persistentState.logsEnabled) {
             logsDisabledTxt.visibility = View.GONE
             searchLayoutLL.visibility = View.VISIBLE
             recyclerView!!.setHasFixedSize(true)
@@ -197,7 +192,7 @@ class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
             currentDNSStatus.text = resources.getString(R.string.configure_dns_connection_name) + " "+ proxyDetails?.proxyName
             //recyclerHeadingLL.visibility = View.GONE
             recyclerView?.visibility = View.GONE
-            if(persistentState.isLogsEnabled()) {
+            if(persistentState.logsEnabled) {
                 noLogsTxt.visibility = View.VISIBLE
             }
         }

@@ -27,7 +27,6 @@ import android.view.*
 import android.widget.*
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
