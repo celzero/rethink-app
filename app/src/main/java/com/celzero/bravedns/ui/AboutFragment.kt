@@ -27,6 +27,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.celzero.bravedns.R
+import com.celzero.bravedns.service.AppUpdater
+import org.koin.android.ext.android.inject
 
 
 class AboutFragment : Fragment(), View.OnClickListener {
@@ -42,6 +44,8 @@ class AboutFragment : Fragment(), View.OnClickListener {
     private lateinit var appVersionText : TextView
     private lateinit var appUpdateTxt : TextView
     private lateinit var whatsNewTxt : TextView
+
+    private val appUpdater by inject<AppUpdater>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
