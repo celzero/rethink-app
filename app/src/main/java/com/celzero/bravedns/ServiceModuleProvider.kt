@@ -30,7 +30,8 @@ private val RootModule = module {
     single<ContentResolver> { androidContext().contentResolver }
 }
 private val updaterModule = module {
-    single<AppUpdater> { NonStoreAppUpdater(Constants.APP_DOWNLOAD_AVAILABLE_CHECK, get())}
+    single { NonStoreAppUpdater(Constants.APP_DOWNLOAD_AVAILABLE_CHECK, get())}
+    single<AppUpdater> { get<NonStoreAppUpdater>() }
 }
 
 val AppModules:List<Module> by lazy {
