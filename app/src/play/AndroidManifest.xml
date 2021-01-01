@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.celzero.bravedns">
     <application
+        tools:replace="android:name"
         android:name=".RethinkDnsApplicationPlay">
     </application>
 
