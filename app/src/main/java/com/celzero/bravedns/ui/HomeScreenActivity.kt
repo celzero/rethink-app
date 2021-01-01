@@ -276,18 +276,21 @@ class HomeScreenActivity : AppCompatActivity() {
         }
 
         override fun onUpdateCheckFailed() {
-            // TODO run on UI thread
-            showDownloadDialog(false, getString(R.string.download_update_dialog_failure_title), getString(R.string.download_update_dialog_failure_message))
+            runOnUiThread {
+                showDownloadDialog(false, getString(R.string.download_update_dialog_failure_title), getString(R.string.download_update_dialog_failure_message))
+            }
         }
 
         override fun onUpToDate() {
-            // TODO run on UI thread
-            showDownloadDialog(false, getString(R.string.download_update_dialog_message_ok_title), getString(R.string.download_update_dialog_message_ok))
+            runOnUiThread {
+                showDownloadDialog(false, getString(R.string.download_update_dialog_message_ok_title), getString(R.string.download_update_dialog_message_ok))
+            }
         }
 
         override fun onUpdateAvailable() {
-            // TODO run on UI thread
-            showDownloadDialog(false, getString(R.string.download_update_dialog_title), getString(R.string.download_update_dialog_message))
+            runOnUiThread {
+                 showDownloadDialog(false, getString(R.string.download_update_dialog_title), getString(R.string.download_update_dialog_message))
+            }
         }
     }
 
