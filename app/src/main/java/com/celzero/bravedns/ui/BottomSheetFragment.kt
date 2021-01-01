@@ -21,9 +21,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.Apk
+import com.celzero.bravedns.databinding.BottomSheetPermissionManagerBinding
 import com.celzero.bravedns.util.DatabaseHandler
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
@@ -35,14 +35,10 @@ import org.koin.android.ext.android.inject
  * for the permissions.
  */
 class BottomSheetFragment(context : Context, apkItem : Apk) : BottomSheetDialogFragment() {
-
-    private var fragmentView: View? = null
+    private var _binding: BottomSheetPermissionManagerBinding? = null
+    private val b get() = _binding!!
 
     private var apkVal : Apk = apkItem
-
-    private lateinit var txtAutoRemove : TextView
-    private lateinit var txtAutoRevoke : TextView
-    private lateinit var txtDoNothing : TextView
     private val dbHandler by inject<DatabaseHandler>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,8 +48,8 @@ class BottomSheetFragment(context : Context, apkItem : Apk) : BottomSheetDialogF
     override fun getTheme(): Int = R.style.BottomSheetDialogTheme
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        fragmentView = inflater.inflate(R.layout.bottom_sheet_permission_manager, container, false)
-        return fragmentView
+        _binding = BottomSheetPermissionManagerBinding.inflate(inflater, container, false)
+        return b.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -65,39 +61,41 @@ class BottomSheetFragment(context : Context, apkItem : Apk) : BottomSheetDialogF
         return super.onCreateDialog(savedInstanceState)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     private fun initView(view : View) {
         print("initView")
         val rule = 0//HomeScreenActivity.dbHandler.getSpecificPackageRule(apkVal.packageName)
         //Toast.makeText(contextV,"Rule:"+rule,Toast.LENGTH_SHORT).show()
-        txtAutoRemove = view.findViewById(R.id.textView)
-        txtAutoRevoke = view.findViewById(R.id.textView2)
-        txtDoNothing = view.findViewById(R.id.textView3)
 
         if(rule == 0){
-            txtDoNothing.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ok,0)
-            txtAutoRemove.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
-            txtAutoRevoke.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
+            b.txtDoNothing.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ok,0)
+            b.txtAutoRemove.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
+            b.txtAutoRevoke.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
         }else if(rule == 1){
-            txtAutoRevoke.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ok,0)
-            txtAutoRemove.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
-            txtDoNothing.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
+            b.txtAutoRevoke.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ok,0)
+            b.txtAutoRemove.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
+            b.txtDoNothing.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
         }else if(rule == 2){
-            txtAutoRemove.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ok,0)
-            txtAutoRevoke.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
-            txtDoNothing.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
+            b.txtAutoRemove.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ok,0)
+            b.txtAutoRevoke.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
+            b.txtDoNothing.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
         }
 
-        txtAutoRemove.setOnClickListener{
+        b.txtAutoRemove.setOnClickListener{
             dbHandler.updatePackage(apkVal.packageName , 2)
             print(apkVal.packageName)
             this.dismiss()
         }
-        txtAutoRevoke.setOnClickListener{
+        b.txtAutoRevoke.setOnClickListener{
             dbHandler.updatePackage(apkVal.packageName , 1)
             print(apkVal.packageName)
             this.dismiss()
         }
-        txtDoNothing.setOnClickListener{
+        b.txtDoNothing.setOnClickListener{
             dbHandler.updatePackage(apkVal.packageName , 0)
             print(apkVal.packageName)
             this.dismiss()
