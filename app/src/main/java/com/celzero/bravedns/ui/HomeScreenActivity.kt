@@ -31,6 +31,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
+import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallRules
 import com.celzero.bravedns.data.AppMode
@@ -244,7 +245,12 @@ class HomeScreenActivity : AppCompatActivity() {
     }
 
     fun checkForUpdate(userInitiation:Boolean = false) {
-        appUpdateManager.checkForAppUpdate(userInitiation, this, installStateUpdatedListener)
+        if (persistentState.downloadSource == Constants.DOWNLOAD_SOURCE_PLAY_STORE) {
+            appUpdateManager.checkForAppUpdate(userInitiation, this, installStateUpdatedListener) // Might be play updater or web updater
+        } else {
+            get<NonStoreAppUpdater>().checkForAppUpdate(userInitiation, this, installStateUpdatedListener) // Always web updater
+        }
+
     }
 
     private fun checkForBlockListUpdate() {
