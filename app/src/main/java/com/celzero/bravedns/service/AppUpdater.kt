@@ -1,7 +1,3 @@
-package com.celzero.bravedns.service
-
-import android.app.Activity
-
 /*
  * Copyright 2020 RethinkDNS and its authors
  *
@@ -17,6 +13,10 @@ import android.app.Activity
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.celzero.bravedns.service
+
+import android.app.Activity
+
 interface AppUpdater {
     fun checkForAppUpdate(isUserInitiated:Boolean, activity: Activity, listener:InstallStateListener)
     fun completeUpdate()
