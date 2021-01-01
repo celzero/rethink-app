@@ -1,9 +1,12 @@
 package com.celzero.bravedns
 
 import android.app.Application
+import com.celzero.bravedns.service.AppUpdater
+import com.celzero.bravedns.util.Constants
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
+import org.koin.dsl.module
 
 /*
  * Copyright 2020 RethinkDNS and its authors
@@ -20,14 +23,16 @@ import org.koin.core.context.startKoin
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-class RethinkDnsApplication:Application() {
+class RethinkDnsApplicationPlay:Application() {
     override fun onCreate() {
         super.onCreate()
         startKoin {
             if(BuildConfig.DEBUG) androidLogger()
-            androidContext(this@RethinkDnsApplication)
+            androidContext(this@RethinkDnsApplicationPlay)
             koin.loadModules(AppModules)
-            koin.loadModules()
+            koin.loadModules(listOf(module {
+                    single<AppUpdater>(override = true) { StoreAppUpdater(androidContext(), get())}
+            }))
         }
     }
 }

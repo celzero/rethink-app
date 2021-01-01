@@ -3,7 +3,9 @@ package com.celzero.bravedns
 import android.content.ContentResolver
 import com.celzero.bravedns.data.DataModule
 import com.celzero.bravedns.database.DatabaseModule
+import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.ServiceModule
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.viewmodel.ViewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
@@ -27,6 +29,9 @@ import org.koin.dsl.module
 private val RootModule = module {
     single<ContentResolver> { androidContext().contentResolver }
 }
+private val updaterModule = module {
+    single<AppUpdater> { NonStoreAppUpdater(Constants.APP_DOWNLOAD_AVAILABLE_CHECK, get())}
+}
 
 val AppModules:List<Module> by lazy {
     mutableListOf<Module>().apply {
@@ -36,5 +41,6 @@ val AppModules:List<Module> by lazy {
         addAll(ViewModelModule.modules)
         addAll(DataModule.modules)
         addAll(ServiceModule.modules)
+        add(updaterModule)
     }
 }
