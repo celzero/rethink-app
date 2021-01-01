@@ -22,28 +22,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.celzero.bravedns.R
+import com.celzero.bravedns.databinding.FragmentAboutBinding
 import com.celzero.bravedns.service.AppUpdater
 import org.koin.android.ext.android.inject
 
 
 class AboutFragment : Fragment(), View.OnClickListener {
-
-    private lateinit var websiteTxt : TextView
-    private lateinit var twitterTxt : TextView
-    private lateinit var githubTxt : TextView
-    private lateinit var  blogTxt : TextView
-    private lateinit var mailTxt : TextView
-    private lateinit var telegramTxt : TextView
-    private lateinit var faqTxt : TextView
-    private lateinit var mozillaImg : ImageView
-    private lateinit var appVersionText : TextView
-    private lateinit var appUpdateTxt : TextView
-    private lateinit var whatsNewTxt : TextView
+    private var _binding: FragmentAboutBinding? = null
+    private val b get() = _binding!!
 
     private val appUpdater by inject<AppUpdater>()
 
@@ -52,42 +41,31 @@ class AboutFragment : Fragment(), View.OnClickListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view: View = inflater.inflate(R.layout.fragment_about, container, false)
-        initView(view)
-        return view
+        _binding = FragmentAboutBinding.inflate(inflater, container, false)
+        initView()
+        return b.root
     }
 
-    private fun initView(view: View) {
-        websiteTxt = view.findViewById(R.id.about_website)
-        twitterTxt = view.findViewById(R.id.about_twitter)
-        githubTxt = view.findViewById(R.id.about_github)
-        blogTxt = view.findViewById(R.id.about_blog)
-        mailTxt = view.findViewById(R.id.about_mail)
-        telegramTxt = view.findViewById(R.id.about_telegram)
-        faqTxt = view.findViewById(R.id.about_faq)
-        mozillaImg = view.findViewById(R.id.mozilla_img)
-        appVersionText = view.findViewById(R.id.about_app_version)
-        appUpdateTxt = view.findViewById(R.id.about_app_update)
-        whatsNewTxt = view.findViewById(R.id.about_whats_new)
+    private fun initView() {
 
         //Log.d(LOG_TAG,"Download source:"+ Utilities.verifyInstallerId(requireContext()))
 
 
-        websiteTxt.setOnClickListener(this)
-        twitterTxt.setOnClickListener(this)
-        githubTxt.setOnClickListener(this)
-        blogTxt.setOnClickListener(this)
-        mailTxt.setOnClickListener(this)
-        telegramTxt.setOnClickListener(this)
-        faqTxt.setOnClickListener(this)
-        mozillaImg.setOnClickListener(this)
-        appUpdateTxt.setOnClickListener(this)
-        whatsNewTxt.setOnClickListener(this)
+        b.aboutWebsite.setOnClickListener(this)
+        b.aboutTwitter.setOnClickListener(this)
+        b.aboutGithub.setOnClickListener(this)
+        b.aboutBlog.setOnClickListener(this)
+        b.aboutMail.setOnClickListener(this)
+        b.aboutTelegram.setOnClickListener(this)
+        b.aboutFaq.setOnClickListener(this)
+        b.mozillaImg.setOnClickListener(this)
+        b.aboutAppUpdate.setOnClickListener(this)
+        b.aboutWhatsNew.setOnClickListener(this)
 
         try {
             val pInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
             val version = pInfo.versionName
-            appVersionText.text = "v$version"
+            b.aboutAppVersion.text = "v$version"
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()
         }
@@ -96,46 +74,51 @@ class AboutFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(view: View?) {
         when {
-            view == telegramTxt -> {
+            view == b.aboutTelegram -> {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("http://www.telegram.me/rethinkdns"))
                 startActivity(intent)
             }
-            view == blogTxt -> {
+            view == b.aboutBlog -> {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://blog.rethinkdns.com/"))
                 startActivity(intent)
             }
-            view == faqTxt -> {
+            view == b.aboutFaq -> {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.bravedns.com/faq"))
                 startActivity(intent)
             }
-            view == githubTxt -> {
+            view == b.aboutGithub -> {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/celzero/rethink-app"))
                 startActivity(intent)
             }
-            view == mailTxt -> {
+            view == b.aboutMail -> {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("mailto:" + "hello@celzero.com"))
                 intent.putExtra(Intent.EXTRA_SUBJECT, "[RethinkDNS]:")
                 startActivity(intent)
             }
-            view == twitterTxt -> {
+            view == b.aboutTwitter -> {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/rethinkdns"))
                 startActivity(intent)
             }
-            view == websiteTxt -> {
+            view == b.aboutWebsite -> {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.bravedns.com/"))
                 startActivity(intent)
             }
-            view == mozillaImg -> {
+            view == b.mozillaImg -> {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://builders.mozilla.community/alumni.html"))
                 startActivity(intent)
             }
-            view == appUpdateTxt ->{
+            view == b.aboutAppUpdate ->{
                 (requireContext() as HomeScreenActivity).checkForUpdate(true)
             }
-            view == whatsNewTxt ->{
+            view == b.aboutWhatsNew ->{
                 showNewFeaturesDialog()
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun showNewFeaturesDialog() {
