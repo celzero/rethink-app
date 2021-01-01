@@ -68,7 +68,9 @@ android {
     flavorDimensions "releaseChannel"
     productFlavors {
         play {
-            matchingFallbacks = ['default']
+            dimension "releaseChannel"
+        }
+        fdroid {
             dimension "releaseChannel"
         }
     }
