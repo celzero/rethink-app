@@ -17,12 +17,14 @@ package com.celzero.bravedns.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.celzero.bravedns.R
+import com.celzero.bravedns.databinding.ActivityAppDetailsBinding
 
-class AppInfoActivity  : AppCompatActivity(){
+class AppInfoActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityAppDetailsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_app_details)
+        binding = ActivityAppDetailsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
     }
 }
