@@ -31,9 +31,9 @@ import com.google.android.play.core.install.model.UpdateAvailability
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
-import com.google.android.play.core.tasks.Task
 
 class StoreAppUpdater(context: Context, private val persistentState: PersistentState) : AppUpdater {
+    private val LOG_TAG = "${Constants.LOG_TAG}/StoreAppUpdater"
     private val listenerMapping = mutableMapOf<AppUpdater.InstallStateListener, InstallStateUpdatedListener>()
     private val appUpdateManager by lazy {
         AppUpdateManagerFactory.create(context)
@@ -50,6 +50,7 @@ class StoreAppUpdater(context: Context, private val persistentState: PersistentS
     }
 
     override fun checkForAppUpdate(isUserInitiated: Boolean, activity: Activity, listener: AppUpdater.InstallStateListener) {
+        Log.d(LOG_TAG, "Beginning update check.")
         val playListener = InstallStateUpdatedListener { state ->
             val mappedStatus = when (state.installStatus()) {
                 InstallStatus.DOWNLOADED -> AppUpdater.InstallStatus.DOWNLOADED
@@ -68,22 +69,24 @@ class StoreAppUpdater(context: Context, private val persistentState: PersistentS
 
         appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
+                Log.i(LOG_TAG, "Update available, starting flexible update")
                 try {
                     appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.FLEXIBLE, activity, 1)
                 } catch (e: IntentSender.SendIntentException) {
                     unregisterListener(listener)
-                    Log.e(Constants.LOG_TAG, "SendIntentException: ${e.message} ", e)
+                    Log.e(LOG_TAG, "SendIntentException: ${e.message} ", e)
                 }
             } else if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                Log.i(LOG_TAG, "Update available, starting immediate update")
                 try {
                     appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.IMMEDIATE, activity, 1)
                 } catch (e: IntentSender.SendIntentException) {
                     unregisterListener(listener)
-                    Log.e(Constants.LOG_TAG, "SendIntentException: ${e.message} ", e)
+                    Log.e(LOG_TAG, "SendIntentException: ${e.message} ", e)
                 }
             } else {
                 unregisterListener(listener)
-                Log.e(Constants.LOG_TAG, "checkForAppUpdateAvailability: something else")
+                Log.e(LOG_TAG, "no update or updating not allowed.")
                 if (isUserInitiated) {
                     listener.onUpdateCheckFailed()
                 }
