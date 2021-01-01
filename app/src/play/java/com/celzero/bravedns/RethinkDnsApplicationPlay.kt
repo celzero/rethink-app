@@ -1,13 +1,3 @@
-package com.celzero.bravedns
-
-import android.app.Application
-import com.celzero.bravedns.service.AppUpdater
-import com.celzero.bravedns.util.Constants
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.core.context.startKoin
-import org.koin.dsl.module
-
 /*
  * Copyright 2020 RethinkDNS and its authors
  *
@@ -23,6 +13,16 @@ import org.koin.dsl.module
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.celzero.bravedns
+
+import android.app.Application
+import com.celzero.bravedns.service.AppUpdater
+import com.celzero.bravedns.util.Constants
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
+import org.koin.dsl.module
+
 class RethinkDnsApplicationPlay:Application() {
     override fun onCreate() {
         super.onCreate()
