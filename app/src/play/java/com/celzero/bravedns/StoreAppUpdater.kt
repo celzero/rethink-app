@@ -50,16 +50,6 @@ class StoreAppUpdater(context: Context, private val persistentState: PersistentS
     }
 
     override fun checkForAppUpdate(isUserInitiated: Boolean, activity: Activity, listener: AppUpdater.InstallStateListener) {
-        var version = 0
-        try {
-            val pInfo: PackageInfo = activity.packageManager.getPackageInfo(activity.packageName, 0)
-            version = pInfo.versionCode
-            persistentState.appVersion = version
-        } catch (e: PackageManager.NameNotFoundException) {
-            Log.e(Constants.LOG_TAG, "Error while fetching version code: ${e.message}", e)
-        }
-
-
         appUpdateManager.registerListener(listenerMapping.put(listener, InstallStateUpdatedListener { state ->
             val mappedStatus = when (state.installStatus()) {
                 InstallStatus.DOWNLOADED -> AppUpdater.InstallStatus.DOWNLOADED
@@ -78,14 +68,14 @@ class StoreAppUpdater(context: Context, private val persistentState: PersistentS
 
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
                 try {
-                    appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.FLEXIBLE, activity, version)
+                    appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.FLEXIBLE, activity, 1)
                 } catch (e: IntentSender.SendIntentException) {
                     unregisterListener(listener)
                     Log.e(Constants.LOG_TAG, "SendIntentException: ${e.message} ", e)
                 }
             } else if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
                 try {
-                    appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.IMMEDIATE, activity, version)
+                    appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.IMMEDIATE, activity, 1)
                 } catch (e: IntentSender.SendIntentException) {
                     unregisterListener(listener)
                     Log.e(Constants.LOG_TAG, "SendIntentException: ${e.message} ", e)
