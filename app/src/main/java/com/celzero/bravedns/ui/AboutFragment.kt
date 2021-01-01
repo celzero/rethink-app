@@ -130,7 +130,7 @@ class AboutFragment : Fragment(), View.OnClickListener {
                 startActivity(intent)
             }
             view == appUpdateTxt ->{
-                (requireContext() as HomeScreenActivity).checkForAppUpdate(true)
+                (requireContext() as HomeScreenActivity).checkForUpdate(true)
             }
             view == whatsNewTxt ->{
                 showNewFeaturesDialog()
