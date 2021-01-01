@@ -25,8 +25,10 @@ import org.json.JSONObject
 import java.io.IOException
 
 class NonStoreAppUpdater(val baseURL:String, private val persistentState: PersistentState):AppUpdater {
+    private val LOG_TAG = "${Constants.LOG_TAG}/NonStoreAppUpdater"
 
     override fun checkForAppUpdate(isUserInitiated: Boolean, activity: Activity, listener: AppUpdater.InstallStateListener) {
+        Log.d(LOG_TAG, "Beginning update check.")
         val url = baseURL + BuildConfig.VERSION_CODE
 
         val client = OkHttpClient()
@@ -36,7 +38,7 @@ class NonStoreAppUpdater(val baseURL:String, private val persistentState: Persis
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.d(Constants.LOG_TAG, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
+                Log.d(LOG_TAG, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
                 if(isUserInitiated) {
                     listener.onUpdateCheckFailed()
                 }
@@ -44,6 +46,7 @@ class NonStoreAppUpdater(val baseURL:String, private val persistentState: Persis
             }
 
             override fun onResponse(call: Call, response: Response) {
+                Log.d(LOG_TAG, "onResponse")
                 try {
                     val stringResponse = response.body!!.string()
                     //creating json object
