@@ -60,7 +60,7 @@ class NonStoreAppUpdater(val baseURL:String, private val persistentState: Persis
                         if (updateValue) {
                             listener.onUpdateAvailable()
                         } else {
-                            listener.onUpToDate()
+                            if(isUserInitiated) listener.onUpToDate()
                         }
                     }
                     response.close()
