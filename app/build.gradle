@@ -65,6 +65,13 @@ android {
         }
 
     }
+    flavorDimensions "releaseChannel"
+    productFlavors {
+        play {
+            matchingFallbacks = ['default']
+            dimension "releaseChannel"
+        }
+    }
     kotlinOptions {
         jvmTarget = '1.8'
     }
@@ -121,7 +128,7 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:1.1.0-alpha01"
 
     implementation 'com.squareup.okhttp3:okhttp:4.9.0'
-    implementation 'com.google.android.play:core:1.9.0'//for new version updater
+    playImplementation 'com.google.android.play:core:1.9.0'//for new version updater
 
     // For go-tun2socks
     implementation project(":tun2socks")
