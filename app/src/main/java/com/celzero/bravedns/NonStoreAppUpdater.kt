@@ -40,7 +40,7 @@ class NonStoreAppUpdater(val baseURL:String, private val persistentState: Persis
             override fun onFailure(call: Call, e: IOException) {
                 Log.d(LOG_TAG, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
                 if(isUserInitiated) {
-                    listener.onUpdateCheckFailed()
+                    listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER)
                 }
                 call.cancel()
             }
@@ -58,16 +58,16 @@ class NonStoreAppUpdater(val baseURL:String, private val persistentState: Persis
                     Log.i(Constants.LOG_TAG, "Server response for the new version download is true, version number-  $latestVersion")
                     if (responseVersion == 1) {
                         if (updateValue) {
-                            listener.onUpdateAvailable()
+                            listener.onUpdateAvailable(AppUpdater.InstallSource.OTHER)
                         } else {
-                            if(isUserInitiated) listener.onUpToDate()
+                            if(isUserInitiated) listener.onUpToDate(AppUpdater.InstallSource.OTHER)
                         }
                     }
                     response.close()
                     client.connectionPool.evictAll()
                 } catch (e: Exception) {
                     if (isUserInitiated) {
-                        listener.onUpdateCheckFailed()
+                        listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER)
                     }
                 }
             }

@@ -515,6 +515,8 @@
     <string name="download_update_dialog_message_ok">You are already on the latest version.</string>
     <string name="download_update_dialog_failure_title">Something went wrong!</string>
     <string name="download_update_dialog_failure_message">Either our servers are down or connection could not be established. Please try again after sometime.</string>
+    <string name="download_update_dialog_trylater_title">Can\'t update right now</string>
+    <string name="download_update_dialog_trylater_message">The update cannot be executed right now, please try again later.</string>
 
     <string name="search_firewall_network_log"><font size="12">Search apps or IPs</font></string>
     <string name="search_firewall_all_apps"><font size="12">Search apps</font></string>
