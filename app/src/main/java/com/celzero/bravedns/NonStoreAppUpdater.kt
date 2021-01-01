@@ -1,33 +1,29 @@
+/*
+ * Copyright 2020 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.celzero.bravedns
 
 import android.app.Activity
 import android.util.Log
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants
 import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
 
-/*
- * Copyright (C) 2021 Daniel Wolf (Ch4t4r)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
-
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * You can contact the developer at daniel.wolf@frostnerd.com.
- */
 class NonStoreAppUpdater(val baseURL:String, private val persistentState: PersistentState):AppUpdater {
 
     override fun checkForAppUpdate(isUserInitiated: Boolean, activity: Activity, listener: AppUpdater.InstallStateListener) {
@@ -55,7 +51,7 @@ class NonStoreAppUpdater(val baseURL:String, private val persistentState: Persis
                     val responseVersion = jsonObject.getInt("version")
                     val updateValue = jsonObject.getBoolean("update")
                     val latestVersion = jsonObject.getInt("latest")
-                    persistentState.lastAppUpdateCheck = System.currentTimeMillis()
+                    persistentState.lastAppUpdateCheck = System.currentTimeMillis() // FIXME move to NTP
                     Log.i(Constants.LOG_TAG, "Server response for the new version download is true, version number-  $latestVersion")
                     if (responseVersion == 1) {
                         if (updateValue) {
@@ -76,8 +72,10 @@ class NonStoreAppUpdater(val baseURL:String, private val persistentState: Persis
     }
 
     override fun completeUpdate() {
+        /* no-op */
     }
 
     override fun unregisterListener(listener: AppUpdater.InstallStateListener) {
+        /* no-op */
     }
 }
