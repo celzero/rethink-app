@@ -285,21 +285,27 @@ class HomeScreenActivity : AppCompatActivity() {
             }
         }
 
-        override fun onUpdateCheckFailed() {
+        override fun onUpdateCheckFailed(installSource: AppUpdater.InstallSource) {
             runOnUiThread {
-                showDownloadDialog(false, getString(R.string.download_update_dialog_failure_title), getString(R.string.download_update_dialog_failure_message))
+                showDownloadDialog(installSource, getString(R.string.download_update_dialog_failure_title), getString(R.string.download_update_dialog_failure_message))
             }
         }
 
-        override fun onUpToDate() {
+        override fun onUpToDate(installSource: AppUpdater.InstallSource) {
             runOnUiThread {
-                showDownloadDialog(false, getString(R.string.download_update_dialog_message_ok_title), getString(R.string.download_update_dialog_message_ok))
+                showDownloadDialog(installSource, getString(R.string.download_update_dialog_message_ok_title), getString(R.string.download_update_dialog_message_ok))
             }
         }
 
-        override fun onUpdateAvailable() {
+        override fun onUpdateAvailable(installSource: AppUpdater.InstallSource) {
             runOnUiThread {
-                 showDownloadDialog(false, getString(R.string.download_update_dialog_title), getString(R.string.download_update_dialog_message))
+                 showDownloadDialog(installSource, getString(R.string.download_update_dialog_title), getString(R.string.download_update_dialog_message))
+            }
+        }
+
+        override fun onUpdateQuotaExceeded(installSource: AppUpdater.InstallSource) {
+            runOnUiThread {
+                showDownloadDialog(installSource, getString(R.string.download_update_dialog_trylater_title), getString(R.string.download_update_dialog_trylater_message))
             }
         }
     }
@@ -400,7 +406,7 @@ class HomeScreenActivity : AppCompatActivity() {
     }
 
 
-    private fun showDownloadDialog(isPlayStore: Boolean, title: String, message: String) {
+    private fun showDownloadDialog(source: AppUpdater.InstallSource, title: String, message: String) {
         val builder = AlertDialog.Builder(context)
         //set title for alert dialog
         builder.setTitle(title)
@@ -408,13 +414,16 @@ class HomeScreenActivity : AppCompatActivity() {
         builder.setMessage(message)
         builder.setCancelable(true)
         //performing positive action
-        if(message == getString(R.string.download_update_dialog_message_ok) || message == getString(R.string.download_update_dialog_failure_message)){
+        if (message == getString(R.string.download_update_dialog_message_ok) ||
+            message == getString(R.string.download_update_dialog_failure_message) ||
+            message == getString(R.string.download_update_dialog_trylater_message)
+        ) {
             builder.setPositiveButton("ok") { dialogInterface, which ->
                 dialogInterface.dismiss()
             }
-        }else {
+        } else {
             builder.setPositiveButton("Visit website") { dialogInterface, which ->
-                if (isPlayStore) {
+                if (source == AppUpdater.InstallSource.STORE) {
                     appUpdateManager.completeUpdate()
                 } else {
                     initiateDownload()

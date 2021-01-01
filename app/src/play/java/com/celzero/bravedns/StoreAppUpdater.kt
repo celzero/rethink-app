@@ -85,23 +85,22 @@ class StoreAppUpdater(context: Context, private val persistentState: PersistentS
                     Log.e(LOG_TAG, "SendIntentException: ${e.message} ", e)
                 }
             } else if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE) {
-                // TODO Update available, but not allowed to update right now. What to show the user?
                 if (isUserInitiated) {
-                    listener.onUpdateCheckFailed()
+                    listener.onUpdateQuotaExceeded(AppUpdater.InstallSource.STORE)
                 }
             } else if(appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_NOT_AVAILABLE){
                 unregisterListener(listener)
                 Log.e(LOG_TAG, "no update")
                 if (isUserInitiated) {
-                    listener.onUpToDate()
+                    listener.onUpToDate(AppUpdater.InstallSource.STORE)
                 }
             }
         }
-        appUpdateInfoTask.addOnFailureListener { e ->
+        appUpdateManager.appUpdateInfo.addOnFailureListener { e ->
             Log.e(LOG_TAG, "Update check failed", e)
             unregisterListener(listener)
             if (isUserInitiated) {
-                listener.onUpdateCheckFailed()
+                listener.onUpdateCheckFailed(AppUpdater.InstallSource.STORE)
             }
         }
     }
