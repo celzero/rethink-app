@@ -50,7 +50,7 @@ class StoreAppUpdater(context: Context, private val persistentState: PersistentS
     }
 
     override fun checkForAppUpdate(isUserInitiated: Boolean, activity: Activity, listener: AppUpdater.InstallStateListener) {
-        appUpdateManager.registerListener(listenerMapping.put(listener, InstallStateUpdatedListener { state ->
+        val playListener = InstallStateUpdatedListener { state ->
             val mappedStatus = when (state.installStatus()) {
                 InstallStatus.DOWNLOADED -> AppUpdater.InstallStatus.DOWNLOADED
                 InstallStatus.CANCELED -> AppUpdater.InstallStatus.CANCELED
@@ -62,10 +62,11 @@ class StoreAppUpdater(context: Context, private val persistentState: PersistentS
                 else -> AppUpdater.InstallStatus.UNKNOWN
             }
             listener.onStateUpdate(AppUpdater.InstallState(mappedStatus))
-        })!!)
+        }
+        listenerMapping[listener] = playListener
+        appUpdateManager.registerListener(playListener)
 
         appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
-
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
                 try {
                     appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.FLEXIBLE, activity, 1)
