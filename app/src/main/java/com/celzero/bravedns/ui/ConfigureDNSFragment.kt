@@ -79,7 +79,7 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
     private var dnsProxyLayoutManager: RecyclerView.LayoutManager? = null
     private val dnsProxyViewModel: DNSProxyEndpointViewModel by viewModel()
 
-    private lateinit var spinnerAdapter : CustomSpinnerAdapter
+    private lateinit var spinnerAdapter: CustomSpinnerAdapter
 
     private val appInfoRepository by inject<AppInfoRepository>()
     private val dohEndpointRepository by inject<DoHEndpointRepository>()
@@ -97,7 +97,7 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initView(view)
+        initView()
         initClickListeners()
     }
 
@@ -110,7 +110,7 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
         fun newInstance() = ConfigureDNSFragment()
     }
 
-    private fun initView(view: View) {
+    private fun initView() {
         val arraySpinner = requireContext().resources.getStringArray(R.array.dns_endpoint_modes).toList()
 
         spinnerAdapter = CustomSpinnerAdapter(requireContext(), arraySpinner)
@@ -119,11 +119,11 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
         b.configureDnsProgressBar.visibility = View.VISIBLE
 
         HomeScreenActivity.GlobalVariable.median50.observe(viewLifecycleOwner, {
-            b.configureLatencyTxt.setText("Latency: " + HomeScreenActivity.GlobalVariable.median50.value.toString() + "ms")
+            b.configureLatencyTxt.text = "Latency: " + HomeScreenActivity.GlobalVariable.median50.value.toString() + "ms"
         })
 
         //latencyTxt.setText("Latency: " + getMedianLatency(this) + "ms")
-        b.configureTotalQueriesTxt.setText("Lifetime Queries: " + persistentState.getNumOfReq())
+        b.configureTotalQueriesTxt.text = "Lifetime Queries: " + persistentState.getNumOfReq()
 
         //DOH init views
         layoutManager = LinearLayoutManager(requireContext())
@@ -149,17 +149,17 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
         dnsCryptRelayViewModel.dnsCryptRelayEndpointList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(dnsCryptRelayRecyclerAdapter::submitList))
         b.recyclerDnsCryptRelays.adapter = dnsCryptRelayRecyclerAdapter
 
-        dohRecyclerAdapter = DoHEndpointAdapter(requireContext(), dohEndpointRepository,persistentState, get(), this)
+        dohRecyclerAdapter = DoHEndpointAdapter(requireContext(), dohEndpointRepository, persistentState, get(), this)
         viewModel.dohEndpointList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(dohRecyclerAdapter!!::submitList))
         b.recyclerDohConnections.adapter = dohRecyclerAdapter
 
-        dnsProxyRecyclerAdapter = DNSProxyEndpointAdapter(requireContext(), dnsProxyEndpointRepository, persistentState,  get(),this)
+        dnsProxyRecyclerAdapter = DNSProxyEndpointAdapter(requireContext(), dnsProxyEndpointRepository, persistentState, get(), this)
         dnsProxyViewModel.dnsProxyEndpointList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(dnsProxyRecyclerAdapter::submitList))
         b.recyclerDnsProxyConnections.adapter = dnsProxyRecyclerAdapter
 
         if (DEBUG) Log.d(LOG_TAG, "Notify the adapter called ???")
         b.configureDnsProgressBar.visibility = View.GONE
-       val dnsValue= appMode?.getDNSType()
+        val dnsValue = appMode?.getDNSType()
         if (dnsValue == 1) {
             b.configureScreenSpinner.setSelection(0)
 
@@ -171,24 +171,24 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
             b.recyclerDohConnectionsHeader.visibility = View.GONE
             b.recyclerDnsCryptConnectionsHeader.visibility = View.VISIBLE
             b.recyclerDnsProxyConnectionsHeader.visibility = View.GONE
-           /* val cryptDetails = appMode?.getDNSCryptServerCount()
-            connectedTitle.text = resources.getString(R.string.configure_dns_connection_name) + "DNS crypt servers: $cryptDetails"
-            connectedURL.text = resources.getString(R.string.configure_dns_connected_dns_crypt_status)*/
+            /* val cryptDetails = appMode?.getDNSCryptServerCount()
+             connectedTitle.text = resources.getString(R.string.configure_dns_connection_name) + "DNS crypt servers: $cryptDetails"
+             connectedURL.text = resources.getString(R.string.configure_dns_connected_dns_crypt_status)*/
         } else {
             b.configureScreenSpinner.setSelection(2)
             b.recyclerDohConnectionsHeader.visibility = View.GONE
             b.recyclerDnsCryptConnectionsHeader.visibility = View.GONE
             b.recyclerDnsProxyConnectionsHeader.visibility = View.VISIBLE
-           /* val proxyDetails = appMode?.getDNSProxyServerDetails()
-            connectedURL.text = resources.getString(R.string.configure_dns_connected_dns_proxy_status)
-            connectedTitle.text = resources.getString(R.string.configure_dns_connection_name) + proxyDetails?.proxyName*/
+            /* val proxyDetails = appMode?.getDNSProxyServerDetails()
+             connectedURL.text = resources.getString(R.string.configure_dns_connected_dns_proxy_status)
+             connectedTitle.text = resources.getString(R.string.configure_dns_connection_name) + proxyDetails?.proxyName*/
         }
 
         val proxySize = checkProxySize()
         if (proxySize == 0) {
             b.recyclerDnsProxyTitle.visibility = View.VISIBLE
             b.recyclerDnsProxyConnections.visibility = View.GONE
-        }else{
+        } else {
             b.recyclerDnsProxyTitle.visibility = View.GONE
             b.recyclerDnsProxyConnections.visibility = View.VISIBLE
         }
@@ -225,19 +225,23 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (position == 0) {
-                    b.recyclerDohConnectionsHeader.visibility = View.VISIBLE
-                    b.recyclerDnsCryptConnectionsHeader.visibility = View.GONE
-                    b.recyclerDnsProxyConnectionsHeader.visibility = View.GONE
-                } else if (position == 1) {
-                    Log.d(LOG_TAG, "DNS Crypt on Click event")
-                    b.recyclerDohConnectionsHeader.visibility = View.GONE
-                    b.recyclerDnsCryptConnectionsHeader.visibility = View.VISIBLE
-                    b.recyclerDnsProxyConnectionsHeader.visibility = View.GONE
-                } else if (position == 2) {
-                    b.recyclerDohConnectionsHeader.visibility = View.GONE
-                    b.recyclerDnsCryptConnectionsHeader.visibility = View.GONE
-                    b.recyclerDnsProxyConnectionsHeader.visibility = View.VISIBLE
+                when (position) {
+                    0 -> {
+                        b.recyclerDohConnectionsHeader.visibility = View.VISIBLE
+                        b.recyclerDnsCryptConnectionsHeader.visibility = View.GONE
+                        b.recyclerDnsProxyConnectionsHeader.visibility = View.GONE
+                    }
+                    1 -> {
+                        Log.d(LOG_TAG, "DNS Crypt on Click event")
+                        b.recyclerDohConnectionsHeader.visibility = View.GONE
+                        b.recyclerDnsCryptConnectionsHeader.visibility = View.VISIBLE
+                        b.recyclerDnsProxyConnectionsHeader.visibility = View.GONE
+                    }
+                    2 -> {
+                        b.recyclerDohConnectionsHeader.visibility = View.GONE
+                        b.recyclerDnsCryptConnectionsHeader.visibility = View.GONE
+                        b.recyclerDnsProxyConnectionsHeader.visibility = View.VISIBLE
+                    }
                 }
             }
 
@@ -274,15 +278,15 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
             connectedURL.text = resources.getString(R.string.configure_dns_connected_dns_proxy_status)
             connectedTitle.text = resources.getString(R.string.configure_dns_connection_name) +proxyDetails?.proxyName
         }*/
-        if(DEBUG) Log.d(LOG_TAG, "onResume in fragment")
+        if (DEBUG) Log.d(LOG_TAG, "onResume in fragment")
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if(DEBUG) Log.d(LOG_TAG, "onActivityResult in fragment")
+        if (DEBUG) Log.d(LOG_TAG, "onActivityResult in fragment")
         super.onActivityResult(requestCode, resultCode, data)
-        if(resultCode == Activity.RESULT_OK){
+        if (resultCode == Activity.RESULT_OK) {
             val stamp = data?.getStringArrayExtra("stamp")
-            if(DEBUG) Log.d(LOG_TAG, "onActivityResult - Stamp : $stamp")
+            if (DEBUG) Log.d(LOG_TAG, "onActivityResult - Stamp : $stamp")
         }
     }
 
@@ -312,15 +316,13 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
         val cancelURLBtn = dialog.findViewById(R.id.dialog_custom_url_cancel_btn) as AppCompatButton
         val customName = dialog.findViewById(R.id.dialog_custom_name_edit_text) as EditText
         val customURL: EditText = dialog.findViewById(R.id.dialog_custom_url_edit_text) as EditText
-        val progressBar: ProgressBar =
-            dialog.findViewById(R.id.dialog_custom_url_loading) as ProgressBar
-        val errorTxt: TextView =
-            dialog.findViewById(R.id.dialog_custom_url_failure_text) as TextView
+        val progressBar: ProgressBar = dialog.findViewById(R.id.dialog_custom_url_loading) as ProgressBar
+        val errorTxt: TextView = dialog.findViewById(R.id.dialog_custom_url_failure_text) as TextView
 
         var count = dohEndpointRepository.getCount()
         count += 1
 
-        customName.setText("DoH $count",TextView.BufferType.EDITABLE)
+        customName.setText("DoH $count", TextView.BufferType.EDITABLE)
         applyURLBtn.setOnClickListener {
             val url = customURL.text.toString()
             val name = customName.text.toString()
@@ -405,8 +407,8 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
         dialog.setCanceledOnTouchOutside(false)
         dialog.window!!.attributes = lp
 
-       /* val radioInternal: RadioButton = dialog.findViewById(R.id.dialog_dns_proxy_radio_internal)
-        val radioExternal: RadioButton = dialog.findViewById(R.id.dialog_dns_proxy_radio_external)*/
+        /* val radioInternal: RadioButton = dialog.findViewById(R.id.dialog_dns_proxy_radio_internal)
+         val radioExternal: RadioButton = dialog.findViewById(R.id.dialog_dns_proxy_radio_external)*/
         val applyURLBtn = dialog.findViewById(R.id.dialog_dns_proxy_apply_btn) as AppCompatButton
         val cancelURLBtn = dialog.findViewById(R.id.dialog_dns_proxy_cancel_btn) as AppCompatButton
         val proxyNameEditText = dialog.findViewById(R.id.dialog_dns_proxy_edit_name) as EditText
@@ -417,16 +419,14 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
         val llSpinnerHeader: LinearLayout = dialog.findViewById(R.id.dialog_dns_proxy_spinner_header)
         val llIPHeader: LinearLayout = dialog.findViewById(R.id.dialog_dns_proxy_ip_header)
 
-        var count  = dnsProxyEndpointRepository.getCount()
+        var count = dnsProxyEndpointRepository.getCount()
         count += 1
         proxyNameEditText.setText("Proxy $count", TextView.BufferType.EDITABLE)
-        ipAddressEditText.setText("127.0.0.1",TextView.BufferType.EDITABLE)
+        ipAddressEditText.setText("127.0.0.1", TextView.BufferType.EDITABLE)
         val appNames: MutableList<String> = ArrayList()
         appNames.add("Nobody")
         appNames.addAll(getAppName())
-        val proxySpinnerAdapter = ArrayAdapter(
-            requireContext(), android.R.layout.simple_spinner_dropdown_item, appNames
-        )
+        val proxySpinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, appNames)
         appNameSpinner.adapter = proxySpinnerAdapter
         //radioInternal.isChecked = true
         llSpinnerHeader.visibility = View.VISIBLE
@@ -481,18 +481,18 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
                         errorTxt.text = "Port range should be from 1024-65535"
                         isValid = false
                     }
-                }else{
+                } else {
                     isValid = true
                 }
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "Error: ${e.message}", e)
-                errorTxt.setText("Invalid port")
+                errorTxt.text = "Invalid port"
                 isValid = false
             }
 
             if (isValid && isIPValid) {
                 //Do the DNS Proxy setting there
-                if(DEBUG) Log.d(LOG_TAG, "Insert into DNSProxy")
+                if (DEBUG) Log.d(LOG_TAG, "Insert into DNSProxy")
                 insertDNSProxyEndpointDB(mode, name, appName, ip, port)
                 b.recyclerDnsProxyTitle.visibility = View.GONE
                 b.recyclerDnsProxyConnections.visibility = View.VISIBLE
@@ -512,15 +512,14 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
     private fun insertDNSProxyEndpointDB(mode: String, name: String, appName: String, ip: String, port: Int) {
         var proxyName = name
         if (proxyName.isEmpty() || proxyName.isBlank()) {
-            if (mode == "Internal") {
-                proxyName = appName
-            } else
-                proxyName = ip
+            proxyName = if (mode == "Internal") {
+                appName
+            } else ip
         }
         //id: Int, proxyName: String,  proxyType: String, proxyAppName: String, proxyIP: String,proxyPort : Int, isSelected: Boolean, isCustom: Boolean, modifiedDataTime: Long, latency: Int
         val dnsProxyEndpoint = DNSProxyEndpoint(-1, proxyName, mode, appName, ip, port, false, true, 0L, 0)
         dnsProxyEndpointRepository.insertAsync(dnsProxyEndpoint)
-        if(DEBUG) Log.d(LOG_TAG, "Insert into DNSProxy - $appName, $port")
+        if (DEBUG) Log.d(LOG_TAG, "Insert into DNSProxy - $appName, $port")
         object : CountDownTimer(500, 500) {
             override fun onTick(millisUntilFinished: Long) {
             }
@@ -561,16 +560,16 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
         count += 1
         cryptNameEditText.setText("DNSCrypt $count", TextView.BufferType.EDITABLE)
 
-        radioServer.setOnClickListener{
+        radioServer.setOnClickListener {
             var count = dnsCryptEndpointRepository.getCount()
-            count +=1
-            cryptNameEditText.setText("DNSCrypt $count",  TextView.BufferType.EDITABLE)
+            count += 1
+            cryptNameEditText.setText("DNSCrypt $count", TextView.BufferType.EDITABLE)
         }
 
-        radioRelay.setOnClickListener{
+        radioRelay.setOnClickListener {
             var count = dnsCryptRelayEndpointRepository.getCount()
             count += 1
-            cryptNameEditText.setText("DNSRelay $count",  TextView.BufferType.EDITABLE)
+            cryptNameEditText.setText("DNSRelay $count", TextView.BufferType.EDITABLE)
         }
 
         applyURLBtn.setOnClickListener {
@@ -669,8 +668,7 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
     private fun checkUrl(url: String): Boolean {
         return try {
             val parsed = URL(url)
-            parsed.protocol == "https" && parsed.host.isNotEmpty() &&
-                    parsed.path.isNotEmpty() && parsed.query == null && parsed.ref == null
+            parsed.protocol == "https" && parsed.host.isNotEmpty() && parsed.path.isNotEmpty() && parsed.query == null && parsed.ref == null
         } catch (e: MalformedURLException) {
             false
         }
@@ -692,9 +690,9 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
     }
 
     override fun updateUIFromAdapter(dnsType: Int) {
-        if(DEBUG) Log.d(LOG_TAG, "UI Update from adapter")
+        if (DEBUG) Log.d(LOG_TAG, "UI Update from adapter")
         if (dnsType == 1) {
-            if(DEBUG) Log.d(LOG_TAG, "DOH has been changed, modify the connection status in the top layout")
+            if (DEBUG) Log.d(LOG_TAG, "DOH has been changed, modify the connection status in the top layout")
             dnsCryptEndpointRepository.removeConnectionStatus()
             dnsCryptRelayEndpointRepository.removeConnectionStatus()
             dnsProxyEndpointRepository.removeConnectionStatus()
@@ -715,7 +713,7 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
             dohRecyclerAdapter?.notifyDataSetChanged()
             dnsCryptRecyclerAdapter.notifyDataSetChanged()
             dnsCryptRelayRecyclerAdapter.notifyDataSetChanged()
-        } else if(dnsType == 4){
+        } else if (dnsType == 4) {
             val proxySize = checkProxySize()
             if (proxySize == 0) {
                 b.recyclerDnsProxyTitle.visibility = View.VISIBLE
