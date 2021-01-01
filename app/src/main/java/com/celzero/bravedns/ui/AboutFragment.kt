@@ -17,12 +17,12 @@ package com.celzero.bravedns.ui
 
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.FragmentAboutBinding
@@ -36,20 +36,14 @@ class AboutFragment : Fragment(), View.OnClickListener {
 
     private val appUpdater by inject<AppUpdater>()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentAboutBinding.inflate(inflater, container, false)
         initView()
         return b.root
     }
 
     private fun initView() {
-
         //Log.d(LOG_TAG,"Download source:"+ Utilities.verifyInstallerId(requireContext()))
-
 
         b.aboutWebsite.setOnClickListener(this)
         b.aboutTwitter.setOnClickListener(this)
@@ -73,44 +67,44 @@ class AboutFragment : Fragment(), View.OnClickListener {
     }
 
     override fun onClick(view: View?) {
-        when {
-            view == b.aboutTelegram -> {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("http://www.telegram.me/rethinkdns"))
+        when (view) {
+            b.aboutTelegram -> {
+                val intent = Intent(Intent.ACTION_VIEW, "http://www.telegram.me/rethinkdns".toUri())
                 startActivity(intent)
             }
-            view == b.aboutBlog -> {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://blog.rethinkdns.com/"))
+            b.aboutBlog -> {
+                val intent = Intent(Intent.ACTION_VIEW, "https://blog.rethinkdns.com/".toUri())
                 startActivity(intent)
             }
-            view == b.aboutFaq -> {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.bravedns.com/faq"))
+            b.aboutFaq -> {
+                val intent = Intent(Intent.ACTION_VIEW, "https://www.bravedns.com/faq".toUri())
                 startActivity(intent)
             }
-            view == b.aboutGithub -> {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/celzero/rethink-app"))
+            b.aboutGithub -> {
+                val intent = Intent(Intent.ACTION_VIEW, "https://github.com/celzero/rethink-app".toUri())
                 startActivity(intent)
             }
-            view == b.aboutMail -> {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("mailto:" + "hello@celzero.com"))
+            b.aboutMail -> {
+                val intent = Intent(Intent.ACTION_VIEW, ("mailto:" + "hello@celzero.com").toUri())
                 intent.putExtra(Intent.EXTRA_SUBJECT, "[RethinkDNS]:")
                 startActivity(intent)
             }
-            view == b.aboutTwitter -> {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/rethinkdns"))
+            b.aboutTwitter -> {
+                val intent = Intent(Intent.ACTION_VIEW, "https://twitter.com/rethinkdns".toUri())
                 startActivity(intent)
             }
-            view == b.aboutWebsite -> {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.bravedns.com/"))
+            b.aboutWebsite -> {
+                val intent = Intent(Intent.ACTION_VIEW, "https://www.bravedns.com/".toUri())
                 startActivity(intent)
             }
-            view == b.mozillaImg -> {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://builders.mozilla.community/alumni.html"))
+            b.mozillaImg -> {
+                val intent = Intent(Intent.ACTION_VIEW, "https://builders.mozilla.community/alumni.html".toUri())
                 startActivity(intent)
             }
-            view == b.aboutAppUpdate ->{
+            b.aboutAppUpdate -> {
                 (requireContext() as HomeScreenActivity).checkForUpdate(true)
             }
-            view == b.aboutWhatsNew ->{
+            b.aboutWhatsNew -> {
                 showNewFeaturesDialog()
             }
         }
@@ -128,7 +122,7 @@ class AboutFragment : Fragment(), View.OnClickListener {
         val builder = AlertDialog.Builder(requireContext())
         builder.setView(view).setTitle(getString(R.string.whats_dialog_title))
 
-        builder.setPositiveButton("Let\'s Go") { dialogInterface, which ->
+        builder.setPositiveButton("Let\'s Go") { dialogInterface, _ ->
             dialogInterface.dismiss()
         }
 
