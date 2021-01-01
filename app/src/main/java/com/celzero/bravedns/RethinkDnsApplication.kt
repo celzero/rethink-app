@@ -27,7 +27,6 @@ class RethinkDnsApplication:Application() {
             if(BuildConfig.DEBUG) androidLogger()
             androidContext(this@RethinkDnsApplication)
             koin.loadModules(AppModules)
-            koin.loadModules()
         }
     }
 }
