@@ -235,12 +235,16 @@ class HomeScreenActivity : AppCompatActivity() {
         if(day == Calendar.FRIDAY || day == Calendar.SATURDAY) {
             if (numOfDays > 0) {
                 Log.i(LOG_TAG, "App update check initiated, number of days: $numOfDays")
-                appUpdateManager.checkForAppUpdate(false, this, installStateUpdatedListener)
+                checkForUpdate()
                 checkForBlockListUpdate()
             } else {
                 Log.i(LOG_TAG, "App update check not initiated")
             }
         }
+    }
+
+    fun checkForUpdate(userInitiation:Boolean = false) {
+        appUpdateManager.checkForAppUpdate(userInitiation, this, installStateUpdatedListener)
     }
 
     private fun checkForBlockListUpdate() {
