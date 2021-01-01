@@ -24,12 +24,16 @@ interface AppUpdater {
 
     interface InstallStateListener {
         fun onStateUpdate(state:InstallState)
-        fun onUpdateAvailable()
-        fun onUpToDate()
-        fun onUpdateCheckFailed()
+        fun onUpdateAvailable(installSource:InstallSource)
+        fun onUpToDate(installSource:InstallSource)
+        fun onUpdateCheckFailed(installSource:InstallSource)
+        fun onUpdateQuotaExceeded(installSource:InstallSource)
     }
     data class InstallState(val status:InstallStatus)
     enum class InstallStatus {
         CANCELED, DOWNLOADED, DOWNLOADING, FAILED, INSTALLED, INSTALLING, PENDING, UNKNOWN
+    }
+    enum class InstallSource {
+        STORE, OTHER
     }
 }
