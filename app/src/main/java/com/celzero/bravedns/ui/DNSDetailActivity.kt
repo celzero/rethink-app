@@ -25,27 +25,23 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.celzero.bravedns.R
+import com.celzero.bravedns.databinding.ActivityDnsDetailBinding
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
-import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
 class DNSDetailActivity : AppCompatActivity() {
-    private lateinit var viewPagerDNS: ViewPager2
-    private lateinit var tabLayoutFirewall: TabLayout
+    private lateinit var b: ActivityDnsDetailBinding
     private val DNS_TABS_COUNT = 2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_dns_detail)
+        b = ActivityDnsDetailBinding.inflate(layoutInflater)
+        setContentView(b.root)
         init()
     }
 
     private fun init() {
-
-        viewPagerDNS = findViewById(R.id.dns_detail_act_viewpager)
-        tabLayoutFirewall = findViewById(R.id.dns_detail_act_tabLayout)
-
-        viewPagerDNS.adapter = object : FragmentStateAdapter(this) {
+        b.dnsDetailActViewpager.adapter = object : FragmentStateAdapter(this) {
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
                     0 -> DNSLogFragment.newInstance()
@@ -58,17 +54,17 @@ class DNSDetailActivity : AppCompatActivity() {
             }
         }
 
-        TabLayoutMediator(tabLayoutFirewall, viewPagerDNS) { tab, position -> // Styling each tab here
+        TabLayoutMediator(b.dnsDetailActTabLayout, b.dnsDetailActViewpager) { tab, position -> // Styling each tab here
             tab.text = when (position) {
                 0 -> getString(R.string.dns_act_log)
                 else -> getString(R.string.dns_act_configure_tab)
             }
-            viewPagerDNS.setCurrentItem(tab.position, true)
+            b.dnsDetailActViewpager.setCurrentItem(tab.position, true)
         }.attach()
 
         val recyclerViewField = ViewPager2::class.java.getDeclaredField("mRecyclerView")
         recyclerViewField.isAccessible = true
-        val recyclerView = recyclerViewField.get(viewPagerDNS) as RecyclerView
+        val recyclerView = recyclerViewField.get(b.dnsDetailActViewpager) as RecyclerView
 
         val touchSlopField = RecyclerView::class.java.getDeclaredField("mTouchSlop")
         touchSlopField.isAccessible = true
