@@ -19,22 +19,21 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
-import android.widget.*
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallAppListAdapter
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.CategoryInfo
 import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.database.RefreshDatabase
+import com.celzero.bravedns.databinding.FragmentFirewallAllAppsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.isSearchEnabled
@@ -45,63 +44,43 @@ import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
-
+class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), SearchView.OnQueryTextListener {
+    private val b by viewBinding(FragmentFirewallAllAppsBinding::bind)
     private var adapterList: FirewallAppListAdapter? = null
 
     private var titleList: MutableList<CategoryInfo>? = ArrayList()
     private var listData: HashMap<CategoryInfo, ArrayList<AppInfo>> = HashMap()
-    private var editSearch: SearchView? = null
-    private lateinit var categoryShowTxt: TextView
     private var categoryState: Boolean = false
-    private lateinit var loadingProgressBar: ProgressBar
-    private lateinit var refreshListImageView : ImageView
 
     private lateinit var animation: Animation
 
-    private var firewallExpandableList: ExpandableListView? = null
-
-    private val firewallAppInfoViewModel : FirewallAppViewModel by viewModel()
+    private val firewallAppInfoViewModel: FirewallAppViewModel by viewModel()
     private val categoryInfoRepository by inject<CategoryInfoRepository>()
     private val refreshDatabase by inject<RefreshDatabase>()
     private val persistentState by inject<PersistentState>()
 
     companion object {
-           fun newInstance() = FirewallAppFragment()
-       }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        super.onCreate(savedInstanceState)
-        val view: View = inflater.inflate(R.layout.fragment_firewall_all_apps, container, false)
-        initView(view)
-        initClickListeners()
-        return view
+        fun newInstance() = FirewallAppFragment()
     }
 
-    private fun initView(view: View) {
-        categoryShowTxt = view.findViewById(R.id.firewall_category_show_txt)
+
+    private fun initView() {
         categoryState = true
-        loadingProgressBar = view.findViewById(R.id.firewall_update_progress)
-        firewallExpandableList = view.findViewById(R.id.firewall_expandable_list)
-        refreshListImageView = view.findViewById(R.id.firewall_app_refresh_list)
-        firewallExpandableList!!.visibility = View.VISIBLE
-        if (firewallExpandableList != null) {
-            adapterList = FirewallAppListAdapter(requireContext(), get(), categoryInfoRepository, persistentState, titleList as ArrayList<CategoryInfo>, listData)
-            firewallExpandableList!!.setAdapter(adapterList)
+        b.firewallExpandableList.visibility = View.VISIBLE
+        adapterList = FirewallAppListAdapter(requireContext(), get(), categoryInfoRepository, persistentState, titleList as ArrayList<CategoryInfo>, listData)
+        b.firewallExpandableList.setAdapter(adapterList)
 
-            firewallExpandableList!!.setOnGroupClickListener { _, view, i, l ->
-                //setListViewHeight(expandableListView, i);
-                false
-            }
-
-            firewallExpandableList!!.setOnGroupExpandListener {
-                //listData[titleList!![it]]!!.sortBy { it.isInternetAllowed }
-            }
+        b.firewallExpandableList.setOnGroupClickListener { _, _, _, _ ->
+            //setListViewHeight(expandableListView, i);
+            false
         }
-        loadingProgressBar.visibility = View.VISIBLE
 
-        editSearch = view.findViewById(R.id.firewall_category_search)
-        editSearch!!.setOnQueryTextListener(this)
+        b.firewallExpandableList.setOnGroupExpandListener {
+            //listData[titleList!![it]]!!.sortBy { it.isInternetAllowed }
+        }
+        b.firewallUpdateProgress.visibility = View.VISIBLE
+
+        b.firewallCategorySearch.setOnQueryTextListener(this)
 
         animation = RotateAnimation(0.0f, 360.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
         animation.repeatCount = -1
@@ -110,45 +89,47 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private fun initClickListeners() {
 
-        editSearch!!.setOnClickListener {
-            editSearch!!.requestFocus()
-            editSearch!!.onActionViewExpanded()
+        b.firewallCategorySearch.setOnClickListener {
+            b.firewallCategorySearch.requestFocus()
+            b.firewallCategorySearch.onActionViewExpanded()
         }
 
-        categoryShowTxt.setOnClickListener {
+        b.firewallCategoryShowTxt.setOnClickListener {
             if (!categoryState) {
                 categoryState = true
-                firewallExpandableList!!.visibility = View.VISIBLE
-                categoryShowTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(requireContext(), R.drawable.ic_keyboard_arrow_up_gray_24dp), null)
+                b.firewallExpandableList.visibility = View.VISIBLE
+                b.firewallCategoryShowTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(requireContext(), R.drawable.ic_keyboard_arrow_up_gray_24dp), null)
             } else {
-                firewallExpandableList!!.visibility = View.GONE
-                categoryShowTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(requireContext(), R.drawable.ic_keyboard_arrow_down_gray_24dp), null)
+                b.firewallExpandableList.visibility = View.GONE
+                b.firewallCategoryShowTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(requireContext(), R.drawable.ic_keyboard_arrow_down_gray_24dp), null)
                 categoryState = false
             }
         }
 
-        refreshListImageView.setOnClickListener {
-            refreshListImageView.isEnabled = false
+        b.firewallAppRefreshList.setOnClickListener {
+            b.firewallAppRefreshList.isEnabled = false
             refreshDatabase()
-            Handler().postDelayed({ refreshListImageView.isEnabled = true }, 4000)
+            Handler().postDelayed({ b.firewallAppRefreshList.isEnabled = true }, 4000)
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         observersForUI()
         super.onViewCreated(view, savedInstanceState)
+        initView()
+        initClickListeners()
     }
 
     private fun refreshDatabase() {
-        refreshListImageView.animation = animation
-        refreshListImageView.startAnimation(animation)
+        b.firewallAppRefreshList.animation = animation
+        b.firewallAppRefreshList.startAnimation(animation)
         object : CountDownTimer(4000, 500) {
             override fun onTick(millisUntilFinished: Long) {}
 
             override fun onFinish() {
-                if(isAdded) {
-                    refreshListImageView.clearAnimation()
-                    if(RethinkDNSApplication.context != null) {
+                if (isAdded) {
+                    b.firewallAppRefreshList.clearAnimation()
+                    if (RethinkDNSApplication.context != null) {
                         Utilities.showToastInMidLayout(RethinkDNSApplication.context!!, getString(R.string.refresh_complete), Toast.LENGTH_SHORT)
                     }
                 }
@@ -160,18 +141,18 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
 
     override fun onQueryTextSubmit(query: String?): Boolean {
         //(adapterList as FirewallAppListAdapter).filterData(query!!)
-        if(DEBUG) Log.d(LOG_TAG, "Category block onQueryTextSubmit: ${isSearchEnabled}, $query")
+        if (DEBUG) Log.d(LOG_TAG, "Category block onQueryTextSubmit: ${isSearchEnabled}, $query")
         if (isSearchEnabled) {
             object : CountDownTimer(500, 1000) {
                 override fun onTick(millisUntilFinished: Long) {}
 
                 override fun onFinish() {
-                    if(DEBUG) Log.d(LOG_TAG, "Category block onQueryTextSubmit final: ${isSearchEnabled}, $query")
+                    if (DEBUG) Log.d(LOG_TAG, "Category block onQueryTextSubmit final: ${isSearchEnabled}, $query")
                     firewallAppInfoViewModel.setFilter(query)
                     if (query.isNullOrEmpty()) {
                         var i = 0
                         titleList!!.forEach { _ ->
-                            firewallExpandableList!!.collapseGroup(i)
+                            b.firewallExpandableList.collapseGroup(i)
                             i += 1
                         }
                     } else {
@@ -179,12 +160,12 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
                             for (i in titleList!!.indices) {
                                 if (listData[titleList!![i]] != null) {
                                     if (listData[titleList!![i]]!!.size > 0) {
-                                        firewallExpandableList!!.expandGroup(i)
+                                        b.firewallExpandableList.expandGroup(i)
                                     }
                                 }
                             }
                         }
-                        if(DEBUG) Log.d(LOG_TAG, "Category block  ${titleList!!.size}")
+                        if (DEBUG) Log.d(LOG_TAG, "Category block  ${titleList!!.size}")
                     }
                 }
             }.start()
@@ -198,7 +179,7 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
     override fun onQueryTextChange(query: String?): Boolean {
         //(adapterList as FirewallAppListAdapter).filterData(query!!)
         //observersForUI("%$query%")
-        if(DEBUG) Log.d(LOG_TAG, "Category block onQueryTextChange : ${isSearchEnabled}, $query")
+        if (DEBUG) Log.d(LOG_TAG, "Category block onQueryTextChange : ${isSearchEnabled}, $query")
         if (isSearchEnabled) {
             object : CountDownTimer(500, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
@@ -210,7 +191,7 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
                     if (query.isNullOrEmpty()) {
                         var i = 0
                         titleList!!.forEach { _ ->
-                            firewallExpandableList!!.collapseGroup(i)
+                            b.firewallExpandableList.collapseGroup(i)
                             i += 1
                         }
 
@@ -221,7 +202,7 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
                             for (i in titleList!!.indices) {
                                 if (listData[titleList!![i]] != null) {
                                     if (listData[titleList!![i]]!!.size > 0) {
-                                        firewallExpandableList!!.expandGroup(i)
+                                        b.firewallExpandableList.expandGroup(i)
                                     }
                                 }
                             }
@@ -242,7 +223,7 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
 
 
     private fun observersForUI() {
-        categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, Observer {
+        categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, {
             titleList = it.toMutableList()
         })
 
@@ -266,11 +247,11 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
 
             if (adapterList != null) {
                 (adapterList as FirewallAppListAdapter).updateData(titleList!!, listData, list as ArrayList<AppInfo>)
-                loadingProgressBar.visibility = View.GONE
-                firewallExpandableList!!.visibility = View.VISIBLE
+                b.firewallUpdateProgress.visibility = View.GONE
+                b.firewallExpandableList.visibility = View.VISIBLE
             } else {
-                loadingProgressBar.visibility = View.VISIBLE
-                firewallExpandableList!!.visibility = View.GONE
+                b.firewallUpdateProgress.visibility = View.VISIBLE
+                b.firewallExpandableList.visibility = View.GONE
             }
             isSearchEnabled = true
         }
