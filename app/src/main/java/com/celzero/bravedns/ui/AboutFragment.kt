@@ -25,6 +25,7 @@ import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentAboutBinding
 import com.celzero.bravedns.service.AppUpdater
 import org.koin.android.ext.android.inject
@@ -109,19 +110,14 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
     }
 
     private fun showNewFeaturesDialog() {
-        val inflater: LayoutInflater = LayoutInflater.from(requireContext())
-        val view: View = inflater.inflate(R.layout.dialog_whatsnew, null)
+        val binding = DialogWhatsnewBinding.inflate(LayoutInflater.from(requireContext()), null, false)
         //val builder: android.app.AlertDialog.Builder = AlertDialog.Builder(this)
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setView(view).setTitle(getString(R.string.whats_dialog_title))
-
-        builder.setPositiveButton("Let\'s Go") { dialogInterface, _ ->
-            dialogInterface.dismiss()
-        }
-
-        builder.setCancelable(true)
-        builder.create().show()
-
+        AlertDialog.Builder(requireContext())
+            .setView(binding.root)
+            .setTitle(getString(R.string.whats_dialog_title))
+            .setPositiveButton("Let\'s Go") { dialogInterface, _ ->
+                dialogInterface.dismiss()
+            }.setCancelable(true).create().show()
     }
 
 }
