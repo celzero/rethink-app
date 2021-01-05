@@ -22,31 +22,26 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.celzero.bravedns.R
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.ConnectionTrackerRepository
-import com.google.android.material.tabs.TabLayout
+import com.celzero.bravedns.databinding.ActivityFirewallBinding
 import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.android.ext.android.inject
 
 class FirewallActivity : AppCompatActivity() {
-    private lateinit var viewPagerFirewall : ViewPager2
-    private lateinit var tabLayoutFirewall : TabLayout
+    private lateinit var b: ActivityFirewallBinding
     private val FIREWALL_TABS_COUNT = 3
 
     private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_firewall)
+        b = ActivityFirewallBinding.inflate(layoutInflater)
+        setContentView(b.root)
         init()
     }
 
     private fun init() {
-
-        viewPagerFirewall = findViewById(R.id.firewall_act_viewpager)
-        tabLayoutFirewall = findViewById(R.id.firewall_act_tabLayout)
-
-        viewPagerFirewall.adapter = object : FragmentStateAdapter(this) {
+        b.firewallActViewpager.adapter = object : FragmentStateAdapter(this) {
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
                     0 -> UniversalFirewallFragment.newInstance()
@@ -54,6 +49,7 @@ class FirewallActivity : AppCompatActivity() {
                     else -> FirewallAppFragment.newInstance()
                 }
             }
+
             override fun getItemCount(): Int {
                 return FIREWALL_TABS_COUNT
             }
@@ -61,19 +57,19 @@ class FirewallActivity : AppCompatActivity() {
 
         //viewPagerFirewall.fakeDragBy(1000F)
 
-        TabLayoutMediator(tabLayoutFirewall, viewPagerFirewall) { tab, position ->
+        TabLayoutMediator(b.firewallActTabLayout, b.firewallActViewpager) { tab, position ->
             tab.text = when (position) {
                 0 -> getString(R.string.firewall_act_universal_tab)
                 1 -> getString(R.string.firewall_act_network_monitor_tab)
                 else -> getString(R.string.firewall_act_apps_tab)
             }
-            viewPagerFirewall.setCurrentItem(tab.position, true)
+            b.firewallActViewpager.setCurrentItem(tab.position, true)
         }.attach()
 
 
         val recyclerViewField = ViewPager2::class.java.getDeclaredField("mRecyclerView")
         recyclerViewField.isAccessible = true
-        val recyclerView = recyclerViewField.get(viewPagerFirewall) as RecyclerView
+        val recyclerView = recyclerViewField.get(b.firewallActViewpager) as RecyclerView
 
         val touchSlopField = RecyclerView::class.java.getDeclaredField("mTouchSlop")
         touchSlopField.isAccessible = true
