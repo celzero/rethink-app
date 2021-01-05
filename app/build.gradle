@@ -154,4 +154,7 @@ dependencies {
     implementation "org.koin:koin-androidx-fragment:$koin_version"
 
     implementation 'hu.autsoft:krate:1.0.0'
+
+    // To use only without reflection variants of viewBinding
+    implementation 'com.kirich1409.viewbindingpropertydelegate:vbpd-noreflection:1.4.0'
 }
