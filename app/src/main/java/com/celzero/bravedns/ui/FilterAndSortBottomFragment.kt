@@ -15,25 +15,15 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.FragmentFilterAndSortBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class FilterAndSortBottomFragment : BottomSheetDialogFragment() {
-    private var _binding: FragmentFilterAndSortBinding? = null
-    private val b get() = _binding!!
+    private val b by viewBinding(FragmentFilterAndSortBinding::bind)
 
     override fun getTheme(): Int = R.style.BottomSheetDialogTheme
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentFilterAndSortBinding.inflate(inflater, container, false)
-        //initView(fragmentView)
-        return b.root
-    }
 
     /*override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

@@ -19,8 +19,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.Apk
+import com.celzero.bravedns.databinding.ActivitySettingsScreenBinding
 import com.celzero.bravedns.databinding.BottomSheetPermissionManagerBinding
 import com.celzero.bravedns.util.DatabaseHandler
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -33,27 +35,16 @@ import org.koin.android.ext.android.inject
  * for the permissions.
  */
 class BottomSheetFragment(apkItem: Apk) : BottomSheetDialogFragment() {
-    private var _binding: BottomSheetPermissionManagerBinding? = null
-    private val b get() = _binding!!
+    private val b by viewBinding(BottomSheetPermissionManagerBinding::bind)
 
     private var apkVal: Apk = apkItem
     private val dbHandler by inject<DatabaseHandler>()
 
     override fun getTheme(): Int = R.style.BottomSheetDialogTheme
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = BottomSheetPermissionManagerBinding.inflate(inflater, container, false)
-        return b.root
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     private fun initView() {

@@ -29,6 +29,7 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.*
 import com.celzero.bravedns.database.*
@@ -55,9 +56,8 @@ import java.net.MalformedURLException
 import java.net.URL
 
 
-class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
-    private var _binding: FragmentConfigureDnsBinding? = null
-    private val b get() = _binding!!
+class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdateInterface {
+    private val b by viewBinding(FragmentConfigureDnsBinding::bind)
 
     //DOH UI elements
     private var layoutManager: RecyclerView.LayoutManager? = null
@@ -89,21 +89,10 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
     private val doHEndpointRepository by inject<DoHEndpointRepository>()
     private val persistentState by inject<PersistentState>()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        super.onCreate(savedInstanceState)
-        _binding = FragmentConfigureDnsBinding.inflate(inflater, container, false)
-        return b.root
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
         initClickListeners()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     companion object {

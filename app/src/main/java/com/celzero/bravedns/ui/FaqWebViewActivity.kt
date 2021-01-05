@@ -21,19 +21,19 @@ import android.util.Log
 import android.webkit.WebChromeClient
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityFaqWebviewLayoutBinding
+import com.celzero.bravedns.databinding.ActivityQueryDetailBinding
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 
 
-class FaqWebViewActivity : AppCompatActivity() {
-    private lateinit var b: ActivityFaqWebviewLayoutBinding
+class FaqWebViewActivity : AppCompatActivity(R.layout.activity_faq_webview_layout) {
+    private val b by viewBinding(ActivityFaqWebviewLayoutBinding::bind)
 
     @SuppressLint("SetJavaScriptEnabled") override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        b = ActivityFaqWebviewLayoutBinding.inflate(layoutInflater)
-        setContentView(b.root)
         b.configureWebview.settings.domStorageEnabled = true
         b.configureWebview.settings.allowContentAccess = true
         b.configureWebview.settings.allowFileAccess = true

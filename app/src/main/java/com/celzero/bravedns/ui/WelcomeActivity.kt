@@ -26,13 +26,14 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityWelcomeBinding
 import com.celzero.bravedns.service.PersistentState
 import org.koin.android.ext.android.inject
 
-class WelcomeActivity : AppCompatActivity() {
-    private lateinit var b: ActivityWelcomeBinding
+class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
+    private val b by viewBinding(ActivityWelcomeBinding::bind)
     private lateinit var dots: Array<TextView?>
     internal val layout: IntArray = intArrayOf(R.layout.welcome_slide1, R.layout.welcome_slide2)
 
@@ -46,9 +47,6 @@ class WelcomeActivity : AppCompatActivity() {
         if (!persistentState.firstTimeLaunch) {
             launchHomeScreen()
         }
-
-        b = ActivityWelcomeBinding.inflate(layoutInflater)
-        setContentView(b.root)
 
         addBottomDots(0)
         changeStatusBarColor()

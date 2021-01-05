@@ -24,19 +24,18 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityDnsDetailBinding
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.google.android.material.tabs.TabLayoutMediator
 
-class DNSDetailActivity : AppCompatActivity() {
-    private lateinit var b: ActivityDnsDetailBinding
+class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
+    private val b by viewBinding(ActivityDnsDetailBinding::bind)
     private val DNS_TABS_COUNT = 2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        b = ActivityDnsDetailBinding.inflate(layoutInflater)
-        setContentView(b.root)
         init()
     }
 

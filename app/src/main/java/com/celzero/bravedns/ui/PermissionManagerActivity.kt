@@ -21,6 +21,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
+import by.kirich1409.viewbindingdelegate.viewBinding
+import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.PermissionManagerApk
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.databinding.ActivityPermissionManagerBinding
@@ -32,8 +34,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class PermissionManagerActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
-    private lateinit var b: ActivityPermissionManagerBinding
+class PermissionManagerActivity : AppCompatActivity(R.layout.activity_permission_manager), SearchView.OnQueryTextListener {
+    private val b by viewBinding(ActivityPermissionManagerBinding::bind)
+
     private lateinit var fastAdapter: FastAdapter<PermissionManagerApk>
     val apkList = ArrayList<PermissionManagerApk>()
     lateinit var itemAdapter: ItemAdapter<PermissionManagerApk>
@@ -44,8 +47,6 @@ class PermissionManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLis
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        b = ActivityPermissionManagerBinding.inflate(layoutInflater)
-        setContentView(b.root)
         Toast.makeText(this, "Permission Manager Activity", Toast.LENGTH_LONG).show()
         initView()
 

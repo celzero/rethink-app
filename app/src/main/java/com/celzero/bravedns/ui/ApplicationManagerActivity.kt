@@ -26,7 +26,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.LinearLayoutManager
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.BuildConfig
+import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ApplicationManagerApk
 import com.celzero.bravedns.animation.ViewAnimation
 import com.celzero.bravedns.database.AppInfoRepository
@@ -40,8 +42,8 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 
-class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
-    private lateinit var b: ActivityApplicationManagerBinding
+class ApplicationManagerActivity : AppCompatActivity(R.layout.activity_application_manager), SearchView.OnQueryTextListener {
+    private val b by viewBinding(ActivityApplicationManagerBinding::bind)
 
     private lateinit var itemAdapter: ItemAdapter<ApplicationManagerApk>
     private lateinit var fastAdapter: FastAdapter<ApplicationManagerApk>
@@ -53,9 +55,6 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        b = ActivityApplicationManagerBinding.inflate(layoutInflater)
-        setContentView(b.root)
-
         initView()
         updateAppList()
     }

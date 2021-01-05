@@ -20,26 +20,24 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.FragmentAboutBinding
 import com.celzero.bravedns.service.AppUpdater
 import org.koin.android.ext.android.inject
 
 
-class AboutFragment : Fragment(), View.OnClickListener {
-    private var _binding: FragmentAboutBinding? = null
-    private val b get() = _binding!!
+class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
+    private val b by viewBinding(FragmentAboutBinding::bind)
 
     private val appUpdater by inject<AppUpdater>()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentAboutBinding.inflate(inflater, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         initView()
-        return b.root
     }
 
     private fun initView() {
@@ -108,11 +106,6 @@ class AboutFragment : Fragment(), View.OnClickListener {
                 showNewFeaturesDialog()
             }
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     private fun showNewFeaturesDialog() {

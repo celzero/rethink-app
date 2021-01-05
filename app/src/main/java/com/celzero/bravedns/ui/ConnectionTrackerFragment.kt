@@ -17,14 +17,13 @@ package com.celzero.bravedns.ui
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ConnectionTrackerAdapter
 import com.celzero.bravedns.database.ConnectionTrackerDAO
@@ -44,9 +43,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  * Live data is used to fetch the network details from the database.
  * Database table name - ConnectionTracker.
  */
-class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
-    private var _binding: ActivityConnectionTrackerBinding? = null
-    private val b get() = _binding!!
+class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker), SearchView.OnQueryTextListener {
+    private val b by viewBinding(ActivityConnectionTrackerBinding::bind)
 
     private var layoutManager: RecyclerView.LayoutManager? = null
     private var recyclerAdapter: ConnectionTrackerAdapter? = null
@@ -56,12 +54,6 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private val connectionTrackerDAO by inject<ConnectionTrackerDAO>()
     private val persistentState by inject<PersistentState>()
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreate(savedInstanceState)
-        _binding = ActivityConnectionTrackerBinding.inflate(inflater, container, false)
-        return b.root
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -130,10 +122,8 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
         // Single-choice items (initialized with checked item)
         builder.setSingleChoiceItems(singleItems, checkedItem) { dialog, which ->
             // Respond to item chosen
-            filterValue = if (which == 0)
-                ":isFilter"
-            else
-                ""
+            filterValue = if (which == 0) ":isFilter"
+            else ""
             checkedItem = which
             if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "Filter Option selected: $filterValue")
             viewModel.setFilterBlocked(filterValue)

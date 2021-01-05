@@ -25,11 +25,13 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DNSQueryAdapter
 import com.celzero.bravedns.database.DNSLogDAO
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.databinding.ActivityQueryDetailBinding
+import com.celzero.bravedns.databinding.FragmentAboutBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
@@ -50,8 +52,7 @@ import java.net.MalformedURLException
 import java.net.URL
 
 class DNSLogFragment : Fragment(), SearchView.OnQueryTextListener {
-    private var _binding: ActivityQueryDetailBinding? = null
-    private val b get() = _binding!!
+    private val b by viewBinding(ActivityQueryDetailBinding::bind)
 
     //private lateinit var context: Context
     private var layoutManager: RecyclerView.LayoutManager? = null
@@ -72,16 +73,6 @@ class DNSLogFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private val dnsLogDAO by inject<DNSLogDAO>()
     private val persistentState by inject<PersistentState>()
-
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreate(savedInstanceState)
-        _binding = ActivityQueryDetailBinding.inflate(inflater, container, false)
-        //setContentView(R.layout.activity_query_detail)
-        //urlName = resources.getStringArray(R.array.doh_endpoint_names)
-        //urlValues = resources.getStringArray(R.array.doh_endpoint_urls)
-        return b.root
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

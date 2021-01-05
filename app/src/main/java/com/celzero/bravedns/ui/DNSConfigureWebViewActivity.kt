@@ -24,8 +24,10 @@ import android.net.Uri
 import android.net.http.SslError
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.AttributeSet
 import android.util.Log
 import android.view.KeyEvent
+import android.view.View
 import android.webkit.*
 import android.webkit.WebView.RENDERER_PRIORITY_BOUND
 import android.widget.ProgressBar
@@ -33,8 +35,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DoHEndpointRepository
+import com.celzero.bravedns.databinding.ActivityAppDetailsBinding
 import com.celzero.bravedns.databinding.ActivityFaqWebviewLayoutBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -55,8 +59,8 @@ import java.io.File
 import java.io.IOException
 
 
-class DNSConfigureWebViewActivity : AppCompatActivity() {
-    private lateinit var b: ActivityFaqWebviewLayoutBinding
+class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webview_layout) {
+    private val b by viewBinding(ActivityFaqWebviewLayoutBinding::bind)
     private val MAX_PROGRESS = 100
     private var stamp: String? = ""
     private var url: String = Constants.CONFIGURE_BLOCKLIST_URL_REMOTE //"https://bravedns.com/configure?v=app"
@@ -79,8 +83,6 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
 
     @SuppressLint("SetJavaScriptEnabled") override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        b = ActivityFaqWebviewLayoutBinding.inflate(layoutInflater)
-        setContentView(b.root)
         context = this
         downloadManager = context.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
         receivedIntentFrom = intent.getIntExtra("location", 0)

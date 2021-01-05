@@ -24,6 +24,7 @@ import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.FragmentInternetManagerBinding
 import com.celzero.bravedns.util.MyAccessibilityService
 
@@ -33,7 +34,7 @@ import com.celzero.bravedns.service.ServiceState
 import com.celzero.bravedns.service.getServiceState*/
 
 
-class InternetManagerFragment : Fragment() {
+class InternetManagerFragment : Fragment(R.layout.fragment_internet_manager) {
     private val b by viewBinding(FragmentInternetManagerBinding::bind)
     private var contextVal: Context? = null
 
