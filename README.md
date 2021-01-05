@@ -48,8 +48,8 @@ To deliver the promise of open-internet for all: With the inevitable ESNI standa
 2. If you plan to work on a feature, please create a github issue on the project first to kickstart the discussion before committing to doing any work. Again, this is to avoid duplicate work more than anything else. 
 3. Release cycles are undecided, but we're leaning towards bi-weekly once automated tests are up, whenever that may be.
 
-## Tenents (unless you know better ones)
-We aren't there yet, may never will be but these are some tenents for the project for the foreseebale future.
+## Tenets (unless you know better ones)
+We aren't there yet, may never will be but these are some tenets for the project for the foreseebale future.
 
 - Make it right, make it secure, make it resilient, make it fast. In that order.
 - Easy to use, no-root, no-gimmicks features that are anti-censorship and anti-surveillance.
@@ -63,8 +63,8 @@ We aren't there yet, may never will be but these are some tenents for the projec
 - Opinionated. Chip-away complexity. Do not expect users to require a PhD in Computer Science to use the app.
   - No duplicate functionality.
   - A concerted effort to not provide too many tunable knobs and settings. To err on the side of easy over simple.
-- Ignore all tenents.
-  - Common sense always takes over when tenents get in the way.
+- Ignore all tenets.
+  - Common sense always takes over when tenets get in the way.
 - Must be distributable on the PlayStore, at least some toned down version of it. 
   - [blokada](https://github.com/blokadaorg/blokada) has the right idea!
   - This unfortunately means on-device blocklists aren't possible; however, [Cloudflare Gateway](https://www.cloudflare.com/teams-gateway/)-esque cloud-based per-user blocklists get us the same functionality.
@@ -76,3 +76,4 @@ Internet censorship (sometimes ISP-enforced and often times government-enforced)
 ## License
 
 [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+
