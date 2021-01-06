@@ -40,6 +40,7 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
     override fun getTheme(): Int = R.style.BottomSheetDialogTheme
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         b.dnsBlockUrl.text = transaction.queryStr
         b.dnsBlockIpAddress.text = transaction.response
         b.dnsBlockConnectionFlag.text = transaction.flag
@@ -95,8 +96,6 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
                 b.dnsBlockPlaceHolder.visibility = View.VISIBLE
             }
         }
-
-        super.onViewCreated(view, savedInstanceState)
     }
 
 }

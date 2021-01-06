@@ -76,10 +76,10 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel.blockedUnivRulesList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(recyclerRulesAdapter!!::submitList))
-        appInfoViewModel.appDetailsList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(recyclerAdapter!!::submitList))
         super.onViewCreated(view, savedInstanceState)
         initView()
+        viewModel.blockedUnivRulesList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(recyclerRulesAdapter!!::submitList))
+        appInfoViewModel.appDetailsList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(recyclerAdapter!!::submitList))
     }
 
     private fun initView() {

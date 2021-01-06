@@ -114,8 +114,8 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        observersForUI()
         super.onViewCreated(view, savedInstanceState)
+        observersForUI()
         initView()
         initClickListeners()
     }

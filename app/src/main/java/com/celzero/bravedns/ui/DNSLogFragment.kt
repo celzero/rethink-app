@@ -51,7 +51,7 @@ import settings.Settings
 import java.net.MalformedURLException
 import java.net.URL
 
-class DNSLogFragment : Fragment(), SearchView.OnQueryTextListener {
+class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQueryTextListener {
     private val b by viewBinding(ActivityQueryDetailBinding::bind)
 
     //private lateinit var context: Context

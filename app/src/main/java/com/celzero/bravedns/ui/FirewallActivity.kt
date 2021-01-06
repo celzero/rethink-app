@@ -24,11 +24,12 @@ import androidx.viewpager2.widget.ViewPager2
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTrackerRepository
+import com.celzero.bravedns.databinding.ActivityFaqWebviewLayoutBinding
 import com.celzero.bravedns.databinding.ActivityFirewallBinding
 import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.android.ext.android.inject
 
-class FirewallActivity : AppCompatActivity(R.layout.activity_faq_webview_layout) {
+class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
     private val b by viewBinding(ActivityFirewallBinding::bind)
     private val FIREWALL_TABS_COUNT = 3
 
