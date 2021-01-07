@@ -56,57 +56,58 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
     }
 
     override fun onBindViewHolder(holder: ConnectionTrackerViewHolder, position: Int) {
-        val connTracker: ConnectionTracker? = getItem(position)
+        val connTracker: ConnectionTracker = getItem(position) ?: return
         holder.update(connTracker, position)
     }
 
 
     inner class ConnectionTrackerViewHolder(private val b: ConnectionTransactionRowBinding) : RecyclerView.ViewHolder(b.root) {
 
-        fun update(connTracker: ConnectionTracker?, position: Int) {
-            if (connTracker != null) {
-                val time = Utilities.convertLongToTime(connTracker.timeStamp)
-                b.connectionResponseTime.text = time
-                b.connectionFlag.text = connTracker.flag
-                b.connectionIpAddress.text = connTracker.ipAddress
-                b.connLatencyTxt.text = connTracker.port.toString()
-                b.connectionAppName.text = connTracker.appName
-                b.connectionType.text = Protocol.getProtocolName(connTracker.protocol).name
-                if (connTracker.isBlocked) {
+        fun update(connTracker: ConnectionTracker, position: Int) {
+            val time = Utilities.convertLongToTime(connTracker.timeStamp)
+            b.connectionResponseTime.text = time
+            b.connectionFlag.text = connTracker.flag
+            b.connectionIpAddress.text = connTracker.ipAddress
+            b.connLatencyTxt.text = connTracker.port.toString()
+            b.connectionAppName.text = connTracker.appName
+            b.connectionType.text = Protocol.getProtocolName(connTracker.protocol).name
+            when {
+                connTracker.isBlocked -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
                     b.connectionStatusIndicator.setBackgroundColor(ContextCompat.getColor(context, R.color.colorRed_A400))
-                } else if (connTracker.blockedByRule.equals(BraveVPNService.BlockedRuleNames.RULE7.ruleName)) {
+                }
+                connTracker.blockedByRule.equals(BraveVPNService.BlockedRuleNames.RULE7.ruleName) -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
                     b.connectionStatusIndicator.setBackgroundColor(ContextCompat.getColor(context, R.color.dividerColor))
-                } else {
+                }
+                else -> {
                     b.connectionStatusIndicator.visibility = View.INVISIBLE
                 }
-                if (connTracker.appName != "Unknown") {
-                    try {
-                        val appArray = context.packageManager.getPackagesForUid(connTracker.uid)
-                        val appCount = (appArray?.size)?.minus(1)
-                        if (appArray?.size!! > 2) {
-                            b.connectionAppName.text = "${connTracker.appName} + $appCount other apps"
-                        } else if (appArray.size == 2) {
-                            b.connectionAppName.text = "${connTracker.appName} + $appCount other app"
-                        }
-                        Glide.with(context).load(context.packageManager.getApplicationIcon(appArray[0]!!)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)
-                    } catch (e: Exception) {
-                        Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)
-                        Log.e(LOG_TAG, "Package Not Found - " + e.message, e)
+            }
+            if (connTracker.appName != "Unknown") {
+                try {
+                    val appArray = context.packageManager.getPackagesForUid(connTracker.uid)
+                    val appCount = (appArray?.size)?.minus(1)
+                    if (appArray?.size!! > 2) {
+                        b.connectionAppName.text = "${connTracker.appName} + $appCount other apps"
+                    } else if (appArray.size == 2) {
+                        b.connectionAppName.text = "${connTracker.appName} + $appCount other app"
                     }
-                } else {
+                    Glide.with(context).load(context.packageManager.getApplicationIcon(appArray[0]!!)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)
+                } catch (e: Exception) {
                     Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)
+                    Log.e(LOG_TAG, "Package Not Found - " + e.message, e)
                 }
+            } else {
+                Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)
+            }
 
-                b.connectionParentLayout.setOnClickListener {
-                    b.connectionParentLayout.isEnabled = false
-                    val bottomSheetFragment = ConnTrackerBottomSheetFragment(context, connTracker)
-                    val frag = context as FragmentActivity
-                    bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
-                    b.connectionParentLayout.isEnabled = true
-                }
-
+            b.connectionParentLayout.setOnClickListener {
+                b.connectionParentLayout.isEnabled = false
+                val bottomSheetFragment = ConnTrackerBottomSheetFragment(context, connTracker)
+                val frag = context as FragmentActivity
+                bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
+                b.connectionParentLayout.isEnabled = true
             }
 
         }
