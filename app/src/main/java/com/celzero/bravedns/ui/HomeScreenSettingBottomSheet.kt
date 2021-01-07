@@ -4,10 +4,11 @@ import android.os.Build
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.RadioButton
 import android.widget.RadioGroup
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.BottomSheetHomeScreenBinding
 import com.celzero.bravedns.service.PersistentState
@@ -19,13 +20,28 @@ import org.koin.android.ext.android.inject
 import settings.Settings
 
 class HomeScreenSettingBottomSheet(var connectedDetails: String) : BottomSheetDialogFragment() {
-    private val b by viewBinding(BottomSheetHomeScreenBinding::bind)
+    private var _binding: BottomSheetHomeScreenBinding? = null
+
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val b get() = _binding!!
+
     private var firewallMode = -1L
     private val LOG_FILE = "HOMESCREEN_BTM_SHEET"
 
     private val persistentState by inject<PersistentState>()
 
     override fun getTheme(): Int = R.style.BottomSheetDialogTheme
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = BottomSheetHomeScreenBinding.inflate(inflater, container, false)
+        return b.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

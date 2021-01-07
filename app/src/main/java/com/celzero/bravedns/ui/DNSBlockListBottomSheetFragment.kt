@@ -23,21 +23,37 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
+import by.kirich1409.viewbindingdelegate.dialogViewBinding
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DNSBottomSheetBlockAdapter
 import com.celzero.bravedns.database.DNSLogs
 import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
 import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
+import com.celzero.bravedns.databinding.FragmentFilterAndSortBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 
 class DNSBlockListBottomSheetFragment(private var contextVal: Context, private var transaction: DNSLogs) : BottomSheetDialogFragment() {
-    private val b by viewBinding(BottomSheetDnsLogBinding::bind)
+    private var _binding: BottomSheetDnsLogBinding? = null
+
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val b get() = _binding!!
 
     private lateinit var recyclerAdapter: DNSBottomSheetBlockAdapter
 
     override fun getTheme(): Int = R.style.BottomSheetDialogTheme
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = BottomSheetDnsLogBinding.inflate(inflater, container, false)
+        return b.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

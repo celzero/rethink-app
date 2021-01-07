@@ -31,7 +31,9 @@ import android.text.Html
 import android.text.Html.FROM_HTML_MODE_LEGACY
 import android.text.format.DateUtils
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.Window
 import android.widget.ArrayAdapter
 import android.widget.ImageView
@@ -39,7 +41,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.automaton.FirewallRules
@@ -67,17 +68,27 @@ import org.koin.android.ext.android.inject
  * TODO : Need to move the strings to strings.xml file.
  */
 class ConnTrackerBottomSheetFragment(private var contextVal: Context, private var ipDetails: ConnectionTracker) : BottomSheetDialogFragment() {
-    private val b by viewBinding(BottomSheetConnTrackBinding::bind)
+    private var _binding: BottomSheetConnTrackBinding? = null
 
-    //private lateinit var txtRule2: TextView
-
-    //private lateinit var switchBlockConnApp: SwitchCompat
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val b get() = _binding!!
 
     private lateinit var firewallRules: FirewallRules
 
     private var isAppBlocked: Boolean = false
     private var isRuleBlocked: Boolean = false
     private var isRuleUniversal: Boolean = false
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = BottomSheetConnTrackBinding.inflate(inflater, container, false)
+        return b.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
