@@ -37,13 +37,14 @@ import android.view.animation.RotateAnimation
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ExcludedAppListAdapter
 import com.celzero.bravedns.database.*
 import com.celzero.bravedns.databinding.ActivitySettingsScreenBinding
+import com.celzero.bravedns.databinding.DialogSetHttpProxyBinding
+import com.celzero.bravedns.databinding.DialogSetProxyBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
@@ -57,7 +58,6 @@ import com.celzero.bravedns.util.Constants.Companion.REFRESH_BLOCKLIST_URL
 import com.celzero.bravedns.util.HttpRequestHelper.Companion.checkStatus
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ExcludedAppViewModel
-import com.google.android.material.textfield.TextInputEditText
 import dnsx.Dnsx
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -507,7 +507,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             val dialog = Dialog(requireContext())
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
             dialog.setTitle("Custom Server URL")
-            dialog.setContentView(R.layout.dialog_set_http_proxy)
+            val dialogBinding = DialogSetHttpProxyBinding.inflate(layoutInflater)
+            dialog.setContentView(dialogBinding.root)
 
             val lp = WindowManager.LayoutParams()
             lp.copyFrom(dialog.window!!.attributes)
@@ -518,12 +519,11 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             dialog.setCanceledOnTouchOutside(false)
             dialog.window!!.attributes = lp
 
-            val applyURLBtn = dialog.findViewById(R.id.dialog_http_proxy_ok_btn) as AppCompatButton
-            val cancelURLBtn = dialog.findViewById(R.id.dialog_http_proxy_cancel_btn) as AppCompatButton
-            val hostAddressEditText = dialog.findViewById(R.id.dialog_http_proxy_edit_text) as TextInputEditText
-            val portEditText: EditText = dialog.findViewById(R.id.dialog_http_proxy_edit_text_port) as TextInputEditText
-            val errorTxt: TextView = dialog.findViewById(R.id.dialog_http_proxy_failure_text) as TextView
-
+            val applyURLBtn = dialogBinding.dialogHttpProxyOkBtn
+            val cancelURLBtn = dialogBinding.dialogHttpProxyCancelBtn
+            val hostAddressEditText = dialogBinding.dialogHttpProxyEditText
+            val portEditText = dialogBinding.dialogHttpProxyEditTextPort
+            val errorTxt = dialogBinding.dialogHttpProxyFailureText
 
             val hostName = persistentState.httpProxyHostAddress
             val portAddr = persistentState.httpProxyPort
@@ -857,7 +857,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     private fun showDialogForSocks5Proxy() {
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.dialog_set_proxy)
+        val dialogBinding = DialogSetProxyBinding.inflate(layoutInflater)
+        dialog.setContentView(dialogBinding.root)
 
         val lp = WindowManager.LayoutParams()
         lp.copyFrom(dialog.window!!.attributes)
@@ -868,18 +869,15 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         dialog.setCanceledOnTouchOutside(false)
         dialog.window!!.attributes = lp
 
-        val applyURLBtn = dialog.findViewById(R.id.dialog_proxy_apply_btn) as AppCompatButton
-        val cancelURLBtn = dialog.findViewById(R.id.dialog_proxy_cancel_btn) as AppCompatButton
-        //val proxyNameEditText = dialog.findViewById(R.id.dialog_proxy_edit_name) as EditText
-        val ipAddressEditText: EditText = dialog.findViewById(R.id.dialog_proxy_edit_ip)
-        val portEditText: EditText = dialog.findViewById(R.id.dialog_proxy_edit_port)
-        val appNameSpinner: Spinner = dialog.findViewById(R.id.dialog_proxy_spinner_appname)
-        val errorTxt: TextView = dialog.findViewById(R.id.dialog_proxy_error_text) as TextView
-        val llSpinnerHeader: LinearLayout = dialog.findViewById(R.id.dialog_proxy_spinner_header)
-        val llIPHeader: LinearLayout = dialog.findViewById(R.id.dialog_proxy_ip_header)
-        val userNameEditText: EditText = dialog.findViewById(R.id.dialog_proxy_edit_username)
-        val passwordEditText: EditText = dialog.findViewById(R.id.dialog_proxy_edit_password)
-        val udpBlockCheckBox: CheckBox = dialog.findViewById(R.id.dialog_proxy_udp_check)
+        val applyURLBtn = dialogBinding.dialogProxyApplyBtn
+        val cancelURLBtn = dialogBinding.dialogProxyCancelBtn
+        val ipAddressEditText: EditText = dialogBinding.dialogProxyEditIp
+        val portEditText: EditText = dialogBinding.dialogProxyEditPort
+        val appNameSpinner: Spinner = dialogBinding.dialogProxySpinnerAppname
+        val errorTxt: TextView = dialogBinding.dialogProxyErrorText
+        val userNameEditText: EditText = dialogBinding.dialogProxyEditUsername
+        val passwordEditText: EditText = dialogBinding.dialogProxyEditPassword
+        val udpBlockCheckBox: CheckBox = dialogBinding.dialogProxyUdpCheck
 
         val sock5Proxy = proxyEndpointRepository.getConnectedProxy()
 

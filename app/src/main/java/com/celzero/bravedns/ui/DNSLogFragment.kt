@@ -84,7 +84,6 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         //context = this
 
         val includeView = b.queryListScrollList
-        //recyclerHeadingLL = includeView.findViewById(R.id.query_list_recycler_heading)
 
         if (persistentState.logsEnabled) {
             includeView.queryListLogsDisabledTv.visibility = View.GONE

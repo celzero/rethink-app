@@ -47,6 +47,8 @@ import com.celzero.bravedns.automaton.FirewallRules
 import com.celzero.bravedns.data.ConnectionRules
 import com.celzero.bravedns.database.*
 import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
+import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
+import com.celzero.bravedns.databinding.DialogSetCustomUrlBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -113,8 +115,6 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
 
 
     private fun initView() {
-        //switchBlockConnApp = view.findViewById(R.id.bs_conn_block_conn_app_switch)
-
         val protocol = Protocol.getProtocolName(ipDetails.protocol).name
 
         b.bsConnConnectionTypeHeading.text = ipDetails.ipAddress!!
@@ -338,20 +338,20 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
     private fun showAlertForClearRules() {
         val builder = AlertDialog.Builder(contextVal)
         //set title for alert dialog
-        builder.setTitle(R.string.bsct_alert_message_clear_rules_heading)
+        .setTitle(R.string.bsct_alert_message_clear_rules_heading)
         //set message for alert dialog
-        builder.setMessage(R.string.bsct_alert_message_clear_rules)
-        builder.setIcon(android.R.drawable.ic_dialog_alert)
-        builder.setCancelable(true)
+        .setMessage(R.string.bsct_alert_message_clear_rules)
+        .setIcon(android.R.drawable.ic_dialog_alert)
+        .setCancelable(true)
         //performing positive action
-        builder.setPositiveButton("Clear") { dialogInterface, which ->
+        .setPositiveButton("Clear") { _, _ ->
             firewallRules.clearFirewallRules(ipDetails.uid, blockedConnectionsRepository)
             //switchBlockConnApp.isChecked = false
             Utilities.showToastInMidLayout(contextVal, getString(R.string.bsct_rules_cleared_toast), Toast.LENGTH_SHORT)
         }
 
         //performing negative action
-        builder.setNeutralButton("Cancel") { dialogInterface, which ->
+        .setNeutralButton("Cancel") { _, _ ->
         }
         // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()
@@ -361,13 +361,13 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
     }
 
     private fun showDialogForInfo() {
-
+        val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCanceledOnTouchOutside(true)
-        dialog.setContentView(R.layout.dialog_info_rules_layout)
-        val okBtn = dialog.findViewById(R.id.info_rules_dialog_cancel_img) as ImageView
-        val descText = dialog.findViewById(R.id.info_rules_dialog_rules_desc) as TextView
+        dialog.setContentView(dialogBinding.root)
+        val okBtn = dialogBinding.infoRulesDialogCancelImg
+        val descText = dialogBinding.infoRulesDialogRulesDesc
 
         var text = getString(R.string.bsct_conn_rule_explanation)
         text = text.replace("\n", "<br /><br />")

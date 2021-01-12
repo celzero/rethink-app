@@ -52,6 +52,8 @@ import com.celzero.bravedns.adapter.SpinnerArrayAdapter
 import com.celzero.bravedns.data.BraveMode
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.CategoryInfoRepository
+import com.celzero.bravedns.databinding.DialogInfoCustomLayoutBinding
+import com.celzero.bravedns.databinding.DialogSetCustomUrlBinding
 import com.celzero.bravedns.databinding.FragmentHomeScreenBinding
 import com.celzero.bravedns.service.*
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -558,8 +560,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setTitle("BraveDNS Modes")
         dialog.setCanceledOnTouchOutside(true)
-        dialog.setContentView(R.layout.dialog_info_custom_layout)
-        val okBtn = dialog.findViewById(R.id.info_dialog_cancel_img) as ImageView
+        val dialogBinding = DialogInfoCustomLayoutBinding.inflate(layoutInflater)
+        dialog.setContentView(dialogBinding.root)
+        val okBtn = dialogBinding.infoDialogCancelImg
         okBtn.setOnClickListener {
             dialog.dismiss()
         }
