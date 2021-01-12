@@ -15,37 +15,31 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.celzero.bravedns.R
+import com.celzero.bravedns.databinding.ActivitySettingsScreenBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class SettingsBottomSheetFragment : BottomSheetDialogFragment() {
+    private var _binding: ActivitySettingsScreenBinding? = null
 
-    private var fragmentView: View? = null
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val b get() = _binding!!
 
     override fun getTheme(): Int = R.style.BottomSheetDialogTheme
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        fragmentView = inflater.inflate(R.layout.activity_settings_screen, container, false)
-
-        return fragmentView
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = ActivitySettingsScreenBinding.inflate(inflater, container, false)
+        return b.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-    }
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return super.onCreateDialog(savedInstanceState)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }

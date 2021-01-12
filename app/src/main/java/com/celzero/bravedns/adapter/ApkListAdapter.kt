@@ -128,7 +128,7 @@ class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) 
                     pos++
                 }
 
-                val bottomSheetFragment = BottomSheetFragment(context, apkList[adapterPosition])
+                val bottomSheetFragment = BottomSheetFragment(apkList[adapterPosition])
                 val frag = context as FragmentActivity
                 bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
 

@@ -17,77 +17,48 @@ package com.celzero.bravedns.ui
 
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.databinding.DialogWhatsnewBinding
+import com.celzero.bravedns.databinding.FragmentAboutBinding
 import com.celzero.bravedns.service.AppUpdater
 import org.koin.android.ext.android.inject
 
 
-class AboutFragment : Fragment(), View.OnClickListener {
-
-    private lateinit var websiteTxt : TextView
-    private lateinit var twitterTxt : TextView
-    private lateinit var githubTxt : TextView
-    private lateinit var  blogTxt : TextView
-    private lateinit var mailTxt : TextView
-    private lateinit var telegramTxt : TextView
-    private lateinit var faqTxt : TextView
-    private lateinit var mozillaImg : ImageView
-    private lateinit var appVersionText : TextView
-    private lateinit var appUpdateTxt : TextView
-    private lateinit var whatsNewTxt : TextView
+class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
+    private val b by viewBinding(FragmentAboutBinding::bind)
 
     private val appUpdater by inject<AppUpdater>()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view: View = inflater.inflate(R.layout.fragment_about, container, false)
-        initView(view)
-        return view
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initView()
     }
 
-    private fun initView(view: View) {
-        websiteTxt = view.findViewById(R.id.about_website)
-        twitterTxt = view.findViewById(R.id.about_twitter)
-        githubTxt = view.findViewById(R.id.about_github)
-        blogTxt = view.findViewById(R.id.about_blog)
-        mailTxt = view.findViewById(R.id.about_mail)
-        telegramTxt = view.findViewById(R.id.about_telegram)
-        faqTxt = view.findViewById(R.id.about_faq)
-        mozillaImg = view.findViewById(R.id.mozilla_img)
-        appVersionText = view.findViewById(R.id.about_app_version)
-        appUpdateTxt = view.findViewById(R.id.about_app_update)
-        whatsNewTxt = view.findViewById(R.id.about_whats_new)
-
+    private fun initView() {
         //Log.d(LOG_TAG,"Download source:"+ Utilities.verifyInstallerId(requireContext()))
 
-
-        websiteTxt.setOnClickListener(this)
-        twitterTxt.setOnClickListener(this)
-        githubTxt.setOnClickListener(this)
-        blogTxt.setOnClickListener(this)
-        mailTxt.setOnClickListener(this)
-        telegramTxt.setOnClickListener(this)
-        faqTxt.setOnClickListener(this)
-        mozillaImg.setOnClickListener(this)
-        appUpdateTxt.setOnClickListener(this)
-        whatsNewTxt.setOnClickListener(this)
+        b.aboutWebsite.setOnClickListener(this)
+        b.aboutTwitter.setOnClickListener(this)
+        b.aboutGithub.setOnClickListener(this)
+        b.aboutBlog.setOnClickListener(this)
+        b.aboutMail.setOnClickListener(this)
+        b.aboutTelegram.setOnClickListener(this)
+        b.aboutFaq.setOnClickListener(this)
+        b.mozillaImg.setOnClickListener(this)
+        b.aboutAppUpdate.setOnClickListener(this)
+        b.aboutWhatsNew.setOnClickListener(this)
 
         try {
             val pInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
             val version = pInfo.versionName
-            appVersionText.text = "v$version"
+            b.aboutAppVersion.text = "v$version"
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()
         }
@@ -95,63 +66,58 @@ class AboutFragment : Fragment(), View.OnClickListener {
     }
 
     override fun onClick(view: View?) {
-        when {
-            view == telegramTxt -> {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("http://www.telegram.me/rethinkdns"))
+        when (view) {
+            b.aboutTelegram -> {
+                val intent = Intent(Intent.ACTION_VIEW, "http://www.telegram.me/rethinkdns".toUri())
                 startActivity(intent)
             }
-            view == blogTxt -> {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://blog.rethinkdns.com/"))
+            b.aboutBlog -> {
+                val intent = Intent(Intent.ACTION_VIEW, "https://blog.rethinkdns.com/".toUri())
                 startActivity(intent)
             }
-            view == faqTxt -> {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.bravedns.com/faq"))
+            b.aboutFaq -> {
+                val intent = Intent(Intent.ACTION_VIEW, "https://www.bravedns.com/faq".toUri())
                 startActivity(intent)
             }
-            view == githubTxt -> {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/celzero/rethink-app"))
+            b.aboutGithub -> {
+                val intent = Intent(Intent.ACTION_VIEW, "https://github.com/celzero/rethink-app".toUri())
                 startActivity(intent)
             }
-            view == mailTxt -> {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("mailto:" + "hello@celzero.com"))
+            b.aboutMail -> {
+                val intent = Intent(Intent.ACTION_VIEW, ("mailto:" + "hello@celzero.com").toUri())
                 intent.putExtra(Intent.EXTRA_SUBJECT, "[RethinkDNS]:")
                 startActivity(intent)
             }
-            view == twitterTxt -> {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/rethinkdns"))
+            b.aboutTwitter -> {
+                val intent = Intent(Intent.ACTION_VIEW, "https://twitter.com/rethinkdns".toUri())
                 startActivity(intent)
             }
-            view == websiteTxt -> {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.bravedns.com/"))
+            b.aboutWebsite -> {
+                val intent = Intent(Intent.ACTION_VIEW, "https://www.bravedns.com/".toUri())
                 startActivity(intent)
             }
-            view == mozillaImg -> {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://builders.mozilla.community/alumni.html"))
+            b.mozillaImg -> {
+                val intent = Intent(Intent.ACTION_VIEW, "https://builders.mozilla.community/alumni.html".toUri())
                 startActivity(intent)
             }
-            view == appUpdateTxt ->{
+            b.aboutAppUpdate -> {
                 (requireContext() as HomeScreenActivity).checkForUpdate(true)
             }
-            view == whatsNewTxt ->{
+            b.aboutWhatsNew -> {
                 showNewFeaturesDialog()
             }
         }
     }
 
     private fun showNewFeaturesDialog() {
-        val inflater: LayoutInflater = LayoutInflater.from(requireContext())
-        val view: View = inflater.inflate(R.layout.dialog_whatsnew, null)
+        val binding = DialogWhatsnewBinding.inflate(LayoutInflater.from(requireContext()), null, false)
         //val builder: android.app.AlertDialog.Builder = AlertDialog.Builder(this)
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setView(view).setTitle(getString(R.string.whats_dialog_title))
-
-        builder.setPositiveButton("Let\'s Go") { dialogInterface, which ->
-            dialogInterface.dismiss()
-        }
-
-        builder.setCancelable(true)
-        builder.create().show()
-
+        AlertDialog.Builder(requireContext())
+            .setView(binding.root)
+            .setTitle(getString(R.string.whats_dialog_title))
+            .setPositiveButton("Let\'s Go") { dialogInterface, _ ->
+                dialogInterface.dismiss()
+            }.setCancelable(true).create().show()
     }
 
 }

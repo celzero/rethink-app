@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -78,6 +77,9 @@ android {
         jvmTarget = '1.8'
     }
 
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
@@ -151,4 +153,7 @@ dependencies {
     implementation "org.koin:koin-androidx-fragment:$koin_version"
 
     implementation 'hu.autsoft:krate:1.0.0'
+
+    // To use only without reflection variants of viewBinding
+    implementation 'com.kirich1409.viewbindingpropertydelegate:vbpd-noreflection:1.4.0'
 }

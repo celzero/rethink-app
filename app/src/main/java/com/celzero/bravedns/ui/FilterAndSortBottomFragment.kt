@@ -20,28 +20,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.celzero.bravedns.R
+import com.celzero.bravedns.databinding.FragmentFilterAndSortBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class FilterAndSortBottomFragment : BottomSheetDialogFragment(){
+class FilterAndSortBottomFragment : BottomSheetDialogFragment() {
+    private var _binding: FragmentFilterAndSortBinding? = null
 
-
-    private lateinit var fragmentView: View
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val b get() = _binding!!
 
     override fun getTheme(): Int = R.style.BottomSheetDialogTheme
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        fragmentView = inflater.inflate(R.layout.fragment_filter_and_sort, container, false)
-        //initView(fragmentView)
-        return fragmentView
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentFilterAndSortBinding.inflate(inflater, container, false)
+        return b.root
     }
 
-    /*override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        //initView(view)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return super.onCreateDialog(savedInstanceState)
-    }*/
-
 }

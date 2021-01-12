@@ -29,9 +29,11 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.*
 import com.celzero.bravedns.database.*
+import com.celzero.bravedns.databinding.FragmentConfigureDnsBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
@@ -46,7 +48,6 @@ import com.celzero.bravedns.viewmodel.DNSCryptEndpointViewModel
 import com.celzero.bravedns.viewmodel.DNSCryptRelayEndpointViewModel
 import com.celzero.bravedns.viewmodel.DNSProxyEndpointViewModel
 import com.celzero.bravedns.viewmodel.DoHEndpointViewModel
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -55,48 +56,30 @@ import java.net.MalformedURLException
 import java.net.URL
 
 
-class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
-    private lateinit var dohRelativeLayout: RelativeLayout
-    private lateinit var dnsCryptRelativeLayout: RelativeLayout
-    private lateinit var dnsProxyRelativeLayout: RelativeLayout
-
-    private lateinit var dnsModeSpinner: Spinner
-
-    private lateinit var progressBar: ProgressBar
-
-    private lateinit var connectedTitle: TextView
-    private lateinit var connectedURL : TextView
-    private lateinit var latencyTxt: TextView
-    private lateinit var lifeTimeQueriesTxt: TextView
-
-    private lateinit var dohCustomAddFabBtn: ExtendedFloatingActionButton
+class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdateInterface {
+    private val b by viewBinding(FragmentConfigureDnsBinding::bind)
 
     //DOH UI elements
-    private var dohRecyclerView: RecyclerView? = null
     private var layoutManager: RecyclerView.LayoutManager? = null
     private var dohRecyclerAdapter: DoHEndpointAdapter? = null
     private val viewModel: DoHEndpointViewModel by viewModel()
 
     //DNSCrypt UI elements
-    private lateinit var dnsCryptRecyclerView: RecyclerView
     private lateinit var dnsCryptRecyclerAdapter: DNSCryptEndpointAdapter
     private var dnsCryptLayoutManager: RecyclerView.LayoutManager? = null
     private val dnsCryptViewModel: DNSCryptEndpointViewModel by viewModel()
 
     //DNSCryptRelay UI elements
-    private lateinit var dnsCryptRelayRecyclerView: RecyclerView
     private lateinit var dnsCryptRelayRecyclerAdapter: DNSCryptRelayEndpointAdapter
     private var dnsCryptRelayLayoutManager: RecyclerView.LayoutManager? = null
     private val dnsCryptRelayViewModel: DNSCryptRelayEndpointViewModel by viewModel()
 
     //DNS Proxy UI Elements
-    private lateinit var dnsProxyRecyclerView: RecyclerView
     private lateinit var dnsProxyRecyclerAdapter: DNSProxyEndpointAdapter
     private var dnsProxyLayoutManager: RecyclerView.LayoutManager? = null
     private val dnsProxyViewModel: DNSProxyEndpointViewModel by viewModel()
-    private lateinit var noProxyText: TextView
 
-    private lateinit var spinnerAdapter : CustomSpinnerAdapter
+    private lateinit var spinnerAdapter: CustomSpinnerAdapter
 
     private val appInfoRepository by inject<AppInfoRepository>()
     private val dohEndpointRepository by inject<DoHEndpointRepository>()
@@ -106,125 +89,97 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
     private val doHEndpointRepository by inject<DoHEndpointRepository>()
     private val persistentState by inject<PersistentState>()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        super.onCreate(savedInstanceState)
-        return inflater.inflate(R.layout.fragment_configure_dns, container, false)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initView(view)
+        initView()
         initClickListeners()
     }
-
 
     companion object {
         fun newInstance() = ConfigureDNSFragment()
     }
 
-    private fun initView(view: View) {
-
-
+    private fun initView() {
         val arraySpinner = requireContext().resources.getStringArray(R.array.dns_endpoint_modes).toList()
-        dnsModeSpinner = view.findViewById(R.id.configure_screen_spinner)
 
         spinnerAdapter = CustomSpinnerAdapter(requireContext(), arraySpinner)
-        dnsModeSpinner.adapter = spinnerAdapter
+        b.configureScreenSpinner.adapter = spinnerAdapter
 
-        progressBar = view.findViewById(R.id.configure_dns_progress_bar)
-
-        connectedTitle = view.findViewById(R.id.configure_connected_status_title)
-        connectedURL  = view.findViewById(R.id.configure_connected_status_url)
-        latencyTxt = view.findViewById(R.id.configure_latency_txt)
-        lifeTimeQueriesTxt = view.findViewById(R.id.configure_total_queries_txt)
-
-        dohCustomAddFabBtn = view.findViewById(R.id.doh_fab_add_server_icon)
-
-        //Containers
-        dohRelativeLayout = view.findViewById(R.id.recycler_doh_connections_header)
-        dnsCryptRelativeLayout = view.findViewById(R.id.recycler_dns_crypt_connections_header)
-        dnsProxyRelativeLayout = view.findViewById(R.id.recycler_dns_proxy_connections_header)
-
-        progressBar.visibility = View.VISIBLE
+        b.configureDnsProgressBar.visibility = View.VISIBLE
 
         HomeScreenActivity.GlobalVariable.median50.observe(viewLifecycleOwner, {
-            latencyTxt.setText("Latency: " + HomeScreenActivity.GlobalVariable.median50.value.toString() + "ms")
+            b.configureLatencyTxt.text = "Latency: " + HomeScreenActivity.GlobalVariable.median50.value.toString() + "ms"
         })
 
         //latencyTxt.setText("Latency: " + getMedianLatency(this) + "ms")
-        lifeTimeQueriesTxt.setText("Lifetime Queries: " + persistentState.getNumOfReq())
+        b.configureTotalQueriesTxt.text = "Lifetime Queries: " + persistentState.getNumOfReq()
 
         //DOH init views
-        dohRecyclerView = view.findViewById<View>(R.id.recycler_doh_connections) as RecyclerView
         layoutManager = LinearLayoutManager(requireContext())
-        dohRecyclerView!!.layoutManager = layoutManager
+        b.recyclerDohConnections.layoutManager = layoutManager
 
         //DNS Crypt init views
-        dnsCryptRecyclerView = view.findViewById(R.id.recycler_dns_crypt_connections)
         dnsCryptLayoutManager = LinearLayoutManager(requireContext())
-        dnsCryptRecyclerView.layoutManager = dnsCryptLayoutManager
+        b.recyclerDnsCryptConnections.layoutManager = dnsCryptLayoutManager
 
         //DNS Crypt Relay init views
-        dnsCryptRelayRecyclerView = view.findViewById(R.id.recycler_dns_crypt_relays)
         dnsCryptRelayLayoutManager = LinearLayoutManager(requireContext())
-        dnsCryptRelayRecyclerView.layoutManager = dnsCryptRelayLayoutManager
+        b.recyclerDnsCryptRelays.layoutManager = dnsCryptRelayLayoutManager
 
         //Proxy init views
-        dnsProxyRecyclerView = view.findViewById(R.id.recycler_dns_proxy_connections)
         dnsProxyLayoutManager = LinearLayoutManager(requireContext())
-        dnsProxyRecyclerView.layoutManager = dnsProxyLayoutManager
-        noProxyText = view.findViewById(R.id.recycler_dns_proxy_title)
+        b.recyclerDnsProxyConnections.layoutManager = dnsProxyLayoutManager
 
         dnsCryptRecyclerAdapter = DNSCryptEndpointAdapter(requireContext(), dnsCryptEndpointRepository, persistentState, get(), this)
         dnsCryptViewModel.dnsCryptEndpointList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(dnsCryptRecyclerAdapter::submitList))
-        dnsCryptRecyclerView.adapter = dnsCryptRecyclerAdapter
+        b.recyclerDnsCryptConnections.adapter = dnsCryptRecyclerAdapter
 
         dnsCryptRelayRecyclerAdapter = DNSCryptRelayEndpointAdapter(requireContext(), dnsCryptRelayEndpointRepository, persistentState, dnsCryptEndpointRepository)
         dnsCryptRelayViewModel.dnsCryptRelayEndpointList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(dnsCryptRelayRecyclerAdapter::submitList))
-        dnsCryptRelayRecyclerView.adapter = dnsCryptRelayRecyclerAdapter
+        b.recyclerDnsCryptRelays.adapter = dnsCryptRelayRecyclerAdapter
 
-        dohRecyclerAdapter = DoHEndpointAdapter(requireContext(), dohEndpointRepository,persistentState, get(), this)
+        dohRecyclerAdapter = DoHEndpointAdapter(requireContext(), dohEndpointRepository, persistentState, get(), this)
         viewModel.dohEndpointList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(dohRecyclerAdapter!!::submitList))
-        dohRecyclerView!!.adapter = dohRecyclerAdapter
+        b.recyclerDohConnections.adapter = dohRecyclerAdapter
 
-        dnsProxyRecyclerAdapter = DNSProxyEndpointAdapter(requireContext(), dnsProxyEndpointRepository, persistentState,  get(),this)
+        dnsProxyRecyclerAdapter = DNSProxyEndpointAdapter(requireContext(), dnsProxyEndpointRepository, persistentState, get(), this)
         dnsProxyViewModel.dnsProxyEndpointList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(dnsProxyRecyclerAdapter::submitList))
-        dnsProxyRecyclerView.adapter = dnsProxyRecyclerAdapter
+        b.recyclerDnsProxyConnections.adapter = dnsProxyRecyclerAdapter
 
         if (DEBUG) Log.d(LOG_TAG, "Notify the adapter called ???")
-        progressBar.visibility = View.GONE
-       val dnsValue= appMode?.getDNSType()
+        b.configureDnsProgressBar.visibility = View.GONE
+        val dnsValue = appMode?.getDNSType()
         if (dnsValue == 1) {
-            dnsModeSpinner.setSelection(0)
+            b.configureScreenSpinner.setSelection(0)
 
-            dohRelativeLayout.visibility = View.VISIBLE
-            dnsCryptRelativeLayout.visibility = View.GONE
-            dnsProxyRelativeLayout.visibility = View.GONE
+            b.recyclerDohConnectionsHeader.visibility = View.VISIBLE
+            b.recyclerDnsCryptConnectionsHeader.visibility = View.GONE
+            b.recyclerDnsProxyConnectionsHeader.visibility = View.GONE
         } else if (dnsValue == 2) {
-            dnsModeSpinner.setSelection(1)
-            dohRelativeLayout.visibility = View.GONE
-            dnsCryptRelativeLayout.visibility = View.VISIBLE
-            dnsProxyRelativeLayout.visibility = View.GONE
-           /* val cryptDetails = appMode?.getDNSCryptServerCount()
-            connectedTitle.text = resources.getString(R.string.configure_dns_connection_name) + "DNS crypt servers: $cryptDetails"
-            connectedURL.text = resources.getString(R.string.configure_dns_connected_dns_crypt_status)*/
+            b.configureScreenSpinner.setSelection(1)
+            b.recyclerDohConnectionsHeader.visibility = View.GONE
+            b.recyclerDnsCryptConnectionsHeader.visibility = View.VISIBLE
+            b.recyclerDnsProxyConnectionsHeader.visibility = View.GONE
+            /* val cryptDetails = appMode?.getDNSCryptServerCount()
+             connectedTitle.text = resources.getString(R.string.configure_dns_connection_name) + "DNS crypt servers: $cryptDetails"
+             connectedURL.text = resources.getString(R.string.configure_dns_connected_dns_crypt_status)*/
         } else {
-            dnsModeSpinner.setSelection(2)
-            dohRelativeLayout.visibility = View.GONE
-            dnsCryptRelativeLayout.visibility = View.GONE
-            dnsProxyRelativeLayout.visibility = View.VISIBLE
-           /* val proxyDetails = appMode?.getDNSProxyServerDetails()
-            connectedURL.text = resources.getString(R.string.configure_dns_connected_dns_proxy_status)
-            connectedTitle.text = resources.getString(R.string.configure_dns_connection_name) + proxyDetails?.proxyName*/
+            b.configureScreenSpinner.setSelection(2)
+            b.recyclerDohConnectionsHeader.visibility = View.GONE
+            b.recyclerDnsCryptConnectionsHeader.visibility = View.GONE
+            b.recyclerDnsProxyConnectionsHeader.visibility = View.VISIBLE
+            /* val proxyDetails = appMode?.getDNSProxyServerDetails()
+             connectedURL.text = resources.getString(R.string.configure_dns_connected_dns_proxy_status)
+             connectedTitle.text = resources.getString(R.string.configure_dns_connection_name) + proxyDetails?.proxyName*/
         }
 
         val proxySize = checkProxySize()
         if (proxySize == 0) {
-            noProxyText.visibility = View.VISIBLE
-            dnsProxyRecyclerView.visibility = View.GONE
-        }else{
-            noProxyText.visibility = View.GONE
-            dnsProxyRecyclerView.visibility = View.VISIBLE
+            b.recyclerDnsProxyTitle.visibility = View.VISIBLE
+            b.recyclerDnsProxyConnections.visibility = View.GONE
+        } else {
+            b.recyclerDnsProxyTitle.visibility = View.GONE
+            b.recyclerDnsProxyConnections.visibility = View.VISIBLE
         }
 
         dnsType.observe(viewLifecycleOwner, {
@@ -239,39 +194,43 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
 
     private fun initClickListeners() {
 
-        dohCustomAddFabBtn.setOnClickListener {
+        b.dohFabAddServerIcon.setOnClickListener {
             when {
-                dnsModeSpinner.selectedItemPosition == 0 -> {
+                b.configureScreenSpinner.selectedItemPosition == 0 -> {
                     showDialogForDOHCustomURL()
                 }
-                dnsModeSpinner.selectedItemPosition == 1 -> {
+                b.configureScreenSpinner.selectedItemPosition == 1 -> {
                     showDialogForDNSCrypt()
                 }
-                dnsModeSpinner.selectedItemPosition == 2 -> {
+                b.configureScreenSpinner.selectedItemPosition == 2 -> {
                     showDialogForDNSProxy()
                 }
             }
         }
 
-        dnsModeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        b.configureScreenSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
 
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (position == 0) {
-                    dohRelativeLayout.visibility = View.VISIBLE
-                    dnsCryptRelativeLayout.visibility = View.GONE
-                    dnsProxyRelativeLayout.visibility = View.GONE
-                } else if (position == 1) {
-                    Log.d(LOG_TAG, "DNS Crypt on Click event")
-                    dohRelativeLayout.visibility = View.GONE
-                    dnsCryptRelativeLayout.visibility = View.VISIBLE
-                    dnsProxyRelativeLayout.visibility = View.GONE
-                } else if (position == 2) {
-                    dohRelativeLayout.visibility = View.GONE
-                    dnsCryptRelativeLayout.visibility = View.GONE
-                    dnsProxyRelativeLayout.visibility = View.VISIBLE
+                when (position) {
+                    0 -> {
+                        b.recyclerDohConnectionsHeader.visibility = View.VISIBLE
+                        b.recyclerDnsCryptConnectionsHeader.visibility = View.GONE
+                        b.recyclerDnsProxyConnectionsHeader.visibility = View.GONE
+                    }
+                    1 -> {
+                        Log.d(LOG_TAG, "DNS Crypt on Click event")
+                        b.recyclerDohConnectionsHeader.visibility = View.GONE
+                        b.recyclerDnsCryptConnectionsHeader.visibility = View.VISIBLE
+                        b.recyclerDnsProxyConnectionsHeader.visibility = View.GONE
+                    }
+                    2 -> {
+                        b.recyclerDohConnectionsHeader.visibility = View.GONE
+                        b.recyclerDnsCryptConnectionsHeader.visibility = View.GONE
+                        b.recyclerDnsProxyConnectionsHeader.visibility = View.VISIBLE
+                    }
                 }
             }
 
@@ -308,15 +267,15 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
             connectedURL.text = resources.getString(R.string.configure_dns_connected_dns_proxy_status)
             connectedTitle.text = resources.getString(R.string.configure_dns_connection_name) +proxyDetails?.proxyName
         }*/
-        if(DEBUG) Log.d(LOG_TAG, "onResume in fragment")
+        if (DEBUG) Log.d(LOG_TAG, "onResume in fragment")
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if(DEBUG) Log.d(LOG_TAG, "onActivityResult in fragment")
+        if (DEBUG) Log.d(LOG_TAG, "onActivityResult in fragment")
         super.onActivityResult(requestCode, resultCode, data)
-        if(resultCode == Activity.RESULT_OK){
+        if (resultCode == Activity.RESULT_OK) {
             val stamp = data?.getStringArrayExtra("stamp")
-            if(DEBUG) Log.d(LOG_TAG, "onActivityResult - Stamp : $stamp")
+            if (DEBUG) Log.d(LOG_TAG, "onActivityResult - Stamp : $stamp")
         }
     }
 
@@ -346,15 +305,13 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
         val cancelURLBtn = dialog.findViewById(R.id.dialog_custom_url_cancel_btn) as AppCompatButton
         val customName = dialog.findViewById(R.id.dialog_custom_name_edit_text) as EditText
         val customURL: EditText = dialog.findViewById(R.id.dialog_custom_url_edit_text) as EditText
-        val progressBar: ProgressBar =
-            dialog.findViewById(R.id.dialog_custom_url_loading) as ProgressBar
-        val errorTxt: TextView =
-            dialog.findViewById(R.id.dialog_custom_url_failure_text) as TextView
+        val progressBar: ProgressBar = dialog.findViewById(R.id.dialog_custom_url_loading) as ProgressBar
+        val errorTxt: TextView = dialog.findViewById(R.id.dialog_custom_url_failure_text) as TextView
 
         var count = dohEndpointRepository.getCount()
         count += 1
 
-        customName.setText("DoH $count",TextView.BufferType.EDITABLE)
+        customName.setText("DoH $count", TextView.BufferType.EDITABLE)
         applyURLBtn.setOnClickListener {
             val url = customURL.text.toString()
             val name = customName.text.toString()
@@ -439,8 +396,8 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
         dialog.setCanceledOnTouchOutside(false)
         dialog.window!!.attributes = lp
 
-       /* val radioInternal: RadioButton = dialog.findViewById(R.id.dialog_dns_proxy_radio_internal)
-        val radioExternal: RadioButton = dialog.findViewById(R.id.dialog_dns_proxy_radio_external)*/
+        /* val radioInternal: RadioButton = dialog.findViewById(R.id.dialog_dns_proxy_radio_internal)
+         val radioExternal: RadioButton = dialog.findViewById(R.id.dialog_dns_proxy_radio_external)*/
         val applyURLBtn = dialog.findViewById(R.id.dialog_dns_proxy_apply_btn) as AppCompatButton
         val cancelURLBtn = dialog.findViewById(R.id.dialog_dns_proxy_cancel_btn) as AppCompatButton
         val proxyNameEditText = dialog.findViewById(R.id.dialog_dns_proxy_edit_name) as EditText
@@ -451,16 +408,14 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
         val llSpinnerHeader: LinearLayout = dialog.findViewById(R.id.dialog_dns_proxy_spinner_header)
         val llIPHeader: LinearLayout = dialog.findViewById(R.id.dialog_dns_proxy_ip_header)
 
-        var count  = dnsProxyEndpointRepository.getCount()
+        var count = dnsProxyEndpointRepository.getCount()
         count += 1
         proxyNameEditText.setText("Proxy $count", TextView.BufferType.EDITABLE)
-        ipAddressEditText.setText("127.0.0.1",TextView.BufferType.EDITABLE)
+        ipAddressEditText.setText("127.0.0.1", TextView.BufferType.EDITABLE)
         val appNames: MutableList<String> = ArrayList()
         appNames.add("Nobody")
         appNames.addAll(getAppName())
-        val proxySpinnerAdapter = ArrayAdapter(
-            requireContext(), android.R.layout.simple_spinner_dropdown_item, appNames
-        )
+        val proxySpinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, appNames)
         appNameSpinner.adapter = proxySpinnerAdapter
         //radioInternal.isChecked = true
         llSpinnerHeader.visibility = View.VISIBLE
@@ -515,21 +470,21 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
                         errorTxt.text = "Port range should be from 1024-65535"
                         isValid = false
                     }
-                }else{
+                } else {
                     isValid = true
                 }
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "Error: ${e.message}", e)
-                errorTxt.setText("Invalid port")
+                errorTxt.text = "Invalid port"
                 isValid = false
             }
 
             if (isValid && isIPValid) {
                 //Do the DNS Proxy setting there
-                if(DEBUG) Log.d(LOG_TAG, "Insert into DNSProxy")
+                if (DEBUG) Log.d(LOG_TAG, "Insert into DNSProxy")
                 insertDNSProxyEndpointDB(mode, name, appName, ip, port)
-                noProxyText.visibility = View.GONE
-                dnsProxyRecyclerView.visibility = View.VISIBLE
+                b.recyclerDnsProxyTitle.visibility = View.GONE
+                b.recyclerDnsProxyConnections.visibility = View.VISIBLE
                 dialog.dismiss()
             } else {
                 Log.i(LOG_TAG, "Insert into DNSProxy fail")
@@ -546,15 +501,14 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
     private fun insertDNSProxyEndpointDB(mode: String, name: String, appName: String, ip: String, port: Int) {
         var proxyName = name
         if (proxyName.isEmpty() || proxyName.isBlank()) {
-            if (mode == "Internal") {
-                proxyName = appName
-            } else
-                proxyName = ip
+            proxyName = if (mode == "Internal") {
+                appName
+            } else ip
         }
         //id: Int, proxyName: String,  proxyType: String, proxyAppName: String, proxyIP: String,proxyPort : Int, isSelected: Boolean, isCustom: Boolean, modifiedDataTime: Long, latency: Int
         val dnsProxyEndpoint = DNSProxyEndpoint(-1, proxyName, mode, appName, ip, port, false, true, 0L, 0)
         dnsProxyEndpointRepository.insertAsync(dnsProxyEndpoint)
-        if(DEBUG) Log.d(LOG_TAG, "Insert into DNSProxy - $appName, $port")
+        if (DEBUG) Log.d(LOG_TAG, "Insert into DNSProxy - $appName, $port")
         object : CountDownTimer(500, 500) {
             override fun onTick(millisUntilFinished: Long) {
             }
@@ -595,16 +549,16 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
         count += 1
         cryptNameEditText.setText("DNSCrypt $count", TextView.BufferType.EDITABLE)
 
-        radioServer.setOnClickListener{
+        radioServer.setOnClickListener {
             var count = dnsCryptEndpointRepository.getCount()
-            count +=1
-            cryptNameEditText.setText("DNSCrypt $count",  TextView.BufferType.EDITABLE)
+            count += 1
+            cryptNameEditText.setText("DNSCrypt $count", TextView.BufferType.EDITABLE)
         }
 
-        radioRelay.setOnClickListener{
+        radioRelay.setOnClickListener {
             var count = dnsCryptRelayEndpointRepository.getCount()
             count += 1
-            cryptNameEditText.setText("DNSRelay $count",  TextView.BufferType.EDITABLE)
+            cryptNameEditText.setText("DNSRelay $count", TextView.BufferType.EDITABLE)
         }
 
         applyURLBtn.setOnClickListener {
@@ -703,8 +657,7 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
     private fun checkUrl(url: String): Boolean {
         return try {
             val parsed = URL(url)
-            parsed.protocol == "https" && parsed.host.isNotEmpty() &&
-                    parsed.path.isNotEmpty() && parsed.query == null && parsed.ref == null
+            parsed.protocol == "https" && parsed.host.isNotEmpty() && parsed.path.isNotEmpty() && parsed.query == null && parsed.ref == null
         } catch (e: MalformedURLException) {
             false
         }
@@ -726,9 +679,9 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
     }
 
     override fun updateUIFromAdapter(dnsType: Int) {
-        if(DEBUG) Log.d(LOG_TAG, "UI Update from adapter")
+        if (DEBUG) Log.d(LOG_TAG, "UI Update from adapter")
         if (dnsType == 1) {
-            if(DEBUG) Log.d(LOG_TAG, "DOH has been changed, modify the connection status in the top layout")
+            if (DEBUG) Log.d(LOG_TAG, "DOH has been changed, modify the connection status in the top layout")
             dnsCryptEndpointRepository.removeConnectionStatus()
             dnsCryptRelayEndpointRepository.removeConnectionStatus()
             dnsProxyEndpointRepository.removeConnectionStatus()
@@ -742,21 +695,21 @@ class ConfigureDNSFragment : Fragment(), UIUpdateInterface {
             dnsProxyRecyclerAdapter.notifyDataSetChanged()
             dohRecyclerAdapter?.notifyDataSetChanged()
         } else if (dnsType == 3) {
-            dnsProxyRecyclerView.visibility = View.VISIBLE
+            b.recyclerDnsProxyConnections.visibility = View.VISIBLE
             doHEndpointRepository.removeConnectionStatus()
             dnsCryptEndpointRepository.removeConnectionStatus()
             dnsCryptRelayEndpointRepository.removeConnectionStatus()
             dohRecyclerAdapter?.notifyDataSetChanged()
             dnsCryptRecyclerAdapter.notifyDataSetChanged()
             dnsCryptRelayRecyclerAdapter.notifyDataSetChanged()
-        } else if(dnsType == 4){
+        } else if (dnsType == 4) {
             val proxySize = checkProxySize()
             if (proxySize == 0) {
-                noProxyText.visibility = View.VISIBLE
-                dnsProxyRecyclerView.visibility = View.GONE
+                b.recyclerDnsProxyTitle.visibility = View.VISIBLE
+                b.recyclerDnsProxyConnections.visibility = View.GONE
             } else {
-                noProxyText.visibility = View.GONE
-                dnsProxyRecyclerView.visibility = View.VISIBLE
+                b.recyclerDnsProxyTitle.visibility = View.GONE
+                b.recyclerDnsProxyConnections.visibility = View.VISIBLE
             }
         }
         spinnerAdapter.notifyDataSetChanged()
