@@ -315,7 +315,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun popupSnackBarForCompleteUpdate() {
-        val snackbar = Snackbar.make(this.findViewById(R.id.container), "New Version is downloaded.", Snackbar.LENGTH_INDEFINITE)
+        val snackbar = Snackbar.make(b.container, "New Version is downloaded.", Snackbar.LENGTH_INDEFINITE)
         snackbar.setAction("RESTART") { appUpdateManager.completeUpdate() }
         snackbar.setActionTextColor(ContextCompat.getColor(this, R.color.textColorMain))
         snackbar.show()
@@ -468,7 +468,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun popupSnackBarForBlocklistUpdate() {
-        val parentLayout = findViewById<View>(android.R.id.content)
+        val parentLayout = b.container
         Snackbar.make(parentLayout, "Update custom blocklist files", Snackbar.LENGTH_LONG).setAction("Update") {
             registerReceiverForDownloadManager(this)
             handleDownloadFiles()
