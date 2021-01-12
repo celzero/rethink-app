@@ -21,11 +21,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.PermissionManagerApk
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfoRepository
+import com.celzero.bravedns.databinding.ActivityPermissionManagerBinding
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import kotlinx.coroutines.Dispatchers
@@ -34,23 +34,20 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class PermissionManagerActivity: AppCompatActivity(), SearchView.OnQueryTextListener{
+class PermissionManagerActivity : AppCompatActivity(R.layout.activity_permission_manager), SearchView.OnQueryTextListener {
+    private val b by viewBinding(ActivityPermissionManagerBinding::bind)
 
     private lateinit var fastAdapter: FastAdapter<PermissionManagerApk>
-    private lateinit var recycle : RecyclerView
     val apkList = ArrayList<PermissionManagerApk>()
     lateinit var itemAdapter: ItemAdapter<PermissionManagerApk>
-    private lateinit var context : Context
-
-    private var editSearch: SearchView? = null
+    private lateinit var context: Context
 
     private val appInfoRepository by inject<AppInfoRepository>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_permission_manager)
-        Toast.makeText(this,"Permission Manager Activity", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "Permission Manager Activity", Toast.LENGTH_LONG).show()
         initView()
 
         context = this
@@ -64,16 +61,14 @@ class PermissionManagerActivity: AppCompatActivity(), SearchView.OnQueryTextList
 
     private fun initView() {
 
-        recycle = findViewById(R.id.permission_manager_recycler_view)
-        recycle.layoutManager = LinearLayoutManager(this)
+        b.permissionManagerRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        itemAdapter =  ItemAdapter()
+        itemAdapter = ItemAdapter()
         fastAdapter = FastAdapter.with(itemAdapter)
-        editSearch = findViewById(R.id.permission_manager_search)
 
-        editSearch!!.setOnQueryTextListener(this)
+        b.permissionManagerSearch.setOnQueryTextListener(this)
 
-        recycle.adapter = fastAdapter
+        b.permissionManagerRecyclerView.adapter = fastAdapter
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
@@ -84,12 +79,11 @@ class PermissionManagerActivity: AppCompatActivity(), SearchView.OnQueryTextList
         return false
     }
 
-    private fun updateAppList() = GlobalScope.launch ( Dispatchers.Default ){
+    private fun updateAppList() = GlobalScope.launch(Dispatchers.Default) {
         val appList = appInfoRepository.getAppInfoAsync()
         //Log.w("DB","App list from DB Size: "+appList.size)
-        appList.forEach{
-
-            val userApk = PermissionManagerApk(packageManager.getPackageInfo(it.packageInfo,0), context)
+        appList.forEach {
+            val userApk = PermissionManagerApk(packageManager.getPackageInfo(it.packageInfo, 0), context)
             apkList.add(userApk)
         }
         withContext(Dispatchers.Main.immediate) {

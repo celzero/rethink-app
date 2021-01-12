@@ -19,22 +19,20 @@ package com.celzero.bravedns.ui
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ApplicationManagerApk
 import com.celzero.bravedns.animation.ViewAnimation
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfoRepository
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.celzero.bravedns.databinding.ActivityApplicationManagerBinding
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import kotlinx.coroutines.Dispatchers
@@ -44,94 +42,79 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 
-class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextListener{
+class ApplicationManagerActivity : AppCompatActivity(R.layout.activity_application_manager), SearchView.OnQueryTextListener {
+    private val b by viewBinding(ActivityApplicationManagerBinding::bind)
 
-    private lateinit var recycle : RecyclerView
     private lateinit var itemAdapter: ItemAdapter<ApplicationManagerApk>
     private lateinit var fastAdapter: FastAdapter<ApplicationManagerApk>
     private val apkList = ArrayList<ApplicationManagerApk>()
-    private lateinit var fabAddIcon : FloatingActionButton
-    private lateinit var fabUninstallIcon : FloatingActionButton
-    private lateinit var fabAppInfoIcon : FloatingActionButton
 
-    private var editSearch: SearchView? = null
-
-    private var isRotate : Boolean = false
+    private var isRotate: Boolean = false
 
     private val appInfoRepository by inject<AppInfoRepository>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_application_manager)
-
         initView()
         updateAppList()
-
     }
 
     private fun initView() {
-        recycle = findViewById(R.id.application_manager_recycler_view)
-        recycle.layoutManager = LinearLayoutManager(this)
+        b.applicationManagerRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        itemAdapter =  ItemAdapter()
+        itemAdapter = ItemAdapter()
         fastAdapter = FastAdapter.with(itemAdapter)
-        editSearch = findViewById(R.id.am_search)
 
-        fabAddIcon = findViewById(R.id.am_fab_add_icon)
-        fabUninstallIcon = findViewById(R.id.am_fab_uninstall_icon)
-        fabAppInfoIcon = findViewById(R.id.am_fab_appinfo_icon)
+        b.amSearch.setOnQueryTextListener(this)
 
-        editSearch!!.setOnQueryTextListener(this)
+        b.applicationManagerRecyclerView.adapter = fastAdapter
 
-        recycle.adapter = fastAdapter
-
-        ViewAnimation.init(fabUninstallIcon)
-        ViewAnimation.init(fabAppInfoIcon)
+        ViewAnimation.init(b.amFabUninstallIcon)
+        ViewAnimation.init(b.amFabAppinfoIcon)
 
         ApplicationManagerApk.cleatList()
 
-        fabAddIcon.setOnClickListener {
+        b.amFabAddIcon.setOnClickListener {
             isRotate = ViewAnimation.rotateFab(it, !isRotate)
-            if(isRotate){
-                ViewAnimation.showIn(fabUninstallIcon)
-                ViewAnimation.showIn(fabAppInfoIcon)
-            }else{
-                ViewAnimation.showOut(fabUninstallIcon)
-                ViewAnimation.showOut(fabAppInfoIcon)
+            if (isRotate) {
+                ViewAnimation.showIn(b.amFabUninstallIcon)
+                ViewAnimation.showIn(b.amFabAppinfoIcon)
+            } else {
+                ViewAnimation.showOut(b.amFabUninstallIcon)
+                ViewAnimation.showOut(b.amFabAppinfoIcon)
             }
         }
 
-        fabUninstallIcon.setOnClickListener{
+        b.amFabUninstallIcon.setOnClickListener {
             val list = ApplicationManagerApk.getAddedList(this)
-            for(app in list){
+            for (app in list) {
                 uninstallPackage(app)
             }
         }
 
-        fabAppInfoIcon.setOnClickListener{
+        b.amFabAppinfoIcon.setOnClickListener {
             val list = ApplicationManagerApk.getAddedList(this)
-            if(list.size >= 1){
+            if (list.size >= 1) {
                 list[list.size - 1].packageName?.let { it1 -> appInfoForPackage(it1) }
             }
         }
     }
 
-    private fun uninstallPackage(app : ApplicationManagerApk){
-        val packageURI = Uri.parse("package:"+app.packageName)
-        val intent = Intent(Intent.ACTION_DELETE,packageURI)
-        intent.putExtra("packageName",app.packageName)
+    private fun uninstallPackage(app: ApplicationManagerApk) {
+        val packageURI = ("package:" + app.packageName).toUri()
+        val intent = Intent(Intent.ACTION_DELETE, packageURI)
+        intent.putExtra("packageName", app.packageName)
         startActivity(intent)
     }
 
-    private fun appInfoForPackage(packageName : String){
-        val activityManager : ActivityManager = getSystemService(Activity.ACTIVITY_SERVICE) as ActivityManager
+    private fun appInfoForPackage(packageName: String) {
+        val activityManager: ActivityManager = getSystemService(Activity.ACTIVITY_SERVICE) as ActivityManager
         activityManager.killBackgroundProcesses(packageName)
 
         try {
             //Open the specific App Info page:
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-            intent.data = Uri.parse("package:$packageName")
+            intent.data = "package:$packageName".toUri()
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             //Open the generic Apps page:
@@ -141,12 +124,12 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
     }
 
 
-    private fun updateAppList() = GlobalScope.launch ( Dispatchers.Default ){
+    private fun updateAppList() = GlobalScope.launch(Dispatchers.Default) {
         val appList = appInfoRepository.getAppInfoAsync()
-        appList.forEach{
-            val packageInfo = packageManager.getPackageInfo(it.packageInfo,0)
-            if(packageInfo.packageName != BuildConfig.APPLICATION_ID ) {
-                val userApk =  ApplicationManagerApk(packageManager.getPackageInfo(it.packageInfo, 0), it.appCategory, this@ApplicationManagerActivity)
+        appList.forEach {
+            val packageInfo = packageManager.getPackageInfo(it.packageInfo, 0)
+            if (packageInfo.packageName != BuildConfig.APPLICATION_ID) {
+                val userApk = ApplicationManagerApk(packageManager.getPackageInfo(it.packageInfo, 0), it.appCategory, this@ApplicationManagerActivity)
                 apkList.add(userApk)
             }
         }
