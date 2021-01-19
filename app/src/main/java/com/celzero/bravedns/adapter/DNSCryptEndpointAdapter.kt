@@ -60,8 +60,7 @@ class DNSCryptEndpointAdapter(private val context: Context,
     companion object {
         private val DIFF_CALLBACK = object :
             DiffUtil.ItemCallback<DNSCryptEndpoint>() {
-            // Concert details may have changed if reloaded from the database,
-            // but ID is fixed.
+
             override fun areItemsTheSame(oldConnection: DNSCryptEndpoint, newConnection: DNSCryptEndpoint) = oldConnection.id == newConnection.id
 
             override fun areContentsTheSame(oldConnection: DNSCryptEndpoint, newConnection: DNSCryptEndpoint) : Boolean{

@@ -64,8 +64,7 @@ class DNSProxyEndpointAdapter(private val context: Context,
     companion object {
         private val DIFF_CALLBACK = object :
             DiffUtil.ItemCallback<DNSProxyEndpoint>() {
-            // Concert details may have changed if reloaded from the database,
-            // but ID is fixed.
+
             override fun areItemsTheSame(oldConnection: DNSProxyEndpoint, newConnection: DNSProxyEndpoint) = oldConnection.id == newConnection.id
 
             override fun areContentsTheSame(oldConnection: DNSProxyEndpoint, newConnection: DNSProxyEndpoint) = oldConnection == newConnection
@@ -266,8 +265,6 @@ class DNSProxyEndpointAdapter(private val context: Context,
         private fun updateDNSProxyDetails(dnsProxyEndpoint: DNSProxyEndpoint) {
             dnsProxyEndpoint.isSelected = true
             dnsProxyEndpointRepository.removeConnectionStatus()
-            dnsProxyEndpointRepository.updateAsync(dnsProxyEndpoint)
-
             object : CountDownTimer(500, 500) {
                 override fun onTick(millisUntilFinished: Long) {
                 }
@@ -289,6 +286,7 @@ class DNSProxyEndpointAdapter(private val context: Context,
             persistentState.dnsType = 3
             persistentState.connectionModeChange = dnsProxyEndpoint.proxyIP!!
             persistentState.dnsProxyIDChange = dnsProxyEndpoint.id
+            dnsProxyEndpointRepository.updateAsync(dnsProxyEndpoint)
             //mDb.close()
         }
     }

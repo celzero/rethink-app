@@ -42,8 +42,7 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
         const val TYPE_CONTROLS: Int = 0
         const val TYPE_TRANSACTION: Int = 1
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DNSLogs>() {
-            // Concert details may have changed if reloaded from the database,
-            // but ID is fixed.
+
             override fun areItemsTheSame(oldConnection: DNSLogs, newConnection: DNSLogs) = oldConnection.id == newConnection.id
 
             override fun areContentsTheSame(oldConnection: DNSLogs, newConnection: DNSLogs) = oldConnection == newConnection

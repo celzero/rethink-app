@@ -19,7 +19,6 @@ package com.celzero.bravedns.ui
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -28,11 +27,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ApplicationManagerApk
 import com.celzero.bravedns.animation.ViewAnimation
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfoRepository
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mikepenz.fastadapter.FastAdapter
@@ -40,7 +37,6 @@ import com.mikepenz.fastadapter.adapters.ItemAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 
@@ -142,9 +138,9 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
 
 
     private fun updateAppList() = GlobalScope.launch ( Dispatchers.Default ){
-        val appList = appInfoRepository.getAppInfoAsync()
+        /*val appList = appInfoRepository.getAppInfoAsync()
         appList.forEach{
-            val packageInfo = packageManager.getPackageInfo(it.packageInfo,0)
+           val packageInfo = packageManager.getPackageInfo(it.packageInfo,0)
             if(packageInfo.packageName != BuildConfig.APPLICATION_ID ) {
                 val userApk =  ApplicationManagerApk(packageManager.getPackageInfo(it.packageInfo, 0), it.appCategory, this@ApplicationManagerActivity)
                 apkList.add(userApk)
@@ -154,7 +150,7 @@ class ApplicationManagerActivity : AppCompatActivity(), SearchView.OnQueryTextLi
             itemAdapter.add(apkList)
             fastAdapter.notifyDataSetChanged()
         }
-        //mDb.close()
+        //mDb.close()*/
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {

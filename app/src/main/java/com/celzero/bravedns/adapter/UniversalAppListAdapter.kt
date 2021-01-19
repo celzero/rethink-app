@@ -61,8 +61,7 @@ class UniversalAppListAdapter(
     companion object {
         private val DIFF_CALLBACK = object :
             DiffUtil.ItemCallback<AppInfo>() {
-            // Concert details may have changed if reloaded from the database,
-            // but ID is fixed.
+
             override fun areItemsTheSame(oldConnection: AppInfo, newConnection: AppInfo)
                 = oldConnection.packageInfo == newConnection.packageInfo
 

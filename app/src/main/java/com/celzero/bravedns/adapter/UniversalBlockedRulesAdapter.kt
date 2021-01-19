@@ -28,7 +28,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallRules
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.BlockedConnections
 import com.celzero.bravedns.database.BlockedConnectionsRepository
 import com.celzero.bravedns.service.BraveVPNService
@@ -47,8 +46,7 @@ class UniversalBlockedRulesAdapter(
     companion object {
         private val DIFF_CALLBACK = object :
             DiffUtil.ItemCallback<BlockedConnections>() {
-            // Concert details may have changed if reloaded from the database,
-            // but ID is fixed.
+
             override fun areItemsTheSame(oldConnection: BlockedConnections, newConnection: BlockedConnections) = oldConnection.id == newConnection.id
 
             override fun areContentsTheSame(oldConnection: BlockedConnections, newConnection: BlockedConnections) = oldConnection == newConnection
