@@ -37,7 +37,10 @@ import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
-import com.celzero.bravedns.database.*
+import com.celzero.bravedns.database.AppInfo
+import com.celzero.bravedns.database.AppInfoRepository
+import com.celzero.bravedns.database.CategoryInfo
+import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -149,11 +152,10 @@ class FirewallAppListAdapter internal constructor(
                 .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                 .into(mIconImageView)
         } catch (e: Exception) {
-            mIconImageView.setImageDrawable(context.getDrawable(R.drawable.default_app_icon))
             Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                 .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                 .into(mIconImageView)
-            Log.e(LOG_TAG, "Application Icon not available for package: ${appInfoDetail.packageInfo}" + e.message, e)
+            Log.i(LOG_TAG, "Application Icon not available for package: ${appInfoDetail.packageInfo}" + e.message)
         }
         mLabelTextView.text = appInfoDetail.appName
 
@@ -273,6 +275,7 @@ class FirewallAppListAdapter internal constructor(
         return convertView
     }
 
+
     override fun getChildrenCount(listPosition: Int): Int {
         return this.dataList[this.titleList[listPosition]]!!.size
     }
@@ -315,7 +318,8 @@ class FirewallAppListAdapter internal constructor(
         val sysAppWarning: TextView = convertView.findViewById(R.id.expand_system_apps_warning)
         val placeHolder : TextView = convertView.findViewById(R.id.expand_system_place_holder)
 
-        categoryNameTV.text = "${listTitle.categoryName} (${listTitle.numberOFApps})"
+        val numberOfApps = listTitle.numberOFApps
+        categoryNameTV.text = "${listTitle.categoryName} ($numberOfApps)"
         val isInternetAllowed = !listTitle.isInternetBlocked
 
         internetChk.isChecked = !isInternetAllowed
@@ -357,7 +361,7 @@ class FirewallAppListAdapter internal constructor(
             placeHolder.visibility = View.GONE
         }
 
-        val numberOfApps = listTitle.numberOFApps
+
         /*if (isInternetAllowed) {
             appCountTV.text = listTitle.numOfAppsBlocked.toString() + "/" + numberOfApps.toString() + " apps blocked"
         } else {
@@ -392,7 +396,17 @@ class FirewallAppListAdapter internal constructor(
                 }
             }
         } catch (e: Exception) {
-            Log.w(LOG_TAG, "One or more application icons are not available" + e.message, e)
+            Log.w(LOG_TAG, "One or more application icons are not available" + e.message)
+            Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                .into(imageHolder1)
+            if (numberOfApps == 1) {
+                imageHolder2.visibility = View.GONE
+            }else{
+                Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                    .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                    .into(imageHolder2)
+            }
         }
         internetChk.setOnClickListener {
             isSearchEnabled = false
@@ -434,12 +448,7 @@ class FirewallAppListAdapter internal constructor(
                 } else {
                     indicatorTV.visibility = View.INVISIBLE
                 }
-                FirewallManager.updateCategoryAppsInternetPermission(
-                    listTitle.categoryName,
-                    !isInternet,
-                    context,
-                    persistentState
-                )
+                FirewallManager.updateCategoryAppsInternetPermission(listTitle.categoryName, !isInternet, persistentState)
 
                 GlobalScope.launch(Dispatchers.IO) {
                     val count = appInfoRepository.updateInternetForAppCategory(listTitle.categoryName, !isInternet)

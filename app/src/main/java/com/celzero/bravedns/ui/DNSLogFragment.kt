@@ -33,7 +33,10 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DNSQueryAdapter
 import com.celzero.bravedns.database.DNSLogDAO
 import com.celzero.bravedns.database.DoHEndpoint
-import com.celzero.bravedns.service.*
+import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.VpnState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.median50
@@ -44,10 +47,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import settings.Settings
 import java.net.MalformedURLException
 import java.net.URL
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class DNSLogFragment  : Fragment(), SearchView.OnQueryTextListener {
 

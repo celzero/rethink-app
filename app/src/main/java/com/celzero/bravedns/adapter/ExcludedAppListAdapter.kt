@@ -19,7 +19,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.os.Handler
 import android.os.Looper
-import android.os.Message
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -31,16 +30,17 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatCheckBox
+import androidx.core.content.ContextCompat
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.ThrowingHandler
 import kotlinx.coroutines.Dispatchers
@@ -56,8 +56,7 @@ class ExcludedAppListAdapter(
     companion object {
         private val DIFF_CALLBACK = object :
             DiffUtil.ItemCallback<AppInfo>() {
-            // Concert details may have changed if reloaded from the database,
-            // but ID is fixed.
+
             override fun areItemsTheSame(oldConnection: AppInfo, newConnection: AppInfo) = oldConnection.packageInfo == newConnection.packageInfo
 
             override fun areContentsTheSame(oldConnection: AppInfo, newConnection: AppInfo) = oldConnection == newConnection
@@ -107,13 +106,22 @@ class ExcludedAppListAdapter(
                 try {
                     //val icon = context.packageManager.getApplicationIcon(appInfo.packageInfo)
                     //appIcon.setImageDrawable(icon)
-                    Glide.with(context).load(context.packageManager.getApplicationIcon(appInfo.packageInfo))
-                        .into(appIcon)
+                    if(!appInfo.packageInfo.contains(Constants.APP_NON_APP) || appInfo.appName != Constants.UNKNOWN_APP){
+                        val icon = context.packageManager.getApplicationIcon(appInfo.packageInfo)
+                        Glide.with(context)
+                            .load(icon)
+                            .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                            .into(appIcon)
+                    }else{
+                        Glide.with(context)
+                            .load(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
+                            .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                            .into(appIcon)
+                    }
+
                 } catch (e: Exception) {
-                    //appIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
-                    Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
-                        .into(appIcon)
-                    Log.e(LOG_TAG, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message, e)
+                    appIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
+                    Log.i(LOG_TAG, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message)
                 }
 
                 parentView?.setOnClickListener {

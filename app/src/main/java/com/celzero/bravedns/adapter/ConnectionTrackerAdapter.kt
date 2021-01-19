@@ -45,8 +45,7 @@ class ConnectionTrackerAdapter(val context : Context) : PagedListAdapter<Connect
     companion object {
         private val DIFF_CALLBACK = object :
             DiffUtil.ItemCallback<ConnectionTracker>() {
-            // Concert details may have changed if reloaded from the database,
-            // but ID is fixed.
+
             override fun areItemsTheSame(oldConnection: ConnectionTracker, newConnection: ConnectionTracker)
                 = oldConnection.id == newConnection.id
 
@@ -118,25 +117,27 @@ class ConnectionTrackerAdapter(val context : Context) : PagedListAdapter<Connect
                 }else if(connTracker.blockedByRule.equals(BraveVPNService.BlockedRuleNames.RULE7.ruleName)){
                     connectionIndicator!!.visibility = View.VISIBLE
                     connectionIndicator!!.setBackgroundColor(ContextCompat.getColor(context, R.color.dividerColor))
-                }
-                else {
+                }else {
                     connectionIndicator!!.visibility = View.INVISIBLE
                 }
                 if (connTracker.appName != "Unknown") {
                     try {
                         val appArray = context.packageManager.getPackagesForUid(connTracker.uid)
-                        val appCount = (appArray?.size)?.minus(1)
-                        if (appArray?.size!! > 2) {
-                            fqdnView!!.text = "${connTracker.appName} + $appCount other apps"
-                        } else if (appArray.size == 2) {
-                            fqdnView!!.text = "${connTracker.appName} + $appCount other app"
+                        if(appArray != null) {
+                            val appCount = (appArray.size).minus(1)
+                            if (appArray.size > 2) {
+                                fqdnView!!.text = "${connTracker.appName} + $appCount other apps"
+                            } else if (appArray.size == 2) {
+                                fqdnView!!.text = "${connTracker.appName} + $appCount other app"
+                            }
+                            Glide.with(context)
+                                .load(context.packageManager.getApplicationIcon(appArray[0]!!))
+                                .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                                .into(appIcon!!)
                         }
-                        Glide.with(context)
-                            .load(context.packageManager.getApplicationIcon(appArray[0]!!))
-                            .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
-                            .into(appIcon!!)
                     } catch (e: Exception) {
-                        Glide.with(context)
+                        //appIcon?.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                       Glide.with(context)
                             .load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                             .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                             .into(appIcon!!)

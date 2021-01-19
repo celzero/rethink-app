@@ -47,9 +47,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.ApplicationManagerActivity"
-            android:theme="@style/AppTheme" />
-        <activity
             android:name=".ui.DNSDetailActivity"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme" />

@@ -81,7 +81,7 @@ class DeviceLockService  : Service(){
     companion object{
         const val ACTION_CHECK_LOCK  = "com.celzero.bravedns.receiver.DeviceLockService.ACTION_START_SERVICE"
         const val EXTRA_CHECK_LOCK_DELAY_INDEX ="com.celzero.bravedns.receiver.DeviceLockService.EXTRA_CHECK_LOCK_DELAY_INDEX"
-        const val EXTRA_STATE = "com.celzero.bravedns.receiver.DeviceLockService..EXTRA_STATE"
+        const val EXTRA_STATE = "com.celzero.bravedns.receiver.DeviceLockService.EXTRA_STATE"
 
         private const val SECOND = 1000
         private const val MINUTE = 60 * SECOND
