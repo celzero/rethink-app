@@ -143,7 +143,10 @@ class Utilities {
             val enabledServices = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
             for (enabledService in enabledServices) {
                 val enabledServiceInfo: ServiceInfo = enabledService.resolveInfo.serviceInfo
-                if (enabledServiceInfo.packageName == context.packageName && enabledServiceInfo.name == service.name) return true
+                if(DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled checking for: ${enabledServiceInfo.packageName}")
+                if (enabledServiceInfo.packageName == context.packageName && enabledServiceInfo.name == service.name){
+                    return true
+                }
             }
             if(DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled failure: ${context.packageName},  ${service.name}, return size: ${enabledServices.size}")
             return false
@@ -159,10 +162,15 @@ class Utilities {
                 while (colonSplitter.hasNext()) {
                     val componentNameString = colonSplitter.next()
                     val enabledService = ComponentName.unflattenFromString(componentNameString)
-                    if (enabledService != null && enabledService == expectedComponentName) return true
+                    if (enabledService != null && enabledService == expectedComponentName) {
+                        if(DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled Enhanced: ${expectedComponentName.packageName}")
+                        return true
+                    }
                 }
+                if(DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled Enhanced: failed calling isAccessibilityServiceEnabled()")
                 return isAccessibilityServiceEnabled(context, accessibilityService)
             }catch (e: Exception){
+                if(DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled Exception: failed calling isAccessibilityServiceEnabled() ${e.message}")
                 return isAccessibilityServiceEnabled(context, accessibilityService)
             }
         }

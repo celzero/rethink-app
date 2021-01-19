@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:nestedScrollingEnabled="false"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_connection_tracker">
 
@@ -139,17 +140,24 @@
             android:textSize="@dimen/default_font_text_view"
             android:text="" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_connection"
+        <com.celzero.bravedns.util.NestedScrollableHost
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:nestedScrollingEnabled="true"
             android:layout_below="@id/connection_list_recycler_heading"
-            android:layout_margin="2dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:orientation="vertical"
-            android:layout_marginBottom="?attr/actionBarSize" />
+            android:layout_marginBottom="?attr/actionBarSize"
+            android:layout_margin="2dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_connection"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:nestedScrollingEnabled="false"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical" />
+        </com.celzero.bravedns.util.NestedScrollableHost>
+
+
 
         <TextView
             android:id="@+id/connection_list_logs_disabled_tv"

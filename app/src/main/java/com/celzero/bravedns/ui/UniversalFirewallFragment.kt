@@ -16,6 +16,7 @@ limitations under the License.
 package com.celzero.bravedns.ui
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings
@@ -228,15 +229,16 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
             val checkedVal = backgroundModeToggle.isChecked
             if(!checkedVal) {
                 if (Utilities.isAccessibilityServiceEnabledEnhanced(requireContext(), BackgroundAccessibilityService::class.java)) {
-                    if(!Utilities.isAccessibilityServiceEnabled(requireContext(), BackgroundAccessibilityService::class.java)){
+                   if(!Utilities.isAccessibilityServiceEnabled(requireContext(), BackgroundAccessibilityService::class.java)){
                         if (!showAlertForPermission(true)) {
                             backgroundModeToggle.isChecked = false
                             persistentState.setIsBackgroundEnabled(false)
                         }
-                    }
-                    GlobalVariable.isBackgroundEnabled = !checkedVal
-                    persistentState.setIsBackgroundEnabled(!checkedVal)
-                    backgroundModeToggle.isChecked = !checkedVal
+                    }else{
+                       GlobalVariable.isBackgroundEnabled = !checkedVal
+                       persistentState.setIsBackgroundEnabled(!checkedVal)
+                       backgroundModeToggle.isChecked = !checkedVal
+                   }
                 } else {
                     if (!showAlertForPermission(false)) {
                         backgroundModeToggle.isChecked = false
@@ -260,10 +262,11 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
                             backgroundModeToggle.isChecked = false
                             persistentState.setIsBackgroundEnabled(false)
                         }
+                    }else {
+                        GlobalVariable.isBackgroundEnabled = !checkedVal
+                        persistentState.setIsBackgroundEnabled(!checkedVal)
+                        backgroundModeToggle.isChecked = !checkedVal
                     }
-                    GlobalVariable.isBackgroundEnabled = !checkedVal
-                    persistentState.setIsBackgroundEnabled(!checkedVal)
-                    backgroundModeToggle.isChecked = !checkedVal
                 } else {
                     if (!showAlertForPermission(false)) {
                         backgroundModeToggle.isChecked = false
@@ -369,9 +372,16 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
     override fun onResume() {
         super.onResume()
         unknownToggle.isChecked =  persistentState.blockUnknownConnections
+        if (DEBUG) Log.d(LOG_TAG, "isAccessibilityServiceEnabled Univ- ${persistentState.backgroundEnabled}, ${backgroundModeToggle.isChecked}")
         if (Utilities.isAccessibilityServiceEnabledEnhanced(requireContext(), BackgroundAccessibilityService::class.java)) {
-            if (DEBUG) Log.d(LOG_TAG, "Background - onLoad accessibility is true")
-            backgroundModeToggle.isChecked = persistentState.backgroundEnabled
+            if(!Utilities.isAccessibilityServiceEnabled(requireContext(), BackgroundAccessibilityService::class.java) && persistentState.backgroundEnabled){
+                backgroundModeToggle.isChecked = false
+                persistentState.backgroundEnabled = false
+                showAlertForPermission(true)
+            }else{
+                if (DEBUG) Log.d(LOG_TAG, "Background - onLoad accessibility is true")
+                backgroundModeToggle.isChecked = persistentState.backgroundEnabled
+            }
         } else {
             if (DEBUG) Log.d(LOG_TAG, "Background - onLoad accessibility is true, changed pref")
             persistentState.setIsBackgroundEnabled(false)
@@ -382,34 +392,52 @@ class UniversalFirewallFragment : Fragment() , SearchView.OnQueryTextListener {
     private fun showAlertForPermission(isRegrant : Boolean) : Boolean {
         var isAllowed  = false
         val builder = AlertDialog.Builder(requireContext())
-        //set title for alert dialog
+        //set title and message for alert dialog
         if(isRegrant){
             builder.setTitle(R.string.alert_permission_accessibility_regrant)
+            val text = getString(R.string.alert_firewall_accessibility_regrant_explanation)
+            /*if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                builder.setMessage(Html.fromHtml(text, HtmlCompat.FROM_HTML_MODE_COMPACT))
+            } else {
+                builder.setMessage(Html.fromHtml(text))
+            }*/
+            builder.setMessage(R.string.alert_firewall_accessibility_regrant_explanation)
+            builder.setPositiveButton("Goto Settings") { _, _ ->
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                val packageName = requireContext().packageName
+                intent.data = Uri.parse("package:$packageName")
+                startActivity(intent)
+            }
+            //performing negative action
+            builder.setNegativeButton("Cancel") { _, _ ->
+                backgroundModeToggle.isChecked = false
+                persistentState.backgroundEnabled = false
+            }
         }else {
             builder.setTitle(R.string.alert_permission_accessibility)
-        }
-        //set message for alert dialog
-        if(isRegrant){
-            builder.setMessage(R.string.alert_firewall_accessibility_regrant_explanation)
-        }else{
             builder.setMessage(R.string.alert_firewall_accessibility_explanation)
+            builder.setPositiveButton("Grant") { _, _ ->
+                isAllowed = true
+                val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                startActivityForResult(intent, 0)
+            }
+            //performing negative action
+            builder.setNegativeButton("Deny") { _, _ ->
+                backgroundModeToggle.isChecked = false
+                persistentState.backgroundEnabled = false
+            }
         }
 
         builder.setIcon(android.R.drawable.ic_dialog_alert)
         //performing positive action
-        builder.setPositiveButton("Grant"){ _, _ ->
-            isAllowed = true
-            val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-            startActivityForResult(intent, 0)
-        }
-        //performing negative action
-        builder.setNegativeButton("Deny"){ _, _ ->
-        }
+
+
         // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()
         // Set other dialog properties
         alertDialog.setCancelable(false)
         alertDialog.show()
+        alertDialog.setCancelable(false)
         return isAllowed
     }
 

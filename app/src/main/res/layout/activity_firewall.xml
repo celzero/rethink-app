@@ -17,7 +17,7 @@
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/firewall_act_viewpager"
-        android:nestedScrollingEnabled="true"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

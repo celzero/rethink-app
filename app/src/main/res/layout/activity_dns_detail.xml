@@ -18,6 +18,7 @@
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/dns_detail_act_viewpager"
         android:layout_width="match_parent"
+        android:orientation="horizontal"
         android:nestedScrollingEnabled="true"
         android:layout_height="match_parent" />
 
