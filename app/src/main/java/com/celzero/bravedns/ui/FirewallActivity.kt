@@ -15,25 +15,23 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.celzero.bravedns.R
-import com.celzero.bravedns.database.AppDatabase
-import com.celzero.bravedns.database.ConnectionTrackerRepository
+import com.celzero.bravedns.util.Constants
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import org.koin.android.ext.android.inject
 
 class FirewallActivity : AppCompatActivity() {
     private lateinit var viewPagerFirewall : ViewPager2
     private lateinit var tabLayoutFirewall : TabLayout
     private val FIREWALL_TABS_COUNT = 3
 
-    private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,30 +57,23 @@ class FirewallActivity : AppCompatActivity() {
             }
         }
 
-        //viewPagerFirewall.fakeDragBy(1000F)
-
         TabLayoutMediator(tabLayoutFirewall, viewPagerFirewall) { tab, position ->
             tab.text = when (position) {
                 0 -> getString(R.string.firewall_act_universal_tab)
                 1 -> getString(R.string.firewall_act_network_monitor_tab)
                 else -> getString(R.string.firewall_act_apps_tab)
             }
-            viewPagerFirewall.setCurrentItem(tab.position, true)
+            viewPagerFirewall.setCurrentItem(tab.position, false)
         }.attach()
 
+        viewPagerFirewall.offscreenPageLimit = 2
 
-        val recyclerViewField = ViewPager2::class.java.getDeclaredField("mRecyclerView")
-        recyclerViewField.isAccessible = true
-        val recyclerView = recyclerViewField.get(viewPagerFirewall) as RecyclerView
-
-        val touchSlopField = RecyclerView::class.java.getDeclaredField("mTouchSlop")
-        touchSlopField.isAccessible = true
-        val touchSlop = touchSlopField.get(recyclerView) as Int
-        touchSlopField.set(recyclerView, touchSlop * 3)       // "8" was obtained experimentally
-
-        connectionTrackerRepository.deleteConnectionTrackerCount()
 
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        Log.i(Constants.LOG_TAG, "New intent with flags for Firewall Activity: "+intent?.flags)
+    }
 
 }

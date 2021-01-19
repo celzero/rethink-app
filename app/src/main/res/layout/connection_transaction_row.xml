@@ -31,7 +31,7 @@
             android:layout_height="40dp"
             android:layout_gravity="center"
             android:layout_margin="10dp"
-            android:src="@android:drawable/sym_def_app_icon" />
+            android:src="@drawable/default_app_icon" />
 
         <LinearLayout
             android:id="@+id/connection_screen_ll"

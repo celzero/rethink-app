@@ -19,7 +19,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 import settings.Settings
 
-class HomeScreenSettingBottomSheet(var connectedDetails : String) : BottomSheetDialogFragment() {
+class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
 
     private var fragmentView: View? = null
     private lateinit var appUpTimeTxt : TextView
@@ -27,6 +27,7 @@ class HomeScreenSettingBottomSheet(var connectedDetails : String) : BottomSheetD
     private lateinit var braveModeRadioGroup: RadioGroup
     private var firewallMode = -1L
     private val LOG_FILE = "HOMESCREEN_BTM_SHEET"
+    private var connectedDetails : String = ""
 
     private val persistentState by inject<PersistentState>()
 
@@ -35,6 +36,10 @@ class HomeScreenSettingBottomSheet(var connectedDetails : String) : BottomSheetD
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         fragmentView = inflater.inflate(R.layout.bottom_sheet_home_screen, container, false)
         return fragmentView
+    }
+
+    constructor(connectedDetails : String) : this(){
+        this.connectedDetails = connectedDetails
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

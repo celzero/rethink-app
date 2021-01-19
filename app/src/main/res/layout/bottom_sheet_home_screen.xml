@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="10dp">
+        android:padding="5dp">
 
         <TextView
             android:id="@+id/bs_home_screen_heading"
@@ -57,8 +57,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layoutDirection="rtl"
-            android:padding="10dp"
-            android:layout_margin="10dp"
+            android:padding="5dp"
+            android:layout_margin="5dp"
             android:text="@string/app_mode_dns_low_battery"
             android:textColor="@color/primaryText"
             android:textSize="@dimen/large_font_text_view" />
@@ -70,8 +70,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layoutDirection="rtl"
-            android:layout_margin="10dp"
-            android:padding="10dp"
+            android:layout_margin="5dp"
+            android:padding="5dp"
             android:text="Firewall"
             android:textColor="@color/primaryText"
             android:textSize="@dimen/large_font_text_view" />
@@ -83,8 +83,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layoutDirection="rtl"
-            android:padding="10dp"
-            android:layout_margin="10dp"
+            android:padding="5dp"
+            android:layout_margin="5dp"
             android:text="DNS and Firewall"
             android:textColor="@color/primaryText"
             android:textSize="@dimen/large_font_text_view" />
@@ -107,7 +107,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:layout_margin="10dp"
+            android:gravity="center"
+            android:layout_margin="5dp"
             android:text="1.1.1.1"
             android:textIsSelectable="true"
             android:textSize="@dimen/large_font_text_view" />
@@ -117,7 +118,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/bs_home_screen_connected_status"
-            android:layout_margin="10dp"
+            android:layout_margin="5dp"
             android:gravity="center"
             android:text="sdad"
             android:textSize="@dimen/default_font_text_view" />
