@@ -39,49 +39,37 @@
                 android:orientation="vertical"
                 android:padding="10dp">
 
-                <com.facebook.shimmer.ShimmerFrameLayout
-                    android:id="@+id/shimmer_view_heading"
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:shimmer_base_color="@color/primaryText"
-                    app:shimmer_duration="30000"
-                    app:shimmer_repeat_delay="20000"
-                    app:shimmer_colored="true"
-                    app:shimmer_width_ratio="1.5"
-                    app:shimmer_shape="radial"
-                    app:shimmer_auto_start="true">
+                    android:layout_gravity="center"
+                    android:orientation="vertical">
 
-                    <LinearLayout
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/fhs_title_rethink"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:orientation="vertical">
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:gravity="center"
+                        android:letterSpacing="0.25"
+                        android:text="rethinkdns"
+                        android:textColor="@color/textColorMain"
+                        android:textSize="@dimen/text_size_heading"
+                        android:visibility="visible" />
 
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/fhs_title_rethink"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:fontFamily="sans-serif-smallcaps"
-                            android:gravity="center"
-                            android:letterSpacing="0.2"
-                            android:text="rethinkdns"
-                            android:textColor="@color/textColorMain"
-                            android:textSize="@dimen/text_size_heading"
-                            android:visibility="visible" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/fhs_title_rethink_desc"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:gravity="center"
-                            android:text="Backed by Mozilla Builders Incubator"
-                            android:textColor="@color/textColorMain"
-                            android:textSize="@dimen/sub_heading_small"
-                            android:visibility="visible" />
-                    </LinearLayout>
-                </com.facebook.shimmer.ShimmerFrameLayout>
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/fhs_title_rethink_desc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:text="Backed by Mozilla Builders Incubator"
+                        android:textColor="@color/textColorMain"
+                        android:textSize="@dimen/sub_heading_small"
+                        android:visibility="visible" />
+                </LinearLayout>
             </LinearLayout>
 
 
@@ -450,51 +438,224 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="start"
             android:layout_gravity="center"
             android:layout_margin="10dp"
+            android:gravity="start"
             android:orientation="horizontal"
+            android:visibility="visible"
             android:weightSum="1">
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/chip_configure_firewall"
-                style="@android:style/Widget.Button"
+                style="@style/Widget.AppCompat.Button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
-                android:foreground="?attr/selectableItemBackground"
-                android:textAlignment="center"
                 android:background="@drawable/rounded_corners_button_primary"
                 android:clickable="true"
-                android:stateListAnimator="@null"
                 android:drawableStart="@drawable/spinner_firewall"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
+                android:elevation="@dimen/bottom_sheet_corner_radius"
+                android:stateListAnimator="@null"
                 android:text="@string/firewall_mode_info_title"
-                android:textColor="@color/primaryText"
-                android:focusable="true" />
+                android:textAlignment="center"
+                android:textColor="@color/primaryText" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/chip_view_logs"
-                style="@android:style/Widget.Button"
+                style="@style/Widget.AppCompat.Button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:stateListAnimator="@null"
                 android:layout_weight="0.5"
-                android:clickable="true"
-                android:focusable="true"
-                android:elevation="16dp"
-                android:foreground="?attr/selectableItemBackground"
-                android:textAlignment="center"
                 android:background="@drawable/rounded_corners_button_primary"
+                android:clickable="true"
                 android:drawableStart="@drawable/spinner_dns"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:elevation="@dimen/bottom_sheet_corner_radius"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
+                android:stateListAnimator="@null"
                 android:text="@string/dns_mode_info_title"
+                android:textAlignment="center"
                 android:textColor="@color/primaryText" />
 
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:weightSum="1">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="5dp"
+                android:layout_weight="0.5"
+                android:padding="10dp"
+                app:cardElevation="@dimen/activity_horizontal_margin">
+
+                <ImageView
+                    android:id="@+id/fhs_card_dns_logs_iv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_margin="5dp"
+                    android:padding="5dp"
+                    android:src="@drawable/logs_home_screen" />
+
+                <LinearLayout
+                    android:id="@+id/fhs_card_dns_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="5dp"
+                        android:padding="5dp"
+                        android:text="DNS"
+                        android:textColor="@color/dividerColor"
+                        app:drawableStartCompat="@drawable/dns_home_screen" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:background="@color/dividerColor" />
+
+                    <TextView
+                        android:id="@+id/fhs_card_dns_latency"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:padding="5dp"
+                        android:text="Latency: 40 ms"
+                        android:textColor="@color/primaryText" />
+
+                    <TextView
+                        android:id="@+id/fhs_card_dns_blocked_queries"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:padding="5dp"
+                        android:text="Blocked queries: 4K"
+                        android:textColor="@color/primaryText" />
+
+                    <TextView
+                        android:id="@+id/fhs_card_dns_lifetime_queries"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:padding="5dp"
+                        android:text="Lifetime queries: 4K"
+                        android:textColor="@color/primaryText" />
+
+                    <TextView
+                        android:id="@+id/fhs_card_dns_connected_dns"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:padding="5dp"
+                        android:text="Connected to: Cloudflare"
+                        android:textColor="@color/primaryText" />
+
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="10dp"
+                android:layout_weight="0.5"
+                android:padding="10dp"
+                app:cardElevation="@dimen/activity_horizontal_margin">
+
+                <ImageView
+                    android:id="@+id/fhs_card_firewall_logs_iv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_margin="5dp"
+                    android:padding="5dp"
+                    android:src="@drawable/logs_home_screen" />
+
+                <LinearLayout
+                    android:id="@+id/fhs_card_firewall_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="5dp"
+                        android:padding="5dp"
+                        android:text="Firewall"
+                        android:textColor="@color/dividerColor"
+                        app:drawableStartCompat="@drawable/firewall_home_screen" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:background="@color/dividerColor" />
+
+                    <TextView
+                        android:id="@+id/fhs_card_firewall_apps"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:padding="5dp"
+                        android:text="Blocked apps: 0"
+                        android:textColor="@color/primaryText" />
+
+                    <TextView
+                        android:id="@+id/fhs_card_firewall_univ"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:padding="5dp"
+                        android:text="Universal rules: 0"
+                        android:textColor="@color/primaryText" />
+
+                    <TextView
+                        android:id="@+id/fhs_card_firewall_whitelist"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:padding="5dp"
+                        android:text="Whitelisted apps: 0"
+                        android:textColor="@color/primaryText" />
+
+                    <TextView
+                        android:id="@+id/fhs_card_firewall_excluded"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:padding="5dp"
+                        android:text="Excluded apps: 0"
+                        android:textColor="@color/primaryText" />
+
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -545,7 +706,6 @@
             android:orientation="vertical">
 
 
-
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/shimmer_view_container1"
                 android:layout_width="match_parent"
@@ -561,16 +721,17 @@
 
                     <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/fhs_dns_on_off_btn"
+                        style="@style/Widget.AppCompat.Button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/rounded_corners_button_primary"
                         android:drawableEnd="@drawable/ic_arrow_down"
                         android:fontFamily="sans-serif-condensed-medium"
+                        android:gravity="center"
                         android:paddingStart="39dp"
                         android:paddingEnd="10dp"
-                        android:gravity="center"
-                        android:text="Start"
                         android:stateListAnimator="@null"
+                        android:text="Start"
                         android:textColor="@color/white"
                         android:textSize="@dimen/home_screen_stat_text" />
 
@@ -589,9 +750,9 @@
                 android:id="@+id/fhs_protection_level_txt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:fontFamily="sans-serif-smallcaps"
                 android:text="not connected"
-                android:layout_marginTop="10dp"
                 android:textColor="@color/accent_bad"
                 android:textSize="@dimen/large_font_text_view" />
 
