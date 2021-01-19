@@ -22,15 +22,10 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -40,6 +35,7 @@ import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.CategoryInfoRepository
+import com.celzero.bravedns.databinding.UnivWhitelistListItemBinding
 import com.celzero.bravedns.service.BraveVPNService.Companion.appWhiteList
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
@@ -51,33 +47,21 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class UniversalAppListAdapter(
-    private val context: Context,
-    private val appInfoRepository: AppInfoRepository,
-    private val categoryInfoRepository:CategoryInfoRepository,
-    private val persistentState:PersistentState
-)  : PagedListAdapter<AppInfo, UniversalAppListAdapter.UniversalAppInfoViewHolder>(DIFF_CALLBACK) {
+class UniversalAppListAdapter(private val context: Context, private val appInfoRepository: AppInfoRepository, private val categoryInfoRepository: CategoryInfoRepository, private val persistentState: PersistentState) : PagedListAdapter<AppInfo, UniversalAppListAdapter.UniversalAppInfoViewHolder>(DIFF_CALLBACK) {
 
     companion object {
-        private val DIFF_CALLBACK = object :
-            DiffUtil.ItemCallback<AppInfo>() {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<AppInfo>() {
             // Concert details may have changed if reloaded from the database,
             // but ID is fixed.
-            override fun areItemsTheSame(oldConnection: AppInfo, newConnection: AppInfo)
-                = oldConnection.packageInfo == newConnection.packageInfo
+            override fun areItemsTheSame(oldConnection: AppInfo, newConnection: AppInfo) = oldConnection.packageInfo == newConnection.packageInfo
 
-            override fun areContentsTheSame(oldConnection: AppInfo, newConnection: AppInfo)
-                = oldConnection == newConnection
+            override fun areContentsTheSame(oldConnection: AppInfo, newConnection: AppInfo) = oldConnection == newConnection
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UniversalAppInfoViewHolder {
-       val v: View = LayoutInflater.from(parent.context).inflate(
-           R.layout.univ_whitelist_list_item,
-           parent, false
-       )
-
-        return UniversalAppInfoViewHolder(v)
+        val itemBinding = UnivWhitelistListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return UniversalAppInfoViewHolder(itemBinding)
     }
 
     override fun onBindViewHolder(holder: UniversalAppInfoViewHolder, position: Int) {
@@ -86,50 +70,29 @@ class UniversalAppListAdapter(
     }
 
 
-
-    inner class UniversalAppInfoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-        // Overall view
-        private var rowView: View? = null
-
-        private var parentView: RelativeLayout? = null
-
-        // Contents of the condensed view
-        private var appName: TextView
-        private var appIcon : ImageView
-        private var checkBox : AppCompatCheckBox
-
-        init {
-            rowView = itemView
-            parentView = itemView.findViewById(R.id.univ_whitelist_container)
-            appName = itemView.findViewById(R.id.univ_whitelist_apk_label_tv)
-            appIcon = itemView.findViewById(R.id.univ_whitelist_apk_icon_iv)
-            checkBox = itemView.findViewById(R.id.univ_whitelist_checkbox)
-        }
+    inner class UniversalAppInfoViewHolder(private val b: UnivWhitelistListItemBinding) : RecyclerView.ViewHolder(b.root) {
 
         fun update(appInfo: AppInfo?) {
-            if(appInfo != null){
-                if(appInfo.appCategory == Constants.APP_CAT_SYSTEM_COMPONENTS){
-                    appName.text = appInfo.appName//+ Constants.RECOMMENDED
-                }else{
-                    appName.text = appInfo.appName
+            if (appInfo != null) {
+                if (appInfo.appCategory == Constants.APP_CAT_SYSTEM_COMPONENTS) {
+                    b.univWhitelistApkLabelTv.text = appInfo.appName//+ Constants.RECOMMENDED
+                } else {
+                    b.univWhitelistApkLabelTv.text = appInfo.appName
                 }
 
-                checkBox.isChecked = appInfo.whiteListUniv1
+                b.univWhitelistCheckbox.isChecked = appInfo.whiteListUniv1
                 try {
-                    Glide.with(context).load(context.packageManager.getApplicationIcon(appInfo.packageInfo))
-                        .into(appIcon)
+                    Glide.with(context).load(context.packageManager.getApplicationIcon(appInfo.packageInfo)).into(b.univWhitelistApkIconIv)
                     //val icon = context.packageManager.getApplicationIcon(appInfo.packageInfo)
                     //appIcon.setImageDrawable(icon)
                 } catch (e: Exception) {
-                    Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
-                        .into(appIcon)
+                    Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.univWhitelistApkIconIv)
                     //appIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
                     Log.e(LOG_TAG, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message, e)
                 }
 
-                parentView?.setOnClickListener{
-                    if(DEBUG) Log.d(LOG_TAG,"parentView- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
+                b.univWhitelistContainer.setOnClickListener {
+                    if (DEBUG) Log.d(LOG_TAG, "parentView- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
                     appInfo.whiteListUniv1 = !appInfo.whiteListUniv1
                     modifyWhiteListApps(appInfo)
                     /*object : CountDownTimer(1000, 500) {
@@ -142,9 +105,9 @@ class UniversalAppListAdapter(
 
                 }
 
-                checkBox.setOnCheckedChangeListener(null)
-                checkBox.setOnClickListener{
-                    if(DEBUG) Log.d(LOG_TAG,"CheckBox- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
+                b.univWhitelistCheckbox.setOnCheckedChangeListener(null)
+                b.univWhitelistCheckbox.setOnClickListener {
+                    if (DEBUG) Log.d(LOG_TAG, "CheckBox- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
                     appInfo.whiteListUniv1 = !appInfo.whiteListUniv1
                     modifyWhiteListApps(appInfo)
                 }
@@ -155,19 +118,19 @@ class UniversalAppListAdapter(
             val status = appInfo.whiteListUniv1
             appWhiteList[appInfo.uid] = status
             val appUIDList = appInfoRepository.getAppListForUID(appInfo.uid)
-            var blockAllApps = false
-            if (appUIDList.size > 1) {
-                blockAllApps = showDialog(appUIDList, appInfo.appName, status)
-            }else{
-                blockAllApps = true
-               /* if (status) {
-                    Toast.makeText(context, "${appInfo.appName} removed from whitelist", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(context, "${appInfo.appName} added to whitelist", Toast.LENGTH_SHORT).show()
-                }*/
+            val blockAllApps: Boolean
+            blockAllApps = if (appUIDList.size > 1) {
+                showDialog(appUIDList, appInfo.appName, status)
+            } else {
+                true
+                /* if (status) {
+                                 Toast.makeText(context, "${appInfo.appName} removed from whitelist", Toast.LENGTH_SHORT).show()
+                             } else {
+                                 Toast.makeText(context, "${appInfo.appName} added to whitelist", Toast.LENGTH_SHORT).show()
+                             }*/
             }
-            if(blockAllApps) {
-                checkBox.isChecked = status
+            if (blockAllApps) {
+                b.univWhitelistCheckbox.isChecked = status
                 CoroutineScope(Dispatchers.IO).launch {
                     if (status) {
                         appUIDList.forEach {
@@ -184,8 +147,8 @@ class UniversalAppListAdapter(
                     categoryInfoRepository.updateBlockedCount(appInfo.appCategory, countBlocked)
                     categoryInfoRepository.updateWhitelistCount(appInfo.appCategory, countWhitelisted)
                 }
-            }else{
-                checkBox.isChecked = !status
+            } else {
+                b.univWhitelistCheckbox.isChecked = !status
                 appInfo.whiteListUniv1 = !status
             }
         }
@@ -195,14 +158,14 @@ class UniversalAppListAdapter(
             val handler: Handler = ThrowingHandler()
             var positiveTxt = ""
             val packageNameList: List<String> = packageList.map { it.appName }
-            var proceedBlocking: Boolean = false
+            var proceedBlocking = false
 
             val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
 
             builderSingle.setIcon(R.drawable.ic_whitelist)
             var appNameEllipsis = appName
-            if(isInternet) {
-                if(appNameEllipsis.length > 10) {
+            if (isInternet) {
+                if (appNameEllipsis.length > 10) {
                     appNameEllipsis = appNameEllipsis.substring(0, 10)
                     appNameEllipsis = "$appNameEllipsis..."
                 }
@@ -212,10 +175,7 @@ class UniversalAppListAdapter(
                 builderSingle.setTitle("Removing  \"$appNameEllipsis\" from the whitelist will also remove these ${packageList.size} apps")
                 positiveTxt = "Remove ${packageList.size} apps"
             }
-            val arrayAdapter = ArrayAdapter<String>(
-                context,
-                android.R.layout.simple_list_item_activated_1
-            )
+            val arrayAdapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_activated_1)
             arrayAdapter.addAll(packageNameList)
             builderSingle.setCancelable(false)
             //builderSingle.setSingleChoiceItems(arrayAdapter,-1,({dialogInterface: DialogInterface, which : Int ->}))
@@ -229,20 +189,16 @@ class UniversalAppListAdapter(
              }*/
             /*val alertDialog : AlertDialog = builderSingle.create()
             alertDialog.getListView().setOnItemClickListener({ adapterView, subview, i, l -> })*/
-            builderSingle.setPositiveButton(
-                positiveTxt
-            ) { dialogInterface: DialogInterface, i: Int ->
+            builderSingle.setPositiveButton(positiveTxt) { _: DialogInterface, _: Int ->
                 proceedBlocking = true
                 handler.sendMessage(handler.obtainMessage())
-            }.setNeutralButton(
-                "Go Back"
-            ) { dialogInterface: DialogInterface, i: Int ->
+            }.setNeutralButton("Go Back") { _: DialogInterface, _: Int ->
                 handler.sendMessage(handler.obtainMessage())
                 proceedBlocking = false
             }
 
             val alertDialog: AlertDialog = builderSingle.show()
-            alertDialog.listView.setOnItemClickListener { adapterView, subview, i, l -> }
+            alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
             alertDialog.setCancelable(false)
             try {
                 Looper.loop()
