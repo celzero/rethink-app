@@ -22,7 +22,7 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import com.celzero.bravedns.R
+import com.celzero.bravedns.databinding.SpinnerListItemBinding
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 
 class CustomSpinnerAdapter(val context: Context, var dataSource: List<String>) : BaseAdapter() {
@@ -34,24 +34,25 @@ class CustomSpinnerAdapter(val context: Context, var dataSource: List<String>) :
         val view: View
         val vh: ItemHolder
         if (convertView == null) {
-            view = inflater.inflate(R.layout.spinner_list_item, parent, false)
-            vh = ItemHolder(view)
-            view?.tag = vh
+            val itemBinding = SpinnerListItemBinding.inflate(inflater, parent, false)
+            view = itemBinding.root
+            vh = ItemHolder(itemBinding)
+            view.tag = vh
         } else {
             view = convertView
             vh = view.tag as ItemHolder
         }
         vh.label.text = dataSource[position]
-        if(position == (appMode?.getDNSType()?.minus(1))){
+        if (position == (appMode?.getDNSType()?.minus(1))) {
             vh.img.visibility = View.VISIBLE
-        }else{
+        } else {
             vh.img.visibility = View.INVISIBLE
         }
 
         return view
     }
 
-    override fun getItem(position: Int): Any? {
+    override fun getItem(position: Int): Any {
         return dataSource[position]
     }
 
@@ -63,9 +64,9 @@ class CustomSpinnerAdapter(val context: Context, var dataSource: List<String>) :
         return position.toLong()
     }
 
-    private class ItemHolder(row: View?) {
-        val label: TextView = row?.findViewById(R.id.spinner_adapter_text) as TextView
-        val img: ImageView = row?.findViewById(R.id.spinner_adapter_image) as ImageView
+    private class ItemHolder(b: SpinnerListItemBinding) {
+        val label: TextView = b.spinnerAdapterText
+        val img: ImageView = b.spinnerAdapterImage
     }
 
 }
