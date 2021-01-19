@@ -30,6 +30,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication
 import com.celzero.bravedns.adapter.FirewallAppListAdapter
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.CategoryInfo
@@ -148,12 +149,13 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
             override fun onFinish() {
                 if(isAdded) {
                     refreshListImageView.clearAnimation()
-                    if(RethinkDNSApplication.context != null) {
-                        Utilities.showToastInMidLayout(RethinkDNSApplication.context!!, getString(R.string.refresh_complete), Toast.LENGTH_SHORT)
+                    if(RethinkDnsApplication.context != null) {
+                        Utilities.showToastInMidLayout(RethinkDnsApplication.context!!, getString(R.string.refresh_complete), Toast.LENGTH_SHORT)
                     }
                 }
             }
         }.start()
+
         refreshDatabase.refreshAppInfoDatabase()
         refreshDatabase.updateCategoryInDB()
     }
@@ -169,6 +171,7 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
                     if(DEBUG) Log.d(LOG_TAG, "Category block onQueryTextSubmit final: ${isSearchEnabled}, $query")
                     firewallAppInfoViewModel.setFilter(query)
                     if (query.isNullOrEmpty()) {
+                        if(DEBUG) Log.d(LOG_TAG, "Search bar empty  ${firewallAppInfoViewModel.firewallAppDetailsList.value?.size}")
                         var i = 0
                         titleList!!.forEach { _ ->
                             firewallExpandableList!!.collapseGroup(i)
@@ -209,6 +212,7 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
                     firewallAppInfoViewModel.setFilter(query)
                     if (query.isNullOrEmpty()) {
                         var i = 0
+                        if(DEBUG) Log.d(LOG_TAG, "Search bar empty  ${firewallAppInfoViewModel.firewallAppDetailsList.value?.size}")
                         titleList!!.forEach { _ ->
                             firewallExpandableList!!.collapseGroup(i)
                             i += 1
@@ -247,22 +251,25 @@ class FirewallAppFragment : Fragment(), SearchView.OnQueryTextListener {
         })
 
         firewallAppInfoViewModel.firewallAppDetailsList.observe(viewLifecycleOwner) { itAppInfo ->
-            isSearchEnabled = false
             val list = itAppInfo!!
-            titleList = categoryInfoRepository.getAppCategoryList().toMutableList()
-            val iterator = titleList!!.iterator()
-            while (iterator.hasNext()) {
-                val item = iterator.next()
-                if (DEBUG) Log.d(LOG_TAG, "Category : ${item.categoryName}, ${item.numberOFApps}, ${item.numOfAppsBlocked}, ${item.isInternetBlocked}")
-                val appList = list.filter { a -> a.appCategory == item.categoryName }
-                //val count = categoryList.filter { a -> !a.isInternetAllowed }
-                if (appList.isNotEmpty()) {
-                    listData[item] = appList as java.util.ArrayList<AppInfo>
-                } else {
-                    iterator.remove()
+            if(isSearchEnabled){
+                titleList = categoryInfoRepository.getAppCategoryList().toMutableList()
+                isSearchEnabled = false
+            }
+            val iterator = titleList?.iterator()
+            if(iterator != null) {
+                while (iterator.hasNext()) {
+                    val item = iterator.next()
+                    if (DEBUG) Log.d(LOG_TAG, "Category : ${item.categoryName}, ${item.numberOFApps}, ${item.numOfAppsBlocked}, ${item.isInternetBlocked}")
+                    val appList = list.filter { a -> a.appCategory == item.categoryName }
+                    //val count = categoryList.filter { a -> !a.isInternetAllowed }
+                    if (appList.isNotEmpty()) {
+                        listData[item] = appList as java.util.ArrayList<AppInfo>
+                    } else {
+                        iterator.remove()
+                    }
                 }
             }
-
 
             if (adapterList != null) {
                 (adapterList as FirewallAppListAdapter).updateData(titleList!!, listData, list as ArrayList<AppInfo>)

@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.celzero.bravedns.R
@@ -63,17 +62,9 @@ class DNSDetailActivity : AppCompatActivity() {
                 0 -> getString(R.string.dns_act_log)
                 else -> getString(R.string.dns_act_configure_tab)
             }
-            viewPagerDNS.setCurrentItem(tab.position, true)
+            viewPagerDNS.setCurrentItem(tab.position, false)
         }.attach()
 
-        val recyclerViewField = ViewPager2::class.java.getDeclaredField("mRecyclerView")
-        recyclerViewField.isAccessible = true
-        val recyclerView = recyclerViewField.get(viewPagerDNS) as RecyclerView
-
-        val touchSlopField = RecyclerView::class.java.getDeclaredField("mTouchSlop")
-        touchSlopField.isAccessible = true
-        val touchSlop = touchSlopField.get(recyclerView) as Int
-        touchSlopField.set(recyclerView, touchSlop * 2)       // "8" was obtained experimentally
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

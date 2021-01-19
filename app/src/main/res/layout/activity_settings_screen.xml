@@ -33,17 +33,6 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <com.facebook.shimmer.ShimmerFrameLayout
-                    android:id="@+id/shimmer_view_heading"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:shimmer_auto_start="true"
-                    app:shimmer_base_color="@color/primaryText"
-                    app:shimmer_colored="true"
-                    app:shimmer_direction="top_to_bottom"
-                    app:shimmer_duration="12000"
-                    app:shimmer_shape="linear"
-                    app:shimmer_width_ratio="1.5">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/settings_app_icon"
@@ -52,7 +41,6 @@
                         android:layout_gravity="center"
                         android:padding="5dp"
                         android:src="@drawable/conf_dns_icon_black" />
-                </com.facebook.shimmer.ShimmerFrameLayout>
 
             </LinearLayout>
 
@@ -590,13 +578,56 @@
                 android:padding="10dp" />
         </RelativeLayout>
 
+        <RelativeLayout
+            android:id="@+id/settings_activity_check_update_rl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:paddingStart="20dp"
+            android:paddingTop="15dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="15dp">
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/settings_activity_check_update_switch"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/gen_settings_check_update_txt"
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_check_update_heading"
+                    android:textSize="@dimen/large_font_text_view" />
+
+                <TextView
+                    android:id="@+id/gen_settings_check_update_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:text="@string/settings_check_update_desc"
+                    android:textSize="@dimen/default_font_text_view" />
+            </LinearLayout>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/settings_activity_check_update_switch"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:padding="10dp" />
+        </RelativeLayout>
         <RelativeLayout
             android:id="@+id/settings_activity_auto_start_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="80dp"
             android:background="@color/colorPrimary"
+            android:layout_marginBottom="80dp"
             android:paddingStart="20dp"
             android:paddingTop="15dp"
             android:paddingEnd="10dp"
@@ -635,6 +666,8 @@
                 android:layout_centerVertical="true"
                 android:padding="10dp" />
         </RelativeLayout>
+
+
 
 
     </LinearLayout>

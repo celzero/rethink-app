@@ -34,18 +34,6 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <com.facebook.shimmer.ShimmerFrameLayout
-                    android:id="@+id/shimmer_view_heading"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:shimmer_auto_start="true"
-                    app:shimmer_base_color="@color/primaryText"
-                    app:shimmer_colored="true"
-                    app:shimmer_direction="top_to_bottom"
-                    app:shimmer_duration="12000"
-                    app:shimmer_shape="linear"
-                    app:shimmer_width_ratio="1.5">
-
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/settings_app_icon"
                         android:layout_width="wrap_content"
@@ -53,7 +41,6 @@
                         android:layout_gravity="center"
                         android:padding="5dp"
                         android:src="@drawable/ic_about_icon" />
-                </com.facebook.shimmer.ShimmerFrameLayout>
             </LinearLayout>
 
             <LinearLayout
