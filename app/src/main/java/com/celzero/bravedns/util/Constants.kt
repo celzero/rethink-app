@@ -48,8 +48,9 @@ class Constants {
         const val APP_CAT_SYSTEM_COMPONENTS = "System Components"
         const val APP_CAT_SYSTEM_APPS = "System Apps"
         const val APP_CAT_OTHER = "Other"
-        const val APP_NON_APP = "Non-App System "
+        const val APP_NON_APP = "Non-App System"
         const val INSTALLED_CAT_APPS = "Installed Apps"
+        const val UNKNOWN_APP = "Unknown"
 
         //No package applications
         const val NO_PACKAGE = "no_package"
@@ -62,7 +63,7 @@ class Constants {
         const val DOWNLOAD_SOURCE_OTHERS = 2
 
         //Network monitor
-        const val FIREWALL_CONNECTIONS_IN_DB = 21000
+        const val FIREWALL_CONNECTIONS_IN_DB = 5000
 
         const val MISSING_UID = -2000
 
@@ -76,6 +77,8 @@ class Constants {
         const val DNS_TYPE_DOH = 1
         const val DNS_TYPE_DNS_CRYPT = 2
         const val DNS_TYPE_DNS_PROXY = 3
+
+        const val AMAZON_BUILD = "Amazon"
 
     }
 

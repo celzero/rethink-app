@@ -94,7 +94,7 @@ class BackgroundAccessibilityService  : AccessibilityService() {
                 eventText + " class? " + event.className +
                 " package? ppp " + event.packageName)*/
         if(BraveVPNService.isBackgroundEnabled) {
-            firewallManager.onAccessibilityEvent(event, this, rootInActiveWindow)
+            firewallManager.onAccessibilityEvent(event, rootInActiveWindow)
         }
     }
 

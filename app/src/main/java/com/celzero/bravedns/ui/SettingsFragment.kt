@@ -123,9 +123,14 @@ class SettingsFragment : Fragment() {
     private lateinit var httpProxyDescText: TextView
     private lateinit var httpProxyProgressBar: ProgressBar
 
+    private lateinit var checkForUpdateRL : RelativeLayout
+    private lateinit var checkForUpdateTV : TextView
+    private lateinit var checkForUpdateDesc  : TextView
+    private lateinit var checkForUpdateSwitch : SwitchMaterial
+
     private var timeStamp : Long = 0L
 
-    private var sock5Proxy: ProxyEndpoint? = null
+    //private var sock5Proxy: ProxyEndpoint? = null
 
     //For exclude apps dialog
     private var excludeAppAdapter: ExcludedAppListAdapter? = null
@@ -143,7 +148,7 @@ class SettingsFragment : Fragment() {
     private val persistentState by inject<PersistentState>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view: View = inflater.inflate(R.layout.activity_settings_screen, container, false)
+        val view = inflater.inflate(R.layout.activity_settings_screen, container, false)
         initView(view)
         initClickListeners()
         return view
@@ -209,6 +214,11 @@ class SettingsFragment : Fragment() {
         httpProxyProgressBar = view.findViewById(R.id.settings_activity_http_proxy_progress)
         httpProxyProgressBar.visibility = View.GONE
 
+        checkForUpdateRL = view.findViewById(R.id.settings_activity_check_update_rl)
+        checkForUpdateTV = view.findViewById(R.id.gen_settings_check_update_txt)
+        checkForUpdateDesc = view.findViewById(R.id.gen_settings_check_update_desc)
+        checkForUpdateSwitch = view.findViewById(R.id.settings_activity_check_update_switch)
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             httpProxyContainer.visibility = View.VISIBLE
             httpProxySwitch.isChecked = persistentState.httpProxyEnabled
@@ -224,9 +234,11 @@ class SettingsFragment : Fragment() {
         if(persistentState.downloadSource == DOWNLOAD_SOURCE_OTHERS){
             onDeviceBlockListRL.visibility = View.VISIBLE
             dnsSettingsHeading.visibility = View.VISIBLE
+            checkForUpdateRL.visibility = View.VISIBLE
         }else{
             onDeviceBlockListRL.visibility = View.GONE
             dnsSettingsHeading.visibility = View.GONE
+            checkForUpdateRL.visibility = View.GONE
         }
 
         localDownloadComplete.observe(viewLifecycleOwner, {
@@ -258,11 +270,12 @@ class SettingsFragment : Fragment() {
         configureBlockListBtn = view.findViewById(R.id.settings_activity_on_device_block_configure_btn)
         refreshOnDeviceBlockListBtn = view.findViewById(R.id.settings_activity_on_device_block_refresh_btn)
 
-        sock5Proxy = proxyEndpointRepository.getConnectedProxy()
+        //sock5Proxy = proxyEndpointRepository.getConnectedProxy()
 
         enableLogsSwitch.isChecked = persistentState.logsEnabled
         autoStartSwitch.isChecked = persistentState.prefAutoStartBootUp
         killAppSwitch.isChecked = persistentState.killAppOnFirewall
+        checkForUpdateSwitch.isChecked = persistentState.checkForAppUpdate
 
         socks5Switch.isChecked = persistentState.socks5Enabled
         if (socks5Switch.isChecked) {
@@ -288,7 +301,7 @@ class SettingsFragment : Fragment() {
             onDeviceLastUpdatedTime.visibility = View.GONE
             refreshOnDeviceBlockListBtn.visibility = View.GONE
             onDeviceBlockListSwitch.isChecked = false
-            onDeviceBlockListDesc.text = "Choose from 170+ blocklists."
+            onDeviceBlockListDesc.text = getString(R.string.settings_local_blockList_desc1)
         }
 
         //For exclude apps
@@ -321,7 +334,7 @@ class SettingsFragment : Fragment() {
      * Disable all the layouts related with DNS
      */
     private fun disableDNSRelatedUI() {
-        dnsSettingsHeading.text  = getString(R.string.app_mode_dns) + getString(R.string.features_disabled)
+        dnsSettingsHeading.text  = getString(R.string.dns_mode_disabled)
         onDeviceBlockListRL.isEnabled = false
         onDeviceBlockListSwitch.isEnabled = false
         refreshOnDeviceBlockListBtn.isEnabled = false
@@ -386,6 +399,10 @@ class SettingsFragment : Fragment() {
             persistentState.killAppOnFirewall = b
         }
 
+        checkForUpdateSwitch.setOnCheckedChangeListener{ _: CompoundButton, b: Boolean ->
+            persistentState.checkForAppUpdate = b
+        }
+
         allowByPassSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             persistentState.allowByPass = b
             object : CountDownTimer(100, 500) {
@@ -407,6 +424,7 @@ class SettingsFragment : Fragment() {
         onDeviceBlockListSwitch.setOnCheckedChangeListener(null)
         onDeviceBlockListSwitch.setOnClickListener{
             val isSelected = onDeviceBlockListSwitch.isChecked
+            onDeviceBlockListSwitch.isEnabled = false
             if(isSelected){
                 onDeviceBlockListProgress.visibility = View.GONE
                 if (!persistentState.blockListFilesDownloaded) {
@@ -424,8 +442,9 @@ class SettingsFragment : Fragment() {
                 configureBlockListBtn.visibility = View.GONE
                 onDeviceLastUpdatedTime.visibility = View.GONE
                 onDeviceBlockListProgress.visibility = View.GONE
-                onDeviceBlockListDesc.text = "Choose from 170+ blocklists."
+                onDeviceBlockListDesc.text = getString(R.string.settings_local_blockList_desc1)
             }
+            Handler().postDelayed({ onDeviceBlockListSwitch.isEnabled = true }, 1000)
         }
 
         socks5Switch.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
@@ -503,7 +522,7 @@ class SettingsFragment : Fragment() {
             onDeviceBlockListDesc.text = "No list configured."
         }
         if(!onDeviceBlockListSwitch.isChecked && downloadInProgress != 0){
-            onDeviceBlockListDesc.text = "Choose from 170+ blocklists."
+            onDeviceBlockListDesc.text = getString(R.string.settings_local_blockList_desc1)
         }
     }
 
@@ -739,7 +758,7 @@ class SettingsFragment : Fragment() {
         //performing positive action
         builder.setPositiveButton("Download") { dialogInterface, which ->
             downloadInProgress = 0
-            onDeviceBlockListDesc.text = "Download in progress..."
+            onDeviceBlockListDesc.text = getString(R.string.settings_local_blocklist_desc2)
             onDeviceBlockListSwitch.visibility = View.GONE
             onDeviceBlockListProgress.visibility = View.VISIBLE
 
@@ -764,12 +783,12 @@ class SettingsFragment : Fragment() {
         refreshDataImg.startAnimation(animation)
         object : CountDownTimer(5000, 500) {
             override fun onTick(millisUntilFinished: Long) {
-                refreshDataDescTxt.text = "Resync in progress..."
+                refreshDataDescTxt.text = getString(R.string.settings_sync_app_details_desc)
             }
 
             override fun onFinish() {
                 refreshDataImg.clearAnimation()
-                refreshDataDescTxt.text = "Resync completed"
+                refreshDataDescTxt.text = getString(R.string.settigns_sync_app_details_desc_completed)
             }
         }.start()
 
@@ -872,7 +891,7 @@ class SettingsFragment : Fragment() {
                                 onDeviceBlockListSwitch.visibility = View.VISIBLE
                                 onDeviceLastUpdatedTime.visibility = View.VISIBLE
                                 onDeviceLastUpdatedTime.text = "Version: v${Utilities.convertLongToDate(timeStamp)}"
-                                onDeviceBlockListDesc.text = "Download completed, Configure blocklist"
+                                onDeviceBlockListDesc.text = getString(R.string.settings_local_blocklist_desc3)
                                 if (DEBUG) Log.d(LOG_TAG, "Download status : Download completed: $status")
                                 Toast.makeText(ctxt, "Blocklists downloaded successfully.", Toast.LENGTH_LONG).show()
                             } else {
@@ -892,7 +911,7 @@ class SettingsFragment : Fragment() {
                             onDeviceBlockListProgress.visibility = View.GONE
                             onDeviceBlockListSwitch.visibility = View.VISIBLE
                             onDeviceBlockListSwitch.isChecked = false
-                            onDeviceBlockListDesc.text = "Error downloading file. Try again."
+                            onDeviceBlockListDesc.text = getString(R.string.settings_local_blocklist_desc4)
                             downloadInProgress = -1
                             timeStamp = 0
                             downloadManager.remove(downloadId)
@@ -908,7 +927,7 @@ class SettingsFragment : Fragment() {
                         onDeviceBlockListProgress.visibility = View.GONE
                         onDeviceBlockListSwitch.visibility = View.VISIBLE
                         onDeviceBlockListSwitch.isChecked = false
-                        onDeviceBlockListDesc.text = "Error downloading file. Try again."
+                        onDeviceBlockListDesc.text = getString(R.string.settings_local_blocklist_desc4)
                         downloadInProgress= -1
                         filesDownloaded = 0
                         timeStamp = 0
@@ -920,7 +939,7 @@ class SettingsFragment : Fragment() {
                 }
             } catch (e: Exception) {
                 Log.w(LOG_TAG,"Exception while downloading: ${e.message}",e)
-                onDeviceBlockListDesc.text = "Error downloading file. Try again."
+                onDeviceBlockListDesc.text = getString(R.string.settings_local_blocklist_desc4)
                 configureBlockListBtn.visibility = View.GONE
                 onDeviceLastUpdatedTime.visibility = View.GONE
                 refreshOnDeviceBlockListBtn.visibility = View.GONE
@@ -1111,6 +1130,16 @@ class SettingsFragment : Fragment() {
         }.start()
 
         //removeConnections()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        try {
+            downloadInProgress = -1
+            requireContext().unregisterReceiver(onComplete)
+        }catch (e: Exception){
+            if(DEBUG) Log.i(LOG_TAG,"Unregister receiver exception for download manager: ${e.message}")
+        }
     }
 
 }

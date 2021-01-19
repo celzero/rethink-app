@@ -138,16 +138,25 @@
         </LinearLayout>
 
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_query"
+        <com.celzero.bravedns.util.NestedScrollableHost
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/query_list_recycler_heading"
-            android:layout_marginTop="2dp"
-            android:background="@color/childListColor"
-            android:nestedScrollingEnabled="true"
-            android:orientation="vertical"
-            android:padding="1dp" />
+            android:layout_margin="2dp"
+            android:layout_marginBottom="?attr/actionBarSize">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_query"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/childListColor"
+                android:nestedScrollingEnabled="true"
+                android:orientation="vertical"
+                android:padding="1dp" />
+
+        </com.celzero.bravedns.util.NestedScrollableHost>
+
+
 
         <TextView
             android:id="@+id/query_list__logs_disabled_tv"
