@@ -121,7 +121,24 @@ class HomeScreenFragment : Fragment() {
     private lateinit var protectionLevelTxt: TextView
 
     private lateinit var shimmerContainer: ShimmerFrameLayout
-    private lateinit var shimmerHeaderContainer : ShimmerFrameLayout
+
+    //for the new card
+    private lateinit var dnsCardLatencyTxt : TextView
+    private lateinit var dnsCardBlockedQueriesTxt : TextView
+    private lateinit var dnsCardLifetimeQueriesTxt : TextView
+    private lateinit var dnsCardConnectedDNSTxt : TextView
+
+    private lateinit var firewallCardAppsTxt : TextView
+    private lateinit var firewallCardUnivTxt : TextView
+    private lateinit var firewallCardWhitelistTxt : TextView
+    private lateinit var firewallCardExcludedTxt : TextView
+
+    private lateinit var firewallCardLL : LinearLayout
+    private lateinit var dnsCardLL : LinearLayout
+
+    private lateinit var firewallLogIV : ImageView
+    private lateinit var dnsLogIV : ImageView
+
 
     private val MAIN_CHANNEL_ID = "vpn"
 
@@ -288,6 +305,23 @@ class HomeScreenFragment : Fragment() {
         chipNetworkMonitor = view.findViewById(R.id.chip_network_monitor)
 
         btmSheetIcon = view.findViewById(R.id.home_fragment_bottom_sheet_icon)
+
+        dnsCardBlockedQueriesTxt = view.findViewById(R.id.fhs_card_dns_blocked_queries)
+        dnsCardConnectedDNSTxt = view.findViewById(R.id.fhs_card_dns_connected_dns)
+        dnsCardLatencyTxt = view.findViewById(R.id.fhs_card_dns_latency)
+        dnsCardLifetimeQueriesTxt = view.findViewById(R.id.fhs_card_dns_lifetime_queries)
+
+        firewallCardAppsTxt = view.findViewById(R.id.fhs_card_firewall_apps)
+        firewallCardExcludedTxt = view.findViewById(R.id.fhs_card_firewall_excluded)
+        firewallCardUnivTxt = view.findViewById(R.id.fhs_card_firewall_univ)
+        firewallCardWhitelistTxt = view.findViewById(R.id.fhs_card_firewall_whitelist)
+
+        firewallCardLL = view.findViewById(R.id.fhs_card_firewall_ll)
+        dnsCardLL = view.findViewById(R.id.fhs_card_dns_ll)
+
+        firewallLogIV = view.findViewById(R.id.fhs_card_firewall_logs_iv)
+        dnsLogIV = view.findViewById(R.id.fhs_card_dns_logs_iv)
+
     }
 
     private fun initializeClickListeners() {
@@ -320,6 +354,22 @@ class HomeScreenFragment : Fragment() {
         chipConfigureFirewall.setOnClickListener {
             if(DEBUG) Log.d(LOG_TAG, "Status : Configure firewall clicked")
             startFirewallActivity()
+        }
+
+        firewallCardLL.setOnClickListener{
+            startFirewallActivity()
+        }
+
+        dnsCardLL.setOnClickListener{
+            startConnectionTrackerActivity()
+        }
+
+        firewallLogIV.setOnClickListener{
+            startFirewallLogsActivity()
+        }
+
+        dnsLogIV.setOnClickListener{
+            startDNSLogsActivity()
         }
 
         //Chips for the DNS Screen
@@ -357,24 +407,26 @@ class HomeScreenFragment : Fragment() {
             handleStartBtnClickEvent()
         }
 
-        categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, {
+       /* categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, {
             val list = it.filter { a -> a.isInternetBlocked }
             tileFCategoryBlockedTxt.text = list.size.toString()
-        })
+        })*/
 
         median50.observe(viewLifecycleOwner, {
             tileDmedianTxt.text = median50.value.toString() + "ms"
             tileDFMedianTxt.text = median50.value.toString() + "ms"
+            dnsCardLatencyTxt.text = "Latency: ${median50.value.toString()}ms"
         })
 
         lifeTimeQ.observe(viewLifecycleOwner, {
             val lifeTimeConversion = if (VERSION.SDK_INT >= VERSION_CODES.N) {
                 CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT).format(lifeTimeQ.value)
             } else {
-                // FIXME: 19-11-2020 - Format the number similar to CompctDecimalFormat
+                // FIXME: 19-11-2020 - Format the number similar to CompactDecimalFormat
                 lifeTimeQ.value.toString()
             }
             tileDLifetimeQueriesTxt.text = lifeTimeConversion
+            dnsCardLifetimeQueriesTxt.text = "Lifetime queries: $lifeTimeConversion"
         })
 
          blockedCount.observe(viewLifecycleOwner, {
@@ -386,6 +438,7 @@ class HomeScreenFragment : Fragment() {
              }
              tileDFTrackersBlockedtxt.text = blocked
              tileDtrackersBlockedTxt.text = blocked
+             dnsCardBlockedQueriesTxt.text = "Blocked queries: $blocked"
          })
 
         appInfoRepository.getBlockedAppCount().observe(viewLifecycleOwner, {
@@ -393,8 +446,18 @@ class HomeScreenFragment : Fragment() {
             tileDFAppsBlockedTxt.text = it.toString()
         })
 
+        appInfoRepository.getAllAppDetailsForLiveData().observe(viewLifecycleOwner,{
+            val blockedList = it.filter { a -> !a.isInternetAllowed }
+            val whiteListApps = it.filter { a -> a.whiteListUniv1 }
+            val excludedList = it.filter { a -> a.isExcluded }
+            firewallCardAppsTxt.text = "Blocked apps: ${blockedList.size}"
+            firewallCardWhitelistTxt.text = "Whitelisted apps: ${whiteListApps.size}"
+            firewallCardExcludedTxt.text = "Excluded apps: ${excludedList.size}"
+        })
+
         numUniversalBlock.observe(viewLifecycleOwner, {
             tileFUniversalBlockedTxt.text = numUniversalBlock.value.toString()
+            firewallCardUnivTxt.text = "Universal rules: "+numUniversalBlock.value.toString()
         })
 
         braveModeToggler.observe(viewLifecycleOwner, {
@@ -457,6 +520,10 @@ class HomeScreenFragment : Fragment() {
         val alwaysOn = android.provider.Settings.Secure.getString(context?.contentResolver, "always_on_vpn_app")
         if (!TextUtils.isEmpty(alwaysOn)) {
             if (context?.packageName == alwaysOn) {
+                val status = VpnController.getInstance()!!.getState(requireContext())
+                if (status?.connectionState == null) {
+                    return false
+                }
                 if (DEBUG) Log.i(LOG_TAG, "Status: $stats , alwaysOn: $alwaysOn - lockdown")
             } else if (!stats) {
                 if (DEBUG) Log.i(LOG_TAG, "Status: $stats , alwaysOn: $alwaysOn - stats value")
@@ -476,6 +543,7 @@ class HomeScreenFragment : Fragment() {
             if((status?.on!!) ) {
                 if(braveMode == DNS_FIREWALL_MODE || braveMode == DNS_MODE && (getPrivateDnsMode() != PrivateDnsMode.STRICT)) {
                     val intent = Intent(requireContext(), DNSDetailActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
                     startActivity(intent)
                 }else{
                     if(getPrivateDnsMode() == PrivateDnsMode.STRICT){
@@ -586,7 +654,39 @@ class HomeScreenFragment : Fragment() {
         }
     }
 
+    private fun startFirewallLogsActivity(){
+        val status: VpnState? = VpnController.getInstance()!!.getState(requireContext())
+        if (DEBUG) Log.d(LOG_TAG, "Status : ${status?.on!!} , BraveMode: $braveMode")
+        if (status?.on!!) {
+            if (braveMode == DNS_FIREWALL_MODE || braveMode == FIREWALL_MODE) {
+                val intent = Intent(requireContext(), FirewallActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+                startActivity(intent)
+            } else {
+                Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
+            }
+        } else {
+            Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
+        }
+    }
 
+    private fun startDNSLogsActivity(){
+        val status: VpnState? = VpnController.getInstance()!!.getState(context)
+        if ((status?.on!!)) {
+            if (braveMode == DNS_FIREWALL_MODE || braveMode == DNS_MODE && (getPrivateDnsMode() != PrivateDnsMode.STRICT)) {
+                val intent = Intent(requireContext(), DNSDetailActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+                startActivity(intent)
+            } else {
+                if (getPrivateDnsMode() == PrivateDnsMode.STRICT) {
+                    Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.private_dns_toast).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
+                }
+                Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_dns).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
+            }
+        } else {
+            Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_dns).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
+        }
+    }
 
 
     /**
@@ -598,6 +698,7 @@ class HomeScreenFragment : Fragment() {
          if(status?.on!!){
             if (braveMode == DNS_FIREWALL_MODE || braveMode == FIREWALL_MODE) {
                 val intent = Intent(requireContext(), FirewallActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
                 startActivity(intent)
             } else {
                 Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
@@ -626,7 +727,7 @@ class HomeScreenFragment : Fragment() {
                 Settings.BlockModeFilter
             braveMode = DNS_FIREWALL_MODE
         }
-        if(DEBUG) Log.d(LOG_TAG, "Firewall mode : $firewallMode, braveMode: $braveMode, SDK_Version: ${VERSION_CODES.M} == ${VERSION.SDK_INT}")
+        if(DEBUG) Log.d(LOG_TAG, "Firewall mode : $firewallMode, braveMode: $braveMode, SDK_Version: ${VERSION.SDK_INT}")
         appMode?.setFirewallMode(firewallMode)
 
         if(braveMode == FIREWALL_MODE){
