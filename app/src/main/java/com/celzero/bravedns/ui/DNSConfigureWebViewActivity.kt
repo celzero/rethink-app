@@ -95,7 +95,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
                 if(receivedIntentFrom == LOCAL) {
                     url = Constants.CONFIGURE_BLOCKLIST_URL_LOCAL + persistentState.localBlockListDownloadTime + "#" + stamp
                 }else{
-                    url = Constants.CONFIGURE_BLOCKLIST_URL_REMOTE + persistentState.remoteBlockListDownloadTime + "#" + stamp
+                    url = Constants.CONFIGURE_BLOCKLIST_URL_REMOTE + "#" + stamp
                     checkForDownload()
                 }
             }
@@ -116,7 +116,6 @@ class DNSConfigureWebViewActivity : AppCompatActivity() {
         })
 
         if (DEBUG) Log.d(LOG_TAG, "Webview: Download remote file - filetag")
-
 
     }
 

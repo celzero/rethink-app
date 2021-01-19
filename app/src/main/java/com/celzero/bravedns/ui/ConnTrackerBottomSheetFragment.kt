@@ -175,7 +175,11 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
             try {
                 val appArray = contextVal.packageManager.getPackagesForUid(ipDetails.uid)
                 val appCount = (appArray?.size)?.minus(1)
-                txtAppName.text = ipDetails.appName +"      ❯"
+                if(ipDetails.uid != 0) {
+                    txtAppName.text = ipDetails.appName + "      ❯"
+                }else{
+                    txtAppName.text = ipDetails.appName
+                }
                 if(appArray != null) {
                     if (appArray?.size!! > 2) {
                         txtAppName.text = "${ipDetails.appName} + $appCount other apps"
@@ -215,11 +219,11 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
 
         switchBlockApp.setOnCheckedChangeListener(null)
         switchBlockApp.setOnClickListener {
-            if (ipDetails.uid == 0) {
+            /*if (ipDetails.uid == 0) {
                 switchBlockApp.isChecked = false
                 Utilities.showToastInMidLayout(contextVal, "Android cannot be firewalled", Toast.LENGTH_SHORT)
-            } else if (ipDetails.appName != "Unknown") {
-                // no-op?
+            } else */if (ipDetails.appName != "Unknown") {
+                firewallApp(FirewallManager.checkInternetPermission(ipDetails.uid))
             } else {
                 if(DEBUG) Log.d(LOG_TAG,"setBlockUnknownConnections - ${switchBlockApp.isChecked} ")
                 persistentState.blockUnknownConnections = switchBlockApp.isChecked

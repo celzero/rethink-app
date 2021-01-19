@@ -84,29 +84,30 @@ class PersistentState(context: Context):SimpleKrate(context) {
     var proxyMode by longPref("proxy_mode", Settings.ProxyModeNone)
     var dnsType by intPref("dns_type", 1)
     var prefAutoStartBootUp by booleanPref("auto_start_on_boot", true)
-    private var _screenState by booleanPref("screen_state", false)
+    var _screenState by booleanPref("screen_state", false)
     private var _median90 by longPref("median_p90", 0)
     private var _numberOfRequests by intPref("number_request", 0)
     var numberOfBlockedRequests by intPref("blocked_request", 0)
     var backgroundEnabled by booleanPref("background_mode", false)
-        private set
-    private var isScreenOff by booleanPref("screen_off", false)
+    var checkForAppUpdate by booleanPref("check_for_app_update", true)
+        //private set
+    var isScreenOff by booleanPref("screen_off", false)
 
     fun wifiAllowed(forPackage:String):Boolean = !excludedPackagesWifi.contains(forPackage)
 
     fun modifyAllowedWifi(forPackage:String, remove:Boolean) {
         if(remove) {
-            excludedPackagesWifi -= forPackage
+            excludedPackagesWifi = excludedPackagesWifi - forPackage
         } else {
-            excludedPackagesWifi += forPackage
+            excludedPackagesWifi = excludedPackagesWifi + forPackage
         }
     }
 
     fun modifyAllowedData(forPackage:String, remove:Boolean) {
         if(remove) {
-            excludedPackagesData -= forPackage
+            excludedPackagesData = excludedPackagesData - forPackage
         } else {
-            excludedPackagesData += forPackage
+            excludedPackagesData = excludedPackagesData + forPackage
         }
     }
 
@@ -193,7 +194,8 @@ class PersistentState(context: Context):SimpleKrate(context) {
 
     fun setIsBackgroundEnabled(isEnabled: Boolean) {
         backgroundEnabled = isEnabled
-        var uValue = HomeScreenActivity.GlobalVariable.numUniversalBlock.value
+        HomeScreenActivity.GlobalVariable.isBackgroundEnabled = backgroundEnabled
+        //var uValue = HomeScreenActivity.GlobalVariable.numUniversalBlock.value
         if (isEnabled) {
             if (getScreenLockData()) {
                 HomeScreenActivity.GlobalVariable.numUniversalBlock.postValue(2)

@@ -73,6 +73,11 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
         initView(view)
     }
 
+    override fun onResume() {
+        super.onResume()
+        initValues()
+    }
+
     companion object{
         fun newInstance() = ConnectionTrackerFragment()
     }
@@ -85,8 +90,10 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
         deleteIcon = includeView.findViewById(R.id.connection_delete_icon)
         searchLayoutLL = includeView.findViewById(R.id.connection_card_view_top)
         disabledLogsTextView = includeView.findViewById(R.id.connection_list_logs_disabled_tv)
+    }
 
-        if(persistentState.logsEnabled){
+    private fun initValues() {
+        if (persistentState.logsEnabled) {
             disabledLogsTextView.visibility = View.GONE
             searchLayoutLL.visibility = View.VISIBLE
 
@@ -98,7 +105,7 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
             viewModel.connectionTrackerList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(recyclerAdapter!!::submitList))
             recyclerView!!.adapter = recyclerAdapter
             //recyclerView!!.setItemViewCacheSize(100)
-        }else{
+        } else {
             disabledLogsTextView.visibility = View.VISIBLE
             searchLayoutLL.visibility = View.GONE
         }
