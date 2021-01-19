@@ -60,8 +60,6 @@ class DoHEndpointAdapter(private val context: Context,
     companion object {
         private val DIFF_CALLBACK = object :
             DiffUtil.ItemCallback<DoHEndpoint>() {
-            // Concert details may have changed if reloaded from the database,
-            // but ID is fixed.
             override fun areItemsTheSame(oldConnection: DoHEndpoint, newConnection: DoHEndpoint) = oldConnection.id == newConnection.id
             override fun areContentsTheSame(oldConnection: DoHEndpoint, newConnection: DoHEndpoint) = oldConnection == newConnection
         }
@@ -280,7 +278,6 @@ class DoHEndpointAdapter(private val context: Context,
         private fun updateDoHDetails(doHEndpoint: DoHEndpoint) {
             doHEndpoint.isSelected = true
             doHEndpointRepository.removeConnectionStatus()
-            doHEndpointRepository.updateAsync(doHEndpoint)
             object : CountDownTimer(1000, 500) {
                 override fun onTick(millisUntilFinished: Long) {
                 }
@@ -294,6 +291,7 @@ class DoHEndpointAdapter(private val context: Context,
             }.start()
             appMode?.setDNSMode(Settings.DNSModePort)
             listener.updateUIFromAdapter(1)
+            doHEndpointRepository.updateAsync(doHEndpoint)
             //mDb.close()
         }
     }
