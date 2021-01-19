@@ -35,11 +35,9 @@ interface DNSProxyEndpointDAO {
     @Delete
     fun delete(dnsProxyEndpoint: DNSProxyEndpoint)
 
-    @Transaction
     @Query("select * from DNSProxyEndpoint order by isSelected desc")
     fun getDNSProxyEndpointLiveData() : DataSource.Factory<Int, DNSProxyEndpoint>
 
-    @Transaction
     @Query("select * from DNSProxyEndpoint where proxyName like :query order by isSelected desc")
     fun getDNSProxyEndpointLiveDataByType(query : String) : DataSource.Factory<Int,DNSProxyEndpoint>
 
@@ -55,11 +53,9 @@ interface DNSProxyEndpointDAO {
     @Query("update DNSProxyEndpoint set isSelected = 0 where isSelected = 1")
     fun removeConnectionStatus()
 
-    @Transaction
     @Query("select count(*) from DNSProxyEndpoint")
     fun getCount() : Int
 
-    @Transaction
     @Query("select * from DNSProxyEndpoint where isSelected = 1")
     fun getConnectedProxy() : DNSProxyEndpoint
 }

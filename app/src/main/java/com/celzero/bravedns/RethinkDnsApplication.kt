@@ -1,6 +1,8 @@
 package com.celzero.bravedns
 
 import android.app.Application
+import android.content.Context
+import android.os.StrictMode
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -21,12 +23,35 @@ import org.koin.core.context.startKoin
  * limitations under the License.
  */
 class RethinkDnsApplication:Application() {
+    companion object {
+        var context: Context? = null
+    }
+
     override fun onCreate() {
         super.onCreate()
+        context = applicationContext
+        //turnOnStrictMode()
         startKoin {
             if(BuildConfig.DEBUG) androidLogger()
             androidContext(this@RethinkDnsApplication)
             koin.loadModules(AppModules)
+        }
+    }
+
+    private fun turnOnStrictMode() {
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()
+                            .detectAll()
+                            .penaltyLog()
+                            .permitDiskReads()
+                            .permitDiskWrites()
+                            .permitNetwork()
+                            .penaltyLog()
+                            .build())
+            StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder()
+                            .detectAll()
+                            .penaltyLog()
+                            .build())
         }
     }
 }

@@ -65,7 +65,7 @@ interface ConnectionTrackerDAO {
     fun getCountConnectionTracker() : Int
 
     //@Transaction
-    @Query("delete from ConnectionTracker where id <  (id - :count)")
+    @Query("delete from ConnectionTracker where id < ((select max(id) from ConnectionTracker) - :count)")
     fun deleteOlderDataCount(count : Int)
 
 }

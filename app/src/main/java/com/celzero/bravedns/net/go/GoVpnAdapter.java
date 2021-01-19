@@ -52,6 +52,7 @@ import java.util.Locale;
 import dnsx.BraveDNS;
 import dnsx.Dnsx;
 import doh.Transport;
+import kotlin.Lazy;
 import protect.Blocker;
 import protect.Protector;
 import settings.Settings;
@@ -61,6 +62,7 @@ import tunnel.IntraTunnel;
 import static com.celzero.bravedns.ui.HomeScreenFragment.DNS_MODE;
 import static com.celzero.bravedns.ui.HomeScreenFragment.FIREWALL_MODE;
 import static com.celzero.bravedns.util.Constants.LOG_TAG;
+import static org.koin.java.KoinJavaComponent.inject;
 
 //import tunnel.IntraTunnel;
 
@@ -171,14 +173,11 @@ public class GoVpnAdapter {
         //TODO : The below statement is incorrect, adding the dohURL as const for testing
 
         try {
-            AppMode appMode = HomeScreenActivity.GlobalVariable.INSTANCE.getAppMode();
-            if (appMode == null) {
-                HomeScreenActivity.GlobalVariable.INSTANCE.setAppMode(appMode);
-                appMode = HomeScreenActivity.GlobalVariable.INSTANCE.getAppMode();
-            }
+            Lazy<AppMode> appMode = inject(AppMode.class);
+
             String dohURL = "https://free.bravedns.com/dns-query";
             try{
-                dohURL = appMode.getDOHDetails().getDohURL();
+                dohURL = appMode.getValue().getDOHDetails().getDohURL();
             }catch(Exception e){
                 Log.w(LOG_TAG,"GoVPNAdapter appMode.getDOHDetails() is null:" +e.getMessage() ,e);
             }
@@ -316,13 +315,17 @@ public class GoVpnAdapter {
                 Log.i(LOG_TAG,"GoVPNAdapter DNSCrypt add servers: "+servers+" removed count:"+serverCount );
             }
             //tunnel.getDNSCryptProxy().addRoutes()
-            RefreshOperation runningTask = new RefreshOperation();
-            runningTask.execute();
+            if(servers.length() > 0) {
+                RefreshOperation runningTask = new RefreshOperation();
+                runningTask.execute();
+            }
             Log.d(LOG_TAG, "GoVPNAdapter setCryptMode - Connected to tunnel with DNSMODE - " + Settings.DNSModeCryptPort + " - blockMode-" + Settings.BlockModeFilter + "proxyMode-" + proxyMode);
         } catch (Exception ex) {
             Log.e(LOG_TAG, "GoVPNAdapter celzero connect-tunnel: dns crypt", ex);
-            RefreshOperation runningTask = new RefreshOperation();
-            runningTask.execute();
+            if(servers.length() > 0) {
+                RefreshOperation runningTask = new RefreshOperation();
+                runningTask.execute();
+            }
         }
     }
 
@@ -365,51 +368,77 @@ public class GoVpnAdapter {
                     //HomeScreenActivity.GlobalVariable.INSTANCE.setCryptModeInProgress(2);
                     if (HomeScreenActivity.GlobalVariable.INSTANCE.getDEBUG())
                         Log.d(LOG_TAG, "GoVPNAdapter Refresh LiveServers -- " + liveServers);
+
+                    // FIXME: 08-01-2021 - Change the redundant usage of same code in the different places.
                     if(liveServers.isEmpty()){
                         Log.i(LOG_TAG,"GoVPNAdapter No live servers - falling back to default DoH mode");
-                        // FIXME: 17-12-2020 - Removed the fail open changes
                         tunnel.stopDNSCryptProxy();
                         dnsCryptEndpointRepository.updateFailingConnections();
-                    }else{
-                        tunnel.setTunMode( Settings.DNSModeCryptPort, firewallMode, proxyMode);
-
-                        if (proxyMode == Settings.ProxyModeSOCKS5) {
-                            setSocks5TunnelMode();
+                        DoHEndpoint doHEndpoint = doHEndpointRepository.updateConnectionDefault();
+                        persistentState.setDnsType(1);
+                        persistentState.setConnectionModeChange(doHEndpoint.getDohURL());
+                        AppMode appMode = HomeScreenActivity.GlobalVariable.INSTANCE.getAppMode();
+                        if (appMode != null) {
+                            appMode.setDNSMode(Settings.DNSModePort);
                         }
-                        Log.d(LOG_TAG,"GoVPNAdapter celzero connect crypt else - tunnel mode set with mode -"+Settings.DNSModeCryptPort + firewallMode + proxyMode);
+                        Handler handler = new Handler(vpnService.getMainLooper());
+                        handler.post(new Runnable() {
+                            public void run() {
+                                Utilities.Companion.showToastInMidLayout(vpnService, "Error connecting to DNSCrypt server.", Toast.LENGTH_SHORT);
+                            }
+                        });
+                    }else{
+                        if(persistentState.getDnsType() == 2) {
+                            tunnel.setTunMode(Settings.DNSModeCryptPort, firewallMode, proxyMode);
+
+                            if (proxyMode == Settings.ProxyModeSOCKS5) {
+                                setSocks5TunnelMode();
+                            }
+                            Log.d(LOG_TAG, "GoVPNAdapter celzero connect crypt else - tunnel mode set with mode -" + Settings.DNSModeCryptPort + firewallMode + proxyMode);
+                        }else{
+                            dnsCryptEndpointRepository.updateFailingConnections();
+                        }
                     }
                 }else{
+                    if(persistentState.getDnsType() == 2) {
+                        dnsCryptEndpointRepository.updateFailingConnections();
+                        //Utilities.Companion.showToastInMidLayout(vpnService, "Error connecting to DNSCrypt server.", Toast.LENGTH_SHORT);
+                        DoHEndpoint doHEndpoint = doHEndpointRepository.updateConnectionDefault();
+                        persistentState.setDnsType(1);
+                        persistentState.setConnectionModeChange(doHEndpoint.getDohURL());
+                        AppMode appMode = HomeScreenActivity.GlobalVariable.INSTANCE.getAppMode();
+                        appMode.setDNSMode(Settings.DNSModePort);
+                        Handler handler = new Handler(vpnService.getMainLooper());
+                        handler.post(new Runnable() {
+                            public void run() {
+                                Utilities.Companion.showToastInMidLayout(vpnService, "Error connecting to DNSCrypt server.", Toast.LENGTH_SHORT);
+                            }
+                        });
+                    }else{
+                        dnsCryptEndpointRepository.updateFailingConnections();
+                    }
+                }
+            } catch (Exception e) {
+                if(persistentState.getDnsType() == 2) {
+                    Log.e(LOG_TAG, "GoVPNAdapter celzero connect-tunnel: dns crypt", e);
                     dnsCryptEndpointRepository.updateFailingConnections();
-                    Utilities.Companion.showToastInMidLayout(vpnService,"Error connecting to DNSCrypt server.", Toast.LENGTH_SHORT);
                     DoHEndpoint doHEndpoint = doHEndpointRepository.updateConnectionDefault();
                     persistentState.setDnsType(1);
                     persistentState.setConnectionModeChange(doHEndpoint.getDohURL());
                     AppMode appMode = HomeScreenActivity.GlobalVariable.INSTANCE.getAppMode();
-                    appMode.setDNSMode(Settings.DNSModePort);
+                    if (appMode != null) {
+                        appMode.setDNSMode(Settings.DNSModePort);
+                    }
                     Handler handler = new Handler(vpnService.getMainLooper());
                     handler.post(new Runnable() {
                         public void run() {
                             Utilities.Companion.showToastInMidLayout(vpnService, "Error connecting to DNSCrypt server.", Toast.LENGTH_SHORT);
                         }
                     });
+                    Log.d(LOG_TAG, "GoVPNAdapter celzero connect crypt exception handling - update dns crypt and remove the servers");
+                } else {
+                    dnsCryptEndpointRepository.updateFailingConnections();
                 }
-            } catch (Exception e) {
-                Log.e(LOG_TAG, "GoVPNAdapter celzero connect-tunnel: dns crypt", e);
-                dnsCryptEndpointRepository.updateFailingConnections();
-                DoHEndpoint doHEndpoint = doHEndpointRepository.updateConnectionDefault();
-                persistentState.setDnsType(1);
-                persistentState.setConnectionModeChange(doHEndpoint.getDohURL());
-                AppMode appMode = HomeScreenActivity.GlobalVariable.INSTANCE.getAppMode();
-                if(appMode != null) {
-                    appMode.setDNSMode(Settings.DNSModePort);
-                }
-                Handler handler =  new Handler(vpnService.getMainLooper());
-                   handler.post( new Runnable(){
-                       public void run(){
-                           Utilities.Companion.showToastInMidLayout(vpnService,"Error connecting to DNSCrypt server.", Toast.LENGTH_SHORT);
-                       }
-                   });
-                Log.d(LOG_TAG,"GoVPNAdapter celzero connect crypt exception handling - update dns crypt and remove the servers");
             }
             return "Executed";
         }
@@ -487,15 +516,15 @@ public class GoVpnAdapter {
     }
 
     private doh.Transport makeDohTransport(@Nullable String url) throws Exception {
-        if(url == null || url.isEmpty()){
+        /*if(url == null || url.isEmpty()){
             return null;
-        }
+        }*/
         //PersistantState persistentState  = new PersistantState();
         //VpnController vpnController = new VpnController();
         //TODO : Check the below code
-        @NonNull String realUrl = PersistentState.Companion.expandUrl(vpnService, url);
-        String dohIPs = getIpString(vpnService, realUrl);
-        return Tun2socks.newDoHTransport(realUrl, dohIPs, getProtector(), listener);
+        //@NonNull String realUrl = PersistentState.Companion.expandUrl(vpnService, url);
+        String dohIPs = getIpString(vpnService, url);
+        return Tun2socks.newDoHTransport(url, dohIPs, getProtector(), listener);
     }
 
     /**
@@ -527,13 +556,13 @@ public class GoVpnAdapter {
         // is called on network changes, and it's important to switch to a fresh transport because the
         // old transport may be using sockets on a deleted interface, which may block until they time
         // out.
-        AppMode configuredAppMode = HomeScreenActivity.GlobalVariable.INSTANCE.getAppMode();
+        Lazy<AppMode> configuredAppMode = inject(AppMode.class);
         if (configuredAppMode == null) {
             HomeScreenActivity.GlobalVariable.INSTANCE.setAppMode(appMode);
         }
         String dohURL = "https://free.bravedns.com/dns-query";
         try {
-            dohURL = appMode.getDOHDetails().getDohURL();
+            dohURL = configuredAppMode.getValue().getDOHDetails().getDohURL();
         } catch (Exception e) {
             Log.e(LOG_TAG, "GoVPNAdapter dohURL is null", e);
         }
@@ -624,7 +653,7 @@ public class GoVpnAdapter {
                     Log.i(LOG_TAG,"GoVPNAdapter app dns mode is set to null with local stamp");
                 }
             } catch (Exception ex) {
-                Log.e(LOG_TAG, "GoVPNAdapter Exception while setting brave dns for local:" + ex.getMessage(), ex);
+                Log.e(LOG_TAG, "GoVPNAdapter Exception while setting brave dns for local:" + ex.getMessage());
             }
         }else{
             if(tunnel.getBraveDNS() != null){

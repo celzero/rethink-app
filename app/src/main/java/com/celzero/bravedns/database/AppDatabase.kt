@@ -23,14 +23,15 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(entities = [AppInfo::class, CategoryInfo::class, ConnectionTracker::class, BlockedConnections::class, DoHEndpoint::class
-, DNSCryptEndpoint::class, DNSProxyEndpoint::class, DNSCryptRelayEndpoint::class,ProxyEndpoint::class,DNSLogs::class],version = 7,exportSchema = false)
+, DNSCryptEndpoint::class, DNSProxyEndpoint::class, DNSCryptRelayEndpoint::class,ProxyEndpoint::class,DNSLogs::class],
+views = [AppInfoView::class],version = 8,exportSchema = false)
 abstract class AppDatabase : RoomDatabase(){
 
     companion object {
-        const val currentVersion:Int = 7
+        const val currentVersion:Int = 8
 
         fun buildDatabase(context: Context) = Room.databaseBuilder(
-            context, AppDatabase::class.java,"bravedns.db")
+            context.applicationContext, AppDatabase::class.java,"bravedns.db")
             .allowMainThreadQueries()
             .addMigrations(MIGRATION_1_2)
             .addMigrations(MIGRATION_2_3)
@@ -38,6 +39,7 @@ abstract class AppDatabase : RoomDatabase(){
             .addMigrations(MIGRATION_4_5)
             .addMigrations(MIGRATION_5_6)
             .addMigrations(MIGRATION_6_7)
+            .addMigrations(MIGRATION_7_8)
             .build()
 
         private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
@@ -127,6 +129,19 @@ abstract class AppDatabase : RoomDatabase(){
             }
         }
 
+        /**
+         * For the version 053-1. Created a view for the AppInfo table so that the read will be minimized.
+         * Also deleting the uid=0 row from AppInfo table. In earlier version the UID=0 is added as default and
+         * not used. Now the UID=0(ANDROID) is added to the non-app category.
+         */
+        private val MIGRATION_7_8: Migration = object : Migration(7, 8) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE VIEW `AppInfoView` AS select appName, appCategory, isInternetAllowed, whiteListUniv1, isExcluded from AppInfo")
+                database.execSQL("UPDATE AppInfo set appCategory = 'System Components' where uid = 0")
+                database.execSQL("DELETE from AppInfo where appName = 'ANDROID' and appCategory = 'System Components'")
+            }
+        }
+
     }
 
     abstract fun appInfoDAO(): AppInfoDAO
@@ -139,6 +154,7 @@ abstract class AppDatabase : RoomDatabase(){
     abstract fun dnsProxyEndpointDAO() : DNSProxyEndpointDAO
     abstract fun proxyEndpointDAO() : ProxyEndpointDAO
     abstract fun dnsLogDAO() : DNSLogDAO
+    abstract fun appInfoViewDAO() : AppInfoViewDAO
 
     fun appInfoRepository() = AppInfoRepository(appInfoDAO())
     fun categoryInfoRepository() = CategoryInfoRepository(categoryInfoDAO())
@@ -150,5 +166,6 @@ abstract class AppDatabase : RoomDatabase(){
     fun dnsProxyEndpointRepository() = DNSProxyEndpointRepository(dnsProxyEndpointDAO())
     fun proxyEndpointRepository() = ProxyEndpointRepository(proxyEndpointDAO())
     fun dnsLogRepository() = DNSLogRepository(dnsLogDAO())
+    fun appInfoViewRepository() = AppInfoViewRepository(appInfoViewDAO())
 
 }
