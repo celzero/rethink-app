@@ -82,6 +82,7 @@ class HomeScreenActivity : AppCompatActivity() {
     private val blockedConnectionsRepository by inject<BlockedConnectionsRepository>()
     private val persistentState by inject<PersistentState>()
 
+
     /*TODO : This task need to be completed.
              Add all the appinfo in the global variable during appload
              Handle those things in the application instead of reaching to DB every time
@@ -110,13 +111,14 @@ class HomeScreenActivity : AppCompatActivity() {
         var appStartTime: Long = System.currentTimeMillis()
         var isBackgroundEnabled: Boolean = false
         var firewallRules: HashMultimap<Int, String> = HashMultimap.create()
-        var DEBUG = false
+        var DEBUG = true
 
         //Screen off - whether the screen preference is set 0-off, 1- on. -1 not initialized
         var isScreenLockedSetting : Int = -1
         //Screen off state - set - 0 if screen is off, 1 - screen is on, -1 not initialized.
         var isScreenLocked : Int = -1
         var localDownloadComplete : MutableLiveData<Int> = MutableLiveData()
+        //Remove the usage of below variable(isSearchEnabled)
         var isSearchEnabled : Boolean = true
 
         var swipeDetector : MutableLiveData<Boolean> = MutableLiveData()
@@ -162,14 +164,17 @@ class HomeScreenActivity : AppCompatActivity() {
         firewallRules.loadFirewallRules(blockedConnectionsRepository)
 
         refreshDatabase.deleteOlderDataFromNetworkLogs()
+        refreshDatabase.refreshAppInfoDatabase()
+
         if (!persistentState.insertionCompleted) {
             refreshDatabase.insertDefaultDNSList()
             refreshDatabase.insertDefaultDNSCryptList()
             refreshDatabase.insertDefaultDNSCryptRelayList()
+            refreshDatabase.insertDefaultDNSProxy()
             refreshDatabase.updateCategoryInDB()
             persistentState.insertionCompleted = true
         }
-        GlobalVariable.isBackgroundEnabled = persistentState.backgroundEnabled
+
         persistentState.setScreenLockData(false)
         updateInstallSource()
         initUpdateCheck()
@@ -181,22 +186,22 @@ class HomeScreenActivity : AppCompatActivity() {
     }
 
     private fun updateInstallSource() {
-        if (persistentState.downloadSource == 0) {
-            val packageManager = packageManager
-            try {
-                val applicationInfo: ApplicationInfo = packageManager.getApplicationInfo(packageName, 0)
-                if (DEBUG) Log.d(LOG_TAG, "Install location: ${packageManager.getInstallerPackageName(applicationInfo.packageName)}")
-                if ("com.android.vending" == packageManager.getInstallerPackageName(applicationInfo.packageName)) {
-                    // App was installed by Play Store
-                    persistentState.downloadSource = Constants.DOWNLOAD_SOURCE_PLAY_STORE
-                } else {
-                    // App was installed from somewhere else
-                    persistentState.downloadSource = Constants.DOWNLOAD_SOURCE_OTHERS
-                }
-            } catch (e: PackageManager.NameNotFoundException) {
-                Log.e(LOG_TAG, "Exception while fetching the app download source: ${e.message}", e)
+        //if (persistentState.downloadSource == 0) {
+        val packageManager = packageManager
+        try {
+            val applicationInfo: ApplicationInfo = packageManager.getApplicationInfo(packageName, 0)
+            if (DEBUG) Log.d(LOG_TAG, "Install location: ${packageManager.getInstallerPackageName(applicationInfo.packageName)}")
+            if ("com.android.vending" == packageManager.getInstallerPackageName(applicationInfo.packageName)) {
+                // App was installed by Play Store
+                persistentState.downloadSource = Constants.DOWNLOAD_SOURCE_PLAY_STORE
+            } else {
+                // App was installed from somewhere else
+                persistentState.downloadSource = Constants.DOWNLOAD_SOURCE_OTHERS
             }
+        } catch (e: PackageManager.NameNotFoundException) {
+            Log.e(LOG_TAG, "Exception while fetching the app download source: ${e.message}", e)
         }
+        //}
     }
 
 
@@ -240,8 +245,8 @@ class HomeScreenActivity : AppCompatActivity() {
         val numOfDays = (diff / (1000 * 60 * 60 * 24)).toInt()
         val calendar: Calendar = Calendar.getInstance()
         val day: Int = calendar.get(Calendar.DAY_OF_WEEK)
-        if(day == Calendar.FRIDAY || day == Calendar.SATURDAY) {
-            if (numOfDays > 0) {
+        if((day == Calendar.FRIDAY || day == Calendar.SATURDAY) && persistentState.checkForAppUpdate) {
+            if (numOfDays > 1) {
                 Log.i(LOG_TAG, "App update check initiated, number of days: $numOfDays")
                 checkForAppUpdate(false)
                 checkForBlockListUpdate()
@@ -249,6 +254,11 @@ class HomeScreenActivity : AppCompatActivity() {
                 Log.i(LOG_TAG, "App update check not initiated")
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        GlobalVariable.isBackgroundEnabled = persistentState.backgroundEnabled
     }
 
     private fun checkForBlockListUpdate() {
@@ -281,7 +291,6 @@ class HomeScreenActivity : AppCompatActivity() {
             appUpdateManager.registerListener(installStateUpdatedListener)
 
             appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
-
                 if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
                     try {
                         appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.FLEXIBLE, this, version)
@@ -296,7 +305,11 @@ class HomeScreenActivity : AppCompatActivity() {
                         appUpdateManager.unregisterListener(installStateUpdatedListener)
                         Log.e(LOG_TAG, "SendIntentException: ${e.message} ", e)
                     }
-                }  else {
+                }else if(UpdateAvailability.UPDATE_NOT_AVAILABLE == appUpdateInfo.updateAvailability()) {
+                    if (isUserInitiated) {
+                        showDownloadDialog(false, getString(R.string.download_update_dialog_message_ok_title), getString(R.string.download_update_dialog_message_ok))
+                    }
+                } else {
                     appUpdateManager.unregisterListener(installStateUpdatedListener)
                     Log.e(LOG_TAG, "checkForAppUpdateAvailability: something else")
                     if(isUserInitiated) {
@@ -318,10 +331,6 @@ class HomeScreenActivity : AppCompatActivity() {
             } else if (state.installStatus() == InstallStatus.INSTALLED) {
                 Log.i(LOG_TAG, "InstallStateUpdatedListener: state: " + state.installStatus())
                 appUpdateManager.unregisterListener(this)
-            } else {
-                appUpdateManager.unregisterListener(this)
-                Log.i(LOG_TAG, "InstallStateUpdatedListener: state: " + state.installStatus())
-               // checkForDownload()
             }
         }
     }
@@ -497,14 +506,18 @@ class HomeScreenActivity : AppCompatActivity() {
                 dialogInterface.dismiss()
             }
         }else {
-            builder.setPositiveButton("Visit website") { dialogInterface, which ->
-                if (isPlayStore) {
+            if(isPlayStore){
+                builder.setPositiveButton("Complete update") { dialogInterface, which ->
                     appUpdateManager.completeUpdate()
-                } else {
+                }
+            }else{
+                builder.setPositiveButton("Visit website") { dialogInterface, which ->
                     initiateDownload()
                 }
             }
+
             builder.setNegativeButton("Remind me later") { dialogInterface, which ->
+                persistentState.lastAppUpdateCheck = System.currentTimeMillis()
                 dialogInterface.dismiss()
             }
         }
@@ -576,13 +589,6 @@ class HomeScreenActivity : AppCompatActivity() {
         } catch (e: java.lang.Exception) {
             Log.e(LOG_TAG, "Download unsuccessful - ${e.message}", e)
         }
-    }
-
-
-
-    override fun onResume() {
-        super.onResume()
-        refreshDatabase.refreshAppInfoDatabase()
     }
 
 
