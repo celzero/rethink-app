@@ -46,7 +46,6 @@
                         app:iconifiedByDefault="false"
                         app:queryBackground="@color/colorPrimaryDark"
                         app:queryHint="@string/search_dns_logs">
-                        <requestFocus />
                     </androidx.appcompat.widget.SearchView>
 
                     <androidx.appcompat.widget.AppCompatImageView

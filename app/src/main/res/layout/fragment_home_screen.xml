@@ -85,574 +85,142 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:paddingTop="15dp"
-            android:visibility="gone"
-            android:weightSum="1">
-
-            <androidx.appcompat.widget.AppCompatSpinner
-                android:id="@+id/fhs_brave_mode_spinner"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="0.8"
-                android:gravity="center" />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/fhs_dns_mode_info"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_weight="0.2"
-                android:padding="5dp"
-                android:src="@drawable/brave_mode_info" />
-
-
-        </LinearLayout>
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/fhs_card_home_top_tile"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:visibility="visible"
-            app:cardElevation="@dimen/activity_horizontal_margin">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:visibility="visible"
-                android:weightSum="2">
-
-                <LinearLayout
-                    android:id="@+id/fhs_tile_show_firewall"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:orientation="horizontal"
-                    android:visibility="gone"
-                    android:weightSum="3">
-
-                    <LinearLayout
-                        android:id="@+id/fhs_ll_firewall"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical"
-                        android:padding="10dp">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/fhs_tile_firewall_apps_txt"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="-"
-                            android:textColor="@color/secondaryText"
-                            android:textSize="@dimen/home_screen_stat_text"
-                            android:tooltipText="Number of apps in the firewall blocklist" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-smallcaps"
-                            android:gravity="center"
-                            android:text="apps blocked"
-                            android:textColor="@color/primaryText"
-                            android:textSize="@dimen/default_font_text_view"
-                            android:tooltipText="Number of apps in the firewall blocklist" />
-
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/fhs_ll_app_mgr"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical"
-                        android:padding="10dp"
-                        android:visibility="visible">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/fhs_tile_firewall_category_txt"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="2"
-                            android:textColor="@color/secondaryText"
-                            android:textSize="@dimen/home_screen_stat_text"
-                            android:tooltipText="Number of app categories in the firewall blocklist" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-smallcaps"
-                            android:gravity="center"
-                            android:text="categories blocked"
-                            android:textColor="@color/primaryText"
-                            android:textSize="@dimen/default_font_text_view"
-                            android:tooltipText="Number of app categories in the firewall blocklist" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical"
-                        android:padding="10dp"
-                        android:visibility="visible">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/fhs_tile_firewall_universal_txt"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0"
-                            android:textColor="@color/secondaryText"
-                            android:textSize="@dimen/home_screen_stat_text"
-                            android:tooltipText="Number of active Universal Firewall rules" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-smallcaps"
-                            android:gravity="center"
-                            android:text="universal firewall"
-                            android:textColor="@color/primaryText"
-                            android:textSize="@dimen/default_font_text_view"
-                            android:tooltipText="Number of active Universal Firewall rules" />
-
-                    </LinearLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/fhs_tile_show_dns"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:visibility="visible"
-                    android:weightSum="3">
-
-                    <LinearLayout
-                        android:id="@+id/fhs_tile_dns_ll"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical"
-                        android:padding="10dp">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/fhs_tile_dns_lifetime_txt"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="-"
-                            android:textColor="@color/secondaryText"
-                            android:textSize="@dimen/home_screen_stat_text"
-                            android:tooltipText="Total DNS queries requested" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-smallcaps"
-                            android:gravity="center"
-                            android:text="lifetime Qs"
-                            android:textColor="@color/primaryText"
-                            android:textSize="@dimen/default_font_text_view"
-                            android:tooltipText="Total DNS queries requested" />
-
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/fhs_tile_dns_median_latency_ll"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical"
-                        android:padding="10dp"
-                        android:visibility="visible">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/fhs_tile_dns_median_latency_txt"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="-"
-                            android:textColor="@color/secondaryText"
-                            android:textSize="@dimen/home_screen_stat_text"
-                            android:tooltipText="End-to-end median DNS request latency" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-smallcaps"
-                            android:gravity="center"
-                            android:text="latency"
-                            android:textColor="@color/primaryText"
-                            android:textSize="@dimen/default_font_text_view"
-                            android:tooltipText="End-to-end median DNS request latency" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical"
-                        android:padding="10dp"
-                        android:visibility="visible">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/fhs_tile_dns_trackers_blocked_txt"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="-"
-                            android:textColor="@color/secondaryText"
-                            android:textSize="@dimen/home_screen_stat_text"
-                            android:tooltipText="Total unresolved, unanswered queries" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-smallcaps"
-                            android:gravity="center"
-                            android:text="unresolved Qs"
-                            android:textColor="@color/primaryText"
-                            android:textSize="@dimen/default_font_text_view"
-                            android:tooltipText="Total unresolved, unanswered queries" />
-
-                    </LinearLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/fhs_tile_show_dns_firewall"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:visibility="gone"
-                    android:weightSum="3">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical"
-                        android:padding="10dp">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/fhs_tile_dns_firewall_apps_blocked_txt"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="-"
-                            android:textColor="@color/secondaryText"
-                            android:textSize="@dimen/home_screen_stat_text"
-                            android:tooltipText="Number of apps in the firewall blocklist" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-smallcaps"
-                            android:gravity="center"
-                            android:text="apps blocked"
-                            android:textColor="@color/primaryText"
-                            android:textSize="@dimen/default_font_text_view"
-                            android:tooltipText="Number of apps in the firewall blocklist" />
-
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical"
-                        android:padding="10dp"
-                        android:visibility="visible">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/fhs_tile_dns_firewall_median_latency_txt"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="-"
-                            android:textColor="@color/secondaryText"
-                            android:textSize="@dimen/home_screen_stat_text"
-                            android:tooltipText="End-to-end median DNS request latency" />
-
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-smallcaps"
-                            android:gravity="center"
-                            android:text="latency"
-                            android:textColor="@color/primaryText"
-                            android:textSize="@dimen/default_font_text_view"
-                            android:tooltipText="End-to-end median DNS request latency" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical"
-                        android:padding="10dp"
-                        android:visibility="visible">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/fhs_tile_dns_firewall_trackers_blocked_txt"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="-%"
-                            android:textColor="@color/secondaryText"
-                            android:textSize="@dimen/home_screen_stat_text"
-                            android:tooltipText="Total unresolved, unanswered queries" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-smallcaps"
-                            android:gravity="center"
-                            android:text="unresolved qs"
-                            android:textColor="@color/primaryText"
-                            android:textSize="@dimen/default_font_text_view"
-                            android:tooltipText="Total unresolved, unanswered queries" />
-
-                    </LinearLayout>
-                </LinearLayout>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_margin="10dp"
-            android:gravity="start"
-            android:orientation="horizontal"
-            android:visibility="visible"
-            android:weightSum="1">
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/chip_configure_firewall"
-                style="@style/Widget.AppCompat.Button"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:background="@drawable/rounded_corners_button_primary"
-                android:clickable="true"
-                android:drawableStart="@drawable/spinner_firewall"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:elevation="@dimen/bottom_sheet_corner_radius"
-                android:stateListAnimator="@null"
-                android:text="@string/firewall_mode_info_title"
-                android:textAlignment="center"
-                android:textColor="@color/primaryText" />
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/chip_view_logs"
-                style="@style/Widget.AppCompat.Button"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_weight="0.5"
-                android:background="@drawable/rounded_corners_button_primary"
-                android:clickable="true"
-                android:drawableStart="@drawable/spinner_dns"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                android:elevation="@dimen/bottom_sheet_corner_radius"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:stateListAnimator="@null"
-                android:text="@string/dns_mode_info_title"
-                android:textAlignment="center"
-                android:textColor="@color/primaryText" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:orientation="horizontal"
-            android:visibility="gone"
+            android:visibility="visible"
             android:weightSum="1">
 
-            <androidx.cardview.widget.CardView
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
+                android:background="@drawable/rounded_corners_button_accent"
                 android:layout_marginEnd="5dp"
-                android:layout_weight="0.5"
-                android:padding="10dp"
-                app:cardElevation="@dimen/activity_horizontal_margin">
+                android:layout_weight="0.5">
 
-                <ImageView
-                    android:id="@+id/fhs_card_dns_logs_iv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_margin="5dp"
-                    android:padding="5dp"
-                    android:src="@drawable/logs_home_screen" />
+
 
                 <LinearLayout
                     android:id="@+id/fhs_card_dns_ll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="10dp">
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:drawablePadding="5dp"
-                        android:padding="5dp"
+                        android:layout_marginBottom="10dp"
+                        android:drawablePadding="10dp"
+                        android:padding="10dp"
                         android:text="DNS"
                         android:textColor="@color/dividerColor"
                         app:drawableStartCompat="@drawable/dns_home_screen" />
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="0.5dp"
-                        android:background="@color/dividerColor" />
-
-                    <TextView
-                        android:id="@+id/fhs_card_dns_latency"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:padding="5dp"
-                        android:text="Latency: 40 ms"
-                        android:textColor="@color/primaryText" />
-
-                    <TextView
-                        android:id="@+id/fhs_card_dns_blocked_queries"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:padding="5dp"
-                        android:text="Blocked queries: 4K"
-                        android:textColor="@color/primaryText" />
-
-                    <TextView
-                        android:id="@+id/fhs_card_dns_lifetime_queries"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:padding="5dp"
-                        android:text="Lifetime queries: 4K"
-                        android:textColor="@color/primaryText" />
 
                     <TextView
                         android:id="@+id/fhs_card_dns_connected_dns"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
                         android:padding="5dp"
-                        android:text="Connected to: Cloudflare"
+                        android:gravity="center_vertical"
+                        android:text="Cloudflare"
+                        android:textColor="@color/primaryText"
+                        android:textSize="@dimen/extra_large_font_text_view" />
+
+                    <TextView
+                        android:id="@+id/fhs_card_dns_latency"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:gravity="center_vertical"
+                        android:textSize="@dimen/default_font_text_view"
+                        android:text="Latency: 44ms"
                         android:textColor="@color/primaryText" />
 
 
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@color/dividerColor" />
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/fhs_card_dns_configure"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="match_parent"
+                        android:textAlignment="viewStart"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dns_card_configure_btn"
+                        android:textColor="@color/secondaryText" />
+
                 </LinearLayout>
 
-            </androidx.cardview.widget.CardView>
+            </LinearLayout>
 
-            <androidx.cardview.widget.CardView
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="10dp"
                 android:layout_weight="0.5"
-                android:padding="10dp"
-                app:cardElevation="@dimen/activity_horizontal_margin">
-
-                <ImageView
-                    android:id="@+id/fhs_card_firewall_logs_iv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_margin="5dp"
-                    android:padding="5dp"
-                    android:src="@drawable/logs_home_screen" />
+                android:background="@drawable/rounded_corners_button_accent">
 
                 <LinearLayout
                     android:id="@+id/fhs_card_firewall_ll"
                     android:layout_width="match_parent"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="10dp">
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:drawablePadding="5dp"
-                        android:padding="5dp"
+                        android:drawablePadding="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:padding="10dp"
                         android:text="Firewall"
                         android:textColor="@color/dividerColor"
                         app:drawableStartCompat="@drawable/firewall_home_screen" />
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="0.5dp"
-                        android:background="@color/dividerColor" />
-
+                    <TextView
+                        android:id="@+id/fhs_card_firewall_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:padding="5dp"
+                        android:text="13 apps blocked"
+                        android:textSize="@dimen/extra_large_font_text_view"
+                        android:textColor="@color/primaryText" />
                     <TextView
                         android:id="@+id/fhs_card_firewall_apps"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
-                        android:padding="5dp"
+                        android:textSize="@dimen/default_font_text_view"
                         android:text="Blocked apps: 0"
-                        android:textColor="@color/primaryText" />
-
-                    <TextView
-                        android:id="@+id/fhs_card_firewall_univ"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
                         android:padding="5dp"
-                        android:text="Universal rules: 0"
                         android:textColor="@color/primaryText" />
 
-                    <TextView
-                        android:id="@+id/fhs_card_firewall_whitelist"
-                        android:layout_width="wrap_content"
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@color/dividerColor" />
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/fhs_card_firewall_configure"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:padding="5dp"
-                        android:text="Whitelisted apps: 0"
-                        android:textColor="@color/primaryText" />
-
-                    <TextView
-                        android:id="@+id/fhs_card_firewall_excluded"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:padding="5dp"
-                        android:text="Excluded apps: 0"
-                        android:textColor="@color/primaryText" />
-
+                        android:textAlignment="viewStart"
+                        android:text="@string/firewall_card_configure_btn"
+                        android:textColor="@color/secondaryText" />
 
                 </LinearLayout>
 
-            </androidx.cardview.widget.CardView>
+            </LinearLayout>
 
         </LinearLayout>
 

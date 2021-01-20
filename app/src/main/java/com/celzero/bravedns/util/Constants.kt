@@ -80,6 +80,8 @@ class Constants {
 
         const val AMAZON_BUILD = "Amazon"
 
+        const val SCREEN_TO_LOAD = "view_pager_screen"
+
     }
 
 }

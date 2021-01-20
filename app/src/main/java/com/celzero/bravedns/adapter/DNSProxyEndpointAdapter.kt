@@ -284,8 +284,8 @@ class DNSProxyEndpointAdapter(private val context: Context,
             }
             listener.updateUIFromAdapter(3)
             persistentState.dnsType = 3
+            persistentState.setConnectedDNS(dnsProxyEndpoint.proxyName)
             persistentState.connectionModeChange = dnsProxyEndpoint.proxyIP!!
-            persistentState.dnsProxyIDChange = dnsProxyEndpoint.id
             dnsProxyEndpointRepository.updateAsync(dnsProxyEndpoint)
             //mDb.close()
         }

@@ -24,6 +24,7 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.celzero.bravedns.R
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -32,10 +33,12 @@ class DNSDetailActivity : AppCompatActivity() {
     private lateinit var viewPagerDNS: ViewPager2
     private lateinit var tabLayoutFirewall: TabLayout
     private val DNS_TABS_COUNT = 2
+    private var screenToLoad = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dns_detail)
+        screenToLoad = intent.getIntExtra(Constants.SCREEN_TO_LOAD,0)
         init()
     }
 
@@ -62,8 +65,9 @@ class DNSDetailActivity : AppCompatActivity() {
                 0 -> getString(R.string.dns_act_log)
                 else -> getString(R.string.dns_act_configure_tab)
             }
-            viewPagerDNS.setCurrentItem(tab.position, false)
+
         }.attach()
+        viewPagerDNS.setCurrentItem(screenToLoad, false)
 
     }
 

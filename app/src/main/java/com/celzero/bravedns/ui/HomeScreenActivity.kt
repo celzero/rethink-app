@@ -96,18 +96,15 @@ class HomeScreenActivity : AppCompatActivity() {
         var appMode: AppMode? = null
         var filesDownloaded: Int = 0
         var lifeTimeQueries: Int = -1
-        var lifeTimeQ: MutableLiveData<Int> = MutableLiveData()
         var medianP90: Long = -1
         var median50: MutableLiveData<Long> = MutableLiveData()
         var blockedCount: MutableLiveData<Int> = MutableLiveData()
         var dnsType : MutableLiveData<Int> = MutableLiveData()
         var braveModeToggler : MutableLiveData<Int> = MutableLiveData()
+        var connectedDNS : MutableLiveData<String> = MutableLiveData()
         //var cryptModeInProgress : Int = 0
         var cryptRelayToRemove : String = ""
 
-        //var appsBlocked : MutableLiveData<Int> = MutableLiveData()
-        //var excludedAppsFromVPN : MutableMap<String,Boolean> = HashMap()
-        var numUniversalBlock: MutableLiveData<Int> = MutableLiveData()
         var appStartTime: Long = System.currentTimeMillis()
         var isBackgroundEnabled: Boolean = false
         var firewallRules: HashMultimap<Int, String> = HashMultimap.create()
