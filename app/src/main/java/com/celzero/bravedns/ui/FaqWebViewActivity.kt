@@ -19,40 +19,39 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.webkit.WebChromeClient
-import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.databinding.ActivityFaqWebviewLayoutBinding
+import com.celzero.bravedns.databinding.ActivityQueryDetailBinding
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 
 
-class FaqWebViewActivity  : AppCompatActivity(){
+class FaqWebViewActivity : AppCompatActivity(R.layout.activity_faq_webview_layout) {
+    private val b by viewBinding(ActivityFaqWebviewLayoutBinding::bind)
 
-    private lateinit var faqWebView : WebView
-
-    @SuppressLint("SetJavaScriptEnabled")
-    override fun onCreate(savedInstanceState: Bundle?) {
+    @SuppressLint("SetJavaScriptEnabled") override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_faq_webview_layout)
-        faqWebView = findViewById(R.id.configure_webview)
-        faqWebView.settings.domStorageEnabled = true
-        faqWebView.settings.allowContentAccess = true
-        faqWebView.settings.allowFileAccess = true
-        faqWebView.settings.javaScriptEnabled = true
-        faqWebView.settings.allowFileAccessFromFileURLs = true
-        faqWebView.settings.allowUniversalAccessFromFileURLs = true
-        faqWebView.settings.setSupportZoom(true)
-        faqWebView.webViewClient = WebViewClient()
-        faqWebView.clearCache(true)
-        faqWebView.clearHistory()
-        faqWebView.isClickable = true
-        faqWebView.webChromeClient = WebChromeClient()
+        b.configureWebview.settings.domStorageEnabled = true
+        b.configureWebview.settings.allowContentAccess = true
+        b.configureWebview.settings.allowFileAccess = true
+        b.configureWebview.settings.javaScriptEnabled = true
+        b.configureWebview.settings.allowFileAccessFromFileURLs = true
+        b.configureWebview.settings.allowUniversalAccessFromFileURLs = true
+        b.configureWebview.settings.setSupportZoom(true)
+        b.configureWebview.webViewClient = WebViewClient()
+        b.configureWebview.clearCache(true)
+        b.configureWebview.clearHistory()
+        b.configureWebview.isClickable = true
+        b.configureWebview.webChromeClient = WebChromeClient()
+
         val url = intent.getStringExtra("url")
-        if(url == null) {
-            faqWebView.loadUrl(this.resources.getString(R.string.faq_web_link))
-        }else{
-            faqWebView.loadUrl(url)
+        if (url == null) {
+            b.configureWebview.loadUrl(this.resources.getString(R.string.faq_web_link))
+        } else {
+            b.configureWebview.loadUrl(url)
         }
         /**
          *  faqWebView.evaluateJavascript(
@@ -66,10 +65,9 @@ class FaqWebViewActivity  : AppCompatActivity(){
     }
 
     override fun onDestroy() {
-        if(DEBUG) Log.d(LOG_TAG, "onDestroy")
-        faqWebView.destroy()
+        if (DEBUG) Log.d(LOG_TAG, "onDestroy")
+        b.configureWebview.destroy()
         super.onDestroy()
-
     }
 
 }

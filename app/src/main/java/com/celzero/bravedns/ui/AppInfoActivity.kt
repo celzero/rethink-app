@@ -15,14 +15,11 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui
 
-import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.databinding.ActivityAppDetailsBinding
 
-class AppInfoActivity  : AppCompatActivity(){
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_app_details)
-    }
+class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
+    private val b by viewBinding(ActivityAppDetailsBinding::bind)
 }

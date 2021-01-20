@@ -22,14 +22,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.util.Constants
 import com.google.android.material.tabs.TabLayout
+import com.celzero.bravedns.database.ConnectionTrackerRepository
+import com.celzero.bravedns.databinding.ActivityFaqWebviewLayoutBinding
+import com.celzero.bravedns.databinding.ActivityFirewallBinding
 import com.google.android.material.tabs.TabLayoutMediator
 
-class FirewallActivity : AppCompatActivity() {
-    private lateinit var viewPagerFirewall : ViewPager2
-    private lateinit var tabLayoutFirewall : TabLayout
+class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
+    private val b by viewBinding(ActivityFirewallBinding::bind)
     private val FIREWALL_TABS_COUNT = 3
     private var screenToLoad = 0
 
@@ -42,11 +45,7 @@ class FirewallActivity : AppCompatActivity() {
     }
 
     private fun init() {
-
-        viewPagerFirewall = findViewById(R.id.firewall_act_viewpager)
-        tabLayoutFirewall = findViewById(R.id.firewall_act_tabLayout)
-
-        viewPagerFirewall.adapter = object : FragmentStateAdapter(this) {
+        b.firewallActViewpager.adapter = object : FragmentStateAdapter(this) {
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
                     0 -> UniversalFirewallFragment.newInstance()
@@ -54,12 +53,15 @@ class FirewallActivity : AppCompatActivity() {
                     else -> FirewallAppFragment.newInstance()
                 }
             }
+
             override fun getItemCount(): Int {
                 return FIREWALL_TABS_COUNT
             }
         }
 
-        TabLayoutMediator(tabLayoutFirewall, viewPagerFirewall) { tab, position ->
+        //viewPagerFirewall.fakeDragBy(1000F)
+
+        TabLayoutMediator(b.firewallActTabLayout, b.firewallActViewpager) { tab, position ->
             tab.text = when (position) {
                 0 -> getString(R.string.firewall_act_universal_tab)
                 1 -> getString(R.string.firewall_act_network_monitor_tab)
@@ -68,8 +70,9 @@ class FirewallActivity : AppCompatActivity() {
             //viewPagerFirewall.setCurrentItem(tab.position, false)
         }.attach()
 
-        viewPagerFirewall.setCurrentItem(screenToLoad, false)
-        viewPagerFirewall.offscreenPageLimit = 2
+        b.firewallActViewpager.offscreenPageLimit = 2
+        b.firewallActViewpager.setCurrentItem(screenToLoad, true)
+
 
     }
 

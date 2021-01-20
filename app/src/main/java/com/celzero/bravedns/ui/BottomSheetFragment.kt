@@ -15,15 +15,15 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui
 
-import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.Apk
+import com.celzero.bravedns.databinding.ActivitySettingsScreenBinding
+import com.celzero.bravedns.databinding.BottomSheetPermissionManagerBinding
 import com.celzero.bravedns.util.DatabaseHandler
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
@@ -34,71 +34,54 @@ import org.koin.android.ext.android.inject
  * whether to auto remove, auto revoke and do nothing
  * for the permissions.
  */
-class BottomSheetFragment(context : Context, apkItem : Apk) : BottomSheetDialogFragment() {
+class BottomSheetFragment(apkItem: Apk) : BottomSheetDialogFragment() {
+    private val b by viewBinding(BottomSheetPermissionManagerBinding::bind)
 
-    private var fragmentView: View? = null
-
-    private var apkVal : Apk = apkItem
-
-    private lateinit var txtAutoRemove : TextView
-    private lateinit var txtAutoRevoke : TextView
-    private lateinit var txtDoNothing : TextView
+    private var apkVal: Apk = apkItem
     private val dbHandler by inject<DatabaseHandler>()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun getTheme(): Int = R.style.BottomSheetDialogTheme
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        fragmentView = inflater.inflate(R.layout.bottom_sheet_permission_manager, container, false)
-        return fragmentView
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initView(view)
+        initView()
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return super.onCreateDialog(savedInstanceState)
-    }
-
-    private fun initView(view : View) {
+    private fun initView() {
         print("initView")
-        val rule = 0//HomeScreenActivity.dbHandler.getSpecificPackageRule(apkVal.packageName)
+        val rule = 0 //HomeScreenActivity.dbHandler.getSpecificPackageRule(apkVal.packageName)
         //Toast.makeText(contextV,"Rule:"+rule,Toast.LENGTH_SHORT).show()
-        txtAutoRemove = view.findViewById(R.id.textView)
-        txtAutoRevoke = view.findViewById(R.id.textView2)
-        txtDoNothing = view.findViewById(R.id.textView3)
 
-        if(rule == 0){
-            txtDoNothing.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ok,0)
-            txtAutoRemove.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
-            txtAutoRevoke.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
-        }else if(rule == 1){
-            txtAutoRevoke.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ok,0)
-            txtAutoRemove.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
-            txtDoNothing.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
-        }else if(rule == 2){
-            txtAutoRemove.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ok,0)
-            txtAutoRevoke.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
-            txtDoNothing.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)
+        when (rule) {
+            0 -> {
+                b.txtDoNothing.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ok, 0)
+                b.txtAutoRemove.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                b.txtAutoRevoke.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+            }
+            1 -> {
+                b.txtAutoRevoke.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ok, 0)
+                b.txtAutoRemove.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                b.txtDoNothing.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+            }
+            2 -> {
+                b.txtAutoRemove.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ok, 0)
+                b.txtAutoRevoke.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                b.txtDoNothing.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+            }
         }
 
-        txtAutoRemove.setOnClickListener{
-            dbHandler.updatePackage(apkVal.packageName , 2)
+        b.txtAutoRemove.setOnClickListener {
+            dbHandler.updatePackage(apkVal.packageName, 2)
             print(apkVal.packageName)
             this.dismiss()
         }
-        txtAutoRevoke.setOnClickListener{
-            dbHandler.updatePackage(apkVal.packageName , 1)
+        b.txtAutoRevoke.setOnClickListener {
+            dbHandler.updatePackage(apkVal.packageName, 1)
             print(apkVal.packageName)
             this.dismiss()
         }
-        txtDoNothing.setOnClickListener{
-            dbHandler.updatePackage(apkVal.packageName , 0)
+        b.txtDoNothing.setOnClickListener {
+            dbHandler.updatePackage(apkVal.packageName, 0)
             print(apkVal.packageName)
             this.dismiss()
         }
