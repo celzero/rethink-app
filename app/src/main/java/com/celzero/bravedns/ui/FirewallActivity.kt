@@ -31,11 +31,13 @@ class FirewallActivity : AppCompatActivity() {
     private lateinit var viewPagerFirewall : ViewPager2
     private lateinit var tabLayoutFirewall : TabLayout
     private val FIREWALL_TABS_COUNT = 3
+    private var screenToLoad = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_firewall)
+        screenToLoad = intent.getIntExtra(Constants.SCREEN_TO_LOAD,0)
         init()
     }
 
@@ -63,11 +65,11 @@ class FirewallActivity : AppCompatActivity() {
                 1 -> getString(R.string.firewall_act_network_monitor_tab)
                 else -> getString(R.string.firewall_act_apps_tab)
             }
-            viewPagerFirewall.setCurrentItem(tab.position, false)
+            //viewPagerFirewall.setCurrentItem(tab.position, false)
         }.attach()
 
+        viewPagerFirewall.setCurrentItem(screenToLoad, false)
         viewPagerFirewall.offscreenPageLimit = 2
-
 
     }
 

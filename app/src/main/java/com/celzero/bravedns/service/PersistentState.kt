@@ -5,6 +5,7 @@ import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.connectedDNS
 import com.celzero.bravedns.util.Constants
 import hu.autsoft.krate.*
 import settings.Settings
@@ -62,7 +63,6 @@ class PersistentState(context: Context):SimpleKrate(context) {
     var numberOfRemoteBlocklists by intPref("remote_block_list_count", 0)
     var numberOfLocalBlocklists by intPref("local_block_list_count", 0)
     var udpBlockedSettings by booleanPref("block_udp_traffic_other_than_dns", false)
-    var dnsProxyIDChange by intPref("dns_proxy_change", 0)
     var insertionCompleted by booleanPref("initial_insert_servers_complete", false)
     var remoteBraveDNSDownloaded by booleanPref("download_remote_block_list", false)
     private var _localBlockListStamp by stringPref("local_block_list_stamp", "")
@@ -92,6 +92,7 @@ class PersistentState(context: Context):SimpleKrate(context) {
     var checkForAppUpdate by booleanPref("check_for_app_update", true)
         //private set
     var isScreenOff by booleanPref("screen_off", false)
+    private var connectedDNSName by stringPref("connected_dns_name","RethinkDNS Basic")
 
     fun wifiAllowed(forPackage:String):Boolean = !excludedPackagesWifi.contains(forPackage)
 
@@ -133,18 +134,8 @@ class PersistentState(context: Context):SimpleKrate(context) {
         _screenState = state
         if (state) {
             HomeScreenActivity.GlobalVariable.isScreenLockedSetting = 1
-            if (backgroundEnabled) {
-                HomeScreenActivity.GlobalVariable.numUniversalBlock.postValue(2)
-            } else {
-                HomeScreenActivity.GlobalVariable.numUniversalBlock.postValue(1)
-            }
         } else {
             HomeScreenActivity.GlobalVariable.isScreenLockedSetting = 0
-            if (backgroundEnabled) {
-                HomeScreenActivity.GlobalVariable.numUniversalBlock.postValue(1)
-            } else {
-                HomeScreenActivity.GlobalVariable.numUniversalBlock.postValue(0)
-            }
         }
     }
 
@@ -178,7 +169,6 @@ class PersistentState(context: Context):SimpleKrate(context) {
         }
         _numberOfRequests = numReq
         HomeScreenActivity.GlobalVariable.lifeTimeQueries = numReq
-        HomeScreenActivity.GlobalVariable.lifeTimeQ.postValue(numReq)
     }
 
     fun getNumOfReq(): Int {
@@ -195,20 +185,6 @@ class PersistentState(context: Context):SimpleKrate(context) {
     fun setIsBackgroundEnabled(isEnabled: Boolean) {
         backgroundEnabled = isEnabled
         HomeScreenActivity.GlobalVariable.isBackgroundEnabled = backgroundEnabled
-        //var uValue = HomeScreenActivity.GlobalVariable.numUniversalBlock.value
-        if (isEnabled) {
-            if (getScreenLockData()) {
-                HomeScreenActivity.GlobalVariable.numUniversalBlock.postValue(2)
-            } else {
-                HomeScreenActivity.GlobalVariable.numUniversalBlock.postValue(1)
-            }
-        } else {
-            if (getScreenLockData()) {
-                HomeScreenActivity.GlobalVariable.numUniversalBlock.postValue(1)
-            } else {
-                HomeScreenActivity.GlobalVariable.numUniversalBlock.postValue(0)
-            }
-        }
     }
 
     fun setScreenLockData(isEnabled : Boolean) {
@@ -223,5 +199,18 @@ class PersistentState(context: Context):SimpleKrate(context) {
             1 -> true
             else -> isScreenOff
         }
+    }
+
+    //fixme replace the below logic once the DNS data is streamlined.
+    fun getConnectedDNS() : String{
+        if(connectedDNS.value.isNullOrEmpty())
+            return connectedDNSName
+        else
+            return connectedDNS.value!!
+    }
+
+    fun setConnectedDNS(name : String) {
+        HomeScreenActivity.GlobalVariable.connectedDNS.postValue(name)
+        connectedDNSName = name
     }
 }

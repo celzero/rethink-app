@@ -48,7 +48,6 @@
                         app:iconifiedByDefault="false"
                         app:queryBackground="@color/colorPrimaryDark"
                         app:queryHint="@string/search_firewall_network_log">
-                        <requestFocus />
                     </androidx.appcompat.widget.SearchView>
 
                     <androidx.appcompat.widget.AppCompatImageView

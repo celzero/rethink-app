@@ -628,6 +628,22 @@
     <string name="ct_bs_rule_1">Rule #1</string>
     <string name="ct_bs_rule_2">Rule #2</string>
 
+    <!-- Home screen -->
+    <!--<string name="firewall_card_text_active"><![CDATA[<font color="#05dfd7">%1$s</font> whitelisted, <font color="#05dfd7">%2$s</font> excluded]]></string>-->
+    <string name="firewall_card_status_inactive">Firewall disabled</string>
+    <string name="firewall_card_status_active">%1$s apps blocked</string>
+
+    <string name="firewall_card_text_active">%1$s whitelisted, %2$s excluded.</string>
+    <string name="firewall_card_text_inactive">Enable firewall mode.</string>
+    <string name="firewall_card_configure_btn">Configure</string>
+
+
+    <string name="dns_card_connected_status_failure">DNS disabled</string>
+
+    <string name="dns_card_latency_active">Latency: %1$sms</string>
+    <string name="dns_card_latency_inactive">Enable DNS mode.</string>
+    <string name="dns_card_configure_btn">Change</string>
+
 
 
 </resources>

@@ -262,9 +262,10 @@ class DNSCryptEndpointAdapter(private val context: Context,
             }.start()
 
             persistentState.connectionModeChange = dnsCryptEndpoint.dnsCryptURL
+            persistentState.setConnectedDNS(dnsCryptEndpoint.dnsCryptName)
             listener.updateUIFromAdapter(2)
             appMode?.setDNSMode(Settings.DNSModeCryptPort)
-            //mDb.close()
+
             return true
         }
 
