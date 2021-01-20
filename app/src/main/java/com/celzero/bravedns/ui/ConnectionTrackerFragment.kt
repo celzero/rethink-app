@@ -17,20 +17,17 @@ package com.celzero.bravedns.ui
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ConnectionTrackerAdapter
 import com.celzero.bravedns.database.ConnectionTrackerDAO
+import com.celzero.bravedns.databinding.ActivityConnectionTrackerBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
@@ -46,15 +43,10 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  * Live data is used to fetch the network details from the database.
  * Database table name - ConnectionTracker.
  */
-class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
+class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker), SearchView.OnQueryTextListener {
+    private val b by viewBinding(ActivityConnectionTrackerBinding::bind)
 
-    private var recyclerView: RecyclerView? = null
     private var layoutManager: RecyclerView.LayoutManager? = null
-    private var editSearchView: SearchView? = null
-    private lateinit var searchLayoutLL : LinearLayout
-    private lateinit var filterIcon: ImageView
-    private lateinit var deleteIcon: ImageView
-    private lateinit var disabledLogsTextView: TextView
     private var recyclerAdapter: ConnectionTrackerAdapter? = null
     private val viewModel: ConnectionTrackerViewModel by viewModel()
     private var filterValue: String = ""
@@ -63,65 +55,47 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
     private val connectionTrackerDAO by inject<ConnectionTrackerDAO>()
     private val persistentState by inject<PersistentState>()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        super.onCreate(savedInstanceState)
-        return inflater.inflate(R.layout.activity_connection_tracker, container, false)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initView(view)
+        initView()
     }
 
-    override fun onResume() {
-        super.onResume()
-        initValues()
-    }
-
-    companion object{
+    companion object {
         fun newInstance() = ConnectionTrackerFragment()
     }
 
-    private fun initView(view: View) {
-        val includeView = view.findViewById<View>(R.id.connection_list_scroll_list)
-        recyclerView = includeView.findViewById<View>(R.id.recycler_connection) as RecyclerView
-        editSearchView = includeView.findViewById(R.id.connection_search)
-        filterIcon = includeView.findViewById(R.id.connection_filter_icon)
-        deleteIcon = includeView.findViewById(R.id.connection_delete_icon)
-        searchLayoutLL = includeView.findViewById(R.id.connection_card_view_top)
-        disabledLogsTextView = includeView.findViewById(R.id.connection_list_logs_disabled_tv)
-    }
+    private fun initView() {
+        val includeView = b.connectionListScrollList
 
-    private fun initValues() {
         if (persistentState.logsEnabled) {
-            disabledLogsTextView.visibility = View.GONE
-            searchLayoutLL.visibility = View.VISIBLE
+            includeView.connectionListLogsDisabledTv.visibility = View.GONE
+            includeView.connectionCardViewTop.visibility = View.VISIBLE
 
-            recyclerView!!.setHasFixedSize(true)
+            includeView.recyclerConnection.setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
-            recyclerView!!.layoutManager = layoutManager
+            includeView.recyclerConnection.layoutManager = layoutManager
 
             recyclerAdapter = ConnectionTrackerAdapter(requireContext())
             viewModel.connectionTrackerList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(recyclerAdapter!!::submitList))
-            recyclerView!!.adapter = recyclerAdapter
+            includeView.recyclerConnection.adapter = recyclerAdapter
             //recyclerView!!.setItemViewCacheSize(100)
         } else {
-            disabledLogsTextView.visibility = View.VISIBLE
-            searchLayoutLL.visibility = View.GONE
+            includeView.connectionListLogsDisabledTv.visibility = View.VISIBLE
+            includeView.connectionCardViewTop.visibility = View.GONE
         }
 
 
-        editSearchView!!.setOnQueryTextListener(this)
-        editSearchView!!.setOnClickListener {
-            editSearchView!!.requestFocus()
-            editSearchView!!.onActionViewExpanded()
+        includeView.connectionSearch.setOnQueryTextListener(this)
+        includeView.connectionSearch.setOnClickListener {
+            includeView.connectionSearch.requestFocus()
+            includeView.connectionSearch.onActionViewExpanded()
         }
 
-        filterIcon.setOnClickListener {
+        includeView.connectionFilterIcon.setOnClickListener {
             showDialogForFilter()
         }
 
-        deleteIcon.setOnClickListener {
+        includeView.connectionDeleteIcon.setOnClickListener {
             showDialogForDelete()
         }
 
@@ -129,7 +103,7 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        viewModel.setFilter(query!!,filterValue)
+        viewModel.setFilter(query!!, filterValue)
         return true
     }
 
@@ -148,10 +122,8 @@ class ConnectionTrackerFragment : Fragment(), SearchView.OnQueryTextListener {
         // Single-choice items (initialized with checked item)
         builder.setSingleChoiceItems(singleItems, checkedItem) { dialog, which ->
             // Respond to item chosen
-            filterValue = if (which == 0)
-                ":isFilter"
-            else
-                ""
+            filterValue = if (which == 0) ":isFilter"
+            else ""
             checkedItem = which
             if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "Filter Option selected: $filterValue")
             viewModel.setFilterBlocked(filterValue)

@@ -32,20 +32,24 @@ import android.text.format.DateUtils
 import android.text.format.DateUtils.FORMAT_ABBREV_RELATIVE
 import android.text.format.DateUtils.MINUTE_IN_MILLIS
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.Window
 import android.widget.*
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import android.widget.AdapterView
+import android.widget.ImageView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.CategoryInfoRepository
+import com.celzero.bravedns.databinding.FragmentHomeScreenBinding
 import com.celzero.bravedns.service.*
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
@@ -69,7 +73,7 @@ import java.util.*
 
 
 class HomeScreenFragment : Fragment() {
-
+    private val b by viewBinding(FragmentHomeScreenBinding::bind)
     private lateinit var layoutHeaderView : TextView
     private lateinit var layoutHeaderViewDesc : TextView
 
@@ -113,9 +117,8 @@ class HomeScreenFragment : Fragment() {
         private const val GREETING_CHANNEL_ID = 2021
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view: View = inflater.inflate(R.layout.fragment_home_screen, container, false)
-        initView(view)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         syncDnsStatus()
         initializeValues()
         initializeClickListeners()
@@ -125,14 +128,12 @@ class HomeScreenFragment : Fragment() {
         registerForBroadCastReceivers()
 
         checkForHeaderUpdate()
-
-        return view
     }
 
     /**
-    *   Function to show the new year wishes to the user,
-    *   As of now the function will check for new year time and
-    *   will turn the text heading and description.
+     *   Function to show the new year wishes to the user,
+     *   As of now the function will check for new year time and
+     *   will turn the text heading and description.
      */
     private fun checkForHeaderUpdate() {
         val currentTime = Calendar.getInstance(Locale.ROOT)
@@ -152,13 +153,13 @@ class HomeScreenFragment : Fragment() {
         timeToOverride[Calendar.DAY_OF_MONTH] = 1
         timeToOverride[Calendar.MONTH] = 0
         timeToOverride[Calendar.YEAR] = 2021
-        if(DEBUG) Log.d(LOG_TAG, "NewYearAlarm : ${currentTime.time}, ${timeToMatch.time}, ${timeToOverride.time} ")
-        if(currentTime > timeToMatch && currentTime < timeToOverride ){
-            layoutHeaderView.text = getString(R.string.new_year)
-            layoutHeaderViewDesc.text = getString(R.string.new_year_desc)
-        }else{
-            layoutHeaderView.text = getString(R.string.app_name).toLowerCase(Locale.ROOT)
-            layoutHeaderViewDesc.text = getString(R.string.backed_by_mozilla)
+        if (DEBUG) Log.d(LOG_TAG, "NewYearAlarm : ${currentTime.time}, ${timeToMatch.time}, ${timeToOverride.time} ")
+        if (currentTime > timeToMatch && currentTime < timeToOverride) {
+            b.fhsTitleRethink.text = getString(R.string.new_year)
+            b.fhsTitleRethinkDesc.text = getString(R.string.new_year_desc)
+        } else {
+            b.fhsTitleRethink.text = getString(R.string.app_name).toLowerCase(Locale.ROOT)
+            b.fhsTitleRethinkDesc.text = getString(R.string.backed_by_mozilla)
         }
     }
 
@@ -192,39 +193,6 @@ class HomeScreenFragment : Fragment() {
         connectedDNS.postValue(persistentState.getConnectedDNS())
     }
 
-
-    private fun initView(view: View) {
-
-        layoutHeaderView = view.findViewById(R.id.fhs_title_rethink)
-        layoutHeaderViewDesc = view.findViewById(R.id.fhs_title_rethink_desc)
-
-        //Complete UI component initialization for the view
-        dnsOnOffBtn = view.findViewById(R.id.fhs_dns_on_off_btn)
-
-
-        //Shimmer Animation for the heading and start btn
-        shimmerContainer = view.findViewById(R.id.shimmer_view_container1)
-
-        appUpTimeTxt = view.findViewById(R.id.fhs_app_uptime)
-
-        protectionLevelTxt = view.findViewById(R.id.fhs_protection_level_txt)
-        protectionDescTxt = view.findViewById(R.id.fhs_app_connected_desc)
-
-        btmSheetIcon = view.findViewById(R.id.home_fragment_bottom_sheet_icon)
-
-        firewallCardStatusTxt =view.findViewById(R.id.fhs_card_firewall_status)
-        firewallCardAppsTxt = view.findViewById(R.id.fhs_card_firewall_apps)
-        firewallCardLL = view.findViewById(R.id.fhs_card_firewall_ll)
-
-        dnsCardLL = view.findViewById(R.id.fhs_card_dns_ll)
-        dnsCardConnectedTxt = view.findViewById(R.id.fhs_card_dns_connected_dns)
-        dnsCardLatencyTxt = view.findViewById(R.id.fhs_card_dns_latency)
-
-        dnsCardConfigureBtn = view.findViewById(R.id.fhs_card_dns_configure)
-        firewallCardConfigureBtn = view.findViewById(R.id.fhs_card_firewall_configure)
-
-    }
-
     private fun initializeClickListeners() {
 
         firewallCardLL.setOnClickListener{
@@ -244,15 +212,16 @@ class HomeScreenFragment : Fragment() {
         }
 
 
-        btmSheetIcon.setOnClickListener{
-            btmSheetIcon.isEnabled = false
+        b.homeFragmentBottomSheetIcon.setOnClickListener {
+            b.homeFragmentBottomSheetIcon.isEnabled = false
             openBottomSheet()
             Handler().postDelayed({ btmSheetIcon.isEnabled = true }, 500)
         }
 
-        // Connect/Disconnect button
-        dnsOnOffBtn.setOnClickListener {
+        // Connect/Disconnect button ==> TODO : Change the label to Start and Stop
+        b.fhsDnsOnOffBtn.setOnClickListener {
             handleStartBtnClickEvent()
+            Handler().postDelayed({ b.homeFragmentBottomSheetIcon.isEnabled = true }, 500)
         }
 
 
@@ -334,7 +303,7 @@ class HomeScreenFragment : Fragment() {
     }
 
     private fun handleStartBtnClickEvent() {
-        dnsOnOffBtn.isEnabled = false
+        b.fhsDnsOnOffBtn.isEnabled = false
         //TODO : check for the service already running
         //val status = VpnController.getInstance()!!.getState(requireContext())
         val status = persistentState.vpnEnabled
@@ -342,11 +311,11 @@ class HomeScreenFragment : Fragment() {
             //if (status!!.activationRequested) {
             if (status) {
                 appStartTime = System.currentTimeMillis()
-                dnsOnOffBtn.setText("start")
+                b.fhsDnsOnOffBtn.text = "start"
                 shimmerForStop()
                 braveModeToggler.postValue(braveMode)
                 //rippleRRLayout.startRippleAnimation()
-                protectionDescTxt.setText(getString(R.string.dns_explanation_disconnected))
+                b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_disconnected)
                 stopDnsVpnService()
             } else {
                 appStartTime = System.currentTimeMillis()
@@ -362,11 +331,11 @@ class HomeScreenFragment : Fragment() {
         } else if (status) {
             Utilities.showToastInMidLayout(requireContext(), getString(R.string.always_on_rethink_enabled), Toast.LENGTH_SHORT)
         }
-        Handler().postDelayed({ dnsOnOffBtn.isEnabled = true }, 500)
+        Handler().postDelayed({ b.fhsDnsOnOffBtn.isEnabled = true }, 500)
     }
 
     private fun openBottomSheet() {
-        val textConnectionDetails = protectionDescTxt.text.toString()
+        val textConnectionDetails = b.fhsAppConnectedDesc.text.toString()
         val bottomSheetFragment = HomeScreenSettingBottomSheet(textConnectionDetails)
         val frag = context as FragmentActivity
         bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
@@ -374,7 +343,7 @@ class HomeScreenFragment : Fragment() {
 
 
     // FIXME: 19-11-2020 - Check the below code for all the edge cases.
-    private fun checkForPrivateDNSandAlwaysON() : Boolean {
+    private fun checkForPrivateDNSandAlwaysON(): Boolean {
         val stats = persistentState.vpnEnabled
         val alwaysOn = android.provider.Settings.Secure.getString(context?.contentResolver, "always_on_vpn_app")
         if (!TextUtils.isEmpty(alwaysOn)) {
@@ -397,7 +366,8 @@ class HomeScreenFragment : Fragment() {
         return false
     }
 
-    private fun startDNSActivity() {
+
+    private fun startConnectionTrackerActivity() {
         val status: VpnState? = VpnController.getInstance()!!.getState(context)
         if ((status?.on!!)) {
             if (braveMode == DNS_FIREWALL_MODE || braveMode == DNS_MODE && (getPrivateDnsMode() != PrivateDnsMode.STRICT)) {
@@ -424,13 +394,13 @@ class HomeScreenFragment : Fragment() {
         builder.setMessage(R.string.always_on_dialog)
         builder.setCancelable(true)
         //performing positive action
-        builder.setPositiveButton(R.string.always_on_dialog_positive_btn) { dialogInterface, which ->
+        builder.setPositiveButton(R.string.always_on_dialog_positive_btn) { _, _ ->
             val intent = Intent("android.net.vpn.SETTINGS")
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
         }
 
-        builder.setNegativeButton(R.string.always_on_dialog_negative_btn) { dialogInterface, which ->
+        builder.setNegativeButton(R.string.always_on_dialog_negative_btn) { _, _ ->
         }
 
         // Create the AlertDialog
@@ -441,16 +411,13 @@ class HomeScreenFragment : Fragment() {
 
     }
 
-
-
-
     override fun onResume() {
         super.onResume()
         syncDnsStatus()
         updateUptime()
         if (persistentState.vpnEnabled) {
             shimmerForStart()
-        }else{
+        } else {
             shimmerForStop()
         }
     }
@@ -491,14 +458,13 @@ class HomeScreenFragment : Fragment() {
         }
     }
 
-
     /**
      * Start the Firewall activity
      */
     private fun startFirewallActivity() {
         val status: VpnState? = VpnController.getInstance()!!.getState(requireContext())
-        if(DEBUG) Log.d(LOG_TAG, "Status : ${status?.on!!} , BraveMode: $braveMode")
-         if(status?.on!!){
+        if (DEBUG) Log.d(LOG_TAG, "Status : ${status?.on!!} , BraveMode: $braveMode")
+        if (status?.on!!) {
             if (braveMode == DNS_FIREWALL_MODE || braveMode == FIREWALL_MODE) {
                 val intent = Intent(requireContext(), FirewallActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -507,8 +473,8 @@ class HomeScreenFragment : Fragment() {
             } else {
                 Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
             }
-        }else {
-             Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
+        } else {
+            Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
         }
     }
 
@@ -519,24 +485,22 @@ class HomeScreenFragment : Fragment() {
             firewallMode = Settings.BlockModeNone
             braveMode = DNS_MODE
         } else if (position == 1) {
-            firewallMode = if (VERSION.SDK_INT >= VERSION_CODES.M && VERSION.SDK_INT < VERSION_CODES.Q)
-                Settings.BlockModeFilterProc
-            else
-                Settings.BlockModeFilter
+            firewallMode = if (VERSION.SDK_INT >= VERSION_CODES.M && VERSION.SDK_INT < VERSION_CODES.Q) Settings.BlockModeFilterProc
+            else Settings.BlockModeFilter
             braveMode = FIREWALL_MODE
         } else if (position == 2) {
-            firewallMode = if(VERSION.SDK_INT >= VERSION_CODES.M && VERSION.SDK_INT < VERSION_CODES.Q)
-                Settings.BlockModeFilterProc
-            else
-                Settings.BlockModeFilter
+            firewallMode = if (VERSION.SDK_INT >= VERSION_CODES.M && VERSION.SDK_INT < VERSION_CODES.Q) Settings.BlockModeFilterProc
+            else Settings.BlockModeFilter
             braveMode = DNS_FIREWALL_MODE
         }
+
         if(DEBUG) Log.d(LOG_TAG, "Firewall mode : $firewallMode, braveMode: $braveMode, SDK_Version: ${VERSION.SDK_INT}")
+
         appMode?.setFirewallMode(firewallMode)
 
-        if(braveMode == FIREWALL_MODE){
+        if (braveMode == FIREWALL_MODE) {
             appMode?.setDNSMode(Settings.DNSModeNone)
-        }else{
+        } else {
             appMode?.setDNSMode(-1)
         }
 
@@ -544,12 +508,16 @@ class HomeScreenFragment : Fragment() {
         persistentState.setBraveMode(braveMode)
 
         if (VpnController.getInstance()!!.getState(requireContext())!!.activationRequested) {
-            if (braveMode == 0){
-                protectionDescTxt.setText(getString(R.string.dns_explanation_dns_connected))
-            }else if (braveMode == 1) {
-                protectionDescTxt.setText(getString(R.string.dns_explanation_firewall_connected))
-            } else {
-                protectionDescTxt.setText(getString(R.string.dns_explanation_connected))
+            when (braveMode) {
+                0 -> {
+                    b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_dns_connected)
+                }
+                1 -> {
+                    b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_firewall_connected)
+                }
+                else -> {
+                    b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_connected)
+                }
             }
         }
     }
@@ -573,7 +541,7 @@ class HomeScreenFragment : Fragment() {
 
     private val messageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-          if (InternalNames.DNS_STATUS.name == intent.action) {
+            if (InternalNames.DNS_STATUS.name == intent.action) {
                 syncDnsStatus()
             }
         }
@@ -586,14 +554,14 @@ class HomeScreenFragment : Fragment() {
 
     private fun updateUptime() {
         val upTime = DateUtils.getRelativeTimeSpanString(appStartTime, System.currentTimeMillis(), MINUTE_IN_MILLIS, FORMAT_ABBREV_RELATIVE)
-        appUpTimeTxt.setText("($upTime)")
+        b.fhsAppUptime.text = "($upTime)"
     }
 
     private fun prepareAndStartDnsVpn() {
         if (hasVpnService()) {
             if (prepareVpnService()) {
-                dnsOnOffBtn.setText("stop")
-                dnsOnOffBtn.setBackgroundResource(R.drawable.rounded_corners_button_accent)
+                b.fhsDnsOnOffBtn.text = "stop"
+                b.fhsDnsOnOffBtn.setBackgroundResource(R.drawable.rounded_corners_button_accent)
                 shimmerForStart()
                 startDnsVpnService()
                 braveModeToggler.postValue(braveMode)
@@ -606,22 +574,22 @@ class HomeScreenFragment : Fragment() {
 
 
 
-    private fun shimmerForStart(){
+    private fun shimmerForStart() {
         val builder = Shimmer.AlphaHighlightBuilder()
         builder.setDuration(10000)
         builder.setBaseAlpha(0.85f)
         builder.setDropoff(1f)
         builder.setHighlightAlpha(0.35f)
-        shimmerContainer.setShimmer(builder.build())
+        b.shimmerViewContainer1.setShimmer(builder.build())
     }
 
-    private fun shimmerForStop(){
+    private fun shimmerForStop() {
         val builder = Shimmer.AlphaHighlightBuilder()
         builder.setDuration(2000)
         builder.setBaseAlpha(0.85f)
         builder.setDropoff(1f)
         builder.setHighlightAlpha(0.35f)
-        shimmerContainer.setShimmer(builder.build())
+        b.shimmerViewContainer1.setShimmer(builder.build())
     }
 
     private fun stopDnsVpnService() {
@@ -631,11 +599,11 @@ class HomeScreenFragment : Fragment() {
     private fun startDnsVpnService() {
         VpnController.getInstance()?.start(requireContext())
         if (braveMode == 0) {
-            protectionDescTxt.setText(getString(R.string.dns_explanation_dns_connected))
+            b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_dns_connected)
         } else if (braveMode == 1) {
-            protectionDescTxt.setText(getString(R.string.dns_explanation_firewall_connected))
+            b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_firewall_connected)
         } else {
-            protectionDescTxt.setText(getString(R.string.dns_explanation_connected))
+            b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_connected)
         }
     }
 
@@ -644,8 +612,7 @@ class HomeScreenFragment : Fragment() {
         return VERSION.SDK_INT >= VERSION_CODES.ICE_CREAM_SANDWICH
     }
 
-    @Throws(ActivityNotFoundException::class)
-    private fun prepareVpnService(): Boolean {
+    @Throws(ActivityNotFoundException::class) private fun prepareVpnService(): Boolean {
         var prepareVpnIntent: Intent? = null
         prepareVpnIntent = try {
             VpnService.prepare(context)
@@ -679,19 +646,16 @@ class HomeScreenFragment : Fragment() {
         val status = VpnController.getInstance()!!.getState(requireContext())
 
         if (status!!.activationRequested || status.connectionState == BraveVPNService.State.WORKING) {
-            dnsOnOffBtn.setBackgroundResource(R.drawable.rounded_corners_button_accent)
-            dnsOnOffBtn.text = "stop"
-            if (braveMode == 0)
-                protectionDescTxt.text = getString(R.string.dns_explanation_dns_connected)
-            else if (braveMode == 1)
-                protectionDescTxt.text = getString(R.string.dns_explanation_firewall_connected)
-            else
-                protectionDescTxt.text = getString(R.string.dns_explanation_connected)
+            b.fhsDnsOnOffBtn.setBackgroundResource(R.drawable.rounded_corners_button_accent)
+            b.fhsDnsOnOffBtn.text = "stop"
+            if (braveMode == 0) b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_dns_connected)
+            else if (braveMode == 1) b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_firewall_connected)
+            else b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_connected)
         } else {
-            dnsOnOffBtn.setBackgroundResource(R.drawable.rounded_corners_button_primary)
+            b.fhsDnsOnOffBtn.setBackgroundResource(R.drawable.rounded_corners_button_primary)
             shimmerForStop()
-            dnsOnOffBtn.text = "start"
-            protectionDescTxt.text = getString(R.string.dns_explanation_disconnected)
+            b.fhsDnsOnOffBtn.text = "start"
+            b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_disconnected)
         }
 
         // Change status and explanation text
@@ -699,46 +663,55 @@ class HomeScreenFragment : Fragment() {
         val explanationId: Int
         var privateDnsMode: PrivateDnsMode = PrivateDnsMode.NONE
         if (status.activationRequested) {
-            if (status.connectionState == null) {
-                statusId = R.string.status_waiting
-                explanationId = R.string.explanation_offline
-            } else if (status.connectionState === BraveVPNService.State.NEW) {
-                statusId = R.string.status_starting
-                explanationId = R.string.explanation_starting
-            } else if (status.connectionState === BraveVPNService.State.WORKING) {
-                statusId = R.string.status_protected
-                explanationId = R.string.explanation_protected
-            } else {
-                statusId = R.string.status_failing
-                explanationId = R.string.explanation_failing
+            when {
+                status.connectionState == null -> {
+                    statusId = R.string.status_waiting
+                    explanationId = R.string.explanation_offline
+                }
+                status.connectionState === BraveVPNService.State.NEW -> {
+                    statusId = R.string.status_starting
+                    explanationId = R.string.explanation_starting
+                }
+                status.connectionState === BraveVPNService.State.WORKING -> {
+                    statusId = R.string.status_protected
+                    explanationId = R.string.explanation_protected
+                }
+                else -> {
+                    statusId = R.string.status_failing
+                    explanationId = R.string.explanation_failing
+                }
             }
         } else if (isAnotherVpnActive()) {
             statusId = R.string.status_exposed
             explanationId = R.string.explanation_vpn
         } else {
             privateDnsMode = getPrivateDnsMode()
-            if (privateDnsMode == PrivateDnsMode.STRICT) {
-                statusId = R.string.status_strict
-                explanationId = R.string.explanation_strict
-            } else if (privateDnsMode == PrivateDnsMode.UPGRADED) {
-                statusId = R.string.status_exposed
-                explanationId = R.string.explanation_upgraded
-            } else {
-                statusId = R.string.status_exposed
-                explanationId = R.string.explanation_exposed
+            when (privateDnsMode) {
+                PrivateDnsMode.STRICT -> {
+                    statusId = R.string.status_strict
+                    explanationId = R.string.explanation_strict
+                }
+                PrivateDnsMode.UPGRADED -> {
+                    statusId = R.string.status_exposed
+                    explanationId = R.string.explanation_upgraded
+                }
+                else -> {
+                    statusId = R.string.status_exposed
+                    explanationId = R.string.explanation_exposed
+                }
             }
         }
-        if(DEBUG) Log.d(LOG_TAG, "Status - ${status.activationRequested}, ${status.connectionState}")
+        if (DEBUG) Log.d(LOG_TAG, "Status - ${status.activationRequested}, ${status.connectionState}")
 
-        if(status.connectionState == BraveVPNService.State.WORKING){
+        if (status.connectionState == BraveVPNService.State.WORKING) {
             statusId = R.string.status_protected
         }
 
-        if(braveMode == 1 && status.activationRequested){
+        if (braveMode == 1 && status.activationRequested) {
             statusId = R.string.status_protected
         }
 
-        if(appMode?.getDNSType() == 3 && status.activationRequested){
+        if (appMode?.getDNSType() == 3 && status.activationRequested) {
             statusId = R.string.status_protected
         }
 
@@ -752,12 +725,11 @@ class HomeScreenFragment : Fragment() {
         } else {
             R.color.accent_bad
         }
-        if (braveMode == FIREWALL_MODE && status.activationRequested)
-            colorId = R.color.positive
+        if (braveMode == FIREWALL_MODE && status.activationRequested) colorId = R.color.positive
 
         val color = ContextCompat.getColor(requireContext(), colorId)
-        protectionLevelTxt.setTextColor(color)
-        protectionLevelTxt.setText(statusId)
+        b.fhsProtectionLevelTxt.setTextColor(color)
+        b.fhsProtectionLevelTxt.setText(statusId)
 
     }
 
@@ -766,8 +738,7 @@ class HomeScreenFragment : Fragment() {
             // Private DNS was introduced in P.
             return PrivateDnsMode.NONE
         }
-        val linkProperties: LinkProperties = getLinkProperties()
-            ?: return PrivateDnsMode.NONE
+        val linkProperties: LinkProperties = getLinkProperties() ?: return PrivateDnsMode.NONE
         if (linkProperties.privateDnsServerName != null) {
             return PrivateDnsMode.STRICT
         }
@@ -777,8 +748,7 @@ class HomeScreenFragment : Fragment() {
     }
 
     private fun getLinkProperties(): LinkProperties? {
-        val connectivityManager =
-            requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (VERSION.SDK_INT < VERSION_CODES.M) {
             // getActiveNetwork() requires M or later.
             return null
@@ -789,26 +759,20 @@ class HomeScreenFragment : Fragment() {
 
     private fun isAnotherVpnActive(): Boolean {
         if (VERSION.SDK_INT >= VERSION_CODES.M) {
-            val connectivityManager =
-                requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val connectivityManager = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val activeNetwork = connectivityManager.activeNetwork ?: return false
-            val capabilities =
-                connectivityManager.getNetworkCapabilities(activeNetwork)
-                    ?: // It's not clear when this can happen, but it has occurred for at least one user.
-                    return false
+            val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: // It's not clear when this can happen, but it has occurred for at least one user.
+            return false
             return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
         }
         // For pre-M versions, return true if there's any network whose name looks like a VPN.
         try {
-            val networkInterfaces =
-                NetworkInterface.getNetworkInterfaces()
+            val networkInterfaces = NetworkInterface.getNetworkInterfaces()
             while (networkInterfaces.hasMoreElements()) {
                 val networkInterface = networkInterfaces.nextElement()
                 val name = networkInterface.name
 
-                if (networkInterface.isUp && name != null &&
-                    (name.startsWith("tun") || name.startsWith("pptp") || name.startsWith("l2tp"))
-                ) {
+                if (networkInterface.isUp && name != null && (name.startsWith("tun") || name.startsWith("pptp") || name.startsWith("l2tp"))) {
                     return true
                 }
             }
