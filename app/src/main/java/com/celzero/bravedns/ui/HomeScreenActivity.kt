@@ -420,16 +420,17 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 dialogInterface.dismiss()
             }
         } else {
-            builder.setPositiveButton("Visit website") { _, _ ->
-                if (source == AppUpdater.InstallSource.STORE) {
+            if (source == AppUpdater.InstallSource.STORE) {
+                builder.setPositiveButton("Complete Update") { _, _ ->
                     appUpdateManager.completeUpdate()
                 }
             }else{
-                builder.setPositiveButton("Visit website") { dialogInterface, which ->
+                builder.setPositiveButton("Visit website") { _, _ ->
                     initiateDownload()
                 }
             }
             builder.setNegativeButton("Remind me later") { dialogInterface, _ ->
+                persistentState.lastAppUpdateCheck = System.currentTimeMillis()
                 dialogInterface.dismiss()
             }
         }

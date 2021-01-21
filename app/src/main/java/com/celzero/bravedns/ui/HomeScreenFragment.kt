@@ -34,13 +34,9 @@ import android.text.format.DateUtils.MINUTE_IN_MILLIS
 import android.util.Log
 import android.view.View
 import android.view.Window
-import android.widget.*
-import androidx.appcompat.widget.AppCompatButton
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
-import android.widget.AdapterView
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -64,7 +60,6 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Utilities
 import com.facebook.shimmer.Shimmer
-import com.facebook.shimmer.ShimmerFrameLayout
 import org.koin.android.ext.android.inject
 import settings.Settings
 import java.net.NetworkInterface
@@ -72,35 +67,10 @@ import java.net.SocketException
 import java.util.*
 
 
-class HomeScreenFragment : Fragment() {
+class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
-    private lateinit var layoutHeaderView : TextView
-    private lateinit var layoutHeaderViewDesc : TextView
 
-    private lateinit var dnsOnOffBtn: AppCompatButton
-
-    private lateinit var appUpTimeTxt: TextView
-
-    private lateinit var btmSheetIcon : Button
-
-    private lateinit var protectionDescTxt: TextView
-    private lateinit var protectionLevelTxt: TextView
-
-    private lateinit var shimmerContainer: ShimmerFrameLayout
-
-    //for the new card
-    private lateinit var dnsCardLatencyTxt : TextView
-    private lateinit var dnsCardConnectedTxt : TextView
-
-    private lateinit var firewallCardAppsTxt : TextView
-    private lateinit var firewallCardStatusTxt : TextView
-
-    private lateinit var firewallCardLL : LinearLayout
-    private lateinit var dnsCardLL : LinearLayout
-
-    private lateinit var dnsCardConfigureBtn : AppCompatButton
-    private lateinit var firewallCardConfigureBtn : AppCompatButton
-
+    //private lateinit var btmSheetIcon : Button
     private val MAIN_CHANNEL_ID = "vpn"
 
     private var REQUEST_CODE_PREPARE_VPN: Int = 100
@@ -195,27 +165,26 @@ class HomeScreenFragment : Fragment() {
 
     private fun initializeClickListeners() {
 
-        firewallCardLL.setOnClickListener{
+        b.fhsCardFirewallLl.setOnClickListener{
             startFirewallLogsActivity()
         }
 
-        dnsCardLL.setOnClickListener{
+        b.fhsCardDnsLl.setOnClickListener{
             startDNSLogsActivity()
         }
 
-        dnsCardConfigureBtn.setOnClickListener{
+        b.fhsCardDnsConfigure.setOnClickListener{
             startDNSActivity()
         }
 
-        firewallCardConfigureBtn.setOnClickListener{
+        b.fhsCardFirewallConfigure.setOnClickListener{
             startFirewallActivity()
         }
-
 
         b.homeFragmentBottomSheetIcon.setOnClickListener {
             b.homeFragmentBottomSheetIcon.isEnabled = false
             openBottomSheet()
-            Handler().postDelayed({ btmSheetIcon.isEnabled = true }, 500)
+            Handler().postDelayed({ b.homeFragmentBottomSheetIcon.isEnabled = true }, 500)
         }
 
         // Connect/Disconnect button ==> TODO : Change the label to Start and Stop
@@ -231,18 +200,18 @@ class HomeScreenFragment : Fragment() {
                 updateDNSCardView()
                 updateFirewallCardView()
             } else {
-                firewallCardAppsTxt.text = getString(R.string.firewall_card_text_inactive)
-                firewallCardStatusTxt.text = getString(R.string.firewall_card_status_inactive)
-                dnsCardLatencyTxt.text = getString(R.string.dns_card_latency_inactive)
-                dnsCardConnectedTxt.text = getString(R.string.dns_card_connected_status_failure)
+                b.fhsCardFirewallApps.text = getString(R.string.firewall_card_text_inactive)
+                b.fhsCardFirewallStatus.text = getString(R.string.firewall_card_status_inactive)
+                b.fhsCardDnsLatency.text = getString(R.string.dns_card_latency_inactive)
+                b.fhsCardDnsConnectedDns.text = getString(R.string.dns_card_connected_status_failure)
             }
         })
     }
 
     private fun updateDNSCardView(){
        if (braveMode == FIREWALL_MODE) {
-            dnsCardLatencyTxt.text = getString(R.string.dns_card_latency_inactive)
-            dnsCardConnectedTxt.text = getString(R.string.dns_card_connected_status_failure)
+           b.fhsCardDnsLatency.text = getString(R.string.dns_card_latency_inactive)
+           b.fhsCardDnsConnectedDns.text = getString(R.string.dns_card_connected_status_failure)
             unregisterObserversForDNS()
         } else {
             registerObserversForDNS()
@@ -255,11 +224,11 @@ class HomeScreenFragment : Fragment() {
      */
     private fun registerObserversForDNS(){
         median50.observe(viewLifecycleOwner, {
-            dnsCardLatencyTxt.text = getString(R.string.dns_card_latency_active, median50.value.toString())
+            b.fhsCardDnsLatency.text = getString(R.string.dns_card_latency_active, median50.value.toString())
         })
 
         connectedDNS.observe(viewLifecycleOwner, {
-            dnsCardConnectedTxt.text = it
+            b.fhsCardDnsConnectedDns.text = it
         })
     }
 
@@ -280,8 +249,8 @@ class HomeScreenFragment : Fragment() {
             val blockedList = it.filter { a -> !a.isInternetAllowed }
             val whiteListApps = it.filter { a -> a.whiteListUniv1 }
             val excludedList = it.filter { a -> a.isExcluded }
-            firewallCardStatusTxt.text = getString(R.string.firewall_card_status_active, blockedList.size.toString())
-            firewallCardAppsTxt.text = Html.fromHtml(getString(R.string.firewall_card_text_active, whiteListApps.size.toString(), excludedList.size.toString()))
+            b.fhsCardFirewallStatus.text = getString(R.string.firewall_card_status_active, blockedList.size.toString())
+            b.fhsCardFirewallApps.text = Html.fromHtml(getString(R.string.firewall_card_text_active, whiteListApps.size.toString(), excludedList.size.toString()))
         })
     }
 
@@ -294,8 +263,8 @@ class HomeScreenFragment : Fragment() {
 
     private fun updateFirewallCardView(){
         if (braveMode == DNS_MODE) {
-            firewallCardAppsTxt.text = getString(R.string.firewall_card_text_inactive)
-            firewallCardStatusTxt.text = getString(R.string.firewall_card_status_inactive)
+            b.fhsCardFirewallApps.text = getString(R.string.firewall_card_text_inactive)
+            b.fhsCardFirewallStatus.text = getString(R.string.firewall_card_status_inactive)
             unregisterObserversForFirewall()
         } else {
             registerObserversForFirewall()
@@ -367,7 +336,7 @@ class HomeScreenFragment : Fragment() {
     }
 
 
-    private fun startConnectionTrackerActivity() {
+    private fun startDNSActivity() {
         val status: VpnState? = VpnController.getInstance()!!.getState(context)
         if ((status?.on!!)) {
             if (braveMode == DNS_FIREWALL_MODE || braveMode == DNS_MODE && (getPrivateDnsMode() != PrivateDnsMode.STRICT)) {
