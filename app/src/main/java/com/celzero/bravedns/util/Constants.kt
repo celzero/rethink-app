@@ -41,6 +41,8 @@ class Constants {
 
         const val APP_DOWNLOAD_LINK = "https://bravedns.com/downloads"
 
+        const val BRAVE_BASE_STAMP = "https://basic.bravedns.com/"
+
         const val BRAVE_BASIC_URL = "basic.bravedns"
         const val APPEND_VCODE = "vcode="
 

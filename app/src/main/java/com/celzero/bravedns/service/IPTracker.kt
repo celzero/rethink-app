@@ -108,7 +108,7 @@ class IPTracker internal constructor(
         }
 
 
-        //appname
+        //app-name
         val packageNameList = context.packageManager.getPackagesForUid(ipDetails.uid)
         //val appName = context.packageManager.getNameForUid(ipDetails.uid)
 
@@ -135,10 +135,14 @@ class IPTracker internal constructor(
                 connTracker.appName = "Unknown"
             } else if (fileSystemUID.uid == -1) {
                 connTracker.appName = "Unnamed(${ipDetails.uid})"
-                insertNonAppToAppInfo(ipDetails.uid, connTracker.appName.toString())
+                if(isAvailableInDatabase(ipDetails.uid)) {
+                    insertNonAppToAppInfo(ipDetails.uid, connTracker.appName.toString())
+                }
             } else {
                 connTracker.appName = fileSystemUID.name
-                insertNonAppToAppInfo(ipDetails.uid, connTracker.appName.toString())
+                if(isAvailableInDatabase(ipDetails.uid)) {
+                    insertNonAppToAppInfo(ipDetails.uid, connTracker.appName.toString())
+                }
             }
         }
         connectionTrackerRepository.insertAsync(connTracker)
@@ -146,5 +150,10 @@ class IPTracker internal constructor(
 
     private fun insertNonAppToAppInfo(uid: Int, appName: String) {
         refreshDatabase.insertNonAppToAppInfo(uid, appName)
+    }
+
+    private fun isAvailableInDatabase(uid: Int) : Boolean{
+        val appName = appInfoRepository.getAppNameForUID(uid)
+        return !appName.isNullOrEmpty()
     }
 }

@@ -339,7 +339,6 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             }
             //performing negative action
             builder.setNegativeButton("Cancel") { _, _ ->
-                includeView.firewallBackgroundModeCheck.isChecked = false
                 persistentState.backgroundEnabled = false
             }
         } else {
@@ -352,7 +351,6 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             }
             //performing negative action
             builder.setNegativeButton("Deny") { _, _ ->
-                includeView.firewallBackgroundModeCheck.isChecked = false
                 persistentState.backgroundEnabled = false
             }
         }

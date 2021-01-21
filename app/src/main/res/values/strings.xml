@@ -646,6 +646,11 @@
     <string name="dns_card_latency_inactive">Enable DNS mode.</string>
     <string name="dns_card_configure_btn">Change</string>
 
+    <!-- Web view configure -->
+    <string name="webview_configure_dialog_positive">Quit</string>
+    <string name="webview_configure_dialog_negative">Cancel</string>
+    <string name="webview_configure_dialog_neutral">Reload</string>
+    <string name="webview_toast_configure_success">Configured URL has been updated successfully</string>
 
 
 </resources>

@@ -77,8 +77,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     private var timeStamp: Long = 0L
 
-    //private var sock5Proxy: ProxyEndpoint? = null
-
     //For exclude apps dialog
     private var excludeAppAdapter: ExcludedAppListAdapter? = null
     private val excludeAppViewModel: ExcludedAppViewModel by viewModel()
@@ -114,11 +112,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityAllowBypassProgress.visibility = View.GONE
 
         b.settingsActivityHttpProxyProgress.visibility = View.GONE
-
-        checkForUpdateRL = view.findViewById(R.id.settings_activity_check_update_rl)
-        checkForUpdateTV = view.findViewById(R.id.gen_settings_check_update_txt)
-        checkForUpdateDesc = view.findViewById(R.id.gen_settings_check_update_desc)
-        checkForUpdateSwitch = view.findViewById(R.id.settings_activity_check_update_switch)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             b.settingsActivityHttpProxyContainer.visibility = View.VISIBLE
@@ -165,8 +158,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 enableDNSFirewallUI()
             }
         })
-
-        sock5Proxy = proxyEndpointRepository.getConnectedProxy()
 
         b.settingsActivityEnableLogsSwitch.isChecked = persistentState.logsEnabled
         b.settingsActivityAutoStartSwitch.isChecked = persistentState.prefAutoStartBootUp
@@ -229,7 +220,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
      * Disable all the layouts related with DNS
      */
     private fun disableDNSRelatedUI() {
-        dnsSettingsHeading.text  = getString(R.string.dns_mode_disabled)
+        b.settingsHeadingDns.text  = getString(R.string.dns_mode_disabled)
         b.settingsActivityOnDeviceBlockRl.isEnabled = false
         b.settingsActivityOnDeviceBlockSwitch.isEnabled = false
         b.settingsActivityOnDeviceBlockRefreshBtn.isEnabled = false
@@ -295,7 +286,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
 
 
-        checkForUpdateSwitch.setOnCheckedChangeListener{ _: CompoundButton, b: Boolean ->
+        b.settingsActivityCheckUpdateSwitch.setOnCheckedChangeListener{ _: CompoundButton, b: Boolean ->
             persistentState.checkForAppUpdate = b
         }
 
@@ -320,7 +311,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityOnDeviceBlockSwitch.setOnCheckedChangeListener(null)
         b.settingsActivityOnDeviceBlockSwitch.setOnClickListener {
             val isSelected = b.settingsActivityOnDeviceBlockSwitch.isChecked
-            onDeviceBlockListSwitch.isEnabled = false
+            b.settingsActivityOnDeviceBlockSwitch.isEnabled = false
             if (isSelected) {
                 b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
                 if (!persistentState.blockListFilesDownloaded) {
@@ -340,7 +331,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
                 b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blockList_desc1)
             }
-            Handler().postDelayed({ onDeviceBlockListSwitch.isEnabled = true }, 1000)
+            Handler().postDelayed({ b.settingsActivityOnDeviceBlockSwitch.isEnabled = true }, 1000)
         }
 
         b.settingsActivitySocks5Switch.setOnCheckedChangeListener { compoundButton: CompoundButton, bool: Boolean ->
