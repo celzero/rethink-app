@@ -15,11 +15,11 @@
  */
 package com.celzero.bravedns.ui
 
+import android.icu.text.CompactDecimalFormat
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
@@ -31,16 +31,14 @@ import com.celzero.bravedns.adapter.DNSQueryAdapter
 import com.celzero.bravedns.database.DNSLogDAO
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.databinding.ActivityQueryDetailBinding
-import com.celzero.bravedns.databinding.FragmentAboutBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.VpnState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.median50
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.lifeTimeQ
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
-import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.DNSLogViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -50,6 +48,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import settings.Settings
 import java.net.MalformedURLException
 import java.net.URL
+import java.util.*
 
 class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQueryTextListener {
     private val b by viewBinding(ActivityQueryDetailBinding::bind)
@@ -100,18 +99,12 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
             includeView.queryListCardViewTop.visibility = View.GONE
         }
 
-        val isServiceRunning = Utilities.isServiceRunning(requireContext(), BraveVPNService::class.java)
+        val isServiceRunning = persistentState.vpnEnabled
         if (!isServiceRunning) {
             includeView.queryListRl.visibility = View.GONE
         } else {
             includeView.queryListRl.visibility = View.VISIBLE
         }
-
-        median50.observe(viewLifecycleOwner, {
-            b.latencyTxt.text = "Latency: " + median50.value.toString() + "ms"
-        })
-
-        b.totalQueriesTxt.text = "Lifetime Queries: " + persistentState.getNumOfReq()
 
         includeView.queryListSearch.setOnQueryTextListener(this)
         includeView.queryListSearch.setOnClickListener {
@@ -126,6 +119,32 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         includeView.queryListDeleteIcon.setOnClickListener {
             showDialogForDelete()
         }
+
+        registerForObservers()
+    }
+
+    private fun registerForObservers(){
+
+        lifeTimeQ.observe(viewLifecycleOwner, {
+            val lifeTimeConversion = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT).format(lifeTimeQ.value)
+            } else {
+                lifeTimeQ.value.toString()
+            }
+            b.totalQueriesTxt.text  = getString(R.string.dns_logs_lifetime_queries, lifeTimeConversion)
+        })
+
+        HomeScreenActivity.GlobalVariable.blockedCount.observe(viewLifecycleOwner, {
+            val blocked = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT).format(HomeScreenActivity.GlobalVariable.blockedCount.value)
+            } else {
+                HomeScreenActivity.GlobalVariable.blockedCount.value.toString()
+            }
+
+            b.latencyTxt.text = getString(R.string.dns_logs_blocked_queries, blocked)
+        })
+
+
     }
 
     override fun onResume() {

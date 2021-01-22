@@ -15,7 +15,7 @@
         app:tabTextColor="@color/secondaryText"
         android:layout_height="wrap_content" />
 
-    <androidx.viewpager2.widget.ViewPager2
+    <androidx.viewpager.widget.ViewPager
         android:id="@+id/firewall_act_viewpager"
         android:orientation="horizontal"
         android:layout_width="match_parent"

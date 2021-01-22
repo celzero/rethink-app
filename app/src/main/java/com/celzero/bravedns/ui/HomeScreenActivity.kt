@@ -97,6 +97,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         var medianP90: Long = -1
         var median50: MutableLiveData<Long> = MutableLiveData()
         var blockedCount: MutableLiveData<Int> = MutableLiveData()
+        var lifeTimeQ : MutableLiveData<Int> = MutableLiveData()
         var dnsType : MutableLiveData<Int> = MutableLiveData()
         var braveModeToggler : MutableLiveData<Int> = MutableLiveData()
         var connectedDNS : MutableLiveData<String> = MutableLiveData()

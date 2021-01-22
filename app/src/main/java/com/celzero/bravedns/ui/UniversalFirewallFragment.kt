@@ -103,7 +103,6 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         recyclerRulesAdapter = UniversalBlockedRulesAdapter(requireContext(), blockedConnectionsRepository)
         recyclerAdapter = UniversalAppListAdapter(requireContext(), appInfoRepository, get(), persistentState)
         includeView.firewallUniversalRecycler.adapter = recyclerRulesAdapter
-        includeView.firewallSearchView.requestFocus()
 
         //recyclerView.isNestedScrollingEnabled = false
         //ViewCompat.setNestedScrollingEnabled(recyclerView, false)

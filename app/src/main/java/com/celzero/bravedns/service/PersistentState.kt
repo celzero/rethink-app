@@ -169,6 +169,7 @@ class PersistentState(context: Context):SimpleKrate(context) {
         }
         _numberOfRequests = numReq
         HomeScreenActivity.GlobalVariable.lifeTimeQueries = numReq
+        HomeScreenActivity.GlobalVariable.lifeTimeQ.postValue(numReq)
     }
 
     fun getNumOfReq(): Int {

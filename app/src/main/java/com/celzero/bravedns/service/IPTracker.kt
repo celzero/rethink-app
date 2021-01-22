@@ -135,12 +135,12 @@ class IPTracker internal constructor(
                 connTracker.appName = "Unknown"
             } else if (fileSystemUID.uid == -1) {
                 connTracker.appName = "Unnamed(${ipDetails.uid})"
-                if(isAvailableInDatabase(ipDetails.uid)) {
+                if(!isAvailableInDatabase(ipDetails.uid)) {
                     insertNonAppToAppInfo(ipDetails.uid, connTracker.appName.toString())
                 }
             } else {
                 connTracker.appName = fileSystemUID.name
-                if(isAvailableInDatabase(ipDetails.uid)) {
+                if(!isAvailableInDatabase(ipDetails.uid)) {
                     insertNonAppToAppInfo(ipDetails.uid, connTracker.appName.toString())
                 }
             }
