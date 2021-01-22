@@ -341,6 +341,17 @@
     <string name="about_twitter">Follow us on Twitter</string>
     <string name="about_mozilla">RethinkDNS is part of Mozilla Builders MVP program.</string>
     <string name="about_app_update_check">Check for app updates</string>
+    <string name="about_dialog_positive_button">Let\'s Go</string>
+    <string name="about_mail_to">mailto:hello@celzero.com</string>
+    <string name="about_mail_subject">[RethinkDNS]:</string>
+    <string name="about_telegram_link">http://www.telegram.me/rethinkdns</string>
+    <string name="about_blog_link">https://blog.rethinkdns.com/</string>
+    <string name="about_faq_link">https://www.bravedns.com/faq</string>
+    <string name="about_github_link">https://github.com/celzero/rethink-app</string>
+    <string name="about_twitter_handle">https://twitter.com/rethinkdns</string>
+    <string name="about_website_link">https://www.bravedns.com/</string>
+    <string name="about_mozilla_alumni_link">https://builders.mozilla.community/alumni.html</string>
+    <string name="About_version">v%1$s</string>
 
     <string name="conn_track_clear_logs_title">Delete all network logs?</string>
     <string name="conn_track_clear_logs_message">This only deletes network logs but not firewall rules. This operation is not reversible. Do you want to proceed?</string>
