@@ -94,8 +94,8 @@ dependencies {
     implementation 'com.google.guava:failureaccess:jar:1.0'*/
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.3.0-alpha02'
-    implementation 'androidx.core:core-ktx:1.5.0-alpha05'
+    implementation 'androidx.appcompat:appcompat:1.3.0-beta01'
+    implementation 'androidx.core:core-ktx:1.5.0-beta01'
     implementation("androidx.preference:preference-ktx:1.1.1")
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation "com.mikepenz:fastadapter:5.0.0-a04"
@@ -127,8 +127,9 @@ dependencies {
     //implementation "androidx.paging:paging-runtime:$paging_version"
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
     implementation "androidx.fragment:fragment-ktx:1.2.5"
-    implementation "com.google.android.material:material:1.3.0-beta01"
+    implementation "com.google.android.material:material:1.3.0-rc01"
     implementation "androidx.viewpager2:viewpager2:1.1.0-alpha01"
+
 
     implementation 'com.squareup.okhttp3:okhttp:4.9.0'
     playImplementation 'com.google.android.play:core:1.9.0'//for new version updater

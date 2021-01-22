@@ -291,7 +291,6 @@
                         app:queryBackground="@color/colorPrimaryDark"
                         app:iconifiedByDefault="false"
                         app:queryHint="@string/search_universal_ips">
-                        <requestFocus />
                     </androidx.appcompat.widget.SearchView>
 
                     <androidx.appcompat.widget.AppCompatImageView

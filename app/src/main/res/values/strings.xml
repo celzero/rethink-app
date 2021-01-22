@@ -574,11 +574,6 @@
         \u00092021. "Block any app not in use" now with better heurisitcs and so should behave in less surprising ways and be more out-of-the-way.
     </string>
 
-    <!-- DNS Log Fragment string -->
-    <string name="dns_log_latency">Latency: </string>
-    <string name="dns_log_lifetime_queries">Lifetime Queries: </string>
-
-
     <!-- Settings Fragment strings -->
     <string name="settings_firewall_header">Firewall</string>
     <string name="settings_kill_app_heading">Kill app when firewalled (experimental)</string>
@@ -651,6 +646,10 @@
     <string name="webview_configure_dialog_negative">Cancel</string>
     <string name="webview_configure_dialog_neutral">Reload</string>
     <string name="webview_toast_configure_success">Configured URL has been updated successfully</string>
+
+    <!-- DNS logs screen -->
+    <string name="dns_logs_lifetime_queries">Lifetime queries: %1$s</string>
+    <string name="dns_logs_blocked_queries">Blocked queries: %1$s</string>
 
 
 </resources>

@@ -162,6 +162,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityEnableLogsSwitch.isChecked = persistentState.logsEnabled
         b.settingsActivityAutoStartSwitch.isChecked = persistentState.prefAutoStartBootUp
         b.settingsActivityKillAppSwitch.isChecked = persistentState.killAppOnFirewall
+        b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
 
         b.settingsActivitySocks5Switch.isChecked = persistentState.socks5Enabled
         if (b.settingsActivitySocks5Switch.isChecked) {

@@ -13,72 +13,86 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package com.celzero.bravedns.ui
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentStatePagerAdapter
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.databinding.ActivityFirewallBinding
 import com.celzero.bravedns.util.Constants
 import com.google.android.material.tabs.TabLayout
-import com.celzero.bravedns.database.ConnectionTrackerRepository
-import com.celzero.bravedns.databinding.ActivityFaqWebviewLayoutBinding
-import com.celzero.bravedns.databinding.ActivityFirewallBinding
-import com.google.android.material.tabs.TabLayoutMediator
+import com.google.android.material.tabs.TabLayout.TabLayoutOnPageChangeListener
 
-class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
+
+class FirewallActivity : AppCompatActivity(R.layout.activity_firewall), TabLayout.OnTabSelectedListener {
     private val b by viewBinding(ActivityFirewallBinding::bind)
-    private val FIREWALL_TABS_COUNT = 3
     private var screenToLoad = 0
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_firewall)
-        screenToLoad = intent.getIntExtra(Constants.SCREEN_TO_LOAD,0)
-        init()
-    }
+        screenToLoad = intent.getIntExtra(Constants.SCREEN_TO_LOAD, 0)
 
-    private fun init() {
-        b.firewallActViewpager.adapter = object : FragmentStateAdapter(this) {
-            override fun createFragment(position: Int): Fragment {
-                return when (position) {
-                    0 -> UniversalFirewallFragment.newInstance()
-                    1 -> ConnectionTrackerFragment.newInstance()
-                    else -> FirewallAppFragment.newInstance()
-                }
-            }
+        // FIXME: 22-01-2021 The view pager is migrated from ViewPager2 to Viewpager.  There is a
+        // known bug in viewpager2 - Focus issue, the Firewall activity has search bar in all the
+        // screens is causing the issue.
+        //https://github.com/material-components/material-components-android/issues/500
+        //https://github.com/android/views-widgets-samples/issues/107
 
-            override fun getItemCount(): Int {
-                return FIREWALL_TABS_COUNT
-            }
-        }
+        //Adding the tabs using addTab() method
+        b.firewallActTabLayout.addTab(b.firewallActTabLayout.newTab().setText(getString(R.string.firewall_act_universal_tab)))
+        b.firewallActTabLayout.addTab(b.firewallActTabLayout.newTab().setText(getString(R.string.firewall_act_network_monitor_tab)))
+        b.firewallActTabLayout.addTab(b.firewallActTabLayout.newTab().setText(getString(R.string.firewall_act_apps_tab)))
+        b.firewallActTabLayout.tabGravity = TabLayout.GRAVITY_FILL
 
-        //viewPagerFirewall.fakeDragBy(1000F)
+        //Creating our pager adapter
+        val adapter = Pager(supportFragmentManager, b.firewallActTabLayout.tabCount)
 
-        TabLayoutMediator(b.firewallActTabLayout, b.firewallActViewpager) { tab, position ->
-            tab.text = when (position) {
-                0 -> getString(R.string.firewall_act_universal_tab)
-                1 -> getString(R.string.firewall_act_network_monitor_tab)
-                else -> getString(R.string.firewall_act_apps_tab)
-            }
-            //viewPagerFirewall.setCurrentItem(tab.position, false)
-        }.attach()
-
-        b.firewallActViewpager.offscreenPageLimit = 2
+        //Adding adapter to pager
+        b.firewallActViewpager.adapter = adapter
         b.firewallActViewpager.setCurrentItem(screenToLoad, true)
 
+        b.firewallActViewpager.addOnPageChangeListener(TabLayoutOnPageChangeListener(b.firewallActTabLayout))
 
+        //Adding onTabSelectedListener to swipe views
+        b.firewallActTabLayout.setOnTabSelectedListener(this)
     }
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        Log.i(Constants.LOG_TAG, "New intent with flags for Firewall Activity: "+intent?.flags)
+    override fun onTabSelected(tab: TabLayout.Tab) {
+        b.firewallActViewpager.currentItem = tab.position
+        b.firewallActTabLayout.selectTab(tab)
     }
 
+    override fun onTabUnselected(tab: TabLayout.Tab?) {}
+
+    override fun onTabReselected(tab: TabLayout.Tab?) {}
+
+}
+
+internal class Pager(fm: FragmentManager?, var tabCount: Int) : FragmentStatePagerAdapter(fm!!) {
+    //Overriding method getItem
+    override fun getItem(position: Int): Fragment {
+        //Returning the current tabs
+        return when (position) {
+            0 -> {
+                UniversalFirewallFragment.newInstance()
+            }
+            1 -> {
+                ConnectionTrackerFragment.newInstance()
+            }
+            2 -> {
+                FirewallAppFragment.newInstance()
+            }
+            else -> FirewallAppFragment.newInstance()
+        }
+    }
+
+    //Overriden method getCount to get the number of tabs
+    override fun getCount(): Int {
+        return tabCount
+    }
 }
