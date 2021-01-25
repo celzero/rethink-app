@@ -197,8 +197,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
 
         val appCount = appList.size
-        val act: HomeScreenActivity = requireContext() as HomeScreenActivity
-        appInfoRepository.getExcludedAppListCountLiveData().observe(act, {
+        appInfoRepository.getExcludedAppListCountLiveData().observe(viewLifecycleOwner, {
             b.settingsActivityExcludeAppsCountText.text = "$it/$appCount apps excluded."
         })
 

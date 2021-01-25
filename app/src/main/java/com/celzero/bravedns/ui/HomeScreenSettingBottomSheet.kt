@@ -59,6 +59,7 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
         b.bsHomeScreenConnectedStatus.text = connectedDetails
         var selectedIndex = HomeScreenActivity.GlobalVariable.braveMode
         if (DEBUG) Log.d(LOG_TAG, "$LOG_FILE - selectedIndex: $selectedIndex")
+        updateBraveModeUI()
         if (selectedIndex != -1) {
             (b.bsHomeScreenRadioGroup.getChildAt(selectedIndex) as RadioButton).isChecked = true
         } else {
@@ -104,18 +105,21 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
         persistentState.setBraveMode(HomeScreenActivity.GlobalVariable.braveMode)
         HomeScreenActivity.GlobalVariable.braveModeToggler.postValue(HomeScreenActivity.GlobalVariable.braveMode)
         if (VpnController.getInstance()!!.getState(requireContext())!!.activationRequested) {
-            when (HomeScreenActivity.GlobalVariable.braveMode) {
-                0 -> {
-                    b.bsHomeScreenConnectedStatus.text = getString(R.string.dns_explanation_dns_connected)
-                }
-                1 -> {
-                    b.bsHomeScreenConnectedStatus.text = getString(R.string.dns_explanation_firewall_connected)
-                }
-                else -> {
-                    b.bsHomeScreenConnectedStatus.text = getString(R.string.dns_explanation_connected)
-                }
+            updateBraveModeUI()
+        }
+    }
+
+    private fun updateBraveModeUI(){
+        when (HomeScreenActivity.GlobalVariable.braveMode) {
+            0 -> {
+                b.bsHomeScreenConnectedStatus.text = getString(R.string.dns_explanation_dns_connected)
             }
-            //enableBraveModeIcons()
+            1 -> {
+                b.bsHomeScreenConnectedStatus.text = getString(R.string.dns_explanation_firewall_connected)
+            }
+            else -> {
+                b.bsHomeScreenConnectedStatus.text = getString(R.string.dns_explanation_connected)
+            }
         }
     }
 

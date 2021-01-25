@@ -144,14 +144,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(messageReceiver, intentFilter)
     }
 
+
     /*
         Assign initial values to the view and variables.
      */
     private fun initializeValues() {
 
         braveMode = persistentState.getBraveMode()
-
-        braveModeToggler.postValue(braveMode)
 
         modifyBraveMode(braveMode)
 
@@ -204,6 +203,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 b.fhsCardFirewallStatus.text = getString(R.string.firewall_card_status_inactive)
                 b.fhsCardDnsLatency.text = getString(R.string.dns_card_latency_inactive)
                 b.fhsCardDnsConnectedDns.text = getString(R.string.dns_card_connected_status_failure)
+                b.fhsCardDnsConfigure.alpha = 0.5F
+                b.fhsCardFirewallConfigure.alpha = 0.5F
             }
         })
     }
@@ -212,9 +213,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
        if (braveMode == FIREWALL_MODE) {
            b.fhsCardDnsLatency.text = getString(R.string.dns_card_latency_inactive)
            b.fhsCardDnsConnectedDns.text = getString(R.string.dns_card_connected_status_failure)
-            unregisterObserversForDNS()
+           b.fhsCardDnsConfigure.alpha = 0.5F
+           unregisterObserversForDNS()
         } else {
-            registerObserversForDNS()
+           b.fhsCardDnsConfigure.alpha = 1F
+           registerObserversForDNS()
         }
     }
 
@@ -265,8 +268,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         if (braveMode == DNS_MODE) {
             b.fhsCardFirewallApps.text = getString(R.string.firewall_card_text_inactive)
             b.fhsCardFirewallStatus.text = getString(R.string.firewall_card_status_inactive)
+            b.fhsCardFirewallConfigure.alpha = 0.5F
             unregisterObserversForFirewall()
         } else {
+            b.fhsCardFirewallConfigure.alpha = 1F
             registerObserversForFirewall()
         }
     }
@@ -282,11 +287,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 appStartTime = System.currentTimeMillis()
                 b.fhsDnsOnOffBtn.text = "start"
                 shimmerForStop()
+                b.fhsCardDnsConfigure.alpha = 0.5F
+                b.fhsCardFirewallConfigure.alpha = 0.5F
                 braveModeToggler.postValue(braveMode)
                 //rippleRRLayout.startRippleAnimation()
                 b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_disconnected)
                 stopDnsVpnService()
             } else {
+                b.fhsCardDnsConfigure.alpha = 1F
+                b.fhsCardFirewallConfigure.alpha = 1F
                 appStartTime = System.currentTimeMillis()
                 if (DEBUG) Log.d(LOG_TAG, "VPN service start initiated with time $appStartTime")
                 if (VpnController.getInstance()?.getBraveVpnService() != null) {
@@ -389,6 +398,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         } else {
             shimmerForStop()
         }
+        braveModeToggler.postValue(braveMode)
     }
 
     private fun startFirewallLogsActivity(){
@@ -540,8 +550,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             Log.e("BraveVPN", "Device does not support system-wide VPN mode.")
         }
     }
-
-
 
     private fun shimmerForStart() {
         val builder = Shimmer.AlphaHighlightBuilder()

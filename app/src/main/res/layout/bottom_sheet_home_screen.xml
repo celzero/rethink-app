@@ -111,7 +111,7 @@
             android:layout_margin="5dp"
             android:text="1.1.1.1"
             android:textIsSelectable="true"
-            android:textSize="@dimen/large_font_text_view" />
+            android:textSize="@dimen/default_font_text_view" />
 
         <TextView
             android:id="@+id/bs_home_screen_app_uptime"
