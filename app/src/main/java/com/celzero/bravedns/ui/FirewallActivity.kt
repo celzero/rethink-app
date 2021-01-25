@@ -26,7 +26,6 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityFirewallBinding
 import com.celzero.bravedns.util.Constants
 import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayout.TabLayoutOnPageChangeListener
 
 
 class FirewallActivity : AppCompatActivity(R.layout.activity_firewall), TabLayout.OnTabSelectedListener {
@@ -43,28 +42,31 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall), TabLayou
         //https://github.com/material-components/material-components-android/issues/500
         //https://github.com/android/views-widgets-samples/issues/107
 
+        val tabTitles = arrayOf(getString(R.string.firewall_act_universal_tab), getString(R.string.firewall_act_network_monitor_tab),
+                    getString(R.string.firewall_act_apps_tab))
+        b.firewallActTabLayout.setupWithViewPager(b.firewallActViewpager)
+
         //Adding the tabs using addTab() method
-        b.firewallActTabLayout.addTab(b.firewallActTabLayout.newTab().setText(getString(R.string.firewall_act_universal_tab)))
-        b.firewallActTabLayout.addTab(b.firewallActTabLayout.newTab().setText(getString(R.string.firewall_act_network_monitor_tab)))
-        b.firewallActTabLayout.addTab(b.firewallActTabLayout.newTab().setText(getString(R.string.firewall_act_apps_tab)))
+        b.firewallActTabLayout.addTab(b.firewallActTabLayout.newTab())
+        b.firewallActTabLayout.addTab(b.firewallActTabLayout.newTab())
+        b.firewallActTabLayout.addTab(b.firewallActTabLayout.newTab())
         b.firewallActTabLayout.tabGravity = TabLayout.GRAVITY_FILL
 
         //Creating our pager adapter
-        val adapter = Pager(supportFragmentManager, b.firewallActTabLayout.tabCount)
+        val adapter = Pager(supportFragmentManager, b.firewallActTabLayout.tabCount, tabTitles)
 
         //Adding adapter to pager
         b.firewallActViewpager.adapter = adapter
-        b.firewallActViewpager.setCurrentItem(screenToLoad, true)
+        b.firewallActViewpager.setCurrentItem(screenToLoad, false)
+        b.firewallActViewpager.offscreenPageLimit = b.firewallActTabLayout.tabCount
 
-        b.firewallActViewpager.addOnPageChangeListener(TabLayoutOnPageChangeListener(b.firewallActTabLayout))
-
-        //Adding onTabSelectedListener to swipe views
-        b.firewallActTabLayout.setOnTabSelectedListener(this)
+        b.firewallActViewpager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(b.firewallActTabLayout))
+        b.firewallActTabLayout.addOnTabSelectedListener(this)
     }
 
     override fun onTabSelected(tab: TabLayout.Tab) {
-        b.firewallActViewpager.currentItem = tab.position
         b.firewallActTabLayout.selectTab(tab)
+        b.firewallActViewpager.setCurrentItem(tab.position, false)
     }
 
     override fun onTabUnselected(tab: TabLayout.Tab?) {}
@@ -73,7 +75,7 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall), TabLayou
 
 }
 
-internal class Pager(fm: FragmentManager?, var tabCount: Int) : FragmentStatePagerAdapter(fm!!) {
+internal class Pager(fm: FragmentManager?, var tabCount: Int, var tabTitles : Array<String>) : FragmentStatePagerAdapter(fm!!) {
     //Overriding method getItem
     override fun getItem(position: Int): Fragment {
         //Returning the current tabs
@@ -84,15 +86,18 @@ internal class Pager(fm: FragmentManager?, var tabCount: Int) : FragmentStatePag
             1 -> {
                 ConnectionTrackerFragment.newInstance()
             }
-            2 -> {
+            else -> {
                 FirewallAppFragment.newInstance()
             }
-            else -> FirewallAppFragment.newInstance()
         }
     }
 
-    //Overriden method getCount to get the number of tabs
+    //Overridden method getCount to get the number of tabs
     override fun getCount(): Int {
         return tabCount
+    }
+
+    override fun getPageTitle(position: Int): CharSequence {
+        return tabTitles[position]
     }
 }

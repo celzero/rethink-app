@@ -142,6 +142,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                 HomeScreenActivity.GlobalVariable.appMode?.setDNSMode(Settings.DNSModePort)
                 persistentState.dnsType = 1
                 persistentState.connectionModeChange = receivedStamp
+                persistentState.setConnectedDNS(Constants.RETHINK_DNS_PLUS)
                 HomeScreenActivity.GlobalVariable.dnsType.postValue(1)
             }
         }.start()
