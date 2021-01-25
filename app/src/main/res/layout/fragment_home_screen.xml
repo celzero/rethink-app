@@ -104,17 +104,15 @@
                     android:id="@+id/fhs_card_dns_ll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingStart="5dp"
-                    android:paddingEnd="5dp"
                     android:orientation="vertical">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="10dp"
                         android:drawablePadding="10dp"
                         android:padding="10dp"
                         android:text="DNS"
+                        android:textSize="@dimen/extra_large_font_text_view"
                         android:textColor="@color/dividerColor"
                         app:drawableEndCompat="@drawable/dns_home_screen" />
 
@@ -123,8 +121,11 @@
                         android:id="@+id/fhs_card_dns_connected_dns"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:padding="5dp"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
                         android:gravity="center_vertical"
+                        android:maxLines="1"
+                        android:ellipsize="end"
                         android:text="Cloudflare"
                         android:textColor="@color/primaryText"
                         android:textSize="@dimen/extra_large_font_text_view" />
@@ -133,26 +134,42 @@
                         android:id="@+id/fhs_card_dns_latency"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:padding="5dp"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:paddingBottom="5dp"
                         android:gravity="center_vertical"
+                        android:textColor="@color/dividerColor"
+                        android:ellipsize="end"
+                        android:maxLines="1"
                         android:textSize="@dimen/default_font_text_view"
-                        android:text="Latency: 44ms"
-                        android:textColor="@color/primaryText" />
+                        android:text="Latency: 44ms" />
 
 
-                    <View
+                    <!--<View
                         android:layout_width="match_parent"
                         android:layout_height="0.5dp"
                         android:layout_marginTop="10dp"
-                        android:background="@color/dividerColor" />
-                    <androidx.appcompat.widget.AppCompatButton
-                        android:id="@+id/fhs_card_dns_configure"
-                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:background="@color/dividerColor" />-->
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:textAlignment="viewStart"
-                        android:layout_height="wrap_content"
-                        android:text="@string/dns_card_configure_btn"
-                        android:textColor="@color/secondaryText" />
+                        android:layout_height="match_parent"
+                        android:layout_margin="2dp"
+                        android:background="@color/black">
+
+                        <Button
+                            android:id="@+id/fhs_card_dns_configure"
+                            style="@style/Widget.AppCompat.Button.Borderless"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:drawableEnd="@drawable/ic_right_arrow_white"
+                            android:drawablePadding="10dp"
+                            android:padding="10dp"
+                            android:text="@string/dns_card_configure_btn"
+                            android:textAlignment="viewStart"
+                            android:textColor="@color/primaryText"
+                            android:textSize="@dimen/default_font_text_view" />
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -169,8 +186,6 @@
                 <LinearLayout
                     android:id="@+id/fhs_card_firewall_ll"
                     android:layout_width="match_parent"
-                    android:paddingStart="5dp"
-                    android:paddingEnd="5dp"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
@@ -178,9 +193,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:drawablePadding="10dp"
-                        android:layout_marginBottom="10dp"
                         android:padding="10dp"
                         android:text="Firewall"
+                        android:textSize="@dimen/extra_large_font_text_view"
                         android:textColor="@color/dividerColor"
                         app:drawableEndCompat="@drawable/firewall_home_screen" />
 
@@ -189,7 +204,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
-                        android:padding="5dp"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
                         android:text="13 apps blocked"
                         android:textSize="@dimen/extra_large_font_text_view"
                         android:textColor="@color/primaryText" />
@@ -199,25 +217,35 @@
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:textSize="@dimen/default_font_text_view"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textColor="@color/dividerColor"
                         android:text="Blocked apps: 0"
-                        android:padding="5dp"
-                        android:textColor="@color/primaryText" />
+                        android:layout_marginBottom="10dp"
+                        android:paddingBottom="5dp"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp" />
 
-                    <View
+
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="0.5dp"
-                        android:layout_marginTop="10dp"
-                        android:background="@color/dividerColor" />
+                        android:layout_height="match_parent"
+                        android:layout_margin="2dp"
+                        android:background="@color/black">
 
-                    <androidx.appcompat.widget.AppCompatButton
-                        android:id="@+id/fhs_card_firewall_configure"
-                        style="@style/Widget.AppCompat.Button.Borderless"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textAlignment="viewStart"
-                        android:text="@string/firewall_card_configure_btn"
-                        android:textColor="@color/secondaryText" />
-
+                        <Button
+                            android:id="@+id/fhs_card_firewall_configure"
+                            style="@style/Widget.AppCompat.Button.Borderless"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:drawableEnd="@drawable/ic_right_arrow_white"
+                            android:text="@string/firewall_card_configure_btn"
+                            android:drawablePadding="10dp"
+                            android:padding="10dp"
+                            android:textAlignment="viewStart"
+                            android:textColor="@color/primaryText"
+                            android:textSize="@dimen/default_font_text_view" />
+                    </LinearLayout>
                 </LinearLayout>
 
             </LinearLayout>

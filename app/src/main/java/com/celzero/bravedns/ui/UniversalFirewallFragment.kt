@@ -209,8 +209,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         }
 
         val appCount = GlobalVariable.appList.size
-        val act: FirewallActivity = requireContext() as FirewallActivity
-        appInfoRepository.getWhitelistCountLiveData().observe(act, {
+        appInfoRepository.getWhitelistCountLiveData().observe(viewLifecycleOwner, {
             includeView.firewallUnivWhitelistCount.text = "$it/$appCount apps whitelisted."
         })
 
