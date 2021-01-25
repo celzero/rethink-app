@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -52,7 +53,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         try {
             val pInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
             val version = pInfo.versionName
-            b.aboutAppVersion.text = getString(R.string.About_version, version)
+            b.aboutAppVersion.text = getString(R.string.about_version, version)
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()
         }
@@ -110,7 +111,13 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             .setTitle(getString(R.string.whats_dialog_title))
             .setPositiveButton(getString(R.string.about_dialog_positive_button)) { dialogInterface, _ ->
                 dialogInterface.dismiss()
-            }.setCancelable(true).create().show()
+            }.setNeutralButton(getString(R.string.about_dialog_neutral_button)){ dialogInterface: DialogInterface, i: Int ->
+                val intent = Intent(Intent.ACTION_VIEW, (getString(R.string.about_mail_to)).toUri())
+                intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_subject))
+                startActivity(intent)
+            }
+            .setCancelable(true).create().show()
+
     }
 
 }
