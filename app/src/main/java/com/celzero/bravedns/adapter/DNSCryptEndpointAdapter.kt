@@ -76,15 +76,15 @@ class DNSCryptEndpointAdapter(private val context: Context,
     }
 
     override fun onBindViewHolder(holder: DNSCryptEndpointViewHolder, position: Int) {
-        val dnsCryptEndpoint: DNSCryptEndpoint? = getItem(position)
+        val dnsCryptEndpoint: DNSCryptEndpoint = getItem(position) ?: return
         holder.update(dnsCryptEndpoint)
     }
 
     inner class DNSCryptEndpointViewHolder(private val b: DnsCryptEndpointListItemBinding) : RecyclerView.ViewHolder(b.root) {
 
-        fun update(dnsCryptEndpoint: DNSCryptEndpoint?) {
-            if (DEBUG) Log.d(LOG_TAG, "dnsCryptEndpoint adapter -- ${dnsCryptEndpoint?.dnsCryptName}")
-            b.dnsCryptEndpointListUrlName.text = dnsCryptEndpoint!!.dnsCryptName
+        fun update(dnsCryptEndpoint: DNSCryptEndpoint) {
+            if (DEBUG) Log.d(LOG_TAG, "dnsCryptEndpoint adapter -- ${dnsCryptEndpoint.dnsCryptName}")
+            b.dnsCryptEndpointListUrlName.text = dnsCryptEndpoint.dnsCryptName
             /*if (dnsCryptEndpoint.isSelected && cryptModeInProgress == 2) {
                 urlExplanationTxt.text = "Connected"
             } else if (dnsCryptEndpoint.isSelected && cryptModeInProgress == 1) {

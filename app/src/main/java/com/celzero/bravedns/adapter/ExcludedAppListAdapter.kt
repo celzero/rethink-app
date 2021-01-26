@@ -59,39 +59,37 @@ class ExcludedAppListAdapter(private val context: Context, private val appInfoRe
     }
 
     override fun onBindViewHolder(holder: ExcludedAppInfoViewHolder, position: Int) {
-        val appInfo: AppInfo? = getItem(position)
+        val appInfo: AppInfo = getItem(position) ?: return
         holder.update(appInfo)
     }
 
 
     inner class ExcludedAppInfoViewHolder(private val b: ExcludedAppListItemBinding) : RecyclerView.ViewHolder(b.root) {
 
-        fun update(appInfo: AppInfo?) {
-            if (appInfo != null) {
-                b.excludedAppListApkLabelTv.text = appInfo.appName
-                b.excludedAppListCheckbox.isChecked = appInfo.isExcluded
-                try {
-                    //val icon = context.packageManager.getApplicationIcon(appInfo.packageInfo)
-                    //appIcon.setImageDrawable(icon)
-                    Glide.with(context).load(context.packageManager.getApplicationIcon(appInfo.packageInfo)).into(b.excludedAppListApkIconIv)
-                } catch (e: Exception) {
-                    //appIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
-                    Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.excludedAppListApkIconIv)
-                    Log.e(LOG_TAG, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message, e)
-                }
+        fun update(appInfo: AppInfo) {
+            b.excludedAppListApkLabelTv.text = appInfo.appName
+            b.excludedAppListCheckbox.isChecked = appInfo.isExcluded
+            try {
+                //val icon = context.packageManager.getApplicationIcon(appInfo.packageInfo)
+                //appIcon.setImageDrawable(icon)
+                Glide.with(context).load(context.packageManager.getApplicationIcon(appInfo.packageInfo)).into(b.excludedAppListApkIconIv)
+            } catch (e: Exception) {
+                //appIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
+                Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.excludedAppListApkIconIv)
+                Log.e(LOG_TAG, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message, e)
+            }
 
-                b.excludedAppListContainer.setOnClickListener {
-                    if (DEBUG) Log.d(LOG_TAG, "parentView- whitelist - ${appInfo.appName},${appInfo.isExcluded}")
-                    appInfo.isExcluded = !appInfo.isExcluded
-                    excludeAppsFromVPN(appInfo, appInfo.isExcluded)
-                }
+            b.excludedAppListContainer.setOnClickListener {
+                if (DEBUG) Log.d(LOG_TAG, "parentView- whitelist - ${appInfo.appName},${appInfo.isExcluded}")
+                appInfo.isExcluded = !appInfo.isExcluded
+                excludeAppsFromVPN(appInfo, appInfo.isExcluded)
+            }
 
-                b.excludedAppListCheckbox.setOnCheckedChangeListener(null)
-                b.excludedAppListCheckbox.setOnClickListener {
-                    if (DEBUG) Log.d(LOG_TAG, "CheckBox- whitelist - ${appInfo.appName},${appInfo.isExcluded}")
-                    appInfo.isExcluded = !appInfo.isExcluded
-                    excludeAppsFromVPN(appInfo, appInfo.isExcluded)
-                }
+            b.excludedAppListCheckbox.setOnCheckedChangeListener(null)
+            b.excludedAppListCheckbox.setOnClickListener {
+                if (DEBUG) Log.d(LOG_TAG, "CheckBox- whitelist - ${appInfo.appName},${appInfo.isExcluded}")
+                appInfo.isExcluded = !appInfo.isExcluded
+                excludeAppsFromVPN(appInfo, appInfo.isExcluded)
             }
         }
 
