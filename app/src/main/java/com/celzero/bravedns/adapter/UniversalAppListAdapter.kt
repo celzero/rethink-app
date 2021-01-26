@@ -65,52 +65,50 @@ class UniversalAppListAdapter(private val context: Context, private val appInfoR
     }
 
     override fun onBindViewHolder(holder: UniversalAppInfoViewHolder, position: Int) {
-        val appInfo: AppInfo? = getItem(position)
+        val appInfo: AppInfo = getItem(position) ?: return
         holder.update(appInfo)
     }
 
 
     inner class UniversalAppInfoViewHolder(private val b: UnivWhitelistListItemBinding) : RecyclerView.ViewHolder(b.root) {
 
-        fun update(appInfo: AppInfo?) {
-            if (appInfo != null) {
-                if (appInfo.appCategory == Constants.APP_CAT_SYSTEM_COMPONENTS) {
-                    b.univWhitelistApkLabelTv.text = appInfo.appName//+ Constants.RECOMMENDED
-                } else {
-                    b.univWhitelistApkLabelTv.text = appInfo.appName
-                }
+        fun update(appInfo: AppInfo) {
+            if (appInfo.appCategory == Constants.APP_CAT_SYSTEM_COMPONENTS) {
+                b.univWhitelistApkLabelTv.text = appInfo.appName//+ Constants.RECOMMENDED
+            } else {
+                b.univWhitelistApkLabelTv.text = appInfo.appName
+            }
 
-                b.univWhitelistCheckbox.isChecked = appInfo.whiteListUniv1
-                try {
-                    Glide.with(context).load(context.packageManager.getApplicationIcon(appInfo.packageInfo)).into(b.univWhitelistApkIconIv)
-                    //val icon = context.packageManager.getApplicationIcon(appInfo.packageInfo)
-                    //appIcon.setImageDrawable(icon)
-                } catch (e: Exception) {
-                    Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.univWhitelistApkIconIv)
-                    //appIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
-                    Log.e(LOG_TAG, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message, e)
-                }
+            b.univWhitelistCheckbox.isChecked = appInfo.whiteListUniv1
+            try {
+                Glide.with(context).load(context.packageManager.getApplicationIcon(appInfo.packageInfo)).into(b.univWhitelistApkIconIv)
+                //val icon = context.packageManager.getApplicationIcon(appInfo.packageInfo)
+                //appIcon.setImageDrawable(icon)
+            } catch (e: Exception) {
+                Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.univWhitelistApkIconIv)
+                //appIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
+                Log.e(LOG_TAG, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message, e)
+            }
 
-                b.univWhitelistContainer.setOnClickListener {
-                    if (DEBUG) Log.d(LOG_TAG, "parentView- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
-                    appInfo.whiteListUniv1 = !appInfo.whiteListUniv1
-                    modifyWhiteListApps(appInfo)
-                    /*object : CountDownTimer(1000, 500) {
-                        override fun onTick(millisUntilFinished: Long) {
-                        }
-                        override fun onFinish() {
+            b.univWhitelistContainer.setOnClickListener {
+                if (DEBUG) Log.d(LOG_TAG, "parentView- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
+                appInfo.whiteListUniv1 = !appInfo.whiteListUniv1
+                modifyWhiteListApps(appInfo)
+                /*object : CountDownTimer(1000, 500) {
+                    override fun onTick(millisUntilFinished: Long) {
+                    }
+                    override fun onFinish() {
 
-                        }
-                    }.start()*/
+                    }
+                }.start()*/
 
-                }
+            }
 
-                b.univWhitelistCheckbox.setOnCheckedChangeListener(null)
-                b.univWhitelistCheckbox.setOnClickListener {
-                    if (DEBUG) Log.d(LOG_TAG, "CheckBox- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
-                    appInfo.whiteListUniv1 = !appInfo.whiteListUniv1
-                    modifyWhiteListApps(appInfo)
-                }
+            b.univWhitelistCheckbox.setOnCheckedChangeListener(null)
+            b.univWhitelistCheckbox.setOnClickListener {
+                if (DEBUG) Log.d(LOG_TAG, "CheckBox- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
+                appInfo.whiteListUniv1 = !appInfo.whiteListUniv1
+                modifyWhiteListApps(appInfo)
             }
         }
 

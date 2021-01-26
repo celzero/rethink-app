@@ -66,57 +66,55 @@ class DNSCryptRelayEndpointAdapter(
     }
 
     override fun onBindViewHolder(holder: DNSCryptRelayEndpointViewHolder, position: Int) {
-        val dnsCryptRelayEndpoint: DNSCryptRelayEndpoint? = getItem(position)
+        val dnsCryptRelayEndpoint: DNSCryptRelayEndpoint = getItem(position) ?: return
         holder.update(dnsCryptRelayEndpoint)
     }
 
 
     inner class DNSCryptRelayEndpointViewHolder(private val b: DnsCryptEndpointListItemBinding) : RecyclerView.ViewHolder(b.root) {
 
-        fun update(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint?) {
-            if (dnsCryptRelayEndpoint != null) {
-                //if(DEBUG) Log.d(LOG_TAG,"Update - dohName ==> ${dnsCryptRelayEndpoint.dnsCryptRelayURL}")
-                b.dnsCryptEndpointListUrlName.text = dnsCryptRelayEndpoint.dnsCryptRelayName
-                /*if(dnsCryptRelayEndpoint.isSelected && HomeScreenActivity.GlobalVariable.cryptModeInProgress == 2){
-                    urlExplanationTxt.text = "Connected"
-                } else if (dnsCryptRelayEndpoint.isSelected && HomeScreenActivity.GlobalVariable.cryptModeInProgress == 1) {
-                    urlExplanationTxt.text = "Connecting.."
-                } else */
-                if (dnsCryptRelayEndpoint.isSelected) {
-                    b.dnsCryptEndpointListUrlExplanation.text = "Connected"
-                } else {
-                    b.dnsCryptEndpointListUrlExplanation.text = ""
-                }
+        fun update(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint) {
+            //if(DEBUG) Log.d(LOG_TAG,"Update - dohName ==> ${dnsCryptRelayEndpoint.dnsCryptRelayURL}")
+            b.dnsCryptEndpointListUrlName.text = dnsCryptRelayEndpoint.dnsCryptRelayName
+            /*if(dnsCryptRelayEndpoint.isSelected && HomeScreenActivity.GlobalVariable.cryptModeInProgress == 2){
+            urlExplanationTxt.text = "Connected"
+        } else if (dnsCryptRelayEndpoint.isSelected && HomeScreenActivity.GlobalVariable.cryptModeInProgress == 1) {
+            urlExplanationTxt.text = "Connecting.."
+        } else */
+            if (dnsCryptRelayEndpoint.isSelected) {
+                b.dnsCryptEndpointListUrlExplanation.text = "Connected"
+            } else {
+                b.dnsCryptEndpointListUrlExplanation.text = ""
+            }
 
-                b.dnsCryptEndpointListActionImage.isChecked = dnsCryptRelayEndpoint.isSelected
-                if (dnsCryptRelayEndpoint.isCustom && !dnsCryptRelayEndpoint.isSelected) {
-                    b.dnsCryptEndpointListInfoImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_uninstall))
-                } else {
-                    b.dnsCryptEndpointListInfoImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_appinfo))
+            b.dnsCryptEndpointListActionImage.isChecked = dnsCryptRelayEndpoint.isSelected
+            if (dnsCryptRelayEndpoint.isCustom && !dnsCryptRelayEndpoint.isSelected) {
+                b.dnsCryptEndpointListInfoImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_uninstall))
+            } else {
+                b.dnsCryptEndpointListInfoImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_appinfo))
+            }
+            b.root.setOnClickListener {
+                //updateDNSCryptRelayDetails(dnsCryptRelayEndpoint)
+                b.dnsCryptEndpointListActionImage.isChecked = !b.dnsCryptEndpointListActionImage.isChecked
+                dnsCryptRelayEndpoint.isSelected = b.dnsCryptEndpointListActionImage.isChecked
+                if (!dnsCryptRelayEndpoint.isSelected) {
+                    cryptRelayToRemove = dnsCryptRelayEndpoint.dnsCryptRelayURL
                 }
-                b.root.setOnClickListener {
-                    //updateDNSCryptRelayDetails(dnsCryptRelayEndpoint)
-                    b.dnsCryptEndpointListActionImage.isChecked = !b.dnsCryptEndpointListActionImage.isChecked
-                    dnsCryptRelayEndpoint.isSelected = b.dnsCryptEndpointListActionImage.isChecked
-                    if (!dnsCryptRelayEndpoint.isSelected) {
-                        cryptRelayToRemove = dnsCryptRelayEndpoint.dnsCryptRelayURL
-                    }
-                    val state = updateDNSCryptRelayDetails(dnsCryptRelayEndpoint)
-                    if (b.dnsCryptEndpointListActionImage.isChecked && !state) {
-                        b.dnsCryptEndpointListActionImage.isChecked = state
-                    }
+                val state = updateDNSCryptRelayDetails(dnsCryptRelayEndpoint)
+                if (b.dnsCryptEndpointListActionImage.isChecked && !state) {
+                    b.dnsCryptEndpointListActionImage.isChecked = state
                 }
-                b.dnsCryptEndpointListActionImage.setOnClickListener {
-                    dnsCryptRelayEndpoint.isSelected = b.dnsCryptEndpointListActionImage.isChecked
-                    val state = updateDNSCryptRelayDetails(dnsCryptRelayEndpoint)
-                    if (b.dnsCryptEndpointListActionImage.isChecked && !state) {
-                        b.dnsCryptEndpointListActionImage.isChecked = state
-                    }
-                    //showExplanationOnImageClick(dnsCryptRelayEndpoint)
+            }
+            b.dnsCryptEndpointListActionImage.setOnClickListener {
+                dnsCryptRelayEndpoint.isSelected = b.dnsCryptEndpointListActionImage.isChecked
+                val state = updateDNSCryptRelayDetails(dnsCryptRelayEndpoint)
+                if (b.dnsCryptEndpointListActionImage.isChecked && !state) {
+                    b.dnsCryptEndpointListActionImage.isChecked = state
                 }
-                b.dnsCryptEndpointListInfoImage.setOnClickListener {
-                    showExplanationOnImageClick(dnsCryptRelayEndpoint)
-                }
+                //showExplanationOnImageClick(dnsCryptRelayEndpoint)
+            }
+            b.dnsCryptEndpointListInfoImage.setOnClickListener {
+                showExplanationOnImageClick(dnsCryptRelayEndpoint)
             }
 
         }

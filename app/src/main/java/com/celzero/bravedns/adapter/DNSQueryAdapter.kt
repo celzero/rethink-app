@@ -53,7 +53,7 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
     }*/
 
     override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
-        val transaction: DNSLogs? = getItem(position)
+        val transaction: DNSLogs = getItem(position) ?: return
         holder.update(transaction, position)
 
 
@@ -102,29 +102,27 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
 
     inner class TransactionViewHolder(private val b: TransactionRowBinding) : RecyclerView.ViewHolder(b.root) {
 
-        fun update(transaction: DNSLogs?, position: Int) {
+        fun update(transaction: DNSLogs, position: Int) {
             // This function can be run up to a dozen times while blocking rendering, so it needs to be
             // as brief as possible.
             //this.transaction = transaction
-            if (transaction != null) {
-                b.responseTime.text = convertLongToTime(transaction.time)
-                b.flag.text = transaction.flag
-                //fqdnView!!.text = Utilities.getETldPlus1(transaction.fqdn!!)
-                b.fqdn.text = transaction.queryStr
-                b.latencyVal.text = transaction.latency.toString() + "ms"
+            b.responseTime.text = convertLongToTime(transaction.time)
+            b.flag.text = transaction.flag
+            //fqdnView!!.text = Utilities.getETldPlus1(transaction.fqdn!!)
+            b.fqdn.text = transaction.queryStr
+            b.latencyVal.text = transaction.latency.toString() + "ms"
 
-                if (transaction.isBlocked) {
-                    b.queryLogIndicator.visibility = View.VISIBLE
-                } else {
-                    b.queryLogIndicator.visibility = View.INVISIBLE
-                }
-                b.root.setOnClickListener {
-                    //if (!transaction.blockList.isNullOrEmpty()) {
-                    b.root.isEnabled = false
-                    openBottomSheet(transaction)
-                    b.root.isEnabled = true
-                    //}
-                }
+            if (transaction.isBlocked) {
+                b.queryLogIndicator.visibility = View.VISIBLE
+            } else {
+                b.queryLogIndicator.visibility = View.INVISIBLE
+            }
+            b.root.setOnClickListener {
+                //if (!transaction.blockList.isNullOrEmpty()) {
+                b.root.isEnabled = false
+                openBottomSheet(transaction)
+                b.root.isEnabled = true
+                //}
             }
 
         }

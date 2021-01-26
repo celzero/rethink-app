@@ -70,67 +70,65 @@ class DoHEndpointAdapter(private val context: Context,
     }
 
     override fun onBindViewHolder(holder: DoHEndpointViewHolder, position: Int) {
-        val doHEndpoint: DoHEndpoint? = getItem(position)
+        val doHEndpoint: DoHEndpoint = getItem(position) ?: return
         holder.update(doHEndpoint)
     }
 
 
     inner class DoHEndpointViewHolder(private val b: DohEndpointListItemBinding) : RecyclerView.ViewHolder(b.root) {
 
-        fun update(doHEndpoint: DoHEndpoint?) {
-            if (doHEndpoint != null) {
-                //if(DEBUG) Log.d(LOG_TAG, "Update - dohName ==> ${doHEndpoint.dohURL}")
-                b.dohEndpointListUrlName.text = doHEndpoint.dohName
-                if (doHEndpoint.isSelected) {
-                    b.dohEndpointListUrlExplanation.text = "Connected."
-                    Log.d(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}")
-                    if (doHEndpoint.dohName == RETHINK_DNS_PLUS) {
-                        val count = persistentState.numberOfRemoteBlocklists
-                        Log.d(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}, count- $count")
-                        if (count != 0) {
-                            b.dohEndpointListUrlExplanation.text = "Connected. $count blocklists in-use."
-                        }
-                    }
-                } else {
-                    b.dohEndpointListUrlExplanation.text = ""
-                }
-                b.dohEndpointListCheckImage.isChecked = doHEndpoint.isSelected
-                if (doHEndpoint.isCustom && !doHEndpoint.isSelected) {
-                    b.dohEndpointListActionImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_uninstall))
-                } else {
-                    b.dohEndpointListActionImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_appinfo))
-                }
+        fun update(doHEndpoint: DoHEndpoint) {
+            //if(DEBUG) Log.d(LOG_TAG, "Update - dohName ==> ${doHEndpoint.dohURL}")
+            b.dohEndpointListUrlName.text = doHEndpoint.dohName
+            if (doHEndpoint.isSelected) {
+                b.dohEndpointListUrlExplanation.text = "Connected."
+                Log.d(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}")
                 if (doHEndpoint.dohName == RETHINK_DNS_PLUS) {
-
-                    b.dohEndpointListConfigure.visibility = View.VISIBLE
-                } else {
-                    b.dohEndpointListConfigure.visibility = View.GONE
-                }
-                b.root.setOnClickListener {
-                    //TODO - Move the string in a common place and remove the literal.
-                    //Maybe to strings.xml or to a Constant file in Util class
-                    updateConnection(doHEndpoint)
-                }
-                b.dohEndpointListActionImage.setOnClickListener {
-                    showExplanationOnImageClick(doHEndpoint)
-                }
-                b.dohEndpointListCheckImage.setOnClickListener {
-                    updateConnection(doHEndpoint)
-                }
-                b.dohEndpointListConfigure.setOnClickListener {
-                    var stamp = ""
-                    try {
-                        stamp = getBlocklistStampFromURL(doHEndpoint.dohURL)
-                        if (DEBUG) Log.d(LOG_TAG, "Configure btn click: ${doHEndpoint.dohURL}, $stamp")
-                    } catch (e: Exception) {
-                        Log.w(LOG_TAG, "Exception while fetching stamp from Go ${e.message}", e)
+                    val count = persistentState.numberOfRemoteBlocklists
+                    Log.d(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}, count- $count")
+                    if (count != 0) {
+                        b.dohEndpointListUrlExplanation.text = "Connected. $count blocklists in-use."
                     }
-                    if (DEBUG) Log.d(LOG_TAG, "startActivityForResult - DohEndpointadapter")
-                    val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
-                    intent.putExtra("location", DNSConfigureWebViewActivity.REMOTE)
-                    intent.putExtra("stamp", stamp)
-                    (context as Activity).startActivityForResult(intent, Activity.RESULT_OK)
                 }
+            } else {
+                b.dohEndpointListUrlExplanation.text = ""
+            }
+            b.dohEndpointListCheckImage.isChecked = doHEndpoint.isSelected
+            if (doHEndpoint.isCustom && !doHEndpoint.isSelected) {
+                b.dohEndpointListActionImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_uninstall))
+            } else {
+                b.dohEndpointListActionImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_appinfo))
+            }
+            if (doHEndpoint.dohName == RETHINK_DNS_PLUS) {
+
+                b.dohEndpointListConfigure.visibility = View.VISIBLE
+            } else {
+                b.dohEndpointListConfigure.visibility = View.GONE
+            }
+            b.root.setOnClickListener {
+                //TODO - Move the string in a common place and remove the literal.
+                //Maybe to strings.xml or to a Constant file in Util class
+                updateConnection(doHEndpoint)
+            }
+            b.dohEndpointListActionImage.setOnClickListener {
+                showExplanationOnImageClick(doHEndpoint)
+            }
+            b.dohEndpointListCheckImage.setOnClickListener {
+                updateConnection(doHEndpoint)
+            }
+            b.dohEndpointListConfigure.setOnClickListener {
+                var stamp = ""
+                try {
+                    stamp = getBlocklistStampFromURL(doHEndpoint.dohURL)
+                    if (DEBUG) Log.d(LOG_TAG, "Configure btn click: ${doHEndpoint.dohURL}, $stamp")
+                } catch (e: Exception) {
+                    Log.w(LOG_TAG, "Exception while fetching stamp from Go ${e.message}", e)
+                }
+                if (DEBUG) Log.d(LOG_TAG, "startActivityForResult - DohEndpointadapter")
+                val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
+                intent.putExtra("location", DNSConfigureWebViewActivity.REMOTE)
+                intent.putExtra("stamp", stamp)
+                (context as Activity).startActivityForResult(intent, Activity.RESULT_OK)
             }
         }
 

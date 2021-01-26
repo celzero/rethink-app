@@ -75,57 +75,54 @@ class DNSProxyEndpointAdapter(private val context: Context,
     }
 
     override fun onBindViewHolder(holder: DNSProxyEndpointViewHolder, position: Int) {
-        val dnsProxyEndpoint: DNSProxyEndpoint? = getItem(position)
+        val dnsProxyEndpoint: DNSProxyEndpoint = getItem(position) ?: return
         holder.update(dnsProxyEndpoint)
     }
 
 
     inner class DNSProxyEndpointViewHolder(private val b: DnsProxyListItemBinding) : RecyclerView.ViewHolder(b.root) {
 
-        fun update(dnsProxyEndpoint: DNSProxyEndpoint?) {
-            if (dnsProxyEndpoint != null) {
-                //if (DEBUG) Log.d(LOG_TAG, "Update - dohName ==> ${dnsProxyEndpoint.proxyType}")
-                b.dnsProxyListUrlName.text = dnsProxyEndpoint.proxyName
-                if (dnsProxyEndpoint.isSelected) {
-                    if (dnsProxyEndpoint.proxyAppName == "Nobody") {
-                        b.dnsProxyListUrlExplanation.text = "Forwarding to ${dnsProxyEndpoint.proxyIP}:${dnsProxyEndpoint.proxyPort}, Nobody"
-                    } else {
-                        Log.d(LOG_TAG, "Proxy : ${dnsProxyEndpoint.proxyAppName}")
-                        val appNameInfo = appList[dnsProxyEndpoint.proxyAppName]
-                        b.dnsProxyListUrlExplanation.text = "Forwarding to ${dnsProxyEndpoint.proxyIP}:${dnsProxyEndpoint.proxyPort}, ${appNameInfo?.appName}"
-                    }
+        fun update(dnsProxyEndpoint: DNSProxyEndpoint) {
+            //if (DEBUG) Log.d(LOG_TAG, "Update - dohName ==> ${dnsProxyEndpoint.proxyType}")
+            b.dnsProxyListUrlName.text = dnsProxyEndpoint.proxyName
+            if (dnsProxyEndpoint.isSelected) {
+                if (dnsProxyEndpoint.proxyAppName == "Nobody") {
+                    b.dnsProxyListUrlExplanation.text = "Forwarding to ${dnsProxyEndpoint.proxyIP}:${dnsProxyEndpoint.proxyPort}, Nobody"
                 } else {
-                    if (dnsProxyEndpoint.proxyAppName == "Nobody") {
-                        b.dnsProxyListUrlExplanation.text = "${dnsProxyEndpoint.proxyIP}:${dnsProxyEndpoint.proxyPort}, Nobody"
-                    } else {
-                        Log.d(LOG_TAG, "Proxy : ${dnsProxyEndpoint.proxyAppName}")
-                        val appNameInfo = appList[dnsProxyEndpoint.proxyAppName]
-                        b.dnsProxyListUrlExplanation.text = "${dnsProxyEndpoint.proxyIP}:${dnsProxyEndpoint.proxyPort}, ${appNameInfo?.appName}"
-                    }
+                    Log.d(LOG_TAG, "Proxy : ${dnsProxyEndpoint.proxyAppName}")
+                    val appNameInfo = appList[dnsProxyEndpoint.proxyAppName]
+                    b.dnsProxyListUrlExplanation.text = "Forwarding to ${dnsProxyEndpoint.proxyIP}:${dnsProxyEndpoint.proxyPort}, ${appNameInfo?.appName}"
                 }
-                b.dnsProxyListCheckImage.isChecked = dnsProxyEndpoint.isSelected
-                if (dnsProxyEndpoint.isCustom && !dnsProxyEndpoint.isSelected) {
-                    b.dnsProxyListActionImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_uninstall))
+            } else {
+                if (dnsProxyEndpoint.proxyAppName == "Nobody") {
+                    b.dnsProxyListUrlExplanation.text = "${dnsProxyEndpoint.proxyIP}:${dnsProxyEndpoint.proxyPort}, Nobody"
                 } else {
-                    b.dnsProxyListActionImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_appinfo))
+                    Log.d(LOG_TAG, "Proxy : ${dnsProxyEndpoint.proxyAppName}")
+                    val appNameInfo = appList[dnsProxyEndpoint.proxyAppName]
+                    b.dnsProxyListUrlExplanation.text = "${dnsProxyEndpoint.proxyIP}:${dnsProxyEndpoint.proxyPort}, ${appNameInfo?.appName}"
                 }
-                b.root.setOnClickListener {
-                    //showApplyDialog(dnsProxyEndpoint)
-                    updateDNSProxyDetails(dnsProxyEndpoint)
-                    b.dnsProxyListCheckImage.isChecked = true
-                }
-                b.dnsProxyListActionImage.setOnClickListener {
-                    showExplanationOnImageClick(dnsProxyEndpoint)
-                }
-
-                b.dnsProxyListCheckImage.setOnClickListener {
-                    updateDNSProxyDetails(dnsProxyEndpoint)
-                    b.dnsProxyListCheckImage.isChecked = true
-                }
-
-                //checkBox.setOn
-
             }
+            b.dnsProxyListCheckImage.isChecked = dnsProxyEndpoint.isSelected
+            if (dnsProxyEndpoint.isCustom && !dnsProxyEndpoint.isSelected) {
+                b.dnsProxyListActionImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_uninstall))
+            } else {
+                b.dnsProxyListActionImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_appinfo))
+            }
+            b.root.setOnClickListener {
+                //showApplyDialog(dnsProxyEndpoint)
+                updateDNSProxyDetails(dnsProxyEndpoint)
+                b.dnsProxyListCheckImage.isChecked = true
+            }
+            b.dnsProxyListActionImage.setOnClickListener {
+                showExplanationOnImageClick(dnsProxyEndpoint)
+            }
+
+            b.dnsProxyListCheckImage.setOnClickListener {
+                updateDNSProxyDetails(dnsProxyEndpoint)
+                b.dnsProxyListCheckImage.isChecked = true
+            }
+
+            //checkBox.setOn
 
         }
 
