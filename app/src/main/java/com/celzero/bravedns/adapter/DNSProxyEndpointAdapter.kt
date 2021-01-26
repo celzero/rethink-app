@@ -23,11 +23,7 @@ import android.content.DialogInterface
 import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.paging.PagedListAdapter
@@ -36,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DNSProxyEndpoint
 import com.celzero.bravedns.database.DNSProxyEndpointRepository
+import com.celzero.bravedns.databinding.DnsProxyListItemBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.QueryTracker
 import com.celzero.bravedns.ui.HomeScreenActivity
@@ -62,8 +59,7 @@ class DNSProxyEndpointAdapter(private val context: Context,
     }
 
     companion object {
-        private val DIFF_CALLBACK = object :
-            DiffUtil.ItemCallback<DNSProxyEndpoint>() {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DNSProxyEndpoint>() {
             // Concert details may have changed if reloaded from the database,
             // but ID is fixed.
             override fun areItemsTheSame(oldConnection: DNSProxyEndpoint, newConnection: DNSProxyEndpoint) = oldConnection.id == newConnection.id
@@ -73,12 +69,9 @@ class DNSProxyEndpointAdapter(private val context: Context,
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DNSProxyEndpointViewHolder {
-        val v: View = LayoutInflater.from(parent.context).inflate(
-            R.layout.dns_proxy_list_item,
-            parent, false
-        )
+        val itemBinding = DnsProxyListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         //v.setBackgroundColor(context.getColor(R.color.colorPrimary))
-        return DNSProxyEndpointViewHolder(v)
+        return DNSProxyEndpointViewHolder(itemBinding)
     }
 
     override fun onBindViewHolder(holder: DNSProxyEndpointViewHolder, position: Int) {
@@ -87,65 +80,47 @@ class DNSProxyEndpointAdapter(private val context: Context,
     }
 
 
-    inner class DNSProxyEndpointViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-        // Overall view
-        private var rowView: View? = null
-
-        // Contents of the condensed view
-        private var urlNameTxt: TextView
-        private var urlExplanationTxt: TextView
-        private var imageAction: ImageView
-        private var checkBox: CheckBox
-
-
-        init {
-            rowView = itemView
-            urlNameTxt = itemView.findViewById(R.id.dns_proxy_list_url_name)
-            urlExplanationTxt = itemView.findViewById(R.id.dns_proxy_list_url_explanation)
-            imageAction = itemView.findViewById(R.id.dns_proxy_list_action_image)
-            checkBox = itemView.findViewById(R.id.dns_proxy_list_check_image)
-        }
+    inner class DNSProxyEndpointViewHolder(private val b: DnsProxyListItemBinding) : RecyclerView.ViewHolder(b.root) {
 
         fun update(dnsProxyEndpoint: DNSProxyEndpoint?) {
             if (dnsProxyEndpoint != null) {
                 //if (DEBUG) Log.d(LOG_TAG, "Update - dohName ==> ${dnsProxyEndpoint.proxyType}")
-                urlNameTxt.text = dnsProxyEndpoint.proxyName
+                b.dnsProxyListUrlName.text = dnsProxyEndpoint.proxyName
                 if (dnsProxyEndpoint.isSelected) {
                     if (dnsProxyEndpoint.proxyAppName == "Nobody") {
-                        urlExplanationTxt.text = "Forwarding to ${dnsProxyEndpoint.proxyIP}:${dnsProxyEndpoint.proxyPort}, Nobody"
+                        b.dnsProxyListUrlExplanation.text = "Forwarding to ${dnsProxyEndpoint.proxyIP}:${dnsProxyEndpoint.proxyPort}, Nobody"
                     } else {
-                        Log.d(LOG_TAG,"Proxy : ${dnsProxyEndpoint.proxyAppName}")
+                        Log.d(LOG_TAG, "Proxy : ${dnsProxyEndpoint.proxyAppName}")
                         val appNameInfo = appList[dnsProxyEndpoint.proxyAppName]
-                        urlExplanationTxt.text = "Forwarding to ${dnsProxyEndpoint.proxyIP}:${dnsProxyEndpoint.proxyPort}, ${appNameInfo?.appName}"
+                        b.dnsProxyListUrlExplanation.text = "Forwarding to ${dnsProxyEndpoint.proxyIP}:${dnsProxyEndpoint.proxyPort}, ${appNameInfo?.appName}"
                     }
                 } else {
-                    if(dnsProxyEndpoint.proxyAppName == "Nobody") {
-                        urlExplanationTxt.text = "${dnsProxyEndpoint.proxyIP}:${dnsProxyEndpoint.proxyPort}, Nobody"
-                    }else{
-                        Log.d(LOG_TAG,"Proxy : ${dnsProxyEndpoint.proxyAppName}")
+                    if (dnsProxyEndpoint.proxyAppName == "Nobody") {
+                        b.dnsProxyListUrlExplanation.text = "${dnsProxyEndpoint.proxyIP}:${dnsProxyEndpoint.proxyPort}, Nobody"
+                    } else {
+                        Log.d(LOG_TAG, "Proxy : ${dnsProxyEndpoint.proxyAppName}")
                         val appNameInfo = appList[dnsProxyEndpoint.proxyAppName]
-                        urlExplanationTxt.text = "${dnsProxyEndpoint.proxyIP}:${dnsProxyEndpoint.proxyPort}, ${appNameInfo?.appName}"
+                        b.dnsProxyListUrlExplanation.text = "${dnsProxyEndpoint.proxyIP}:${dnsProxyEndpoint.proxyPort}, ${appNameInfo?.appName}"
                     }
                 }
-                checkBox.isChecked = dnsProxyEndpoint.isSelected
+                b.dnsProxyListCheckImage.isChecked = dnsProxyEndpoint.isSelected
                 if (dnsProxyEndpoint.isCustom && !dnsProxyEndpoint.isSelected) {
-                    imageAction.setImageDrawable(context.getDrawable(R.drawable.ic_fab_uninstall))
+                    b.dnsProxyListActionImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_uninstall))
                 } else {
-                    imageAction.setImageDrawable(context.getDrawable(R.drawable.ic_fab_appinfo))
+                    b.dnsProxyListActionImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_appinfo))
                 }
-                rowView?.setOnClickListener {
+                b.root.setOnClickListener {
                     //showApplyDialog(dnsProxyEndpoint)
                     updateDNSProxyDetails(dnsProxyEndpoint)
-                    checkBox.isChecked = true
+                    b.dnsProxyListCheckImage.isChecked = true
                 }
-                imageAction.setOnClickListener {
+                b.dnsProxyListActionImage.setOnClickListener {
                     showExplanationOnImageClick(dnsProxyEndpoint)
                 }
 
-                checkBox.setOnClickListener{
+                b.dnsProxyListCheckImage.setOnClickListener {
                     updateDNSProxyDetails(dnsProxyEndpoint)
-                    checkBox.isChecked = true
+                    b.dnsProxyListCheckImage.isChecked = true
                 }
 
                 //checkBox.setOn
@@ -155,8 +130,7 @@ class DNSProxyEndpointAdapter(private val context: Context,
         }
 
         private fun showExplanationOnImageClick(dnsProxyEndpoint: DNSProxyEndpoint) {
-            if (dnsProxyEndpoint.isCustom && !dnsProxyEndpoint.isSelected)
-                showDialogForDelete(dnsProxyEndpoint)
+            if (dnsProxyEndpoint.isCustom && !dnsProxyEndpoint.isSelected) showDialogForDelete(dnsProxyEndpoint)
             else {
                 showDialogExplanation(dnsProxyEndpoint.proxyName, dnsProxyEndpoint.proxyAppName!!, dnsProxyEndpoint.proxyIP!!, dnsProxyEndpoint.proxyPort.toString())
                 /*if (dnsProxyEndpoint.proxyIP.isNullOrEmpty()) {
@@ -173,9 +147,9 @@ class DNSProxyEndpointAdapter(private val context: Context,
             builder.setTitle(title)
             val app = appList[appName]?.appName
             //set message for alert dialog
-            if(app != null && !app.isNullOrEmpty()) {
+            if (app != null && !app.isNullOrEmpty()) {
                 builder.setMessage("AppName: $app\n\nURL: $url\n\nPort: $message")
-            }else{
+            } else {
                 builder.setMessage("AppName: Nobody \n\nURL: $url\n\nPort: $message")
             }
             builder.setCancelable(true)
