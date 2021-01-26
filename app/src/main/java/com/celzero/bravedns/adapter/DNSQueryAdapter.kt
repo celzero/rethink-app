@@ -20,23 +20,21 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DNSLogs
+import com.celzero.bravedns.databinding.TransactionRowBinding
 import com.celzero.bravedns.ui.DNSBlockListBottomSheetFragment
 import java.text.SimpleDateFormat
 import java.util.*
 
 
-class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQueryAdapter.TransactionViewHolder>(DIFF_CALLBACK){
+class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQueryAdapter.TransactionViewHolder>(DIFF_CALLBACK) {
 
 
-   // private val transactions: MutableList<DNSQueryAdapter.TransactionView> = mutableListOf()
+    // private val transactions: MutableList<DNSQueryAdapter.TransactionView> = mutableListOf()
 
     companion object {
         const val TYPE_CONTROLS: Int = 0
@@ -55,7 +53,7 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
     }*/
 
     override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
-        val transaction : DNSLogs? = getItem(position)
+        val transaction: DNSLogs? = getItem(position)
         holder.update(transaction, position)
 
 
@@ -78,10 +76,7 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
             val v: View = activity.getControlView(parent)
             QueryAdapter.ControlViewHolder(v)
         } else */if (viewType == TYPE_TRANSACTION) {
-            val v: View = LayoutInflater.from(parent.context).inflate(
-                R.layout.transaction_row,
-                parent, false
-            )
+            val itemBinding = TransactionRowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
             // Workaround for lack of vector drawable background support in pre-Lollipop Android.
             //val expand = v.findViewById<View>(R.id.expand)
@@ -95,7 +90,7 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
                 // Deprecated starting in API 16.
                 expand.setBackgroundDrawable(expander)
             }*/
-            TransactionViewHolder(v)
+            TransactionViewHolder(itemBinding)
         } else {
             throw AssertionError(String.format(Locale.ROOT, "Unknown viewType %d", viewType))
         }
@@ -105,55 +100,29 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
         return transactions[(transactions.size - 1) - position]
     }*/
 
-    inner class TransactionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-        //private var transaction: DNSQueryAdapter.TransactionView? = null
-
-        // Overall view
-        private var rowView: View? = null
-
-        // Contents of the condensed view
-        private var timeView: TextView? = null
-        private var flagView: TextView? = null
-
-        // Contents of the expanded details view
-        private var fqdnView: TextView? = null
-        private var latencyView: TextView? = null
-        private var queryLayoutLL: LinearLayout? = null
-        private var queryIndicator: TextView? = null
-
-        init {
-            rowView = itemView
-
-            timeView = itemView.findViewById(R.id.response_time)
-            flagView = itemView.findViewById(R.id.flag)
-            fqdnView = itemView.findViewById(R.id.fqdn)
-            latencyView = itemView.findViewById(R.id.latency_val)
-            queryLayoutLL = itemView.findViewById(R.id.query_screen_ll)
-            queryIndicator = itemView.findViewById(R.id.query_log_indicator)
-        }
+    inner class TransactionViewHolder(private val b: TransactionRowBinding) : RecyclerView.ViewHolder(b.root) {
 
         fun update(transaction: DNSLogs?, position: Int) {
             // This function can be run up to a dozen times while blocking rendering, so it needs to be
             // as brief as possible.
             //this.transaction = transaction
-            if(transaction != null) {
-                timeView!!.text = convertLongToTime(transaction.time)
-                flagView!!.text = transaction.flag
+            if (transaction != null) {
+                b.responseTime.text = convertLongToTime(transaction.time)
+                b.flag.text = transaction.flag
                 //fqdnView!!.text = Utilities.getETldPlus1(transaction.fqdn!!)
-                fqdnView!!.text = transaction.queryStr
-                latencyView!!.text = transaction.latency.toString() + "ms"
+                b.fqdn.text = transaction.queryStr
+                b.latencyVal.text = transaction.latency.toString() + "ms"
 
                 if (transaction.isBlocked) {
-                    queryIndicator!!.visibility = View.VISIBLE
+                    b.queryLogIndicator.visibility = View.VISIBLE
                 } else {
-                    queryIndicator!!.visibility = View.INVISIBLE
+                    b.queryLogIndicator.visibility = View.INVISIBLE
                 }
-                rowView?.setOnClickListener {
+                b.root.setOnClickListener {
                     //if (!transaction.blockList.isNullOrEmpty()) {
-                    rowView?.isEnabled = false
+                    b.root.isEnabled = false
                     openBottomSheet(transaction)
-                    rowView?.isEnabled = true
+                    b.root.isEnabled = true
                     //}
                 }
             }
@@ -161,7 +130,7 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
         }
     }
 
-    fun openBottomSheet(transaction: DNSLogs){
+    fun openBottomSheet(transaction: DNSLogs) {
         val bottomSheetFragment = DNSBlockListBottomSheetFragment(context, transaction)
         val frag = context as FragmentActivity
         bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
