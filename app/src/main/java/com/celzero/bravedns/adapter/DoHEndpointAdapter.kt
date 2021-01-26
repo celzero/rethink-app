@@ -23,18 +23,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.database.DoHEndpointRepository
+import com.celzero.bravedns.databinding.DohEndpointListItemBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.QueryTracker
 import com.celzero.bravedns.ui.DNSConfigureWebViewActivity
@@ -58,8 +55,7 @@ class DoHEndpointAdapter(private val context: Context,
                          val listener: UIUpdateInterface) : PagedListAdapter<DoHEndpoint, DoHEndpointAdapter.DoHEndpointViewHolder>(DIFF_CALLBACK) {
 
     companion object {
-        private val DIFF_CALLBACK = object :
-            DiffUtil.ItemCallback<DoHEndpoint>() {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DoHEndpoint>() {
             // Concert details may have changed if reloaded from the database,
             // but ID is fixed.
             override fun areItemsTheSame(oldConnection: DoHEndpoint, newConnection: DoHEndpoint) = oldConnection.id == newConnection.id
@@ -68,9 +64,9 @@ class DoHEndpointAdapter(private val context: Context,
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DoHEndpointViewHolder {
-        val v: View = LayoutInflater.from(parent.context).inflate(R.layout.doh_endpoint_list_item, parent, false)
+        val itemBinding = DohEndpointListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         //v.setBackgroundColor(context.getColor(R.color.colorPrimary))
-        return DoHEndpointViewHolder(v)
+        return DoHEndpointViewHolder(itemBinding)
     }
 
     override fun onBindViewHolder(holder: DoHEndpointViewHolder, position: Int) {
@@ -79,77 +75,57 @@ class DoHEndpointAdapter(private val context: Context,
     }
 
 
-    inner class DoHEndpointViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-        // Overall view
-        private var rowView: View? = null
-
-        // Contents of the condensed view
-        private var urlNameTxt: TextView
-        private var urlExplanationTxt: TextView
-        private var imageAction: ImageView
-        private var checkBox: AppCompatCheckBox
-        private var configureBtn: Button
-
-
-        init {
-            rowView = itemView
-            urlNameTxt = itemView.findViewById(R.id.doh_endpoint_list_url_name)
-            urlExplanationTxt = itemView.findViewById(R.id.doh_endpoint_list_url_explanation)
-            imageAction = itemView.findViewById(R.id.doh_endpoint_list_action_image)
-            checkBox = itemView.findViewById(R.id.doh_endpoint_list_check_image)
-            configureBtn = itemView.findViewById(R.id.doh_endpoint_list_configure)
-        }
+    inner class DoHEndpointViewHolder(private val b: DohEndpointListItemBinding) : RecyclerView.ViewHolder(b.root) {
 
         fun update(doHEndpoint: DoHEndpoint?) {
             if (doHEndpoint != null) {
                 //if(DEBUG) Log.d(LOG_TAG, "Update - dohName ==> ${doHEndpoint.dohURL}")
-                urlNameTxt.text = doHEndpoint.dohName
+                b.dohEndpointListUrlName.text = doHEndpoint.dohName
                 if (doHEndpoint.isSelected) {
-                    urlExplanationTxt.text = "Connected."
+                    b.dohEndpointListUrlExplanation.text = "Connected."
                     Log.d(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}")
-                    if(doHEndpoint.dohName == RETHINK_DNS_PLUS){
+                    if (doHEndpoint.dohName == RETHINK_DNS_PLUS) {
                         val count = persistentState.numberOfRemoteBlocklists
                         Log.d(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}, count- $count")
                         if (count != 0) {
-                            urlExplanationTxt.text = "Connected. $count blocklists in-use."
+                            b.dohEndpointListUrlExplanation.text = "Connected. $count blocklists in-use."
                         }
                     }
                 } else {
-                    urlExplanationTxt.text = ""
+                    b.dohEndpointListUrlExplanation.text = ""
                 }
-                checkBox.isChecked = doHEndpoint.isSelected
+                b.dohEndpointListCheckImage.isChecked = doHEndpoint.isSelected
                 if (doHEndpoint.isCustom && !doHEndpoint.isSelected) {
-                    imageAction.setImageDrawable(context.getDrawable(R.drawable.ic_fab_uninstall))
+                    b.dohEndpointListActionImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_uninstall))
                 } else {
-                    imageAction.setImageDrawable(context.getDrawable(R.drawable.ic_fab_appinfo))
+                    b.dohEndpointListActionImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_appinfo))
                 }
                 if (doHEndpoint.dohName == RETHINK_DNS_PLUS) {
 
-                    configureBtn.visibility = View.VISIBLE
+                    b.dohEndpointListConfigure.visibility = View.VISIBLE
                 } else {
-                    configureBtn.visibility = View.GONE
+                    b.dohEndpointListConfigure.visibility = View.GONE
                 }
-                rowView?.setOnClickListener {
+                b.root.setOnClickListener {
                     //TODO - Move the string in a common place and remove the literal.
                     //Maybe to strings.xml or to a Constant file in Util class
                     updateConnection(doHEndpoint)
                 }
-                imageAction.setOnClickListener {
+                b.dohEndpointListActionImage.setOnClickListener {
                     showExplanationOnImageClick(doHEndpoint)
                 }
-                checkBox.setOnClickListener {
+                b.dohEndpointListCheckImage.setOnClickListener {
                     updateConnection(doHEndpoint)
                 }
-                configureBtn.setOnClickListener {
+                b.dohEndpointListConfigure.setOnClickListener {
                     var stamp = ""
                     try {
                         stamp = getBlocklistStampFromURL(doHEndpoint.dohURL)
-                        if(DEBUG) Log.d(LOG_TAG, "Configure btn click: ${doHEndpoint.dohURL}, $stamp")
+                        if (DEBUG) Log.d(LOG_TAG, "Configure btn click: ${doHEndpoint.dohURL}, $stamp")
                     } catch (e: Exception) {
                         Log.w(LOG_TAG, "Exception while fetching stamp from Go ${e.message}", e)
                     }
-                    if(DEBUG) Log.d(LOG_TAG, "startActivityForResult - DohEndpointadapter")
+                    if (DEBUG) Log.d(LOG_TAG, "startActivityForResult - DohEndpointadapter")
                     val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
                     intent.putExtra("location", DNSConfigureWebViewActivity.REMOTE)
                     intent.putExtra("stamp", stamp)
@@ -160,7 +136,7 @@ class DoHEndpointAdapter(private val context: Context,
 
 
         private fun updateConnection(doHEndpoint: DoHEndpoint) {
-            if(DEBUG) Log.d(LOG_TAG, "updateConnection - ${doHEndpoint.dohName}, ${doHEndpoint.dohURL}")
+            if (DEBUG) Log.d(LOG_TAG, "updateConnection - ${doHEndpoint.dohName}, ${doHEndpoint.dohURL}")
             doHEndpoint.dohURL = doHEndpointRepository.getConnectionURL(doHEndpoint.id)
             if (doHEndpoint.dohName == RETHINK_DNS_PLUS) {
                 var stamp = ""
@@ -169,24 +145,23 @@ class DoHEndpointAdapter(private val context: Context,
                 } catch (e: Exception) {
                     Log.e(LOG_TAG, "Exception while fetching stamp from Go ${e.message}", e)
                 }
-                if(DEBUG) Log.d(LOG_TAG, "updateConnection - $stamp")
+                if (DEBUG) Log.d(LOG_TAG, "updateConnection - $stamp")
                 if (stamp.isEmpty()) {
                     showDialogToConfigure()
-                    checkBox.isChecked = false
-                }else{
+                    b.dohEndpointListCheckImage.isChecked = false
+                } else {
                     updateDoHDetails(doHEndpoint)
-                    checkBox.isChecked = true
+                    b.dohEndpointListCheckImage.isChecked = true
                 }
             } else {
                 updateDoHDetails(doHEndpoint)
-                checkBox.isChecked = true
+                b.dohEndpointListCheckImage.isChecked = true
             }
             //mDb.close()
         }
 
         private fun showExplanationOnImageClick(doHEndpoint: DoHEndpoint) {
-            if (doHEndpoint.isCustom && !doHEndpoint.isSelected)
-                showDialogToDelete(doHEndpoint)
+            if (doHEndpoint.isCustom && !doHEndpoint.isSelected) showDialogToDelete(doHEndpoint)
             else {
                 if (doHEndpoint.dohExplanation.isNullOrEmpty()) {
                     showDialogExplanation(doHEndpoint.dohName, doHEndpoint.dohURL, "")
@@ -210,11 +185,11 @@ class DoHEndpointAdapter(private val context: Context,
             builder.setPositiveButton("Ok") { dialogInterface, which ->
                 dialogInterface.dismiss()
             }
-            builder.setNeutralButton("Copy"){ dialogInterface: DialogInterface, i: Int ->
+            builder.setNeutralButton("Copy") { dialogInterface: DialogInterface, i: Int ->
                 val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
                 val clip = ClipData.newPlainText("URL", url)
                 clipboard?.setPrimaryClip(clip)
-                Utilities.showToastInMidLayout(context,context.getString(R.string.info_dialog_copy_toast_msg),Toast.LENGTH_SHORT)
+                Utilities.showToastInMidLayout(context, context.getString(R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
             }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
@@ -268,7 +243,7 @@ class DoHEndpointAdapter(private val context: Context,
 
             //performing negative action
             builder.setNegativeButton("Cancel") { dialogInterface, which ->
-                checkBox.isChecked = false
+                b.dohEndpointListCheckImage.isChecked = false
             }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
