@@ -110,6 +110,7 @@ class WhitelistAppDialog(private var activity: Context, private val appInfoRepos
             categoryList.forEach {
                 val countBlocked = appInfoRepository.getBlockedCountForCategory(it)
                 categoryInfoRepository.updateBlockedCount(it, countBlocked)
+                Log.d(LOG_TAG, "All Category $it with block count as $countBlocked")
             }
             categoryInfoRepository.updateWhitelistCountForAll(checked)
         } else {
@@ -118,6 +119,7 @@ class WhitelistAppDialog(private var activity: Context, private val appInfoRepos
                 categoryInfoRepository.updateWhitelistForCategory(it, checked)
                 val countBlocked = appInfoRepository.getBlockedCountForCategory(it)
                 categoryInfoRepository.updateBlockedCount(it, countBlocked)
+                Log.d(LOG_TAG, "Category $it with block count as $countBlocked")
             }
 
         }
