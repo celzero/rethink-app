@@ -32,8 +32,8 @@ android {
         applicationId "com.celzero.bravedns"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 11 // For version name 053
-        versionName "0.5.3"
+        versionCode 12 // For version name 053a
+        versionName "0.5.3a"
        /* splits {
              abi {
                  enable true

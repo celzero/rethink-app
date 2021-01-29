@@ -12,7 +12,7 @@
         android:id="@+id/query_list_rl"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="2dp">
+        android:layout_marginTop="1dp">
 
         <LinearLayout
             android:id="@+id/query_list_card_view_top"
@@ -155,10 +155,8 @@
 
         </com.celzero.bravedns.util.NestedScrollableHost>
 
-
-
         <TextView
-            android:id="@+id/query_list__logs_disabled_tv"
+            android:id="@+id/query_list_logs_disabled_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
