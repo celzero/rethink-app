@@ -432,7 +432,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.d(LOG_TAG, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
+                Log.i(LOG_TAG, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
                 activity?.runOnUiThread {
                     b.settingsActivityOnDeviceBlockConfigureBtn.visibility = View.GONE
                     b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.GONE
@@ -608,7 +608,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == Activity.RESULT_OK) {
             val stamp = data?.getStringExtra("stamp")
-            Log.d(LOG_TAG, "onActivityResult - stamp from webview - $stamp")
+            Log.i(LOG_TAG, "onActivityResult - stamp from webview - $stamp")
             setBraveDNSLocal()
         }
     }
@@ -957,7 +957,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 errorTxt.text = "Invalid port"
                 isValid = false
             }
-            Log.d(LOG_TAG, "Pattern not matching - port- $port , ${portEditText.text}")
             if (udpBlockCheckBox.isChecked) {
                 isUDPBlock = true
             }
@@ -993,7 +992,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 proxyName = appName
             } else proxyName = ip
         }
-        Log.d(LOG_TAG, "Pattern matching 1- $appName")
         //id: Int, proxyName: String,  proxyType: String, proxyAppName: String, proxyIP: String,proxyPort : Int, isSelected: Boolean, isCustom: Boolean, modifiedDataTime: Long, latency: Int
         val proxyEndpoint = ProxyEndpoint(-1, proxyName, 1, mode, appName, ip, port, userName, password, true, true, isUDPBlock, 0L, 0)
         proxyEndpointRepository.clearAllData()
