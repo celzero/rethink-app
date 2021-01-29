@@ -3,7 +3,9 @@ package com.celzero.bravedns.service
 import android.content.Context
 import android.util.Log
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.connectedDNS
 import com.celzero.bravedns.util.Constants
@@ -204,8 +206,24 @@ class PersistentState(context: Context):SimpleKrate(context) {
 
     //fixme replace the below logic once the DNS data is streamlined.
     fun getConnectedDNS() : String{
-        if(connectedDNS.value.isNullOrEmpty())
-            return connectedDNSName
+        if(connectedDNS.value.isNullOrEmpty()){
+            val dnsType = appMode?.getDNSType()
+            if(dnsType == 1){
+                var dohDetail: DoHEndpoint? = null
+                try {
+                    dohDetail = appMode?.getDOHDetails()
+                } catch (e: Exception) {
+                    return connectedDNSName
+                }
+                return dohDetail?.dohName!!
+            }else if(dnsType == 2){
+                val cryptDetails = appMode?.getDNSCryptServerCount()
+                return "DNSCrypt: $cryptDetails resolvers"
+            }else{
+                val proxyDetails = appMode?.getDNSProxyServerDetails()
+                return proxyDetails?.proxyAppName!!
+            }
+        }
         else
             return connectedDNS.value!!
     }

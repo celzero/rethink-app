@@ -94,7 +94,6 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                     checkForDownload()
                 }
             }
-            Log.d(LOG_TAG, "Webview:  - url - $url")
         } catch (e: Exception) {
             Log.i(LOG_TAG, "Webview: Exception: ${e.message}", e)
             showDialogOnError(null)
@@ -143,7 +142,6 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                 persistentState.dnsType = 1
                 persistentState.connectionModeChange = receivedStamp
                 persistentState.setConnectedDNS(Constants.RETHINK_DNS_PLUS)
-                HomeScreenActivity.GlobalVariable.dnsType.postValue(1)
             }
         }.start()
 
@@ -442,7 +440,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         val blockListTimeStamp = persistentState.remoteBlockListDownloadTime
         val appVersionCode = persistentState.appVersion
         val url = "${Constants.REFRESH_BLOCKLIST_URL}$blockListTimeStamp&${Constants.APPEND_VCODE}$appVersionCode"
-        Log.d(LOG_TAG, "Webview: Check for local download, url - $url")
+        Log.i(LOG_TAG, "Webview: Check for local download, url - $url")
         run(url)
     }
 
@@ -452,7 +450,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.d(LOG_TAG, "Webview: onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
+                Log.i(LOG_TAG, "Webview: onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
             }
 
             override fun onResponse(call: Call, response: Response) {

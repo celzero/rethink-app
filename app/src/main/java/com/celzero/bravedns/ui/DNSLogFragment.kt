@@ -166,6 +166,7 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
             val cryptDetails = appMode?.getDNSCryptServerCount()
             b.connectedStatusTitle.text = resources.getString(R.string.configure_dns_connection_name) + " DNSCrypt resolvers: $cryptDetails"
             b.connectedStatusTitleUrl.text = resources.getString(R.string.configure_dns_connected_dns_crypt_status)
+            persistentState.setConnectedDNS("DNSCrypt: $cryptDetails resolvers")
             b.queryListScrollList.recyclerQuery.visibility = View.VISIBLE
             b.queryListScrollList.dnsLogNoLogText.visibility = View.GONE
         } else {
