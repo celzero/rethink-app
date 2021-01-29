@@ -450,8 +450,8 @@
 
     <string name="dns_proxy_no_proxy">Set up a DNS Proxy by clicking on the ADD button below.</string>
 
-    <string name="show_logs_disabled_network_message">Logging of network connections is disabled. To enable, goto Settings->General-> Turn on "Enable DNS and Firewall logs"</string>
-    <string name="show_logs_disabled_dns_message">Logging of DNS connections is disabled. To enable, goto Settings->General-> Turn on "Enable DNS and Firewall logs"</string>
+    <string name="show_logs_disabled_network_message">Connection logging has been disabled. To re-enable, goto <i>Settings</i> and turn on <i>Enable DNS and Firewall logs.</i></string>
+    <string name="show_logs_disabled_dns_message">DNS request logging has been disabled. To re-enable, goto <i>Settings</i> and turn on <i>Enable DNS and Firewall logs.</i></string>
 
 
     <string-array name="dns_crypt_endpoint_names">
@@ -559,11 +559,11 @@
     <string name="firewall_app_info_not_available">Cannot block the app</string>
 
     <string name="whats_dialog_title">What\'s new in v053a</string>
-    <string name="whats_new_version_name">🎁 ❄ Data Privacy Day (Jan 28) ❄️ 🎁</string>
+    <string name="whats_new_version_name">🎁 Data Privacy Day (Jan 28) 🎁</string>
     <string name="whats_new_version_update">Incremental update:\n\n
         \u00091. Better support for the "Always-on VPN" feature.\n\n
         \u00092. Home screen UI refreshed.\n\n
-        \u00093. Improvements in "Block apps not in use" behaviour.\n\n
+        \u00093. Improvements in "Block apps not in use" behavior.\n\n
         \u00094. Enable / disable auto-check for app updates.\n\n
         \u00095. Major performance and stability bug fixes.\n
     </string>
@@ -626,7 +626,7 @@
 
     <string name="firewall_card_text_active">%1$s whitelisted, %2$s excluded.</string>
     <string name="firewall_card_text_inactive">Enable firewall mode.</string>
-    <string name="firewall_card_configure_btn">Configure</string>\
+    <string name="firewall_card_configure_btn">All apps</string>\
     <string name="firewall_card_view_logs_btn">View logs</string>
 
 
@@ -634,7 +634,7 @@
 
     <string name="dns_card_latency_active">Latency: %1$sms</string>
     <string name="dns_card_latency_inactive">Enable DNS mode.</string>
-    <string name="dns_card_configure_btn">Change</string>
+    <string name="dns_card_configure_btn">Configure</string>
 
     <!-- Web view configure -->
     <string name="webview_configure_dialog_positive">Quit</string>

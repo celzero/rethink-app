@@ -30,6 +30,7 @@ import androidx.annotation.Nullable
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.NonStoreAppUpdater
@@ -98,7 +99,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         var median50: MutableLiveData<Long> = MutableLiveData()
         var blockedCount: MutableLiveData<Int> = MutableLiveData()
         var lifeTimeQ : MutableLiveData<Int> = MutableLiveData()
-        var dnsType : MutableLiveData<Int> = MutableLiveData()
         var braveModeToggler : MutableLiveData<Int> = MutableLiveData()
         var connectedDNS : MutableLiveData<String> = MutableLiveData()
         //var cryptModeInProgress : Int = 0
@@ -107,7 +107,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         var appStartTime: Long = System.currentTimeMillis()
         var isBackgroundEnabled: Boolean = false
         var firewallRules: HashMultimap<Int, String> = HashMultimap.create()
-        var DEBUG = true
+        var DEBUG = false
 
         //Screen off - whether the screen preference is set 0-off, 1- on. -1 not initialized
         var isScreenLockedSetting: Int = -1
@@ -202,8 +202,14 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             val builder = AlertDialog.Builder(this)
             builder.setView(view).setTitle(getString(R.string.whats_dialog_title))
 
-            builder.setPositiveButton("Let\'s Go") { dialogInterface, _ ->
+            builder.setPositiveButton(getString(R.string.about_dialog_positive_button)) { dialogInterface, _ ->
                 dialogInterface.dismiss()
+            }
+
+            builder.setNeutralButton(getString(R.string.about_dialog_neutral_button)) { _, _ ->
+                val intent = Intent(Intent.ACTION_VIEW, (getString(R.string.about_mail_to)).toUri())
+                intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_subject))
+                startActivity(intent)
             }
 
             builder.setCancelable(false)
@@ -329,7 +335,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.d(LOG_TAG, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
+                Log.i(LOG_TAG, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
             }
 
             override fun onResponse(call: Call, response: Response) {

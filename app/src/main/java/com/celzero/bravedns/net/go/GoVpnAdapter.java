@@ -377,6 +377,7 @@ public class GoVpnAdapter {
                         DoHEndpoint doHEndpoint = doHEndpointRepository.updateConnectionDefault();
                         persistentState.setDnsType(1);
                         persistentState.setConnectionModeChange(doHEndpoint.getDohURL());
+                        persistentState.setConnectedDNS(doHEndpoint.getDohName());
                         AppMode appMode = HomeScreenActivity.GlobalVariable.INSTANCE.getAppMode();
                         if (appMode != null) {
                             appMode.setDNSMode(Settings.DNSModePort);
@@ -390,14 +391,13 @@ public class GoVpnAdapter {
                     }else{
                         if(persistentState.getDnsType() == 2) {
                             tunnel.setTunMode(Settings.DNSModeCryptPort, firewallMode, proxyMode);
-
                             if (proxyMode == Settings.ProxyModeSOCKS5) {
                                 setSocks5TunnelMode();
                             }
                             Log.d(LOG_TAG, "GoVPNAdapter celzero connect crypt else - tunnel mode set with mode -" + Settings.DNSModeCryptPort + firewallMode + proxyMode);
-                        }else{
+                        }/*else{
                             dnsCryptEndpointRepository.updateFailingConnections();
-                        }
+                        }*/
                     }
                 }else{
                     if(persistentState.getDnsType() == 2) {
@@ -414,9 +414,9 @@ public class GoVpnAdapter {
                                 Utilities.Companion.showToastInMidLayout(vpnService, "Error connecting to DNSCrypt server.", Toast.LENGTH_SHORT);
                             }
                         });
-                    }else{
+                    }/*else{
                         dnsCryptEndpointRepository.updateFailingConnections();
-                    }
+                    }*/
                 }
             } catch (Exception e) {
                 if(persistentState.getDnsType() == 2) {
@@ -436,9 +436,9 @@ public class GoVpnAdapter {
                         }
                     });
                     Log.d(LOG_TAG, "GoVPNAdapter celzero connect crypt exception handling - update dns crypt and remove the servers");
-                } else {
+                } /*else {
                     dnsCryptEndpointRepository.updateFailingConnections();
-                }
+                }*/
             }
             return "Executed";
         }
