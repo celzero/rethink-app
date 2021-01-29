@@ -108,13 +108,6 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
 
         b.configureDnsProgressBar.visibility = View.VISIBLE
 
-        HomeScreenActivity.GlobalVariable.median50.observe(viewLifecycleOwner, {
-            b.configureLatencyTxt.text = "Latency: " + HomeScreenActivity.GlobalVariable.median50.value.toString() + "ms"
-        })
-
-        //latencyTxt.setText("Latency: " + getMedianLatency(this) + "ms")
-        b.configureTotalQueriesTxt.text = "Lifetime Queries: " + persistentState.getNumOfReq()
-
         //DOH init views
         layoutManager = LinearLayoutManager(requireContext())
         b.recyclerDohConnections.layoutManager = layoutManager
@@ -147,12 +140,10 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
         dnsProxyViewModel.dnsProxyEndpointList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(dnsProxyRecyclerAdapter::submitList))
         b.recyclerDnsProxyConnections.adapter = dnsProxyRecyclerAdapter
 
-        if (DEBUG) Log.d(LOG_TAG, "Notify the adapter called ???")
         b.configureDnsProgressBar.visibility = View.GONE
         val dnsValue = appMode?.getDNSType()
         if (dnsValue == 1) {
             b.configureScreenSpinner.setSelection(0)
-
             b.recyclerDohConnectionsHeader.visibility = View.VISIBLE
             b.recyclerDnsCryptConnectionsHeader.visibility = View.GONE
             b.recyclerDnsProxyConnectionsHeader.visibility = View.GONE
@@ -161,17 +152,11 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
             b.recyclerDohConnectionsHeader.visibility = View.GONE
             b.recyclerDnsCryptConnectionsHeader.visibility = View.VISIBLE
             b.recyclerDnsProxyConnectionsHeader.visibility = View.GONE
-            /* val cryptDetails = appMode?.getDNSCryptServerCount()
-             connectedTitle.text = resources.getString(R.string.configure_dns_connection_name) + "DNS crypt servers: $cryptDetails"
-             connectedURL.text = resources.getString(R.string.configure_dns_connected_dns_crypt_status)*/
         } else {
             b.configureScreenSpinner.setSelection(2)
             b.recyclerDohConnectionsHeader.visibility = View.GONE
             b.recyclerDnsCryptConnectionsHeader.visibility = View.GONE
             b.recyclerDnsProxyConnectionsHeader.visibility = View.VISIBLE
-            /* val proxyDetails = appMode?.getDNSProxyServerDetails()
-             connectedURL.text = resources.getString(R.string.configure_dns_connected_dns_proxy_status)
-             connectedTitle.text = resources.getString(R.string.configure_dns_connection_name) + proxyDetails?.proxyName*/
         }
 
         val proxySize = checkProxySize()
@@ -182,11 +167,6 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
             b.recyclerDnsProxyTitle.visibility = View.GONE
             b.recyclerDnsProxyConnections.visibility = View.VISIBLE
         }
-
-        /*dnsType.observe(viewLifecycleOwner, {
-            updateUIFromAdapter(it!!)
-        })*/
-
     }
 
     private fun getAppName(): MutableList<String> {
@@ -251,27 +231,9 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
                 dnsCryptRelayRecyclerAdapter.notifyDataSetChanged()
             }
         }.start()
-
-
-        /*val dnsType = appMode?.getDNSType()
-        if (dnsType == 1) {
-            val dohDetail = appMode?.getDOHDetails()
-            connectedURL.text = resources.getString(R.string.configure_dns_connected_doh_status)
-            connectedTitle.text = resources.getString(R.string.configure_dns_connection_name) + dohDetail?.dohName
-        } else if (dnsType == 2) {
-            val cryptDetails = appMode?.getDNSCryptServerCount()
-            connectedTitle.text = resources.getString(R.string.configure_dns_connection_name) + "DNS crypt servers: $cryptDetails"
-            connectedURL.text = resources.getString(R.string.configure_dns_connected_dns_crypt_status)
-        } else {
-            val proxyDetails = appMode?.getDNSProxyServerDetails()
-            connectedURL.text = resources.getString(R.string.configure_dns_connected_dns_proxy_status)
-            connectedTitle.text = resources.getString(R.string.configure_dns_connection_name) +proxyDetails?.proxyName
-        }*/
-        if (DEBUG) Log.d(LOG_TAG, "onResume in fragment")
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (DEBUG) Log.d(LOG_TAG, "onActivityResult in fragment")
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
             val stamp = data?.getStringArrayExtra("stamp")
@@ -289,7 +251,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
         var retryAttempts = 0
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setTitle("Custom Server URL")
+        dialog.setTitle(getString(R.string.cd_custom_doh_dialog_title))
         dialog.setContentView(R.layout.dialog_set_custom_url)
 
         val lp = WindowManager.LayoutParams()
@@ -311,7 +273,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
         var count = dohEndpointRepository.getCount()
         count += 1
 
-        customName.setText("DoH $count", TextView.BufferType.EDITABLE)
+        customName.setText(getString(R.string.cd_custom_doh_url_name, count.toString()), TextView.BufferType.EDITABLE)
         applyURLBtn.setOnClickListener {
             val url = customURL.text.toString()
             val name = customName.text.toString()
@@ -384,7 +346,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
     private fun showDialogForDNSProxy() {
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setTitle("Custom DNS Proxy")
+        dialog.setTitle(getString(R.string.cd_custom_dns_proxy_title))
         dialog.setContentView(R.layout.dialog_set_dns_proxy)
 
         val lp = WindowManager.LayoutParams()
@@ -396,8 +358,6 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
         dialog.setCanceledOnTouchOutside(false)
         dialog.window!!.attributes = lp
 
-        /* val radioInternal: RadioButton = dialog.findViewById(R.id.dialog_dns_proxy_radio_internal)
-         val radioExternal: RadioButton = dialog.findViewById(R.id.dialog_dns_proxy_radio_external)*/
         val applyURLBtn = dialog.findViewById(R.id.dialog_dns_proxy_apply_btn) as AppCompatButton
         val cancelURLBtn = dialog.findViewById(R.id.dialog_dns_proxy_cancel_btn) as AppCompatButton
         val proxyNameEditText = dialog.findViewById(R.id.dialog_dns_proxy_edit_name) as EditText
@@ -410,54 +370,35 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
 
         var count = dnsProxyEndpointRepository.getCount()
         count += 1
-        proxyNameEditText.setText("Proxy $count", TextView.BufferType.EDITABLE)
-        ipAddressEditText.setText("127.0.0.1", TextView.BufferType.EDITABLE)
+        proxyNameEditText.setText(getString(R.string.cd_custom_dns_proxy_name, count.toString()), TextView.BufferType.EDITABLE)
+        ipAddressEditText.setText(getString(R.string.cd_custom_dns_proxy_default_ip), TextView.BufferType.EDITABLE)
         val appNames: MutableList<String> = ArrayList()
-        appNames.add("Nobody")
+        appNames.add(getString(R.string.cd_custom_dns_proxy_default_app))
         appNames.addAll(getAppName())
         val proxySpinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, appNames)
         appNameSpinner.adapter = proxySpinnerAdapter
-        //radioInternal.isChecked = true
         llSpinnerHeader.visibility = View.VISIBLE
         llIPHeader.visibility = View.VISIBLE
 
-        /*radioInternal.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
-            if (b) {
-                llSpinnerHeader.visibility = View.VISIBLE
-                llIPHeader.visibility = View.GONE
-            }
-        }
-
-        radioExternal.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
-            if (b) {
-                llSpinnerHeader.visibility = View.GONE
-                llIPHeader.visibility = View.VISIBLE
-            }
-        }*/
-
         applyURLBtn.setOnClickListener {
-            var ip: String = ""
-            var appName: String = ""
             var port: Int = 0
-            var mode: String = ""
             var isValid = true
             var isIPValid = false
             val name = proxyNameEditText.text.toString()
-            mode = "External"
-            ip = ipAddressEditText.text.toString()
+            val mode = getString(R.string.cd_dns_proxy_mode_external)
+            val ip = ipAddressEditText.text.toString()
 
-            appName = appNames[appNameSpinner.selectedItemPosition]
-            if (appName.isEmpty() || appName == "Nobody") {
+            var appName = appNames[appNameSpinner.selectedItemPosition]
+            if (appName.isEmpty() || appName == getString(R.string.cd_custom_dns_proxy_default_app)) {
                 appName = appNames[0]
             } else {
                 appName = appInfoRepository.getPackageNameForAppName(appName)
             }
 
-
             if (Patterns.IP_ADDRESS.matcher(ip).matches()) {
                 isIPValid = true
             } else {
-                errorTxt.text = "Invalid IP address"
+                errorTxt.text = getString(R.string.cd_dns_proxy_error_text_1)
                 isIPValid = false
             }
 
@@ -467,27 +408,27 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
                     if (port in 65535 downTo 1024) {
                         isValid = true
                     } else {
-                        errorTxt.text = "Port range should be from 1024-65535"
+                        errorTxt.text = getString(R.string.cd_dns_proxy_error_text_2)
                         isValid = false
                     }
                 } else {
                     isValid = true
                 }
             } catch (e: Exception) {
-                Log.e(LOG_TAG, "Error: ${e.message}", e)
-                errorTxt.text = "Invalid port"
+                Log.w(LOG_TAG, "Error: ${e.message}", e)
+                errorTxt.text = getString(R.string.cd_dns_proxy_error_text_3)
                 isValid = false
             }
 
             if (isValid && isIPValid) {
                 //Do the DNS Proxy setting there
-                if (DEBUG) Log.d(LOG_TAG, "Insert into DNSProxy")
+                if (DEBUG) Log.d(LOG_TAG, "new value inserted into DNSProxy")
                 insertDNSProxyEndpointDB(mode, name, appName, ip, port)
                 b.recyclerDnsProxyTitle.visibility = View.GONE
                 b.recyclerDnsProxyConnections.visibility = View.VISIBLE
                 dialog.dismiss()
             } else {
-                Log.i(LOG_TAG, "Insert into DNSProxy fail")
+                Log.i(LOG_TAG, "Failed to insert new value into DNSProxy: $name, $appName")
             }
 
         }
@@ -501,14 +442,14 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
     private fun insertDNSProxyEndpointDB(mode: String, name: String, appName: String, ip: String, port: Int) {
         var proxyName = name
         if (proxyName.isEmpty() || proxyName.isBlank()) {
-            proxyName = if (mode == "Internal") {
+            proxyName = if (mode == getString(R.string.cd_dns_proxy_mode_internal)) {
                 appName
             } else ip
         }
         //id: Int, proxyName: String,  proxyType: String, proxyAppName: String, proxyIP: String,proxyPort : Int, isSelected: Boolean, isCustom: Boolean, modifiedDataTime: Long, latency: Int
         val dnsProxyEndpoint = DNSProxyEndpoint(-1, proxyName, mode, appName, ip, port, false, true, 0L, 0)
         dnsProxyEndpointRepository.insertAsync(dnsProxyEndpoint)
-        if (DEBUG) Log.d(LOG_TAG, "Insert into DNSProxy - $appName, $port")
+        if (DEBUG) Log.d(LOG_TAG, "Insert into DNSProxy database- $appName, $port")
         object : CountDownTimer(500, 500) {
             override fun onTick(millisUntilFinished: Long) {
             }
@@ -523,7 +464,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
     private fun showDialogForDNSCrypt() {
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setTitle("Add DNSCrypt Resolver or Relay")
+        dialog.setTitle(getString(R.string.cd_dns_crypt_dialog_title))
         dialog.setContentView(R.layout.dialog_set_dns_crypt)
 
         val lp = WindowManager.LayoutParams()
@@ -547,28 +488,26 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
         radioServer.isChecked = true
         var count = dnsCryptEndpointRepository.getCount()
         count += 1
-        cryptNameEditText.setText("DNSCrypt $count", TextView.BufferType.EDITABLE)
+        cryptNameEditText.setText(getString(R.string.cd_dns_crypt_name, count.toString()), TextView.BufferType.EDITABLE)
 
         radioServer.setOnClickListener {
-            var count = dnsCryptEndpointRepository.getCount()
+            count = dnsCryptEndpointRepository.getCount()
             count += 1
-            cryptNameEditText.setText("DNSCrypt $count", TextView.BufferType.EDITABLE)
+            cryptNameEditText.setText(getString(R.string.cd_dns_crypt_name, count.toString()), TextView.BufferType.EDITABLE)
         }
 
         radioRelay.setOnClickListener {
-            var count = dnsCryptRelayEndpointRepository.getCount()
+            count = dnsCryptRelayEndpointRepository.getCount()
             count += 1
-            cryptNameEditText.setText("DNSRelay $count", TextView.BufferType.EDITABLE)
+            cryptNameEditText.setText(getString(R.string.cd_dns_crypt_relay_name, count.toString()), TextView.BufferType.EDITABLE)
         }
 
         applyURLBtn.setOnClickListener {
-            var urlStamp = ""
-            var desc = ""
             val isValid = true
             var mode: Int = -1
             val name: String = cryptNameEditText.text.toString()
-            urlStamp = cryptURLEditText.text.toString()
-            desc = cryptDescEditText.text.toString()
+            val urlStamp = cryptURLEditText.text.toString()
+            val desc = cryptDescEditText.text.toString()
 
             if (radioServer.isChecked) {
                 mode = 0
@@ -598,7 +537,6 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
         if (serverName.isEmpty() || serverName.isBlank()) {
             serverName = urlStamp
         }
-        //id: Int, dnsCryptRelayName: String, dnsCryptRelayURL: String, dnsCryptRelayExplanation: String, isSelected: Boolean, isCustom: Boolean, modifiedDataTime: Long, latency: Int
         val dnsCryptRelayEndpoint = DNSCryptRelayEndpoint(-1, serverName, urlStamp, desc, false, true, 0L, 0)
         dnsCryptRelayEndpointRepository.insertAsync(dnsCryptRelayEndpoint)
         object : CountDownTimer(500, 500) {
@@ -616,7 +554,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
         if (serverName.isEmpty() || serverName.isBlank()) {
             serverName = urlStamp
         }
-        //id: Int, dnsCryptName: String, dnsCryptURL: String, dnsCryptExplanation: String, isSelected: Boolean, isCustom: Boolean, modifiedDataTime: Long, latency: Int
+
         val dnsCryptEndpoint = DNSCryptEndpoint(-1, serverName, urlStamp, desc, false, true, 0L, 0)
         dnsCryptEndpointRepository.insertAsync(dnsCryptEndpoint)
         object : CountDownTimer(500, 500) {
@@ -630,7 +568,6 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
     }
 
     private fun checkProxySize(): Int {
-        val count = dnsProxyEndpointRepository.getCount()
         return dnsProxyEndpointRepository.getCount()
     }
 

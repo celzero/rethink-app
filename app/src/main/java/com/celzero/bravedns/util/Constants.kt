@@ -84,6 +84,8 @@ class Constants {
 
         const val SCREEN_TO_LOAD = "view_pager_screen"
 
+        const val PACKAGE = "package:"
+
     }
 
 }
