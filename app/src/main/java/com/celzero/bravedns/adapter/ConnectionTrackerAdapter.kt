@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.paging.PagedListAdapter
@@ -63,7 +64,7 @@ class ConnectionTrackerAdapter(val context : Context) : PagedListAdapter<Connect
 
     override fun onBindViewHolder(holder: ConnectionTrackerViewHolder, position: Int) {
         val connTracker: ConnectionTracker? = getItem(position)
-        holder.update(connTracker, position)
+        holder.update(connTracker,position)
     }
 
 
@@ -131,22 +132,21 @@ class ConnectionTrackerAdapter(val context : Context) : PagedListAdapter<Connect
                             }
                             Glide.with(context)
                                 .load(context.packageManager.getApplicationIcon(appArray[0]!!))
-                                .error(ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground))
+                                .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                                 .into(appIcon!!)
-                        }else{
-                            Glide.with(context).load(ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground)).into(appIcon!!)
                         }
                     } catch (e: Exception) {
-                       // appIcon?.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground))
-                        Glide.with(context)
-                            .load(ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground))
+                        //appIcon?.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                       Glide.with(context)
+                            .load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                            .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                             .into(appIcon!!)
                         Log.e(LOG_TAG, "Package Not Found - " + e.message, e)
                     }
                 }else{
-                    //appIcon?.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground))
                     Glide.with(context)
-                        .load(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
+                        .load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                        .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                         .into(appIcon!!)
                 }
 
