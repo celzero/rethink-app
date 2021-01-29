@@ -23,7 +23,9 @@ import android.os.CountDownTimer
 import android.os.Handler
 import android.util.Log
 import android.util.Patterns
-import android.view.*
+import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
@@ -40,7 +42,6 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.VpnState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.dnsType
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.UIUpdateInterface
 import com.celzero.bravedns.util.Utilities
@@ -182,9 +183,9 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
             b.recyclerDnsProxyConnections.visibility = View.VISIBLE
         }
 
-        dnsType.observe(viewLifecycleOwner, {
+        /*dnsType.observe(viewLifecycleOwner, {
             updateUIFromAdapter(it!!)
-        })
+        })*/
 
     }
 
@@ -221,7 +222,6 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
                         b.recyclerDnsProxyConnectionsHeader.visibility = View.GONE
                     }
                     1 -> {
-                        Log.d(LOG_TAG, "DNS Crypt on Click event")
                         b.recyclerDohConnectionsHeader.visibility = View.GONE
                         b.recyclerDnsCryptConnectionsHeader.visibility = View.VISIBLE
                         b.recyclerDnsProxyConnectionsHeader.visibility = View.GONE

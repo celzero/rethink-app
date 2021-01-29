@@ -257,12 +257,13 @@ class DNSCryptEndpointAdapter(private val context: Context,
                 override fun onFinish() {
                     notifyDataSetChanged()
                     persistentState.dnsType = 2
+                    val connectedDNS = dnsCryptEndpointRepository.getConnectedCount()
+                    persistentState.setConnectedDNS("DNSCrypt: $connectedDNS resolvers")
                     queryTracker.reinitializeQuantileEstimator()
                 }
             }.start()
 
             persistentState.connectionModeChange = dnsCryptEndpoint.dnsCryptURL
-            persistentState.setConnectedDNS(dnsCryptEndpoint.dnsCryptName)
             listener.updateUIFromAdapter(2)
             appMode?.setDNSMode(Settings.DNSModeCryptPort)
 

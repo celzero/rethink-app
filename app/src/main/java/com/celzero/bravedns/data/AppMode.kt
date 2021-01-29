@@ -130,7 +130,6 @@ class AppMode internal constructor(
     }
 
     fun getDNSCryptServerCount() : Int{
-        val count = dnsCryptEndpointRepository.getConnectedCount()
         return dnsCryptEndpointRepository.getConnectedCount()
     }
 
