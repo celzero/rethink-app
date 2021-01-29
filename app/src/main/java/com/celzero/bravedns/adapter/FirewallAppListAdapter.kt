@@ -558,21 +558,21 @@ class FirewallAppListAdapter internal constructor(
         builderSingle.setIcon(R.drawable.spinner_firewall)
 
         if(isSysComponent){
-            builderSingle.setTitle("Blocking System Components")
+            builderSingle.setTitle("Block System Components")
             builderSingle.setMessage(context.resources.getString(R.string.system_components_warning))
         }else{
-            builderSingle.setTitle("Blocking System Apps")
+            builderSingle.setTitle("Block System Apps")
             builderSingle.setMessage(context.resources.getString(R.string.system_apps_warning))
         }
 
 
         builderSingle.setPositiveButton(
-            "Proceed"
+            "Block anyway"
         ) { dialogInterface: DialogInterface, i: Int ->
             proceedBlocking = true
             handlerDelete.sendMessage(handlerDelete.obtainMessage())
         }.setNegativeButton(
-            "Go Back"
+            "Cancel"
         ) { dialogInterface: DialogInterface, i: Int ->
             handlerDelete.sendMessage(handlerDelete.obtainMessage())
             proceedBlocking = false

@@ -325,6 +325,7 @@
             android:layout_height="40dp"
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
+            android:contentDescription="@string/about_mozilla"
             android:src="@drawable/mozilla" />
 
         <androidx.appcompat.widget.AppCompatTextView

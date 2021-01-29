@@ -50,6 +50,7 @@ import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
@@ -113,30 +114,28 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
 
 
     private fun initView() {
-        //switchBlockConnApp = view.findViewById(R.id.bs_conn_block_conn_app_switch)
-
         val protocol = Protocol.getProtocolName(ipDetails.protocol).name
 
         b.bsConnConnectionTypeHeading.text = ipDetails.ipAddress!!
         b.bsConnConnectionFlag.text = ipDetails.flag.toString()
 
-        var _text = getString(R.string.bsct_block)
+        var text = getString(R.string.bsct_block)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            b.bsConnBlockAppTxt.text = Html.fromHtml(_text, FROM_HTML_MODE_LEGACY)
+            b.bsConnBlockAppTxt.text = Html.fromHtml(text, FROM_HTML_MODE_LEGACY)
         } else {
-            b.bsConnBlockAppTxt.text = Html.fromHtml(_text)
+            b.bsConnBlockAppTxt.text = Html.fromHtml(text)
         }
 
-        _text = getString(R.string.bsct_block_all)
+        text = getString(R.string.bsct_block_all)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            b.bsConnBlockConnAllTxt.text = Html.fromHtml(_text, FROM_HTML_MODE_LEGACY)
+            b.bsConnBlockConnAllTxt.text = Html.fromHtml(text, FROM_HTML_MODE_LEGACY)
         } else {
-            b.bsConnBlockConnAllTxt.text = Html.fromHtml(_text)
+            b.bsConnBlockConnAllTxt.text = Html.fromHtml(text)
         }
 
         val time = DateUtils.getRelativeTimeSpanString(ipDetails.timeStamp, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE)
 
-        if (ipDetails.appName != "Unknown") {
+        if (ipDetails.appName != getString(R.string.ctbs_unknown_app)) {
             try {
                 val appArray = contextVal.packageManager.getPackagesForUid(ipDetails.uid)
                 val appCount = (appArray?.size)?.minus(1)
@@ -147,12 +146,10 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
                 }
                 if (appArray != null) {
                     if (appArray.size > 2) {
-                        b.bsConnTrackAppName.text = "${ipDetails.appName} + $appCount other apps"
-                        //chipKillApp.text = "Kill all ${appCount?.plus(1)} apps"
+                        b.bsConnTrackAppName.text = getString(R.string.ctbs_app_other_apps, ipDetails.appName, appCount.toString())
                         b.bsConnTrackAppKill.visibility = View.GONE
                     } else if (appArray.size == 2) {
-                        b.bsConnTrackAppName.text = "${ipDetails.appName} + $appCount other app"
-                        //chipKillApp.text = "Kill ${appCount?.plus(1)} apps"
+                        b.bsConnTrackAppName.text = getString(R.string.ctbs_app_other_app, ipDetails.appName, appCount.toString())
                         b.bsConnTrackAppKill.visibility = View.GONE
                     }
                     b.bsConnTrackAppIcon.setImageDrawable(contextVal.packageManager.getApplicationIcon(appArray[0]!!))
@@ -161,17 +158,14 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
                 Log.e(LOG_TAG, "Package Not Found - " + e.message, e)
             }
         } else {
-            b.bsConnTrackAppName.text = "Unknown"
+            b.bsConnTrackAppName.text = getString(R.string.ctbs_unknown_app)
             b.bsConnTrackAppKill.visibility = View.GONE
-            b.bsConnBlockedRule1Txt.text = "Rule #5"
+            b.bsConnBlockedRule1Txt.text = getString(R.string.ctbs_rule_5)
             b.bsConnBlockAppTxt.text = contextVal.resources.getString(R.string.univ_block_unknown_connections)
         }
 
         val listBlocked = blockedConnectionsRepository.getAllBlockedConnectionsForUID(ipDetails.uid)
         listBlocked.forEach {
-            /*if(it.ruleType == (BraveVPNService.BlockedRuleNames.RULE2.ruleName) && ipDetails.ipAddress.equals(it.ipAddress) && ipDetails.uid == it.uid){
-                switchBlockConnAll.isChecked = true
-            }else*/
             if (it.ruleType == (BraveVPNService.BlockedRuleNames.RULE2.ruleName) && ipDetails.ipAddress.equals(it.ipAddress) && it.uid == UNIVERSAL_RULES_UID) {
                 b.bsConnBlockConnAllSwitch.isChecked = true
             }
@@ -182,10 +176,9 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         isRuleBlocked = firewallRules.checkRules(ipDetails.uid, connRules)
         isRuleUniversal = firewallRules.checkRules(UNIVERSAL_RULES_UID, connRules)
 
-
         b.bsConnBlockAppCheck.setOnCheckedChangeListener(null)
         b.bsConnBlockAppCheck.setOnClickListener {
-            if (ipDetails.appName != "Unknown") {
+            if (ipDetails.appName != getString(R.string.ctbs_unknown_app)) {
                 firewallApp(FirewallManager.checkInternetPermission(ipDetails.uid))
             } else {
                 if (DEBUG) Log.d(LOG_TAG, "setBlockUnknownConnections - ${b.bsConnBlockAppCheck.isChecked} ")
@@ -196,27 +189,27 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         if (ipDetails.isBlocked) {
             b.bsConnTrackAppKill.visibility = View.VISIBLE
             b.bsConnTrackAppKill.text = ipDetails.blockedByRule
-            _text = getString(R.string.bsct_conn_conn_desc_blocked, protocol, ipDetails.port.toString(), time)
+            text = getString(R.string.bsct_conn_conn_desc_blocked, protocol, ipDetails.port.toString(), time)
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                b.bsConnConnectionDetails.text = Html.fromHtml(_text, FROM_HTML_MODE_COMPACT)
+                b.bsConnConnectionDetails.text = Html.fromHtml(text, FROM_HTML_MODE_COMPACT)
             } else {
-                b.bsConnConnectionDetails.text = Html.fromHtml(_text)
+                b.bsConnConnectionDetails.text = Html.fromHtml(text)
             }
         } else {
-            _text = getString(R.string.bsct_conn_conn_desc_allowed, protocol, ipDetails.port.toString(), time)
+            text = getString(R.string.bsct_conn_conn_desc_allowed, protocol, ipDetails.port.toString(), time)
             b.bsConnTrackAppKill.visibility = View.GONE
             if (ipDetails.blockedByRule.equals(BraveVPNService.BlockedRuleNames.RULE7.ruleName)) {
                 b.bsConnTrackAppKill.visibility = View.VISIBLE
-                b.bsConnTrackAppKill.text = "Whitelisted"
+                b.bsConnTrackAppKill.text = getString(R.string.ctbs_whitelisted)
             }
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                b.bsConnConnectionDetails.text = Html.fromHtml(_text, FROM_HTML_MODE_LEGACY)
+                b.bsConnConnectionDetails.text = Html.fromHtml(text, FROM_HTML_MODE_LEGACY)
             } else {
-                b.bsConnConnectionDetails.text = Html.fromHtml(_text)
+                b.bsConnConnectionDetails.text = Html.fromHtml(text)
             }
         }
 
-        if (ipDetails.appName != "Unknown") {
+        if (ipDetails.appName != getString(R.string.ctbs_unknown_app)) {
             b.bsConnBlockAppCheck.isChecked = isAppBlocked
         } else {
             b.bsConnBlockAppCheck.isChecked = persistentState.blockUnknownConnections
@@ -232,12 +225,12 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
                 if (DEBUG) Log.d(LOG_TAG, "Universal Remove - ${connRules.ipAddress}, ${BraveVPNService.BlockedRuleNames.RULE2.ruleName}")
                 firewallRules.removeFirewallRules(UNIVERSAL_RULES_UID, connRules.ipAddress, BraveVPNService.BlockedRuleNames.RULE2.ruleName, blockedConnectionsRepository)
                 isRuleUniversal = false
-                Utilities.showToastInMidLayout(contextVal, "Unblocked ${connRules.ipAddress}", Toast.LENGTH_SHORT)
+                Utilities.showToastInMidLayout(contextVal, getString(R.string.ctbs_unblocked_app, connRules.ipAddress), Toast.LENGTH_SHORT)
             } else {
                 if (DEBUG) Log.d(LOG_TAG, "Universal Add - ${connRules.ipAddress}, ${BraveVPNService.BlockedRuleNames.RULE2.ruleName}")
                 firewallRules.addFirewallRules(UNIVERSAL_RULES_UID, connRules.ipAddress, BraveVPNService.BlockedRuleNames.RULE2.ruleName, blockedConnectionsRepository)
                 isRuleUniversal = true
-                Utilities.showToastInMidLayout(contextVal, "Blocking all connections to ${connRules.ipAddress}", Toast.LENGTH_SHORT)
+                Utilities.showToastInMidLayout(contextVal, getString(R.string.ctbs_block_connections, connRules.ipAddress), Toast.LENGTH_SHORT)
             }
             b.bsConnBlockConnAllSwitch.isChecked = isRuleUniversal
         }
@@ -246,17 +239,17 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
             try {
                 val appUIDList = appInfoRepository.getAppListForUID(ipDetails.uid)
                 if (appUIDList.size == 1) {
-                    if (ipDetails.appName != null || ipDetails.appName!! == "Unknown") {
+                    if (ipDetails.appName != null || ipDetails.appName!! == getString(R.string.ctbs_unknown_app)) {
                         val packageName = appInfoRepository.getPackageNameForAppName(ipDetails.appName!!)
                         appInfoForPackage(packageName)
                     } else {
-                        Utilities.showToastInMidLayout(contextVal, "App Info not available", Toast.LENGTH_SHORT)
+                        Utilities.showToastInMidLayout(contextVal, getString(R.string.ctbs_app_info_not_available_toast), Toast.LENGTH_SHORT)
                     }
                 } else {
-                    Utilities.showToastInMidLayout(contextVal, "App Info not available", Toast.LENGTH_SHORT)
+                    Utilities.showToastInMidLayout(contextVal, getString(R.string.ctbs_app_info_not_available_toast), Toast.LENGTH_SHORT)
                 }
             } catch (e: java.lang.Exception) {
-                Utilities.showToastInMidLayout(contextVal, "App Info not available", Toast.LENGTH_SHORT)
+                Utilities.showToastInMidLayout(contextVal, getString(R.string.ctbs_app_info_not_available_toast), Toast.LENGTH_SHORT)
             }
         }
 
@@ -269,7 +262,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         try {
             //Open the specific App Info page:
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-            intent.data = Uri.parse("package:$packageName")
+            intent.data = Uri.parse("${Constants.PACKAGE}:$packageName")
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             //Open the generic Apps page:
@@ -292,13 +285,13 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
                 return
             }
             if (appUIDList.size > 1) {
-                var title = "Blocking \"${ipDetails.appName}\" will also block these ${appUIDList.size} other apps"
-                var positiveText = "Block ${appUIDList.size} apps"
+                var title = getString(R.string.ctbs_block_other_apps, ipDetails.appName, appUIDList.size.toString())
+                var positiveText = getString(R.string.ctbs_block_other_apps_positive_text, appUIDList.size.toString())
                 if (isBlocked) {
-                    title = "Unblocking \"${ipDetails.appName}\" will also unblock these ${appUIDList.size} other apps"
-                    positiveText = "Unblock ${appUIDList.size} apps"
+                    title = getString(R.string.ctbs_unblock_other_apps, ipDetails.appName, appUIDList.size.toString())
+                    positiveText = getString(R.string.ctbs_unblock_other_apps_positive_text, appUIDList.size.toString())
                 }
-                blockAllApps = showDialog(appUIDList, ipDetails.appName!!, title, positiveText)
+                blockAllApps = showDialog(appUIDList, title, positiveText)
             }
             if (appUIDList.size <= 1 || blockAllApps) {
                 val uid = ipDetails.uid
@@ -325,9 +318,9 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         val blockAllApps: Boolean
         val appUIDList = appInfoRepository.getAppListForUID(ipDetails.uid)
         if (appUIDList.size > 1) {
-            val title = "Clearing rules for \"${ipDetails.appName}\" will also clear rules for these ${appUIDList.size} other apps"
-            val positiveText = "Clear rules"
-            blockAllApps = showDialog(appUIDList, ipDetails.appName!!, title, positiveText)
+            val title = getString(R.string.ctbs_clear_rules_desc, ipDetails.appName, appUIDList.size.toString())
+            val positiveText = getString(R.string.ctbs_clear_rules_positive_text)
+            blockAllApps = showDialog(appUIDList, title, positiveText)
             if (blockAllApps) {
                 firewallRules.clearFirewallRules(ipDetails.uid, blockedConnectionsRepository)
                 Utilities.showToastInMidLayout(contextVal, getString(R.string.bsct_rules_cleared_toast), Toast.LENGTH_SHORT)
@@ -346,14 +339,13 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         builder.setIcon(android.R.drawable.ic_dialog_alert)
         builder.setCancelable(true)
         //performing positive action
-        builder.setPositiveButton("Clear") { dialogInterface, which ->
+        builder.setPositiveButton(getString(R.string.ctbs_clear_rules_dialog_positive)) { _, _ ->
             firewallRules.clearFirewallRules(ipDetails.uid, blockedConnectionsRepository)
-            //switchBlockConnApp.isChecked = false
             Utilities.showToastInMidLayout(contextVal, getString(R.string.bsct_rules_cleared_toast), Toast.LENGTH_SHORT)
         }
 
         //performing negative action
-        builder.setNeutralButton("Cancel") { dialogInterface, which ->
+        builder.setNeutralButton(getString(R.string.ctbs_clear_rules_dialog_negative)) { _, _ ->
         }
         // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()
@@ -386,7 +378,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
     /**
      *TODO : Come up with better way to handle the dialog instead of using the handlers.
      */
-    private fun showDialog(packageList: List<AppInfo>, appName: String, title: String, positiveText: String): Boolean {
+    private fun showDialog(packageList: List<AppInfo>, title: String, positiveText: String): Boolean {
         //Change the handler logic into some other
         val handler: Handler = @SuppressLint("HandlerLeak") object : Handler() {
             override fun handleMessage(mesg: Message) {
@@ -411,7 +403,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         builderSingle.setPositiveButton(positiveTxt) { _: DialogInterface, _: Int ->
             proceedBlocking = true
             handler.sendMessage(handler.obtainMessage())
-        }.setNeutralButton("Go Back") { _: DialogInterface, _: Int ->
+        }.setNeutralButton(getString(R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int ->
             handler.sendMessage(handler.obtainMessage())
             proceedBlocking = false
         }

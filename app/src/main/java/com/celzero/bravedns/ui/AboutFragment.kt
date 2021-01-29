@@ -111,7 +111,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             .setTitle(getString(R.string.whats_dialog_title))
             .setPositiveButton(getString(R.string.about_dialog_positive_button)) { dialogInterface, _ ->
                 dialogInterface.dismiss()
-            }.setNeutralButton(getString(R.string.about_dialog_neutral_button)){ dialogInterface: DialogInterface, i: Int ->
+            }.setNeutralButton(getString(R.string.about_dialog_neutral_button)){ _: DialogInterface, _: Int ->
                 val intent = Intent(Intent.ACTION_VIEW, (getString(R.string.about_mail_to)).toUri())
                 intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_subject))
                 startActivity(intent)
