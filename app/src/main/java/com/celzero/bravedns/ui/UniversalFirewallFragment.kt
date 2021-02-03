@@ -104,9 +104,6 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         recyclerAdapter = UniversalAppListAdapter(requireContext(), appInfoRepository, get(), persistentState)
         includeView.firewallUniversalRecycler.adapter = recyclerRulesAdapter
 
-        //recyclerView.isNestedScrollingEnabled = false
-        //ViewCompat.setNestedScrollingEnabled(recyclerView, false)
-
         if (DEBUG) Log.d(LOG_TAG, "UniversalFirewallFragment - post observer")
 
         includeView.firewallAllAppsCheck.isChecked = persistentState.getFirewallModeForScreenState()
@@ -145,10 +142,6 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             persistentState.udpBlockedSettings = !includeView.firewallUdpConnectionModeCheck.isChecked
             includeView.firewallUdpConnectionModeCheck.isChecked = !includeView.firewallUdpConnectionModeCheck.isChecked
         }
-
-        /*ipRulesAddBtn.setOnClickListener{
-            Utilities.showToastInMidLayout(requireContext(),"Yet to implement",Toast.LENGTH_SHORT)
-        }*/
 
         //Background mode toggle
         includeView.firewallBackgroundModeTxt.setOnClickListener {
@@ -210,7 +203,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
 
         val appCount = GlobalVariable.appList.size
         appInfoRepository.getWhitelistCountLiveData().observe(viewLifecycleOwner, {
-            includeView.firewallUnivWhitelistCount.text = "$it/$appCount apps whitelisted."
+            includeView.firewallUnivWhitelistCount.text = getString(R.string.whitelist_dialog_apps_in_use, it.toString(), appCount.toString())
         })
 
         includeView.firewallAppsShowTxt.setOnClickListener {
@@ -277,15 +270,15 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             builder.setIcon(android.R.drawable.ic_dialog_alert)
             builder.setCancelable(true)
             //performing positive action
-            builder.setPositiveButton("Delete all") { _, _ ->
+            builder.setPositiveButton(getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->
 
                 blockedConnectionsRepository.deleteAllIPRulesUniversal()
                 GlobalVariable.firewallRules.clear()
-                Utilities.showToastInMidLayout(requireContext(), "Deleted all IP rules.", Toast.LENGTH_SHORT)
+                Utilities.showToastInMidLayout(requireContext(), getString(R.string.univ_ip_delete_toast_success), Toast.LENGTH_SHORT)
             }
 
             //performing negative action
-            builder.setNegativeButton("Cancel") { _, _ ->
+            builder.setNegativeButton(getString(R.string.univ_ip_delete_dialog_negative)) { _, _ ->
             }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
@@ -293,7 +286,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             alertDialog.setCancelable(true)
             alertDialog.show()
         } else {
-            Utilities.showToastInMidLayout(requireContext(), "No IP rules set", Toast.LENGTH_SHORT)
+            Utilities.showToastInMidLayout(requireContext(), getString(R.string.univ_ip_no_rules_set), Toast.LENGTH_SHORT)
         }
     }
 
@@ -323,39 +316,33 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         if (isRegrant) {
             builder.setTitle(R.string.alert_permission_accessibility_regrant)
             val text = getString(R.string.alert_firewall_accessibility_regrant_explanation)
-            /*if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                builder.setMessage(Html.fromHtml(text, HtmlCompat.FROM_HTML_MODE_COMPACT))
-            } else {
-                builder.setMessage(Html.fromHtml(text))
-            }*/
             builder.setMessage(R.string.alert_firewall_accessibility_regrant_explanation)
-            builder.setPositiveButton("Goto Settings") { _, _ ->
+            builder.setPositiveButton(getString(R.string.univ_accessibility_crash_dialog_positive)) { _, _ ->
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                 val packageName = requireContext().packageName
                 intent.data = Uri.parse("package:$packageName")
                 startActivity(intent)
             }
             //performing negative action
-            builder.setNegativeButton("Cancel") { _, _ ->
+            builder.setNegativeButton(getString(R.string.univ_accessibility_crash_dialog_negative)) { _, _ ->
                 persistentState.backgroundEnabled = false
             }
         } else {
             builder.setTitle(R.string.alert_permission_accessibility)
             builder.setMessage(R.string.alert_firewall_accessibility_explanation)
-            builder.setPositiveButton("Grant") { _, _ ->
+            builder.setPositiveButton(getString(R.string.univ_accessibility_dialog_positive)) { _, _ ->
                 isAllowed = true
                 val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
                 startActivityForResult(intent, 0)
             }
             //performing negative action
-            builder.setNegativeButton("Deny") { _, _ ->
+            builder.setNegativeButton(getString(R.string.univ_accessibility_dialog_negative)) { _, _ ->
                 persistentState.backgroundEnabled = false
             }
         }
 
         builder.setIcon(android.R.drawable.ic_dialog_alert)
         //performing positive action
-
 
         // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()

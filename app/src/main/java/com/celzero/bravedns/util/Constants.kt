@@ -42,9 +42,17 @@ class Constants {
         const val APP_DOWNLOAD_LINK = "https://bravedns.com/downloads"
 
         const val BRAVE_BASE_STAMP = "https://basic.bravedns.com/"
+        const val BRAVE_CONFIGURE_BASE_STAMP = "bravedns.com/configure"
+
+        const val DOWNLOAD_STATUS_SUCCESSFUL = "STATUS_SUCCESSFUL"
 
         const val BRAVE_BASIC_URL = "basic.bravedns"
         const val APPEND_VCODE = "vcode="
+
+        //constants for the server response json
+        const val JSON_VERSION = "version"
+        const val JSON_UPDATE = "update"
+        const val JSON_LATEST = "latest"
 
         //Firewall system components
         const val APP_CAT_SYSTEM_COMPONENTS = "System Components"
@@ -86,6 +94,19 @@ class Constants {
 
         const val PACKAGE = "package:"
 
+        const val LOCATION_INTENT_EXTRA = "location"
+        const val STAMP_INTENT_EXTRA = "stamp"
+        const val URL_INTENT_EXTRA = "url"
+
+        const val VPN_INTENT = "android.net.vpn.SETTINGS"
+
+        const val SETTINGS = "Settings"
+
+        const val HTTP_PROXY_PORT = "8118"
+
+        const val SOCKS_DEFAULT_IP = "127.0.0.1"
+        const val SOCKS_DEFAULT_PORT = "9050"
+        const val SOCKS = "Socks5"
     }
 
 }
