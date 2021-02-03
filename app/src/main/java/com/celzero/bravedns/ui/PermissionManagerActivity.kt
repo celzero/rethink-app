@@ -17,7 +17,6 @@ package com.celzero.bravedns.ui
 
 import android.content.Context
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -38,8 +37,8 @@ class PermissionManagerActivity : AppCompatActivity(R.layout.activity_permission
     private val b by viewBinding(ActivityPermissionManagerBinding::bind)
 
     private lateinit var fastAdapter: FastAdapter<PermissionManagerApk>
-    val apkList = ArrayList<PermissionManagerApk>()
-    lateinit var itemAdapter: ItemAdapter<PermissionManagerApk>
+    private val apkList = ArrayList<PermissionManagerApk>()
+    private lateinit var itemAdapter: ItemAdapter<PermissionManagerApk>
     private lateinit var context: Context
 
     private val appInfoRepository by inject<AppInfoRepository>()
@@ -47,16 +46,9 @@ class PermissionManagerActivity : AppCompatActivity(R.layout.activity_permission
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Toast.makeText(this, "Permission Manager Activity", Toast.LENGTH_LONG).show()
         initView()
-
         context = this
-
-        //val task = MyAsyncAppDetailsTaskPM(this)
-        //task.execute(1)
-
         updateAppList()
-
     }
 
     private fun initView() {
@@ -81,7 +73,6 @@ class PermissionManagerActivity : AppCompatActivity(R.layout.activity_permission
 
     private fun updateAppList() = GlobalScope.launch(Dispatchers.Default) {
         val appList = appInfoRepository.getAppInfoAsync()
-        //Log.w("DB","App list from DB Size: "+appList.size)
         appList.forEach {
             val userApk = PermissionManagerApk(packageManager.getPackageInfo(it.packageInfo, 0), context)
             apkList.add(userApk)

@@ -18,7 +18,6 @@ package com.celzero.bravedns.ui
 import android.icu.text.CompactDecimalFormat
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
@@ -31,43 +30,27 @@ import com.celzero.bravedns.adapter.DNSQueryAdapter
 import com.celzero.bravedns.database.DNSLogDAO
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.databinding.ActivityQueryDetailBinding
-import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.VpnState
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.lifeTimeQ
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.viewmodel.DNSLogViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import settings.Settings
-import java.net.MalformedURLException
-import java.net.URL
 import java.util.*
 
 class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQueryTextListener {
     private val b by viewBinding(ActivityQueryDetailBinding::bind)
 
-    //private lateinit var context: Context
     private var layoutManager: RecyclerView.LayoutManager? = null
     private var recyclerAdapter: DNSQueryAdapter? = null
-
-    //private lateinit var loadingIllustration: FrameLayout
-
-    // private lateinit var recyclerHeadingLL : LinearLayout
 
     private val viewModel: DNSLogViewModel by viewModel()
     private var checkedItem = 1
     private var filterValue: String = ""
 
-    lateinit var urlName: Array<String>
-    lateinit var urlValues: Array<String>
-    var prevSpinnerSelection: Int = 2
     var check = 2
 
     private val dnsLogDAO by inject<DNSLogDAO>()
@@ -79,11 +62,7 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     }
 
     private fun initView() {
-        if (DEBUG) Log.d(LOG_TAG, "InitView from DNSLogFragment")
-        //context = this
-
         val includeView = b.queryListScrollList
-        //recyclerHeadingLL = includeView.findViewById(R.id.query_list_recycler_heading)
 
         if (persistentState.logsEnabled) {
             includeView.queryListLogsDisabledTv.visibility = View.GONE
@@ -152,19 +131,20 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         val dnsType = appMode?.getDNSType()
 
         if (dnsType == 1) {
-            var dohDetail: DoHEndpoint? = null
+            val dohDetail: DoHEndpoint?
             try {
                 dohDetail = appMode?.getDOHDetails()
             } catch (e: Exception) {
                 return
             }
             b.connectedStatusTitleUrl.text = resources.getString(R.string.configure_dns_connected_doh_status)
-            b.connectedStatusTitle.text = resources.getString(R.string.configure_dns_connection_name) + " " + dohDetail?.dohName
+            b.connectedStatusTitle.text = resources.getString(R.string.configure_dns_connection_name, dohDetail?.dohName)
             b.queryListScrollList.recyclerQuery.visibility = View.VISIBLE
             b.queryListScrollList.dnsLogNoLogText.visibility = View.GONE
         } else if (dnsType == 2) {
             val cryptDetails = appMode?.getDNSCryptServerCount()
-            b.connectedStatusTitle.text = resources.getString(R.string.configure_dns_connection_name) + " DNSCrypt resolvers: $cryptDetails"
+            val cryptName = resources.getString(R.string.configure_dns_crypt_name, cryptDetails.toString())
+            b.connectedStatusTitle.text = resources.getString(R.string.configure_dns_connection_name, cryptName)
             b.connectedStatusTitleUrl.text = resources.getString(R.string.configure_dns_connected_dns_crypt_status)
             persistentState.setConnectedDNS("DNSCrypt: $cryptDetails resolvers")
             b.queryListScrollList.recyclerQuery.visibility = View.VISIBLE
@@ -172,8 +152,7 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         } else {
             val proxyDetails = appMode?.getDNSProxyServerDetails()
             b.connectedStatusTitleUrl.text = resources.getString(R.string.configure_dns_connected_dns_proxy_status)
-            b.connectedStatusTitle.text = resources.getString(R.string.configure_dns_connection_name) + " " + proxyDetails?.proxyName
-            //recyclerHeadingLL.visibility = View.GONE
+            b.connectedStatusTitle.text = resources.getString(R.string.configure_dns_connection_name, proxyDetails?.proxyName)
             b.queryListScrollList.recyclerQuery.visibility = View.GONE
             if (persistentState.logsEnabled) {
                 b.queryListScrollList.dnsLogNoLogText.visibility = View.VISIBLE
@@ -185,7 +164,7 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         val singleItems = arrayOf(getString(R.string.filter_dns_blocked_connections), getString(R.string.filter_dns_all_connections))
 
         val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("Select filter")
+        builder.setTitle(getString(R.string.dns_log_dialog_title))
 
         // Single-choice items (initialized with checked item)
         builder.setSingleChoiceItems(singleItems, checkedItem) { dialog, which ->
@@ -193,7 +172,6 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
             filterValue = if (which == 0) ":isFilter"
             else ""
             checkedItem = which
-            if (DEBUG) Log.d(LOG_TAG, "Filter Option selected: $filterValue")
             viewModel.setFilterBlocked(filterValue)
             dialog.dismiss()
         }
@@ -210,13 +188,13 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         builder.setIcon(android.R.drawable.ic_dialog_alert)
         builder.setCancelable(true)
         //performing positive action
-        builder.setPositiveButton("Delete logs") { _, _ ->
+        builder.setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
             GlobalScope.launch(Dispatchers.IO) {
                 dnsLogDAO.clearAllData()
             }
         }
         //performing negative action
-        builder.setNegativeButton("Cancel") { _, _ ->
+        builder.setNegativeButton(getString(R.string.dns_log_dialog_negative)) { _, _ ->
         }
         // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()
@@ -224,33 +202,6 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         alertDialog.setCancelable(true)
         alertDialog.show()
     }
-
-    // Check that the URL is a plausible DOH server: https with a domain, a path (at least "/"),
-    // and no query parameters or fragment.
-    private fun checkUrl(url: String): Boolean {
-        return try {
-            val parsed = URL(url)
-            parsed.protocol == "https" && parsed.host.isNotEmpty() && parsed.path.isNotEmpty() && parsed.query == null && parsed.ref == null
-        } catch (e: MalformedURLException) {
-            false
-        }
-    }
-
-    private fun checkConnection(): Boolean {
-        var connectionStatus = false
-        val status: VpnState? = VpnController.getInstance()!!.getState(requireContext())
-        if (status!!.activationRequested) {
-            if (status.connectionState == null) {
-                if (appMode?.getFirewallMode() == Settings.BlockModeSink) {
-                    connectionStatus = true
-                }
-            } else if (status.connectionState === BraveVPNService.State.WORKING) {
-                connectionStatus = true
-            }
-        }
-        return connectionStatus
-    }
-
 
     companion object {
         fun newInstance() = DNSLogFragment()

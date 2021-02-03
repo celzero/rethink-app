@@ -72,13 +72,10 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
         b.firewallExpandableList.setAdapter(adapterList)
 
         b.firewallExpandableList.setOnGroupClickListener { _, _, _, _ ->
-            //setListViewHeight(expandableListView, i);
             false
         }
 
-        b.firewallExpandableList.setOnGroupExpandListener {
-            //listData[titleList!![it]]!!.sortBy { it.isInternetAllowed }
-        }
+        b.firewallExpandableList.setOnGroupExpandListener {}
         b.firewallUpdateProgress.visibility = View.VISIBLE
 
         b.firewallCategorySearch.setOnQueryTextListener(this)
@@ -142,8 +139,6 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        //(adapterList as FirewallAppListAdapter).filterData(query!!)
-        if (DEBUG) Log.d(LOG_TAG, "Category block onQueryTextSubmit: ${isSearchEnabled}, $query")
         if (isSearchEnabled) {
             object : CountDownTimer(500, 1000) {
                 override fun onTick(millisUntilFinished: Long) {}
@@ -175,13 +170,10 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
 
 
         }
-        //observersForUI("%$query%")
         return false
     }
 
     override fun onQueryTextChange(query: String?): Boolean {
-        //(adapterList as FirewallAppListAdapter).filterData(query!!)
-        //observersForUI("%$query%")
         if (DEBUG) Log.d(LOG_TAG, "Category block onQueryTextChange : ${isSearchEnabled}, $query")
         if (isSearchEnabled) {
             object : CountDownTimer(500, 1000) {
@@ -189,7 +181,6 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
                 }
 
                 override fun onFinish() {
-                    if (DEBUG) Log.d(LOG_TAG, "Category block onQueryTextChange final: ${isSearchEnabled}, $query")
                     firewallAppInfoViewModel.setFilter(query)
                     if (query.isNullOrEmpty()) {
                         var i = 0
@@ -200,7 +191,6 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
                         }
 
                     } else {
-                        //var i = 0
                         if (titleList!!.size > 0) {
 
                             for (i in titleList!!.indices) {
@@ -243,7 +233,6 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
                     val item = iterator.next()
                     if (DEBUG) Log.d(LOG_TAG, "Category : ${item.categoryName}, ${item.numberOFApps}, ${item.numOfAppsBlocked}, ${item.isInternetBlocked}")
                     val appList = list.filter { a -> a.appCategory == item.categoryName }
-                    //val count = categoryList.filter { a -> !a.isInternetAllowed }
                     if (appList.isNotEmpty()) {
                         listData[item] = appList as java.util.ArrayList<AppInfo>
                     } else {

@@ -56,7 +56,6 @@ class WhitelistAppDialog(private var activity: Context, private val appInfoRepos
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         b = CustomDialogLayoutBinding.inflate(layoutInflater)
         setContentView(b.root)
-        //setCancelable(false)
         window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
 
         mLayoutManager = LinearLayoutManager(activity)
@@ -77,15 +76,15 @@ class WhitelistAppDialog(private var activity: Context, private val appInfoRepos
         val appCount = appList.size
         val act: FirewallActivity = activity as FirewallActivity
         appInfoRepository.getWhitelistCountLiveData().observe(act, {
-            b.customSelectAllOptionCount.text = "$it/$appCount apps whitelisted"
+            b.customSelectAllOptionCount.text = act.getString(R.string.whitelist_dialog_apps_in_use, it.toString(), appCount.toString())
         })
 
         b.customSelectAllOptionCheckbox.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             modifyAppsInUniversalAppList(b)
             if (b) {
-                Utilities.showToastInMidLayout(activity, "Selected apps added to whitelist", Toast.LENGTH_SHORT)
+                Utilities.showToastInMidLayout(activity, act.getString(R.string.whitelist_toast_positive), Toast.LENGTH_SHORT)
             } else {
-                Utilities.showToastInMidLayout(activity, "Selected apps removed from whitelist", Toast.LENGTH_SHORT)
+                Utilities.showToastInMidLayout(activity, act.getString(R.string.whitelist_toast_negative), Toast.LENGTH_SHORT)
             }
             object : CountDownTimer(500, 500) {
                 override fun onTick(millisUntilFinished: Long) {

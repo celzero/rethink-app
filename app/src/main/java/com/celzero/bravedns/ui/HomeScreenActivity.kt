@@ -66,15 +66,14 @@ import kotlin.collections.HashMap
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
 
-    lateinit var internetManagerFragment: InternetManagerFragment
-    lateinit var settingsFragment: SettingsFragment
-    lateinit var homeScreenFragment: HomeScreenFragment
-    lateinit var aboutFragment: AboutFragment
-    lateinit var context: Context
+    private lateinit var internetManagerFragment: InternetManagerFragment
+    private lateinit var settingsFragment: SettingsFragment
+    private lateinit var homeScreenFragment: HomeScreenFragment
+    private lateinit var aboutFragment: AboutFragment
+    private lateinit var context: Context
     private val refreshDatabase by inject<RefreshDatabase>()
-    lateinit var downloadManager: DownloadManager
+    private lateinit var downloadManager: DownloadManager
     private var timeStamp = 0L
-    //lateinit var appSample : AppInfo
 
     private val doHEndpointRepository by inject<DoHEndpointRepository>()
     private val blockedConnectionsRepository by inject<BlockedConnectionsRepository>()
@@ -101,7 +100,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         var lifeTimeQ : MutableLiveData<Int> = MutableLiveData()
         var braveModeToggler : MutableLiveData<Int> = MutableLiveData()
         var connectedDNS : MutableLiveData<String> = MutableLiveData()
-        //var cryptModeInProgress : Int = 0
         var cryptRelayToRemove: String = ""
 
         var appStartTime: Long = System.currentTimeMillis()
@@ -123,7 +121,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     companion object {
         var isLoadingComplete: Boolean = false
-        const val DAYS_TO_MAINTAIN_NETWORK_LOG = 2
         var enqueue: Long = 0
     }
 
@@ -138,7 +135,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
 
         context = this
-        //dbHandler = DatabaseHandler(this)
 
         internetManagerFragment = InternetManagerFragment()
         homeScreenFragment = HomeScreenFragment()
@@ -176,7 +172,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun updateInstallSource() {
-        //if (persistentState.downloadSource == 0) {
         val packageManager = packageManager
         try {
             val applicationInfo: ApplicationInfo = packageManager.getApplicationInfo(packageName, 0)
@@ -186,12 +181,11 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 persistentState.downloadSource = Constants.DOWNLOAD_SOURCE_PLAY_STORE
             } else {
                 // App was installed from somewhere else
-                persistentState.downloadSource = Constants.DOWNLOAD_SOURCE_OTHERS
+                persistentState.downloadSource = DOWNLOAD_SOURCE_OTHERS
             }
         } catch (e: PackageManager.NameNotFoundException) {
             Log.e(LOG_TAG, "Exception while fetching the app download source: ${e.message}", e)
         }
-        //}
     }
 
 
@@ -343,13 +337,12 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 //creating json object
                 try {
                     val jsonObject = JSONObject(stringResponse)
-                    val responseVersion = jsonObject.getInt("version")
-                    val updateValue = jsonObject.getBoolean("update")
-                    timeStamp = jsonObject.getLong("latest")
+                    val responseVersion = jsonObject.getInt(Constants.JSON_VERSION)
+                    val updateValue = jsonObject.getBoolean(Constants.JSON_UPDATE)
+                    timeStamp = jsonObject.getLong(Constants.JSON_LATEST)
                     persistentState.lastAppUpdateCheck = System.currentTimeMillis()
                     Log.i(LOG_TAG, "Server response for the new version download is $updateValue, response version number- $responseVersion, timestamp- $timeStamp")
                     if (responseVersion == 1) {
-                        //PersistentState.setLocalBlockListDownloadTime(context, timeStamp)
                         if (updateValue) {
                             if (persistentState.downloadSource == DOWNLOAD_SOURCE_OTHERS) {
                                 (context as HomeScreenActivity).runOnUiThread {
@@ -379,27 +372,20 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     private var onComplete: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(ctxt: Context, intent: Intent) {
-
-            if (DEBUG) Log.d(LOG_TAG, "Intent on receive ")
             try {
                 val action = intent.action
                 if (DEBUG) Log.d(LOG_TAG, "Download status: $action")
                 if (DownloadManager.ACTION_DOWNLOAD_COMPLETE == action) {
-                    if (DEBUG) Log.d(LOG_TAG, "Download status: $action")
-                    //val downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0)
                     val query = DownloadManager.Query()
                     query.setFilterById(enqueue)
                     val c: Cursor = downloadManager.query(query)
                     if (c.moveToFirst()) {
-                        //val columnIndex: Int = c.getColumnIndex(DownloadManager.COLUMN_STATUS)
                         val status = checkStatus(c)
                         if (DEBUG) Log.d(LOG_TAG, "Download status: $status,${GlobalVariable.filesDownloaded}")
-                        if (status == "STATUS_SUCCESSFUL") {
+                        if (status == Constants.DOWNLOAD_STATUS_SUCCESSFUL) {
                             val from = File(ctxt.getExternalFilesDir(null).toString() + Constants.DOWNLOAD_PATH + Constants.FILE_TAG_NAME)
                             val to = File(ctxt.filesDir.canonicalPath + Constants.FILE_TAG_NAME)
                             from.copyTo(to, true)
-                            /*val destDir = File(ctxt.filesDir.canonicalPath)
-                            Utilities.moveTo(from, to, destDir)*/
                             persistentState.remoteBraveDNSDownloaded = true
                             persistentState.remoteBlockListDownloadTime = timeStamp
                         } else {
@@ -423,20 +409,20 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         builder.setCancelable(true)
         //performing positive action
         if (message == getString(R.string.download_update_dialog_message_ok) || message == getString(R.string.download_update_dialog_failure_message) || message == getString(R.string.download_update_dialog_trylater_message)) {
-            builder.setPositiveButton("ok") { dialogInterface, _ ->
+            builder.setPositiveButton(getString(R.string.hs_download_positive_default)) { dialogInterface, _ ->
                 dialogInterface.dismiss()
             }
         } else {
             if (source == AppUpdater.InstallSource.STORE) {
-                builder.setPositiveButton("Complete Update") { _, _ ->
+                builder.setPositiveButton(getString(R.string.hs_download_positive_play_store)) { _, _ ->
                     appUpdateManager.completeUpdate()
                 }
             }else{
-                builder.setPositiveButton("Visit website") { _, _ ->
+                builder.setPositiveButton(getString(R.string.hs_download_positive_website)) { _, _ ->
                     initiateDownload()
                 }
             }
-            builder.setNegativeButton("Remind me later") { dialogInterface, _ ->
+            builder.setNegativeButton(getString(R.string.hs_download_negative_default)) { dialogInterface, _ ->
                 persistentState.lastAppUpdateCheck = System.currentTimeMillis()
                 dialogInterface.dismiss()
             }
@@ -480,7 +466,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     private fun popupSnackBarForBlocklistUpdate() {
         val parentLayout = findViewById<View>(android.R.id.content)
-        Snackbar.make(parentLayout, "Update custom blocklist files", Snackbar.LENGTH_LONG).setAction("Update") {
+        Snackbar.make(parentLayout, getString(R.string.hs_snack_bar_blocklist_message), Snackbar.LENGTH_LONG).setAction("Update") {
             registerReceiverForDownloadManager(this)
             handleDownloadFiles()
         }.setActionTextColor(resources.getColor(R.color.accent_bad)).show()
@@ -498,8 +484,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             if (DEBUG) Log.d(LOG_TAG, "downloadBlockListFiles - url: $url")
             val uri: Uri = Uri.parse(url)
             val request = DownloadManager.Request(uri)
-            request.setTitle("RethinkDNS Blocklists")
-            request.setDescription("$fileName download in progress..")
+            request.setTitle(getString(R.string.hs_download_blocklist_heading))
+            request.setDescription(getString(R.string.hs_download_blocklist_desc, fileName))
             request.setDestinationInExternalFilesDir(context, Constants.DOWNLOAD_PATH, fileName)
             Log.d(LOG_TAG, "Path - ${context.filesDir.canonicalPath}${Constants.DOWNLOAD_PATH}${fileName}")
             enqueue = downloadManager.enqueue(request)

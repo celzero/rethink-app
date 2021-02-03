@@ -23,22 +23,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
-import by.kirich1409.viewbindingdelegate.dialogViewBinding
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DNSBottomSheetBlockAdapter
 import com.celzero.bravedns.database.DNSLogs
-import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
 import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
-import com.celzero.bravedns.databinding.FragmentFilterAndSortBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 
 class DNSBlockListBottomSheetFragment(private var contextVal: Context, private var transaction: DNSLogs) : BottomSheetDialogFragment() {
     private var _binding: BottomSheetDnsLogBinding? = null
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
+    // This property is only valid between onCreateView and onDestroyView.
     private val b get() = _binding!!
 
     private lateinit var recyclerAdapter: DNSBottomSheetBlockAdapter
@@ -60,7 +55,6 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
         b.dnsBlockUrl.text = transaction.queryStr
         b.dnsBlockIpAddress.text = transaction.response
         b.dnsBlockConnectionFlag.text = transaction.flag
-        //latencyTxt.text = "Latency: "+transaction.latency
         b.dnsBlockLatency.visibility = View.GONE
         b.dnsBlockIpLatency.text = transaction.latency.toString() + "ms"
         if (transaction.serverIP.isNotEmpty()) {
@@ -99,14 +93,11 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
                 b.dnsBlockBlockedDesc.text = getString(R.string.bsct_conn_block_desc, upTime, " by ${transaction.serverIP}")
             }
 
-            //blockedDescTxt.text = "blocked " + upTime
             val blockLists = transaction.blockLists.split(",")
             if (blockLists != null) {
-                //placeHolderTxt.visibility = View.GONE
                 b.dnsBlockRecyclerview.layoutManager = LinearLayoutManager(contextVal)
                 recyclerAdapter = DNSBottomSheetBlockAdapter(contextVal, blockLists)
                 b.dnsBlockRecyclerview.adapter = recyclerAdapter
-                //dnsBlockRecyclerView.addItemDecoration(DividerItemDecoration(contextVal, DividerItemDecoration.VERTICAL))
                 b.dnsBlockPlaceHolder.visibility = View.GONE
             } else {
                 b.dnsBlockPlaceHolder.visibility = View.VISIBLE

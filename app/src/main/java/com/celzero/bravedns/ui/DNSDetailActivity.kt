@@ -22,17 +22,16 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.databinding.ActivityDnsDetailBinding
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.google.android.material.tabs.TabLayoutMediator
 
 class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
     private val b by viewBinding(ActivityDnsDetailBinding::bind)
-    private val DNS_TABS_COUNT = 2
+    private val dnsTabsCount = 2
     private var screenToLoad = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,7 +50,7 @@ class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
             }
 
             override fun getItemCount(): Int {
-                return DNS_TABS_COUNT
+                return dnsTabsCount
             }
         }
 
@@ -69,7 +68,7 @@ class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
         super.onActivityResult(requestCode, resultCode, data)
         if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "onActivityResult")
         if (resultCode == Activity.RESULT_OK) {
-            val stamp = data?.getStringArrayExtra("stamp")
+            val stamp = data?.getStringArrayExtra(Constants.STAMP_INTENT_EXTRA)
             if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "onActivityResult - Stamp : $stamp")
         }
     }

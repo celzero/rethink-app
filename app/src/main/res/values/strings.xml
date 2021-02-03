@@ -384,8 +384,6 @@
     <string name="univ_firewall_dialog_message">Deleting this rule would allow any app to connect to this IP. Do you want to proceed?</string>
     <string name="univ_firewall_no_ip_message">No IPs found. Tap on entries in the Network Log screen to block individual IP addresses.</string>
 
-    <string name="univ_delete_firewall_dialog_title">Delete all IP Rules?</string>
-    <string name="univ_delete_firewall_dialog_message">Deleting these rules would allow any application to connect to the currently blocked IPs.</string>
 
     <string name="doh_custom_url_remove_dialog_title">Delete DoH endpoint?</string>
     <string name="doh_custom_url_remove_dialog_message">Delete the DNS over Https endpoint from saved configuration.</string>
@@ -479,7 +477,8 @@
     <string name="configure_dns_connected_doh_status">dns over https</string>
     <string name="configure_dns_connected_dns_crypt_status">dnscrypt</string>
     <string name="configure_dns_connected_dns_proxy_status">dns proxy</string>
-    <string name="configure_dns_connection_name">Connected to  </string>
+    <string name="configure_dns_connection_name">Connected to %1$s</string>
+    <string name="configure_dns_crypt_name">DNSCrypt resolvers: %1$s</string>
 
     <string name="firewall_app_added_in_whitelist">whitelisted app</string>
     <string name="firewall_app_added_in_excluded_list">excluded app</string>
@@ -510,6 +509,7 @@
     <string name="app_mode_dns_firewall">DNS and Firewall</string>
 
     <string name="settings_vpn_heading">VPN</string>
+    <string name="settings_vpn_heading_disabled">VPN disabled</string>
 
     <string name="info_dialog_copy_toast_msg">URI Copied.</string>
 
@@ -572,15 +572,36 @@
     <string name="settings_autostart_bootup_desc">On Power up, Start RethinkDNS if it was running before device shut down.</string>
 
     <string name="settings_local_blockList_desc1">Choose from 170+ blocklists.</string>
-    <string name="settings_local_blocklist_desc2">Download in progress...</string>
+    <string name="settings_local_blocklist_desc2">Download in progress…</string>
     <string name="settings_local_blocklist_desc3">Download completed, Configure blocklist</string>
     <string name="settings_local_blocklist_desc4">Error downloading file. Try again.</string>
+    <string name="settings_local_blocklist_desc5">Configure blocklists</string>
+    <string name="settings_local_blocklist_desc6">No list configured.</string>
+    <string name="settings_local_blocklist_in_use">%1$s blocklists are in-use.</string>
+    <string name="settings_local_blocklist_toast_default">Blocklists are up-to-date.</string>
+    <string name="settings_local_blocklist_dialog_positive">Download</string>
+    <string name="settings_local_blocklist_dialog_negative">Cancel</string>
+    <string name="settings_local_blocklist_download_success">Blocklists downloaded successfully.</string>
+    <string name="settings_local_blocklist_version">Version: v%1$s</string>
 
-    <string name="settings_sync_app_details_desc">Resync in progress...</string>
-    <string name="settigns_sync_app_details_desc_completed">Resync completed</string>
+    <string name="settings_sync_app_details_desc">Resync in progress…</string>
+    <string name="settings_sync_app_details_desc_completed">Resync completed</string>
 
     <string name="settings_check_update_heading">Check for app updates</string>
     <string name="settings_check_update_desc">Check for apps updates once a week.</string>
+
+    <string name="settings_http_proxy_desc">Forwarding to %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc_default">This proxy is only a recommendation and it is possible that some apps will ignore it.</string>
+    <string name="settings_http_proxy_dialog_title">Custom Server URL</string>
+    <string name="settings_http_proxy_error_text1">Port range should be from 1024–65535</string>
+    <string name="settings_http_proxy_error_text2">Invalid port</string>
+    <string name="settings_http_proxy_error_text3">Hostname is empty</string>
+    <string name="settings_http_proxy_toast_success">HTTP proxy is set</string>
+
+    <string name="settings_app_list_default_app">Nobody</string>
+
+    <string name="settings_socks_forwarding_desc">Forwarding to %1$s:%2$s, %3$s</string>
+    <string name="settings_socks_forwarding_default_desc">Forward connections to SOCKS5 endpoint.</string>
 
     <!-- FirewallAppFragment -->
     <string name="apps_icon_content_desc">Application Icon</string>
@@ -590,21 +611,24 @@
     <string name="ct_bs_rule_2">Rule #2</string>
 
     <!-- Home screen -->
-    <!--<string name="firewall_card_text_active"><![CDATA[<font color="#05dfd7">%1$s</font> whitelisted, <font color="#05dfd7">%2$s</font> excluded]]></string>-->
     <string name="firewall_card_status_inactive">Disabled</string>
     <string name="firewall_card_status_active">%1$s apps blocked</string>
 
     <string name="firewall_card_text_active">%1$s whitelisted, %2$s excluded.</string>
     <string name="firewall_card_text_inactive">Enable firewall mode.</string>
-    <string name="firewall_card_configure_btn">All apps</string>\
+    <string name="firewall_card_configure_btn">All apps</string>
     <string name="firewall_card_view_logs_btn">View logs</string>
-
 
     <string name="dns_card_connected_status_failure">Disabled</string>
 
     <string name="dns_card_latency_active">Latency: %1$sms</string>
     <string name="dns_card_latency_inactive">Enable DNS mode.</string>
     <string name="dns_card_configure_btn">Configure</string>
+
+    <string name="hsf_start_btn_state">start</string>
+    <string name="hsf_stop_btn_state">stop</string>
+
+    <string name="hsf_uptime">(%1$s)</string>
 
     <!-- Web view configure -->
     <string name="webview_configure_dialog_positive">Quit</string>
@@ -689,5 +713,48 @@
     <string name="ctbs_clear_rules_dialog_positive">Clear</string>
     <string name="ctbs_clear_rules_dialog_negative">Cancel</string>
     <string name="ctbs_dialog_negative_btn">Go Back</string>
+
+    <!-- DNS Configure web view activity -->
+    <string name="wv_local_blocklist_toast">Local blocklists updated successfully</string>
+
+    <!-- DNS Log fragment -->
+    <string name="dns_log_dialog_title">Select filter</string>
+    <string name="dns_log_dialog_positive">Delete logs</string>
+    <string name="dns_log_dialog_negative">Cancel</string>
+
+    <!-- Excluded app dialog -->
+    <string name="ex_dialog_count">%1$s/%2$s apps excluded.</string>
+
+    <!-- Home Screen activity -->
+    <string name="hs_download_positive_default">ok</string>
+    <string name="hs_download_positive_play_store">Complete Update</string>
+    <string name="hs_download_positive_website">Visit website</string>
+
+    <string name="hs_download_negative_default">Remind me later</string>
+
+    <string name="hs_snack_bar_blocklist_message">Update custom blocklist files</string>
+
+    <string name="hs_download_blocklist_heading">RethinkDNS Blocklists</string>
+    <string name="hs_download_blocklist_desc">%1$s download in progress..</string>
+
+    <!-- Whitelist dialog -->
+    <string name="whitelist_dialog_apps_in_use">%1$s/%2$s apps whitelisted.</string>
+    <string name="whitelist_toast_positive">Selected apps added to whitelist</string>
+    <string name="whitelist_toast_negative">Selected apps removed from whitelist</string>
+
+
+    <!-- Universal Firewall-->
+    <string name="univ_ip_delete_dialog_positive">Delete all</string>
+    <string name="univ_ip_delete_dialog_negative">Cancel</string>
+    <string name="univ_ip_delete_toast_success">Deleted all IP rules.</string>
+    <string name="univ_ip_no_rules_set">No IP rules set</string>
+    <string name="univ_delete_firewall_dialog_title">Delete all IP Rules?</string>
+    <string name="univ_delete_firewall_dialog_message">Deleting these rules would allow any application to connect to the currently blocked IPs.</string>
+
+    <string name="univ_accessibility_crash_dialog_positive">Goto Settings</string>
+    <string name="univ_accessibility_crash_dialog_negative">Cancel</string>
+    <string name="univ_accessibility_dialog_positive">Grant</string>
+    <string name="univ_accessibility_dialog_negative">Deny</string>
+
 
 </resources>

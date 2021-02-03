@@ -22,7 +22,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -31,7 +30,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.Apk
 import com.celzero.bravedns.adapter.ApkListAdapter
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.AppInfoRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -47,7 +45,6 @@ class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener{
     lateinit var mRecyclerView: RecyclerView
     private lateinit var mLinearLayoutManager: LinearLayoutManager
     lateinit var contextVal : Context
-    //private var arraySort = ArrayList<Apk>()
     private var editsearch: SearchView? = null
 
     private lateinit var filterIcon : ImageView
@@ -74,16 +71,12 @@ class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener{
         mRecyclerView.layoutManager = mLinearLayoutManager
         mRecyclerView.adapter = mAdapter
 
-        //arraySort = apkList
-
         editsearch = includeView.findViewById(R.id.search) as SearchView
         editsearch!!.setOnQueryTextListener(this)
-
 
         updateAppList()
 
         expandableImage.setOnClickListener {
-            Toast.makeText(this.context, "Load", Toast.LENGTH_SHORT).show()
             mAdapter.notifyDataSetChanged()
         }
 
@@ -101,7 +94,6 @@ class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener{
 
     private fun updateAppList() = GlobalScope.launch ( Dispatchers.Default ){
             val appList = appInfoRepository.getAppInfoAsync()
-            //Log.w("DB","App list from DB Size: "+appList.size)
             appList.forEach{
                 val userApk = Apk(it.appName,it.appName,it.packageInfo,it.uid.toString())
                 apkList.add(userApk)

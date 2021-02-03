@@ -67,13 +67,12 @@ import java.util.*
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
 
-    private var REQUEST_CODE_PREPARE_VPN: Int = 100
-
     private val appInfoRepository by inject<AppInfoRepository>()
     private val persistentState by inject<PersistentState>()
 
     companion object {
         //private
+        private var REQUEST_CODE_PREPARE_VPN: Int = 100
         const val DNS_MODE = 0
         const val FIREWALL_MODE = 1
         const val DNS_FIREWALL_MODE = 2
@@ -96,8 +95,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun registerForBroadCastReceivers() {
         // Register broadcast receiver
         val intentFilter = IntentFilter(InternalNames.DNS_STATUS.name)
-        //intentFilter.addAction(InternalNames.DNS_STATUS.name)
-        //intentFilter.addAction(InternalNames.TRACKER.name)
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(messageReceiver, intentFilter)
     }
 
@@ -152,7 +149,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
 
         braveModeToggler.observe(viewLifecycleOwner, {
-            if (DEBUG) Log.d(LOG_TAG, "HomeScreen -> braveModeToggler -> observer")
             if (persistentState.vpnEnabled) {
                 updateDNSCardView()
                 updateFirewallCardView()
@@ -243,13 +239,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun handleStartBtnClickEvent() {
         b.fhsDnsOnOffBtn.isEnabled = false
         //TODO : check for the service already running
-        //val status = VpnController.getInstance()!!.getState(requireContext())
         val status = persistentState.vpnEnabled
         if (!checkForPrivateDNSandAlwaysON()) {
-            //if (status!!.activationRequested) {
             if (status) {
                 appStartTime = System.currentTimeMillis()
-                b.fhsDnsOnOffBtn.text = "start"
+                b.fhsDnsOnOffBtn.text = getString(R.string.hsf_start_btn_state)
                 shimmerForStop()
                 b.fhsCardDnsConfigure.alpha = 0.5F
                 b.fhsCardFirewallConfigure.alpha = 0.5F
@@ -340,7 +334,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setCancelable(true)
         //performing positive action
         builder.setPositiveButton(R.string.always_on_dialog_positive_btn) { _, _ ->
-            val intent = Intent("android.net.vpn.SETTINGS")
+            val intent = Intent(Constants.VPN_INTENT)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
         }
@@ -497,13 +491,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun updateUptime() {
         val upTime = DateUtils.getRelativeTimeSpanString(appStartTime, System.currentTimeMillis(), MINUTE_IN_MILLIS, FORMAT_ABBREV_RELATIVE)
-        b.fhsAppUptime.text = "($upTime)"
+        b.fhsAppUptime.text = getString(R.string.hsf_uptime, upTime)
     }
 
     private fun prepareAndStartDnsVpn() {
         if (hasVpnService()) {
             if (prepareVpnService()) {
-                b.fhsDnsOnOffBtn.text = "stop"
+                b.fhsDnsOnOffBtn.text = getString(R.string.hsf_stop_btn_state)
                 b.fhsDnsOnOffBtn.setBackgroundResource(R.drawable.rounded_corners_button_accent)
                 shimmerForStart()
                 startDnsVpnService()
@@ -589,14 +583,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         if (status!!.activationRequested || status.connectionState == BraveVPNService.State.WORKING) {
             b.fhsDnsOnOffBtn.setBackgroundResource(R.drawable.rounded_corners_button_accent)
-            b.fhsDnsOnOffBtn.text = "stop"
+            b.fhsDnsOnOffBtn.text = getString(R.string.hsf_stop_btn_state)
             if (braveMode == 0) b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_dns_connected)
             else if (braveMode == 1) b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_firewall_connected)
             else b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_connected)
         } else {
             b.fhsDnsOnOffBtn.setBackgroundResource(R.drawable.rounded_corners_button_primary)
             shimmerForStop()
-            b.fhsDnsOnOffBtn.text = "start"
+            b.fhsDnsOnOffBtn.text = getString(R.string.hsf_start_btn_state)
             b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_disconnected)
         }
 
