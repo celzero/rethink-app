@@ -31,7 +31,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatToggleButton
-import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
@@ -65,9 +64,6 @@ class FirewallAppListAdapter internal constructor(
     private var dataList: HashMap<CategoryInfo, ArrayList<AppInfo>>
 ) : BaseExpandableListAdapter() {
 
-/*    var completeList: List<AppInfo> = ArrayList<AppInfo>()
-    var originalTitleList: List<CategoryInfo> = ArrayList()
-    var originalDataList: HashMap<CategoryInfo, ArrayList<AppInfo>> = HashMap()*/
 
     override fun getChild(listPosition: Int, expandedListPosition: Int): AppInfo {
         return this.dataList[this.titleList[listPosition]]!![expandedListPosition]
@@ -77,48 +73,12 @@ class FirewallAppListAdapter internal constructor(
         return expandedListPosition.toLong()
     }
 
-    fun updateData(title: List<CategoryInfo>, list: HashMap<CategoryInfo, ArrayList<AppInfo>>, completeList: ArrayList<AppInfo>) {
-        //this.completeList = completeList
+    fun updateData(title: List<CategoryInfo>, list: HashMap<CategoryInfo, ArrayList<AppInfo>>) {
         titleList = title
         dataList = list
         this.notifyDataSetChanged()
-        //originalTitleList = title
-        //originalDataList = list
     }
 
-    /**
-     * Yet to complete the below function logic,
-     * TODO : Filter the query string and update it in the list adapter for search
-     */
-    /*fun filterData(query: String) {
-        titleList = originalTitleList
-        dataList = originalDataList
-        val searchResult = dataList
-        if (query != "") {
-            searchResult.clear()
-            dataList.forEach {
-                val normalList = it.value.filter { a -> a.appName.toLowerCase().contains(query.toLowerCase()) }
-                printNormalList(normalList)
-                if (normalList.isNotEmpty()) {
-                    titleList = titleList.filter { titleList ->
-                        titleList.categoryName.contains(
-                            it.key.categoryName
-                        )
-                    }
-                    searchResult[titleList[0]] = normalList as java.util.ArrayList<AppInfo>
-                }
-            }
-            //if (searchResult.isNotEmpty())
-            dataList = searchResult
-        }
-        this.notifyDataSetChanged()
-    }
-
-    private fun printNormalList(normalList: List<AppInfo>) {
-        normalList.forEach {
-            if(DEBUG) Log.d(LOG_TAG, "${it.appName} ... Category: ${it.appCategory}")
-        }
-    }*/
 
     override fun getChildView(listPosition: Int, expandedListPosition: Int, isLastChild: Boolean, convertView: View?, parent: ViewGroup): View {
         var convertView = convertView
@@ -127,27 +87,17 @@ class FirewallAppListAdapter internal constructor(
             val layoutInflater = this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             convertView = layoutInflater.inflate(R.layout.apk_list_item, null)
         }
-        //Not used
-        val mLLTopLayout: LinearLayoutCompat = convertView!!.findViewById(R.id.firewall_apk_list_top_layout)
-        val fwMobileDataImg: AppCompatImageView = convertView.findViewById(R.id.firewall_toggle_mobile_data)
 
         //Child View UI components
-        val mIconImageView: ImageView = convertView.findViewById(R.id.firewall_apk_icon_iv)
+        val mIconImageView: ImageView = convertView!!.findViewById(R.id.firewall_apk_icon_iv)
         val mLabelTextView: TextView = convertView.findViewById(R.id.firewall_apk_label_tv)
         val mPackageTextView: TextView = convertView.findViewById(R.id.firewall_apk_package_tv)
         val mIconIndicator: TextView = convertView.findViewById(R.id.firewall_status_indicator)
-        //val firewallSearchCard : CardView = convertView.findViewById(R.id.firewall_search_card)
-        //val firewallSearch : androidx.appcompat.widget.SearchView = convertView.findViewById(R.id.firewall_search)
 
         val fwWifiImg: SwitchCompat = convertView.findViewById(R.id.firewall_toggle_wifi)
         val firewallApkProgressBar: ProgressBar = convertView.findViewById(R.id.firewall_apk_progress_bar)
-        //var appIcon = context.resources.getDrawable(android.R.drawable.)
-
-
 
         try {
-            //val appIcon = context.packageManager.getApplicationIcon(appInfoDetail.packageInfo)
-            //mIconImageView.setImageDrawable(appIcon)
             Glide.with(context).load(context.packageManager.getApplicationIcon(appInfoDetail.packageInfo))
                 .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                 .into(mIconImageView)
@@ -160,7 +110,6 @@ class FirewallAppListAdapter internal constructor(
         mLabelTextView.text = appInfoDetail.appName
 
         firewallApkProgressBar.visibility = View.GONE
-
 
         //To disable the app from selecting into firewall
         if (appInfoDetail.whiteListUniv1) {
@@ -179,8 +128,6 @@ class FirewallAppListAdapter internal constructor(
             mPackageTextView.visibility = View.GONE
         }
 
-
-        //fwWifiImg.visibility = View.VISIBLE
         //For WiFi
         if (appInfoDetail.isInternetAllowed) {
             fwWifiImg.isChecked = false
@@ -189,8 +136,6 @@ class FirewallAppListAdapter internal constructor(
             fwWifiImg.isChecked = true
             mIconIndicator.setBackgroundColor(context.getColor(R.color.colorAmber_900))
         }
-
-
 
         fwWifiImg.setOnClickListener {
             isSearchEnabled = false
@@ -240,20 +185,6 @@ class FirewallAppListAdapter internal constructor(
                             }
                         }
                     }
-                   /* val temp = appInfoDetail.appCategory
-                    var list: CategoryInfo? = null
-                    titleList.forEach {
-                        if (it.categoryName == temp) {
-                            list = it
-                        }
-                    }*/
-                    /*if (list!!.isInternetBlocked) {
-                        val categoryInfoRepository = mDb.categoryInfoRepository()
-                        categoryInfoRepository.updateCategoryInternet(
-                            list!!.categoryName,
-                            false
-                        )
-                    }*/
                     appInfoRepository.updateInternetForuid(uid, !isInternetAllowed)
 
                 }
@@ -261,15 +192,7 @@ class FirewallAppListAdapter internal constructor(
                 fwWifiImg.isChecked = !isInternetAllowed
             }
             isSearchEnabled = true
-            //mDb.close()
         }
-
-
-      /*  mLabelTextView.setOnClickListener {
-            val bottomSheetFragment = IPAppListBottomSheetFragment(context, appInfoDetail)
-            val frag = context as FragmentActivity
-            bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
-        }*/
 
         fwWifiImg.setOnCheckedChangeListener(null)
         return convertView
@@ -285,12 +208,6 @@ class FirewallAppListAdapter internal constructor(
     }
 
     override fun getGroupCount(): Int {
-        /*if (titleList.isEmpty()) {
-            val mDb = AppDatabase.invoke(context.applicationContext)
-            val appInfoRepository = mDb.appInfoRepository()
-            this.titleList = appInfoRepository.getAllAppDetailsForLiveData()
-            mDb.close()
-        }*/
         return this.titleList.size
     }
 
@@ -310,7 +227,6 @@ class FirewallAppListAdapter internal constructor(
         val categoryNameTV: TextView = convertView!!.findViewById(R.id.expand_textView_category_name)
         val appCountTV: TextView = convertView.findViewById(R.id.expand_textView_app_count)
         val internetChk: AppCompatToggleButton = convertView.findViewById((R.id.expand_checkbox))
-        val imageHolderLL: LinearLayout = convertView.findViewById(R.id.imageLayout)
         val imageHolder1: AppCompatImageView = convertView.findViewById(R.id.imageLayout_1)
         val imageHolder2: AppCompatImageView = convertView.findViewById(R.id.imageLayout_2)
         val progressBar: ProgressBar = convertView.findViewById(R.id.expand_header_progress)
@@ -361,22 +277,13 @@ class FirewallAppListAdapter internal constructor(
             placeHolder.visibility = View.GONE
         }
 
-
-        /*if (isInternetAllowed) {
-            appCountTV.text = listTitle.numOfAppsBlocked.toString() + "/" + numberOfApps.toString() + " apps blocked"
-        } else {
-            appCountTV.text = numberOfApps.toString() + "/" + numberOfApps.toString() + " apps blocked"
-        }*/
         appCountTV.text = "${listTitle.numOfAppsBlocked} blocked, ${listTitle.numOfAppWhitelisted} whitelisted, ${listTitle.numOfAppsExcluded} excluded."
-        //appCountTV.text = "Blocked: ${listTitle.numOfAppsBlocked}, Whitelisted: ${listTitle.numOfAppWhitelisted},\nExcluded: ${listTitle.numOfAppsExcluded}, Total Apps: ${listTitle.numberOFApps} "
 
         val list = dataList[listTitle]
         try {
             if (list != null && list.isNotEmpty()) {
                 if (numberOfApps != 0) {
                     if (numberOfApps >= 2) {
-                        //imageHolder1.setImageDrawable(context.packageManager.getApplicationIcon(list[0].packageInfo))
-                        //imageHolder2.setImageDrawable(context.packageManager.getApplicationIcon(list[1].packageInfo))
                         Glide.with(context).load(context.packageManager.getApplicationIcon(list[0].packageInfo))
                             .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                             .into(imageHolder1)
@@ -384,7 +291,6 @@ class FirewallAppListAdapter internal constructor(
                             .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                             .into(imageHolder2)
                     } else {
-                        //imageHolder1.setImageDrawable(context.packageManager.getApplicationIcon(list[0].packageInfo))
                         Glide.with(context).load(context.packageManager.getApplicationIcon(list[0].packageInfo))
                             .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                             .into(imageHolder1)
@@ -437,12 +343,10 @@ class FirewallAppListAdapter internal constructor(
                     override fun onFinish() {
                         progressBar.visibility = View.GONE
                         internetChk.visibility = View.VISIBLE
-                        //notifyDataSetChanged()
                     }
                 }.start()
 
                 val isInternet = !listTitle.isInternetBlocked
-
                 if (isInternet) {
                     indicatorTV.visibility = View.VISIBLE
                 } else {
@@ -453,7 +357,6 @@ class FirewallAppListAdapter internal constructor(
                 GlobalScope.launch(Dispatchers.IO) {
                     val count = appInfoRepository.updateInternetForAppCategory(listTitle.categoryName, !isInternet)
                     if(DEBUG) Log.d(LOG_TAG,"Apps updated : $count, $isInternet")
-                    //val count = appInfoRepository.getBlockedCountForCategory(listTitle.categoryName)
                     try {
                         if (count == listTitle.numberOFApps) {
                             categoryInfoRepository.updateCategoryInternet(listTitle.categoryName, isInternet)
@@ -465,17 +368,12 @@ class FirewallAppListAdapter internal constructor(
                     }
                     isSearchEnabled = true
                     if(DEBUG) Log.d(LOG_TAG, "Category block completed : $isSearchEnabled")
-                    //mDb.close()
                 }
             }else{
                 Log.d(LOG_TAG,"else - proceedBlock: $proceedBlock")
                 internetChk.isChecked = proceedBlock
                 internetChk.setCompoundDrawablesWithIntrinsicBounds(
-                    context.getDrawable(R.drawable.dis_allowed),
-                    null,
-                    null,
-                    null
-                )
+                    context.getDrawable(R.drawable.dis_allowed), null, null, null)
             }
         }
         internetChk.setOnCheckedChangeListener(null)
@@ -492,21 +390,20 @@ class FirewallAppListAdapter internal constructor(
 
 
     private fun showDialog(packageList: List<AppInfo>, appName: String, isInternet: Boolean): Boolean {
-        //Change the handler logic into some other
         val handler: Handler = ThrowingHandler()
         var positiveTxt = ""
         val packageNameList: List<String> = packageList.map { it.appName }
-        var proceedBlocking: Boolean = false
+        var proceedBlocking = false
 
         val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
 
         builderSingle.setIcon(R.drawable.spinner_firewall)
         if (isInternet) {
-            builderSingle.setTitle("Blocking \"$appName\" will also block these ${packageList.size} apps")
-            positiveTxt = "Block ${packageList.size} apps"
+            builderSingle.setTitle(context.getString(R.string.ctbs_block_other_apps, appName, packageList.size.toString()))
+            positiveTxt = context.getString(R.string.ctbs_block_other_apps_positive_text, packageList.size.toString())
         } else {
-            builderSingle.setTitle("Unblocking \"$appName\" will also unblock these ${packageList.size} apps")
-            positiveTxt = "Unblock ${packageList.size} apps"
+            builderSingle.setTitle(context.getString(R.string.ctbs_unblock_other_apps, appName, packageList.size.toString()))
+            positiveTxt = context.getString(R.string.ctbs_unblock_other_apps_positive_text, packageList.size.toString())
         }
         val arrayAdapter = ArrayAdapter<String>(
             context,
@@ -514,31 +411,19 @@ class FirewallAppListAdapter internal constructor(
         )
         arrayAdapter.addAll(packageNameList)
         builderSingle.setCancelable(false)
-        //builderSingle.setSingleChoiceItems(arrayAdapter,-1,({dialogInterface: DialogInterface, which : Int ->}))
+
         builderSingle.setItems(packageNameList.toTypedArray(), null)
 
-
-        /* builderSingle.setAdapter(arrayAdapter) { dialogInterface, which ->
-              Log.d(LOG_TAG,"OnClick")
-             //dialogInterface.cancel()
-             //builderSingle.setCancelable(false)
-         }*/
-        /*val alertDialog : AlertDialog = builderSingle.create()
-        alertDialog.getListView().setOnItemClickListener({ adapterView, subview, i, l -> })*/
-        builderSingle.setPositiveButton(
-            positiveTxt
-        ) { dialogInterface: DialogInterface, i: Int ->
+        builderSingle.setPositiveButton(positiveTxt) { _: DialogInterface, _: Int ->
             proceedBlocking = true
             handler.sendMessage(handler.obtainMessage())
-        }.setNeutralButton(
-            "Go Back"
-        ) { dialogInterface: DialogInterface, i: Int ->
+        }.setNeutralButton(context.getString(R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int ->
             handler.sendMessage(handler.obtainMessage())
             proceedBlocking = false
         }
 
         val alertDialog: AlertDialog = builderSingle.show()
-        alertDialog.listView.setOnItemClickListener { adapterView, subview, i, l -> }
+        alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
         alertDialog.setCancelable(false)
         try {
             Looper.loop()
@@ -551,29 +436,25 @@ class FirewallAppListAdapter internal constructor(
     private fun showDialogForSystemAppBlock(isSysComponent : Boolean): Boolean {
         //Change the handler logic into some other
         val handlerDelete: Handler = ThrowingHandler()
-        var proceedBlocking: Boolean = false
+        var proceedBlocking = false
 
         val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
 
         builderSingle.setIcon(R.drawable.spinner_firewall)
 
         if(isSysComponent){
-            builderSingle.setTitle("Block System Components")
+            builderSingle.setTitle(context.resources.getString(R.string.system_components_warning_title))
             builderSingle.setMessage(context.resources.getString(R.string.system_components_warning))
         }else{
-            builderSingle.setTitle("Block System Apps")
+            builderSingle.setTitle(context.resources.getString(R.string.system_apps_warning_title))
             builderSingle.setMessage(context.resources.getString(R.string.system_apps_warning))
         }
 
 
-        builderSingle.setPositiveButton(
-            "Block anyway"
-        ) { dialogInterface: DialogInterface, i: Int ->
+        builderSingle.setPositiveButton(context.resources.getString(R.string.system_apps_dialog_positive)) { _: DialogInterface, _: Int ->
             proceedBlocking = true
             handlerDelete.sendMessage(handlerDelete.obtainMessage())
-        }.setNegativeButton(
-            "Cancel"
-        ) { dialogInterface: DialogInterface, i: Int ->
+        }.setNegativeButton(context.resources.getString(R.string.system_apps_dialog_negative)) { _: DialogInterface, _: Int ->
             handlerDelete.sendMessage(handlerDelete.obtainMessage())
             proceedBlocking = false
         }
@@ -588,24 +469,4 @@ class FirewallAppListAdapter internal constructor(
 
         return proceedBlocking
     }
-
-
-    /*override fun onQueryTextSubmit(query: String?): Boolean {
-        val filteredList = dataList[titleList.last()]!!.filter { a -> a.appName.toLowerCase().contains(query!!.toLowerCase()) }
-        if(filteredList.isNotEmpty()) {
-            dataList[titleList.last()]!!.clear()
-            dataList[titleList.last()]!!.addAll(filteredList)
-            notifyDataSetChanged()
-        }
-        return false
-    }
-
-    override fun onQueryTextChange(newText: String?): Boolean {
-        val filteredList = dataList[titleList.last()]!!.filter { a -> a.appName.toLowerCase().contains(newText!!.toLowerCase()) }
-        dataList[titleList.last()]!!.clear()
-        dataList[titleList.last()]!!.addAll(filteredList)
-        //notifyDataSetChanged()
-        return true
-    }*/
-
 }

@@ -40,6 +40,7 @@ import com.celzero.bravedns.service.QueryTracker
 import com.celzero.bravedns.ui.DNSConfigureWebViewActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_DNS_PLUS
 import com.celzero.bravedns.util.UIUpdateInterface
@@ -67,7 +68,6 @@ class DoHEndpointAdapter(private val context: Context,
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DoHEndpointViewHolder {
         val v: View = LayoutInflater.from(parent.context).inflate(R.layout.doh_endpoint_list_item, parent, false)
-        //v.setBackgroundColor(context.getColor(R.color.colorPrimary))
         return DoHEndpointViewHolder(v)
     }
 
@@ -104,13 +104,13 @@ class DoHEndpointAdapter(private val context: Context,
                 //if(DEBUG) Log.d(LOG_TAG, "Update - dohName ==> ${doHEndpoint.dohURL}")
                 urlNameTxt.text = doHEndpoint.dohName
                 if (doHEndpoint.isSelected) {
-                    urlExplanationTxt.text = "Connected."
+                    urlExplanationTxt.text = context.getString(R.string.dns_connected)
                     Log.d(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}")
                     if(doHEndpoint.dohName == RETHINK_DNS_PLUS){
                         val count = persistentState.numberOfRemoteBlocklists
                         Log.d(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}, count- $count")
                         if (count != 0) {
-                            urlExplanationTxt.text = "Connected. $count blocklists in-use."
+                            urlExplanationTxt.text = context.getString(R.string.dns_connected_rethink_plus, count.toString())
                         }
                     }
                 } else {
@@ -129,8 +129,6 @@ class DoHEndpointAdapter(private val context: Context,
                     configureBtn.visibility = View.GONE
                 }
                 rowView?.setOnClickListener {
-                    //TODO - Move the string in a common place and remove the literal.
-                    //Maybe to strings.xml or to a Constant file in Util class
                     updateConnection(doHEndpoint)
                 }
                 imageAction.setOnClickListener {
@@ -149,8 +147,8 @@ class DoHEndpointAdapter(private val context: Context,
                     }
                     if(DEBUG) Log.d(LOG_TAG, "startActivityForResult - DohEndpointadapter")
                     val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
-                    intent.putExtra("location", DNSConfigureWebViewActivity.REMOTE)
-                    intent.putExtra("stamp", stamp)
+                    intent.putExtra(Constants.LOCATION_INTENT_EXTRA, DNSConfigureWebViewActivity.REMOTE)
+                    intent.putExtra(Constants.STAMP_INTENT_EXTRA, stamp)
                     (context as Activity).startActivityForResult(intent, Activity.RESULT_OK)
                 }
             }
@@ -179,7 +177,6 @@ class DoHEndpointAdapter(private val context: Context,
                 updateDoHDetails(doHEndpoint)
                 checkBox.isChecked = true
             }
-            //mDb.close()
         }
 
         private fun showExplanationOnImageClick(doHEndpoint: DoHEndpoint) {
@@ -188,10 +185,8 @@ class DoHEndpointAdapter(private val context: Context,
             else {
                 if (doHEndpoint.dohExplanation.isNullOrEmpty()) {
                     showDialogExplanation(doHEndpoint.dohName, doHEndpoint.dohURL, "")
-                    //Toast.makeText(context, doHEndpoint.dohURL, Toast.LENGTH_SHORT).show()
                 } else {
                     showDialogExplanation(doHEndpoint.dohName, doHEndpoint.dohURL, doHEndpoint.dohExplanation!!)
-                    //Toast.makeText(context, doHEndpoint.dohExplanation, Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -205,10 +200,10 @@ class DoHEndpointAdapter(private val context: Context,
             builder.setMessage(url + "\n\n" + message)
             builder.setCancelable(true)
             //performing positive action
-            builder.setPositiveButton("Ok") { dialogInterface, which ->
+            builder.setPositiveButton(context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
                 dialogInterface.dismiss()
             }
-            builder.setNeutralButton("Copy"){ dialogInterface: DialogInterface, i: Int ->
+            builder.setNeutralButton(context.getString(R.string.dns_info_neutral)){ _: DialogInterface, _: Int ->
                 val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
                 val clip = ClipData.newPlainText("URL", url)
                 clipboard?.setPrimaryClip(clip)
@@ -230,7 +225,7 @@ class DoHEndpointAdapter(private val context: Context,
             builder.setIcon(android.R.drawable.ic_dialog_alert)
             builder.setCancelable(true)
             //performing positive action
-            builder.setPositiveButton("Delete") { dialogInterface, which ->
+            builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { dialogInterface, which ->
                 GlobalScope.launch(Dispatchers.IO) {
                     doHEndpointRepository.deleteDoHEndpoint(doHEndpoint.dohURL)
                 }
@@ -238,7 +233,7 @@ class DoHEndpointAdapter(private val context: Context,
             }
 
             //performing negative action
-            builder.setNegativeButton("Cancel") { dialogInterface, which ->
+            builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { dialogInterface, which ->
 
             }
             // Create the AlertDialog
@@ -256,16 +251,16 @@ class DoHEndpointAdapter(private val context: Context,
             builder.setMessage(R.string.doh_brave_pro_configure_desc)
             builder.setCancelable(true)
             //performing positive action
-            builder.setPositiveButton("configure") { dialogInterface, which ->
+            builder.setPositiveButton(context.getString(R.string.dns_connected_rethink_configure)) { _, _ ->
                 val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
-                intent.putExtra("location", DNSConfigureWebViewActivity.REMOTE)
-                intent.putExtra("stamp", "")
+                intent.putExtra(Constants.LOCATION_INTENT_EXTRA, DNSConfigureWebViewActivity.REMOTE)
+                intent.putExtra(Constants.STAMP_INTENT_EXTRA, "")
                 (context as Activity).startActivityForResult(intent, Activity.RESULT_OK)
 
             }
 
             //performing negative action
-            builder.setNegativeButton("Cancel") { dialogInterface, which ->
+            builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
                 checkBox.isChecked = false
             }
             // Create the AlertDialog
@@ -293,7 +288,6 @@ class DoHEndpointAdapter(private val context: Context,
             appMode?.setDNSMode(Settings.DNSModePort)
             listener.updateUIFromAdapter(1)
             doHEndpointRepository.updateAsync(doHEndpoint)
-            //mDb.close()
         }
     }
 

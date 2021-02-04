@@ -16,20 +16,20 @@ limitations under the License.
 
 package com.celzero.bravedns.adapter
 
-import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.DialogInterface
 import android.os.CountDownTimer
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.getSystemService
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -108,13 +108,8 @@ class DNSCryptEndpointAdapter(private val context: Context,
         fun update(dnsCryptEndpoint: DNSCryptEndpoint?) {
             if(DEBUG) Log.d(LOG_TAG,"dnsCryptEndpoint adapter -- ${dnsCryptEndpoint?.dnsCryptName}")
             urlNameTxt.text = dnsCryptEndpoint!!.dnsCryptName
-            /*if (dnsCryptEndpoint.isSelected && cryptModeInProgress == 2) {
-                urlExplanationTxt.text = "Connected"
-            } else if (dnsCryptEndpoint.isSelected && cryptModeInProgress == 1) {
-                urlExplanationTxt.text = "Connecting.."
-            } else */
             if (dnsCryptEndpoint.isSelected) {
-                urlExplanationTxt.text = "Connected"
+                urlExplanationTxt.text = context.getString(R.string.dns_connected)
             } else {
                 urlExplanationTxt.text = ""
             }
@@ -128,16 +123,13 @@ class DNSCryptEndpointAdapter(private val context: Context,
             rowView?.setOnClickListener {
                 imageAction.isChecked = !imageAction.isChecked
                 dnsCryptEndpoint.isSelected = imageAction.isChecked
-                //serverList.add(dnsCryptEndpoint)
                 val state = updateDNSCryptDetails(dnsCryptEndpoint)
                 if (!state) {
                     imageAction.isChecked = !state
                 }
             }
             imageAction.setOnClickListener {
-                //serverList.add(dnsCryptEndpoint)
                 dnsCryptEndpoint.isSelected = imageAction.isChecked
-                //cryptModeInProgress = 1
                 val state = updateDNSCryptDetails(dnsCryptEndpoint)
                 if(!state){
                     imageAction.isChecked = !state
@@ -169,7 +161,7 @@ class DNSCryptEndpointAdapter(private val context: Context,
             builder.setIcon(android.R.drawable.ic_dialog_alert)
             builder.setCancelable(true)
             //performing positive action
-            builder.setPositiveButton("Delete") { dialogInterface, which ->
+            builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { dialogInterface, which ->
                 GlobalScope.launch(Dispatchers.IO) {
                     if (dnsCryptEndpoint != null) {
                         dnsCryptEndpointRepository.deleteDNSCryptEndpoint(dnsCryptEndpoint.dnsCryptURL)
@@ -179,7 +171,7 @@ class DNSCryptEndpointAdapter(private val context: Context,
             }
 
             //performing negative action
-            builder.setNegativeButton("Cancel") { dialogInterface, which ->
+            builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { dialogInterface, which ->
             }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
@@ -196,11 +188,11 @@ class DNSCryptEndpointAdapter(private val context: Context,
             builder.setMessage(url + "\n\n"+message)
             builder.setCancelable(true)
             //performing positive action
-            builder.setPositiveButton("Ok") { dialogInterface, which ->
+            builder.setPositiveButton(context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
                 dialogInterface.dismiss()
             }
 
-            builder.setNeutralButton("Copy") { dialogInterface: DialogInterface, i: Int ->
+            builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
                 val clipboard: ClipboardManager? = context.getSystemService()
                 val clip = ClipData.newPlainText("URL", url)
                 clipboard?.setPrimaryClip(clip)
@@ -213,38 +205,12 @@ class DNSCryptEndpointAdapter(private val context: Context,
             alertDialog.show()
         }
 
-        private fun showApplyDialog(dnsCryptEndpoint : DNSCryptEndpoint) {
-            val dialog = Dialog(context)
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-            dialog.setContentView(R.layout.dialog_bottom_apply_changes)
-            val window: Window = dialog.window!!
-            val wlp: WindowManager.LayoutParams = window.attributes
-            wlp.width = WindowManager.LayoutParams.WRAP_CONTENT
-            wlp.gravity = Gravity.BOTTOM
-            wlp.flags = wlp.flags and WindowManager.LayoutParams.FLAG_DIM_BEHIND.inv()
-            window.attributes = wlp
-
-            val applyURLBtn = dialog.findViewById(R.id.dialog_bottom_apply_changes_ok_btn) as AppCompatButton
-            val cancelURLBtn = dialog.findViewById(R.id.dialog_bottom_apply_changes_cancel_btn) as AppCompatButton
-
-            applyURLBtn.setOnClickListener {
-                updateDNSCryptDetails(dnsCryptEndpoint)
-                dialog.dismiss()
-            }
-
-            cancelURLBtn.setOnClickListener {
-                dialog.dismiss()
-            }
-            // Set other dialog properties
-            dialog.show()
-
-        }
 
         private fun updateDNSCryptDetails(dnsCryptEndpoint : DNSCryptEndpoint) : Boolean{
             val list = dnsCryptEndpointRepository.getConnectedDNSCrypt()
             if(list.size == 1){
                 if(!dnsCryptEndpoint.isSelected && list[0].dnsCryptURL == dnsCryptEndpoint.dnsCryptURL){
-                    Toast.makeText(context,"Atleast one resolver should be selected.",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,context.getString(R.string.dns_select_toast),Toast.LENGTH_SHORT).show()
                     return false
                 }
             }
@@ -269,9 +235,5 @@ class DNSCryptEndpointAdapter(private val context: Context,
 
             return true
         }
-
     }
-
-
-
 }

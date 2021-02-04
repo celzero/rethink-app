@@ -104,8 +104,6 @@ class ExcludedAppListAdapter(
                 appName.text = appInfo.appName
                 checkBox.isChecked = appInfo.isExcluded
                 try {
-                    //val icon = context.packageManager.getApplicationIcon(appInfo.packageInfo)
-                    //appIcon.setImageDrawable(icon)
                     if(!appInfo.packageInfo.contains(Constants.APP_NON_APP) || appInfo.appName != Constants.UNKNOWN_APP){
                         val icon = context.packageManager.getApplicationIcon(appInfo.packageInfo)
                         Glide.with(context)
@@ -158,7 +156,6 @@ class ExcludedAppListAdapter(
                     categoryInfoRepository.updateExcludedCount(appInfo.appCategory, excludedCount)
                     categoryInfoRepository.updateWhitelistCount(appInfo.appCategory,whitelistCount)
                 }
-                //excludedAppsFromVPN[appInfo.packageInfo] = status
                 if(DEBUG) Log.d(LOG_TAG,"Apps excluded - ${appInfo.appName}, $status")
             } else {
                 checkBox.isChecked = !status
@@ -172,49 +169,35 @@ class ExcludedAppListAdapter(
             val handler: Handler = ThrowingHandler()
             var positiveTxt = ""
             val packageNameList: List<String> = packageList.map { it.appName }
-            var proceedBlocking: Boolean = false
+            var proceedBlocking = false
 
             val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
 
             builderSingle.setIcon(R.drawable.ic_exclude_app)
             if (isInternet) {
-                builderSingle.setTitle("Excluding \"$appName\" will also exclude these ${packageList.size} apps")
-                positiveTxt = "Exclude ${packageList.size} apps"
+                builderSingle.setTitle(context.getString(R.string.exclude_app_desc, appName, packageList.size.toString()))
+                positiveTxt = context.getString(R.string.exclude_app_dialog_positive, packageList.size.toString())
             } else {
-                builderSingle.setTitle("Unexcluding \"$appName\" will also unexclude these ${packageList.size} apps")
-                positiveTxt = "Unexclude ${packageList.size} apps"
+                builderSingle.setTitle(context.getString(R.string.unexclude_app_desc, appName, packageList.size.toString()))
+                positiveTxt = context.getString(R.string.unexclude_app_dialog_positive, packageList.size.toString())
             }
-            val arrayAdapter = ArrayAdapter<String>(
-                context,
-                android.R.layout.simple_list_item_activated_1
-            )
+            val arrayAdapter = ArrayAdapter<String>(context,
+                android.R.layout.simple_list_item_activated_1)
             arrayAdapter.addAll(packageNameList)
             builderSingle.setCancelable(false)
-            //builderSingle.setSingleChoiceItems(arrayAdapter,-1,({dialogInterface: DialogInterface, which : Int ->}))
+
             builderSingle.setItems(packageNameList.toTypedArray(), null)
 
-
-            /* builderSingle.setAdapter(arrayAdapter) { dialogInterface, which ->
-                  if(DEBUG) Log.d(LOG_TAG,"OnClick")
-                 //dialogInterface.cancel()
-                 //builderSingle.setCancelable(false)
-             }*/
-            /*val alertDialog : AlertDialog = builderSingle.create()
-            alertDialog.getListView().setOnItemClickListener({ adapterView, subview, i, l -> })*/
-            builderSingle.setPositiveButton(
-                positiveTxt
-            ) { dialogInterface: DialogInterface, i: Int ->
+            builderSingle.setPositiveButton(positiveTxt) { _: DialogInterface, _: Int ->
                 proceedBlocking = true
                 handler.sendMessage(handler.obtainMessage())
-            }.setNeutralButton(
-                "Go Back"
-            ) { dialogInterface: DialogInterface, i: Int ->
+            }.setNeutralButton(context.getString(R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int ->
                 handler.sendMessage(handler.obtainMessage())
                 proceedBlocking = false
             }
 
             val alertDialog: AlertDialog = builderSingle.show()
-            alertDialog.listView.setOnItemClickListener { adapterView, subview, i, l -> }
+            alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
             alertDialog.setCancelable(false)
             try {
                 Looper.loop()

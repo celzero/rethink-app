@@ -109,7 +109,7 @@ class UniversalAppListAdapter(
         fun update(appInfo: AppInfo?) {
             if(appInfo != null){
                 if(appInfo.appCategory == Constants.APP_CAT_SYSTEM_COMPONENTS){
-                    appName.text = appInfo.appName//+ Constants.RECOMMENDED
+                    appName.text = appInfo.appName
                 }else{
                     appName.text = appInfo.appName
                 }
@@ -118,12 +118,9 @@ class UniversalAppListAdapter(
                 try {
                     Glide.with(context).load(context.packageManager.getApplicationIcon(appInfo.packageInfo))
                         .into(appIcon)
-                    //val icon = context.packageManager.getApplicationIcon(appInfo.packageInfo)
-                    //appIcon.setImageDrawable(icon)
                 } catch (e: Exception) {
                     Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                         .into(appIcon)
-                    //appIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
                     Log.e(LOG_TAG, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message, e)
                 }
 
@@ -131,14 +128,6 @@ class UniversalAppListAdapter(
                     if(DEBUG) Log.d(LOG_TAG,"parentView- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
                     appInfo.whiteListUniv1 = !appInfo.whiteListUniv1
                     modifyWhiteListApps(appInfo)
-                    /*object : CountDownTimer(1000, 500) {
-                        override fun onTick(millisUntilFinished: Long) {
-                        }
-                        override fun onFinish() {
-
-                        }
-                    }.start()*/
-
                 }
 
                 checkBox.setOnCheckedChangeListener(null)
@@ -159,11 +148,6 @@ class UniversalAppListAdapter(
                 blockAllApps = showDialog(appUIDList, appInfo.appName, status)
             }else{
                 blockAllApps = true
-               /* if (status) {
-                    Toast.makeText(context, "${appInfo.appName} removed from whitelist", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(context, "${appInfo.appName} added to whitelist", Toast.LENGTH_SHORT).show()
-                }*/
             }
             if(blockAllApps) {
                 checkBox.isChecked = status
@@ -194,7 +178,7 @@ class UniversalAppListAdapter(
             val handler: Handler = ThrowingHandler()
             var positiveTxt = ""
             val packageNameList: List<String> = packageList.map { it.appName }
-            var proceedBlocking: Boolean = false
+            var proceedBlocking = false
 
             val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
 
@@ -205,11 +189,11 @@ class UniversalAppListAdapter(
                     appNameEllipsis = appNameEllipsis.substring(0, 10)
                     appNameEllipsis = "$appNameEllipsis..."
                 }
-                builderSingle.setTitle("Adding \"$appNameEllipsis\" to the whitelist will also add these ${packageList.size} apps")
-                positiveTxt = "Add ${packageList.size} apps"
+                builderSingle.setTitle(context.getString(R.string.whitelist_add_app, appNameEllipsis, packageList.size.toString()))
+                positiveTxt = context.getString(R.string.whitelist_add_positive, packageList.size.toString())
             } else {
-                builderSingle.setTitle("Removing  \"$appNameEllipsis\" from the whitelist will also remove these ${packageList.size} apps")
-                positiveTxt = "Remove ${packageList.size} apps"
+                builderSingle.setTitle(context.getString(R.string.whitelist_remove_app, appNameEllipsis, packageList.size.toString()))
+                positiveTxt = context.getString(R.string.whitelist_add_negative, packageList.size.toString())
             }
             val arrayAdapter = ArrayAdapter<String>(
                 context,
@@ -217,31 +201,18 @@ class UniversalAppListAdapter(
             )
             arrayAdapter.addAll(packageNameList)
             builderSingle.setCancelable(false)
-            //builderSingle.setSingleChoiceItems(arrayAdapter,-1,({dialogInterface: DialogInterface, which : Int ->}))
             builderSingle.setItems(packageNameList.toTypedArray(), null)
 
-
-            /* builderSingle.setAdapter(arrayAdapter) { dialogInterface, which ->
-                  Log.d(LOG_TAG,"OnClick")
-                 //dialogInterface.cancel()
-                 //builderSingle.setCancelable(false)
-             }*/
-            /*val alertDialog : AlertDialog = builderSingle.create()
-            alertDialog.getListView().setOnItemClickListener({ adapterView, subview, i, l -> })*/
-            builderSingle.setPositiveButton(
-                positiveTxt
-            ) { dialogInterface: DialogInterface, i: Int ->
+            builderSingle.setPositiveButton(positiveTxt) { _: DialogInterface, _: Int ->
                 proceedBlocking = true
                 handler.sendMessage(handler.obtainMessage())
-            }.setNeutralButton(
-                "Go Back"
-            ) { dialogInterface: DialogInterface, i: Int ->
+            }.setNeutralButton(context.getString(R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int ->
                 handler.sendMessage(handler.obtainMessage())
                 proceedBlocking = false
             }
 
             val alertDialog: AlertDialog = builderSingle.show()
-            alertDialog.listView.setOnItemClickListener { adapterView, subview, i, l -> }
+            alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
             alertDialog.setCancelable(false)
             try {
                 Looper.loop()

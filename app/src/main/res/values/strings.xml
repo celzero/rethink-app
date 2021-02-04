@@ -368,9 +368,14 @@
     <string name="always_on_dialog_negative_btn">Cancel</string>
 
 
+    <string name="system_apps_warning_title">Block System Apps</string>
+    <string name="system_components_warning_title">Block System Components</string>
 
     <string name="system_apps_warning">Some system apps are critical to proper functioning of a device. Block them only if you know what you are doing.</string>
     <string name="system_components_warning">Some system components are critical to proper functioning of a device. Block them only if you know what you are doing.</string>
+
+    <string name="system_apps_dialog_positive">Block anyway</string>
+    <string name="system_apps_dialog_negative">Cancel</string>
 
     <string name="firewall_act_universal_tab">Universal</string>
     <string name="firewall_act_apps_tab">All apps</string>
@@ -744,6 +749,9 @@
 
 
     <!-- Universal Firewall-->
+    <string name="univ_ip_delete_individual_positive">Delete</string>
+    <string name="univ_ip_delete_individual_negative">Cancel</string>
+    <string name="univ_ip_delete_individual_toast">%1$s unblocked.</string>
     <string name="univ_ip_delete_dialog_positive">Delete all</string>
     <string name="univ_ip_delete_dialog_negative">Cancel</string>
     <string name="univ_ip_delete_toast_success">Deleted all IP rules.</string>
@@ -755,6 +763,42 @@
     <string name="univ_accessibility_crash_dialog_negative">Cancel</string>
     <string name="univ_accessibility_dialog_positive">Grant</string>
     <string name="univ_accessibility_dialog_negative">Deny</string>
+
+    <!-- Connection tracker adapter -->
+    <string name="ct_app_name">%1$s + %2$s other app</string>
+    <string name="ct_app_names">%1$s + %2$s other apps</string>
+
+    <!-- DNS adapters -->
+    <string name="dns_connected_rethink_plus">Connected. %1$s blocklists in-use</string>
+    <string name="dns_connected_rethink_configure">configure</string>
+    <string name="dns_connected">Connected</string>
+    <string name="dns_delete_positive">Delete</string>
+    <string name="dns_delete_negative">Cancel</string>
+
+    <string name="dns_info_positive">Ok</string>
+    <string name="dns_info_neutral">Copy</string>
+
+    <string name="dns_select_toast">Atleast one resolver should be selected.</string>
+    <string name="dns_crypt_relay_error_toast">No resolver selected</string>
+
+    <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
+    <string name="dns_proxy_dialog_message">AppName: %1$s\n\nURL: %2$s\n\nPort: %3$s</string>
+
+    <string name="dns_query_latency">%1$sms</string>
+
+    <string name="exclude_app_desc">Excluding "%1$s" will also exclude these %2$s apps</string>
+    <string name="unexclude_app_desc">Unexcluding "%1$s" will also unexclude these %2$s apps</string>
+
+    <string name="exclude_app_dialog_positive">Exclude %1$s apps</string>
+    <string name="unexclude_app_dialog_positive">Unexclude %1$s apps</string>
+
+    <!-- whitelist -->
+    <string name="whitelist_add_app">Adding "%1$s" to the whitelist will also add these %2$s apps</string>
+    <string name="whitelist_remove_app">Removing "%1$s" from the whitelist will also remove these %2$s apps</string>
+    <string name="whitelist_add_positive">Add %1$s apps</string>
+    <string name="whitelist_add_negative">Remove %1$s apps</string>
+
+
 
 
 </resources>
