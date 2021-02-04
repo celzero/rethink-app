@@ -34,6 +34,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
@@ -119,15 +120,15 @@ class ConnectionTrackerAdapter(val context : Context) : PagedListAdapter<Connect
                 }else {
                     connectionIndicator!!.visibility = View.INVISIBLE
                 }
-                if (connTracker.appName != "Unknown") {
+                if (connTracker.appName != Constants.UNKNOWN_APP) {
                     try {
                         val appArray = context.packageManager.getPackagesForUid(connTracker.uid)
                         if(appArray != null) {
                             val appCount = (appArray.size).minus(1)
                             if (appArray.size > 2) {
-                                fqdnView!!.text = "${connTracker.appName} + $appCount other apps"
+                                fqdnView!!.text = context.getString(R.string.ct_app_names, connTracker.appName, appCount.toString())
                             } else if (appArray.size == 2) {
-                                fqdnView!!.text = "${connTracker.appName} + $appCount other app"
+                                fqdnView!!.text = context.getString(R.string.ct_app_name, connTracker.appName, appCount.toString())
                             }
                             Glide.with(context)
                                 .load(context.packageManager.getApplicationIcon(appArray[0]!!))
@@ -137,14 +138,12 @@ class ConnectionTrackerAdapter(val context : Context) : PagedListAdapter<Connect
                             Glide.with(context).load(ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground)).into(appIcon!!)
                         }
                     } catch (e: Exception) {
-                       // appIcon?.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground))
                         Glide.with(context)
                             .load(ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground))
                             .into(appIcon!!)
                         Log.e(LOG_TAG, "Package Not Found - " + e.message, e)
                     }
                 }else{
-                    //appIcon?.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground))
                     Glide.with(context)
                         .load(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
                         .into(appIcon!!)

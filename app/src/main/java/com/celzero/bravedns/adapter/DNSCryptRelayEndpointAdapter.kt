@@ -66,7 +66,6 @@ class DNSCryptRelayEndpointAdapter(
             R.layout.dns_crypt_endpoint_list_item,
             parent, false
         )
-        //v.setBackgroundColor(context.getColor(R.color.colorPrimary))
         return DNSCryptRelayEndpointViewHolder(v)
     }
 
@@ -98,15 +97,9 @@ class DNSCryptRelayEndpointAdapter(
 
         fun update(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint?) {
             if (dnsCryptRelayEndpoint != null) {
-                //if(DEBUG) Log.d(LOG_TAG,"Update - dohName ==> ${dnsCryptRelayEndpoint.dnsCryptRelayURL}")
                 urlNameTxt.text = dnsCryptRelayEndpoint.dnsCryptRelayName
-                /*if(dnsCryptRelayEndpoint.isSelected && HomeScreenActivity.GlobalVariable.cryptModeInProgress == 2){
-                    urlExplanationTxt.text = "Connected"
-                } else if (dnsCryptRelayEndpoint.isSelected && HomeScreenActivity.GlobalVariable.cryptModeInProgress == 1) {
-                    urlExplanationTxt.text = "Connecting.."
-                } else */
                 if (dnsCryptRelayEndpoint.isSelected) {
-                    urlExplanationTxt.text = "Connected"
+                    urlExplanationTxt.text = context.getString(R.string.dns_connected)
                 } else {
                     urlExplanationTxt.text = ""
                 }
@@ -135,7 +128,6 @@ class DNSCryptRelayEndpointAdapter(
                     if (imageAction.isChecked && !state) {
                         imageAction.isChecked = state
                     }
-                    //showExplanationOnImageClick(dnsCryptRelayEndpoint)
                 }
                 infoImage.setOnClickListener {
                     showExplanationOnImageClick(dnsCryptRelayEndpoint)
@@ -164,11 +156,11 @@ class DNSCryptRelayEndpointAdapter(
             builder.setMessage(url + "\n\n" + message)
             builder.setCancelable(true)
             //performing positive action
-            builder.setPositiveButton("Ok") { dialogInterface, which ->
+            builder.setPositiveButton(context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
                 dialogInterface.dismiss()
             }
 
-            builder.setNeutralButton("Copy") { dialogInterface: DialogInterface, i: Int ->
+            builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
                 val clipboard: ClipboardManager? = context.getSystemService()
                 val clip = ClipData.newPlainText("URL", url)
                 clipboard?.setPrimaryClip(clip)
@@ -190,7 +182,7 @@ class DNSCryptRelayEndpointAdapter(
             builder.setIcon(android.R.drawable.ic_dialog_alert)
             builder.setCancelable(true)
             //performing positive action
-            builder.setPositiveButton("Delete") { dialogInterface, which ->
+            builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { dialogInterface, which ->
                 GlobalScope.launch(Dispatchers.IO) {
                     if (dnsCryptRelayEndpoint != null) {
                         dnsCryptRelayEndpointRepository.deleteDNSCryptRelayEndpoint(dnsCryptRelayEndpoint.dnsCryptRelayURL)
@@ -200,7 +192,7 @@ class DNSCryptRelayEndpointAdapter(
             }
 
             //performing negative action
-            builder.setNegativeButton("Cancel") { dialogInterface, which ->
+            builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { dialogInterface, which ->
             }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
@@ -249,10 +241,9 @@ class DNSCryptRelayEndpointAdapter(
                 }.start()
                 persistentState.dnsType = 2
                 persistentState.connectionModeChange = dnsCryptRelayEndpoint.dnsCryptRelayURL
-                //mDb.close()
                 return true
             } else {
-                Toast.makeText(context, "No resolver selected", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, context.getString(R.string.dns_crypt_relay_error_toast), Toast.LENGTH_LONG).show()
                 return false
             }
 

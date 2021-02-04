@@ -107,6 +107,8 @@ class Constants {
         const val SOCKS_DEFAULT_IP = "127.0.0.1"
         const val SOCKS_DEFAULT_PORT = "9050"
         const val SOCKS = "Socks5"
+
+        const val DATE_FORMAT_PATTERN = "HH:mm:ss"
     }
 
 }

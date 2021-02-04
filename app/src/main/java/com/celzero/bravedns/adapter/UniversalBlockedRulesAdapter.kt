@@ -104,19 +104,18 @@ class UniversalBlockedRulesAdapter(
             builder.setIcon(android.R.drawable.ic_dialog_alert)
             builder.setCancelable(true)
             //performing positive action
-            builder.setPositiveButton("Delete") { dialogInterface, which ->
+            builder.setPositiveButton(context.getString(R.string.univ_ip_delete_individual_positive)) { _, _ ->
                 GlobalScope.launch(Dispatchers.IO) {
                     if (blockedConns != null) {
                         val firewallRules = FirewallRules.getInstance()
                         firewallRules.removeFirewallRules(ConnTrackerBottomSheetFragment.UNIVERSAL_RULES_UID, blockedConns.ipAddress!!, BraveVPNService.BlockedRuleNames.RULE2.ruleName, blockedConnectionsRepository)
                     }
                 }
-                Toast.makeText(context, "${blockedConns.ipAddress} unblocked.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.univ_ip_delete_individual_toast, blockedConns.ipAddress), Toast.LENGTH_SHORT).show()
             }
 
             //performing negative action
-            builder.setNegativeButton("Cancel") { dialogInterface, which ->
-            }
+            builder.setNegativeButton(context.getString(R.string.univ_ip_delete_individual_negative)) { _, _ -> }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
             // Set other dialog properties
