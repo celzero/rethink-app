@@ -85,6 +85,18 @@
             android:text="@string/dns_logs_not_available_text"
             android:textColor="@color/textColorMain" />
 
+        <TextView
+            android:id="@+id/query_list_logs_disabled_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/query_list_recycler_heading"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/show_logs_disabled_dns_message"
+            android:textSize="@dimen/large_font_text_view"
+            android:visibility="gone" />
+
         <LinearLayout
             android:id="@+id/query_list_recycler_heading"
             android:layout_width="match_parent"
@@ -97,8 +109,6 @@
             android:paddingBottom="10dp"
             android:visibility="gone"
             android:weightSum="1">
-
-
 
             <TextView
                 android:layout_width="0dp"
@@ -154,18 +164,6 @@
                 android:padding="1dp" />
 
         </com.celzero.bravedns.util.NestedScrollableHost>
-
-        <TextView
-            android:id="@+id/query_list_logs_disabled_tv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:gravity="center"
-            android:padding="10dp"
-            android:layout_below="@id/query_list_recycler_heading"
-            android:text="@string/show_logs_disabled_dns_message"
-            android:textSize="@dimen/large_font_text_view"
-            android:visibility="gone" />
 
     </RelativeLayout>
 </LinearLayout>
