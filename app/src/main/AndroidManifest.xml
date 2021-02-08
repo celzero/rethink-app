@@ -23,8 +23,7 @@
         android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
         android:name=".RethinkDnsApplication"
-        android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true">
+        android:theme="@style/AppTheme">
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />
