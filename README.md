@@ -32,11 +32,11 @@ RethinkDNS is not an anonymity tool: It helps users tackle unabated censorship a
 
 RethinkDNS doesn't aim to be a feature-rich traditional firewall: It is more in-line with [Little Snitch](https://www.obdev.at/products/littlesnitch/index.html) than IP tables, say.
 
-RethinkDNS is not an anti-virus: RethinkDNS may stop users from phising attacks, malware, scareware websites through its DNS-based blocklists, but it doesn't actively mitigate threats or even look for them or act on them, otherwise.
+RethinkDNS is not an anti-virus: RethinkDNS may stop users from phishing attacks, malware, scareware websites through its DNS-based blocklists, but it doesn't actively mitigate threats or even look for them or act on them, otherwise.
 
 ### What RethinkDNS aspires to be
 
-To turn Android devices into user-agents: Something that users can control as they please without requiring root-access. A big part of this, for an always-on, always-connected devices, is capturing network traffic and reporting it in a way that makes sense to the end-users who can then take a series of actions to limit their exposure but not necessiarly eliminate it. Take DNS for example-- for most if not all connections, apps send out a DNS request first, and by tracking just those one can glean a lot of intelligence about what's happening with the phone and which app's responsible.
+To turn Android devices into user-agents: Something that users can control as they please without requiring root-access. A big part of this, for an always-on, always-connected devices, is capturing network traffic and reporting it in a way that makes sense to the end-users who can then take a series of actions to limit their exposure but not necessarily eliminate it. Take DNS for example-- for most if not all connections, apps send out a DNS request first, and by tracking just those one can glean a lot of intelligence about what's happening with the phone and which app's responsible.
 
 To deliver the promise of open-internet for all: With the inevitable ESNI standardization and the imminent adoption of DNS over HTTPS and DNS over TLS across operating systems, we're that much closer to an open internet. Of course, Deep Packet Inspection remains a credible threat that can't be mitigated with this, but it is one example of delivering maximum impact (circumvents internet censorship in most countries) with minimal effort (not requiring a use of a VPN or IPFS, for example). RethinkDNS would continue to make these technologies accessible in the most simplest way possible, especially the ones that get 90% of the way there with 10% effort.
 
@@ -49,15 +49,15 @@ To deliver the promise of open-internet for all: With the inevitable ESNI standa
 3. Release cycles are undecided, but we're leaning towards bi-weekly once automated tests are up, whenever that may be.
 
 ## Tenets (unless you know better ones)
-We aren't there yet, may never will be but these are some tenets for the project for the foreseebale future.
+We aren't there yet, may never will be but these are some tenets for the project for the foreseeable future.
 
 - Make it right, make it secure, make it resilient, make it fast. In that order.
 - Easy to use, no-root, no-gimmicks features that are anti-censorship and anti-surveillance.
   - Easy to use: Any of the 2B+ Android users must be able to use it. Think CleanMaster / Instagram levels of ease-of-use. 
   - no-root: Shouldn't require root-access for any functionality added to it.
   - no-gimmicks: Misleading material bordering on scareware, for example.
-  - anti-censorship: Features focused on helping bring an open internet to everyone, preferably in the most efficient way possible (both monetairly and technically).
- - Anti-surveillance: As above, but features that further limit (may not necessairly eliminate) surveillance by apps.
+  - anti-censorship: Features focused on helping bring an open internet to everyone, preferably in the most efficient way possible (both monetarily and technically).
+ - Anti-surveillance: As above, but features that further limit (may not necessarily eliminate) surveillance by apps.
 - Incremental changes in balance with newer features.
   - For example, work on nagging UI issues or OEM specific bugs, must be taken up on equal weight to newer features, and a release must probably establish a good balance between the two. However; working on only incremental changes for a release is fine.
 - Opinionated. Chip-away complexity. Do not expect users to require a PhD in Computer Science to use the app.
