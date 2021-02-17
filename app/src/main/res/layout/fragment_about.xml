@@ -59,7 +59,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:background="@color/colorPrimary"
+            android:background="?attr/background"
             android:orientation="vertical"
             android:padding="5dp">
 
@@ -81,7 +81,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:background="@color/colorPrimary"
                 android:gravity="center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:paddingLeft="20dp"
@@ -96,7 +95,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:background="@color/colorPrimary"
+            android:background="?attr/background"
             android:orientation="vertical"
             android:padding="5dp">
 
@@ -126,7 +125,6 @@
                 android:paddingTop="3dp"
                 android:paddingBottom="10dp"
                 android:text="@string/about_bravedns_toreport_text"
-                android:textColor="@color/textColorMain"
                 android:textSize="@dimen/large_font_text_view" />
 
 
@@ -136,7 +134,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:background="@color/colorPrimary"
+            android:background="?attr/background"
             android:orientation="vertical"
             android:paddingTop="10dp"
             android:paddingBottom="15dp">
@@ -150,7 +148,7 @@
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/about_app"
-                android:textColor="@color/secondaryText"
+                android:textColor="?attr/secondaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -179,7 +177,6 @@
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/about_app_update_check"
-                android:textColor="@color/primaryText"
                 android:textSize="@dimen/large_font_text_view" />
 
 
@@ -189,7 +186,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:background="@color/colorPrimary"
+            android:background="?attr/background"
             android:orientation="vertical"
             android:paddingTop="10dp"
             android:paddingBottom="15dp">
@@ -203,7 +200,7 @@
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/about_web"
-                android:textColor="@color/secondaryText"
+                android:textColor="?attr/secondaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
 
 
@@ -219,7 +216,6 @@
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/about_website"
-                android:textColor="@color/primaryText"
                 android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -270,7 +266,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:background="@color/colorPrimary"
+            android:background="?attr/background"
             android:orientation="vertical"
             android:paddingTop="10dp"
             android:paddingBottom="10dp">
@@ -284,7 +280,7 @@
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/about_connect"
-                android:textColor="@color/secondaryText"
+                android:textColor="?attr/secondaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView

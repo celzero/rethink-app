@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:textSize="@dimen/large_font_text_view"
-        android:text="Add DNS over HTTPS"
+        android:text="@string/cd_doh_dialog_heading"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout
@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_marginTop="10dp"
         android:layout_height="wrap_content"
-        android:hint="Resolver Name"
+        android:hint="@string/cd_doh_dialog_resolver_name"
         app:hintTextColor="@color/secondaryText"
         app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_top">
 
@@ -45,7 +45,7 @@
         android:id="@+id/text_input_layout1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Resolver URL"
+        android:hint="@string/cd_doh_dialog_resolver_url"
         app:hintTextColor="@color/secondaryText"
         app:layout_constraintTop_toBottomOf="@id/text_input_layout_name">
 
@@ -77,7 +77,7 @@
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
         android:padding="5dp"
-        android:text="Host connection failed. Try again."
+        android:text="@string/settings_http_proxy_error_text4"
         android:textSize="@dimen/default_font_text_view"
         android:textColor="@color/colorRed_A400"
         android:visibility="invisible"
@@ -92,7 +92,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
-        android:text="Add"
+        android:text="@string/cd_dialog_positive_btn"
         android:textSize="@dimen/large_font_text_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_failure_text" />
@@ -106,7 +106,7 @@
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         android:gravity="center"
-        android:text="Cancel"
+        android:text="@string/cd_dialog_negative_btn"
         android:textSize="@dimen/large_font_text_view"
         app:layout_constraintEnd_toStartOf="@id/dialog_custom_url_ok_btn"
         app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_failure_text" />

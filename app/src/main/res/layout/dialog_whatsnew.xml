@@ -14,7 +14,7 @@
             android:layout_height="wrap_content"
             android:padding="@dimen/sub_heading"
             android:text="@string/whats_new_version_name"
-            android:textColor="@color/primaryText"
+            android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/heading_font_text_view"
             android:textStyle="bold" />
 
@@ -23,8 +23,8 @@
             android:layout_height="wrap_content"
             android:padding="10dp"
             android:lineSpacingExtra="4sp"
+            android:textColor="?attr/primaryTextColor"
             android:text="@string/whats_new_version_update"
-            android:textColor="@color/primaryText"
             android:textSize="@dimen/large_font_text_view" />
 
 

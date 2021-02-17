@@ -12,4 +12,18 @@
             <enum name="strokeRipple" value="1"/>
         </attr>
     </declare-styleable>
+    <attr name="primaryColor" format="reference" />
+    <attr name="primaryDarkColor" format="reference" />
+    <attr name="primaryColorAccent" format="reference" />
+    <attr name="primaryTextColor" format="reference" />
+    <attr name="secondaryTextColor" format="reference" />
+    <attr name="dividerColor" format="reference" />
+    <attr name="roundedCornersButton"  format="reference"/>
+    <attr name="homeScreenBtnBackground" format="reference"/>
+    <attr name="svgStrokeColor" format="reference"/>
+    <attr name="svgFillColor" format="reference"/>
+    <attr name="accentGood" format="reference"/>
+    <attr name="accentBad" format="reference"/>
+    <attr name="backgroundDark" format="reference"/>
+
 </resources>

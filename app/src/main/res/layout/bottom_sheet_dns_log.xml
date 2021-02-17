@@ -8,12 +8,10 @@
     android:focusable="true">
 
     <TextView
-        style="@style/ActionItem"
-        android:layout_width="match_parent"
+        android:layout_width="60dp"
+        android:layout_gravity="center"
         android:layout_height="3dp"
-        android:layout_marginLeft="40dp"
         android:layout_marginTop="10dp"
-        android:layout_marginRight="40dp"
         android:layout_marginBottom="40dp"
         android:background="@color/recycler_selected" />
 
@@ -34,7 +32,6 @@
 
             <TextView
                 android:id="@+id/dns_block_url"
-                style="@style/ActionItem"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -44,6 +41,7 @@
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
                 android:text="@string/action_automatic"
+                android:textColor="?attr/primaryTextColor"
                 android:textIsSelectable="true"
                 android:textSize="@dimen/heading_font_text_view" />
         </RelativeLayout>
@@ -75,7 +73,6 @@
             <TextView
                 android:layout_weight="0.65"
                 android:id="@+id/dns_block_ip_address"
-                style="@style/ActionItem"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
@@ -85,12 +82,12 @@
                 android:ellipsize="end"
                 android:paddingEnd="10dp"
                 android:text="asdasaasda"
+                android:textColor="?attr/primaryTextColor"
                 android:textIsSelectable="true"
                 android:textSize="@dimen/large_font_text_view" />
 
             <TextView
                 android:id="@+id/dns_block_ip_latency"
-                style="@style/ActionItem"
                 android:layout_weight="0.2"
                 android:layout_width="wrap_content"
                 android:layout_marginEnd="5dp"
@@ -108,7 +105,6 @@
 
         <TextView
             android:id="@+id/dns_block_blocked_desc"
-            style="@style/ActionItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/dns_block_ip_header"
@@ -121,7 +117,6 @@
 
         <TextView
             android:id="@+id/dns_block_resolver"
-            style="@style/ActionItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/dns_block_blocked_desc"
@@ -134,7 +129,6 @@
 
         <TextView
             android:id="@+id/dns_block_latency"
-            style="@style/ActionItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/dns_block_resolver"
@@ -165,8 +159,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:text="Blocklists"
-                android:textColor="@color/primaryText"
+                android:text="@string/dns_btm_sheet_header"
+                android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
 
             <androidx.recyclerview.widget.RecyclerView
@@ -174,7 +168,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/dns_block_btm_sheet"
-                android:background="@color/colorPrimary"
+                android:background="?attr/background"
                 android:focusableInTouchMode="true"
                 android:orientation="vertical"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />

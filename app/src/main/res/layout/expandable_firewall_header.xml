@@ -5,36 +5,36 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
-    android:background="@color/colorPrimary"
+    android:backgroundTint="?attr/background"
     android:descendantFocusability="blocksDescendants">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:backgroundTint="@color/colorPrimary"
         app:cardElevation="@dimen/activity_horizontal_margin"
         app:cardMaxElevation="@dimen/activity_horizontal_margin">
+
+        <TextView
+            android:id="@+id/expand_header_category_indicator"
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="5dp"
+            android:background="@color/colorAmber_900"
+            android:textColor="@color/colorAmber_900"
+            android:textSize="@dimen/large_font_text_view" />
 
         <RelativeLayout
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+
             <RelativeLayout
                 android:id="@+id/expand_header_rl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/expand_header_category_indicator"
-                    android:layout_width="2dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_marginEnd="5dp"
-                    android:background="@color/colorAmber_900"
-                    android:text="TextView1"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:textColor="@color/colorAmber_900" />
 
                 <TextView
                     android:id="@+id/expand_textView_category_name"
@@ -45,7 +45,6 @@
                     android:paddingTop="15dp"
                     android:paddingBottom="5dp"
                     android:text="TextView"
-                    android:textColor="@color/primaryText"
                     android:textSize="@dimen/large_font_text_view"
                     android:textStyle="bold" />
 
@@ -55,8 +54,8 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/expand_textView_category_name"
                     android:layout_alignStart="@id/expand_textView_category_name"
-                    android:layout_toStartOf="@id/expand_checkbox"
                     android:layout_marginEnd="10dp"
+                    android:layout_toStartOf="@id/expand_checkbox"
                     android:text="Textview"
                     android:textColor="@color/textColorMain"
                     android:textSize="@dimen/default_font_text_view" />
@@ -71,9 +70,9 @@
                     android:drawableStart="@drawable/allowed"
                     android:drawablePadding="10dp"
                     android:padding="10dp"
-                    android:textSize="@dimen/default_font_text_view"
-                    android:textOff="Unblocked"
-                    android:textOn="Blocked" />
+                    android:textOff="@string/firewall_toggle_unblocked"
+                    android:textOn="@string/firewall_toggle_blocked"
+                    android:textSize="@dimen/default_font_text_view" />
 
                 <ProgressBar
                     android:id="@+id/expand_header_progress"
@@ -142,11 +141,9 @@
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
                     android:paddingBottom="20dp"
-                    android:textSize="@dimen/default_font_text_view"
                     android:text="@string/system_apps_warning"
+                    android:textSize="@dimen/default_font_text_view"
                     android:visibility="gone" />
-
-
             </RelativeLayout>
 
             <TextView
@@ -154,7 +151,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/expand_header_rl"
-                android:background="@color/childListColor"
                 android:paddingBottom="20dp"
                 android:visibility="gone" />
         </RelativeLayout>

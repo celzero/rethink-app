@@ -138,7 +138,6 @@
             android:layout_gravity="end"
             android:layout_marginTop="20dp"
             android:background="@drawable/button_background_ripple"
-            android:text="Ok"
             android:textSize="@dimen/large_font_text_view"
             android:visibility="gone" />
     </LinearLayout>

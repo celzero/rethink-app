@@ -11,8 +11,8 @@
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/firewall_act_tabLayout"
         android:layout_width="match_parent"
-        android:background="@color/colorPrimaryDark"
-        app:tabTextColor="@color/secondaryText"
+        android:background="?attr/colorPrimaryDark"
+        app:tabTextColor="?attr/secondaryTextColor"
         android:layout_height="wrap_content" />
 
     <androidx.viewpager.widget.ViewPager

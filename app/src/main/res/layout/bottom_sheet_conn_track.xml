@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bs_conn_top_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true"
     android:orientation="vertical"
     android:paddingBottom="40dp"
+    android:background="?attr/background"
     android:focusable="true">
 
     <TextView
-        style="@style/ActionItem"
-        android:layout_width="match_parent"
+        android:layout_width="60dp"
         android:layout_height="3dp"
-        android:layout_marginLeft="40dp"
+        android:layout_gravity="center"
         android:layout_marginTop="10dp"
-        android:layout_marginRight="40dp"
         android:layout_marginBottom="20dp"
         android:background="@color/recycler_selected" />
 
@@ -29,10 +27,10 @@
         android:layout_marginEnd="25dp"
         android:padding="5dp"
         android:text="@string/bsct_app_info"
-        android:textColor="@color/accent_bad"
+        android:textColor="?attr/secondaryTextColor"
         android:textSize="@dimen/large_font_text_view"
         android:visibility="visible"
-        app:chipBackgroundColor="@color/colorPrimaryDark" />
+        app:chipBackgroundColor="?attr/backgroundDark" />
 
 
     <RelativeLayout
@@ -57,16 +55,16 @@
 
         <TextView
             android:id="@+id/bs_conn_track_app_name"
-            style="@style/ActionItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_margin="2dp"
+            android:textColor="?attr/primaryTextColor"
             android:layout_marginTop="8dp"
             android:layout_toEndOf="@id/bs_conn_track_app_icon"
             android:gravity="center"
             android:text="@string/action_automatic"
-            android:textSize="@dimen/heading_font_text_view" />
+            android:textSize="@dimen/extra_large_font_text_view" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -89,13 +87,13 @@
 
         <TextView
             android:id="@+id/bs_conn_connection_type_heading"
-            style="@style/ActionItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginTop="2dp"
             android:layout_toEndOf="@id/bs_conn_connection_flag"
             android:paddingStart="10dp"
+            android:textColor="?attr/primaryTextColor"
             android:paddingEnd="10dp"
             android:textIsSelectable="true"
             android:textSize="@dimen/heading_font_text_view" />
@@ -120,7 +118,6 @@
 
             <TextView
                 android:id="@+id/bs_conn_blocked_desc"
-                style="@style/ActionItem"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
@@ -133,7 +130,6 @@
 
             <TextView
                 android:id="@+id/bs_conn_connection_details"
-                style="@style/ActionItem"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
@@ -146,7 +142,6 @@
 
     <TextView
         android:id="@+id/bs_conn_connection_details1"
-        style="@style/ActionItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
@@ -161,7 +156,6 @@
 
     <TextView
         android:id="@+id/bs_conn_blocked_rule1_txt"
-        style="@style/ActionItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -188,13 +182,13 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.9"
             android:padding="5dp"
+            android:textColor="?attr/primaryTextColor"
             android:text="@string/bsct_block"
-            android:textColor="@color/primaryText"
             android:textSize="@dimen/large_font_text_view" />
 
-        <androidx.appcompat.widget.SwitchCompat
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/bs_conn_block_app_check"
-            style="@style/SwitchCompat_theme"
+            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -213,7 +207,6 @@
         android:visibility="gone" />
 
     <TextView
-        style="@style/ActionItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -241,13 +234,13 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.9"
             android:padding="5dp"
+            android:textColor="?attr/primaryTextColor"
             android:text="@string/bsct_block_all"
-            android:textColor="@color/primaryText"
             android:textSize="@dimen/large_font_text_view" />
 
-        <androidx.appcompat.widget.SwitchCompat
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/bs_conn_block_conn_all_switch"
-            style="@style/SwitchCompat_theme"
+            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -279,7 +272,7 @@
             android:layout_weight="0.5"
             android:text="@string/bsct_clear"
             android:textAlignment="center"
-            android:textColor="@color/accent_bad"
+            android:textColor="?attr/secondaryTextColor"
             android:visibility="gone"
             app:chipBackgroundColor="@color/colorPrimaryDark" />
     </LinearLayout>

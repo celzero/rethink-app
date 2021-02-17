@@ -9,8 +9,7 @@
     android:focusable="true">
 
     <TextView
-        style="@style/ActionItem"
-        android:layout_width="50dp"
+        android:layout_width="60dp"
         android:layout_height="3dp"
         android:layout_gravity="center"
         android:layout_marginTop="10dp"
@@ -33,6 +32,7 @@
             android:textStyle="bold"
             android:gravity="center"
             android:text="@string/app_mode_choose"
+            android:textColor="?attr/primaryTextColor"
             android:textIsSelectable="true"
             android:textSize="@dimen/extra_large_font_text_view" />
     </RelativeLayout>
@@ -51,42 +51,42 @@
         android:layout_marginBottom="10dp"
         android:gravity="center">
 
-        <androidx.appcompat.widget.AppCompatRadioButton
+        <com.google.android.material.radiobutton.MaterialRadioButton
             android:id="@+id/bs_home_screen_radio_dns"
-            style="@style/SwitchCompat_theme"
+            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layoutDirection="rtl"
             android:padding="5dp"
             android:layout_margin="5dp"
             android:text="@string/app_mode_dns_low_battery"
-            android:textColor="@color/primaryText"
+            android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/large_font_text_view" />
 
 
-        <androidx.appcompat.widget.AppCompatRadioButton
+        <com.google.android.material.radiobutton.MaterialRadioButton
             android:id="@+id/bs_home_screen_radio_firewall"
-            style="@style/SwitchCompat_theme"
+            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layoutDirection="rtl"
             android:layout_margin="5dp"
             android:padding="5dp"
-            android:text="Firewall"
-            android:textColor="@color/primaryText"
+            android:text="@string/app_mode_firewall"
+            android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/large_font_text_view" />
 
 
-        <androidx.appcompat.widget.AppCompatRadioButton
+        <com.google.android.material.radiobutton.MaterialRadioButton
             android:id="@+id/bs_home_screen_radio_dns_firewall"
-            style="@style/SwitchCompat_theme"
+            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layoutDirection="rtl"
             android:padding="5dp"
             android:layout_margin="5dp"
-            android:text="DNS and Firewall"
-            android:textColor="@color/primaryText"
+            android:text="@string/app_mode_dns_firewall"
+            android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/large_font_text_view" />
 
 
@@ -109,8 +109,8 @@
             android:layout_centerInParent="true"
             android:gravity="center"
             android:layout_margin="5dp"
-            android:text="1.1.1.1"
             android:textIsSelectable="true"
+            android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/default_font_text_view" />
 
         <TextView
@@ -119,8 +119,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/bs_home_screen_connected_status"
             android:layout_margin="5dp"
+            android:textColor="?attr/primaryTextColor"
             android:gravity="center"
-            android:text="sdad"
             android:textSize="@dimen/default_font_text_view" />
 
     </RelativeLayout>

@@ -3,21 +3,18 @@
     android:id="@+id/apk_parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="5dp"
-    android:background="@color/childListColor">
-
+    android:backgroundTint="?attr/backgroundDark">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="2dp"
         android:elevation="@dimen/activity_horizontal_margin">
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/firewall_apk_list_top_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/childListColor"
-
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -62,7 +59,6 @@
                         android:fontFamily="sans-serif-light"
                         android:gravity="bottom"
                         android:padding="5dp"
-                        android:textColor="@color/primaryText"
                         android:textSize="@dimen/large_font_text_view" />
 
                     <TextView
@@ -92,18 +88,16 @@
                         android:src="@drawable/data_on"
                         android:visibility="gone" />
 
-                    <androidx.appcompat.widget.SwitchCompat
+                    <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/firewall_toggle_wifi"
+                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                         android:layout_width="65dp"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:layout_margin="5dp"
                         android:layout_marginStart="15dp"
-                        android:gravity="center"
-                        android:src="@drawable/ic_dns_off"
-                        android:textAlignment="center"
-                        android:textColor="@color/primaryText" />
+                        android:gravity="center" />
 
                     <ProgressBar
                         android:id="@+id/firewall_apk_progress_bar"

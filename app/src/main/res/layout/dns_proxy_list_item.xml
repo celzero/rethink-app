@@ -31,7 +31,7 @@
                 android:ellipsize="end"
                 android:fontFamily="sans-serif-light"
                 android:text="Dummy Label"
-                android:textColor="@color/primaryText"
+                android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
 
             <TextView
@@ -71,7 +71,7 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="3dp"
+        android:layout_height="2dp"
         android:layout_below="@id/dns_proxy_list_container"
         android:background="@color/borderblack" />
 

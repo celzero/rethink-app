@@ -30,6 +30,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.33"
+                android:layout_gravity="center"
                 android:gravity="center"
                 android:orientation="vertical">
 
@@ -72,13 +73,13 @@
             android:padding="10dp"
             android:textSize="@dimen/large_font_text_view"
             android:text="@string/settings_firewall_header"
-            android:textColor="@color/secondaryText" />
+            android:textColor="?attr/secondaryTextColor" />
 
         <RelativeLayout
             android:id="@+id/settings_activity_kill_app_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:background="?attr/background"
             android:paddingStart="20dp"
             android:paddingTop="18dp"
             android:paddingEnd="10dp"
@@ -126,13 +127,13 @@
             android:padding="10dp"
             android:text="@string/settings_dns_header"
             android:textSize="@dimen/large_font_text_view"
-            android:textColor="@color/secondaryText" />
+            android:textColor="?attr/secondaryTextColor"/>
 
         <RelativeLayout
             android:id="@+id/settings_activity_on_device_block_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:background="?attr/background"
             android:paddingStart="20dp"
             android:paddingTop="15dp"
             android:paddingEnd="10dp"
@@ -227,7 +228,7 @@
             android:padding="10dp"
             android:textSize="@dimen/large_font_text_view"
             android:text="@string/settings_vpn_header"
-            android:textColor="@color/secondaryText" />
+            android:textColor="?attr/secondaryTextColor" />
 
         <TextView
             android:id="@+id/settings_activity_vpn_lockdown_desc"
@@ -240,7 +241,7 @@
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:visibility="gone"
-            android:background="@color/colorPrimary"
+            android:background="?attr/background"
             android:text="@string/settings_lock_down_mode_desc"
             android:textSize="@dimen/default_font_text_view"
             app:drawableStartCompat="@drawable/dis_allowed" />
@@ -249,7 +250,7 @@
             android:id="@+id/settings_activity_exclude_apps_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:background="?attr/background"
             android:paddingStart="20dp"
             android:paddingTop="15dp"
             android:paddingEnd="10dp"
@@ -305,7 +306,7 @@
             android:id="@+id/settings_activity_allow_bypass_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:background="?attr/background"
             android:paddingStart="20dp"
             android:paddingTop="15dp"
             android:paddingEnd="10dp"
@@ -363,13 +364,13 @@
             android:padding="10dp"
             android:text="@string/settings_proxy_header"
             android:textSize="@dimen/large_font_text_view"
-            android:textColor="@color/secondaryText" />
+            android:textColor="?attr/secondaryTextColor" />
 
         <RelativeLayout
             android:id="@+id/settings_activity_socks5_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:background="?attr/background"
             android:paddingStart="20dp"
             android:paddingTop="15dp"
             android:paddingEnd="10dp"
@@ -424,7 +425,7 @@
             android:id="@+id/settings_activity_http_proxy_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:background="?attr/background"
             android:paddingStart="20dp"
             android:paddingTop="15dp"
             android:paddingEnd="10dp"
@@ -487,13 +488,13 @@
             android:padding="10dp"
             android:text="@string/settings_general_header"
             android:textSize="@dimen/large_font_text_view"
-            android:textColor="@color/secondaryText" />
+            android:textColor="?attr/secondaryTextColor"/>
 
         <RelativeLayout
             android:id="@+id/settings_activity_refresh_data_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:background="?attr/background"
             android:paddingStart="20dp"
             android:paddingTop="15dp"
             android:visibility="gone"
@@ -538,7 +539,7 @@
             android:id="@+id/settings_activity_enable_logs_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:background="?attr/background"
             android:paddingStart="20dp"
             android:paddingTop="15dp"
             android:paddingEnd="10dp"
@@ -579,10 +580,55 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/settings_activity_theme_rl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/background"
+            android:paddingStart="20dp"
+            android:paddingTop="15dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="15dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/settings_activity_theme_switch"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/gen_settings_theme_txt"
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_theme_heading"
+                    android:textSize="@dimen/large_font_text_view" />
+
+                <TextView
+                    android:id="@+id/gen_settings_theme_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:text="@string/settings_theme_desc"
+                    android:textSize="@dimen/default_font_text_view" />
+            </LinearLayout>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/settings_activity_theme_switch"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:padding="10dp" />
+        </RelativeLayout>
+
+        <RelativeLayout
             android:id="@+id/settings_activity_check_update_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:background="?attr/background"
             android:paddingStart="20dp"
             android:paddingTop="15dp"
             android:paddingEnd="10dp"
@@ -626,7 +672,7 @@
             android:id="@+id/settings_activity_auto_start_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:background="?attr/background"
             android:layout_marginBottom="80dp"
             android:paddingStart="20dp"
             android:paddingTop="15dp"

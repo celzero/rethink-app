@@ -54,8 +54,8 @@
                         android:fontFamily="sans-serif-smallcaps"
                         android:gravity="center"
                         android:letterSpacing="0.25"
-                        android:text="rethinkdns"
-                        android:textColor="@color/textColorMain"
+                        android:text="@string/app_name_small_case"
+                        android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/text_size_heading"
                         android:visibility="visible" />
 
@@ -65,20 +65,12 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:gravity="center"
-                        android:text="Backed by Mozilla Builders Incubator"
-                        android:textColor="@color/textColorMain"
+                        android:text="@string/backed_by_mozilla"
+                        android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/sub_heading_small"
                         android:visibility="visible" />
                 </LinearLayout>
             </LinearLayout>
-
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0"
-                android:gravity="center"
-                android:orientation="vertical" />
 
         </LinearLayout>
 
@@ -94,11 +86,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:background="@drawable/rounded_corners_button_accent"
+                android:background="?attr/roundedCornersButton"
                 android:layout_marginEnd="5dp"
                 android:layout_weight="0.5">
-
-
 
                 <LinearLayout
                     android:id="@+id/fhs_card_dns_ll"
@@ -111,9 +101,9 @@
                         android:layout_height="wrap_content"
                         android:drawablePadding="10dp"
                         android:padding="10dp"
-                        android:text="DNS"
+                        android:text="@string/dns_mode_info_title"
                         android:textSize="@dimen/extra_large_font_text_view"
-                        android:textColor="@color/dividerColor"
+                        android:textColor="?attr/primaryTextColor"
                         app:drawableEndCompat="@drawable/dns_home_screen" />
 
 
@@ -126,8 +116,7 @@
                         android:gravity="center_vertical"
                         android:maxLines="1"
                         android:ellipsize="end"
-                        android:text="Cloudflare"
-                        android:textColor="@color/primaryText"
+                        android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/extra_large_font_text_view" />
 
                     <TextView
@@ -139,11 +128,10 @@
                         android:layout_marginBottom="10dp"
                         android:paddingBottom="5dp"
                         android:gravity="center_vertical"
-                        android:textColor="@color/dividerColor"
+                        android:textColor="?attr/primaryTextColor"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:textSize="@dimen/default_font_text_view"
-                        android:text="Latency: 44ms" />
+                        android:textSize="@dimen/default_font_text_view" />
 
 
                     <!--<View
@@ -155,7 +143,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_margin="2dp"
-                        android:background="@color/black">
+                        android:background="?attr/homeScreenBtnBackground">
 
                         <Button
                             android:id="@+id/fhs_card_dns_configure"
@@ -167,7 +155,7 @@
                             android:padding="10dp"
                             android:text="@string/dns_card_configure_btn"
                             android:textAlignment="viewStart"
-                            android:textColor="@color/secondaryText"
+                            android:textColor="?attr/secondaryTextColor"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
@@ -181,7 +169,7 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="10dp"
                 android:layout_weight="0.5"
-                android:background="@drawable/rounded_corners_button_accent">
+                android:background="?attr/roundedCornersButton">
 
                 <LinearLayout
                     android:id="@+id/fhs_card_firewall_ll"
@@ -194,9 +182,9 @@
                         android:layout_height="wrap_content"
                         android:drawablePadding="10dp"
                         android:padding="10dp"
-                        android:text="Firewall"
+                        android:text="@string/firewall_mode_info_title"
                         android:textSize="@dimen/extra_large_font_text_view"
-                        android:textColor="@color/dividerColor"
+                        android:textColor="?attr/primaryTextColor"
                         app:drawableEndCompat="@drawable/firewall_home_screen" />
 
                     <TextView
@@ -208,9 +196,8 @@
                         android:paddingEnd="10dp"
                         android:maxLines="1"
                         android:ellipsize="end"
-                        android:text="13 apps blocked"
                         android:textSize="@dimen/extra_large_font_text_view"
-                        android:textColor="@color/primaryText" />
+                        android:textColor="?attr/primaryTextColor" />
                     <TextView
                         android:id="@+id/fhs_card_firewall_apps"
                         android:layout_width="wrap_content"
@@ -219,8 +206,7 @@
                         android:textSize="@dimen/default_font_text_view"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:textColor="@color/dividerColor"
-                        android:text="Blocked apps: 0"
+                        android:textColor="?attr/primaryTextColor"
                         android:layout_marginBottom="10dp"
                         android:paddingBottom="5dp"
                         android:paddingStart="10dp"
@@ -231,7 +217,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_margin="2dp"
-                        android:background="@color/black">
+                        android:background="?attr/homeScreenBtnBackground">
 
                         <Button
                             android:id="@+id/fhs_card_firewall_configure"
@@ -243,7 +229,7 @@
                             android:drawablePadding="10dp"
                             android:padding="10dp"
                             android:textAlignment="viewStart"
-                            android:textColor="@color/secondaryText"
+                            android:textColor="?attr/secondaryTextColor"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
                 </LinearLayout>
@@ -254,46 +240,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="20dp"
-            android:orientation="horizontal"
-            android:weightSum="1">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_network_monitor"
-                style="@style/Widget.MaterialComponents.Chip.Action"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:layout_weight="0.5"
-                android:padding="5dp"
-                android:text="Network monitor"
-                android:textAlignment="center"
-                android:textColor="@color/secondaryText"
-                android:visibility="gone"
-                app:chipBackgroundColor="@color/colorPrimaryDark" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_settings"
-                style="@style/Widget.MaterialComponents.Chip.Action"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_weight="0.5"
-                android:padding="5dp"
-                android:text="Settings"
-                android:textAlignment="center"
-                android:textColor="@color/secondaryText"
-                android:visibility="gone"
-                app:chipBackgroundColor="@color/colorPrimaryDark" />
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:layout_marginBottom="90dp"
@@ -327,7 +274,6 @@
                         android:paddingStart="39dp"
                         android:paddingEnd="10dp"
                         android:stateListAnimator="@null"
-                        android:text="Start"
                         android:textColor="@color/white"
                         android:textSize="@dimen/home_screen_stat_text" />
 
@@ -348,7 +294,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:fontFamily="sans-serif-smallcaps"
-                android:text="not connected"
                 android:textColor="@color/accent_bad"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -367,7 +312,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-smallcaps"
-                android:text="uptime"
                 android:textColor="@color/textColorMain"
                 android:textSize="@dimen/default_font_text_view"
                 android:visibility="gone" />

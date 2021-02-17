@@ -23,13 +23,21 @@ import androidx.appcompat.app.AppCompatActivity
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityFaqWebviewLayoutBinding
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
+import org.koin.android.ext.android.inject
 
 
 class FaqWebViewActivity : AppCompatActivity(R.layout.activity_faq_webview_layout) {
     private val b by viewBinding(ActivityFaqWebviewLayoutBinding::bind)
+    private val persistentState by inject<PersistentState>()
 
     @SuppressLint("SetJavaScriptEnabled") override fun onCreate(savedInstanceState: Bundle?) {
+        if (persistentState.theme) {
+            setTheme(R.style.AppTheme)
+        } else {
+            setTheme(R.style.AppTheme_white)
+        }
         super.onCreate(savedInstanceState)
         b.configureWebview.settings.domStorageEnabled = true
         b.configureWebview.settings.allowContentAccess = true

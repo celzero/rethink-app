@@ -20,20 +20,6 @@
             android:paddingBottom="5dp">
 
             <TextView
-                android:id="@+id/firewall_universal_top_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:background="@color/colorPrimaryDark"
-                android:fontFamily="sans-serif-smallcaps"
-                android:padding="10dp"
-                android:text="universal firewall"
-                android:textColor="@color/secondaryText"
-                android:textSize="@dimen/large_font_text_view"
-                android:visibility="gone"
-                app:drawableRightCompat="@drawable/ic_keyboard_arrow_up_gray_24dp" />
-
-            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="2dp"
@@ -51,7 +37,7 @@
                 android:layout_marginLeft="2dp"
                 android:layout_marginTop="2dp"
                 android:layout_marginRight="2dp"
-                android:background="@color/colorPrimary">
+                android:background="?attr/background">
 
                 <TextView
                     android:id="@+id/firewall_all_apps_txt"
@@ -59,12 +45,12 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0.9"
                     android:padding="10dp"
-                    android:text="Block all apps when device is locked"
-                    android:textColor="@color/primaryText"
+                    android:text="@string/univ_firewall_rule_1"
                     android:textSize="@dimen/large_font_text_view" />
 
-                <androidx.appcompat.widget.SwitchCompat
+                <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/firewall_all_apps_check"
+                    style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="15dp" />
@@ -79,20 +65,20 @@
                 android:layout_marginLeft="2dp"
                 android:layout_marginTop="2dp"
                 android:layout_marginRight="2dp"
-                android:background="@color/colorPrimary">
+                android:background="?attr/background">
 
                 <TextView
                     android:id="@+id/firewall_background_mode_txt"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.9"
                     android:padding="10dp"
-                    android:text="Block any app not in use (experimental)"
-                    android:textColor="@color/primaryText"
+                    android:text="@string/univ_firewall_rule_2"
                     android:textSize="@dimen/large_font_text_view" />
 
-                <androidx.appcompat.widget.SwitchCompat
+                <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/firewall_background_mode_check"
+                    style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="15dp" />
@@ -107,20 +93,20 @@
                 android:layout_marginLeft="2dp"
                 android:layout_marginTop="2dp"
                 android:layout_marginRight="2dp"
-                android:background="@color/colorPrimary">
+                android:background="?attr/background">
 
                 <TextView
                     android:id="@+id/firewall_unknown_connection_mode_txt"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.9"
                     android:padding="10dp"
                     android:text="@string/univ_block_unknown_connections"
-                    android:textColor="@color/primaryText"
                     android:textSize="@dimen/large_font_text_view" />
 
-                <androidx.appcompat.widget.SwitchCompat
+                <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/firewall_unknown_connection_mode_check"
+                    style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="15dp" />
@@ -134,20 +120,20 @@
                 android:layout_marginLeft="2dp"
                 android:layout_marginTop="2dp"
                 android:layout_marginRight="2dp"
-                android:background="@color/colorPrimary">
+                android:background="?attr/background">
 
                 <TextView
                     android:id="@+id/firewall_udp_connection_mode_txt"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.9"
                     android:padding="10dp"
-                    android:text="@string/univ_firewall_rules_6"
-                    android:textColor="@color/primaryText"
+                    android:text="@string/univ_firewall_rule_4"
                     android:textSize="@dimen/large_font_text_view" />
 
-                <androidx.appcompat.widget.SwitchCompat
+                <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/firewall_udp_connection_mode_check"
+                    style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="15dp" />
@@ -162,7 +148,7 @@
                 android:layout_marginStart="2dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="2dp"
-                android:background="@color/colorPrimary"
+                android:background="?attr/background"
                 android:padding="10dp">
 
                 <LinearLayout
@@ -174,17 +160,15 @@
                     android:orientation="vertical">
 
                     <TextView
-
                         style="@style/TextAppearance.AppCompat.Subhead"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@color/colorPrimary"
                         android:fontFamily="sans-serif-smallcaps"
                         android:gravity="center_vertical"
                         android:paddingTop="5dp"
                         android:paddingBottom="5dp"
                         android:textSize="@dimen/large_font_text_view"
-                        android:text="Whitelist Apps"
+                        android:text="@string/univ_whitelist_heading"
                         android:textStyle="bold" />
 
                     <TextView
@@ -225,15 +209,15 @@
             android:layout_marginLeft="2dp"
             android:layout_marginTop="15dp"
             android:layout_marginRight="2dp"
-            android:background="@color/colorPrimary"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:background="?attr/background"
             android:fontFamily="sans-serif-smallcaps"
             android:gravity="center_vertical"
             android:paddingStart="10dp"
             android:paddingTop="10dp"
             android:paddingEnd="10dp"
             android:paddingBottom="5dp"
-            android:text="View Blocked IPs"
-            android:textColor="@color/primaryText"
+            android:text="@string/univ_view_blocked_ip"
             android:textSize="@dimen/large_font_text_view"
             android:textStyle="bold"
             android:visibility="visible"
@@ -245,7 +229,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="2dp"
             android:layout_marginRight="2dp"
-            android:background="@color/colorPrimary"
+            android:background="?attr/background"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:paddingBottom="15dp"
@@ -258,9 +242,7 @@
             android:id="@+id/firewall_search_view_top"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/light"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
+            android:background="?attr/backgroundDark"
             android:orientation="vertical"
             android:visibility="visible">
 
@@ -268,7 +250,7 @@
                 android:id="@+id/firewall_search_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
+                android:layout_margin="3dp"
                 android:elevation="10dp"
                 android:visibility="visible">
 
@@ -288,8 +270,7 @@
                         android:layout_weight="0.9"
                         android:fontFamily="sans-serif"
                         android:isScrollContainer="true"
-                        app:queryBackground="@color/colorPrimaryDark"
-                        app:iconifiedByDefault="false"
+                        app:iconifiedByDefault="true"
                         app:queryHint="@string/search_universal_ips">
                     </androidx.appcompat.widget.SearchView>
 
