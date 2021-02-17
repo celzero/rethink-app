@@ -50,8 +50,8 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true //Disabled this option for open testing to get more log details
-            shrinkResources true
+            minifyEnabled false //Disabled this option for open testing to get more log details
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         leakCanary {
