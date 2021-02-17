@@ -115,7 +115,7 @@ public class GoVpnAdapter {
 
     //private Boolean isAdapterAvailable = false;
     private GoIntraListener listener;
-    @NonNull private final AppMode appMode;
+    private AppMode appMode;
     @NonNull private final DNSProxyEndpointRepository dnsProxyEndpointRepository;
     @NonNull private final DNSCryptEndpointRepository dnsCryptEndpointRepository;
     @NonNull private final DoHEndpointRepository doHEndpointRepository;
@@ -192,11 +192,6 @@ public class GoVpnAdapter {
             Log.i(LOG_TAG,"GoVPNAdapter Connect tunnel with url "+dohURL);
             tunnel = Tun2socks.connectIntraTunnel(tunFd.getFd(), fakeDns,
                 transport, getProtector(), getBlocker(), listener);
-            // connectIntraTunnel takes ownership of the file descriptor.
-            //tunnel = Tun2socks.connectIntraTunnel(tunFd.detachFd(), fakeDns,
-              //     transport, getProtector(), getBlocker(), listener);
-            ///tunFd = null;
-            //isAdapterAvailable = true;
             //To set bravedns mode- two modes
             //Mode local - Requires to set the local mode with
             //Mode Remote -
@@ -226,9 +221,6 @@ public class GoVpnAdapter {
             } else {
                 setCryptMode();
             }
-            //Log.i(LOG_TAG, "connectTunnel - Tunnel mode is set with Parameters - DNSMode: " + iDnsMode + " , blockMode: " + iBlockMode + ", ProxyMode: " + proxyMode);
-
-
 
             Log.i(LOG_TAG,"GoVPNAdapter dnsMode mode - "+iDnsMode);
 
@@ -633,12 +625,13 @@ public class GoVpnAdapter {
     }
 
     private Boolean setBraveDNSLocalMode() {
-        AppMode appMode = HomeScreenActivity.GlobalVariable.INSTANCE.getAppMode();
         if (persistentState.getBlockListFilesDownloaded() && persistentState.getLocalBlocklistEnabled()) {
             try {
+                if(appMode == null){
+                    appMode = HomeScreenActivity.GlobalVariable.INSTANCE.getAppMode();
+                }
                 if(appMode.getBraveDNS() != null) {
                     String stamp = persistentState.getLocalBlockListStamp();
-                    assert stamp != null;
                     if(!stamp.isEmpty()){
                         Log.i(LOG_TAG, "GoVPNAdapter Tunnel is set with local stamp: " + stamp);
                         tunnel.setBraveDNS(appMode.getBraveDNS());
