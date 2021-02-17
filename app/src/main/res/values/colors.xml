@@ -28,7 +28,7 @@
 
     <color name="primaryText">#FDFDFD</color>
     <color name="secondaryText">#05dfd7</color>
-    <color name="dividerColor">#BDBDBD</color>
+    <color name="dividerColor">#2F2F2F</color>
     <color name="white">#FFFFFF</color>
 
     <color name="borderColor">#444444</color>

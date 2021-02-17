@@ -42,7 +42,7 @@
         <item name="searchViewStyle">@style/SearchView_custom</item>
         <item name="primaryTextColor">@color/black_white</item>
         <item name="secondaryTextColor">@color/black_white</item>
-        <item name="dividerColor">@color/colorPrimary_white</item>
+        <item name="dividerColor">@color/background_dark_white</item>
         <item name="roundedCornersButton">@drawable/rounded_corners_button_primary_white</item>
         <item name="homeScreenBtnBackground">@color/lightColorPrimary_white</item>
         <item name="svgStrokeColor">@color/stroke_color_white</item>
