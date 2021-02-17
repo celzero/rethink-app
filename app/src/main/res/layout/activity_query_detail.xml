@@ -72,7 +72,7 @@
                         android:paddingStart="5dp"
                         android:paddingEnd="5dp"
                         android:text="@string/dns_logs_blocked_queries"
-                        android:textColor="@color/dividerColor"
+                        android:textColor="@color/textColorMain"
                         android:textSize="@dimen/default_font_text_view" />
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -85,7 +85,7 @@
                         android:paddingStart="5dp"
                         android:paddingEnd="5dp"
                         android:text="@string/dns_logs_lifetime_queries"
-                        android:textColor="@color/dividerColor"
+                        android:textColor="@color/textColorMain"
                         android:textSize="@dimen/default_font_text_view" />
 
                 </LinearLayout>
