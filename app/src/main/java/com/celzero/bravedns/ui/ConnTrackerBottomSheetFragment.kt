@@ -102,6 +102,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
     }
 
     override fun getTheme(): Int = R.style.BottomSheetDialogTheme
+
     private val appInfoRepository: AppInfoRepository by inject()
     private val blockedConnectionsRepository: BlockedConnectionsRepository by inject()
     private val categoryInfoRepository: CategoryInfoRepository by inject()
@@ -239,7 +240,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
             try {
                 val appUIDList = appInfoRepository.getAppListForUID(ipDetails.uid)
                 if (appUIDList.size == 1) {
-                    if (ipDetails.appName != null || ipDetails.appName!! == getString(R.string.ctbs_unknown_app)) {
+                    if (ipDetails.appName != null || ipDetails.appName!! != getString(R.string.ctbs_unknown_app)) {
                         val packageName = appInfoRepository.getPackageNameForAppName(ipDetails.appName!!)
                         appInfoForPackage(packageName)
                     } else {
@@ -259,6 +260,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
     }
 
     private fun appInfoForPackage(packageName: String) {
+        Log.d(LOG_TAG, "appInfoForPackage: $packageName")
         try {
             //Open the specific App Info page:
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
@@ -266,6 +268,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             //Open the generic Apps page:
+            Log.w(LOG_TAG,"Exception while opening app info: ${e.message}",e)
             val intent = Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS)
             startActivity(intent)
         }
