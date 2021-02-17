@@ -78,6 +78,11 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
 
 
     @SuppressLint("SetJavaScriptEnabled") override fun onCreate(savedInstanceState: Bundle?) {
+        if (persistentState.theme) {
+            setTheme(R.style.AppTheme)
+        } else {
+            setTheme(R.style.AppTheme_white)
+        }
         super.onCreate(savedInstanceState)
         context = this
         downloadManager = context.getSystemService(DOWNLOAD_SERVICE) as DownloadManager

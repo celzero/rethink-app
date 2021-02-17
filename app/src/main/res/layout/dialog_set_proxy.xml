@@ -14,57 +14,7 @@
         android:layout_gravity="center"
         android:padding="10dp"
         android:textSize="@dimen/large_font_text_view"
-        android:text="Set SOCKS5 (TCP) Proxy" />
-
-   <!-- <RadioGroup
-        android:id="@+id/dialog_proxy_radio_group"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="10dp">
-
-        <com.google.android.material.radiobutton.MaterialRadioButton
-            android:id="@+id/dialog_proxy_radio_internal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:text="Internal" />
-
-        <com.google.android.material.radiobutton.MaterialRadioButton
-            android:id="@+id/dialog_proxy_radio_external"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:text="External" />
-    </RadioGroup>-->
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="10dp"
-        android:visibility="gone"
-        android:weightSum="1">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0.3"
-            android:textSize="@dimen/large_font_text_view"
-            android:text="Proxy Name" />
-
-        <EditText
-            android:id="@+id/dialog_proxy_edit_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0.7"
-            android:textSize="@dimen/large_font_text_view"
-            android:hint="Proxy Name" />
-
-    </LinearLayout>
+        android:text="@string/settings_dns_proxy_dialog_header" />
 
     <LinearLayout
         android:id="@+id/dialog_proxy_spinner_header"
@@ -80,7 +30,7 @@
             android:layout_gravity="center"
             android:layout_weight="0.3"
             android:textSize="@dimen/large_font_text_view"
-            android:text="App" />
+            android:text="@string/settings_dns_proxy_dialog_app" />
 
         <androidx.appcompat.widget.AppCompatSpinner
             android:id="@+id/dialog_proxy_spinner_appname"
@@ -106,7 +56,7 @@
             android:layout_gravity="center"
             android:textSize="@dimen/large_font_text_view"
             android:layout_weight="0.3"
-            android:text="Hostname" />
+            android:text="@string/settings_dns_proxy_dialog_hostname" />
 
         <EditText
             android:id="@+id/dialog_proxy_edit_ip"
@@ -133,7 +83,7 @@
             android:layout_gravity="center"
             android:textSize="@dimen/large_font_text_view"
             android:layout_weight="0.3"
-            android:text="Port Number" />
+            android:text="@string/settings_dns_proxy_dialog_port_number" />
 
         <EditText
             android:id="@+id/dialog_proxy_edit_port"
@@ -161,7 +111,7 @@
             android:layout_gravity="center"
             android:layout_weight="0.3"
             android:textSize="@dimen/large_font_text_view"
-            android:text="Username" />
+            android:text="@string/settings_dns_proxy_dialog_username" />
 
         <EditText
             android:id="@+id/dialog_proxy_edit_username"
@@ -188,7 +138,7 @@
             android:layout_gravity="center"
             android:layout_weight="0.3"
             android:textSize="@dimen/large_font_text_view"
-            android:text="Password" />
+            android:text="@string/settings_dns_proxy_dialog_password" />
 
         <EditText
             android:id="@+id/dialog_proxy_edit_password"
@@ -216,7 +166,7 @@
             android:layout_gravity="center"
             android:layout_weight="0.9"
             android:textSize="@dimen/large_font_text_view"
-            android:text="@string/univ_firewall_rules_6" />
+            android:text="@string/univ_firewall_rule_4" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/dialog_proxy_udp_check"
@@ -250,7 +200,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:gravity="center"
-            android:text="cancel"
+            android:text="@string/settings_dns_proxy_dialog_negative_btn"
             android:textSize="@dimen/large_font_text_view"
             android:textColor="@color/accent_bad" />
 
@@ -262,7 +212,7 @@
             android:textSize="@dimen/large_font_text_view"
             android:layout_margin="5dp"
             android:gravity="center"
-            android:text="set"
+            android:text="@string/settings_dns_proxy_dialog_positive_btn"
             android:textColor="@color/accent_bad" />
     </LinearLayout>
 </LinearLayout>

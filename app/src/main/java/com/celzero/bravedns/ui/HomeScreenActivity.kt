@@ -128,6 +128,11 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     //TODO : Remove the unwanted data and the assignments happening
     //TODO : Create methods and segregate the data.
     override fun onCreate(savedInstanceState: Bundle?) {
+        if (persistentState.theme) {
+            setTheme(R.style.AppTheme)
+        } else {
+            setTheme(R.style.AppTheme_white)
+        }
         super.onCreate(savedInstanceState)
 
         if (persistentState.firstTimeLaunch) {

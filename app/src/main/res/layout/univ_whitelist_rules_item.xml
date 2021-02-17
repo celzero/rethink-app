@@ -24,7 +24,6 @@
                 android:layout_toStartOf="@id/univ_whitelist_rules_delete_btn"
                 android:ellipsize="end"
                 android:fontFamily="sans-serif-medium"
-                android:text="Dummy Label"
                 android:textColor="@color/primaryText"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -33,7 +32,7 @@
                 android:id="@+id/univ_whitelist_rules_delete_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="delete"
+                android:text="@string/univ_ip_delete_btn"
                 android:textSize="@dimen/large_font_text_view"
                 android:layout_alignParentEnd="true"
                 android:layout_centerInParent="true" />

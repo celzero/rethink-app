@@ -17,6 +17,7 @@ package com.celzero.bravedns.ui
 
 import android.app.Activity
 import android.content.*
+import android.content.res.TypedArray
 import android.net.ConnectivityManager
 import android.net.LinkProperties
 import android.net.NetworkCapabilities
@@ -31,6 +32,7 @@ import android.text.format.DateUtils
 import android.text.format.DateUtils.FORMAT_ABBREV_RELATIVE
 import android.text.format.DateUtils.MINUTE_IN_MILLIS
 import android.util.Log
+import android.util.TypedValue
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -174,7 +176,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
            unregisterObserversForDNS()
         } else {
            b.fhsCardDnsConfigure.alpha = 1F
-           b.fhsCardDnsConfigure.setTextColor(ContextCompat.getColor(requireContext(), R.color.secondaryText))
+           b.fhsCardDnsConfigure.setTextColor(fetchTextColor())
            registerObserversForDNS()
         }
     }
@@ -231,9 +233,17 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             unregisterObserversForFirewall()
         } else {
             b.fhsCardFirewallConfigure.alpha = 1F
-            b.fhsCardFirewallConfigure.setTextColor(ContextCompat.getColor(requireContext(), R.color.secondaryText))
+            b.fhsCardFirewallConfigure.setTextColor(fetchTextColor())
             registerObserversForFirewall()
         }
+    }
+
+    private fun fetchTextColor(): Int {
+        val typedValue = TypedValue()
+        val a: TypedArray = requireContext().obtainStyledAttributes(typedValue.data, intArrayOf(R.attr.secondaryTextColor))
+        val color = a.getColor(0, 0)
+        a.recycle()
+        return color
     }
 
     private fun handleStartBtnClickEvent() {
@@ -255,8 +265,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             } else {
                 b.fhsCardDnsConfigure.alpha = 1F
                 b.fhsCardFirewallConfigure.alpha = 1F
-                b.fhsCardDnsConfigure.setTextColor(ContextCompat.getColor(requireContext(), R.color.secondaryText))
-                b.fhsCardFirewallConfigure.setTextColor(ContextCompat.getColor(requireContext(), R.color.secondaryText))
+                b.fhsCardDnsConfigure.setTextColor(fetchTextColor())
+                b.fhsCardFirewallConfigure.setTextColor(fetchTextColor())
                 appStartTime = System.currentTimeMillis()
                 if (DEBUG) Log.d(LOG_TAG, "VPN service start initiated with time $appStartTime")
                 if (VpnController.getInstance()?.getBraveVpnService() != null) {
@@ -312,7 +322,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             if (braveMode == DNS_FIREWALL_MODE || braveMode == DNS_MODE && (getPrivateDnsMode() != PrivateDnsMode.STRICT)) {
                 val intent = Intent(requireContext(), DNSDetailActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                intent.putExtra(Constants.SCREEN_TO_LOAD,1)
+                intent.putExtra(Constants.SCREEN_TO_LOAD, 1)
                 startActivity(intent)
             } else {
                 if (getPrivateDnsMode() == PrivateDnsMode.STRICT) {
@@ -383,7 +393,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             if (braveMode == DNS_FIREWALL_MODE || braveMode == FIREWALL_MODE) {
                 val intent = Intent(requireContext(), FirewallActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                intent.putExtra(Constants.SCREEN_TO_LOAD,0)
+                intent.putExtra(Constants.SCREEN_TO_LOAD, 0)
                 startActivity(intent)
             } else {
                 Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
@@ -399,7 +409,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             if (braveMode == DNS_FIREWALL_MODE || braveMode == DNS_MODE && (getPrivateDnsMode() != PrivateDnsMode.STRICT)) {
                 val intent = Intent(requireContext(), DNSDetailActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                intent.putExtra(Constants.SCREEN_TO_LOAD,0)
+                intent.putExtra(Constants.SCREEN_TO_LOAD, 0)
                 startActivity(intent)
             } else {
                 if (getPrivateDnsMode() == PrivateDnsMode.STRICT) {
@@ -422,7 +432,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             if (braveMode == DNS_FIREWALL_MODE || braveMode == FIREWALL_MODE) {
                 val intent = Intent(requireContext(), FirewallActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                intent.putExtra(Constants.SCREEN_TO_LOAD,2)
+                intent.putExtra(Constants.SCREEN_TO_LOAD, 2)
                 startActivity(intent)
             } else {
                 Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
@@ -653,18 +663,18 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         var colorId: Int
         colorId = if (status.on) {
-            if (status.connectionState != BraveVPNService.State.FAILING) R.color.positive else R.color.accent_bad
+            if (status.connectionState != BraveVPNService.State.FAILING) fetchTextColor(R.color.positive) else fetchTextColor(R.color.accent_bad)
         } else if (privateDnsMode == PrivateDnsMode.STRICT) {
             // If the VPN is off but we're in strict mode, show the status in white.  This isn't a bad
             // state, but Intra isn't helping.
-            R.color.indicator
+            fetchTextColor(R.color.indicator)
         } else {
-            R.color.accent_bad
+            fetchTextColor(R.color.accent_bad)
         }
-        if (braveMode == FIREWALL_MODE && status.activationRequested) colorId = R.color.positive
+        if (braveMode == FIREWALL_MODE && status.activationRequested) colorId = fetchTextColor(R.color.positive)
 
-        val color = ContextCompat.getColor(requireContext(), colorId)
-        b.fhsProtectionLevelTxt.setTextColor(color)
+        //val color = colorId //ContextCompat.getColor(requireContext(), colorId)
+        b.fhsProtectionLevelTxt.setTextColor(colorId)
         b.fhsProtectionLevelTxt.setText(statusId)
 
     }
@@ -722,6 +732,21 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         NONE,  // The setting is "Off" or "Opportunistic", and the DNS connection is not using TLS.
         UPGRADED,  // The setting is "Opportunistic", and the DNS connection has upgraded to TLS.
         STRICT // The setting is "Strict".
+    }
+
+    private fun fetchTextColor(attr: Int): Int {
+        val attributeFetch = if(attr == R.color.positive){
+            R.attr.accentGood
+        }else if(attr == R.color.accent_bad){
+            R.attr.accentBad
+        }else{
+            R.attr.accentGood
+        }
+        val typedValue = TypedValue()
+        val a: TypedArray = requireContext().obtainStyledAttributes(typedValue.data, intArrayOf(attributeFetch))
+        val color = a.getColor(0, 0)
+        a.recycle()
+        return color
     }
 
 }

@@ -12,8 +12,8 @@
         android:layout_height="wrap_content"
         android:padding="5dp"
         android:textSize="@dimen/large_font_text_view"
-        android:text="Exclude app from DNS and Firewall"
-        android:textColor="@color/secondaryText" />
+        android:text="@string/ex_dialog_header"
+        android:textColor="?attr/secondaryTextColor" />
 
     <LinearLayout
         android:id="@+id/exclude_app_dialog_search_layout"
@@ -71,7 +71,7 @@
             android:layout_centerVertical="true"
             android:layout_alignParentStart="true"
             android:layout_toStartOf="@id/exclude_app_select_all_text"
-            android:textColor="@color/primaryText"
+            android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/default_font_text_view" />
 
         <TextView
@@ -81,7 +81,8 @@
             android:layout_centerVertical="true"
             android:layout_toStartOf="@id/exclude_app_select_all_option_checkbox"
             android:fontFamily="sans-serif-smallcaps"
-            android:text="select all"
+            android:text="@string/ex_select_all"
+            android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/large_font_text_view" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
@@ -92,8 +93,8 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="10dp"
             android:layout_marginStart="10dp"
-            android:buttonTint="@color/primaryText"
-            android:foregroundTint="@color/secondaryText" />
+            android:buttonTint="?attr/primaryTextColor"
+            android:foregroundTint="?attr/secondaryTextColor" />
     </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -111,8 +112,8 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:textSize="@dimen/large_font_text_view"
-        android:text="Go back"
-        android:textColor="@color/accent_bad" />
+        android:text="@string/ex_dialog_button"
+        android:textColor="?attr/accentBad" />
 
 
 </RelativeLayout>

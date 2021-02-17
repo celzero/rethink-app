@@ -5,7 +5,6 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="1dp"
     android:background="?android:attr/selectableItemBackground"
-    android:backgroundTint="@color/colorPrimary"
     android:elevation="@dimen/activity_horizontal_margin">
 
     <RelativeLayout
@@ -32,7 +31,7 @@
                 android:ellipsize="end"
                 android:fontFamily="sans-serif-light"
                 android:text="Dummy Label"
-                android:textColor="@color/primaryText"
+                android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
 
             <TextView
@@ -56,8 +55,7 @@
             android:layout_marginEnd="10dp"
             android:layout_toStartOf="@id/doh_endpoint_list_check_image"
             android:padding="10dp"
-            android:src="@drawable/ic_fab_appinfo"
-            android:text="delete" />
+            android:src="@drawable/ic_fab_appinfo" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/doh_endpoint_list_check_image"
@@ -81,13 +79,13 @@
         android:layout_marginEnd="12dp"
         android:layout_marginBottom="5dp"
         android:padding="10dp"
-        android:text="configure"
+        android:text="@string/dns_connected_rethink_configure"
         android:textSize="@dimen/large_font_text_view"
-        android:textColor="@color/secondaryText" />
+        android:textColor="?attr/secondaryTextColor" />
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="3dp"
+        android:layout_height="2dp"
         android:layout_below="@id/doh_endpoint_list_configure"
         android:background="@color/borderblack" />
 

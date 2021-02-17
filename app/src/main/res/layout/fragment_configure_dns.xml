@@ -2,15 +2,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/colorPrimary">
+    android:layout_height="match_parent">
 
     <ScrollView
         android:id="@+id/fragment_configure_doh_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="2dp"
-        android:background="@color/childListColor"
         android:fillViewport="true"
         android:nestedScrollingEnabled="true"
         android:scrollbars="none">
@@ -39,7 +37,7 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="start"
                         android:dropDownWidth="match_parent"
-                        android:dropDownSelector="@color/accent_good"
+                        android:dropDownSelector="?attr/backgroundDark"
                         android:gravity="start"
                         android:spinnerMode="dropdown"
                         android:tooltipText="@string/cd_dns_type_spinner_tooltip" />
@@ -85,7 +83,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:background="@color/childListColor"
                         android:fontFamily="sans-serif-smallcaps"
                         android:padding="5dp"
                         android:text="@string/cd_dns_crypt_title"
@@ -109,7 +106,6 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/recycler_dns_crypt_connections"
                         android:layout_marginTop="10dp"
-                        android:background="@color/childListColor"
                         android:fontFamily="sans-serif-smallcaps"
                         android:paddingStart="5dp"
                         android:paddingTop="30dp"
@@ -171,10 +167,10 @@
         android:layout_margin="20dp"
         android:drawablePadding="10dp"
         android:text="@string/cd_fab_add_button"
-        android:textColor="@color/accent_good"
+        android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/default_font_text_view"
-        app:backgroundTint="@color/colorPrimaryDark"
+        android:backgroundTint="?attr/backgroundDark"
         app:fabSize="normal"
         app:icon="@drawable/ic_fab_without_border"
-        app:iconTint="@color/accent_good" />
+        app:iconTint="?attr/primaryTextColor" />
 </RelativeLayout>

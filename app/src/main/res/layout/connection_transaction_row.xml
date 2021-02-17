@@ -6,8 +6,8 @@
     android:layout_height="wrap_content"
     android:layout_margin="1dp"
     android:animateLayoutChanges="true"
-    android:background="@color/colorPrimary"
-    android:backgroundTint="@color/colorPrimary"
+    android:background="?attr/background"
+    android:backgroundTint="?attr/background"
     android:orientation="vertical"
     app:cardElevation="@dimen/activity_horizontal_margin">
 
@@ -15,7 +15,6 @@
         android:id="@+id/connection_parent_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
         android:orientation="horizontal">
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -39,7 +38,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/colorPrimary"
             android:orientation="vertical">
 
             <LinearLayout
@@ -55,7 +53,6 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
                     android:orientation="horizontal">
-
 
                     <TextView
                         android:id="@+id/connection_app_name"
@@ -147,7 +144,6 @@
                         android:paddingEnd="10dp"
                         android:textSize="@dimen/large_font_text_view"
                         android:textAppearance="@android:style/TextAppearance.Material.Subhead"
-                        android:textColor="@color/primaryText"
                         tools:text="ss" />
 
                     <TextView
@@ -162,7 +158,6 @@
                         android:singleLine="true"
                         android:textSize="@dimen/default_font_text_view"
                         android:textAppearance="@android:style/TextAppearance.Material.Body1"
-                        android:textColor="@color/primaryText"
                         tools:text="10(ms)" />
 
                     <TextView
@@ -177,7 +172,6 @@
                         android:singleLine="true"
                         android:textSize="@dimen/default_font_text_view"
                         android:textAppearance="@android:style/TextAppearance.Material.Body1"
-                        android:textColor="@color/primaryText"
                         tools:text="TCP" />
 
                 </LinearLayout>

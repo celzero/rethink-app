@@ -95,6 +95,7 @@ class PersistentState(context: Context):SimpleKrate(context) {
         //private set
     var isScreenOff by booleanPref("screen_off", false)
     private var connectedDNSName by stringPref("connected_dns_name","RethinkDNS Basic")
+    var theme by booleanPref("theme", true)
 
     fun wifiAllowed(forPackage:String):Boolean = !excludedPackagesWifi.contains(forPackage)
 

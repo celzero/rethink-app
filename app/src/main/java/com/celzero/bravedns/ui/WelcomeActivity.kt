@@ -42,6 +42,11 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
     private val persistentState by inject<PersistentState>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        if (persistentState.theme) {
+            setTheme(R.style.AppTheme)
+        } else {
+            setTheme(R.style.AppTheme_white)
+        }
         super.onCreate(savedInstanceState)
 
         if (!persistentState.firstTimeLaunch) {

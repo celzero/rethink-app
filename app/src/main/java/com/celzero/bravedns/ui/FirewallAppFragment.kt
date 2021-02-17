@@ -24,7 +24,6 @@ import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -90,18 +89,6 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
         b.firewallCategorySearch.setOnClickListener {
             b.firewallCategorySearch.requestFocus()
             b.firewallCategorySearch.onActionViewExpanded()
-        }
-
-        b.firewallCategoryShowTxt.setOnClickListener {
-            if (!categoryState) {
-                categoryState = true
-                b.firewallExpandableList.visibility = View.VISIBLE
-                b.firewallCategoryShowTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(requireContext(), R.drawable.ic_keyboard_arrow_up_gray_24dp), null)
-            } else {
-                b.firewallExpandableList.visibility = View.GONE
-                b.firewallCategoryShowTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(requireContext(), R.drawable.ic_keyboard_arrow_down_gray_24dp), null)
-                categoryState = false
-            }
         }
 
         b.firewallAppRefreshList.setOnClickListener {
@@ -242,7 +229,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
             }
 
             if (adapterList != null) {
-                (adapterList as FirewallAppListAdapter).updateData(titleList!!, listData, list as ArrayList<AppInfo>)
+                (adapterList as FirewallAppListAdapter).updateData(titleList!!, listData)
                 b.firewallUpdateProgress.visibility = View.GONE
                 b.firewallExpandableList.visibility = View.VISIBLE
             } else {

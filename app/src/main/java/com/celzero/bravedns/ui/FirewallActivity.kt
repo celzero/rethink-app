@@ -24,15 +24,23 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityFirewallBinding
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.google.android.material.tabs.TabLayout
+import org.koin.android.ext.android.inject
 
 
 class FirewallActivity : AppCompatActivity(R.layout.activity_firewall), TabLayout.OnTabSelectedListener {
     private val b by viewBinding(ActivityFirewallBinding::bind)
     private var screenToLoad = 0
+    private val persistentState by inject<PersistentState>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        if (persistentState.theme) {
+            setTheme(R.style.AppTheme)
+        } else {
+            setTheme(R.style.AppTheme_white)
+        }
         super.onCreate(savedInstanceState)
         screenToLoad = intent.getIntExtra(Constants.SCREEN_TO_LOAD, 0)
 

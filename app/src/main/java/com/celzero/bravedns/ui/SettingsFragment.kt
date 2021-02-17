@@ -162,6 +162,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityAutoStartSwitch.isChecked = persistentState.prefAutoStartBootUp
         b.settingsActivityKillAppSwitch.isChecked = persistentState.killAppOnFirewall
         b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
+        b.settingsActivityThemeSwitch.isChecked = persistentState.theme
 
         b.settingsActivitySocks5Switch.isChecked = persistentState.socks5Enabled
         if (b.settingsActivitySocks5Switch.isChecked) {
@@ -380,6 +381,17 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
         b.settingsActivityOnDeviceBlockRefreshBtn.setOnClickListener {
             checkForDownload(true)
+        }
+
+        b.settingsActivityThemeSwitch.setOnCheckedChangeListener{ _: CompoundButton, isSelected: Boolean ->
+            if(isSelected){
+                requireActivity().setTheme(R.style.AppTheme_white)
+                requireActivity().recreate()
+            }else{
+                requireActivity().setTheme(R.style.AppTheme)
+                requireActivity().recreate()
+            }
+            persistentState.theme = isSelected
         }
 
     }

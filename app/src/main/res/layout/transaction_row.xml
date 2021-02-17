@@ -6,8 +6,8 @@
     android:layout_height="wrap_content"
     android:layout_margin="1dp"
     android:animateLayoutChanges="true"
-    android:background="@color/colorPrimary"
-    android:backgroundTint="@color/colorPrimary"
+    android:background="?attr/background"
+    android:backgroundTint="?attr/background"
     android:orientation="vertical"
     app:cardElevation="@dimen/activity_horizontal_margin">
 
@@ -15,7 +15,7 @@
         android:id="@+id/query_screen_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
+        android:background="?attr/background"
         android:orientation="vertical">
 
         <LinearLayout
@@ -70,7 +70,6 @@
                     android:marqueeRepeatLimit="marquee_forever"
                     android:scrollHorizontally="true"
                     android:textAppearance="@android:style/TextAppearance.Material.Body1"
-                    android:textColor="@color/primaryText"
                     android:textSize="@dimen/large_font_text_view"
                     tools:text="longlongongexaasdsadsdsdasdasdsmple.com" />
             </LinearLayout>
@@ -92,7 +91,6 @@
                     android:singleLine="true"
                     android:textSize="@dimen/default_font_text_view"
                     android:textAppearance="@android:style/TextAppearance.Material.Body1"
-                    android:textColor="@color/primaryText"
                     tools:text="10(ms)" />
             </LinearLayout>
 
@@ -113,7 +111,6 @@
                     android:singleLine="true"
                     android:textSize="@dimen/default_font_text_view"
                     android:textAppearance="@android:style/TextAppearance.Material.Body1"
-                    android:textColor="@color/primaryText"
                     tools:text="17:54:11" />
             </LinearLayout>
 
