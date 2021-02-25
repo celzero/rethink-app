@@ -185,7 +185,6 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         builder.setTitle(R.string.dns_query_clear_logs_title)
         //set message for alert dialog
         builder.setMessage(R.string.dns_query_clear_logs_message)
-        builder.setIcon(android.R.drawable.ic_dialog_alert)
         builder.setCancelable(true)
         //performing positive action
         builder.setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->

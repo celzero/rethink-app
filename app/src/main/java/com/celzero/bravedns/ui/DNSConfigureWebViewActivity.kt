@@ -19,6 +19,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DownloadManager
 import android.content.*
+import android.content.res.Configuration
 import android.database.Cursor
 import android.net.Uri
 import android.net.http.SslError
@@ -78,10 +79,16 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
 
 
     @SuppressLint("SetJavaScriptEnabled") override fun onCreate(savedInstanceState: Bundle?) {
-        if (persistentState.theme) {
-            setTheme(R.style.AppTheme)
-        } else {
+        if (persistentState.theme == 0) {
+            if (isDarkThemeOn()) {
+                setTheme(R.style.AppTheme)
+            } else {
+                setTheme(R.style.AppTheme_white)
+            }
+        } else if (persistentState.theme == 1) {
             setTheme(R.style.AppTheme_white)
+        } else {
+            setTheme(R.style.AppTheme)
         }
         super.onCreate(savedInstanceState)
         context = this
@@ -111,9 +118,12 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
             } else {
                 persistentState.numberOfRemoteBlocklists = it!!
             }
-
         })
 
+    }
+
+    private fun Context.isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
     override fun onDestroy() {
@@ -144,9 +154,9 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
 
             override fun onFinish() {
                 HomeScreenActivity.GlobalVariable.appMode?.setDNSMode(Settings.DNSModePort)
-                persistentState.dnsType = 1
                 persistentState.connectionModeChange = receivedStamp
                 persistentState.setConnectedDNS(Constants.RETHINK_DNS_PLUS)
+                persistentState.dnsType = 1
             }
         }.start()
 
@@ -181,6 +191,14 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         }
         Toast.makeText(this, getString(R.string.wv_local_blocklist_toast), Toast.LENGTH_SHORT).show()
         //}
+    }
+
+    private fun getExternalFilePath(context: Context, isAbsolutePathNeeded: Boolean): String {
+        return if (isAbsolutePathNeeded) {
+            context.getExternalFilesDir(null).toString() + Constants.DOWNLOAD_PATH + persistentState.remoteBlockListDownloadTime
+        } else {
+            Constants.DOWNLOAD_PATH + persistentState.remoteBlockListDownloadTime
+        }
     }
 
     private fun setWebClient() {
@@ -227,7 +245,6 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
             getString(R.string.webview_no_stamp_change_remote)
         }
         builder.setMessage(desc)
-        builder.setIcon(android.R.drawable.ic_dialog_alert)
         builder.setCancelable(true)
         //performing positive action
         builder.setPositiveButton(getString(R.string.webview_configure_dialog_positive)) { dialogInterface, _ ->
@@ -325,7 +342,6 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         builder.setTitle(R.string.webview_error_title)
         //set message for alert dialog
         builder.setMessage(R.string.webview_error_message)
-        builder.setIcon(android.R.drawable.ic_dialog_alert)
         builder.setCancelable(true)
         //performing positive action
         builder.setPositiveButton(getString(R.string.webview_configure_dialog_neutral)) { _, _ ->
@@ -396,7 +412,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                         val status = HttpRequestHelper.checkStatus(c)
                         if (DEBUG) Log.d(LOG_TAG, "Webview: Download status: $status,${HomeScreenActivity.GlobalVariable.filesDownloaded}")
                         if (status == Constants.DOWNLOAD_STATUS_SUCCESSFUL) {
-                            val from = File(ctxt.getExternalFilesDir(null).toString() + Constants.DOWNLOAD_PATH + Constants.FILE_TAG_NAME)
+                            val from = File(getExternalFilePath(ctxt, true)+ Constants.FILE_TAG_NAME)
                             val to = File(ctxt.filesDir.canonicalPath + Constants.FILE_TAG_NAME)
                             val fileDownloaded = from.copyTo(to, true)
                             if (fileDownloaded.exists()) {
@@ -434,8 +450,8 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         if (DEBUG) Log.d(LOG_TAG, "Webview: download filetag file with url: $url")
         val uri: Uri = Uri.parse(url)
         val request = DownloadManager.Request(uri)
-        request.setDestinationInExternalFilesDir(this, Constants.DOWNLOAD_PATH, Constants.FILE_TAG_NAME)
-        Log.i(LOG_TAG, "Webview: Path - ${this.filesDir.canonicalPath}${Constants.DOWNLOAD_PATH}${Constants.FILE_TAG_NAME}")
+        request.setDestinationInExternalFilesDir(this, getExternalFilePath(this, false), Constants.FILE_TAG_NAME)
+        Log.i(LOG_TAG, "Webview: Path - ${getExternalFilePath(this, true)}${Constants.FILE_TAG_NAME}")
         enqueue = downloadManager.enqueue(request)
     }
 

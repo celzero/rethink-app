@@ -101,7 +101,6 @@ class UniversalBlockedRulesAdapter(
             builder.setTitle(R.string.univ_firewall_dialog_title)
             //set message for alert dialog
             builder.setMessage(R.string.univ_firewall_dialog_message)
-            builder.setIcon(android.R.drawable.ic_dialog_alert)
             builder.setCancelable(true)
             //performing positive action
             builder.setPositiveButton(context.getString(R.string.univ_ip_delete_individual_positive)) { _, _ ->

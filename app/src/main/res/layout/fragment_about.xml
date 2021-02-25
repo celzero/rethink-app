@@ -18,6 +18,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="15dp"
+            android:visibility="gone"
             android:weightSum="1">
 
             <LinearLayout
@@ -58,7 +59,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:background="?attr/background"
             android:orientation="vertical"
             android:padding="5dp">
@@ -113,6 +113,7 @@
                 android:drawablePadding="10dp"
                 android:gravity="center"
                 android:lineSpacingExtra="5dp"
+                android:textColor="?attr/invertedPrimaryTextColor"
                 android:padding="10dp"
                 android:text="@string/about_join_telegram"
                 android:textSize="@dimen/large_font_text_view" />
@@ -148,7 +149,7 @@
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/about_app"
-                android:textColor="?attr/secondaryTextColor"
+                android:textColor="?attr/accentGood"
                 android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -200,7 +201,7 @@
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/about_web"
-                android:textColor="?attr/secondaryTextColor"
+                android:textColor="?attr/accentGood"
                 android:textSize="@dimen/large_font_text_view" />
 
 
@@ -280,7 +281,7 @@
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/about_connect"
-                android:textColor="?attr/secondaryTextColor"
+                android:textColor="?attr/accentGood"
                 android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -330,7 +331,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/about_mozilla"
-            android:textColor="@color/textColorMain"
+            android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/default_font_text_view" />
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -342,7 +343,7 @@
             android:gravity="center"
             android:paddingTop="20dp"
             android:paddingBottom="40dp"
-            android:textColor="@color/textColorMain"
+            android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/large_font_text_view" />
 
     </LinearLayout>

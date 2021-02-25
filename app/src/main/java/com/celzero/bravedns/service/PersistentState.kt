@@ -95,7 +95,7 @@ class PersistentState(context: Context):SimpleKrate(context) {
         //private set
     var isScreenOff by booleanPref("screen_off", false)
     private var connectedDNSName by stringPref("connected_dns_name","RethinkDNS Basic")
-    var theme by booleanPref("theme", true)
+    var theme by intPref("app_theme", 0)
 
     fun wifiAllowed(forPackage:String):Boolean = !excludedPackagesWifi.contains(forPackage)
 
@@ -213,10 +213,10 @@ class PersistentState(context: Context):SimpleKrate(context) {
                 var dohDetail: DoHEndpoint? = null
                 try {
                     dohDetail = appMode?.getDOHDetails()
+                    return dohDetail?.dohName!!
                 } catch (e: Exception) {
                     return connectedDNSName
                 }
-                return dohDetail?.dohName!!
             }else if(dnsType == 2){
                 val cryptDetails = appMode?.getDNSCryptServerCount()
                 return "DNSCrypt: $cryptDetails resolvers"

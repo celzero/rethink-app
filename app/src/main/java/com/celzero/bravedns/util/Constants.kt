@@ -23,11 +23,12 @@ class Constants {
         const val LOG_TAG = "RethinkDNS"
 
         //Download path and file names
-        const val DOWNLOAD_PATH = "/downloads"
+        const val DOWNLOAD_PATH = "/downloads/"
         const val FILE_TAG_NAME ="/filetag.json"
         const val FILE_BASIC_CONFIG = "/basicconfig.json"
         const val FILE_RD_FILE = "/rd.txt"
         const val FILE_TD_FILE = "/td.txt"
+        const val LOCAL_BLOCKLIST_FILE_COUNT = 4
 
         //Download URL's
         const val JSON_DOWNLOAD_BLOCKLIST_LINK = "https://download.bravedns.com/blocklists"
@@ -78,6 +79,7 @@ class Constants {
         const val MISSING_UID = -2000
 
         const val RETHINK_DNS_PLUS = "RethinkDNS Plus"
+        const val RETHINK_DNS = "RethinkDNS Basic (default)"
 
         const val DELAY_FOR_BLOCK_RESPONSE : Long = 30000
         const val BACKGROUND_DELAY_CHECK : Long = 4000

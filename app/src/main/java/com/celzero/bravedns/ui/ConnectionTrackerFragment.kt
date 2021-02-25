@@ -141,7 +141,6 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         builder.setTitle(R.string.conn_track_clear_logs_title)
         //set message for alert dialog
         builder.setMessage(R.string.conn_track_clear_logs_message)
-        builder.setIcon(android.R.drawable.ic_dialog_alert)
         builder.setCancelable(true)
         //performing positive action
         builder.setPositiveButton(getString(R.string.ct_delete_logs_positive_btn)) { _, _ ->

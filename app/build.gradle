@@ -34,6 +34,7 @@ android {
         targetSdkVersion 30
         versionCode 12 // For version name 053a
         versionName "0.5.3a"
+        vectorDrawables.useSupportLibrary = true
        /* splits {
              abi {
                  enable true

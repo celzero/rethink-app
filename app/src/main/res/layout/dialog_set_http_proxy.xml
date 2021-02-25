@@ -75,7 +75,7 @@
         android:padding="5dp"
         android:textSize="@dimen/default_font_text_view"
         android:text="@string/http_proxy_dialog_desc"
-        android:textColor="@color/textColorMain"
+        android:textColor="?attr/primaryLightColorText"
         android:visibility="visible"
         app:layout_constraintTop_toBottomOf="@id/text_input_layout1" />
 

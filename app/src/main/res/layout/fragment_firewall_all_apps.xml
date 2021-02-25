@@ -78,7 +78,7 @@
         android:layout_marginStart="2dp"
         android:layout_marginEnd="2dp"
         android:childDivider="?attr/background"
-        android:divider="?attr/dividerColor"
+        android:divider="?attr/border"
         android:dividerHeight="2dp"
         android:groupIndicator="@null"
         android:nestedScrollingEnabled="true"

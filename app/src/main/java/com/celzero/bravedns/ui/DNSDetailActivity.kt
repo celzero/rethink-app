@@ -16,7 +16,9 @@ limitations under the License.
 package com.celzero.bravedns.ui
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -38,10 +40,16 @@ class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
     private val persistentState by inject<PersistentState>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (persistentState.theme) {
-            setTheme(R.style.AppTheme)
-        } else {
+        if (persistentState.theme == 0) {
+            if (isDarkThemeOn()) {
+                setTheme(R.style.AppTheme)
+            } else {
+                setTheme(R.style.AppTheme_white)
+            }
+        } else if (persistentState.theme == 1) {
             setTheme(R.style.AppTheme_white)
+        } else {
+            setTheme(R.style.AppTheme)
         }
         super.onCreate(savedInstanceState)
         screenToLoad = intent.getIntExtra(Constants.SCREEN_TO_LOAD,0)
@@ -70,6 +78,10 @@ class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
         }.attach()
 
         b.dnsDetailActViewpager.setCurrentItem(screenToLoad, true)
+    }
+
+    private fun Context.isDarkThemeOn(): Boolean {
+           return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

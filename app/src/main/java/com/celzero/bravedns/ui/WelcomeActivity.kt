@@ -17,6 +17,7 @@ package com.celzero.bravedns.ui
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -42,10 +43,16 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
     private val persistentState by inject<PersistentState>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (persistentState.theme) {
-            setTheme(R.style.AppTheme)
-        } else {
+        if (persistentState.theme == 0) {
+            if (isDarkThemeOn()) {
+                setTheme(R.style.AppTheme)
+            } else {
+                setTheme(R.style.AppTheme_white)
+            }
+        } else if (persistentState.theme == 1) {
             setTheme(R.style.AppTheme_white)
+        } else {
+            setTheme(R.style.AppTheme)
         }
         super.onCreate(savedInstanceState)
 
@@ -87,6 +94,10 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
 
         })
 
+    }
+
+    private fun Context.isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
     private fun changeStatusBarColor() {

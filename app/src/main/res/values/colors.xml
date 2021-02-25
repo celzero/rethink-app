@@ -79,18 +79,22 @@
 
     <!-- Light theme -->
     <color name="colorPrimary_white">#FFFFFF</color>
-    <color name="colorPrimaryDark_white">#4788C7</color>
+    <color name="colorPrimaryDark_white">#1e88e5</color>
     <color name="childListColor_white">#ececec</color>
-    <color name="lightColorPrimary_white">#2278d4</color>
+    <color name="lightColorPrimary_white">#005cb2</color>
     <color name="positive_white">#FFFFFF</color>
-    <color name="negative_white">#F05D23</color>
-    <color name="accent_bad_white">#F71735</color>
-    <color name="accent_good_white">#2278d4</color>
+    <color name="negative_white">#005cb2</color>
+    <color name="accent_bad_white">#c60055</color>
+    <color name="accent_good_white">#fafafa</color>
     <color name="neutral_white">#1B1B1E</color>
     <color name="black_white">#000000</color>
     <color name="recycler_selected_white">#e1e1e1</color>
-    <color name="background_dark_white">#e1e1e1</color>
+    <color name="background_dark_white">#e0e0e0</color>
     <color name="stroke_color_white">#000000</color>
     <color name="fill_color_white">#00000000</color>
+    <color name="main_button_disabled">#757575</color>
+    <color name="border_white">#eeeeee</color>
+    <color name="textColorMain_white">#424242</color>
+    <color name="whitelist">#00e676</color>
 
 </resources>
