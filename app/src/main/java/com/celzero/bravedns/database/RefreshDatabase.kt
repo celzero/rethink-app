@@ -22,7 +22,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
 import com.celzero.bravedns.R
-import com.celzero.bravedns.database.*
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -96,9 +95,8 @@ class RefreshDatabase internal constructor(
                         appInfo.packageInfo = applicationInfo.packageName
                         appInfo.uid = applicationInfo.uid
                         val dbAppInfo = appInfoRepository.getAppInfoForPackageName(appInfo.packageInfo)
-                        if (dbAppInfo != null) {
+                        if (dbAppInfo != null && dbAppInfo.appName.isNotEmpty()) {
                             HomeScreenActivity.GlobalVariable.appList[applicationInfo.packageName] = dbAppInfo
-                            return@forEach
                         }else{
                             if(DEBUG) Log.d(LOG_TAG,"Refresh Database, AppInfo - new package found ${appInfo.appName} will be inserted")
                             appInfo.isDataEnabled = true
@@ -113,41 +111,35 @@ class RefreshDatabase internal constructor(
                             appInfo.mobileDataUsed = 0
                             appInfo.trackers = 0
                             appInfo.wifiDataUsed = 0
-                        }
 
-                        val category = fetchCategory(appInfo.packageInfo)
-                        if (category.toLowerCase(Locale.ROOT) != PlayStoreCategory.OTHER.name.toLowerCase(Locale.ROOT)) {
-                            appInfo.appCategory = category
-                        } else if (((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) && FileSystemUID.isUIDAppRange(
-                                appInfo.uid
-                            )
-                        ) {
-                            appInfo.appCategory = Constants.APP_CAT_SYSTEM_APPS
-                            appInfo.isSystemApp = true
-                        } else if (((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0)){
-                            appInfo.appCategory = Constants.APP_CAT_SYSTEM_COMPONENTS
-                            appInfo.isSystemApp = true
-                        } else {
-                            val temp = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                ApplicationInfo.getCategoryTitle(context, applicationInfo.category)
+                            val category = fetchCategory(appInfo.packageInfo)
+                            if (category.toLowerCase(Locale.ROOT) != PlayStoreCategory.OTHER.name.toLowerCase(Locale.ROOT)) {
+                                appInfo.appCategory = category
+                            } else if (((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) && FileSystemUID.isUIDAppRange(appInfo.uid)) {
+                                appInfo.appCategory = Constants.APP_CAT_SYSTEM_APPS
+                                appInfo.isSystemApp = true
+                            } else if (((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0)) {
+                                appInfo.appCategory = Constants.APP_CAT_SYSTEM_COMPONENTS
+                                appInfo.isSystemApp = true
                             } else {
-                                Constants.INSTALLED_CAT_APPS
+                                val temp = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    ApplicationInfo.getCategoryTitle(context, applicationInfo.category)
+                                } else {
+                                    Constants.INSTALLED_CAT_APPS
+                                }
+                                if (temp != null) appInfo.appCategory = temp.toString()
+                                else appInfo.appCategory = Constants.APP_CAT_OTHER
                             }
-                            if (temp != null)
-                                appInfo.appCategory = temp.toString()
-                            else
-                                appInfo.appCategory = Constants.APP_CAT_OTHER
+                            if (appInfo.appCategory.contains("_")) appInfo.appCategory = appInfo.appCategory.replace("_", " ").toLowerCase(Locale.ROOT)
+
+                            //appInfo.uid = context.packageManager.getPackageUid(appInfo.packageInfo, PackageManager.GET_META_DATA)
+                            appInfo.isInternetAllowed = persistentState.wifiAllowed(appInfo.packageInfo)
+
+
+                            //TODO Handle this Global scope variable properly. Only half done.
+                            HomeScreenActivity.GlobalVariable.appList[applicationInfo.packageName] = appInfo
+                            appInfoRepository.insertAsync(appInfo, this)
                         }
-                        if (appInfo.appCategory.contains("_"))
-                            appInfo.appCategory = appInfo.appCategory.replace("_", " ").toLowerCase(Locale.ROOT)
-
-                        //appInfo.uid = context.packageManager.getPackageUid(appInfo.packageInfo, PackageManager.GET_META_DATA)
-                        appInfo.isInternetAllowed = persistentState.wifiAllowed(appInfo.packageInfo)
-
-
-                        //TODO Handle this Global scope variable properly. Only half done.
-                        HomeScreenActivity.GlobalVariable.appList[applicationInfo.packageName] = appInfo
-                        appInfoRepository.insertAsync(appInfo, this)
                     }
                 }
                 updateCategoryInDB()
