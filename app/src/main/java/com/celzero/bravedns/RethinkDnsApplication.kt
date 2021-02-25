@@ -2,7 +2,9 @@ package com.celzero.bravedns
 
 import android.app.Application
 import android.content.Context
+import android.content.res.Configuration
 import android.os.StrictMode
+import com.celzero.bravedns.service.PersistentState
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -28,14 +30,31 @@ class RethinkDnsApplication:Application() {
     }
 
     override fun onCreate() {
+        val persistentState = PersistentState(this)
+        if (persistentState.theme == 0) {
+            if (isDarkThemeOn()) {
+                setTheme(R.style.AppTheme)
+            } else {
+                setTheme(R.style.AppTheme_white)
+            }
+        } else if (persistentState.theme == 1) {
+            setTheme(R.style.AppTheme_white)
+        } else {
+            setTheme(R.style.AppTheme)
+        }
         super.onCreate()
         context = applicationContext
+
         //turnOnStrictMode()
         startKoin {
             if(BuildConfig.DEBUG) androidLogger()
             androidContext(this@RethinkDnsApplication)
             koin.loadModules(AppModules)
         }
+    }
+
+    private fun Context.isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
     private fun turnOnStrictMode() {

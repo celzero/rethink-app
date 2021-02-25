@@ -63,9 +63,10 @@
                         android:marqueeRepeatLimit="marquee_forever"
                         android:scrollHorizontally="true"
                         android:singleLine="false"
+                        android:fontFamily="sans-serif-light"
                         android:textSize="@dimen/large_font_text_view"
                         android:textAppearance="@android:style/TextAppearance.Material.Body1"
-                        android:textColor="@color/textColorMain"
+                        android:textColor="?attr/primaryLightColorText"
                         tools:text="longlongongexaasdsa" />
                 </LinearLayout>
 
@@ -85,7 +86,7 @@
                         android:singleLine="true"
                         android:textSize="@dimen/default_font_text_view"
                         android:textAppearance="@android:style/TextAppearance.Material.Body1"
-                        android:textColor="@color/textColorMain"
+                        android:textColor="?attr/primaryLightColorText"
                         tools:text="17:54:11" />
 
 
@@ -138,6 +139,7 @@
                         android:layout_weight="0.65"
                         android:ellipsize="start"
                         android:focusable="true"
+                        android:fontFamily="sans-serif-condensed-medium"
                         android:focusableInTouchMode="true"
                         android:marqueeRepeatLimit="marquee_forever"
                         android:paddingStart="10dp"
@@ -173,16 +175,6 @@
                         android:textSize="@dimen/default_font_text_view"
                         android:textAppearance="@android:style/TextAppearance.Material.Body1"
                         tools:text="TCP" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:padding="5dp">
-
 
                 </LinearLayout>
             </LinearLayout>

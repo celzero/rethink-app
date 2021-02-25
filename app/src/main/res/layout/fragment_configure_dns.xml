@@ -141,7 +141,7 @@
                         android:layout_marginTop="15dp"
                         android:gravity="center"
                         android:text="@string/dns_proxy_no_proxy"
-                        android:textColor="@color/textColorMain"
+                        android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/large_font_text_view" />
 
                     <androidx.recyclerview.widget.RecyclerView

@@ -17,7 +17,9 @@ limitations under the License.
 package com.celzero.bravedns.adapter
 
 import android.content.Context
+import android.content.res.TypedArray
 import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -116,7 +118,7 @@ class ConnectionTrackerAdapter(val context : Context) : PagedListAdapter<Connect
                     connectionIndicator!!.setBackgroundColor(ContextCompat.getColor(context, R.color.colorRed_A400))
                 }else if(connTracker.blockedByRule.equals(BraveVPNService.BlockedRuleNames.RULE7.ruleName)){
                     connectionIndicator!!.visibility = View.VISIBLE
-                    connectionIndicator!!.setBackgroundColor(ContextCompat.getColor(context, R.color.dividerColor))
+                    connectionIndicator!!.setBackgroundColor(fetchTextColor(R.color.dividerColor))
                 }else {
                     connectionIndicator!!.visibility = View.INVISIBLE
                 }
@@ -159,6 +161,19 @@ class ConnectionTrackerAdapter(val context : Context) : PagedListAdapter<Connect
 
             }
 
+        }
+
+        private fun fetchTextColor(attr: Int): Int {
+            val attributeFetch = if (attr == R.color.dividerColor) {
+                R.attr.dividerColor
+            } else {
+                R.attr.accentGood
+            }
+            val typedValue = TypedValue()
+            val a: TypedArray = context.obtainStyledAttributes(typedValue.data, intArrayOf(attributeFetch))
+            val color = a.getColor(0, 0)
+            a.recycle()
+            return color
         }
 
 

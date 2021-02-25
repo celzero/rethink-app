@@ -103,7 +103,7 @@
                         android:padding="10dp"
                         android:text="@string/dns_mode_info_title"
                         android:textSize="@dimen/extra_large_font_text_view"
-                        android:textColor="?attr/primaryTextColor"
+                        android:textColor="?attr/primaryDarkColorText"
                         app:drawableEndCompat="@drawable/dns_home_screen" />
 
 
@@ -116,7 +116,7 @@
                         android:gravity="center_vertical"
                         android:maxLines="1"
                         android:ellipsize="end"
-                        android:textColor="?attr/primaryTextColor"
+                        android:textColor="?attr/primaryDarkColorText"
                         android:textSize="@dimen/extra_large_font_text_view" />
 
                     <TextView
@@ -128,7 +128,7 @@
                         android:layout_marginBottom="10dp"
                         android:paddingBottom="5dp"
                         android:gravity="center_vertical"
-                        android:textColor="?attr/primaryTextColor"
+                        android:textColor="?attr/primaryDarkColorText"
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:textSize="@dimen/default_font_text_view" />
@@ -184,7 +184,7 @@
                         android:padding="10dp"
                         android:text="@string/firewall_mode_info_title"
                         android:textSize="@dimen/extra_large_font_text_view"
-                        android:textColor="?attr/primaryTextColor"
+                        android:textColor="?attr/primaryDarkColorText"
                         app:drawableEndCompat="@drawable/firewall_home_screen" />
 
                     <TextView
@@ -197,7 +197,7 @@
                         android:maxLines="1"
                         android:ellipsize="end"
                         android:textSize="@dimen/extra_large_font_text_view"
-                        android:textColor="?attr/primaryTextColor" />
+                        android:textColor="?attr/primaryDarkColorText" />
                     <TextView
                         android:id="@+id/fhs_card_firewall_apps"
                         android:layout_width="wrap_content"
@@ -206,7 +206,7 @@
                         android:textSize="@dimen/default_font_text_view"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:textColor="?attr/primaryTextColor"
+                        android:textColor="?attr/primaryDarkColorText"
                         android:layout_marginBottom="10dp"
                         android:paddingBottom="5dp"
                         android:paddingStart="10dp"
@@ -303,7 +303,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-smallcaps"
                 android:text="@string/dns_explanation_disconnected"
-                android:textColor="@color/textColorMain"
+                android:textColor="?attr/primaryLightColorText"
                 android:textSize="@dimen/large_font_text_view"
                 android:visibility="gone" />
 
@@ -312,7 +312,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-smallcaps"
-                android:textColor="@color/textColorMain"
+                android:textColor="?attr/primaryLightColorText"
                 android:textSize="@dimen/default_font_text_view"
                 android:visibility="gone" />
         </LinearLayout>

@@ -20,6 +20,8 @@ import android.content.*
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.content.res.Configuration
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
@@ -105,7 +107,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         var appStartTime: Long = System.currentTimeMillis()
         var isBackgroundEnabled: Boolean = false
         var firewallRules: HashMultimap<Int, String> = HashMultimap.create()
-        var DEBUG = false
+        var DEBUG = true
 
         //Screen off - whether the screen preference is set 0-off, 1- on. -1 not initialized
         var isScreenLockedSetting: Int = -1
@@ -116,7 +118,11 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         //Remove the usage of below variable(isSearchEnabled)
         var isSearchEnabled : Boolean = true
 
-        var swipeDetector: MutableLiveData<Boolean> = MutableLiveData()
+    }
+
+    private fun Context.isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and
+                Configuration.UI_MODE_NIGHT_MASK == UI_MODE_NIGHT_YES
     }
 
     companion object {
@@ -124,22 +130,29 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         var enqueue: Long = 0
     }
 
-
     //TODO : Remove the unwanted data and the assignments happening
     //TODO : Create methods and segregate the data.
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (persistentState.theme) {
-            setTheme(R.style.AppTheme)
-        } else {
+        if(persistentState.theme == 0){
+            if (isDarkThemeOn()) {
+                setTheme(R.style.AppTheme)
+            } else {
+                setTheme(R.style.AppTheme_white)
+            }
+        }else if (persistentState.theme == 1) {
             setTheme(R.style.AppTheme_white)
+        } else {
+            setTheme(R.style.AppTheme)
         }
         super.onCreate(savedInstanceState)
+        context = this
 
         if (persistentState.firstTimeLaunch) {
+            GlobalVariable.connectedDNS.postValue(Constants.RETHINK_DNS)
             launchOnBoardingActivity()
+        }else{
+            showNewFeaturesDialog()
         }
-
-        context = this
 
         internetManagerFragment = InternetManagerFragment()
         homeScreenFragment = HomeScreenFragment()
@@ -169,7 +182,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         persistentState.setScreenLockData(false)
         updateInstallSource()
         initUpdateCheck()
-        showNewFeaturesDialog()
+
     }
 
     private fun launchOnBoardingActivity() {
@@ -240,7 +253,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         val numOfDays = (diff / (1000 * 60 * 60 * 24)).toInt()
         val calendar: Calendar = Calendar.getInstance()
         val day: Int = calendar.get(Calendar.DAY_OF_WEEK)
-        if((day == Calendar.FRIDAY || day == Calendar.SATURDAY) && persistentState.checkForAppUpdate) {
+        if ((day == Calendar.FRIDAY || day == Calendar.SATURDAY) && persistentState.checkForAppUpdate) {
             if (numOfDays > 1) {
                 Log.i(LOG_TAG, "App update check initiated, number of days: $numOfDays")
                 checkForUpdate()
@@ -356,7 +369,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                             } else {
                                 (context as HomeScreenActivity).runOnUiThread {
                                     registerReceiverForDownloadManager(context)
-                                    downloadManager = HttpRequestHelper.downloadBlockListFiles(context)
+                                    handleDownloadFiles()
                                 }
                             }
                         }
@@ -388,8 +401,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                         val status = checkStatus(c)
                         if (DEBUG) Log.d(LOG_TAG, "Download status: $status,${GlobalVariable.filesDownloaded}")
                         if (status == Constants.DOWNLOAD_STATUS_SUCCESSFUL) {
-                            val from = File(ctxt.getExternalFilesDir(null).toString() + Constants.DOWNLOAD_PATH + Constants.FILE_TAG_NAME)
-                            val to = File(ctxt.filesDir.canonicalPath + Constants.FILE_TAG_NAME)
+                            val from = File(getExternalFilePath(ctxt, true) + Constants.FILE_TAG_NAME)
+                            val to = File(context.filesDir.canonicalPath + Constants.FILE_TAG_NAME)
                             from.copyTo(to, true)
                             persistentState.remoteBraveDNSDownloaded = true
                             persistentState.remoteBlockListDownloadTime = timeStamp
@@ -404,6 +417,13 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
     }
 
+    private fun getExternalFilePath(context: Context, isAbsolutePathNeeded: Boolean): String {
+        return if (isAbsolutePathNeeded) {
+            context.getExternalFilesDir(null).toString() + Constants.DOWNLOAD_PATH + persistentState.localBlockListDownloadTime
+        } else {
+            Constants.DOWNLOAD_PATH + persistentState.localBlockListDownloadTime
+        }
+    }
 
     private fun showDownloadDialog(source: AppUpdater.InstallSource, title: String, message: String) {
         val builder = AlertDialog.Builder(context)
@@ -491,8 +511,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             val request = DownloadManager.Request(uri)
             request.setTitle(getString(R.string.hs_download_blocklist_heading))
             request.setDescription(getString(R.string.hs_download_blocklist_desc, fileName))
-            request.setDestinationInExternalFilesDir(context, Constants.DOWNLOAD_PATH, fileName)
-            Log.d(LOG_TAG, "Path - ${context.filesDir.canonicalPath}${Constants.DOWNLOAD_PATH}${fileName}")
+            request.setDestinationInExternalFilesDir(context, getExternalFilePath(this, false), fileName)
+            Log.d(LOG_TAG, "Path - ${getExternalFilePath(this, true)}${fileName}")
             enqueue = downloadManager.enqueue(request)
         } catch (e: java.lang.Exception) {
             Log.e(LOG_TAG, "Download unsuccessful - ${e.message}", e)

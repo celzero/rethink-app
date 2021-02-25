@@ -31,6 +31,7 @@
 
 
             <TextView
+                android:textColor="?attr/primaryTextColor"
                 android:id="@+id/dns_block_url"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -41,7 +42,6 @@
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
                 android:text="@string/action_automatic"
-                android:textColor="?attr/primaryTextColor"
                 android:textIsSelectable="true"
                 android:textSize="@dimen/heading_font_text_view" />
         </RelativeLayout>
@@ -71,6 +71,7 @@
                 android:textSize="26sp" />
 
             <TextView
+                android:textColor="?attr/primaryTextColor"
                 android:layout_weight="0.65"
                 android:id="@+id/dns_block_ip_address"
                 android:layout_width="wrap_content"
@@ -82,7 +83,6 @@
                 android:ellipsize="end"
                 android:paddingEnd="10dp"
                 android:text="asdasaasda"
-                android:textColor="?attr/primaryTextColor"
                 android:textIsSelectable="true"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -97,7 +97,7 @@
                 android:text="12323434 ms"
                 android:layout_gravity="center"
                 android:textAlignment="center"
-                android:textColor="@color/textColorMain"
+                android:textColor="?attr/primaryLightColorText"
                 android:textSize="@dimen/default_font_text_view" />
 
 
@@ -111,7 +111,7 @@
             android:layout_centerInParent="true"
             android:padding="5dp"
             android:text="@string/bsct_conn_block_desc"
-            android:textColor="@color/textColorMain"
+            android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/default_font_text_view"
             android:visibility="visible" />
 
@@ -124,7 +124,7 @@
             android:layout_marginTop="5dp"
             android:padding="5dp"
             android:text="@string/bsct_conn_block_desc"
-            android:textColor="@color/textColorMain"
+            android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/default_font_text_view" />
 
         <TextView
@@ -136,7 +136,7 @@
             android:layout_marginTop="5dp"
             android:padding="5dp"
             android:text=""
-            android:textColor="@color/textColorMain"
+            android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/default_font_text_view" />
 
         <TextView
@@ -160,6 +160,8 @@
                 android:layout_height="wrap_content"
                 android:padding="10dp"
                 android:text="@string/dns_btm_sheet_header"
+                android:fontFamily="sans-serif-smallcaps"
+                android:textStyle="bold"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
 

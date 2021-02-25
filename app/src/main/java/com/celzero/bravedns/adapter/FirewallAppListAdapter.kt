@@ -276,8 +276,8 @@ class FirewallAppListAdapter internal constructor(
             sysAppWarning.visibility = View.GONE
             placeHolder.visibility = View.GONE
         }
-
-        appCountTV.text = "${listTitle.numOfAppsBlocked} blocked, ${listTitle.numOfAppWhitelisted} whitelisted, ${listTitle.numOfAppsExcluded} excluded."
+        appCountTV.text = context.getString(R.string.ct_app_details, listTitle.numOfAppsBlocked.toString(),
+            listTitle.numOfAppWhitelisted.toString(), listTitle.numOfAppsExcluded.toString())
 
         val list = dataList[listTitle]
         try {

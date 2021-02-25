@@ -42,6 +42,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
+                    android:fontFamily="sans-serif"
+                    android:textColor="?attr/primaryTextColor"
                     android:text="@string/configure_dns_connected_doh_status"
                     android:textSize="@dimen/large_font_text_view" />
 
@@ -52,7 +54,7 @@
                     android:fontFamily="sans-serif-smallcaps"
                     android:gravity="center"
                     android:padding="5dp"
-                    android:textColor="@color/textColorMain"
+                    android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view" />
 
                 <LinearLayout
@@ -72,7 +74,7 @@
                         android:paddingStart="5dp"
                         android:paddingEnd="5dp"
                         android:text="@string/dns_logs_blocked_queries"
-                        android:textColor="@color/textColorMain"
+                        android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/default_font_text_view" />
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -85,7 +87,7 @@
                         android:paddingStart="5dp"
                         android:paddingEnd="5dp"
                         android:text="@string/dns_logs_lifetime_queries"
-                        android:textColor="@color/textColorMain"
+                        android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/default_font_text_view" />
 
                 </LinearLayout>

@@ -339,7 +339,6 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         builder.setTitle(R.string.bsct_alert_message_clear_rules_heading)
         //set message for alert dialog
         builder.setMessage(R.string.bsct_alert_message_clear_rules)
-        builder.setIcon(android.R.drawable.ic_dialog_alert)
         builder.setCancelable(true)
         //performing positive action
         builder.setPositiveButton(getString(R.string.ctbs_clear_rules_dialog_positive)) { _, _ ->

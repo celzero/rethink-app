@@ -9,6 +9,7 @@
         <item name="accentGood">@color/accent_good</item>
         <item name="accentBad">@color/accent_bad</item>
         <item name="colorSwitchThumbNormal">@color/neutral</item>
+        <item name="colorCheckSelected">@color/accent_bad</item>
         <item name="android:buttonStyleToggle">@android:style/Widget.Material.Button.Toggle</item>
         <item name="chipStyle">@style/Widget.MaterialComponents.Chip.Action</item>
         <item name="android:splitMotionEvents">false</item>
@@ -17,21 +18,28 @@
         <item name="backgroundDark">@color/colorPrimaryDark</item>
         <item name="searchViewStyle">@style/SearchView_custom</item>
         <item name="primaryTextColor">@color/primaryText</item>
+        <item name="primaryDarkColorText">@color/primaryText</item>
+        <item name="primaryLightColorText">@color/textColorMain</item>
         <item name="secondaryTextColor">@color/secondaryText</item>
-        <item name="dividerColor">@color/dividerColor</item>
+        <item name="dividerColor">@color/neutral</item>
         <item name="roundedCornersButton">@drawable/rounded_corners_button_accent</item>
         <item name="homeScreenBtnBackground">@color/black</item>
         <item name="svgStrokeColor">@color/stroke_color</item>
         <item name="svgFillColor">@color/fill_color</item>
+        <item name="mainButtonBackground">@color/button_background_tint</item>
+        <item name="mainButtonBackgroundDisabled">@color/colorPrimary</item>
+        <item name="border">@color/borderblack</item>
+        <item name="invertedPrimaryTextColor">@color/white</item>
     </style>
 
     <style name="AppTheme_white" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary_white</item>
+        <item name="colorPrimary">@color/background_dark_white</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark_white</item>
         <item name="colorAccent">@color/accent_bad_white</item>
-        <item name="accentGood">@color/accent_good_white</item>
+        <item name="accentGood">@color/negative_white</item>
         <item name="accentBad">@color/accent_bad_white</item>
+        <item name="colorCheckSelected">@color/black_white</item>
         <item name="colorSwitchThumbNormal">@color/neutral_white</item>
         <item name="android:buttonStyleToggle">@android:style/Widget.Material.Button.Toggle</item>
         <item name="chipStyle">@style/Widget.MaterialComponents.Chip.Action</item>
@@ -41,12 +49,18 @@
         <item name="backgroundDark">@color/background_dark_white</item>
         <item name="searchViewStyle">@style/SearchView_custom</item>
         <item name="primaryTextColor">@color/black_white</item>
-        <item name="secondaryTextColor">@color/black_white</item>
-        <item name="dividerColor">@color/background_dark_white</item>
+        <item name="primaryDarkColorText">@color/colorPrimary_white</item>
+        <item name="primaryLightColorText">@color/textColorMain_white</item>
+        <item name="secondaryTextColor">@color/accent_good_white</item>
+        <item name="dividerColor">@color/whitelist</item>
         <item name="roundedCornersButton">@drawable/rounded_corners_button_primary_white</item>
         <item name="homeScreenBtnBackground">@color/lightColorPrimary_white</item>
         <item name="svgStrokeColor">@color/stroke_color_white</item>
         <item name="svgFillColor">@color/fill_color_white</item>
+        <item name="mainButtonBackground">@color/lightColorPrimary_white</item>
+        <item name="mainButtonBackgroundDisabled">@color/main_button_disabled</item>
+        <item name="border">@color/border_white</item>
+        <item name="invertedPrimaryTextColor">@color/white</item>
     </style>
 
 
@@ -54,10 +68,24 @@
         <item name="materialThemeOverlay">@style/CustomCompoundButton_Switch</item>
     </style>
 
+    <style name="CustomWidget.MaterialComponents.CompoundButton.Switch.Bad" parent="Widget.MaterialComponents.CompoundButton.Switch">
+        <item name="materialThemeOverlay">@style/CustomCompoundButton_Switch_bad</item>
+    </style>
+
+
     <style name="CustomCompoundButton_Switch">
         <item name="colorSurface">@color/neutral</item>
         <item name="colorOnSurface">@color/neutral</item>
         <item name="colorControlActivated">?attr/accentGood</item>
+    </style>
+
+    <style name="CustomCompoundButton_Switch_bad">
+        <item name="colorSurface">@color/neutral</item>
+        <item name="colorOnSurface">@color/neutral</item>
+        <item name="colorControlActivated">?attr/accentBad</item>
+        <item name="colorControlHighlight">?attr/accentBad</item>
+        <item name="android:colorControlActivated">?attr/accentBad</item>
+        <item name="colorAccent">?attr/accentBad</item>
     </style>
 
     <style name="BottomSheet" parent="@style/Widget.Design.BottomSheet.Modal">
@@ -71,7 +99,7 @@
 
     <style name="BottomSheetDialogTheme" parent="BaseBottomSheetDialog">
         <!-- Active thumb color & Active track color(30% transparency) -->
-        <item name="colorControlActivated">@attr/accentBad</item>
+        <item name="colorControlActivated">?attr/accentBad</item>
         <!-- Inactive thumb color -->
         <item name="colorSwitchThumbNormal">@color/neutral</item>
         <!-- Inactive track color(30% transparency) -->
@@ -85,7 +113,7 @@
 
     <style name="SwitchCompat_theme" parent="Theme.MaterialComponents.NoActionBar.Bridge">
         <!-- Active thumb color & Active track color(30% transparency) -->
-        <item name="colorControlActivated">@attr/accentBad</item>
+        <item name="colorControlActivated">?attr/accentBad</item>
         <!-- Inactive thumb color -->
         <item name="colorSwitchThumbNormal">@color/neutral</item>
         <!-- Inactive track color(30% transparency) -->

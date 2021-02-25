@@ -17,6 +17,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="15dp"
+            android:visibility="gone"
             android:weightSum="1">
 
             <LinearLayout
@@ -29,19 +30,18 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.33"
                 android:layout_gravity="center"
+                android:layout_weight="0.33"
                 android:gravity="center"
                 android:orientation="vertical">
 
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/settings_app_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:padding="5dp"
-                        android:src="@drawable/conf_dns_icon_black" />
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/settings_app_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:padding="5dp"
+                    android:src="@drawable/conf_dns_icon_black" />
 
             </LinearLayout>
 
@@ -71,9 +71,9 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-smallcaps"
             android:padding="10dp"
-            android:textSize="@dimen/large_font_text_view"
             android:text="@string/settings_firewall_header"
-            android:textColor="?attr/secondaryTextColor" />
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/large_font_text_view" />
 
         <RelativeLayout
             android:id="@+id/settings_activity_kill_app_rl"
@@ -97,15 +97,15 @@
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:text="@string/settings_kill_app_heading" />
+                    android:text="@string/settings_kill_app_heading"
+                    android:textSize="@dimen/large_font_text_view" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="5dp"
-                    android:textSize="@dimen/default_font_text_view"
-                    android:text="@string/settings_kill_app_desc" />
+                    android:text="@string/settings_kill_app_desc"
+                    android:textSize="@dimen/default_font_text_view" />
             </LinearLayout>
 
             <com.google.android.material.switchmaterial.SwitchMaterial
@@ -126,8 +126,8 @@
             android:fontFamily="sans-serif-smallcaps"
             android:padding="10dp"
             android:text="@string/settings_dns_header"
-            android:textSize="@dimen/large_font_text_view"
-            android:textColor="?attr/secondaryTextColor"/>
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/large_font_text_view" />
 
         <RelativeLayout
             android:id="@+id/settings_activity_on_device_block_rl"
@@ -140,9 +140,11 @@
             android:paddingBottom="15dp">
 
             <LinearLayout
+                android:id="@+id/settings_activity_on_device_ll"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
+                android:layout_marginBottom="10dp"
                 android:layout_toStartOf="@id/settings_activity_on_device_block_switch"
                 android:orientation="vertical">
 
@@ -150,16 +152,17 @@
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:text="@string/settings_local_blocklist_heading" />
+                    android:text="@string/settings_local_blocklist_heading"
+                    android:textSize="@dimen/large_font_text_view" />
 
                 <TextView
                     android:id="@+id/settings_activity_on_device_block_desc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="5dp"
-                    android:textSize="@dimen/default_font_text_view"
-                    android:text="@string/settings_local_blocklist_desc_1" />
+                    android:text="@string/settings_local_blocklist_desc_1"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/default_font_text_view" />
             </LinearLayout>
 
             <com.google.android.material.switchmaterial.SwitchMaterial
@@ -182,14 +185,14 @@
                 android:id="@+id/settings_activity_on_device_block_configure_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/settings_activity_on_device_block_switch"
+                android:layout_below="@id/settings_activity_on_device_ll"
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="3dp"
                 android:layout_marginEnd="3dp"
                 android:padding="13dp"
                 android:text="@string/settings_local_blocklist_configure"
+                android:textColor="?attr/accentGood"
                 android:textSize="@dimen/default_font_text_view"
-                android:textColor="@color/accent_good"
                 android:visibility="visible" />
 
             <Button
@@ -197,26 +200,27 @@
                 style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/settings_activity_on_device_block_switch"
+                android:layout_below="@id/settings_activity_on_device_ll"
                 android:layout_marginEnd="10dp"
                 android:layout_toStartOf="@id/settings_activity_on_device_block_configure_btn"
                 android:padding="10dp"
                 android:text="@string/settings_local_blocklist_update"
+                android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/default_font_text_view"
-                android:textColor="@color/primaryText"
                 android:visibility="visible" />
 
-                <TextView
-                    android:id="@+id/settings_activity_on_device_last_updated_time_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/Widget.AppCompat.TextView"
-                    android:layout_marginEnd="10dp"
-                    android:layout_alignBottom="@id/settings_activity_on_device_block_refresh_btn"
-                    android:gravity="center"
-                    android:layout_below="@id/settings_activity_on_device_block_switch"
-                    android:textSize="@dimen/default_font_text_view"
-                    android:text="@string/settings_local_blocklist_check_time"/>
+            <TextView
+                android:id="@+id/settings_activity_on_device_last_updated_time_txt"
+                style="@style/Widget.AppCompat.TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/settings_activity_on_device_ll"
+                android:layout_alignBottom="@id/settings_activity_on_device_block_refresh_btn"
+                android:layout_alignParentStart="true"
+                android:layout_marginEnd="10dp"
+                android:gravity="center"
+                android:text="@string/settings_local_blocklist_check_time"
+                android:textSize="@dimen/default_font_text_view" />
         </RelativeLayout>
 
         <TextView
@@ -226,24 +230,24 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-smallcaps"
             android:padding="10dp"
-            android:textSize="@dimen/large_font_text_view"
             android:text="@string/settings_vpn_header"
-            android:textColor="?attr/secondaryTextColor" />
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/large_font_text_view" />
 
         <TextView
             android:id="@+id/settings_activity_vpn_lockdown_desc"
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawablePadding="10dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:visibility="gone"
             android:background="?attr/background"
+            android:drawablePadding="10dp"
+            android:paddingStart="10dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="10dp"
             android:text="@string/settings_lock_down_mode_desc"
             android:textSize="@dimen/default_font_text_view"
+            android:visibility="gone"
             app:drawableStartCompat="@drawable/dis_allowed" />
 
         <RelativeLayout
@@ -257,7 +261,6 @@
             android:paddingBottom="15dp">
 
 
-
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -269,9 +272,9 @@
                 <TextView
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
-                    android:textSize="@dimen/large_font_text_view"
                     android:layout_height="wrap_content"
-                    android:text="@string/settings_exclude_app_heading" />
+                    android:text="@string/settings_exclude_app_heading"
+                    android:textSize="@dimen/large_font_text_view" />
 
                 <TextView
                     android:id="@+id/settings_activity_exclude_apps_count_text"
@@ -281,15 +284,15 @@
                     android:paddingTop="5dp"
                     android:paddingBottom="2dp"
                     android:text=""
-                    android:textSize="@dimen/default_font_text_view"
-                    android:textColor="@color/textColorMain" />
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/default_font_text_view" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="2dp"
-                    android:textSize="@dimen/default_font_text_view"
-                    android:text="@string/settings_exclude_app_desc" />
+                    android:text="@string/settings_exclude_app_desc"
+                    android:textSize="@dimen/default_font_text_view" />
             </LinearLayout>
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -324,16 +327,16 @@
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:text="@string/settings_allow_bypass_heading" />
+                    android:text="@string/settings_allow_bypass_heading"
+                    android:textSize="@dimen/large_font_text_view" />
 
                 <TextView
                     android:id="@+id/settings_activity_allow_bypass_desc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="5dp"
-                    android:textSize="@dimen/default_font_text_view"
-                    android:text="@string/settings_allow_bypass_desc" />
+                    android:text="@string/settings_allow_bypass_desc"
+                    android:textSize="@dimen/default_font_text_view" />
             </LinearLayout>
 
             <com.google.android.material.switchmaterial.SwitchMaterial
@@ -363,8 +366,8 @@
             android:fontFamily="sans-serif-smallcaps"
             android:padding="10dp"
             android:text="@string/settings_proxy_header"
-            android:textSize="@dimen/large_font_text_view"
-            android:textColor="?attr/secondaryTextColor" />
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/large_font_text_view" />
 
         <RelativeLayout
             android:id="@+id/settings_activity_socks5_rl"
@@ -387,17 +390,17 @@
                 <TextView
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
-                    android:textSize="@dimen/large_font_text_view"
                     android:layout_height="wrap_content"
-                    android:text="@string/settings_socks5_heading" />
+                    android:text="@string/settings_socks5_heading"
+                    android:textSize="@dimen/large_font_text_view" />
 
                 <TextView
                     android:id="@+id/settings_activity_socks5_desc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="5dp"
-                    android:textSize="@dimen/default_font_text_view"
-                    android:text="@string/settings_socks5_desc" />
+                    android:text="@string/settings_socks5_desc"
+                    android:textSize="@dimen/default_font_text_view" />
             </LinearLayout>
 
             <com.google.android.material.switchmaterial.SwitchMaterial
@@ -445,8 +448,8 @@
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:text="@string/settings_https_heading" />
+                    android:text="@string/settings_https_heading"
+                    android:textSize="@dimen/large_font_text_view" />
 
                 <TextView
                     android:id="@+id/settings_activity_http_proxy_desc"
@@ -455,8 +458,8 @@
                     android:layout_gravity="fill"
                     android:paddingTop="5dp"
                     android:paddingBottom="5dp"
-                    android:textSize="@dimen/default_font_text_view"
-                    android:text="@string/settings_https_desc" />
+                    android:text="@string/settings_https_desc"
+                    android:textSize="@dimen/default_font_text_view" />
             </LinearLayout>
 
             <com.google.android.material.switchmaterial.SwitchMaterial
@@ -487,8 +490,8 @@
             android:fontFamily="sans-serif-smallcaps"
             android:padding="10dp"
             android:text="@string/settings_general_header"
-            android:textSize="@dimen/large_font_text_view"
-            android:textColor="?attr/secondaryTextColor"/>
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/large_font_text_view" />
 
         <RelativeLayout
             android:id="@+id/settings_activity_refresh_data_rl"
@@ -497,9 +500,9 @@
             android:background="?attr/background"
             android:paddingStart="20dp"
             android:paddingTop="15dp"
-            android:visibility="gone"
             android:paddingEnd="10dp"
-            android:paddingBottom="15dp">
+            android:paddingBottom="15dp"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -514,15 +517,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="5dp"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:text="@string/settings_refresh_heading" />
+                    android:text="@string/settings_refresh_heading"
+                    android:textSize="@dimen/large_font_text_view" />
 
                 <TextView
                     android:id="@+id/settings_activity_refresh_desc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/default_font_text_view"
-                    android:text="@string/settings_refresh_desc" />
+                    android:text="@string/settings_refresh_desc"
+                    android:textSize="@dimen/default_font_text_view" />
             </LinearLayout>
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -558,15 +561,15 @@
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:text="@string/settings_enable_logs" />
+                    android:text="@string/settings_enable_logs"
+                    android:textSize="@dimen/large_font_text_view" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="5dp"
-                    android:textSize="@dimen/default_font_text_view"
-                    android:text="@string/settings_enable_logs_desc" />
+                    android:text="@string/settings_enable_logs_desc"
+                    android:textSize="@dimen/default_font_text_view" />
             </LinearLayout>
 
             <com.google.android.material.switchmaterial.SwitchMaterial
@@ -577,6 +580,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:padding="10dp" />
+
         </RelativeLayout>
 
         <RelativeLayout
@@ -594,7 +598,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:layout_toStartOf="@id/settings_activity_theme_switch"
+                android:layout_toStartOf="@id/settings_activity_theme_switch_img"
                 android:orientation="vertical">
 
                 <TextView
@@ -614,14 +618,24 @@
                     android:textSize="@dimen/default_font_text_view" />
             </LinearLayout>
 
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/settings_activity_theme_switch"
-                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/settings_activity_theme_switch_img"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:padding="10dp" />
+                android:padding="10dp"
+                android:src="@drawable/ic_right_arrow_small" />
+
+            <ProgressBar
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:padding="10dp"
+                android:visibility="gone" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -667,13 +681,24 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:padding="10dp" />
+
+            <ProgressBar
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:padding="10dp"
+                android:visibility="gone" />
         </RelativeLayout>
+
         <RelativeLayout
             android:id="@+id/settings_activity_auto_start_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/background"
             android:layout_marginBottom="80dp"
+            android:background="?attr/background"
             android:paddingStart="20dp"
             android:paddingTop="15dp"
             android:paddingEnd="10dp"
@@ -692,15 +717,15 @@
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:text="@string/settings_autostart_bootup_heading" />
+                    android:text="@string/settings_autostart_bootup_heading"
+                    android:textSize="@dimen/large_font_text_view" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="5dp"
-                    android:textSize="@dimen/default_font_text_view"
-                    android:text="@string/settings_autostart_bootup_desc" />
+                    android:text="@string/settings_autostart_bootup_desc"
+                    android:textSize="@dimen/default_font_text_view" />
             </LinearLayout>
 
             <com.google.android.material.switchmaterial.SwitchMaterial
@@ -712,9 +737,5 @@
                 android:layout_centerVertical="true"
                 android:padding="10dp" />
         </RelativeLayout>
-
-
-
-
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

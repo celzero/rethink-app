@@ -179,7 +179,6 @@ class DNSCryptRelayEndpointAdapter(
             builder.setTitle(R.string.dns_crypt_relay_remove_dialog_title)
             //set message for alert dialog
             builder.setMessage(R.string.dns_crypt_relay_remove_dialog_message)
-            builder.setIcon(android.R.drawable.ic_dialog_alert)
             builder.setCancelable(true)
             //performing positive action
             builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { dialogInterface, which ->

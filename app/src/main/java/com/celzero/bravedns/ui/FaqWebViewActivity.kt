@@ -16,6 +16,8 @@ limitations under the License.
 package com.celzero.bravedns.ui
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import android.webkit.WebChromeClient
 import android.webkit.WebViewClient
@@ -33,10 +35,16 @@ class FaqWebViewActivity : AppCompatActivity(R.layout.activity_faq_webview_layou
     private val persistentState by inject<PersistentState>()
 
     @SuppressLint("SetJavaScriptEnabled") override fun onCreate(savedInstanceState: Bundle?) {
-        if (persistentState.theme) {
-            setTheme(R.style.AppTheme)
-        } else {
+        if (persistentState.theme == 0) {
+            if (isDarkThemeOn()) {
+                setTheme(R.style.AppTheme)
+            } else {
+                setTheme(R.style.AppTheme_white)
+            }
+        } else if (persistentState.theme == 1) {
             setTheme(R.style.AppTheme_white)
+        } else {
+            setTheme(R.style.AppTheme)
         }
         super.onCreate(savedInstanceState)
         b.configureWebview.settings.domStorageEnabled = true
@@ -58,6 +66,10 @@ class FaqWebViewActivity : AppCompatActivity(R.layout.activity_faq_webview_layou
         } else {
             b.configureWebview.loadUrl(url)
         }
+    }
+
+    private fun Context.isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
     override fun onDestroy() {

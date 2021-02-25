@@ -25,5 +25,12 @@
     <attr name="accentGood" format="reference"/>
     <attr name="accentBad" format="reference"/>
     <attr name="backgroundDark" format="reference"/>
+    <attr name="primaryDarkColorText" format="reference" />
+    <attr name="primaryLightColorText" format="reference"/>
+    <attr name="mainButtonBackground" format="reference" />
+    <attr name="mainButtonBackgroundDisabled" format="reference" />
+    <attr name="border" format="reference"/>
+    <attr name="invertedPrimaryTextColor" format="reference"/>
+    <attr name="colorCheckSelected" format="reference"/>
 
 </resources>

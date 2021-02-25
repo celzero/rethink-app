@@ -240,9 +240,9 @@
     <string name="brave_dns_connect_prompt_firewall">Start Firewall / DNS+Firewall to configure apps.</string>
     <string name="brave_dns_connect_prompt_query">Start DNS / DNS+Firewall to view logs</string>
 
-    <string name="brave_dns_connect_mode_change_firewall">Firewall is disabled.</string>
+    <string name="brave_dns_connect_mode_change_firewall">Choose Mode.</string>
 
-    <string name="brave_dns_connect_mode_change_dns">DNS is disabled.</string>
+    <string name="brave_dns_connect_mode_change_dns">Choose Mode.</string>
 
     <string name="brave_dns_connect_mode_change_connection">Start Firewall / DNS+Firewall to view network logs.</string>
 
@@ -560,6 +560,11 @@
     <string name="settings_socks_forwarding_desc">Forwarding to %1$s:%2$s, %3$s</string>
     <string name="settings_socks_forwarding_default_desc">Forward connections to SOCKS5 endpoint.</string>
 
+    <string name="settings_theme_dialog_title">Select theme</string>
+    <string name="settings_theme_dialog_themes_1">Default system</string>
+    <string name="settings_theme_dialog_themes_2">Light</string>
+    <string name="settings_theme_dialog_themes_3">Dark</string>
+
     <!-- FirewallAppFragment -->
     <string name="apps_icon_content_desc">Application Icon</string>
 
@@ -586,6 +591,16 @@
     <string name="hsf_stop_btn_state">stop</string>
 
     <string name="hsf_uptime">(%1$s)</string>
+
+    <string name="hsf_vpn_dialog_header">VPN activation request</string>
+    <string name="hsf_vpn_dialog_message">Set up VPN connection for the first time message</string>
+    <string name="hsf_vpn_dialog_positive">Proceed</string>
+    <string name="hsf_vpn_dialog_negative">Cancel</string>
+
+    <string name="hsf_start_dialog_header">Start VPN</string>
+    <string name="hsf_start_dialog_message">Start VPN to enable the %1$s</string>
+    <string name="hsf_start_dialog_positive">Start</string>
+    <string name="hsf_start_dialog_negative">Dismiss</string>
 
     <!-- Web view configure -->
     <string name="webview_configure_dialog_positive">Quit</string>
@@ -664,6 +679,8 @@
     <string name="ct_delete_logs_positive_btn">Delete logs</string>
     <string name="ct_delete_logs_negative_btn">Cancel</string>
     <string name="ct_filter_dialog_title">Select filter</string>
+
+    <string name="ct_app_details">%1$s blocked, %2$s whitelisted, %3$s excluded.</string>
 
     <!-- Connection tracker bottom sheet fragment string -->
     <string name="ctbs_app_info_not_available_toast">App Info not available</string>

@@ -45,6 +45,7 @@
                     android:paddingTop="15dp"
                     android:paddingBottom="5dp"
                     android:text="TextView"
+                    android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view"
                     android:textStyle="bold" />
 
@@ -57,12 +58,13 @@
                     android:layout_marginEnd="10dp"
                     android:layout_toStartOf="@id/expand_checkbox"
                     android:text="Textview"
-                    android:textColor="@color/textColorMain"
+                    android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view" />
 
                 <androidx.appcompat.widget.AppCompatToggleButton
                     android:id="@+id/expand_checkbox"
                     android:layout_width="wrap_content"
+                    android:checked="true"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"

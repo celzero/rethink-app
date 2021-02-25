@@ -29,7 +29,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:fontFamily="sans-serif-light"
                 android:text="Dummy Label"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
@@ -39,9 +38,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:fontFamily="sans-serif-light"
                 android:text="Dummy Label"
-                android:textColor="@color/textColorMain"
+                android:textColor="?attr/primaryLightColorText"
                 android:textSize="@dimen/default_font_text_view" />
 
         </LinearLayout>
@@ -65,6 +63,8 @@
             android:layout_alignParentEnd="true"
             android:gravity="center"
             android:padding="10dp"
+            android:buttonTint="?attr/colorCheckSelected"
+            android:foregroundTint="?attr/colorCheckSelected"
             android:text="@null" />
 
     </RelativeLayout>
@@ -73,6 +73,6 @@
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:layout_below="@id/dns_proxy_list_container"
-        android:background="@color/borderblack" />
+        android:background="?attr/border" />
 
 </RelativeLayout>

@@ -13,7 +13,7 @@
         android:padding="5dp"
         android:text="@string/whitelist_heading"
         android:textSize="@dimen/large_font_text_view"
-        android:textColor="?attr/secondaryTextColor" />
+        android:textColor="?attr/accentGood" />
 
     <LinearLayout
         android:id="@+id/custom_dialog_search_layout"

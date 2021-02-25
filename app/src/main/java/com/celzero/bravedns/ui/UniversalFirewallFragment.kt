@@ -267,7 +267,6 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             builder.setTitle(R.string.univ_delete_firewall_dialog_title)
             //set message for alert dialog
             builder.setMessage(R.string.univ_delete_firewall_dialog_message)
-            builder.setIcon(android.R.drawable.ic_dialog_alert)
             builder.setCancelable(true)
             //performing positive action
             builder.setPositiveButton(getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->
@@ -341,7 +340,6 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             }
         }
 
-        builder.setIcon(android.R.drawable.ic_dialog_alert)
         //performing positive action
 
         // Create the AlertDialog

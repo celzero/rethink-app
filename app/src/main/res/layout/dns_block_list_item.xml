@@ -53,7 +53,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@id/dns_block_list_container"
-        android:background="@color/black"
+        android:background="?attr/border"
         android:visibility="visible" />
 
 </RelativeLayout>

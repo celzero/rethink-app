@@ -45,6 +45,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0.9"
                     android:padding="10dp"
+                    android:textColor="?attr/primaryTextColor"
                     android:text="@string/univ_firewall_rule_1"
                     android:textSize="@dimen/large_font_text_view" />
 
@@ -74,6 +75,7 @@
                     android:layout_weight="0.9"
                     android:padding="10dp"
                     android:text="@string/univ_firewall_rule_2"
+                    android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
@@ -102,6 +104,7 @@
                     android:layout_weight="0.9"
                     android:padding="10dp"
                     android:text="@string/univ_block_unknown_connections"
+                    android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
@@ -129,6 +132,7 @@
                     android:layout_weight="0.9"
                     android:padding="10dp"
                     android:text="@string/univ_firewall_rule_4"
+                    android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
@@ -270,7 +274,7 @@
                         android:layout_weight="0.9"
                         android:fontFamily="sans-serif"
                         android:isScrollContainer="true"
-                        app:iconifiedByDefault="true"
+                        app:iconifiedByDefault="false"
                         app:queryHint="@string/search_universal_ips">
                     </androidx.appcompat.widget.SearchView>
 
@@ -312,7 +316,7 @@
                 android:gravity="center"
                 android:textSize="@dimen/default_font_text_view"
                 android:text="@string/univ_firewall_no_ip_message"
-                android:textColor="@color/textColorMain"
+                android:textColor="?attr/primaryLightColorText"
                 android:visibility="invisible" />
 
             <androidx.recyclerview.widget.RecyclerView
