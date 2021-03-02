@@ -9,5 +9,6 @@
       android:strokeWidth="2"
       android:fillColor="?attr/svgFillColor"
       android:strokeColor="?attr/svgStrokeColor"
+      android:strokeAlpha="0.5"
       android:strokeLineCap="round"/>
 </vector>

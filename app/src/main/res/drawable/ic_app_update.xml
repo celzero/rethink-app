@@ -8,12 +8,14 @@
         android:pathData="M12,3L12,16"
         android:strokeWidth="2"
         android:strokeColor="?attr/svgStrokeColor"
+        android:strokeAlpha="0.5"
         android:strokeLineCap="square"
         android:strokeLineJoin="miter" />
     <path
         android:fillColor="?attr/svgFillColor"
         android:pathData="M7,12l5,5l5,-5"
         android:strokeWidth="2"
+        android:strokeAlpha="0.5"
         android:strokeColor="?attr/svgStrokeColor"
         android:strokeLineCap="square"
         android:strokeLineJoin="miter" />
@@ -21,6 +23,7 @@
         android:fillColor="?attr/svgFillColor"
         android:pathData="M20,21L4,21"
         android:strokeWidth="2"
+        android:strokeAlpha="0.5"
         android:strokeColor="?attr/svgStrokeColor"
         android:strokeLineCap="square"
         android:strokeLineJoin="miter" />

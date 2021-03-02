@@ -21,7 +21,7 @@
         android:layout_marginTop="10dp"
         android:layout_height="wrap_content"
         android:hint="@string/cd_doh_dialog_resolver_name"
-        app:hintTextColor="@color/secondaryText"
+        app:hintTextColor="?attr/accentGood"
         app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_top">
 
         <EditText
@@ -35,7 +35,7 @@
             android:inputType="textNoSuggestions"
             android:padding="10dp"
             android:maxLines="2"
-            android:textColor="@color/primaryText"
+            android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/large_font_text_view"
             app:layout_constraintRight_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_top" />
@@ -46,7 +46,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/cd_doh_dialog_resolver_url"
-        app:hintTextColor="@color/secondaryText"
+        app:hintTextColor="?attr/accentGood"
         app:layout_constraintTop_toBottomOf="@id/text_input_layout_name">
 
         <EditText
@@ -62,7 +62,7 @@
             android:textSize="@dimen/large_font_text_view"
             android:text="https://"
             android:maxLines="2"
-            android:textColor="@color/primaryText"
+            android:textColor="?attr/primaryTextColor"
             app:layout_constraintRight_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/text_input_layout_name" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -94,6 +94,7 @@
         android:layout_marginBottom="10dp"
         android:text="@string/cd_dialog_positive_btn"
         android:textSize="@dimen/large_font_text_view"
+        android:textColor="?attr/accentBad"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_failure_text" />
 
@@ -108,6 +109,7 @@
         android:gravity="center"
         android:text="@string/cd_dialog_negative_btn"
         android:textSize="@dimen/large_font_text_view"
+        android:textColor="?attr/accentBad"
         app:layout_constraintEnd_toStartOf="@id/dialog_custom_url_ok_btn"
         app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_failure_text" />
 

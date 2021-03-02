@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
+        android:background="@null"
         android:visibility="visible"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -31,7 +32,6 @@
                 android:id="@+id/query_card_view_top"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/background"
                 android:gravity="center"
                 android:orientation="vertical"
                 android:paddingTop="20dp"
@@ -74,8 +74,8 @@
                         android:paddingStart="5dp"
                         android:paddingEnd="5dp"
                         android:text="@string/dns_logs_blocked_queries"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/large_font_text_view" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/total_queries_txt"
@@ -87,19 +87,12 @@
                         android:paddingStart="5dp"
                         android:paddingEnd="5dp"
                         android:text="@string/dns_logs_lifetime_queries"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/large_font_text_view" />
 
                 </LinearLayout>
 
             </LinearLayout>
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin"
-                app:popupTheme="@style/AppTheme" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>

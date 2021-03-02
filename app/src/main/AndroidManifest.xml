@@ -23,7 +23,7 @@
         android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
         android:name=".RethinkDnsApplication"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppThemeInitial">
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />
@@ -47,6 +47,7 @@
             android:launchMode="singleTask" />
         <activity
             android:name=".ui.WelcomeActivity"
+            android:noHistory="true"
             android:launchMode="singleTask"/>
         <activity
             android:name=".ui.AppInfoActivity"

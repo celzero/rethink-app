@@ -1,5 +1,8 @@
 <resources>
 
+    <style name="AppThemeInitial" parent="@android:style/Theme.Holo">
+        <item name="android:windowDisablePreview">true</item>
+    </style>
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.NoActionBar.Bridge">
         <!-- Customize your theme here. -->
@@ -39,7 +42,7 @@
         <item name="colorAccent">@color/accent_bad_white</item>
         <item name="accentGood">@color/negative_white</item>
         <item name="accentBad">@color/accent_bad_white</item>
-        <item name="colorCheckSelected">@color/black_white</item>
+        <item name="colorCheckSelected">@color/negative_white</item>
         <item name="colorSwitchThumbNormal">@color/neutral_white</item>
         <item name="android:buttonStyleToggle">@android:style/Widget.Material.Button.Toggle</item>
         <item name="chipStyle">@style/Widget.MaterialComponents.Chip.Action</item>

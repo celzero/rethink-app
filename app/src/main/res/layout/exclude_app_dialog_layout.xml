@@ -31,7 +31,7 @@
             android:layout_gravity="start"
             android:fontFamily="sans-serif"
             android:isScrollContainer="true"
-            app:queryHint="Search by app name">
+            app:queryHint="@string/search_hint">
             <requestFocus />
         </androidx.appcompat.widget.SearchView>
         <ImageView

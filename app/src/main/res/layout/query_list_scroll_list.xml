@@ -105,10 +105,9 @@
                 android:id="@+id/recycler_query"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="?attr/background"
+                android:background="?attr/backgroundDark"
                 android:nestedScrollingEnabled="true"
-                android:orientation="vertical"
-                android:padding="1dp" />
+                android:orientation="vertical" />
 
         </com.celzero.bravedns.util.NestedScrollableHost>
 

@@ -66,7 +66,7 @@
             android:textSize="@dimen/large_font_text_view"
             android:maxLines="1"
             android:layout_weight="0.7"
-            android:hint="IP Address" />
+            android:hint="@string/settings_socks5_dialog_hint_ip" />
 
     </LinearLayout>
 
@@ -92,7 +92,7 @@
             android:layout_gravity="center"
             android:layout_weight="0.7"
             android:maxLines="1"
-            android:hint="Port"
+            android:hint="@string/settings_socks5_dialog_hint_port"
             android:textSize="@dimen/large_font_text_view"
             android:inputType="number" />
 
@@ -121,7 +121,7 @@
             android:layout_weight="0.7"
             android:maxLines="1"
             android:textSize="@dimen/large_font_text_view"
-            android:hint="Username (optional)" />
+            android:hint="@string/settings_socks5_dialog_hint_username" />
 
     </LinearLayout>
 
@@ -147,7 +147,7 @@
             android:layout_gravity="center"
             android:layout_weight="0.7"
             android:textSize="@dimen/large_font_text_view"
-            android:hint="Password (optional)"
+            android:hint="@string/settings_socks5_dialog_hint_password"
             android:maxLines="1"
             android:inputType="textPassword" />
 
@@ -169,6 +169,8 @@
             android:text="@string/univ_firewall_rule_4" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
+            android:buttonTint="?attr/accentGood"
+            android:foregroundTint="?attr/accentGood"
             android:id="@+id/dialog_proxy_udp_check"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -202,7 +204,7 @@
             android:gravity="center"
             android:text="@string/settings_dns_proxy_dialog_negative_btn"
             android:textSize="@dimen/large_font_text_view"
-            android:textColor="@color/accent_bad" />
+            android:textColor="?attr/accentBad" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/dialog_proxy_apply_btn"
@@ -213,6 +215,6 @@
             android:layout_margin="5dp"
             android:gravity="center"
             android:text="@string/settings_dns_proxy_dialog_positive_btn"
-            android:textColor="@color/accent_bad" />
+            android:textColor="?attr/accentBad" />
     </LinearLayout>
 </LinearLayout>

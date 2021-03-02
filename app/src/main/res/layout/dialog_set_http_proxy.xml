@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/settings_http_proxy_hostname"
-        app:hintTextColor="@color/secondaryText"
+        app:hintTextColor="?attr/accentGood"
         app:layout_constraintTop_toBottomOf="@id/dialog_http_proxy_top">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -45,7 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/settings_http_proxy_port"
-        app:hintTextColor="@color/secondaryText"
+        app:hintTextColor="?attr/accentGood"
         app:layout_constraintTop_toBottomOf="@id/dialog_http_proxy_ip_address">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -106,6 +106,7 @@
         android:layout_marginBottom="10dp"
         android:text="@string/settings_dns_proxy_dialog_positive_btn"
         android:textSize="@dimen/large_font_text_view"
+        android:textColor="?attr/accentBad"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_http_proxy_failure_text" />
 
@@ -119,6 +120,7 @@
         android:layout_marginBottom="10dp"
         android:gravity="center"
         android:textSize="@dimen/large_font_text_view"
+        android:textColor="?attr/accentBad"
         android:text="@string/settings_dns_proxy_dialog_negative_btn"
         app:layout_constraintEnd_toStartOf="@id/dialog_http_proxy_ok_btn"
         app:layout_constraintTop_toBottomOf="@id/dialog_http_proxy_failure_text" />
