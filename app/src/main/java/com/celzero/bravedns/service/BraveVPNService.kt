@@ -21,7 +21,6 @@ import android.content.*
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import android.net.ProxyInfo
 import android.net.VpnService
 import android.os.Build.VERSION
@@ -60,12 +59,9 @@ import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.internal.synchronized
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import org.koin.core.component.KoinApiExtension
 import protect.Blocker
 import protect.Protector
 import settings.Settings
@@ -73,11 +69,10 @@ import java.util.*
 import kotlin.collections.HashMap
 
 
-@KoinApiExtension
-class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector, Blocker,
+class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListener, Protector, Blocker,
     OnSharedPreferenceChangeListener {
 
-    @GuardedBy("vpnController") private var networkManager: NetworkManager? = null
+    //@GuardedBy("vpnController") private var networkManager: ConnectionCapabilityMonitor? = null
 
     @GuardedBy("vpnController") private var connectionCapabilityMonitor : ConnectionCapabilityMonitor ?= null
 
@@ -237,7 +232,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                 if ((uid != -1 && uid != MISSING_UID)) {
                     var isBGBlock = true
                     if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Background blocked $uid, $destIp, before sleep: $uid, $destIp, $isBGBlock, ${System.currentTimeMillis()}")
-                    for (i in 3 downTo 1) {
+                    for (i in 4 downTo 1) {
                         if (backgroundAllowedUID.containsKey(uid)) {
                             if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Background not blocked $uid, $destIp, AccessibilityEvent: app in foreground: $uid")
                             isBGBlock = false
@@ -350,7 +345,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
 
     override fun getResolvers(): String {
         val ips: MutableList<String?> = ArrayList()
-        val ipsList = networkManager!!.getSystemResolvers()
+        val ipsList = connectionCapabilityMonitor!!.getSystemResolvers()
         if (ipsList != null) {
             for (ip in ipsList) {
                 val address = ip.hostAddress
@@ -532,7 +527,6 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         return builder
     }
 
-    @InternalCoroutinesApi
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         appInfoRepository.getUIDForUnivWhiteList().observeForever {
             appWhiteList = it.associateBy({ it }, { true }).toMutableMap()
@@ -555,11 +549,11 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         registerReceiversForScreenState()
         registerReceiverForBootComplete()
         if (vpnController != null) {
-            synchronized(vpnController) {
+            kotlin.synchronized(vpnController) {
                 if(DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Registering the shared pref changes with the vpn service")
                 persistentState.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
 
-                if (networkManager != null) {
+                if (connectionCapabilityMonitor != null) {
                     spawnServerUpdate()
                     return Service.START_REDELIVER_INTENT
                 }
@@ -571,9 +565,9 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                 // If we're online, |networkManager| immediately calls this.onNetworkConnected(), which in turn
                 // calls startVpn() to actually start.  If we're offline, the startup actions will be delayed
                 // until we come online.
-                networkManager = NetworkManager(this, this)
+                //networkManager = NetworkManager(this, this)
 
-                connectionCapabilityMonitor = ConnectionCapabilityMonitor(this)
+                connectionCapabilityMonitor = ConnectionCapabilityMonitor(this, this)
                 // Mark this as a foreground service.  This is normally done to ensure that the service
                 // survives under memory pressure.  Since this is a VPN service, it is presumably protected
                 // anyway, but the foreground service mechanism allows us to set a persistent notification,
@@ -584,11 +578,13 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
                 // anyway, but the foreground service mechanism allows us to set a persistent notification,
                 // which helps users understand what's going on, and return to the app if they want.
 
-                val applicationContext = this.applicationContext
+                //Removed the below code as part of testing - Multiple startVPN thread is not getting
+                //closed after the execution.
+                /*val applicationContext = this.applicationContext
                 val connectivityManager = applicationContext!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
                 connectivityManager.activeNetworkInfo?.takeIf { it.isConnected }?.also {
                     onNetworkConnected(it)
-                }
+                }*/
                 val builder = updateBuilder(this)
                 Log.i(LOG_TAG, "$FILE_LOG_TAG onStart command - start as foreground service. ")
                 startForeground(SERVICE_ID, builder.notification)
@@ -615,17 +611,18 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         }
     }
 
-    @InternalCoroutinesApi private fun spawnServerUpdate() {
+    private fun spawnServerUpdate() {
         if (vpnController != null) {
-            synchronized(vpnController) {
-                if (networkManager != null) {
+            kotlin.synchronized(vpnController) {
+                if (connectionCapabilityMonitor != null) {
                     Thread({ updateServerConnection() }, "updateServerConnection-onStartCommand").start()
                 }
             }
         }
     }
 
-    @WorkerThread private fun updateServerConnection() {
+    @WorkerThread
+    private fun updateServerConnection() {
         vpnAdapter?.updateDohUrl(appMode?.getDNSMode(), appMode?.getFirewallMode(), appMode?.getProxyMode())
     }
 
@@ -639,6 +636,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         }
 
         if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Record Transaction: status- ${transaction.status}")
+        if (DEBUG) Log.d(LOG_TAG,"$FILE_LOG_TAG Blocklist - ${transaction.blockList}")
         // Update the connection state.  If the transaction succeeded, then the connection is working.
         // If the transaction failed, then the connection is not working.
         // If the transaction was canceled, then we don't have any new information about the status
@@ -654,7 +652,6 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         vpnAdapter!!.setCryptMode()
     }
 
-    @InternalCoroutinesApi
     override fun onSharedPreferenceChanged(preferences: SharedPreferences?, key: String?) {
         /*TODO Check on the Persistent State variable
             Check on updating the values for Package change and for mode change.
@@ -717,9 +714,10 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         if (PersistentState.BACKGROUND_MODE == key) {
             isBackgroundEnabled = persistentState.backgroundEnabled && Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
             Log.i(LOG_TAG, "$FILE_LOG_TAG preference for background mode is modified - $isBackgroundEnabled")
-            if (isBackgroundEnabled) {
+            //Removed the restart of the VPN service when the accessibility service is enabled.
+            /*if (isBackgroundEnabled) {
                 restartVpn(appMode?.getDNSMode()!!, appMode?.getFirewallMode()!!, appMode?.getProxyMode()!!)
-            }
+            }*/
         }
         if (PersistentState.BLOCK_UNKNOWN_CONNECTIONS == key) {
             Log.i(LOG_TAG, "$FILE_LOG_TAG preference for block unknown connections is modified")
@@ -822,12 +820,11 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         }
     }
 
-    @InternalCoroutinesApi
     fun restartVpn(dnsModeL: Long, firewallModeL: Long, proxyMode: Long) {
         isBackgroundEnabled = persistentState.backgroundEnabled &&
             Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
         if (vpnController != null) {
-            synchronized(vpnController) {
+            kotlin.synchronized(vpnController) {
                 Thread({
                     //updateServerConnection()
                     // Attempt seamless handoff as described in the docs for VpnService.Builder.establish().
@@ -850,14 +847,16 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         return GoVpnAdapter.establish(this, appMode, dnsProxyEndpointRepository, get(), get(), persistentState)
     }
 
-    override fun onNetworkConnected(networkInfo: NetworkInfo?) {
+    override fun onNetworkConnected() {
         setNetworkConnected(true)
 
         // This code is used to start the VPN for the first time, but startVpn is idempotent, so we can
         // call it every time. startVpn performs network activity so it has to run on a separate thread.
         Thread({ //TODO Work on the order of the function call.
+            Log.d(LOG_TAG, "onNetworkConnected - BraveVPNService -startVpn started , ${Thread.currentThread().id}")
             updateServerConnection()
             startVpn()
+            Log.d(LOG_TAG, "onNetworkConnected - BraveVPNService -startVpn Completed , ${Thread.currentThread().id}")
         }, "startVpn-onNetworkConnected").start()
     }
 
@@ -876,10 +875,15 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         }
     }
 
-    @WorkerThread private fun startVpn() {
+    @WorkerThread
+    private fun startVpn() {
         isBackgroundEnabled = persistentState.backgroundEnabled
             && Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
         kotlin.synchronized(vpnController!!) {
+            //Added again as the thread keeps hanging around.
+            if (vpnAdapter != null) {
+                return
+            }
             startVpnAdapter()
             vpnController.onStartComplete(this, vpnAdapter != null)
             if (vpnAdapter == null) {
@@ -912,10 +916,7 @@ class BraveVPNService : VpnService(), NetworkManager.NetworkListener, Protector,
         kotlin.synchronized(vpnController!!) {
             Log.w(LOG_TAG, "$FILE_LOG_TAG Destroying DNS VPN service")
             persistentState.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
-            if (networkManager != null) {
-                networkManager!!.destroy()
-                connectionCapabilityMonitor?.removeCallBack(this)
-            }
+            connectionCapabilityMonitor?.removeCallBack()
             vpnController.setBraveVpnService(null)
             stopForeground(true)
             if (vpnAdapter != null) {

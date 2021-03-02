@@ -1,4 +1,6 @@
 /*
+Copyright 2020 RethinkDNS developers
+
 Copyright 2019 Jigsaw Operations LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,7 +48,7 @@ public class GoProber extends Prober {
         // Protection isn't needed for Lollipop+, or if the VPN is not active.
         Protector protector = VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP ? null :
                 vpnController.getBraveVpnService();
-        Transport transport = Tun2socks.newDoHTransport(url, dohIPs, protector, null);
+        Transport transport = Tun2socks.newDoHTransport(url, dohIPs, protector, null, null);
         if (transport == null) {
           callback.onCompleted(false);
           return;
@@ -60,6 +62,6 @@ public class GoProber extends Prober {
       } catch (Exception e) {
         callback.onCompleted(false);
       }
-    }).start();
+    },"GoProber-probe").start();
   }
 }

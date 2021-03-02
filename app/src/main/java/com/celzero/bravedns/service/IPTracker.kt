@@ -50,12 +50,12 @@ class IPTracker internal constructor(
     //private val recentIPActivity: Queue<Long> = LinkedList()
     private var historyEnabled = true
 
-    @Synchronized fun getRecentIPTransactions(): Queue<IPDetails?>? {
+    fun getRecentIPTransactions(): Queue<IPDetails?>? {
         return LinkedList(recentTrackers)
     }
 
 
-    @Synchronized fun recordTransaction(ipDetails: IPDetails?) {
+    fun recordTransaction(ipDetails: IPDetails?) {
         //Modified the call of the insert to database inside the coroutine scope.
         GlobalScope.launch(Dispatchers.IO) {
             if (ipDetails != null) {
