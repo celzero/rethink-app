@@ -52,12 +52,12 @@ import java.util.Locale;
 import dnsx.BraveDNS;
 import dnsx.Dnsx;
 import doh.Transport;
+import intra.Tunnel;
 import kotlin.Lazy;
 import protect.Blocker;
 import protect.Protector;
 import settings.Settings;
 import tun2socks.Tun2socks;
-import tunnel.IntraTunnel;
 
 import static com.celzero.bravedns.ui.HomeScreenFragment.DNS_MODE;
 import static com.celzero.bravedns.ui.HomeScreenFragment.FIREWALL_MODE;
@@ -111,7 +111,7 @@ public class GoVpnAdapter {
 
     // The Intra session object from go-tun2socks.  Initially null.
     //private Tunnel tunnel;
-    private IntraTunnel tunnel;
+    private Tunnel tunnel;
 
     //private Boolean isAdapterAvailable = false;
     private GoIntraListener listener;
@@ -516,7 +516,7 @@ public class GoVpnAdapter {
         //TODO : Check the below code
         //@NonNull String realUrl = PersistentState.Companion.expandUrl(vpnService, url);
         String dohIPs = getIpString(vpnService, url);
-        return Tun2socks.newDoHTransport(url, dohIPs, getProtector(), listener);
+        return Tun2socks.newDoHTransport(url, dohIPs, getProtector(), null, listener);
     }
 
     /**
