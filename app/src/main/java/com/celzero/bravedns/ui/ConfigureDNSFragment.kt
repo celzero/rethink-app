@@ -20,7 +20,6 @@ import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.os.Handler
 import android.util.Log
 import android.util.Patterns
 import android.view.View
@@ -278,15 +277,17 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
             val url = customURL.text.toString()
             val name = customName.text.toString()
 
-            val timerHandler = Handler()
-            var updater: Runnable? = null
+            /*val timerHandler = Handler()
+            var updater: Runnable? = null*/
             if (checkUrl(url)) {
-                errorTxt.visibility = View.GONE
+                insertDoHEndpoint(name, url)
+                dialog.dismiss()
+                /*errorTxt.visibility = View.GONE
                 applyURLBtn.visibility = View.INVISIBLE
                 cancelURLBtn.visibility = View.INVISIBLE
                 progressBar.visibility = View.VISIBLE
-
-                var count = 0
+*/
+               /* var count = 0
                 var connectionStatus: Boolean
                 updater = Runnable {
                     kotlin.run {
@@ -322,7 +323,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
                         }
                     }
                 }
-                timerHandler.postDelayed(updater, 2000)
+                timerHandler.postDelayed(updater, 2000)*/
             } else {
                 errorTxt.text = resources.getString(R.string.custom_url_error_invalid_url)
                 errorTxt.visibility = View.VISIBLE
@@ -333,10 +334,10 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
         }
 
         cancelURLBtn.setOnClickListener {
-            if (VpnController.getInstance() != null && retryAttempts != 0) {
+            /*if (VpnController.getInstance() != null && retryAttempts != 0) {
                 VpnController.getInstance()!!.stop(requireContext())
                 VpnController.getInstance()!!.start(requireContext())
-            }
+            }*/
             dialog.dismiss()
         }
         dialog.show()
