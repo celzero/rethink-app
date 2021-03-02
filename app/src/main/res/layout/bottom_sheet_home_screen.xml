@@ -4,9 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true"
+    android:focusable="true"
     android:orientation="vertical"
-    android:paddingBottom="40dp"
-    android:focusable="true">
+    android:paddingBottom="40dp">
 
     <TextView
         android:layout_width="60dp"
@@ -29,71 +29,229 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:textStyle="bold"
             android:gravity="center"
             android:text="@string/app_mode_choose"
             android:textColor="?attr/primaryTextColor"
             android:textIsSelectable="true"
-            android:textSize="@dimen/extra_large_font_text_view" />
+            android:textSize="@dimen/extra_large_font_text_view"
+            android:textStyle="bold" />
     </RelativeLayout>
 
     <View
         android:layout_width="match_parent"
+        android:layout_height="1dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
-        android:layout_height="1dp"
-        android:background="@color/recycler_selected" />
+        android:background="@color/recycler_selected"
+        android:visibility="gone" />
 
     <RadioGroup
         android:id="@+id/bs_home_screen_radio_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp"
+        android:background="?attr/backgroundDark"
         android:gravity="center">
 
-        <com.google.android.material.radiobutton.MaterialRadioButton
-            android:id="@+id/bs_home_screen_radio_dns"
-            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-            android:layout_width="match_parent"
+        <RelativeLayout
+            android:id="@+id/bs_hs_dns_rl"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layoutDirection="rtl"
-            android:padding="5dp"
-            android:text="@string/app_mode_dns_low_battery"
-            android:textColor="?attr/primaryTextColor"
-            android:textSize="@dimen/large_font_text_view" />
-        <com.google.android.material.radiobutton.MaterialRadioButton
-            android:id="@+id/bs_home_screen_radio_firewall"
-            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-            android:layout_width="match_parent"
+            android:layout_marginBottom="1dp"
+            android:background="?attr/background"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp">
+
+            <ImageView
+                android:id="@+id/dns_icon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:alpha="0.5"
+                android:layout_margin="5dp"
+                android:contentDescription="@string/apps_icon_content_desc"
+                android:padding="5dp"
+                android:src="@drawable/bs_dns_home_screen" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/bs_home_screen_radio_dns"
+                android:layout_toEndOf="@id/dns_icon"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="@string/app_mode_dns_low_battery"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="@dimen/large_font_text_view" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="5dp"
+                    android:text="@string/dns_mode_info_explanation_new"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/default_font_text_view" />
+            </LinearLayout>
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/bs_home_screen_radio_dns"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_margin="5dp"
+                android:layoutDirection="rtl"
+                android:padding="5dp"
+                android:text="" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/bs_hs_firewall_rl"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layoutDirection="rtl"
-            android:padding="5dp"
-            android:text="@string/app_mode_firewall"
-            android:textColor="?attr/primaryTextColor"
-            android:textSize="@dimen/large_font_text_view" />
+            android:layout_marginBottom="1dp"
+            android:background="?attr/background"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp">
+
+            <ImageView
+                android:id="@+id/firewall_icon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:layout_margin="5dp"
+                android:alpha="0.5"
+                android:contentDescription="@string/apps_icon_content_desc"
+                android:padding="5dp"
+                android:src="@drawable/bs_firewall_home_screen" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/bs_home_screen_radio_firewall"
+                android:layout_toEndOf="@id/firewall_icon"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="@string/app_mode_firewall"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="@dimen/large_font_text_view" />
+
+                <TextView
+                    android:id="@+id/textView4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="5dp"
+                    android:text="@string/firewall_mode_info_explanation_new"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/default_font_text_view" />
+            </LinearLayout>
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/bs_home_screen_radio_firewall"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_margin="5dp"
+                android:layoutDirection="rtl"
+                android:padding="5dp"
+                android:text="" />
+        </RelativeLayout>
 
 
-        <com.google.android.material.radiobutton.MaterialRadioButton
-            android:id="@+id/bs_home_screen_radio_dns_firewall"
-            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-            android:layout_width="match_parent"
+        <RelativeLayout
+            android:id="@+id/bs_hs_dns_firewall_rl"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layoutDirection="rtl"
-            android:padding="5dp"
-            android:text="@string/app_mode_dns_firewall"
-            android:textColor="?attr/primaryTextColor"
-            android:textSize="@dimen/large_font_text_view" />
+            android:background="?attr/background"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp">
 
+            <ImageView
+                android:id="@+id/dns_firewall_icon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:alpha="0.5"
+                android:layout_margin="5dp"
+                android:contentDescription="@string/apps_icon_content_desc"
+                android:padding="5dp"
+                android:src="@drawable/ic_dns_firewall" />
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/bs_home_screen_radio_dns_firewall"
+                android:layout_toEndOf="@id/dns_firewall_icon"
+                android:orientation="vertical">
 
+                <TextView
+                    android:id="@+id/textView5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/app_mode_dns_firewall"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="@dimen/large_font_text_view" />
+
+                <TextView
+                    android:id="@+id/textView6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="@string/dns_firewall_mode_info_explanation_new"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/default_font_text_view" />
+            </LinearLayout>
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/bs_home_screen_radio_dns_firewall"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_margin="5dp"
+                android:layoutDirection="rtl"
+                android:padding="5dp"
+                android:text="" />
+        </RelativeLayout>
     </RadioGroup>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/recycler_selected" />
+        android:background="@color/recycler_selected"
+        android:visibility="gone" />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -104,20 +262,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:gravity="center"
             android:layout_margin="5dp"
-            android:textIsSelectable="true"
+            android:gravity="center"
             android:textColor="?attr/primaryTextColor"
-            android:textSize="@dimen/default_font_text_view" />
+            android:textIsSelectable="true"
+            android:textSize="@dimen/default_font_text_view"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/bs_home_screen_app_uptime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/bs_home_screen_connected_status"
-            android:layout_margin="5dp"
-            android:textColor="?attr/primaryTextColor"
+            android:layout_margin="10dp"
             android:gravity="center"
+            android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/default_font_text_view" />
 
     </RelativeLayout>

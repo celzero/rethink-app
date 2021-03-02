@@ -86,6 +86,6 @@
         android:textSize="@dimen/large_font_text_view"
         style="@style/TextAppearance.AppCompat.Widget.Button"
         android:background="@drawable/button_background_ripple"
-        android:text="Ok"/>
+        android:text="@string/hs_download_positive_default"/>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

@@ -140,6 +140,7 @@
                         android:layout_marginTop="10dp"
                         android:background="@color/dividerColor" />-->
                     <LinearLayout
+                        android:id="@+id/fhs_card_dns_configure_ll"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_margin="2dp"
@@ -214,6 +215,7 @@
 
 
                     <LinearLayout
+                        android:id="@+id/fhs_card_firewall_configure_ll"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_margin="2dp"
@@ -256,6 +258,7 @@
                 app:shimmer_base_alpha="0.85"
                 app:shimmer_dropoff="1"
                 app:shimmer_duration="1000"
+                app:shimmer_auto_start="false"
                 app:shimmer_highlight_alpha="0.35">
 
                 <FrameLayout

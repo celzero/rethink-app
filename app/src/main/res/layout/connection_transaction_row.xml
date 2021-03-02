@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="1dp"
+    android:layout_marginBottom="1dp"
     android:animateLayoutChanges="true"
     android:background="?attr/background"
-    android:backgroundTint="?attr/background"
     android:orientation="vertical"
     app:cardElevation="@dimen/activity_horizontal_margin">
 
@@ -19,7 +18,7 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/connection_status_indicator"
-            android:layout_width="1dp"
+            android:layout_width="1.5dp"
             android:layout_height="match_parent"
             android:background="@color/colorRed_A400"
             android:padding="5dp" />
@@ -103,7 +102,7 @@
                         android:id="@+id/connection_flag"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
+                        android:layout_gravity="end"
                         android:ellipsize="none"
                         android:gravity="center"
                         android:minWidth="35dp"
@@ -123,7 +122,7 @@
                 android:weightSum="1">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="horizontal"
@@ -142,7 +141,7 @@
                         android:fontFamily="sans-serif-condensed-medium"
                         android:focusableInTouchMode="true"
                         android:marqueeRepeatLimit="marquee_forever"
-                        android:paddingStart="10dp"
+                        android:paddingStart="8dp"
                         android:paddingEnd="10dp"
                         android:textSize="@dimen/large_font_text_view"
                         android:textAppearance="@android:style/TextAppearance.Material.Subhead"
@@ -180,4 +179,4 @@
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</LinearLayout>

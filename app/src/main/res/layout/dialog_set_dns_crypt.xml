@@ -59,6 +59,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/cd_dns_crypt_dialog_name"
+                app:hintTextColor="?attr/accentGood"
                 app:layout_constraintTop_toBottomOf="@id/dialog_dns_proxy_radio_group">
 
                 <EditText
@@ -75,6 +76,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/cd_dns_crypt_dialog_stamp"
+                app:hintTextColor="?attr/accentGood"
                 app:layout_constraintTop_toBottomOf="@id/text_input_layout1">
 
                 <EditText
@@ -89,6 +91,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/cd_dns_crypt_dialog_desc"
+                app:hintTextColor="?attr/accentGood"
                 app:layout_constraintTop_toBottomOf="@id/text_input_layout2">
 
                 <EditText
@@ -106,6 +109,7 @@
                 android:layout_height="wrap_content"
                 android:padding="2dp"
                 android:textSize="@dimen/default_font_text_view"
+                android:textColor="@color/colorRed_A400"
                 app:layout_constraintTop_toBottomOf="@id/text_input_layout3" />
 
         </LinearLayout>
@@ -114,6 +118,7 @@
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/dialog_dns_crypt_ok_btn"
         style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+        android:textColor="?attr/accentBad"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -125,6 +130,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/dialog_dns_crypt_cancel_btn"
+        android:textColor="?attr/accentBad"
         style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

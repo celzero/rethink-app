@@ -36,10 +36,9 @@ import org.koin.android.ext.android.inject
 class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
     private val b by viewBinding(ActivityWelcomeBinding::bind)
     private lateinit var dots: Array<TextView?>
-    internal val layout: IntArray = intArrayOf(R.layout.welcome_slide1, R.layout.welcome_slide2)
+    internal val layout: IntArray = intArrayOf(R.layout.welcome_slide2, R.layout.welcome_slide1)
 
     private lateinit var myPagerAdapter: PagerAdapter
-
     private val persistentState by inject<PersistentState>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,28 +71,37 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
         }
 
         b.btnNext.setOnClickListener {
-            val currentItem = getItem(1)
-            if (currentItem < layout.size) b.viewPager.currentItem = currentItem
-            else launchHomeScreen()
+            val currentItem = getItem()
+            if (currentItem+1 >= layout.size) {
+                launchHomeScreen()
+            }else {
+                b.viewPager.currentItem = currentItem+1
+            }
         }
 
         b.viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {
-                if (ViewPager.SCROLLBAR_POSITION_RIGHT == state + 1) {
-                    if (getItem(1) == layout.size) launchHomeScreen()
-                }
             }
 
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-
             }
 
             override fun onPageSelected(position: Int) {
                 addBottomDots(position)
+                if (position >= layout.size - 1) {
+                    b.btnNext.text = getString(R.string.finish)
+                    b.btnNext.visibility = View.VISIBLE
+                    b.btnSkip.visibility = View.INVISIBLE
+                }else{
+                    b.btnSkip.visibility = View.VISIBLE
+                    b.btnNext.visibility = View.INVISIBLE
+                }
             }
-
         })
+    }
 
+    override fun onBackPressed() {
+        return
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -127,8 +135,8 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
         }
     }
 
-    private fun getItem(i: Int): Int {
-        return b.viewPager.currentItem + i
+    private fun getItem(): Int {
+        return b.viewPager.currentItem
     }
 
     private fun launchHomeScreen() {

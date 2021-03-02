@@ -1,21 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="1dp"
-    android:animateLayoutChanges="true"
+    android:layout_marginBottom="0.5dp"
     android:background="?attr/background"
-    android:backgroundTint="?attr/background"
-    android:orientation="vertical"
-    app:cardElevation="@dimen/activity_horizontal_margin">
+    android:animateLayoutChanges="true"
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/query_screen_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/background"
         android:orientation="vertical">
 
         <LinearLayout
@@ -116,4 +113,4 @@
 
         </LinearLayout>
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</LinearLayout>

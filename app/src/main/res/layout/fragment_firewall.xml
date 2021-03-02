@@ -246,7 +246,6 @@
             android:id="@+id/firewall_search_view_top"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/backgroundDark"
             android:orientation="vertical"
             android:visibility="visible">
 

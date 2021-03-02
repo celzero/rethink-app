@@ -58,7 +58,6 @@ class UniversalBlockedRulesAdapter(
             R.layout.univ_whitelist_rules_item,
             parent, false
         )
-        v.setBackgroundColor(context.getColor(R.color.colorPrimary))
         return UniversalBlockedConnViewHolder(v)
     }
 

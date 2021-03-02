@@ -84,7 +84,7 @@
     <color name="lightColorPrimary_white">#005cb2</color>
     <color name="positive_white">#FFFFFF</color>
     <color name="negative_white">#005cb2</color>
-    <color name="accent_bad_white">#c60055</color>
+    <color name="accent_bad_white">#ff1744</color>
     <color name="accent_good_white">#fafafa</color>
     <color name="neutral_white">#1B1B1E</color>
     <color name="black_white">#000000</color>
@@ -95,6 +95,6 @@
     <color name="main_button_disabled">#757575</color>
     <color name="border_white">#eeeeee</color>
     <color name="textColorMain_white">#424242</color>
-    <color name="whitelist">#00e676</color>
+    <color name="whitelist">#9cff57</color>
 
 </resources>

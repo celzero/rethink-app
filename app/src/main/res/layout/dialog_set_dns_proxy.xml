@@ -135,7 +135,7 @@
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
         android:textSize="@dimen/default_font_text_view"
-        android:textColor="@color/negative"/>
+        android:textColor="@color/colorRed_A400"/>
 
 
     <LinearLayout
@@ -153,7 +153,7 @@
             android:gravity="center"
             android:textSize="@dimen/large_font_text_view"
             android:text="@string/dns_proxy_negative_btn"
-            android:textColor="@color/accent_bad" />
+            android:textColor="?attr/accentBad" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/dialog_dns_proxy_apply_btn"
@@ -164,6 +164,6 @@
             android:gravity="center"
             android:text="@string/dns_proxy_positive_btn"
             android:textSize="@dimen/large_font_text_view"
-            android:textColor="@color/accent_bad" />
+            android:textColor="?attr/accentBad" />
     </LinearLayout>
 </LinearLayout>

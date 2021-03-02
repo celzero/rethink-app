@@ -5,6 +5,8 @@
     <string name="title_settings">Settings</string>
     <string name="txt_im_topic">Internet Manager</string>
     <string name="backed_by_mozilla">Part of Mozilla Builders MVP Program</string>
+    <string name="settings_title_desc">A highly customizable DNS and Firewall</string>
+    <string name="about_title_desc">Detect and block network security threats</string>
 
     <string name="txt_im_tip">Tip : Firewall prevents apps from accessing the Internet over Wifi or Mobile data. Since most forms of surveillance require the data to be sent over to a central repository, firewalling them effectively mitigates the threat. \n\nThere\'s a class of apps that require Internet connection all day, and those are usually communication apps like Gmail and messenger apps like WhatsApp. Firewalling them might not be an option, and that\'s why we built content blockers. </string>
 
@@ -27,12 +29,13 @@
 
     <string name="next">Next</string>
     <string name="skip">Skip</string>
+    <string name="finish">Finish</string>
 
     <string name="slide_2_title">Welcome</string>
-    <string name="slide_2_desc">RethinkDNS is the easiest way to monitor app activity, circumvent Internet censorship, and firewall apps on your Android device.</string>
+    <string name="slide_2_desc">RethinkDNS is the easiest way to monitor network activity, bypass Internet censorship, and firewall apps on your Android device.</string>
 
-    <string name="slide_1_title">Welcome</string>
-    <string name="slide_1_desc">Say hello to a safer, transparent, and secure Android.</string>
+    <string name="slide_1_title">Free and Open Source</string>
+    <string name="slide_1_desc">RethinkDNS is an open source software backed by Mozilla Builders MVP program.</string>
 
     <string-array name="doh_endpoint_names">
         <item>Cloudflare</item>
@@ -47,7 +50,7 @@
         <item>https://cloudflare-dns.com/dns-query</item>
         <item>https://family.cloudflare-dns.com/dns-query</item>
         <item>https://security.cloudflare-dns.com/dns-query</item>
-        <item>https://basic.bravedns.com/1:YBcgAIAQIAAIAABgIAA=</item>
+        <item>https://basic.bravedns.com/1:YASAAQBwIAA=</item>
         <item>https://cloudflare-dns.com/</item>
         <item>https://basic.bravedns.com/</item>
     </string-array>
@@ -226,11 +229,15 @@
 
     <string name="hybrid_mode_info_title">DNS + Firewall</string>
 
+    <string name="dns_mode_info_explanation_new">Block malware and other security threats with configurable, encrypted DNS.</string>
+    <string name="firewall_mode_info_explanation_new">Monitor network activity and firewall any app or IP address.</string>
+    <string name="dns_firewall_mode_info_explanation_new">All of the above + bypass Internet censorship.</string>
+
     <string name="alert_permission_accessibility">Permission - Accessibility</string>
 
     <string name="alert_permission_accessibility_regrant">Action Required</string>
 
-    <string name="alert_firewall_accessibility_explanation">RethinkDNS uses accessibility service to track which apps are in-use (foreground) versus those that are not in-use (background).</string>
+    <string name="alert_firewall_accessibility_explanation">RethinkDNS uses accessibility service to track which apps are in-use (foreground) versus those that are not in-use (background).\n\nRethinkDNS does not collect any information or spy on you in any way.</string>
 
     <string name="alert_firewall_accessibility_regrant_explanation">
         RethinkDNS accessibility service has stopped or crashed. <b>Goto Settings and Force Stop</b> RethinkDNS and start it again to use "Block any app not in use" feature.\n\n
@@ -311,9 +318,11 @@
 
     <string name="system_apps_warning_title">Block System Apps</string>
     <string name="system_components_warning_title">Block System Components</string>
+    <string name="system_non_app_warning_title">Block Non-App System</string>
 
     <string name="system_apps_warning">Some system apps are critical to proper functioning of a device. Block them only if you know what you are doing.</string>
     <string name="system_components_warning">Some system components are critical to proper functioning of a device. Block them only if you know what you are doing.</string>
+    <string name="system_non_apps_warning">Some non-app system components are critical to proper functioning of a device. Block them only if you know what you are doing.</string>
 
     <string name="system_apps_dialog_positive">Block anyway</string>
     <string name="system_apps_dialog_negative">Cancel</string>
@@ -467,29 +476,28 @@
     <string name="features_disabled">(disabled)</string>
     <string name="firewall_app_info_not_available">Cannot block the app</string>
 
-    <string name="whats_dialog_title">What\'s new in v053a</string>
-    <string name="whats_new_version_name">🎁 Data Privacy Day (Jan 28) 🎁</string>
+    <string name="whats_dialog_title">What\'s new in v053b</string>
+    <string name="whats_new_version_name">🎁 International Women\'s Day (Mar 08) 🎁</string>
     <string name="whats_new_version_update">Incremental update:\n\n
-        \u00091. Better support for the "Always-on VPN" feature.\n\n
-        \u00092. Home screen UI refreshed.\n\n
-        \u00093. Improvements in "Block apps not in use" behavior.\n\n
-        \u00094. Enable / disable auto-check for app updates.\n\n
-        \u00095. Major performance and stability bug fixes.\n
+        1. Themes: Dark and Light themes. More flavors coming soon.\n\n
+        2. Fixed a Battery drain issue.\n\n
+        3. Home and Welcome screen UI changes.\n\n
+        4. Improvements to the underlying Firewall and DNS network engine.\n\n
     </string>
 
     <!-- Settings Fragment strings -->
-    <string name="settings_firewall_header">Firewall</string>
+    <string name="settings_firewall_header">firewall</string>
     <string name="settings_kill_app_heading">Kill app when firewalled (experimental)</string>
     <string name="settings_kill_app_desc">Some stubborn apps persistently try to connect to the internet even when firewalled. Enable this setting to kill such apps.</string>
 
-    <string name="settings_dns_header">DNS</string>
+    <string name="settings_dns_header">dns</string>
     <string name="settings_local_blocklist_heading">Enable on-device blocklists</string>
     <string name="settings_local_blocklist_desc_1">Choose from 170+ blocklists.</string>
     <string name="settings_local_blocklist_configure">configure</string>
     <string name="settings_local_blocklist_update">Update</string>
     <string name="settings_local_blocklist_check_time">last check for update: 10 mins ago</string>
 
-    <string name="settings_vpn_header">VPN</string>
+    <string name="settings_vpn_header">vpn</string>
     <string name="settings_exclude_app_heading">Exclude apps from Firewall and DNS</string>
     <string name="settings_exclude_app_desc">Connections from excluded apps will not monitored or blocked.</string>
 
@@ -498,13 +506,13 @@
     <string name="settings_allow_bypass_lockdown_desc">"Disabled. Settings->VPN->Block connections without VPN" is enabled for RethinkDNS, enabling the feature will block the internet connection of the apps which are trying to bypass the VPN.</string>
     <string name="settings_lock_down_mode_desc">Cannot exclude apps or allow bypass because VPN is running in lockdown mode.</string>
 
-    <string name="settings_proxy_header">Proxy (experimental)</string>
+    <string name="settings_proxy_header">proxy (experimental)</string>
     <string name="settings_socks5_heading">Setup SOCKS5 (TCP) Proxy</string>
     <string name="settings_socks5_desc">Forward connections to SOCKS5 endpoint.</string>
     <string name="settings_https_heading">Setup HTTP(S) Proxy</string>
     <string name="settings_https_desc">This setting is only a recommendation and it is possible that apps will ignore it.</string>
 
-    <string name="settings_general_header">General</string>
+    <string name="settings_general_header">general</string>
     <string name="settings_refresh_heading">Refresh Data</string>
     <string name="settings_refresh_desc">Re-sync application list.</string>
     <string name="settings_autostart_bootup_heading">Auto-start on power up (experimental)</string>
@@ -529,7 +537,7 @@
     <string name="settings_check_update_heading">Check for app updates</string>
     <string name="settings_check_update_desc">Check for apps updates once a week.</string>
 
-    <string name="settings_theme_heading">Enable Dark Theme</string>
+    <string name="settings_theme_heading">Appearance</string>
     <string name="settings_theme_desc">Dark/light theme</string>
 
     <string name="settings_http_proxy_desc">Forwarding to %1$s:%2$s</string>
@@ -546,7 +554,7 @@
 
     <string name="settings_dns_proxy_dialog_header_socks5">Set SOCKS5 (TCP) Proxy</string>
 
-    <string name="settings_dns_proxy_dialog_header">Set SOCKS5(TCP) Proxy</string>
+    <string name="settings_dns_proxy_dialog_header">Set SOCKS5 (TCP) Proxy</string>
     <string name="settings_dns_proxy_dialog_app">App</string>
     <string name="settings_dns_proxy_dialog_hostname">Hostname</string>
     <string name="settings_dns_proxy_dialog_port_number">Port Number</string>
@@ -560,10 +568,18 @@
     <string name="settings_socks_forwarding_desc">Forwarding to %1$s:%2$s, %3$s</string>
     <string name="settings_socks_forwarding_default_desc">Forward connections to SOCKS5 endpoint.</string>
 
-    <string name="settings_theme_dialog_title">Select theme</string>
-    <string name="settings_theme_dialog_themes_1">Default system</string>
+    <string name="settings_socks5_dialog_hint_ip">IP Address</string>
+    <string name="settings_socks5_dialog_hint_port">Port</string>
+    <string name="settings_socks5_dialog_hint_username">Username (optional)</string>
+    <string name="settings_socks5_dialog_hint_password">Password (optional)</string>
+
+
+    <string name="settings_theme_dialog_title">Appearance</string>
+    <string name="settings_theme_dialog_themes_1">Set by System</string>
     <string name="settings_theme_dialog_themes_2">Light</string>
     <string name="settings_theme_dialog_themes_3">Dark</string>
+
+    <string name="settings_selected_theme">Current theme: %1$s</string>
 
     <!-- FirewallAppFragment -->
     <string name="apps_icon_content_desc">Application Icon</string>
@@ -592,13 +608,13 @@
 
     <string name="hsf_uptime">(%1$s)</string>
 
-    <string name="hsf_vpn_dialog_header">VPN activation request</string>
-    <string name="hsf_vpn_dialog_message">Set up VPN connection for the first time message</string>
+    <string name="hsf_vpn_dialog_header">Attention!</string>
+    <string name="hsf_vpn_dialog_message">RethinkDNS needs permission to set up a local VPN to encrypt the device\'s DNS requests, implement a network monitor, and enforce firewall rules. \n\nRethinkDNS does not collect any information or spy on you in any way.</string>
     <string name="hsf_vpn_dialog_positive">Proceed</string>
     <string name="hsf_vpn_dialog_negative">Cancel</string>
 
-    <string name="hsf_start_dialog_header">Start VPN</string>
-    <string name="hsf_start_dialog_message">Start VPN to enable the %1$s</string>
+    <string name="hsf_start_dialog_header">Start %1$s</string>
+    <string name="hsf_start_dialog_message">You are one step away from safe and secure Android: Instantly see network activity, block websites, IPs, and badly behaving apps.</string>
     <string name="hsf_start_dialog_positive">Start</string>
     <string name="hsf_start_dialog_negative">Dismiss</string>
 
@@ -617,15 +633,15 @@
     <string name="about_bravedns_whoarewe">RethinkDNS is a free and open-source project, led by ex-engineers from Amazon, IBM, and Scientific Games.</string>
     <string name="about_bravedns_toreport_text">to report bugs and suggest features.</string>
     <string name="about_join_telegram">Join the RethinkDNS group on Telegram</string>
-    <string name="about_web">Links</string>
+    <string name="about_web">links</string>
     <string name="about_website">Visit rethinkdns.com</string>
     <string name="about_github">Contribute on GitHub</string>
     <string name="about_faq">View FAQs</string>
     <string name="about_blog">Read our blog</string>
-    <string name="about_connect">Contact</string>
-    <string name="about_app">App</string>
+    <string name="about_connect">contact</string>
+    <string name="about_app">app</string>
     <string name="about_email">Email us</string>
-    <string name="about_whats_new">What\'s new</string>
+    <string name="about_whats_new">What\'s new in %1$s</string>
     <string name="about_twitter">Follow us on Twitter</string>
     <string name="about_mozilla">RethinkDNS is part of Mozilla Builders MVP program.</string>
     <string name="about_app_update_check">Check for app updates</string>
@@ -640,13 +656,14 @@
     <string name="about_website_link">https://www.bravedns.com/</string>
     <string name="about_mozilla_alumni_link">https://builders.mozilla.community/alumni.html</string>
     <string name="about_version">v%1$s</string>
+    <string name="about_version_install_source">v%1$s (%2$s)</string>
     <string name="about_dialog_neutral_button">Suggest features</string>
 
     <!-- Configure DNS Fragment string == cd -->
     <string name="cd_dns_type_spinner_tooltip">Select DNS</string>
     <string name="cd_dns_crypt_title">resolvers</string>
     <string name="cd_dns_crypt_relay_title">relays</string>
-    <string name="cd_fab_add_button">Add</string>
+    <string name="cd_fab_add_button">Custom DNS</string>
     <string name="cd_custom_doh_dialog_title">Custom Server URL</string>
     <string name="cd_custom_doh_url_name">DoH %1$s</string>
     <string name="cd_custom_dns_proxy_title">Custom DNS Proxy</string>
@@ -716,6 +733,8 @@
     <string name="ex_dialog_header">Exclude app from DNS and Firewall</string>
     <string name="ex_dialog_button">Go back</string>
     <string name="ex_select_all">select all</string>
+
+    <string name="search_hint">Search by app name</string>
 
     <!-- Home Screen activity -->
     <string name="hs_download_positive_default">ok</string>

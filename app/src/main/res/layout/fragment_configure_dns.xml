@@ -58,12 +58,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_below="@id/configure_screen_spinner_layout"
+                    android:layout_marginTop="10dp"
                     android:visibility="gone">
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recycler_doh_connections"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/background"
                         android:clickable="true"
                         android:focusable="true"
                         android:nestedScrollingEnabled="true"
@@ -85,8 +87,9 @@
                         android:layout_marginTop="10dp"
                         android:fontFamily="sans-serif-smallcaps"
                         android:padding="5dp"
+                        android:layout_marginStart="15dp"
                         android:text="@string/cd_dns_crypt_title"
-                        android:textColor="@color/secondaryText"
+                        android:textColor="?attr/accentGood"
                         android:textSize="@dimen/heading_font_text_view"
                         android:visibility="visible" />
 
@@ -94,8 +97,8 @@
                         android:id="@+id/recycler_dns_crypt_connections"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/recycler_dns_crypt_servers_title"
-                        android:clickable="true"
+                        android:layout_below="@id/recycler_dns_crypt_servers_title"                        android:clickable="true"
+                        android:background="?attr/background"
                         android:focusable="true"
                         android:nestedScrollingEnabled="true"
                         android:visibility="visible" />
@@ -107,12 +110,13 @@
                         android:layout_below="@id/recycler_dns_crypt_connections"
                         android:layout_marginTop="10dp"
                         android:fontFamily="sans-serif-smallcaps"
+                        android:layout_marginStart="15dp"
                         android:paddingStart="5dp"
-                        android:paddingTop="30dp"
+                        android:paddingTop="15dp"
                         android:paddingEnd="5dp"
                         android:paddingBottom="10dp"
                         android:text="@string/cd_dns_crypt_relay_title"
-                        android:textColor="@color/secondaryText"
+                        android:textColor="?attr/accentGood"
                         android:textSize="@dimen/heading_font_text_view"
                         android:visibility="visible" />
 
@@ -122,6 +126,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/recycler_dns_crypt_relays_title"
                         android:clickable="true"
+                        android:background="?attr/background"
                         android:focusable="true"
                         android:nestedScrollingEnabled="true"
                         android:visibility="visible" />
@@ -132,6 +137,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_below="@id/configure_screen_spinner_layout"
+                    android:layout_marginTop="10dp"
                     android:visibility="gone">
 
                     <TextView
@@ -147,9 +153,10 @@
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recycler_dns_proxy_connections"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:clickable="true"
                         android:focusable="true"
+                        android:background="?attr/background"
                         android:nestedScrollingEnabled="true"
                         android:visibility="visible" />
                 </RelativeLayout>
@@ -163,14 +170,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="20dp"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="30dp"
+        android:textAllCaps="false"
         android:drawablePadding="10dp"
         android:text="@string/cd_fab_add_button"
-        android:textColor="?attr/primaryTextColor"
+        android:textColor="@color/white"
         android:textSize="@dimen/default_font_text_view"
-        android:backgroundTint="?attr/backgroundDark"
-        app:fabSize="normal"
+        android:backgroundTint="?attr/mainButtonBackground"
+        app:fabSize="mini"
         app:icon="@drawable/ic_fab_without_border"
-        app:iconTint="?attr/primaryTextColor" />
+        app:iconTint="@color/white" />
 </RelativeLayout>
