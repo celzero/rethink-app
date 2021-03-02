@@ -28,10 +28,13 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentAboutBinding
+import com.celzero.bravedns.service.PersistentState
+import org.koin.android.ext.android.inject
 
 
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
     private val b by viewBinding(FragmentAboutBinding::bind)
+    private val persistentState by inject<PersistentState>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -53,11 +56,11 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         try {
             val pInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
             val version = pInfo.versionName
-            b.aboutAppVersion.text = getString(R.string.about_version, version)
+            b.aboutAppVersion.text = getString(R.string.about_version_install_source, version, persistentState.downloadSource.toString())
+            b.aboutWhatsNew.text = getString(R.string.about_whats_new, getString(R.string.about_version, version))
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()
         }
-
     }
 
     override fun onClick(view: View?) {

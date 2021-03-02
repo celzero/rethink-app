@@ -66,7 +66,7 @@ class RefreshDatabase internal constructor(
                                 updateCategoryInDB()
                             }
                         } catch (e: Exception) {
-                            Log.e(LOG_TAG, "Application not available ${it.appName}" + e.message, e)
+                            Log.w(LOG_TAG, "Application not available ${it.appName}" + e.message, e)
                             appInfoRepository.delete(it)
                             updateCategoryInDB()
                         }
@@ -88,17 +88,23 @@ class RefreshDatabase internal constructor(
             if(DEBUG) Log.d(LOG_TAG,"getAppInfo - ${appDetailsFromDB.size}, $nonAppsCount, ${allPackages.size}")
             if (appDetailsFromDB.isEmpty() || ((appDetailsFromDB.size-nonAppsCount) != (allPackages.size - 1)) ) {
                 allPackages.forEach {
+                    if(DEBUG) Log.d(LOG_TAG,"Refresh Database, AppInfo -> ${context.packageManager.getApplicationLabel(it.applicationInfo)}")
                     if (it.applicationInfo.packageName != context.applicationContext.packageName) {
                         val applicationInfo: ApplicationInfo = it.applicationInfo
                         val appInfo = AppInfo()
                         appInfo.appName = context.packageManager.getApplicationLabel(applicationInfo).toString()
                         appInfo.packageInfo = applicationInfo.packageName
                         appInfo.uid = applicationInfo.uid
-                        val dbAppInfo = appInfoRepository.getAppInfoForPackageName(appInfo.packageInfo)
+                        val dbAppInfo = if(!appInfo.packageInfo.isNullOrEmpty()) {
+                             appInfoRepository.getAppInfoForPackageName(appInfo.packageInfo)
+                        }else{
+                            null
+                        }
                         if (dbAppInfo != null && dbAppInfo.appName.isNotEmpty()) {
                             HomeScreenActivity.GlobalVariable.appList[applicationInfo.packageName] = dbAppInfo
                         }else{
-                            if(DEBUG) Log.d(LOG_TAG,"Refresh Database, AppInfo - new package found ${appInfo.appName} will be inserted")
+                            if(DEBUG) Log.d(LOG_TAG,"Refresh Database, AppInfo - new package found ${appInfo.appName} - " +
+                                        "${context.packageManager.getApplicationLabel(it.applicationInfo)} will be inserted")
                             appInfo.isDataEnabled = true
                             appInfo.isWifiEnabled = true
                             appInfo.isScreenOff = false
@@ -134,7 +140,6 @@ class RefreshDatabase internal constructor(
 
                             //appInfo.uid = context.packageManager.getPackageUid(appInfo.packageInfo, PackageManager.GET_META_DATA)
                             appInfo.isInternetAllowed = persistentState.wifiAllowed(appInfo.packageInfo)
-
 
                             //TODO Handle this Global scope variable properly. Only half done.
                             HomeScreenActivity.GlobalVariable.appList[applicationInfo.packageName] = appInfo

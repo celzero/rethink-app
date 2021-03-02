@@ -18,7 +18,7 @@ package com.celzero.bravedns.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
+import android.os.CountDownTimer
 import android.provider.Settings
 import android.util.Log
 import android.view.View
@@ -148,16 +148,19 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             val checkedVal = includeView.firewallBackgroundModeCheck.isChecked
             if (!checkedVal) {
                 if (Utilities.isAccessibilityServiceEnabledEnhanced(requireContext(), BackgroundAccessibilityService::class.java)) {
-                   if(!Utilities.isAccessibilityServiceEnabled(requireContext(), BackgroundAccessibilityService::class.java)){
+                    if (!Utilities.isAccessibilityServiceEnabled(requireContext(), BackgroundAccessibilityService::class.java)) {
                         if (!showAlertForPermission(true)) {
                             includeView.firewallBackgroundModeCheck.isChecked = false
                             persistentState.setIsBackgroundEnabled(false)
                         }
-                    }else{
-                       GlobalVariable.isBackgroundEnabled = !checkedVal
-                       persistentState.setIsBackgroundEnabled(!checkedVal)
-                       includeView.firewallBackgroundModeCheck.isChecked = !checkedVal
-                   }
+                    } else {
+                        GlobalVariable.isBackgroundEnabled = !checkedVal
+                        persistentState.setIsBackgroundEnabled(!checkedVal)
+                        includeView.firewallBackgroundModeCheck.isChecked = !checkedVal
+                    }
+                    GlobalVariable.isBackgroundEnabled = !checkedVal
+                    persistentState.setIsBackgroundEnabled(!checkedVal)
+                    includeView.firewallBackgroundModeCheck.isChecked = !checkedVal
                 } else {
                     if (!showAlertForPermission(false)) {
                         includeView.firewallBackgroundModeCheck.isChecked = false
@@ -214,7 +217,14 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             // it will throw exception
             customDialog.show()
             customDialog.setCanceledOnTouchOutside(false)
-            Handler().postDelayed({ includeView.firewallAppsShowTxt.isEnabled = true }, 100)
+            object : CountDownTimer(100, 500) {
+                override fun onTick(millisUntilFinished: Long) {
+                }
+
+                override fun onFinish() {
+                    includeView.firewallAppsShowTxt.isEnabled = true
+                }
+            }.start()
         }
 
         includeView.firewallRulesShowTxt.setOnClickListener {

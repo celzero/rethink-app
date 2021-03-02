@@ -17,7 +17,6 @@ package com.celzero.bravedns.ui
 
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.view.animation.Animation
@@ -94,7 +93,14 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
         b.firewallAppRefreshList.setOnClickListener {
             b.firewallAppRefreshList.isEnabled = false
             refreshDatabase()
-            Handler().postDelayed({ b.firewallAppRefreshList.isEnabled = true }, 4000)
+            object : CountDownTimer(1000, 4000) {
+                override fun onTick(millisUntilFinished: Long) {
+                }
+
+                override fun onFinish() {
+                    b.firewallAppRefreshList.isEnabled = true
+                }
+            }.start()
         }
     }
 

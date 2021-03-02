@@ -163,7 +163,7 @@ class DoHEndpointAdapter(private val context: Context,
                 try {
                     stamp = getBlocklistStampFromURL(doHEndpoint.dohURL)
                 } catch (e: Exception) {
-                    Log.e(LOG_TAG, "Exception while fetching stamp from Go ${e.message}", e)
+                    Log.w(LOG_TAG, "Exception while fetching stamp from Go ${e.message}", e)
                 }
                 if(DEBUG) Log.d(LOG_TAG, "updateConnection - $stamp")
                 if (stamp.isEmpty()) {

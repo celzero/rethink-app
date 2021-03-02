@@ -40,6 +40,11 @@ class Constants {
         const val CONFIGURE_BLOCKLIST_URL_LOCAL = "https://bravedns.com/configure?v=app&tstamp="
         const val CONFIGURE_BLOCKLIST_URL_REMOTE =  "https://bravedns.com/configure?v=app"
 
+        val DOWNLOAD_URLS  = listOf("https://download.bravedns.com/blocklists","https://download.bravedns.com/basicconfig",
+                            "https://download.bravedns.com/rank","https://download.bravedns.com/trie")
+
+        val FILE_NAMES = listOf("/filetag.json","/basicconfig.json", "/rd.txt", "/td.txt")
+
         const val APP_DOWNLOAD_LINK = "https://bravedns.com/downloads"
 
         const val BRAVE_BASE_STAMP = "https://basic.bravedns.com/"
@@ -47,7 +52,7 @@ class Constants {
 
         const val DOWNLOAD_STATUS_SUCCESSFUL = "STATUS_SUCCESSFUL"
 
-        const val BRAVE_BASIC_URL = "basic.bravedns"
+        const val BRAVE_BASIC_URL = "bravedns.com"
         const val APPEND_VCODE = "vcode="
 
         //constants for the server response json
@@ -82,8 +87,8 @@ class Constants {
         const val RETHINK_DNS = "RethinkDNS Basic (default)"
 
         const val DELAY_FOR_BLOCK_RESPONSE : Long = 30000
-        const val BACKGROUND_DELAY_CHECK : Long = 4000
-        const val BACKGROUND_DELAY_CHECK_REMAINING : Long = 22000
+        const val BACKGROUND_DELAY_CHECK : Long = 2000
+        const val BACKGROUND_DELAY_CHECK_REMAINING : Long = 23000
         const val BACKGROUND_DELAY_CHECK_3 : Long = 12000
 
         const val DNS_TYPE_DOH = 1
@@ -101,8 +106,6 @@ class Constants {
         const val URL_INTENT_EXTRA = "url"
 
         const val VPN_INTENT = "android.net.vpn.SETTINGS"
-
-        const val SETTINGS = "Settings"
 
         const val HTTP_PROXY_PORT = "8118"
 
