@@ -56,6 +56,8 @@ class WhitelistAppDialog(private var activity: Context, private val appInfoRepos
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         b = CustomDialogLayoutBinding.inflate(layoutInflater)
         setContentView(b.root)
+        setCancelable(false)
+
         window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
 
         mLayoutManager = LinearLayoutManager(activity)
@@ -86,7 +88,7 @@ class WhitelistAppDialog(private var activity: Context, private val appInfoRepos
             } else {
                 Utilities.showToastInMidLayout(activity, act.getString(R.string.whitelist_toast_negative), Toast.LENGTH_SHORT)
             }
-            object : CountDownTimer(500, 500) {
+            object : CountDownTimer(100, 500) {
                 override fun onTick(millisUntilFinished: Long) {
                 }
 
@@ -125,7 +127,7 @@ class WhitelistAppDialog(private var activity: Context, private val appInfoRepos
 
     private fun categoryListByAppNameFromDB(name: String) {
         category = appInfoRepository.getAppCategoryForAppName("%$name%")
-        Log.d(LOG_TAG, "Category - ${category.size}")
+        if(DEBUG) Log.d(LOG_TAG, "Category - ${category.size}")
         setCategoryChips(category)
     }
 

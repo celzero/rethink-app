@@ -115,7 +115,7 @@ class AppMode internal constructor(
         if (dohEndpoint != null) {
             if (dohEndpoint.dohURL.isEmpty()) {
                 if (HomeScreenActivity.GlobalVariable.DEBUG) {
-                    Log.d(LOG_TAG, "getDOHDetails -appMode- DoH endpoint is null")
+                    Log.i(LOG_TAG, "getDOHDetails -appMode- DoH endpoint is null")
                 }
             }else{
                 if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "getDOHDetails -appMode- DoH endpoint - ${dohEndpoint.dohURL}")

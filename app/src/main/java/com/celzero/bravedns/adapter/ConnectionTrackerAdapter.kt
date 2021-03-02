@@ -143,7 +143,7 @@ class ConnectionTrackerAdapter(val context : Context) : PagedListAdapter<Connect
                         Glide.with(context)
                             .load(ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground))
                             .into(appIcon!!)
-                        Log.e(LOG_TAG, "Package Not Found - " + e.message, e)
+                        Log.w(LOG_TAG, "Package Not Found - " + e.message, e)
                     }
                 }else{
                     Glide.with(context)

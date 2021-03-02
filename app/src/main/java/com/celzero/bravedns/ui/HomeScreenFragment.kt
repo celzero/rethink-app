@@ -25,7 +25,7 @@ import android.net.VpnService
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
-import android.os.Handler
+import android.os.CountDownTimer
 import android.text.Html
 import android.text.TextUtils
 import android.text.format.DateUtils
@@ -128,7 +128,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             startDNSActivity()
         }
 
+        b.fhsCardDnsConfigureLl.setOnClickListener {
+            startDNSActivity()
+        }
+
         b.fhsCardFirewallConfigure.setOnClickListener{
+            startFirewallActivity()
+        }
+
+        b.fhsCardFirewallConfigureLl.setOnClickListener{
             startFirewallActivity()
         }
 
@@ -138,13 +146,27 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.homeFragmentBottomSheetIcon.setOnClickListener {
             b.homeFragmentBottomSheetIcon.isEnabled = false
             openBottomSheet()
-            Handler().postDelayed({ b.homeFragmentBottomSheetIcon.isEnabled = true }, 500)
+            object : CountDownTimer(100, 500) {
+                override fun onTick(millisUntilFinished: Long) {
+                }
+
+                override fun onFinish() {
+                    b.homeFragmentBottomSheetIcon.isEnabled = true
+                }
+            }.start()
         }
 
         // Connect/Disconnect button ==> TODO : Change the label to Start and Stop
         b.fhsDnsOnOffBtn.setOnClickListener {
             handleStartBtnClickEvent()
-            Handler().postDelayed({ b.homeFragmentBottomSheetIcon.isEnabled = true }, 500)
+            object : CountDownTimer(100, 500) {
+                override fun onTick(millisUntilFinished: Long) {
+                }
+
+                override fun onFinish() {
+                    b.homeFragmentBottomSheetIcon.isEnabled = true
+                }
+            }.start()
         }
 
 
@@ -205,7 +227,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * The observers for the firewall card in the home screen, will be calling this method
      * when the VPN is active and the mode is set to either Firewall or DNS+Firewall.
      */
-    private fun registerObserversForFirewall(){
+    private fun    registerObserversForFirewall(){
         appInfoRepository.getAllAppDetailsForLiveData().observe(viewLifecycleOwner, {
             val blockedList = it.filter { a -> !a.isInternetAllowed }
             val whiteListApps = it.filter { a -> a.whiteListUniv1 }
@@ -271,7 +293,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         } else if (status) {
             Utilities.showToastInMidLayout(requireContext(), getString(R.string.always_on_rethink_enabled), Toast.LENGTH_SHORT)
         }
-        Handler().postDelayed({ b.fhsDnsOnOffBtn.isEnabled = true }, 500)
+        object : CountDownTimer(100, 500) {
+            override fun onTick(millisUntilFinished: Long) {
+            }
+
+            override fun onFinish() {
+                b.fhsDnsOnOffBtn.isEnabled = true
+            }
+        }.start()
     }
 
     private fun openBottomSheet() {
@@ -375,7 +404,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         } else {
             //when the Firewall is not enabled and VPN is not active. show the dialog to start VPN
-            showDialogToStart(getString(R.string.app_mode_firewall))
+            showDialogToStart()
             //Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
         }
     }
@@ -398,7 +427,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         } else {
             //when the DNS is not enabled and VPN is not active. show the dialog to start VPN
-            showDialogToStart(getString(R.string.app_mode_dns))
+            showDialogToStart()
             //Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_dns).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
         }
     }
@@ -422,7 +451,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         } else {
             //when the Firewall is not enabled and VPN is not active. show the dialog to start VPN
-            showDialogToStart(getString(R.string.app_mode_firewall))
+            showDialogToStart()
             //Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
         }
     }
@@ -445,17 +474,27 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         } else {
             //when the DNS is not enabled and VPN is not active. show the dialog to start VPN
-            showDialogToStart(getString(R.string.app_mode_dns))
+            showDialogToStart()
             //Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_dns).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
         }
     }
 
-    private fun showDialogToStart(mode : String){
+    private fun getModeText() : String{
+        if(braveMode == DNS_MODE){
+            return getString(R.string.app_mode_dns)
+        }else if(braveMode == FIREWALL_MODE){
+            return getString(R.string.app_mode_firewall)
+        }else{
+            return getString(R.string.app_mode_dns_firewall)
+        }
+    }
+
+    private fun showDialogToStart(){
         val builder = AlertDialog.Builder(requireContext())
         //set title for alert dialog
-        builder.setTitle(R.string.hsf_start_dialog_header)
+        builder.setTitle(getString(R.string.hsf_start_dialog_header, getModeText()))
         //set message for alert dialog
-        builder.setMessage(getString(R.string.hsf_start_dialog_message, mode))
+        builder.setMessage(getString(R.string.hsf_start_dialog_message))
         builder.setCancelable(true)
         //performing positive action
         builder.setPositiveButton(R.string.hsf_start_dialog_positive) { _, _ ->
@@ -471,6 +510,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             //If the VPN.prepare is not null, then the first time VPN dialog is shown.
             if (prepareVpnIntent == null) {
                 openBottomSheet()
+                Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_dns).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
             }
         }
 
@@ -639,6 +679,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         builder.setNegativeButton(R.string.hsf_vpn_dialog_negative) { _, _ ->
+            b.fhsCardDnsConfigure.alpha = 0.5F
+            b.fhsCardFirewallConfigure.alpha = 0.5F
+            b.fhsCardDnsConfigure.setTextColor(fetchTextColor(R.color.textColorMain))
+            b.fhsCardFirewallConfigure.setTextColor(fetchTextColor(R.color.textColorMain))
         }
         // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()
@@ -798,7 +842,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 }
             }
         } catch (e: SocketException) {
-            Log.e(LOG_TAG, e.message, e)
+            Log.w(LOG_TAG, e.message, e)
         }
         return false
     }

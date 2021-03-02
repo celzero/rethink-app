@@ -46,6 +46,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.isSearchEnabled
 import com.celzero.bravedns.util.Constants.Companion.APP_CAT_SYSTEM_APPS
 import com.celzero.bravedns.util.Constants.Companion.APP_CAT_SYSTEM_COMPONENTS
+import com.celzero.bravedns.util.Constants.Companion.APP_NON_APP
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.ThrowingHandler
 import kotlinx.coroutines.CoroutineScope
@@ -181,7 +182,7 @@ class FirewallAppListAdapter internal constructor(
                             try {
                                 activityManager.killBackgroundProcesses(it.packageInfo)
                             } catch (e: Exception) {
-                                Log.e(LOG_TAG, "firewall - kill app - exception" + e.message, e)
+                                Log.w(LOG_TAG, "firewall - kill app - exception" + e.message, e)
                             }
                         }
                     }
@@ -272,7 +273,11 @@ class FirewallAppListAdapter internal constructor(
             }else {
                 placeHolder.visibility = View.VISIBLE
             }
-        } else{
+        } else if(listTitle.categoryName == APP_NON_APP){
+            sysAppWarning.text = context.getString(R.string.system_non_apps_warning)
+            sysAppWarning.visibility = View.VISIBLE
+            placeHolder.visibility = View.GONE
+        }else{
             sysAppWarning.visibility = View.GONE
             placeHolder.visibility = View.GONE
         }
@@ -319,17 +324,27 @@ class FirewallAppListAdapter internal constructor(
             if(DEBUG) Log.d(LOG_TAG, "Category block clicked : $isSearchEnabled")
             var proceedBlock = false
             proceedBlock = if (listTitle.categoryName == APP_CAT_SYSTEM_APPS && isInternetAllowed) {
-                showDialogForSystemAppBlock(false)
+                if(listTitle.numOfAppWhitelisted != listTitle.numberOFApps) {
+                    showDialogForSystemAppBlock(APP_CAT_SYSTEM_APPS)
+                }else{
+                    false
+                }
             }else{
                 true
             }
             if(listTitle.categoryName == APP_CAT_SYSTEM_COMPONENTS && isInternetAllowed){
-                val count = appInfoRepository.getWhitelistCount(listTitle.categoryName)
-                if(DEBUG) Log.d(LOG_TAG, "Category block - System components, count: $count, ${listTitle.numberOFApps}")
-                proceedBlock = if(count != listTitle.numberOFApps){
-                    showDialogForSystemAppBlock(true)
+                if(DEBUG) Log.d(LOG_TAG, "Category block - System components, count: ${listTitle.numOfAppWhitelisted}, ${listTitle.numberOFApps}")
+                proceedBlock = if(listTitle.numOfAppWhitelisted != listTitle.numberOFApps){
+                    showDialogForSystemAppBlock(APP_CAT_SYSTEM_COMPONENTS)
                 }else{
-                    true
+                    false
+                }
+            }
+            if(listTitle.categoryName == APP_NON_APP && isInternetAllowed) {
+                proceedBlock = if(listTitle.numOfAppWhitelisted != listTitle.numberOFApps){
+                    showDialogForSystemAppBlock(APP_NON_APP)
+                }else{
+                    false
                 }
             }
             if(proceedBlock) {
@@ -364,7 +379,7 @@ class FirewallAppListAdapter internal constructor(
                             categoryInfoRepository.updateBlockedCount(listTitle.categoryName, count)
                         }
                     }catch(e : Exception){
-                        Log.e(LOG_TAG,"Exception when inserting the category internet info: ${e.message}",e)
+                        Log.w(LOG_TAG,"Exception when inserting the category internet info: ${e.message}",e)
                     }
                     isSearchEnabled = true
                     if(DEBUG) Log.d(LOG_TAG, "Category block completed : $isSearchEnabled")
@@ -373,7 +388,7 @@ class FirewallAppListAdapter internal constructor(
                 Log.d(LOG_TAG,"else - proceedBlock: $proceedBlock")
                 internetChk.isChecked = proceedBlock
                 internetChk.setCompoundDrawablesWithIntrinsicBounds(
-                    context.getDrawable(R.drawable.dis_allowed), null, null, null)
+                    context.getDrawable(R.drawable.allowed), null, null, null)
             }
         }
         internetChk.setOnCheckedChangeListener(null)
@@ -433,7 +448,7 @@ class FirewallAppListAdapter internal constructor(
         return proceedBlocking
     }
 
-    private fun showDialogForSystemAppBlock(isSysComponent : Boolean): Boolean {
+    private fun showDialogForSystemAppBlock(isSysComponent : String): Boolean {
         //Change the handler logic into some other
         val handlerDelete: Handler = ThrowingHandler()
         var proceedBlocking = false
@@ -442,9 +457,12 @@ class FirewallAppListAdapter internal constructor(
 
         builderSingle.setIcon(R.drawable.spinner_firewall)
 
-        if(isSysComponent){
+        if(isSysComponent == APP_CAT_SYSTEM_COMPONENTS){
             builderSingle.setTitle(context.resources.getString(R.string.system_components_warning_title))
             builderSingle.setMessage(context.resources.getString(R.string.system_components_warning))
+        }else if(isSysComponent == APP_NON_APP){
+            builderSingle.setTitle(context.resources.getString(R.string.system_non_app_warning_title))
+            builderSingle.setMessage(context.resources.getString(R.string.system_non_apps_warning))
         }else{
             builderSingle.setTitle(context.resources.getString(R.string.system_apps_warning_title))
             builderSingle.setMessage(context.resources.getString(R.string.system_apps_warning))

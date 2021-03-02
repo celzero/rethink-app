@@ -107,7 +107,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         var appStartTime: Long = System.currentTimeMillis()
         var isBackgroundEnabled: Boolean = false
         var firewallRules: HashMultimap<Int, String> = HashMultimap.create()
-        var DEBUG = true
+        var DEBUG = false
 
         //Screen off - whether the screen preference is set 0-off, 1- on. -1 not initialized
         var isScreenLockedSetting: Int = -1
@@ -150,6 +150,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         if (persistentState.firstTimeLaunch) {
             GlobalVariable.connectedDNS.postValue(Constants.RETHINK_DNS)
             launchOnBoardingActivity()
+            updateNewVersion()
         }else{
             showNewFeaturesDialog()
         }
@@ -183,6 +184,16 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         updateInstallSource()
         initUpdateCheck()
 
+    }
+
+    private fun updateNewVersion() {
+        try {
+            val pInfo: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+            val version = pInfo.versionCode
+            persistentState.appVersion = version
+        } catch (e: PackageManager.NameNotFoundException) {
+            Log.e(LOG_TAG, "Error while fetching version code: ${e.message}", e)
+        }
     }
 
     private fun launchOnBoardingActivity() {
@@ -270,7 +281,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         } else {
             get<NonStoreAppUpdater>().checkForAppUpdate(userInitiation, this, installStateUpdatedListener) // Always web updater
         }
-
     }
 
     private fun checkForBlockListUpdate() {
@@ -512,10 +522,10 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             request.setTitle(getString(R.string.hs_download_blocklist_heading))
             request.setDescription(getString(R.string.hs_download_blocklist_desc, fileName))
             request.setDestinationInExternalFilesDir(context, getExternalFilePath(this, false), fileName)
-            Log.d(LOG_TAG, "Path - ${getExternalFilePath(this, true)}${fileName}")
+            Log.i(LOG_TAG, "Path - ${getExternalFilePath(this, true)}${fileName}")
             enqueue = downloadManager.enqueue(request)
         } catch (e: java.lang.Exception) {
-            Log.e(LOG_TAG, "Download unsuccessful - ${e.message}", e)
+            Log.w(LOG_TAG, "Download unsuccessful - ${e.message}", e)
         }
     }
                 

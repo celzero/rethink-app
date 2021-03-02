@@ -36,6 +36,7 @@ class DoHEndpoint {
         if (other?.javaClass != javaClass) return false
         other as DoHEndpoint
         if (dohURL != other.dohURL) return false
+        if(isSelected != isSelected) return false
         return true
     }
 

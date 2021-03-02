@@ -121,7 +121,7 @@ class UniversalAppListAdapter(
                 } catch (e: Exception) {
                     Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                         .into(appIcon)
-                    Log.e(LOG_TAG, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message, e)
+                    Log.w(LOG_TAG, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message, e)
                 }
 
                 parentView?.setOnClickListener{
