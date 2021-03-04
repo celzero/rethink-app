@@ -158,14 +158,6 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
             b.recyclerDnsProxyConnectionsHeader.visibility = View.VISIBLE
         }
 
-        val proxySize = checkProxySize()
-        if (proxySize == 0) {
-            b.recyclerDnsProxyTitle.visibility = View.VISIBLE
-            b.recyclerDnsProxyConnections.visibility = View.GONE
-        } else {
-            b.recyclerDnsProxyTitle.visibility = View.GONE
-            b.recyclerDnsProxyConnections.visibility = View.VISIBLE
-        }
     }
 
     private fun getAppName(): MutableList<String> {
@@ -640,15 +632,6 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
             dohRecyclerAdapter?.notifyDataSetChanged()
             dnsCryptRecyclerAdapter.notifyDataSetChanged()
             dnsCryptRelayRecyclerAdapter.notifyDataSetChanged()
-        } else if (dnsType == 4) {
-            val proxySize = checkProxySize()
-            if (proxySize == 0) {
-                b.recyclerDnsProxyTitle.visibility = View.VISIBLE
-                b.recyclerDnsProxyConnections.visibility = View.GONE
-            } else {
-                b.recyclerDnsProxyTitle.visibility = View.GONE
-                b.recyclerDnsProxyConnections.visibility = View.VISIBLE
-            }
         }
         spinnerAdapter.notifyDataSetChanged()
     }

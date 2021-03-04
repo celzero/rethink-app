@@ -114,7 +114,11 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         //Screen off state - set - 0 if screen is off, 1 - screen is on, -1 not initialized.
         var isScreenLocked : Int = -1
-        var localDownloadComplete : MutableLiveData<Int> = MutableLiveData()
+
+        //Local blocklist download complete listener
+        // 0 - Not initiated, 1 - initiated, 2 - success, -1 - failure
+        var localDownloadStatus : MutableLiveData<Int> = MutableLiveData()
+
         //Remove the usage of below variable(isSearchEnabled)
         var isSearchEnabled : Boolean = true
 
@@ -169,7 +173,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         firewallRules.loadFirewallRules(blockedConnectionsRepository)
 
         refreshDatabase.deleteOlderDataFromNetworkLogs()
-        refreshDatabase.refreshAppInfoDatabase()
 
         if (!persistentState.insertionCompleted) {
             refreshDatabase.insertDefaultDNSList()
@@ -184,6 +187,13 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         updateInstallSource()
         initUpdateCheck()
 
+    }
+
+    private fun updateForLocalDownload(){
+        persistentState.blockListFilesDownloaded = false
+        persistentState.numberOfLocalBlocklists = 0
+        persistentState.localBlocklistEnabled = false
+        persistentState.localBlockListDownloadTime = 0
     }
 
     private fun updateNewVersion() {
@@ -220,6 +230,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     private fun showNewFeaturesDialog() {
         if (checkToShowNewFeatures()) {
+            updateForLocalDownload()
             val inflater: LayoutInflater = LayoutInflater.from(this)
             val view: View = inflater.inflate(R.layout.dialog_whatsnew, null)
             val builder = AlertDialog.Builder(this)

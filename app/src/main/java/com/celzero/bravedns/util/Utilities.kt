@@ -260,7 +260,7 @@ class Utilities {
                 toast.setGravity(Gravity.CENTER, 0, 0)
                 toast.show()
             }catch (e: java.lang.IllegalStateException){
-                Log.w(LOG_TAG,"Show Toast issue : ${e.message}",e)
+                Log.w(LOG_TAG, "Show Toast issue : ${e.message}", e)
             }
         }
 
@@ -326,24 +326,6 @@ class Utilities {
             }
         }
 
-        /**
-         * Clean up the folder which had the old download files.
-         * This was introduced in v053, before that the files downloaded as part of blocklists
-         * are stored in external files dir by the DownloadManager and moved to canonicalPath.
-         * Now in v053 we are moving the files from external dir to canonical path.
-         * So deleting the old files in the external directory.
-         */
-        fun deleteOldFiles(context : Context){
-            val dir = File(context.getExternalFilesDir(null).toString() + Constants.DOWNLOAD_PATH)
-            if (dir.isDirectory) {
-                val children = dir.list()
-                if(children != null && children.isNotEmpty()) {
-                    for (i in children.indices) {
-                        File(dir, children[i]).delete()
-                    }
-                }
-            }
-        }
 
     }
 }
