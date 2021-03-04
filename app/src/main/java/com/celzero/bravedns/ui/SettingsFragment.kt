@@ -17,18 +17,12 @@ package com.celzero.bravedns.ui
 
 import android.app.Activity
 import android.app.Dialog
-import android.app.DownloadManager
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.res.Configuration
-import android.database.Cursor
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.view.Window
@@ -37,7 +31,6 @@ import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -49,14 +42,12 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.filesDownloaded
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.localDownloadComplete
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.localDownloadStatus
 import com.celzero.bravedns.util.AppDownloadManager
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_OTHERS
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Constants.Companion.REFRESH_BLOCKLIST_URL
-import com.celzero.bravedns.util.HttpRequestHelper.Companion.checkStatus
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ExcludedAppViewModel
 import com.google.android.material.textfield.TextInputEditText
@@ -76,7 +67,7 @@ import java.io.IOException
 class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     private val b by viewBinding(ActivitySettingsScreenBinding::bind)
 
-    private var timeStamp: Long = 0L
+    private val FILETAG : String = "Settings Fragment-"
 
     //For exclude apps dialog
     private var excludeAppAdapter: ExcludedAppListAdapter? = null
@@ -84,8 +75,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     private val refreshDatabase by inject<RefreshDatabase>()
     private lateinit var animation: Animation
-
-    private lateinit var downloadManager: DownloadManager
 
     private val appInfoRepository by inject<AppInfoRepository>()
     private val proxyEndpointRepository by inject<ProxyEndpointRepository>()
@@ -96,12 +85,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         super.onViewCreated(view, savedInstanceState)
         initView()
         initClickListeners()
-    }
-
-    companion object {
-        var enqueue: Long = 0
-        var downloadInProgress = -1
-        private const val FILE_LOG_TAG = Constants.SETTINGS
     }
 
     private fun initView() {
@@ -124,7 +107,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             b.settingsActivityHttpProxyContainer.visibility = View.GONE
         }
         b.settingsActivityAllowBypassSwitch.isChecked = persistentState.allowByPass
-        timeStamp = persistentState.localBlockListDownloadTime
 
         if (persistentState.downloadSource == DOWNLOAD_SOURCE_OTHERS) {
             b.settingsActivityOnDeviceBlockRl.visibility = View.VISIBLE
@@ -134,18 +116,16 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             b.settingsHeadingDns.visibility = View.GONE
         }
 
-        localDownloadComplete.observe(viewLifecycleOwner, {
-            if (it == 1) {
-                downloadInProgress = 1
-                b.settingsActivityOnDeviceBlockConfigureBtn.visibility = View.VISIBLE
-                b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.VISIBLE
-                b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.VISIBLE
-                b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
-                b.settingsActivityOnDeviceBlockSwitch.visibility = View.VISIBLE
-                b.settingsActivityOnDeviceBlockSwitch.isChecked = true
-                b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc3)
-                b.settingsActivityOnDeviceLastUpdatedTimeTxt.text = getString(R.string.settings_local_blocklist_version, Utilities.convertLongToDate(timeStamp))
-                localDownloadComplete.postValue(0)
+        localDownloadStatus.observe(viewLifecycleOwner, {
+            //download initiated and failed
+            if (it == -1) {
+                updateDownloadFailure()
+            } else if (it == 1) {// download initiated
+                updateDownloadInitiated()
+            } else if (it == 0) { // download not initiated.
+                initialUI()
+            } else if(it == 2){
+                updateDownloadSuccess()
             }
         })
 
@@ -164,6 +144,15 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityKillAppSwitch.isChecked = persistentState.killAppOnFirewall
         b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
 
+        //gen_settings_theme_desc
+        if (persistentState.theme == 0) {
+            b.genSettingsThemeDesc.text = getString(R.string.settings_selected_theme, getString(R.string.settings_theme_dialog_themes_1))
+        } else if (persistentState.theme == 1) {
+            b.genSettingsThemeDesc.text = getString(R.string.settings_selected_theme, getString(R.string.settings_theme_dialog_themes_2))
+        } else {
+            b.genSettingsThemeDesc.text = getString(R.string.settings_selected_theme, getString(R.string.settings_theme_dialog_themes_3))
+        }
+
         b.settingsActivitySocks5Switch.isChecked = persistentState.socks5Enabled
         if (b.settingsActivitySocks5Switch.isChecked) {
             val sock5Proxy = proxyEndpointRepository.getConnectedProxy()
@@ -181,6 +170,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             b.settingsActivityOnDeviceBlockConfigureBtn.visibility = View.VISIBLE
             b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.VISIBLE
             b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.VISIBLE
+            val timeStamp = persistentState.localBlockListDownloadTime
             b.settingsActivityOnDeviceLastUpdatedTimeTxt.text = getString(R.string.settings_local_blocklist_version, Utilities.convertLongToDate(timeStamp))
             b.settingsActivityOnDeviceBlockSwitch.isChecked = true
         } else {
@@ -251,7 +241,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val alwaysOn = android.provider.Settings.Secure.getString(requireContext().contentResolver, "always_on_vpn_app")
             val lockDown = android.provider.Settings.Secure.getInt(requireContext().contentResolver, "always_on_vpn_lockdown", 0)
-            if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG isLockDownEnabled - $lockDown , $alwaysOn")
+            if (DEBUG) Log.d(LOG_TAG, "$FILETAG isLockDownEnabled - $lockDown , $alwaysOn")
             if (lockDown != 0 && context?.packageName == alwaysOn) {
                 disableForLockdownModeUI()
             } else {
@@ -264,13 +254,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     }
 
     private fun initClickListeners() {
-        b.settingsActivityRefreshDataRl.setOnClickListener {
-            refreshDatabase()
-        }
-
-        b.settingsActivityRefreshDataImg.setOnClickListener {
-            refreshDatabase()
-        }
 
         b.settingsActivityEnableLogsSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             persistentState.logsEnabled = b
@@ -314,12 +297,14 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             if (isSelected) {
                 b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
                 if (!persistentState.blockListFilesDownloaded) {
+                    persistentState.localBlockListDownloadTime = 0L
                     showDownloadDialog()
                 } else {
                     if (isSelected) {
                         setBraveDNSLocal()
                         val count = persistentState.numberOfLocalBlocklists
                         b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_in_use, count.toString())
+                        persistentState.localBlocklistEnabled = true
                     }
                 }
             } else {
@@ -329,8 +314,16 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.GONE
                 b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
                 b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blockList_desc1)
+                persistentState.localBlocklistEnabled = false
             }
-            Handler().postDelayed({ b.settingsActivityOnDeviceBlockSwitch.isEnabled = true }, 1000)
+            object : CountDownTimer(100, 1000) {
+                override fun onTick(millisUntilFinished: Long) {
+                }
+
+                override fun onFinish() {
+                    b.settingsActivityOnDeviceBlockSwitch.isEnabled = true
+                }
+            }.start()
         }
 
         b.settingsActivitySocks5Switch.setOnCheckedChangeListener { compoundButton: CompoundButton, bool: Boolean ->
@@ -355,15 +348,27 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityExcludeAppsImg.setOnClickListener {
             b.settingsActivityExcludeAppsImg.isEnabled = false
             showExcludeAppDialog(requireContext(), excludeAppAdapter!!, excludeAppViewModel)
-            Handler().postDelayed({ b.settingsActivityExcludeAppsImg.isEnabled = true }, 100)
+            object : CountDownTimer(100, 100) {
+                override fun onTick(millisUntilFinished: Long) {
+                }
+
+                override fun onFinish() {
+                    b.settingsActivityExcludeAppsImg.isEnabled = true
+                }
+            }.start()
         }
 
         b.settingsActivityExcludeAppsRl.setOnClickListener {
             b.settingsActivityExcludeAppsRl.isEnabled = false
             showExcludeAppDialog(requireContext(), excludeAppAdapter!!, excludeAppViewModel)
-            Handler().postDelayed({
-                b.settingsActivityExcludeAppsRl.isEnabled = true
-            }, 100)
+            object : CountDownTimer(100, 100) {
+                override fun onTick(millisUntilFinished: Long) {
+                }
+
+                override fun onFinish() {
+                    b.settingsActivityExcludeAppsRl.isEnabled = true
+                }
+            }.start()
         }
 
         b.settingsAppFaqIcon.setOnClickListener {
@@ -373,26 +378,15 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityOnDeviceBlockConfigureBtn.setOnClickListener {
             val intent = Intent(requireContext(), DNSConfigureWebViewActivity::class.java)
             val stamp = persistentState.getLocalBlockListStamp()
-            if (DEBUG) Log.d(LOG_TAG, "Stamp value in settings screen - $stamp")
+            if (DEBUG) Log.d(LOG_TAG, "$FILETAG Stamp value in settings screen - $stamp")
             intent.putExtra(Constants.LOCATION_INTENT_EXTRA, DNSConfigureWebViewActivity.LOCAL)
             intent.putExtra(Constants.STAMP_INTENT_EXTRA, stamp)
             (requireContext() as Activity).startActivityForResult(intent, Activity.RESULT_OK)
         }
 
         b.settingsActivityOnDeviceBlockRefreshBtn.setOnClickListener {
-            checkForDownload(true)
+            checkForDownload(isUserInitiated = true, isRetry = false)
         }
-
-        /*b.settingsActivityThemeSwitch.setOnCheckedChangeListener{ _: CompoundButton, isSelected: Boolean ->
-            if(isSelected){
-                requireActivity().setTheme(R.style.AppTheme_white)
-                requireActivity().recreate()
-            }else{
-                requireActivity().setTheme(R.style.AppTheme)
-                requireActivity().recreate()
-            }
-            persistentState.theme = isSelected
-        }*/
 
         b.settingsActivityThemeRl.setOnClickListener{
             showDialogForTheme()
@@ -412,7 +406,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             getString(R.string.settings_theme_dialog_themes_2), getString(R.string.settings_theme_dialog_themes_3))
         val checkedItem = persistentState.theme
         alertDialog.setSingleChoiceItems(items, checkedItem) { dialog, which ->
-            Log.d(LOG_TAG, "Theme Before- ${persistentState.theme}, $which")
             if(persistentState.theme != which) {
                 when (which) {
                     0 -> {
@@ -425,21 +418,18 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                             requireActivity().setTheme(R.style.AppTheme_white)
                             requireActivity().recreate()
                         }
-                        Log.d(LOG_TAG, "Theme After- ${persistentState.theme}, $which")
                     }
                     1 -> {
                         persistentState.theme = 1
                         dialog.dismiss()
                         requireActivity().setTheme(R.style.AppTheme_white)
                         requireActivity().recreate()
-                        Log.d(LOG_TAG, "Theme After- ${persistentState.theme}, $which")
                     }
                     2 -> {
                         persistentState.theme = 2
                         dialog.dismiss()
                         requireActivity().setTheme(R.style.AppTheme)
                         requireActivity().recreate()
-                        Log.d(LOG_TAG, "Theme After- ${persistentState.theme}, $which")
                     }
                 }
             }else{
@@ -453,58 +443,42 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     override fun onResume() {
         super.onResume()
         detectLockDownMode()
-        if (persistentState.localBlocklistEnabled && persistentState.blockListFilesDownloaded && persistentState.getLocalBlockListStamp().isNullOrEmpty()) {
-            b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc5)
-            b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
-        } else if (downloadInProgress == 0) {
-            b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc2)
-            b.settingsActivityOnDeviceBlockSwitch.visibility = View.GONE
-            b.settingsActivityOnDeviceBlockProgress.visibility = View.VISIBLE
-        } else {
-            b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
-            val count = persistentState.numberOfLocalBlocklists
-            if (count != 0) {
-                b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_in_use, count.toString())
-            }
-        }
-        val count = persistentState.numberOfLocalBlocklists
-        if (count != 0 && persistentState.localBlocklistEnabled) {
-            b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_in_use, count.toString())
-        } else if (persistentState.localBlocklistEnabled) {
-            b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc6)
-        }
-        if (!b.settingsActivityOnDeviceBlockSwitch.isChecked && downloadInProgress != 0) {
+        if (!persistentState.localBlocklistEnabled) {
             b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blockList_desc1)
+        }else {
+            val count = persistentState.numberOfLocalBlocklists
+            if (persistentState.localBlocklistEnabled && persistentState.blockListFilesDownloaded && persistentState.getLocalBlockListStamp().isNotEmpty()) {
+                if(count !=0 ){
+                    b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_in_use, count.toString())
+                }else {
+                    b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc6)
+                }
+            } else if(count != 0){
+                b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_in_use, count.toString())
+            }else {
+                b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blockList_desc1)
+            }
         }
     }
 
-    private fun checkForDownload(isUserInitiated: Boolean): Boolean {
-        if (timeStamp == 0L) {
-            timeStamp = persistentState.localBlockListDownloadTime
-        }
+    private fun checkForDownload(isUserInitiated: Boolean, isRetry : Boolean): Boolean {
+        val timeStamp = persistentState.localBlockListDownloadTime
         val appVersionCode = persistentState.appVersion
         val url = "$REFRESH_BLOCKLIST_URL$timeStamp&${Constants.APPEND_VCODE}$appVersionCode"
-        if (DEBUG) Log.d(LOG_TAG, "Check for local download, url - $url")
-        run(url, isUserInitiated)
+        if (DEBUG) Log.d(LOG_TAG, "$FILETAG Check for local download, url - $url")
+        run(url, isUserInitiated, isRetry)
         return false
     }
 
-    private fun run(url: String, isUserInitiated: Boolean) {
+    private fun run(url: String, isUserInitiated: Boolean, isRetry: Boolean) {
         val client = OkHttpClient()
         val request = Request.Builder().url(url).build()
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.i(LOG_TAG, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
+                Log.i(LOG_TAG, "$FILETAG onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
                 activity?.runOnUiThread {
-                    b.settingsActivityOnDeviceBlockConfigureBtn.visibility = View.GONE
-                    b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.GONE
-                    b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.GONE
-                    b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
-                    b.settingsActivityOnDeviceBlockSwitch.visibility = View.VISIBLE
-                    b.settingsActivityOnDeviceBlockSwitch.isChecked = false
-                    b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc4)
-                    downloadInProgress = -1
+                    updateDownloadFailure()
                 }
             }
 
@@ -514,32 +488,21 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                     //creating json object
                     val jsonObject = JSONObject(stringResponse)
                     val version = jsonObject.getInt(Constants.JSON_VERSION)
-                    if (DEBUG) Log.d(LOG_TAG, "client onResponse for refresh blocklist files-  $version")
+                    if (DEBUG) Log.d(LOG_TAG, "$FILETAG client onResponse for refresh blocklist files-  $version")
                     if (version == 1) {
                         val updateValue = jsonObject.getBoolean(Constants.JSON_UPDATE)
-                        timeStamp = jsonObject.getLong(Constants.JSON_LATEST)
-                        if (DEBUG) Log.d(LOG_TAG, "onResponse -  $updateValue")
-                        if (updateValue) {
+                        val timeStamp = jsonObject.getLong(Constants.JSON_LATEST)
+                        if (DEBUG) Log.d(LOG_TAG, "$FILETAG onResponse -  $updateValue")
+                        if (updateValue || isRetry) {
                             persistentState.localBlockListDownloadTime = timeStamp
-                            activity?.runOnUiThread {
-                                registerReceiverForDownloadManager()
-                                handleDownloadFiles()
-                            }
+                            val appDownloadManager  = AppDownloadManager(persistentState)
+                            appDownloadManager.downloadLocalBlocklist(timeStamp, requireContext())
                         } else {
                             activity?.runOnUiThread {
-                                if (isUserInitiated) {
-                                    Utilities.showToastInMidLayout(activity as Context, getString(R.string.settings_local_blocklist_toast_default), Toast.LENGTH_SHORT)
+                                if (isUserInitiated && !isRetry) {
+                                    showRedownloadDialog(timeStamp)
                                 } else {
-                                    b.settingsActivityOnDeviceBlockConfigureBtn.visibility = View.GONE
-                                    b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.GONE
-                                    b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.GONE
-                                    b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
-                                    b.settingsActivityOnDeviceBlockSwitch.visibility = View.VISIBLE
-                                    b.settingsActivityOnDeviceBlockSwitch.isChecked = false
-                                    b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc4)
-                                    downloadInProgress = -1
-                                    timeStamp = 0
-                                    persistentState.localBlockListDownloadTime = 0
+                                    updateDownloadFailure()
                                     Utilities.showToastInMidLayout(activity as Context, getString(R.string.settings_local_blocklist_desc4), Toast.LENGTH_SHORT)
                                 }
                             }
@@ -548,20 +511,49 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                     response.body!!.close()
                     client.connectionPool.evictAll()
                 } catch (e: java.lang.Exception) {
-                    Log.w(LOG_TAG, "Exception while downloading: ${e.message}", e)
-                    b.settingsActivityOnDeviceBlockConfigureBtn.visibility = View.GONE
-                    b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.GONE
-                    b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.GONE
-                    b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
-                    b.settingsActivityOnDeviceBlockSwitch.visibility = View.VISIBLE
-                    b.settingsActivityOnDeviceBlockSwitch.isChecked = false
-                    downloadInProgress = -1
-                    timeStamp = 0
-                    persistentState.localBlockListDownloadTime = 0
-                    b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc4)
+                    Log.w(LOG_TAG, "$FILETAG Exception while downloading: ${e.message}", e)
+                    activity?.runOnUiThread {
+                       updateDownloadFailure()
+                    }
                 }
             }
         })
+    }
+
+    private fun updateDownloadFailure(){
+        b.settingsActivityOnDeviceBlockConfigureBtn.visibility = View.GONE
+        b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.GONE
+        b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.GONE
+        b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
+        b.settingsActivityOnDeviceBlockSwitch.visibility = View.VISIBLE
+        b.settingsActivityOnDeviceBlockSwitch.isChecked = false
+        b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc4)
+    }
+
+    private fun updateDownloadSuccess(){
+        b.settingsActivityOnDeviceBlockConfigureBtn.visibility = View.VISIBLE
+        b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.VISIBLE
+        b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.VISIBLE
+        b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
+        b.settingsActivityOnDeviceBlockSwitch.visibility = View.VISIBLE
+        b.settingsActivityOnDeviceBlockSwitch.isChecked = true
+        b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc3)
+        val timeStamp = persistentState.localBlockListDownloadTime
+        b.settingsActivityOnDeviceLastUpdatedTimeTxt.text = getString(R.string.settings_local_blocklist_version, Utilities.convertLongToDate(timeStamp))
+    }
+
+    private fun initialUI(){
+        b.settingsActivityOnDeviceBlockConfigureBtn.visibility = View.GONE
+        b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.GONE
+        b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.GONE
+        b.settingsActivityOnDeviceBlockSwitch.isChecked = false
+        b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blockList_desc1)
+    }
+
+    private fun updateDownloadInitiated(){
+        b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc2)
+        b.settingsActivityOnDeviceBlockSwitch.visibility = View.GONE
+        b.settingsActivityOnDeviceBlockProgress.visibility = View.VISIBLE
     }
 
 
@@ -614,7 +606,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                         isValid = false
                     }
                 } catch (e: Exception) {
-                    Log.e(LOG_TAG, "Error: ${e.message}", e)
+                    Log.e(LOG_TAG, "$FILETAG Error: ${e.message}", e)
                     errorTxt.text = getString(R.string.settings_http_proxy_error_text2)
                     errorTxt.visibility = View.VISIBLE
                     isValid = false
@@ -645,13 +637,11 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
             cancelURLBtn.setOnClickListener {
                 dialog.dismiss()
-                if (DEBUG) Log.d(LOG_TAG, "HTTP IsSelected is false")
                 persistentState.httpProxyEnabled = false
                 b.settingsActivityHttpProxyDesc.text = getString(R.string.settings_http_proxy_desc_default)
                 b.settingsActivityHttpProxySwitch.isChecked = false
             }
         } else {
-            if (DEBUG) Log.d(LOG_TAG, "HTTP IsSelected is false")
             persistentState.httpProxyEnabled = false
             b.settingsActivityHttpProxySwitch.isChecked = false
             b.settingsActivityHttpProxyDesc.text =  getString(R.string.settings_http_proxy_desc_default)
@@ -663,7 +653,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == Activity.RESULT_OK) {
             val stamp = data?.getStringExtra(Constants.STAMP_INTENT_EXTRA)
-            Log.i(LOG_TAG, "onActivityResult - stamp from webview - $stamp")
+            Log.i(LOG_TAG, "$FILETAG onActivityResult - stamp from webview - $stamp")
             setBraveDNSLocal()
         }
     }
@@ -672,14 +662,20 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityOnDeviceBlockConfigureBtn.visibility = View.VISIBLE
         b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.VISIBLE
         b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.VISIBLE
+        val timeStamp = persistentState.localBlockListDownloadTime
         b.settingsActivityOnDeviceLastUpdatedTimeTxt.text = getString(R.string.settings_local_blocklist_version, Utilities.convertLongToDate(timeStamp))
-        val path: String = requireContext().filesDir.canonicalPath
+        val path: String = requireContext().filesDir.canonicalPath + "/" +timeStamp
         if (appMode?.getBraveDNS() == null) {
             GlobalScope.launch(Dispatchers.IO) {
-                if (DEBUG) Log.d(LOG_TAG, "Local brave dns set call from settings fragment")
-                val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
-                appMode?.setBraveDNSMode(braveDNS)
-                persistentState.localBlocklistEnabled = true
+                try {
+                    if (DEBUG) Log.d(LOG_TAG, "$FILETAG Local brave dns set call from settings fragment newBraveDNSLocal : $path")
+                    val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
+                    appMode?.setBraveDNSMode(braveDNS)
+                    persistentState.localBlocklistEnabled = true
+                }catch(e : Exception){
+                    Log.w(LOG_TAG, "Exception while setting blocklist: ${e.message}",e)
+                    persistentState.localBlocklistEnabled = false
+                }
             }
         }
     }
@@ -698,13 +694,11 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         builder.setMessage(R.string.local_blocklist_download_desc)
         builder.setCancelable(false)
         //performing positive action
-        builder.setPositiveButton(getString(R.string.settings_local_blocklist_dialog_positive)) { dialogInterface, which ->
-            downloadInProgress = 0
+        builder.setPositiveButton(getString(R.string.settings_local_blocklist_dialog_positive)) { _, _ ->
             b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc2)
             b.settingsActivityOnDeviceBlockSwitch.visibility = View.GONE
             b.settingsActivityOnDeviceBlockProgress.visibility = View.VISIBLE
-
-            checkForDownload(false)
+            checkForDownload(isUserInitiated = false, isRetry = false)
         }
 
         //performing negative action
@@ -718,172 +712,31 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     }
 
-    private fun refreshDatabase() {
-        b.settingsActivityRefreshDataImg.animation = animation
-        b.settingsActivityRefreshDataImg.startAnimation(animation)
-        object : CountDownTimer(5000, 500) {
-            override fun onTick(millisUntilFinished: Long) {
-                b.settingsActivityRefreshDesc.text = getString(R.string.settings_sync_app_details_desc)
-            }
-
-            override fun onFinish() {
-                b.settingsActivityRefreshDataImg.clearAnimation()
-                b.settingsActivityRefreshDesc.text = getString(R.string.settings_sync_app_details_desc_completed)
-            }
-        }.start()
-
-        refreshDatabase.refreshAppInfoDatabase()
-    }
-
-    private fun registerReceiverForDownloadManager() {
-        AppDownloadManager.cleanupDownloads(requireContext())
-        requireContext().registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
-    }
-
-    private fun handleDownloadFiles() {
-        downloadManager = requireContext().getSystemService(AppCompatActivity.DOWNLOAD_SERVICE) as DownloadManager
-        if (timeStamp == 0L) {
-            timeStamp = persistentState.localBlockListDownloadTime
+    private fun showRedownloadDialog(timeStamp : Long) {
+        val builder = AlertDialog.Builder(requireContext())
+        //set title for alert dialog
+        builder.setTitle(R.string.local_blocklist_redownload)
+        //set message for alert dialog
+        builder.setMessage(getString(R.string.local_blocklist_redownload_desc, Utilities.convertLongToDate(timeStamp)))
+        builder.setCancelable(false)
+        //performing positive action
+        builder.setPositiveButton(getString(R.string.local_blocklist_positive)) { dialogInterface, _ ->
+            dialogInterface.dismiss()
         }
-        val url = Constants.JSON_DOWNLOAD_BLOCKLIST_LINK + "/" + timeStamp
-        downloadBlockListFiles(url, Constants.FILE_TAG_NAME, requireContext())
-    }
 
-    private fun downloadBlockListFiles(url: String, fileName: String, context: Context) {
-        try {
-            if (DEBUG) Log.d(LOG_TAG, "downloadBlockListFiles - url: $url")
-            val uri: Uri = Uri.parse(url)
-            val request = DownloadManager.Request(uri)
-            request.setTitle(getString(R.string.hs_download_blocklist_heading))
-            request.setDescription(getString(R.string.hs_download_blocklist_desc, fileName))
-            request.setDestinationInExternalFilesDir(context, getExternalFilePath(context, false), fileName)
-            Log.d(LOG_TAG, "Path - ${getExternalFilePath(context, true)}${fileName}")
-            enqueue = downloadManager.enqueue(request)
-        } catch (e: java.lang.Exception) {
-            Log.e(LOG_TAG, "Download unsuccessful - ${e.message}", e)
-            downloadInProgress = -1
+        //performing negative action
+        builder.setNeutralButton(getString(R.string.local_blocklist_neutral)) { dialogInterface, which ->
+            b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc2)
+            b.settingsActivityOnDeviceBlockSwitch.visibility = View.GONE
+            b.settingsActivityOnDeviceBlockProgress.visibility = View.VISIBLE
+            val timeStamp = persistentState.localBlockListDownloadTime
+            val appDownloadManager = AppDownloadManager(persistentState)
+            appDownloadManager.downloadLocalBlocklist(timeStamp, requireContext())
         }
-    }
-
-    private fun getExternalFilePath(context: Context, isAbsolutePathNeeded: Boolean) : String{
-        return if(isAbsolutePathNeeded){
-            context.getExternalFilesDir(null).toString() + Constants.DOWNLOAD_PATH + persistentState.localBlockListDownloadTime
-        }else{
-            Constants.DOWNLOAD_PATH + persistentState.localBlockListDownloadTime
-        }
-    }
-
-
-    private var onComplete: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(ctxt: Context, intent: Intent) {
-            try {
-                val action = intent.action
-                if (DownloadManager.ACTION_DOWNLOAD_COMPLETE == action) {
-                    val downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0)
-                    val query = DownloadManager.Query()
-                    query.setFilterById(enqueue)
-                    val c: Cursor = downloadManager.query(query)
-                    if (c.moveToFirst()) {
-                        val status = checkStatus(c)
-                        if (DEBUG) Log.d(LOG_TAG, "Download status: $status,$filesDownloaded, $downloadId")
-                        if (status == Constants.DOWNLOAD_STATUS_SUCCESSFUL) {
-                            filesDownloaded += 1
-                            if (filesDownloaded == 1) {
-                                /*val from = File(getExternalFilePath(ctxt,true) + Constants.FILE_TAG_NAME)
-                                val to = File(ctxt.filesDir.canonicalPath + Constants.FILE_TAG_NAME)
-                                from.copyTo(to, true)*/
-                                if (timeStamp == 0L) {
-                                    timeStamp = persistentState.localBlockListDownloadTime
-                                }
-                                val url = Constants.JSON_DOWNLOAD_BASIC_CONFIG_LINK + "/" + timeStamp
-                                if (DEBUG) Log.d(LOG_TAG, "Check for local download, url - $url")
-                                downloadBlockListFiles(url, Constants.FILE_BASIC_CONFIG, ctxt)
-                            } else if (filesDownloaded == 2) {
-                                /*val from = File(getExternalFilePath(ctxt,true) + Constants.FILE_BASIC_CONFIG)
-                                val to = File(ctxt.filesDir.canonicalPath + Constants.FILE_BASIC_CONFIG)
-                                from.copyTo(to, true)*/
-                                if (timeStamp == 0L) {
-                                    timeStamp = persistentState.localBlockListDownloadTime
-                                }
-                                val url = Constants.JSON_DOWNLOAD_BASIC_RANK_LINK + "/" + timeStamp
-                                if (DEBUG) Log.d(LOG_TAG, "Check for local download, url - $url")
-                                downloadBlockListFiles(url, Constants.FILE_RD_FILE, ctxt)
-                            } else if (filesDownloaded == 3) {
-                                /*val from = File(getExternalFilePath(ctxt,true)+ Constants.FILE_RD_FILE)
-                                val to = File(ctxt.filesDir.canonicalPath + Constants.FILE_RD_FILE)
-                                from.copyTo(to, true)*/
-                                if (timeStamp == 0L) {
-                                    timeStamp = persistentState.localBlockListDownloadTime
-                                }
-                                val url = Constants.JSON_DOWNLOAD_BASIC_TRIE_LINK + "/" + timeStamp
-                                if (DEBUG) Log.d(LOG_TAG, "Check for local download, url - $url")
-                                downloadBlockListFiles(url, Constants.FILE_TD_FILE, ctxt)
-                            } else if (filesDownloaded == 4) {
-                               /* val from = File(getExternalFilePath(ctxt,true) + Constants.FILE_TD_FILE)
-                                val to = File(ctxt.filesDir.canonicalPath + Constants.FILE_TD_FILE)
-                                val downloadedFile = from.copyTo(to, true)*/
-                                if (timeStamp == 0L) {
-                                    timeStamp = persistentState.localBlockListDownloadTime
-                                }
-                                val copyCompleted = AppDownloadManager.copyFilesToCanonicalPath(ctxt, timeStamp.toString())
-                                if(copyCompleted) {
-                                    persistentState.blockListFilesDownloaded = true
-                                    persistentState.localBlocklistEnabled = true
-                                    localDownloadComplete.postValue(1)
-                                    downloadInProgress = 1
-                                    b.settingsActivityOnDeviceBlockConfigureBtn.visibility = View.VISIBLE
-                                    b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.VISIBLE
-                                    b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
-                                    b.settingsActivityOnDeviceBlockSwitch.visibility = View.VISIBLE
-                                    b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.VISIBLE
-                                    b.settingsActivityOnDeviceLastUpdatedTimeTxt.text = getString(R.string.settings_local_blocklist_version, Utilities.convertLongToDate(timeStamp))
-                                    b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc3)
-                                    if (DEBUG) Log.d(LOG_TAG, "Download status : Download completed: $status")
-                                    Toast.makeText(ctxt, getString(R.string.settings_local_blocklist_download_success), Toast.LENGTH_LONG).show()
-                                }else{
-                                    Log.i(LOG_TAG, "Download failed: $enqueue, $action, $downloadId")
-                                    downloadFailureUpdate()
-                                }
-                            } else {
-                                b.settingsActivityOnDeviceBlockConfigureBtn.visibility = View.VISIBLE
-                                b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.VISIBLE
-                                b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.VISIBLE
-                                b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
-                                b.settingsActivityOnDeviceBlockSwitch.visibility = View.VISIBLE
-                                b.settingsActivityOnDeviceLastUpdatedTimeTxt.text = getString(R.string.settings_local_blocklist_version, Utilities.convertLongToDate(timeStamp))
-                            }
-                        } else {
-                            Log.i(LOG_TAG, "Download failed: $enqueue, $action, $downloadId")
-                            downloadManager.remove(downloadId)
-                            downloadFailureUpdate()
-                        }
-                    } else {
-                        if (DEBUG) Log.d(LOG_TAG, "Download failed: $enqueue, $action")
-                        downloadFailureUpdate()
-                    }
-                    c.close()
-                }
-            } catch (e: Exception) {
-                Log.w(LOG_TAG, "Exception while downloading: ${e.message}", e)
-                downloadFailureUpdate()
-            }
-        }
-    }
-
-    private fun downloadFailureUpdate(){
-        b.settingsActivityOnDeviceBlockConfigureBtn.visibility = View.GONE
-        b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.GONE
-        b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.GONE
-        b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
-        b.settingsActivityOnDeviceBlockSwitch.visibility = View.VISIBLE
-        b.settingsActivityOnDeviceBlockSwitch.isChecked = false
-        b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc4)
-        downloadInProgress = -1
-        filesDownloaded = 0
-        timeStamp = 0
-        persistentState.localBlockListDownloadTime = 0L
-        persistentState.blockListFilesDownloaded = false
-        persistentState.localBlocklistEnabled = false
+        // Create the AlertDialog
+        val alertDialog: AlertDialog = builder.create()
+        // Set other dialog properties
+        alertDialog.show()
     }
 
     private fun startWebViewIntent() {
@@ -993,7 +846,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                     isValid = true
                 }
             } catch (e: Exception) {
-                Log.e(LOG_TAG, "Error: ${e.message}", e)
+                Log.w(LOG_TAG, "$FILETAG Error: ${e.message}", e)
                 errorTxt.text = getString(R.string.settings_http_proxy_error_text2)
                 isValid = false
             }
@@ -1052,14 +905,15 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     }
 
-    override fun onDestroy() {
+    /*override fun onDestroy() {
         super.onDestroy()
-        try {
-            downloadInProgress = -1
-            requireContext().unregisterReceiver(onComplete)
+        *//*try {
+            if(downloadInProgress == -1) {
+                requireContext().unregisterReceiver(onComplete)
+            }
         }catch (e: Exception){
-            if(DEBUG) Log.i(LOG_TAG, "Unregister receiver exception for download manager: ${e.message}")
-        }
-    }
+            if(DEBUG) Log.i(LOG_TAG, "$FILETAG Unregister receiver exception for download manager: ${e.message}")
+        }*//*
+    }*/
 
 }

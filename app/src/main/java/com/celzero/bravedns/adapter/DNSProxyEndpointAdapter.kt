@@ -198,17 +198,6 @@ class DNSProxyEndpointAdapter(private val context: Context,
                         dnsProxyEndpointRepository.deleteDNSProxyEndpoint(dnsProxyEndpoint.id)
                     }
                 }
-
-                object : CountDownTimer(500, 500) {
-                    override fun onTick(millisUntilFinished: Long) {
-                    }
-
-                    override fun onFinish() {
-                        listener.updateUIFromAdapter(4)
-                    }
-                }.start()
-
-
                 Toast.makeText(context, R.string.dns_proxy_remove_success, Toast.LENGTH_SHORT).show()
             }
 

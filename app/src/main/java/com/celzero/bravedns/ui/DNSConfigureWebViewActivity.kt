@@ -42,8 +42,8 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.DownloadHelper
 import com.celzero.bravedns.util.HttpRequestHelper
-import com.celzero.bravedns.util.Utilities
 import dnsx.Dnsx
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -133,10 +133,10 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
             updateDoHEndPoint()
         }
         b.configureWebview.removeJavascriptInterface("JSInterface")
+        b.webviewPlaceholder.removeView(b.configureWebview)
         b.configureWebview.removeAllViews()
         b.configureWebview.clearHistory()
         b.configureWebview.destroy()
-
         super.onDestroy()
     }
 
@@ -175,17 +175,20 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         }
         val stamp = Xdns.getBlocklistStampFromURL(receivedStamp)
         if (DEBUG) Log.d(LOG_TAG, "Split stamp - $stamp")
-        val path: String = this.filesDir.canonicalPath
+        val path: String = this.filesDir.canonicalPath + "/"+ persistentState.localBlockListDownloadTime
         if (HomeScreenActivity.GlobalVariable.appMode?.getBraveDNS() == null) {
+            persistentState.setLocalBlockListStamp(stamp)
             GlobalScope.launch(Dispatchers.IO) {
+                if (DEBUG) Log.d(LOG_TAG, "Split stamp newBraveDNSLocal - $path")
                 val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
                 HomeScreenActivity.GlobalVariable.appMode?.setBraveDNSMode(braveDNS)
-                persistentState.setLocalBlockListStamp(stamp)
                 if (DEBUG) Log.d(LOG_TAG, "Webview: Local brave dns set call from web view -stamp: $stamp")
             }
         } else {
+            persistentState.setLocalBlockListStamp(stamp)
             GlobalScope.launch(Dispatchers.IO) {
-                persistentState.setLocalBlockListStamp(stamp)
+                val braveDNS = HomeScreenActivity.GlobalVariable.appMode?.getBraveDNS()
+                HomeScreenActivity.GlobalVariable.appMode?.setBraveDNSMode(braveDNS)
                 if (DEBUG) Log.d(LOG_TAG, "Webview: Local brave dns set call from web view -stamp: $stamp")
             }
         }
@@ -292,7 +295,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                         // Renderer was killed because the system ran out of memory.
                         // The app can recover gracefully by creating a new WebView instance
                         // in the foreground.
-                        Log.e(LOG_TAG, ("Webview: System killed the WebView rendering process Recreating..."))
+                        Log.w(LOG_TAG, ("Webview: System killed the WebView rendering process Recreating..."))
 
                         view?.also { webView ->
                             webView.destroy()
@@ -307,7 +310,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
 
                 // Renderer crashed because of an internal error, such as a memory
                 // access violation.
-                Log.e(LOG_TAG, "Webview: The WebView rendering process crashed!")
+                Log.w(LOG_TAG, "Webview: The WebView rendering process crashed!")
 
                 // In this example, the app itself crashes after detecting that the
                 // renderer crashed. If you choose to handle the crash more gracefully
@@ -330,7 +333,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                 }
             }
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "Web view: Issue while loading url: ${e.message}", e)
+            Log.w(LOG_TAG, "Web view: Issue while loading url: ${e.message}", e)
             showDialogOnError(null)
         }
     }
@@ -416,7 +419,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                             val to = File(ctxt.filesDir.canonicalPath + Constants.FILE_TAG_NAME)
                             val fileDownloaded = from.copyTo(to, true)
                             if (fileDownloaded.exists()) {
-                                Utilities.deleteOldFiles(ctxt)
+                                DownloadHelper.deleteOldFiles(ctxt)
                             }
                             persistentState.remoteBraveDNSDownloaded = true
                         } else {
@@ -428,7 +431,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                     c.close()
                 }
             } catch (e: Exception) {
-                Log.e(LOG_TAG, "Webview: Error downloading filetag.json file: ${e.message}", e)
+                Log.w(LOG_TAG, "Webview: Error downloading filetag.json file: ${e.message}", e)
             }
         }
     }

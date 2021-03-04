@@ -559,51 +559,6 @@
             android:textSize="@dimen/large_font_text_view" />
 
         <RelativeLayout
-            android:id="@+id/settings_activity_refresh_data_rl"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/background"
-            android:paddingStart="20dp"
-            android:paddingTop="15dp"
-            android:paddingEnd="10dp"
-            android:paddingBottom="15dp"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_toStartOf="@id/settings_activity_refresh_data_img"
-                android:orientation="vertical">
-
-                <TextView
-                    style="@style/TextAppearance.AppCompat.Subhead"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="5dp"
-                    android:text="@string/settings_refresh_heading"
-                    android:textSize="@dimen/large_font_text_view" />
-
-                <TextView
-                    android:id="@+id/settings_activity_refresh_desc"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/settings_refresh_desc"
-                    android:textSize="@dimen/default_font_text_view" />
-            </LinearLayout>
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/settings_activity_refresh_data_img"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_marginEnd="10dp"
-                android:padding="10dp"
-                android:src="@drawable/ic_refresh" />
-        </RelativeLayout>
-
-        <RelativeLayout
             android:id="@+id/settings_activity_enable_logs_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

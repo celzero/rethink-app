@@ -358,7 +358,12 @@
     <string name="doh_brave_pro_configure_desc">Configure RethinkDNS Plus to block adult content, dating and gambling websites, malware, spyware and more.</string>
 
     <string name="local_blocklist_download">Download Blocklists</string>
-    <string name="local_blocklist_download_desc">Download blocklists (around 40MB) to use this feature?</string>
+    <string name="local_blocklist_download_desc">Download blocklists (around 50MB) to use this feature?</string>
+
+    <string name="local_blocklist_redownload">Up-to-date!</string>
+    <string name="local_blocklist_redownload_desc">Local Blocklists are already at the latest version v%1$s.</string>
+    <string name="local_blocklist_positive">Okay</string>
+    <string name="local_blocklist_neutral">Download again</string>
 
     <string name="webview_no_stamp_change_title">Quit?</string>
     <string name="webview_no_stamp_change_desc">Currently, %1$s blocklist(s) in-use. No additional blocklists have been set. Do you want to quit anyway?</string>
