@@ -21,16 +21,10 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.appcompat.widget.AppCompatCheckBox
-import androidx.core.content.ContextCompat
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -39,6 +33,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.CategoryInfoRepository
+import com.celzero.bravedns.databinding.ExcludedAppListItemBinding
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
@@ -47,13 +42,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class ExcludedAppListAdapter(
-    private val context: Context,
-    private val appInfoRepository: AppInfoRepository,
-    private val categoryInfoRepository: CategoryInfoRepository
-) : PagedListAdapter<AppInfo, ExcludedAppListAdapter.ExcludedAppInfoViewHolder>(DIFF_CALLBACK) {
+class ExcludedAppListAdapter(private val context: Context, private val appInfoRepository: AppInfoRepository, private val categoryInfoRepository: CategoryInfoRepository) : PagedListAdapter<AppInfo, ExcludedAppListAdapter.ExcludedAppInfoViewHolder>(DIFF_CALLBACK) {
 
     companion object {
+
         private val DIFF_CALLBACK = object :
             DiffUtil.ItemCallback<AppInfo>() {
 
@@ -64,89 +56,62 @@ class ExcludedAppListAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExcludedAppInfoViewHolder {
-        val v: View = LayoutInflater.from(parent.context).inflate(
-            R.layout.excluded_app_list_item,
-            parent, false
-        )
-
-        return ExcludedAppInfoViewHolder(v)
+        val itemBinding = ExcludedAppListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ExcludedAppInfoViewHolder(itemBinding)
     }
 
     override fun onBindViewHolder(holder: ExcludedAppInfoViewHolder, position: Int) {
-        val appInfo: AppInfo? = getItem(position)
+        val appInfo: AppInfo = getItem(position) ?: return
         holder.update(appInfo)
     }
 
 
-    inner class ExcludedAppInfoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class ExcludedAppInfoViewHolder(private val b: ExcludedAppListItemBinding) : RecyclerView.ViewHolder(b.root) {
 
-        // Overall view
-        private var rowView: View? = null
-
-        private var parentView: RelativeLayout? = null
-
-        // Contents of the condensed view
-        private var appName: TextView
-        private var appIcon: ImageView
-        private var checkBox: AppCompatCheckBox
-
-
-        init {
-            rowView = itemView
-            parentView = itemView.findViewById(R.id.excluded_app_list_container)
-            appName = itemView.findViewById(R.id.excluded_app_list_apk_label_tv)
-            appIcon = itemView.findViewById(R.id.excluded_app_list_apk_icon_iv)
-            checkBox = itemView.findViewById(R.id.excluded_app_list_checkbox)
-        }
-
-        fun update(appInfo: AppInfo?) {
-            if (appInfo != null) {
-                appName.text = appInfo.appName
-                checkBox.isChecked = appInfo.isExcluded
-                try {
-                    if(!appInfo.packageInfo.contains(Constants.APP_NON_APP) || appInfo.appName != Constants.UNKNOWN_APP){
-                        val icon = context.packageManager.getApplicationIcon(appInfo.packageInfo)
-                        Glide.with(context)
-                            .load(icon)
-                            .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
-                            .into(appIcon)
-                    }else{
+        fun update(appInfo: AppInfo) {
+            b.excludedAppListApkLabelTv.text = appInfo.appName
+            b.excludedAppListCheckbox.isChecked = appInfo.isExcluded
+            try {
+                if(!appInfo.packageInfo.contains(Constants.APP_NON_APP) || appInfo.appName != Constants.UNKNOWN_APP){
+                  Glide.with(context).load(context.packageManager.getApplicationIcon(appInfo.packageInfo)).into(b.excludedAppListApkIconIv)
+                }else{
                         Glide.with(context)
                             .load(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
                             .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
-                            .into(appIcon)
+                            .into(b.excludedAppListApkIconIv)
                     }
 
-                } catch (e: Exception) {
-                    appIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
-                    Log.i(LOG_TAG, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message)
-                }
+            } catch (e: Exception) {
+                //appIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
+                Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.excludedAppListApkIconIv)
+                Log.e(LOG_TAG, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message, e)
+            }
 
-                parentView?.setOnClickListener {
-                    if (DEBUG) Log.d(LOG_TAG, "parentView- whitelist - ${appInfo.appName},${appInfo.isExcluded}")
-                    appInfo.isExcluded = !appInfo.isExcluded
-                    excludeAppsFromVPN(appInfo, appInfo.isExcluded)
-                }
 
-                checkBox.setOnCheckedChangeListener(null)
-                checkBox.setOnClickListener {
-                    if (DEBUG) Log.d(LOG_TAG, "CheckBox- whitelist - ${appInfo.appName},${appInfo.isExcluded}")
-                    appInfo.isExcluded = !appInfo.isExcluded
-                    excludeAppsFromVPN(appInfo, appInfo.isExcluded)
-                }
+            b.excludedAppListContainer.setOnClickListener {
+                if (DEBUG) Log.d(LOG_TAG, "parentView- whitelist - ${appInfo.appName},${appInfo.isExcluded}")
+                appInfo.isExcluded = !appInfo.isExcluded
+                excludeAppsFromVPN(appInfo, appInfo.isExcluded)
+            }
+
+            b.excludedAppListCheckbox.setOnCheckedChangeListener(null)
+            b.excludedAppListCheckbox.setOnClickListener {
+                if (DEBUG) Log.d(LOG_TAG, "CheckBox- whitelist - ${appInfo.appName},${appInfo.isExcluded}")
+                appInfo.isExcluded = !appInfo.isExcluded
+                excludeAppsFromVPN(appInfo, appInfo.isExcluded)
             }
         }
 
         private fun excludeAppsFromVPN(appInfo: AppInfo, status: Boolean) {
             val appUIDList = appInfoRepository.getAppListForUID(appInfo.uid)
             var blockAllApps = false
-            if (appUIDList.size > 1) {
-                blockAllApps = showDialog(appUIDList, appInfo.appName, status)
+            blockAllApps = if (appUIDList.size > 1) {
+                showDialog(appUIDList, appInfo.appName, status)
             } else {
-                blockAllApps = true
+                true
             }
             if (blockAllApps) {
-                checkBox.isChecked = status
+                b.excludedAppListCheckbox.isChecked = status
                 GlobalScope.launch(Dispatchers.IO) {
                     appInfoRepository.updateExcludedList(appInfo.uid, status)
                     val count = appInfoRepository.getBlockedCountForCategory(appInfo.appCategory)
@@ -154,13 +119,13 @@ class ExcludedAppListAdapter(
                     val whitelistCount = appInfoRepository.getBlockedCountForCategory(appInfo.appCategory)
                     categoryInfoRepository.updateBlockedCount(appInfo.appCategory, count)
                     categoryInfoRepository.updateExcludedCount(appInfo.appCategory, excludedCount)
-                    categoryInfoRepository.updateWhitelistCount(appInfo.appCategory,whitelistCount)
+                    categoryInfoRepository.updateWhitelistCount(appInfo.appCategory, whitelistCount)
                 }
                 if(DEBUG) Log.d(LOG_TAG,"Apps excluded - ${appInfo.appName}, $status")
             } else {
-                checkBox.isChecked = !status
+                b.excludedAppListCheckbox.isChecked = !status
                 appInfo.isExcluded = !status
-                if(DEBUG) Log.d(LOG_TAG,"App not excluded - ${appInfo.appName}, $status")
+                if (DEBUG) Log.d(LOG_TAG, "App not excluded - ${appInfo.appName}, $status")
             }
         }
 
@@ -181,12 +146,12 @@ class ExcludedAppListAdapter(
                 builderSingle.setTitle(context.getString(R.string.unexclude_app_desc, appName, packageList.size.toString()))
                 positiveTxt = context.getString(R.string.unexclude_app_dialog_positive, packageList.size.toString())
             }
-            val arrayAdapter = ArrayAdapter<String>(context,
-                android.R.layout.simple_list_item_activated_1)
+            val arrayAdapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_activated_1)
             arrayAdapter.addAll(packageNameList)
             builderSingle.setCancelable(false)
 
             builderSingle.setItems(packageNameList.toTypedArray(), null)
+
 
             builderSingle.setPositiveButton(positiveTxt) { _: DialogInterface, _: Int ->
                 proceedBlocking = true

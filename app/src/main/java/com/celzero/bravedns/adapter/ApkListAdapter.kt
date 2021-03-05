@@ -19,13 +19,12 @@ package com.celzero.bravedns.adapter
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.celzero.bravedns.R
+import com.celzero.bravedns.databinding.LayoutApkItemBinding
 import com.celzero.bravedns.ui.BottomSheetFragment
 import com.celzero.bravedns.util.Utilities
 import java.util.*
@@ -35,32 +34,29 @@ import kotlin.collections.ArrayList
 class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) : RecyclerView.Adapter<ApkListAdapter.ApkListViewHolder>() {
 
 
-    var apkListFiltered : ArrayList<Apk> = ArrayList()
+    var apkListFiltered: ArrayList<Apk> = ArrayList()
 
     init {
 
         apkListFiltered.addAll(apkList)
     }
 
-    fun updateApkList(){
+    fun updateApkList() {
         notifyDataSetChanged()
     }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ApkListViewHolder {
-        return ApkListViewHolder(
-            LayoutInflater.from(context).inflate(R.layout.layout_apk_item, parent, false),
-            context,
-            apkList
-        )
+        val itemBinding = LayoutApkItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ApkListViewHolder(itemBinding, context, apkList)
     }
 
     override fun onBindViewHolder(holder: ApkListViewHolder, position: Int) {
         //print("onBindViewHolder: "+apkList[position].appInfo)
         holder.mIconImageView.setImageDrawable(context.packageManager.getApplicationIcon(apkList[position].packageName))
-        holder.mLabelTextView.text =apkList[position].appName
+        holder.mLabelTextView.text = apkList[position].appName
         //holder.mLabelTextView.text =
-          //  context.packageManager.getApplicationLabel(apkList.get(position).appInfo).toString()
+        //  context.packageManager.getApplicationLabel(apkList.get(position).appInfo).toString()
         //holder.mPackageTextView.text = "Tap for more Info"
         /*if(position < 3 ) {
             holder.mIconIndicator.setBackgroundResource(R.color.colorRed_900)
@@ -83,12 +79,12 @@ class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) 
     fun filter(c: String) {
 
         var charText = c
-        println("apkList  : "+ apkList.size)
-        println("1 apkList Filtered : "+ apkListFiltered.size)
+        println("apkList  : " + apkList.size)
+        println("1 apkList Filtered : " + apkListFiltered.size)
         charText = charText.toLowerCase(Locale.getDefault())
         apkList.clear()
         if (charText.isEmpty()) {
-            println("apkList Filtered : "+ apkListFiltered.size)
+            println("apkList Filtered : " + apkListFiltered.size)
             apkList.addAll(apkListFiltered)
         } else {
             for (wp in apkListFiltered) {
@@ -101,29 +97,22 @@ class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) 
     }
 
 
-    inner class ApkListViewHolder(view: View, context: Context, apkList: ArrayList<Apk>) :
-        RecyclerView.ViewHolder(view) {
+    inner class ApkListViewHolder(b: LayoutApkItemBinding, context: Context, apkList: ArrayList<Apk>) : RecyclerView.ViewHolder(b.root) {
 
-        val mIconImageView: ImageView = view.findViewById(R.id.apk_icon_iv)
-        val mLabelTextView: TextView = view.findViewById(R.id.apk_label_tv)
-        val mPackageTextView: TextView = view.findViewById(R.id.apk_package_tv)
-        //val mIconIndicator : TextView = view.findViewById(R.id.status_indicator)
+        val mIconImageView: ImageView = b.apkIconIv
+        val mLabelTextView: TextView = b.apkLabelTv
 
         init {
             //var permissionList : String = ""
-            view.setOnClickListener{
-                val permissionDetails  = Utilities.getPermissionDetails(
-                    context,
-                    apkList[adapterPosition].packageName
-                )
+            b.root.setOnClickListener {
+                val permissionDetails = Utilities.getPermissionDetails(context, apkList[adapterPosition].packageName)
                 println("One")
 
                 var pos = 0
-                if(permissionDetails.requestedPermissionsFlags!=null)
-                permissionDetails.requestedPermissionsFlags.forEach {
+                if (permissionDetails.requestedPermissionsFlags != null) permissionDetails.requestedPermissionsFlags.forEach {
 
-                    if((it and PackageInfo.REQUESTED_PERMISSION_GRANTED) == PackageInfo.REQUESTED_PERMISSION_GRANTED){
-                        println("Granted: "+permissionDetails.requestedPermissions[pos])
+                    if ((it and PackageInfo.REQUESTED_PERMISSION_GRANTED) == PackageInfo.REQUESTED_PERMISSION_GRANTED) {
+                        println("Granted: " + permissionDetails.requestedPermissions[pos])
                     }
                     pos++
                 }
@@ -156,8 +145,6 @@ class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) 
 
         }
     }
-
-
 
 
 }

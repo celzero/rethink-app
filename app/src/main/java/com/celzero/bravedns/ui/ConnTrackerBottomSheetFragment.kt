@@ -47,6 +47,8 @@ import com.celzero.bravedns.automaton.FirewallRules
 import com.celzero.bravedns.data.ConnectionRules
 import com.celzero.bravedns.database.*
 import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
+import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
+import com.celzero.bravedns.databinding.DialogSetCustomUrlBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -334,8 +336,9 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
     private fun showAlertForClearRules() {
         val builder = AlertDialog.Builder(contextVal)
         //set title for alert dialog
-        builder.setTitle(R.string.bsct_alert_message_clear_rules_heading)
+        .setTitle(R.string.bsct_alert_message_clear_rules_heading)
         //set message for alert dialog
+
         builder.setMessage(R.string.bsct_alert_message_clear_rules)
         builder.setCancelable(true)
         //performing positive action
@@ -355,13 +358,13 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
     }
 
     private fun showDialogForInfo() {
-
+        val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCanceledOnTouchOutside(true)
-        dialog.setContentView(R.layout.dialog_info_rules_layout)
-        val okBtn = dialog.findViewById(R.id.info_rules_dialog_cancel_img) as ImageView
-        val descText = dialog.findViewById(R.id.info_rules_dialog_rules_desc) as TextView
+        dialog.setContentView(dialogBinding.root)
+        val okBtn = dialogBinding.infoRulesDialogCancelImg
+        val descText = dialogBinding.infoRulesDialogRulesDesc
 
         var text = getString(R.string.bsct_conn_rule_explanation)
         text = text.replace("\n", "<br /><br />")

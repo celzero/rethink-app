@@ -23,9 +23,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.os.CountDownTimer
 import android.view.*
-import android.widget.CheckBox
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
@@ -37,6 +34,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DNSCryptEndpointRepository
 import com.celzero.bravedns.database.DNSCryptRelayEndpoint
 import com.celzero.bravedns.database.DNSCryptRelayEndpointRepository
+import com.celzero.bravedns.databinding.DnsCryptEndpointListItemBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.cryptRelayToRemove
 import com.celzero.bravedns.util.Utilities
@@ -54,7 +52,6 @@ class DNSCryptRelayEndpointAdapter(
     companion object {
         private val DIFF_CALLBACK = object :
             DiffUtil.ItemCallback<DNSCryptRelayEndpoint>() {
-
             override fun areItemsTheSame(oldConnection: DNSCryptRelayEndpoint, newConnection: DNSCryptRelayEndpoint) = oldConnection.id == newConnection.id
 
             override fun areContentsTheSame(oldConnection: DNSCryptRelayEndpoint, newConnection: DNSCryptRelayEndpoint) = oldConnection == newConnection
@@ -62,83 +59,68 @@ class DNSCryptRelayEndpointAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DNSCryptRelayEndpointViewHolder {
-        val v: View = LayoutInflater.from(parent.context).inflate(
-            R.layout.dns_crypt_endpoint_list_item,
-            parent, false
-        )
-        return DNSCryptRelayEndpointViewHolder(v)
+        val itemBinding = DnsCryptEndpointListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        //v.setBackgroundColor(context.getColor(R.color.colorPrimary))
+        return DNSCryptRelayEndpointViewHolder(itemBinding)
     }
 
     override fun onBindViewHolder(holder: DNSCryptRelayEndpointViewHolder, position: Int) {
-        val dnsCryptRelayEndpoint: DNSCryptRelayEndpoint? = getItem(position)
+        val dnsCryptRelayEndpoint: DNSCryptRelayEndpoint = getItem(position) ?: return
         holder.update(dnsCryptRelayEndpoint)
     }
 
 
-    inner class DNSCryptRelayEndpointViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class DNSCryptRelayEndpointViewHolder(private val b: DnsCryptEndpointListItemBinding) : RecyclerView.ViewHolder(b.root) {
 
-        // Overall view
-        private var rowView: View? = null
+        fun update(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint) {
+            //if(DEBUG) Log.d(LOG_TAG,"Update - dohName ==> ${dnsCryptRelayEndpoint.dnsCryptRelayURL}")
+            b.dnsCryptEndpointListUrlName.text = dnsCryptRelayEndpoint.dnsCryptRelayName
+            /*if(dnsCryptRelayEndpoint.isSelected && HomeScreenActivity.GlobalVariable.cryptModeInProgress == 2){
+            urlExplanationTxt.text = "Connected"
+        } else if (dnsCryptRelayEndpoint.isSelected && HomeScreenActivity.GlobalVariable.cryptModeInProgress == 1) {
+            urlExplanationTxt.text = "Connecting.."
+        } else */
+            if (dnsCryptRelayEndpoint.isSelected) {
+                b.dnsCryptEndpointListUrlExplanation.text = "Connected"
+            } else {
+                b.dnsCryptEndpointListUrlExplanation.text = ""
+            }
 
-        // Contents of the condensed view
-        private var urlNameTxt : TextView
-        private var urlExplanationTxt : TextView
-        private var imageAction: CheckBox
-        private var infoImage : ImageView
-
-
-        init {
-            rowView = itemView
-            urlNameTxt = itemView.findViewById(R.id.dns_crypt_endpoint_list_url_name)
-            urlExplanationTxt = itemView.findViewById(R.id.dns_crypt_endpoint_list_url_explanation)
-            imageAction = itemView.findViewById(R.id.dns_crypt_endpoint_list_action_image)
-            infoImage = itemView.findViewById(R.id.dns_crypt_endpoint_list_info_image)
-        }
-
-        fun update(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint?) {
-            if (dnsCryptRelayEndpoint != null) {
-                urlNameTxt.text = dnsCryptRelayEndpoint.dnsCryptRelayName
-                if (dnsCryptRelayEndpoint.isSelected) {
-                    urlExplanationTxt.text = context.getString(R.string.dns_connected)
-                } else {
-                    urlExplanationTxt.text = ""
+            b.dnsCryptEndpointListActionImage.isChecked = dnsCryptRelayEndpoint.isSelected
+            if (dnsCryptRelayEndpoint.isCustom && !dnsCryptRelayEndpoint.isSelected) {
+                b.dnsCryptEndpointListInfoImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_uninstall))
+            } else {
+                b.dnsCryptEndpointListInfoImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_appinfo))
+            }
+            b.root.setOnClickListener {
+                //updateDNSCryptRelayDetails(dnsCryptRelayEndpoint)
+                b.dnsCryptEndpointListActionImage.isChecked = !b.dnsCryptEndpointListActionImage.isChecked
+                dnsCryptRelayEndpoint.isSelected = b.dnsCryptEndpointListActionImage.isChecked
+                if (!dnsCryptRelayEndpoint.isSelected) {
+                    cryptRelayToRemove = dnsCryptRelayEndpoint.dnsCryptRelayURL
+                }
+                val state = updateDNSCryptRelayDetails(dnsCryptRelayEndpoint)
+                if (b.dnsCryptEndpointListActionImage.isChecked && !state) {
+                    b.dnsCryptEndpointListActionImage.isChecked = state
                 }
 
-                imageAction.isChecked = dnsCryptRelayEndpoint.isSelected
-                if (dnsCryptRelayEndpoint.isCustom && !dnsCryptRelayEndpoint.isSelected) {
-                    infoImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_uninstall))
-                } else {
-                    infoImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_appinfo))
+            }
+            b.dnsCryptEndpointListActionImage.setOnClickListener {
+                dnsCryptRelayEndpoint.isSelected = b.dnsCryptEndpointListActionImage.isChecked
+                val state = updateDNSCryptRelayDetails(dnsCryptRelayEndpoint)
+                if (b.dnsCryptEndpointListActionImage.isChecked && !state) {
+                    b.dnsCryptEndpointListActionImage.isChecked = state
                 }
-                rowView?.setOnClickListener {
-                    //updateDNSCryptRelayDetails(dnsCryptRelayEndpoint)
-                    imageAction.isChecked = !imageAction.isChecked
-                    dnsCryptRelayEndpoint.isSelected = imageAction.isChecked
-                    if(!dnsCryptRelayEndpoint.isSelected) {
-                        cryptRelayToRemove = dnsCryptRelayEndpoint.dnsCryptRelayURL
-                    }
-                    val state  = updateDNSCryptRelayDetails(dnsCryptRelayEndpoint)
-                    if(imageAction.isChecked && !state){
-                        imageAction.isChecked = state
-                    }
-                }
-                imageAction.setOnClickListener {
-                    dnsCryptRelayEndpoint.isSelected = imageAction.isChecked
-                    val state = updateDNSCryptRelayDetails(dnsCryptRelayEndpoint)
-                    if (imageAction.isChecked && !state) {
-                        imageAction.isChecked = state
-                    }
-                }
-                infoImage.setOnClickListener {
-                    showExplanationOnImageClick(dnsCryptRelayEndpoint)
-                }
+                //showExplanationOnImageClick(dnsCryptRelayEndpoint)
+            }
+            b.dnsCryptEndpointListInfoImage.setOnClickListener {
+                showExplanationOnImageClick(dnsCryptRelayEndpoint)
             }
 
         }
 
         private fun showExplanationOnImageClick(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint) {
-            if (dnsCryptRelayEndpoint.isCustom && !dnsCryptRelayEndpoint.isSelected)
-                showDialogForDelete(dnsCryptRelayEndpoint)
+            if (dnsCryptRelayEndpoint.isCustom && !dnsCryptRelayEndpoint.isSelected) showDialogForDelete(dnsCryptRelayEndpoint)
             else {
                 if (dnsCryptRelayEndpoint.dnsCryptRelayExplanation.isNullOrEmpty()) {
                     showDialogExplanation(dnsCryptRelayEndpoint.dnsCryptRelayName, dnsCryptRelayEndpoint.dnsCryptRelayURL, "")
@@ -200,7 +182,7 @@ class DNSCryptRelayEndpointAdapter(
             alertDialog.show()
         }
 
-        private fun showApplyDialog(dnsCryptRelayEndpoint : DNSCryptRelayEndpoint) {
+        private fun showApplyDialog(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint) {
             val dialog = Dialog(context)
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
             dialog.setContentView(R.layout.dialog_bottom_apply_changes)
@@ -227,7 +209,7 @@ class DNSCryptRelayEndpointAdapter(
 
         }
 
-        private fun updateDNSCryptRelayDetails(dnsCryptRelayEndpoint : DNSCryptRelayEndpoint) : Boolean{
+        private fun updateDNSCryptRelayDetails(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint): Boolean {
             if (dnsCryptEndpointRepository.getConnectedCount() > 0) {
                 dnsCryptRelayEndpointRepository.updateAsync(dnsCryptRelayEndpoint)
                 object : CountDownTimer(500, 500) {
@@ -248,7 +230,6 @@ class DNSCryptRelayEndpointAdapter(
 
         }
     }
-
 
 
 }
