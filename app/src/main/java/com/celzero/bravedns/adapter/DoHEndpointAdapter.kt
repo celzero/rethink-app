@@ -240,10 +240,8 @@ class DoHEndpointAdapter(private val context: Context,
             }
 
             //performing negative action
-
             builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
-                checkBox.isChecked = false
-
+                b.dohEndpointListCheckImage.isChecked = false
             }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
