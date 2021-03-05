@@ -3,10 +3,8 @@
     android:id="@+id/doh_endpoint_list_parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="1dp"
-    android:background="?android:attr/selectableItemBackground"
-    android:backgroundTint="@color/colorPrimary"
-    android:elevation="@dimen/activity_horizontal_margin">
+    android:layout_margin="0.5dp"
+    android:background="?android:attr/selectableItemBackground">
 
     <RelativeLayout
         android:id="@+id/doh_endpoint_list_container"
@@ -30,9 +28,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:fontFamily="sans-serif-light"
                 android:text="Dummy Label"
-                android:textColor="@color/primaryText"
+                android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
 
             <TextView
@@ -40,9 +37,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:fontFamily="sans-serif-light"
                 android:text="Dummy Label"
-                android:textColor="@color/textColorMain"
+                android:textColor="?attr/primaryLightColorText"
                 android:textSize="@dimen/default_font_text_view" />
 
         </LinearLayout>
@@ -56,8 +52,7 @@
             android:layout_marginEnd="10dp"
             android:layout_toStartOf="@id/doh_endpoint_list_check_image"
             android:padding="10dp"
-            android:src="@drawable/ic_fab_appinfo"
-            android:text="delete" />
+            android:src="@drawable/ic_fab_appinfo" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/doh_endpoint_list_check_image"
@@ -67,6 +62,9 @@
             android:gravity="center"
             android:text="@null"
             android:layout_alignParentEnd="true"
+            android:buttonTint="?attr/accentGood"
+            android:foregroundTint="?attr/accentGood"
+            android:checked="false"
             android:padding="10dp" />
 
     </RelativeLayout>
@@ -76,19 +74,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/doh_endpoint_list_container"
+        android:background="@drawable/rounded_corners_button_primary"
         android:layout_alignParentStart="true"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
-        android:layout_marginBottom="5dp"
-        android:padding="10dp"
-        android:text="configure"
+        android:layout_marginBottom="10dp"
+        android:padding="0dp"
+        android:text="@string/dns_connected_rethink_configure"
         android:textSize="@dimen/large_font_text_view"
-        android:textColor="@color/secondaryText" />
+        android:textColor="@color/white" />
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="3dp"
+        android:layout_height="0.5dp"
         android:layout_below="@id/doh_endpoint_list_configure"
-        android:background="@color/borderblack" />
+        android:background="?attr/backgroundDark" />
+
 
 </RelativeLayout>

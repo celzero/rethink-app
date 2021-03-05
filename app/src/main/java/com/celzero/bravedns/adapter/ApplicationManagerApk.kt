@@ -79,10 +79,7 @@ class ApplicationManagerApk (packageInfo: PackageInfo,  var category: String, co
         private val mIconImageView: ImageView = itemView.findViewById(R.id.am_apk_icon_iv)
         private val mLabelTextView: TextView = itemView.findViewById(R.id.am_apk_label_tv)
         private val mCheckBox : CheckBox = itemView.findViewById(R.id.am_action_item_checkbox)
-        val mPackageTextView: TextView = itemView.findViewById(R.id.am_apk_package_tv)
-        val mIconIndicator : TextView = itemView.findViewById(R.id.am_status_indicator)
-        //val mUninstallTV : TextView = itemView.findViewById(R.id.am_uninstall_tv)
-        //val mForceStopTV : TextView = itemView.findViewById(R.id.am_force_stop_tv)
+        private val mPackageTextView: TextView = itemView.findViewById(R.id.am_apk_package_tv)
 
         override fun bindView(permissionManagerApk:  ApplicationManagerApk, payloads: MutableList<Any>) {
             mIconImageView.setImageDrawable(permissionManagerApk.appIcon)
@@ -91,9 +88,6 @@ class ApplicationManagerApk (packageInfo: PackageInfo,  var category: String, co
             mCheckBox.setOnCheckedChangeListener(null)
             mCheckBox.isChecked = permissionManagerApk.isSelected
 
-           /* if(this.layoutPosition%2 == 0){
-                llFirwallBg.setBackgroundColor(context!!.getColor(R.color.colorPrimaryDark))
-            }*/
 
             mCheckBox.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
                if(b){
@@ -105,15 +99,6 @@ class ApplicationManagerApk (packageInfo: PackageInfo,  var category: String, co
                    permissionManagerApk.isChecked = false
                    permissionManagerApk.isSelected = false
                }
-                /*if(permissionManagerApk.isChecked && b) {
-                    addedList.remove(permissionManagerApk)
-                    permissionManagerApk.isChecked = false
-                    mCheckBox.isChecked = false
-                }else if(!permissionManagerApk.isChecked && !b){
-                    addedList.add(permissionManagerApk)
-                    permissionManagerApk.isChecked = true
-                    mCheckBox.isChecked = b
-                }*/
             }
         }
 

@@ -32,7 +32,12 @@ class BraveTileService : TileService() {
     override fun onStartListening() {
         val vpnState: VpnState = VpnController.getInstance()!!.getState(this)!!
 
-        val tile = qsTile
+        //Fix detected null pointer exception. Intra #415
+        val tile = if(qsTile == null){
+            return
+        }else{
+            qsTile
+        }
 
         if (vpnState.activationRequested) {
             tile.state = Tile.STATE_ACTIVE

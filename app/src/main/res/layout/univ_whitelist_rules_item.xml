@@ -3,10 +3,10 @@
     android:id="@+id/am_apk_parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorPrimaryDark"
     android:layout_marginBottom="1dp"
-    android:layout_marginStart="5dp"
-    android:layout_marginEnd="5dp">
+    android:layout_marginStart="3dp"
+    android:background="?attr/background"
+    android:layout_marginEnd="3dp">
 
         <RelativeLayout
             android:id="@+id/univ_whitelist_rules_container"
@@ -23,9 +23,8 @@
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@id/univ_whitelist_rules_delete_btn"
                 android:ellipsize="end"
-                android:fontFamily="sans-serif-medium"
-                android:text="Dummy Label"
-                android:textColor="@color/primaryText"
+                android:fontFamily="sans-serif"
+                android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatButton
@@ -33,7 +32,7 @@
                 android:id="@+id/univ_whitelist_rules_delete_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="delete"
+                android:text="@string/univ_ip_delete_btn"
                 android:textSize="@dimen/large_font_text_view"
                 android:layout_alignParentEnd="true"
                 android:layout_centerInParent="true" />

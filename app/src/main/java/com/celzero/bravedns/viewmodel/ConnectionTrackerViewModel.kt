@@ -15,7 +15,6 @@ limitations under the License.
 */
 package com.celzero.bravedns.viewmodel
 
-import android.content.Context
 import android.util.Log
 import androidx.arch.core.util.Function
 import androidx.lifecycle.LiveData
@@ -24,7 +23,6 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.PagedList
 import androidx.paging.toLiveData
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -42,17 +40,17 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
     var connectionTrackerList = Transformations.switchMap<String, PagedList<ConnectionTracker>>(
                 filteredList, (Function<String, LiveData<PagedList<ConnectionTracker>>> { input ->
                     if (input.isBlank()) {
-                        connectionTrackerDAO.getConnectionTrackerLiveData().toLiveData(pageSize = 20)
+                        connectionTrackerDAO.getConnectionTrackerLiveData().toLiveData(pageSize = 30)
                     } else if(input.contains("isFilter")){
                         val searchText = input.split(":")[0]
                         if(DEBUG) Log.d(LOG_TAG, "Filter option - Function - $searchText, $input")
                         if(searchText.isEmpty()){
-                            connectionTrackerDAO.getConnectionBlockedConnections().toLiveData(pageSize = 20)
+                            connectionTrackerDAO.getConnectionBlockedConnections().toLiveData(pageSize = 30)
                         }else {
-                            connectionTrackerDAO.getConnectionBlockedConnectionsByName("%$searchText%").toLiveData(pageSize = 20)
+                            connectionTrackerDAO.getConnectionBlockedConnectionsByName("%$searchText%").toLiveData(pageSize = 30)
                         }
                     }else {
-                        connectionTrackerDAO.getConnectionTrackerByName("%$input%").toLiveData(20)
+                        connectionTrackerDAO.getConnectionTrackerByName("%$input%").toLiveData(30)
                     }
                 } as Function<String, LiveData<PagedList<ConnectionTracker>>>)
 

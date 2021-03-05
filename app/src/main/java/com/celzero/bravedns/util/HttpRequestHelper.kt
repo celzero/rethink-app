@@ -42,7 +42,7 @@ class HttpRequestHelper{
 
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
-                    Log.d(LOG_TAG, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
+                    Log.i(LOG_TAG, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
                 }
 
                 override fun onResponse(call: Call, response: Response) {

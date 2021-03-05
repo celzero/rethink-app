@@ -20,6 +20,7 @@ import android.util.Log
 import com.celzero.bravedns.database.*
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import dnsx.BraveDNS
@@ -115,7 +116,7 @@ class AppMode internal constructor(
         if (dohEndpoint != null) {
             if (dohEndpoint.dohURL.isEmpty()) {
                 if (HomeScreenActivity.GlobalVariable.DEBUG) {
-                    Log.d(LOG_TAG, "getDOHDetails -appMode- DoH endpoint is null")
+                    Log.i(LOG_TAG, "getDOHDetails -appMode- DoH endpoint is null")
                 }
             }else{
                 if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "getDOHDetails -appMode- DoH endpoint - ${dohEndpoint.dohURL}")
@@ -130,7 +131,6 @@ class AppMode internal constructor(
     }
 
     fun getDNSCryptServerCount() : Int{
-        val count = dnsCryptEndpointRepository.getConnectedCount()
         return dnsCryptEndpointRepository.getConnectedCount()
     }
 
@@ -202,8 +202,8 @@ class AppMode internal constructor(
     fun getBraveDNS(): BraveDNS?{
         if(braveDNS == null && persistentState.localBlocklistEnabled
             && persistentState.blockListFilesDownloaded && !persistentState.getLocalBlockListStamp().isNullOrEmpty()){
-            val path: String = context.filesDir.canonicalPath
-            if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "Local brave dns set call from AppMode")
+            val path: String = context.filesDir.canonicalPath +"/"+ persistentState.localBlockListDownloadTime
+            if (DEBUG) Log.d(LOG_TAG, "Local brave dns set call from AppMode path newBraveDNSLocal :$path")
             braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
             HomeScreenActivity.GlobalVariable.appMode?.setBraveDNSMode(braveDNS)
         }

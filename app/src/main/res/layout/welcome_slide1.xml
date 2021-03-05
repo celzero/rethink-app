@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/light">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -19,7 +18,7 @@
             android:layout_weight="0.2"
             android:gravity="center"
             android:text="@string/slide_1_title"
-            android:textColor="@color/textColorMain"
+            android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/slide_title" />
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -31,7 +30,7 @@
             android:paddingLeft="@dimen/desc_padding"
             android:paddingRight="@dimen/desc_padding"
             android:text="@string/slide_1_desc"
-            android:textColor="@color/primaryText"
+            android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/large_font_text_view" />
 
         <androidx.appcompat.widget.AppCompatImageView

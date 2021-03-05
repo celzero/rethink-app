@@ -23,14 +23,15 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(entities = [AppInfo::class, CategoryInfo::class, ConnectionTracker::class, BlockedConnections::class, DoHEndpoint::class
-, DNSCryptEndpoint::class, DNSProxyEndpoint::class, DNSCryptRelayEndpoint::class,ProxyEndpoint::class,DNSLogs::class],version = 7,exportSchema = false)
+, DNSCryptEndpoint::class, DNSProxyEndpoint::class, DNSCryptRelayEndpoint::class,ProxyEndpoint::class,DNSLogs::class],
+views = [AppInfoView::class],version = 9,exportSchema = false)
 abstract class AppDatabase : RoomDatabase(){
 
     companion object {
-        const val currentVersion:Int = 7
+        const val currentVersion:Int = 9
 
         fun buildDatabase(context: Context) = Room.databaseBuilder(
-            context, AppDatabase::class.java,"bravedns.db")
+            context.applicationContext, AppDatabase::class.java,"bravedns.db")
             .allowMainThreadQueries()
             .addMigrations(MIGRATION_1_2)
             .addMigrations(MIGRATION_2_3)
@@ -38,6 +39,8 @@ abstract class AppDatabase : RoomDatabase(){
             .addMigrations(MIGRATION_4_5)
             .addMigrations(MIGRATION_5_6)
             .addMigrations(MIGRATION_6_7)
+            .addMigrations(MIGRATION_7_8)
+            .addMigrations(MIGRATION_8_9)
             .build()
 
         private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
@@ -77,17 +80,18 @@ abstract class AppDatabase : RoomDatabase(){
                 database.execSQL("CREATE TABLE 'DNSProxyEndpoint' ( 'id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'proxyName' TEXT NOT NULL, 'proxyType' TEXT NOT NULL,'proxyAppName' TEXT , 'proxyIP' TEXT, 'proxyPort' INTEGER NOT NULL, 'isSelected' INTEGER NOT NULL, 'isCustom' INTEGER NOT NULL,'modifiedDataTime' INTEGER NOT NULL, 'latency' INTEGER NOT NULL) ")
                 database.execSQL("CREATE TABLE 'ProxyEndpoint' ( 'id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'proxyName' TEXT NOT NULL,'proxyMode' INTEGER NOT NULL, 'proxyType' TEXT NOT NULL,'proxyAppName' TEXT , 'proxyIP' TEXT, 'userName' TEXT , 'password' TEXT, 'proxyPort' INTEGER NOT NULL, 'isSelected' INTEGER NOT NULL, 'isCustom' INTEGER NOT NULL , 'isUDP' INTEGER NOT NULL,'modifiedDataTime' INTEGER NOT NULL, 'latency' INTEGER NOT NULL) ")
                 //Perform insert of endpoints
-                //database.execSQL("INSERT INTO DoHEndpoint(id,dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values(1,'No filter','https://cloudflare-dns.com/dns-query','Does not block any DNS requests. Uses Cloudflare''s 1.1.1.1 DNS endpoint.',0,0,0,0)")
-                //database.execSQL("INSERT INTO DoHEndpoint(id,dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values(2,'Family','https://family.cloudflare-dns.com/dns-query','Blocks malware and adult content. Uses Cloudflare''s 1.1.1.3 DNS endpoint.',0,0,0,0)")
-                //database.execSQL("INSERT INTO DoHEndpoint(id,dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values(3,'RethinkDNS Basic (default)','https://free.bravedns.com/dns-query','Blocks malware and more. Uses RethinkDNS''s non-configurable basic endpoint.',1,0,0,0)")
-                //database.execSQL("INSERT INTO DoHEndpoint(id,dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values(4,'RethinkDNS Pro','https://free.bravedns.com/dns-query','Configurable DNS endpoint: Provides in-depth analytics of your Internet traffic, allows you to set custom rules and more. Coming soon.',0,0,0,0)")
+                database.execSQL("INSERT INTO DoHEndpoint(id,dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values(1,'Cloudflare','https://cloudflare-dns.com/dns-query','Does not block any DNS requests. Uses Cloudflare''s 1.1.1.1 DNS endpoint.',0,0,0,0)")
+                database.execSQL("INSERT INTO DoHEndpoint(id,dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values(2,'Cloudflare Family','https://family.cloudflare-dns.com/dns-query','Blocks malware and adult content. Uses Cloudflare''s 1.1.1.3 DNS endpoint.',0,0,0,0)")
+                database.execSQL("INSERT INTO DoHEndpoint(id,dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values(3,'Cloudflare Security','https://security.cloudflare-dns.com/dns-query','Blocks malicious content. Uses Cloudflare''s 1.1.1.2 DNS endpoint.',0,0,0,0)")
+                database.execSQL("INSERT INTO DoHEndpoint(id,dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values(4,'RethinkDNS Basic (default)','https://basic.bravedns.com/1:YBcgAIAQIAAIAABgIAA=','Blocks malware and more. Uses RethinkDNS''s non-configurable basic endpoint.',1,0,0,0)")
+                database.execSQL("INSERT INTO DoHEndpoint(id,dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values(5,'RethinkDNS Plus','https://basic.bravedns.com/','Configurable DNS endpoint: Provides in-depth analytics of your Internet traffic, allows you to set custom rules and more.',0,0,0,0)")
             }
         }
 
         private val MIGRATION_4_5 : Migration = object  : Migration(4,5) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("DELETE from DNSProxyEndpoint")
-                database.execSQL("UPDATE DoHEndpoint set dohURL  = 'https://basic.bravedns.com/1:wBdgAIoBoB02kIAA5HI=' where id = 3")
+                database.execSQL("UPDATE DoHEndpoint set dohURL  = 'https://basic.bravedns.com/1:wBdgAIoBoB02kIAA5HI=' where id = 4")
                 database.execSQL("UPDATE DNSCryptEndpoint set dnsCryptName='Quad9', dnsCryptURL='sdns://AQYAAAAAAAAAEzE0OS4xMTIuMTEyLjEwOjg0NDMgZ8hHuMh1jNEgJFVDvnVnRt803x2EwAuMRwNo34Idhj4ZMi5kbnNjcnlwdC1jZXJ0LnF1YWQ5Lm5ldA',dnsCryptExplanation='Quad9 (anycast) no-dnssec/no-log/no-filter 9.9.9.10 / 149.112.112.10' where id=5")
                 database.execSQL("INSERT into DNSProxyEndpoint values (1,'Google','External','Nobody','8.8.8.8',53,0,0,0,0)")
                 database.execSQL("INSERT into DNSProxyEndpoint values (2,'Cloudflare','External','Nobody','1.1.1.1',53,0,0,0,0)")
@@ -127,6 +131,26 @@ abstract class AppDatabase : RoomDatabase(){
             }
         }
 
+        /**
+         * For the version 053-1. Created a view for the AppInfo table so that the read will be minimized.
+         * Also deleting the uid=0 row from AppInfo table. In earlier version the UID=0 is added as default and
+         * not used. Now the UID=0(ANDROID) is added to the non-app category.
+         */
+        private val MIGRATION_7_8: Migration = object : Migration(7, 8) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE VIEW `AppInfoView` AS select appName, appCategory, isInternetAllowed, whiteListUniv1, isExcluded from AppInfo")
+                database.execSQL("UPDATE AppInfo set appCategory = 'System Components' where uid = 0")
+                database.execSQL("DELETE from AppInfo where appName = 'ANDROID' and appCategory = 'System Components'")
+            }
+        }
+
+        private val MIGRATION_8_9: Migration = object : Migration(8, 9) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("UPDATE DoHEndpoint set dohURL  = 'https://basic.bravedns.com/1:YASAAQBwIAA=' where id = 4")
+            }
+        }
+
+
     }
 
     abstract fun appInfoDAO(): AppInfoDAO
@@ -139,6 +163,7 @@ abstract class AppDatabase : RoomDatabase(){
     abstract fun dnsProxyEndpointDAO() : DNSProxyEndpointDAO
     abstract fun proxyEndpointDAO() : ProxyEndpointDAO
     abstract fun dnsLogDAO() : DNSLogDAO
+    abstract fun appInfoViewDAO() : AppInfoViewDAO
 
     fun appInfoRepository() = AppInfoRepository(appInfoDAO())
     fun categoryInfoRepository() = CategoryInfoRepository(categoryInfoDAO())
@@ -150,5 +175,6 @@ abstract class AppDatabase : RoomDatabase(){
     fun dnsProxyEndpointRepository() = DNSProxyEndpointRepository(dnsProxyEndpointDAO())
     fun proxyEndpointRepository() = ProxyEndpointRepository(proxyEndpointDAO())
     fun dnsLogRepository() = DNSLogRepository(dnsLogDAO())
+    fun appInfoViewRepository() = AppInfoViewRepository(appInfoViewDAO())
 
 }

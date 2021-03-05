@@ -64,14 +64,12 @@ class PermissionManagerApk (packageInfo: PackageInfo, context : Context) : Abstr
     }
 
     inner class ViewHolder (itemView: View): FastAdapter.ViewHolder<PermissionManagerApk>(itemView) {
-        val mIconImageView: ImageView = itemView.findViewById(R.id.pm_apk_icon_iv)
-        val mLabelTextView: TextView = itemView.findViewById(R.id.pm_apk_label_tv)
-        val mPackageTextView: TextView = itemView.findViewById(R.id.pm_apk_package_tv)
-        val mIconIndicator : TextView = itemView.findViewById(R.id.pm_status_indicator)
+        private val mIconImageView: ImageView = itemView.findViewById(R.id.pm_apk_icon_iv)
+        private val mLabelTextView: TextView = itemView.findViewById(R.id.pm_apk_label_tv)
 
         override fun bindView(item:  PermissionManagerApk, payloads: MutableList<Any>) {
             mIconImageView.setImageDrawable(item.appIcon)
-            mLabelTextView.setText(item.appName)
+            mLabelTextView.text = item.appName
 
             mLabelTextView.setOnClickListener {
                 val intent = Intent(context, AppInfoActivity::class.java)
@@ -81,7 +79,7 @@ class PermissionManagerApk (packageInfo: PackageInfo, context : Context) : Abstr
 
         override fun unbindView(item: PermissionManagerApk) {
             mIconImageView.setImageDrawable(null)
-            mLabelTextView.setText(null)
+            mLabelTextView.text = null
         }
 
     }

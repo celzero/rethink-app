@@ -32,27 +32,17 @@ android {
         applicationId "com.celzero.bravedns"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 11 // For version name 053
-        versionName "0.5.3"
-       /* splits {
-             abi {
-                 enable true
-                 reset()
-                 include 'x86_64', 'x86', 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'mips'
-                 universalApk false
-             }
-         }*/
+        versionCode 13 // For version name 053b
+        versionName "0.5.3b"
+        vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        ndk {
-            abiFilters 'x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'arm64-v8a'
-        }
     }
 
     buildTypes {
         release {
             minifyEnabled true //Disabled this option for open testing to get more log details
-            shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         leakCanary {
             matchingFallbacks = ['debug']
@@ -83,18 +73,16 @@ android {
 }
 
 dependencies {
+    androidTestImplementation 'androidx.test:rules:1.3.0-beta01'
     def koin_version = '2.2.2'
     def room_version = "2.2.6"
     def paging_version = "2.1.2"
 
     implementation "com.google.guava:guava:30.1-android"
 
-    /*implementation "com.google.guava:guava:30.1-android"
-    implementation 'com.google.guava:failureaccess:jar:1.0'*/
-
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.3.0-alpha02'
-    implementation 'androidx.core:core-ktx:1.5.0-alpha05'
+    implementation 'androidx.appcompat:appcompat:1.3.0-beta01'
+    implementation 'androidx.core:core-ktx:1.5.0-beta01'
     implementation("androidx.preference:preference-ktx:1.1.1")
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation "com.mikepenz:fastadapter:5.0.0-a04"
@@ -113,7 +101,7 @@ dependencies {
 
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
-    implementation "androidx.room:room-coroutines:2.1.0-alpha04"
+    implementation "androidx.room:room-ktx:$room_version"
 
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
@@ -122,17 +110,14 @@ dependencies {
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.8.3'
 
     //For paging - connection tracker
-    //implementation "androidx.paging:paging-runtime:$paging_version"
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
     implementation "androidx.fragment:fragment-ktx:1.2.5"
-    implementation "com.google.android.material:material:1.3.0-beta01"
+    implementation "com.google.android.material:material:1.3.0-rc01"
     implementation "androidx.viewpager2:viewpager2:1.1.0-alpha01"
+
 
     implementation 'com.squareup.okhttp3:okhttp:4.9.0'
     playImplementation 'com.google.android.play:core:1.9.0'//for new version updater
-
-    // For go-tun2socks
-    implementation project(":tun2socks")
 
     //Glide implementation
     implementation 'com.github.bumptech.glide:glide:4.11.0'
@@ -156,4 +141,8 @@ dependencies {
 
     // To use only without reflection variants of viewBinding
     implementation 'com.kirich1409.viewbindingpropertydelegate:vbpd-noreflection:1.4.0'
+    implementation 'com.kirich1409.viewbindingpropertydelegate:viewbindingpropertydelegate:1.4.0'
+
+    //Tun2socks
+    implementation 'com.github.celzero:firestack:f78e9b50a1'
 }

@@ -37,9 +37,9 @@ import kotlinx.coroutines.launch
 class UniversalBlockedRulesAdapter(private val context: Context, private val blockedConnectionsRepository: BlockedConnectionsRepository) : PagedListAdapter<BlockedConnections, UniversalBlockedRulesAdapter.UniversalBlockedConnViewHolder>(DIFF_CALLBACK) {
 
     companion object {
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<BlockedConnections>() {
-            // Concert details may have changed if reloaded from the database,
-            // but ID is fixed.
+        private val DIFF_CALLBACK = object :
+            DiffUtil.ItemCallback<BlockedConnections>() {
+
             override fun areItemsTheSame(oldConnection: BlockedConnections, newConnection: BlockedConnections) = oldConnection.id == newConnection.id
 
             override fun areContentsTheSame(oldConnection: BlockedConnections, newConnection: BlockedConnections) = oldConnection == newConnection
@@ -69,20 +69,25 @@ class UniversalBlockedRulesAdapter(private val context: Context, private val blo
 
         private fun showDialogForDelete(blockedConns: BlockedConnections) {
             val builder = AlertDialog.Builder(context)
-                //set title for alert dialog
-                .setTitle(R.string.univ_firewall_dialog_title)
-                //set message for alert dialog
-                .setMessage(R.string.univ_firewall_dialog_message).setIcon(android.R.drawable.ic_dialog_alert).setCancelable(true)
-                //performing positive action
-                .setPositiveButton("Delete") { _, _ ->
-                    GlobalScope.launch(Dispatchers.IO) {
+            //set title for alert dialog
+            builder.setTitle(R.string.univ_firewall_dialog_title)
+            //set message for alert dialog
+            builder.setMessage(R.string.univ_firewall_dialog_message)
+            builder.setCancelable(true)
+            //performing positive action
+            builder.setPositiveButton(context.getString(R.string.univ_ip_delete_individual_positive)) { _, _ ->
+                GlobalScope.launch(Dispatchers.IO) {
+                    if (blockedConns != null) {
                         val firewallRules = FirewallRules.getInstance()
                         firewallRules.removeFirewallRules(ConnTrackerBottomSheetFragment.UNIVERSAL_RULES_UID, blockedConns.ipAddress!!, BraveVPNService.BlockedRuleNames.RULE2.ruleName, blockedConnectionsRepository)
                     }
                     Toast.makeText(context, "${blockedConns.ipAddress} unblocked.", Toast.LENGTH_SHORT).show()
                 }
-                //performing negative action
-                .setNegativeButton("Cancel") { _, _ -> }
+                Toast.makeText(context, context.getString(R.string.univ_ip_delete_individual_toast, blockedConns.ipAddress), Toast.LENGTH_SHORT).show()
+            }
+
+            //performing negative action
+            builder.setNegativeButton(context.getString(R.string.univ_ip_delete_individual_negative)) { _, _ -> }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
             // Set other dialog properties

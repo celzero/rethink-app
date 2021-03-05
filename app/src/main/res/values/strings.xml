@@ -1,11 +1,12 @@
-
 <resources>
     <string name="app_name">RethinkDNS</string>
-    <string name="app_name_brave">RethinkDNS</string>
+    <string name="app_name_small_case">rethinkdns</string>
     <string name="title_about">About</string>
     <string name="title_settings">Settings</string>
     <string name="txt_im_topic">Internet Manager</string>
-    <string name="backed_by_mozilla">Backed by Mozilla Builders Incubator</string>
+    <string name="backed_by_mozilla">Part of Mozilla Builders MVP Program</string>
+    <string name="settings_title_desc">A highly customizable DNS and Firewall</string>
+    <string name="about_title_desc">Detect and block network security threats</string>
 
     <string name="txt_im_tip">Tip : Firewall prevents apps from accessing the Internet over Wifi or Mobile data. Since most forms of surveillance require the data to be sent over to a central repository, firewalling them effectively mitigates the threat. \n\nThere\'s a class of apps that require Internet connection all day, and those are usually communication apps like Gmail and messenger apps like WhatsApp. Firewalling them might not be an option, and that\'s why we built content blockers. </string>
 
@@ -15,12 +16,8 @@
 
     <string name="txt_home">Home</string>
 
-    <string name="admin_receiver_status_enabled">
-        Ready to set dns based content blocker.
-    </string>
-    <string name="admin_receiver_status_disabled">
-        Content blocker no longer in effect.
-    </string>
+    <string name="admin_receiver_status_enabled">Ready to set dns based content blocker.</string>
+    <string name="admin_receiver_status_disabled">Content blocker no longer in effect.</string>
 
     <!-- Permission Manager -->
     <string name="accessibility_service_description">
@@ -28,18 +25,17 @@
         RethinkDNS does not collect or sell any information.
     </string>
 
-    <string name="accessibility_service_label">
-        RethinkDNS
-    </string>
+    <string name="accessibility_service_label">RethinkDNS</string>
 
     <string name="next">Next</string>
     <string name="skip">Skip</string>
+    <string name="finish">Finish</string>
 
     <string name="slide_2_title">Welcome</string>
-    <string name="slide_2_desc">RethinkDNS is the easiest way to monitor app activity, circumvent Internet censorship, and firewall apps on your Android device.</string>
+    <string name="slide_2_desc">RethinkDNS is the easiest way to monitor network activity, bypass Internet censorship, and firewall apps on your Android device.</string>
 
-    <string name="slide_1_title">Welcome</string>
-    <string name="slide_1_desc">Say hello to a safer, transparent, and secure Android.</string>
+    <string name="slide_1_title">Free and Open Source</string>
+    <string name="slide_1_desc">RethinkDNS is an open source software backed by Mozilla Builders MVP program.</string>
 
     <string-array name="doh_endpoint_names">
         <item>Cloudflare</item>
@@ -54,7 +50,7 @@
         <item>https://cloudflare-dns.com/dns-query</item>
         <item>https://family.cloudflare-dns.com/dns-query</item>
         <item>https://security.cloudflare-dns.com/dns-query</item>
-        <item>https://basic.bravedns.com/1:YBcgAIAQIAAIAABgIAA=</item>
+        <item>https://basic.bravedns.com/1:YASAAQBwIAA=</item>
         <item>https://cloudflare-dns.com/</item>
         <item>https://basic.bravedns.com/</item>
     </string-array>
@@ -79,27 +75,23 @@
 
     <string name="warning_title" description="Status indicator text shown in a warning notification.">
     Warning: RethinkDNS has been deactivated
-  </string>
+    </string>
 
-    <string name="notification_content"
-        description="Indicates what will happen if the user taps the notification.">
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification.">
     Tap to change protection setting
   </string>
 
-    <string name="warning_channel_name"
-        description="This is the name of the class of notifications that show warnings.  It's only
+    <string name="warning_channel_name" description="This is the name of the class of notifications that show warnings.  It's only
   visible in the system's advanced notifications settings page.">
     Warning
   </string>
 
-    <string name="warning_channel_description"
-        description="This is the explanatory text describing the 'Warning' notification class.  It's
+    <string name="warning_channel_description" description="This is the explanatory text describing the 'Warning' notification class.  It's
   only visible in the system's advanced notifications settings page.">
     Shown when RethinkDNS has encountered a problem.
   </string>
 
-    <string name="notification_title"
-        description="Status indicator text shown in a persistent notification.">
+    <string name="notification_title" description="Status indicator text shown in a persistent notification.">
     Protected! Connected to Fast and Secure DNS.
   </string>
 
@@ -116,82 +108,69 @@
     </string>
 
 
-    <string name="status_waiting"
-        description="This text appears during the connection process if Intra needs user permission or the phone is offline.">
+    <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">
     waiting
-  </string>
+    </string>
 
-    <string name="status_failing"
-        description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">
     failing
-  </string>
+    </string>
 
-    <string name="explanation_offline"
-        description="Status indicator shown when there is no network connection.">
+    <string name="explanation_offline" description="Status indicator shown when there is no network connection.">
     Your device is offline.  Intra is waiting for a network connection.
-  </string>
+    </string>
 
-    <string name="explanation_vpn"
-        description="Warning text shown on the main screen before the user starts Intra">
+    <string name="explanation_vpn" description="Warning text shown on the main screen before the user starts Intra">
     RethinkDNS has detected another VPN on your device.  If you enable Rethink, that VPN will be disabled.
     RethinkDNS is not as secure as a trusted VPN.
-  </string>
+    </string>
 
     <string name="explanation_failing">
     Warning: Queries are failing.  You may want to choose a different server or restart Intra.
-  </string>
+    </string>
 
-    <string name="status_starting"
-        description="This text briefly appears while starting.">
+    <string name="status_starting" description="This text briefly appears while starting.">
     starting
-  </string>
+    </string>
 
-    <string name="explanation_starting"
-        description="Corresponds to status_starting">
+    <string name="explanation_starting" description="Corresponds to status_starting">
     Hang tight.  Intra is establishing a server connection.
-  </string>
+    </string>
 
-    <string name="status_protected"
-        description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">
+    <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">
     protected
-  </string>
+    </string>
 
-    <string name="explanation_protected"
-        description="Expanded form of status_protected">
+    <string name="explanation_protected" description="Expanded form of status_protected">
     Your connection is protected from DNS attacks.
-  </string>
+    </string>
 
-    <string name="explanation_upgraded"
-        description="Corresponds to status_upgraded.">
+    <string name="explanation_upgraded" description="Corresponds to status_upgraded.">
     Your connection is currently protected by Android Private DNS, but an attacker could disable
     or undermine this protection.
-  </string>
+    </string>
 
-    <string name="status_strict"
-        description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">
     private dns is enabled
-  </string>
+    </string>
 
-    <string name="explanation_strict"
-        description="Explanation on the main screen for users who have Private DNS strict mode enabled at the OS level.">
+    <string name="explanation_strict" description="Explanation on the main screen for users who have Private DNS strict mode enabled at the OS level.">
     RethinkDNS has detected that the Android Private DNS setting is enabled.  This means your DNS
     queries are already protected, so there\'s no need to enable Rethink.
-  </string>
+    </string>
 
-    <string name="status_exposed"
-        description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">
     not protected
-  </string>
+    </string>
 
-    <string name="explanation_exposed"
-        description="Expanded form of status_exposed">
+    <string name="explanation_exposed" description="Expanded form of status_exposed">
     Your connection is exposed to DNS attacks.
-  </string>
+    </string>
 
-  <string name="dns_explanation_dns_connected">Connected to RethinkDNS</string>
+    <string name="dns_explanation_dns_connected">Connected to RethinkDNS</string>
     <string name="dns_explanation_firewall_connected">Connected to Firewall</string>
 
-    <string name="dns_explanation_connected" description= "The message will be shown when the DNS is connected">
+    <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">
         Connected to RethinkDNS and Firewall
     </string>
 
@@ -222,13 +201,9 @@
         Apply firewall rules on all applications based on device events, for example, firewall when the device is locked or when a particular app is not in use.
     </string>
 
-    <string name="category_firewall_explanation">
-        Whitelisted applications are exempt from all firewall rules.
-    </string> <!--Applications added to whitelist will be exempt from all firewall rules.-->
+    <string name="category_firewall_explanation">Whitelisted applications are exempt from all firewall rules.</string>
 
-    <string name="ip_details_list_explanation">
-        All connections to these IPs are blocked for all apps except the ones in the whitelist.
-    </string>
+    <string name="ip_details_list_explanation">All connections to these IPs are blocked for all apps except the ones in the whitelist.</string>
 
     <string-array name="brave_dns_mode_names">
         <item>DNS</item>
@@ -242,69 +217,43 @@
         <item>@drawable/spinner_both</item>
     </integer-array>
 
-
-    <string name="dns_mode_info_title">
-        DNS
-    </string>
+    <string name="dns_mode_info_title">DNS</string>
 
     <string name="firewall_rules">Firewall Rules</string>
 
-    <string name="dns_mode_info_explanation">
-        \u0009 Circumvent Internet censorship.\n\u0009 Prevent DNS manipulation attacks with encrypted DNS.\n\u0009 First line of defence against malware and other security threats.\n\u0009 Monitor DNS traffic.
-    </string>
+    <string name="dns_mode_info_explanation">\u0009 Circumvent Internet censorship.\n\u0009 Prevent DNS manipulation attacks with encrypted DNS.\n\u0009 First line of defence against malware and other security threats.\n\u0009 Monitor DNS traffic.</string>
 
+    <string name="firewall_mode_info_title">Firewall</string>
 
-    <string name="firewall_mode_info_title">
-        Firewall
-    </string>
+    <string name="firewall_mode_info_explanation">\u0009 Firewall select apps from connecting to the Internet.\n\u0009 Monitor network activity of all apps.\n\u0009 Note: This feature may consume extra battery.</string>
 
-    <string name="firewall_mode_info_explanation">
-        \u0009 Firewall select apps from connecting to the Internet.\n\u0009 Monitor network activity of all apps.\n\u0009 Note: This feature may consume extra battery.
-    </string>
+    <string name="hybrid_mode_info_title">DNS + Firewall</string>
 
+    <string name="dns_mode_info_explanation_new">Block malware and other security threats with configurable, encrypted DNS.</string>
+    <string name="firewall_mode_info_explanation_new">Monitor network activity and firewall any app or IP address.</string>
+    <string name="dns_firewall_mode_info_explanation_new">All of the above + bypass Internet censorship.</string>
 
-    <string name="hybrid_mode_info_title">
-        DNS + Firewall
-    </string>
+    <string name="alert_permission_accessibility">Permission - Accessibility</string>
 
-    <string name="alert_permission_accessibility">
-        Permission - Accessibility
-    </string>
+    <string name="alert_permission_accessibility_regrant">Action Required</string>
 
-    <string name="alert_permission_accessibility_regrant">
-        Regrant Permission - Accessibility
-    </string>
+    <string name="alert_firewall_accessibility_explanation">RethinkDNS uses accessibility service to track which apps are in-use (foreground) versus those that are not in-use (background).\n\nRethinkDNS does not collect any information or spy on you in any way.</string>
 
-    <string name="alert_firewall_accessibility_explanation">
+    <string name="alert_firewall_accessibility_regrant_explanation">
+        RethinkDNS accessibility service has stopped or crashed. <b>Goto Settings and Force Stop</b> RethinkDNS and start it again to use "Block any app not in use" feature.\n\n
         RethinkDNS uses accessibility service to track which apps are in-use (foreground) versus those that are not in-use (background).
     </string>
 
-    <string name="alert_firewall_accessibility_regrant_explanation">
-        RethinkDNS accessibility service has stopped or crashed. Revoke accessibility permissions and regrant them to start it back again. RethinkDNS uses accessibility service to track which apps are in-use (foreground) versus those that are not in-use (background).
-    </string>
+    <string name="brave_dns_connect_prompt_firewall">Start Firewall / DNS+Firewall to configure apps.</string>
+    <string name="brave_dns_connect_prompt_query">Start DNS / DNS+Firewall to view logs</string>
 
-    <string name="brave_dns_connect_prompt_firewall">
-        Start Firewall / DNS+Firewall to configure apps.
-    </string>
-    <string name="brave_dns_connect_prompt_query">
-       Start DNS / DNS+Firewall to view logs
-    </string>
+    <string name="brave_dns_connect_mode_change_firewall">Choose Mode.</string>
 
-    <string name="brave_dns_connect_mode_change_firewall">
-       Firewall is disabled.
-    </string>
+    <string name="brave_dns_connect_mode_change_dns">Choose Mode.</string>
 
-    <string name="brave_dns_connect_mode_change_dns">
-        DNS is disabled.
-    </string>
+    <string name="brave_dns_connect_mode_change_connection">Start Firewall / DNS+Firewall to view network logs.</string>
 
-    <string name="brave_dns_connect_mode_change_connection">
-         Start Firewall / DNS+Firewall to view network logs.
-     </string>
-
-    <string name="faq_web_link">
-        https://www.bravedns.com/faq
-    </string>
+    <string name="faq_web_link">https://www.bravedns.com/faq</string>
 
     <string name="dns_mode_0">No Filter</string>
     <string name="dns_mode_1">Family</string>
@@ -323,24 +272,6 @@
     <string name="custom_url_error_host_failed">Host connection failed. Try again.</string>
     <string name="custom_url_error_invalid_url">Invalid URL</string>
     <string name="custom_url_added_successfully">New custom DNS endpoint added.</string>
-
-
-    <string name="about_bravedns_explantion">RethinkDNS is the easiest way to monitor app activity, circumvent Internet censorship, and firewall apps on your Android device. </string>
-    <string name="about_bravedns_whoarewe">RethinkDNS is a free and open-source project, led by ex-engineers from Amazon, IBM, and Scientific Games.</string>
-    <string name="about_bravedns_toreport_text">to report bugs and suggest features.</string>
-    <string name="about_join_telegram">Join the RethinkDNS group on Telegram</string>
-    <string name="about_web">Links</string>
-    <string name="about_website">Visit rethinkdns.com</string>
-    <string name="about_github">Contribute on GitHub</string>
-    <string name="about_faq">View FAQs</string>
-    <string name="about_blog">Read our blog</string>
-    <string name="about_connect">Contact</string>
-    <string name="about_app">App</string>
-    <string name="about_email">Email us</string>
-    <string name="about_whats_new">What\'s new</string>
-    <string name="about_twitter">Follow us on Twitter</string>
-    <string name="about_mozilla">RethinkDNS is part of Mozilla Builders MVP program.</string>
-    <string name="about_app_update_check">Check for app updates</string>
 
     <string name="conn_track_clear_logs_title">Delete all network logs?</string>
     <string name="conn_track_clear_logs_message">This only deletes network logs but not firewall rules. This operation is not reversible. Do you want to proceed?</string>
@@ -364,14 +295,14 @@
     <string name="bsct_conn_conn_desc_allowed">allowed on &lt;u>%1$s:%2$s&lt;/u> %3$s.\u0020</string>
     <string name="bsct_conn_conn_desc_blocked">blocked on &lt;u>%1$s/%2$s&lt;/u> %3$s</string>
     <string name="bsct_conn_rule_explanation">
-        \u0009 &lt;u>Rule #1&lt;/u>: Blocks an app from connecting to the Internet.
-        \n \u0009 &lt;u>Rule #2&lt;/u>: Blocks any app from connecting to a particular IP.
-        \n \u0009 &lt;u>Rule #3&lt;/u>: Blocks all connections when device locked (Universal Firewall).
-        \n \u0009 &lt;u>Rule #4&lt;/u>: Blocks any app not in use (Universal Firewall).
-        \n \u0009 &lt;u>Rule #5&lt;/u>: Blocks connections when source app unknown (Universal Firewall).
-        \n \u0009 &lt;u>Rule #6&lt;/u>: Blocks all UDP traffic except DNS (Universal Firewall).
+        &lt;u>Rule #1&lt;/u>: Blocks an app from connecting to the Internet.
+        \n &lt;u>Rule #2&lt;/u>: Blocks any app from connecting to a particular IP.
+        \n &lt;u>Rule #3&lt;/u>: Blocks all connections when device locked (Universal Firewall).
+        \n &lt;u>Rule #4&lt;/u>: Blocks any app not in use (Universal Firewall).
+        \n &lt;u>Rule #5&lt;/u>: Blocks connections when source app unknown (Universal Firewall).
+        \n &lt;u>Rule #6&lt;/u>: Blocks all UDP traffic except DNS (Universal Firewall).
         </string>
-    <string name="univ_block_unknown_connections">Block connections when source app is unknown</string>
+
     <string name="bsct_alert_message_clear_rules">All rules related to this app will be cleared</string>
     <string name="bsct_alert_message_clear_rules_heading">Clear rules</string>
     <string name="bsct_rules_cleared_toast">All rules related to this app is cleared</string>
@@ -385,10 +316,16 @@
     <string name="always_on_dialog_positive_btn">Go to Settings</string>
     <string name="always_on_dialog_negative_btn">Cancel</string>
 
-
+    <string name="system_apps_warning_title">Block System Apps</string>
+    <string name="system_components_warning_title">Block System Components</string>
+    <string name="system_non_app_warning_title">Block Non-App System</string>
 
     <string name="system_apps_warning">Some system apps are critical to proper functioning of a device. Block them only if you know what you are doing.</string>
     <string name="system_components_warning">Some system components are critical to proper functioning of a device. Block them only if you know what you are doing.</string>
+    <string name="system_non_apps_warning">Some non-app system components are critical to proper functioning of a device. Block them only if you know what you are doing.</string>
+
+    <string name="system_apps_dialog_positive">Block anyway</string>
+    <string name="system_apps_dialog_negative">Cancel</string>
 
     <string name="firewall_act_universal_tab">Universal</string>
     <string name="firewall_act_apps_tab">All apps</string>
@@ -397,13 +334,9 @@
     <string name="dns_act_configure_tab">Configure</string>
     <string name="dns_act_log">Logs</string>
 
-
     <string name="univ_firewall_dialog_title">Delete IP Rule?</string>
     <string name="univ_firewall_dialog_message">Deleting this rule would allow any app to connect to this IP. Do you want to proceed?</string>
     <string name="univ_firewall_no_ip_message">No IPs found. Tap on entries in the Network Log screen to block individual IP addresses.</string>
-
-    <string name="univ_delete_firewall_dialog_title">Delete all IP Rules?</string>
-    <string name="univ_delete_firewall_dialog_message">Deleting these rules would allow any application to connect to the currently blocked IPs.</string>
 
     <string name="doh_custom_url_remove_dialog_title">Delete DoH endpoint?</string>
     <string name="doh_custom_url_remove_dialog_message">Delete the DNS over Https endpoint from saved configuration.</string>
@@ -425,7 +358,12 @@
     <string name="doh_brave_pro_configure_desc">Configure RethinkDNS Plus to block adult content, dating and gambling websites, malware, spyware and more.</string>
 
     <string name="local_blocklist_download">Download Blocklists</string>
-    <string name="local_blocklist_download_desc">Download blocklists (around 40MB) to use this feature?</string>
+    <string name="local_blocklist_download_desc">Download blocklists (around 50MB) to use this feature?</string>
+
+    <string name="local_blocklist_redownload">Up-to-date!</string>
+    <string name="local_blocklist_redownload_desc">Local Blocklists are already at the latest version v%1$s.</string>
+    <string name="local_blocklist_positive">Okay</string>
+    <string name="local_blocklist_neutral">Download again</string>
 
     <string name="webview_no_stamp_change_title">Quit?</string>
     <string name="webview_no_stamp_change_desc">Currently, %1$s blocklist(s) in-use. No additional blocklists have been set. Do you want to quit anyway?</string>
@@ -438,9 +376,8 @@
 
     <string name="dns_proxy_no_proxy">Set up a DNS Proxy by clicking on the ADD button below.</string>
 
-    <string name="show_logs_disabled_network_message">Logging of network connections is disabled. To enable, goto Settings->General-> Turn on "Enable DNS and Firewall logs"</string>
-    <string name="show_logs_disabled_dns_message">Logging of DNS connections is disabled. To enable, goto Settings->General-> Turn on "Enable DNS and Firewall logs"</string>
-
+    <string name="show_logs_disabled_network_message">Connection logging has been disabled. To re-enable, goto <i>Settings</i> and turn on <i>Enable DNS and Firewall logs.</i></string>
+    <string name="show_logs_disabled_dns_message">DNS request logging has been disabled. To re-enable, goto <i>Settings</i> and turn on <i>Enable DNS and Firewall logs.</i></string>
 
     <string-array name="dns_crypt_endpoint_names">
         <item>Cleanbrowsing Family</item>
@@ -469,35 +406,35 @@
         <item>Quad9 (anycast) no-dnssec/no-log/no-filter 9.9.9.10 / 149.112.112.10</item>
     </string-array>
 
-
     <string-array name="dns_crypt_relay_endpoint_names">
-            <item>Netherlands</item>
-            <item>France</item>
-            <item>Sweden</item>
-            <item>US - Los Angeles, CA</item>
-            <item>Singapore</item>
-        </string-array>
+        <item>Netherlands</item>
+        <item>France</item>
+        <item>Sweden</item>
+        <item>US - Los Angeles, CA</item>
+        <item>Singapore</item>
+    </string-array>
 
-        <string-array name="dns_crypt_relay_endpoint_urls">
-            <item>sdns://gRI1MS4xNS4xMjQuMjA4OjQzNDM</item>
-            <item>sdns://gREyMTIuMTI5LjQ2LjMyOjQ0Mw</item>
-            <item>sdns://gRMxMjguMTI3LjEwNC4xMDg6NDQz</item>
-            <item>sdns://gRAyMy4xOS42Ny4xMTY6NDQz</item>
-            <item>sdns://gRMxNzQuMTM4LjI5LjE3NToxNDQz</item>
-        </string-array>
+    <string-array name="dns_crypt_relay_endpoint_urls">
+        <item>sdns://gRI1MS4xNS4xMjQuMjA4OjQzNDM</item>
+        <item>sdns://gREyMTIuMTI5LjQ2LjMyOjQ0Mw</item>
+        <item>sdns://gRMxMjguMTI3LjEwNC4xMDg6NDQz</item>
+        <item>sdns://gRAyMy4xOS42Ny4xMTY6NDQz</item>
+        <item>sdns://gRMxNzQuMTM4LjI5LjE3NToxNDQz</item>
+    </string-array>
 
-        <string-array name="dns_crypt_relay_endpoint_desc">
-            <item>Anonymized DNS relay hosted in Netherlands.</item>
-            <item>Anonymized DNS relay hosted in Paris, France provided by https://cryptostorm.is/.</item>
-            <item>Anonymized DNS relay hosted in Stockholm, Sweden provided by https://cryptostorm.is/.</item>
-            <item>Anonymized DNS relay hosted in US - Los Angeles, CA provided by https://cryptostorm.is/.</item>
-            <item>Anonymized DNS relay hosted in Singapore.</item>
-        </string-array>
+    <string-array name="dns_crypt_relay_endpoint_desc">
+        <item>Anonymized DNS relay hosted in Netherlands.</item>
+        <item>Anonymized DNS relay hosted in Paris, France provided by https://cryptostorm.is/.</item>
+        <item>Anonymized DNS relay hosted in Stockholm, Sweden provided by https://cryptostorm.is/.</item>
+        <item>Anonymized DNS relay hosted in US - Los Angeles, CA provided by https://cryptostorm.is/.</item>
+        <item>Anonymized DNS relay hosted in Singapore.</item>
+    </string-array>
 
     <string name="configure_dns_connected_doh_status">dns over https</string>
     <string name="configure_dns_connected_dns_crypt_status">dnscrypt</string>
     <string name="configure_dns_connected_dns_proxy_status">dns proxy</string>
-    <string name="configure_dns_connection_name">Connected to  </string>
+    <string name="configure_dns_connection_name">Connected to %1$s</string>
+    <string name="configure_dns_crypt_name">DNSCrypt resolvers: %1$s</string>
 
     <string name="firewall_app_added_in_whitelist">whitelisted app</string>
     <string name="firewall_app_added_in_excluded_list">excluded app</string>
@@ -507,10 +444,8 @@
     <string name="http_proxy_dialog_heading">Set HTTP(S) Proxy</string>
     <string name="http_proxy_dialog_desc">HTTP(S) Proxy settings are only a hint to applications but they may or may not use it; however, browsers like Chrome and Firefox do use these.</string>
 
-    <string name="univ_firewall_rules_6">Block all UDP traffic except DNS</string>
-
     <string name="download_update_dialog_title">New Update!</string>
-    <string name="download_update_dialog_message">A version of the app is available for download from the website. Do you want to proceed?</string>
+    <string name="download_update_dialog_message">A new version of the app is available for download from the website. Do you want to proceed?</string>
     <string name="download_update_dialog_message_ok_title">Up-to-date!</string>
     <string name="download_update_dialog_message_ok">You are already on the latest version.</string>
     <string name="download_update_dialog_failure_title">Something went wrong!</string>
@@ -523,18 +458,18 @@
     <string name="search_dns_logs"><font size="12">Search domain names or IPs</font></string>
     <string name="search_universal_ips"><font size="12">Search IPs</font></string>
 
+    <string name="app_mode_dns_low_battery">DNS (battery saver)</string>
     <string name="app_mode_dns">DNS</string>
     <string name="app_mode_firewall">Firewall</string>
     <string name="app_mode_dns_firewall">DNS and Firewall</string>
 
     <string name="settings_vpn_heading">VPN</string>
+    <string name="settings_vpn_heading_disabled">VPN disabled</string>
 
     <string name="info_dialog_copy_toast_msg">URI Copied.</string>
 
     <string name="settings_enable_logs_desc">Store DNS and Firewall logs locally on-device.</string>
     <string name="settings_enable_logs">Enable on-device logging</string>
-
-    <string name="app_mode_dns_low_battery">DNS (battery saver)</string>
 
     <string name="app_mode_choose">Choose mode</string>
     <string name="vpn_start_error_doh_url">Something went wrong. Cannot start VPN.</string>
@@ -542,56 +477,32 @@
     <string name="new_year">2021</string>
     <string name="new_year_desc">Happy New Year</string>
 
-
+    <string name="dns_mode_disabled">DNS (disabled)</string>
     <string name="features_disabled">(disabled)</string>
     <string name="firewall_app_info_not_available">Cannot block the app</string>
 
-    <string name="whats_dialog_title">15+ new features in v053</string>
-    <string name="whats_new_version_name">🎅 🎄 Happy New Year ❄️ 🎁 </string>
-    <string name="whats_new_version_update">Android 6 and Battery Saver mode:\n\n
-        \u00091. The app now runs on Android 6 and above.\n\n
-        Battery Saver Mode:\n\n
-        \u00092. The app now bundles in a battery saver mode in which only DNS works but not Firewall.\n\n
-        Homescreen:\n\n
-        \u00093. Start / Stop now looks more like a traditional button with a bottom sheet to help choose between battery-saver DNS-only mode and full-fledged DNS + Firewall mode.\n
-        \u00094. DNS and Firewall buttons on the homescreen are now more prominent.\n\n
-        Settings:\n\n
-        \u00095. Enable or disable on-device DNS and Firewall logging.\n
-        \u00096. "Refresh app list" button moved to the Firewall screen.\n\n
-        DNS:\n\n
-        \u00097. Latest 20K DNS logs are stored on-device.\n
-        \u00098. Search box and filters for DNS logs.\n\n
-        Firewall:\n\n
-        \u00099. Fix for Whitelist reverting to default.\n
-        \u000910. Fix for Exclusion list reverting to default.\n
-        \u000911. All apps tab now shows total number of app, number of apps in the whitelist / exclusion list, and number of apps blocked.\n
-        \u000912. Improve scroll performance of the Network Log screen.\n
-        \u000913. Network Log bottom sheet now slightly less cluttered: A couple of UI elements removed.\n
-        \u000914. Distinguish between "unamed" (connections from apps without a name) and "unknown" (orphan connections without an owner app) in the network logs.\n
-        \u000915. Improvements to app UX when the VPN is run in "lockdown mode" (that is, when "Block connections without VPN" is enabled from Android\'s VPN Settings page).\n
-        \u000916. Some apps retry relentlessly when their connections are firewalled: Gatekeep connections for 30 seconds to delay those fast-paced non-stop retries.\n\n
-        Universal Firewall:\n\n
-        \u00092021. "Block any app not in use" now with better heurisitcs and so should behave in less surprising ways and be more out-of-the-way.
+    <string name="whats_dialog_title">What\'s new in v053b</string>
+    <string name="whats_new_version_name">🎁 International Women\'s Day (Mar 08) 🎁</string>
+    <string name="whats_new_version_update">Incremental update:\n\n
+        1. Themes: Dark and Light themes. More flavors coming soon.\n\n
+        2. Fixed a Battery drain issue.\n\n
+        3. Home and Welcome screen UI changes.\n\n
+        4. Improvements to the underlying Firewall and DNS network engine.\n\n
     </string>
 
-    <!-- DNS Log Fragment string -->
-    <string name="dns_log_latency">Latency: </string>
-    <string name="dns_log_lifetime_queries">Lifetime Queries: </string>
-
-
     <!-- Settings Fragment strings -->
-    <string name="settings_firewall_header">Firewall</string>
+    <string name="settings_firewall_header">firewall</string>
     <string name="settings_kill_app_heading">Kill app when firewalled (experimental)</string>
     <string name="settings_kill_app_desc">Some stubborn apps persistently try to connect to the internet even when firewalled. Enable this setting to kill such apps.</string>
 
-    <string name="settings_dns_header">DNS</string>
+    <string name="settings_dns_header">dns</string>
     <string name="settings_local_blocklist_heading">Enable on-device blocklists</string>
     <string name="settings_local_blocklist_desc_1">Choose from 170+ blocklists.</string>
     <string name="settings_local_blocklist_configure">configure</string>
     <string name="settings_local_blocklist_update">Update</string>
     <string name="settings_local_blocklist_check_time">last check for update: 10 mins ago</string>
 
-    <string name="settings_vpn_header">VPN</string>
+    <string name="settings_vpn_header">vpn</string>
     <string name="settings_exclude_app_heading">Exclude apps from Firewall and DNS</string>
     <string name="settings_exclude_app_desc">Connections from excluded apps will not monitored or blocked.</string>
 
@@ -600,17 +511,80 @@
     <string name="settings_allow_bypass_lockdown_desc">"Disabled. Settings->VPN->Block connections without VPN" is enabled for RethinkDNS, enabling the feature will block the internet connection of the apps which are trying to bypass the VPN.</string>
     <string name="settings_lock_down_mode_desc">Cannot exclude apps or allow bypass because VPN is running in lockdown mode.</string>
 
-    <string name="settings_proxy_header">Proxy (experimental)</string>
+    <string name="settings_proxy_header">proxy (experimental)</string>
     <string name="settings_socks5_heading">Setup SOCKS5 (TCP) Proxy</string>
     <string name="settings_socks5_desc">Forward connections to SOCKS5 endpoint.</string>
     <string name="settings_https_heading">Setup HTTP(S) Proxy</string>
     <string name="settings_https_desc">This setting is only a recommendation and it is possible that apps will ignore it.</string>
 
-    <string name="settings_general_header">General</string>
+    <string name="settings_general_header">general</string>
     <string name="settings_refresh_heading">Refresh Data</string>
     <string name="settings_refresh_desc">Re-sync application list.</string>
-    <string name="settings_autostart_bootup_heading">Auto-start on bootup (experimental)</string>
-    <string name="settings_autostart_bootup_desc">Start RethinkDNS if it was running before device bootup.</string>
+    <string name="settings_autostart_bootup_heading">Auto-start on power up (experimental)</string>
+    <string name="settings_autostart_bootup_desc">On Power up, Start RethinkDNS if it was running before device shut down.</string>
+
+    <string name="settings_local_blockList_desc1">Choose from 170+ blocklists.</string>
+    <string name="settings_local_blocklist_desc2">Download in progress…</string>
+    <string name="settings_local_blocklist_desc3">Download completed, Configure blocklist</string>
+    <string name="settings_local_blocklist_desc4">Error downloading file. Try again.</string>
+    <string name="settings_local_blocklist_desc5">Configure blocklists</string>
+    <string name="settings_local_blocklist_desc6">No list configured.</string>
+    <string name="settings_local_blocklist_in_use">%1$s blocklists are in-use.</string>
+    <string name="settings_local_blocklist_toast_default">Blocklists are up-to-date.</string>
+    <string name="settings_local_blocklist_dialog_positive">Download</string>
+    <string name="settings_local_blocklist_dialog_negative">Cancel</string>
+    <string name="settings_local_blocklist_download_success">Blocklists downloaded successfully.</string>
+    <string name="settings_local_blocklist_version">Version: v%1$s</string>
+
+    <string name="settings_sync_app_details_desc">Resync in progress…</string>
+    <string name="settings_sync_app_details_desc_completed">Resync completed</string>
+
+    <string name="settings_check_update_heading">Check for app updates</string>
+    <string name="settings_check_update_desc">Check for apps updates once a week.</string>
+
+    <string name="settings_theme_heading">Appearance</string>
+    <string name="settings_theme_desc">Dark/light theme</string>
+
+    <string name="settings_http_proxy_desc">Forwarding to %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc_default">This proxy is only a recommendation and it is possible that some apps will ignore it.</string>
+    <string name="settings_http_proxy_dialog_title">Custom Server URL</string>
+    <string name="settings_http_proxy_error_text1">Port range should be from 1024–65535</string>
+    <string name="settings_http_proxy_error_text2">Invalid port</string>
+    <string name="settings_http_proxy_error_text3">Hostname is empty</string>
+    <string name="settings_http_proxy_error_text4">Host connection failed. Try again.</string>
+    <string name="settings_http_proxy_toast_success">HTTP proxy is set</string>
+
+    <string name="settings_http_proxy_hostname">Hostname</string>
+    <string name="settings_http_proxy_port">Port</string>
+
+    <string name="settings_dns_proxy_dialog_header_socks5">Set SOCKS5 (TCP) Proxy</string>
+
+    <string name="settings_dns_proxy_dialog_header">Set SOCKS5 (TCP) Proxy</string>
+    <string name="settings_dns_proxy_dialog_app">App</string>
+    <string name="settings_dns_proxy_dialog_hostname">Hostname</string>
+    <string name="settings_dns_proxy_dialog_port_number">Port Number</string>
+    <string name="settings_dns_proxy_dialog_username">Username</string>
+    <string name="settings_dns_proxy_dialog_password">Password</string>
+    <string name="settings_dns_proxy_dialog_positive_btn">set</string>
+    <string name="settings_dns_proxy_dialog_negative_btn">cancel</string>
+
+    <string name="settings_app_list_default_app">Nobody</string>
+
+    <string name="settings_socks_forwarding_desc">Forwarding to %1$s:%2$s, %3$s</string>
+    <string name="settings_socks_forwarding_default_desc">Forward connections to SOCKS5 endpoint.</string>
+
+    <string name="settings_socks5_dialog_hint_ip">IP Address</string>
+    <string name="settings_socks5_dialog_hint_port">Port</string>
+    <string name="settings_socks5_dialog_hint_username">Username (optional)</string>
+    <string name="settings_socks5_dialog_hint_password">Password (optional)</string>
+
+
+    <string name="settings_theme_dialog_title">Appearance</string>
+    <string name="settings_theme_dialog_themes_1">Set by System</string>
+    <string name="settings_theme_dialog_themes_2">Light</string>
+    <string name="settings_theme_dialog_themes_3">Dark</string>
+
+    <string name="settings_selected_theme">Current theme: %1$s</string>
 
     <!-- FirewallAppFragment -->
     <string name="apps_icon_content_desc">Application Icon</string>
@@ -619,6 +593,247 @@
     <string name="ct_bs_rule_1">Rule #1</string>
     <string name="ct_bs_rule_2">Rule #2</string>
 
+    <!-- Home screen -->
+    <string name="firewall_card_status_inactive">Disabled</string>
+    <string name="firewall_card_status_active">%1$s apps blocked</string>
+
+    <string name="firewall_card_text_active">%1$s whitelisted, %2$s excluded.</string>
+    <string name="firewall_card_text_inactive">Enable firewall mode.</string>
+    <string name="firewall_card_configure_btn">All apps</string>
+    <string name="firewall_card_view_logs_btn">View logs</string>
+
+    <string name="dns_card_connected_status_failure">Disabled</string>
+
+    <string name="dns_card_latency_active">Latency: %1$sms</string>
+    <string name="dns_card_latency_inactive">Enable DNS mode.</string>
+    <string name="dns_card_configure_btn">Configure</string>
+
+    <string name="hsf_start_btn_state">start</string>
+    <string name="hsf_stop_btn_state">stop</string>
+
+    <string name="hsf_uptime">(%1$s)</string>
+
+    <string name="hsf_vpn_dialog_header">Attention!</string>
+    <string name="hsf_vpn_dialog_message">RethinkDNS needs permission to set up a local VPN to encrypt the device\'s DNS requests, implement a network monitor, and enforce firewall rules. \n\nRethinkDNS does not collect any information or spy on you in any way.</string>
+    <string name="hsf_vpn_dialog_positive">Proceed</string>
+    <string name="hsf_vpn_dialog_negative">Cancel</string>
+
+    <string name="hsf_start_dialog_header">Start %1$s</string>
+    <string name="hsf_start_dialog_message">You are one step away from safe and secure Android: Instantly see network activity, block websites, IPs, and badly behaving apps.</string>
+    <string name="hsf_start_dialog_positive">Start</string>
+    <string name="hsf_start_dialog_negative">Dismiss</string>
+
+    <!-- Web view configure -->
+    <string name="webview_configure_dialog_positive">Quit</string>
+    <string name="webview_configure_dialog_negative">Cancel</string>
+    <string name="webview_configure_dialog_neutral">Reload</string>
+    <string name="webview_toast_configure_success">Configured URL has been updated successfully</string>
+
+    <!-- DNS logs screen -->
+    <string name="dns_logs_lifetime_queries">Lifetime queries: %1$s</string>
+    <string name="dns_logs_blocked_queries">Blocked queries: %1$s</string>
+
+    <!-- About fragment -->
+    <string name="about_bravedns_explantion">RethinkDNS is the easiest way to monitor app activity, circumvent Internet censorship, and firewall apps on your Android device. </string>
+    <string name="about_bravedns_whoarewe">RethinkDNS is a free and open-source project, led by ex-engineers from Amazon, IBM, and Scientific Games.</string>
+    <string name="about_bravedns_toreport_text">to report bugs and suggest features.</string>
+    <string name="about_join_telegram">Join the RethinkDNS group on Telegram</string>
+    <string name="about_web">links</string>
+    <string name="about_website">Visit rethinkdns.com</string>
+    <string name="about_github">Contribute on GitHub</string>
+    <string name="about_faq">View FAQs</string>
+    <string name="about_blog">Read our blog</string>
+    <string name="about_connect">contact</string>
+    <string name="about_app">app</string>
+    <string name="about_email">Email us</string>
+    <string name="about_whats_new">What\'s new in %1$s</string>
+    <string name="about_twitter">Follow us on Twitter</string>
+    <string name="about_mozilla">RethinkDNS is part of Mozilla Builders MVP program.</string>
+    <string name="about_app_update_check">Check for app updates</string>
+    <string name="about_dialog_positive_button">Let\'s Go</string>
+    <string name="about_mail_to">mailto:hello@celzero.com</string>
+    <string name="about_mail_subject">[RethinkDNS]:</string>
+    <string name="about_telegram_link">http://www.telegram.me/rethinkdns</string>
+    <string name="about_blog_link">https://blog.rethinkdns.com/</string>
+    <string name="about_faq_link">https://www.bravedns.com/faq</string>
+    <string name="about_github_link">https://github.com/celzero/rethink-app</string>
+    <string name="about_twitter_handle">https://twitter.com/rethinkdns</string>
+    <string name="about_website_link">https://www.bravedns.com/</string>
+    <string name="about_mozilla_alumni_link">https://builders.mozilla.community/alumni.html</string>
+    <string name="about_version">v%1$s</string>
+    <string name="about_version_install_source">v%1$s (%2$s)</string>
+    <string name="about_dialog_neutral_button">Suggest features</string>
+
+    <!-- Configure DNS Fragment string == cd -->
+    <string name="cd_dns_type_spinner_tooltip">Select DNS</string>
+    <string name="cd_dns_crypt_title">resolvers</string>
+    <string name="cd_dns_crypt_relay_title">relays</string>
+    <string name="cd_fab_add_button">Custom DNS</string>
+    <string name="cd_custom_doh_dialog_title">Custom Server URL</string>
+    <string name="cd_custom_doh_url_name">DoH %1$s</string>
+    <string name="cd_custom_dns_proxy_title">Custom DNS Proxy</string>
+    <string name="cd_custom_dns_proxy_name">Proxy %1$s</string>
+    <string name="cd_custom_dns_proxy_default_ip">127.0.0.1</string>
+    <string name="cd_custom_dns_proxy_default_app">Nobody</string>
+    <string name="cd_dns_proxy_mode_internal">Internal</string>
+    <string name="cd_dns_proxy_mode_external">External</string>
+    <string name="cd_dns_proxy_error_text_1">Invalid IP address</string>
+    <string name="cd_dns_proxy_error_text_2">Port range should be from 1024–65535</string>
+    <string name="cd_dns_proxy_error_text_3">Invalid port</string>
+    <string name="cd_dns_crypt_dialog_title">Add DNSCrypt Resolver or Relay</string>
+    <string name="cd_dns_crypt_name">DNSCrypt %1$s</string>
+    <string name="cd_dns_crypt_relay_name">DNSRelay %1$s</string>
+
+    <string name="cd_dns_crypt_dialog_heading">Add DNSCrypt Resolver or Relay</string>
+    <string name="cd_dns_crypt_resolver_heading">Resolver</string>
+    <string name="cd_dns_crypt_relay_heading">Relay</string>
+    <string name="cd_dns_crypt_dialog_name">Name</string>
+    <string name="cd_dns_crypt_dialog_stamp">Stamp</string>
+    <string name="cd_dns_crypt_dialog_desc">Description (optional)</string>
+    <string name="cd_dialog_positive_btn">add</string>
+    <string name="cd_dialog_negative_btn">cancel</string>
+
+    <string name="cd_doh_dialog_heading">Add DNS over HTTPS</string>
+    <string name="cd_doh_dialog_resolver_name">Resolver Name</string>
+    <string name="cd_doh_dialog_resolver_url">Resolver URL</string>
+
+    <!-- Connection Tracker fragment string -->
+    <string name="ct_delete_logs_positive_btn">Delete logs</string>
+    <string name="ct_delete_logs_negative_btn">Cancel</string>
+    <string name="ct_filter_dialog_title">Select filter</string>
+
+    <string name="ct_app_details">%1$s blocked, %2$s whitelisted, %3$s excluded.</string>
+
+    <!-- Connection tracker bottom sheet fragment string -->
+    <string name="ctbs_app_info_not_available_toast">App Info not available</string>
+    <string name="ctbs_unknown_app">Unknown</string>
+    <string name="ctbs_app_other_apps">%1$s + %2$s other apps</string>
+    <string name="ctbs_app_other_app">%1$s + %2$s other app</string>
+    <string name="ctbs_rule_5">Rule #5</string>
+    <string name="ctbs_whitelisted">Whitelisted</string>
+    <string name="ctbs_unblocked_app">Unblocked %1$s</string>
+    <string name="ctbs_block_connections">Blocking all connections to %1$s</string>
+    <string name="ctbs_block_other_apps">Blocking %1$s will also block these %2$s other apps</string>
+    <string name="ctbs_block_other_apps_positive_text">Block %1$s apps</string>
+    <string name="ctbs_unblock_other_apps">Unblocking %1$s will also unblock these %2$s other apps</string>
+    <string name="ctbs_unblock_other_apps_positive_text">Unblock %1$s apps</string>
+    <string name="ctbs_clear_rules_desc">Clearing rules for %1$s will also clear rules for these %2$s other apps"</string>
+    <string name="ctbs_clear_rules_positive_text">Clear rules</string>
+    <string name="ctbs_clear_rules_dialog_positive">Clear</string>
+    <string name="ctbs_clear_rules_dialog_negative">Cancel</string>
+    <string name="ctbs_dialog_negative_btn">Go Back</string>
+
+    <!-- DNS Configure web view activity -->
+    <string name="wv_local_blocklist_toast">Local blocklists updated successfully</string>
+
+    <!-- DNS Log fragment -->
+    <string name="dns_log_dialog_title">Select filter</string>
+    <string name="dns_log_dialog_positive">Delete logs</string>
+    <string name="dns_log_dialog_negative">Cancel</string>
+
+    <string name="dns_btm_sheet_header">Blocklists</string>
+
+    <!-- Excluded app dialog -->
+    <string name="ex_dialog_count">%1$s/%2$s apps excluded.</string>
+    <string name="ex_dialog_header">Exclude app from DNS and Firewall</string>
+    <string name="ex_dialog_button">Go back</string>
+    <string name="ex_select_all">select all</string>
+
+    <string name="search_hint">Search by app name</string>
+
+    <!-- Home Screen activity -->
+    <string name="hs_download_positive_default">ok</string>
+    <string name="hs_download_positive_play_store">Complete Update</string>
+    <string name="hs_download_positive_website">Visit website</string>
+
+    <string name="hs_download_negative_default">Remind me later</string>
+
+    <string name="hs_snack_bar_blocklist_message">Update custom blocklist files</string>
+
+    <string name="hs_download_blocklist_heading">RethinkDNS Blocklists</string>
+    <string name="hs_download_blocklist_desc">%1$s download in progress..</string>
+
+    <!-- Whitelist dialog -->
+    <string name="whitelist_dialog_apps_in_use">%1$s/%2$s apps whitelisted.</string>
+    <string name="whitelist_toast_positive">Selected apps added to whitelist</string>
+    <string name="whitelist_toast_negative">Selected apps removed from whitelist</string>
 
 
+    <!-- Universal Firewall-->
+    <string name="univ_firewall_rule_1">Block all apps when device is locked</string>
+    <string name="univ_firewall_rule_2">Block any app not in use (experimental)</string>
+    <string name="univ_firewall_rule_3">Block connections when source app is unknown</string>
+    <string name="univ_firewall_rule_4">Block all UDP traffic except DNS</string>
+
+    <string name="univ_block_unknown_connections">Block connections when source app is unknown</string>
+
+    <string name="univ_whitelist_heading">Whitelist Apps</string>
+
+    <string name="univ_view_blocked_ip">View Blocked IPs</string>
+
+    <string name="univ_ip_delete_individual_positive">Delete</string>
+    <string name="univ_ip_delete_individual_negative">Cancel</string>
+    <string name="univ_ip_delete_individual_toast">%1$s unblocked.</string>
+    <string name="univ_ip_delete_dialog_positive">Delete all</string>
+    <string name="univ_ip_delete_dialog_negative">Cancel</string>
+    <string name="univ_ip_delete_toast_success">Deleted all IP rules.</string>
+    <string name="univ_ip_no_rules_set">No IP rules set</string>
+    <string name="univ_delete_firewall_dialog_title">Delete all IP Rules?</string>
+    <string name="univ_delete_firewall_dialog_message">Deleting these rules would allow any application to connect to the currently blocked IPs.</string>
+    <string name="univ_ip_delete_btn">delete</string>
+
+
+    <string name="univ_accessibility_crash_dialog_positive">Goto Settings</string>
+    <string name="univ_accessibility_crash_dialog_negative">Cancel</string>
+    <string name="univ_accessibility_dialog_positive">Grant</string>
+    <string name="univ_accessibility_dialog_negative">Deny</string>
+
+    <!-- Connection tracker adapter -->
+    <string name="ct_app_name">%1$s + %2$s other app</string>
+    <string name="ct_app_names">%1$s + %2$s other apps</string>
+
+    <!-- DNS adapters -->
+    <string name="dns_connected_rethink_plus">Connected. %1$s blocklists in-use</string>
+    <string name="dns_connected_rethink_configure">configure</string>
+    <string name="dns_connected">Connected</string>
+    <string name="dns_delete_positive">Delete</string>
+    <string name="dns_delete_negative">Cancel</string>
+
+    <string name="dns_info_positive">Ok</string>
+    <string name="dns_info_neutral">Copy</string>
+
+    <string name="dns_select_toast">Atleast one resolver should be selected.</string>
+    <string name="dns_crypt_relay_error_toast">No resolver selected</string>
+
+    <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
+    <string name="dns_proxy_dialog_message">AppName: %1$s\n\nURL: %2$s\n\nPort: %3$s</string>
+
+    <string name="dns_query_latency">%1$sms</string>
+
+    <string name="exclude_app_desc">Excluding "%1$s" will also exclude these %2$s apps</string>
+    <string name="unexclude_app_desc">Unexcluding "%1$s" will also unexclude these %2$s apps</string>
+
+    <string name="exclude_app_dialog_positive">Exclude %1$s apps</string>
+    <string name="unexclude_app_dialog_positive">Unexclude %1$s apps</string>
+
+    <!-- whitelist -->
+    <string name="whitelist_add_app">Adding "%1$s" to the whitelist will also add these %2$s apps</string>
+    <string name="whitelist_remove_app">Removing "%1$s" from the whitelist will also remove these %2$s apps</string>
+    <string name="whitelist_add_positive">Add %1$s apps</string>
+    <string name="whitelist_add_negative">Remove %1$s apps</string>
+
+    <string name="whitelist_heading">Whitelist Applications</string>
+    <string name="whitelist_select_all">select all</string>
+    <string name="whitelist_button">Go back</string>
+
+    <string name="dns_proxy_dialog_header_dns">Add DNS Proxy</string>
+    <string name="dns_proxy_name">Proxy Name</string>
+    <string name="dns_proxy_app">App</string>
+    <string name="dns_proxy_ip_address">IP Address</string>
+    <string name="dns_proxy_port">Port Number</string>
+    <string name="dns_proxy_negative_btn">cancel</string>
+    <string name="dns_proxy_positive_btn">add</string>
+    <!-- Firewall -->
+    <string name="firewall_toggle_unblocked">Unblocked</string>
+    <string name="firewall_toggle_blocked">Blocked</string>
 </resources>

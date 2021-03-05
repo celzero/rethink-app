@@ -6,12 +6,10 @@
     android:orientation="vertical">
 
     <TextView
-        style="@style/ActionItem"
-        android:layout_width="match_parent"
+        android:layout_gravity="center"
+        android:layout_width="60dp"
         android:layout_height="3dp"
-        android:layout_marginLeft="40dp"
         android:layout_marginTop="10dp"
-        android:layout_marginRight="40dp"
         android:layout_marginBottom="40dp"
         android:background="@color/recycler_selected" />
 
@@ -28,8 +26,7 @@
                 android:id="@+id/parent_btm_sheet"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:text="List" />
+                android:padding="10dp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/ip_app_recyclerview"

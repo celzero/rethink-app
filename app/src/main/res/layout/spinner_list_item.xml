@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="10dp"
+    android:background="@null"
     tools:ignore="UseCompoundDrawables">
 
     <ImageView

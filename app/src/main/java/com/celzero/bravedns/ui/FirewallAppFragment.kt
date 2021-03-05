@@ -17,17 +17,16 @@ package com.celzero.bravedns.ui
 
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication
 import com.celzero.bravedns.adapter.FirewallAppListAdapter
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.CategoryInfo
@@ -71,13 +70,10 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
         b.firewallExpandableList.setAdapter(adapterList)
 
         b.firewallExpandableList.setOnGroupClickListener { _, _, _, _ ->
-            //setListViewHeight(expandableListView, i);
             false
         }
 
-        b.firewallExpandableList.setOnGroupExpandListener {
-            //listData[titleList!![it]]!!.sortBy { it.isInternetAllowed }
-        }
+        b.firewallExpandableList.setOnGroupExpandListener {}
         b.firewallUpdateProgress.visibility = View.VISIBLE
 
         b.firewallCategorySearch.setOnQueryTextListener(this)
@@ -94,22 +90,17 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
             b.firewallCategorySearch.onActionViewExpanded()
         }
 
-        b.firewallCategoryShowTxt.setOnClickListener {
-            if (!categoryState) {
-                categoryState = true
-                b.firewallExpandableList.visibility = View.VISIBLE
-                b.firewallCategoryShowTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(requireContext(), R.drawable.ic_keyboard_arrow_up_gray_24dp), null)
-            } else {
-                b.firewallExpandableList.visibility = View.GONE
-                b.firewallCategoryShowTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(requireContext(), R.drawable.ic_keyboard_arrow_down_gray_24dp), null)
-                categoryState = false
-            }
-        }
-
         b.firewallAppRefreshList.setOnClickListener {
             b.firewallAppRefreshList.isEnabled = false
             refreshDatabase()
-            Handler().postDelayed({ b.firewallAppRefreshList.isEnabled = true }, 4000)
+            object : CountDownTimer(1000, 4000) {
+                override fun onTick(millisUntilFinished: Long) {
+                }
+
+                override fun onFinish() {
+                    b.firewallAppRefreshList.isEnabled = true
+                }
+            }.start()
         }
     }
 
@@ -129,19 +120,18 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
             override fun onFinish() {
                 if (isAdded) {
                     b.firewallAppRefreshList.clearAnimation()
-                    if (RethinkDNSApplication.context != null) {
-                        Utilities.showToastInMidLayout(RethinkDNSApplication.context!!, getString(R.string.refresh_complete), Toast.LENGTH_SHORT)
+                    if (RethinkDnsApplication.context != null) {
+                        Utilities.showToastInMidLayout(RethinkDnsApplication.context!!, getString(R.string.refresh_complete), Toast.LENGTH_SHORT)
                     }
                 }
             }
         }.start()
+
         refreshDatabase.refreshAppInfoDatabase()
         refreshDatabase.updateCategoryInDB()
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        //(adapterList as FirewallAppListAdapter).filterData(query!!)
-        if (DEBUG) Log.d(LOG_TAG, "Category block onQueryTextSubmit: ${isSearchEnabled}, $query")
         if (isSearchEnabled) {
             object : CountDownTimer(500, 1000) {
                 override fun onTick(millisUntilFinished: Long) {}
@@ -150,6 +140,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
                     if (DEBUG) Log.d(LOG_TAG, "Category block onQueryTextSubmit final: ${isSearchEnabled}, $query")
                     firewallAppInfoViewModel.setFilter(query)
                     if (query.isNullOrEmpty()) {
+                        if(DEBUG) Log.d(LOG_TAG, "Search bar empty  ${firewallAppInfoViewModel.firewallAppDetailsList.value?.size}")
                         var i = 0
                         titleList!!.forEach { _ ->
                             b.firewallExpandableList.collapseGroup(i)
@@ -172,13 +163,10 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
 
 
         }
-        //observersForUI("%$query%")
         return false
     }
 
     override fun onQueryTextChange(query: String?): Boolean {
-        //(adapterList as FirewallAppListAdapter).filterData(query!!)
-        //observersForUI("%$query%")
         if (DEBUG) Log.d(LOG_TAG, "Category block onQueryTextChange : ${isSearchEnabled}, $query")
         if (isSearchEnabled) {
             object : CountDownTimer(500, 1000) {
@@ -186,17 +174,16 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
                 }
 
                 override fun onFinish() {
-                    if (DEBUG) Log.d(LOG_TAG, "Category block onQueryTextChange final: ${isSearchEnabled}, $query")
                     firewallAppInfoViewModel.setFilter(query)
                     if (query.isNullOrEmpty()) {
                         var i = 0
+                        if(DEBUG) Log.d(LOG_TAG, "Search bar empty  ${firewallAppInfoViewModel.firewallAppDetailsList.value?.size}")
                         titleList!!.forEach { _ ->
                             b.firewallExpandableList.collapseGroup(i)
                             i += 1
                         }
 
                     } else {
-                        //var i = 0
                         if (titleList!!.size > 0) {
 
                             for (i in titleList!!.indices) {
@@ -228,25 +215,27 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
         })
 
         firewallAppInfoViewModel.firewallAppDetailsList.observe(viewLifecycleOwner) { itAppInfo ->
-            isSearchEnabled = false
             val list = itAppInfo!!
-            titleList = categoryInfoRepository.getAppCategoryList().toMutableList()
-            val iterator = titleList!!.iterator()
-            while (iterator.hasNext()) {
-                val item = iterator.next()
-                if (DEBUG) Log.d(LOG_TAG, "Category : ${item.categoryName}, ${item.numberOFApps}, ${item.numOfAppsBlocked}, ${item.isInternetBlocked}")
-                val appList = list.filter { a -> a.appCategory == item.categoryName }
-                //val count = categoryList.filter { a -> !a.isInternetAllowed }
-                if (appList.isNotEmpty()) {
-                    listData[item] = appList as java.util.ArrayList<AppInfo>
-                } else {
-                    iterator.remove()
+            if(isSearchEnabled){
+                titleList = categoryInfoRepository.getAppCategoryList().toMutableList()
+                isSearchEnabled = false
+            }
+            val iterator = titleList?.iterator()
+            if(iterator != null) {
+                while (iterator.hasNext()) {
+                    val item = iterator.next()
+                    if (DEBUG) Log.d(LOG_TAG, "Category : ${item.categoryName}, ${item.numberOFApps}, ${item.numOfAppsBlocked}, ${item.isInternetBlocked}")
+                    val appList = list.filter { a -> a.appCategory == item.categoryName }
+                    if (appList.isNotEmpty()) {
+                        listData[item] = appList as java.util.ArrayList<AppInfo>
+                    } else {
+                        iterator.remove()
+                    }
                 }
             }
 
-
             if (adapterList != null) {
-                (adapterList as FirewallAppListAdapter).updateData(titleList!!, listData, list as ArrayList<AppInfo>)
+                (adapterList as FirewallAppListAdapter).updateData(titleList!!, listData)
                 b.firewallUpdateProgress.visibility = View.GONE
                 b.firewallExpandableList.visibility = View.VISIBLE
             } else {

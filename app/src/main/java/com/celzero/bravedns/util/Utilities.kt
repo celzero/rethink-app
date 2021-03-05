@@ -143,7 +143,10 @@ class Utilities {
             val enabledServices = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
             for (enabledService in enabledServices) {
                 val enabledServiceInfo: ServiceInfo = enabledService.resolveInfo.serviceInfo
-                if (enabledServiceInfo.packageName == context.packageName && enabledServiceInfo.name == service.name) return true
+                if(DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled checking for: ${enabledServiceInfo.packageName}")
+                if (enabledServiceInfo.packageName == context.packageName && enabledServiceInfo.name == service.name){
+                    return true
+                }
             }
             if(DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled failure: ${context.packageName},  ${service.name}, return size: ${enabledServices.size}")
             return false
@@ -159,10 +162,15 @@ class Utilities {
                 while (colonSplitter.hasNext()) {
                     val componentNameString = colonSplitter.next()
                     val enabledService = ComponentName.unflattenFromString(componentNameString)
-                    if (enabledService != null && enabledService == expectedComponentName) return true
+                    if (enabledService != null && enabledService == expectedComponentName) {
+                        if(DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled Enhanced: ${expectedComponentName.packageName}")
+                        return true
+                    }
                 }
+                if(DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled Enhanced: failed calling isAccessibilityServiceEnabled()")
                 return isAccessibilityServiceEnabled(context, accessibilityService)
             }catch (e: Exception){
+                if(DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled Exception: failed calling isAccessibilityServiceEnabled() ${e.message}")
                 return isAccessibilityServiceEnabled(context, accessibilityService)
             }
         }
@@ -248,11 +256,11 @@ class Utilities {
 
         fun showToastInMidLayout(context: Context, message: String, toastLength: Int){
             try {
-                val toast = Toast.makeText(context, message, toastLength)
+                val toast = Toast.makeText(context.applicationContext, message, toastLength)
                 toast.setGravity(Gravity.CENTER, 0, 0)
                 toast.show()
             }catch (e: java.lang.IllegalStateException){
-                Log.w(LOG_TAG,"Show Toast issue : ${e.message}",e)
+                Log.w(LOG_TAG, "Show Toast issue : ${e.message}", e)
             }
         }
 
@@ -318,24 +326,6 @@ class Utilities {
             }
         }
 
-        /**
-         * Clean up the folder which had the old download files.
-         * This was introduced in v053, before that the files downloaded as part of blocklists
-         * are stored in external files dir by the DownloadManager and moved to canonicalPath.
-         * Now in v053 we are moving the files from external dir to canonical path.
-         * So deleting the old files in the external directory.
-         */
-        fun deleteOldFiles(context : Context){
-            val dir = File(context.getExternalFilesDir(null).toString() + Constants.DOWNLOAD_PATH)
-            if (dir.isDirectory) {
-                val children = dir.list()
-                if(children != null && children.isNotEmpty()) {
-                    for (i in children.indices) {
-                        File(dir, children[i]).delete()
-                    }
-                }
-            }
-        }
 
     }
 }

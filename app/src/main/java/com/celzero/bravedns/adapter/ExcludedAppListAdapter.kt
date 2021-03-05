@@ -35,6 +35,7 @@ import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.databinding.ExcludedAppListItemBinding
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.ThrowingHandler
 import kotlinx.coroutines.Dispatchers
@@ -44,9 +45,10 @@ import kotlinx.coroutines.launch
 class ExcludedAppListAdapter(private val context: Context, private val appInfoRepository: AppInfoRepository, private val categoryInfoRepository: CategoryInfoRepository) : PagedListAdapter<AppInfo, ExcludedAppListAdapter.ExcludedAppInfoViewHolder>(DIFF_CALLBACK) {
 
     companion object {
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<AppInfo>() {
-            // Concert details may have changed if reloaded from the database,
-            // but ID is fixed.
+
+        private val DIFF_CALLBACK = object :
+            DiffUtil.ItemCallback<AppInfo>() {
+
             override fun areItemsTheSame(oldConnection: AppInfo, newConnection: AppInfo) = oldConnection.packageInfo == newConnection.packageInfo
 
             override fun areContentsTheSame(oldConnection: AppInfo, newConnection: AppInfo) = oldConnection == newConnection
@@ -70,14 +72,21 @@ class ExcludedAppListAdapter(private val context: Context, private val appInfoRe
             b.excludedAppListApkLabelTv.text = appInfo.appName
             b.excludedAppListCheckbox.isChecked = appInfo.isExcluded
             try {
-                //val icon = context.packageManager.getApplicationIcon(appInfo.packageInfo)
-                //appIcon.setImageDrawable(icon)
-                Glide.with(context).load(context.packageManager.getApplicationIcon(appInfo.packageInfo)).into(b.excludedAppListApkIconIv)
+                if(!appInfo.packageInfo.contains(Constants.APP_NON_APP) || appInfo.appName != Constants.UNKNOWN_APP){
+                  Glide.with(context).load(context.packageManager.getApplicationIcon(appInfo.packageInfo)).into(b.excludedAppListApkIconIv)
+                }else{
+                        Glide.with(context)
+                            .load(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
+                            .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                            .into(b.excludedAppListApkIconIv)
+                    }
+
             } catch (e: Exception) {
                 //appIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
                 Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.excludedAppListApkIconIv)
                 Log.e(LOG_TAG, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message, e)
             }
+
 
             b.excludedAppListContainer.setOnClickListener {
                 if (DEBUG) Log.d(LOG_TAG, "parentView- whitelist - ${appInfo.appName},${appInfo.isExcluded}")
@@ -112,8 +121,7 @@ class ExcludedAppListAdapter(private val context: Context, private val appInfoRe
                     categoryInfoRepository.updateExcludedCount(appInfo.appCategory, excludedCount)
                     categoryInfoRepository.updateWhitelistCount(appInfo.appCategory, whitelistCount)
                 }
-                //excludedAppsFromVPN[appInfo.packageInfo] = status
-                if (DEBUG) Log.d(LOG_TAG, "Apps excluded - ${appInfo.appName}, $status")
+                if(DEBUG) Log.d(LOG_TAG,"Apps excluded - ${appInfo.appName}, $status")
             } else {
                 b.excludedAppListCheckbox.isChecked = !status
                 appInfo.isExcluded = !status
@@ -126,42 +134,35 @@ class ExcludedAppListAdapter(private val context: Context, private val appInfoRe
             val handler: Handler = ThrowingHandler()
             var positiveTxt = ""
             val packageNameList: List<String> = packageList.map { it.appName }
-            var proceedBlocking: Boolean = false
+            var proceedBlocking = false
 
             val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
 
             builderSingle.setIcon(R.drawable.ic_exclude_app)
             if (isInternet) {
-                builderSingle.setTitle("Excluding \"$appName\" will also exclude these ${packageList.size} apps")
-                positiveTxt = "Exclude ${packageList.size} apps"
+                builderSingle.setTitle(context.getString(R.string.exclude_app_desc, appName, packageList.size.toString()))
+                positiveTxt = context.getString(R.string.exclude_app_dialog_positive, packageList.size.toString())
             } else {
-                builderSingle.setTitle("Unexcluding \"$appName\" will also unexclude these ${packageList.size} apps")
-                positiveTxt = "Unexclude ${packageList.size} apps"
+                builderSingle.setTitle(context.getString(R.string.unexclude_app_desc, appName, packageList.size.toString()))
+                positiveTxt = context.getString(R.string.unexclude_app_dialog_positive, packageList.size.toString())
             }
             val arrayAdapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_activated_1)
             arrayAdapter.addAll(packageNameList)
             builderSingle.setCancelable(false)
-            //builderSingle.setSingleChoiceItems(arrayAdapter,-1,({dialogInterface: DialogInterface, which : Int ->}))
+
             builderSingle.setItems(packageNameList.toTypedArray(), null)
 
 
-            /* builderSingle.setAdapter(arrayAdapter) { dialogInterface, which ->
-                  if(DEBUG) Log.d(LOG_TAG,"OnClick")
-                 //dialogInterface.cancel()
-                 //builderSingle.setCancelable(false)
-             }*/
-            /*val alertDialog : AlertDialog = builderSingle.create()
-            alertDialog.getListView().setOnItemClickListener({ adapterView, subview, i, l -> })*/
-            builderSingle.setPositiveButton(positiveTxt) { dialogInterface: DialogInterface, i: Int ->
+            builderSingle.setPositiveButton(positiveTxt) { _: DialogInterface, _: Int ->
                 proceedBlocking = true
                 handler.sendMessage(handler.obtainMessage())
-            }.setNeutralButton("Go Back") { dialogInterface: DialogInterface, i: Int ->
+            }.setNeutralButton(context.getString(R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int ->
                 handler.sendMessage(handler.obtainMessage())
                 proceedBlocking = false
             }
 
             val alertDialog: AlertDialog = builderSingle.show()
-            alertDialog.listView.setOnItemClickListener { adapterView, subview, i, l -> }
+            alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
             alertDialog.setCancelable(false)
             try {
                 Looper.loop()
