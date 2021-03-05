@@ -23,7 +23,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:text="Add DNSCrypt Resolver or Relay"
+                android:text="@string/cd_dns_crypt_dialog_heading"
                 android:textSize="@dimen/large_font_text_view"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -42,7 +42,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
-                    android:text="Resolver"
+                    android:text="@string/cd_dns_crypt_resolver_heading"
                     android:textSize="@dimen/large_font_text_view" />
 
                 <com.google.android.material.radiobutton.MaterialRadioButton
@@ -50,7 +50,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:text="Relay"
+                    android:text="@string/cd_dns_crypt_relay_heading"
                     android:textSize="@dimen/large_font_text_view" />
             </RadioGroup>
 
@@ -58,7 +58,8 @@
                 android:id="@+id/text_input_layout1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Name"
+                android:hint="@string/cd_dns_crypt_dialog_name"
+                app:hintTextColor="?attr/accentGood"
                 app:layout_constraintTop_toBottomOf="@id/dialog_dns_proxy_radio_group">
 
                 <EditText
@@ -74,7 +75,8 @@
                 android:id="@+id/text_input_layout2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Stamp"
+                android:hint="@string/cd_dns_crypt_dialog_stamp"
+                app:hintTextColor="?attr/accentGood"
                 app:layout_constraintTop_toBottomOf="@id/text_input_layout1">
 
                 <EditText
@@ -88,7 +90,8 @@
                 android:id="@+id/text_input_layout3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Description (optional)"
+                android:hint="@string/cd_dns_crypt_dialog_desc"
+                app:hintTextColor="?attr/accentGood"
                 app:layout_constraintTop_toBottomOf="@id/text_input_layout2">
 
                 <EditText
@@ -106,6 +109,7 @@
                 android:layout_height="wrap_content"
                 android:padding="2dp"
                 android:textSize="@dimen/default_font_text_view"
+                android:textColor="@color/colorRed_A400"
                 app:layout_constraintTop_toBottomOf="@id/text_input_layout3" />
 
         </LinearLayout>
@@ -114,17 +118,19 @@
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/dialog_dns_crypt_ok_btn"
         style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+        android:textColor="?attr/accentBad"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
-        android:text="Add"
+        android:text="@string/cd_dialog_positive_btn"
         android:textSize="@dimen/large_font_text_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_dns_crypt_scroll" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/dialog_dns_crypt_cancel_btn"
+        android:textColor="?attr/accentBad"
         style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -132,7 +138,7 @@
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         android:gravity="center"
-        android:text="Cancel"
+        android:text="@string/cd_dialog_negative_btn"
         android:textSize="@dimen/large_font_text_view"
         app:layout_constraintEnd_toStartOf="@id/dialog_dns_crypt_ok_btn"
         app:layout_constraintTop_toBottomOf="@id/dialog_dns_crypt_scroll" />

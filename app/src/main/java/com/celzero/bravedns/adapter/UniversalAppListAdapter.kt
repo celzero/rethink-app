@@ -50,10 +50,12 @@ import kotlinx.coroutines.launch
 class UniversalAppListAdapter(private val context: Context, private val appInfoRepository: AppInfoRepository, private val categoryInfoRepository: CategoryInfoRepository, private val persistentState: PersistentState) : PagedListAdapter<AppInfo, UniversalAppListAdapter.UniversalAppInfoViewHolder>(DIFF_CALLBACK) {
 
     companion object {
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<AppInfo>() {
-            // Concert details may have changed if reloaded from the database,
-            // but ID is fixed.
-            override fun areItemsTheSame(oldConnection: AppInfo, newConnection: AppInfo) = oldConnection.packageInfo == newConnection.packageInfo
+
+        private val DIFF_CALLBACK = object :
+            DiffUtil.ItemCallback<AppInfo>() {
+
+            override fun areItemsTheSame(oldConnection: AppInfo, newConnection: AppInfo)
+                = oldConnection.packageInfo == newConnection.packageInfo
 
             override fun areContentsTheSame(oldConnection: AppInfo, newConnection: AppInfo) = oldConnection == newConnection
         }
@@ -116,16 +118,12 @@ class UniversalAppListAdapter(private val context: Context, private val appInfoR
             val status = appInfo.whiteListUniv1
             appWhiteList[appInfo.uid] = status
             val appUIDList = appInfoRepository.getAppListForUID(appInfo.uid)
-            val blockAllApps: Boolean
-            blockAllApps = if (appUIDList.size > 1) {
-                showDialog(appUIDList, appInfo.appName, status)
-            } else {
-                true
-                /* if (status) {
-                                 Toast.makeText(context, "${appInfo.appName} removed from whitelist", Toast.LENGTH_SHORT).show()
-                             } else {
-                                 Toast.makeText(context, "${appInfo.appName} added to whitelist", Toast.LENGTH_SHORT).show()
-                             }*/
+
+            var blockAllApps = false
+            if (appUIDList.size > 1) {
+                blockAllApps = showDialog(appUIDList, appInfo.appName, status)
+            }else{
+                blockAllApps = true
             }
             if (blockAllApps) {
                 b.univWhitelistCheckbox.isChecked = status
@@ -167,30 +165,21 @@ class UniversalAppListAdapter(private val context: Context, private val appInfoR
                     appNameEllipsis = appNameEllipsis.substring(0, 10)
                     appNameEllipsis = "$appNameEllipsis..."
                 }
-                builderSingle.setTitle("Adding \"$appNameEllipsis\" to the whitelist will also add these ${packageList.size} apps")
-                positiveTxt = "Add ${packageList.size} apps"
+                builderSingle.setTitle(context.getString(R.string.whitelist_add_app, appNameEllipsis, packageList.size.toString()))
+                positiveTxt = context.getString(R.string.whitelist_add_positive, packageList.size.toString())
             } else {
-                builderSingle.setTitle("Removing  \"$appNameEllipsis\" from the whitelist will also remove these ${packageList.size} apps")
-                positiveTxt = "Remove ${packageList.size} apps"
+                builderSingle.setTitle(context.getString(R.string.whitelist_remove_app, appNameEllipsis, packageList.size.toString()))
+                positiveTxt = context.getString(R.string.whitelist_add_negative, packageList.size.toString())
             }
             val arrayAdapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_activated_1)
             arrayAdapter.addAll(packageNameList)
             builderSingle.setCancelable(false)
-            //builderSingle.setSingleChoiceItems(arrayAdapter,-1,({dialogInterface: DialogInterface, which : Int ->}))
             builderSingle.setItems(packageNameList.toTypedArray(), null)
 
-
-            /* builderSingle.setAdapter(arrayAdapter) { dialogInterface, which ->
-                  Log.d(LOG_TAG,"OnClick")
-                 //dialogInterface.cancel()
-                 //builderSingle.setCancelable(false)
-             }*/
-            /*val alertDialog : AlertDialog = builderSingle.create()
-            alertDialog.getListView().setOnItemClickListener({ adapterView, subview, i, l -> })*/
             builderSingle.setPositiveButton(positiveTxt) { _: DialogInterface, _: Int ->
                 proceedBlocking = true
                 handler.sendMessage(handler.obtainMessage())
-            }.setNeutralButton("Go Back") { _: DialogInterface, _: Int ->
+            }.setNeutralButton(context.getString(R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int ->
                 handler.sendMessage(handler.obtainMessage())
                 proceedBlocking = false
             }

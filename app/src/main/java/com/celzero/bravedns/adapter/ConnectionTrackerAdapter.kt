@@ -17,7 +17,9 @@ limitations under the License.
 package com.celzero.bravedns.adapter
 
 import android.content.Context
+import android.content.res.TypedArray
 import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,6 +35,7 @@ import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
@@ -41,10 +44,11 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
 
 
     companion object {
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<ConnectionTracker>() {
-            // Concert details may have changed if reloaded from the database,
-            // but ID is fixed.
-            override fun areItemsTheSame(oldConnection: ConnectionTracker, newConnection: ConnectionTracker) = oldConnection.id == newConnection.id
+        private val DIFF_CALLBACK = object :
+            DiffUtil.ItemCallback<ConnectionTracker>() {
+
+            override fun areItemsTheSame(oldConnection: ConnectionTracker, newConnection: ConnectionTracker)
+                = oldConnection.id == newConnection.id
 
             override fun areContentsTheSame(oldConnection: ConnectionTracker, newConnection: ConnectionTracker) = oldConnection == newConnection
         }
@@ -110,6 +114,19 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
                 b.connectionParentLayout.isEnabled = true
             }
 
+        }
+
+        private fun fetchTextColor(attr: Int): Int {
+            val attributeFetch = if (attr == R.color.dividerColor) {
+                R.attr.dividerColor
+            } else {
+                R.attr.accentGood
+            }
+            val typedValue = TypedValue()
+            val a: TypedArray = context.obtainStyledAttributes(typedValue.data, intArrayOf(attributeFetch))
+            val color = a.getColor(0, 0)
+            a.recycle()
+            return color
         }
 
 

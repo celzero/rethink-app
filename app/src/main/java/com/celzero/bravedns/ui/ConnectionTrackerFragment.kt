@@ -29,6 +29,7 @@ import com.celzero.bravedns.adapter.ConnectionTrackerAdapter
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.databinding.ActivityConnectionTrackerBinding
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
 import kotlinx.coroutines.Dispatchers
@@ -117,7 +118,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         val singleItems = arrayOf(getString(R.string.filter_network_blocked_connections), getString(R.string.filter_network_all_connections))
 
         val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("Select filter")
+        builder.setTitle(getString(R.string.ct_filter_dialog_title))
 
         // Single-choice items (initialized with checked item)
         builder.setSingleChoiceItems(singleItems, checkedItem) { dialog, which ->
@@ -125,7 +126,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
             filterValue = if (which == 0) ":isFilter"
             else ""
             checkedItem = which
-            if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "Filter Option selected: $filterValue")
+            if (DEBUG) Log.d(LOG_TAG, "Filter Option selected: $filterValue")
             viewModel.setFilterBlocked(filterValue)
             dialog.dismiss()
         }
@@ -140,17 +141,16 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         builder.setTitle(R.string.conn_track_clear_logs_title)
         //set message for alert dialog
         builder.setMessage(R.string.conn_track_clear_logs_message)
-        builder.setIcon(android.R.drawable.ic_dialog_alert)
         builder.setCancelable(true)
         //performing positive action
-        builder.setPositiveButton("Delete logs") { _, _ ->
+        builder.setPositiveButton(getString(R.string.ct_delete_logs_positive_btn)) { _, _ ->
             GlobalScope.launch(Dispatchers.IO) {
                 connectionTrackerDAO.clearAllData()
             }
         }
 
         //performing negative action
-        builder.setNegativeButton("Cancel") { _, _ ->
+        builder.setNegativeButton(getString(R.string.ct_delete_logs_negative_btn)) { _, _ ->
         }
         // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()

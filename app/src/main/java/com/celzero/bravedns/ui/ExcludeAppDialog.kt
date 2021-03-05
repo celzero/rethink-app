@@ -77,7 +77,7 @@ class ExcludeAppDialog(private var activity: Context, private val appInfoReposit
         val appCount = HomeScreenActivity.GlobalVariable.appList.size
         val act: HomeScreenActivity = activity as HomeScreenActivity
         appInfoRepository.getExcludedAppListCountLiveData().observe(act, {
-            b.excludeAppSelectCountText.text = "$it/$appCount apps excluded"
+            b.excludeAppSelectCountText.text = act.getString(R.string.ex_dialog_count, it.toString(), appCount.toString())
         })
 
 
@@ -147,7 +147,6 @@ class ExcludeAppDialog(private var activity: Context, private val appInfoReposit
     private fun applyChanges() {
         val excludedApps = appInfoRepository.getExcludedAppList()
         persistentState.excludedAppsFromVPN = excludedApps.toMutableSet()
-        //Toast.makeText(activity,"Update Successful",Toast.LENGTH_SHORT).show()
     }
 
     private fun showCategoryChips() {
@@ -201,7 +200,6 @@ class ExcludeAppDialog(private var activity: Context, private val appInfoReposit
                     }
                 }
                 if (filterString.isNotEmpty()) {
-                    if (DEBUG) Log.d(LOG_TAG, "category - $filterString")
                     viewModel.setFilter("category:$filterString")
                 } else {
                     viewModel.setFilter("")

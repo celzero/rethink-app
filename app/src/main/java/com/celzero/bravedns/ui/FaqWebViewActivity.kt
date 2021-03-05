@@ -16,23 +16,36 @@ limitations under the License.
 package com.celzero.bravedns.ui
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.webkit.WebChromeClient
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityFaqWebviewLayoutBinding
-import com.celzero.bravedns.databinding.ActivityQueryDetailBinding
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Constants
+import org.koin.android.ext.android.inject
 
 
 class FaqWebViewActivity : AppCompatActivity(R.layout.activity_faq_webview_layout) {
     private val b by viewBinding(ActivityFaqWebviewLayoutBinding::bind)
+    private val persistentState by inject<PersistentState>()
 
     @SuppressLint("SetJavaScriptEnabled") override fun onCreate(savedInstanceState: Bundle?) {
+        if (persistentState.theme == 0) {
+            if (isDarkThemeOn()) {
+                setTheme(R.style.AppTheme)
+            } else {
+                setTheme(R.style.AppTheme_white)
+            }
+        } else if (persistentState.theme == 1) {
+            setTheme(R.style.AppTheme_white)
+        } else {
+            setTheme(R.style.AppTheme)
+        }
         super.onCreate(savedInstanceState)
         b.configureWebview.settings.domStorageEnabled = true
         b.configureWebview.settings.allowContentAccess = true
@@ -47,25 +60,19 @@ class FaqWebViewActivity : AppCompatActivity(R.layout.activity_faq_webview_layou
         b.configureWebview.isClickable = true
         b.configureWebview.webChromeClient = WebChromeClient()
 
-        val url = intent.getStringExtra("url")
+        val url = intent.getStringExtra(Constants.URL_INTENT_EXTRA)
         if (url == null) {
             b.configureWebview.loadUrl(this.resources.getString(R.string.faq_web_link))
         } else {
             b.configureWebview.loadUrl(url)
         }
-        /**
-         *  faqWebView.evaluateJavascript(
-        "(function() { return ('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>'); })();",
-        ValueCallback<String?> { html ->
-        Log.d("HTML", html)
-        // code here
-        })
-         */
+    }
 
+    private fun Context.isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
     override fun onDestroy() {
-        if (DEBUG) Log.d(LOG_TAG, "onDestroy")
         b.configureWebview.destroy()
         super.onDestroy()
     }

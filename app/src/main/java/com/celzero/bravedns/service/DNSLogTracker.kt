@@ -41,7 +41,6 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                                          private val persistentState:PersistentState,
                                          private val context: Context) {
 
-    @Synchronized
     fun recordTransaction(transaction: Transaction?) {
         if (transaction != null) {
             insertToDB(transaction)
@@ -62,7 +61,6 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
             }
             dnsLogs.latency = transaction.responseTime// - transaction.queryTime
             dnsLogs.queryStr = transaction.name
-            dnsLogs.blockLists = transaction.blockList
             dnsLogs.responseTime = transaction.responseTime
             dnsLogs.serverIP = transaction.serverIp
             dnsLogs.status = transaction.status.name

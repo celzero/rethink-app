@@ -50,9 +50,8 @@ class DNSCryptRelayEndpointAdapter(
 ) : PagedListAdapter<DNSCryptRelayEndpoint, DNSCryptRelayEndpointAdapter.DNSCryptRelayEndpointViewHolder>(DIFF_CALLBACK) {
 
     companion object {
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DNSCryptRelayEndpoint>() {
-            // Concert details may have changed if reloaded from the database,
-            // but ID is fixed.
+        private val DIFF_CALLBACK = object :
+            DiffUtil.ItemCallback<DNSCryptRelayEndpoint>() {
             override fun areItemsTheSame(oldConnection: DNSCryptRelayEndpoint, newConnection: DNSCryptRelayEndpoint) = oldConnection.id == newConnection.id
 
             override fun areContentsTheSame(oldConnection: DNSCryptRelayEndpoint, newConnection: DNSCryptRelayEndpoint) = oldConnection == newConnection
@@ -104,6 +103,7 @@ class DNSCryptRelayEndpointAdapter(
                 if (b.dnsCryptEndpointListActionImage.isChecked && !state) {
                     b.dnsCryptEndpointListActionImage.isChecked = state
                 }
+
             }
             b.dnsCryptEndpointListActionImage.setOnClickListener {
                 dnsCryptRelayEndpoint.isSelected = b.dnsCryptEndpointListActionImage.isChecked
@@ -138,11 +138,11 @@ class DNSCryptRelayEndpointAdapter(
             builder.setMessage(url + "\n\n" + message)
             builder.setCancelable(true)
             //performing positive action
-            builder.setPositiveButton("Ok") { dialogInterface, which ->
+            builder.setPositiveButton(context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
                 dialogInterface.dismiss()
             }
 
-            builder.setNeutralButton("Copy") { dialogInterface: DialogInterface, i: Int ->
+            builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
                 val clipboard: ClipboardManager? = context.getSystemService()
                 val clip = ClipData.newPlainText("URL", url)
                 clipboard?.setPrimaryClip(clip)
@@ -161,10 +161,9 @@ class DNSCryptRelayEndpointAdapter(
             builder.setTitle(R.string.dns_crypt_relay_remove_dialog_title)
             //set message for alert dialog
             builder.setMessage(R.string.dns_crypt_relay_remove_dialog_message)
-            builder.setIcon(android.R.drawable.ic_dialog_alert)
             builder.setCancelable(true)
             //performing positive action
-            builder.setPositiveButton("Delete") { dialogInterface, which ->
+            builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { dialogInterface, which ->
                 GlobalScope.launch(Dispatchers.IO) {
                     if (dnsCryptRelayEndpoint != null) {
                         dnsCryptRelayEndpointRepository.deleteDNSCryptRelayEndpoint(dnsCryptRelayEndpoint.dnsCryptRelayURL)
@@ -174,7 +173,7 @@ class DNSCryptRelayEndpointAdapter(
             }
 
             //performing negative action
-            builder.setNegativeButton("Cancel") { dialogInterface, which ->
+            builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { dialogInterface, which ->
             }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
@@ -223,10 +222,9 @@ class DNSCryptRelayEndpointAdapter(
                 }.start()
                 persistentState.dnsType = 2
                 persistentState.connectionModeChange = dnsCryptRelayEndpoint.dnsCryptRelayURL
-                //mDb.close()
                 return true
             } else {
-                Toast.makeText(context, "No resolver selected", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, context.getString(R.string.dns_crypt_relay_error_toast), Toast.LENGTH_LONG).show()
                 return false
             }
 

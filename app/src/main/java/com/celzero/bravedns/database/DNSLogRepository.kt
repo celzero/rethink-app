@@ -26,7 +26,7 @@ class DNSLogRepository(private val dnsLogDAO: DNSLogDAO) {
     fun insertAsync(dnsLogs: DNSLogs, coroutineScope: CoroutineScope = GlobalScope) {
         //coroutineScope.launch {
         dnsLogDAO.insert(dnsLogs)
-        deleteConnectionTrackerCount()
+        //deleteConnectionTrackerCount()
         //}
     }
 

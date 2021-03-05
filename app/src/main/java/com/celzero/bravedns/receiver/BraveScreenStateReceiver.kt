@@ -22,17 +22,15 @@ import android.content.Intent
 import android.util.Log
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
-import kotlinx.coroutines.InternalCoroutinesApi
 
 
 class BraveScreenStateReceiver : BroadcastReceiver() {
 
-    @InternalCoroutinesApi
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent!!.action.equals(Intent.ACTION_SCREEN_OFF)) {
             if(DEBUG) Log.d(LOG_TAG,"BraveScreenStateReceiver : Action_screen_off detected from the receiver")
-            if(ReceiverHelper.persistentState.getFirewallModeForScreenState() && !ReceiverHelper.persistentState.getScreenLockData()) {
-                if(DEBUG) Log.d(LOG_TAG,"BraveSCreenStateReceiver : Screen lock data not true, calling DeviceLockService service")
+            if(ReceiverHelper.persistentState._screenState && !ReceiverHelper.persistentState.isScreenOff) {
+                if(DEBUG) Log.d(LOG_TAG,"BraveSsreenStateReceiver : Screen lock data not true, calling DeviceLockService service")
                 val newIntent = Intent(context, DeviceLockService::class.java)
                 newIntent.action = DeviceLockService.ACTION_CHECK_LOCK
                 newIntent.putExtra(DeviceLockService.EXTRA_STATE, intent.action)
@@ -40,8 +38,8 @@ class BraveScreenStateReceiver : BroadcastReceiver() {
             }
         } else if (intent.action.equals(Intent.ACTION_USER_PRESENT) || intent.action.equals(Intent.ACTION_SCREEN_ON)) {
             if(DEBUG) Log.d(LOG_TAG,"BraveScreenStateReceiver : ACTION_USER_PRESENT/ACTION_SCREEN_ON detected from the receiver")
-            if(ReceiverHelper.persistentState.getFirewallModeForScreenState()) {
-                val state = ReceiverHelper.persistentState.getScreenLockData()
+            if(ReceiverHelper.persistentState._screenState) {
+                val state = ReceiverHelper.persistentState.isScreenOff
                 if(state) {
                     ReceiverHelper.persistentState.setScreenLockData(false)
                 }

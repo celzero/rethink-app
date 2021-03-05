@@ -1,22 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bs_conn_top_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true"
+    android:focusable="true"
     android:orientation="vertical"
-    android:paddingBottom="40dp"
-    android:focusable="true">
+    android:paddingBottom="40dp">
 
     <TextView
-        style="@style/ActionItem"
-        android:layout_width="match_parent"
+        android:layout_width="60dp"
         android:layout_height="3dp"
-        android:layout_marginLeft="40dp"
+        android:layout_gravity="center"
         android:layout_marginTop="10dp"
-        android:layout_marginRight="40dp"
         android:layout_marginBottom="20dp"
         android:background="@color/recycler_selected" />
 
@@ -29,18 +26,18 @@
         android:layout_marginEnd="25dp"
         android:padding="5dp"
         android:text="@string/bsct_app_info"
-        android:textColor="@color/accent_bad"
+        android:textColor="?attr/accentGood"
         android:textSize="@dimen/large_font_text_view"
         android:visibility="visible"
-        app:chipBackgroundColor="@color/colorPrimaryDark" />
+        app:chipBackgroundColor="?attr/backgroundDark" />
 
 
     <RelativeLayout
         android:id="@+id/bs_conn_track_app_name_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
         android:layout_gravity="center"
+        android:gravity="center"
         android:orientation="horizontal"
         android:paddingStart="20dp"
         android:paddingEnd="20dp">
@@ -57,7 +54,6 @@
 
         <TextView
             android:id="@+id/bs_conn_track_app_name"
-            style="@style/ActionItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -66,7 +62,8 @@
             android:layout_toEndOf="@id/bs_conn_track_app_icon"
             android:gravity="center"
             android:text="@string/action_automatic"
-            android:textSize="@dimen/heading_font_text_view" />
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/extra_large_font_text_view" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -83,13 +80,13 @@
             android:ellipsize="none"
             android:gravity="center"
             android:minWidth="35dp"
+            android:fontFamily="sans-serif-condensed-medium"
             android:singleLine="true"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textAppearance="@android:style/TextAppearance.Material.Subhead"
             android:textSize="26sp" />
 
         <TextView
             android:id="@+id/bs_conn_connection_type_heading"
-            style="@style/ActionItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -97,6 +94,7 @@
             android:layout_toEndOf="@id/bs_conn_connection_flag"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
+            android:textColor="?attr/primaryTextColor"
             android:textIsSelectable="true"
             android:textSize="@dimen/heading_font_text_view" />
 
@@ -120,25 +118,23 @@
 
             <TextView
                 android:id="@+id/bs_conn_blocked_desc"
-                style="@style/ActionItem"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="fill_horizontal"
                 android:ellipsize="end"
                 android:gravity="end"
-                android:layout_gravity="fill_horizontal"
                 android:text="@string/bsct_conn_block_desc"
-                android:textColor="@color/textColorMain"
+                android:textColor="?attr/primaryLightColorText"
                 android:textSize="@dimen/default_font_text_view"
                 android:visibility="gone" />
 
             <TextView
                 android:id="@+id/bs_conn_connection_details"
-                style="@style/ActionItem"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:text="@string/bsct_conn_conn_desc_allowed"
-                android:textColor="@color/textColorMain"
+                android:textColor="?attr/primaryLightColorText"
                 android:textSize="@dimen/default_font_text_view" />
         </LinearLayout>
 
@@ -146,7 +142,6 @@
 
     <TextView
         android:id="@+id/bs_conn_connection_details1"
-        style="@style/ActionItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
@@ -155,23 +150,10 @@
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
         android:text="@string/bsct_conn_conn_desc_allowed"
-        android:textColor="@color/textColorMain"
+        android:textColor="?attr/primaryLightColorText"
         android:textSize="@dimen/default_font_text_view"
         android:visibility="gone" />
 
-    <TextView
-        android:id="@+id/bs_conn_blocked_rule1_txt"
-        style="@style/ActionItem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/drawable_purple_gradient"
-        android:gravity="start"
-        android:padding="7dp"
-        android:text="@string/ct_bs_rule_1"
-        android:textColor="@color/textColorMain"
-        android:textSize="@dimen/default_font_text_view" />
 
     <LinearLayout
         android:id="@+id/bs_conn_blocked_rule1_header_ll"
@@ -182,22 +164,41 @@
         android:paddingStart="20dp"
         android:paddingEnd="20dp">
 
-        <TextView
-            android:id="@+id/bs_conn_block_app_txt"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.9"
-            android:padding="5dp"
-            android:text="@string/bsct_block"
-            android:textColor="@color/primaryText"
-            android:textSize="@dimen/large_font_text_view" />
+            android:orientation="vertical">
 
-        <androidx.appcompat.widget.SwitchCompat
+            <TextView
+                android:id="@+id/bs_conn_blocked_rule1_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/drawable_purple_gradient"
+                android:gravity="start"
+                android:padding="7dp"
+                android:text="@string/ct_bs_rule_1"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="@dimen/default_font_text_view" />
+
+            <TextView
+                android:id="@+id/bs_conn_block_app_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:padding="5dp"
+                android:text="@string/bsct_block"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view" />
+        </LinearLayout>
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/bs_conn_block_app_check"
-            style="@style/SwitchCompat_theme"
+            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch.Bad"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:gravity="bottom"
             android:padding="5dp" />
 
     </LinearLayout>
@@ -212,45 +213,51 @@
         android:textSize="@dimen/default_font_text_view"
         android:visibility="gone" />
 
-    <TextView
-        style="@style/ActionItem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/drawable_purple_gradient"
-        android:gravity="start"
-        android:padding="7dp"
-        android:text="@string/ct_bs_rule_2"
-        android:textColor="@color/textColorMain"
-        android:textSize="@dimen/default_font_text_view" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="2dp"
+        android:layout_marginTop="20dp"
         android:layout_marginRight="2dp"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
         android:paddingBottom="5dp">
 
-        <TextView
-            android:id="@+id/bs_conn_block_conn_all_txt"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.9"
-            android:padding="5dp"
-            android:text="@string/bsct_block_all"
-            android:textColor="@color/primaryText"
-            android:textSize="@dimen/large_font_text_view" />
+            android:orientation="vertical">
 
-        <androidx.appcompat.widget.SwitchCompat
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/drawable_purple_gradient"
+                android:gravity="start"
+                android:padding="7dp"
+                android:text="@string/ct_bs_rule_2"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="@dimen/default_font_text_view" />
+
+            <TextView
+                android:id="@+id/bs_conn_block_conn_all_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.9"
+                android:padding="5dp"
+                android:text="@string/bsct_block_all"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view" />
+
+        </LinearLayout>
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/bs_conn_block_conn_all_switch"
-            style="@style/SwitchCompat_theme"
+            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch.Bad"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_gravity="bottom"
             android:padding="5dp" />
 
     </LinearLayout>
@@ -279,7 +286,7 @@
             android:layout_weight="0.5"
             android:text="@string/bsct_clear"
             android:textAlignment="center"
-            android:textColor="@color/accent_bad"
+            android:textColor="?attr/secondaryTextColor"
             android:visibility="gone"
             app:chipBackgroundColor="@color/colorPrimaryDark" />
     </LinearLayout>

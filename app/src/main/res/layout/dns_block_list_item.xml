@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/dns_block_list_parent"
     android:layout_width="match_parent"
+    android:background="?attr/background"
     android:layout_height="wrap_content">
 
     <RelativeLayout
@@ -18,26 +19,24 @@
             android:ellipsize="end"
             android:gravity="center"
             android:padding="10dp"
+            android:textColor="?attr/primaryTextColor"
             android:text="Dummy Label"
-            android:textColor="@color/primaryText"
             android:textSize="@dimen/large_font_text_view" />
 
         <TextView
             android:id="@+id/dns_block_list_header"
-            style="@style/ActionItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/dns_block_list_url_name"
             android:background="@drawable/drawable_purple_gradient"
             android:gravity="center"
             android:padding="10dp"
+            android:textColor="?attr/primaryTextColor"
             android:text="Header"
-            android:textSize="@dimen/large_font_text_view"
-            android:textColor="@color/textColorMain" />
+            android:textSize="@dimen/large_font_text_view" />
 
         <TextView
             android:id="@+id/dns_block_list_subheader"
-            style="@style/ActionItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -45,7 +44,7 @@
             android:padding="10dp"
             android:text="Header"
             android:textSize="@dimen/large_font_text_view"
-            android:textColor="@color/primaryText"
+            android:textColor="?attr/primaryTextColor"
             android:visibility="gone" />
 
     </RelativeLayout>
@@ -54,7 +53,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@id/dns_block_list_container"
-        android:background="@color/black"
+        android:background="?attr/border"
         android:visibility="visible" />
 
 </RelativeLayout>

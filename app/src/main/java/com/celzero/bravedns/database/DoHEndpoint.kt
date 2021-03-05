@@ -35,7 +35,8 @@ class DoHEndpoint {
         if (this === other) return true
         if (other?.javaClass != javaClass) return false
         other as DoHEndpoint
-        if (id != other.id) return false
+        if (dohURL != other.dohURL) return false
+        if(isSelected != isSelected) return false
         return true
     }
 

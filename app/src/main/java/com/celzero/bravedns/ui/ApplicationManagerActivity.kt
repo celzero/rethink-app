@@ -27,7 +27,6 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ApplicationManagerApk
 import com.celzero.bravedns.animation.ViewAnimation
@@ -38,7 +37,6 @@ import com.mikepenz.fastadapter.adapters.ItemAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 
@@ -124,12 +122,12 @@ class ApplicationManagerActivity : AppCompatActivity(R.layout.activity_applicati
     }
 
 
-    private fun updateAppList() = GlobalScope.launch(Dispatchers.Default) {
-        val appList = appInfoRepository.getAppInfoAsync()
-        appList.forEach {
-            val packageInfo = packageManager.getPackageInfo(it.packageInfo, 0)
-            if (packageInfo.packageName != BuildConfig.APPLICATION_ID) {
-                val userApk = ApplicationManagerApk(packageManager.getPackageInfo(it.packageInfo, 0), it.appCategory, this@ApplicationManagerActivity)
+    private fun updateAppList() = GlobalScope.launch ( Dispatchers.Default ){
+        /*val appList = appInfoRepository.getAppInfoAsync()
+        appList.forEach{
+           val packageInfo = packageManager.getPackageInfo(it.packageInfo,0)
+            if(packageInfo.packageName != BuildConfig.APPLICATION_ID ) {
+                val userApk =  ApplicationManagerApk(packageManager.getPackageInfo(it.packageInfo, 0), it.appCategory, this@ApplicationManagerActivity)
                 apkList.add(userApk)
             }
         }
@@ -137,7 +135,7 @@ class ApplicationManagerActivity : AppCompatActivity(R.layout.activity_applicati
             itemAdapter.add(apkList)
             fastAdapter.notifyDataSetChanged()
         }
-        //mDb.close()
+        //mDb.close()*/
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {

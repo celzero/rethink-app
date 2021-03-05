@@ -20,8 +20,8 @@
         android:id="@+id/dialog_http_proxy_ip_address"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Hostname"
-        app:hintTextColor="@color/secondaryText"
+        android:hint="@string/settings_http_proxy_hostname"
+        app:hintTextColor="?attr/accentGood"
         app:layout_constraintTop_toBottomOf="@id/dialog_http_proxy_top">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -44,8 +44,8 @@
         android:id="@+id/text_input_layout1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Port"
-        app:hintTextColor="@color/secondaryText"
+        android:hint="@string/settings_http_proxy_port"
+        app:hintTextColor="?attr/accentGood"
         app:layout_constraintTop_toBottomOf="@id/dialog_http_proxy_ip_address">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -75,7 +75,7 @@
         android:padding="5dp"
         android:textSize="@dimen/default_font_text_view"
         android:text="@string/http_proxy_dialog_desc"
-        android:textColor="@color/textColorMain"
+        android:textColor="?attr/primaryLightColorText"
         android:visibility="visible"
         app:layout_constraintTop_toBottomOf="@id/text_input_layout1" />
 
@@ -90,7 +90,7 @@
         android:layout_marginBottom="10dp"
         android:padding="5dp"
         android:textSize="@dimen/default_font_text_view"
-        android:text="Host connection failed. Try again."
+        android:text="@string/settings_http_proxy_error_text4"
         android:textColor="@color/colorRed_A400"
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/dialog_http_proxy_explanation_text" />
@@ -104,8 +104,9 @@
         android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
-        android:text="Set"
+        android:text="@string/settings_dns_proxy_dialog_positive_btn"
         android:textSize="@dimen/large_font_text_view"
+        android:textColor="?attr/accentBad"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_http_proxy_failure_text" />
 
@@ -119,7 +120,8 @@
         android:layout_marginBottom="10dp"
         android:gravity="center"
         android:textSize="@dimen/large_font_text_view"
-        android:text="Cancel"
+        android:textColor="?attr/accentBad"
+        android:text="@string/settings_dns_proxy_dialog_negative_btn"
         app:layout_constraintEnd_toStartOf="@id/dialog_http_proxy_ok_btn"
         app:layout_constraintTop_toBottomOf="@id/dialog_http_proxy_failure_text" />
 

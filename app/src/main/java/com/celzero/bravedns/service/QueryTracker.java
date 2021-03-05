@@ -15,8 +15,6 @@ limitations under the License.
 */
 package com.celzero.bravedns.service;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 
 import com.celzero.bravedns.net.doh.Transaction;
@@ -33,11 +31,9 @@ public class QueryTracker {
     private static final int HISTORY_SIZE = 1000;
     private static long numRequests = 0;
     private static P2QuantileEstimation quantileEstimator;
-    @NonNull private final Context context;
     @NonNull private final PersistentState persistentState;
 
-    QueryTracker(@NonNull PersistentState persistentState, @NonNull Context context) {
-        this.context = context;
+    QueryTracker(@NonNull PersistentState persistentState) {
         this.persistentState = persistentState;
     }
 
@@ -46,7 +42,7 @@ public class QueryTracker {
         numRequests = 1;
     }
 
-    synchronized void recordTransaction(Transaction transaction) {
+    void recordTransaction(Transaction transaction) {
         ++numRequests;
         if (numRequests % HISTORY_SIZE == 0) {
             numRequests = 1;
@@ -55,7 +51,7 @@ public class QueryTracker {
         sync(transaction);
     }
 
-    public synchronized void sync(Transaction transaction) {
+    public void sync(Transaction transaction) {
         if (transaction != null && transaction.blockList.isEmpty() && !transaction.serverIp.isEmpty()) {
             // Restore number of requests from storage, or 0 if it isn't defined yet.
             long val =  transaction.responseTime;

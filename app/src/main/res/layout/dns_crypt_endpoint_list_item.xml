@@ -3,7 +3,7 @@
     android:id="@+id/doh_endpoint_list_parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="1dp"
+    android:layout_margin="0.5dp"
     android:background="?android:attr/selectableItemBackground"
     android:elevation="@dimen/activity_horizontal_margin">
 
@@ -12,7 +12,6 @@
         android:id="@+id/dns_crypt_endpoint_list_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
         android:padding="5dp">
 
         <LinearLayout
@@ -20,7 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="15dp"
             android:layout_toStartOf="@id/dns_crypt_endpoint_list_action_image"
             android:orientation="vertical">
 
@@ -29,9 +28,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:fontFamily="sans-serif-light"
+                android:fontFamily="sans-serif"
                 android:text="Dummy Label"
-                android:textColor="@color/primaryText"
+                android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
 
             <TextView
@@ -39,9 +38,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:fontFamily="sans-serif-light"
+                android:fontFamily="sans-serif"
                 android:text="Dummy Label"
-                android:textColor="@color/textColorMain"
+                android:textColor="?attr/primaryLightColorText"
                 android:textSize="@dimen/default_font_text_view" />
 
         </LinearLayout>
@@ -55,8 +54,7 @@
             android:layout_marginEnd="10dp"
             android:layout_toStartOf="@id/dns_crypt_endpoint_list_action_image"
             android:padding="10dp"
-            android:src="@drawable/ic_fab_appinfo"
-            android:text="delete" />
+            android:src="@drawable/ic_fab_appinfo" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/dns_crypt_endpoint_list_action_image"
@@ -64,6 +62,8 @@
             android:layout_height="48dp"
             android:layout_alignParentEnd="true"
             android:gravity="center"
+            android:buttonTint="?attr/accentGood"
+                        android:foregroundTint="?attr/accentGood"
             android:text="@null"
             android:padding="10dp" />
 
@@ -71,8 +71,8 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="3dp"
+        android:layout_height="0.5dp"
         android:layout_below="@id/dns_crypt_endpoint_list_container"
-        android:background="@color/borderblack"/>
+        android:background="?attr/backgroundDark" />
 
 </RelativeLayout>

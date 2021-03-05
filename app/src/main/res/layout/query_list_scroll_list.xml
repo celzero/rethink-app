@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_query_detail">
 
@@ -12,13 +11,12 @@
         android:id="@+id/query_list_rl"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="2dp">
+        android:layout_marginTop="1dp">
 
         <LinearLayout
             android:id="@+id/query_list_card_view_top"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/childListColor"
             android:orientation="vertical">
 
             <androidx.cardview.widget.CardView
@@ -44,10 +42,7 @@
                         android:fontFamily="sans-serif"
                         android:isScrollContainer="true"
                         app:iconifiedByDefault="false"
-                        app:queryBackground="@color/colorPrimaryDark"
-                        app:queryHint="@string/search_dns_logs">
-                        <requestFocus />
-                    </androidx.appcompat.widget.SearchView>
+                        app:queryHint="@string/search_dns_logs"/>
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/query_list_filter_icon"
@@ -81,85 +76,40 @@
             android:layout_margin="20dp"
             android:gravity="center"
             android:padding="20dp"
-            android:visibility="gone"
-            android:textSize="@dimen/large_font_text_view"
             android:text="@string/dns_logs_not_available_text"
-            android:textColor="@color/textColorMain" />
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/large_font_text_view"
+            android:visibility="gone" />
 
-        <LinearLayout
-            android:id="@+id/query_list_recycler_heading"
+        <TextView
+            android:id="@+id/query_list_logs_disabled_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/query_list_card_view_top"
-            android:background="@color/childListColor"
-            android:elevation="@dimen/activity_horizontal_margin"
-            android:orientation="horizontal"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:visibility="gone"
-            android:weightSum="1">
-
-
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.64"
-                android:fontFamily="sans-serif"
-                android:text="Query"
-                android:textSize="@dimen/default_font_text_view"
-                android:gravity="start"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
-                android:textColor="@color/secondaryText" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.21"
-                android:fontFamily="sans-serif"
-                android:gravity="end"
-                android:paddingStart="3dp"
-                android:paddingEnd="3dp"
-                android:text="Latency"
-                android:textSize="@dimen/default_font_text_view"
-                android:textColor="@color/secondaryText" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_weight="0.15"
-                android:fontFamily="sans-serif"
-                android:gravity="center"
-                android:text="Time"
-                android:textSize="@dimen/default_font_text_view"
-                android:textColor="@color/secondaryText" />
-        </LinearLayout>
-
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_query"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/query_list_recycler_heading"
-            android:layout_marginTop="2dp"
-            android:background="@color/childListColor"
-            android:nestedScrollingEnabled="true"
-            android:orientation="vertical"
-            android:padding="1dp" />
-
-        <TextView
-            android:id="@+id/query_list__logs_disabled_tv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:gravity="center"
             android:padding="10dp"
-            android:layout_below="@id/query_list_recycler_heading"
             android:text="@string/show_logs_disabled_dns_message"
             android:textSize="@dimen/large_font_text_view"
             android:visibility="gone" />
+
+
+        <com.celzero.bravedns.util.NestedScrollableHost
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/query_list_logs_disabled_tv"
+            android:layout_margin="2dp"
+            android:layout_marginBottom="?attr/actionBarSize">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_query"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/backgroundDark"
+                android:nestedScrollingEnabled="true"
+                android:orientation="vertical" />
+
+        </com.celzero.bravedns.util.NestedScrollableHost>
 
     </RelativeLayout>
 </LinearLayout>

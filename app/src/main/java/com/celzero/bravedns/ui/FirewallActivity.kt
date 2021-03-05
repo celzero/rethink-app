@@ -13,72 +13,111 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package com.celzero.bravedns.ui
 
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentStatePagerAdapter
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.database.ConnectionTrackerRepository
-import com.celzero.bravedns.databinding.ActivityFaqWebviewLayoutBinding
 import com.celzero.bravedns.databinding.ActivityFirewallBinding
-import com.google.android.material.tabs.TabLayoutMediator
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Constants
+import com.google.android.material.tabs.TabLayout
 import org.koin.android.ext.android.inject
 
-class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
-    private val b by viewBinding(ActivityFirewallBinding::bind)
-    private val FIREWALL_TABS_COUNT = 3
 
-    private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
+class FirewallActivity : AppCompatActivity(R.layout.activity_firewall), TabLayout.OnTabSelectedListener {
+    private val b by viewBinding(ActivityFirewallBinding::bind)
+    private var screenToLoad = 0
+    private val persistentState by inject<PersistentState>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        if (persistentState.theme == 0) {
+            if (isDarkThemeOn()) {
+                setTheme(R.style.AppTheme)
+            } else {
+                setTheme(R.style.AppTheme_white)
+            }
+        } else if (persistentState.theme == 1) {
+            setTheme(R.style.AppTheme_white)
+        } else {
+            setTheme(R.style.AppTheme)
+        }
         super.onCreate(savedInstanceState)
-        init()
+        screenToLoad = intent.getIntExtra(Constants.SCREEN_TO_LOAD, 0)
+
+        // FIXME: 22-01-2021 The view pager is migrated from ViewPager2 to Viewpager.  There is a
+        // known bug in viewpager2 - Focus issue, the Firewall activity has search bar in all the
+        // screens is causing the issue.
+        //https://github.com/material-components/material-components-android/issues/500
+        //https://github.com/android/views-widgets-samples/issues/107
+
+        val tabTitles = arrayOf(getString(R.string.firewall_act_universal_tab), getString(R.string.firewall_act_network_monitor_tab),
+                    getString(R.string.firewall_act_apps_tab))
+        b.firewallActTabLayout.setupWithViewPager(b.firewallActViewpager)
+
+        //Adding the tabs using addTab() method
+        b.firewallActTabLayout.addTab(b.firewallActTabLayout.newTab())
+        b.firewallActTabLayout.addTab(b.firewallActTabLayout.newTab())
+        b.firewallActTabLayout.addTab(b.firewallActTabLayout.newTab())
+        b.firewallActTabLayout.tabGravity = TabLayout.GRAVITY_FILL
+
+        //Creating our pager adapter
+        val adapter = Pager(supportFragmentManager, b.firewallActTabLayout.tabCount, tabTitles)
+
+        //Adding adapter to pager
+        b.firewallActViewpager.adapter = adapter
+        b.firewallActViewpager.setCurrentItem(screenToLoad, false)
+        b.firewallActViewpager.offscreenPageLimit = b.firewallActTabLayout.tabCount
+
+        b.firewallActViewpager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(b.firewallActTabLayout))
+        b.firewallActTabLayout.addOnTabSelectedListener(this)
     }
 
-    private fun init() {
-        b.firewallActViewpager.adapter = object : FragmentStateAdapter(this) {
-            override fun createFragment(position: Int): Fragment {
-                return when (position) {
-                    0 -> UniversalFirewallFragment.newInstance()
-                    1 -> ConnectionTrackerFragment.newInstance()
-                    else -> FirewallAppFragment.newInstance()
-                }
-            }
+    override fun onTabSelected(tab: TabLayout.Tab) {
+        b.firewallActTabLayout.selectTab(tab)
+        b.firewallActViewpager.setCurrentItem(tab.position, false)
+    }
 
-            override fun getItemCount(): Int {
-                return FIREWALL_TABS_COUNT
+    override fun onTabUnselected(tab: TabLayout.Tab?) {}
+
+    override fun onTabReselected(tab: TabLayout.Tab?) {}
+
+    private fun Context.isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+    }
+
+}
+
+internal class Pager(fm: FragmentManager?, var tabCount: Int, var tabTitles : Array<String>) : FragmentStatePagerAdapter(fm!!) {
+    //Overriding method getItem
+    override fun getItem(position: Int): Fragment {
+        //Returning the current tabs
+        return when (position) {
+            0 -> {
+                UniversalFirewallFragment.newInstance()
+            }
+            1 -> {
+                ConnectionTrackerFragment.newInstance()
+            }
+            else -> {
+                FirewallAppFragment.newInstance()
             }
         }
-
-        //viewPagerFirewall.fakeDragBy(1000F)
-
-        TabLayoutMediator(b.firewallActTabLayout, b.firewallActViewpager) { tab, position ->
-            tab.text = when (position) {
-                0 -> getString(R.string.firewall_act_universal_tab)
-                1 -> getString(R.string.firewall_act_network_monitor_tab)
-                else -> getString(R.string.firewall_act_apps_tab)
-            }
-            b.firewallActViewpager.setCurrentItem(tab.position, true)
-        }.attach()
-
-
-        val recyclerViewField = ViewPager2::class.java.getDeclaredField("mRecyclerView")
-        recyclerViewField.isAccessible = true
-        val recyclerView = recyclerViewField.get(b.firewallActViewpager) as RecyclerView
-
-        val touchSlopField = RecyclerView::class.java.getDeclaredField("mTouchSlop")
-        touchSlopField.isAccessible = true
-        val touchSlop = touchSlopField.get(recyclerView) as Int
-        touchSlopField.set(recyclerView, touchSlop * 3)       // "8" was obtained experimentally
-
-        connectionTrackerRepository.deleteConnectionTrackerCount()
-
     }
 
+    //Overridden method getCount to get the number of tabs
+    override fun getCount(): Int {
+        return tabCount
+    }
 
+    override fun getPageTitle(position: Int): CharSequence {
+        return tabTitles[position]
+    }
 }

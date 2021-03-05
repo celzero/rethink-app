@@ -23,53 +23,41 @@
         android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
         android:name=".RethinkDnsApplication"
-        android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true">
+        android:theme="@style/AppThemeInitial">
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />
 
         <activity
             android:name=".ui.FirewallActivity"
-            android:launchMode="singleTask"
-            android:theme="@style/AppTheme" />
+            android:launchMode="singleTask" />
         <activity
             android:name=".ui.PermissionManagerActivity"
-            android:launchMode="singleInstance"
-            android:theme="@style/AppTheme" />
+            android:launchMode="singleInstance" />
         <activity
             android:name=".ui.HomeScreenActivity"
-            android:launchMode="singleTask"
-            android:theme="@style/AppTheme">
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.ApplicationManagerActivity"
-            android:theme="@style/AppTheme" />
-        <activity
             android:name=".ui.DNSDetailActivity"
-            android:launchMode="singleTask"
-            android:theme="@style/AppTheme" />
+            android:launchMode="singleTask" />
         <activity
             android:name=".ui.WelcomeActivity"
-            android:launchMode="singleTask"
-            android:theme="@style/AppTheme">
-        </activity>
+            android:noHistory="true"
+            android:launchMode="singleTask"/>
         <activity
             android:name=".ui.AppInfoActivity"
-            android:launchMode="singleInstance"
-            android:theme="@style/AppTheme" />
+            android:launchMode="singleInstance" />
         <activity
             android:name=".ui.FaqWebViewActivity"
-            android:launchMode="singleInstance"
-            android:theme="@style/AppTheme" />
+            android:launchMode="singleInstance" />
         <activity
             android:name=".ui.DNSConfigureWebViewActivity"
-            android:launchMode="singleInstance"
-            android:theme="@style/AppTheme" />
+            android:launchMode="singleInstance" />
         <service
             android:name=".util.BackgroundAccessibilityService"
             android:label="@string/accessibility_service_label"

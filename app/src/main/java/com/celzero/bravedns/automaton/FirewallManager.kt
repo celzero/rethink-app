@@ -16,7 +16,6 @@ limitations under the License.
 
 package com.celzero.bravedns.automaton
 
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.text.TextUtils
@@ -94,7 +93,7 @@ class FirewallManager(service: BackgroundAccessibilityService) {
             }
         }
 
-        fun updateCategoryAppsInternetPermission(categoryName : String, isAllowed: Boolean, context: Context, persistentState: PersistentState){
+        fun updateCategoryAppsInternetPermission(categoryName : String, isAllowed: Boolean, persistentState: PersistentState){
             GlobalScope.launch ( Dispatchers.IO ) {
                 GlobalVariable.appList.forEach {
                     if (it.value.appCategory == categoryName && !it.value.whiteListUniv1 ) {
@@ -109,7 +108,7 @@ class FirewallManager(service: BackgroundAccessibilityService) {
     }
 
 
-    fun onAccessibilityEvent(event: AccessibilityEvent, that: BackgroundAccessibilityService,rootInActiveWindow: AccessibilityNodeInfo?){
+    fun onAccessibilityEvent(event: AccessibilityEvent, rootInActiveWindow: AccessibilityNodeInfo?){
         packageManager = accessibilityService.packageManager
 
         val eventPackageName = getLatestPackageName(event, rootInActiveWindow)
@@ -172,8 +171,8 @@ class FirewallManager(service: BackgroundAccessibilityService) {
      */
     private fun getLatestPackageName(event: AccessibilityEvent, rootInActiveWindow: AccessibilityNodeInfo?): String? {
         var packageName : String? = event.packageName?.toString()
-        if(packageName.isNullOrEmpty()){
-            packageName = rootInActiveWindow?.packageName?.toString()
+        if(packageName.isNullOrEmpty() && rootInActiveWindow != null){
+            packageName = rootInActiveWindow.packageName?.toString()
             if(DEBUG) Log.d(LOG_TAG,"AccessibilityEvent: Value from rootInActiveWindow : $packageName")
         }
         if(DEBUG) Log.d(LOG_TAG,"AccessibilityEvent: $packageName")
@@ -201,14 +200,14 @@ class FirewallManager(service: BackgroundAccessibilityService) {
         if(DEBUG) Log.d(LOG_TAG,"FirewallManager: isBackgroundEnabled: ${GlobalVariable.isBackgroundEnabled}")
         if(!GlobalVariable.isBackgroundEnabled)
             return
-        if (packagesStack.isNullOrEmpty()) {
+        if (latestTrackedPackage.isNullOrEmpty()) {
             return
         }else {
-            val currentPackage = packagesStack.elementAt(0)
+            val currentPackage = latestTrackedPackage
             if(DEBUG) Log.d(LOG_TAG,"FirewallManager: Package: $currentPackage, $isAllowed")
-            packagesStack.remove(currentPackage)
+            //packagesStack.remove(currentPackage)
             packageElect = currentPackage
-            updateInternetBackground(currentPackage,isAllowed)
+            updateInternetBackground(currentPackage!!,isAllowed)
         }
     }
 

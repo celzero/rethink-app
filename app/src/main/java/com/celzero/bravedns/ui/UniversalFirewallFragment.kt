@@ -16,8 +16,9 @@ limitations under the License.
 package com.celzero.bravedns.ui
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
+import android.os.CountDownTimer
 import android.provider.Settings
 import android.util.Log
 import android.view.View
@@ -102,10 +103,6 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         recyclerRulesAdapter = UniversalBlockedRulesAdapter(requireContext(), blockedConnectionsRepository)
         recyclerAdapter = UniversalAppListAdapter(requireContext(), appInfoRepository, get(), persistentState)
         includeView.firewallUniversalRecycler.adapter = recyclerRulesAdapter
-        includeView.firewallSearchView.requestFocus()
-
-        //recyclerView.isNestedScrollingEnabled = false
-        //ViewCompat.setNestedScrollingEnabled(recyclerView, false)
 
         if (DEBUG) Log.d(LOG_TAG, "UniversalFirewallFragment - post observer")
 
@@ -146,10 +143,6 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             includeView.firewallUdpConnectionModeCheck.isChecked = !includeView.firewallUdpConnectionModeCheck.isChecked
         }
 
-        /*ipRulesAddBtn.setOnClickListener{
-            Utilities.showToastInMidLayout(requireContext(),"Yet to implement",Toast.LENGTH_SHORT)
-        }*/
-
         //Background mode toggle
         includeView.firewallBackgroundModeTxt.setOnClickListener {
             val checkedVal = includeView.firewallBackgroundModeCheck.isChecked
@@ -160,6 +153,10 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
                             includeView.firewallBackgroundModeCheck.isChecked = false
                             persistentState.setIsBackgroundEnabled(false)
                         }
+                    } else {
+                        GlobalVariable.isBackgroundEnabled = !checkedVal
+                        persistentState.setIsBackgroundEnabled(!checkedVal)
+                        includeView.firewallBackgroundModeCheck.isChecked = !checkedVal
                     }
                     GlobalVariable.isBackgroundEnabled = !checkedVal
                     persistentState.setIsBackgroundEnabled(!checkedVal)
@@ -187,6 +184,10 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
                             includeView.firewallBackgroundModeCheck.isChecked = false
                             persistentState.setIsBackgroundEnabled(false)
                         }
+                    }else {
+                        GlobalVariable.isBackgroundEnabled = !checkedVal
+                        persistentState.setIsBackgroundEnabled(!checkedVal)
+                        includeView.firewallBackgroundModeCheck.isChecked = !checkedVal
                     }
                     GlobalVariable.isBackgroundEnabled = !checkedVal
                     persistentState.setIsBackgroundEnabled(!checkedVal)
@@ -204,9 +205,8 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         }
 
         val appCount = GlobalVariable.appList.size
-        val act: FirewallActivity = requireContext() as FirewallActivity
-        appInfoRepository.getWhitelistCountLiveData().observe(act, {
-            includeView.firewallUnivWhitelistCount.text = "$it/$appCount apps whitelisted."
+        appInfoRepository.getWhitelistCountLiveData().observe(viewLifecycleOwner, {
+            includeView.firewallUnivWhitelistCount.text = getString(R.string.whitelist_dialog_apps_in_use, it.toString(), appCount.toString())
         })
 
         includeView.firewallAppsShowTxt.setOnClickListener {
@@ -217,7 +217,14 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             // it will throw exception
             customDialog.show()
             customDialog.setCanceledOnTouchOutside(false)
-            Handler().postDelayed({ includeView.firewallAppsShowTxt.isEnabled = true }, 100)
+            object : CountDownTimer(100, 500) {
+                override fun onTick(millisUntilFinished: Long) {
+                }
+
+                override fun onFinish() {
+                    includeView.firewallAppsShowTxt.isEnabled = true
+                }
+            }.start()
         }
 
         includeView.firewallRulesShowTxt.setOnClickListener {
@@ -270,18 +277,17 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             builder.setTitle(R.string.univ_delete_firewall_dialog_title)
             //set message for alert dialog
             builder.setMessage(R.string.univ_delete_firewall_dialog_message)
-            builder.setIcon(android.R.drawable.ic_dialog_alert)
             builder.setCancelable(true)
             //performing positive action
-            builder.setPositiveButton("Delete all") { _, _ ->
+            builder.setPositiveButton(getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->
 
                 blockedConnectionsRepository.deleteAllIPRulesUniversal()
                 GlobalVariable.firewallRules.clear()
-                Utilities.showToastInMidLayout(requireContext(), "Deleted all IP rules.", Toast.LENGTH_SHORT)
+                Utilities.showToastInMidLayout(requireContext(), getString(R.string.univ_ip_delete_toast_success), Toast.LENGTH_SHORT)
             }
 
             //performing negative action
-            builder.setNegativeButton("Cancel") { _, _ ->
+            builder.setNegativeButton(getString(R.string.univ_ip_delete_dialog_negative)) { _, _ ->
             }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
@@ -289,7 +295,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             alertDialog.setCancelable(true)
             alertDialog.show()
         } else {
-            Utilities.showToastInMidLayout(requireContext(), "No IP rules set", Toast.LENGTH_SHORT)
+            Utilities.showToastInMidLayout(requireContext(), getString(R.string.univ_ip_no_rules_set), Toast.LENGTH_SHORT)
         }
     }
 
@@ -297,8 +303,14 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         super.onResume()
         b.appScrollingInclFirewall.firewallUnknownConnectionModeCheck.isChecked = persistentState.blockUnknownConnections
         if (Utilities.isAccessibilityServiceEnabledEnhanced(requireContext(), BackgroundAccessibilityService::class.java)) {
-            if (DEBUG) Log.d(LOG_TAG, "Background - onLoad accessibility is true")
-            b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = persistentState.backgroundEnabled
+            if(!Utilities.isAccessibilityServiceEnabled(requireContext(), BackgroundAccessibilityService::class.java) && persistentState.backgroundEnabled){
+                b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = false
+                persistentState.backgroundEnabled = false
+                showAlertForPermission(true)
+            }else{
+                if (DEBUG) Log.d(LOG_TAG, "Background - onLoad accessibility is true")
+                b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = persistentState.backgroundEnabled
+            }
         } else {
             if (DEBUG) Log.d(LOG_TAG, "Background - onLoad accessibility is true, changed pref")
             persistentState.setIsBackgroundEnabled(false)
@@ -309,34 +321,43 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
     private fun showAlertForPermission(isRegrant: Boolean): Boolean {
         var isAllowed = false
         val builder = AlertDialog.Builder(requireContext())
-        //set title for alert dialog
+        //set title and message for alert dialog
         if (isRegrant) {
             builder.setTitle(R.string.alert_permission_accessibility_regrant)
+            val text = getString(R.string.alert_firewall_accessibility_regrant_explanation)
+            builder.setMessage(R.string.alert_firewall_accessibility_regrant_explanation)
+            builder.setPositiveButton(getString(R.string.univ_accessibility_crash_dialog_positive)) { _, _ ->
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                val packageName = requireContext().packageName
+                intent.data = Uri.parse("package:$packageName")
+                startActivity(intent)
+            }
+            //performing negative action
+            builder.setNegativeButton(getString(R.string.univ_accessibility_crash_dialog_negative)) { _, _ ->
+                persistentState.backgroundEnabled = false
+            }
         } else {
             builder.setTitle(R.string.alert_permission_accessibility)
-        }
-        //set message for alert dialog
-        if (isRegrant) {
-            builder.setMessage(R.string.alert_firewall_accessibility_regrant_explanation)
-        } else {
             builder.setMessage(R.string.alert_firewall_accessibility_explanation)
+            builder.setPositiveButton(getString(R.string.univ_accessibility_dialog_positive)) { _, _ ->
+                isAllowed = true
+                val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                startActivityForResult(intent, 0)
+            }
+            //performing negative action
+            builder.setNegativeButton(getString(R.string.univ_accessibility_dialog_negative)) { _, _ ->
+                persistentState.backgroundEnabled = false
+            }
         }
 
-        builder.setIcon(android.R.drawable.ic_dialog_alert)
         //performing positive action
-        builder.setPositiveButton("Grant") { _, _ ->
-            isAllowed = true
-            val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-            startActivityForResult(intent, 0)
-        }
-        //performing negative action
-        builder.setNegativeButton("Deny") { _, _ ->
-        }
+
         // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()
         // Set other dialog properties
         alertDialog.setCancelable(false)
         alertDialog.show()
+        alertDialog.setCancelable(false)
         return isAllowed
     }
 

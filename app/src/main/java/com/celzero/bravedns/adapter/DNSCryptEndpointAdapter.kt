@@ -16,7 +16,6 @@ limitations under the License.
 
 package com.celzero.bravedns.adapter
 
-import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -26,7 +25,6 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.getSystemService
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -56,9 +54,9 @@ class DNSCryptEndpointAdapter(private val context: Context,
     //private var serverList : MutableList<DNSCryptEndpoint> = ArrayList()
 
     companion object {
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DNSCryptEndpoint>() {
-            // Concert details may have changed if reloaded from the database,
-            // but ID is fixed.
+        private val DIFF_CALLBACK = object :
+            DiffUtil.ItemCallback<DNSCryptEndpoint>() {
+
             override fun areItemsTheSame(oldConnection: DNSCryptEndpoint, newConnection: DNSCryptEndpoint) = oldConnection.id == newConnection.id
 
             override fun areContentsTheSame(oldConnection: DNSCryptEndpoint, newConnection: DNSCryptEndpoint): Boolean {
@@ -82,6 +80,7 @@ class DNSCryptEndpointAdapter(private val context: Context,
 
     inner class DNSCryptEndpointViewHolder(private val b: DnsCryptEndpointListItemBinding) : RecyclerView.ViewHolder(b.root) {
 
+
         fun update(dnsCryptEndpoint: DNSCryptEndpoint) {
             if (DEBUG) Log.d(LOG_TAG, "dnsCryptEndpoint adapter -- ${dnsCryptEndpoint.dnsCryptName}")
             b.dnsCryptEndpointListUrlName.text = dnsCryptEndpoint.dnsCryptName
@@ -101,11 +100,13 @@ class DNSCryptEndpointAdapter(private val context: Context,
             } else {
                 b.dnsCryptEndpointListInfoImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_appinfo))
             }
+
             b.dnsCryptEndpointListActionImage.isChecked = dnsCryptEndpoint.isSelected
             b.root.setOnClickListener {
                 b.dnsCryptEndpointListActionImage.isChecked = !b.dnsCryptEndpointListActionImage.isChecked
                 dnsCryptEndpoint.isSelected = b.dnsCryptEndpointListActionImage.isChecked
                 //serverList.add(dnsCryptEndpoint)
+
                 val state = updateDNSCryptDetails(dnsCryptEndpoint)
                 if (!state) {
                     b.dnsCryptEndpointListActionImage.isChecked = !state
@@ -142,10 +143,9 @@ class DNSCryptEndpointAdapter(private val context: Context,
             builder.setTitle(R.string.dns_crypt_custom_url_remove_dialog_title)
             //set message for alert dialog
             builder.setMessage(R.string.dns_crypt_url_remove_dialog_message)
-            builder.setIcon(android.R.drawable.ic_dialog_alert)
             builder.setCancelable(true)
             //performing positive action
-            builder.setPositiveButton("Delete") { dialogInterface, which ->
+            builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { dialogInterface, which ->
                 GlobalScope.launch(Dispatchers.IO) {
                     if (dnsCryptEndpoint != null) {
                         dnsCryptEndpointRepository.deleteDNSCryptEndpoint(dnsCryptEndpoint.dnsCryptURL)
@@ -155,7 +155,7 @@ class DNSCryptEndpointAdapter(private val context: Context,
             }
 
             //performing negative action
-            builder.setNegativeButton("Cancel") { dialogInterface, which ->
+            builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { dialogInterface, which ->
             }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
@@ -172,11 +172,11 @@ class DNSCryptEndpointAdapter(private val context: Context,
             builder.setMessage(url + "\n\n" + message)
             builder.setCancelable(true)
             //performing positive action
-            builder.setPositiveButton("Ok") { dialogInterface, which ->
+            builder.setPositiveButton(context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
                 dialogInterface.dismiss()
             }
 
-            builder.setNeutralButton("Copy") { dialogInterface: DialogInterface, i: Int ->
+            builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
                 val clipboard: ClipboardManager? = context.getSystemService()
                 val clip = ClipData.newPlainText("URL", url)
                 clipboard?.setPrimaryClip(clip)
@@ -218,9 +218,9 @@ class DNSCryptEndpointAdapter(private val context: Context,
 
         private fun updateDNSCryptDetails(dnsCryptEndpoint: DNSCryptEndpoint): Boolean {
             val list = dnsCryptEndpointRepository.getConnectedDNSCrypt()
-            if (list.size == 1) {
-                if (!dnsCryptEndpoint.isSelected && list[0].dnsCryptURL == dnsCryptEndpoint.dnsCryptURL) {
-                    Toast.makeText(context, "Atleast one resolver should be selected.", Toast.LENGTH_SHORT).show()
+            if(list.size == 1){
+                if(!dnsCryptEndpoint.isSelected && list[0].dnsCryptURL == dnsCryptEndpoint.dnsCryptURL){
+                    Toast.makeText(context,context.getString(R.string.dns_select_toast),Toast.LENGTH_SHORT).show()
                     return false
                 }
             }
@@ -233,6 +233,8 @@ class DNSCryptEndpointAdapter(private val context: Context,
                 override fun onFinish() {
                     notifyDataSetChanged()
                     persistentState.dnsType = 2
+                    val connectedDNS = dnsCryptEndpointRepository.getConnectedCount()
+                    persistentState.setConnectedDNS("DNSCrypt: $connectedDNS resolvers")
                     queryTracker.reinitializeQuantileEstimator()
                 }
             }.start()
@@ -240,11 +242,8 @@ class DNSCryptEndpointAdapter(private val context: Context,
             persistentState.connectionModeChange = dnsCryptEndpoint.dnsCryptURL
             listener.updateUIFromAdapter(2)
             appMode?.setDNSMode(Settings.DNSModeCryptPort)
-            //mDb.close()
+
             return true
         }
-
     }
-
-
 }

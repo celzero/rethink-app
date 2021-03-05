@@ -96,7 +96,6 @@ class VpnController {
         Log.i(LOG_TAG,"VPNController - Start(Synchronized) executed - $context")
     }
 
-    @Synchronized
     fun onStartComplete(context: Context?, succeeded: Boolean) {
         if (!succeeded) {
             // VPN setup only fails if VPN permission has been revoked.  If this happens, clear the
@@ -105,9 +104,9 @@ class VpnController {
         } else {
             stateChanged(context!!)
         }
+        Log.d(LOG_TAG, "onStartComplete - VpnController")
     }
 
-    @Synchronized
     fun stop(context: Context?) {
         Log.i(LOG_TAG,"VPN Controller stop - ${context!!}")
         VpnControllerHelper.persistentState.vpnEnabled = false
@@ -119,7 +118,6 @@ class VpnController {
         stateChanged(context)
     }
 
-    //@Synchronized
     fun getState(context: Context?): VpnState? {
         val requested: Boolean = VpnControllerHelper.persistentState.vpnEnabled
         val on = braveVpnService != null && braveVpnService!!.isOn()
@@ -129,9 +127,6 @@ class VpnController {
         return VpnState(requested, on, connectionState)
     }
 
-    /*fun test(){
-        braveVpnService!!.test()
-    }*/
 }
 
 internal object VpnControllerHelper:KoinComponent {

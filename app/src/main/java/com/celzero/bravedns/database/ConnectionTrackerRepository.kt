@@ -17,8 +17,6 @@ package com.celzero.bravedns.database
 
 import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.paging.PagedList
-import androidx.paging.toLiveData
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
@@ -45,7 +43,6 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
     fun insertAsync(connectionTracker: ConnectionTracker, coroutineScope: CoroutineScope = GlobalScope) {
         //coroutineScope.launch {
             connectionTrackerDAO.insert(connectionTracker)
-            deleteConnectionTrackerCount()
         //}
     }
 
@@ -54,9 +51,9 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
         connectionTrackerDAO.insertBulk(connTrackerList)
     }
 
-    fun getConnectionTrackerLiveData(): LiveData<PagedList<ConnectionTracker>> {
-        return connectionTrackerDAO.getConnectionTrackerLiveData().toLiveData(pageSize = 50)
-    }
+    /*fun getConnectionTrackerLiveData(): LiveData<PagedList<ConnectionTracker>> {
+        return connectionTrackerDAO.getConnectionTrackerLiveData().toLiveData(pageSize = 20)
+    }*/
 
     fun deleteConnectionTrackerCount(coroutineScope: CoroutineScope = GlobalScope)  {
         //coroutineScope.launch {

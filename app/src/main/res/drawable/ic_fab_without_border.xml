@@ -7,7 +7,7 @@
       android:pathData="M20,12L4,12M12,4L12,20"
       android:strokeLineJoin="miter"
       android:strokeWidth="1"
-      android:fillColor="#00000000"
-      android:strokeColor="#05dfd7"
+      android:fillColor="?attr/svgFillColor"
+      android:strokeColor="@color/white"
       android:strokeLineCap="square"/>
 </vector>

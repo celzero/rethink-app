@@ -11,13 +11,13 @@
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/firewall_act_tabLayout"
         android:layout_width="match_parent"
-        android:background="@color/colorPrimaryDark"
-        app:tabTextColor="@color/secondaryText"
+        android:background="?attr/colorPrimaryDark"
+        app:tabTextColor="?attr/secondaryTextColor"
         android:layout_height="wrap_content" />
 
-    <androidx.viewpager2.widget.ViewPager2
+    <androidx.viewpager.widget.ViewPager
         android:id="@+id/firewall_act_viewpager"
-        android:nestedScrollingEnabled="true"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
