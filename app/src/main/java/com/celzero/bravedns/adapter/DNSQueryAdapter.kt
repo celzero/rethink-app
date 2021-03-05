@@ -56,11 +56,8 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
 
         return if (viewType == TYPE_TRANSACTION) {
-            val v: View = LayoutInflater.from(parent.context).inflate(
-                R.layout.transaction_row,
-                parent, false
-            )
-            TransactionViewHolder(v)
+            val itemBinding = TransactionRowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            TransactionViewHolder(itemBinding)
         } else {
             throw AssertionError(String.format(Locale.ROOT, "Unknown viewType %d", viewType))
         }
@@ -72,40 +69,41 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
         fun update(transaction: DNSLogs, position: Int) {
             // This function can be run up to a dozen times while blocking rendering, so it needs to be
             // as brief as possible.
-          if(transaction != null) {
-            //this.transaction = transaction
-            b.responseTime.text = convertLongToTime(transaction.time)
-            b.flag.text = transaction.flag
-            //fqdnView!!.text = Utilities.getETldPlus1(transaction.fqdn!!)
-            b.fqdn.text = transaction.queryStr
-            b.latencyVal.text = transaction.latency.toString() + "ms"
+            if (transaction != null) {
+                //this.transaction = transaction
+                b.responseTime.text = convertLongToTime(transaction.time)
+                b.flag.text = transaction.flag
+                //fqdnView!!.text = Utilities.getETldPlus1(transaction.fqdn!!)
+                b.fqdn.text = transaction.queryStr
+                b.latencyVal.text = transaction.latency.toString() + "ms"
 
-            if (transaction.isBlocked) {
-                b.queryLogIndicator.visibility = View.VISIBLE
-            } else {
-                b.queryLogIndicator.visibility = View.INVISIBLE
+                if (transaction.isBlocked) {
+                    b.queryLogIndicator.visibility = View.VISIBLE
+                } else {
+                    b.queryLogIndicator.visibility = View.INVISIBLE
+                }
+                b.root.setOnClickListener {
+                    //if (!transaction.blockList.isNullOrEmpty()) {
+                    b.root.isEnabled = false
+                    openBottomSheet(transaction)
+                    b.root.isEnabled = true
+                    //}
+
+                }
+
             }
-            b.root.setOnClickListener {
-                //if (!transaction.blockList.isNullOrEmpty()) {
-                b.root.isEnabled = false
-                openBottomSheet(transaction)
-                b.root.isEnabled = true
-                //}
-
-            }
-
         }
-    }
 
-    fun openBottomSheet(transaction: DNSLogs) {
-        val bottomSheetFragment = DNSBlockListBottomSheetFragment(context, transaction)
-        val frag = context as FragmentActivity
-        bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
-    }
+        private fun openBottomSheet(transaction: DNSLogs) {
+            val bottomSheetFragment = DNSBlockListBottomSheetFragment(context, transaction)
+            val frag = context as FragmentActivity
+            bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
+        }
 
-    fun convertLongToTime(time: Long): String {
-        val date = Date(time)
-        val format = SimpleDateFormat(Constants.DATE_FORMAT_PATTERN)
-        return format.format(date)
+        private fun convertLongToTime(time: Long): String {
+            val date = Date(time)
+            val format = SimpleDateFormat(Constants.DATE_FORMAT_PATTERN)
+            return format.format(date)
+        }
     }
 }
