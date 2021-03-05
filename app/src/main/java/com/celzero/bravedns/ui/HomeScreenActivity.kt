@@ -356,7 +356,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun popupSnackBarForCompleteUpdate() {
-        val snackbar = Snackbar.make(this.findViewById(R.id.container), "New Version is downloaded.", Snackbar.LENGTH_INDEFINITE)
+        val snackbar = Snackbar.make(b.container, "New Version is downloaded.", Snackbar.LENGTH_INDEFINITE)
         snackbar.setAction("RESTART") { appUpdateManager.completeUpdate() }
         snackbar.setActionTextColor(ContextCompat.getColor(this, R.color.textColorMain))
         snackbar.show()

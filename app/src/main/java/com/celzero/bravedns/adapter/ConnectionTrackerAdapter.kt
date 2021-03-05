@@ -23,9 +23,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.paging.PagedListAdapter
@@ -34,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTracker
+import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
 import com.celzero.bravedns.util.Constants
@@ -41,7 +40,7 @@ import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
 
-class ConnectionTrackerAdapter(val context : Context) : PagedListAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(DIFF_CALLBACK) {
+class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(DIFF_CALLBACK) {
 
 
     companion object {
@@ -51,114 +50,68 @@ class ConnectionTrackerAdapter(val context : Context) : PagedListAdapter<Connect
             override fun areItemsTheSame(oldConnection: ConnectionTracker, newConnection: ConnectionTracker)
                 = oldConnection.id == newConnection.id
 
-            override fun areContentsTheSame(oldConnection: ConnectionTracker, newConnection: ConnectionTracker)
-                = oldConnection == newConnection
+            override fun areContentsTheSame(oldConnection: ConnectionTracker, newConnection: ConnectionTracker) = oldConnection == newConnection
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConnectionTrackerViewHolder {
-       val v: View = LayoutInflater.from(parent.context).inflate(
-                       R.layout.connection_transaction_row,
-                       parent, false
-                   )
-        return ConnectionTrackerViewHolder(v)
+        val itemBinding = ConnectionTransactionRowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ConnectionTrackerViewHolder(itemBinding)
     }
 
     override fun onBindViewHolder(holder: ConnectionTrackerViewHolder, position: Int) {
-        val connTracker: ConnectionTracker? = getItem(position)
+        val connTracker: ConnectionTracker = getItem(position) ?: return
         holder.update(connTracker, position)
     }
 
 
+    inner class ConnectionTrackerViewHolder(private val b: ConnectionTransactionRowBinding) : RecyclerView.ViewHolder(b.root) {
 
-    inner class ConnectionTrackerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-        // Overall view
-        private var rowView: View? = null
-
-        private var parentView: LinearLayout? = null
-
-        // Contents of the condensed view
-        private var timeView: TextView? = null
-        private var flagView: TextView? = null
-
-        private var fqdnView: TextView? = null
-        private var ipView: TextView? = null
-        private var latencyTxt: TextView? = null
-        private var queryLayoutLL: LinearLayout? = null
-        private var connectionType: TextView? = null
-        private var appIcon: ImageView? = null
-        private var connectionIndicator: TextView? = null
-
-        init {
-            rowView = itemView
-            parentView = itemView.findViewById(R.id.connection_parent_layout)
-            timeView = itemView.findViewById(R.id.connection_response_time)
-            flagView = itemView.findViewById(R.id.connection_flag)
-            fqdnView = itemView.findViewById(R.id.connection_app_name)
-            ipView = itemView.findViewById(R.id.connection_ip_address)
-            latencyTxt = itemView.findViewById(R.id.conn_latency_txt)
-            connectionType = itemView.findViewById(R.id.connection_type)
-            queryLayoutLL = itemView.findViewById(R.id.connection_screen_ll)
-            appIcon = itemView.findViewById(R.id.connection_app_icon)
-            connectionIndicator = itemView.findViewById(R.id.connection_status_indicator)
-        }
-
-        fun update(connTracker: ConnectionTracker?, position: Int) {
-            if(connTracker != null){
-                val time = Utilities.convertLongToTime(connTracker.timeStamp)
-                timeView!!.text = time
-                flagView!!.text = connTracker.flag
-                ipView!!.text = connTracker.ipAddress
-                latencyTxt!!.text = connTracker.port.toString()
-                fqdnView!!.text = connTracker.appName
-                connectionType!!.text = Protocol.getProtocolName(connTracker.protocol).name
-                if (connTracker.isBlocked) {
-                    connectionIndicator!!.visibility = View.VISIBLE
-                    connectionIndicator!!.setBackgroundColor(ContextCompat.getColor(context, R.color.colorRed_A400))
-                }else if(connTracker.blockedByRule.equals(BraveVPNService.BlockedRuleNames.RULE7.ruleName)){
-                    connectionIndicator!!.visibility = View.VISIBLE
-                    connectionIndicator!!.setBackgroundColor(fetchTextColor(R.color.dividerColor))
-                }else {
-                    connectionIndicator!!.visibility = View.INVISIBLE
+        fun update(connTracker: ConnectionTracker, position: Int) {
+            val time = Utilities.convertLongToTime(connTracker.timeStamp)
+            b.connectionResponseTime.text = time
+            b.connectionFlag.text = connTracker.flag
+            b.connectionIpAddress.text = connTracker.ipAddress
+            b.connLatencyTxt.text = connTracker.port.toString()
+            b.connectionAppName.text = connTracker.appName
+            b.connectionType.text = Protocol.getProtocolName(connTracker.protocol).name
+            when {
+                connTracker.isBlocked -> {
+                    b.connectionStatusIndicator.visibility = View.VISIBLE
+                    b.connectionStatusIndicator.setBackgroundColor(ContextCompat.getColor(context, R.color.colorRed_A400))
                 }
-                if (connTracker.appName != Constants.UNKNOWN_APP) {
-                    try {
-                        val appArray = context.packageManager.getPackagesForUid(connTracker.uid)
-                        if(appArray != null) {
-                            val appCount = (appArray.size).minus(1)
-                            if (appArray.size > 2) {
-                                fqdnView!!.text = context.getString(R.string.ct_app_names, connTracker.appName, appCount.toString())
-                            } else if (appArray.size == 2) {
-                                fqdnView!!.text = context.getString(R.string.ct_app_name, connTracker.appName, appCount.toString())
-                            }
-                            Glide.with(context)
-                                .load(context.packageManager.getApplicationIcon(appArray[0]!!))
-                                .error(ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground))
-                                .into(appIcon!!)
-                        }else{
-                            Glide.with(context).load(ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground)).into(appIcon!!)
-                        }
-                    } catch (e: Exception) {
-                        Glide.with(context)
-                            .load(ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground))
-                            .into(appIcon!!)
-                        Log.w(LOG_TAG, "Package Not Found - " + e.message, e)
+                connTracker.blockedByRule.equals(BraveVPNService.BlockedRuleNames.RULE7.ruleName) -> {
+                    b.connectionStatusIndicator.visibility = View.VISIBLE
+                    b.connectionStatusIndicator.setBackgroundColor(ContextCompat.getColor(context, R.color.dividerColor))
+                }
+                else -> {
+                    b.connectionStatusIndicator.visibility = View.INVISIBLE
+                }
+            }
+            if (connTracker.appName != "Unknown") {
+                try {
+                    val appArray = context.packageManager.getPackagesForUid(connTracker.uid)
+                    val appCount = (appArray?.size)?.minus(1)
+                    if (appArray?.size!! > 2) {
+                        b.connectionAppName.text = "${connTracker.appName} + $appCount other apps"
+                    } else if (appArray.size == 2) {
+                        b.connectionAppName.text = "${connTracker.appName} + $appCount other app"
                     }
-                }else{
-                    Glide.with(context)
-                        .load(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
-                        .into(appIcon!!)
+                    Glide.with(context).load(context.packageManager.getApplicationIcon(appArray[0]!!)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)
+                } catch (e: Exception) {
+                    Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)
+                    Log.e(LOG_TAG, "Package Not Found - " + e.message, e)
                 }
+            } else {
+                Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)
+            }
 
-                parentView!!.setOnClickListener {
-                    parentView!!.isEnabled = false
-                    val bottomSheetFragment = ConnTrackerBottomSheetFragment(context, connTracker)
-                    val frag = context as FragmentActivity
-                    bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
-                    parentView!!.isEnabled = true
-                }
-
+            b.connectionParentLayout.setOnClickListener {
+                b.connectionParentLayout.isEnabled = false
+                val bottomSheetFragment = ConnTrackerBottomSheetFragment(context, connTracker)
+                val frag = context as FragmentActivity
+                bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
+                b.connectionParentLayout.isEnabled = true
             }
 
         }

@@ -22,15 +22,10 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -40,6 +35,7 @@ import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.CategoryInfoRepository
+import com.celzero.bravedns.databinding.UnivWhitelistListItemBinding
 import com.celzero.bravedns.service.BraveVPNService.Companion.appWhiteList
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
@@ -51,91 +47,70 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class UniversalAppListAdapter(
-    private val context: Context,
-    private val appInfoRepository: AppInfoRepository,
-    private val categoryInfoRepository:CategoryInfoRepository,
-    private val persistentState:PersistentState
-)  : PagedListAdapter<AppInfo, UniversalAppListAdapter.UniversalAppInfoViewHolder>(DIFF_CALLBACK) {
+class UniversalAppListAdapter(private val context: Context, private val appInfoRepository: AppInfoRepository, private val categoryInfoRepository: CategoryInfoRepository, private val persistentState: PersistentState) : PagedListAdapter<AppInfo, UniversalAppListAdapter.UniversalAppInfoViewHolder>(DIFF_CALLBACK) {
 
     companion object {
+
         private val DIFF_CALLBACK = object :
             DiffUtil.ItemCallback<AppInfo>() {
 
             override fun areItemsTheSame(oldConnection: AppInfo, newConnection: AppInfo)
                 = oldConnection.packageInfo == newConnection.packageInfo
 
-            override fun areContentsTheSame(oldConnection: AppInfo, newConnection: AppInfo)
-                = oldConnection == newConnection
+            override fun areContentsTheSame(oldConnection: AppInfo, newConnection: AppInfo) = oldConnection == newConnection
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UniversalAppInfoViewHolder {
-       val v: View = LayoutInflater.from(parent.context).inflate(
-           R.layout.univ_whitelist_list_item,
-           parent, false
-       )
-
-        return UniversalAppInfoViewHolder(v)
+        val itemBinding = UnivWhitelistListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return UniversalAppInfoViewHolder(itemBinding)
     }
 
     override fun onBindViewHolder(holder: UniversalAppInfoViewHolder, position: Int) {
-        val appInfo: AppInfo? = getItem(position)
+        val appInfo: AppInfo = getItem(position) ?: return
         holder.update(appInfo)
     }
 
 
+    inner class UniversalAppInfoViewHolder(private val b: UnivWhitelistListItemBinding) : RecyclerView.ViewHolder(b.root) {
 
-    inner class UniversalAppInfoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        fun update(appInfo: AppInfo) {
+            if (appInfo.appCategory == Constants.APP_CAT_SYSTEM_COMPONENTS) {
+                b.univWhitelistApkLabelTv.text = appInfo.appName//+ Constants.RECOMMENDED
+            } else {
+                b.univWhitelistApkLabelTv.text = appInfo.appName
+            }
 
-        // Overall view
-        private var rowView: View? = null
+            b.univWhitelistCheckbox.isChecked = appInfo.whiteListUniv1
+            try {
+                Glide.with(context).load(context.packageManager.getApplicationIcon(appInfo.packageInfo)).into(b.univWhitelistApkIconIv)
+                //val icon = context.packageManager.getApplicationIcon(appInfo.packageInfo)
+                //appIcon.setImageDrawable(icon)
+            } catch (e: Exception) {
+                Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.univWhitelistApkIconIv)
+                //appIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
+                Log.e(LOG_TAG, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message, e)
+            }
 
-        private var parentView: RelativeLayout? = null
+            b.univWhitelistContainer.setOnClickListener {
+                if (DEBUG) Log.d(LOG_TAG, "parentView- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
+                appInfo.whiteListUniv1 = !appInfo.whiteListUniv1
+                modifyWhiteListApps(appInfo)
+                /*object : CountDownTimer(1000, 500) {
+                    override fun onTick(millisUntilFinished: Long) {
+                    }
+                    override fun onFinish() {
 
-        // Contents of the condensed view
-        private var appName: TextView
-        private var appIcon : ImageView
-        private var checkBox : AppCompatCheckBox
+                    }
+                }.start()*/
 
-        init {
-            rowView = itemView
-            parentView = itemView.findViewById(R.id.univ_whitelist_container)
-            appName = itemView.findViewById(R.id.univ_whitelist_apk_label_tv)
-            appIcon = itemView.findViewById(R.id.univ_whitelist_apk_icon_iv)
-            checkBox = itemView.findViewById(R.id.univ_whitelist_checkbox)
-        }
+            }
 
-        fun update(appInfo: AppInfo?) {
-            if(appInfo != null){
-                if(appInfo.appCategory == Constants.APP_CAT_SYSTEM_COMPONENTS){
-                    appName.text = appInfo.appName
-                }else{
-                    appName.text = appInfo.appName
-                }
-
-                checkBox.isChecked = appInfo.whiteListUniv1
-                try {
-                    Glide.with(context).load(context.packageManager.getApplicationIcon(appInfo.packageInfo))
-                        .into(appIcon)
-                } catch (e: Exception) {
-                    Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
-                        .into(appIcon)
-                    Log.w(LOG_TAG, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message, e)
-                }
-
-                parentView?.setOnClickListener{
-                    if(DEBUG) Log.d(LOG_TAG,"parentView- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
-                    appInfo.whiteListUniv1 = !appInfo.whiteListUniv1
-                    modifyWhiteListApps(appInfo)
-                }
-
-                checkBox.setOnCheckedChangeListener(null)
-                checkBox.setOnClickListener{
-                    if(DEBUG) Log.d(LOG_TAG,"CheckBox- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
-                    appInfo.whiteListUniv1 = !appInfo.whiteListUniv1
-                    modifyWhiteListApps(appInfo)
-                }
+            b.univWhitelistCheckbox.setOnCheckedChangeListener(null)
+            b.univWhitelistCheckbox.setOnClickListener {
+                if (DEBUG) Log.d(LOG_TAG, "CheckBox- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
+                appInfo.whiteListUniv1 = !appInfo.whiteListUniv1
+                modifyWhiteListApps(appInfo)
             }
         }
 
@@ -143,14 +118,15 @@ class UniversalAppListAdapter(
             val status = appInfo.whiteListUniv1
             appWhiteList[appInfo.uid] = status
             val appUIDList = appInfoRepository.getAppListForUID(appInfo.uid)
+
             var blockAllApps = false
             if (appUIDList.size > 1) {
                 blockAllApps = showDialog(appUIDList, appInfo.appName, status)
             }else{
                 blockAllApps = true
             }
-            if(blockAllApps) {
-                checkBox.isChecked = status
+            if (blockAllApps) {
+                b.univWhitelistCheckbox.isChecked = status
                 CoroutineScope(Dispatchers.IO).launch {
                     if (status) {
                         appUIDList.forEach {
@@ -167,8 +143,8 @@ class UniversalAppListAdapter(
                     categoryInfoRepository.updateBlockedCount(appInfo.appCategory, countBlocked)
                     categoryInfoRepository.updateWhitelistCount(appInfo.appCategory, countWhitelisted)
                 }
-            }else{
-                checkBox.isChecked = !status
+            } else {
+                b.univWhitelistCheckbox.isChecked = !status
                 appInfo.whiteListUniv1 = !status
             }
         }
@@ -184,8 +160,8 @@ class UniversalAppListAdapter(
 
             builderSingle.setIcon(R.drawable.ic_whitelist)
             var appNameEllipsis = appName
-            if(isInternet) {
-                if(appNameEllipsis.length > 10) {
+            if (isInternet) {
+                if (appNameEllipsis.length > 10) {
                     appNameEllipsis = appNameEllipsis.substring(0, 10)
                     appNameEllipsis = "$appNameEllipsis..."
                 }
@@ -195,10 +171,7 @@ class UniversalAppListAdapter(
                 builderSingle.setTitle(context.getString(R.string.whitelist_remove_app, appNameEllipsis, packageList.size.toString()))
                 positiveTxt = context.getString(R.string.whitelist_add_negative, packageList.size.toString())
             }
-            val arrayAdapter = ArrayAdapter<String>(
-                context,
-                android.R.layout.simple_list_item_activated_1
-            )
+            val arrayAdapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_activated_1)
             arrayAdapter.addAll(packageNameList)
             builderSingle.setCancelable(false)
             builderSingle.setItems(packageNameList.toTypedArray(), null)

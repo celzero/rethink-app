@@ -26,7 +26,6 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.*
-import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,6 +33,9 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.*
 import com.celzero.bravedns.database.*
+import com.celzero.bravedns.databinding.DialogSetCustomUrlBinding
+import com.celzero.bravedns.databinding.DialogSetDnsCryptBinding
+import com.celzero.bravedns.databinding.DialogSetDnsProxyBinding
 import com.celzero.bravedns.databinding.FragmentConfigureDnsBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
@@ -254,12 +256,12 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
         dialog.setCanceledOnTouchOutside(false)
         dialog.window!!.attributes = lp
 
-        val applyURLBtn = dialog.findViewById(R.id.dialog_custom_url_ok_btn) as AppCompatButton
-        val cancelURLBtn = dialog.findViewById(R.id.dialog_custom_url_cancel_btn) as AppCompatButton
-        val customName = dialog.findViewById(R.id.dialog_custom_name_edit_text) as EditText
-        val customURL: EditText = dialog.findViewById(R.id.dialog_custom_url_edit_text) as EditText
-        val progressBar: ProgressBar = dialog.findViewById(R.id.dialog_custom_url_loading) as ProgressBar
-        val errorTxt: TextView = dialog.findViewById(R.id.dialog_custom_url_failure_text) as TextView
+        val applyURLBtn = dialogBinding.dialogCustomUrlOkBtn
+        val cancelURLBtn = dialogBinding.dialogCustomUrlCancelBtn
+        val customName = dialogBinding.dialogCustomNameEditText
+        val customURL = dialogBinding.dialogCustomUrlEditText
+        val progressBar = dialogBinding.dialogCustomUrlLoading
+        val errorTxt = dialogBinding.dialogCustomUrlFailureText
 
         var count = dohEndpointRepository.getCount()
         count += 1
@@ -337,6 +339,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
 
 
     private fun showDialogForDNSProxy() {
+        val dialogBinding = DialogSetDnsProxyBinding.inflate(layoutInflater)
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setTitle(getString(R.string.cd_custom_dns_proxy_title))
@@ -349,17 +352,18 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
         dialog.show()
         dialog.setCancelable(false)
         dialog.setCanceledOnTouchOutside(false)
+
         dialog.window!!.attributes = lp
 
-        val applyURLBtn = dialog.findViewById(R.id.dialog_dns_proxy_apply_btn) as AppCompatButton
-        val cancelURLBtn = dialog.findViewById(R.id.dialog_dns_proxy_cancel_btn) as AppCompatButton
-        val proxyNameEditText = dialog.findViewById(R.id.dialog_dns_proxy_edit_name) as EditText
-        val ipAddressEditText: EditText = dialog.findViewById(R.id.dialog_dns_proxy_edit_ip)
-        val portEditText: EditText = dialog.findViewById(R.id.dialog_dns_proxy_edit_port)
-        val appNameSpinner: Spinner = dialog.findViewById(R.id.dialog_dns_proxy_spinner_appname)
-        val errorTxt: TextView = dialog.findViewById(R.id.dialog_dns_proxy_error_text) as TextView
-        val llSpinnerHeader: LinearLayout = dialog.findViewById(R.id.dialog_dns_proxy_spinner_header)
-        val llIPHeader: LinearLayout = dialog.findViewById(R.id.dialog_dns_proxy_ip_header)
+        val applyURLBtn = dialogBinding.dialogDnsProxyApplyBtn
+        val cancelURLBtn = dialogBinding.dialogDnsProxyCancelBtn
+        val proxyNameEditText = dialogBinding.dialogDnsProxyEditName
+        val ipAddressEditText = dialogBinding.dialogDnsProxyEditIp
+        val portEditText = dialogBinding.dialogDnsProxyEditPort
+        val appNameSpinner = dialogBinding.dialogDnsProxySpinnerAppname
+        val errorTxt = dialogBinding.dialogDnsProxyErrorText
+        val llSpinnerHeader = dialogBinding.dialogDnsProxySpinnerHeader
+        val llIPHeader = dialogBinding.dialogDnsProxyIpHeader
 
         var count = dnsProxyEndpointRepository.getCount()
         count += 1
@@ -381,11 +385,12 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
             val mode = getString(R.string.cd_dns_proxy_mode_external)
             val ip = ipAddressEditText.text.toString()
 
+
             var appName = appNames[appNameSpinner.selectedItemPosition]
             if (appName.isEmpty() || appName == getString(R.string.cd_custom_dns_proxy_default_app)) {
                 appName = appNames[0]
             } else {
-                appName = appInfoRepository.getPackageNameForAppName(appName)
+                appInfoRepository.getPackageNameForAppName(appName)
             }
 
             if (Patterns.IP_ADDRESS.matcher(ip).matches()) {
@@ -455,6 +460,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
 
 
     private fun showDialogForDNSCrypt() {
+        val dialogBinding = DialogSetDnsCryptBinding.inflate(layoutInflater)
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setTitle(getString(R.string.cd_dns_crypt_dialog_title))
@@ -469,14 +475,13 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
         dialog.setCanceledOnTouchOutside(false)
         dialog.window!!.attributes = lp
 
-        val radioServer: RadioButton = dialog.findViewById(R.id.dialog_dns_crypt_radio_server)
-        val radioRelay: RadioButton = dialog.findViewById(R.id.dialog_dns_crypt_radio_relay)
-        val applyURLBtn = dialog.findViewById(R.id.dialog_dns_crypt_ok_btn) as AppCompatButton
-        val cancelURLBtn = dialog.findViewById(R.id.dialog_dns_crypt_cancel_btn) as AppCompatButton
-        val cryptNameEditText = dialog.findViewById(R.id.dialog_dns_crypt_name) as EditText
-        val cryptURLEditText: EditText = dialog.findViewById(R.id.dialog_dns_crypt_url)
-        val cryptDescEditText: EditText = dialog.findViewById(R.id.dialog_dns_crypt_desc)
-        val errorTxt: TextView = dialog.findViewById(R.id.dialog_dns_crypt_error_txt) as TextView
+        val radioServer = dialogBinding.dialogDnsCryptRadioServer
+        val radioRelay = dialogBinding.dialogDnsCryptRadioRelay
+        val applyURLBtn = dialogBinding.dialogDnsCryptOkBtn
+        val cancelURLBtn = dialogBinding.dialogDnsCryptCancelBtn
+        val cryptNameEditText = dialogBinding.dialogDnsCryptName
+        val cryptURLEditText = dialogBinding.dialogDnsCryptUrl
+        val cryptDescEditText = dialogBinding.dialogDnsCryptDesc
 
         radioServer.isChecked = true
         var count = dnsCryptEndpointRepository.getCount()
