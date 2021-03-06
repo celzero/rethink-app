@@ -1,0 +1,34 @@
+Say hello to a safer, transparent, and secure Android.
+
+Open:
+Protects from DNS manipulation typically employed to censor websites, social media, and messaging apps.
+
+Safe:
+Reveals network activity of installed apps and lets you disable, uninstall, or firewall them.
+
+Secure:
+First line of defense against spyware, ransomware, and malware that steal personal information and takeover accounts.
+
+Fast:
+DNS Servers are deployed to 200+ locations world-wide to ensure your internet is as fast and highly available as it can be.
+
+Transparent:
+Open source and free of any trackers.
+
+***Features***
+
+App Firewall:
+Prevent apps from connecting to the Internet.
+
+A firewall blocks any app connecting to the Internet over Wifi or Mobile data. Since most forms of surveillance require the data to be sent the network to a server, firewalling them effectively mitigates the threat (File Managers, Alarm Clock, Calculator are few such examples of apps that do not require any Internet access to function).
+
+Monitoring:
+Keep tabs on incoming and outgoing Internet traffic.
+
+If enabled, the connectivity (DNS) logs are collected and analyzed. Automated reports flag previously unknown or suspicious connections, and reveal the extent of attempt to steal data by spyware networks. In our tests, around 60% of the traffic is flagged and reported as being initiated by known spyware. Logs generated are made available in near-real time to the user for their own analysis.Content Blocking:
+Block spyware, malware and more.
+
+Anti-Censorship:
+The app encrypts your internet connection to Domain Name System (DNS) server run by rethinkdns with presence in our 200+ locations world-wide. DNS servers are the address book of the internet: A DNS server provides the exact addresses you need to visit a website or open an app.
+
+However, it is common to alter responses sent by DNS servers to block access or redirect to fake websites. By encrypting the connection to DNS servers on your Android device, rethinkdns helps ensure that the results can’t be manipulated, so you can safely access the internet.
