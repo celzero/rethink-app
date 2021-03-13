@@ -47,7 +47,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import settings.Settings
 
-
 class DNSCryptEndpointAdapter(private val context: Context,
                               private val dnsCryptEndpointRepository:DNSCryptEndpointRepository,
                               private val persistentState: PersistentState,
@@ -139,7 +138,7 @@ class DNSCryptEndpointAdapter(private val context: Context,
             }
         }
 
-        private fun showDialogForDelete(dnsCryptEndpoint: DNSCryptEndpoint) {
+        private fun showDialogForDelete(dnsCryptEndpoint: DNSCryptEndpoint?) {
             val builder = AlertDialog.Builder(context)
             //set title for alert dialog
             builder.setTitle(R.string.dns_crypt_custom_url_remove_dialog_title)
@@ -147,7 +146,7 @@ class DNSCryptEndpointAdapter(private val context: Context,
             builder.setMessage(R.string.dns_crypt_url_remove_dialog_message)
             builder.setCancelable(true)
             //performing positive action
-            builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { dialogInterface, which ->
+            builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { _, _ ->
                 GlobalScope.launch(Dispatchers.IO) {
                     if (dnsCryptEndpoint != null) {
                         dnsCryptEndpointRepository.deleteDNSCryptEndpoint(dnsCryptEndpoint.dnsCryptURL)
@@ -157,7 +156,7 @@ class DNSCryptEndpointAdapter(private val context: Context,
             }
 
             //performing negative action
-            builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { dialogInterface, which ->
+            builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
             }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()

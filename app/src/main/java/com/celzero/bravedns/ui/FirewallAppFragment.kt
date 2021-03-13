@@ -26,7 +26,6 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication
 import com.celzero.bravedns.adapter.FirewallAppListAdapter
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.CategoryInfo
@@ -120,9 +119,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
             override fun onFinish() {
                 if (isAdded) {
                     b.firewallAppRefreshList.clearAnimation()
-                    if (RethinkDnsApplication.context != null) {
-                        Utilities.showToastInMidLayout(RethinkDnsApplication.context!!, getString(R.string.refresh_complete), Toast.LENGTH_SHORT)
-                    }
+                    Utilities.showToastInMidLayout(requireContext(), getString(R.string.refresh_complete), Toast.LENGTH_SHORT)
                 }
             }
         }.start()

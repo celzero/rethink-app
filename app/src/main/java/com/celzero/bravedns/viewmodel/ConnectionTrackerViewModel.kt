@@ -52,7 +52,7 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
                     }else {
                         connectionTrackerDAO.getConnectionTrackerByName("%$input%").toLiveData(30)
                     }
-                } as Function<String, LiveData<PagedList<ConnectionTracker>>>)
+                } )
 
             )
 

@@ -155,7 +155,7 @@ class DNSCryptRelayEndpointAdapter(
             alertDialog.show()
         }
 
-        private fun showDialogForDelete(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint) {
+        private fun showDialogForDelete(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint?) {
             val builder = AlertDialog.Builder(context)
             //set title for alert dialog
             builder.setTitle(R.string.dns_crypt_relay_remove_dialog_title)
@@ -163,7 +163,7 @@ class DNSCryptRelayEndpointAdapter(
             builder.setMessage(R.string.dns_crypt_relay_remove_dialog_message)
             builder.setCancelable(true)
             //performing positive action
-            builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { dialogInterface, which ->
+            builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { _, _ ->
                 GlobalScope.launch(Dispatchers.IO) {
                     if (dnsCryptRelayEndpoint != null) {
                         dnsCryptRelayEndpointRepository.deleteDNSCryptRelayEndpoint(dnsCryptRelayEndpoint.dnsCryptRelayURL)
@@ -173,7 +173,7 @@ class DNSCryptRelayEndpointAdapter(
             }
 
             //performing negative action
-            builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { dialogInterface, which ->
+            builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
             }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
