@@ -119,16 +119,6 @@ class HttpRequestHelper{
                     //reasonText = "Filename:\n$filename"
                 }
             }
-            /*  val toast = Toast.makeText(
-                  this@DownloadDataActivity,
-                  """
-                    $statusText
-                    $reasonText
-                    """.trimIndent(),
-                  Toast.LENGTH_LONG
-              )
-              toast.setGravity(Gravity.TOP, 25, 400)
-              toast.show()*/
             return statusText
         }
 

@@ -111,7 +111,7 @@ class FirewallManager(service: BackgroundAccessibilityService) {
     fun onAccessibilityEvent(event: AccessibilityEvent, rootInActiveWindow: AccessibilityNodeInfo?){
         packageManager = accessibilityService.packageManager
 
-        val eventPackageName = getLatestPackageName(event, rootInActiveWindow)
+        val eventPackageName = getEventPackageName(event, rootInActiveWindow)
 
         val hasContentDisappeared = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
             event.eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED ||  event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
@@ -136,7 +136,7 @@ class FirewallManager(service: BackgroundAccessibilityService) {
                 if (eventPackageName != null && event.source != null) {
                     packagesStack.add(eventPackageName)
                 }
-                latestTrackedPackage = getLatestPackageName(event, rootInActiveWindow)
+                latestTrackedPackage = getEventPackageName(event, rootInActiveWindow)
 
             }
         }
@@ -169,7 +169,7 @@ class FirewallManager(service: BackgroundAccessibilityService) {
      * If the event retrieved package name is null then the check for the package name
      * is carried out in (getRootInActiveWindow)AccessibilityNodeInfo
      */
-    private fun getLatestPackageName(event: AccessibilityEvent, rootInActiveWindow: AccessibilityNodeInfo?): String? {
+    private fun getEventPackageName(event: AccessibilityEvent, rootInActiveWindow: AccessibilityNodeInfo?): String? {
         var packageName : String? = event.packageName?.toString()
         if(packageName.isNullOrEmpty() && rootInActiveWindow != null){
             packageName = rootInActiveWindow.packageName?.toString()

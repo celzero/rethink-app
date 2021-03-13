@@ -243,7 +243,6 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
      * else, it will revert back to default end point
      */
     private fun showDialogForDOHCustomURL() {
-        var retryAttempts = 0
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setTitle(getString(R.string.cd_custom_doh_dialog_title))
@@ -274,53 +273,9 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
             val url = customURL.text.toString()
             val name = customName.text.toString()
 
-            /*val timerHandler = Handler()
-            var updater: Runnable? = null*/
             if (checkUrl(url)) {
                 insertDoHEndpoint(name, url)
                 dialog.dismiss()
-                /*errorTxt.visibility = View.GONE
-                applyURLBtn.visibility = View.INVISIBLE
-                cancelURLBtn.visibility = View.INVISIBLE
-                progressBar.visibility = View.VISIBLE
-*/
-               /* var count = 0
-                var connectionStatus: Boolean
-                updater = Runnable {
-                    kotlin.run {
-                        connectionStatus = checkConnection()
-                        if (connectionStatus || count >= 3) {
-                            timerHandler.removeCallbacksAndMessages(updater)
-                            timerHandler.removeCallbacksAndMessages(null)
-                            if (connectionStatus) {
-                                activity?.runOnUiThread {
-                                    dialog.dismiss()
-                                    Toast.makeText(context, resources.getString(R.string.custom_url_added_successfully), Toast.LENGTH_SHORT).show()
-                                }
-                                if (retryAttempts > 0) {
-                                    if (VpnController.getInstance() != null) {
-                                        VpnController.getInstance()!!.stop(requireContext())
-                                        VpnController.getInstance()!!.start(requireContext())
-                                    }
-                                }
-                                insertDoHEndpoint(name, url)
-
-                            } else {
-                                retryAttempts += 1
-                                errorTxt.text = resources.getText(R.string.custom_url_error_host_failed)
-                                errorTxt.visibility = View.VISIBLE
-                                cancelURLBtn.visibility = View.VISIBLE
-                                applyURLBtn.visibility = View.VISIBLE
-                                progressBar.visibility = View.INVISIBLE
-                            }
-                        }
-                        count++
-                        if (!connectionStatus && count <= 3) {
-                            timerHandler.postDelayed(updater!!, 1000)
-                        }
-                    }
-                }
-                timerHandler.postDelayed(updater, 2000)*/
             } else {
                 errorTxt.text = resources.getString(R.string.custom_url_error_invalid_url)
                 errorTxt.visibility = View.VISIBLE
@@ -331,10 +286,6 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
         }
 
         cancelURLBtn.setOnClickListener {
-            /*if (VpnController.getInstance() != null && retryAttempts != 0) {
-                VpnController.getInstance()!!.stop(requireContext())
-                VpnController.getInstance()!!.start(requireContext())
-            }*/
             dialog.dismiss()
         }
         dialog.show()
@@ -346,7 +297,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setTitle(getString(R.string.cd_custom_dns_proxy_title))
-        dialog.setContentView(R.layout.dialog_set_dns_proxy)
+        dialog.setContentView(dialogBinding.root)
 
         val lp = WindowManager.LayoutParams()
         lp.copyFrom(dialog.window!!.attributes)
@@ -467,7 +418,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setTitle(getString(R.string.cd_dns_crypt_dialog_title))
-        dialog.setContentView(R.layout.dialog_set_dns_crypt)
+        dialog.setContentView(dialogBinding.root)
 
         val lp = WindowManager.LayoutParams()
         lp.copyFrom(dialog.window!!.attributes)
@@ -485,6 +436,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
         val cryptNameEditText = dialogBinding.dialogDnsCryptName
         val cryptURLEditText = dialogBinding.dialogDnsCryptUrl
         val cryptDescEditText = dialogBinding.dialogDnsCryptDesc
+        val errorText = dialogBinding.dialogDnsCryptErrorTxt
 
         radioServer.isChecked = true
         var count = dnsCryptEndpointRepository.getCount()
@@ -504,7 +456,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
         }
 
         applyURLBtn.setOnClickListener {
-            val isValid = true
+            var isValid = true
             var mode: Int = -1
             val name: String = cryptNameEditText.text.toString()
             val urlStamp = cryptURLEditText.text.toString()
@@ -515,6 +467,10 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
             } else if (radioRelay.isChecked) {
                 mode = 1
             }
+            if (urlStamp.isEmpty() ) {
+                isValid = false
+                errorText.text = getString(R.string.cd_dns_crypt_error_text_1)
+            }
 
             if (isValid) {
                 //Do the DNS Crypt setting there
@@ -524,6 +480,8 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
                     insertDNSCryptRelay(name, urlStamp, desc)
                 }
                 dialog.dismiss()
+            }else{
+
             }
         }
 
@@ -567,11 +525,6 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
             }
         }.start()
     }
-
-    private fun checkProxySize(): Int {
-        return dnsProxyEndpointRepository.getCount()
-    }
-
 
     private fun insertDoHEndpoint(name: String, url: String) {
         var dohName: String = name

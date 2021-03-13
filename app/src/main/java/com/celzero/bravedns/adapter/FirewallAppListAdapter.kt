@@ -216,8 +216,8 @@ class FirewallAppListAdapter internal constructor(
         return listPosition.toLong()
     }
 
-    override fun getGroupView(listPosition: Int, isExpanded: Boolean, convertView: View?, parent: ViewGroup): View {
-        var convertView = convertView
+    override fun getGroupView(listPosition: Int, isExpanded: Boolean, view: View?, parent: ViewGroup): View {
+        var convertView = view
         val listTitle = getGroup(listPosition)
         if (convertView == null) {
             val layoutInflater =

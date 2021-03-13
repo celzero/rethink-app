@@ -48,7 +48,6 @@ class UniversalBlockedRulesAdapter(private val context: Context, private val blo
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UniversalBlockedConnViewHolder {
         val itemBinding = UnivWhitelistRulesItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        itemBinding.root.setBackgroundColor(context.getColor(R.color.colorPrimary))
         return UniversalBlockedConnViewHolder(itemBinding)
     }
 
@@ -81,7 +80,6 @@ class UniversalBlockedRulesAdapter(private val context: Context, private val blo
                         val firewallRules = FirewallRules.getInstance()
                         firewallRules.removeFirewallRules(ConnTrackerBottomSheetFragment.UNIVERSAL_RULES_UID, blockedConns.ipAddress!!, BraveVPNService.BlockedRuleNames.RULE2.ruleName, blockedConnectionsRepository)
                     }
-                    Toast.makeText(context, "${blockedConns.ipAddress} unblocked.", Toast.LENGTH_SHORT).show()
                 }
                 Toast.makeText(context, context.getString(R.string.univ_ip_delete_individual_toast, blockedConns.ipAddress), Toast.LENGTH_SHORT).show()
             }

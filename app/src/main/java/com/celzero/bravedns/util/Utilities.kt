@@ -254,9 +254,9 @@ class Utilities {
             return serversToSend
         }
 
-        fun showToastInMidLayout(context: Context, message: String, toastLength: Int){
+        fun showToastInMidLayout(context: Context?, message: String, toastLength: Int){
             try {
-                val toast = Toast.makeText(context.applicationContext, message, toastLength)
+                val toast = Toast.makeText(context?.applicationContext, message, toastLength)
                 toast.setGravity(Gravity.CENTER, 0, 0)
                 toast.show()
             }catch (e: java.lang.IllegalStateException){

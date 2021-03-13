@@ -25,9 +25,6 @@ import org.koin.core.context.startKoin
  * limitations under the License.
  */
 class RethinkDnsApplication:Application() {
-    companion object {
-        var context: Context? = null
-    }
 
     override fun onCreate() {
         val persistentState = PersistentState(this)
@@ -43,9 +40,9 @@ class RethinkDnsApplication:Application() {
             setTheme(R.style.AppTheme)
         }
         super.onCreate()
-        context = applicationContext
 
-        //turnOnStrictMode()
+        //if(BuildConfig.DEBUG) turnOnStrictMode()
+
         startKoin {
             if(BuildConfig.DEBUG) androidLogger()
             androidContext(this@RethinkDnsApplication)
@@ -59,16 +56,17 @@ class RethinkDnsApplication:Application() {
 
     private fun turnOnStrictMode() {
         if (BuildConfig.DEBUG) {
-            StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()
+           /* StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()
                             .detectAll()
                             .penaltyLog()
                             .permitDiskReads()
                             .permitDiskWrites()
                             .permitNetwork()
                             .penaltyLog()
-                            .build())
+                            .build())*/
             StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder()
                             .detectAll()
+                            .detectLeakedSqlLiteObjects()
                             .penaltyLog()
                             .build())
         }

@@ -35,10 +35,10 @@ import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
+import org.koin.core.component.KoinApiExtension
 
 class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(DIFF_CALLBACK) {
 
@@ -67,7 +67,7 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
 
     inner class ConnectionTrackerViewHolder(private val b: ConnectionTransactionRowBinding) : RecyclerView.ViewHolder(b.root) {
 
-        fun update(connTracker: ConnectionTracker, position: Int) {
+        @KoinApiExtension fun update(connTracker: ConnectionTracker, position: Int) {
             val time = Utilities.convertLongToTime(connTracker.timeStamp)
             b.connectionResponseTime.text = time
             b.connectionFlag.text = connTracker.flag
@@ -82,7 +82,7 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
                 }
                 connTracker.blockedByRule.equals(BraveVPNService.BlockedRuleNames.RULE7.ruleName) -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
-                    b.connectionStatusIndicator.setBackgroundColor(ContextCompat.getColor(context, R.color.dividerColor))
+                    b.connectionStatusIndicator.setBackgroundColor(fetchTextColor(R.color.dividerColor))
                 }
                 else -> {
                     b.connectionStatusIndicator.visibility = View.INVISIBLE
@@ -100,7 +100,7 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
                     Glide.with(context).load(context.packageManager.getApplicationIcon(appArray[0]!!)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)
                 } catch (e: Exception) {
                     Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)
-                    Log.e(LOG_TAG, "Package Not Found - " + e.message, e)
+                    Log.w(LOG_TAG, "Package Not Found - " + e.message)
                 }
             } else {
                 Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)

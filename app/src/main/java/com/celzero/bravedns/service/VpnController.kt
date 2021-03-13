@@ -34,11 +34,11 @@ class VpnController {
         private var tracker: QueryTracker? = null
 
         @Synchronized
-        fun getInstance(): VpnController? {
+        fun getInstance(): VpnController {
             if (dnsVpnServiceState == null) {
                 dnsVpnServiceState = VpnController()
             }
-            return dnsVpnServiceState
+            return dnsVpnServiceState!!
         }
     }
 
