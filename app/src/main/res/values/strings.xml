@@ -557,6 +557,9 @@
     <string name="settings_orbot_notification_heading">Action required</string>
     <string name="settings_orbot_notification_content">Failure starting Tor-as-a-proxy. Open the Orbot app to start it manually.</string>
 
+    <string name="settings_orbot_notification_desc">Orbot - Starting Tor-as-a-proxy failure notification</string>
+    <string name="settings_orbot_notification_action">Open Orbot</string>
+
     <string name="settings_general_header">GENERAL</string>
     <string name="settings_refresh_heading">Refresh Data</string>
     <string name="settings_refresh_desc">Re-sync application list.</string>
@@ -694,10 +697,10 @@
     <string name="about_mail_subject">[RethinkDNS]:</string>
     <string name="about_telegram_link">http://www.telegram.me/rethinkdns</string>
     <string name="about_blog_link">https://blog.rethinkdns.com/</string>
-    <string name="about_faq_link">https://www.bravedns.com/faq</string>
+    <string name="about_faq_link">https://www.rethinkdns.com/faq</string>
     <string name="about_github_link">https://github.com/celzero/rethink-app</string>
     <string name="about_twitter_handle">https://twitter.com/rethinkdns</string>
-    <string name="about_website_link">https://www.bravedns.com/</string>
+    <string name="about_website_link">https://www.rethinkdns.com/</string>
     <string name="about_mozilla_alumni_link">https://builders.mozilla.community/alumni.html</string>
     <string name="about_version">v%1$s</string>
     <string name="about_version_install_source">v%1$s (%2$s)</string>
