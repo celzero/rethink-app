@@ -21,6 +21,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -99,7 +100,21 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         const val UNIVERSAL_RULES_UID = -1000
     }
 
-    override fun getTheme(): Int = R.style.BottomSheetDialogTheme
+    override fun getTheme(): Int = if (persistentState.theme == 0) {
+        if (isDarkThemeOn()) {
+            R.style.BottomSheetDialogTheme
+        } else {
+            R.style.BottomSheetDialogTheme_white
+        }
+    } else if (persistentState.theme == 1) {
+        R.style.BottomSheetDialogTheme_white
+    } else {
+        R.style.BottomSheetDialogTheme
+    }
+
+    private fun isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+    }
 
     private val appInfoRepository: AppInfoRepository by inject()
     private val blockedConnectionsRepository: BlockedConnectionsRepository by inject()

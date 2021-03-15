@@ -39,17 +39,17 @@ import com.celzero.bravedns.viewmodel.ExcludedAppViewModel
 import com.google.android.material.chip.Chip
 import java.util.stream.Collectors
 
-
 class ExcludeAppDialog(private var activity: Context,
-    private val appInfoRepository: AppInfoRepository,
-    private val appInfoViewRepository: AppInfoViewRepository,
-    private val categoryInfoRepository: CategoryInfoRepository,
-    private val persistentState: PersistentState,
-    internal var adapter: RecyclerView.Adapter<*>,
-    var viewModel: ExcludedAppViewModel)
-    : Dialog(activity), View.OnClickListener, SearchView.OnQueryTextListener {
+                    private val appInfoRepository: AppInfoRepository,
+                    private val appInfoViewRepository: AppInfoViewRepository,
+                    private val categoryInfoRepository: CategoryInfoRepository,
+                    private val persistentState: PersistentState,
+                    internal var adapter: RecyclerView.Adapter<*>,
+                    var viewModel: ExcludedAppViewModel,
+                    themeID :Int)
+    : Dialog(activity, themeID), View.OnClickListener, SearchView.OnQueryTextListener {
+
     private lateinit var b: ExcludeAppDialogLayoutBinding
-    //var dialog: Dialog? = null
 
     private var mLayoutManager: RecyclerView.LayoutManager? = null
 

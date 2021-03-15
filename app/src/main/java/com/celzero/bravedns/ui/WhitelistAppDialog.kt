@@ -30,6 +30,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfoRepository
+import com.celzero.bravedns.database.AppInfoViewRepository
 import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.databinding.CustomDialogLayoutBinding
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -41,9 +42,16 @@ import com.google.android.material.chip.Chip
 import java.util.stream.Collectors
 
 
-class WhitelistAppDialog(private var activity: Context, private val appInfoRepository: AppInfoRepository, private val categoryInfoRepository: CategoryInfoRepository, internal var adapter: RecyclerView.Adapter<*>, var viewModel: AppListViewModel) : Dialog(activity), View.OnClickListener, SearchView.OnQueryTextListener {
+class WhitelistAppDialog(private var activity: Context,
+                         private val appInfoRepository: AppInfoRepository,
+                         private val appInfoViewRepository: AppInfoViewRepository,
+                         private val categoryInfoRepository: CategoryInfoRepository,
+                         internal var adapter: RecyclerView.Adapter<*>,
+                         var viewModel: AppListViewModel,
+                         themeID :Int)
+    : Dialog(activity, themeID), View.OnClickListener, SearchView.OnQueryTextListener {
+
     private lateinit var b: CustomDialogLayoutBinding
-    var dialog: Dialog? = null
 
     private var mLayoutManager: RecyclerView.LayoutManager? = null
     private var filterCategories: MutableList<String> = ArrayList()
@@ -77,7 +85,7 @@ class WhitelistAppDialog(private var activity: Context, private val appInfoRepos
 
         val appCount = appList.size
         val act: FirewallActivity = activity as FirewallActivity
-        appInfoRepository.getWhitelistCountLiveData().observe(act, {
+        appInfoViewRepository.getWhitelistCountLiveData().observe(act, {
             b.customSelectAllOptionCount.text = act.getString(R.string.whitelist_dialog_apps_in_use, it.toString(), appCount.toString())
         })
 

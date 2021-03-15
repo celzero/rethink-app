@@ -74,17 +74,17 @@ class ExcludedAppListAdapter(private val context: Context, private val appInfoRe
             b.excludedAppListCheckbox.isChecked = appInfo.isExcluded
             try {
                 if(!appInfo.packageInfo.contains(Constants.APP_NON_APP) || appInfo.appName != Constants.UNKNOWN_APP){
-                  Glide.with(context).load(context.packageManager.getApplicationIcon(appInfo.packageInfo)).into(b.excludedAppListApkIconIv)
-                }else{
-                        Glide.with(context)
-                            .load(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
-                            .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
-                            .into(b.excludedAppListApkIconIv)
-                    }
+                  Glide.with(context).load(context.packageManager.getApplicationIcon(appInfo.packageInfo))
+                        .into(b.excludedAppListApkIconIv)
+                } else {
+                    Glide.with(context).load(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
+                        .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                        .into(b.excludedAppListApkIconIv)
+                }
 
             } catch (e: Exception) {
-                //appIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
-                Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.excludedAppListApkIconIv)
+                Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                        .into(b.excludedAppListApkIconIv)
                 Log.e(LOG_TAG, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message, e)
             }
 

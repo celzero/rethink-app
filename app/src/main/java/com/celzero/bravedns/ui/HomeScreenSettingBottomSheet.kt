@@ -1,5 +1,6 @@
 package com.celzero.bravedns.ui
 
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.text.format.DateUtils
@@ -31,7 +32,21 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
 
     private val persistentState by inject<PersistentState>()
 
-    override fun getTheme(): Int = R.style.BottomSheetDialogTheme
+    override fun getTheme(): Int = if (persistentState.theme == 0) {
+        if (isDarkThemeOn()) {
+            R.style.BottomSheetDialogTheme
+        } else {
+            R.style.BottomSheetDialogTheme_white
+        }
+    } else if (persistentState.theme == 1) {
+        R.style.BottomSheetDialogTheme_white
+    } else {
+        R.style.BottomSheetDialogTheme
+    }
+
+    private fun isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = BottomSheetHomeScreenBinding.inflate(inflater, container, false)
