@@ -17,7 +17,6 @@ package com.celzero.bravedns.ui
 
 import android.app.DownloadManager
 import android.content.*
-import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -35,6 +34,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallRules
@@ -49,7 +49,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.util.*
-import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_OTHERS
+import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.HttpRequestHelper.Companion.checkStatus
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -96,8 +96,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         var appMode: AppMode? = null
         var filesDownloaded: Int = 0
         var lifeTimeQueries: Int = -1
-        var medianP90: Long = -1
-        var median50: MutableLiveData<Long> = MutableLiveData()
+
         var blockedCount: MutableLiveData<Int> = MutableLiveData()
         var lifeTimeQ : MutableLiveData<Int> = MutableLiveData()
         var braveModeToggler : MutableLiveData<Int> = MutableLiveData()
@@ -107,17 +106,13 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         var appStartTime: Long = System.currentTimeMillis()
         var isBackgroundEnabled: Boolean = false
         var firewallRules: HashMultimap<Int, String> = HashMultimap.create()
-        var DEBUG = false
+        var DEBUG = true
 
         //Screen off - whether the screen preference is set 0-off, 1- on. -1 not initialized
         var isScreenLockedSetting: Int = -1
 
         //Screen off state - set - 0 if screen is off, 1 - screen is on, -1 not initialized.
         var isScreenLocked : Int = -1
-
-        //Local blocklist download complete listener
-        // 0 - Not initiated, 1 - initiated, 2 - success, -1 - failure
-        var localDownloadStatus : MutableLiveData<Int> = MutableLiveData()
 
         //Remove the usage of below variable(isSearchEnabled)
         var isSearchEnabled : Boolean = true
@@ -155,6 +150,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             GlobalVariable.connectedDNS.postValue(Constants.RETHINK_DNS)
             launchOnBoardingActivity()
             updateNewVersion()
+            updateInstallSource()
         }else{
             showNewFeaturesDialog()
         }
@@ -184,16 +180,28 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
 
         persistentState.setScreenLockData(false)
-        updateInstallSource()
         initUpdateCheck()
+
+        backgroundAccessibilityCheck()
 
     }
 
-    private fun updateForLocalDownload(){
+    private fun backgroundAccessibilityCheck() {
+        if (Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)) {
+            if (!Utilities.isAccessibilityServiceEnabled(this, BackgroundAccessibilityService::class.java) && persistentState.backgroundEnabled) {
+                persistentState.backgroundEnabled = false
+                persistentState.isAccessibilityCrashDetected = true
+            }
+        }
+    }
+
+    private fun updateForDownload(){
         persistentState.blockListFilesDownloaded = false
         persistentState.numberOfLocalBlocklists = 0
         persistentState.localBlocklistEnabled = false
         persistentState.localBlockListDownloadTime = 0
+        persistentState.remoteBraveDNSDownloaded = false
+        persistentState.remoteBlockListDownloadTime = 0
     }
 
     private fun updateNewVersion() {
@@ -211,18 +219,18 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun updateInstallSource() {
-        val packageManager = packageManager
         try {
-            val applicationInfo: ApplicationInfo = packageManager.getApplicationInfo(packageName, 0)
-            if (DEBUG) Log.d(LOG_TAG, "Install location: ${packageManager.getInstallerPackageName(applicationInfo.packageName)}")
-            if ("com.android.vending" == packageManager.getInstallerPackageName(applicationInfo.packageName)) {
-                // App was installed by Play Store
-                persistentState.downloadSource = Constants.DOWNLOAD_SOURCE_PLAY_STORE
-            } else {
-                // App was installed from somewhere else
-                persistentState.downloadSource = DOWNLOAD_SOURCE_OTHERS
+            when(BuildConfig.FLAVOR){
+                Constants.FLAVOR_PLAY -> {
+                    persistentState.downloadSource = DOWNLOAD_SOURCE_PLAY_STORE
+                } Constants.FLAVOR_FDROID -> {
+                    persistentState.downloadSource = Constants.DOWNLOAD_SOURCE_FDROID
+                } else -> {
+                    persistentState.downloadSource = Constants.DOWNLOAD_SOURCE_WEBSITE
+                }
             }
-        } catch (e: PackageManager.NameNotFoundException) {
+
+        } catch (e: java.lang.Exception) {
             Log.e(LOG_TAG, "Exception while fetching the app download source: ${e.message}", e)
         }
     }
@@ -230,7 +238,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     private fun showNewFeaturesDialog() {
         if (checkToShowNewFeatures()) {
-            updateForLocalDownload()
+            updateInstallSource()
+            updateForDownload()
             val inflater: LayoutInflater = LayoutInflater.from(this)
             val view: View = inflater.inflate(R.layout.dialog_whatsnew, null)
             val builder = AlertDialog.Builder(this)
@@ -287,9 +296,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     fun checkForUpdate(userInitiation: Boolean = false) {
-        if (persistentState.downloadSource == Constants.DOWNLOAD_SOURCE_PLAY_STORE) {
+        if (BuildConfig.FLAVOR == Constants.FLAVOR_PLAY) {
             appUpdateManager.checkForAppUpdate(userInitiation, this, installStateUpdatedListener) // Might be play updater or web updater
-        } else {
+        } else if(BuildConfig.FLAVOR == Constants.FLAVOR_WEBSITE){
             get<NonStoreAppUpdater>().checkForAppUpdate(userInitiation, this, installStateUpdatedListener) // Always web updater
         }
     }
@@ -383,7 +392,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                     Log.i(LOG_TAG, "Server response for the new version download is $updateValue, response version number- $responseVersion, timestamp- $timeStamp")
                     if (responseVersion == 1) {
                         if (updateValue) {
-                            if (persistentState.downloadSource == DOWNLOAD_SOURCE_OTHERS) {
+                            if (persistentState.downloadSource != DOWNLOAD_SOURCE_PLAY_STORE) {
                                 (context as HomeScreenActivity).runOnUiThread {
                                     popupSnackBarForBlocklistUpdate()
                                 }
