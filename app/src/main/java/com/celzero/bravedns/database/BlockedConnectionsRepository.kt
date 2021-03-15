@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.celzero.bravedns.database
 
+import androidx.lifecycle.LiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -72,6 +73,10 @@ class BlockedConnectionsRepository(private val blockedConnectionsDAO: BlockedCon
     fun getBlockedConnectionsCount(): Int{
         return blockedConnectionsDAO.getBlockedConnectionsCount()
     }
+
+    fun getBlockedConnectionCountLiveData(): LiveData<Int>{
+          return blockedConnectionsDAO.getBlockedConnectionCountLiveData()
+      }
 
 
     //fun deleteRules(uid, )
