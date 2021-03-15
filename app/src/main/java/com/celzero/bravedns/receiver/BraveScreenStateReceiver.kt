@@ -19,13 +19,16 @@ package com.celzero.bravedns.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.util.Log
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import org.koin.core.component.KoinApiExtension
 
 
 class BraveScreenStateReceiver : BroadcastReceiver() {
 
+    @KoinApiExtension
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent!!.action.equals(Intent.ACTION_SCREEN_OFF)) {
             if(DEBUG) Log.d(LOG_TAG,"BraveScreenStateReceiver : Action_screen_off detected from the receiver")
@@ -42,6 +45,10 @@ class BraveScreenStateReceiver : BroadcastReceiver() {
                 val state = ReceiverHelper.persistentState.isScreenOff
                 if(state) {
                     ReceiverHelper.persistentState.setScreenLockData(false)
+                    if (context != null) {
+                        val connectivityManager: ConnectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                        connectivityManager.reportNetworkConnectivity(connectivityManager.activeNetwork, true)
+                    }
                 }
             }
         }
