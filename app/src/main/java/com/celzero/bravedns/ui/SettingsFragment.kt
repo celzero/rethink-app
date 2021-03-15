@@ -31,8 +31,10 @@ import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ExcludedAppListAdapter
@@ -40,16 +42,18 @@ import com.celzero.bravedns.database.*
 import com.celzero.bravedns.databinding.ActivitySettingsScreenBinding
 import com.celzero.bravedns.databinding.DialogSetHttpProxyBinding
 import com.celzero.bravedns.databinding.DialogSetProxyBinding
+import com.celzero.bravedns.download.AppDownloadManager
+import com.celzero.bravedns.download.DownloadConstants
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.localDownloadStatus
-import com.celzero.bravedns.util.AppDownloadManager
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_OTHERS
+import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Constants.Companion.REFRESH_BLOCKLIST_URL
+import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ExcludedAppViewModel
 import dnsx.Dnsx
@@ -74,10 +78,10 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     private var excludeAppAdapter: ExcludedAppListAdapter? = null
     private val excludeAppViewModel: ExcludedAppViewModel by viewModel()
 
-    private val refreshDatabase by inject<RefreshDatabase>()
     private lateinit var animation: Animation
 
     private val appInfoRepository by inject<AppInfoRepository>()
+    private val appInfoViewRepository by inject<AppInfoViewRepository>()
     private val proxyEndpointRepository by inject<ProxyEndpointRepository>()
     private val categoryInfoRepository by inject<CategoryInfoRepository>()
     private val persistentState by inject<PersistentState>()
@@ -109,7 +113,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
         b.settingsActivityAllowBypassSwitch.isChecked = persistentState.allowByPass
 
-        if (persistentState.downloadSource == DOWNLOAD_SOURCE_OTHERS) {
+        if (persistentState.downloadSource != DOWNLOAD_SOURCE_PLAY_STORE) {
             b.settingsActivityOnDeviceBlockRl.visibility = View.VISIBLE
             b.settingsHeadingDns.visibility = View.VISIBLE
         } else {
@@ -117,18 +121,25 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             b.settingsHeadingDns.visibility = View.GONE
         }
 
-        localDownloadStatus.observe(viewLifecycleOwner, {
+        initialUI()
+
+        /*localDownloadStatus.observe(viewLifecycleOwner, {
             //download initiated and failed
-            if (it == -1) {
-                updateDownloadFailure()
-            } else if (it == 1) {// download initiated
-                updateDownloadInitiated()
-            } else if (it == 0) { // download not initiated.
-                initialUI()
-            } else if(it == 2){
-                updateDownloadSuccess()
+            when (it) {
+                -1 -> {
+                    updateDownloadFailure()
+                }
+                0 -> {// download not initiated
+                    initialUI()
+                }
+                1 -> {// download initiated.
+                    updateDownloadInitiated()
+                }
+                2 -> {
+                    updateDownloadSuccess()
+                }
             }
-        })
+        })*/
 
         HomeScreenActivity.GlobalVariable.braveModeToggler.observe(viewLifecycleOwner, {
             if (HomeScreenActivity.GlobalVariable.braveMode == HomeScreenFragment.DNS_MODE) {
@@ -146,12 +157,16 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
 
         //gen_settings_theme_desc
-        if (persistentState.theme == 0) {
-            b.genSettingsThemeDesc.text = getString(R.string.settings_selected_theme, getString(R.string.settings_theme_dialog_themes_1))
-        } else if (persistentState.theme == 1) {
-            b.genSettingsThemeDesc.text = getString(R.string.settings_selected_theme, getString(R.string.settings_theme_dialog_themes_2))
-        } else {
-            b.genSettingsThemeDesc.text = getString(R.string.settings_selected_theme, getString(R.string.settings_theme_dialog_themes_3))
+        when(persistentState.theme){
+            0 -> {
+                b.genSettingsThemeDesc.text = getString(R.string.settings_selected_theme, getString(R.string.settings_theme_dialog_themes_1))
+            }
+            1 -> {
+                b.genSettingsThemeDesc.text = getString(R.string.settings_selected_theme, getString(R.string.settings_theme_dialog_themes_2))
+            }
+            else -> {
+                b.genSettingsThemeDesc.text = getString(R.string.settings_selected_theme, getString(R.string.settings_theme_dialog_themes_3))
+            }
         }
 
         b.settingsActivitySocks5Switch.isChecked = persistentState.socks5Enabled
@@ -165,6 +180,10 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             }
         }
         b.settingsActivitySocks5Progress.visibility = View.GONE
+
+        if(!get<OrbotHelper>().isOrbotInstalled()){
+            b.settingsActivityOrbotContainer.visibility = View.GONE
+        }
 
         //blockUnknownConnSwitch.isChecked = persistentState.getBlockUnknownConnections(requireContext())
         if (persistentState.localBlocklistEnabled) {
@@ -188,7 +207,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
 
         val appCount = appList.size
-        appInfoRepository.getExcludedAppListCountLiveData().observe(viewLifecycleOwner, {
+        appInfoViewRepository.getExcludedAppListCountLiveData().observe(viewLifecycleOwner, {
             b.settingsActivityExcludeAppsCountText.text = getString(R.string.ex_dialog_count, it.toString(), appCount.toString())
         })
 
@@ -227,6 +246,13 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityAllowBypassSwitch.isEnabled = false
         b.settingsActivityExcludeAppsImg.isEnabled = false
         b.settingsActivityVpnLockdownDesc.visibility = View.VISIBLE
+        //Orbot
+        b.settingsActivityOrbotImg.isEnabled = false
+        b.settingsActivityOrbotContainer.isEnabled = false
+        //SOCKS5
+        b.settingsActivitySocks5Switch.isEnabled = false
+        //HTTP Proxy
+        b.settingsActivityHttpProxySwitch.isEnabled = false
     }
 
     private fun enableForLockdownModeUI() {
@@ -236,6 +262,13 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityAllowBypassSwitch.isEnabled = true
         b.settingsActivityExcludeAppsImg.isEnabled = true
         b.settingsActivityVpnLockdownDesc.visibility = View.GONE
+        //Orbot
+        b.settingsActivityOrbotImg.isEnabled = true
+        b.settingsActivityOrbotContainer.isEnabled = true
+        //SOCKS5
+        b.settingsActivitySocks5Switch.isEnabled = true
+        //HTTP Proxy
+        b.settingsActivityHttpProxySwitch.isEnabled = true
     }
 
     private fun detectLockDownMode() {
@@ -298,7 +331,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             if (isSelected) {
                 b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
                 if (!persistentState.blockListFilesDownloaded) {
-                    persistentState.localBlockListDownloadTime = 0L
                     showDownloadDialog()
                 } else {
                     if (isSelected) {
@@ -327,24 +359,50 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             }.start()
         }
 
-        b.settingsActivitySocks5Switch.setOnCheckedChangeListener { compoundButton: CompoundButton, bool: Boolean ->
-            persistentState.socks5Enabled = bool
-            if (bool) {
-                showDialogForSocks5Proxy()
-            } else {
-                b.settingsActivitySocks5Switch.visibility = View.GONE
-                b.settingsActivitySocks5Progress.visibility = View.VISIBLE
-                appMode?.setProxyMode(Settings.ProxyModeNone)
-                b.settingsActivitySocks5Desc.text = getString(R.string.settings_socks_forwarding_default_desc)
-                b.settingsActivitySocks5Switch.visibility = View.VISIBLE
-                b.settingsActivitySocks5Progress.visibility = View.GONE
+        b.settingsActivitySocks5OrbotImage.setOnClickListener{
+            if (b.settingsActivitySocks5Switch.isChecked) {
+                Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_orbot_disabled_error), Toast.LENGTH_SHORT)
+                b.settingsActivitySocks5OrbotImage.setImageResource(R.drawable.orbot_disabled)
             }
         }
 
-
-        b.settingsActivityHttpProxySwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
-            showDialogForHTTPProxy(b)
+        b.settingsActivitySocks5Switch.setOnCheckedChangeListener { _: CompoundButton, bool: Boolean ->
+            if (persistentState.orbotMode != Constants.ORBAT_MODE_NONE) {
+                Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_disabled_error), Toast.LENGTH_SHORT)
+                b.settingsActivitySocks5Switch.isChecked = false
+            }else {
+                persistentState.socks5Enabled = bool
+                if (bool) {
+                    showDialogForSocks5Proxy()
+                } else {
+                    b.settingsActivitySocks5Switch.visibility = View.GONE
+                    b.settingsActivitySocks5Progress.visibility = View.VISIBLE
+                    appMode?.setProxyMode(Settings.ProxyModeNone)
+                    b.settingsActivitySocks5Desc.text = getString(R.string.settings_socks_forwarding_default_desc)
+                    b.settingsActivitySocks5Switch.visibility = View.VISIBLE
+                    b.settingsActivitySocks5Progress.visibility = View.GONE
+                }
+            }
         }
+
+        b.settingsActivityOrbotImg.setOnClickListener{
+            if (b.settingsActivityHttpProxySwitch.isChecked) {
+                Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_https_orbot_disabled_error), Toast.LENGTH_SHORT)
+            } else {
+                //orbotHTTPSIntegration(isEnabled)
+                openBottomSheetForOrbot()
+            }
+        }
+
+        b.settingsActivityHttpProxySwitch.setOnCheckedChangeListener { _: CompoundButton, isEnabled: Boolean ->
+            if (persistentState.orbotMode == Constants.ORBAT_MODE_HTTP || persistentState.orbotMode == Constants.ORBAT_MODE_BOTH) {
+                Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_https_disabled_error), Toast.LENGTH_SHORT)
+                b.settingsActivityHttpProxySwitch.isChecked = false
+            } else {
+                showDialogForHTTPProxy(isEnabled)
+            }
+        }
+
 
         b.settingsActivityExcludeAppsImg.setOnClickListener {
             b.settingsActivityExcludeAppsImg.isEnabled = false
@@ -393,7 +451,103 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             showDialogForTheme()
         }
 
+        WorkManager.getInstance().getWorkInfosByTagLiveData(DownloadConstants.DOWNLOAD_TAG).observe(viewLifecycleOwner, { workInfoList ->
+            if(workInfoList != null && workInfoList.isNotEmpty()) {
+                val workInfo = workInfoList[0]
+                if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
+                    Log.d(LOG_TAG, "AppDownloadManager Work Manager completed - ${DownloadConstants.DOWNLOAD_TAG}")
+                }else if(workInfo != null && (workInfo.state == WorkInfo.State.ENQUEUED || workInfo.state == WorkInfo.State.RUNNING)){
+                    updateDownloadInitiated()
+                }
+                else {
+                    Log.d(LOG_TAG, "AppDownloadManager Work Manager - ${DownloadConstants.DOWNLOAD_TAG}, ${workInfo.state}")
+                }
+            }
+        })
+
+        WorkManager.getInstance().getWorkInfosByTagLiveData(DownloadConstants.FILE_TAG).observe(viewLifecycleOwner, { workInfoList ->
+            if (workInfoList != null && workInfoList.isNotEmpty()) {
+                val workInfo = workInfoList[0]
+                if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
+                    Log.i(LOG_TAG, "AppDownloadManager Work Manager completed - ${DownloadConstants.FILE_TAG}")
+                    updateDownloadSuccess()
+                    WorkManager.getInstance().pruneWork()
+                } else if (workInfo != null && (workInfo.state == WorkInfo.State.CANCELLED || workInfo.state == WorkInfo.State.FAILED)) {
+                    updateDownloadFailure()
+                    Log.i(LOG_TAG, "AppDownloadManager Work Manager failed - ${DownloadConstants.FILE_TAG}")
+                    /*-1 -> {
+                        updateDownloadFailure()
+                    }
+                    0 -> {// download not initiated
+                        initialUI()
+                    }
+                    1 -> {// download initiated.
+                        updateDownloadInitiated()
+                    }
+                    2 -> {
+                        updateDownloadSuccess()
+                    }*/
+                } else {
+                    Log.d(LOG_TAG, "AppDownloadManager Work Manager - ${DownloadConstants.FILE_TAG}, ${workInfo.state}")
+                }
+            }
+        })
+
     }
+
+    private fun openBottomSheetForOrbot(){
+        if (VpnController.getInstance() != null) {
+            val vpnService = VpnController.getInstance()?.getBraveVpnService()
+            if (vpnService != null) {
+                val bottomSheetFragment = OrbotBottomSheetFragment(requireContext())
+                val frag = context as FragmentActivity
+                bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
+            } else {
+                Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_vpn_disabled_error), Toast.LENGTH_SHORT)
+            }
+        }else{
+            Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_vpn_disabled_error), Toast.LENGTH_SHORT)
+        }
+    }
+
+    /*private fun orbotSocks5Integration(enabled: Boolean) {
+        val rotate = RotateAnimation(0F, 360F, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
+        rotate.duration = 1000
+        rotate.interpolator = LinearInterpolator()
+        rotate.repeatCount = Animation.INFINITE
+        if(enabled){
+            if(OrbotHelper.isOrbotInstalled()){
+                Log.d(LOG_TAG, "Settings - Orbot - installed true")
+                if(VpnController.getInstance() != null){
+                    val vpnService = VpnController.getInstance()?.getBraveVpnService()
+                    if(vpnService != null){
+                        OrbotHelper.requestOrbotStatus(vpnService)
+                        b.settingsActivitySocks5OrbotImage.startAnimation(rotate)
+                    }else{
+                        Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_vpn_disabled_error), Toast.LENGTH_LONG)
+                    }
+                }
+            }
+        }else{
+            b.settingsActivitySocks5OrbotImage.startAnimation(rotate)
+            OrbotHelper.stopOrbot(requireContext())
+            persistentState.proxyMode = Settings.ProxyModeNone
+            persistentState.orbotSocks5Enabled = false
+        }
+    }
+
+    private fun orbotHTTPSIntegration(enabled: Boolean){
+        persistentState.httpProxyEnabled = enabled
+        persistentState.httpProxyPort = 0
+        persistentState.httpProxyHostAddress = ""
+        persistentState.orbotHttpsEnabled = enabled
+        if(enabled){
+            if(OrbotHelper.isOrbotInstalled()){
+                Log.d(LOG_TAG, "Settings - Orbot - installed true")
+                OrbotHelper.requestOrbotStatus(requireContext(), this)
+            }
+        }
+    }*/
 
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
@@ -403,8 +557,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     private fun showDialogForTheme() {
         val alertDialog = AlertDialog.Builder(requireContext())
         alertDialog.setTitle(getString(R.string.settings_theme_dialog_title))
-        val items  = arrayOf(getString(R.string.settings_theme_dialog_themes_1),
-            getString(R.string.settings_theme_dialog_themes_2), getString(R.string.settings_theme_dialog_themes_3))
+        val items  = arrayOf(getString(R.string.settings_theme_dialog_themes_1), getString(R.string.settings_theme_dialog_themes_2), getString(R.string.settings_theme_dialog_themes_3))
         val checkedItem = persistentState.theme
         alertDialog.setSingleChoiceItems(items, checkedItem) { dialog, which ->
             if(persistentState.theme != which) {
@@ -412,10 +565,10 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                     0 -> {
                         persistentState.theme = 0
                         dialog.dismiss()
-                        if(requireActivity().isDarkThemeOn()){
+                        if (requireActivity().isDarkThemeOn()) {
                             requireActivity().setTheme(R.style.AppTheme)
                             requireActivity().recreate()
-                        }else{
+                        } else {
                             requireActivity().setTheme(R.style.AppTheme_white)
                             requireActivity().recreate()
                         }
@@ -462,7 +615,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
     }
 
-    private fun checkForDownload(isUserInitiated: Boolean, isRetry : Boolean): Boolean {
+    private fun checkForDownload(isUserInitiated: Boolean, isRetry: Boolean): Boolean {
         val timeStamp = persistentState.localBlockListDownloadTime
         val appVersionCode = persistentState.appVersion
         val url = "$REFRESH_BLOCKLIST_URL$timeStamp&${Constants.APPEND_VCODE}$appVersionCode"
@@ -494,10 +647,12 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                         val updateValue = jsonObject.getBoolean(Constants.JSON_UPDATE)
                         val timeStamp = jsonObject.getLong(Constants.JSON_LATEST)
                         if (DEBUG) Log.d(LOG_TAG, "$FILETAG onResponse -  $updateValue")
-                        if (updateValue || isRetry) {
-                            persistentState.localBlockListDownloadTime = timeStamp
-                            val appDownloadManager  = AppDownloadManager(persistentState)
-                            appDownloadManager.downloadLocalBlocklist(timeStamp, requireContext())
+                        if (updateValue) {
+                            persistentState.tempBlocklistDownloadTime = timeStamp
+                            get<AppDownloadManager>().downloadLocalBlocklist(timeStamp)
+                            activity?.runOnUiThread{
+                                updateDownloadInitiated()
+                            }
                         } else {
                             activity?.runOnUiThread {
                                 if (isUserInitiated && !isRetry) {
@@ -514,7 +669,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 } catch (e: java.lang.Exception) {
                     Log.w(LOG_TAG, "$FILETAG Exception while downloading: ${e.message}", e)
                     activity?.runOnUiThread {
-                       updateDownloadFailure()
+                        updateDownloadFailure()
                     }
                 }
             }
@@ -548,6 +703,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.GONE
         b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.GONE
         b.settingsActivityOnDeviceBlockSwitch.isChecked = false
+        b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
         b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blockList_desc1)
     }
 
@@ -560,9 +716,9 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     private fun showDialogForHTTPProxy(isEnabled: Boolean) {
         if (isEnabled) {
-            var isValid = true
-            var host: String = ""
-            var port: Int = 0
+            var isValid: Boolean
+            var host = ""
+            var port = 0
             val dialog = Dialog(requireContext())
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
 
@@ -587,7 +743,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
             val hostName = persistentState.httpProxyHostAddress
             val portAddr = persistentState.httpProxyPort
-            if (!hostName.isNullOrEmpty()) {
+            if (hostName.isNotEmpty()) {
                 hostAddressEditText.setText(hostName, TextView.BufferType.EDITABLE)
             }
             if (portAddr != 0) {
@@ -640,11 +796,15 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             cancelURLBtn.setOnClickListener {
                 dialog.dismiss()
                 persistentState.httpProxyEnabled = false
+                persistentState.httpProxyHostAddress = ""
+                persistentState.httpProxyPort  = 0
                 b.settingsActivityHttpProxyDesc.text = getString(R.string.settings_http_proxy_desc_default)
                 b.settingsActivityHttpProxySwitch.isChecked = false
             }
         } else {
             persistentState.httpProxyEnabled = false
+            persistentState.httpProxyHostAddress = ""
+            persistentState.httpProxyPort = 0
             b.settingsActivityHttpProxySwitch.isChecked = false
             b.settingsActivityHttpProxyDesc.text =  getString(R.string.settings_http_proxy_desc_default)
         }
@@ -674,8 +834,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                     val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
                     appMode?.setBraveDNSMode(braveDNS)
                     persistentState.localBlocklistEnabled = true
-                }catch(e : Exception){
-                    Log.w(LOG_TAG, "Exception while setting blocklist: ${e.message}",e)
+                }catch (e: Exception){
+                    Log.w(LOG_TAG, "Exception while setting blocklist: ${e.message}", e)
                     persistentState.localBlocklistEnabled = false
                 }
             }
@@ -704,7 +864,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
 
         //performing negative action
-        builder.setNegativeButton(getString(R.string.settings_local_blocklist_dialog_negative)) { dialogInterface, which ->
+        builder.setNegativeButton(getString(R.string.settings_local_blocklist_dialog_negative)) { _, _ ->
             b.settingsActivityOnDeviceBlockSwitch.isChecked = false
         }
         // Create the AlertDialog
@@ -714,7 +874,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     }
 
-    private fun showRedownloadDialog(timeStamp : Long) {
+    private fun showRedownloadDialog(timeStamp: Long) {
         val builder = AlertDialog.Builder(requireContext())
         //set title for alert dialog
         builder.setTitle(R.string.local_blocklist_redownload)
@@ -727,13 +887,12 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
 
         //performing negative action
-        builder.setNeutralButton(getString(R.string.local_blocklist_neutral)) { dialogInterface, which ->
+        builder.setNeutralButton(getString(R.string.local_blocklist_neutral)) { _, _ ->
             b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc2)
             b.settingsActivityOnDeviceBlockSwitch.visibility = View.GONE
             b.settingsActivityOnDeviceBlockProgress.visibility = View.VISIBLE
-            val timeStamp = persistentState.localBlockListDownloadTime
-            val appDownloadManager = AppDownloadManager(persistentState)
-            appDownloadManager.downloadLocalBlocklist(timeStamp, requireContext())
+            persistentState.tempBlocklistDownloadTime = timeStamp
+            get<AppDownloadManager>().downloadLocalBlocklist(timeStamp)
         }
         // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()
@@ -748,7 +907,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
 
     private fun showExcludeAppDialog(context: Context, recyclerAdapter: ExcludedAppListAdapter, excludeAppViewModel: ExcludedAppViewModel) {
-        val excludeAppDialog = ExcludeAppDialog(context, get(), get(), persistentState, recyclerAdapter, excludeAppViewModel)
+        val excludeAppDialog = ExcludeAppDialog(context, get(), get(), get(), persistentState, recyclerAdapter, excludeAppViewModel)
         //if we know that the particular variable not null any time ,we can assign !! (not null operator ),
         // then  it won't check for null, if it becomes null, it will throw exception
         excludeAppDialog.show()
@@ -910,15 +1069,5 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     }
 
-    /*override fun onDestroy() {
-        super.onDestroy()
-        *//*try {
-            if(downloadInProgress == -1) {
-                requireContext().unregisterReceiver(onComplete)
-            }
-        }catch (e: Exception){
-            if(DEBUG) Log.i(LOG_TAG, "$FILETAG Unregister receiver exception for download manager: ${e.message}")
-        }*//*
-    }*/
 
 }

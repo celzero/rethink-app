@@ -46,6 +46,8 @@ import com.celzero.bravedns.ui.HomeScreenActivity;
 import com.celzero.bravedns.util.Constants;
 import com.celzero.bravedns.util.Utilities;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.util.Locale;
 
@@ -143,10 +145,10 @@ public class GoVpnAdapter {
 
     private GoVpnAdapter(BraveVPNService vpnService, ParcelFileDescriptor tunFd,
                          AppMode appMode,
-                         DNSProxyEndpointRepository dnsProxyEndpointRepository,
-                         DNSCryptEndpointRepository dnsCryptEndpointRepository,
-                         DoHEndpointRepository doHEndpointRepository,
-                         PersistentState persistentState) {
+                         @NotNull DNSProxyEndpointRepository dnsProxyEndpointRepository,
+                         @NotNull DNSCryptEndpointRepository dnsCryptEndpointRepository,
+                         @NotNull DoHEndpointRepository doHEndpointRepository,
+                         @NotNull PersistentState persistentState) {
         this.vpnService = vpnService;
         this.tunFd = tunFd;
         this.appMode = appMode;
@@ -192,13 +194,16 @@ public class GoVpnAdapter {
             Log.i(LOG_TAG,"GoVPNAdapter Connect tunnel with url "+dohURL);
             tunnel = Tun2socks.connectIntraTunnel(tunFd.getFd(), fakeDns,
                 transport, getProtector(), getBlocker(), listener);
-            //To set bravedns mode- two modes
-            //Mode local - Requires to set the local mode with
-            //Mode Remote -
-            Boolean isLocalSet = setBraveDNSLocalMode();
-            if (!isLocalSet && dohURL.contains(Constants.BRAVE_BASIC_URL)) {
-                Log.i(LOG_TAG,"GoVPNAdapter Set stamp for remote url :"+dohURL);
-                setBraveDNSRemoteMode(dohURL);
+
+            if(iDnsMode == Settings.DNSModeIP || iDnsMode == Settings.DNSModePort || iDnsMode == Settings.DNSModeNone) {
+                //To set bravedns mode- two modes
+                //Mode local - Requires to set the local mode with
+                //Mode Remote -
+                Boolean isLocalSet = setBraveDNSLocalMode();
+                if (!isLocalSet && dohURL.contains(Constants.BRAVE_BASIC_URL)) {
+                    Log.i(LOG_TAG, "GoVPNAdapter Set stamp for remote url :" + dohURL);
+                    setBraveDNSRemoteMode(dohURL);
+                }
             }
 
             if (HomeScreenActivity.GlobalVariable.INSTANCE.getDEBUG()) {
@@ -208,14 +213,18 @@ public class GoVpnAdapter {
             if (HomeScreenActivity.GlobalVariable.INSTANCE.getDEBUG())
                 Log.d(LOG_TAG, "GoVPNAdapter Connected to tunnel with DNSMODE - " + iDnsMode + ", blockMode-" + iBlockMode + ", proxyMode-" + proxyMode);
             if (iDnsMode != Settings.DNSModeCryptIP && iDnsMode != Settings.DNSModeCryptPort) {
-                tunnel.setTunMode(iDnsMode, iBlockMode, proxyMode);
+                if(proxyMode == Constants.ORBOT_SOCKS){
+                    tunnel.setTunMode(iDnsMode, iBlockMode, Settings.ProxyModeSOCKS5);
+                }else {
+                    tunnel.setTunMode(iDnsMode, iBlockMode, proxyMode);
+                }
                 checkForCryptRemoval();
                 if (iDnsMode == Settings.DNSModeProxyIP || iDnsMode == Settings.DNSModeProxyPort) {
                     Log.i(LOG_TAG, "GoVPNAdapter dnsMode mode - " + iDnsMode);
                     setDNSProxy();
                 }
 
-                if (proxyMode == Settings.ProxyModeSOCKS5) {
+                if (proxyMode == Settings.ProxyModeSOCKS5 || proxyMode == Constants.ORBOT_SOCKS) {
                     setSocks5TunnelMode();
                 }
             } else {
@@ -231,31 +240,6 @@ public class GoVpnAdapter {
         }
     }
 
-    /**
-     * When the tunnel is set with BlockmodeSink,
-     * all the traffic flowing through the VPN will be dropped.
-     *//*
-    public void setDNSTunnelMode(Long dns) {
-        //checkForCryptRemoval();
-        dnsMode = dns;
-        blockMode = Settings.BlockModeNone;
-        Log.d(LOG_TAG, "setDNSTunnelMode Parameters - DNSMode: " + dnsMode + " , blockmode: " + blockMode + ", ProxyMode: " + proxyMode);
-        tunnel.setTunMode(dnsMode, blockMode, proxyMode);
-    }
-
-    *//**
-     * When the tunnel is set with BlockModeFilter,
-     * all the traffic flowing through the VPN will be filtered, with the configuration.
-     *//*
-    public void setFilterTunnelMode() {
-        //checkForCryptRemoval();
-        if (VERSION.SDK_INT >= VERSION_CODES.O && VERSION.SDK_INT < VERSION_CODES.Q)
-            blockMode = Settings.BlockModeFilterProc;
-        else
-            blockMode = Settings.BlockModeFilter;
-        Log.d(LOG_TAG, "setFilterTunnelMode Parameters - DNSMode: " + dnsMode + " , blockmode: " + blockMode + ", ProxyMode: " + proxyMode);
-        tunnel.setTunMode(dnsMode, blockMode, proxyMode);
-    }*/
 
     public void checkForCryptRemoval(){
         if(HomeScreenActivity.GlobalVariable.INSTANCE.getDEBUG())
@@ -383,7 +367,7 @@ public class GoVpnAdapter {
                     }else{
                         if(persistentState.getDnsType() == 2) {
                             tunnel.setTunMode(Settings.DNSModeCryptPort, firewallMode, proxyMode);
-                            if (proxyMode == Settings.ProxyModeSOCKS5) {
+                            if (proxyMode == Settings.ProxyModeSOCKS5 || proxyMode == Constants.ORBOT_SOCKS) {
                                 setSocks5TunnelMode();
                             }
                             Log.d(LOG_TAG, "GoVPNAdapter celzero connect crypt else - tunnel mode set with mode -" + Settings.DNSModeCryptPort + firewallMode + proxyMode);
@@ -444,11 +428,17 @@ public class GoVpnAdapter {
     public void setSocks5TunnelMode() {
         AppMode appMode = HomeScreenActivity.GlobalVariable.INSTANCE.getAppMode();
         assert appMode != null;
-        ProxyEndpoint socks5 = appMode.getSocks5ProxyDetails();
-        setProxyMode(socks5.getUserName(), socks5.getPassword(), socks5.getProxyIP(), socks5.getProxyPort());
+        ProxyEndpoint socks5;
+        if(proxyMode == Constants.ORBOT_SOCKS){
+            socks5 = appMode.getOrbotProxyDetails();
+        }else{
+            socks5 = appMode.getSocks5ProxyDetails();
+        }
+        if(socks5 != null) {
+            setProxyMode(socks5.getUserName(), socks5.getPassword(), socks5.getProxyIP(), socks5.getProxyPort());
+        }
         if (HomeScreenActivity.GlobalVariable.INSTANCE.getDEBUG())
             Log.d(LOG_TAG, "GoVPNAdapter Socks5 mode set - " + socks5.getProxyIP() + "," + socks5.getProxyPort());
-
     }
 
     private static ParcelFileDescriptor establishVpn(BraveVPNService vpnService) {
@@ -572,10 +562,15 @@ public class GoVpnAdapter {
             if (HomeScreenActivity.GlobalVariable.INSTANCE.getDEBUG())
                 Log.d(LOG_TAG, "GoVPNAdapter Before DOH URL set bravedns- " + dohURL);
 
-            Boolean isLocalSet = setBraveDNSLocalMode();
-
-            if(!isLocalSet && dohURL.contains(Constants.BRAVE_BASIC_URL)){
-                setBraveDNSRemoteMode(dohURL);
+            if (dnsMode == Settings.DNSModeIP || dnsMode == Settings.DNSModePort || dnsMode == Settings.DNSModeNone) {
+                //To set bravedns mode- two modes
+                //Mode local - Requires to set the local mode with
+                //Mode Remote -
+                Boolean isLocalSet = setBraveDNSLocalMode();
+                if (!isLocalSet && dohURL.contains(Constants.BRAVE_BASIC_URL)) {
+                    Log.i(LOG_TAG, "GoVPNAdapter Set stamp for remote url :" + dohURL);
+                    setBraveDNSRemoteMode(dohURL);
+                }
             }
             Log.i(LOG_TAG,"GoVPNAdapter updateDohUrl call- Modes -- DNSMODE- " + dnsMode + " - blockMode-" + blockMode + " proxyMode-" + proxyMode);
 
@@ -585,21 +580,22 @@ public class GoVpnAdapter {
 
 
             if (dnsMode != Settings.DNSModeCryptIP && dnsMode != Settings.DNSModeCryptPort) {
-                tunnel.setTunMode(dnsMode, blockMode, proxyMode);
+                if (proxyMode == Constants.ORBOT_SOCKS) {
+                    tunnel.setTunMode(dnsMode, blockMode, Settings.ProxyModeSOCKS5);
+                } else {
+                    tunnel.setTunMode(dnsMode, blockMode, proxyMode);
+                }
                 checkForCryptRemoval();
                 if (dnsMode == Settings.DNSModeProxyIP || dnsMode == Settings.DNSModeProxyPort) {
                     Log.i(LOG_TAG, "GoVPNAdapter dnsMode mode - " + dnsMode);
                     setDNSProxy();
                 }
-
-                if (proxyMode == Settings.ProxyModeSOCKS5) {
+                if (proxyMode == Settings.ProxyModeSOCKS5  || proxyMode == Constants.ORBOT_SOCKS) {
                     setSocks5TunnelMode();
                 }
             } else {
                 setCryptMode();
             }
-
-
         } catch (Exception e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             tunnel.disconnect();

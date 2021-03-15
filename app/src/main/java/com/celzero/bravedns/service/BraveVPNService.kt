@@ -50,25 +50,25 @@ import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.backgroundAllowedUID
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
-import com.celzero.bravedns.util.BackgroundAccessibilityService
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.BACKGROUND_DELAY_CHECK_REMAINING
+import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
-import com.celzero.bravedns.util.Protocol
-import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
+import org.koin.core.component.KoinApiExtension
 import protect.Blocker
 import protect.Protector
 import settings.Settings
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.collections.HashMap
+import kotlin.random.Random
 
 
+@KoinApiExtension
 class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListener, Protector, Blocker,
     OnSharedPreferenceChangeListener {
 
@@ -108,6 +108,8 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
 
     private lateinit var connTracer: ConnectionTracer
 
+    private val rand : Random = Random
+
     private val appInfoRepository by inject<AppInfoRepository>()
     private val socks5ProxyEndpointRepository by inject<ProxyEndpointRepository>()
     private val dnsProxyEndpointRepository by inject<DNSProxyEndpointRepository>()
@@ -131,7 +133,6 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
         var isBlocked = false
         val first = sourceAddress.split(":")
         val second = destAddress.split(":")
-
         isBlocked = checkConnectionBlocked(uid.toInt(), protocol, first[0], first[first.size - 1].toInt(), second[0], second[second.size - 1].toInt())
         return isBlocked
     }
@@ -160,47 +161,25 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
 
             ipDetails = IPDetails(uid, sourceIp, sourcePort, destIp, destPort, System.currentTimeMillis(), false, "", protocol)
 
-            //Check for the Private DNS override
-            /*if (DEBUG) Log.d(LOG_TAG, "privateDNSOverride value: $privateDNSOverride, $uid, $destPort, $sourcePort")
-            if (privateDNSOverride) {
-                if (DEBUG) Log.d(LOG_TAG, "privateDNSOverride: $uid, $destPort")
-                if (uid == FileSystemUID.ANDROID.uid && destPort == PRIVATE_DNS_PORT) {
-                    if (DEBUG) Log.d(LOG_TAG, "privateDNSOverride: $uid, $destPort")
-                    ipDetails = IPDetails(uid, sourceIp, sourcePort, destIp, destPort, System.currentTimeMillis(), true, BlockedRuleNames.RULE6.ruleName, protocol)
-                    sendConnTracking(ipDetails)
-                    return true
-                }
-            }
-
-            if(DEBUG) Log.i(LOG_TAG,
-                    "Thread: ${Thread.currentThread().id}, name: ${Thread.currentThread().name},
-                    uid: $uid, ip: $sourceIp, $destIp, port: $sourcePort, $destPort, $protocol")
-            */
-
-
             if (appWhiteList.containsKey(uid)) {
-                if ((destIp != GoVpnAdapter.FAKE_DNS_IP && destPort != DNS_REQUEST_PORT)) {
-                    ipDetails.isBlocked = false
-                    ipDetails.blockedByRule = BlockedRuleNames.RULE7.ruleName
-                    sendConnTracking(ipDetails)
-                }
+                ipDetails.isBlocked = false
+                ipDetails.blockedByRule = BlockedRuleNames.RULE7.ruleName
+                sendConnTracking(ipDetails)
                 Log.i(LOG_TAG, "$FILE_LOG_TAG appWhiteList: $uid")
                 return false
             }
 
             if (persistentState.blockUnknownConnections && destIp != GoVpnAdapter.FAKE_DNS_IP) {
                 if (uid == -1 || uid == MISSING_UID)  {
-                    if ((destIp != GoVpnAdapter.FAKE_DNS_IP && destPort != DNS_REQUEST_PORT)) {
-                        ipDetails.isBlocked = true
-                        ipDetails.blockedByRule = BlockedRuleNames.RULE5.ruleName
-                        sendConnTracking(ipDetails)
-                    }
+                    ipDetails.isBlocked = true
+                    ipDetails.blockedByRule = BlockedRuleNames.RULE5.ruleName
+                    sendConnTracking(ipDetails)
                     delayBeforeResponse()
                     return true
                 }
             }
 
-            if (protocol == 17 && blockUDPTraffic  && destIp != GoVpnAdapter.FAKE_DNS_IP && destPort != DNS_REQUEST_PORT) {
+            if (protocol == 17 && blockUDPTraffic) {
                 ipDetails.isBlocked = true
                 ipDetails.blockedByRule = BlockedRuleNames.RULE6.ruleName
                 sendConnTracking(ipDetails)
@@ -216,11 +195,9 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
                 // FIXME: 04-12-2020 Removed the app range check for testing.
                 //if ((uid != 0 || uid != -1) && FileSystemUID.isUIDAppRange(uid)) {
                 if ((uid != -1 && uid != MISSING_UID)) {
-                    if ((destIp != GoVpnAdapter.FAKE_DNS_IP && destPort != DNS_REQUEST_PORT)) {
-                        ipDetails.isBlocked = true
-                        ipDetails.blockedByRule = BlockedRuleNames.RULE3.ruleName
-                        sendConnTracking(ipDetails)
-                    }
+                    ipDetails.isBlocked = true
+                    ipDetails.blockedByRule = BlockedRuleNames.RULE3.ruleName
+                    sendConnTracking(ipDetails)
                     if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG isScreenLocked: $uid, $destPort")
                     delayBeforeResponse()
                     return true
@@ -232,7 +209,17 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
                 if ((uid != -1 && uid != MISSING_UID)) {
                     var isBGBlock = true
                     if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Background blocked $uid, $destIp, before sleep: $uid, $destIp, $isBGBlock, ${System.currentTimeMillis()}")
-                    for (i in 4 downTo 1) {
+
+                    //Introducing exponential calculation for the wait time.
+                    //initially the thread sleep was done with constant time. for eg., thread
+                    //will sleep for 2 secs and will check if the app is in foreground or not.
+                    //To avoid the constant time wait introduced the exponential logic below.
+                    val baseWaitMs = TimeUnit.MILLISECONDS.toMillis(50)
+                    val bgBlockWaitMs = TimeUnit.SECONDS.toMillis(20)
+                    var remainingWaitMs = TimeUnit.SECONDS.toMillis(10)
+                    var attempt = 0
+
+                    while(remainingWaitMs > 0){
                         if (backgroundAllowedUID.containsKey(uid)) {
                             if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Background not blocked $uid, $destIp, AccessibilityEvent: app in foreground: $uid")
                             isBGBlock = false
@@ -240,20 +227,24 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
                         } else {
                             if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Background blocked $uid, $destIp, AccessibilityEvent: UID: $uid is not available in the foreground, trying again")
                         }
-                        Thread.sleep(Constants.BACKGROUND_DELAY_CHECK)
+                        // ref: https://stackoverflow.com/a/363692
+                        val exponent = exp(baseWaitMs, attempt)
+                        val randomValue = rand.nextLong(exponent - baseWaitMs + 1) + baseWaitMs
+                        val waitTimeMs = Math.min(randomValue, remainingWaitMs)
+                        remainingWaitMs -= waitTimeMs
+                        attempt += 1
+                        Thread.sleep(waitTimeMs)
                     }
-                    if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Background blocked $uid, $destIp, after sleep: $uid, $destIp, $isBGBlock, ${System.currentTimeMillis()}")
+
+                    //When the app is not in foreground.
                     if (isBGBlock) {
-                        Thread.sleep(BACKGROUND_DELAY_CHECK_REMAINING)
-                        if (!backgroundAllowedUID.containsKey(uid)) {
-                            if ((destIp != GoVpnAdapter.FAKE_DNS_IP && destPort != DNS_REQUEST_PORT)) {
-                                ipDetails.isBlocked = true
-                                ipDetails.blockedByRule = BlockedRuleNames.RULE4.ruleName
-                                sendConnTracking(ipDetails)
-                            }
-                            Log.i(LOG_TAG, "$FILE_LOG_TAG Background blocked $uid after sleep of: 30 secs")
-                            return isBGBlock
-                        }
+                        if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Background blocked $uid, $destIp, after sleep: $uid, $destIp, $isBGBlock, ${System.currentTimeMillis()}")
+                        Thread.sleep((bgBlockWaitMs + remainingWaitMs).toLong())
+                        ipDetails.isBlocked = true
+                        ipDetails.blockedByRule = BlockedRuleNames.RULE4.ruleName
+                        sendConnTracking(ipDetails)
+                        Log.i(LOG_TAG, "$FILE_LOG_TAG Background blocked $uid after sleep of: 30 secs")
+                        return isBGBlock
                     }
                 }
             }
@@ -277,11 +268,10 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
                 isBlocked = firewallRules.checkRules(UNIVERSAL_RULES_UID, connectionRules)
                 if (isBlocked) blockedBy = BlockedRuleNames.RULE2.ruleName
             }
-            if ((destPort != DNS_REQUEST_PORT && destIp != GoVpnAdapter.FAKE_DNS_IP)) {
-                ipDetails.isBlocked = isBlocked
-                ipDetails.blockedByRule = blockedBy
-                sendConnTracking(ipDetails)
-            }
+            ipDetails.isBlocked = isBlocked
+            ipDetails.blockedByRule = blockedBy
+            sendConnTracking(ipDetails)
+
         } catch (iex: Exception) {
             //Returning the blocked as true for all the block call from GO with exceptions.
             //So the apps which are hit in exceptions will have the response sent as blocked(true)
@@ -305,6 +295,14 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
         Thread.sleep(Constants.DELAY_FOR_BLOCK_RESPONSE)
     }
 
+    //Exponential calculation - used for app not in use feature (thread wait)
+    private fun exp(base : Long, pow : Int) : Long {
+        return if(pow == 0){
+            base
+        }else{
+            (1 shl pow) * base
+        }
+    }
 
     private fun killFirewalledApplication(uid: Int) {
         if(DEBUG) Log.i(LOG_TAG, "$FILE_LOG_TAG Firewalled application trying to connect - Kill app is enabled - uid - $uid")
@@ -364,102 +362,108 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
     fun newBuilder(): Builder {
         var builder = Builder()
 
-        if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
-            if (VERSION.SDK_INT >= VERSION_CODES.Q) {
-                if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG isLockDownEnabled - ${this.isLockdownEnabled}, ${this.isAlwaysOn}")
-                if (!this.isLockdownEnabled) {
-                    if (persistentState.allowByPass) {
-                        Log.d(LOG_TAG, "$FILE_LOG_TAG getAllowByPass - true")
-                        builder = builder.allowBypass()
-                    }
+        if (VERSION.SDK_INT >= VERSION_CODES.Q) {
+            if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG isLockDownEnabled - ${this.isLockdownEnabled}, ${this.isAlwaysOn}")
+            if (!this.isLockdownEnabled) {
+                if (persistentState.allowByPass) {
+                    Log.d(LOG_TAG, "$FILE_LOG_TAG getAllowByPass - true")
+                    builder = builder.allowBypass()
                 }
             }
+        }
 
-            //Fix - Cloud Backups were failing thinking that the VPN connection is metered.
-            //The below code will fix that.
-            if (VERSION.SDK_INT >= VERSION_CODES.Q) {
-                builder.setMetered(false)
+        //Fix - Cloud Backups were failing thinking that the VPN connection is metered.
+        //The below code will fix that.
+        if (VERSION.SDK_INT >= VERSION_CODES.Q) {
+            builder.setMetered(false)
+        }
+
+        if (VERSION.SDK_INT >= VERSION_CODES.Q) {
+            if (!this.isLockdownEnabled && (persistentState.orbotMode ==
+                                Constants.ORBAT_MODE_HTTP || persistentState.orbotMode == Constants.ORBAT_MODE_BOTH)) {
+                getHttpProxyInfo()?.let { builder.setHttpProxy(it) }
             }
 
-            if (VERSION.SDK_INT >= VERSION_CODES.Q) {
-                if (persistentState.httpProxyEnabled) {
-                    val host = persistentState.httpProxyHostAddress
-                    val port = persistentState.httpProxyPort
-                    val proxyInfo: ProxyInfo = ProxyInfo.buildDirectProxy(host!!, port)
-                    builder.setHttpProxy(proxyInfo)
-                    Log.i(LOG_TAG, "$FILE_LOG_TAG Http proxy enabled - builder updated with $host, $port")
-                }
+            if (persistentState.httpProxyEnabled) {
+                getHttpProxyInfo()?.let { builder.setHttpProxy(it) }
             }
+        }
 
-            try {
-                // Workaround for any app incompatibility bugs.
-                //TODO : As of now the wifi  packages are considered for blocking the entire traffic
-                if (appMode?.getFirewallMode() == Settings.BlockModeSink) {
-                    if (persistentState.excludedPackagesWifi.isEmpty()) {
-                        builder.addAllowedApplication("")
-                    } else {
-                        for (packageName in persistentState.excludedPackagesWifi) {
-                            builder = builder.addAllowedApplication(packageName!!)
-                        }
-                    }
+        try {
+            // Workaround for any app incompatibility bugs.
+            //TODO : As of now the wifi  packages are considered for blocking the entire traffic
+            if (appMode?.getFirewallMode() == Settings.BlockModeSink) {
+                if (persistentState.excludedPackagesWifi.isEmpty()) {
+                    builder.addAllowedApplication("")
                 } else {
-                    /* The check for the apps to exclude from VPN or not.
-                       In case of lockdown mode, the excluded apps wont able to connected. so
-                       not including the apps in the excluded list if the lockdown mode is
-                       enabled. */
-                    val excludedApps = persistentState.excludedAppsFromVPN
-                    if (VERSION.SDK_INT >= VERSION_CODES.Q) {
-                        if (!this.isLockdownEnabled) {
-                            excludedApps?.forEach {
-                                builder = builder.addDisallowedApplication(it)
-                                Log.i(LOG_TAG, "$FILE_LOG_TAG Excluded package - $it")
-                            }
-                        }else{
-                            Log.i(LOG_TAG, "$FILE_LOG_TAG lockdown mode enabled, Ignoring apps to exclude")
-                        }
-                    }else{
-                        excludedApps?.forEach {
+                    for (packageName in persistentState.excludedPackagesWifi) {
+                        builder = builder.addAllowedApplication(packageName)
+                    }
+                }
+            } else {
+                /* The check for the apps to exclude from VPN or not.
+                   In case of lockdown mode, the excluded apps wont able to connected. so
+                   not including the apps in the excluded list if the lockdown mode is
+                   enabled. */
+                val excludedApps = persistentState.excludedAppsFromVPN
+                if (VERSION.SDK_INT >= VERSION_CODES.Q) {
+                    if (!this.isLockdownEnabled) {
+                        excludedApps.forEach {
                             builder = builder.addDisallowedApplication(it)
                             Log.i(LOG_TAG, "$FILE_LOG_TAG Excluded package - $it")
                         }
+                    }else{
+                        Log.i(LOG_TAG, "$FILE_LOG_TAG lockdown mode enabled, Ignoring apps to exclude")
                     }
-                    //builder = builder.addDisallowedApplication("com.android.vending")
-                    builder = builder.addDisallowedApplication(this.packageName)
-                }
-                Log.i(LOG_TAG, "$FILE_LOG_TAG Proxy mode set to Socks5 ${appMode?.getProxyMode()}")
-                if (appMode?.getProxyMode() == Settings.ProxyModeSOCKS5) {
-                    //For Socks5 if there is a app selected, add that app in excluded list
-
-                    val socks5ProxyEndpoint = socks5ProxyEndpointRepository.getConnectedProxy()
-                    if (socks5ProxyEndpoint != null) {
-                        if (!socks5ProxyEndpoint.proxyAppName.isNullOrEmpty() && socks5ProxyEndpoint.proxyAppName != "Nobody") {
-                            Log.i(LOG_TAG, "$FILE_LOG_TAG Proxy mode set to Socks5 with the app - ${socks5ProxyEndpoint.proxyAppName!!}- added to excluded list")
-                            builder = builder.addDisallowedApplication(socks5ProxyEndpoint.proxyAppName!!)
-                        }
-                    } else {
-                        Log.i(LOG_TAG, "$FILE_LOG_TAG Proxy mode not set to Socks5 with the app - null - added to excluded list")
+                }else{
+                    excludedApps.forEach {
+                        builder = builder.addDisallowedApplication(it)
+                        Log.i(LOG_TAG, "$FILE_LOG_TAG Excluded package - $it")
                     }
                 }
-
-                if (appMode.getDNSType() == 3) {
-                    try {
-                        //For DNS proxy mode, if any app is set then exclude the application from the list
-                        var dnsProxyEndpoint = dnsProxyEndpointRepository.getConnectedProxy()
-                        if (!dnsProxyEndpoint.proxyAppName.isNullOrEmpty() && dnsProxyEndpoint.proxyAppName != "Nobody") {
-                            Log.i(LOG_TAG, "$FILE_LOG_TAG DNS Proxy mode is set with the app - ${dnsProxyEndpoint.proxyAppName!!}- added to excluded list")
-                            builder = builder.addDisallowedApplication(dnsProxyEndpoint.proxyAppName!!)
-                        } else {
-                            Log.i(LOG_TAG, "$FILE_LOG_TAG DNS Proxy mode is set with the app - ${dnsProxyEndpoint.proxyAppName!!}- added to excluded list")
-                        }
-                    }catch (e : Exception){
-                        Log.w(LOG_TAG,"Exception while excluding the proxy app from VPN")
-                    }
-                    //mDb.close()
-                }
-
-            } catch (e: PackageManager.NameNotFoundException) {
-                Log.e(LOG_TAG, "$FILE_LOG_TAG Failed to exclude an app", e)
+                //builder = builder.addDisallowedApplication("com.android.vending")
+                builder = builder.addDisallowedApplication(this.packageName)
             }
+            Log.i(LOG_TAG, "$FILE_LOG_TAG Proxy mode set to Socks5 ${appMode?.getProxyMode()}")
+            if (appMode?.getProxyMode() == Settings.ProxyModeSOCKS5) {
+                //For Socks5 if there is a app selected, add that app in excluded list
+
+                val socks5ProxyEndpoint = socks5ProxyEndpointRepository.getConnectedProxy()
+                if (socks5ProxyEndpoint != null) {
+                    if (!socks5ProxyEndpoint.proxyAppName.isNullOrEmpty() && socks5ProxyEndpoint.proxyAppName != "Nobody") {
+                        Log.i(LOG_TAG, "$FILE_LOG_TAG Proxy mode set to Socks5 with the app - ${socks5ProxyEndpoint.proxyAppName!!}- added to excluded list")
+                        builder = builder.addDisallowedApplication(socks5ProxyEndpoint.proxyAppName!!)
+                    }
+                } else {
+                    Log.i(LOG_TAG, "$FILE_LOG_TAG Proxy mode not set to Socks5 with the app - null - added to excluded list")
+                }
+            }
+            if (VERSION.SDK_INT >= VERSION_CODES.Q) {
+                if (!this.isLockdownEnabled) {
+                    if (appMode.getProxyMode() == Constants.ORBOT_SOCKS) {
+                        builder = builder.addDisallowedApplication(OrbotHelper.ORBOT_PACKAGE_NAME)
+                    }
+                }
+            }
+
+            if (appMode.getDNSType() == 3) {
+                try {
+                    //For DNS proxy mode, if any app is set then exclude the application from the list
+                    var dnsProxyEndpoint = dnsProxyEndpointRepository.getConnectedProxy()
+                    if (!dnsProxyEndpoint.proxyAppName.isNullOrEmpty() && dnsProxyEndpoint.proxyAppName != "Nobody") {
+                        Log.i(LOG_TAG, "$FILE_LOG_TAG DNS Proxy mode is set with the app - ${dnsProxyEndpoint.proxyAppName!!}- added to excluded list")
+                        builder = builder.addDisallowedApplication(dnsProxyEndpoint.proxyAppName!!)
+                    } else {
+                        Log.i(LOG_TAG, "$FILE_LOG_TAG DNS Proxy mode is set with the app - ${dnsProxyEndpoint.proxyAppName!!}- added to excluded list")
+                    }
+                }catch (e : Exception){
+                    Log.w(LOG_TAG,"Exception while excluding the proxy app from VPN")
+                }
+                //mDb.close()
+            }
+
+        } catch (e: PackageManager.NameNotFoundException) {
+            Log.e(LOG_TAG, "$FILE_LOG_TAG Failed to exclude an app", e)
         }
         return builder
     }
@@ -473,6 +477,18 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
 
     private fun setPrivateDNSOverrideFromPref() {
         privateDNSOverride = persistentState.allowPrivateDNS
+    }
+
+    private fun getHttpProxyInfo() : ProxyInfo?{
+        var proxyInfo: ProxyInfo? = null
+        val host = persistentState.httpProxyHostAddress
+        val port = persistentState.httpProxyPort
+        Log.i(LOG_TAG, "$FILE_LOG_TAG Http proxy enabled - builder updated with $host, $port")
+        if (host != "" && port != 0) {
+            proxyInfo = ProxyInfo.buildDirectProxy(host, port)
+            Log.i(LOG_TAG, "$FILE_LOG_TAG Http proxy enabled - builder updated with $host, $port")
+        }
+        return proxyInfo
     }
 
     private fun registerReceiversForScreenState() {
@@ -528,8 +544,11 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        appInfoRepository.getUIDForUnivWhiteList().observeForever {
-            appWhiteList = it.associateBy({ it }, { true }).toMutableMap()
+        appInfoRepository.getUIDForUnivWhiteList().observeForever { appInfoList ->
+            appWhiteList = appInfoList.associateBy({ it }, { true }).toMutableMap()
+        }
+        if(persistentState.orbotMode != Constants.ORBAT_MODE_NONE && persistentState.orbotEnabled){
+            get<OrbotHelper>().startOrbot(this)
         }
         blockUDPTraffic = persistentState.udpBlockedSettings
         privateDNSOverride = persistentState.allowPrivateDNS
@@ -752,6 +771,12 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
             blockUDPTraffic = persistentState.udpBlockedSettings
         }
 
+        if(PersistentState.ORBOT_MODE_CHANGE == key){
+            if(persistentState.orbotHTTPEnabled) {
+                restartVpn(appMode?.getDNSMode(), appMode?.getFirewallMode(), appMode?.getProxyMode())
+            }
+        }
+
     }
 
     fun signalStopService(userInitiated: Boolean) {
@@ -804,6 +829,8 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
     }
 
     private fun stopVpnAdapter() {
+        if(persistentState.orbotMode != Constants.ORBAT_MODE_NONE)
+            get<OrbotHelper>().unregisterReceiver(this)
         if (vpnController != null) {
             kotlin.synchronized(vpnController) {
                 if (vpnAdapter != null) {
@@ -909,6 +936,7 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
     override fun onDestroy() {
         try {
             unregisterReceiver(braveScreenStateReceiver)
+            get<OrbotHelper>().unregisterReceiver(this)
         } catch (e: java.lang.Exception) {
             Log.w(LOG_TAG, "$FILE_LOG_TAG Unregister receiver error: ${e.message}", e)
         }

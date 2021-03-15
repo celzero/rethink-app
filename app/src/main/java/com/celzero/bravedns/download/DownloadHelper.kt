@@ -1,8 +1,10 @@
-package com.celzero.bravedns.util
+package com.celzero.bravedns.download
 
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import java.io.File
 
@@ -44,9 +46,18 @@ class DownloadHelper {
         }
 
         private fun deleteRecursive(fileOrDirectory: File) {
-            if (fileOrDirectory.isDirectory) for (child in fileOrDirectory.listFiles()) deleteRecursive(child)
-            val isDeleted = fileOrDirectory.delete()
-            if (DEBUG) Log.d(LOG_TAG, "AppDownloadManager - deleteRecursive -- File : ${fileOrDirectory.path}, $isDeleted")
+            try {
+                if (fileOrDirectory.isDirectory) for (child in fileOrDirectory.listFiles()!!) deleteRecursive(child)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val isDeleted = fileOrDirectory.deleteRecursively()
+                    if (DEBUG) Log.d(LOG_TAG, "AppDownloadManager O above- deleteRecursive -- File : ${fileOrDirectory.path}, $isDeleted")
+                } else {
+                    val isDeleted = fileOrDirectory.delete()
+                    if (DEBUG) Log.d(LOG_TAG, "AppDownloadManager - deleteRecursive -- File : ${fileOrDirectory.path}, $isDeleted")
+                }
+            } catch (e: Exception) {
+                Log.w(LOG_TAG, "File delete exception: ${e.message}", e)
+            }
         }
 
         fun deleteFromCanonicalPath(context: Context) {

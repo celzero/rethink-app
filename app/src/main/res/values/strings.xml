@@ -239,10 +239,7 @@
 
     <string name="alert_firewall_accessibility_explanation">RethinkDNS uses accessibility service to track which apps are in-use (foreground) versus those that are not in-use (background).\n\nRethinkDNS does not collect any information or spy on you in any way.</string>
 
-    <string name="alert_firewall_accessibility_regrant_explanation">
-        RethinkDNS accessibility service has stopped or crashed. <b>Goto Settings and Force Stop</b> RethinkDNS and start it again to use "Block any app not in use" feature.\n\n
-        RethinkDNS uses accessibility service to track which apps are in-use (foreground) versus those that are not in-use (background).
-    </string>
+    <string name="alert_firewall_accessibility_regrant_explanation">RethinkDNS accessibility service has stopped or crashed. <b>Goto Settings and Force Stop</b> RethinkDNS and start it again to use "Block any app not in use" feature.\n\nRethinkDNS uses accessibility service to track which apps are in-use (foreground) versus those that are not in-use (background).</string>
 
     <string name="brave_dns_connect_prompt_firewall">Start Firewall / DNS+Firewall to configure apps.</string>
     <string name="brave_dns_connect_prompt_query">Start DNS / DNS+Firewall to view logs</string>
@@ -392,7 +389,7 @@
         <item>sdns://AQIAAAAAAAAAFDE3Ni4xMDMuMTMwLjEzMDo1NDQzINErR_JS3PLCu_iZEIbq95zkSV2LFsigxDIuUso_OQhzIjIuZG5zY3J5cHQuZGVmYXVsdC5uczEuYWRndWFyZC5jb20</item>
         <item>sdns://AQIAAAAAAAAAFDE3Ni4xMDMuMTMwLjEzMjo1NDQzILgxXdexS27jIKRw3C7Wsao5jMnlhvhdRUXWuMm1AFq6ITIuZG5zY3J5cHQuZmFtaWx5Lm5zMS5hZGd1YXJkLmNvbQ</item>
         <item>sdns://AQMAAAAAAAAAEjE4NS4yMjguMTY4Ljk6ODQ0MyC8rDL61UNpFx8IMtYHUCfDIIzu8Ojpn5QY3HdgZdSPKRFjbGVhbmJyb3dzaW5nLm9yZw</item>
-        <item>sdns://AQYAAAAAAAAAEzE0OS4xMTIuMTEyLjEwOjg0NDMgZ8hHuMh1jNEgJFVDvnVnRt803x2EwAuMRwNo34Idhj4ZMi5kbnNjcnlwdC1jZXJ0LnF1YWQ5Lm5ldA</item>
+        <item>sdns://AQMAAAAAAAAADDkuOS45Ljk6ODQ0MyBnyEe4yHWM0SAkVUO-dWdG3zTfHYTAC4xHA2jfgh2GPhkyLmRuc2NyeXB0LWNlcnQucXVhZDkubmV0</item>
     </string-array>
 
     <string-array name="dns_crypt_endpoint_desc">
@@ -403,7 +400,7 @@
         <item>Protects your device from malware and more.</item>
         <item>Adguard DNS with safe-search and adult content blocking.</item>
         <item>Block access to phishing, malware, and malicious domains. It does not block adult content.</item>
-        <item>Quad9 (anycast) no-dnssec/no-log/no-filter 9.9.9.10 / 149.112.112.10</item>
+        <item>Quad9 (anycast) dnssec/no-log/filter 9.9.9.9 / 149.112.112.9</item>
     </string-array>
 
     <string-array name="dns_crypt_relay_endpoint_names">
@@ -463,8 +460,8 @@
     <string name="app_mode_firewall">Firewall</string>
     <string name="app_mode_dns_firewall">DNS and Firewall</string>
 
-    <string name="settings_vpn_heading">VPN</string>
-    <string name="settings_vpn_heading_disabled">VPN disabled</string>
+    <string name="settings_vpn_heading">VPN &amp; Proxy</string>
+    <string name="settings_vpn_heading_disabled">VPN &amp; Proxy (disabled)</string>
 
     <string name="info_dialog_copy_toast_msg">URI Copied.</string>
 
@@ -491,18 +488,17 @@
     </string>
 
     <!-- Settings Fragment strings -->
-    <string name="settings_firewall_header">firewall</string>
+    <string name="settings_firewall_header">FIREWALL</string>
     <string name="settings_kill_app_heading">Kill app when firewalled (experimental)</string>
     <string name="settings_kill_app_desc">Some stubborn apps persistently try to connect to the internet even when firewalled. Enable this setting to kill such apps.</string>
 
-    <string name="settings_dns_header">dns</string>
+    <string name="settings_dns_header">DNS</string>
     <string name="settings_local_blocklist_heading">Enable on-device blocklists</string>
     <string name="settings_local_blocklist_desc_1">Choose from 170+ blocklists.</string>
     <string name="settings_local_blocklist_configure">configure</string>
     <string name="settings_local_blocklist_update">Update</string>
     <string name="settings_local_blocklist_check_time">last check for update: 10 mins ago</string>
 
-    <string name="settings_vpn_header">vpn</string>
     <string name="settings_exclude_app_heading">Exclude apps from Firewall and DNS</string>
     <string name="settings_exclude_app_desc">Connections from excluded apps will not monitored or blocked.</string>
 
@@ -517,7 +513,51 @@
     <string name="settings_https_heading">Setup HTTP(S) Proxy</string>
     <string name="settings_https_desc">This setting is only a recommendation and it is possible that apps will ignore it.</string>
 
-    <string name="settings_general_header">general</string>
+    <string name="orbot_socks5">TCP-Only Proxy</string>
+    <string name="orbot_socks5_desc">Forwards all TCP connections to Orbot over SOCKS5.</string>
+    <string name="orbot_http">HTTP Proxy</string>
+    <string name="orbot_http_desc">Recommends that apps use Orbot\'s HTTP proxy.</string>
+    <string name="orbot_both">TCP + HTTP Proxy</string>
+    <string name="orbot_both_desc">All of the above.</string>
+    <string name="orbot_none">No Proxy</string>
+    <string name="orbot_none_desc">No Proxy</string>
+
+    <string name="orbot_bs_status_1">Forwarding TCP connections to Orbot.</string>
+    <string name="orbot_bs_status_2">HTTP proxy set but it is possible apps may ignore it.</string>
+    <string name="orbot_bs_status_3">Forwarding TCP to Orbot and HTTP proxy set.</string>
+    <string name="orbot_bs_status_4">One-click Tor-as-a-proxy (Orbot) setup.</string>
+
+    <string name="orbot_app_issue">Could not launch Orbot. Is it installed?</string>
+    <string name="orbot_bs_status_trying_connect">Setting up Orbot…</string>
+
+    <string name="orbot_stop_dialog_title">Manually Stop Orbot</string>
+    <string name="orbot_stop_dialog_message">RethinkDNS has stopped forwarding connections to Orbot, but Orbot maybe running in the background.</string>
+    <string name="orbot_stop_dialog_positive">Stop Orbot</string>
+    <string name="orbot_stop_dialog_negative">Dismiss</string>
+
+    <string name="orbot_bs_positive_start">start</string>
+    <string name="orbot_bs_positive_stop">stop</string>
+    <string name="orbot_bs_negative">cancel</string>
+
+    <string name="settings_orbot_heading">Orbot setup</string>
+    <string name="settings_orbot_https_desc">Will enable Orbot in non-vpn mode with HTTPS set.</string>
+
+    <string name="settings_orbot_socks5_heading">Orbot one touch setup - SOCKS5</string>
+    <string name="settings_orbot_socks5_desc">Enable Orbot in non-vpn mode. Touch on Orbot icon to setup.</string>
+    <string name="settings_orbot_socks5_desc_positive">Forwarding the connections to Orbot</string>
+
+    <string name="settings_socks5_orbot_disabled_error">SOCKS5 proxy is turned on. Turn off to continue with one touch setup.</string>
+    <string name="settings_socks5_disabled_error">Orbot one touch start is turned on. Turn off to continue SOCKS5 configuration.</string>
+    <string name="settings_socks5_vpn_disabled_error">RethinkDNS is not started. Start RethinkDNS to continue setup</string>
+    <string name="settings_orbot_error_not_started">Orbot not started. Try again later.</string>
+
+    <string name="settings_https_orbot_disabled_error">HTTPS proxy is turned on. Turn off to continue with one touch setup.</string>
+    <string name="settings_https_disabled_error">Orbot one touch start is turned on. Turn off to continue HTTPS configuration.</string>
+
+    <string name="settings_orbot_notification_heading">Action required</string>
+    <string name="settings_orbot_notification_content">Failure starting Tor-as-a-proxy. Open the Orbot app to start it manually.</string>
+
+    <string name="settings_general_header">GENERAL</string>
     <string name="settings_refresh_heading">Refresh Data</string>
     <string name="settings_refresh_desc">Re-sync application list.</string>
     <string name="settings_autostart_bootup_heading">Auto-start on power up (experimental)</string>
@@ -577,7 +617,6 @@
     <string name="settings_socks5_dialog_hint_port">Port</string>
     <string name="settings_socks5_dialog_hint_username">Username (optional)</string>
     <string name="settings_socks5_dialog_hint_password">Password (optional)</string>
-
 
     <string name="settings_theme_dialog_title">Appearance</string>
     <string name="settings_theme_dialog_themes_1">Set by System</string>
@@ -692,6 +731,7 @@
     <string name="cd_dns_crypt_dialog_desc">Description (optional)</string>
     <string name="cd_dialog_positive_btn">add</string>
     <string name="cd_dialog_negative_btn">cancel</string>
+    <string name="cd_dns_crypt_error_text_1">Stamp cannot be empty</string>
 
     <string name="cd_doh_dialog_heading">Add DNS over HTTPS</string>
     <string name="cd_doh_dialog_resolver_name">Resolver Name</string>
@@ -787,6 +827,8 @@
     <string name="univ_accessibility_crash_dialog_negative">Cancel</string>
     <string name="univ_accessibility_dialog_positive">Grant</string>
     <string name="univ_accessibility_dialog_negative">Deny</string>
+
+    <string name="univ_blocked_ip_count">%1$s IPs blocked.</string>
 
     <!-- Connection tracker adapter -->
     <string name="ct_app_name">%1$s + %2$s other app</string>

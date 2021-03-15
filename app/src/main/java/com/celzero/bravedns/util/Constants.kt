@@ -74,10 +74,6 @@ class Constants {
         //Whitelist
         const val RECOMMENDED  = " [Recommended]"
 
-        //Application download source
-        const val DOWNLOAD_SOURCE_PLAY_STORE = 1
-        const val DOWNLOAD_SOURCE_OTHERS = 2
-
         //Network monitor
         const val FIREWALL_CONNECTIONS_IN_DB = 5000
 
@@ -88,7 +84,7 @@ class Constants {
 
         const val DELAY_FOR_BLOCK_RESPONSE : Long = 30000
         const val BACKGROUND_DELAY_CHECK : Long = 2000
-        const val BACKGROUND_DELAY_CHECK_REMAINING : Long = 23000
+        const val BACKGROUND_DELAY_CHECK_REMAINING : Long = 20000
         const val BACKGROUND_DELAY_CHECK_3 : Long = 12000
 
         const val DNS_TYPE_DOH = 1
@@ -114,6 +110,23 @@ class Constants {
         const val SOCKS = "Socks5"
 
         const val DATE_FORMAT_PATTERN = "HH:mm:ss"
+
+        const val ORBOT_SOCKS = 10L
+
+        const val ORBAT_MODE_NONE = 1
+        const val ORBAT_MODE_SOCKS5 = 2
+        const val ORBAT_MODE_HTTP = 3
+        const val ORBAT_MODE_BOTH = 4
+
+        //Application download source
+        const val DOWNLOAD_SOURCE_PLAY_STORE = 1
+        const val DOWNLOAD_SOURCE_FDROID = 2
+        const val DOWNLOAD_SOURCE_WEBSITE = 3
+
+        const val FLAVOR_PLAY = "play"
+        const val FLAVOR_FDROID = "fdroid"
+        const val FLAVOR_WEBSITE = "website"
+
     }
 
 }

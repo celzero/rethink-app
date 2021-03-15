@@ -2,6 +2,7 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.ui.HomeScreenActivity
@@ -10,6 +11,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.connectedDNS
 import com.celzero.bravedns.util.Constants
 import hu.autsoft.krate.*
+import org.koin.core.component.KoinApiExtension
 import settings.Settings
 
 /*
@@ -44,6 +46,7 @@ class PersistentState(context: Context):SimpleKrate(context) {
         const val HTTP_PROXY_ENABLED = "http_proxy_enabled"
         const val DNS_PROXY_ID = "dns_proxy_change"
         const val BLOCK_UDP_OTHER_THAN_DNS = "block_udp_traffic_other_than_dns"
+        const val ORBOT_MODE_CHANGE = "orbot_http_enabled"
 
         fun expandUrl(context: Context, url: String?): String {
             return if (url == null || url.isEmpty()) {
@@ -73,6 +76,7 @@ class PersistentState(context: Context):SimpleKrate(context) {
     var localBlocklistEnabled by booleanPref("enable_local_list", false)
     var remoteBlockListDownloadTime by longPref("remote_block_list_downloaded_time", 0)
     var localBlockListDownloadTime by longPref("local_block_list_downloaded_time", 0)
+    var tempBlocklistDownloadTime by longPref("temp_time_during_download",0)
     var httpProxyPort by intPref("http_proxy_port", 0)
     var httpProxyEnabled by booleanPref("http_proxy_enabled", false)
     var httpProxyHostAddress by stringPref("http_proxy_ipaddress", "")
@@ -96,6 +100,18 @@ class PersistentState(context: Context):SimpleKrate(context) {
     var isScreenOff by booleanPref("screen_off", false)
     private var connectedDNSName by stringPref("connected_dns_name","RethinkDNS Basic")
     var theme by intPref("app_theme", 0)
+
+    var orbotConnectionStatus : MutableLiveData<Boolean> = MutableLiveData()
+    //var orbotConnectionInitiated by booleanPref("orbot_connection_initiated", false)
+    var orbotEnabled by booleanPref("orbot_enabled", false)
+    var orbotMode by intPref("orbot_mode", 0)
+    var downloadIDs by stringSetPref("download_ids", emptySet())
+    var orbotHTTPEnabled by booleanPref("orbot_http_enabled", false)
+
+    var isAccessibilityCrashDetected by booleanPref("accessibility_crash", false)
+
+
+    var median50: MutableLiveData<Long> = MutableLiveData()
 
     fun wifiAllowed(forPackage:String):Boolean = !excludedPackagesWifi.contains(forPackage)
 
@@ -152,16 +168,8 @@ class PersistentState(context: Context):SimpleKrate(context) {
     }
 
     fun setMedianLatency(medianP90 : Long){
-        // TODO Remove UI logic from settings
-        HomeScreenActivity.GlobalVariable.medianP90 = medianP90
-        HomeScreenActivity.GlobalVariable.median50.postValue(medianP90)
+        median50.postValue(medianP90)
         _median90 = medianP90
-    }
-
-    fun getMedianLatency() : Long{
-        return HomeScreenActivity.GlobalVariable.medianP90.takeIf {
-            it != -1L
-        } ?: _median90
     }
 
     fun setNumOfReq(){
@@ -191,6 +199,7 @@ class PersistentState(context: Context):SimpleKrate(context) {
         HomeScreenActivity.GlobalVariable.isBackgroundEnabled = backgroundEnabled
     }
 
+    @KoinApiExtension
     fun setScreenLockData(isEnabled : Boolean) {
         HomeScreenActivity.GlobalVariable.isScreenLocked = if(isEnabled) 1
         else 0
@@ -230,7 +239,7 @@ class PersistentState(context: Context):SimpleKrate(context) {
     }
 
     fun setConnectedDNS(name : String) {
-        HomeScreenActivity.GlobalVariable.connectedDNS.postValue(name)
+        connectedDNS.postValue(name)
         connectedDNSName = name
     }
 }

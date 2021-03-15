@@ -33,6 +33,7 @@
         <item name="mainButtonBackgroundDisabled">@color/colorPrimary</item>
         <item name="border">@color/borderblack</item>
         <item name="invertedPrimaryTextColor">@color/white</item>
+        <item name="android:navigationBarColor">@color/black</item>
     </style>
 
     <style name="AppTheme_white" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
@@ -64,6 +65,7 @@
         <item name="mainButtonBackgroundDisabled">@color/main_button_disabled</item>
         <item name="border">@color/border_white</item>
         <item name="invertedPrimaryTextColor">@color/white</item>
+        <item name="android:navigationBarColor">@color/background_dark_white</item>
     </style>
 
 
@@ -107,6 +109,17 @@
         <item name="colorSwitchThumbNormal">@color/neutral</item>
         <!-- Inactive track color(30% transparency) -->
         <item name="android:colorForeground">@color/primaryText</item>
+        <item name="android:navigationBarColor">@color/colorPrimary</item>
+    </style>
+
+    <style name="BottomSheetDialogTheme_white" parent="BaseBottomSheetDialog">
+        <!-- Active thumb color & Active track color(30% transparency) -->
+        <item name="colorControlActivated">?attr/accentBad</item>
+        <!-- Inactive thumb color -->
+        <item name="colorSwitchThumbNormal">@color/neutral</item>
+        <!-- Inactive track color(30% transparency) -->
+        <item name="android:colorForeground">@color/primaryText</item>
+        <item name="android:navigationBarColor">@color/background_dark_white</item>
     </style>
 
     <style name="SearchView_custom" parent="Widget.AppCompat.SearchView">
@@ -131,10 +144,10 @@
     </style>
 
     <style name="ThinnerChip_action" parent="Widget.MaterialComponents.Chip.Action">
-            <item name="chipCornerRadius">12dp</item>
-            <item name="chipMinHeight">24dp</item>
-            <item name="android:textSize">11sp</item>
-            <item name="chipMinTouchTargetSize">30dp</item>
-        </style>
+        <item name="chipCornerRadius">12dp</item>
+        <item name="chipMinHeight">24dp</item>
+        <item name="android:textSize">11sp</item>
+        <item name="chipMinTouchTargetSize">30dp</item>
+    </style>
 
 </resources>
