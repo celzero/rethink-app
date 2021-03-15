@@ -10,6 +10,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.connectedDNS
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.ORBAT_MODE_NONE
 import hu.autsoft.krate.*
 import org.koin.core.component.KoinApiExtension
 import settings.Settings
@@ -104,7 +105,7 @@ class PersistentState(context: Context):SimpleKrate(context) {
     var orbotConnectionStatus : MutableLiveData<Boolean> = MutableLiveData()
     //var orbotConnectionInitiated by booleanPref("orbot_connection_initiated", false)
     var orbotEnabled by booleanPref("orbot_enabled", false)
-    var orbotMode by intPref("orbot_mode", 0)
+    var orbotMode by intPref("orbot_mode", ORBAT_MODE_NONE)
     var downloadIDs by stringSetPref("download_ids", emptySet())
     var orbotHTTPEnabled by booleanPref("orbot_http_enabled", false)
 
