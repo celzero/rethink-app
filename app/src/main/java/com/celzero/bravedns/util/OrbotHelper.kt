@@ -156,10 +156,10 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
         override fun onReceive(context: Context, intent: Intent) {
             if (DEBUG) Log.d(LOG_TAG, "OrbotHelper - Orbot - OnStatusReceiver - ${intent.action}")
             if (TextUtils.equals(intent.action, ACTION_STATUS)) {
-                isResponseReceivedFromOrbot = true
                 val status = intent.getStringExtra(EXTRA_STATUS)
                 if (DEBUG) Log.d(LOG_TAG, "OrbotHelper - Orbot - status - $status")
                 if (status == STATUS_ON) {
+                    isResponseReceivedFromOrbot = true
                     if (socks5IP != null && httpsIP != null && socks5IP != null && httpsIP != null) {
                         orbotStarted()
                     } else {
@@ -210,8 +210,8 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
         val mainActivityIntent = PendingIntent.getActivity(context, 0, Intent(context, HomeScreenActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT)
         var builder: NotificationCompat.Builder
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name: CharSequence = context.resources.getString(R.string.settings_orbot_notification_heading)
-            val description = context.resources.getString(R.string.settings_orbot_notification_content)
+            val name: CharSequence = ORBOT_NOTIFICATION_ID
+            val description = context.resources.getString(R.string.settings_orbot_notification_desc)
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(ORBOT_NOTIFICATION_ID, name, importance)
             channel.description = description
@@ -227,7 +227,7 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
         builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(mainActivityIntent).setContentText(contentText)
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
         val openIntent = getOrbotOpenIntent(context)
-        val notificationAction : NotificationCompat.Action = NotificationCompat.Action(0, "Open Orbot", openIntent)
+        val notificationAction : NotificationCompat.Action = NotificationCompat.Action(0, context.resources.getString(R.string.settings_orbot_notification_action), openIntent)
         builder.addAction(notificationAction)
 
         // Secret notifications are not shown on the lock screen.  No need for this app to show there.

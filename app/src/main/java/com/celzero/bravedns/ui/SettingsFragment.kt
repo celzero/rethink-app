@@ -359,13 +359,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             }.start()
         }
 
-        b.settingsActivitySocks5OrbotImage.setOnClickListener{
-            if (b.settingsActivitySocks5Switch.isChecked) {
-                Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_orbot_disabled_error), Toast.LENGTH_SHORT)
-                b.settingsActivitySocks5OrbotImage.setImageResource(R.drawable.orbot_disabled)
-            }
-        }
-
         b.settingsActivitySocks5Switch.setOnCheckedChangeListener { _: CompoundButton, bool: Boolean ->
             if (persistentState.orbotMode != Constants.ORBAT_MODE_NONE) {
                 Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_disabled_error), Toast.LENGTH_SHORT)
@@ -388,14 +381,25 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityOrbotImg.setOnClickListener{
             if (b.settingsActivityHttpProxySwitch.isChecked) {
                 Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_https_orbot_disabled_error), Toast.LENGTH_SHORT)
+            } else if(b.settingsActivitySocks5Switch.isChecked) {
+                Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_orbot_disabled_error), Toast.LENGTH_SHORT)
             } else {
-                //orbotHTTPSIntegration(isEnabled)
+                openBottomSheetForOrbot()
+            }
+        }
+
+        b.settingsActivityOrbotContainer.setOnClickListener{
+            if (b.settingsActivityHttpProxySwitch.isChecked) {
+                Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_https_orbot_disabled_error), Toast.LENGTH_SHORT)
+            } else if (b.settingsActivitySocks5Switch.isChecked) {
+                Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_orbot_disabled_error), Toast.LENGTH_SHORT)
+            } else {
                 openBottomSheetForOrbot()
             }
         }
 
         b.settingsActivityHttpProxySwitch.setOnCheckedChangeListener { _: CompoundButton, isEnabled: Boolean ->
-            if (persistentState.orbotMode == Constants.ORBAT_MODE_HTTP || persistentState.orbotMode == Constants.ORBAT_MODE_BOTH) {
+            if (persistentState.orbotMode != Constants.ORBAT_MODE_NONE) {
                 Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_https_disabled_error), Toast.LENGTH_SHORT)
                 b.settingsActivityHttpProxySwitch.isChecked = false
             } else {
@@ -475,18 +479,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 } else if (workInfo != null && (workInfo.state == WorkInfo.State.CANCELLED || workInfo.state == WorkInfo.State.FAILED)) {
                     updateDownloadFailure()
                     Log.i(LOG_TAG, "AppDownloadManager Work Manager failed - ${DownloadConstants.FILE_TAG}")
-                    /*-1 -> {
-                        updateDownloadFailure()
-                    }
-                    0 -> {// download not initiated
-                        initialUI()
-                    }
-                    1 -> {// download initiated.
-                        updateDownloadInitiated()
-                    }
-                    2 -> {
-                        updateDownloadSuccess()
-                    }*/
                 } else {
                     Log.d(LOG_TAG, "AppDownloadManager Work Manager - ${DownloadConstants.FILE_TAG}, ${workInfo.state}")
                 }
@@ -509,45 +501,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_vpn_disabled_error), Toast.LENGTH_SHORT)
         }
     }
-
-    /*private fun orbotSocks5Integration(enabled: Boolean) {
-        val rotate = RotateAnimation(0F, 360F, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
-        rotate.duration = 1000
-        rotate.interpolator = LinearInterpolator()
-        rotate.repeatCount = Animation.INFINITE
-        if(enabled){
-            if(OrbotHelper.isOrbotInstalled()){
-                Log.d(LOG_TAG, "Settings - Orbot - installed true")
-                if(VpnController.getInstance() != null){
-                    val vpnService = VpnController.getInstance()?.getBraveVpnService()
-                    if(vpnService != null){
-                        OrbotHelper.requestOrbotStatus(vpnService)
-                        b.settingsActivitySocks5OrbotImage.startAnimation(rotate)
-                    }else{
-                        Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_vpn_disabled_error), Toast.LENGTH_LONG)
-                    }
-                }
-            }
-        }else{
-            b.settingsActivitySocks5OrbotImage.startAnimation(rotate)
-            OrbotHelper.stopOrbot(requireContext())
-            persistentState.proxyMode = Settings.ProxyModeNone
-            persistentState.orbotSocks5Enabled = false
-        }
-    }
-
-    private fun orbotHTTPSIntegration(enabled: Boolean){
-        persistentState.httpProxyEnabled = enabled
-        persistentState.httpProxyPort = 0
-        persistentState.httpProxyHostAddress = ""
-        persistentState.orbotHttpsEnabled = enabled
-        if(enabled){
-            if(OrbotHelper.isOrbotInstalled()){
-                Log.d(LOG_TAG, "Settings - Orbot - installed true")
-                OrbotHelper.requestOrbotStatus(requireContext(), this)
-            }
-        }
-    }*/
 
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
