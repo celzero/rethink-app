@@ -75,8 +75,16 @@ class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
         return proxyEndpointDAO.getConnectedProxy()
     }
 
+    fun getConnectedOrbotProxy(): ProxyEndpoint? {
+        return proxyEndpointDAO.getConnectedOrbotProxy()
+    }
+
     fun clearAllData(){
         proxyEndpointDAO.clearAllData()
+    }
+
+    fun clearOrbotData(){
+        proxyEndpointDAO.clearOrbotData()
     }
 
 

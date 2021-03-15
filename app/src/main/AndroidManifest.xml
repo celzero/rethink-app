@@ -80,6 +80,10 @@
             </intent-filter>
         </receiver>
         <receiver
+            android:name=".receiver.OrbotNotificationReceiver"
+            android:label="@string/app_name">
+        </receiver>
+        <receiver
             android:name=".receiver.BraveScreenStateReceiver"
             android:label="@string/app_name">
             <intent-filter android:priority="999">

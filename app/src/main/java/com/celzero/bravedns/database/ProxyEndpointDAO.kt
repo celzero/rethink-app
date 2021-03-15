@@ -26,7 +26,7 @@ interface ProxyEndpointDAO {
     @Update
     fun update(proxyEndpoint: ProxyEndpoint)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(proxyEndpoint: ProxyEndpoint)
 
     @Delete
@@ -45,6 +45,9 @@ interface ProxyEndpointDAO {
     @Query("delete from ProxyEndpoint")
     fun clearAllData()
 
+    @Query("delete from ProxyEndpoint where proxyName = 'ORBOT'")
+    fun clearOrbotData()
+
     @Query("delete from ProxyEndpoint where proxyIP like :proxyIP or proxyAppName like :proxyIP and proxyPort = :port")
     fun deleteDNSProxyEndpoint(proxyIP : String, port : Int)
 
@@ -56,4 +59,7 @@ interface ProxyEndpointDAO {
 
     @Query("select * from ProxyEndpoint where isSelected = 1")
     fun getConnectedProxy() : ProxyEndpoint
+
+    @Query("select * from ProxyEndpoint where isSelected = 1 and proxyName = 'ORBOT'")
+    fun getConnectedOrbotProxy() : ProxyEndpoint
 }

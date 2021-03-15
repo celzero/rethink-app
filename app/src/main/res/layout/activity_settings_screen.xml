@@ -293,7 +293,7 @@
             android:fontFamily="sans-serif-smallcaps"
             android:padding="10dp"
             android:layout_marginStart="10dp"
-            android:text="@string/settings_vpn_header"
+            android:text="@string/settings_vpn_heading"
             android:textColor="?attr/accentGood"
             android:textSize="@dimen/large_font_text_view" />
 
@@ -363,7 +363,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
                 android:padding="10dp"
                 android:src="@drawable/ic_right_arrow_small" />
         </RelativeLayout>
@@ -422,17 +421,6 @@
                 android:padding="10dp" />
         </RelativeLayout>
 
-        <TextView
-            style="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-smallcaps"
-            android:padding="10dp"
-            android:layout_marginStart="10dp"
-            android:text="@string/settings_proxy_header"
-            android:textColor="?attr/accentGood"
-            android:textSize="@dimen/large_font_text_view" />
-
         <RelativeLayout
             android:id="@+id/settings_activity_socks5_rl"
             android:layout_width="wrap_content"
@@ -487,7 +475,54 @@
                 android:padding="10dp" />
         </RelativeLayout>
 
+        <RelativeLayout
+            android:id="@+id/settings_activity_socks5_orbot_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/background"
+            android:paddingStart="20dp"
+            android:paddingTop="15dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="20dp"
+            android:visibility="gone">
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/settings_activity_socks5_orbot_image"
+                android:baselineAligned="true"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_orbot_socks5_heading"
+                    android:textSize="@dimen/large_font_text_view" />
+
+                <TextView
+                    android:id="@+id/settings_activity_socks5_orbot_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="fill"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:text="@string/settings_orbot_socks5_desc"
+                    android:textSize="@dimen/default_font_text_view" />
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/settings_activity_socks5_orbot_image"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/orbot_disabled"
+                android:layout_marginEnd="10dp"
+                android:padding="5dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true" />
+        </RelativeLayout>
         <RelativeLayout
             android:id="@+id/settings_activity_http_proxy_container"
             android:layout_width="wrap_content"
@@ -544,6 +579,55 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
                 android:padding="10dp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/settings_activity_orbot_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/background"
+            android:paddingStart="20dp"
+            android:paddingTop="15dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="20dp"
+            android:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/settings_activity_orbot_img"
+                android:baselineAligned="true"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_orbot_heading"
+                    android:textSize="@dimen/large_font_text_view" />
+
+                <TextView
+                    android:id="@+id/settings_activity_http_orbot_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="fill"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:text="@string/settings_orbot_https_desc"
+                    android:textSize="@dimen/default_font_text_view" />
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/settings_activity_orbot_img"
+                android:src="@drawable/ic_right_arrow_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:padding="10dp" />
+
         </RelativeLayout>
 
         <TextView

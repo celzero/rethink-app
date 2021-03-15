@@ -23,11 +23,13 @@ import android.net.NetworkRequest
 import android.os.Build
 import android.util.Log
 import com.celzero.bravedns.data.AppMode
-import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import settings.Settings
 import java.net.InetAddress
 import java.util.*
 
@@ -82,10 +84,21 @@ class ConnectionCapabilityMonitor(context: Context, networkListener: NetworkList
            without VPN"). If the lockdown mode is modified, then the VPN service will be restarted*/
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val vpnService = VpnController.getInstance()?.getBraveVpnService()
-            if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(Constants.LOG_TAG, "ConnectionCapabilityMonitor Value for isLockDownEnabled - ${vpnService?.isLockdownEnabled}, ${vpnService?.isLockDownPrevious}")
+            if (DEBUG) Log.d(LOG_TAG, "ConnectionCapabilityMonitor Value for isLockDownEnabled - ${vpnService?.isLockdownEnabled}, ${vpnService?.isLockDownPrevious}")
             if (vpnService?.isLockdownEnabled != vpnService?.isLockDownPrevious) {
                 vpnService?.isLockDownPrevious = vpnService?.isLockdownEnabled!!
-                vpnService.restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
+                //Introducing the lockdown mode and Orbot - proxy mode for the Orbot one touch
+                //configuration. When the lockdown mode is enabled, the exclusion of Orbot will
+                // be avoided which will result in no internet connectivity.
+                //This is temp change, the changes are need to be moved out of capabilities once the
+                //appMode variable is removed.
+                if(vpnService.isLockdownEnabled && appMode.getProxyMode() == Constants.ORBOT_SOCKS) {
+                    if(DEBUG) Log.d(LOG_TAG,"isLockDownEnabled - True, ORBOT is socks5 - restart with proxy mode none")
+                    vpnService.restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), Settings.ProxyModeNone)
+                }else{
+                    if(DEBUG) Log.d(LOG_TAG,"isLockDownEnabled - False, ORBOT is ${appMode.getProxyMode()} - restart with set proxy mode")
+                    vpnService.restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
+                }
             }
         }
     }
@@ -120,5 +133,6 @@ class ConnectionCapabilityMonitor(context: Context, networkListener: NetworkList
         }
         return resolvers
     }
+
 
 }

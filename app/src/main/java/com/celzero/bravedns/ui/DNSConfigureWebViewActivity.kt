@@ -42,7 +42,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
-import com.celzero.bravedns.util.DownloadHelper
+import com.celzero.bravedns.download.DownloadHelper
 import com.celzero.bravedns.util.HttpRequestHelper
 import dnsx.Dnsx
 import kotlinx.coroutines.Dispatchers
@@ -98,12 +98,14 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         try {
             initWebView()
             setWebClient()
+            if(receivedIntentFrom == REMOTE){
+                checkForDownload()
+            }
             if (stamp != null && stamp!!.isNotEmpty()) {
                 if (receivedIntentFrom == LOCAL) {
                     url = Constants.CONFIGURE_BLOCKLIST_URL_LOCAL + persistentState.localBlockListDownloadTime + "#" + stamp
                 }else{
                     url = Constants.CONFIGURE_BLOCKLIST_URL_REMOTE + "#" + stamp
-                    checkForDownload()
                 }
             }
         } catch (e: Exception) {

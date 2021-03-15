@@ -146,6 +146,10 @@ class AppMode internal constructor(
         return socks5ProxyEndpoint!!
     }
 
+    fun getOrbotProxyDetails(): ProxyEndpoint? {
+        return proxyEndpointRepository.getConnectedOrbotProxy()
+    }
+
     private fun constructStringForRemoval(cryptList: List<DNSCryptEndpoint>): String {
         var removeServerString = ""
         cryptList.forEach {
