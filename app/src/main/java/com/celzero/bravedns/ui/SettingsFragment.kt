@@ -907,11 +907,30 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
 
     private fun showExcludeAppDialog(context: Context, recyclerAdapter: ExcludedAppListAdapter, excludeAppViewModel: ExcludedAppViewModel) {
-        val excludeAppDialog = ExcludeAppDialog(context, get(), get(), get(), persistentState, recyclerAdapter, excludeAppViewModel)
+        val themeID = getCurrentTheme()
+        val excludeAppDialog = ExcludeAppDialog(context, get(), get(), get(), persistentState, recyclerAdapter, excludeAppViewModel,themeID)
         //if we know that the particular variable not null any time ,we can assign !! (not null operator ),
         // then  it won't check for null, if it becomes null, it will throw exception
         excludeAppDialog.show()
         excludeAppDialog.setCanceledOnTouchOutside(false)
+    }
+
+    private fun getCurrentTheme(): Int {
+        if (persistentState.theme == 0) {
+            if (isDarkThemeOn()) {
+                return R.style.AppTheme
+            } else {
+                return R.style.AppTheme_white
+            }
+        } else if (persistentState.theme == 1) {
+            return R.style.AppTheme_white
+        } else {
+            return R.style.AppTheme
+        }
+    }
+
+    private fun isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
     private fun showDialogForSocks5Proxy() {

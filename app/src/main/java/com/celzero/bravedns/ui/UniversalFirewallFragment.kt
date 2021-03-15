@@ -16,6 +16,7 @@ limitations under the License.
 package com.celzero.bravedns.ui
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -186,11 +187,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
                         GlobalVariable.isBackgroundEnabled = !checkedVal
                         persistentState.setIsBackgroundEnabled(!checkedVal)
                         includeView.firewallBackgroundModeCheck.isChecked = !checkedVal
-                        //persistentState.isAccessibilityCrashDetected = checkedVal
                     }
-                    /*GlobalVariable.isBackgroundEnabled = !checkedVal
-                    persistentState.setIsBackgroundEnabled(!checkedVal)
-                    includeView.firewallBackgroundModeCheck.isChecked = !checkedVal*/
                 } else {
                     if (!showAlertForPermission(false)) {
                         includeView.firewallBackgroundModeCheck.isChecked = false
@@ -214,7 +211,8 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
 
         includeView.firewallAppsShowTxt.setOnClickListener {
             includeView.firewallAppsShowTxt.isEnabled = false
-            val customDialog = WhitelistAppDialog(requireContext(), get(), get(), get(), recyclerAdapter!!, appInfoViewModel)
+            val themeID = getCurrentTheme()
+            val customDialog = WhitelistAppDialog(requireContext(), get(), get(), get(), recyclerAdapter!!, appInfoViewModel, themeID)
             //if we know that the particular variable not null any time ,we can assign !!
             // (not null operator ), then  it won't check for null, if it becomes null,
             // it will throw exception
@@ -258,6 +256,27 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
 
     }
 
+    private fun getCurrentTheme(): Int {
+        if (persistentState.theme == 0) {
+            if (isDarkThemeOn()) {
+                return R.style.AppTheme
+            } else {
+                return R.style.AppTheme_white
+            }
+        } else if (persistentState.theme == 1) {
+            return R.style.AppTheme_white
+        } else {
+            return R.style.AppTheme
+        }
+    }
+
+
+    private fun isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and
+                Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+    }
+
+
     private fun setIPRulesVisible() {
         ipListState = false
         b.appScrollingInclFirewall.firewallSearchViewTop.visibility = View.VISIBLE
@@ -289,7 +308,6 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             builder.setCancelable(true)
             //performing positive action
             builder.setPositiveButton(getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->
-
                 blockedConnectionsRepository.deleteAllIPRulesUniversal()
                 GlobalVariable.firewallRules.clear()
                 Utilities.showToastInMidLayout(requireContext(), getString(R.string.univ_ip_delete_toast_success), Toast.LENGTH_SHORT)
