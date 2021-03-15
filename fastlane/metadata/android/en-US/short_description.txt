@@ -1,1 +1,1 @@
-RethinkDNS is the easiest way to monitor app activity, circumvent Internet censorship, block ads and trackers, and firewall apps on your Android device. Open source and free.
+Firewall apps, monitor network activity, block malware, change DNS.
