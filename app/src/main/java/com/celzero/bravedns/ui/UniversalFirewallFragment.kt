@@ -26,7 +26,6 @@ import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -35,6 +34,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.UniversalAppListAdapter
 import com.celzero.bravedns.adapter.UniversalBlockedRulesAdapter
 import com.celzero.bravedns.database.AppInfoRepository
+import com.celzero.bravedns.database.AppInfoViewRepository
 import com.celzero.bravedns.database.BlockedConnectionsRepository
 import com.celzero.bravedns.databinding.UniversalFragementContainerBinding
 import com.celzero.bravedns.service.BraveVPNService
@@ -65,10 +65,10 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
     private val viewModel: BlockedConnectionsViewModel by viewModel()
     private val appInfoViewModel: AppListViewModel by viewModel()
 
-    private var universalState: Boolean = false
     private var ipListState: Boolean = false
 
     private val appInfoRepository by inject<AppInfoRepository>()
+    private val appInfoViewRepository by inject<AppInfoViewRepository>()
     private val blockedConnectionsRepository by inject<BlockedConnectionsRepository>()
     private val persistentState by inject<PersistentState>()
 
@@ -95,7 +95,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             includeView.firewallScrollConnectCheck.visibility = View.VISIBLE
         }
 
-        setIPRulesVisible()
+        setIPRulesInvisible()
 
         includeView.firewallUniversalRecycler.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(requireContext())
@@ -156,11 +156,9 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
                     } else {
                         GlobalVariable.isBackgroundEnabled = !checkedVal
                         persistentState.setIsBackgroundEnabled(!checkedVal)
+                        //persistentState.isAccessibilityCrashDetected = checkedVal
                         includeView.firewallBackgroundModeCheck.isChecked = !checkedVal
                     }
-                    GlobalVariable.isBackgroundEnabled = !checkedVal
-                    persistentState.setIsBackgroundEnabled(!checkedVal)
-                    includeView.firewallBackgroundModeCheck.isChecked = !checkedVal
                 } else {
                     if (!showAlertForPermission(false)) {
                         includeView.firewallBackgroundModeCheck.isChecked = false
@@ -188,10 +186,11 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
                         GlobalVariable.isBackgroundEnabled = !checkedVal
                         persistentState.setIsBackgroundEnabled(!checkedVal)
                         includeView.firewallBackgroundModeCheck.isChecked = !checkedVal
+                        //persistentState.isAccessibilityCrashDetected = checkedVal
                     }
-                    GlobalVariable.isBackgroundEnabled = !checkedVal
+                    /*GlobalVariable.isBackgroundEnabled = !checkedVal
                     persistentState.setIsBackgroundEnabled(!checkedVal)
-                    includeView.firewallBackgroundModeCheck.isChecked = !checkedVal
+                    includeView.firewallBackgroundModeCheck.isChecked = !checkedVal*/
                 } else {
                     if (!showAlertForPermission(false)) {
                         includeView.firewallBackgroundModeCheck.isChecked = false
@@ -205,13 +204,17 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         }
 
         val appCount = GlobalVariable.appList.size
-        appInfoRepository.getWhitelistCountLiveData().observe(viewLifecycleOwner, {
+        appInfoViewRepository.getWhitelistCountLiveData().observe(viewLifecycleOwner, {
             includeView.firewallUnivWhitelistCount.text = getString(R.string.whitelist_dialog_apps_in_use, it.toString(), appCount.toString())
+        })
+
+        blockedConnectionsRepository.getBlockedConnectionCountLiveData().observe(viewLifecycleOwner, {
+            includeView.firewallUnivIpCount.text = getString(R.string.univ_blocked_ip_count, it.toString())
         })
 
         includeView.firewallAppsShowTxt.setOnClickListener {
             includeView.firewallAppsShowTxt.isEnabled = false
-            val customDialog = WhitelistAppDialog(requireContext(), appInfoRepository, get(), recyclerAdapter!!, appInfoViewModel)
+            val customDialog = WhitelistAppDialog(requireContext(), get(), get(), get(), recyclerAdapter!!, appInfoViewModel)
             //if we know that the particular variable not null any time ,we can assign !!
             // (not null operator ), then  it won't check for null, if it becomes null,
             // it will throw exception
@@ -227,23 +230,19 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             }.start()
         }
 
-        includeView.firewallRulesShowTxt.setOnClickListener {
+        includeView.firewallUnivIpHeader.setOnClickListener {
             if (ipListState) {
-                ipListState = false
-                includeView.firewallSearchViewTop.visibility = View.VISIBLE
-                includeView.firewallUniversalRecycler.visibility = View.VISIBLE
-                includeView.firewallUnivWhitelistRulesExpTxt.visibility = View.VISIBLE
-                includeView.firewallSearchContainer.visibility = View.VISIBLE
-                includeView.firewallNoRulesSetTxt.visibility = View.VISIBLE
-                includeView.firewallRulesShowTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(requireContext(), R.drawable.ic_keyboard_arrow_down_gray_24dp), null)
+                setIPRulesVisible()
             } else {
-                ipListState = true
-                includeView.firewallSearchViewTop.visibility = View.GONE
-                includeView.firewallUniversalRecycler.visibility = View.GONE
-                includeView.firewallUnivWhitelistRulesExpTxt.visibility = View.VISIBLE
-                includeView.firewallNoRulesSetTxt.visibility = View.GONE
-                includeView.firewallSearchContainer.visibility = View.GONE
-                includeView.firewallRulesShowTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(requireContext(), R.drawable.ic_keyboard_arrow_up_gray_24dp), null)
+                setIPRulesInvisible()
+            }
+        }
+
+        includeView.firewallUnivIpImg.setOnClickListener {
+            if (ipListState) {
+                setIPRulesVisible()
+            } else {
+                setIPRulesInvisible()
             }
         }
 
@@ -266,7 +265,17 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         b.appScrollingInclFirewall.firewallUnivWhitelistRulesExpTxt.visibility = View.VISIBLE
         b.appScrollingInclFirewall.firewallSearchContainer.visibility = View.VISIBLE
         b.appScrollingInclFirewall.firewallNoRulesSetTxt.visibility = View.VISIBLE
-        b.appScrollingInclFirewall.firewallRulesShowTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(requireContext(), R.drawable.ic_keyboard_arrow_down_gray_24dp), null)
+        b.appScrollingInclFirewall.firewallUnivIpImg.setImageResource(R.drawable.ic_keyboard_arrow_down_gray_24dp)
+    }
+
+    private fun setIPRulesInvisible(){
+        ipListState = true
+        b.appScrollingInclFirewall.firewallSearchViewTop.visibility = View.GONE
+        b.appScrollingInclFirewall.firewallUniversalRecycler.visibility = View.GONE
+        b.appScrollingInclFirewall.firewallUnivWhitelistRulesExpTxt.visibility = View.VISIBLE
+        b.appScrollingInclFirewall.firewallNoRulesSetTxt.visibility = View.GONE
+        b.appScrollingInclFirewall.firewallSearchContainer.visibility = View.GONE
+        b.appScrollingInclFirewall.firewallUnivIpImg.setImageResource(R.drawable.ic_keyboard_arrow_up_gray_24dp)
     }
 
     private fun showDialogForDelete() {
@@ -303,7 +312,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         super.onResume()
         b.appScrollingInclFirewall.firewallUnknownConnectionModeCheck.isChecked = persistentState.blockUnknownConnections
         if (Utilities.isAccessibilityServiceEnabledEnhanced(requireContext(), BackgroundAccessibilityService::class.java)) {
-            if(!Utilities.isAccessibilityServiceEnabled(requireContext(), BackgroundAccessibilityService::class.java) && persistentState.backgroundEnabled){
+            if(!Utilities.isAccessibilityServiceEnabled(requireContext(), BackgroundAccessibilityService::class.java) && persistentState.isAccessibilityCrashDetected){
                 b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = false
                 persistentState.backgroundEnabled = false
                 showAlertForPermission(true)
@@ -324,9 +333,9 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         //set title and message for alert dialog
         if (isRegrant) {
             builder.setTitle(R.string.alert_permission_accessibility_regrant)
-            val text = getString(R.string.alert_firewall_accessibility_regrant_explanation)
             builder.setMessage(R.string.alert_firewall_accessibility_regrant_explanation)
             builder.setPositiveButton(getString(R.string.univ_accessibility_crash_dialog_positive)) { _, _ ->
+                persistentState.isAccessibilityCrashDetected  = false
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                 val packageName = requireContext().packageName
                 intent.data = Uri.parse("package:$packageName")
@@ -335,6 +344,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             //performing negative action
             builder.setNegativeButton(getString(R.string.univ_accessibility_crash_dialog_negative)) { _, _ ->
                 persistentState.backgroundEnabled = false
+                persistentState.isAccessibilityCrashDetected  = false
             }
         } else {
             builder.setTitle(R.string.alert_permission_accessibility)

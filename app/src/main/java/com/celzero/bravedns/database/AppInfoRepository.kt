@@ -159,20 +159,9 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.getAppInfoForPackageName(packageName)
     }
 
-    fun getBlockedAppCount(): LiveData<Int>{
-        return appInfoDAO.getBlockedAppCount()
-    }
-
-    fun getWhitelistCountLiveData(): LiveData<Int>{
-        return appInfoDAO.getWhitelistCountLiveData()
-    }
 
     fun getWhitelistCount(categoryName : String): Int{
         return appInfoDAO.getWhitelistCount(categoryName)
-    }
-
-    fun getExcludedAppListCountLiveData(): LiveData<Int>{
-        return appInfoDAO.getExcludedAppListCountLiveData()
     }
 
     fun getAppNameForUID(uid : Int): String{

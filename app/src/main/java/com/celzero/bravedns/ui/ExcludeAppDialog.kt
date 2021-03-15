@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfoRepository
+import com.celzero.bravedns.database.AppInfoViewRepository
 import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.databinding.ExcludeAppDialogLayoutBinding
 import com.celzero.bravedns.service.PersistentState
@@ -39,9 +40,16 @@ import com.google.android.material.chip.Chip
 import java.util.stream.Collectors
 
 
-class ExcludeAppDialog(private var activity: Context, private val appInfoRepository: AppInfoRepository, private val categoryInfoRepository: CategoryInfoRepository, private val persistentState: PersistentState, internal var adapter: RecyclerView.Adapter<*>, var viewModel: ExcludedAppViewModel) : Dialog(activity), View.OnClickListener, SearchView.OnQueryTextListener {
+class ExcludeAppDialog(private var activity: Context,
+    private val appInfoRepository: AppInfoRepository,
+    private val appInfoViewRepository: AppInfoViewRepository,
+    private val categoryInfoRepository: CategoryInfoRepository,
+    private val persistentState: PersistentState,
+    internal var adapter: RecyclerView.Adapter<*>,
+    var viewModel: ExcludedAppViewModel)
+    : Dialog(activity), View.OnClickListener, SearchView.OnQueryTextListener {
     private lateinit var b: ExcludeAppDialogLayoutBinding
-    var dialog: Dialog? = null
+    //var dialog: Dialog? = null
 
     private var mLayoutManager: RecyclerView.LayoutManager? = null
 
@@ -52,6 +60,7 @@ class ExcludeAppDialog(private var activity: Context, private val appInfoReposit
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         b = ExcludeAppDialogLayoutBinding.inflate(layoutInflater)
         setContentView(b.root)
@@ -76,7 +85,7 @@ class ExcludeAppDialog(private var activity: Context, private val appInfoReposit
 
         val appCount = HomeScreenActivity.GlobalVariable.appList.size
         val act: HomeScreenActivity = activity as HomeScreenActivity
-        appInfoRepository.getExcludedAppListCountLiveData().observe(act, {
+        appInfoViewRepository.getExcludedAppListCountLiveData().observe(act, {
             b.excludeAppSelectCountText.text = act.getString(R.string.ex_dialog_count, it.toString(), appCount.toString())
         })
 

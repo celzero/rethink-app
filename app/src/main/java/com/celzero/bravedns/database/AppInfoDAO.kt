@@ -142,15 +142,11 @@ interface AppInfoDAO {
     @Query("select count(*) from AppInfo where isInternetAllowed = 0")
     fun getBlockedAppCount() : LiveData<Int>
 
-    @Query("select count(*) from AppInfo where whiteListUniv1 = 1")
-    fun getWhitelistCountLiveData() : LiveData<Int>
-
+   /* @Query("select count(*) from AppInfo where whiteListUniv1 = 1")
+    fun getWhitelistCountLiveData() : LiveData<Int>*/
 
     @Query("select count(*) from AppInfo where whiteListUniv1 = 1 and appCategory = :categoryName")
     fun getWhitelistCount(categoryName : String): Int
-
-    @Query("select count(*) from AppInfo where isExcluded = 1")
-    fun getExcludedAppListCountLiveData() : LiveData<Int>
 
     @Query("select appName from AppInfo where uid = :uid")
     fun getAppNameForUID(uid : Int) : String

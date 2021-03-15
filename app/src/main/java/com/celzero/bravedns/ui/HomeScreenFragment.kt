@@ -26,7 +26,6 @@ import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.text.Html
 import android.text.TextUtils
 import android.text.format.DateUtils
 import android.text.format.DateUtils.FORMAT_ABBREV_RELATIVE
@@ -41,8 +40,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.database.AppInfoRepository
-import com.celzero.bravedns.database.DoHEndpoint
+import com.celzero.bravedns.database.AppInfoViewRepository
 import com.celzero.bravedns.databinding.FragmentHomeScreenBinding
 import com.celzero.bravedns.service.*
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -53,7 +51,6 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveModeToggler
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.connectedDNS
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.lifeTimeQueries
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.median50
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Utilities
@@ -68,7 +65,7 @@ import java.util.*
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
 
-    private val appInfoRepository by inject<AppInfoRepository>()
+    private val appInfoViewRepository by inject<AppInfoViewRepository>()
     private val persistentState by inject<PersistentState>()
 
     companion object {
@@ -97,7 +94,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         val intentFilter = IntentFilter(InternalNames.DNS_STATUS.name)
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(messageReceiver, intentFilter)
     }
-
 
     /*
         Assign initial values to the view and variables.
@@ -187,6 +183,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         })
     }
 
+
     private fun updateDNSCardView(){
        if (braveMode == FIREWALL_MODE) {
            b.fhsCardDnsLatency.text = getString(R.string.dns_card_latency_inactive)
@@ -206,8 +203,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * The observers are register to update the UI in the home screen
      */
     private fun registerObserversForDNS(){
-        median50.observe(viewLifecycleOwner, {
-            b.fhsCardDnsLatency.text = getString(R.string.dns_card_latency_active, median50.value.toString())
+        persistentState.median50.observe(viewLifecycleOwner, {
+            b.fhsCardDnsLatency.text = getString(R.string.dns_card_latency_active, it.toString())
         })
 
         connectedDNS.observe(viewLifecycleOwner, {
@@ -219,7 +216,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
        * Unregister all the DNS related observers which updates the dns card.
        */
       private fun unregisterObserversForDNS(){
-          median50.removeObservers(viewLifecycleOwner)
+          persistentState.median50.removeObservers(viewLifecycleOwner)
           connectedDNS.removeObservers(viewLifecycleOwner)
       }
 
@@ -227,13 +224,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * The observers for the firewall card in the home screen, will be calling this method
      * when the VPN is active and the mode is set to either Firewall or DNS+Firewall.
      */
-    private fun    registerObserversForFirewall(){
-        appInfoRepository.getAllAppDetailsForLiveData().observe(viewLifecycleOwner, {
+    private fun registerObserversForFirewall(){
+        appInfoViewRepository.getAllAppDetailsForLiveData().observe(viewLifecycleOwner, {
             val blockedList = it.filter { a -> !a.isInternetAllowed }
             val whiteListApps = it.filter { a -> a.whiteListUniv1 }
             val excludedList = it.filter { a -> a.isExcluded }
             b.fhsCardFirewallStatus.text = getString(R.string.firewall_card_status_active, blockedList.size.toString())
-            b.fhsCardFirewallApps.text = Html.fromHtml(getString(R.string.firewall_card_text_active, whiteListApps.size.toString(), excludedList.size.toString()))
+            b.fhsCardFirewallApps.text = getString(R.string.firewall_card_text_active, whiteListApps.size.toString(), excludedList.size.toString())
         })
     }
 
@@ -241,7 +238,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * Unregister all the firewall related observers for the Home screen card.
      */
     private fun unregisterObserversForFirewall(){
-        appInfoRepository.getAllAppDetailsForLiveData().removeObservers(viewLifecycleOwner)
+        appInfoViewRepository.getAllAppDetailsForLiveData().removeObservers(viewLifecycleOwner)
     }
 
     private fun updateFirewallCardView(){
@@ -252,9 +249,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             b.fhsCardFirewallConfigure.setTextColor(fetchTextColor(R.color.textColorMain))
             unregisterObserversForFirewall()
         } else {
+            registerObserversForFirewall()
             b.fhsCardFirewallConfigure.alpha = 1F
             b.fhsCardFirewallConfigure.setTextColor(fetchTextColor(R.color.secondaryText))
-            registerObserversForFirewall()
         }
     }
 
@@ -372,20 +369,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             shimmerForStop()
         }
         braveModeToggler.postValue(braveMode)
-        val dnsType = appMode?.getDNSType()
-
-        if (dnsType == 1) {
-            var dohDetail: DoHEndpoint? = null
-            try {
-                dohDetail = appMode?.getDOHDetails()
-                persistentState.setConnectedDNS(dohDetail?.dohName!!)
-            } catch (e: Exception) {
-                return
-            }
-        } else if (dnsType == 2) {
-            val cryptDetails = appMode?.getDNSCryptServerCount()
-            persistentState.setConnectedDNS("DNSCrypt: $cryptDetails resolvers")
-        }
     }
 
     private fun startFirewallLogsActivity(){
@@ -605,13 +588,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
     //Shimmer
     private fun shimmerForStart() {
-       /* val builder = Shimmer.AlphaHighlightBuilder()
-        builder.setDuration(10000)
-        builder.setBaseAlpha(0.85f)
-        builder.setDropoff(1f)
-        builder.setHighlightAlpha(0.35f)
-        //TODO  - Changes
-        b.shimmerViewContainer1.setShimmer(builder.build())*/
         if(DEBUG) Log.d(LOG_TAG, "Shimmer stop executed")
         b.shimmerViewContainer1.stopShimmer()
     }
@@ -632,6 +608,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun startDnsVpnService() {
+
         VpnController.getInstance()?.start(requireContext())
         if (braveMode == 0) {
             b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_dns_connected)
