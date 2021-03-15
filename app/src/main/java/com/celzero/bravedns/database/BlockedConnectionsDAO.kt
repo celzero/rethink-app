@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.celzero.bravedns.database
 
+import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.room.*
 
@@ -67,4 +68,7 @@ interface BlockedConnectionsDAO {
 
     @Query("select count(*) from BlockedConnections where uid = -1000")
     fun getBlockedConnectionsCount() : Int
+
+    @Query("select count(*) from BlockedConnections where uid = -1000")
+    fun getBlockedConnectionCountLiveData(): LiveData<Int>
 }

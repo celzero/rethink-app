@@ -45,8 +45,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0.9"
                     android:padding="10dp"
-                    android:textColor="?attr/primaryTextColor"
                     android:text="@string/univ_firewall_rule_1"
+                    android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
@@ -171,8 +171,8 @@
                         android:gravity="center_vertical"
                         android:paddingTop="5dp"
                         android:paddingBottom="5dp"
-                        android:textSize="@dimen/large_font_text_view"
                         android:text="@string/univ_whitelist_heading"
+                        android:textSize="@dimen/large_font_text_view"
                         android:textStyle="bold" />
 
                     <TextView
@@ -206,26 +206,55 @@
             </RelativeLayout>
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/firewall_rules_show_txt"
-            android:layout_width="match_parent"
+        <RelativeLayout
+            android:id="@+id/firewall_ip_container"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="2dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginRight="2dp"
-            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="2dp"
             android:background="?attr/background"
-            android:fontFamily="sans-serif-smallcaps"
-            android:gravity="center_vertical"
-            android:paddingStart="10dp"
-            android:paddingTop="10dp"
-            android:paddingEnd="10dp"
-            android:paddingBottom="5dp"
-            android:text="@string/univ_view_blocked_ip"
-            android:textSize="@dimen/large_font_text_view"
-            android:textStyle="bold"
-            android:visibility="visible"
-            app:drawableRightCompat="@drawable/ic_keyboard_arrow_up_gray_24dp" />
+            android:padding="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/firewall_univ_ip_img"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/firewall_univ_ip_header"
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:gravity="center_vertical"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:text="@string/univ_view_blocked_ip"
+                    android:textSize="@dimen/large_font_text_view"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/firewall_univ_ip_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:textColor="@color/neutral"
+                    android:textSize="@dimen/default_font_text_view" />
+
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/firewall_univ_ip_img"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/ic_keyboard_arrow_up_gray_24dp" />
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/firewall_univ_whitelist_rules_exp_txt"
@@ -274,8 +303,7 @@
                         android:fontFamily="sans-serif"
                         android:isScrollContainer="true"
                         app:iconifiedByDefault="false"
-                        app:queryHint="@string/search_universal_ips">
-                    </androidx.appcompat.widget.SearchView>
+                        app:queryHint="@string/search_universal_ips"></androidx.appcompat.widget.SearchView>
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/firewall_search_add_icon"
@@ -284,8 +312,8 @@
                         android:layout_gravity="center"
                         android:layout_weight="0.05"
                         android:padding="5dp"
-                        android:visibility="gone"
-                        android:src="@drawable/ic_add" />
+                        android:src="@drawable/ic_add"
+                        android:visibility="gone" />
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/firewall_search_delete_icon"
@@ -310,12 +338,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
+                android:gravity="center"
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp"
-                android:gravity="center"
-                android:textSize="@dimen/default_font_text_view"
                 android:text="@string/univ_firewall_no_ip_message"
                 android:textColor="?attr/primaryLightColorText"
+                android:textSize="@dimen/default_font_text_view"
                 android:visibility="invisible" />
 
             <androidx.recyclerview.widget.RecyclerView

@@ -28,6 +28,7 @@
             android:layout_height="wrap_content"
             android:drawablePadding="20dp"
             android:padding="10dp"
+            android:textColor="?attr/primaryTextColor"
             android:text="@string/firewall_rules"
             android:textSize="@dimen/heading_font_text_view"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
@@ -42,6 +43,7 @@
             android:padding="10dp"
             android:layout_marginTop="20dp"
             android:textSize="@dimen/large_font_text_view"
+            android:textColor="?attr/primaryTextColor"
             android:text="@string/bsct_conn_rule_explanation"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
