@@ -104,7 +104,7 @@ class VpnController {
         } else {
             stateChanged(context!!)
         }
-        Log.d(LOG_TAG, "onStartComplete - VpnController")
+        Log.i(LOG_TAG, "onStartComplete - VpnController")
     }
 
     fun stop(context: Context?) {

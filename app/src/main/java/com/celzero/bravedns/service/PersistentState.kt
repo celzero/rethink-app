@@ -1,3 +1,18 @@
+/*
+ * Copyright 2020 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.celzero.bravedns.service
 
 import android.content.Context
@@ -15,21 +30,6 @@ import hu.autsoft.krate.*
 import org.koin.core.component.KoinApiExtension
 import settings.Settings
 
-/*
- * Copyright 2020 RethinkDNS and its authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 class PersistentState(context: Context):SimpleKrate(context) {
     companion object {
         const val BRAVE_MODE = "brave_mode"
@@ -47,7 +47,7 @@ class PersistentState(context: Context):SimpleKrate(context) {
         const val HTTP_PROXY_ENABLED = "http_proxy_enabled"
         const val DNS_PROXY_ID = "dns_proxy_change"
         const val BLOCK_UDP_OTHER_THAN_DNS = "block_udp_traffic_other_than_dns"
-        const val ORBOT_MODE_CHANGE = "orbot_http_enabled"
+        const val ORBOT_MODE_CHANGE = "orbot_mode_enabled"
 
         fun expandUrl(context: Context, url: String?): String {
             return if (url == null || url.isEmpty()) {
@@ -105,13 +105,13 @@ class PersistentState(context: Context):SimpleKrate(context) {
     var orbotConnectionStatus : MutableLiveData<Boolean> = MutableLiveData()
     //var orbotConnectionInitiated by booleanPref("orbot_connection_initiated", false)
     var orbotEnabled by booleanPref("orbot_enabled", false)
-    var orbotMode by intPref("orbot_mode", ORBAT_MODE_NONE)
+    private var orbotMode by intPref("orbot_mode", ORBAT_MODE_NONE)
     var downloadIDs by stringSetPref("download_ids", emptySet())
-    var orbotHTTPEnabled by booleanPref("orbot_http_enabled", false)
+    var orbotEnabledMode by intPref("orbot_mode_enabled", ORBAT_MODE_NONE)
 
     var isAccessibilityCrashDetected by booleanPref("accessibility_crash", false)
 
-
+    var orbotModeConst : Int = 0
     var median50: MutableLiveData<Long> = MutableLiveData()
 
     fun wifiAllowed(forPackage:String):Boolean = !excludedPackagesWifi.contains(forPackage)
@@ -242,5 +242,17 @@ class PersistentState(context: Context):SimpleKrate(context) {
     fun setConnectedDNS(name : String) {
         connectedDNS.postValue(name)
         connectedDNSName = name
+    }
+
+    fun setOrbotModePersistence(mode : Int){
+        orbotModeConst = mode
+        orbotMode = mode
+    }
+
+    fun getOrbotModePersistence(): Int{
+        if(orbotModeConst == 0)
+            return orbotMode
+        else
+            return orbotModeConst
     }
 }

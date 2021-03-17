@@ -38,11 +38,11 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DoHEndpointRepository
 import com.celzero.bravedns.databinding.ActivityFaqWebviewLayoutBinding
+import com.celzero.bravedns.download.DownloadHelper
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
-import com.celzero.bravedns.download.DownloadHelper
 import com.celzero.bravedns.util.HttpRequestHelper
 import dnsx.Dnsx
 import kotlinx.coroutines.Dispatchers
@@ -415,15 +415,15 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                     val c: Cursor = downloadManager.query(query)!!
                     if (c.moveToFirst()) {
                         val status = HttpRequestHelper.checkStatus(c)
-                        if (DEBUG) Log.d(LOG_TAG, "Webview: Download status: $status,${HomeScreenActivity.GlobalVariable.filesDownloaded}")
                         if (status == Constants.DOWNLOAD_STATUS_SUCCESSFUL) {
                             val from = File(getExternalFilePath(ctxt, true)+ Constants.FILE_TAG_NAME)
-                            val to = File(ctxt.filesDir.canonicalPath + Constants.FILE_TAG_NAME)
+                            val to = File(ctxt.filesDir.canonicalPath +"/"+persistentState.remoteBlockListDownloadTime + Constants.FILE_TAG_NAME)
                             val fileDownloaded = from.copyTo(to, true)
                             if (fileDownloaded.exists()) {
                                 DownloadHelper.deleteOldFiles(ctxt)
                             }
                             persistentState.remoteBraveDNSDownloaded = true
+
                         } else {
                             Log.w(LOG_TAG, "Webview: Error downloading filetag.json file: $status")
                         }

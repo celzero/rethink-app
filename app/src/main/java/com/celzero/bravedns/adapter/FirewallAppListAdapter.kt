@@ -385,7 +385,7 @@ class FirewallAppListAdapter internal constructor(
                     if(DEBUG) Log.d(LOG_TAG, "Category block completed : $isSearchEnabled")
                 }
             }else{
-                Log.d(LOG_TAG,"else - proceedBlock: $proceedBlock")
+                if(DEBUG) Log.d(LOG_TAG,"else - proceedBlock: $proceedBlock")
                 internetChk.isChecked = proceedBlock
                 internetChk.setCompoundDrawablesWithIntrinsicBounds(
                     context.getDrawable(R.drawable.allowed), null, null, null)

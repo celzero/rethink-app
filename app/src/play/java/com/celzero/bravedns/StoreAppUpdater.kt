@@ -50,7 +50,7 @@ class StoreAppUpdater(context: Context, private val persistentState: PersistentS
     }
 
     override fun checkForAppUpdate(isUserInitiated: Boolean, activity: Activity, listener: AppUpdater.InstallStateListener) {
-        Log.d(LOG_TAG, "Beginning update check.")
+        Log.i(LOG_TAG, "Beginning update check.")
         val playListener = InstallStateUpdatedListener { state ->
             val mappedStatus = when (state.installStatus()) {
                 InstallStatus.DOWNLOADED -> AppUpdater.InstallStatus.DOWNLOADED

@@ -94,7 +94,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         var backgroundAllowedUID: MutableMap<Int, Boolean> = HashMap()
         var blockedUID: MutableMap<Int, Boolean> = HashMap()
         var appMode: AppMode? = null
-        var filesDownloaded: Int = 0
+
         var lifeTimeQueries: Int = -1
 
         var blockedCount: MutableLiveData<Int> = MutableLiveData()
@@ -106,7 +106,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         var appStartTime: Long = System.currentTimeMillis()
         var isBackgroundEnabled: Boolean = false
         var firewallRules: HashMultimap<Int, String> = HashMultimap.create()
-        var DEBUG = true
+        var DEBUG = false
 
         //Screen off - whether the screen preference is set 0-off, 1- on. -1 not initialized
         var isScreenLockedSetting: Int = -1
@@ -429,7 +429,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                     val c: Cursor = downloadManager.query(query)
                     if (c.moveToFirst()) {
                         val status = checkStatus(c)
-                        if (DEBUG) Log.d(LOG_TAG, "Download status: $status,${GlobalVariable.filesDownloaded}")
                         if (status == Constants.DOWNLOAD_STATUS_SUCCESSFUL) {
                             val from = File(getExternalFilePath(ctxt, true) + Constants.FILE_TAG_NAME)
                             val to = File(context.filesDir.canonicalPath + Constants.FILE_TAG_NAME)
