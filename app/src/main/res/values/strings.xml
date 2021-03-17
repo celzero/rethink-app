@@ -484,7 +484,7 @@
     <string name="whats_new_version_name">🎁 International Happiness Day (Mar 20) 🎁</string>
     <string name="whats_new_version_update">Incremental update:\n\n
         1. Support for one-click Tor-as-a-proxy (Orbot setup).\n\n
-        2. Miscellaneous bug fix.\n\n
+        2. App reports bad network connectivity from Android.\n\n
     </string>
 
     <!-- Settings Fragment strings -->
