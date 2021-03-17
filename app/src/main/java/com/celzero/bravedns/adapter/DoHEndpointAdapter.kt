@@ -83,10 +83,10 @@ class DoHEndpointAdapter(private val context: Context,
             b.dohEndpointListUrlName.text = doHEndpoint.dohName
             if (doHEndpoint.isSelected) {
                 b.dohEndpointListUrlExplanation.text = context.getString(R.string.dns_connected)
-                Log.d(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}")
+                Log.i(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}")
                 if (doHEndpoint.dohName == RETHINK_DNS_PLUS) {
                     val count = persistentState.numberOfRemoteBlocklists
-                    Log.d(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}, count- $count")
+                    Log.i(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}, count- $count")
                     if (count != 0) {
                         b.dohEndpointListUrlExplanation.text =  context.getString(R.string.dns_connected_rethink_plus, count.toString())
 

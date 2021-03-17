@@ -50,7 +50,7 @@
         <item>https://cloudflare-dns.com/dns-query</item>
         <item>https://family.cloudflare-dns.com/dns-query</item>
         <item>https://security.cloudflare-dns.com/dns-query</item>
-        <item>https://basic.bravedns.com/1:YASAAQBwIAA=</item>
+        <item>https://basic.bravedns.com/1:IAAgAA==</item>
         <item>https://cloudflare-dns.com/</item>
         <item>https://basic.bravedns.com/</item>
     </string-array>
@@ -140,6 +140,8 @@
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">
     protected
     </string>
+
+    <string name="status_protected_with_tor">protected with tor</string>
 
     <string name="explanation_protected" description="Expanded form of status_protected">
     Your connection is protected from DNS attacks.
@@ -458,7 +460,7 @@
     <string name="app_mode_dns_low_battery">DNS (battery saver)</string>
     <string name="app_mode_dns">DNS</string>
     <string name="app_mode_firewall">Firewall</string>
-    <string name="app_mode_dns_firewall">DNS and Firewall</string>
+    <string name="app_mode_dns_firewall">DNS and Firewall (default)</string>
 
     <string name="settings_vpn_heading">VPN &amp; Proxy</string>
     <string name="settings_vpn_heading_disabled">VPN &amp; Proxy (disabled)</string>
@@ -478,13 +480,11 @@
     <string name="features_disabled">(disabled)</string>
     <string name="firewall_app_info_not_available">Cannot block the app</string>
 
-    <string name="whats_dialog_title">What\'s new in v053b</string>
-    <string name="whats_new_version_name">🎁 International Women\'s Day (Mar 08) 🎁</string>
+    <string name="whats_dialog_title">What\'s new in v053c</string>
+    <string name="whats_new_version_name">🎁 International Happiness Day (Mar 20) 🎁</string>
     <string name="whats_new_version_update">Incremental update:\n\n
-        1. Themes: Dark and Light themes. More flavors coming soon.\n\n
-        2. Fixed a Battery drain issue.\n\n
-        3. Home and Welcome screen UI changes.\n\n
-        4. Improvements to the underlying Firewall and DNS network engine.\n\n
+        1. Support for one-click Tor-as-a-proxy (Orbot setup).\n\n
+        2. Miscellaneous bug fix.\n\n
     </string>
 
     <!-- Settings Fragment strings -->
@@ -505,7 +505,7 @@
     <string name="settings_allow_bypass_heading">Allow Bypass</string>
     <string name="settings_allow_bypass_desc">Allow requesting apps to bypass RethinkDNS firewall on-demand. Some audio/video conference apps like Zoom and WhatsApp may require an on-demand bypass to function properly.</string>
     <string name="settings_allow_bypass_lockdown_desc">"Disabled. Settings->VPN->Block connections without VPN" is enabled for RethinkDNS, enabling the feature will block the internet connection of the apps which are trying to bypass the VPN.</string>
-    <string name="settings_lock_down_mode_desc">Cannot exclude apps or allow bypass because VPN is running in lockdown mode.</string>
+    <string name="settings_lock_down_mode_desc">Cannot exclude apps, allow bypass, or setup proxies when VPN is running in lockdown mode. <u>Go to VPN settings</u>.</string>
 
     <string name="settings_proxy_header">proxy (experimental)</string>
     <string name="settings_socks5_heading">Setup SOCKS5 (TCP) Proxy</string>
@@ -513,34 +513,56 @@
     <string name="settings_https_heading">Setup HTTP(S) Proxy</string>
     <string name="settings_https_desc">This setting is only a recommendation and it is possible that apps will ignore it.</string>
 
-    <string name="orbot_socks5">TCP-Only Proxy</string>
-    <string name="orbot_socks5_desc">Forwards all TCP connections to Orbot over SOCKS5.</string>
+    <string name="orbot_socks5">TCP-only Proxy</string>
+    <string name="orbot_socks5_desc">Forwards all TCP connections to Orbot.</string>
     <string name="orbot_http">HTTP Proxy</string>
     <string name="orbot_http_desc">Recommends that apps use Orbot\'s HTTP proxy.</string>
     <string name="orbot_both">TCP + HTTP Proxy</string>
     <string name="orbot_both_desc">All of the above.</string>
-    <string name="orbot_none">No Proxy</string>
-    <string name="orbot_none_desc">No Proxy</string>
+    <string name="orbot_none">None (default)</string>
+    <string name="orbot_none_desc">None of the above.</string>
 
     <string name="orbot_bs_status_1">Forwarding TCP connections to Orbot.</string>
-    <string name="orbot_bs_status_2">HTTP proxy set but it is possible apps may ignore it.</string>
-    <string name="orbot_bs_status_3">Forwarding TCP to Orbot and HTTP proxy set.</string>
-    <string name="orbot_bs_status_4">One-click Tor-as-a-proxy (Orbot) setup.</string>
+    <string name="orbot_bs_status_2">HTTP Proxy is set (apps may ignore it).</string>
+    <string name="orbot_bs_status_3">Forwarding TCP to Orbot, HTTP Proxy also set.</string>
+    <string name="orbot_bs_status_4">One-click Tor-as-a-Proxy (Orbot) setup.</string>
 
     <string name="orbot_app_issue">Could not launch Orbot. Is it installed?</string>
     <string name="orbot_bs_status_trying_connect">Setting up Orbot…</string>
 
     <string name="orbot_stop_dialog_title">Manually Stop Orbot</string>
     <string name="orbot_stop_dialog_message">RethinkDNS has stopped forwarding connections to Orbot, but Orbot maybe running in the background.</string>
-    <string name="orbot_stop_dialog_positive">Stop Orbot</string>
-    <string name="orbot_stop_dialog_negative">Dismiss</string>
+    <string name="orbot_stop_dialog_negative">Stop Orbot</string>
+    <string name="orbot_stop_dialog_positive">Okay</string>
+
+    <string name="orbot_title">Orbot and Proxies</string>
+    <string name="orbot_explanation">
+            Orbot is a free proxy app that empowers other apps to use the Internet more &lt;u>securely&lt;/u>.
+            \nOrbot uses &lt;u>Tor&lt;/u> to encrypt your Internet traffic which helps you &lt;u>bypass censorship&lt;/u> and defend against forms of &lt;u>network surveillance&lt;/u> that threaten personal freedom and privacy.
+            \n&lt;u>TCP Proxy&lt;/u>: RethinkDNS forwards only TCP connections of all but excluded apps to Orbot.
+        \n&lt;u>HTTP Proxy&lt;/u>: RethinkDNS &lt;i>sets&lt;/i> HTTP proxy but does not enforce that the apps use it. Usually, browsers like Chrome and Firefox do use it.
+            </string>
 
     <string name="orbot_bs_positive_start">start</string>
     <string name="orbot_bs_positive_stop">stop</string>
     <string name="orbot_bs_negative">cancel</string>
 
-    <string name="settings_orbot_heading">Orbot setup</string>
-    <string name="settings_orbot_https_desc">Will enable Orbot in non-vpn mode with HTTPS set.</string>
+    <string name="orbot_install_dialog_title">Install Orbot?</string>
+    <string name="orbot_install_dialog_message">Orbot brings the features and functionality of Tor to Android.</string>
+    <string name="orbot_install_dialog_positive">Install</string>
+    <string name="orbot_install_dialog_source_play">Install from playstore</string>
+    <string name="orbot_install_dialog_source_fdroid">Install from fdroid</string>
+    <string name="orbot_install_dialog_source_web">Install from website</string>
+    <string name="orbot_install_dialog_negative">Dismiss</string>
+    <string name="orbot_install_dialog_neutral">website</string>
+    <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
+    <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
+    <string name="orbot_install_activity_error">Something went wrong, try after sometime</string>
+
+    <string name="settings_orbot_heading">Setup Orbot</string>
+    <string name="settings_orbot_header">Orbot\t\u276F</string>
+    <string name="settings_orbot_desc">Orbot in non-vpn mode with HTTPS/SOCKS5.</string>
+    <string name="settings_orbot_install_desc">Tap here to install Orbot</string>
 
     <string name="settings_orbot_socks5_heading">Orbot one touch setup - SOCKS5</string>
     <string name="settings_orbot_socks5_desc">Enable Orbot in non-vpn mode. Touch on Orbot icon to setup.</string>
@@ -555,16 +577,16 @@
     <string name="settings_https_disabled_error">Orbot one touch start is turned on. Turn off to continue HTTPS configuration.</string>
 
     <string name="settings_orbot_notification_heading">Action required</string>
-    <string name="settings_orbot_notification_content">Failure starting Tor-as-a-proxy. Open the Orbot app to start it manually.</string>
+    <string name="settings_orbot_notification_content">Failure starting Tor-as-a-Proxy. Open the Orbot app to start it manually.</string>
 
-    <string name="settings_orbot_notification_desc">Orbot - Starting Tor-as-a-proxy failure notification</string>
+    <string name="settings_orbot_notification_desc">Orbot - Starting Tor-as-a-Proxy failure notification</string>
     <string name="settings_orbot_notification_action">Open Orbot</string>
 
     <string name="settings_general_header">GENERAL</string>
     <string name="settings_refresh_heading">Refresh Data</string>
     <string name="settings_refresh_desc">Re-sync application list.</string>
-    <string name="settings_autostart_bootup_heading">Auto-start on power up (experimental)</string>
-    <string name="settings_autostart_bootup_desc">On Power up, Start RethinkDNS if it was running before device shut down.</string>
+    <string name="settings_autostart_bootup_heading">Auto-start on power-up (experimental)</string>
+    <string name="settings_autostart_bootup_desc">On device power-up, start RethinkDNS if it was running before shut down.</string>
 
     <string name="settings_local_blockList_desc1">Choose from 170+ blocklists.</string>
     <string name="settings_local_blocklist_desc2">Download in progress…</string>
@@ -583,7 +605,7 @@
     <string name="settings_sync_app_details_desc_completed">Resync completed</string>
 
     <string name="settings_check_update_heading">Check for app updates</string>
-    <string name="settings_check_update_desc">Check for apps updates once a week.</string>
+    <string name="settings_check_update_desc">Automatically check for app updates once a week.</string>
 
     <string name="settings_theme_heading">Appearance</string>
     <string name="settings_theme_desc">Dark/light theme</string>

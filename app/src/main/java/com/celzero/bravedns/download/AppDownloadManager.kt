@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.celzero.bravedns.download
 
 import android.app.DownloadManager
@@ -17,6 +33,12 @@ import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_FILE_COUNT
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import java.util.concurrent.TimeUnit
 
+/**
+ * Generic class responsible for downloading the block list for both remote and local.
+ * As of now, the download manager will download the local blocklist and initiate thw workers
+ * to listen for the download complete and for copying the files from external to canonical path.
+ * TODO remote blocklist - implementation pending.
+ */
 class AppDownloadManager(private val persistentState: PersistentState, private val context: Context?) {
 
     private lateinit var downloadManager: DownloadManager
@@ -87,23 +109,6 @@ class AppDownloadManager(private val persistentState: PersistentState, private v
     }
 
     /**
-     * Updates the shared preference values based on the files downloaded
-
-    private fun updateSharedPref(isDownloadSuccess: Boolean) {
-        if (isDownloadSuccess) {
-            localDownloadStatus.postValue(2)
-            persistentState.blockListFilesDownloaded = true
-            persistentState.localBlocklistEnabled = true
-        } else {
-            localDownloadStatus.postValue(-1)
-            persistentState.localBlockListDownloadTime = 0L
-            persistentState.localBlocklistEnabled = false
-            persistentState.blockListFilesDownloaded = false
-        }
-    }*/
-
-
-    /**
      * Updates the values for the local download.
      * The observers in the UI will reflect the download status.
      */
@@ -118,8 +123,6 @@ class AppDownloadManager(private val persistentState: PersistentState, private v
     private fun updateRemoteUIValues(isDownloadSuccess: Boolean) {
 
     }
-
-
 
     /**
      * Init for downloads.
@@ -144,25 +147,5 @@ class AppDownloadManager(private val persistentState: PersistentState, private v
             persistentState.downloadIDs =  persistentState.downloadIDs + downloadManager.enqueue(this).toString()
         }
     }
-
-    /*private fun timeOutForDownload(){
-        // Create an executor that executes tasks in a background thread.
-        val backgroundExecutor: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
-
-        // Execute a task in the background thread after 3 minutes.
-        // This task will be timeout execution for the download.
-        // After 3 minutes of init download, The failure will be updated,
-        backgroundExecutor.schedule({
-            Log.i(LOG_TAG, "timeOutForDownload executor triggered - ${localDownloadStatus.value}")
-            if (localDownloadStatus.value != 2) {
-                localDownloadStatus.postValue(-1)
-                persistentState.localBlockListDownloadTime = 0L
-                persistentState.localBlocklistEnabled = false
-                persistentState.blockListFilesDownloaded = false
-                //context?.unregisterReceiver(onCompleteReceiver)
-            }
-            backgroundExecutor.shutdown()
-        },40, TimeUnit.MINUTES)
-    }*/
 
 }

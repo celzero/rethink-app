@@ -19,7 +19,8 @@ import android.graphics.Camera
 import android.view.animation.Animation
 import android.view.animation.Transformation
 
-//https://github.com/guardianproject/orbot/blob/master/appcore/src/main/java/org/torproject/android/core/ui/Rotate3dAnimation.kt
+// Code adopted from below link
+// github.com/guardianproject/orbot/blob/ce3f265/appcore/src/main/java/org/torproject/android/core/ui/Rotate3dAnimation.kt
 
 /**
  * An animation that rotates the view on the Y axis between two specified angles.

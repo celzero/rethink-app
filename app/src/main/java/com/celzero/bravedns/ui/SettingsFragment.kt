@@ -17,12 +17,14 @@ package com.celzero.bravedns.ui
 
 import android.app.Activity
 import android.app.Dialog
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.provider.Settings.ACTION_VPN_SETTINGS
 import android.util.Log
 import android.view.View
 import android.view.Window
@@ -31,11 +33,13 @@ import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ExcludedAppListAdapter
 import com.celzero.bravedns.database.*
@@ -50,7 +54,10 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_FDROID
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
+import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_WEBSITE
+import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Constants.Companion.REFRESH_BLOCKLIST_URL
 import com.celzero.bravedns.util.OrbotHelper
@@ -113,7 +120,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
         b.settingsActivityAllowBypassSwitch.isChecked = persistentState.allowByPass
 
-        if (persistentState.downloadSource != DOWNLOAD_SOURCE_PLAY_STORE) {
+        if (BuildConfig.FLAVOR != Constants.FLAVOR_PLAY) {
             b.settingsActivityOnDeviceBlockRl.visibility = View.VISIBLE
             b.settingsHeadingDns.visibility = View.VISIBLE
         } else {
@@ -121,25 +128,11 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             b.settingsHeadingDns.visibility = View.GONE
         }
 
-        initialUI()
+        if(BuildConfig.FLAVOR == FLAVOR_FDROID){
+            b.settingsActivityCheckUpdateRl.visibility = View.GONE
+        }
 
-        /*localDownloadStatus.observe(viewLifecycleOwner, {
-            //download initiated and failed
-            when (it) {
-                -1 -> {
-                    updateDownloadFailure()
-                }
-                0 -> {// download not initiated
-                    initialUI()
-                }
-                1 -> {// download initiated.
-                    updateDownloadInitiated()
-                }
-                2 -> {
-                    updateDownloadSuccess()
-                }
-            }
-        })*/
+        initialUI()
 
         HomeScreenActivity.GlobalVariable.braveModeToggler.observe(viewLifecycleOwner, {
             if (HomeScreenActivity.GlobalVariable.braveMode == HomeScreenFragment.DNS_MODE) {
@@ -180,10 +173,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             }
         }
         b.settingsActivitySocks5Progress.visibility = View.GONE
-
-        if(!get<OrbotHelper>().isOrbotInstalled()){
-            b.settingsActivityOrbotContainer.visibility = View.GONE
-        }
 
         //blockUnknownConnSwitch.isChecked = persistentState.getBlockUnknownConnections(requireContext())
         if (persistentState.localBlocklistEnabled) {
@@ -359,8 +348,22 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             }.start()
         }
 
+        b.settingsActivityVpnLockdownDesc.setOnClickListener{
+            try {
+                val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    Intent(ACTION_VPN_SETTINGS)
+                } else {
+                    Intent("android.net.vpn.SETTINGS")
+                }
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
+            } catch (e: ActivityNotFoundException) {
+                Log.w(LOG_TAG, "Exception while opening app info: ${e.message}", e)
+            }
+        }
+
         b.settingsActivitySocks5Switch.setOnCheckedChangeListener { _: CompoundButton, bool: Boolean ->
-            if (persistentState.orbotMode != Constants.ORBAT_MODE_NONE) {
+            if (persistentState.getOrbotModePersistence() != Constants.ORBAT_MODE_NONE) {
                 Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_disabled_error), Toast.LENGTH_SHORT)
                 b.settingsActivitySocks5Switch.isChecked = false
             }else {
@@ -379,27 +382,35 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
 
         b.settingsActivityOrbotImg.setOnClickListener{
-            if (b.settingsActivityHttpProxySwitch.isChecked) {
-                Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_https_orbot_disabled_error), Toast.LENGTH_SHORT)
-            } else if(b.settingsActivitySocks5Switch.isChecked) {
-                Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_orbot_disabled_error), Toast.LENGTH_SHORT)
-            } else {
-                openBottomSheetForOrbot()
+            if(get<OrbotHelper>().isOrbotInstalled()) {
+                if (b.settingsActivityHttpProxySwitch.isChecked) {
+                    Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_https_orbot_disabled_error), Toast.LENGTH_SHORT)
+                } else if (b.settingsActivitySocks5Switch.isChecked) {
+                    Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_orbot_disabled_error), Toast.LENGTH_SHORT)
+                } else {
+                    openBottomSheetForOrbot()
+                }
+            }else{
+                showOrbotInstallDialog()
             }
         }
 
         b.settingsActivityOrbotContainer.setOnClickListener{
-            if (b.settingsActivityHttpProxySwitch.isChecked) {
-                Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_https_orbot_disabled_error), Toast.LENGTH_SHORT)
-            } else if (b.settingsActivitySocks5Switch.isChecked) {
-                Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_orbot_disabled_error), Toast.LENGTH_SHORT)
+            if (get<OrbotHelper>().isOrbotInstalled()) {
+                if (b.settingsActivityHttpProxySwitch.isChecked) {
+                    Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_https_orbot_disabled_error), Toast.LENGTH_SHORT)
+                } else if (b.settingsActivitySocks5Switch.isChecked) {
+                    Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_orbot_disabled_error), Toast.LENGTH_SHORT)
+                } else {
+                    openBottomSheetForOrbot()
+                }
             } else {
-                openBottomSheetForOrbot()
+                showOrbotInstallDialog()
             }
         }
 
         b.settingsActivityHttpProxySwitch.setOnCheckedChangeListener { _: CompoundButton, isEnabled: Boolean ->
-            if (persistentState.orbotMode != Constants.ORBAT_MODE_NONE) {
+            if (persistentState.getOrbotModePersistence() != Constants.ORBAT_MODE_NONE) {
                 Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_https_disabled_error), Toast.LENGTH_SHORT)
                 b.settingsActivityHttpProxySwitch.isChecked = false
             } else {
@@ -459,12 +470,12 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             if(workInfoList != null && workInfoList.isNotEmpty()) {
                 val workInfo = workInfoList[0]
                 if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
-                    Log.d(LOG_TAG, "AppDownloadManager Work Manager completed - ${DownloadConstants.DOWNLOAD_TAG}")
+                    Log.i(LOG_TAG, "AppDownloadManager Work Manager completed - ${DownloadConstants.DOWNLOAD_TAG}")
                 }else if(workInfo != null && (workInfo.state == WorkInfo.State.ENQUEUED || workInfo.state == WorkInfo.State.RUNNING)){
                     updateDownloadInitiated()
                 }
                 else {
-                    Log.d(LOG_TAG, "AppDownloadManager Work Manager - ${DownloadConstants.DOWNLOAD_TAG}, ${workInfo.state}")
+                    Log.i(LOG_TAG, "AppDownloadManager Work Manager - ${DownloadConstants.DOWNLOAD_TAG}, ${workInfo.state}")
                 }
             }
         })
@@ -480,11 +491,32 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                     updateDownloadFailure()
                     Log.i(LOG_TAG, "AppDownloadManager Work Manager failed - ${DownloadConstants.FILE_TAG}")
                 } else {
-                    Log.d(LOG_TAG, "AppDownloadManager Work Manager - ${DownloadConstants.FILE_TAG}, ${workInfo.state}")
+                    Log.i(LOG_TAG, "AppDownloadManager Work Manager - ${DownloadConstants.FILE_TAG}, ${workInfo.state}")
                 }
             }
         })
 
+    }
+
+
+    private fun updateUI() {
+        when (persistentState.getOrbotModePersistence()) {
+            Constants.ORBAT_MODE_SOCKS5 -> {
+                b.settingsActivityHttpOrbotDesc.text = getString(R.string.orbot_bs_status_1)
+            }
+            Constants.ORBAT_MODE_HTTP -> {
+                b.settingsActivityHttpOrbotDesc.text = getString(R.string.orbot_bs_status_2)
+            }
+            Constants.ORBAT_MODE_BOTH -> {
+                b.settingsActivityHttpOrbotDesc.text = getString(R.string.orbot_bs_status_3)
+            }
+            Constants.ORBAT_MODE_NONE -> {
+                b.settingsActivityHttpOrbotDesc.text = getString(R.string.orbot_bs_status_4)
+            }
+            else -> {
+                b.settingsActivityHttpOrbotDesc.text = getString(R.string.orbot_bs_status_4)
+            }
+        }
     }
 
     private fun openBottomSheetForOrbot(){
@@ -565,6 +597,15 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             }else {
                 b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blockList_desc1)
             }
+        }
+
+        // Checks whether the Orbot is installed.
+        // If not, then prompt the user for installation.
+        // Else, enable the Orbot bottom sheet fragment.
+        if (!get<OrbotHelper>().isOrbotInstalled()) {
+            b.settingsActivityHttpOrbotDesc.text = getString(R.string.settings_orbot_install_desc)
+        } else {
+            updateUI()
         }
     }
 
@@ -798,6 +839,75 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     private fun removeBraveDNSLocal() {
         appMode?.setBraveDNSMode(null)
         persistentState.localBlocklistEnabled = false
+    }
+
+    /**
+     * Prompt user to download the Orbot app based on the current BUILDCONFIG flavor.
+     */
+    private fun showOrbotInstallDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        //set title for alert dialog
+        builder.setTitle(R.string.orbot_install_dialog_title)
+        //set message for alert dialog
+        builder.setMessage(R.string.orbot_install_dialog_message)
+
+        //Play store install intent
+        if(BuildConfig.FLAVOR == Constants.FLAVOR_PLAY){
+            builder.setPositiveButton(getString(R.string.orbot_install_dialog_positive)){ _, _ ->
+                val intent = get<OrbotHelper>().getIntentForDownload(requireContext(), DOWNLOAD_SOURCE_PLAY_STORE)
+                if(intent != null){
+                    try {
+                        startActivity(intent)
+                    }catch (e : ActivityNotFoundException){
+                        Utilities.showToastInMidLayout(requireContext(), getString(R.string.orbot_install_activity_error), Toast.LENGTH_SHORT)
+                    }
+                }else{
+                    Utilities.showToastInMidLayout(requireContext(), getString(R.string.orbot_install_activity_error), Toast.LENGTH_SHORT)
+                }
+            }
+
+        }else if(BuildConfig.FLAVOR == FLAVOR_FDROID){//fDroid install intent
+            builder.setPositiveButton(getString(R.string.orbot_install_dialog_positive)) { _, _ ->
+                val intent = get<OrbotHelper>().getIntentForDownload(requireContext(), DOWNLOAD_SOURCE_FDROID)
+                if (intent != null) {
+                    try {
+                        startActivity(intent)
+                    } catch (e: ActivityNotFoundException) {
+                        Utilities.showToastInMidLayout(requireContext(), getString(R.string.orbot_install_activity_error), Toast.LENGTH_SHORT)
+                    }
+                } else {
+                    Utilities.showToastInMidLayout(requireContext(), getString(R.string.orbot_install_activity_error), Toast.LENGTH_SHORT)
+                }
+            }
+        }else{//Orbot website download link
+            builder.setPositiveButton(getString(R.string.orbot_install_dialog_positive)) { _, _ ->
+                val intent = get<OrbotHelper>().getIntentForDownload(requireContext(), DOWNLOAD_SOURCE_WEBSITE)
+                if (intent != null) {
+                    try {
+                        startActivity(intent)
+                    } catch (e: ActivityNotFoundException) {
+                        Utilities.showToastInMidLayout(requireContext(), getString(R.string.orbot_install_activity_error), Toast.LENGTH_SHORT)
+                    }
+                } else {
+                    Utilities.showToastInMidLayout(requireContext(), getString(R.string.orbot_install_activity_error), Toast.LENGTH_SHORT)
+                }
+            }
+        }
+
+        //performing negative action
+        builder.setNegativeButton(getString(R.string.orbot_install_dialog_negative)) { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        // Take to the Tor website.
+        builder.setNeutralButton(getString(R.string.orbot_install_dialog_neutral)) { _, _ ->
+            val intent = Intent(Intent.ACTION_VIEW, getString(R.string.orbot_website_link).toUri())
+            startActivity(intent)
+        }
+        // Create the AlertDialog
+        val alertDialog: AlertDialog = builder.create()
+        // Set other dialog properties
+        alertDialog.show()
     }
 
 

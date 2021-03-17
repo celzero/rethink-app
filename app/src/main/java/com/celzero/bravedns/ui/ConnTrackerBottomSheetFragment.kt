@@ -273,7 +273,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
     }
 
     private fun appInfoForPackage(packageName: String) {
-        Log.d(LOG_TAG, "appInfoForPackage: $packageName")
+        if(DEBUG) Log.d(LOG_TAG, "appInfoForPackage: $packageName")
         try {
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
             intent.data = Uri.fromParts("package", packageName, null)

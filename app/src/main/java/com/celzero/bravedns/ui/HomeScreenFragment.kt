@@ -759,6 +759,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             statusId = R.string.status_protected
         }
 
+        if(statusId == R.string.status_protected && persistentState.getOrbotModePersistence() != Constants.ORBAT_MODE_NONE){
+            statusId = R.string.status_protected_with_tor
+        }
+
         var colorId: Int
         colorId = if (status.on) {
             if (status.connectionState != BraveVPNService.State.FAILING) fetchTextColor(R.color.positive) else fetchTextColor(R.color.accent_bad)

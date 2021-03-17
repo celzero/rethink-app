@@ -24,11 +24,11 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(entities = [AppInfo::class, CategoryInfo::class, ConnectionTracker::class, BlockedConnections::class, DoHEndpoint::class
 , DNSCryptEndpoint::class, DNSProxyEndpoint::class, DNSCryptRelayEndpoint::class,ProxyEndpoint::class,DNSLogs::class],
-views = [AppInfoView::class],version = 9,exportSchema = false)
+views = [AppInfoView::class],version = 10,exportSchema = false)
 abstract class AppDatabase : RoomDatabase(){
 
     companion object {
-        const val currentVersion:Int = 9
+        const val currentVersion:Int = 10
 
         fun buildDatabase(context: Context) = Room.databaseBuilder(
             context.applicationContext, AppDatabase::class.java,"bravedns.db")
@@ -41,6 +41,7 @@ abstract class AppDatabase : RoomDatabase(){
             .addMigrations(MIGRATION_6_7)
             .addMigrations(MIGRATION_7_8)
             .addMigrations(MIGRATION_8_9)
+            .addMigrations(MIGRATION_9_10)
             .build()
 
         private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
@@ -150,6 +151,11 @@ abstract class AppDatabase : RoomDatabase(){
             }
         }
 
+        private val MIGRATION_9_10 : Migration = object : Migration(9, 10){
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("UPDATE DoHEndpoint set dohURL  = 'https://basic.bravedns.com/1:IAAgAA==' where id = 4")
+            }
+        }
 
     }
 

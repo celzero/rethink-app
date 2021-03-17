@@ -166,6 +166,7 @@
                 android:fontFamily="sans-serif-smallcaps"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
+                android:textStyle="bold"
                 android:text="@string/about_app"
                 android:textColor="?attr/accentGood"
                 android:textSize="@dimen/extra_large_font_text_view" />
@@ -219,6 +220,7 @@
                 android:lineSpacingExtra="5dp"
                 android:fontFamily="sans-serif-smallcaps"
                 android:padding="5dp"
+                android:textStyle="bold"
                 android:text="@string/about_web"
                 android:textColor="?attr/accentGood"
                 android:textSize="@dimen/extra_large_font_text_view" />
@@ -301,6 +303,7 @@
                 android:padding="5dp"
                 android:fontFamily="sans-serif-smallcaps"
                 android:text="@string/about_connect"
+                android:textStyle="bold"
                 android:textColor="?attr/accentGood"
                 android:textSize="@dimen/extra_large_font_text_view" />
 

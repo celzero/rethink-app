@@ -366,7 +366,7 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
             if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG isLockDownEnabled - ${this.isLockdownEnabled}, ${this.isAlwaysOn}")
             if (!this.isLockdownEnabled) {
                 if (persistentState.allowByPass) {
-                    Log.d(LOG_TAG, "$FILE_LOG_TAG getAllowByPass - true")
+                    Log.i(LOG_TAG, "$FILE_LOG_TAG getAllowByPass - true")
                     builder = builder.allowBypass()
                 }
             }
@@ -379,8 +379,8 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
         }
 
         if (VERSION.SDK_INT >= VERSION_CODES.Q) {
-            if (!this.isLockdownEnabled && (persistentState.orbotMode ==
-                                Constants.ORBAT_MODE_HTTP || persistentState.orbotMode == Constants.ORBAT_MODE_BOTH)) {
+            if (!this.isLockdownEnabled && (persistentState.getOrbotModePersistence() ==
+                                Constants.ORBAT_MODE_HTTP || persistentState.getOrbotModePersistence() == Constants.ORBAT_MODE_BOTH)) {
                 getHttpProxyInfo()?.let { builder.setHttpProxy(it) }
             }
 
@@ -484,11 +484,14 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
         val host = persistentState.httpProxyHostAddress
         val port = persistentState.httpProxyPort
         Log.i(LOG_TAG, "$FILE_LOG_TAG Http proxy enabled - builder updated with $host, $port")
-        if (host != "" && port != 0) {
+        if (host.isNotEmpty() && port != 0) {
             proxyInfo = ProxyInfo.buildDirectProxy(host, port)
             Log.i(LOG_TAG, "$FILE_LOG_TAG Http proxy enabled - builder updated with $host, $port")
+            return proxyInfo
+        }else{
+            Log.i(LOG_TAG, "$FILE_LOG_TAG Http proxy enabled - else part builder updated with $host, $port")
         }
-        return proxyInfo
+        return null
     }
 
     private fun registerReceiversForScreenState() {
@@ -547,7 +550,7 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
         appInfoRepository.getUIDForUnivWhiteList().observeForever { appInfoList ->
             appWhiteList = appInfoList.associateBy({ it }, { true }).toMutableMap()
         }
-        if(persistentState.orbotMode != Constants.ORBAT_MODE_NONE && persistentState.orbotEnabled){
+        if(persistentState.getOrbotModePersistence() != Constants.ORBAT_MODE_NONE && !persistentState.orbotEnabled){
             get<OrbotHelper>().startOrbot(this)
         }
         blockUDPTraffic = persistentState.udpBlockedSettings
@@ -662,8 +665,45 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
         // of the connection, so we don't send an update.
         if (transaction.status === Transaction.Status.COMPLETE) {
             vpnController!!.onConnectionStateChanged(this, State.WORKING)
+            // TODO - reporting as good network - Test for DNS failing
+            reportGoodNetwork()
+
         } else if (transaction.status !== Transaction.Status.CANCELED) {
             vpnController!!.onConnectionStateChanged(this, State.FAILING)
+            // TODO - When failing reporting as bad network - Test for DNS failing
+            reportBadNetwork()
+        }
+    }
+
+    /**
+     * Added as part of finding if reporting the network connectivity improves the
+     * failing case.
+     * TODO - Check whether this has any impact on the users else remove it.
+     */
+    private var reportBadNetworkMs = 0L
+    private fun reportBadNetwork(){
+        val currTime = System.currentTimeMillis()
+        if(currTime - reportBadNetworkMs > 30000) {
+            if(DEBUG) Log.i(LOG_TAG, "$FILE_LOG_TAG Network reportBadNetwork - $currTime - ${System.currentTimeMillis() - reportGoodNetworkMs}")
+            reportBadNetworkMs = currTime
+            val connectivityManager: ConnectivityManager = this.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            connectivityManager.reportNetworkConnectivity(connectivityManager.activeNetwork, false)
+        }
+    }
+
+    /**
+     * Added as part of finding if reporting the network connectivity improves the
+     * failing case.
+     * TODO - Check whether this has any impact on the users else remove it.
+     */
+    private var reportGoodNetworkMs = 0L
+    private fun reportGoodNetwork() {
+        val currTime = System.currentTimeMillis()
+        if (currTime - reportGoodNetworkMs > 30000) {
+            if(DEBUG) Log.i(LOG_TAG, "$FILE_LOG_TAG  Network reportGoodNetwork - $currTime - ${System.currentTimeMillis() - reportGoodNetworkMs}")
+            reportGoodNetworkMs = currTime
+            val connectivityManager: ConnectivityManager = this.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            connectivityManager.reportNetworkConnectivity(connectivityManager.activeNetwork, true)
         }
     }
 
@@ -686,7 +726,7 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
 
 
         if (PersistentState.DNS_TYPE == key) {
-            Log.d(LOG_TAG, "$FILE_LOG_TAG DNSType- ${appMode?.getDNSType()}")
+            Log.i(LOG_TAG, "$FILE_LOG_TAG DNSType- ${appMode?.getDNSType()}")
 
             /**
              * The code has been modified to restart the VPN service when there is a
@@ -706,22 +746,22 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
         }
 
         if (PersistentState.PROXY_MODE == key) {
-            Log.d(LOG_TAG, "$FILE_LOG_TAG PROXY_MODE- ${appMode?.getProxyMode()}")
+            Log.i(LOG_TAG, "$FILE_LOG_TAG PROXY_MODE- ${appMode?.getProxyMode()}")
             restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
         }
 
         if (PersistentState.CONNECTION_CHANGE == key) {
-            Log.d(LOG_TAG, "$FILE_LOG_TAG CONNECTION_CHANGE- ${appMode?.getDNSMode()}")
+            Log.i(LOG_TAG, "$FILE_LOG_TAG CONNECTION_CHANGE- ${appMode?.getDNSMode()}")
             spawnServerUpdate()
         }
 
         if (PersistentState.DNS_PROXY_ID == key) {
-            Log.d(LOG_TAG, "$FILE_LOG_TAG DNS PROXY CHANGE- ${appMode?.getDNSMode()!!}")
+            Log.i(LOG_TAG, "$FILE_LOG_TAG DNS PROXY CHANGE- ${appMode?.getDNSMode()!!}")
             restartVpn(appMode?.getDNSMode()!!, appMode?.getFirewallMode()!!, appMode?.getProxyMode()!!)
         }
 
         if (PersistentState.EXCLUDE_FROM_VPN == key) {
-            Log.d(LOG_TAG, "$FILE_LOG_TAG EXCLUDE_FROM_VPN - restartVpn- ${appMode?.getDNSMode()}")
+            Log.i(LOG_TAG, "$FILE_LOG_TAG EXCLUDE_FROM_VPN - restartVpn- ${appMode?.getDNSMode()}")
             restartVpn(appMode?.getDNSMode()!!, appMode?.getFirewallMode()!!, appMode?.getProxyMode()!!)
         }
 
@@ -772,11 +812,8 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
         }
 
         if(PersistentState.ORBOT_MODE_CHANGE == key){
-            if(persistentState.orbotHTTPEnabled) {
-                restartVpn(appMode?.getDNSMode(), appMode?.getFirewallMode(), appMode?.getProxyMode())
-            }
+            restartVpn(appMode?.getDNSMode(), appMode?.getFirewallMode(), appMode?.getProxyMode())
         }
-
     }
 
     fun signalStopService(userInitiated: Boolean) {
@@ -798,10 +835,6 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
             } else {
                 builder = Notification.Builder(this)
                 builder.setVibrate(vibrationPattern)
-                if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
-                    // Only available in API >= 16.  Deprecated in API 26.
-                    builder = builder.setPriority(Notification.PRIORITY_MAX)
-                }
             }
             val mainActivityIntent = PendingIntent.getActivity(this, 0, Intent(this, HomeScreenActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT)
             builder.setSmallIcon(R.drawable.dns_icon)
@@ -810,15 +843,12 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
                 .setContentIntent(mainActivityIntent)
                 // Open the main UI if possible.
                 .setAutoCancel(true)
-            if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
-                builder.setCategory(Notification.CATEGORY_ERROR)
-            }
             notificationManager.notify(0, builder.notification)
         }
         stopVpnAdapter()
         stopSelf()
 
-        Log.d(LOG_TAG, "$FILE_LOG_TAG Stop Foreground")
+        Log.i(LOG_TAG, "$FILE_LOG_TAG Stop Foreground")
         updateQuickSettingsTile()
     }
 
@@ -829,7 +859,7 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
     }
 
     private fun stopVpnAdapter() {
-        if(persistentState.orbotMode != Constants.ORBAT_MODE_NONE)
+        if(persistentState.getOrbotModePersistence() != Constants.ORBAT_MODE_NONE)
             get<OrbotHelper>().unregisterReceiver(this)
         if (vpnController != null) {
             kotlin.synchronized(vpnController) {
@@ -880,10 +910,10 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
         // This code is used to start the VPN for the first time, but startVpn is idempotent, so we can
         // call it every time. startVpn performs network activity so it has to run on a separate thread.
         Thread({ //TODO Work on the order of the function call.
-            Log.d(LOG_TAG, "onNetworkConnected - BraveVPNService -startVpn started , ${Thread.currentThread().id}")
+            Log.i(LOG_TAG, "onNetworkConnected - BraveVPNService -startVpn started , ${Thread.currentThread().id}")
             updateServerConnection()
             startVpn()
-            Log.d(LOG_TAG, "onNetworkConnected - BraveVPNService -startVpn Completed , ${Thread.currentThread().id}")
+            Log.i(LOG_TAG, "onNetworkConnected - BraveVPNService -startVpn Completed , ${Thread.currentThread().id}")
         }, "startVpn-onNetworkConnected").start()
     }
 
@@ -914,7 +944,7 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
             startVpnAdapter()
             vpnController.onStartComplete(this, vpnAdapter != null)
             if (vpnAdapter == null) {
-                Log.d(LOG_TAG, "$FILE_LOG_TAG Failed to startVpn VPN adapter")
+                Log.i(LOG_TAG, "$FILE_LOG_TAG Failed to startVpn VPN adapter")
                 stopSelf()
             }
         }

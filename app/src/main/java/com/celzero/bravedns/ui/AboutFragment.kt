@@ -25,10 +25,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentAboutBinding
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Constants
 import org.koin.android.ext.android.inject
 
 
@@ -42,6 +44,11 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
     }
 
     private fun initView() {
+
+        if(BuildConfig.FLAVOR == Constants.FLAVOR_FDROID){
+            b.aboutAppUpdate.visibility = View.GONE
+        }
+
         b.aboutWebsite.setOnClickListener(this)
         b.aboutTwitter.setOnClickListener(this)
         b.aboutGithub.setOnClickListener(this)

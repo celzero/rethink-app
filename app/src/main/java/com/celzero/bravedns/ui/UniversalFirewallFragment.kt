@@ -284,7 +284,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         b.appScrollingInclFirewall.firewallUnivWhitelistRulesExpTxt.visibility = View.VISIBLE
         b.appScrollingInclFirewall.firewallSearchContainer.visibility = View.VISIBLE
         b.appScrollingInclFirewall.firewallNoRulesSetTxt.visibility = View.VISIBLE
-        b.appScrollingInclFirewall.firewallUnivIpImg.setImageResource(R.drawable.ic_keyboard_arrow_down_gray_24dp)
+        b.appScrollingInclFirewall.firewallUnivIpImg.setImageResource(R.drawable.ic_keyboard_arrow_up_gray_24dp)
     }
 
     private fun setIPRulesInvisible(){
@@ -294,7 +294,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         b.appScrollingInclFirewall.firewallUnivWhitelistRulesExpTxt.visibility = View.VISIBLE
         b.appScrollingInclFirewall.firewallNoRulesSetTxt.visibility = View.GONE
         b.appScrollingInclFirewall.firewallSearchContainer.visibility = View.GONE
-        b.appScrollingInclFirewall.firewallUnivIpImg.setImageResource(R.drawable.ic_keyboard_arrow_up_gray_24dp)
+        b.appScrollingInclFirewall.firewallUnivIpImg.setImageResource(R.drawable.ic_keyboard_arrow_down_gray_24dp)
     }
 
     private fun showDialogForDelete() {

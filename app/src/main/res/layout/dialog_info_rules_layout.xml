@@ -17,17 +17,18 @@
 
         <ImageView
             android:id="@+id/info_rules_dialog_cancel_img"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_gravity="end"
             android:src="@android:drawable/ic_menu_close_clear_cancel" />
 
         <TextView
+            android:id="@+id/info_rules_dialog_rules_title"
             style="@style/Widget.AppCompat.TextView.SpinnerItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawablePadding="20dp"
-            android:padding="10dp"
+            android:padding="5dp"
             android:textColor="?attr/primaryTextColor"
             android:text="@string/firewall_rules"
             android:textSize="@dimen/heading_font_text_view"
@@ -40,8 +41,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:lineSpacingExtra="5dp"
-            android:padding="10dp"
-            android:layout_marginTop="20dp"
+            android:padding="5dp"
+            android:layout_marginTop="10dp"
             android:textSize="@dimen/large_font_text_view"
             android:textColor="?attr/primaryTextColor"
             android:text="@string/bsct_conn_rule_explanation"

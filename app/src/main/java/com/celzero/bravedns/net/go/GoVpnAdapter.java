@@ -295,7 +295,7 @@ public class GoVpnAdapter {
                 RefreshOperation runningTask = new RefreshOperation();
                 runningTask.execute();
             }
-            Log.d(LOG_TAG, "GoVPNAdapter setCryptMode - Connected to tunnel with DNSMODE - " + Settings.DNSModeCryptPort + " - blockMode-" + Settings.BlockModeFilter + "proxyMode-" + proxyMode);
+            Log.i(LOG_TAG, "GoVPNAdapter setCryptMode - Connected to tunnel with DNSMODE - " + Settings.DNSModeCryptPort + " - blockMode-" + Settings.BlockModeFilter + "proxyMode-" + proxyMode);
         } catch (Exception ex) {
             Log.e(LOG_TAG, "GoVPNAdapter celzero connect-tunnel: dns crypt", ex);
             if(servers.length() > 0) {
@@ -370,7 +370,7 @@ public class GoVpnAdapter {
                             if (proxyMode == Settings.ProxyModeSOCKS5 || proxyMode == Constants.ORBOT_SOCKS) {
                                 setSocks5TunnelMode();
                             }
-                            Log.d(LOG_TAG, "GoVPNAdapter celzero connect crypt else - tunnel mode set with mode -" + Settings.DNSModeCryptPort + firewallMode + proxyMode);
+                            Log.i(LOG_TAG, "GoVPNAdapter celzero connect crypt else - tunnel mode set with mode -" + Settings.DNSModeCryptPort + firewallMode + proxyMode);
                         }/*else{
                             dnsCryptEndpointRepository.updateFailingConnections();
                         }*/
@@ -427,18 +427,19 @@ public class GoVpnAdapter {
 
     public void setSocks5TunnelMode() {
         AppMode appMode = HomeScreenActivity.GlobalVariable.INSTANCE.getAppMode();
-        assert appMode != null;
-        ProxyEndpoint socks5;
-        if(proxyMode == Constants.ORBOT_SOCKS){
-            socks5 = appMode.getOrbotProxyDetails();
-        }else{
-            socks5 = appMode.getSocks5ProxyDetails();
+        if(appMode != null) {
+            ProxyEndpoint socks5;
+            if (proxyMode == Constants.ORBOT_SOCKS) {
+                socks5 = appMode.getOrbotProxyDetails();
+            } else {
+                socks5 = appMode.getSocks5ProxyDetails();
+            }
+            if (socks5 != null) {
+                setProxyMode(socks5.getUserName(), socks5.getPassword(), socks5.getProxyIP(), socks5.getProxyPort());
+            }
+            if (HomeScreenActivity.GlobalVariable.INSTANCE.getDEBUG())
+                Log.d(LOG_TAG, "GoVPNAdapter Socks5 mode set - " + socks5.getProxyIP() + "," + socks5.getProxyPort());
         }
-        if(socks5 != null) {
-            setProxyMode(socks5.getUserName(), socks5.getPassword(), socks5.getProxyIP(), socks5.getProxyPort());
-        }
-        if (HomeScreenActivity.GlobalVariable.INSTANCE.getDEBUG())
-            Log.d(LOG_TAG, "GoVPNAdapter Socks5 mode set - " + socks5.getProxyIP() + "," + socks5.getProxyPort());
     }
 
     private static ParcelFileDescriptor establishVpn(BraveVPNService vpnService) {
@@ -483,7 +484,7 @@ public class GoVpnAdapter {
     public synchronized void close() {
         if (tunnel != null) {
             tunnel.disconnect();
-            Log.d(LOG_TAG,"GoVPNAdapter Tunnel disconnect");
+            Log.i(LOG_TAG,"GoVPNAdapter Tunnel disconnect");
         }
         if (tunFd != null) {
             try {
@@ -608,10 +609,10 @@ public class GoVpnAdapter {
         if (dohURL.contains(Constants.BRAVE_BASIC_URL)) {
             try {
                 if(persistentState.getRemoteBraveDNSDownloaded()) {
-                    String path = vpnService.getFilesDir().getCanonicalPath();
+                    String path = vpnService.getFilesDir().getCanonicalPath() +"/"+ persistentState.getRemoteBlockListDownloadTime();
                     BraveDNS braveDNS = Dnsx.newBraveDNSRemote(path + Constants.FILE_TAG_NAME);
                     if (HomeScreenActivity.GlobalVariable.INSTANCE.getDEBUG())
-                        Log.d(LOG_TAG, "GoVPNAdapter DOH URL set bravedns- " + dohURL + "--" + braveDNS);
+                        Log.d(LOG_TAG, "GoVPNAdapter DOH URL set bravedns- " + dohURL + "--" + path);
                     tunnel.setBraveDNS(braveDNS);
                 }
             } catch (Exception ex) {
