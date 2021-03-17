@@ -484,7 +484,7 @@
     <string name="whats_new_version_name">🎁 International Happiness Day (Mar 20) 🎁</string>
     <string name="whats_new_version_update">Incremental update:\n\n
         1. Support for one-click Tor-as-a-proxy (Orbot setup).\n\n
-        2. App reports bad network connectivity from Android.\n\n
+        2. When the network is unavailable RethinkDNS now reports "bad network connectivity" to the Android OS. This might improve scenario where apps do not recover from poor / flaky networks.\n\n
     </string>
 
     <!-- Settings Fragment strings -->
