@@ -52,8 +52,8 @@ class ApplicationManagerApk (packageInfo: PackageInfo,  var category: String, co
     }
 
     companion object{
-        val addedList = ArrayList<ApplicationManagerApk>()
-        fun getAddedList(context : Context ):ArrayList<ApplicationManagerApk>{
+        private val addedList = ArrayList<ApplicationManagerApk>()
+        fun getAddedList():ArrayList<ApplicationManagerApk>{
             return addedList
         }
 
@@ -75,29 +75,28 @@ class ApplicationManagerApk (packageInfo: PackageInfo,  var category: String, co
     }
 
     inner class ViewHolder (itemView: View): FastAdapter.ViewHolder<ApplicationManagerApk>(itemView) {
-        private val llFirwallBg : androidx.appcompat.widget.LinearLayoutCompat = itemView.findViewById(R.id.am_list_ll_bg)
         private val mIconImageView: ImageView = itemView.findViewById(R.id.am_apk_icon_iv)
         private val mLabelTextView: TextView = itemView.findViewById(R.id.am_apk_label_tv)
         private val mCheckBox : CheckBox = itemView.findViewById(R.id.am_action_item_checkbox)
         private val mPackageTextView: TextView = itemView.findViewById(R.id.am_apk_package_tv)
 
-        override fun bindView(permissionManagerApk:  ApplicationManagerApk, payloads: MutableList<Any>) {
-            mIconImageView.setImageDrawable(permissionManagerApk.appIcon)
-            mLabelTextView.setText(permissionManagerApk.appName)
-            mPackageTextView.text = permissionManagerApk.category
+        override fun bindView(item:  ApplicationManagerApk, payloads: MutableList<Any>) {
+            mIconImageView.setImageDrawable(item.appIcon)
+            mLabelTextView.text = item.appName
+            mPackageTextView.text = item.category
             mCheckBox.setOnCheckedChangeListener(null)
-            mCheckBox.isChecked = permissionManagerApk.isSelected
+            mCheckBox.isChecked = item.isSelected
 
 
-            mCheckBox.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
+            mCheckBox.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
                if(b){
-                   addedList.add(permissionManagerApk)
-                   permissionManagerApk.isChecked = true
-                   permissionManagerApk.isSelected = true
+                   addedList.add(item)
+                   item.isChecked = true
+                   item.isSelected = true
                }else{
-                   addedList.remove(permissionManagerApk)
-                   permissionManagerApk.isChecked = false
-                   permissionManagerApk.isSelected = false
+                   addedList.remove(item)
+                   item.isChecked = false
+                   item.isSelected = false
                }
             }
         }

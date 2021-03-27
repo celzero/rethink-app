@@ -28,20 +28,16 @@ class BlockedConnectionsRepository(private val blockedConnectionsDAO: BlockedCon
         blockedConnectionsDAO.update(blockedConnections)
     }
 
-    fun deleteAsync(blockedConnections: BlockedConnections) {
+  /*  fun deleteAsync(blockedConnections: BlockedConnections) {
         blockedConnectionsDAO.delete(blockedConnections)
+    }*/
+
+    fun clearFirewallRules(uid: Int) {
+        blockedConnectionsDAO.clearFirewallRules(uid)
     }
 
-    fun clearFirewallRules(uid: Int, coroutineScope: CoroutineScope = GlobalScope) {
-        //coroutineScope.launch {
-            blockedConnectionsDAO.clearFirewallRules(uid)
-        //}
-    }
-
-    fun insertAsync(blockedConnections: BlockedConnections, coroutineScope: CoroutineScope = GlobalScope) {
-        //coroutineScope.launch {
-            blockedConnectionsDAO.insert(blockedConnections)
-        //}
+    fun insertAsync(blockedConnections: BlockedConnections) {
+        blockedConnectionsDAO.insert(blockedConnections)
     }
 
     fun getBlockedConnections(): List<BlockedConnections> {
@@ -52,16 +48,12 @@ class BlockedConnectionsRepository(private val blockedConnectionsDAO: BlockedCon
         return blockedConnectionsDAO.getAllBlockedConnectionsForUID(uid)
     }
 
-    fun deleteIPRulesUniversal(ipAddress: String, coroutineScope: CoroutineScope = GlobalScope) {
-        //coroutineScope.launch {
-            blockedConnectionsDAO.deleteIPRulesUniversal(ipAddress)
-        //}
+    fun deleteIPRulesUniversal(ipAddress: String) {
+        blockedConnectionsDAO.deleteIPRulesUniversal(ipAddress)
     }
 
-    fun deleteIPRulesForUID(uid: Int, ipAddress: String, coroutineScope: CoroutineScope = GlobalScope) {
-        //coroutineScope.launch {
-            blockedConnectionsDAO.deleteIPRulesForUID(uid, ipAddress)
-        //}
+    fun deleteIPRulesForUID(uid: Int, ipAddress: String) {
+        blockedConnectionsDAO.deleteIPRulesForUID(uid, ipAddress)
     }
 
     fun deleteAllIPRulesUniversal(coroutineScope: CoroutineScope = GlobalScope) {
@@ -76,8 +68,5 @@ class BlockedConnectionsRepository(private val blockedConnectionsDAO: BlockedCon
 
     fun getBlockedConnectionCountLiveData(): LiveData<Int>{
           return blockedConnectionsDAO.getBlockedConnectionCountLiveData()
-      }
-
-
-    //fun deleteRules(uid, )
+    }
 }

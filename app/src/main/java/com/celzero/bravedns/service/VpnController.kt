@@ -31,7 +31,6 @@ class VpnController {
         private var dnsVpnServiceState: VpnController? = null
         private var braveVpnService : BraveVPNService ? = null
         private var connectionState: BraveVPNService.State? = null
-        private var tracker: QueryTracker? = null
 
         @Synchronized
         fun getInstance(): VpnController {
@@ -66,9 +65,6 @@ class VpnController {
         connectionState = state
         //TODO Changes done to remove the check of context
         stateChanged(context)
-        /*if (context != null) {
-
-        }*/
     }
 
 
@@ -110,7 +106,7 @@ class VpnController {
     fun stop(context: Context?) {
         Log.i(LOG_TAG,"VPN Controller stop - ${context!!}")
         VpnControllerHelper.persistentState.vpnEnabled = false
-        connectionState = null //BraveVPNService.State.STOP
+        connectionState = null
         if (braveVpnService != null) {
             braveVpnService!!.signalStopService(true)
         }
@@ -118,12 +114,9 @@ class VpnController {
         stateChanged(context)
     }
 
-    fun getState(context: Context?): VpnState? {
+    fun getState(): VpnState {
         val requested: Boolean = VpnControllerHelper.persistentState.vpnEnabled
         val on = braveVpnService != null && braveVpnService!!.isOn()
-        /*if(connectionState == null){
-            connectionState = BraveVPNService.State.NEW
-        }*/
         return VpnState(requested, on, connectionState)
     }
 
@@ -131,5 +124,4 @@ class VpnController {
 
 internal object VpnControllerHelper:KoinComponent {
     val persistentState by inject<PersistentState>()
-    val queryTracker by inject<QueryTracker>()
 }

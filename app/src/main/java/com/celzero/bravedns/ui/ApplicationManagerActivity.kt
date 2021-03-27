@@ -84,14 +84,14 @@ class ApplicationManagerActivity : AppCompatActivity(R.layout.activity_applicati
         }
 
         b.amFabUninstallIcon.setOnClickListener {
-            val list = ApplicationManagerApk.getAddedList(this)
+            val list = ApplicationManagerApk.getAddedList()
             for (app in list) {
                 uninstallPackage(app)
             }
         }
 
         b.amFabAppinfoIcon.setOnClickListener {
-            val list = ApplicationManagerApk.getAddedList(this)
+            val list = ApplicationManagerApk.getAddedList()
             if (list.size >= 1) {
                 list[list.size - 1].packageName?.let { it1 -> appInfoForPackage(it1) }
             }

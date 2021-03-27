@@ -24,6 +24,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DNSLogs
 import com.celzero.bravedns.databinding.TransactionRowBinding
 import com.celzero.bravedns.ui.DNSBlockListBottomSheetFragment
@@ -46,7 +47,7 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
 
     override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
         val transaction: DNSLogs = getItem(position) ?: return
-        holder.update(transaction, position)
+        holder.update(transaction)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -66,16 +67,14 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
 
     inner class TransactionViewHolder(private val b: TransactionRowBinding) : RecyclerView.ViewHolder(b.root) {
 
-        fun update(transaction: DNSLogs, position: Int) {
+        fun update(transaction: DNSLogs?) {
             // This function can be run up to a dozen times while blocking rendering, so it needs to be
             // as brief as possible.
             if (transaction != null) {
-                //this.transaction = transaction
                 b.responseTime.text = convertLongToTime(transaction.time)
                 b.flag.text = transaction.flag
-                //fqdnView!!.text = Utilities.getETldPlus1(transaction.fqdn!!)
                 b.fqdn.text = transaction.queryStr
-                b.latencyVal.text = transaction.latency.toString() + "ms"
+                b.latencyVal.text = context.getString(R.string.dns_query_latency, transaction.latency.toString())
 
                 if (transaction.isBlocked) {
                     b.queryLogIndicator.visibility = View.VISIBLE
@@ -83,12 +82,9 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
                     b.queryLogIndicator.visibility = View.INVISIBLE
                 }
                 b.root.setOnClickListener {
-                    //if (!transaction.blockList.isNullOrEmpty()) {
                     b.root.isEnabled = false
                     openBottomSheet(transaction)
                     b.root.isEnabled = true
-                    //}
-
                 }
 
             }
@@ -102,7 +98,7 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
 
         private fun convertLongToTime(time: Long): String {
             val date = Date(time)
-            val format = SimpleDateFormat(Constants.DATE_FORMAT_PATTERN)
+            val format = SimpleDateFormat(Constants.DATE_FORMAT_PATTERN, Locale.ROOT)
             return format.format(date)
         }
     }

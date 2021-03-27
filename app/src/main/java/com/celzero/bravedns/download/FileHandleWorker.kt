@@ -35,6 +35,7 @@ import java.io.File
  *
  * As of now the code is written only for the local block list copy.
  */
+
 class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
         : Worker(context, workerParameters){
 
@@ -45,7 +46,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             val outputData = workDataOf(DownloadConstants.OUTPUT_FILES to response)
 
             return if(response) Result.success(outputData)
-            else Result.retry()
+            else Result.failure()
 
         }catch (e : Exception){
             Log.w(LOG_TAG, "FileHandleWorker Error while moving files to canonical path ${e.message}")

@@ -16,17 +16,17 @@ limitations under the License.
 
 package com.celzero.bravedns.adapter
 
-import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.DialogInterface
 import android.os.CountDownTimer
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -51,8 +51,9 @@ class DNSCryptEndpointAdapter(private val context: Context,
                               private val dnsCryptEndpointRepository:DNSCryptEndpointRepository,
                               private val persistentState: PersistentState,
                               private val queryTracker: QueryTracker,
-                              var listener : UIUpdateInterface) : PagedListAdapter<DNSCryptEndpoint, DNSCryptEndpointAdapter.DNSCryptEndpointViewHolder>(DIFF_CALLBACK) {
-    //private var serverList : MutableList<DNSCryptEndpoint> = ArrayList()
+                              var listener : UIUpdateInterface) : PagedListAdapter<DNSCryptEndpoint,
+                              DNSCryptEndpointAdapter.DNSCryptEndpointViewHolder>(DIFF_CALLBACK) {
+
 
     companion object {
         private val DIFF_CALLBACK = object :
@@ -85,28 +86,22 @@ class DNSCryptEndpointAdapter(private val context: Context,
         fun update(dnsCryptEndpoint: DNSCryptEndpoint) {
             if (DEBUG) Log.d(LOG_TAG, "dnsCryptEndpoint adapter -- ${dnsCryptEndpoint.dnsCryptName}")
             b.dnsCryptEndpointListUrlName.text = dnsCryptEndpoint.dnsCryptName
-            /*if (dnsCryptEndpoint.isSelected && cryptModeInProgress == 2) {
-                urlExplanationTxt.text = "Connected"
-            } else if (dnsCryptEndpoint.isSelected && cryptModeInProgress == 1) {
-                urlExplanationTxt.text = "Connecting.."
-            } else */
             if (dnsCryptEndpoint.isSelected) {
-                b.dnsCryptEndpointListUrlExplanation.text = "Connected"
+                b.dnsCryptEndpointListUrlExplanation.text = context.getString(R.string.dns_connected)
             } else {
                 b.dnsCryptEndpointListUrlExplanation.text = ""
             }
 
             if (dnsCryptEndpoint.isCustom && !dnsCryptEndpoint.isSelected) {
-                b.dnsCryptEndpointListInfoImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_uninstall))
+                b.dnsCryptEndpointListInfoImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_fab_uninstall))
             } else {
-                b.dnsCryptEndpointListInfoImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_appinfo))
+                b.dnsCryptEndpointListInfoImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_fab_appinfo))
             }
 
             b.dnsCryptEndpointListActionImage.isChecked = dnsCryptEndpoint.isSelected
             b.root.setOnClickListener {
                 b.dnsCryptEndpointListActionImage.isChecked = !b.dnsCryptEndpointListActionImage.isChecked
                 dnsCryptEndpoint.isSelected = b.dnsCryptEndpointListActionImage.isChecked
-                //serverList.add(dnsCryptEndpoint)
 
                 val state = updateDNSCryptDetails(dnsCryptEndpoint)
                 if (!state) {
@@ -114,9 +109,7 @@ class DNSCryptEndpointAdapter(private val context: Context,
                 }
             }
             b.dnsCryptEndpointListActionImage.setOnClickListener {
-                //serverList.add(dnsCryptEndpoint)
                 dnsCryptEndpoint.isSelected = b.dnsCryptEndpointListActionImage.isChecked
-                //cryptModeInProgress = 1
                 val state = updateDNSCryptDetails(dnsCryptEndpoint)
                 if (!state) {
                     b.dnsCryptEndpointListActionImage.isChecked = !state
@@ -190,33 +183,6 @@ class DNSCryptEndpointAdapter(private val context: Context,
             alertDialog.show()
         }
 
-        private fun showApplyDialog(dnsCryptEndpoint: DNSCryptEndpoint) {
-            val dialog = Dialog(context)
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-            dialog.setContentView(R.layout.dialog_bottom_apply_changes)
-            val window: Window = dialog.window!!
-            val wlp: WindowManager.LayoutParams = window.attributes
-            wlp.width = WindowManager.LayoutParams.WRAP_CONTENT
-            wlp.gravity = Gravity.BOTTOM
-            wlp.flags = wlp.flags and WindowManager.LayoutParams.FLAG_DIM_BEHIND.inv()
-            window.attributes = wlp
-
-            val applyURLBtn = dialog.findViewById(R.id.dialog_bottom_apply_changes_ok_btn) as AppCompatButton
-            val cancelURLBtn = dialog.findViewById(R.id.dialog_bottom_apply_changes_cancel_btn) as AppCompatButton
-
-            applyURLBtn.setOnClickListener {
-                updateDNSCryptDetails(dnsCryptEndpoint)
-                dialog.dismiss()
-            }
-
-            cancelURLBtn.setOnClickListener {
-                dialog.dismiss()
-            }
-            // Set other dialog properties
-            dialog.show()
-
-        }
-
         private fun updateDNSCryptDetails(dnsCryptEndpoint: DNSCryptEndpoint): Boolean {
             val list = dnsCryptEndpointRepository.getConnectedDNSCrypt()
             if(list.size == 1){
@@ -235,7 +201,8 @@ class DNSCryptEndpointAdapter(private val context: Context,
                     notifyDataSetChanged()
                     persistentState.dnsType = 2
                     val connectedDNS = dnsCryptEndpointRepository.getConnectedCount()
-                    persistentState.setConnectedDNS("DNSCrypt: $connectedDNS resolvers")
+                    val text = context.getString(R.string.configure_dns_crypt, connectedDNS)
+                    persistentState.setConnectedDNS(text)
                     queryTracker.reinitializeQuantileEstimator()
                 }
             }.start()

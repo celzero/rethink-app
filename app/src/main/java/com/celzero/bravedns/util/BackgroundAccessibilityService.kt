@@ -19,10 +19,8 @@ import android.accessibilityservice.AccessibilityService
 import android.content.Intent
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
-import android.view.accessibility.AccessibilityEvent.*
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 
 class BackgroundAccessibilityService  : AccessibilityService() {
 
@@ -40,7 +38,8 @@ class BackgroundAccessibilityService  : AccessibilityService() {
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
-        if(DEBUG) {
+        // Commenting out the below code - warning during the build process
+        /*if(DEBUG) {
             val eventText = when (event.eventType) {
                 TYPE_VIEW_CLICKED -> "Clicked: "
                 TYPE_WINDOWS_CHANGED -> "WindowsChanged: "
@@ -89,7 +88,7 @@ class BackgroundAccessibilityService  : AccessibilityService() {
                 TYPE_VIEW_TEXT_SELECTION_CHANGED -> "TypeViewTextSelectionChanged: "
                 else -> "Default: "
             } + event.contentDescription + " " + event.text
-        }
+        }*/
         /*Log.w("______","onAEvent: sourcepack " + event.source?.packageName + " text? " +
                 eventText + " class? " + event.className +
                 " package? ppp " + event.packageName)*/

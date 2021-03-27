@@ -57,7 +57,7 @@ interface DoHEndpointDAO {
 
     @Transaction
     @Query("select * from DoHEndpoint where isSelected = 1")
-    fun getConnectedDoH() : DoHEndpoint
+    fun getConnectedDoH() : DoHEndpoint?
 
     @Query("update DoHEndpoint set dohURL = :url, isSelected = 1 where id = 5")
     fun updateConnectionURL(url : String)

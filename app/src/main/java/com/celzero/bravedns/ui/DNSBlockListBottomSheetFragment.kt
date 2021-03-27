@@ -16,18 +16,22 @@ limitations under the License.
 package com.celzero.bravedns.ui
 
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Html
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DNSBottomSheetBlockAdapter
 import com.celzero.bravedns.database.DNSLogs
 import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
+import com.celzero.bravedns.service.PersistentState
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import org.koin.android.ext.android.inject
 
 
 class DNSBlockListBottomSheetFragment(private var contextVal: Context, private var transaction: DNSLogs) : BottomSheetDialogFragment() {
@@ -37,8 +41,23 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
     private val b get() = _binding!!
 
     private lateinit var recyclerAdapter: DNSBottomSheetBlockAdapter
+    private val persistentState by inject<PersistentState>()
 
-    override fun getTheme(): Int = R.style.BottomSheetDialogTheme
+    override fun getTheme(): Int = if (persistentState.theme == 0) {
+        if (isDarkThemeOn()) {
+            R.style.BottomSheetDialogTheme
+        } else {
+            R.style.BottomSheetDialogThemeWhite
+        }
+    } else if (persistentState.theme == 1) {
+        R.style.BottomSheetDialogThemeWhite
+    } else {
+        R.style.BottomSheetDialogTheme
+    }
+
+    private fun isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = BottomSheetDnsLogBinding.inflate(inflater, container, false)
@@ -69,12 +88,11 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
             b.dnsBlockBlockedDesc.text = "blocked $upTime by ${transaction.serverIP}"
         } else {
             if (transaction.serverIP.isNotEmpty() && transaction.relayIP.isNotEmpty()) {
-                var styledText = ""
                 val text = "resolved <u>anonymously</u> $upTime by ${transaction.serverIP}"
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    styledText = Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY).toString()
+                val styledText = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY).toString()
                 } else {
-                    styledText = Html.fromHtml(text).toString()
+                    HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
                 }
                 b.dnsBlockBlockedDesc.text = styledText
             } else if (transaction.serverIP.isNotEmpty()) {
@@ -94,7 +112,7 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
             }
 
             val blockLists = transaction.blockLists.split(",")
-            if (blockLists != null) {
+            if (blockLists.isNotEmpty()) {
                 b.dnsBlockRecyclerview.layoutManager = LinearLayoutManager(contextVal)
                 recyclerAdapter = DNSBottomSheetBlockAdapter(contextVal, blockLists)
                 b.dnsBlockRecyclerview.adapter = recyclerAdapter

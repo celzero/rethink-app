@@ -27,9 +27,9 @@ class CategoryInfoRepository  (private val categoryInfoDAO: CategoryInfoDAO){
         categoryInfoDAO.update(categoryInfo)
     }
 
-    fun deleteAsync(categoryInfo : CategoryInfo){
+   /* fun deleteAsync(categoryInfo : CategoryInfo){
         categoryInfoDAO.delete(categoryInfo)
-    }
+    }*/
 
     fun insertAsync(categoryInfo : CategoryInfo){
         categoryInfoDAO.insert(categoryInfo)
@@ -45,7 +45,6 @@ class CategoryInfoRepository  (private val categoryInfoDAO: CategoryInfoDAO){
 
     fun updateCategoryInternet(categoryName: String, isInternetBlocked : Boolean){
         categoryInfoDAO.updateCategoryInternet(categoryName, isInternetBlocked)
-        //val categoryDetail = categoryInfoDAO.getCategoryDetail(categoryName)
         if(DEBUG) Log.d(LOG_TAG,"updateCategoryInternet - isInternetBlocked 1 -$isInternetBlocked")
         if(isInternetBlocked){
             categoryInfoDAO.updateBlockedCount(categoryName)
@@ -53,10 +52,6 @@ class CategoryInfoRepository  (private val categoryInfoDAO: CategoryInfoDAO){
             if(DEBUG) Log.d(LOG_TAG,"updateCategoryInternet - isInternetBlocked -$isInternetBlocked")
             categoryInfoDAO.updateBlockedCountToZero(categoryName)
         }
-    }
-
-    fun deleteAllCategory(){
-        categoryInfoDAO.deleteAllCategory()
     }
 
     fun updateNumberOfBlocked(categoryName: String, isAppBlocked: Boolean){
@@ -68,6 +63,7 @@ class CategoryInfoRepository  (private val categoryInfoDAO: CategoryInfoDAO){
             }else{
                 categoryInfoDAO.updateCategoryInternet(categoryName, false)
             }
+            if(DEBUG) Log.d(LOG_TAG, "Updated value: $count")
         }else {
             val count = categoryInfoDAO.decreaseNumberOfBlocked(categoryName)
             val categoryDetail = categoryInfoDAO.getCategoryDetail(categoryName)
@@ -76,6 +72,7 @@ class CategoryInfoRepository  (private val categoryInfoDAO: CategoryInfoDAO){
             } else {
                 categoryInfoDAO.updateCategoryInternet(categoryName, false)
             }
+            if(DEBUG) Log.d(LOG_TAG, "Updated value: $count")
         }
     }
 

@@ -63,7 +63,7 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters)
             cursor?.let {
                 if (cursor.moveToFirst()) {
                     val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
-                    if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(Constants.LOG_TAG, "AppDownloadManager onReceive ACTION_DOWNLOAD_COMPLETE 1 $downloadID")
+                    if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(Constants.LOG_TAG, "AppDownloadManager onReceive ACTION_DOWNLOAD_COMPLETE $status $downloadID")
                     query.setFilterById(downloadID.toLong())
                     if (status == DownloadManager.STATUS_RUNNING) {
                         Log.i(Constants.LOG_TAG, "AppDownloadManager status is $downloadID running")
@@ -71,7 +71,7 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters)
                         if (ReceiverHelper.persistentState.downloadIDs.contains(downloadID)) {
                             ReceiverHelper.persistentState.downloadIDs = ReceiverHelper.persistentState.downloadIDs - downloadID.toString()
                         }
-                        Log.i(Constants.LOG_TAG, "AppDownloadManager onReceive STATUS_SUCCESSFUL - ${downloadID}")
+                        Log.i(Constants.LOG_TAG, "AppDownloadManager onReceive STATUS_SUCCESSFUL - $downloadID")
                         if (ReceiverHelper.persistentState.downloadIDs.isEmpty()) {
                             cursor.close()
                             return 1

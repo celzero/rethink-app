@@ -73,7 +73,7 @@ class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
         doHEndpointDAO.removeConnectionStatus()
     }
 
-    fun getConnectedDoH(): DoHEndpoint {
+    fun getConnectedDoH(): DoHEndpoint? {
         return doHEndpointDAO.getConnectedDoH()
     }
 
@@ -89,7 +89,7 @@ class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
         return doHEndpointDAO.getCount()
     }
 
-    fun updateConnectionDefault() : DoHEndpoint{
+    fun updateConnectionDefault() : DoHEndpoint?{
         doHEndpointDAO.updateConnectionDefault()
         return doHEndpointDAO.getConnectedDoH()
     }

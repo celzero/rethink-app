@@ -267,7 +267,7 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
             notificationManager?.createNotificationChannel(channel)
             builder = NotificationCompat.Builder(context, ORBOT_NOTIFICATION_ID)
         } else {
-            builder = NotificationCompat.Builder(context)
+            builder = NotificationCompat.Builder(context, ORBOT_NOTIFICATION_ID)
         }
 
         val contentTitle = context.resources.getString(R.string.settings_orbot_notification_heading)
@@ -297,7 +297,6 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
      */
     private fun orbotStarted() {
         persistentState.orbotEnabled = true
-        ///persistentState.orbotConnectionInitiated = false
         persistentState.orbotConnectionStatus.postValue(false)
         setOrbotMode()
     }

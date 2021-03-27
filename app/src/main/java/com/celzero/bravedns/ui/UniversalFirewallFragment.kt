@@ -38,7 +38,6 @@ import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.AppInfoViewRepository
 import com.celzero.bravedns.database.BlockedConnectionsRepository
 import com.celzero.bravedns.databinding.UniversalFragementContainerBinding
-import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -87,7 +86,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
     private fun initView() {
         val includeView = b.appScrollingInclFirewall
 
-        val isServiceRunning = Utilities.isServiceRunning(requireContext(), BraveVPNService::class.java)
+        val isServiceRunning = persistentState.vpnEnabled
 
         if (!isServiceRunning) {
             includeView.firewallScrollConnectCheck.visibility = View.GONE
@@ -261,10 +260,10 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             if (isDarkThemeOn()) {
                 return R.style.AppTheme
             } else {
-                return R.style.AppTheme_white
+                return R.style.AppThemeWhite
             }
         } else if (persistentState.theme == 1) {
-            return R.style.AppTheme_white
+            return R.style.AppThemeWhite
         } else {
             return R.style.AppTheme
         }

@@ -36,11 +36,11 @@ class Rotate3dAnimation
      * of the translation can be specified, as well as whether the translation
      * should be reversed in time.
      *
-     * @param fromDegrees the start angle of the 3D rotation
-     * @param toDegrees the end angle of the 3D rotation
-     * @param centerX the X center of the 3D rotation
-     * @param centerY the Y center of the 3D rotation
-     * @param reverse true if the translation should be reversed, false otherwise
+     * @param mFromDegrees the start angle of the 3D rotation
+     * @param mToDegrees the end angle of the 3D rotation
+     * @param mCenterX the X center of the 3D rotation
+     * @param mCenterY the Y center of the 3D rotation
+     * @param mReverse true if the translation should be reversed, false otherwise
      */
     (
     private val mFromDegrees: Float, private

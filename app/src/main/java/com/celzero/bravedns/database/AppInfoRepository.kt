@@ -28,20 +28,18 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         }
     }
 
-    fun deleteAsync(appInfo: AppInfo, coroutineScope: CoroutineScope = GlobalScope) {
+    /*fun deleteAsync(appInfo: AppInfo, coroutineScope: CoroutineScope = GlobalScope) {
         coroutineScope.launch {
             appInfoDAO.delete(appInfo)
         }
-    }
+    }*/
 
     fun delete(appInfo: AppInfo){
         appInfoDAO.delete(appInfo)
     }
 
-    fun insertAsync(appInfo: AppInfo, coroutineScope: CoroutineScope = GlobalScope) {
-        //coroutineScope.launch {
-            appInfoDAO.insert(appInfo)
-        //}
+    fun insertAsync(appInfo: AppInfo) {
+        appInfoDAO.insert(appInfo)
     }
 
     fun isRootUserAvailable(): String?{
@@ -56,10 +54,8 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.getNonAppCount()
     }
 
-    fun updateInternetForuid(uid: Int, isInternetAllowed: Boolean, coroutineScope: CoroutineScope = GlobalScope) {
-        //coroutineScope.launch {
-            appInfoDAO.updateInternetPermissionForAlluid(uid, isInternetAllowed)
-        //}
+    fun updateInternetForUID(uid: Int, isInternetAllowed: Boolean) {
+        appInfoDAO.updateInternetPermissionForAlluid(uid, isInternetAllowed)
     }
 
     fun getAppListForUID(uid: Int): List<AppInfo> {

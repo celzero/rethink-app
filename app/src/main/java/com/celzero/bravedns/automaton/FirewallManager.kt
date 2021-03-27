@@ -205,7 +205,6 @@ class FirewallManager(service: BackgroundAccessibilityService) {
         }else {
             val currentPackage = latestTrackedPackage
             if(DEBUG) Log.d(LOG_TAG,"FirewallManager: Package: $currentPackage, $isAllowed")
-            //packagesStack.remove(currentPackage)
             packageElect = currentPackage
             updateInternetBackground(currentPackage!!,isAllowed)
         }

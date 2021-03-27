@@ -50,7 +50,7 @@ class BraveAutoStartReceiver  : BroadcastReceiver() {
                     context!!.startActivity(startIntent)
                     return
                 } else {
-                    VpnController.getInstance()?.start(context!!)
+                    VpnController.getInstance().start(context!!)
                 }
             }
         }

@@ -15,11 +15,7 @@ limitations under the License.
 */
 package com.celzero.bravedns.database
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -33,46 +29,16 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
         }
     }
 
-    fun deleteAsync(connectionTracker: ConnectionTracker, coroutineScope: CoroutineScope = GlobalScope) {
-        coroutineScope.launch {
-            connectionTrackerDAO.delete(connectionTracker)
-        }
+    fun insertAsync(connectionTracker: ConnectionTracker) {
+        connectionTrackerDAO.insert(connectionTracker)
     }
 
-
-    fun insertAsync(connectionTracker: ConnectionTracker, coroutineScope: CoroutineScope = GlobalScope) {
-        //coroutineScope.launch {
-            connectionTrackerDAO.insert(connectionTracker)
-        //}
+    fun deleteConnectionTrackerCount()  {
+        connectionTrackerDAO.deleteOlderDataCount(Constants.FIREWALL_CONNECTIONS_IN_DB)
     }
 
-    fun insertBulkAsync(connTrackerList : ArrayList<ConnectionTracker>){
-        if(DEBUG) Log.d(LOG_TAG, "Conn tracker bulk insert: ${connTrackerList.size}")
-        connectionTrackerDAO.insertBulk(connTrackerList)
+    fun deleteOlderData(date: Long) {
+        connectionTrackerDAO.deleteOlderData(date)
     }
-
-    /*fun getConnectionTrackerLiveData(): LiveData<PagedList<ConnectionTracker>> {
-        return connectionTrackerDAO.getConnectionTrackerLiveData().toLiveData(pageSize = 20)
-    }*/
-
-    fun deleteConnectionTrackerCount(coroutineScope: CoroutineScope = GlobalScope)  {
-        //coroutineScope.launch {
-            //val count = connectionTrackerDAO.getCountConnectionTracker()
-            //if (count > 4000) {
-            connectionTrackerDAO.deleteOlderDataCount(Constants.FIREWALL_CONNECTIONS_IN_DB)
-            //}
-        //}
-    }
-
-    fun deleteOlderData(date: Long, coroutineScope: CoroutineScope = GlobalScope) {
-        //coroutineScope.launch {
-            connectionTrackerDAO.deleteOlderData(date)
-        //}
-    }
-
-    fun getConnTrackerForAppLiveData(uid: Int): LiveData<List<ConnectionTracker>> {
-        return connectionTrackerDAO.getConnTrackerForAppLiveData(uid)
-    }
-
 
 }

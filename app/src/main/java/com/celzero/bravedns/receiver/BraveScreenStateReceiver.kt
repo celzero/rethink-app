@@ -28,7 +28,6 @@ import org.koin.core.component.KoinApiExtension
 
 class BraveScreenStateReceiver : BroadcastReceiver() {
 
-    @KoinApiExtension
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent!!.action.equals(Intent.ACTION_SCREEN_OFF)) {
             if(DEBUG) Log.d(LOG_TAG,"BraveScreenStateReceiver : Action_screen_off detected from the receiver")

@@ -38,7 +38,6 @@ import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
-import org.koin.core.component.KoinApiExtension
 
 class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(DIFF_CALLBACK) {
 
@@ -61,13 +60,13 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
 
     override fun onBindViewHolder(holder: ConnectionTrackerViewHolder, position: Int) {
         val connTracker: ConnectionTracker = getItem(position) ?: return
-        holder.update(connTracker, position)
+        holder.update(connTracker)
     }
 
 
     inner class ConnectionTrackerViewHolder(private val b: ConnectionTransactionRowBinding) : RecyclerView.ViewHolder(b.root) {
 
-        @KoinApiExtension fun update(connTracker: ConnectionTracker, position: Int) {
+        fun update(connTracker: ConnectionTracker) {
             val time = Utilities.convertLongToTime(connTracker.timeStamp)
             b.connectionResponseTime.text = time
             b.connectionFlag.text = connTracker.flag
@@ -93,9 +92,9 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
                     val appArray = context.packageManager.getPackagesForUid(connTracker.uid)
                     val appCount = (appArray?.size)?.minus(1)
                     if (appArray?.size!! > 2) {
-                        b.connectionAppName.text = "${connTracker.appName} + $appCount other apps"
+                        b.connectionAppName.text = context.getString(R.string.ctbs_app_other_apps, connTracker.appName, appCount)
                     } else if (appArray.size == 2) {
-                        b.connectionAppName.text = "${connTracker.appName} + $appCount other app"
+                        b.connectionAppName.text = context.getString(R.string.ctbs_app_other_app, connTracker.appName, appCount)
                     }
                     Glide.with(context).load(context.packageManager.getApplicationIcon(appArray[0]!!)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)
                 } catch (e: Exception) {

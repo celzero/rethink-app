@@ -15,7 +15,6 @@
  */
 package com.celzero.bravedns.ui
 
-import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -26,7 +25,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.os.Message
 import android.provider.Settings
 import android.text.Html
 import android.text.Html.FROM_HTML_MODE_LEGACY
@@ -39,6 +37,7 @@ import android.view.Window
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
@@ -52,6 +51,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Protocol
+import com.celzero.bravedns.util.ThrowingHandler
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.CoroutineScope
@@ -67,6 +67,7 @@ import org.koin.android.ext.android.inject
  *
  * TODO : Need to move the strings to strings.xml file.
  */
+
 class ConnTrackerBottomSheetFragment(private var contextVal: Context, private var ipDetails: ConnectionTracker) : BottomSheetDialogFragment() {
     private var _binding: BottomSheetConnTrackBinding? = null
 
@@ -104,10 +105,10 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         if (isDarkThemeOn()) {
             R.style.BottomSheetDialogTheme
         } else {
-            R.style.BottomSheetDialogTheme_white
+            R.style.BottomSheetDialogThemeWhite
         }
     } else if (persistentState.theme == 1) {
-        R.style.BottomSheetDialogTheme_white
+        R.style.BottomSheetDialogThemeWhite
     } else {
         R.style.BottomSheetDialogTheme
     }
@@ -137,14 +138,14 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             b.bsConnBlockAppTxt.text = Html.fromHtml(text, FROM_HTML_MODE_LEGACY)
         } else {
-            b.bsConnBlockAppTxt.text = Html.fromHtml(text)
+            b.bsConnBlockAppTxt.text = HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
         }
 
         text = getString(R.string.bsct_block_all)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             b.bsConnBlockConnAllTxt.text = Html.fromHtml(text, FROM_HTML_MODE_LEGACY)
         } else {
-            b.bsConnBlockConnAllTxt.text = Html.fromHtml(text)
+            b.bsConnBlockConnAllTxt.text = HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
         }
 
         val time = DateUtils.getRelativeTimeSpanString(ipDetails.timeStamp, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE)
@@ -207,7 +208,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                 b.bsConnConnectionDetails.text = Html.fromHtml(text, FROM_HTML_MODE_COMPACT)
             } else {
-                b.bsConnConnectionDetails.text = Html.fromHtml(text)
+                b.bsConnConnectionDetails.text = HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
             }
         } else {
             text = getString(R.string.bsct_conn_conn_desc_allowed, protocol, ipDetails.port.toString(), time)
@@ -219,7 +220,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                 b.bsConnConnectionDetails.text = Html.fromHtml(text, FROM_HTML_MODE_LEGACY)
             } else {
-                b.bsConnConnectionDetails.text = Html.fromHtml(text)
+                b.bsConnConnectionDetails.text = HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
             }
         }
 
@@ -237,7 +238,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         b.bsConnBlockConnAllSwitch.setOnClickListener {
             if (isRuleUniversal) {
                 if (DEBUG) Log.d(LOG_TAG, "Universal Remove - ${connRules.ipAddress}, ${BraveVPNService.BlockedRuleNames.RULE2.ruleName}")
-                firewallRules.removeFirewallRules(UNIVERSAL_RULES_UID, connRules.ipAddress, BraveVPNService.BlockedRuleNames.RULE2.ruleName, blockedConnectionsRepository)
+                firewallRules.removeFirewallRules(UNIVERSAL_RULES_UID, connRules.ipAddress,  blockedConnectionsRepository)
                 isRuleUniversal = false
                 Utilities.showToastInMidLayout(contextVal, getString(R.string.ctbs_unblocked_app, connRules.ipAddress), Toast.LENGTH_SHORT)
             } else {
@@ -318,7 +319,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
                         categoryInfoRepository.updateNumberOfBlocked(it.appCategory, !isBlocked)
                         if (DEBUG) Log.d(LOG_TAG, "Category block executed with blocked as $isBlocked")
                     }
-                    appInfoRepository.updateInternetForuid(uid, isBlocked)
+                    appInfoRepository.updateInternetForUID(uid, isBlocked)
                 }
             } else {
                 b.bsConnBlockAppCheck.isChecked = isBlocked
@@ -380,7 +381,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
 
         var text = getString(R.string.bsct_conn_rule_explanation)
         text = text.replace("\n", "<br /><br />")
-        val styledText = Html.fromHtml(text)
+        val styledText = HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
         descText.text = styledText
 
         okBtn.setOnClickListener {
@@ -394,13 +395,9 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
      *TODO : Come up with better way to handle the dialog instead of using the handlers.
      */
     private fun showDialog(packageList: List<AppInfo>, title: String, positiveText: String): Boolean {
-        //Change the handler logic into some other
-        val handler: Handler = @SuppressLint("HandlerLeak") object : Handler() {
-            override fun handleMessage(mesg: Message) {
-                throw RuntimeException()
-            }
-        }
-        var positiveTxt = ""
+        // TODO Change the handler logic into some other
+        val handler: Handler = ThrowingHandler()
+
         val packageNameList: List<String> = packageList.map { it.appName }
         var proceedBlocking = false
 
@@ -408,7 +405,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
 
         builderSingle.setIcon(R.drawable.spinner_firewall)
         builderSingle.setTitle(title)
-        positiveTxt = positiveText
+        val positiveTxt: String = positiveText
 
         val arrayAdapter = ArrayAdapter<String>(contextVal, android.R.layout.simple_list_item_activated_1)
         arrayAdapter.addAll(packageNameList)

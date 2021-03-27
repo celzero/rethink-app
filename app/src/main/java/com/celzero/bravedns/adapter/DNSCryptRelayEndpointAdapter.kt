@@ -16,16 +16,16 @@ limitations under the License.
 
 package com.celzero.bravedns.adapter
 
-import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.DialogInterface
 import android.os.CountDownTimer
-import android.view.*
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -60,7 +60,6 @@ class DNSCryptRelayEndpointAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DNSCryptRelayEndpointViewHolder {
         val itemBinding = DnsCryptEndpointListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        //v.setBackgroundColor(context.getColor(R.color.colorPrimary))
         return DNSCryptRelayEndpointViewHolder(itemBinding)
     }
 
@@ -73,27 +72,20 @@ class DNSCryptRelayEndpointAdapter(
     inner class DNSCryptRelayEndpointViewHolder(private val b: DnsCryptEndpointListItemBinding) : RecyclerView.ViewHolder(b.root) {
 
         fun update(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint) {
-            //if(DEBUG) Log.d(LOG_TAG,"Update - dohName ==> ${dnsCryptRelayEndpoint.dnsCryptRelayURL}")
             b.dnsCryptEndpointListUrlName.text = dnsCryptRelayEndpoint.dnsCryptRelayName
-            /*if(dnsCryptRelayEndpoint.isSelected && HomeScreenActivity.GlobalVariable.cryptModeInProgress == 2){
-            urlExplanationTxt.text = "Connected"
-        } else if (dnsCryptRelayEndpoint.isSelected && HomeScreenActivity.GlobalVariable.cryptModeInProgress == 1) {
-            urlExplanationTxt.text = "Connecting.."
-        } else */
             if (dnsCryptRelayEndpoint.isSelected) {
-                b.dnsCryptEndpointListUrlExplanation.text = "Connected"
+                b.dnsCryptEndpointListUrlExplanation.text = context.getString(R.string.dns_connected)
             } else {
                 b.dnsCryptEndpointListUrlExplanation.text = ""
             }
 
             b.dnsCryptEndpointListActionImage.isChecked = dnsCryptRelayEndpoint.isSelected
             if (dnsCryptRelayEndpoint.isCustom && !dnsCryptRelayEndpoint.isSelected) {
-                b.dnsCryptEndpointListInfoImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_uninstall))
+                b.dnsCryptEndpointListInfoImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_fab_uninstall))
             } else {
-                b.dnsCryptEndpointListInfoImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_appinfo))
+                b.dnsCryptEndpointListInfoImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_fab_appinfo))
             }
             b.root.setOnClickListener {
-                //updateDNSCryptRelayDetails(dnsCryptRelayEndpoint)
                 b.dnsCryptEndpointListActionImage.isChecked = !b.dnsCryptEndpointListActionImage.isChecked
                 dnsCryptRelayEndpoint.isSelected = b.dnsCryptEndpointListActionImage.isChecked
                 if (!dnsCryptRelayEndpoint.isSelected) {
@@ -180,33 +172,6 @@ class DNSCryptRelayEndpointAdapter(
             // Set other dialog properties
             alertDialog.setCancelable(true)
             alertDialog.show()
-        }
-
-        private fun showApplyDialog(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint) {
-            val dialog = Dialog(context)
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-            dialog.setContentView(R.layout.dialog_bottom_apply_changes)
-            val window: Window = dialog.window!!
-            val wlp: WindowManager.LayoutParams = window.attributes
-            wlp.width = WindowManager.LayoutParams.WRAP_CONTENT
-            wlp.gravity = Gravity.BOTTOM
-            wlp.flags = wlp.flags and WindowManager.LayoutParams.FLAG_DIM_BEHIND.inv()
-            window.attributes = wlp
-
-            val applyURLBtn = dialog.findViewById(R.id.dialog_bottom_apply_changes_ok_btn) as AppCompatButton
-            val cancelURLBtn = dialog.findViewById(R.id.dialog_bottom_apply_changes_cancel_btn) as AppCompatButton
-
-            applyURLBtn.setOnClickListener {
-                updateDNSCryptRelayDetails(dnsCryptRelayEndpoint)
-                dialog.dismiss()
-            }
-
-            cancelURLBtn.setOnClickListener {
-                dialog.dismiss()
-            }
-            // Set other dialog properties
-            dialog.show()
-
         }
 
         private fun updateDNSCryptRelayDetails(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint): Boolean {

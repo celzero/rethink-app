@@ -26,11 +26,9 @@ interface ConnectionTrackerDAO {
     @Update
     fun update(connectionTracker: ConnectionTracker)
 
-    //@Transaction
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(connectionTracker: ConnectionTracker)
 
-    //@Transaction
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertBulk(connTrackerList: List<ConnectionTracker>)
 
@@ -40,11 +38,9 @@ interface ConnectionTrackerDAO {
     @Query("select * from ConnectionTracker order by timeStamp desc")
     fun getConnectionTrackerLiveData() : DataSource.Factory<Int, ConnectionTracker>
 
-    //@Transaction
     @Query("select * from ConnectionTracker where appName like :query or ipAddress like :query order by timeStamp desc")
     fun getConnectionTrackerByName(query : String) : DataSource.Factory<Int,ConnectionTracker>
 
-   // @Transaction
     @Query("select * from ConnectionTracker where isBlocked = 1 order by timeStamp desc")
     fun getConnectionBlockedConnections(): DataSource.Factory<Int,ConnectionTracker>
 
@@ -57,14 +53,12 @@ interface ConnectionTrackerDAO {
     @Query("delete from ConnectionTracker")
     fun clearAllData()
 
-    //@Transaction
     @Query("select * from ConnectionTracker where uid = :uid order by ipAddress, timeStamp desc")
     fun getConnTrackerForAppLiveData(uid: Int) :LiveData<List<ConnectionTracker>>
 
     @Query("select count(*) from ConnectionTracker")
     fun getCountConnectionTracker() : Int
 
-    //@Transaction
     @Query("delete from ConnectionTracker where id < ((select max(id) from ConnectionTracker) - :count)")
     fun deleteOlderDataCount(count : Int)
 

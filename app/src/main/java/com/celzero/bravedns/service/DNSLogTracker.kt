@@ -18,6 +18,7 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import android.util.Log
+import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DNSLogRepository
 import com.celzero.bravedns.database.DNSLogs
 import com.celzero.bravedns.net.dns.DnsPacket
@@ -127,9 +128,9 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
             } else {
                 dnsLogs.response = transaction.status.name
                 dnsLogs.flag = if (transaction.status === Transaction.Status.CANCELED) {
-                    "\u274c" // "X" mark
+                    context.getString(R.string.unicode_x_sign)// "X" mark
                 } else {
-                    "\u26a0" // Warning sign
+                    context.getString(R.string.unicode_warning_sign) // Warning sign
                 }
             }
             if(dnsLogs.isBlocked){
