@@ -37,14 +37,8 @@ class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) 
     var apkListFiltered: ArrayList<Apk> = ArrayList()
 
     init {
-
         apkListFiltered.addAll(apkList)
     }
-
-    fun updateApkList() {
-        notifyDataSetChanged()
-    }
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ApkListViewHolder {
         val itemBinding = LayoutApkItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -52,23 +46,8 @@ class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) 
     }
 
     override fun onBindViewHolder(holder: ApkListViewHolder, position: Int) {
-        //print("onBindViewHolder: "+apkList[position].appInfo)
         holder.mIconImageView.setImageDrawable(context.packageManager.getApplicationIcon(apkList[position].packageName))
         holder.mLabelTextView.text = apkList[position].appName
-        //holder.mLabelTextView.text =
-        //  context.packageManager.getApplicationLabel(apkList.get(position).appInfo).toString()
-        //holder.mPackageTextView.text = "Tap for more Info"
-        /*if(position < 3 ) {
-            holder.mIconIndicator.setBackgroundResource(R.color.colorRed_900)
-            val anim: Animation = AlphaAnimation(0.0f, 1.0f)
-            anim.setDuration(1000) //You can manage the blinking time with this parameter
-
-            anim.setStartOffset(20)
-            anim.setRepeatMode(Animation.REVERSE)
-            anim.setRepeatCount(Animation.INFINITE)
-            holder.mIconIndicator.startAnimation(anim)
-        }*/
-
     }
 
     override fun getItemCount(): Int {
@@ -103,10 +82,8 @@ class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) 
         val mLabelTextView: TextView = b.apkLabelTv
 
         init {
-            //var permissionList : String = ""
             b.root.setOnClickListener {
-                val permissionDetails = Utilities.getPermissionDetails(context, apkList[adapterPosition].packageName)
-                println("One")
+                val permissionDetails = Utilities.getPermissionDetails(context, apkList[bindingAdapterPosition].packageName)
 
                 var pos = 0
                 if (permissionDetails.requestedPermissionsFlags != null) permissionDetails.requestedPermissionsFlags.forEach {
@@ -117,32 +94,10 @@ class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) 
                     pos++
                 }
 
-                val bottomSheetFragment = BottomSheetFragment(apkList[adapterPosition])
+                val bottomSheetFragment = BottomSheetFragment(apkList[bindingAdapterPosition])
                 val frag = context as FragmentActivity
                 bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
-
-                /*val viewDialog = LayoutInflater.from(context).inflate(R.layout.bottom_sheet_permission_manager, null)
-                val dialog = BottomSheetDialog(context)
-                dialog.setContentView(viewDialog)*/
-
-                /*viewDialog.findViewById<TextView>(R.id.textView).setOnClickListener{
-                    print(apkList.get(adapterPosition).packageName)
-                    dialog.dismiss()
-                }
-
-                viewDialog.findViewById<TextView>(R.id.textView2).setOnClickListener{
-                    print(apkList.get(adapterPosition).packageName)
-                    dialog.dismiss()
-                }
-
-                viewDialog.findViewById<TextView>(R.id.textView3).setOnClickListener{
-                    print(apkList.get(adapterPosition).packageName)
-                    dialog.dismiss()
-                }*/
-
             }
-
-
         }
     }
 

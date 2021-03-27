@@ -26,12 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class AppPermissionGroup {
-
-
-    private final PackageManager mPackageManager;
-    private final PackageInfo mPackageInfo;
     private final String mName;
-    private final String mDeclaringPackage;
     private final CharSequence mLabel;
     private final ArrayMap<String, Permission> mPermissions = new ArrayMap<>();
 
@@ -67,12 +62,12 @@ public final class AppPermissionGroup {
             }
         }
 
-        return create(packageManager, packageInfo, groupInfo, permissionInfos);
+        return create(packageInfo, groupInfo, permissionInfos);
     }
 
-    public static AppPermissionGroup create(PackageManager packageManager, PackageInfo packageInfo, PackageItemInfo groupInfo, List<PermissionInfo> permissionInfos) {
+    public static AppPermissionGroup create(PackageInfo packageInfo, PackageItemInfo groupInfo, List<PermissionInfo> permissionInfos) {
 
-        AppPermissionGroup group = new AppPermissionGroup(packageManager, packageInfo, groupInfo.name, groupInfo.packageName, groupInfo.loadLabel(packageManager));
+        AppPermissionGroup group = new AppPermissionGroup(groupInfo.name, groupInfo.packageName);
 
         if (groupInfo instanceof PermissionInfo) {
             permissionInfos = new ArrayList<>();
@@ -117,10 +112,7 @@ public final class AppPermissionGroup {
         return group;
     }
 
-    private AppPermissionGroup(PackageManager packageManager, PackageInfo packageInfo, String name, String declaringPackage, CharSequence label) {
-        mPackageManager = packageManager;
-        mPackageInfo = packageInfo;
-        mDeclaringPackage = declaringPackage;
+    private AppPermissionGroup( String name, CharSequence label) {
         mName = name;
         mLabel = label;
     }

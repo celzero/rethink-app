@@ -24,7 +24,6 @@ class AppPermissions(private val packageManager: PackageManager, packageInfo: Pa
     private val mNameToGroupMap = LinkedHashMap<CharSequence, AppPermissionGroup>()
 
     private var packageInfo: PackageInfo? = null
-        private set
 
     val permissionGroups: List<AppPermissionGroup>
         get() = mGroups
@@ -34,22 +33,9 @@ class AppPermissions(private val packageManager: PackageManager, packageInfo: Pa
         loadPermissionGroups()
     }
 
-    fun refresh() {
-        loadPackageInfo()
-        loadPermissionGroups()
-    }
 
     fun getPermissionGroup(name: CharSequence): AppPermissionGroup? {
         return mNameToGroupMap[name]
-    }
-
-    private fun loadPackageInfo() {
-        try {
-            packageInfo = packageManager.getPackageInfo(
-                packageInfo!!.packageName, PackageManager.GET_PERMISSIONS
-            )
-        } catch (e: PackageManager.NameNotFoundException) {
-        }
     }
 
     private fun loadPermissionGroups() {

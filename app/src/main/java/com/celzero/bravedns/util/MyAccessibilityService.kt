@@ -18,7 +18,6 @@ package com.celzero.bravedns.util
 import android.accessibilityservice.AccessibilityService
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
-import android.view.accessibility.AccessibilityRecord
 import com.celzero.bravedns.automaton.PermissionsManager
 import com.celzero.bravedns.automaton.PrivateDnsManager
 
@@ -34,7 +33,7 @@ class MyAccessibilityService : AccessibilityService() {
         PRIVATE_DNS_UNSET(2)
     }
 
-    companion object mode {
+    companion object Mode {
         var privateDnsMode: PrivateDnsMode = PrivateDnsMode.NONE
 
         fun setPrivateDnsMode() {
@@ -51,7 +50,7 @@ class MyAccessibilityService : AccessibilityService() {
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
-        val eventText = when (event.eventType) {
+        /*val eventText = when (event.eventType) {
             AccessibilityEvent.TYPE_VIEW_CLICKED -> "Clicked: "
             AccessibilityEvent.TYPE_WINDOWS_CHANGED -> "WindowsChanged: "
             AccessibilityEvent.TYPE_ANNOUNCEMENT -> "Announcement: "
@@ -98,16 +97,16 @@ class MyAccessibilityService : AccessibilityService() {
             AccessibilityEvent.WINDOWS_CHANGE_TITLE -> "WindowsChangedTite: "
             AccessibilityEvent.TYPE_VIEW_TEXT_SELECTION_CHANGED -> "TypeViewTextSelectionChanged: "
             else -> "Default: "
-        } + event.contentDescription + " " + event.text
+        } + event.contentDescription + " " + event.text*/
 
        /* Log.w("______","onAEvent: sourcepack " + event.source?.packageName + " text? " +
                 eventText + " class? " + event.className +
-                " package? ppp " + event.packageName)*/
+                " package? ppp " + event.packageName)
         for (i in 0 until event.recordCount) {
             val r: AccessibilityRecord = event.getRecord(i)
             //Log.w("PermissionsManager", "_____ record record $$$$ ______ ${r.source} ${r.className} ${r.contentDescription}")
         }
-
+        */
         if (isPrivateDnsMode()) {
             privateDnsManager.onAccessibilityEvent(event)
         } else {

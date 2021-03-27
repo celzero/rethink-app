@@ -43,7 +43,6 @@ import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.isSearchEnabled
 import com.celzero.bravedns.util.Constants.Companion.APP_CAT_SYSTEM_APPS
 import com.celzero.bravedns.util.Constants.Companion.APP_CAT_SYSTEM_COMPONENTS
 import com.celzero.bravedns.util.Constants.Companion.APP_NON_APP
@@ -81,8 +80,8 @@ class FirewallAppListAdapter internal constructor(
     }
 
 
-    override fun getChildView(listPosition: Int, expandedListPosition: Int, isLastChild: Boolean, convertView: View?, parent: ViewGroup): View {
-        var convertView = convertView
+    override fun getChildView(listPosition: Int, expandedListPosition: Int, isLastChild: Boolean, view: View?, parent: ViewGroup): View {
+        var convertView = view
         val appInfoDetail = getChild(listPosition, expandedListPosition)
         if (convertView == null) {
             val layoutInflater = this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -139,7 +138,6 @@ class FirewallAppListAdapter internal constructor(
         }
 
         fwWifiImg.setOnClickListener {
-            isSearchEnabled = false
             fwWifiImg.isEnabled = false
             val isInternetAllowed = appInfoDetail.isInternetAllowed
             val appUIDList = appInfoRepository.getAppListForUID(appInfoDetail.uid)
@@ -186,13 +184,12 @@ class FirewallAppListAdapter internal constructor(
                             }
                         }
                     }
-                    appInfoRepository.updateInternetForuid(uid, !isInternetAllowed)
+                    appInfoRepository.updateInternetForUID(uid, !isInternetAllowed)
 
                 }
             } else {
                 fwWifiImg.isChecked = !isInternetAllowed
             }
-            isSearchEnabled = true
         }
 
         fwWifiImg.setOnCheckedChangeListener(null)
@@ -320,10 +317,7 @@ class FirewallAppListAdapter internal constructor(
             }
         }
         internetChk.setOnClickListener {
-            isSearchEnabled = false
-            if(DEBUG) Log.d(LOG_TAG, "Category block clicked : $isSearchEnabled")
-            var proceedBlock = false
-            proceedBlock = if (listTitle.categoryName == APP_CAT_SYSTEM_APPS && isInternetAllowed) {
+            var proceedBlock = if (listTitle.categoryName == APP_CAT_SYSTEM_APPS && isInternetAllowed) {
                 if(listTitle.numOfAppWhitelisted != listTitle.numberOFApps) {
                     showDialogForSystemAppBlock(APP_CAT_SYSTEM_APPS)
                 }else{
@@ -381,14 +375,12 @@ class FirewallAppListAdapter internal constructor(
                     }catch(e : Exception){
                         Log.w(LOG_TAG,"Exception when inserting the category internet info: ${e.message}",e)
                     }
-                    isSearchEnabled = true
-                    if(DEBUG) Log.d(LOG_TAG, "Category block completed : $isSearchEnabled")
                 }
             }else{
                 if(DEBUG) Log.d(LOG_TAG,"else - proceedBlock: $proceedBlock")
                 internetChk.isChecked = proceedBlock
                 internetChk.setCompoundDrawablesWithIntrinsicBounds(
-                    context.getDrawable(R.drawable.allowed), null, null, null)
+                    ContextCompat.getDrawable(context, R.drawable.allowed), null, null, null)
             }
         }
         internetChk.setOnCheckedChangeListener(null)
@@ -406,7 +398,7 @@ class FirewallAppListAdapter internal constructor(
 
     private fun showDialog(packageList: List<AppInfo>, appName: String, isInternet: Boolean): Boolean {
         val handler: Handler = ThrowingHandler()
-        var positiveTxt = ""
+        val positiveTxt : String
         val packageNameList: List<String> = packageList.map { it.appName }
         var proceedBlocking = false
 

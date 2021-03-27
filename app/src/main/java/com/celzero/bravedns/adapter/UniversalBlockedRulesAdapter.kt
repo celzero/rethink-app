@@ -28,11 +28,11 @@ import com.celzero.bravedns.automaton.FirewallRules
 import com.celzero.bravedns.database.BlockedConnections
 import com.celzero.bravedns.database.BlockedConnectionsRepository
 import com.celzero.bravedns.databinding.UnivWhitelistRulesItemBinding
-import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinApiExtension
 
 class UniversalBlockedRulesAdapter(private val context: Context, private val blockedConnectionsRepository: BlockedConnectionsRepository) : PagedListAdapter<BlockedConnections, UniversalBlockedRulesAdapter.UniversalBlockedConnViewHolder>(DIFF_CALLBACK) {
 
@@ -52,21 +52,21 @@ class UniversalBlockedRulesAdapter(private val context: Context, private val blo
     }
 
     override fun onBindViewHolder(holder: UniversalBlockedConnViewHolder, position: Int) {
-        val blockedConns: BlockedConnections = getItem(position) ?: return
-        holder.update(blockedConns)
+        val blockedConnections: BlockedConnections = getItem(position) ?: return
+        holder.update(blockedConnections)
     }
 
 
     inner class UniversalBlockedConnViewHolder(private val b: UnivWhitelistRulesItemBinding) : RecyclerView.ViewHolder(b.root) {
 
-        fun update(blockedConns: BlockedConnections) {
-            b.univWhitelistRulesApkLabelTv.text = blockedConns.ipAddress
+        fun update(blockedConnections: BlockedConnections) {
+            b.univWhitelistRulesApkLabelTv.text = blockedConnections.ipAddress
             b.univWhitelistRulesDeleteBtn.setOnClickListener {
-                showDialogForDelete(blockedConns)
+                showDialogForDelete(blockedConnections)
             }
         }
 
-        private fun showDialogForDelete(blockedConns: BlockedConnections) {
+        private fun showDialogForDelete(blockedConnections: BlockedConnections?) {
             val builder = AlertDialog.Builder(context)
             //set title for alert dialog
             builder.setTitle(R.string.univ_firewall_dialog_title)
@@ -75,13 +75,13 @@ class UniversalBlockedRulesAdapter(private val context: Context, private val blo
             builder.setCancelable(true)
             //performing positive action
             builder.setPositiveButton(context.getString(R.string.univ_ip_delete_individual_positive)) { _, _ ->
-                GlobalScope.launch(Dispatchers.IO) {
-                    if (blockedConns != null) {
+                if (blockedConnections != null) {
+                    GlobalScope.launch(Dispatchers.IO) {
                         val firewallRules = FirewallRules.getInstance()
-                        firewallRules.removeFirewallRules(ConnTrackerBottomSheetFragment.UNIVERSAL_RULES_UID, blockedConns.ipAddress!!, BraveVPNService.BlockedRuleNames.RULE2.ruleName, blockedConnectionsRepository)
+                        firewallRules.removeFirewallRules(ConnTrackerBottomSheetFragment.UNIVERSAL_RULES_UID, blockedConnections.ipAddress!!, blockedConnectionsRepository)
                     }
+                    Toast.makeText(context, context.getString(R.string.univ_ip_delete_individual_toast, blockedConnections.ipAddress), Toast.LENGTH_SHORT).show()
                 }
-                Toast.makeText(context, context.getString(R.string.univ_ip_delete_individual_toast, blockedConns.ipAddress), Toast.LENGTH_SHORT).show()
             }
 
             //performing negative action

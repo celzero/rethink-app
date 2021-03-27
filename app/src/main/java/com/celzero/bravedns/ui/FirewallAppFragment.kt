@@ -34,7 +34,6 @@ import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.FragmentFirewallAllAppsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.isSearchEnabled
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.FirewallAppViewModel
@@ -129,43 +128,37 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        if (isSearchEnabled) {
-            object : CountDownTimer(500, 1000) {
-                override fun onTick(millisUntilFinished: Long) {}
+        object : CountDownTimer(500, 1000) {
+            override fun onTick(millisUntilFinished: Long) {}
 
-                override fun onFinish() {
-                    if (DEBUG) Log.d(LOG_TAG, "Category block onQueryTextSubmit final: ${isSearchEnabled}, $query")
-                    firewallAppInfoViewModel.setFilter(query)
-                    if (query.isNullOrEmpty()) {
-                        if(DEBUG) Log.d(LOG_TAG, "Search bar empty  ${firewallAppInfoViewModel.firewallAppDetailsList.value?.size}")
-                        var i = 0
-                        titleList!!.forEach { _ ->
-                            b.firewallExpandableList.collapseGroup(i)
-                            i += 1
-                        }
-                    } else {
-                        if (titleList!!.size > 0) {
-                            for (i in titleList!!.indices) {
-                                if (listData[titleList!![i]] != null) {
-                                    if (listData[titleList!![i]]!!.size > 0) {
-                                        b.firewallExpandableList.expandGroup(i)
-                                    }
+            override fun onFinish() {
+                firewallAppInfoViewModel.setFilter(query)
+                if (query.isNullOrEmpty()) {
+                    if (DEBUG) Log.d(LOG_TAG, "Search bar empty  ${firewallAppInfoViewModel.firewallAppDetailsList.value?.size}")
+                    var i = 0
+                    titleList!!.forEach { _ ->
+                        b.firewallExpandableList.collapseGroup(i)
+                        i += 1
+                    }
+                } else {
+                    if (titleList!!.size > 0) {
+                        for (i in titleList!!.indices) {
+                            if (listData[titleList!![i]] != null) {
+                                if (listData[titleList!![i]]!!.size > 0) {
+                                    b.firewallExpandableList.expandGroup(i)
                                 }
                             }
                         }
-                        if (DEBUG) Log.d(LOG_TAG, "Category block  ${titleList!!.size}")
                     }
+                    if (DEBUG) Log.d(LOG_TAG, "Category block  ${titleList!!.size}")
                 }
-            }.start()
+            }
+        }.start()
 
-
-        }
         return false
     }
 
     override fun onQueryTextChange(query: String?): Boolean {
-        if (DEBUG) Log.d(LOG_TAG, "Category block onQueryTextChange : ${isSearchEnabled}, $query")
-        if (isSearchEnabled) {
             object : CountDownTimer(500, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
                 }
@@ -195,7 +188,6 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
                     }
                 }
             }.start()
-        }
         return true
     }
 
@@ -213,10 +205,8 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
 
         firewallAppInfoViewModel.firewallAppDetailsList.observe(viewLifecycleOwner) { itAppInfo ->
             val list = itAppInfo!!
-            if(isSearchEnabled){
-                titleList = categoryInfoRepository.getAppCategoryList().toMutableList()
-                isSearchEnabled = false
-            }
+            titleList = categoryInfoRepository.getAppCategoryList().toMutableList()
+
             val iterator = titleList?.iterator()
             if(iterator != null) {
                 while (iterator.hasNext()) {
@@ -239,7 +229,6 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
                 b.firewallUpdateProgress.visibility = View.VISIBLE
                 b.firewallExpandableList.visibility = View.GONE
             }
-            isSearchEnabled = true
         }
 
 

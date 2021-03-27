@@ -98,8 +98,7 @@ class IPTracker internal constructor(
         connTracker.timeStamp = ipDetails.timeStamp
         connTracker.blockedByRule = ipDetails.blockedByRule
 
-        var serverAddress: InetAddress? = null
-        //var resolver : String? = null
+        val serverAddress: InetAddress?
         try {
             serverAddress = InetAddress.getByName(ipDetails.destIP)
             val countryCode: String = getCountryCode(serverAddress!!, context)

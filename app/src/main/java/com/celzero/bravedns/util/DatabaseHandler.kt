@@ -67,7 +67,7 @@ class DatabaseHandler(context: Context)  : SQLiteOpenHelper(context, DATABASE_NA
         val packageList:LinkedHashMap<String, Rules> = LinkedHashMap()
         val selectQuery = "SELECT  * FROM $TABLE_PERMISSION_MANAGER"
         val db = this.readableDatabase
-        var cursor: Cursor? = null
+        val cursor: Cursor?
         try{
             cursor = db.rawQuery(selectQuery, null)
         }catch (e: SQLiteException) {
@@ -99,7 +99,7 @@ class DatabaseHandler(context: Context)  : SQLiteOpenHelper(context, DATABASE_NA
         val packageRule : Int
         val selectQuery = "SELECT  * FROM $TABLE_PERMISSION_MANAGER where $KEY_PACKAGE_NAME = '$packageName'"
         val db = this.readableDatabase
-        var cursor: Cursor? = null
+        val cursor: Cursor?
         try{
             cursor = db.rawQuery(selectQuery, null)
         }catch (e: SQLiteException) {

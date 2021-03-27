@@ -47,10 +47,10 @@ import kotlinx.coroutines.launch
 import settings.Settings
 
 class DNSProxyEndpointAdapter(private val context: Context,
-                                private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
-                                private val persistentState: PersistentState,
-                                private val queryTracker: QueryTracker,
-                                val listener: UIUpdateInterface)
+                              private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
+                              private val persistentState: PersistentState,
+                              private val queryTracker: QueryTracker,
+                              private val listener: UIUpdateInterface)
     : PagedListAdapter<DNSProxyEndpoint, DNSProxyEndpointAdapter.DNSProxyEndpointViewHolder>(DIFF_CALLBACK) {
 
 

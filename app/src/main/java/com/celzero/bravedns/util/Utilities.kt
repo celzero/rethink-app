@@ -19,18 +19,14 @@ package com.celzero.bravedns.util
 import android.Manifest
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
-import android.app.Activity
-import android.app.ActivityManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.graphics.Color
-import android.os.Environment
 import android.provider.Settings
 import android.text.TextUtils.SimpleStringSplitter
-import android.text.format.DateUtils
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -45,11 +41,11 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.google.android.material.snackbar.Snackbar
 import com.google.common.net.InternetDomainName
-import java.io.*
+import org.koin.core.component.KoinApiExtension
+import java.io.IOException
 import java.net.InetAddress
 import java.text.SimpleDateFormat
 import java.util.*
-
 
 class Utilities {
 
@@ -78,37 +74,12 @@ class Utilities {
             return permissionGranted
         }
 
-        fun checkExternalStorage(): Boolean {
-            return Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
-        }
-
-
         fun getPermissionDetails(activity: Context, packageName: String): PackageInfo {
             val appInstall: PackageInfo
             val p = activity.packageManager
             appInstall = p.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
             return appInstall
         }
-
-        fun hasPermissionToReadPhoneStats(context: Context): Boolean {
-            return ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_DENIED
-        }
-
-
-        fun requestPhoneStateStats(context: Activity) {
-            ActivityCompat.requestPermissions(context, arrayOf(Manifest.permission.READ_PHONE_STATE), READ_PHONE_STATE_REQUEST)
-        }
-
-        fun isServiceRunning(c: Context, serviceClass: Class<*>): Boolean {
-            val manager = c.getSystemService<ActivityManager>() ?: return false
-            for (service in manager.getRunningServices(Int.MAX_VALUE)) {
-                if (serviceClass.name == service.service.className) {
-                    return true
-                }
-            }
-            return false
-        }
-
 
         // Convert an FQDN like "www.example.co.uk." to an eTLD + 1 like "example.co.uk".
         fun getETldPlus1(fqdn: String): String? {
@@ -235,10 +206,6 @@ class Utilities {
             return format.format(date)
         }
 
-        fun convertLongToRelativeTime(timeStamp: Long): String{
-            return "Last updated: ${DateUtils.getRelativeTimeSpanString(timeStamp, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE)}"
-        }
-
         fun prepareServersToRemove(servers: String, liveServers: String): String{
             val serverList  = servers.split(",")
             val liveServerList = liveServers.split(",")
@@ -264,17 +231,6 @@ class Utilities {
             }
         }
 
-        //Check app is installed via playstore -
-        //https://stackoverflow.com/questions/37539949/detect-if-an-app-is-installed-from-play-store
-        fun verifyInstallerId(context: Context): Boolean {
-            // A list with valid installers package name
-            val validInstallers: List<String> = ArrayList(listOf("com.android.vending", "com.google.android.feedback"))
-            // The package name of the app that has installed your app
-            val installer = context.packageManager.getInstallerPackageName(context.packageName)
-            // true if your app has been downloaded from Play Store
-            return installer != null && validInstallers.contains(installer)
-        }
-
         fun isIPLocal(ipAddress: String): Boolean{
             return try{
                 val ip = InetAddress.getByName(ipAddress)
@@ -294,38 +250,6 @@ class Utilities {
                 names[type]
             } else String.format(Locale.ROOT, "%d", type)
         }
-
-
-        /**
-        * To move the files from the the source to destination folder.
-        * Utility will be used to move the files which are downloaded as part of
-        * local/remote blocklist.*/
-        @Throws(FileNotFoundException::class, IOError::class)
-        fun moveTo(source: File, dest: File, destDirectory: File? = null) {
-
-            if (destDirectory?.exists() == false) {
-                destDirectory.mkdir()
-            }
-
-            val fis = FileInputStream(source)
-            val bufferLength = 1024
-            val buffer = ByteArray(bufferLength)
-            val fos = FileOutputStream(dest)
-            val bos = BufferedOutputStream(fos, bufferLength)
-            var read = fis.read(buffer, 0, bufferLength)
-            while (read != -1) {
-                bos.write(buffer, 0, read)
-                read = fis.read(buffer) // if read value is -1, it escapes loop.
-            }
-            fis.close()
-            bos.flush()
-            bos.close()
-
-            if (!source.delete()) {
-                Log.w(LOG_TAG, "failed to delete ${source.name}")
-            }
-        }
-
 
     }
 }

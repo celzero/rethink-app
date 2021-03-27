@@ -25,6 +25,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -65,7 +66,6 @@ class DoHEndpointAdapter(private val context: Context,
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DoHEndpointViewHolder {
         val itemBinding = DohEndpointListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        //v.setBackgroundColor(context.getColor(R.color.colorPrimary))
         return DoHEndpointViewHolder(itemBinding)
     }
 
@@ -79,7 +79,6 @@ class DoHEndpointAdapter(private val context: Context,
 
 
         fun update(doHEndpoint: DoHEndpoint) {
-            //if(DEBUG) Log.d(LOG_TAG, "Update - dohName ==> ${doHEndpoint.dohURL}")
             b.dohEndpointListUrlName.text = doHEndpoint.dohName
             if (doHEndpoint.isSelected) {
                 b.dohEndpointListUrlExplanation.text = context.getString(R.string.dns_connected)
@@ -89,7 +88,6 @@ class DoHEndpointAdapter(private val context: Context,
                     Log.i(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}, count- $count")
                     if (count != 0) {
                         b.dohEndpointListUrlExplanation.text =  context.getString(R.string.dns_connected_rethink_plus, count.toString())
-
                     }
                 }
             } else {
@@ -97,9 +95,9 @@ class DoHEndpointAdapter(private val context: Context,
             }
             b.dohEndpointListCheckImage.isChecked = doHEndpoint.isSelected
             if (doHEndpoint.isCustom && !doHEndpoint.isSelected) {
-                b.dohEndpointListActionImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_uninstall))
+                b.dohEndpointListActionImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_fab_uninstall))
             } else {
-                b.dohEndpointListActionImage.setImageDrawable(context.getDrawable(R.drawable.ic_fab_appinfo))
+                b.dohEndpointListActionImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_fab_appinfo))
             }
             if (doHEndpoint.dohName == RETHINK_DNS_PLUS) {
 
@@ -205,7 +203,7 @@ class DoHEndpointAdapter(private val context: Context,
             builder.setMessage(R.string.doh_custom_url_remove_dialog_message)
             builder.setCancelable(true)
             //performing positive action
-            builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { dialogInterface, which ->
+            builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { _, _ ->
                 GlobalScope.launch(Dispatchers.IO) {
                     doHEndpointRepository.deleteDoHEndpoint(doHEndpoint.dohURL)
                 }
@@ -213,7 +211,7 @@ class DoHEndpointAdapter(private val context: Context,
             }
 
             //performing negative action
-            builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { dialogInterface, which ->
+            builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
 
             }
             // Create the AlertDialog

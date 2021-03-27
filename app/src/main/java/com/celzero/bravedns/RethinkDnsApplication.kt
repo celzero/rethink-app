@@ -32,10 +32,10 @@ class RethinkDnsApplication:Application() {
             if (isDarkThemeOn()) {
                 setTheme(R.style.AppTheme)
             } else {
-                setTheme(R.style.AppTheme_white)
+                setTheme(R.style.AppThemeWhite)
             }
         } else if (persistentState.theme == 1) {
-            setTheme(R.style.AppTheme_white)
+            setTheme(R.style.AppThemeWhite)
         } else {
             setTheme(R.style.AppTheme)
         }

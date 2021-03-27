@@ -39,10 +39,7 @@ import com.celzero.bravedns.databinding.DialogSetCustomUrlBinding
 import com.celzero.bravedns.databinding.DialogSetDnsCryptBinding
 import com.celzero.bravedns.databinding.DialogSetDnsProxyBinding
 import com.celzero.bravedns.databinding.FragmentConfigureDnsBinding
-import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.VpnState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
@@ -55,7 +52,6 @@ import com.celzero.bravedns.viewmodel.DoHEndpointViewModel
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import settings.Settings
 import java.net.MalformedURLException
 import java.net.URL
 
@@ -332,9 +328,9 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
         llIPHeader.visibility = View.VISIBLE
 
         applyURLBtn.setOnClickListener {
-            var port: Int = 0
-            var isValid = true
-            var isIPValid = false
+            var port = 0
+            var isValid: Boolean
+            val isIPValid: Boolean
             val name = proxyNameEditText.text.toString()
             val mode = getString(R.string.cd_dns_proxy_mode_external)
             val ip = ipAddressEditText.text.toString()
@@ -376,7 +372,6 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
                 //Do the DNS Proxy setting there
                 if (DEBUG) Log.d(LOG_TAG, "new value inserted into DNSProxy")
                 insertDNSProxyEndpointDB(mode, name, appName, ip, port)
-                b.recyclerDnsProxyTitle.visibility = View.GONE
                 b.recyclerDnsProxyConnections.visibility = View.VISIBLE
                 dialog.dismiss()
             } else {
@@ -552,21 +547,6 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
         } catch (e: MalformedURLException) {
             false
         }
-    }
-
-    private fun checkConnection(): Boolean {
-        var connectionStatus = false
-        val status: VpnState? = VpnController.getInstance()!!.getState(requireContext())
-        if (status!!.activationRequested) {
-            if (status.connectionState == null) {
-                if (appMode?.getFirewallMode() == Settings.BlockModeSink) {
-                    connectionStatus = true
-                }
-            } else if (status.connectionState === BraveVPNService.State.WORKING) {
-                connectionStatus = true
-            }
-        }
-        return connectionStatus
     }
 
     override fun updateUIFromAdapter(dnsType: Int) {

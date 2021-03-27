@@ -28,7 +28,7 @@ views = [AppInfoView::class],version = 10,exportSchema = false)
 abstract class AppDatabase : RoomDatabase(){
 
     companion object {
-        const val currentVersion:Int = 10
+        //const val currentVersion:Int = 10
 
         fun buildDatabase(context: Context) = Room.databaseBuilder(
             context.applicationContext, AppDatabase::class.java,"bravedns.db")

@@ -24,7 +24,6 @@ import com.celzero.bravedns.util.MyAccessibilityService
 
 
 class PrivateDnsManager(private val accessibilityService: MyAccessibilityService) {
-    val TAG = "PrivateDnsManager"
 
     enum class AutoState(val code: Int) {
         DASHBOARD(0),
@@ -36,10 +35,10 @@ class PrivateDnsManager(private val accessibilityService: MyAccessibilityService
 
     var nextState = AutoState.DASHBOARD
 
-    val privateDnsModeProviderViewId = "com.android.settings:id/private_dns_mode_provider"
-    val privateDnsModeOffViewId = "com.android.settings:id/private_dns_mode_off"
-    val privateDnsModeHostnameViewId = "com.android.settings:id/private_dns_mode_provider_hostname"
-    val saveViewId = "android:id/button1"
+    private val privateDnsModeProviderViewId = "com.android.settings:id/private_dns_mode_provider"
+    private val privateDnsModeOffViewId = "com.android.settings:id/private_dns_mode_off"
+    private val privateDnsModeHostnameViewId = "com.android.settings:id/private_dns_mode_provider_hostname"
+    private val saveViewId = "android:id/button1"
 
     private val dns = "dns.adguard.com"
 
@@ -55,10 +54,8 @@ class PrivateDnsManager(private val accessibilityService: MyAccessibilityService
             packageName == "com.android.settings" &&
             isDashboard()) {
             val list: List<AccessibilityNodeInfo> = event.source.findAccessibilityNodeInfosByText("Private DNS")
-            //Log.w(TAG, "ppppp ____dashboard_____ ${list.size}")
             for (node in list) {
-                val perf: Boolean? = node.parent?.parent?.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-                //Log.w(TAG, "ppppp ________ $perf node ${node.parent?.parent}")
+                node.parent?.parent?.performAction(AccessibilityNodeInfo.ACTION_CLICK)
                 nextState = AutoState.DIALOG_DNS
             }
 
@@ -80,43 +77,30 @@ class PrivateDnsManager(private val accessibilityService: MyAccessibilityService
                 prov = event.source.findAccessibilityNodeInfosByViewId(privateDnsModeOffViewId)
             }
 
-            //Log.w(TAG, "ppppp _____privatednsmode____ ${prov.size}")
             for (node in prov) {
-                val perf: Boolean = node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-                val perf2: Boolean = node.performAction(AccessibilityNodeInfo.ACTION_SELECT)
-                //Log.w(TAG, "ppppp ________ cli: $perf sel: $perf2 node $node")
+                node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                node.performAction(AccessibilityNodeInfo.ACTION_SELECT)
                 break
             }
-            /*}
-            // ContentChangeTypeDesc: null [Private DNS provider hostname] class? android.widget.RadioButton package? ppp com.android.settings
-
-            if (event.eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_CONTENT_DESCRIPTION &&
-                    packageName == "com.android.settings" &&
-                    isRadio() &&
-                    event.className == "android.widget.RadioButton") {*/
 
             val list: List<AccessibilityNodeInfo> =
                 event.source.findAccessibilityNodeInfosByViewId(privateDnsModeHostnameViewId)
             val save: List<AccessibilityNodeInfo> =
                 event.source.findAccessibilityNodeInfosByViewId(saveViewId)
 
-            //Log.w(TAG, "ppppp _____privatednsmode____ ${list.size} ${save.size}")
-
             if (MyAccessibilityService.isSetPrivateDnsMode()) {
                 nextState = AutoState.TEXT_ENTRY
                 for (node in list) {
                     val arguments = Bundle()
                     arguments.putString(AccessibilityNodeInfoCompat.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, dns)
-                    val perf2: Boolean = node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments)
-                    //Log.w(TAG, "ppppp ________ text: $perf2 node $node")
+                    node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments)
                     break
                 }
             }
 
             nextState = AutoState.BUTTON_SAVE
             for (node in save) {
-                val perf2: Boolean = node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-                //Log.w(TAG, "ppppp ________ text: $perf2 node $node")
+                node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
                 break
             }
 

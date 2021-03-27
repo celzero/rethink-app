@@ -43,7 +43,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class ExcludedAppListAdapter(private val context: Context, private val appInfoRepository: AppInfoRepository, private val categoryInfoRepository: CategoryInfoRepository) : PagedListAdapter<AppInfo, ExcludedAppListAdapter.ExcludedAppInfoViewHolder>(DIFF_CALLBACK) {
+class ExcludedAppListAdapter(private val context: Context,
+                            private val appInfoRepository: AppInfoRepository,
+                            private val categoryInfoRepository: CategoryInfoRepository)
+    : PagedListAdapter<AppInfo, ExcludedAppListAdapter.ExcludedAppInfoViewHolder>(DIFF_CALLBACK) {
 
     companion object {
 
@@ -105,8 +108,7 @@ class ExcludedAppListAdapter(private val context: Context, private val appInfoRe
 
         private fun excludeAppsFromVPN(appInfo: AppInfo, status: Boolean) {
             val appUIDList = appInfoRepository.getAppListForUID(appInfo.uid)
-            var blockAllApps = false
-            blockAllApps = if (appUIDList.size > 1) {
+            val blockAllApps: Boolean = if (appUIDList.size > 1) {
                 showDialog(appUIDList, appInfo.appName, status)
             } else {
                 true
@@ -133,19 +135,19 @@ class ExcludedAppListAdapter(private val context: Context, private val appInfoRe
         private fun showDialog(packageList: List<AppInfo>, appName: String, isInternet: Boolean): Boolean {
             //Change the handler logic into some other
             val handler: Handler = ThrowingHandler()
-            var positiveTxt = ""
+            val positiveTxt: String
             val packageNameList: List<String> = packageList.map { it.appName }
             var proceedBlocking = false
 
             val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
 
             builderSingle.setIcon(R.drawable.ic_exclude_app)
-            if (isInternet) {
+            positiveTxt = if (isInternet) {
                 builderSingle.setTitle(context.getString(R.string.exclude_app_desc, appName, packageList.size.toString()))
-                positiveTxt = context.getString(R.string.exclude_app_dialog_positive, packageList.size.toString())
+                context.getString(R.string.exclude_app_dialog_positive, packageList.size.toString())
             } else {
                 builderSingle.setTitle(context.getString(R.string.unexclude_app_desc, appName, packageList.size.toString()))
-                positiveTxt = context.getString(R.string.unexclude_app_dialog_positive, packageList.size.toString())
+                context.getString(R.string.unexclude_app_dialog_positive, packageList.size.toString())
             }
             val arrayAdapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_activated_1)
             arrayAdapter.addAll(packageNameList)

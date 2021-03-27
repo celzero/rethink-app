@@ -17,27 +17,20 @@ limitations under the License.
 package com.celzero.bravedns.database
 
 import com.celzero.bravedns.util.Constants
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
 
 class DNSLogRepository(private val dnsLogDAO: DNSLogDAO) {
 
 
-    fun insertAsync(dnsLogs: DNSLogs, coroutineScope: CoroutineScope = GlobalScope) {
-        //coroutineScope.launch {
+    fun insertAsync(dnsLogs: DNSLogs) {
         dnsLogDAO.insert(dnsLogs)
-        //deleteConnectionTrackerCount()
-        //}
     }
 
     fun deleteOlderData(date: Long){
         dnsLogDAO.deleteOlderData(date)
     }
 
-    fun deleteConnectionTrackerCount(coroutineScope: CoroutineScope = GlobalScope) {
-        //coroutineScope.launch {
-            dnsLogDAO.deleteOlderDataCount(Constants.FIREWALL_CONNECTIONS_IN_DB)
-        //}
+    fun deleteConnectionTrackerCount() {
+        dnsLogDAO.deleteOlderDataCount(Constants.FIREWALL_CONNECTIONS_IN_DB)
     }
 
 }

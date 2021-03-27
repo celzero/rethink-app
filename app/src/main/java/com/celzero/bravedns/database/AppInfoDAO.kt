@@ -23,13 +23,11 @@ import androidx.room.*
 interface AppInfoDAO {
 
     @Update
-    //@Transaction
     fun update(appInfo: AppInfo)
 
     @Query("update AppInfo set isInternetAllowed = :isInternetAllowed where uid = :uid")
     fun updateInternetPermissionForAlluid(uid: Int, isInternetAllowed: Boolean)
 
-   // @Transaction
     @Query("select * from AppInfo where uid = :uid")
     fun getAppListForUID(uid: Int): List<AppInfo>
 
@@ -37,7 +35,6 @@ interface AppInfoDAO {
     fun updateInternetPermissionForCategory(categoryName: String, isInternetAllowed: Boolean) : Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    //@Transaction
     fun insert(appInfo: AppInfo)
 
     @Delete
@@ -46,11 +43,9 @@ interface AppInfoDAO {
     @Query("select * from AppInfo order by appCategory,uid")
     fun getAllAppDetails(): List<AppInfo>
 
-   // @Transaction
     @Query("select * from AppInfo order by appCategory,isInternetAllowed,lower(appName)")
     fun getAllAppDetailsForLiveData(): LiveData<List<AppInfo>>
 
-    //@Transaction
     @Query("select * from AppInfo where appName like :input order by appCategory,isInternetAllowed,lower(appName)")
     fun getAppDetailsForLiveData(input: String): LiveData<List<AppInfo>>
 
@@ -72,15 +67,12 @@ interface AppInfoDAO {
     @Query("select packageInfo from AppInfo where appName = :appName")
     fun getPackageNameForAppName(appName: String): String
 
-    //@Transaction
     @Query("select * from AppInfo where isExcluded = 0  order by whiteListUniv1 desc,lower(appName) ")
     fun getUnivAppDetailsLiveData(): DataSource.Factory<Int, AppInfo>
 
-    //@Transaction
     @Query("select * from AppInfo where isSystemApp = 1 and isExcluded=0  order by whiteListUniv1 desc,lower(appName)")
     fun getUnivAppSystemAppsLiveData(): DataSource.Factory<Int, AppInfo>
 
-    //@Transaction
     @Query("select * from AppInfo where appName like :filter and isExcluded = 0   order by whiteListUniv1 desc,lower(appName)")
     fun getUnivAppDetailsFilterLiveData(filter: String): DataSource.Factory<Int, AppInfo>
 
@@ -103,29 +95,23 @@ interface AppInfoDAO {
     @Query("update AppInfo set whiteListUniv1 = :isEnabled, isInternetAllowed = 1  where appCategory = :category")
     fun updateWhiteListForCategories(category: String, isEnabled: Boolean) : Int
 
-    //@Transaction
     @Query("select * from AppInfo  order by isExcluded desc,lower(appName)")
     fun getExcludedAppDetailsLiveData(): DataSource.Factory<Int, AppInfo>
 
-    //@Transaction
     @Query("select * from AppInfo where isSystemApp = 1 order by isExcluded desc,lower(appName)")
     fun getExcludedAAppSystemAppsLiveData(): DataSource.Factory<Int, AppInfo>
 
-   // @Transaction
     @Query("select * from AppInfo where appCategory in (:filter)  order by isExcluded desc,lower(appName)")
     fun getExcludedAppDetailsFilterForCategoryLiveData(filter: List<String>): DataSource.Factory<Int, AppInfo>
 
-    //@Transaction
     @Query("select * from AppInfo where appName like :filter order by isExcluded desc,lower(appName)")
     fun getExcludedAppDetailsFilterLiveData(filter: String): DataSource.Factory<Int, AppInfo>
-
 
     @Query("update AppInfo set isExcluded = :isExcluded, isInternetAllowed = 1, whiteListUniv1 = 0 ")
     fun updateExcludedForAllApp(isExcluded: Boolean)
 
     @Query("update AppInfo set isExcluded = :isExcluded, isInternetAllowed = 1, whiteListUniv1 = 0 where appCategory = :category ")
     fun updateExcludedForCategories(category: String, isExcluded: Boolean)
-
 
     @Query("update AppInfo set isExcluded = :isExcluded, isInternetAllowed = 1, whiteListUniv1 = 0 where uid = :uid")
     fun updateExcludedList(uid: Int, isExcluded: Boolean)
@@ -141,9 +127,6 @@ interface AppInfoDAO {
 
     @Query("select count(*) from AppInfo where isInternetAllowed = 0")
     fun getBlockedAppCount() : LiveData<Int>
-
-   /* @Query("select count(*) from AppInfo where whiteListUniv1 = 1")
-    fun getWhitelistCountLiveData() : LiveData<Int>*/
 
     @Query("select count(*) from AppInfo where whiteListUniv1 = 1 and appCategory = :categoryName")
     fun getWhitelistCount(categoryName : String): Int

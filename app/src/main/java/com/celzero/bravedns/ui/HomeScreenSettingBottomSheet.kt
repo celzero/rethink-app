@@ -51,10 +51,10 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
         if (isDarkThemeOn()) {
             R.style.BottomSheetDialogTheme
         } else {
-            R.style.BottomSheetDialogTheme_white
+            R.style.BottomSheetDialogThemeWhite
         }
     } else if (persistentState.theme == 1) {
-        R.style.BottomSheetDialogTheme_white
+        R.style.BottomSheetDialogThemeWhite
     } else {
         R.style.BottomSheetDialogTheme
     }
@@ -187,7 +187,7 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
         }
         persistentState.setBraveMode(HomeScreenActivity.GlobalVariable.braveMode)
         HomeScreenActivity.GlobalVariable.braveModeToggler.postValue(HomeScreenActivity.GlobalVariable.braveMode)
-        if (VpnController.getInstance()!!.getState(requireContext())!!.activationRequested) {
+        if (VpnController.getInstance().getState().activationRequested) {
             updateBraveModeUI()
         }
     }

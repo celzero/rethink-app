@@ -48,9 +48,9 @@ class AppDownloadManager(private val persistentState: PersistentState, private v
      * Takes care of number of files need to be downloaded for the remote blocklist.
      * For remote blocklist, we require only filetag.json file.
      */
-    private fun downloadRemoteBlocklist() {
+    /*private fun downloadRemoteBlocklist() {
 
-    }
+    }*/
 
     /**
      * Responsible for downloading the local blocklist files.
@@ -112,17 +112,17 @@ class AppDownloadManager(private val persistentState: PersistentState, private v
      * Updates the values for the local download.
      * The observers in the UI will reflect the download status.
      */
-    private fun updateLocalUIValues(isDownloadSuccess: Boolean) {
+    /*private fun updateLocalUIValues(isDownloadSuccess: Boolean) {
 
-    }
+    }*/
 
     /**
      * Updates the values for the Remote download.
      * The observers in the UI will reflect the download status.
      */
-    private fun updateRemoteUIValues(isDownloadSuccess: Boolean) {
+    /*private fun updateRemoteUIValues(isDownloadSuccess: Boolean) {
 
-    }
+    }*/
 
     /**
      * Init for downloads.
@@ -131,7 +131,6 @@ class AppDownloadManager(private val persistentState: PersistentState, private v
      */
     private fun initDownload(context: Context) {
         downloadReference.clear()
-        //timeOutForDownload()
         DownloadHelper.deleteOldFiles(context)
         persistentState.downloadIDs = emptySet()
     }

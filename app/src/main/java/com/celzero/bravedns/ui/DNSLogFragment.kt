@@ -113,11 +113,11 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
             b.totalQueriesTxt.text  = getString(R.string.dns_logs_lifetime_queries, lifeTimeConversion)
         })
 
-        HomeScreenActivity.GlobalVariable.blockedCount.observe(viewLifecycleOwner, {
+        persistentState.blockedCount.observe(viewLifecycleOwner, {
             val blocked = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT).format(HomeScreenActivity.GlobalVariable.blockedCount.value)
+                CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT).format(persistentState.blockedCount.value)
             } else {
-                HomeScreenActivity.GlobalVariable.blockedCount.value.toString()
+                persistentState.blockedCount.value.toString()
             }
 
             b.latencyTxt.text = getString(R.string.dns_logs_blocked_queries, blocked)

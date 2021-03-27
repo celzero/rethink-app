@@ -25,12 +25,13 @@ import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
 import com.celzero.bravedns.ui.HomeScreenActivity
+import org.koin.core.component.KoinApiExtension
 
 @RequiresApi(api = Build.VERSION_CODES.N)
 class BraveTileService : TileService() {
 
     override fun onStartListening() {
-        val vpnState: VpnState = VpnController.getInstance()!!.getState(this)!!
+        val vpnState: VpnState = VpnController.getInstance().getState()
 
         //Fix detected null pointer exception. Intra #415
         val tile = if(qsTile == null){
@@ -49,14 +50,14 @@ class BraveTileService : TileService() {
     }
 
     override fun onClick() {
-        val vpnState: VpnState = VpnController.getInstance()!!.getState(this)!!
+        val vpnState: VpnState = VpnController.getInstance().getState()
 
         if (vpnState.activationRequested) {
-            VpnController.getInstance()!!.stop(this)
+            VpnController.getInstance().stop(this)
         } else {
             if (VpnService.prepare(this) == null) {
                 // Start VPN service when VPN permission has been granted.
-                VpnController.getInstance()!!.start(this)
+                VpnController.getInstance().start(this)
             } else {
                 // Open Main activity when VPN permission has not been granted.
                 val intent = Intent(this, HomeScreenActivity::class.java)

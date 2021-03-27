@@ -84,11 +84,8 @@ class UniversalAppListAdapter(private val context: Context, private val appInfoR
             b.univWhitelistCheckbox.isChecked = appInfo.whiteListUniv1
             try {
                 Glide.with(context).load(context.packageManager.getApplicationIcon(appInfo.packageInfo)).into(b.univWhitelistApkIconIv)
-                //val icon = context.packageManager.getApplicationIcon(appInfo.packageInfo)
-                //appIcon.setImageDrawable(icon)
             } catch (e: Exception) {
                 Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.univWhitelistApkIconIv)
-                //appIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
                 Log.e(LOG_TAG, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message, e)
             }
 
@@ -96,14 +93,6 @@ class UniversalAppListAdapter(private val context: Context, private val appInfoR
                 if (DEBUG) Log.d(LOG_TAG, "parentView- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
                 appInfo.whiteListUniv1 = !appInfo.whiteListUniv1
                 modifyWhiteListApps(appInfo)
-                /*object : CountDownTimer(1000, 500) {
-                    override fun onTick(millisUntilFinished: Long) {
-                    }
-                    override fun onFinish() {
-
-                    }
-                }.start()*/
-
             }
 
             b.univWhitelistCheckbox.setOnCheckedChangeListener(null)
@@ -119,11 +108,10 @@ class UniversalAppListAdapter(private val context: Context, private val appInfoR
             appWhiteList[appInfo.uid] = status
             val appUIDList = appInfoRepository.getAppListForUID(appInfo.uid)
 
-            var blockAllApps = false
-            if (appUIDList.size > 1) {
-                blockAllApps = showDialog(appUIDList, appInfo.appName, status)
+            val blockAllApps = if (appUIDList.size > 1) {
+                showDialog(appUIDList, appInfo.appName, status)
             }else{
-                blockAllApps = true
+                true
             }
             if (blockAllApps) {
                 b.univWhitelistCheckbox.isChecked = status
@@ -135,7 +123,7 @@ class UniversalAppListAdapter(private val context: Context, private val appInfoR
                             FirewallManager.updateAppInternetPermission(it.packageInfo, status)
                             FirewallManager.updateAppInternetPermissionByUID(it.uid, status)
                         }
-                        appInfoRepository.updateInternetForuid(appInfo.uid, status)
+                        appInfoRepository.updateInternetForUID(appInfo.uid, status)
                     }
                     appInfoRepository.updateWhiteList(appInfo.uid, status)
                     val countBlocked = appInfoRepository.getBlockedCountForCategory(appInfo.appCategory)
@@ -152,7 +140,7 @@ class UniversalAppListAdapter(private val context: Context, private val appInfoR
         private fun showDialog(packageList: List<AppInfo>, appName: String, isInternet: Boolean): Boolean {
             //Change the handler logic into some other
             val handler: Handler = ThrowingHandler()
-            var positiveTxt = ""
+            val positiveTxt: String
             val packageNameList: List<String> = packageList.map { it.appName }
             var proceedBlocking = false
 

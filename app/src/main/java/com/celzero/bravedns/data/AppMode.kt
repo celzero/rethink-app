@@ -64,10 +64,10 @@ class AppMode internal constructor(
     }
 
     fun getFirewallMode(): Long {
-        if (appFirewallMode == -1L) {
-            return persistentState.firewallMode.toLong()
+        return if (appFirewallMode == -1L) {
+            persistentState.firewallMode.toLong()
         } else {
-            return appFirewallMode
+            appFirewallMode
         }
     }
 
@@ -80,6 +80,7 @@ class AppMode internal constructor(
         if (appProxyMode == -1L) {
             return persistentState.proxyMode
         }
+        Log.d(LOG_TAG, "proxy mode - $appProxyMode")
         return appProxyMode
     }
 
@@ -101,26 +102,28 @@ class AppMode internal constructor(
 
     private fun getProxyModeSettings(): Long {
         val dnsProxy = dnsProxyEndpointRepository.getConnectedProxy()
-        appDNSMode = if (dnsProxy.proxyType == proxyTypeInternal) {
-            Settings.DNSModeProxyPort
-        } else if (dnsProxy.proxyType == proxyTypeExternal) {
-            Settings.DNSModeProxyIP
-        } else {
-            Settings.DNSModeProxyPort
+        appDNSMode = when (dnsProxy.proxyType) {
+            proxyTypeInternal -> {
+                Settings.DNSModeProxyPort
+            }
+            proxyTypeExternal -> {
+                Settings.DNSModeProxyIP
+            }
+            else -> {
+                Settings.DNSModeProxyPort
+            }
         }
         return appDNSMode
     }
 
-    fun getDOHDetails(): DoHEndpoint {
-        val dohEndpoint = doHEndpointRepository.getConnectedDoH()
-        if (dohEndpoint != null) {
-            if (dohEndpoint.dohURL.isEmpty()) {
-                if (HomeScreenActivity.GlobalVariable.DEBUG) {
-                    Log.i(LOG_TAG, "getDOHDetails -appMode- DoH endpoint is null")
-                }
-            }else{
-                if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "getDOHDetails -appMode- DoH endpoint - ${dohEndpoint.dohURL}")
+    fun getDOHDetails(): DoHEndpoint? {
+        val dohEndpoint : DoHEndpoint = doHEndpointRepository.getConnectedDoH() ?: return null
+        if (dohEndpoint.dohURL.isEmpty()) {
+            if (DEBUG) {
+                Log.i(LOG_TAG, "getDOHDetails -appMode- DoH endpoint is null")
             }
+        }else{
+            if (DEBUG) Log.d(LOG_TAG, "getDOHDetails -appMode- DoH endpoint - ${dohEndpoint.dohURL}")
         }
         return dohEndpoint
     }
@@ -182,7 +185,6 @@ class AppMode internal constructor(
 
     private fun constructRelayString(relay: List<DNSCryptRelayEndpoint>): String {
         var relayString = ""
-        val i = 1
         return if (relay.isEmpty()) {
             relayString
         } else {
@@ -203,9 +205,9 @@ class AppMode internal constructor(
         this.braveDNS = braveDNS
     }
 
-    fun getBraveDNS(): BraveDNS?{
+    fun getBraveDNS(): BraveDNS? {
         if(braveDNS == null && persistentState.localBlocklistEnabled
-            && persistentState.blockListFilesDownloaded && !persistentState.getLocalBlockListStamp().isNullOrEmpty()){
+            && persistentState.blockListFilesDownloaded && persistentState.getLocalBlockListStamp().isNotEmpty()){
             val path: String = context.filesDir.canonicalPath +"/"+ persistentState.localBlockListDownloadTime
             if (DEBUG) Log.d(LOG_TAG, "Local brave dns set call from AppMode path newBraveDNSLocal :$path")
             braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
