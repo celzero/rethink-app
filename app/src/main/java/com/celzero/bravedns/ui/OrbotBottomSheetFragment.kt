@@ -17,16 +17,16 @@ package com.celzero.bravedns.ui
 
 import android.app.Dialog
 import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Configuration
+import android.content.res.Resources
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.text.Html
 import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,6 +36,7 @@ import android.view.animation.Animation
 import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.text.HtmlCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.animation.Rotate3dAnimation
 import com.celzero.bravedns.databinding.BottomSheetOrbotBinding
@@ -56,12 +57,13 @@ import org.koin.android.ext.android.inject
  * Bottom sheet dialog fragment will be shown in SettingsFragment.kt.
  * The fragment will prompt for the One touch Integration with Orbot app.
  */
-class OrbotBottomSheetFragment(private val contextVal: Context) : BottomSheetDialogFragment() {
+class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
     private var _binding: BottomSheetOrbotBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val b get() = _binding!!
+
 
     private val persistentState by inject<PersistentState>()
 
@@ -75,6 +77,7 @@ class OrbotBottomSheetFragment(private val contextVal: Context) : BottomSheetDia
         _binding = null
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -84,10 +87,10 @@ class OrbotBottomSheetFragment(private val contextVal: Context) : BottomSheetDia
         if (isDarkThemeOn()) {
             R.style.BottomSheetDialogTheme
         } else {
-            R.style.BottomSheetDialogTheme_white
+            R.style.BottomSheetDialogThemeWhite
         }
     } else if (persistentState.theme == 1) {
-        R.style.BottomSheetDialogTheme_white
+        R.style.BottomSheetDialogThemeWhite
     } else {
         R.style.BottomSheetDialogTheme
     }
@@ -95,18 +98,12 @@ class OrbotBottomSheetFragment(private val contextVal: Context) : BottomSheetDia
     private fun isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
-    //R.style.BottomSheetDialogTheme
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
         initClickListeners()
     }
-
-    private fun Context.isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-    }
-
 
     private fun initView() {
         updateUI()
@@ -126,14 +123,6 @@ class OrbotBottomSheetFragment(private val contextVal: Context) : BottomSheetDia
             openOrbotApp()
         }
 
-        /*b.bsOrbotRadioNone.setOnCheckedChangeListener{ compoundButton: CompoundButton, isSelected: Boolean ->
-            if(isSelected){
-                persistentState.orbotMode = Constants.ORBAT_MODE_NONE
-                persistentState.orbotConnectionStatus.postValue(false)
-                disableOrbot()
-                showOrbotStopDialog()
-            }
-        }*/
         b.bsOrbotRadioNone.setOnCheckedChangeListener(null)
         b.bsOrbotRadioNone.setOnClickListener{
             if (b.bsOrbotRadioNone.isChecked) {
@@ -292,16 +281,29 @@ class OrbotBottomSheetFragment(private val contextVal: Context) : BottomSheetDia
 
     /**
      * Circular animation for the Orbot Icon.
-     * The value is 82 is hardcoded for the Icon width.
      */
     private fun animateOrbotIcon() {
-        val width = b.orbotIcon.measuredWidth
+        // In some cases, the width of orbotIcon is 0 - For both width and measuredWidth.
+        // Convert the width(40dp) to pixel and add to animation parameter in case of 0
+        var width = b.orbotIcon.measuredWidth
+        if(width == 0){
+            width = getCalculatedWidth()
+        }
         val rotation = Rotate3dAnimation(0.0f, 360.0f * 4f, width / 2f, width / 2f, 20f, true)
         rotation.fillAfter = true
         rotation.interpolator = AccelerateInterpolator()
         rotation.duration = 2.toLong() * 1000
         rotation.repeatCount = Animation.INFINITE
         b.orbotIcon.startAnimation(rotation)
+    }
+
+    // ref: https://stackoverflow.com/questions/4605527/converting-pixels-to-dp
+    // Calculate the width of the icon manually.
+    // Invoke this method when the width of the Orbot icon is returned as 0 by viewBinder.
+    private fun getCalculatedWidth() : Int {
+        val dip = 40f
+        val r: Resources = resources
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, r.displayMetrics).toInt()
     }
 
     private fun disableLoading(){
@@ -367,7 +369,7 @@ class OrbotBottomSheetFragment(private val contextVal: Context) : BottomSheetDia
     private fun openOrbotApp() {
         val packageName =  OrbotHelper.ORBOT_PACKAGE_NAME
         try {
-            val launchIntent: Intent? = contextVal.packageManager.getLaunchIntentForPackage(packageName)
+            val launchIntent: Intent? = requireActivity().packageManager.getLaunchIntentForPackage(packageName)
             if (launchIntent != null) {//null pointer check in case package name was not found
                 startActivity(launchIntent)
             }else{
@@ -386,13 +388,11 @@ class OrbotBottomSheetFragment(private val contextVal: Context) : BottomSheetDia
      */
     private fun startOrbot() {
         if ( get<OrbotHelper>().isOrbotInstalled()) {
-            if (VpnController.getInstance() != null) {
-                val vpnService = VpnController.getInstance().getBraveVpnService()
-                if (vpnService != null) {
-                    get<OrbotHelper>().startOrbot(vpnService)
-                } else {
-                    Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_vpn_disabled_error), Toast.LENGTH_LONG)
-                }
+            val vpnService = VpnController.getInstance().getBraveVpnService()
+            if (vpnService != null) {
+                get<OrbotHelper>().startOrbot(vpnService)
+            } else {
+                Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_vpn_disabled_error), Toast.LENGTH_LONG)
             }
         }
     }
@@ -410,7 +410,7 @@ class OrbotBottomSheetFragment(private val contextVal: Context) : BottomSheetDia
         }
         builder.setNegativeButton(getString(R.string.orbot_stop_dialog_negative)) { dialogInterface: DialogInterface, _: Int ->
             dialogInterface.dismiss()
-            val launchIntent: Intent? = contextVal.packageManager.getLaunchIntentForPackage(OrbotHelper.ORBOT_PACKAGE_NAME)
+            val launchIntent: Intent? = requireActivity().packageManager.getLaunchIntentForPackage(OrbotHelper.ORBOT_PACKAGE_NAME)
             if (launchIntent != null) {//null pointer check in case package name was not found
                 Log.d(LOG_TAG, "launchIntent: ${OrbotHelper.ORBOT_PACKAGE_NAME}")
                 startActivity(launchIntent)
@@ -435,7 +435,7 @@ class OrbotBottomSheetFragment(private val contextVal: Context) : BottomSheetDia
 
         var text = getString(R.string.orbot_explanation)
         text = text.replace("\n", "<br /><br />")
-        val styledText = Html.fromHtml(text)
+        val styledText = HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
         descText.text = styledText
         titleText.text = getString(R.string.orbot_title)
         titleText.setCompoundDrawablesRelative(null, null, null, null)
