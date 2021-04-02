@@ -42,14 +42,16 @@ class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
     override fun onCreate(savedInstanceState: Bundle?) {
         if (persistentState.theme == 0) {
             if (isDarkThemeOn()) {
-                setTheme(R.style.AppTheme)
+                setTheme(R.style.AppThemeTrueBlack)
             } else {
-                setTheme(R.style.AppTheme_white)
+                setTheme(R.style.AppThemeWhite)
             }
         } else if (persistentState.theme == 1) {
-            setTheme(R.style.AppTheme_white)
-        } else {
+            setTheme(R.style.AppThemeWhite)
+        } else if (persistentState.theme == 2) {
             setTheme(R.style.AppTheme)
+        } else {
+            setTheme(R.style.AppThemeTrueBlack)
         }
         super.onCreate(savedInstanceState)
         screenToLoad = intent.getIntExtra(Constants.SCREEN_TO_LOAD,0)
@@ -92,6 +94,4 @@ class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
             if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "onActivityResult - Stamp : $stamp")
         }
     }
-
-
 }

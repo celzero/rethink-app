@@ -251,7 +251,7 @@ class DoHEndpointAdapter(private val context: Context,
         private fun updateDoHDetails(doHEndpoint: DoHEndpoint) {
             doHEndpoint.isSelected = true
             doHEndpointRepository.removeConnectionStatus()
-            object : CountDownTimer(1000, 500) {
+            object : CountDownTimer(1000, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
                 }
 

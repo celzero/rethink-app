@@ -96,7 +96,7 @@ class WhitelistAppDialog(private var activity: Context,
             } else {
                 Utilities.showToastInMidLayout(activity, act.getString(R.string.whitelist_toast_negative), Toast.LENGTH_SHORT)
             }
-            object : CountDownTimer(100, 500) {
+            object : CountDownTimer(500, 500) {
                 override fun onTick(millisUntilFinished: Long) {
                 }
 
@@ -127,6 +127,7 @@ class WhitelistAppDialog(private var activity: Context,
                 categoryInfoRepository.updateWhitelistForCategory(it, checked)
                 val countBlocked = appInfoRepository.getBlockedCountForCategory(it)
                 categoryInfoRepository.updateBlockedCount(it, countBlocked)
+                if(DEBUG) Log.d(LOG_TAG, "Update whitelist count: $update")
             }
 
         }
