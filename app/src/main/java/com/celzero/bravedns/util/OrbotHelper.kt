@@ -32,7 +32,7 @@ import androidx.core.net.toUri
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.database.ProxyEndpointRepository
-import com.celzero.bravedns.receiver.OrbotNotificationReceiver
+import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
@@ -81,7 +81,7 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
 
         private const val orbot = "ORBOT"
 
-        const val ORBOT_NOTIFICATION_ACTION = "OPEN_ORBOT"
+        //const val ORBOT_NOTIFICATION_ACTION = "OPEN_ORBOT"
         const val ORBOT_NOTIFICATION_ACTION_TEXT = "OPEN_ORBOT_INTENT"
 
         //https://github.com/guardianproject/orbot/blob/master/orbotservice/src/main/java/org/torproject/android/service/TorServiceConstants.java
@@ -287,8 +287,8 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
     }
 
     private fun getOrbotOpenIntent(context: Context): PendingIntent? {
-        val intentAction = Intent(context, OrbotNotificationReceiver::class.java)
-        intentAction.putExtra(ORBOT_NOTIFICATION_ACTION, ORBOT_NOTIFICATION_ACTION_TEXT)
+        val intentAction = Intent(context, NotificationActionReceiver::class.java)
+        intentAction.putExtra(Constants.NOTIFICATION_ACTION, ORBOT_NOTIFICATION_ACTION_TEXT)
         return PendingIntent.getBroadcast(context, 1, intentAction, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 

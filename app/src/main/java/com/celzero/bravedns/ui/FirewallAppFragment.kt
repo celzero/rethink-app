@@ -73,6 +73,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
 
         b.firewallExpandableList.setOnGroupExpandListener {}
         b.firewallUpdateProgress.visibility = View.VISIBLE
+        b.firewallAppRefreshList.isEnabled = true
 
         b.firewallCategorySearch.setOnQueryTextListener(this)
 
@@ -91,12 +92,14 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
         b.firewallAppRefreshList.setOnClickListener {
             b.firewallAppRefreshList.isEnabled = false
             refreshDatabase()
-            object : CountDownTimer(1000, 4000) {
+            object : CountDownTimer(4000, 4000) {
                 override fun onTick(millisUntilFinished: Long) {
                 }
 
                 override fun onFinish() {
-                    b.firewallAppRefreshList.isEnabled = true
+                    if (isAdded) {
+                        b.firewallAppRefreshList.isEnabled = true
+                    }
                 }
             }.start()
         }
@@ -112,7 +115,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
     private fun refreshDatabase() {
         b.firewallAppRefreshList.animation = animation
         b.firewallAppRefreshList.startAnimation(animation)
-        object : CountDownTimer(4000, 500) {
+        object : CountDownTimer(4000, 4000) {
             override fun onTick(millisUntilFinished: Long) {}
 
             override fun onFinish() {
@@ -124,11 +127,11 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
         }.start()
 
         refreshDatabase.refreshAppInfoDatabase()
-        refreshDatabase.updateCategoryInDB()
+        //refreshDatabase.updateCategoryInDB()
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        object : CountDownTimer(500, 1000) {
+        object : CountDownTimer(1000, 1000) {
             override fun onTick(millisUntilFinished: Long) {}
 
             override fun onFinish() {
@@ -159,7 +162,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
     }
 
     override fun onQueryTextChange(query: String?): Boolean {
-            object : CountDownTimer(500, 1000) {
+            object : CountDownTimer(1000, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
                 }
 
