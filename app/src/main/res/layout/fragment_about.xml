@@ -73,10 +73,9 @@
         </LinearLayout>
 
 
-        <LinearLayout
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/background"
             android:orientation="vertical"
             android:padding="5dp">
 
@@ -85,6 +84,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
+                android:elevation="10dp"
                 android:gravity="center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:paddingLeft="20dp"
@@ -105,14 +105,13 @@
                 android:text="@string/about_bravedns_whoarewe"
                 android:textSize="@dimen/large_font_text_view" />
 
-        </LinearLayout>
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:background="?attr/background"
             android:orientation="vertical"
             android:padding="5dp">
 
@@ -125,14 +124,14 @@
                 android:layout_gravity="center"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="5dp"
-                android:background="@drawable/rounded_corners_button_primary"
+                android:background="@drawable/rounded_corners_button_accent"
                 android:drawableStart="@drawable/ic_telegram"
                 android:drawablePadding="10dp"
                 android:gravity="center"
                 android:lineSpacingExtra="5dp"
-                android:textColor="?attr/invertedPrimaryTextColor"
                 android:padding="10dp"
                 android:text="@string/about_join_telegram"
+                android:textColor="?attr/accentGood"
                 android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -148,11 +147,10 @@
 
         </LinearLayout>
 
-        <LinearLayout
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:background="?attr/background"
             android:orientation="vertical"
             android:paddingTop="10dp"
             android:paddingBottom="15dp">
@@ -162,14 +160,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="54dp"
-                android:gravity="center_vertical"
                 android:fontFamily="sans-serif-smallcaps"
+                android:gravity="center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
-                android:textStyle="bold"
                 android:text="@string/about_app"
                 android:textColor="?attr/accentGood"
-                android:textSize="@dimen/extra_large_font_text_view" />
+                android:textSize="@dimen/extra_large_font_text_view"
+                android:textStyle="bold" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_whats_new"
@@ -200,13 +198,12 @@
                 android:textSize="@dimen/large_font_text_view" />
 
 
-        </LinearLayout>
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:background="?attr/background"
             android:orientation="vertical"
             android:paddingTop="10dp"
             android:paddingBottom="15dp">
@@ -216,14 +213,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="54dp"
+                android:fontFamily="sans-serif-smallcaps"
                 android:gravity="center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:fontFamily="sans-serif-smallcaps"
                 android:padding="5dp"
-                android:textStyle="bold"
                 android:text="@string/about_web"
                 android:textColor="?attr/accentGood"
-                android:textSize="@dimen/extra_large_font_text_view" />
+                android:textSize="@dimen/extra_large_font_text_view"
+                android:textStyle="bold" />
 
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -279,7 +276,7 @@
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
-                android:text="@string/about_blog"
+                android:text="@string/about_docs"
                 android:textSize="@dimen/large_font_text_view" />
 
         </LinearLayout>
@@ -288,7 +285,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:background="?attr/background"
             android:orientation="vertical"
             android:paddingTop="10dp"
             android:paddingBottom="10dp">
@@ -298,14 +294,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="54dp"
+                android:fontFamily="sans-serif-smallcaps"
                 android:gravity="center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
-                android:fontFamily="sans-serif-smallcaps"
                 android:text="@string/about_connect"
-                android:textStyle="bold"
                 android:textColor="?attr/accentGood"
-                android:textSize="@dimen/extra_large_font_text_view" />
+                android:textSize="@dimen/extra_large_font_text_view"
+                android:textStyle="bold" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_mail"
@@ -334,6 +330,73 @@
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/about_twitter"
+                android:textSize="@dimen/large_font_text_view" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:orientation="vertical"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="54dp"
+                android:fontFamily="sans-serif-smallcaps"
+                android:gravity="center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/about_settings"
+                android:textColor="?attr/accentGood"
+                android:textSize="@dimen/extra_large_font_text_view"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_app_info"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:drawableStart="@drawable/ic_about_settings"
+                android:drawablePadding="20dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/about_settings_app_info"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_vpn_profile"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:drawableStart="@drawable/ic_about_key"
+                android:drawablePadding="20dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/about_settings_vpn_profile"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_app_notification"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:drawableStart="@drawable/ic_about_notifications"
+                android:drawablePadding="20dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/about_settings_notification"
                 android:textSize="@dimen/large_font_text_view" />
 
 

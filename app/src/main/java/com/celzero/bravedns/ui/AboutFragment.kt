@@ -15,12 +15,19 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui
 
+import android.content.ActivityNotFoundException
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
+import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
@@ -31,6 +38,7 @@ import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentAboutBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Utilities
 import org.koin.android.ext.android.inject
 
 
@@ -59,6 +67,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         b.mozillaImg.setOnClickListener(this)
         b.aboutAppUpdate.setOnClickListener(this)
         b.aboutWhatsNew.setOnClickListener(this)
+        b.aboutAppInfo.setOnClickListener(this)
+        b.aboutAppNotification.setOnClickListener(this)
+        b.aboutVpnProfile.setOnClickListener(this)
 
         try {
             val pInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
@@ -77,7 +88,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
                 startActivity(intent)
             }
             b.aboutBlog -> {
-                val intent = Intent(Intent.ACTION_VIEW, getString(R.string.about_blog_link).toUri())
+                val intent = Intent(Intent.ACTION_VIEW, getString(R.string.about_docs_link).toUri())
                 startActivity(intent)
             }
             b.aboutFaq -> {
@@ -106,11 +117,71 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
                 startActivity(intent)
             }
             b.aboutAppUpdate -> {
-                (requireContext() as HomeScreenActivity).checkForUpdate(true)
+                if (BuildConfig.FLAVOR == Constants.FLAVOR_FDROID) {
+                    showFdroidUpdateDialog()
+                }else {
+                    (requireContext() as HomeScreenActivity).checkForUpdate(true)
+                }
             }
             b.aboutWhatsNew -> {
                 showNewFeaturesDialog()
             }
+            b.aboutAppInfo -> {
+                openAppInfo()
+            }
+            b.aboutVpnProfile -> {
+                openVPNProfile()
+            }
+            b.aboutAppNotification -> {
+                openNotificationSettings()
+            }
+        }
+    }
+
+    private fun openAppInfo() {
+        val packageName = requireContext().packageName
+        try {
+            val intent = Intent(ACTION_APPLICATION_DETAILS_SETTINGS)
+            intent.data = Uri.fromParts("package", packageName, null)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Utilities.showToastInMidLayout(requireContext(), getString(R.string.app_info_error), Toast.LENGTH_SHORT)
+            Log.w(Constants.LOG_TAG, "Exception while opening app info: ${e.message}", e)
+        }
+    }
+
+    private fun openVPNProfile(){
+        try {
+            val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                Intent(Settings.ACTION_VPN_SETTINGS)
+            } else {
+                Intent("android.net.vpn.SETTINGS")
+            }
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Utilities.showToastInMidLayout(requireContext(), getString(R.string.vpn_profile_error), Toast.LENGTH_SHORT)
+            Log.w(Constants.LOG_TAG, "Exception while opening app info: ${e.message}", e)
+        }
+    }
+
+    private fun openNotificationSettings(){
+        val packageName = requireContext().packageName
+        try {
+            val intent = Intent()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                intent.action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
+                intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+            } else {
+                intent.action = ACTION_APPLICATION_DETAILS_SETTINGS
+                intent.addCategory(Intent.CATEGORY_DEFAULT)
+                intent.data = Uri.parse("package:$packageName")
+            }
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Utilities.showToastInMidLayout(requireContext(), getString(R.string.vpn_profile_error), Toast.LENGTH_SHORT)
+            Log.w(Constants.LOG_TAG, "Exception while opening app info: ${e.message}", e)
         }
     }
 
@@ -127,7 +198,23 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
                 startActivity(intent)
             }
             .setCancelable(true).create().show()
+    }
 
+    private fun showFdroidUpdateDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        //set title for alert dialog
+        builder.setTitle(R.string.fdroid_update_title)
+        //set message for alert dialog
+        builder.setMessage(R.string.fdroid_update_message)
+        builder.setCancelable(true)
+        builder.setPositiveButton(getString(R.string.fdroid_positive_button)) { dialogInterface, _ ->
+            dialogInterface.dismiss()
+        }
+        // Create the AlertDialog
+        val alertDialog: AlertDialog = builder.create()
+        // Set other dialog properties
+        alertDialog.setCancelable(true)
+        alertDialog.show()
     }
 
 }
