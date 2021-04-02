@@ -2,7 +2,7 @@
 <resources>
     <color name="rippleColor">#006f67</color>
 
-    <color name="accent_good">#05dfd7</color>
+    <color name="accent_good">#18ffff</color>
     <color name="accent_bad">#ff4081</color>
     <color name="light">#393939</color>
     <color name="indicator">#deffffff</color>
@@ -11,20 +11,24 @@
     <color name="button_background_end">#006f67</color>
     <color name="button_background_tint">#004E4B</color>
 
-    <color name="colorPrimary">#393939</color>
+    <color name="colorPrimary">#636363</color>
     <color name="colorPrimaryDark">#444444</color>
     <color name="childListColor">#2d2c2c</color>
+    <color name="background">#393939</color>
     <color name="lightColorPrimary">#C5CAE9</color>
     <color name="positive">#05dfd7</color>
     <color name="negative">#DF3520</color>
     <color name="neutral">#959595</color>
     <color name="black">#2F2F2F</color>
     <color name="recycler_selected">#6E7069</color>
+    <color name="navBarBackground">#2d2c2c</color>
+    <color name="buttonBackground">#006f67</color>
 
     <color name="stroke_color">#FFFFFF</color>
     <color name="fill_color">#00000000</color>
 
     <color name="border_color">#757474</color>
+    <color name="dimColor">#6b6b6b</color>
 
     <color name="primaryText">#FDFDFD</color>
     <color name="secondaryText">#05dfd7</color>
@@ -32,7 +36,7 @@
     <color name="white">#FFFFFF</color>
 
     <color name="borderColor">#444444</color>
-    <color name="borderblack">#2B2A2A</color>
+    <color name="borderBlack">#2B2A2A</color>
 
     <color name="textColorMain">#BDBDBD</color>
     <color name="blue_background">#405de6</color>
@@ -80,21 +84,39 @@
     <!-- Light theme -->
     <color name="colorPrimary_white">#FFFFFF</color>
     <color name="colorPrimaryDark_white">#1e88e5</color>
+    <color name="colorFloating_white">#efefef</color>
     <color name="childListColor_white">#ececec</color>
     <color name="lightColorPrimary_white">#005cb2</color>
     <color name="positive_white">#FFFFFF</color>
     <color name="negative_white">#005cb2</color>
+    <color name="accent_white">#ff4081</color>
     <color name="accent_bad_white">#ff1744</color>
     <color name="accent_good_white">#fafafa</color>
     <color name="neutral_white">#1B1B1E</color>
     <color name="black_white">#000000</color>
     <color name="recycler_selected_white">#e1e1e1</color>
-    <color name="background_dark_white">#e0e0e0</color>
+    <color name="background_dark_white">#ececec</color>
     <color name="stroke_color_white">#000000</color>
     <color name="fill_color_white">#00000000</color>
     <color name="main_button_disabled">#757575</color>
     <color name="border_white">#eeeeee</color>
     <color name="textColorMain_white">#424242</color>
     <color name="whitelist">#9cff57</color>
+    <color name="navBarBackgroundWhite">#FFFFFF</color>
+    <color name="buttonBackgroundWhite">#1e88e5</color>
+
+    <!-- Black theme latest colors -->
+    <color name="colorBackgroundBlack">#121212</color>
+    <color name="colorBackgroundTintBlack">#383838</color>
+    <color name="colorPrimaryBlackTheme">#000000</color>
+    <color name="colorAccentBlackTheme">#4fc3f7</color>
+    <color name="colorPrimaryBlack">#383838</color>
+    <color name="accentGoodBlack">#4fc3f7</color>
+    <color name="accentBadBlack">#ff4081</color>
+    <color name="neutralBlack">#959595</color>
+    <color name="negativeBlack">#DF3520</color>
+    <color name="navBarBackgroundBlack">#000000</color>
+    <color name="buttonBackgroundBlack">#4fc3f7</color>
+    <color name="dividerBlack">#000000</color>
 
 </resources>

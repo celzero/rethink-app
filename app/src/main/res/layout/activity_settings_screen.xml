@@ -62,7 +62,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:gravity="center"
-                        android:text="@string/settings_title_desc"
+                        android:text="@string/about_title_desc"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/sub_heading_small"
                         android:visibility="visible" />
@@ -71,59 +71,6 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="15dp"
-            android:visibility="gone"
-            android:weightSum="1">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.33"
-                android:gravity="center"
-                android:orientation="vertical" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_weight="0.33"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/settings_app_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:padding="5dp"
-                    android:src="@drawable/conf_dns_icon_black" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.33"
-                android:orientation="vertical"
-                android:weightSum="1">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/settings_app_faq_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="end"
-                    android:drawableTop="@drawable/ic_faq"
-                    android:padding="5dp" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-
         <TextView
             android:id="@+id/settings_heading_dns"
             style="@style/TextAppearance.AppCompat.Subhead"
@@ -131,6 +78,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:fontFamily="sans-serif-smallcaps"
+            android:lineSpacingExtra="5dp"
             android:padding="10dp"
             android:text="@string/settings_dns_header"
             android:textColor="?attr/accentGood"
@@ -141,8 +89,8 @@
             android:id="@+id/settings_activity_on_device_block_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/background"
             android:paddingStart="20dp"
+
             android:paddingTop="15dp"
             android:paddingEnd="10dp"
             android:paddingBottom="15dp">
@@ -228,7 +176,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_marginEnd="10dp"
                 android:gravity="center"
-                android:text="@string/settings_local_blocklist_check_time"
+                android:text="@string/settings_local_blocklist_version"
                 android:textSize="@dimen/default_font_text_view" />
         </RelativeLayout>
 
@@ -239,6 +187,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:fontFamily="sans-serif-smallcaps"
+            android:lineSpacingExtra="5dp"
             android:padding="10dp"
             android:text="@string/settings_vpn_heading"
             android:textColor="?attr/accentGood"
@@ -250,7 +199,6 @@
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/background"
             android:drawablePadding="10dp"
             android:paddingStart="10dp"
             android:paddingTop="10dp"
@@ -265,7 +213,6 @@
             android:id="@+id/settings_activity_exclude_apps_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/background"
             android:paddingStart="20dp"
             android:paddingTop="15dp"
             android:paddingEnd="10dp"
@@ -319,7 +266,6 @@
             android:id="@+id/settings_activity_allow_bypass_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/background"
             android:paddingStart="20dp"
             android:paddingTop="15dp"
             android:paddingEnd="10dp"
@@ -373,7 +319,6 @@
             android:id="@+id/settings_activity_socks5_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/background"
             android:paddingStart="20dp"
             android:paddingTop="15dp"
             android:paddingEnd="10dp"
@@ -427,7 +372,6 @@
             android:id="@+id/settings_activity_http_proxy_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/background"
             android:paddingStart="20dp"
             android:paddingTop="15dp"
             android:paddingEnd="10dp"
@@ -485,7 +429,6 @@
             android:id="@+id/settings_activity_orbot_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/background"
             android:paddingStart="20dp"
             android:paddingTop="15dp"
             android:paddingEnd="10dp"
@@ -537,6 +480,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:fontFamily="sans-serif-smallcaps"
+            android:lineSpacingExtra="5dp"
             android:padding="10dp"
             android:text="@string/settings_general_header"
             android:textColor="?attr/accentGood"
@@ -547,7 +491,6 @@
             android:id="@+id/settings_activity_enable_logs_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/background"
             android:paddingStart="20dp"
             android:paddingTop="15dp"
             android:paddingEnd="10dp"
@@ -592,7 +535,6 @@
             android:id="@+id/settings_activity_theme_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/background"
             android:paddingStart="20dp"
             android:paddingTop="15dp"
             android:paddingEnd="10dp"
@@ -647,7 +589,6 @@
             android:id="@+id/settings_activity_check_update_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/background"
             android:paddingStart="20dp"
             android:paddingTop="15dp"
             android:paddingEnd="10dp"
@@ -702,7 +643,6 @@
             android:id="@+id/settings_activity_auto_start_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/background"
             android:paddingStart="20dp"
             android:paddingTop="15dp"
             android:paddingEnd="10dp"
@@ -749,6 +689,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:fontFamily="sans-serif-smallcaps"
+            android:lineSpacingExtra="5dp"
             android:padding="10dp"
             android:text="@string/settings_firewall_header"
             android:textColor="?attr/accentGood"
@@ -760,7 +701,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="80dp"
-            android:background="?attr/background"
             android:paddingStart="20dp"
             android:paddingTop="18dp"
             android:paddingEnd="10dp"

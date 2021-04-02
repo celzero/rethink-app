@@ -76,16 +76,5 @@
         android:text="@string/hybrid_mode_info_title"
         app:drawableStartCompat="@drawable/spinner_both" />
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/info_dialog_cancel_btn"
-        android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_gravity="end"
-        android:textSize="@dimen/large_font_text_view"
-        style="@style/TextAppearance.AppCompat.Widget.Button"
-        android:background="@drawable/button_background_ripple"
-        android:text="@string/hs_download_positive_default"/>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

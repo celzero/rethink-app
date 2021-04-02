@@ -204,7 +204,7 @@
             android:gravity="center"
             android:text="@string/settings_dns_proxy_dialog_negative_btn"
             android:textSize="@dimen/large_font_text_view"
-            android:textColor="?attr/accentBad" />
+            android:textColor="?attr/accentGood" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/dialog_proxy_apply_btn"
@@ -215,6 +215,6 @@
             android:layout_margin="5dp"
             android:gravity="center"
             android:text="@string/settings_dns_proxy_dialog_positive_btn"
-            android:textColor="?attr/accentBad" />
+            android:textColor="?attr/accentGood" />
     </LinearLayout>
 </LinearLayout>

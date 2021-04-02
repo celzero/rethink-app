@@ -37,7 +37,6 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="start"
                         android:dropDownWidth="match_parent"
-                        android:dropDownSelector="?attr/backgroundDark"
                         android:gravity="start"
                         android:spinnerMode="dropdown"
                         android:tooltipText="@string/cd_dns_type_spinner_tooltip" />
@@ -65,7 +64,6 @@
                         android:id="@+id/recycler_doh_connections"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="?attr/background"
                         android:clickable="true"
                         android:focusable="true"
                         android:nestedScrollingEnabled="true"
@@ -98,7 +96,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/recycler_dns_crypt_servers_title"                        android:clickable="true"
-                        android:background="?attr/background"
                         android:focusable="true"
                         android:nestedScrollingEnabled="true"
                         android:visibility="visible" />
@@ -126,7 +123,6 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/recycler_dns_crypt_relays_title"
                         android:clickable="true"
-                        android:background="?attr/background"
                         android:focusable="true"
                         android:nestedScrollingEnabled="true"
                         android:visibility="visible" />
@@ -140,23 +136,12 @@
                     android:layout_marginTop="10dp"
                     android:visibility="gone">
 
-                    <TextView
-                        android:id="@+id/recycler_dns_proxy_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="15dp"
-                        android:gravity="center"
-                        android:text="@string/dns_proxy_no_proxy"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/large_font_text_view" />
-
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recycler_dns_proxy_connections"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:clickable="true"
                         android:focusable="true"
-                        android:background="?attr/background"
                         android:nestedScrollingEnabled="true"
                         android:visibility="visible" />
                 </RelativeLayout>
@@ -177,7 +162,7 @@
         android:text="@string/cd_fab_add_button"
         android:textColor="@color/white"
         android:textSize="@dimen/default_font_text_view"
-        android:backgroundTint="?attr/mainButtonBackground"
+        android:backgroundTint="?attr/buttonBackground"
         app:fabSize="mini"
         app:icon="@drawable/ic_fab_without_border"
         app:iconTint="@color/white" />

@@ -105,7 +105,6 @@
                 android:id="@+id/recycler_query"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="?attr/backgroundDark"
                 android:nestedScrollingEnabled="true"
                 android:orientation="vertical" />
 

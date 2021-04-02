@@ -37,22 +37,22 @@ class FaqWebViewActivity : AppCompatActivity(R.layout.activity_faq_webview_layou
     @SuppressLint("SetJavaScriptEnabled") override fun onCreate(savedInstanceState: Bundle?) {
         if (persistentState.theme == 0) {
             if (isDarkThemeOn()) {
-                setTheme(R.style.AppTheme)
+                setTheme(R.style.AppThemeTrueBlack)
             } else {
-                setTheme(R.style.AppTheme_white)
+                setTheme(R.style.AppThemeWhite)
             }
         } else if (persistentState.theme == 1) {
-            setTheme(R.style.AppTheme_white)
-        } else {
+            setTheme(R.style.AppThemeWhite)
+        } else if (persistentState.theme == 2) {
             setTheme(R.style.AppTheme)
+        } else {
+            setTheme(R.style.AppThemeTrueBlack)
         }
         super.onCreate(savedInstanceState)
         b.configureWebview.settings.domStorageEnabled = true
         b.configureWebview.settings.allowContentAccess = true
         b.configureWebview.settings.allowFileAccess = true
         b.configureWebview.settings.javaScriptEnabled = true
-        b.configureWebview.settings.allowFileAccessFromFileURLs = true
-        b.configureWebview.settings.allowUniversalAccessFromFileURLs = true
         b.configureWebview.settings.setSupportZoom(true)
         b.configureWebview.webViewClient = WebViewClient()
         b.configureWebview.clearCache(true)

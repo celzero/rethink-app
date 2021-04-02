@@ -130,15 +130,5 @@
             android:text="@string/dns_mode_4_explanation"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/info_dialog_cancel_btn"
-            style="@style/TextAppearance.AppCompat.Widget.Button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/button_background_ripple"
-            android:textSize="@dimen/large_font_text_view"
-            android:visibility="gone" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

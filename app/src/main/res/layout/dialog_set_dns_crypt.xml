@@ -118,7 +118,7 @@
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/dialog_dns_crypt_ok_btn"
         style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-        android:textColor="?attr/accentBad"
+        android:textColor="?attr/accentGood"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -130,7 +130,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/dialog_dns_crypt_cancel_btn"
-        android:textColor="?attr/accentBad"
+        android:textColor="?attr/accentGood"
         style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

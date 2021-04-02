@@ -70,7 +70,6 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
-        android:layout_below="@id/dns_proxy_list_container"
-        android:background="?attr/backgroundDark" />
+        android:layout_below="@id/dns_proxy_list_container" />
 
 </RelativeLayout>

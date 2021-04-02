@@ -1,16 +1,15 @@
 <?xml version ="1.0" encoding ="utf-8"?><!--  Learn More about how to use App Actions: https://developer.android.com/guide/actions/index.html -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" >
    <stroke
-          android:width="1dp"
-          android:color="?attr/backgroundDark" />
+          android:width="0.75dp"
+          android:color="@color/recycler_selected" />
 
-   <solid android:color="?attr/backgroundDark" />
+   <solid android:color="?attr/background" />
 
    <padding
            android:left="1dp"
            android:right="1dp"
            android:bottom="1dp"
            android:top="1dp" />
-
    <corners android:radius="40dp" />
 </shape>

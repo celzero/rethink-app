@@ -28,8 +28,7 @@
         android:text="@string/bsct_app_info"
         android:textColor="?attr/accentGood"
         android:textSize="@dimen/large_font_text_view"
-        android:visibility="visible"
-        app:chipBackgroundColor="?attr/backgroundDark" />
+        android:visibility="visible" />
 
 
     <RelativeLayout

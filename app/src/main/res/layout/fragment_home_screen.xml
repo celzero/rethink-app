@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     android:orientation="vertical"
+    android:background="?attr/background"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     app:layout_scrollFlags="scroll|enterAlways">
 
@@ -94,12 +95,14 @@
                     android:id="@+id/fhs_card_dns_ll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
                     android:orientation="vertical">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:drawablePadding="10dp"
+                        android:background="@android:color/transparent"
                         android:padding="10dp"
                         android:text="@string/dns_mode_info_title"
                         android:textSize="@dimen/extra_large_font_text_view"
@@ -110,6 +113,7 @@
                     <TextView
                         android:id="@+id/fhs_card_dns_connected_dns"
                         android:layout_width="wrap_content"
+                        android:background="@android:color/transparent"
                         android:layout_height="wrap_content"
                         android:paddingStart="10dp"
                         android:paddingEnd="10dp"
@@ -124,6 +128,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingStart="10dp"
+                        android:background="@android:color/transparent"
                         android:paddingEnd="10dp"
                         android:layout_marginBottom="10dp"
                         android:paddingBottom="5dp"
@@ -132,13 +137,6 @@
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:textSize="@dimen/default_font_text_view" />
-
-
-                    <!--<View
-                        android:layout_width="match_parent"
-                        android:layout_height="0.5dp"
-                        android:layout_marginTop="10dp"
-                        android:background="@color/dividerColor" />-->
                     <LinearLayout
                         android:id="@+id/fhs_card_dns_configure_ll"
                         android:layout_width="match_parent"
@@ -156,7 +154,7 @@
                             android:padding="10dp"
                             android:text="@string/dns_card_configure_btn"
                             android:textAlignment="viewStart"
-                            android:textColor="?attr/secondaryTextColor"
+                            android:textColor="?attr/invertedPrimaryTextColor"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
@@ -175,6 +173,7 @@
                 <LinearLayout
                     android:id="@+id/fhs_card_firewall_ll"
                     android:layout_width="match_parent"
+                    android:background="@android:color/transparent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
@@ -184,6 +183,7 @@
                         android:drawablePadding="10dp"
                         android:padding="10dp"
                         android:text="@string/firewall_mode_info_title"
+                        android:background="@android:color/transparent"
                         android:textSize="@dimen/extra_large_font_text_view"
                         android:textColor="?attr/primaryDarkColorText"
                         app:drawableEndCompat="@drawable/firewall_home_screen" />
@@ -194,6 +194,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:paddingStart="10dp"
+                        android:background="@android:color/transparent"
                         android:paddingEnd="10dp"
                         android:maxLines="1"
                         android:ellipsize="end"
@@ -205,6 +206,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:textSize="@dimen/default_font_text_view"
+                        android:background="@android:color/transparent"
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:textColor="?attr/primaryDarkColorText"
@@ -231,7 +233,7 @@
                             android:drawablePadding="10dp"
                             android:padding="10dp"
                             android:textAlignment="viewStart"
-                            android:textColor="?attr/secondaryTextColor"
+                            android:textColor="?attr/invertedPrimaryTextColor"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
                 </LinearLayout>
@@ -249,6 +251,15 @@
             android:layout_weight="0.3"
             android:gravity="bottom|center"
             android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fhs_network_name_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="50dp"
+                android:fontFamily="sans-serif-smallcaps"
+                android:textColor="@color/accent_bad"
+                android:textSize="@dimen/large_font_text_view" />
 
 
             <com.facebook.shimmer.ShimmerFrameLayout
@@ -277,7 +288,7 @@
                         android:paddingStart="39dp"
                         android:paddingEnd="10dp"
                         android:stateListAnimator="@null"
-                        android:textColor="@color/white"
+                        android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/home_screen_stat_text" />
 
                     <Button

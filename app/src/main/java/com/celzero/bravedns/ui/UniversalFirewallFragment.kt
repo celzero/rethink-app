@@ -217,7 +217,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             // it will throw exception
             customDialog.show()
             customDialog.setCanceledOnTouchOutside(false)
-            object : CountDownTimer(100, 500) {
+            object : CountDownTimer(500, 500) {
                 override fun onTick(millisUntilFinished: Long) {
                 }
 
@@ -258,14 +258,16 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
     private fun getCurrentTheme(): Int {
         if (persistentState.theme == 0) {
             if (isDarkThemeOn()) {
-                return R.style.AppTheme
+                return R.style.AppThemeTrueBlack
             } else {
                 return R.style.AppThemeWhite
             }
         } else if (persistentState.theme == 1) {
             return R.style.AppThemeWhite
-        } else {
+        } else if (persistentState.theme == 2) {
             return R.style.AppTheme
+        } else {
+            return R.style.AppThemeTrueBlack
         }
     }
 

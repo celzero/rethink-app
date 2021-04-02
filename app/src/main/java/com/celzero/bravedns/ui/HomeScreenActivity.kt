@@ -48,6 +48,7 @@ import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.lifeTimeQ
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
@@ -63,7 +64,6 @@ import java.io.File
 import java.io.IOException
 import java.util.*
 import kotlin.collections.HashMap
-
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
@@ -97,7 +97,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         var lifeTimeQueries: Int = -1
 
-        var blockedCount: MutableLiveData<Int> = MutableLiveData()
         var lifeTimeQ : MutableLiveData<Int> = MutableLiveData()
         var braveModeToggler : MutableLiveData<Int> = MutableLiveData()
         var connectedDNS : MutableLiveData<String> = MutableLiveData()
@@ -106,7 +105,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         var appStartTime: Long = System.currentTimeMillis()
         var isBackgroundEnabled: Boolean = false
         var firewallRules: HashMultimap<Int, String> = HashMultimap.create()
-        var DEBUG = false
+        var DEBUG = true
 
         //Screen off - whether the screen preference is set 0-off, 1- on. -1 not initialized
         var isScreenLockedSetting: Int = -1
@@ -114,8 +113,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         //Screen off state - set - 0 if screen is off, 1 - screen is on, -1 not initialized.
         var isScreenLocked : Int = -1
 
-        //Remove the usage of below variable(isSearchEnabled)
-        var isSearchEnabled : Boolean = true
 
     }
 
@@ -132,16 +129,18 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     //TODO : Remove the unwanted data and the assignments happening
     //TODO : Create methods and segregate the data.
     override fun onCreate(savedInstanceState: Bundle?) {
-        if(persistentState.theme == 0){
+        if (persistentState.theme == 0) {
             if (isDarkThemeOn()) {
-                setTheme(R.style.AppTheme)
+                setTheme(R.style.AppThemeTrueBlack)
             } else {
-                setTheme(R.style.AppTheme_white)
+                setTheme(R.style.AppThemeWhite)
             }
-        }else if (persistentState.theme == 1) {
-            setTheme(R.style.AppTheme_white)
-        } else {
+        } else if (persistentState.theme == 1) {
+            setTheme(R.style.AppThemeWhite)
+        } else if (persistentState.theme == 2) {
             setTheme(R.style.AppTheme)
+        } else {
+            setTheme(R.style.AppThemeTrueBlack)
         }
         super.onCreate(savedInstanceState)
         context = this
@@ -180,6 +179,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
 
         persistentState.setScreenLockData(false)
+        lifeTimeQ.postValue(persistentState.getNumOfReq())
         initUpdateCheck()
 
         backgroundAccessibilityCheck()
@@ -196,10 +196,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun updateForDownload(){
-        persistentState.blockListFilesDownloaded = false
-        persistentState.numberOfLocalBlocklists = 0
-        persistentState.localBlocklistEnabled = false
-        persistentState.localBlockListDownloadTime = 0
         persistentState.remoteBraveDNSDownloaded = false
         persistentState.remoteBlockListDownloadTime = 0
     }
@@ -523,7 +519,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         Snackbar.make(parentLayout, getString(R.string.hs_snack_bar_blocklist_message), Snackbar.LENGTH_LONG).setAction("Update") {
             registerReceiverForDownloadManager(this)
             handleDownloadFiles()
-        }.setActionTextColor(resources.getColor(R.color.accent_bad)).show()
+        }.setActionTextColor(ContextCompat.getColor(context, R.color.accent_bad)).show()
     }
 
     private fun handleDownloadFiles() {
