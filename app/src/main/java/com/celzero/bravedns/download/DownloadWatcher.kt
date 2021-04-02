@@ -17,12 +17,14 @@ package com.celzero.bravedns.download
 
 import android.app.DownloadManager
 import android.content.Context
+import android.os.SystemClock
 import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.celzero.bravedns.receiver.ReceiverHelper
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 
 /**
  * The download watcher  - Worker initiated from AppDownloadManager class.
@@ -35,8 +37,12 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters)
         : Worker(context, workerParameters) {
     override fun doWork(): Result {
 
-        if(ReceiverHelper.persistentState.downloadIDs.isEmpty()){
-            return Result.retry()
+        val startTime = ReceiverHelper.persistentState.workManagerStartTime
+        val currentTime = SystemClock.elapsedRealtime()
+        Log.d(LOG_TAG, "AppDownloadManager - $startTime, $currentTime")
+        if(currentTime - startTime > Constants.WORK_MANAGER_TIMEOUT){
+            ReceiverHelper.persistentState.workManagerStartTime = 0
+            return Result.failure()
         }
 
         when (checkForDownload(context)) {

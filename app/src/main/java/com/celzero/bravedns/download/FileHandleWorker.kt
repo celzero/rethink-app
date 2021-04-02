@@ -81,6 +81,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
                             ReceiverHelper.persistentState.localBlocklistEnabled = true
                             ReceiverHelper.persistentState.blockListFilesDownloaded = true
                             ReceiverHelper.persistentState.tempBlocklistDownloadTime = 0
+                            ReceiverHelper.persistentState.workManagerStartTime = 0
                             DownloadHelper.deleteOldFiles(context)
                             return true
                         }
