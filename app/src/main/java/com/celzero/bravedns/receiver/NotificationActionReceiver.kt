@@ -25,18 +25,24 @@ import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import com.celzero.bravedns.R
+import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
 
-class OrbotNotificationReceiver : BroadcastReceiver() {
+class NotificationActionReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         Log.d(Constants.LOG_TAG, "OrbotNotificationReceiver: onReceive")
-        val action: String? = intent?.getStringExtra(OrbotHelper.ORBOT_NOTIFICATION_ACTION)
+        val action: String? = intent?.getStringExtra(Constants.NOTIFICATION_ACTION)
         if(action == OrbotHelper.ORBOT_NOTIFICATION_ACTION_TEXT){
             openOrbotApp(context)
             val manager = context?.getSystemService(Context. NOTIFICATION_SERVICE) as NotificationManager
             manager.cancel(OrbotHelper.ORBOT_SERVICE_ID)
+        } else if(action == Constants.VPN_NOTIFICATION_ACTION){
+            stopDnsVpnService(context)
+            val manager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.cancel(BraveVPNService.SERVICE_ID)
         }
     }
 
@@ -60,6 +66,10 @@ class OrbotNotificationReceiver : BroadcastReceiver() {
         } catch (e: ActivityNotFoundException) {
             Log.w(Constants.LOG_TAG, "Exception while opening app info: ${e.message}", e)
         }
+    }
+
+    private fun stopDnsVpnService(context: Context?) {
+        VpnController.getInstance().stop(context)
     }
 
 }
