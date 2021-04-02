@@ -46,8 +46,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerInParent="true"
-                android:buttonTint="?attr/primaryTextColor"
-                android:foregroundTint="?attr/secondaryTextColor"
+                android:buttonTint="?attr/accentGood"
+                android:foregroundTint="?attr/accentGood"
                 android:layout_margin="10dp" />
 
         </RelativeLayout>

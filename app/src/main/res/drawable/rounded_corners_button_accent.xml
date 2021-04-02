@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="?attr/mainButtonBackgroundDisabled" />
     <stroke
-        android:width="0.5dp"
-        android:color="@color/border_color" />
+        android:width="0.75dp"
+        android:color="@color/recycler_selected" />
     <corners android:radius="5dp" />
 </shape>

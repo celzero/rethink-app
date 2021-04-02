@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
-    android:background="?attr/background"
     android:descendantFocusability="blocksDescendants">
 
 
@@ -56,6 +55,7 @@
                     android:textSize="@dimen/default_font_text_view" />
 
                 <androidx.appcompat.widget.AppCompatToggleButton
+                    android:theme="@style/CustomCompoundButton_Switch_bad"
                     android:id="@+id/expand_checkbox"
                     android:layout_width="wrap_content"
                     android:checked="true"

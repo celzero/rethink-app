@@ -1,17 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="RippleBackground">
-        <attr name="rb_color" format="color" />
-        <attr name="rb_strokeWidth" format="dimension"/>
-        <attr name="rb_radius" format="dimension"/>
-        <attr name="rb_duration" format="integer"/>
-        <attr name="rb_rippleAmount" format="integer"/>
-        <attr name="rb_scale" format="float"/>
-        <attr name="rb_type" format="enum">
-            <enum name="fillRipple" value="0"/>
-            <enum name="strokeRipple" value="1"/>
-        </attr>
-    </declare-styleable>
     <attr name="primaryColor" format="reference" />
     <attr name="primaryDarkColor" format="reference" />
     <attr name="primaryColorAccent" format="reference" />
@@ -24,13 +12,13 @@
     <attr name="svgFillColor" format="reference"/>
     <attr name="accentGood" format="reference"/>
     <attr name="accentBad" format="reference"/>
-    <attr name="backgroundDark" format="reference"/>
     <attr name="primaryDarkColorText" format="reference" />
     <attr name="primaryLightColorText" format="reference"/>
     <attr name="mainButtonBackground" format="reference" />
-    <attr name="mainButtonBackgroundDisabled" format="reference" />
     <attr name="border" format="reference"/>
     <attr name="invertedPrimaryTextColor" format="reference"/>
     <attr name="colorCheckSelected" format="reference"/>
-
+    <attr name="navBarBackground" format="reference"/>
+    <attr name="buttonBackground" format="reference"/>
+    <attr name="tabIndicator" format="reference"/>
 </resources>

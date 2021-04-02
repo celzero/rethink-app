@@ -57,6 +57,7 @@ import java.io.File
 import java.io.IOException
 
 
+
 class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webview_layout) {
     private val b by viewBinding(ActivityFaqWebviewLayoutBinding::bind)
     private val maxProgressBar = 100
@@ -81,14 +82,16 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     @SuppressLint("SetJavaScriptEnabled") override fun onCreate(savedInstanceState: Bundle?) {
         if (persistentState.theme == 0) {
             if (isDarkThemeOn()) {
-                setTheme(R.style.AppTheme)
+                setTheme(R.style.AppThemeTrueBlack)
             } else {
-                setTheme(R.style.AppTheme_white)
+                setTheme(R.style.AppThemeWhite)
             }
         } else if (persistentState.theme == 1) {
-            setTheme(R.style.AppTheme_white)
-        } else {
+            setTheme(R.style.AppThemeWhite)
+        } else if (persistentState.theme == 2) {
             setTheme(R.style.AppTheme)
+        } else {
+            setTheme(R.style.AppThemeTrueBlack)
         }
         super.onCreate(savedInstanceState)
         context = this
@@ -150,7 +153,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         doHEndpointRepository.removeConnectionStatus()
         doHEndpointRepository.updateConnectionURL(receivedStamp)
 
-        object : CountDownTimer(500, 1000) {
+        object : CountDownTimer(1000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
             }
 
@@ -200,9 +203,9 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
 
     private fun getExternalFilePath(context: Context, isAbsolutePathNeeded: Boolean): String {
         return if (isAbsolutePathNeeded) {
-            context.getExternalFilesDir(null).toString() + Constants.DOWNLOAD_PATH + persistentState.remoteBlockListDownloadTime
+            context.getExternalFilesDir(null).toString() + Constants.DOWNLOAD_PATH + persistentState.tempRemoteBlockListDownloadTime
         } else {
-            Constants.DOWNLOAD_PATH + persistentState.remoteBlockListDownloadTime
+            Constants.DOWNLOAD_PATH + persistentState.tempRemoteBlockListDownloadTime
         }
     }
 
@@ -393,13 +396,6 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         }
     }
 
-    private fun handleDownloadFiles() {
-        val timeStamp = persistentState.remoteBlockListDownloadTime
-        if (timeStamp == 0L) {
-            checkForDownload()
-        }
-    }
-
     private fun registerReceiverForDownloadManager() {
         this.registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
     }
@@ -417,13 +413,13 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                         val status = HttpRequestHelper.checkStatus(c)
                         if (status == Constants.DOWNLOAD_STATUS_SUCCESSFUL) {
                             val from = File(getExternalFilePath(ctxt, true)+ Constants.FILE_TAG_NAME)
-                            val to = File(ctxt.filesDir.canonicalPath +"/"+persistentState.remoteBlockListDownloadTime + Constants.FILE_TAG_NAME)
+                            val to = File(ctxt.filesDir.canonicalPath +"/"+persistentState.tempRemoteBlockListDownloadTime + Constants.FILE_TAG_NAME)
                             val fileDownloaded = from.copyTo(to, true)
                             if (fileDownloaded.exists()) {
                                 DownloadHelper.deleteOldFiles(ctxt)
+                                persistentState.remoteBraveDNSDownloaded = true
+                                persistentState.remoteBlockListDownloadTime = persistentState.tempRemoteBlockListDownloadTime
                             }
-                            persistentState.remoteBraveDNSDownloaded = true
-
                         } else {
                             Log.w(LOG_TAG, "Webview: Error downloading filetag.json file: $status")
                         }
@@ -434,6 +430,8 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                 }
             } catch (e: Exception) {
                 Log.w(LOG_TAG, "Webview: Error downloading filetag.json file: ${e.message}", e)
+                persistentState.remoteBlockListDownloadTime = 0L
+                persistentState.remoteBraveDNSDownloaded = false
             }
         }
     }
@@ -450,7 +448,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
 
     private fun downloadBlockListFiles() {
         registerReceiverForDownloadManager()
-        if (timeStamp == 0L) timeStamp = persistentState.remoteBlockListDownloadTime
+        if (timeStamp == 0L) timeStamp = persistentState.tempRemoteBlockListDownloadTime
         val url = Constants.JSON_DOWNLOAD_BLOCKLIST_LINK + "/" + timeStamp
         if (DEBUG) Log.d(LOG_TAG, "Webview: download filetag file with url: $url")
         val uri: Uri = Uri.parse(url)
@@ -486,7 +484,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                 if (version == 1) {
                     val updateValue = jsonObject.getBoolean(Constants.JSON_UPDATE)
                     timeStamp = jsonObject.getLong(Constants.JSON_LATEST)
-                    persistentState.remoteBlockListDownloadTime = timeStamp
+                    persistentState.tempRemoteBlockListDownloadTime = timeStamp
                     if (DEBUG) Log.d(LOG_TAG, "Webview: onResponse -  $updateValue, $timeStamp")
                     if (updateValue) {
                         (context as Activity).runOnUiThread {

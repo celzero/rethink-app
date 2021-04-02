@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="AppThemeInitial" parent="@android:style/Theme.Holo">
+    <style name="AppThemeInitial" parent="Theme.MaterialComponents.NoActionBar.Bridge">
         <item name="android:windowDisablePreview">true</item>
     </style>
     <!-- Base application theme. -->
@@ -8,7 +8,9 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/accent_bad</item>
+        <item name="colorBackgroundFloating">@color/colorPrimary</item>
+        <item name="android:colorBackgroundFloating">@color/colorPrimary</item>
+        <item name="colorAccent">@color/accent_good</item>
         <item name="accentGood">@color/accent_good</item>
         <item name="accentBad">@color/accent_bad</item>
         <item name="colorSwitchThumbNormal">@color/neutral</item>
@@ -17,30 +19,34 @@
         <item name="chipStyle">@style/Widget.MaterialComponents.Chip.Action</item>
         <item name="android:splitMotionEvents">false</item>
         <item name="android:windowEnableSplitTouch">false</item>
-        <item name="background">@color/colorPrimary</item>
-        <item name="backgroundDark">@color/colorPrimaryDark</item>
+        <item name="background">@color/background</item>
         <item name="searchViewStyle">@style/SearchView_custom</item>
         <item name="primaryTextColor">@color/primaryText</item>
         <item name="primaryDarkColorText">@color/primaryText</item>
         <item name="primaryLightColorText">@color/textColorMain</item>
         <item name="secondaryTextColor">@color/secondaryText</item>
-        <item name="dividerColor">@color/neutral</item>
+        <item name="divider">@color/neutral</item>
         <item name="roundedCornersButton">@drawable/rounded_corners_button_accent</item>
         <item name="homeScreenBtnBackground">@color/black</item>
         <item name="svgStrokeColor">@color/stroke_color</item>
         <item name="svgFillColor">@color/fill_color</item>
         <item name="mainButtonBackground">@color/button_background_tint</item>
-        <item name="mainButtonBackgroundDisabled">@color/colorPrimary</item>
-        <item name="border">@color/borderblack</item>
-        <item name="invertedPrimaryTextColor">@color/white</item>
+        <item name="border">@color/borderBlack</item>
+        <item name="invertedPrimaryTextColor">@color/accent_good</item>
         <item name="android:navigationBarColor">@color/black</item>
+        <item name="navBarBackground">@color/navBarBackground</item>
+        <item name="buttonBackground">@color/buttonBackground</item>
+        <item name="colorSurface">@color/colorPrimaryDark</item>
+        <item name="tabIndicator">@color/accent_good</item>
     </style>
 
-    <style name="AppTheme_white" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
+    <style name="AppThemeWhite" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/background_dark_white</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark_white</item>
-        <item name="colorAccent">@color/accent_bad_white</item>
+        <item name="colorBackgroundFloating">@color/colorFloating_white</item>
+        <item name="android:colorBackgroundFloating">@color/colorFloating_white</item>
+        <item name="colorAccent">@color/negative_white</item>
         <item name="accentGood">@color/negative_white</item>
         <item name="accentBad">@color/accent_bad_white</item>
         <item name="colorCheckSelected">@color/negative_white</item>
@@ -50,22 +56,61 @@
         <item name="android:splitMotionEvents">false</item>
         <item name="android:windowEnableSplitTouch">false</item>
         <item name="background">@color/colorPrimary_white</item>
-        <item name="backgroundDark">@color/background_dark_white</item>
         <item name="searchViewStyle">@style/SearchView_custom</item>
         <item name="primaryTextColor">@color/black_white</item>
         <item name="primaryDarkColorText">@color/colorPrimary_white</item>
-        <item name="primaryLightColorText">@color/textColorMain_white</item>
-        <item name="secondaryTextColor">@color/accent_good_white</item>
-        <item name="dividerColor">@color/whitelist</item>
-        <item name="roundedCornersButton">@drawable/rounded_corners_button_primary_white</item>
+        <item name="primaryLightColorText">@color/black_white</item>
+        <item name="secondaryTextColor">@color/colorPrimaryDark_white</item>
+        <item name="divider">@color/border_white</item>
+        <item name="roundedCornersButton">@drawable/rounded_corners_button_primary</item>
         <item name="homeScreenBtnBackground">@color/lightColorPrimary_white</item>
         <item name="svgStrokeColor">@color/stroke_color_white</item>
         <item name="svgFillColor">@color/fill_color_white</item>
         <item name="mainButtonBackground">@color/lightColorPrimary_white</item>
-        <item name="mainButtonBackgroundDisabled">@color/main_button_disabled</item>
         <item name="border">@color/border_white</item>
         <item name="invertedPrimaryTextColor">@color/white</item>
-        <item name="android:navigationBarColor">@color/background_dark_white</item>
+        <item name="android:navigationBarColor">@color/navBarBackgroundWhite</item>
+        <item name="navBarBackground">@color/navBarBackgroundWhite</item>
+        <item name="buttonBackground">@color/buttonBackgroundWhite</item>
+        <item name="colorSurface">@color/navBarBackgroundWhite</item>
+        <item name="tabIndicator">@color/accent_bad</item>
+    </style>
+
+    <style name="AppThemeTrueBlack" parent="Theme.MaterialComponents.NoActionBar.Bridge">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimaryBlack</item>
+        <item name="colorSecondary">@color/accentGoodBlack</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryBlackTheme</item>
+        <item name="colorBackgroundFloating">@color/colorPrimaryBlack</item>
+        <item name="android:colorBackgroundFloating">@color/colorPrimaryBlack</item>
+        <item name="colorAccent">@color/accentGoodBlack</item>
+        <item name="accentGood">@color/accentGoodBlack</item>
+        <item name="accentBad">@color/accentBadBlack</item>
+        <item name="colorSwitchThumbNormal">@color/neutralBlack</item>
+        <item name="colorCheckSelected">@color/negative</item>
+        <item name="android:buttonStyleToggle">@android:style/Widget.Material.Button.Toggle</item>
+        <item name="chipStyle">@style/Widget.MaterialComponents.Chip.Action</item>
+        <item name="android:splitMotionEvents">false</item>
+        <item name="android:windowEnableSplitTouch">false</item>
+        <item name="background">@color/colorBackgroundBlack</item>
+        <item name="searchViewStyle">@style/SearchView_custom</item>
+        <item name="primaryTextColor">@color/primaryText</item>
+        <item name="primaryDarkColorText">@color/primaryText</item>
+        <item name="primaryLightColorText">@color/background_dark_white</item>
+        <item name="secondaryTextColor">@color/accent_good</item>
+        <item name="divider">@color/neutral</item>
+        <item name="roundedCornersButton">@drawable/rounded_corners_button_accent</item>
+        <item name="homeScreenBtnBackground">@color/black</item>
+        <item name="svgStrokeColor">@color/stroke_color</item>
+        <item name="svgFillColor">@color/fill_color</item>
+        <item name="mainButtonBackground">@color/accentGoodBlack</item>
+        <item name="border">@color/borderBlack</item>
+        <item name="invertedPrimaryTextColor">@color/accentGoodBlack</item>
+        <item name="android:navigationBarColor">@color/black_white</item>
+        <item name="navBarBackground">@color/navBarBackgroundBlack</item>
+        <item name="buttonBackground">@color/buttonBackgroundBlack</item>
+        <item name="colorSurface">@color/navBarBackgroundBlack</item>
+        <item name="tabIndicator">@color/accentGoodBlack</item>
     </style>
 
 
@@ -87,18 +132,22 @@
     <style name="CustomCompoundButton_Switch_bad">
         <item name="colorSurface">@color/neutral</item>
         <item name="colorOnSurface">@color/neutral</item>
-        <item name="colorControlActivated">?attr/accentBad</item>
-        <item name="colorControlHighlight">?attr/accentBad</item>
-        <item name="android:colorControlActivated">?attr/accentBad</item>
-        <item name="colorAccent">?attr/accentBad</item>
+        <item name="colorControlHighlight">@color/negative</item>
+        <item name="colorControlActivated">@color/negative</item>
+        <item name="android:colorControlHighlight">@color/negative</item>
+        <item name="android:colorControlActivated">@color/negative</item>
+        <item name="colorAccent">@color/negative</item>
+        <item name="android:colorAccent">@color/negative</item>
+        <item name="android:thumbTint">@color/negative</item>
+        <item name="android:thumbTintMode">@color/negative</item>
     </style>
 
     <style name="BottomSheet" parent="@style/Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/bg_bottom_sheet_dialog_fragment</item>
     </style>
 
-    <style name="BaseBottomSheetDialog" parent="@style/Theme.Design.Light.BottomSheetDialog">
-        <item name="android:windowIsFloating">false</item>
+    <style name="BaseBottomSheetDialog" parent="@style/Theme.Design.BottomSheetDialog">
+        <item name="android:windowIsFloating">true</item>
         <item name="bottomSheetStyle">@style/BottomSheet</item>
     </style>
 
@@ -112,7 +161,7 @@
         <item name="android:navigationBarColor">@color/colorPrimary</item>
     </style>
 
-    <style name="BottomSheetDialogTheme_white" parent="BaseBottomSheetDialog">
+    <style name="BottomSheetDialogThemeWhite" parent="BaseBottomSheetDialog">
         <!-- Active thumb color & Active track color(30% transparency) -->
         <item name="colorControlActivated">?attr/accentBad</item>
         <!-- Inactive thumb color -->

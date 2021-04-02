@@ -19,12 +19,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
-import android.text.Html
+import android.util.TypedValue
 import android.view.*
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.text.HtmlCompat
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -44,14 +45,16 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
     override fun onCreate(savedInstanceState: Bundle?) {
         if (persistentState.theme == 0) {
             if (isDarkThemeOn()) {
-                setTheme(R.style.AppTheme)
+                setTheme(R.style.AppThemeTrueBlack)
             } else {
-                setTheme(R.style.AppTheme_white)
+                setTheme(R.style.AppThemeWhite)
             }
         } else if (persistentState.theme == 1) {
-            setTheme(R.style.AppTheme_white)
-        } else {
+            setTheme(R.style.AppThemeWhite)
+        } else if (persistentState.theme == 2) {
             setTheme(R.style.AppTheme)
+        } else {
+            setTheme(R.style.AppThemeTrueBlack)
         }
         super.onCreate(savedInstanceState)
 
@@ -109,11 +112,9 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
     }
 
     private fun changeStatusBarColor() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            val window: Window = window
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            window.statusBarColor = Color.TRANSPARENT
-        }
+        val window: Window = window
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.statusBarColor = Color.TRANSPARENT
     }
 
     private fun addBottomDots(currentPage: Int) {
@@ -125,8 +126,9 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
         b.layoutDots.removeAllViews()
         for (i in dots.indices) {
             dots[i] = TextView(this)
-            dots[i]?.text = Html.fromHtml("&#8226;")
-            dots[i]?.textSize = 35F
+            dots[i]?.layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            dots[i]?.text = HtmlCompat.fromHtml("&#8226;", HtmlCompat.FROM_HTML_MODE_LEGACY)
+            dots[i]?.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30F)
             dots[i]?.setTextColor(colorInActive[currentPage])
             b.layoutDots.addView(dots[i])
         }

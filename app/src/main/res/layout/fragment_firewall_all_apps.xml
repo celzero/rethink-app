@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/background"
     android:focusable="true"
     android:focusableInTouchMode="true">
 
@@ -77,7 +78,6 @@
         android:layout_below="@id/firewall_app_search_view_top"
         android:layout_marginStart="2dp"
         android:layout_marginEnd="2dp"
-        android:childDivider="?attr/backgroundDark"
         android:divider="?attr/border"
         android:dividerHeight="1dp"
         android:groupIndicator="@null"

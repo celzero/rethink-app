@@ -3,7 +3,6 @@
     android:id="@+id/apk_parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:backgroundTint="?attr/backgroundDark"
     android:layout_margin="1dp">
 
     <androidx.appcompat.widget.LinearLayoutCompat

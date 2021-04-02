@@ -219,6 +219,7 @@
         <item>@drawable/spinner_both</item>
     </integer-array>
 
+    <string name="notification_action_stop_vpn">STOP</string>
     <string name="dns_mode_info_title">DNS</string>
 
     <string name="firewall_rules">Firewall Rules</string>
@@ -359,6 +360,16 @@
     <string name="local_blocklist_download">Download Blocklists</string>
     <string name="local_blocklist_download_desc">Download blocklists (around 50MB) to use this feature?</string>
 
+    <string name="download_lockdown_dialog_heading">Download Blocklists</string>
+    <string name="download_lockdown_dialog_desc">Lockdown mode is enabled. RethinkDNS uses Android\'s default Download manager to download the blocklist files.</string>
+    <string name="download_lockdown_dialog_positive">Goto Settings</string>
+    <string name="download_lockdown_dialog_negative">Cancel</string>
+
+    <string name="local_blocklist_lockdown_redownload">Up-to-date!</string>
+    <string name="local_blocklist_lockdown_redownload_desc">Local Blocklists are already at the latest version v%1$s.</string>
+    <string name="local_blocklist_lockdown_positive">Okay</string>
+    <string name="local_blocklist_lockdown_neutral">Download again</string>
+
     <string name="local_blocklist_redownload">Up-to-date!</string>
     <string name="local_blocklist_redownload_desc">Local Blocklists are already at the latest version v%1$s.</string>
     <string name="local_blocklist_positive">Okay</string>
@@ -371,7 +382,7 @@
     <string name="webview_error_title">Error</string>
     <string name="webview_error_message">Something went wrong. Please try again later.</string>
 
-    <string name="refresh_complete">Re-sync of application list is complete.</string>
+    <string name="refresh_complete">Application re-sync is complete.</string>
 
     <string name="dns_proxy_no_proxy">Set up a DNS Proxy by clicking on the ADD button below.</string>
 
@@ -433,7 +444,8 @@
     <string name="configure_dns_connected_dns_crypt_status">dnscrypt</string>
     <string name="configure_dns_connected_dns_proxy_status">dns proxy</string>
     <string name="configure_dns_connection_name">Connected to %1$s</string>
-    <string name="configure_dns_crypt_name">DNSCrypt resolvers: %1$s</string>
+    <string name="configure_dns_crypt_name">DNSCrypt resolvers: </string>
+    <string name="configure_dns_crypt">DNSCrypt: %1$s resolvers</string>
 
     <string name="firewall_app_added_in_whitelist">whitelisted app</string>
     <string name="firewall_app_added_in_excluded_list">excluded app</string>
@@ -480,11 +492,13 @@
     <string name="features_disabled">(disabled)</string>
     <string name="firewall_app_info_not_available">Cannot block the app</string>
 
-    <string name="whats_dialog_title">What\'s new in v053c</string>
-    <string name="whats_new_version_name">🎁 International Happiness Day (Mar 20) 🎁</string>
-    <string name="whats_new_version_update">Incremental update:\n\n
-        1. Support for one-click Tor-as-a-proxy (Orbot setup).\n\n
-        2. When the network is unavailable RethinkDNS now reports "bad network connectivity" to the Android OS. This might improve scenario where apps do not recover from poor / flaky networks.\n\n
+    <string name="whats_dialog_title">What\'s new in v053d</string>
+    <string name="whats_new_version_name">🎁 Earth Day (Apr 22) 🎁</string>
+    <string name="whats_new_version_update">Fix the Internet release:\n\n
+        1. Major updates to how the app handles connectivity changes. This fixes issues where devices may have previously lost Internet connectivity with the app switched on.\n\n
+        2. <i>True Black</i> theme on popular demand. Check the <i>Settings -> Appearance</i>.\n\n
+        3. Improvements on themes. Better consistency in the colour scheme.\n\n
+        4. Stop button in the <i>Notification</i> bar.
     </string>
 
     <!-- Settings Fragment strings -->
@@ -497,7 +511,6 @@
     <string name="settings_local_blocklist_desc_1">Choose from 170+ blocklists.</string>
     <string name="settings_local_blocklist_configure">configure</string>
     <string name="settings_local_blocklist_update">Update</string>
-    <string name="settings_local_blocklist_check_time">last check for update: 10 mins ago</string>
 
     <string name="settings_exclude_app_heading">Exclude apps from Firewall and DNS</string>
     <string name="settings_exclude_app_desc">Connections from excluded apps will not monitored or blocked.</string>
@@ -570,7 +583,7 @@
 
     <string name="settings_socks5_orbot_disabled_error">SOCKS5 proxy is turned on. Turn off to continue with one touch setup.</string>
     <string name="settings_socks5_disabled_error">Orbot one touch start is turned on. Turn off to continue SOCKS5 configuration.</string>
-    <string name="settings_socks5_vpn_disabled_error">RethinkDNS is not started. Start RethinkDNS to continue setup</string>
+    <string name="settings_socks5_vpn_disabled_error">Start RethinkDNS to continue setup.</string>
     <string name="settings_orbot_error_not_started">Orbot not started. Try again later.</string>
 
     <string name="settings_https_orbot_disabled_error">HTTPS proxy is turned on. Turn off to continue with one touch setup.</string>
@@ -647,6 +660,7 @@
     <string name="settings_theme_dialog_themes_1">Set by System</string>
     <string name="settings_theme_dialog_themes_2">Light</string>
     <string name="settings_theme_dialog_themes_3">Dark</string>
+    <string name="settings_theme_dialog_themes_4">True Black</string>
 
     <string name="settings_selected_theme">Current theme: %1$s</string>
 
@@ -707,9 +721,14 @@
     <string name="about_github">Contribute on GitHub</string>
     <string name="about_faq">View FAQs</string>
     <string name="about_blog">Read our blog</string>
+    <string name="about_docs">Read docs</string>
     <string name="about_connect">contact</string>
     <string name="about_app">app</string>
     <string name="about_email">Email us</string>
+    <string name="about_settings">system</string>
+    <string name="about_settings_app_info">App Information</string>
+    <string name="about_settings_vpn_profile">VPN Profile</string>
+    <string name="about_settings_notification">Notification Settings</string>
     <string name="about_whats_new">What\'s new in %1$s</string>
     <string name="about_twitter">Follow us on Twitter</string>
     <string name="about_mozilla">RethinkDNS is part of Mozilla Builders MVP program.</string>
@@ -719,6 +738,7 @@
     <string name="about_mail_subject">[RethinkDNS]:</string>
     <string name="about_telegram_link">http://www.telegram.me/rethinkdns</string>
     <string name="about_blog_link">https://blog.rethinkdns.com/</string>
+    <string name="about_docs_link">https://docs.rethinkdns.com/</string>
     <string name="about_faq_link">https://www.rethinkdns.com/faq</string>
     <string name="about_github_link">https://github.com/celzero/rethink-app</string>
     <string name="about_twitter_handle">https://twitter.com/rethinkdns</string>
@@ -727,6 +747,14 @@
     <string name="about_version">v%1$s</string>
     <string name="about_version_install_source">v%1$s (%2$s)</string>
     <string name="about_dialog_neutral_button">Suggest features</string>
+
+    <string name="app_info_error">Could not launch App info. Try again later.</string>
+    <string name="vpn_profile_error">Could not launch VPN profile. Try again later.</string>
+    <string name="notification_settings_error">Could not launch Notification settings. Try again later.</string>
+
+    <string name="fdroid_update_title">FDroid</string>
+    <string name="fdroid_update_message">Update check is not performed for FDroid builds. Visit FDroid to check for updates.</string>
+    <string name="fdroid_positive_button">Okay</string>
 
     <!-- Configure DNS Fragment string == cd -->
     <string name="cd_dns_type_spinner_tooltip">Select DNS</string>
@@ -898,9 +926,16 @@
     <string name="dns_proxy_app">App</string>
     <string name="dns_proxy_ip_address">IP Address</string>
     <string name="dns_proxy_port">Port Number</string>
-    <string name="dns_proxy_negative_btn">cancel</string>
+    <string name="dns_proxy_negative_btn">Cancel</string>
     <string name="dns_proxy_positive_btn">add</string>
     <!-- Firewall -->
     <string name="firewall_toggle_unblocked">Unblocked</string>
     <string name="firewall_toggle_blocked">Blocked</string>
+
+
+    <!-- Unicode -->
+    <string name="unicode_warning_sign">\u26a0</string>
+    <string name="unicode_x_sign">\u274c</string>
+    <string name="unicode_question_sign">\u2754</string>
+
 </resources>

@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/background"
     android:padding="5dp">
 
     <TextView
@@ -93,8 +94,8 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="10dp"
             android:layout_marginStart="10dp"
-            android:buttonTint="?attr/primaryTextColor"
-            android:foregroundTint="?attr/secondaryTextColor" />
+            android:buttonTint="?attr/accentGood"
+                android:foregroundTint="?attr/accentGood" />
     </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -113,7 +114,7 @@
         android:layout_alignParentBottom="true"
         android:text="@string/whitelist_button"
         android:textSize="@dimen/large_font_text_view"
-        android:textColor="?attr/accentBad" />
+        android:textColor="?attr/accentGood" />
 
 
 </RelativeLayout>
