@@ -49,14 +49,16 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
 
     override fun getTheme(): Int = if (persistentState.theme == 0) {
         if (isDarkThemeOn()) {
-            R.style.BottomSheetDialogTheme
+            R.style.BottomSheetDialogThemeTrueBlack
         } else {
             R.style.BottomSheetDialogThemeWhite
         }
     } else if (persistentState.theme == 1) {
         R.style.BottomSheetDialogThemeWhite
-    } else {
+    } else if (persistentState.theme == 2) {
         R.style.BottomSheetDialogTheme
+    } else {
+        R.style.BottomSheetDialogThemeTrueBlack
     }
 
     private fun isDarkThemeOn(): Boolean {

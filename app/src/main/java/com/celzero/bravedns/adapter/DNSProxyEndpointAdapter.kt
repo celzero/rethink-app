@@ -83,8 +83,7 @@ class DNSProxyEndpointAdapter(private val context: Context,
                     b.dnsProxyListUrlExplanation.text = context.getString(R.string.settings_socks_forwarding_desc, dnsProxyEndpoint.proxyIP, dnsProxyEndpoint.proxyPort.toString(), context.getString(R.string.cd_custom_dns_proxy_default_app))
                 } else {
                     Log.i(LOG_TAG, "Proxy : ${dnsProxyEndpoint.proxyAppName}")
-                    val appNameInfo = appList[dnsProxyEndpoint.proxyAppName]
-                    b.dnsProxyListUrlExplanation.text = context.getString(R.string.settings_socks_forwarding_desc, dnsProxyEndpoint.proxyIP, dnsProxyEndpoint.proxyPort.toString(), appNameInfo?.appName)
+                    b.dnsProxyListUrlExplanation.text = context.getString(R.string.settings_socks_forwarding_desc, dnsProxyEndpoint.proxyIP, dnsProxyEndpoint.proxyPort.toString(), dnsProxyEndpoint.proxyAppName)
 
                 }
             } else {
@@ -92,8 +91,7 @@ class DNSProxyEndpointAdapter(private val context: Context,
                     b.dnsProxyListUrlExplanation.text = context.getString(R.string.dns_proxy_desc, dnsProxyEndpoint.proxyIP, dnsProxyEndpoint.proxyPort.toString(), context.getString(R.string.cd_custom_dns_proxy_default_app))
                 } else {
                     Log.i(LOG_TAG, "Proxy : ${dnsProxyEndpoint.proxyAppName}")
-                    val appNameInfo = appList[dnsProxyEndpoint.proxyAppName]
-                    b.dnsProxyListUrlExplanation.text = context.getString(R.string.dns_proxy_desc, dnsProxyEndpoint.proxyIP, dnsProxyEndpoint.proxyPort.toString(), appNameInfo?.appName)
+                    b.dnsProxyListUrlExplanation.text = context.getString(R.string.dns_proxy_desc, dnsProxyEndpoint.proxyIP, dnsProxyEndpoint.proxyPort.toString(), dnsProxyEndpoint.proxyAppName)
                 }
             }
 

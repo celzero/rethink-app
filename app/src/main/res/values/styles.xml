@@ -158,7 +158,8 @@
         <item name="colorSwitchThumbNormal">@color/neutral</item>
         <!-- Inactive track color(30% transparency) -->
         <item name="android:colorForeground">@color/primaryText</item>
-        <item name="android:navigationBarColor">@color/colorPrimary</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:navigationBarColor">@color/childListColor</item>
     </style>
 
     <style name="BottomSheetDialogThemeWhite" parent="BaseBottomSheetDialog">
@@ -168,8 +169,20 @@
         <item name="colorSwitchThumbNormal">@color/neutral</item>
         <!-- Inactive track color(30% transparency) -->
         <item name="android:colorForeground">@color/primaryText</item>
-        <item name="android:navigationBarColor">@color/background_dark_white</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:navigationBarColor">@color/colorPrimary_white</item>
     </style>
+
+    <style name="BottomSheetDialogThemeTrueBlack" parent="BaseBottomSheetDialog">
+           <!-- Active thumb color & Active track color(30% transparency) -->
+           <item name="colorControlActivated">?attr/accentBad</item>
+           <!-- Inactive thumb color -->
+           <item name="colorSwitchThumbNormal">@color/neutral</item>
+           <!-- Inactive track color(30% transparency) -->
+           <item name="android:colorForeground">@color/primaryText</item>
+           <item name="android:windowIsFloating">false</item>
+           <item name="android:navigationBarColor">@color/colorBackgroundBlack</item>
+       </style>
 
     <style name="SearchView_custom" parent="Widget.AppCompat.SearchView">
         <item name="searchViewStyle">@style/Widget.AppCompat.Light.SearchView</item>

@@ -24,6 +24,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.connectedDNS
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.lifeTimeQueries
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.ORBAT_MODE_NONE
 import hu.autsoft.krate.*
@@ -186,8 +187,11 @@ class PersistentState(context: Context):SimpleKrate(context) {
     }
 
     fun getNumOfReq(): Int {
-        if (HomeScreenActivity.GlobalVariable.lifeTimeQueries >= 0)
+        if (HomeScreenActivity.GlobalVariable.lifeTimeQueries >= 0) {
+            HomeScreenActivity.GlobalVariable.lifeTimeQ.postValue(lifeTimeQueries)
             return HomeScreenActivity.GlobalVariable.lifeTimeQueries
+        }
+        HomeScreenActivity.GlobalVariable.lifeTimeQ.postValue(_numberOfRequests)
         return _numberOfRequests
     }
 
@@ -228,8 +232,11 @@ class PersistentState(context: Context):SimpleKrate(context) {
                     connectedDNSName
                 }
             }else if(dnsType == 2){
-                val cryptDetails = appMode?.getDNSCryptServerCount()
-                "DNSCrypt: $cryptDetails resolvers"
+                if(appMode?.getDNSCryptServerCount() != null) {
+                    val cryptDetails = appMode?.getDNSCryptServerCount()
+                    "DNSCrypt: $cryptDetails resolvers"
+                }
+                "DNSCrypt: 0 resolvers"
             }else{
                 val proxyDetails = appMode?.getDNSProxyServerDetails()
                 proxyDetails?.proxyAppName!!

@@ -99,6 +99,7 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
             showDialogForDelete()
         }
 
+        persistentState.getNumOfReq()
         registerForObservers()
     }
 

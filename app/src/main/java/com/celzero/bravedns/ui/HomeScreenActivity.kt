@@ -105,7 +105,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         var appStartTime: Long = System.currentTimeMillis()
         var isBackgroundEnabled: Boolean = false
         var firewallRules: HashMultimap<Int, String> = HashMultimap.create()
-        var DEBUG = true
+        var DEBUG = false
 
         //Screen off - whether the screen preference is set 0-off, 1- on. -1 not initialized
         var isScreenLockedSetting: Int = -1
