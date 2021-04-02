@@ -35,9 +35,12 @@ import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
+import java.util.*
 
 class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(DIFF_CALLBACK) {
 
@@ -71,9 +74,16 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
             b.connectionResponseTime.text = time
             b.connectionFlag.text = connTracker.flag
             b.connectionIpAddress.text = connTracker.ipAddress
-            b.connLatencyTxt.text = connTracker.port.toString()
+            // Instead of showing the port name and protocol, now the ports are resolved with
+            // known ports(reserved port and protocol identifiers).
+            // https://github.com/celzero/rethink-app/issues/42 - #3 - transport + protocol.
+            val resolvedPort = KnownPorts.resolvePort(connTracker.port)
+            if(resolvedPort != Constants.PORT_VAL_UNKNOWN){
+                b.connLatencyTxt.text = resolvedPort?.toUpperCase(Locale.ROOT)
+            }else {
+                b.connLatencyTxt.text = Protocol.getProtocolName(connTracker.protocol).name
+            }
             b.connectionAppName.text = connTracker.appName
-            b.connectionType.text = Protocol.getProtocolName(connTracker.protocol).name
             when {
                 connTracker.isBlocked -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
@@ -92,9 +102,9 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
                     val appArray = context.packageManager.getPackagesForUid(connTracker.uid)
                     val appCount = (appArray?.size)?.minus(1)
                     if (appArray?.size!! > 2) {
-                        b.connectionAppName.text = context.getString(R.string.ctbs_app_other_apps, connTracker.appName, appCount)
+                        b.connectionAppName.text = context.getString(R.string.ctbs_app_other_apps, connTracker.appName, appCount.toString())
                     } else if (appArray.size == 2) {
-                        b.connectionAppName.text = context.getString(R.string.ctbs_app_other_app, connTracker.appName, appCount)
+                        b.connectionAppName.text = context.getString(R.string.ctbs_app_other_app, connTracker.appName, appCount.toString())
                     }
                     Glide.with(context).load(context.packageManager.getApplicationIcon(appArray[0]!!)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)
                 } catch (e: Exception) {
