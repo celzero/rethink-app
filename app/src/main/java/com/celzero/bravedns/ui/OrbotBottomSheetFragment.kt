@@ -91,6 +91,8 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         }
     } else if (persistentState.theme == 1) {
         R.style.BottomSheetDialogThemeWhite
+    } else if (persistentState.theme == 2) {
+        R.style.BottomSheetDialogThemeTrueBlack
     } else {
         R.style.BottomSheetDialogTheme
     }

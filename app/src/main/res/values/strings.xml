@@ -443,7 +443,7 @@
     <string name="configure_dns_connected_dns_crypt_status">dnscrypt</string>
     <string name="configure_dns_connected_dns_proxy_status">dns proxy</string>
     <string name="configure_dns_connection_name">Connected to %1$s</string>
-    <string name="configure_dns_crypt_name">DNSCrypt resolvers: </string>
+    <string name="configure_dns_crypt_name">DNSCrypt resolvers: %1$s</string>
     <string name="configure_dns_crypt">DNSCrypt: %1$s resolvers</string>
 
     <string name="firewall_app_added_in_whitelist">whitelisted app</string>
@@ -824,7 +824,7 @@
 
     <!-- Excluded app dialog -->
     <string name="ex_dialog_count">%1$s/%2$s apps excluded.</string>
-    <string name="ex_dialog_header">Exclude app from DNS and Firewall</string>
+    <string name="ex_dialog_header">Exclude apps from DNS and Firewall</string>
     <string name="ex_dialog_button">Go back</string>
     <string name="ex_select_all">select all</string>
 
@@ -913,7 +913,7 @@
     <string name="whitelist_add_positive">Add %1$s apps</string>
     <string name="whitelist_add_negative">Remove %1$s apps</string>
 
-    <string name="whitelist_heading">Whitelist Applications</string>
+    <string name="whitelist_heading">Whitelist Apps</string>
     <string name="whitelist_select_all">select all</string>
     <string name="whitelist_button">Go back</string>
 
