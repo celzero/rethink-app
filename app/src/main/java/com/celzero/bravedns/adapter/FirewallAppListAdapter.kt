@@ -148,11 +148,9 @@ class FirewallAppListAdapter internal constructor(
 
             val activityManager: ActivityManager = context.getSystemService(Activity.ACTIVITY_SERVICE) as ActivityManager
             if (appUIDList.size <= 1 || blockAllApps) {
-                object : CountDownTimer(500, 250) {
+                object : CountDownTimer(500, 500) {
                     override fun onTick(millisUntilFinished: Long) {
-                        fwWifiImg.isEnabled = false
                     }
-
                     override fun onFinish() {
                         fwWifiImg.isEnabled = true
                     }
@@ -343,10 +341,10 @@ class FirewallAppListAdapter internal constructor(
             }
             if(proceedBlock) {
                 Log.i(LOG_TAG,"Blocking proceeded - ")
-                object : CountDownTimer(100, 500) {
+                internetChk.visibility = View.GONE
+                progressBar.visibility = View.VISIBLE
+                object : CountDownTimer(500, 500) {
                     override fun onTick(millisUntilFinished: Long) {
-                        internetChk.visibility = View.GONE
-                        progressBar.visibility = View.VISIBLE
                     }
 
                     override fun onFinish() {

@@ -212,7 +212,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
     override fun onResume() {
         super.onResume()
 
-        object : CountDownTimer(100, 500) {
+        object : CountDownTimer(500, 500) {
             override fun onTick(millisUntilFinished: Long) {
             }
 

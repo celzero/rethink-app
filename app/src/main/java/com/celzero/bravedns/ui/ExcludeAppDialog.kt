@@ -92,7 +92,7 @@ class ExcludeAppDialog(private var activity: Context,
 
         b.excludeAppSelectAllOptionCheckbox.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             modifyAppsInExcludedAppList(b)
-            object : CountDownTimer(1000, 500) {
+            object : CountDownTimer(1000, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
                 }
 

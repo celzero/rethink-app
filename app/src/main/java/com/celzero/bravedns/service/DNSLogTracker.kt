@@ -119,11 +119,11 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                         dnsLogs.flag = getFlag(countryCode)
                     } else {
                         dnsLogs.response = "NXDOMAIN"
-                        dnsLogs.flag = "\u2754" // White question mark
+                        dnsLogs.flag = context.getString(R.string.unicode_question_sign) // White question mark
                     }
                 } else {
                     dnsLogs.response = err
-                    dnsLogs.flag = "\u26a0" // Warning sign
+                    dnsLogs.flag = context.getString(R.string.unicode_warning_sign) // Warning sign
                 }
             } else {
                 dnsLogs.response = transaction.status.name
