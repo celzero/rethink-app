@@ -81,7 +81,6 @@ class ConnectionCapabilityMonitor(context: Context, networkListener: NetworkList
         if (!isActiveNetworkAvailable) {
             networkListener?.onNetworkDisconnected()
             if(DEBUG) Log.d(LOG_TAG, "ActiveNetworks onLost: null val")
-            persistentState.setTestNetworkVal("Empty")
         } else {
             // Part of issue fix, internet connection showing metered even if its not the case.
             // (apps lose connectivity during switch over Mobile Data from WiFi)
@@ -151,8 +150,6 @@ class ConnectionCapabilityMonitor(context: Context, networkListener: NetworkList
         }
         if (setDiff.size != 0 || isActiveNetworkChanged) {
             if (DEBUG) Log.d(LOG_TAG, "ActiveNetworks - setting setUnderlyingNetworks - ${activeNetworks.size}")
-            if(activeNetworks.size>0)
-                connectivityManager.getNetworkInfo(activeNetworks.elementAt(0))?.typeName?.let { persistentState.setTestNetworkVal(it) }
             networkListener?.onNetworkChange(activeNetworks)
             prevNetworks.clear()
             prevNetworks.addAll(activeNetworks)

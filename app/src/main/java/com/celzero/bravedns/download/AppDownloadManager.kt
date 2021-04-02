@@ -72,6 +72,7 @@ class AppDownloadManager(private val persistentState: PersistentState, private v
             Log.i(LOG_TAG, "Context for download is null")
             persistentState.localBlocklistEnabled = false
             persistentState.tempBlocklistDownloadTime = 0
+            persistentState.workManagerStartTime = 0
             persistentState.blockListFilesDownloaded = false
         }
     }
@@ -131,8 +132,8 @@ class AppDownloadManager(private val persistentState: PersistentState, private v
      */
     private fun initDownload(context: Context) {
         downloadReference.clear()
-        DownloadHelper.deleteOldFiles(context)
         persistentState.downloadIDs = emptySet()
+        DownloadHelper.deleteOldFiles(context)
     }
 
     private fun download(url: String, fileName: String, timeStamp: String) {
