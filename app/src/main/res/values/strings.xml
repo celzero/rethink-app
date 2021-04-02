@@ -360,15 +360,14 @@
     <string name="local_blocklist_download">Download Blocklists</string>
     <string name="local_blocklist_download_desc">Download blocklists (around 50MB) to use this feature?</string>
 
-    <string name="download_lockdown_dialog_heading">Download Blocklists</string>
-    <string name="download_lockdown_dialog_desc">Lockdown mode is enabled. RethinkDNS uses Android\'s default Download manager to download the blocklist files.</string>
-    <string name="download_lockdown_dialog_positive">Goto Settings</string>
+    <string name="download_lockdown_dialog_heading">Action required</string>
+    <string name="download_lockdown_dialog_desc">Cannot download or update blocklists when VPN is in Lockdown Mode. Disable it from VPN settings.</string>
+    <string name="download_lockdown_dialog_positive">VPN settings</string>
     <string name="download_lockdown_dialog_negative">Cancel</string>
 
     <string name="local_blocklist_lockdown_redownload">Up-to-date!</string>
     <string name="local_blocklist_lockdown_redownload_desc">Local Blocklists are already at the latest version v%1$s.</string>
     <string name="local_blocklist_lockdown_positive">Okay</string>
-    <string name="local_blocklist_lockdown_neutral">Download again</string>
 
     <string name="local_blocklist_redownload">Up-to-date!</string>
     <string name="local_blocklist_redownload_desc">Local Blocklists are already at the latest version v%1$s.</string>
@@ -382,7 +381,7 @@
     <string name="webview_error_title">Error</string>
     <string name="webview_error_message">Something went wrong. Please try again later.</string>
 
-    <string name="refresh_complete">Application re-sync is complete.</string>
+    <string name="refresh_complete">App list re-sync complete.</string>
 
     <string name="dns_proxy_no_proxy">Set up a DNS Proxy by clicking on the ADD button below.</string>
 
@@ -477,7 +476,7 @@
     <string name="settings_vpn_heading">VPN &amp; Proxy</string>
     <string name="settings_vpn_heading_disabled">VPN &amp; Proxy (disabled)</string>
 
-    <string name="info_dialog_copy_toast_msg">URI Copied.</string>
+    <string name="info_dialog_copy_toast_msg">IP address copied.</string>
 
     <string name="settings_enable_logs_desc">Store DNS and Firewall logs locally on-device.</string>
     <string name="settings_enable_logs">Enable on-device logging</string>
@@ -583,7 +582,7 @@
 
     <string name="settings_socks5_orbot_disabled_error">SOCKS5 proxy is turned on. Turn off to continue with one touch setup.</string>
     <string name="settings_socks5_disabled_error">Orbot one touch start is turned on. Turn off to continue SOCKS5 configuration.</string>
-    <string name="settings_socks5_vpn_disabled_error">Start RethinkDNS to continue setup.</string>
+    <string name="settings_socks5_vpn_disabled_error">Start RethinkDNS to proceed.</string>
     <string name="settings_orbot_error_not_started">Orbot not started. Try again later.</string>
 
     <string name="settings_https_orbot_disabled_error">HTTPS proxy is turned on. Turn off to continue with one touch setup.</string>
@@ -726,7 +725,7 @@
     <string name="about_app">app</string>
     <string name="about_email">Email us</string>
     <string name="about_settings">system</string>
-    <string name="about_settings_app_info">App Information</string>
+    <string name="about_settings_app_info">App info</string>
     <string name="about_settings_vpn_profile">VPN Profile</string>
     <string name="about_settings_notification">Notification Settings</string>
     <string name="about_whats_new">What\'s new in %1$s</string>
@@ -748,13 +747,10 @@
     <string name="about_version_install_source">v%1$s (%2$s)</string>
     <string name="about_dialog_neutral_button">Suggest features</string>
 
-    <string name="app_info_error">Could not launch App info. Try again later.</string>
-    <string name="vpn_profile_error">Could not launch VPN profile. Try again later.</string>
-    <string name="notification_settings_error">Could not launch Notification settings. Try again later.</string>
+    <string name="app_info_error">Could not launch App info.</string>
+    <string name="vpn_profile_error">Could not launch VPN profile.</string>
+    <string name="notification_settings_error">Could not launch Notification settings.</string>
 
-    <string name="fdroid_update_title">FDroid</string>
-    <string name="fdroid_update_message">Update check is not performed for FDroid builds. Visit FDroid to check for updates.</string>
-    <string name="fdroid_positive_button">Okay</string>
 
     <!-- Configure DNS Fragment string == cd -->
     <string name="cd_dns_type_spinner_tooltip">Select DNS</string>
@@ -901,7 +897,7 @@
     <string name="dns_crypt_relay_error_toast">No resolver selected</string>
 
     <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
-    <string name="dns_proxy_dialog_message">AppName: %1$s\n\nURL: %2$s\n\nPort: %3$s</string>
+    <string name="dns_proxy_dialog_message">App name: %1$s\n\nIP address: %2$s\n\nPort number: %3$s</string>
 
     <string name="dns_query_latency">%1$sms</string>
 

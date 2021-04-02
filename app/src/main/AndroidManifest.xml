@@ -80,7 +80,7 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".receiver.OrbotNotificationReceiver"
+            android:name=".receiver.NotificationActionReceiver"
             android:label="@string/app_name">
         </receiver>
         <receiver

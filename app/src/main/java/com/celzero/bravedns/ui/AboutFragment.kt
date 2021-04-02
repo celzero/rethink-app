@@ -117,11 +117,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
                 startActivity(intent)
             }
             b.aboutAppUpdate -> {
-                if (BuildConfig.FLAVOR == Constants.FLAVOR_FDROID) {
-                    showFdroidUpdateDialog()
-                }else {
-                    (requireContext() as HomeScreenActivity).checkForUpdate(true)
-                }
+                (requireContext() as HomeScreenActivity).checkForUpdate(true)
             }
             b.aboutWhatsNew -> {
                 showNewFeaturesDialog()
@@ -199,22 +195,5 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             }
             .setCancelable(true).create().show()
     }
-
-    private fun showFdroidUpdateDialog() {
-        val builder = AlertDialog.Builder(requireContext())
-        //set title for alert dialog
-        builder.setTitle(R.string.fdroid_update_title)
-        //set message for alert dialog
-        builder.setMessage(R.string.fdroid_update_message)
-        builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.fdroid_positive_button)) { dialogInterface, _ ->
-            dialogInterface.dismiss()
-        }
-        // Create the AlertDialog
-        val alertDialog: AlertDialog = builder.create()
-        // Set other dialog properties
-        alertDialog.setCancelable(true)
-        alertDialog.show()
-    }
-
+    
 }
