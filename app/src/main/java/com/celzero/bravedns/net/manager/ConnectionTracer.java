@@ -23,7 +23,11 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 import java.net.InetSocketAddress;
+import java.util.concurrent.TimeUnit;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
 import static com.celzero.bravedns.util.Constants.LOG_TAG;
@@ -31,13 +35,18 @@ import static com.celzero.bravedns.util.Constants.LOG_TAG;
 public class ConnectionTracer {
     private static final boolean DEBUG = false;
     private static final int MISSING_UID = -2000;
-    private final Context context;
     private final ConnectivityManager cm;
+    private final Cache<String, Integer> uidCache;
 
     public ConnectionTracer(Context ctx) {
-        this.context = ctx;
-
-        this.cm = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
+        this.cm = (ConnectivityManager) ctx.getSystemService(CONNECTIVITY_SERVICE);
+        // Cache the UID for the next 30 seconds.
+        // the UID will expire after 30 seconds of the write.
+        // Key for the cache is protocol, local, remote
+        this.uidCache = CacheBuilder.newBuilder()
+            .maximumSize(1000)
+            .expireAfterWrite(30, TimeUnit.SECONDS)
+            .build();
     }
 
     @TargetApi(Build.VERSION_CODES.Q)
@@ -71,12 +80,19 @@ public class ConnectionTracer {
             remote = new InetSocketAddress(destIp, destPort);
         }
         int uid = -1;
+        String key = protocol+local.getAddress().getHostAddress()+remote.getAddress().getHostAddress();
+        try {
+            int value = uidCache.getIfPresent(key);
+            Log.d(LOG_TAG, "Cache GetUidQ uid: " + value);
+            return value;
+        } catch (Exception ignored) { }
+
         try{
             uid = cm.getConnectionOwnerUid(protocol, local, remote);
+            uidCache.put(key, uid);
         }catch(SecurityException secEx){
             Log.e(LOG_TAG,"NETWORK_STACK permission - "+secEx.getMessage());
         }
-
 
         if (DEBUG) Log.d(LOG_TAG, "GetUidQ(" + local + "," + remote + "): " + uid);
 
