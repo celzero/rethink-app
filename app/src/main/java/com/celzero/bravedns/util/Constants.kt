@@ -47,7 +47,7 @@ class Constants {
 
         // Earlier the link was https://bravedns.com/downloads
         // modified below link post v053c release
-        const val APP_DOWNLOAD_LINK = "https://bravedns.com/download"
+        const val APP_DOWNLOAD_LINK = "https://rethinkdns.com/download"
 
         const val BRAVE_BASE_STAMP = "https://basic.bravedns.com/"
         const val BRAVE_CONFIGURE_BASE_STAMP = "bravedns.com/configure"
@@ -118,6 +118,13 @@ class Constants {
         const val FLAVOR_PLAY = "play"
         const val FLAVOR_FDROID = "fdroid"
         const val FLAVOR_WEBSITE = "website"
+
+        const val PORT_VAL_UNKNOWN = "unknown"
+
+        const val NOTIFICATION_ACTION = "NOTIFICATION_VALUE"
+        const val VPN_NOTIFICATION_ACTION = "STOP_RETHINKDNS"
+
+        const val WORK_MANAGER_TIMEOUT = 1*40*60*1000
 
     }
 

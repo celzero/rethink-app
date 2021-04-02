@@ -27,7 +27,6 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.connectedDNS
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.ORBAT_MODE_NONE
 import hu.autsoft.krate.*
-import org.koin.core.component.KoinApiExtension
 import settings.Settings
 
 class PersistentState(context: Context):SimpleKrate(context) {
@@ -76,6 +75,8 @@ class PersistentState(context: Context):SimpleKrate(context) {
     var blockListFilesDownloaded by booleanPref("download_block_list_files", false)
     var localBlocklistEnabled by booleanPref("enable_local_list", false)
     var remoteBlockListDownloadTime by longPref("remote_block_list_downloaded_time", 0)
+    var tempRemoteBlockListDownloadTime by longPref("temp_remote_block_list_downloaded_time", 0)
+    var workManagerStartTime by longPref("work_manager_start_time", 0)
     var localBlockListDownloadTime by longPref("local_block_list_downloaded_time", 0)
     var tempBlocklistDownloadTime by longPref("temp_time_during_download",0)
     var httpProxyPort by intPref("http_proxy_port", 0)
@@ -113,6 +114,7 @@ class PersistentState(context: Context):SimpleKrate(context) {
 
     var orbotModeConst : Int = 0
     var median50: MutableLiveData<Long> = MutableLiveData()
+    var blockedCount: MutableLiveData<Int> = MutableLiveData()
 
     fun wifiAllowed(forPackage:String):Boolean = !excludedPackagesWifi.contains(forPackage)
 
@@ -174,8 +176,7 @@ class PersistentState(context: Context):SimpleKrate(context) {
     }
 
     fun setNumOfReq(){
-        var numReq = 0
-        numReq = if(HomeScreenActivity.GlobalVariable.lifeTimeQueries > 0) HomeScreenActivity.GlobalVariable.lifeTimeQueries + 1
+        val numReq = if(HomeScreenActivity.GlobalVariable.lifeTimeQueries > 0) HomeScreenActivity.GlobalVariable.lifeTimeQueries + 1
         else {
             _numberOfRequests + 1
         }
@@ -192,7 +193,7 @@ class PersistentState(context: Context):SimpleKrate(context) {
 
     fun incrementBlockedReq() {
         numberOfBlockedRequests += 1
-        HomeScreenActivity.GlobalVariable.blockedCount.postValue(numberOfBlockedRequests)
+        blockedCount.postValue(numberOfBlockedRequests)
     }
 
     fun setIsBackgroundEnabled(isEnabled: Boolean) {
@@ -200,7 +201,6 @@ class PersistentState(context: Context):SimpleKrate(context) {
         HomeScreenActivity.GlobalVariable.isBackgroundEnabled = backgroundEnabled
     }
 
-    @KoinApiExtension
     fun setScreenLockData(isEnabled : Boolean) {
         HomeScreenActivity.GlobalVariable.isScreenLocked = if(isEnabled) 1
         else 0
@@ -219,20 +219,20 @@ class PersistentState(context: Context):SimpleKrate(context) {
     fun getConnectedDNS() : String{
         if(connectedDNS.value.isNullOrEmpty()){
             val dnsType = appMode?.getDNSType()
-            if(dnsType == 1){
-                var dohDetail: DoHEndpoint? = null
+            return if(dnsType == 1){
+                val dohDetail: DoHEndpoint?
                 try {
                     dohDetail = appMode?.getDOHDetails()
-                    return dohDetail?.dohName!!
+                    dohDetail?.dohName!!
                 } catch (e: Exception) {
-                    return connectedDNSName
+                    connectedDNSName
                 }
             }else if(dnsType == 2){
                 val cryptDetails = appMode?.getDNSCryptServerCount()
-                return "DNSCrypt: $cryptDetails resolvers"
+                "DNSCrypt: $cryptDetails resolvers"
             }else{
                 val proxyDetails = appMode?.getDNSProxyServerDetails()
-                return proxyDetails?.proxyAppName!!
+                proxyDetails?.proxyAppName!!
             }
         }
         else
