@@ -86,7 +86,6 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.6.0-alpha01'
     implementation("androidx.preference:preference-ktx:1.1.1")
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    implementation "com.mikepenz:fastadapter:5.0.0-a04"
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

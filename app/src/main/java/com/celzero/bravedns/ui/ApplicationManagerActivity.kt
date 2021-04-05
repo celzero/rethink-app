@@ -32,8 +32,6 @@ import com.celzero.bravedns.adapter.ApplicationManagerApk
 import com.celzero.bravedns.animation.ViewAnimation
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.databinding.ActivityApplicationManagerBinding
-import com.mikepenz.fastadapter.FastAdapter
-import com.mikepenz.fastadapter.adapters.ItemAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -43,8 +41,6 @@ import org.koin.android.ext.android.inject
 class ApplicationManagerActivity : AppCompatActivity(R.layout.activity_application_manager), SearchView.OnQueryTextListener {
     private val b by viewBinding(ActivityApplicationManagerBinding::bind)
 
-    private lateinit var itemAdapter: ItemAdapter<ApplicationManagerApk>
-    private lateinit var fastAdapter: FastAdapter<ApplicationManagerApk>
     private val apkList = ArrayList<ApplicationManagerApk>()
 
     private var isRotate: Boolean = false
@@ -60,12 +56,12 @@ class ApplicationManagerActivity : AppCompatActivity(R.layout.activity_applicati
     private fun initView() {
         b.applicationManagerRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        itemAdapter = ItemAdapter()
-        fastAdapter = FastAdapter.with(itemAdapter)
+        /*itemAdapter = ItemAdapter()
+        fastAdapter = FastAdapter.with(itemAdapter)*/
 
         b.amSearch.setOnQueryTextListener(this)
 
-        b.applicationManagerRecyclerView.adapter = fastAdapter
+        //b.applicationManagerRecyclerView.adapter = fastAdapter
 
         ViewAnimation.init(b.amFabUninstallIcon)
         ViewAnimation.init(b.amFabAppinfoIcon)
@@ -84,10 +80,10 @@ class ApplicationManagerActivity : AppCompatActivity(R.layout.activity_applicati
         }
 
         b.amFabUninstallIcon.setOnClickListener {
-            val list = ApplicationManagerApk.getAddedList()
+            /*val list = ApplicationManagerApk.getAddedList()
             for (app in list) {
                 uninstallPackage(app)
-            }
+            }*/
         }
 
         b.amFabAppinfoIcon.setOnClickListener {
@@ -98,12 +94,6 @@ class ApplicationManagerActivity : AppCompatActivity(R.layout.activity_applicati
         }
     }
 
-    private fun uninstallPackage(app: ApplicationManagerApk) {
-        val packageURI = ("package:" + app.packageName).toUri()
-        val intent = Intent(Intent.ACTION_DELETE, packageURI)
-        intent.putExtra("packageName", app.packageName)
-        startActivity(intent)
-    }
 
     private fun appInfoForPackage(packageName: String) {
         val activityManager: ActivityManager = getSystemService(Activity.ACTIVITY_SERVICE) as ActivityManager
@@ -139,18 +129,18 @@ class ApplicationManagerActivity : AppCompatActivity(R.layout.activity_applicati
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        itemAdapter.filter(query)
+        /*itemAdapter.filter(query)
         itemAdapter.itemFilter.filterPredicate = { item: ApplicationManagerApk, constraint: CharSequence? ->
             item.appName?.contains(constraint.toString(), ignoreCase = true)!!
-        }
+        }*/
         return false
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
-        itemAdapter.filter(newText)
+        /*itemAdapter.filter(newText)
         itemAdapter.itemFilter.filterPredicate = { item: ApplicationManagerApk, constraint: CharSequence? ->
             item.appName?.contains(constraint.toString(), ignoreCase = true)!!
-        }
+        }*/
         return true
     }
 }

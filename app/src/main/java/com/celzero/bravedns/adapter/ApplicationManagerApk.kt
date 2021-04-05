@@ -19,17 +19,13 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.graphics.drawable.Drawable
-import android.view.View
-import android.widget.CheckBox
-import android.widget.CompoundButton
-import android.widget.ImageView
-import android.widget.TextView
-import com.celzero.bravedns.R
-import com.mikepenz.fastadapter.FastAdapter
-import com.mikepenz.fastadapter.items.AbstractItem
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.celzero.bravedns.databinding.AppScrollListBinding
 
 
-class ApplicationManagerApk (packageInfo: PackageInfo,  var category: String, context : Context) : AbstractItem<ApplicationManagerApk.ViewHolder>() {
+class ApplicationManagerApk (packageInfo: PackageInfo,  var category: String, context : Context) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var appInfo: ApplicationInfo?= null
     var appName: String ?= null
@@ -62,47 +58,21 @@ class ApplicationManagerApk (packageInfo: PackageInfo,  var category: String, co
         }
     }
 
-    /** defines the type defining this item. must be unique. preferably an id */
-    override val type: Int
-        get() = R.id.am_apk_parent
 
-    /** defines the layout which will be used for this item in the list  */
-    override val layoutRes: Int
-        get() = R.layout.am_list_item
+    inner class ViewHolder(private val b: AppScrollListBinding): RecyclerView.ViewHolder(b.root) {
 
-    override fun getViewHolder(v: View): ViewHolder {
-        return ViewHolder(v)
     }
 
-    inner class ViewHolder (itemView: View): FastAdapter.ViewHolder<ApplicationManagerApk>(itemView) {
-        private val mIconImageView: ImageView = itemView.findViewById(R.id.am_apk_icon_iv)
-        private val mLabelTextView: TextView = itemView.findViewById(R.id.am_apk_label_tv)
-        private val mCheckBox : CheckBox = itemView.findViewById(R.id.am_action_item_checkbox)
-        private val mPackageTextView: TextView = itemView.findViewById(R.id.am_apk_package_tv)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val itemBinding = AppScrollListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(itemBinding)
+    }
 
-        override fun bindView(item:  ApplicationManagerApk, payloads: MutableList<Any>) {
-            mIconImageView.setImageDrawable(item.appIcon)
-            mLabelTextView.text = item.appName
-            mPackageTextView.text = item.category
-            mCheckBox.setOnCheckedChangeListener(null)
-            mCheckBox.isChecked = item.isSelected
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 
+    }
 
-            mCheckBox.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
-               if(b){
-                   addedList.add(item)
-                   item.isChecked = true
-                   item.isSelected = true
-               }else{
-                   addedList.remove(item)
-                   item.isChecked = false
-                   item.isSelected = false
-               }
-            }
-        }
-
-        override fun unbindView(item: ApplicationManagerApk) {
-            super.detachFromWindow(item)
-        }
+    override fun getItemCount(): Int {
+        return 0
     }
 }
