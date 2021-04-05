@@ -48,6 +48,7 @@ import com.celzero.bravedns.net.manager.ConnectionTracer
 import com.celzero.bravedns.receiver.BraveAutoStartReceiver
 import com.celzero.bravedns.receiver.BraveScreenStateReceiver
 import com.celzero.bravedns.receiver.NotificationActionReceiver
+import com.celzero.bravedns.service.PersistentState.Companion.BACKGROUND_MODE
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment.Companion.UNIVERSAL_RULES_UID
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -446,7 +447,7 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
             if (appMode.getDNSType() == 3) {
                 try {
                     //For DNS proxy mode, if any app is set then exclude the application from the list
-                    var dnsProxyEndpoint = dnsProxyEndpointRepository.getConnectedProxy()
+                    val dnsProxyEndpoint = dnsProxyEndpointRepository.getConnectedProxy()
                     if (!dnsProxyEndpoint.proxyAppName.isNullOrEmpty() && dnsProxyEndpoint.proxyAppName != "Nobody") {
                         Log.i(LOG_TAG, "$FILE_LOG_TAG DNS Proxy mode is set with the app - ${dnsProxyEndpoint.proxyAppName!!}- added to excluded list")
                         builder = builder.addDisallowedApplication(dnsProxyEndpoint.proxyAppName!!)
@@ -592,7 +593,7 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
                 // until we come online.
                 connectionCapabilityMonitor = ConnectionCapabilityMonitor(this, this)
 
-
+                restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
                 // Mark this as a foreground service.  This is normally done to ensure that the service
                 // survives under memory pressure.  Since this is a VPN service, it is presumably protected
                 // anyway, but the foreground service mechanism allows us to set a persistent notification,
@@ -732,7 +733,7 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
             Log.i(LOG_TAG, "$FILE_LOG_TAG preference for screen off mode is modified - $isScreenLocked")
         }
 
-        if (PersistentState.BACKGROUND_MODE == key) {
+        if (BACKGROUND_MODE == key) {
             isBackgroundEnabled = persistentState.backgroundEnabled && Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
             Log.i(LOG_TAG, "$FILE_LOG_TAG preference for background mode is modified - $isBackgroundEnabled")
         }

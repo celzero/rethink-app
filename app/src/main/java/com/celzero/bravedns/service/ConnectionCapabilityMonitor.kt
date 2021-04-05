@@ -57,7 +57,7 @@ class ConnectionCapabilityMonitor(context: Context, networkListener: NetworkList
         super.onAvailable(network)
         //if(DEBUG) Log.d(LOG_TAG, "ActiveNetworks onAvailable 1: ${network.networkHandle}, ${connectivityManager.activeNetwork?.networkHandle}, ${connectivityManager.getNetworkInfo(network)?.typeName}")
         if (activeNetworks.isEmpty()) {
-            networkListener?.onNetworkConnected()
+            //networkListener?.onNetworkConnected()
             prevNetworks.clear()
         }
         if (activeNetworks.none { activeNetwork -> activeNetwork.networkHandle == network.networkHandle }) activeNetworks.add(network)
