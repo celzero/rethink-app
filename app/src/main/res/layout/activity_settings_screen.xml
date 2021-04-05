@@ -62,7 +62,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:gravity="center"
-                        android:text="@string/settings_title_desc"
+                        android:text="@string/about_title_desc"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/sub_heading_small"
                         android:visibility="visible" />
