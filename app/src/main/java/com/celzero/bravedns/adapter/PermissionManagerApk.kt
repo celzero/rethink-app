@@ -16,19 +16,15 @@ limitations under the License.
 package com.celzero.bravedns.adapter
 
 import android.content.Context
-import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.graphics.drawable.Drawable
-import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
-import com.celzero.bravedns.R
-import com.celzero.bravedns.ui.AppInfoActivity
-import com.mikepenz.fastadapter.FastAdapter
-import com.mikepenz.fastadapter.items.AbstractItem
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.celzero.bravedns.databinding.PmListItemBinding
 
-class PermissionManagerApk (packageInfo: PackageInfo, context : Context) : AbstractItem<PermissionManagerApk.ViewHolder>() {
+class PermissionManagerApk (packageInfo: PackageInfo, context : Context) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var appInfo: ApplicationInfo = packageInfo.applicationInfo
     var appName: String ?= null
@@ -48,39 +44,19 @@ class PermissionManagerApk (packageInfo: PackageInfo, context : Context) : Abstr
 
     }
 
-    /** defines the type defining this item. must be unique. preferably an id */
-    override val type: Int
-        get() = R.id.pm_apk_parent
 
-    /** defines the layout which will be used for this item in the list  */
-    override val layoutRes: Int
-        get() = R.layout.pm_list_item
-
-
-
-
-    override fun getViewHolder(v: View): ViewHolder {
-        return ViewHolder(v)
+    inner class ViewHolder (b: PmListItemBinding): RecyclerView.ViewHolder(b.root) {
     }
 
-    inner class ViewHolder (itemView: View): FastAdapter.ViewHolder<PermissionManagerApk>(itemView) {
-        private val mIconImageView: ImageView = itemView.findViewById(R.id.pm_apk_icon_iv)
-        private val mLabelTextView: TextView = itemView.findViewById(R.id.pm_apk_label_tv)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val itemBinding = PmListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(itemBinding)
+    }
 
-        override fun bindView(item:  PermissionManagerApk, payloads: MutableList<Any>) {
-            mIconImageView.setImageDrawable(item.appIcon)
-            mLabelTextView.text = item.appName
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    }
 
-            mLabelTextView.setOnClickListener {
-                val intent = Intent(context, AppInfoActivity::class.java)
-                context?.startActivity(intent)
-            }
-        }
-
-        override fun unbindView(item: PermissionManagerApk) {
-            mIconImageView.setImageDrawable(null)
-            mLabelTextView.text = null
-        }
-
+    override fun getItemCount(): Int {
+        return 0
     }
 }

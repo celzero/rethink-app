@@ -25,20 +25,17 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.PermissionManagerApk
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.databinding.ActivityPermissionManagerBinding
-import com.mikepenz.fastadapter.FastAdapter
-import com.mikepenz.fastadapter.adapters.ItemAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class PermissionManagerActivity : AppCompatActivity(R.layout.activity_permission_manager), SearchView.OnQueryTextListener {
     private val b by viewBinding(ActivityPermissionManagerBinding::bind)
 
-    private lateinit var fastAdapter: FastAdapter<PermissionManagerApk>
+    //private lateinit var fastAdapter: FastAdapter<PermissionManagerApk>
     private val apkList = ArrayList<PermissionManagerApk>()
-    private lateinit var itemAdapter: ItemAdapter<PermissionManagerApk>
+    //private lateinit var itemAdapter: ItemAdapter<PermissionManagerApk>
     private lateinit var context: Context
 
     private val appInfoRepository by inject<AppInfoRepository>()
@@ -54,20 +51,19 @@ class PermissionManagerActivity : AppCompatActivity(R.layout.activity_permission
     private fun initView() {
 
         b.permissionManagerRecyclerView.layoutManager = LinearLayoutManager(this)
-
+        b.permissionManagerSearch.setOnQueryTextListener(this)
+        /*
         itemAdapter = ItemAdapter()
         fastAdapter = FastAdapter.with(itemAdapter)
 
-        b.permissionManagerSearch.setOnQueryTextListener(this)
-
-        b.permissionManagerRecyclerView.adapter = fastAdapter
+        b.permissionManagerRecyclerView.adapter = fastAdapter*/
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        itemAdapter.filter(query)
+       /* itemAdapter.filter(query)
         itemAdapter.itemFilter.filterPredicate = { item: PermissionManagerApk, constraint: CharSequence? ->
             item.appName?.contains(constraint.toString(), ignoreCase = true)!!
-        }
+        }*/
         return false
     }
 
@@ -77,17 +73,17 @@ class PermissionManagerActivity : AppCompatActivity(R.layout.activity_permission
             val userApk = PermissionManagerApk(packageManager.getPackageInfo(it.packageInfo, 0), context)
             apkList.add(userApk)
         }
-        withContext(Dispatchers.Main.immediate) {
+        /*withContext(Dispatchers.Main.immediate) {
             itemAdapter.add(apkList)
             fastAdapter.notifyDataSetChanged()
-        }
+        }*/
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
-        itemAdapter.filter(newText)
+        /*itemAdapter.filter(newText)
         itemAdapter.itemFilter.filterPredicate = { item: PermissionManagerApk, constraint: CharSequence? ->
             item.appName?.contains(constraint.toString(), ignoreCase = true)!!
-        }
+        }*/
         return true
     }
 }
