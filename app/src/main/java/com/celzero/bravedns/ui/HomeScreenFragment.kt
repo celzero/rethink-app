@@ -358,7 +358,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     override fun onResume() {
         super.onResume()
-        syncDnsStatus()
+        autoStartCheck()
         updateUptime()
         if (persistentState.vpnEnabled) {
             //Shimmer
@@ -368,6 +368,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             shimmerForStop()
         }
         braveModeToggler.postValue(braveMode)
+        syncDnsStatus()
     }
 
     private fun startFirewallLogsActivity(){
@@ -680,6 +681,25 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             stopDnsVpnService()
         }
     }
+
+    /**
+     * Issue fix - https://github.com/celzero/rethink-app/issues/57
+     * When the application crashes/updates it goes into
+     * red waiting state. This causes confusion to the users also requires
+     * click of START button twice to start the app.
+     * FIX : The check for the controller state. If the state of the controller
+     * is activationRequested and the VPN is not connected then
+     * the start will be initiated.
+     */
+    private fun autoStartCheck() {
+        val controller = VpnController.getInstance()
+        val state = controller.getState()
+        if (state.activationRequested && !state.on) {
+            Log.d(LOG_TAG, "HOMESCREENFRAGMENT - start VPN (previous state)")
+            prepareAndStartDnsVpn()
+        }
+    }
+
 
     // Sets the UI DNS status on/off.
     private fun syncDnsStatus() {
