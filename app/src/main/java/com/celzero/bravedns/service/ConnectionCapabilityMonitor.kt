@@ -22,7 +22,6 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.google.common.collect.Sets
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 class ConnectionCapabilityMonitor(context: Context, networkListener: NetworkListener) : ConnectivityManager.NetworkCallback(), KoinComponent {
 
@@ -35,10 +34,7 @@ class ConnectionCapabilityMonitor(context: Context, networkListener: NetworkList
     private val prevNetworks: MutableSet<Network> = mutableSetOf()
     var connectivityManager: ConnectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-    private val persistentState by inject<PersistentState>()
-
     interface NetworkListener {
-        fun onNetworkConnected()
         fun onNetworkDisconnected()
         fun onNetworkChange(networkSet: MutableSet<Network>)
         fun checkLockDown()
@@ -57,7 +53,11 @@ class ConnectionCapabilityMonitor(context: Context, networkListener: NetworkList
         super.onAvailable(network)
         //if(DEBUG) Log.d(LOG_TAG, "ActiveNetworks onAvailable 1: ${network.networkHandle}, ${connectivityManager.activeNetwork?.networkHandle}, ${connectivityManager.getNetworkInfo(network)?.typeName}")
         if (activeNetworks.isEmpty()) {
-            networkListener?.onNetworkConnected()
+            // Removing the startVPN() in BraveVPNService. Earlier, the call
+            // was made when once the app receives onAvailable event.
+            // Now as part of reducing the startVPN thread issue(#242) call for
+            // startVPN is removed.
+            //networkListener?.onNetworkConnected()
             prevNetworks.clear()
         }
         if (activeNetworks.none { activeNetwork -> activeNetwork.networkHandle == network.networkHandle }) activeNetworks.add(network)
@@ -143,7 +143,6 @@ class ConnectionCapabilityMonitor(context: Context, networkListener: NetworkList
 
     private fun networkChangeCheck() {
         val setDiff = Sets.symmetricDifference(prevNetworks, activeNetworks)
-        if(DEBUG) Log.d(LOG_TAG, "ActiveNetworks setDiff size - ${setDiff.size}, ${prevNetworks.size}, ${activeNetworks.size}")
         var isActiveNetworkChanged = false
         if(prevNetworks.size > 0 && activeNetworks.size> 0){
             isActiveNetworkChanged = (prevNetworks.elementAt(0).networkHandle != activeNetworks.elementAt(0).networkHandle)
