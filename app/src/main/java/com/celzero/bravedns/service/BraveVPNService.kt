@@ -56,9 +56,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import protect.Blocker
@@ -99,7 +97,11 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
         var blockUDPTraffic: Boolean = false
 
     }
-    var isLockDownPrevious : Boolean  = false
+
+    private var isLockDownPrevious : Boolean  = false
+
+    private val vpnScope = MainScope()
+    private var isLoadFirewallRulesCompleted : Boolean = false
 
     private lateinit var connTracer: ConnectionTracer
 
@@ -143,6 +145,13 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
      * RULE6 - Universal firewall - Block all UDP connections
      */
     private fun checkConnectionBlocked(_uid: Int, protocol: Int, sourceIp: String, sourcePort: Int, destIp: String, destPort: Int): Boolean {
+
+        if(!isLoadFirewallRulesCompleted){
+            checkIfLoadRulesCompleted()
+        }else{
+            if(DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG isLoadFirewallRulesCompleted checkConnectionBlocked is true")
+        }
+
         val ipDetails: IPDetails?
         var isBlocked: Boolean
         var uid = _uid
@@ -233,7 +242,7 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
                     //When the app is not in foreground.
                     if (isBGBlock) {
                         if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Background blocked $uid, $destIp, after sleep: $uid, $destIp, $isBGBlock, ${System.currentTimeMillis()}")
-                        Thread.sleep((bgBlockWaitMs + remainingWaitMs).toLong())
+                        Thread.sleep((bgBlockWaitMs + remainingWaitMs))
                         ipDetails.isBlocked = true
                         ipDetails.blockedByRule = BlockedRuleNames.RULE4.ruleName
                         sendConnTracking(ipDetails)
@@ -283,6 +292,37 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
         }
         if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Response for the block: $destIp  %After% $uid, $isBlocked,$sourceIp, $sourcePort, $destIp, $destPort")
         return isBlocked
+    }
+
+    private fun checkIfLoadRulesCompleted() {
+        // Adding the exponential calculation of wait time until we load the firewall
+        // rules. The other check of the block() method will be executed once we load
+        // the firewall rules.
+        val baseWaitMs = TimeUnit.MILLISECONDS.toMillis(50)
+        val bgBlockWaitMs = TimeUnit.SECONDS.toMillis(20)
+        var remainingWaitMs = TimeUnit.SECONDS.toMillis(10)
+        var attempt = 0
+
+        while (remainingWaitMs > 0) {
+            if (isLoadFirewallRulesCompleted) {
+                if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG isLoadFirewallRulesCompleted is true")
+                break
+            } else {
+                if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG isLoadFirewallRulesCompleted is false, trying again")
+            }
+            // ref: https://stackoverflow.com/a/363692
+            val exponent = exp(baseWaitMs, attempt)
+            val randomValue = rand.nextLong(exponent - baseWaitMs + 1) + baseWaitMs
+            val waitTimeMs = Math.min(randomValue, remainingWaitMs)
+            remainingWaitMs -= waitTimeMs
+            attempt += 1
+            Thread.sleep(waitTimeMs)
+        }
+
+        //When the app is not in foreground.
+        if (!isLoadFirewallRulesCompleted) {
+            Thread.sleep((bgBlockWaitMs + remainingWaitMs))
+        }
     }
 
     private fun delayBeforeResponse() {
@@ -446,7 +486,7 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
             if (appMode.getDNSType() == 3) {
                 try {
                     //For DNS proxy mode, if any app is set then exclude the application from the list
-                    var dnsProxyEndpoint = dnsProxyEndpointRepository.getConnectedProxy()
+                    val dnsProxyEndpoint = dnsProxyEndpointRepository.getConnectedProxy()
                     if (!dnsProxyEndpoint.proxyAppName.isNullOrEmpty() && dnsProxyEndpoint.proxyAppName != "Nobody") {
                         Log.i(LOG_TAG, "$FILE_LOG_TAG DNS Proxy mode is set with the app - ${dnsProxyEndpoint.proxyAppName!!}- added to excluded list")
                         builder = builder.addDisallowedApplication(dnsProxyEndpoint.proxyAppName!!)
@@ -552,10 +592,13 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        vpnScope.launch {
+            loadAppFirewallRules()
+        }
         appInfoRepository.getUIDForUnivWhiteList().observeForever { appInfoList ->
             appWhiteList = appInfoList.associateBy({ it }, { true }).toMutableMap()
         }
-        if(persistentState.orbotEnabledMode != Constants.ORBAT_MODE_NONE /*&& !persistentState.orbotEnabled*/){
+        if(persistentState.orbotEnabledMode != Constants.ORBAT_MODE_NONE){
             get<OrbotHelper>().startOrbot(this)
         }
         blockUDPTraffic = persistentState.udpBlockedSettings
@@ -583,20 +626,14 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
                     return Service.START_REDELIVER_INTENT
                 }
 
-                // If we're online, |networkManager| immediately calls this.onNetworkConnected(), which in turn
-                // calls startVpn() to actually start.  If we're offline, the startup actions will be delayed
-                // until we come online.
-
-                // If we're online, |networkManager| immediately calls this.onNetworkConnected(), which in turn
-                // calls startVpn() to actually start.  If we're offline, the startup actions will be delayed
-                // until we come online.
+                // Register for ConnectivityManager
                 connectionCapabilityMonitor = ConnectionCapabilityMonitor(this, this)
 
-
-                // Mark this as a foreground service.  This is normally done to ensure that the service
-                // survives under memory pressure.  Since this is a VPN service, it is presumably protected
-                // anyway, but the foreground service mechanism allows us to set a persistent notification,
-                // which helps users understand what's going on, and return to the app if they want.
+                // Part of issue fix(#242) - StartVPN thread that for some reason is waiting
+                // Avoiding the call from ConnectivityManager to invoke startVPN is removed.
+                // RestartVPN is executed when the VPNService - onStartCommand is called.
+                // Added as part of testing.
+                restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
 
                 // Mark this as a foreground service.  This is normally done to ensure that the service
                 // survives under memory pressure.  Since this is a VPN service, it is presumably protected
@@ -613,6 +650,19 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
             Log.i(LOG_TAG, "$FILE_LOG_TAG onStart command not initiated - vpnController is null ")
         }
         return Service.START_REDELIVER_INTENT
+    }
+
+    private suspend fun loadAppFirewallRules() {
+        withContext(Dispatchers.IO) {
+            val appDetailsFromDB = appInfoRepository.getAppInfoAsync()
+            appDetailsFromDB.forEach {
+                HomeScreenActivity.GlobalVariable.appList[it.packageInfo] = it
+                if (!it.isInternetAllowed) {
+                    HomeScreenActivity.GlobalVariable.blockedUID[it.uid] = false
+                }
+            }
+            isLoadFirewallRulesCompleted = true
+        }
     }
 
     private fun registerAccessibilityServiceState() {
@@ -828,6 +878,7 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
                     vpnAdapter = null
                     vpnController.stop(this)
                     vpnController.getState().activationRequested = false
+                    persistentState.vpnEnabled = false
                     vpnController.onConnectionStateChanged(this, null)
                     Log.e(LOG_TAG, "$FILE_LOG_TAG Stop Called - stopVpnAdapter closed all states")
                 }
@@ -863,20 +914,9 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
         return GoVpnAdapter.establish(this, get(), get(), get(), get(), get())
     }
 
-    override fun onNetworkConnected() {
-        // This code is used to start the VPN for the first time, but startVpn is idempotent, so we can
-        // call it every time. startVpn performs network activity so it has to run on a separate thread.
-        Thread({ //TODO Work on the order of the function call.
-            Log.i(LOG_TAG, "onNetworkConnected - BraveVPNService -startVpn started , ${Thread.currentThread().id}")
-            updateServerConnection()
-            startVpn()
-            Log.i(LOG_TAG, "onNetworkConnected - BraveVPNService -startVpn Completed , ${Thread.currentThread().id}")
-        }, "startVpn-onNetworkConnected").start()
-    }
-
     override fun onNetworkDisconnected() {
         setUnderlyingNetworks(null)
-        vpnController!!.onConnectionStateChanged(this, null)
+        vpnController!!.onConnectionStateChanged(this, State.FAILING)
     }
 
     override fun onNetworkChange(networkSet: MutableSet<Network>) {
@@ -906,37 +946,6 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
         } else {
             if (DEBUG) Log.d(LOG_TAG, "isLockDownEnabled - False, ORBOT is ${appMode.getProxyMode()} - restart with set proxy mode")
             restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
-        }
-    }
-
-    @WorkerThread
-    private fun startVpn() {
-        isBackgroundEnabled = persistentState.backgroundEnabled
-            && Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
-        synchronized(vpnController!!) {
-            //Added again as the thread keeps hanging around.
-            if (vpnAdapter != null) {
-                return
-            }
-            startVpnAdapter()
-            vpnController.onStartComplete(this, vpnAdapter != null)
-            if (vpnAdapter == null) {
-                Log.i(LOG_TAG, "$FILE_LOG_TAG Failed to startVpn VPN adapter")
-                stopSelf()
-            }
-        }
-    }
-
-    private fun startVpnAdapter() {
-        synchronized(vpnController!!) {
-            if (vpnAdapter == null) {
-                vpnAdapter = makeVpnAdapter()
-                if (vpnAdapter != null) {
-                    vpnAdapter!!.start(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
-                } else {
-                    Log.w(LOG_TAG, "$FILE_LOG_TAG Failed to start VPN adapter!")
-                }
-            }
         }
     }
 
