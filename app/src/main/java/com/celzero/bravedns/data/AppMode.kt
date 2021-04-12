@@ -19,7 +19,6 @@ import android.content.Context
 import android.util.Log
 import com.celzero.bravedns.database.*
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
@@ -210,8 +209,11 @@ class AppMode internal constructor(
             && persistentState.blockListFilesDownloaded && persistentState.getLocalBlockListStamp().isNotEmpty()){
             val path: String = context.filesDir.canonicalPath +"/"+ persistentState.localBlockListDownloadTime
             if (DEBUG) Log.d(LOG_TAG, "Local brave dns set call from AppMode path newBraveDNSLocal :$path")
-            braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
-            HomeScreenActivity.GlobalVariable.appMode?.setBraveDNSMode(braveDNS)
+            try{
+                braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
+            }catch (e : Exception){
+                if (DEBUG) Log.d(LOG_TAG, "Local brave dns set exception :${e.message}")
+            }
         }
         return braveDNS
     }

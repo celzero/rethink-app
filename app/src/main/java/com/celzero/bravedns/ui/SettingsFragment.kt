@@ -306,9 +306,11 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 override fun onTick(millisUntilFinished: Long) {
                 }
                 override fun onFinish() {
-                    b.settingsActivityAllowBypassSwitch.isEnabled = true
-                    b.settingsActivityAllowBypassProgress.visibility = View.GONE
-                    b.settingsActivityAllowBypassSwitch.visibility = View.VISIBLE
+                    if(isAdded) {
+                        b.settingsActivityAllowBypassSwitch.isEnabled = true
+                        b.settingsActivityAllowBypassProgress.visibility = View.GONE
+                        b.settingsActivityAllowBypassSwitch.visibility = View.VISIBLE
+                    }
                 }
             }.start()
 
@@ -353,7 +355,9 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 }
 
                 override fun onFinish() {
-                    b.settingsActivityOnDeviceBlockSwitch.isEnabled = true
+                    if(isAdded) {
+                        b.settingsActivityOnDeviceBlockSwitch.isEnabled = true
+                    }
                 }
             }.start()
         }
@@ -437,7 +441,9 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 }
 
                 override fun onFinish() {
-                    b.settingsActivityExcludeAppsImg.isEnabled = true
+                    if(isAdded) {
+                        b.settingsActivityExcludeAppsImg.isEnabled = true
+                    }
                 }
             }.start()
         }
@@ -450,7 +456,9 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 }
 
                 override fun onFinish() {
-                    b.settingsActivityExcludeAppsRl.isEnabled = true
+                    if(isAdded) {
+                        b.settingsActivityExcludeAppsRl.isEnabled = true
+                    }
                 }
             }.start()
         }
@@ -466,7 +474,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
 
         b.settingsActivityOnDeviceBlockRefreshBtn.setOnClickListener {
-            checkForDownload(isUserInitiated = true, isRetry = false)
+            checkForDownload(isUserInitiated = true, isRetry = true)
         }
 
         b.settingsActivityThemeRl.setOnClickListener{
@@ -487,12 +495,13 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         WorkManager.getInstance().getWorkInfosByTagLiveData(DownloadConstants.DOWNLOAD_TAG).observe(viewLifecycleOwner, { workInfoList ->
             if (workInfoList != null && workInfoList.isNotEmpty()) {
                 val workInfo = workInfoList[0]
-                if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
-                    Log.i(LOG_TAG, "AppDownloadManager Work Manager completed - ${DownloadConstants.DOWNLOAD_TAG}")
-                } else if (workInfo != null && (workInfo.state == WorkInfo.State.ENQUEUED || workInfo.state == WorkInfo.State.RUNNING)) {
+                if (workInfo != null && (workInfo.state == WorkInfo.State.ENQUEUED || workInfo.state == WorkInfo.State.RUNNING)) {
                     updateDownloadInitiated()
                 } else if (workInfo != null && (workInfo.state == WorkInfo.State.CANCELLED || workInfo.state == WorkInfo.State.FAILED)) {
                     updateDownloadFailure()
+                    WorkManager.getInstance().pruneWork()
+                    WorkManager.getInstance().cancelAllWorkByTag(DownloadConstants.DOWNLOAD_TAG)
+                    WorkManager.getInstance().cancelAllWorkByTag(DownloadConstants.FILE_TAG)
                     Log.i(LOG_TAG, "AppDownloadManager Work Manager failed - ${DownloadConstants.FILE_TAG}")
                 } else {
                     Log.i(LOG_TAG, "AppDownloadManager Work Manager - ${DownloadConstants.DOWNLOAD_TAG}, ${workInfo.state}")
@@ -509,6 +518,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                     WorkManager.getInstance().pruneWork()
                 } else if (workInfo != null && (workInfo.state == WorkInfo.State.CANCELLED || workInfo.state == WorkInfo.State.FAILED)) {
                     updateDownloadFailure()
+                    WorkManager.getInstance().pruneWork()
+                    WorkManager.getInstance().cancelAllWorkByTag(DownloadConstants.FILE_TAG)
                     Log.i(LOG_TAG, "AppDownloadManager Work Manager failed - ${DownloadConstants.FILE_TAG}")
                 } else {
                     Log.i(LOG_TAG, "AppDownloadManager Work Manager - ${DownloadConstants.FILE_TAG}, ${workInfo.state}")
@@ -645,7 +656,11 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             override fun onFailure(call: Call, e: IOException) {
                 Log.i(LOG_TAG, "$FILETAG onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
                 activity?.runOnUiThread {
-                    updateDownloadFailure()
+                    if(isRetry) {
+                        Utilities.showToastInMidLayout(requireContext(),getString(R.string.local_blocklist_update_check_failure), Toast.LENGTH_SHORT)
+                    }else{
+                        updateDownloadFailure()
+                    }
                 }
             }
 
@@ -863,10 +878,18 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 }catch (e: Exception){
                     Log.w(LOG_TAG, "Exception while setting blocklist: ${e.message}", e)
                     persistentState.localBlocklistEnabled = false
+                    if (isAdded) {
+                        (context as HomeScreenActivity).runOnUiThread {
+                            updateDownloadFailure()
+                            showDialogForFileCorrupt(timeStamp)
+                        }
+                    }
                 }
             }
         }
     }
+
+
 
     private fun removeBraveDNSLocal() {
         appMode?.setBraveDNSMode(null)
@@ -1041,11 +1064,32 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         alertDialog.show()
     }
 
-    private fun startWebViewIntent() {
-        val intent = Intent(requireContext(), FaqWebViewActivity::class.java)
-        startActivity(intent)
+    private fun showDialogForFileCorrupt(timeStamp: Long) {
+        val builder = AlertDialog.Builder(requireContext())
+        //set title for alert dialog
+        builder.setTitle(R.string.local_blocklist_corrupt)
+        //set message for alert dialog
+        builder.setMessage(R.string.local_blocklist_corrupt_desc)
+        builder.setCancelable(false)
+        //performing positive action
+        builder.setNegativeButton(getString(R.string.local_blocklist_corrupt_negative)) { dialogInterface, _ ->
+            dialogInterface.dismiss()
+        }
+        //performing negative action
+        builder.setPositiveButton(getString(R.string.local_blocklist_corrupt_positive)) { _, _ ->
+            b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc2)
+            b.settingsActivityOnDeviceBlockSwitch.visibility = View.GONE
+            b.settingsActivityOnDeviceBlockProgress.visibility = View.VISIBLE
+            b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.INVISIBLE
+            persistentState.tempBlocklistDownloadTime = timeStamp
+            persistentState.workManagerStartTime = SystemClock.elapsedRealtime()
+            get<AppDownloadManager>().downloadLocalBlocklist(timeStamp)
+        }
+        // Create the AlertDialog
+        val alertDialog: AlertDialog = builder.create()
+        // Set other dialog properties
+        alertDialog.show()
     }
-
 
     private fun showExcludeAppDialog(context: Context, recyclerAdapter: ExcludedAppListAdapter, excludeAppViewModel: ExcludedAppViewModel) {
         val themeID = getCurrentTheme()
@@ -1214,9 +1258,11 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             }
             override fun onFinish() {
                 appMode?.setProxyMode(Settings.ProxyModeSOCKS5)
-                b.settingsActivitySocks5Switch.isEnabled = true
-                b.settingsActivitySocks5Progress.visibility = View.GONE
-                b.settingsActivitySocks5Switch.visibility = View.VISIBLE
+                if(isAdded) {
+                    b.settingsActivitySocks5Switch.isEnabled = true
+                    b.settingsActivitySocks5Progress.visibility = View.GONE
+                    b.settingsActivitySocks5Switch.visibility = View.VISIBLE
+                }
             }
         }.start()
     }
