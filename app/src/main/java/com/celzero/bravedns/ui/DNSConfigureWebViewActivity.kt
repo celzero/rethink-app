@@ -185,9 +185,13 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
             persistentState.setLocalBlockListStamp(stamp)
             GlobalScope.launch(Dispatchers.IO) {
                 if (DEBUG) Log.d(LOG_TAG, "Split stamp newBraveDNSLocal - $path")
-                val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
-                HomeScreenActivity.GlobalVariable.appMode?.setBraveDNSMode(braveDNS)
-                if (DEBUG) Log.d(LOG_TAG, "Webview: Local brave dns set call from web view -stamp: $stamp")
+                try {
+                    val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
+                    HomeScreenActivity.GlobalVariable.appMode?.setBraveDNSMode(braveDNS)
+                    if (DEBUG) Log.d(LOG_TAG, "Webview: Local brave dns set call from web view -stamp: $stamp")
+                } catch (e: Exception) {
+                    if (DEBUG) Log.d(LOG_TAG, "Local brave dns set exception :${e.message}")
+                }
             }
         } else {
             persistentState.setLocalBlockListStamp(stamp)

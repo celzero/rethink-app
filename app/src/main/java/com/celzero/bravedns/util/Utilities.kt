@@ -41,7 +41,6 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.google.android.material.snackbar.Snackbar
 import com.google.common.net.InternetDomainName
-import org.koin.core.component.KoinApiExtension
 import java.io.IOException
 import java.net.InetAddress
 import java.text.SimpleDateFormat
@@ -223,7 +222,7 @@ class Utilities {
 
         fun showToastInMidLayout(context: Context?, message: String, toastLength: Int){
             try {
-                val toast = Toast.makeText(context?.applicationContext, message, toastLength)
+                val toast = Toast.makeText(context, message, toastLength)
                 toast.setGravity(Gravity.CENTER, 0, 0)
                 toast.show()
             }catch (e: java.lang.IllegalStateException){

@@ -31,16 +31,15 @@ import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
  * The worker will be listening for the status of the download for the download ID's
  * stored in shared preference.
  * Once the download is completed, the Worker will send a Result.success().
- * Else, the Result.retry() will be triggered to check again. 
+ * Else, the Result.retry() will be triggered to check again.
  */
-class DownloadWatcher(val context: Context, workerParameters: WorkerParameters)
-        : Worker(context, workerParameters) {
+class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) : Worker(context, workerParameters) {
     override fun doWork(): Result {
 
         val startTime = ReceiverHelper.persistentState.workManagerStartTime
         val currentTime = SystemClock.elapsedRealtime()
         Log.d(LOG_TAG, "AppDownloadManager - $startTime, $currentTime")
-        if(currentTime - startTime > Constants.WORK_MANAGER_TIMEOUT){
+        if (currentTime - startTime > Constants.WORK_MANAGER_TIMEOUT) {
             ReceiverHelper.persistentState.workManagerStartTime = 0
             return Result.failure()
         }
@@ -64,35 +63,39 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters)
         //Check for the download success from the receiver
         ReceiverHelper.persistentState.downloadIDs.forEach { downloadID ->
             val query = DownloadManager.Query()
+            query.setFilterById(downloadID.toLong())
             val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
             val cursor = downloadManager.query(query)
-            cursor?.let {
-                if (cursor.moveToFirst()) {
-                    val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
-                    if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(Constants.LOG_TAG, "AppDownloadManager onReceive ACTION_DOWNLOAD_COMPLETE $status $downloadID")
-                    query.setFilterById(downloadID.toLong())
-                    if (status == DownloadManager.STATUS_RUNNING) {
-                        Log.i(Constants.LOG_TAG, "AppDownloadManager status is $downloadID running")
-                    } else if (status == DownloadManager.STATUS_SUCCESSFUL) {
-                        if (ReceiverHelper.persistentState.downloadIDs.contains(downloadID)) {
-                            ReceiverHelper.persistentState.downloadIDs = ReceiverHelper.persistentState.downloadIDs - downloadID.toString()
-                        }
-                        Log.i(Constants.LOG_TAG, "AppDownloadManager onReceive STATUS_SUCCESSFUL - $downloadID")
-                        if (ReceiverHelper.persistentState.downloadIDs.isEmpty()) {
-                            cursor.close()
-                            return 1
-                        }
-                    } else if (status == DownloadManager.STATUS_FAILED) {
-                        if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(Constants.LOG_TAG, "AppDownloadManager STATUS_FAILED")
-                        cursor.close()
-                        return -1
+            if (cursor == null) {
+                Log.i(LOG_TAG, "AppDownloadManager status is $downloadID cursor null")
+                return -1
+            }
+            if (cursor.moveToFirst()) {
+                val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
+                if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "AppDownloadManager onReceive ACTION_DOWNLOAD_COMPLETE $status $downloadID")
+                if (status == DownloadManager.STATUS_RUNNING) {
+                    Log.i(LOG_TAG, "AppDownloadManager status is $downloadID running")
+                } else if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                    if (ReceiverHelper.persistentState.downloadIDs.contains(downloadID)) {
+                        ReceiverHelper.persistentState.downloadIDs = ReceiverHelper.persistentState.downloadIDs.minusElement(downloadID)
                     }
+                    Log.i(LOG_TAG, "AppDownloadManager onReceive STATUS_SUCCESSFUL - $downloadID")
+                    if (ReceiverHelper.persistentState.downloadIDs.isEmpty()) {
+                        cursor.close()
+                        return 1
+                    }
+                } else if (status == DownloadManager.STATUS_FAILED) {
+                    if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "AppDownloadManager STATUS_FAILED")
+                    cursor.close()
+                    return -1
                 }
+            } else {
+                if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "AppDownloadManager moveToFirst is false")
+                cursor.close()
+                return -1
             }
             cursor.close()
         }
         return 0
     }
-
-
 }

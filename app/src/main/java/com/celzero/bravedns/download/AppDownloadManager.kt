@@ -21,7 +21,6 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.work.*
-import com.celzero.bravedns.download.DownloadConstants.Companion.DOWNLOAD_IDS
 import com.celzero.bravedns.download.DownloadConstants.Companion.DOWNLOAD_TAG
 import com.celzero.bravedns.download.DownloadConstants.Companion.FILE_TAG
 import com.celzero.bravedns.receiver.ReceiverHelper
@@ -80,10 +79,7 @@ class AppDownloadManager(private val persistentState: PersistentState, private v
     private fun initiateDownloadStatusCheck() {
         WorkManager.getInstance().pruneWork()
 
-        val downloadIDs = ReceiverHelper.persistentState.downloadIDs.toTypedArray()
-        val downloadWorkerData = workDataOf(DOWNLOAD_IDS to downloadIDs)
         val downloadWatcher = OneTimeWorkRequestBuilder<DownloadWatcher>()
-            .setInputData(downloadWorkerData)
             .setBackoffCriteria(BackoffPolicy.LINEAR,
                                 OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
                                 TimeUnit.MILLISECONDS)
@@ -110,6 +106,7 @@ class AppDownloadManager(private val persistentState: PersistentState, private v
     }
 
     /**
+     * TODO
      * Updates the values for the local download.
      * The observers in the UI will reflect the download status.
      */
@@ -118,6 +115,7 @@ class AppDownloadManager(private val persistentState: PersistentState, private v
     }*/
 
     /**
+     * TODO
      * Updates the values for the Remote download.
      * The observers in the UI will reflect the download status.
      */
@@ -144,7 +142,9 @@ class AppDownloadManager(private val persistentState: PersistentState, private v
             setTitle(fileName)
             setDescription(fileName)
             request.setDestinationInExternalFilesDir(context, DownloadHelper.getExternalFilePath(null, timeStamp), fileName)
-            persistentState.downloadIDs =  persistentState.downloadIDs + downloadManager.enqueue(this).toString()
+            val downloadID = downloadManager.enqueue(this)
+            if (DEBUG) Log.d(LOG_TAG, "AppDownloadManager filename - $fileName, downloadID - $downloadID")
+            persistentState.downloadIDs =  persistentState.downloadIDs + downloadID.toString()
         }
     }
 

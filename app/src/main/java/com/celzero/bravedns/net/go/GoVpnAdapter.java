@@ -592,11 +592,12 @@ public class GoVpnAdapter {
     private Boolean setBraveDNSLocalMode() {
         if (persistentState.getBlockListFilesDownloaded() && persistentState.getLocalBlocklistEnabled()) {
             try {
-                if(appMode.getBraveDNS() != null) {
+                BraveDNS localBraveDNS = appMode.getBraveDNS();
+                if(localBraveDNS != null) {
                     String stamp = persistentState.getLocalBlockListStamp();
                     if(!stamp.isEmpty()){
                         Log.i(LOG_TAG, "GoVPNAdapter Tunnel is set with local stamp: " + stamp);
-                        tunnel.setBraveDNS(appMode.getBraveDNS());
+                        tunnel.setBraveDNS(localBraveDNS);
                         tunnel.getBraveDNS().setStamp(stamp);
                         Log.i(LOG_TAG, "GoVPNAdapter Tunnel is set with local stamp (GetStamp): " + tunnel.getBraveDNS().getStamp());
                         return true;
