@@ -291,7 +291,8 @@
     <string name="bsct_block_all">Block &lt;u>all apps&lt;/u> from connecting to &lt;u>this IP&lt;/u></string>
     <string name="bsct_block_app">Block &lt;u>this app&lt;/u> from connecting to this IP</string>
     <string name="bsct_block">Block &lt;u>this app&lt;/u> from connecting to the Internet</string>
-    <string name="bsct_conn_block_desc">blocked %1$s %2$s</string>
+    <string name="bsct_conn_block_desc">blocked %1$s by %2$s</string>
+    <string name="bsct_conn_block_desc_device">blocked %1$s on device</string>
     <string name="bsct_conn_conn_desc_allowed">allowed on &lt;u>%1$s:%2$s&lt;/u> %3$s.\u0020</string>
     <string name="bsct_conn_conn_desc_blocked">blocked on &lt;u>%1$s/%2$s&lt;/u> %3$s</string>
     <string name="bsct_conn_rule_explanation">
@@ -373,6 +374,13 @@
     <string name="local_blocklist_redownload_desc">Local Blocklists are already at the latest version v%1$s.</string>
     <string name="local_blocklist_positive">Okay</string>
     <string name="local_blocklist_neutral">Download again</string>
+
+    <string name="local_blocklist_corrupt">Re-download blocklists</string>
+    <string name="local_blocklist_corrupt_desc">Something went wrong! Please download blocklists (around 50 mb in size) again.</string>
+    <string name="local_blocklist_corrupt_positive">Re-download</string>
+    <string name="local_blocklist_corrupt_negative">Cancel</string>
+
+    <string name="local_blocklist_update_check_failure">Something went wrong. Try again later!</string>
 
     <string name="webview_no_stamp_change_title">Quit?</string>
     <string name="webview_no_stamp_change_desc">Currently, %1$s blocklist(s) in-use. No additional blocklists have been set. Do you want to quit anyway?</string>
@@ -822,6 +830,15 @@
 
     <string name="dns_btm_sheet_header">Blocklists</string>
 
+    <!-- DNS log bottom sheet -->
+    <string name="dns_btm_blocked_by">blocked %1$s by %2$s</string>
+    <string name="dns_btm_resolver">Resolver %1$s</string>
+    <string name="dns_btm_resolved_crypt">resolved <u>anonymously</u> %1$s by %2$s</string>
+    <string name="dns_btm_resolved_doh">resolved %1$s by %2$s</string>
+    <string name="dns_btm_resolved_doh_no_server">resolved %1$s</string>
+
+    <string name="dns_btm_latency_ms">%1$sms</string>
+
     <!-- Excluded app dialog -->
     <string name="ex_dialog_count">%1$s/%2$s apps excluded.</string>
     <string name="ex_dialog_header">Exclude apps from DNS and Firewall</string>
@@ -933,5 +950,6 @@
     <string name="unicode_warning_sign">\u26a0</string>
     <string name="unicode_x_sign">\u274c</string>
     <string name="unicode_question_sign">\u2754</string>
+    <string name="fav_icon">fav_icon</string>
 
 </resources>
