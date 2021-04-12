@@ -25,16 +25,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DNSBottomSheetBlockAdapter
 import com.celzero.bravedns.database.DNSLogs
 import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
+import com.celzero.bravedns.receiver.GlideImageRequestListener
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Utilities
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 
 
-class DNSBlockListBottomSheetFragment(private var contextVal: Context, private var transaction: DNSLogs) : BottomSheetDialogFragment() {
+class DNSBlockListBottomSheetFragment(private var contextVal: Context, private var transaction: DNSLogs)
+            : BottomSheetDialogFragment(), GlideImageRequestListener.Callback {
     private var _binding: BottomSheetDnsLogBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
@@ -77,20 +81,23 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
         b.dnsBlockIpAddress.text = transaction.response
         b.dnsBlockConnectionFlag.text = transaction.flag
         b.dnsBlockLatency.visibility = View.GONE
-        b.dnsBlockIpLatency.text = transaction.latency.toString() + "ms"
+        b.dnsBlockIpLatency.text = getString(R.string.dns_btm_latency_ms, transaction.latency.toString())
         if (transaction.serverIP.isNotEmpty()) {
             b.dnsBlockResolver.visibility = View.VISIBLE
-            b.dnsBlockResolver.text = "Resolver (${transaction.serverIP})"
+            b.dnsBlockResolver.text = getString(R.string.dns_btm_resolver, transaction.serverIP)
             b.dnsBlockResolver.visibility = View.GONE
         } else {
             b.dnsBlockResolver.visibility = View.GONE
         }
+        if(transaction.response != "NXDOMAIN" && !transaction.isBlocked){
+            setFavIcon(transaction.queryStr)
+        }
         val upTime = DateUtils.getRelativeTimeSpanString(transaction.time, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE)
         if (transaction.isBlocked) {
-            b.dnsBlockBlockedDesc.text = "blocked $upTime by ${transaction.serverIP}"
+            b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_blocked_by, upTime, transaction.serverIP)
         } else {
             if (transaction.serverIP.isNotEmpty() && transaction.relayIP.isNotEmpty()) {
-                val text = "resolved <u>anonymously</u> $upTime by ${transaction.serverIP}"
+                val text = getString(R.string.dns_btm_resolved_crypt, upTime, transaction.serverIP)
                 val styledText = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY).toString()
                 } else {
@@ -98,9 +105,9 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
                 }
                 b.dnsBlockBlockedDesc.text = styledText
             } else if (transaction.serverIP.isNotEmpty()) {
-                b.dnsBlockBlockedDesc.text = "resolved $upTime by ${transaction.serverIP}"
+                b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh, upTime, transaction.serverIP)
             } else {
-                b.dnsBlockBlockedDesc.text = "resolved $upTime"
+                b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh_no_server, upTime)
             }
         }
         if (transaction.blockLists.isEmpty()) {
@@ -108,9 +115,9 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
             b.dnsBlockPlaceHolder.visibility = View.VISIBLE
         } else {
             if (transaction.serverIP.isEmpty()) {
-                b.dnsBlockBlockedDesc.text = getString(R.string.bsct_conn_block_desc, upTime, " on device")
+                b.dnsBlockBlockedDesc.text = getString(R.string.bsct_conn_block_desc_device, upTime)
             } else {
-                b.dnsBlockBlockedDesc.text = getString(R.string.bsct_conn_block_desc, upTime, " by ${transaction.serverIP}")
+                b.dnsBlockBlockedDesc.text = getString(R.string.bsct_conn_block_desc, upTime, transaction.serverIP)
             }
 
             val blockLists = transaction.blockLists.split(",")
@@ -123,6 +130,24 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
                 b.dnsBlockPlaceHolder.visibility = View.VISIBLE
             }
         }
+    }
+
+    private fun setFavIcon(query: String) {
+        val trim = query.dropLast(1)
+        val domainURL = Utilities.getETldPlus1(trim)
+        val url = "https://icons.duckduckgo.com/ip2/$domainURL.ico"
+        Glide.with(contextVal)
+            .load(url)
+            .listener(GlideImageRequestListener(this))
+            .into(b.dnsBlockFavIcon)
+    }
+
+    override fun onFailure(message: String?) {
+        b.dnsBlockFavIcon.visibility = View.GONE
+    }
+
+    override fun onSuccess(dataSource: String) {
+        b.dnsBlockFavIcon.visibility = View.VISIBLE
     }
 
 }

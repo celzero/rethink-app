@@ -17,6 +17,7 @@ limitations under the License.
 package com.celzero.bravedns.adapter
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,11 +25,14 @@ import androidx.fragment.app.FragmentActivity
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DNSLogs
 import com.celzero.bravedns.databinding.TransactionRowBinding
+import com.celzero.bravedns.receiver.GlideImageRequestListener
 import com.celzero.bravedns.ui.DNSBlockListBottomSheetFragment
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Utilities.Companion.getETldPlus1
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -65,21 +69,30 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
     }
 
 
-    inner class TransactionViewHolder(private val b: TransactionRowBinding) : RecyclerView.ViewHolder(b.root) {
-
+    inner class TransactionViewHolder(private val b: TransactionRowBinding) : RecyclerView.ViewHolder(b.root), GlideImageRequestListener.Callback {
         fun update(transaction: DNSLogs?) {
             // This function can be run up to a dozen times while blocking rendering, so it needs to be
             // as brief as possible.
             if (transaction != null) {
                 b.responseTime.text = convertLongToTime(transaction.time)
-                b.flag.text = transaction.flag
                 b.fqdn.text = transaction.queryStr
                 b.latencyVal.text = context.getString(R.string.dns_query_latency, transaction.latency.toString())
+                b.flag.text = transaction.flag
 
                 if (transaction.isBlocked) {
+                    b.flag.visibility = View.VISIBLE
+                    b.favIcon.visibility = View.GONE
                     b.queryLogIndicator.visibility = View.VISIBLE
                 } else {
+                    b.flag.visibility = View.GONE
+                    b.favIcon.visibility = View.VISIBLE
                     b.queryLogIndicator.visibility = View.INVISIBLE
+                }
+                if (transaction.response != "NXDOMAIN" && !transaction.isBlocked) {
+                    setFavIcon(transaction.queryStr)
+                }else{
+                    b.flag.visibility = View.VISIBLE
+                    b.favIcon.visibility = View.GONE
                 }
                 b.root.setOnClickListener {
                     b.root.isEnabled = false
@@ -88,6 +101,27 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
                 }
 
             }
+        }
+
+        private fun setFavIcon(query: String) {
+            val trim = query.dropLast(1)
+            val domainURL = getETldPlus1(trim)
+            Log.d(Constants.LOG_TAG, "URI HOST value: $trim, $domainURL")
+            val url = "https://icons.duckduckgo.com/ip2/$domainURL.ico"
+            Glide.with(context)
+                .load(url)
+                .listener(GlideImageRequestListener(this))
+                .into(b.favIcon)
+        }
+
+        override fun onFailure(message: String?) {
+            b.flag.visibility = View.VISIBLE
+            b.favIcon.visibility = View.GONE
+        }
+
+        override fun onSuccess(dataSource: String) {
+            b.flag.visibility = View.GONE
+            b.favIcon.visibility = View.VISIBLE
         }
 
         private fun openBottomSheet(transaction: DNSLogs) {
@@ -102,4 +136,6 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
             return format.format(date)
         }
     }
+
+
 }

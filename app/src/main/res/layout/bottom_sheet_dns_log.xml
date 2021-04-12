@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clickable="true"
@@ -19,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/dns_block_header_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -29,6 +30,12 @@
             android:paddingStart="20dp"
             android:paddingEnd="20dp">
 
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/dns_block_fav_icon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:visibility="gone"
+                android:src="@android:color/transparent" />
 
             <TextView
                 android:textColor="?attr/primaryTextColor"
@@ -36,7 +43,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:layout_centerVertical="true"
                 android:layout_margin="2dp"
                 android:layout_marginTop="8dp"
                 android:paddingStart="10dp"
@@ -44,7 +50,7 @@
                 android:text="@string/action_automatic"
                 android:textIsSelectable="true"
                 android:textSize="@dimen/heading_font_text_view" />
-        </RelativeLayout>
+        </LinearLayout>
 
 
         <LinearLayout
@@ -56,6 +62,8 @@
             android:weightSum="1"
             android:gravity="center"
             android:layout_centerHorizontal="true">
+
+
 
             <TextView
                 android:id="@+id/dns_block_connection_flag"
