@@ -33,11 +33,10 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:ellipsize="none"
-            android:layout_gravity="center"
+            android:gravity="center"
             android:layout_weight="0"
             android:minWidth="40dp"
-            android:padding="10dp"
-            android:singleLine="true"
+            android:alpha="0.75"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
             android:textSize="30sp"
             tools:text="" />
@@ -48,10 +47,11 @@
             android:layout_height="50dp"
             android:layout_gravity="start|center_vertical"
             android:layout_weight="0"
-            android:visibility="visible"
+            android:visibility="gone"
             android:src="@android:color/transparent"
             android:minWidth="40dp"
             android:padding="10dp"
+            android:alpha="0.75"
             android:contentDescription="@string/fav_icon" />
 
         <LinearLayout

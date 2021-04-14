@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "com.celzero.bravedns",
+  "variantName": "processFdroidReleaseResources",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "versionCode": 16,
+      "versionName": "0.5.3e",
+      "outputFile": "app-fdroid-release.apk"
+    }
+  ]
+}
