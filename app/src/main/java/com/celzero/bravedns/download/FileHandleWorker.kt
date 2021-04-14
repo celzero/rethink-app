@@ -105,11 +105,11 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
 
     /**
      * Post the check of number of files downloaded by the
-     * download manager, We need to validate the dowloaded files.
+     * download manager, need to validate the downloaded files.
      * As of now there is no checksum validation.
-     * So validating the donwloaded files by
-     * create localBraveDNS object. If the object is returned by the
-     * Dnsx then valid. Null/exception will be invalid.
+     * So validating the downloaded files by
+     * create localBraveDNS object. If the object returned by the
+     * Dnsx is not null then valid. Null/exception will be invalid.
      */
     private fun isDownloadValid(): Boolean {
         try{
@@ -117,7 +117,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             val path: String = context.filesDir.canonicalPath +"/"+ timeStamp
             val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
             if(braveDNS != null){
-                if(DEBUG) Log.w(LOG_TAG, "AppDownloadManager isDownloadValid braveDNS is valid")
+                if(DEBUG) Log.d(LOG_TAG, "AppDownloadManager isDownloadValid - braveDNS is valid")
                 return true
             }
         }catch (e : Exception){

@@ -293,7 +293,7 @@
     <string name="bsct_block">Block &lt;u>this app&lt;/u> from connecting to the Internet</string>
     <string name="bsct_conn_block_desc">blocked %1$s by %2$s</string>
     <string name="bsct_conn_block_desc_device">blocked %1$s on device</string>
-    <string name="bsct_conn_conn_desc_allowed">allowed on &lt;u>%1$s:%2$s&lt;/u> %3$s.\u0020</string>
+    <string name="bsct_conn_conn_desc_allowed">allowed on &lt;u>%1$s/%2$s&lt;/u> %3$s.\u0020</string>
     <string name="bsct_conn_conn_desc_blocked">blocked on &lt;u>%1$s/%2$s&lt;/u> %3$s</string>
     <string name="bsct_conn_rule_explanation">
         &lt;u>Rule #1&lt;/u>: Blocks an app from connecting to the Internet.
@@ -499,13 +499,12 @@
     <string name="features_disabled">(disabled)</string>
     <string name="firewall_app_info_not_available">Cannot block the app</string>
 
-    <string name="whats_dialog_title">What\'s new in v053d</string>
-    <string name="whats_new_version_name">🎁 Earth Day (Apr 22) 🎁</string>
-    <string name="whats_new_version_update">Fix the Internet release:\n\n
-        1. Major updates to how the app handles connectivity changes. This fixes issues where devices may have previously lost Internet connectivity with the app switched on.\n\n
-        2. <i>True Black</i> theme on popular demand. Check the <i>Settings -> Appearance</i>.\n\n
-        3. Improvements on themes. Better consistency in the colour scheme.\n\n
-        4. Stop button in the <i>Notification</i> bar.
+    <string name="whats_dialog_title">What\'s new in v053e</string>
+    <string name="whats_new_version_name">🎁 Press Freedom Day (3 May) 🎁</string>
+    <string name="whats_new_version_update">Fixes and improvements:\n\n
+        1. DNS Logs UI now shows website icons corresponding to DNS queries. These icons are fetched from DuckDuckGo. To enable / disable this see the Settings screen.\n\n
+        2. An edge case during app start-up where all connections were allowed while the firewall rules were being loaded has been fixed.\n\n
+        3. Changes to the way the app recovers from the \'Waiting\' state.\n\n
     </string>
 
     <!-- Settings Fragment strings -->
@@ -621,11 +620,14 @@
     <string name="settings_local_blocklist_download_success">Blocklists downloaded successfully.</string>
     <string name="settings_local_blocklist_version">Version: v%1$s</string>
 
-    <string name="settings_sync_app_details_desc">Resync in progress…</string>
-    <string name="settings_sync_app_details_desc_completed">Resync completed</string>
+    <string name="settings_sync_app_details_desc">Re-sync in progress…</string>
+    <string name="settings_sync_app_details_desc_completed">Re-sync completed</string>
 
     <string name="settings_check_update_heading">Check for app updates</string>
     <string name="settings_check_update_desc">Automatically check for app updates once a week.</string>
+
+    <string name="settings_fav_icon_heading">Show website icon in DNS logs</string>
+    <string name="settings_fav_icon_desc">Fetches website icons from <i>duckduckgo.com</i>.</string>
 
     <string name="settings_theme_heading">Appearance</string>
     <string name="settings_theme_desc">Dark/light theme</string>

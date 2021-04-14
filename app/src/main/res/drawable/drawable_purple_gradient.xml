@@ -4,8 +4,6 @@
           android:width="0.75dp"
           android:color="@color/recycler_selected" />
 
-   <solid android:color="?attr/background" />
-
    <padding
            android:left="1dp"
            android:right="1dp"

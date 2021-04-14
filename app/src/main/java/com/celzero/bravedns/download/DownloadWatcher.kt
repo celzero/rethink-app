@@ -85,7 +85,7 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
                         return 1
                     }
                 } else if (status == DownloadManager.STATUS_FAILED) {
-                    if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "AppDownloadManager STATUS_FAILED")
+                    Log.i(LOG_TAG, "AppDownloadManager onReceive STATUS_FAILED - $downloadID")
                     cursor.close()
                     return -1
                 }
