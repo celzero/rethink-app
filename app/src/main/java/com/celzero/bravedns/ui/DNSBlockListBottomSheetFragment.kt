@@ -17,28 +17,35 @@ package com.celzero.bravedns.ui
 
 import android.content.Context
 import android.content.res.Configuration
+import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Html
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.Nullable
 import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DNSBottomSheetBlockAdapter
 import com.celzero.bravedns.database.DNSLogs
 import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
-import com.celzero.bravedns.receiver.GlideImageRequestListener
+import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Utilities.Companion.getETldPlus1
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 
 
-class DNSBlockListBottomSheetFragment(private var contextVal: Context, private var transaction: DNSLogs)
-            : BottomSheetDialogFragment(), GlideImageRequestListener.Callback {
+class DNSBlockListBottomSheetFragment(private var contextVal: Context, private var transaction: DNSLogs) : BottomSheetDialogFragment() {
     private var _binding: BottomSheetDnsLogBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
@@ -89,8 +96,12 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
         } else {
             b.dnsBlockResolver.visibility = View.GONE
         }
-        if(transaction.response != "NXDOMAIN" && !transaction.isBlocked){
-            setFavIcon(transaction.queryStr)
+        if (persistentState.fetchFavIcon) {
+            if (transaction.status == Transaction.Status.COMPLETE.toString() && !transaction.isBlocked) {
+                val trim = transaction.queryStr.dropLast(1)
+                val url = "https://icons.duckduckgo.com/ip2/$trim.ico"
+                updateImage(url, true)
+            }
         }
         val upTime = DateUtils.getRelativeTimeSpanString(transaction.time, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE)
         if (transaction.isBlocked) {
@@ -132,22 +143,33 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
         }
     }
 
-    private fun setFavIcon(query: String) {
-        val trim = query.dropLast(1)
-        val domainURL = Utilities.getETldPlus1(trim)
-        val url = "https://icons.duckduckgo.com/ip2/$domainURL.ico"
-        Glide.with(contextVal)
-            .load(url)
-            .listener(GlideImageRequestListener(this))
-            .into(b.dnsBlockFavIcon)
-    }
+    private fun updateImage(url: String, retry: Boolean) {
+        try {
+            Glide.with(contextVal).load(url).apply(RequestOptions()).listener(object : RequestListener<Drawable?> {
+                override fun onLoadFailed(@Nullable e: GlideException?, model: Any?, target: com.bumptech.glide.request.target.Target<Drawable?>?, isFirstResource: Boolean): Boolean {
+                    Handler(Looper.getMainLooper()).post {
+                        if (retry) {
+                            val extractURL = url.substringAfter(Constants.FAV_ICON_URL).dropLast(4)
+                            val domainURL = getETldPlus1(extractURL)
+                            val glideURL = "${Constants.FAV_ICON_URL}$domainURL.ico"
+                            updateImage(glideURL, false)
+                        }
+                    }
+                    return false
+                }
 
-    override fun onFailure(message: String?) {
-        b.dnsBlockFavIcon.visibility = View.GONE
-    }
-
-    override fun onSuccess(dataSource: String) {
-        b.dnsBlockFavIcon.visibility = View.VISIBLE
+                override fun onResourceReady(resource: Drawable?, model: Any?, target: com.bumptech.glide.request.target.Target<Drawable?>?, dataSource: com.bumptech.glide.load.DataSource, isFirstResource: Boolean): Boolean {
+                    if(isAdded) {
+                        b.dnsBlockFavIcon.visibility = View.VISIBLE
+                    }
+                    return false
+                }
+            }).into(b.dnsBlockFavIcon)
+        } catch (e: Exception) {
+            if(isAdded) {
+                b.dnsBlockFavIcon.visibility = View.GONE
+            }
+        }
     }
 
 }

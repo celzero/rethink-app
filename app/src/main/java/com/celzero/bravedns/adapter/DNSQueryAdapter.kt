@@ -17,27 +17,41 @@ limitations under the License.
 package com.celzero.bravedns.adapter
 
 import android.content.Context
+import android.graphics.drawable.Drawable
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.annotation.Nullable
 import androidx.fragment.app.FragmentActivity
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.CustomViewTarget
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
+import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DNSLogs
 import com.celzero.bravedns.databinding.TransactionRowBinding
-import com.celzero.bravedns.receiver.GlideImageRequestListener
+import com.celzero.bravedns.net.doh.Transaction
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.DNSBlockListBottomSheetFragment
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Utilities.Companion.getETldPlus1
+import com.celzero.bravedns.util.Utilities
 import java.text.SimpleDateFormat
 import java.util.*
 
 
-class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQueryAdapter.TransactionViewHolder>(DIFF_CALLBACK) {
+class DNSQueryAdapter(val context: Context, private val persistentState: PersistentState) : PagedListAdapter<DNSLogs, DNSQueryAdapter.TransactionViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         const val TYPE_TRANSACTION: Int = 1
@@ -49,6 +63,8 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
         }
     }
 
+    private val favIcon = persistentState.fetchFavIcon
+
     override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
         val transaction: DNSLogs = getItem(position) ?: return
         holder.update(transaction)
@@ -58,18 +74,18 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
         return TYPE_TRANSACTION
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
-
-        return if (viewType == TYPE_TRANSACTION) {
-            val itemBinding = TransactionRowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            TransactionViewHolder(itemBinding)
-        } else {
-            throw AssertionError(String.format(Locale.ROOT, "Unknown viewType %d", viewType))
-        }
+    override fun getItemId(position: Int): Long {
+        return super.getItemId(position)
     }
 
 
-    inner class TransactionViewHolder(private val b: TransactionRowBinding) : RecyclerView.ViewHolder(b.root), GlideImageRequestListener.Callback {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
+        val itemBinding = TransactionRowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return TransactionViewHolder(itemBinding, favIcon)
+    }
+
+
+    inner class TransactionViewHolder(private val b: TransactionRowBinding, private val favIcon: Boolean) : RecyclerView.ViewHolder(b.root){
         fun update(transaction: DNSLogs?) {
             // This function can be run up to a dozen times while blocking rendering, so it needs to be
             // as brief as possible.
@@ -78,21 +94,23 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
                 b.fqdn.text = transaction.queryStr
                 b.latencyVal.text = context.getString(R.string.dns_query_latency, transaction.latency.toString())
                 b.flag.text = transaction.flag
-
+                b.flag.visibility = View.VISIBLE
+                b.favIcon.visibility = View.GONE
+                if (favIcon) {
+                    if (transaction.status == Transaction.Status.COMPLETE.toString() && !transaction.isBlocked) {
+                        val url = "${Constants.FAV_ICON_URL}${transaction.queryStr}ico"
+                        Log.d(Constants.LOG_TAG, "URI HOST value: $url")
+                        updateImage(url, true)
+                    } else {
+                        Glide.with(context).clear(b.favIcon)
+                    }
+                }else{
+                    Glide.with(context).clear(b.favIcon)
+                }
                 if (transaction.isBlocked) {
-                    b.flag.visibility = View.VISIBLE
-                    b.favIcon.visibility = View.GONE
                     b.queryLogIndicator.visibility = View.VISIBLE
                 } else {
-                    b.flag.visibility = View.GONE
-                    b.favIcon.visibility = View.VISIBLE
                     b.queryLogIndicator.visibility = View.INVISIBLE
-                }
-                if (transaction.response != "NXDOMAIN" && !transaction.isBlocked) {
-                    setFavIcon(transaction.queryStr)
-                }else{
-                    b.flag.visibility = View.VISIBLE
-                    b.favIcon.visibility = View.GONE
                 }
                 b.root.setOnClickListener {
                     b.root.isEnabled = false
@@ -101,27 +119,6 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
                 }
 
             }
-        }
-
-        private fun setFavIcon(query: String) {
-            val trim = query.dropLast(1)
-            val domainURL = getETldPlus1(trim)
-            Log.d(Constants.LOG_TAG, "URI HOST value: $trim, $domainURL")
-            val url = "https://icons.duckduckgo.com/ip2/$domainURL.ico"
-            Glide.with(context)
-                .load(url)
-                .listener(GlideImageRequestListener(this))
-                .into(b.favIcon)
-        }
-
-        override fun onFailure(message: String?) {
-            b.flag.visibility = View.VISIBLE
-            b.favIcon.visibility = View.GONE
-        }
-
-        override fun onSuccess(dataSource: String) {
-            b.flag.visibility = View.GONE
-            b.favIcon.visibility = View.VISIBLE
         }
 
         private fun openBottomSheet(transaction: DNSLogs) {
@@ -135,7 +132,57 @@ class DNSQueryAdapter(val context: Context) : PagedListAdapter<DNSLogs, DNSQuery
             val format = SimpleDateFormat(Constants.DATE_FORMAT_PATTERN, Locale.ROOT)
             return format.format(date)
         }
+
+        private fun updateImage(url: String, retry: Boolean) {
+            try {
+                val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
+                Glide.with(context)
+                    .load(url)
+                    .apply(RequestOptions())
+                    .transition(withCrossFade(factory))
+                    .listener(object : RequestListener<Drawable?> {
+                        override fun onLoadFailed(@Nullable e: GlideException?, model: Any?, target: com.bumptech.glide.request.target.Target<Drawable?>?, isFirstResource: Boolean): Boolean {
+                            Handler(Looper.getMainLooper()).post {
+                                if (retry) {
+                                    val extractURL = url.substringAfter(Constants.FAV_ICON_URL).dropLast(4)
+                                    val domainURL = Utilities.getETldPlus1(extractURL)
+                                    val glideURL = "${Constants.FAV_ICON_URL}$domainURL.ico"
+                                    Log.d(Constants.LOG_TAG, "URI HOST value onFailure: $glideURL")
+                                    updateImage(glideURL, false)
+                                }
+                            }
+                            return false
+                        }
+
+                        override fun onResourceReady(resource: Drawable?, model: Any?, target: com.bumptech.glide.request.target.Target<Drawable?>?, dataSource: com.bumptech.glide.load.DataSource, isFirstResource: Boolean): Boolean {
+                            Log.d(Constants.LOG_TAG, "URI HOST value updateImage: $retry")
+                            return false
+                        }
+                    })
+                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                    .into(object : CustomViewTarget<ImageView, Drawable>(b.favIcon) {
+                        override fun onLoadFailed(errorDrawable: Drawable?) {
+                            b.flag.visibility = View.VISIBLE
+                            b.favIcon.visibility = View.GONE
+                            b.favIcon.setImageDrawable(null)
+                        }
+
+                        override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                            b.flag.visibility = View.GONE
+                            b.favIcon.visibility = View.VISIBLE
+                            b.favIcon.setImageDrawable(resource)
+                        }
+
+                        override fun onResourceCleared(placeholder: Drawable?) {
+                            b.favIcon.visibility = View.GONE
+                            b.flag.visibility = View.VISIBLE
+                        }
+                    })
+            } catch (e: Exception) {
+                Log.d(Constants.LOG_TAG, "URI HOST value exception: $retry")
+                b.flag.visibility = View.VISIBLE
+                b.favIcon.visibility = View.GONE
+            }
+        }
     }
-
-
 }

@@ -126,6 +126,7 @@ class Constants {
 
         const val WORK_MANAGER_TIMEOUT = 1*40*60*1000
 
+        const val FAV_ICON_URL = "https://icons.duckduckgo.com/ip2/"
     }
 
 }
