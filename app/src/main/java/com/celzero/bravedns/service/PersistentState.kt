@@ -18,6 +18,7 @@ package com.celzero.bravedns.service
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.ui.HomeScreenActivity
@@ -30,7 +31,7 @@ import com.celzero.bravedns.util.Constants.Companion.ORBAT_MODE_NONE
 import hu.autsoft.krate.*
 import settings.Settings
 
-class PersistentState(context: Context):SimpleKrate(context) {
+class PersistentState(private val context: Context):SimpleKrate(context) {
     companion object {
         const val BRAVE_MODE = "brave_mode"
         const val BACKGROUND_MODE = "background_mode"
@@ -111,6 +112,8 @@ class PersistentState(context: Context):SimpleKrate(context) {
     var downloadIDs by stringSetPref("download_ids", emptySet())
     var orbotEnabledMode by intPref("orbot_mode_enabled", ORBAT_MODE_NONE)
 
+    var fetchFavIcon by booleanPref("fav_icon_enabled", BuildConfig.FLAVOR != Constants.FLAVOR_FDROID)
+
     var isAccessibilityCrashDetected by booleanPref("accessibility_crash", false)
 
     var orbotModeConst : Int = 0
@@ -120,18 +123,18 @@ class PersistentState(context: Context):SimpleKrate(context) {
     fun wifiAllowed(forPackage:String):Boolean = !excludedPackagesWifi.contains(forPackage)
 
     fun modifyAllowedWifi(forPackage:String, remove:Boolean) {
-        if(remove) {
-            excludedPackagesWifi = excludedPackagesWifi - forPackage
+        excludedPackagesWifi = if(remove) {
+            excludedPackagesWifi - forPackage
         } else {
-            excludedPackagesWifi = excludedPackagesWifi + forPackage
+            excludedPackagesWifi + forPackage
         }
     }
 
     fun modifyAllowedData(forPackage:String, remove:Boolean) {
-        if(remove) {
-            excludedPackagesData = excludedPackagesData - forPackage
+        excludedPackagesData = if(remove) {
+            excludedPackagesData - forPackage
         } else {
-            excludedPackagesData = excludedPackagesData + forPackage
+            excludedPackagesData + forPackage
         }
     }
 
@@ -177,19 +180,19 @@ class PersistentState(context: Context):SimpleKrate(context) {
     }
 
     fun setNumOfReq(){
-        val numReq = if(HomeScreenActivity.GlobalVariable.lifeTimeQueries > 0) HomeScreenActivity.GlobalVariable.lifeTimeQueries + 1
+        val numReq = if(lifeTimeQueries > 0) lifeTimeQueries + 1
         else {
             _numberOfRequests + 1
         }
         _numberOfRequests = numReq
-        HomeScreenActivity.GlobalVariable.lifeTimeQueries = numReq
+        lifeTimeQueries = numReq
         HomeScreenActivity.GlobalVariable.lifeTimeQ.postValue(numReq)
     }
 
     fun getNumOfReq(): Int {
-        if (HomeScreenActivity.GlobalVariable.lifeTimeQueries >= 0) {
+        if (lifeTimeQueries >= 0) {
             HomeScreenActivity.GlobalVariable.lifeTimeQ.postValue(lifeTimeQueries)
-            return HomeScreenActivity.GlobalVariable.lifeTimeQueries
+            return lifeTimeQueries
         }
         HomeScreenActivity.GlobalVariable.lifeTimeQ.postValue(_numberOfRequests)
         return _numberOfRequests
@@ -234,9 +237,10 @@ class PersistentState(context: Context):SimpleKrate(context) {
             }else if(dnsType == 2){
                 if(appMode?.getDNSCryptServerCount() != null) {
                     val cryptDetails = appMode?.getDNSCryptServerCount()
-                    "DNSCrypt: $cryptDetails resolvers"
+                     context.getString(R.string.configure_dns_crypt, cryptDetails.toString())
+                }else {
+                    context.getString(R.string.configure_dns_crypt, "0")
                 }
-                "DNSCrypt: 0 resolvers"
             }else{
                 val proxyDetails = appMode?.getDNSProxyServerDetails()
                 proxyDetails?.proxyAppName!!

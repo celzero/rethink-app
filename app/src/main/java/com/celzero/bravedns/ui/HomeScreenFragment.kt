@@ -769,10 +769,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             statusId = R.string.status_protected
         }
 
-        if (appMode?.getDNSType() == 3 && status.activationRequested) {
-            statusId = R.string.status_protected
-        }
-
         if(statusId == R.string.status_protected && persistentState.getOrbotModePersistence() != Constants.ORBAT_MODE_NONE){
             statusId = R.string.status_protected_with_tor
         }
@@ -788,6 +784,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             fetchTextColor(R.color.accent_bad)
         }
         if (braveMode == FIREWALL_MODE && status.activationRequested) colorId = fetchTextColor(R.color.positive)
+        if (appMode?.getDNSType() == 3 && status.activationRequested) {
+            statusId = R.string.status_protected
+            colorId = fetchTextColor(R.color.positive)
+        }
 
         b.fhsProtectionLevelTxt.setTextColor(colorId)
         b.fhsProtectionLevelTxt.setText(statusId)

@@ -83,7 +83,6 @@ public class ConnectionTracer {
         String key = protocol+local.getAddress().getHostAddress()+remote.getAddress().getHostAddress();
         try {
             int value = uidCache.getIfPresent(key);
-            Log.d(LOG_TAG, "Cache GetUidQ uid: " + value);
             return value;
         } catch (Exception ignored) { }
 

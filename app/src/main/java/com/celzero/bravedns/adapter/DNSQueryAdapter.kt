@@ -20,7 +20,6 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -99,7 +98,6 @@ class DNSQueryAdapter(val context: Context, private val persistentState: Persist
                 if (favIcon) {
                     if (transaction.status == Transaction.Status.COMPLETE.toString() && !transaction.isBlocked) {
                         val url = "${Constants.FAV_ICON_URL}${transaction.queryStr}ico"
-                        Log.d(Constants.LOG_TAG, "URI HOST value: $url")
                         updateImage(url, true)
                     } else {
                         Glide.with(context).clear(b.favIcon)
@@ -147,7 +145,6 @@ class DNSQueryAdapter(val context: Context, private val persistentState: Persist
                                     val extractURL = url.substringAfter(Constants.FAV_ICON_URL).dropLast(4)
                                     val domainURL = Utilities.getETldPlus1(extractURL)
                                     val glideURL = "${Constants.FAV_ICON_URL}$domainURL.ico"
-                                    Log.d(Constants.LOG_TAG, "URI HOST value onFailure: $glideURL")
                                     updateImage(glideURL, false)
                                 }
                             }
@@ -155,7 +152,6 @@ class DNSQueryAdapter(val context: Context, private val persistentState: Persist
                         }
 
                         override fun onResourceReady(resource: Drawable?, model: Any?, target: com.bumptech.glide.request.target.Target<Drawable?>?, dataSource: com.bumptech.glide.load.DataSource, isFirstResource: Boolean): Boolean {
-                            Log.d(Constants.LOG_TAG, "URI HOST value updateImage: $retry")
                             return false
                         }
                     })
@@ -179,7 +175,6 @@ class DNSQueryAdapter(val context: Context, private val persistentState: Persist
                         }
                     })
             } catch (e: Exception) {
-                Log.d(Constants.LOG_TAG, "URI HOST value exception: $retry")
                 b.flag.visibility = View.VISIBLE
                 b.favIcon.visibility = View.GONE
             }

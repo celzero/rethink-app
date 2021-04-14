@@ -148,6 +148,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityKillAppSwitch.isChecked = persistentState.killAppOnFirewall
         b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
         b.settingsActivityThemeRl.isEnabled = true
+        b.settingsActivityFavIconSwitch.isChecked = persistentState.fetchFavIcon
 
         when(persistentState.theme){
             0 -> {
@@ -297,12 +298,16 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             persistentState.checkForAppUpdate = b
         }
 
+        b.settingsActivityFavIconSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
+            persistentState.fetchFavIcon = b
+        }
+
         b.settingsActivityAllowBypassSwitch.setOnCheckedChangeListener { _: CompoundButton, bool: Boolean ->
             persistentState.allowByPass = bool
             b.settingsActivityAllowBypassSwitch.isEnabled = false
             b.settingsActivityAllowBypassSwitch.visibility = View.INVISIBLE
             b.settingsActivityAllowBypassProgress.visibility = View.VISIBLE
-            object : CountDownTimer(500, 500) {
+            object : CountDownTimer(1000, 500) {
                 override fun onTick(millisUntilFinished: Long) {
                 }
                 override fun onFinish() {
@@ -684,7 +689,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                             }
                         } else {
                             activity?.runOnUiThread {
-                                if (isUserInitiated && !isRetry) {
+                                if (isUserInitiated) {
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                                         val vpnService = VpnController.getInstance().getBraveVpnService()
                                         if (vpnService != null && vpnService.isLockdownEnabled) {
