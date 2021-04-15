@@ -114,12 +114,14 @@ class P2QuantileEstimation(probability: Double) {
     }
 
     fun getQuantile(): Double {
-        if (count > 5) {
+        val c = count
+
+        if (c > 5) {
             return q[2]
         }
  
-        Arrays.sort(q, 0, count)
-        val index = ((count - 1) * p).roundToInt()
+        Arrays.sort(q, 0, c)
+        val index = ((c - 1) * p).roundToInt()
         return q[index]
     }
 
