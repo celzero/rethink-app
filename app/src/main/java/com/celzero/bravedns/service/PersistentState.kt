@@ -95,7 +95,7 @@ class PersistentState(private val context: Context):SimpleKrate(context) {
     var dnsType by intPref("dns_type", 1)
     var prefAutoStartBootUp by booleanPref("auto_start_on_boot", true)
     var _screenState by booleanPref("screen_state", false)
-    private var _median90 by longPref("median_p90", 0)
+    //private var _median90 by longPref("median_p90", 0)
     private var _numberOfRequests by intPref("number_request", 0)
     var numberOfBlockedRequests by intPref("blocked_request", 0)
     var backgroundEnabled by booleanPref("background_mode", false)
@@ -176,7 +176,7 @@ class PersistentState(private val context: Context):SimpleKrate(context) {
 
     fun setMedianLatency(medianP90 : Long){
         median50.postValue(medianP90)
-        _median90 = medianP90
+        //_median90 = medianP90
     }
 
     fun setNumOfReq(){
