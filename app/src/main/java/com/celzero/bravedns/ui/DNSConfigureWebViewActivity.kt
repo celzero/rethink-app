@@ -34,6 +34,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
+import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebSettingsCompat.DARK_STRATEGY_PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING
+import androidx.webkit.WebViewFeature
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DoHEndpointRepository
@@ -125,10 +128,45 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
             }
         })
 
+        setWebViewTheme()
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+    }
+
+    /**
+     * Sets the theme for the webview based on the application theme.
+     * FORCE_DARK_ON - For Dark and True black theme
+     * FORCE_DARK_OFF - Light mode.
+     */
+    private fun setWebViewTheme(){
+        if (persistentState.theme == 0) {
+            if (isDarkThemeOn()) {
+                if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                    WebSettingsCompat.setForceDark(b.configureWebview.settings, WebSettingsCompat.FORCE_DARK_ON)
+                }
+            } else {
+                if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                    WebSettingsCompat.setForceDark(b.configureWebview.settings, WebSettingsCompat.FORCE_DARK_OFF)
+                }
+            }
+        } else if (persistentState.theme == 1) {
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                WebSettingsCompat.setForceDark(b.configureWebview.settings, WebSettingsCompat.FORCE_DARK_OFF)
+            }
+        } else if (persistentState.theme == 2) {
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                WebSettingsCompat.setForceDark(b.configureWebview.settings, WebSettingsCompat.FORCE_DARK_ON)
+            }
+        } else {
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                WebSettingsCompat.setForceDark(b.configureWebview.settings, WebSettingsCompat.FORCE_DARK_ON)
+            }
+        }
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK_STRATEGY)) {
+            WebSettingsCompat.setForceDarkStrategy(b.configureWebview.settings, DARK_STRATEGY_PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING)
+        }
     }
 
     override fun onDestroy() {

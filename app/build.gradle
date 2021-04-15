@@ -147,4 +147,8 @@ dependencies {
 
     //Work manager
     implementation 'android.arch.work:work-runtime-ktx:1.0.1'
+
+    //Webkit
+    implementation 'androidx.webkit:webkit:1.4.0'
+
 }
