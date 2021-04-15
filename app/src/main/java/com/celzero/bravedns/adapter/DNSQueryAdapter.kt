@@ -96,7 +96,8 @@ class DNSQueryAdapter(val context: Context, private val persistentState: Persist
                 b.flag.visibility = View.VISIBLE
                 b.favIcon.visibility = View.GONE
                 if (favIcon) {
-                    if (transaction.status == Transaction.Status.COMPLETE.toString() && !transaction.isBlocked) {
+                    if (transaction.status == Transaction.Status.COMPLETE.toString()
+                        && transaction.response != "NXDOMAIN" && !transaction.isBlocked) {
                         val url = "${Constants.FAV_ICON_URL}${transaction.queryStr}ico"
                         updateImage(url, true)
                     } else {

@@ -97,7 +97,8 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
             b.dnsBlockResolver.visibility = View.GONE
         }
         if (persistentState.fetchFavIcon) {
-            if (transaction.status == Transaction.Status.COMPLETE.toString() && !transaction.isBlocked) {
+            if (transaction.status == Transaction.Status.COMPLETE.toString()
+                && transaction.response != "NXDOMAIN" && !transaction.isBlocked) {
                 val trim = transaction.queryStr.dropLast(1)
                 val url = "https://icons.duckduckgo.com/ip2/$trim.ico"
                 updateImage(url, true)
