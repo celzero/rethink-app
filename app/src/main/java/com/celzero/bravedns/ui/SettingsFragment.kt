@@ -123,10 +123,10 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
         if (BuildConfig.FLAVOR != FLAVOR_PLAY) {
             b.settingsActivityOnDeviceBlockRl.visibility = View.VISIBLE
-            b.settingsHeadingDns.visibility = View.VISIBLE
+            //b.settingsHeadingDns.visibility = View.VISIBLE
         } else {
             b.settingsActivityOnDeviceBlockRl.visibility = View.GONE
-            b.settingsHeadingDns.visibility = View.GONE
+            //b.settingsHeadingDns.visibility = View.GONE
         }
 
         if(BuildConfig.FLAVOR == FLAVOR_FDROID){
