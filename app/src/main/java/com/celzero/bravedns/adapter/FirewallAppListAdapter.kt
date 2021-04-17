@@ -33,13 +33,13 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatToggleButton
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
-import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.CategoryInfo
 import com.celzero.bravedns.database.CategoryInfoRepository
+import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -98,11 +98,11 @@ class FirewallAppListAdapter internal constructor(
         val firewallApkProgressBar: ProgressBar = convertView.findViewById(R.id.firewall_apk_progress_bar)
 
         try {
-            Glide.with(context).load(context.packageManager.getApplicationIcon(appInfoDetail.packageInfo))
+            GlideApp.with(context).load(context.packageManager.getApplicationIcon(appInfoDetail.packageInfo))
                 .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                 .into(mIconImageView)
         } catch (e: Exception) {
-            Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+            GlideApp.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                 .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                 .into(mIconImageView)
             Log.i(LOG_TAG, "Application Icon not available for package: ${appInfoDetail.packageInfo}" + e.message)
@@ -284,14 +284,14 @@ class FirewallAppListAdapter internal constructor(
             if (list != null && list.isNotEmpty()) {
                 if (numberOfApps != 0) {
                     if (numberOfApps >= 2) {
-                        Glide.with(context).load(context.packageManager.getApplicationIcon(list[0].packageInfo))
+                        GlideApp.with(context).load(context.packageManager.getApplicationIcon(list[0].packageInfo))
                             .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                             .into(imageHolder1)
-                        Glide.with(context).load(context.packageManager.getApplicationIcon(list[1].packageInfo))
+                        GlideApp.with(context).load(context.packageManager.getApplicationIcon(list[1].packageInfo))
                             .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                             .into(imageHolder2)
                     } else {
-                        Glide.with(context).load(context.packageManager.getApplicationIcon(list[0].packageInfo))
+                        GlideApp.with(context).load(context.packageManager.getApplicationIcon(list[0].packageInfo))
                             .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                             .into(imageHolder1)
                         imageHolder2.visibility = View.GONE
@@ -303,13 +303,13 @@ class FirewallAppListAdapter internal constructor(
             }
         } catch (e: Exception) {
             Log.w(LOG_TAG, "One or more application icons are not available" + e.message)
-            Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+            GlideApp.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                 .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                 .into(imageHolder1)
             if (numberOfApps == 1) {
                 imageHolder2.visibility = View.GONE
             }else{
-                Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                GlideApp.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                     .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                     .into(imageHolder2)
             }

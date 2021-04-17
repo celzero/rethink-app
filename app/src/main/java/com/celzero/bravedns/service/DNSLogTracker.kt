@@ -21,9 +21,12 @@ import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DNSLogRepository
 import com.celzero.bravedns.database.DNSLogs
+import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.dns.DnsPacket
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.DNS_TYPE_DNS_CRYPT
 import com.celzero.bravedns.util.Constants.Companion.DNS_TYPE_DOH
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
@@ -38,9 +41,7 @@ import java.net.InetAddress
 import java.net.ProtocolException
 import java.net.UnknownHostException
 
-class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRepository,
-                                         private val persistentState:PersistentState,
-                                         private val context: Context) {
+class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRepository, private val persistentState: PersistentState, private val context: Context) {
 
     fun recordTransaction(transaction: Transaction?) {
         if (transaction != null) {
@@ -53,7 +54,7 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
             val dnsLogs = DNSLogs()
 
             dnsLogs.blockLists = transaction.blockList
-            if(transaction.isDNSCrypt) {
+            if (transaction.isDNSCrypt) {
                 dnsLogs.dnsType = DNS_TYPE_DNS_CRYPT
                 dnsLogs.relayIP = transaction.relayIp
             } else {
@@ -72,7 +73,7 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                 val serverAddress = if (transaction.serverIp != null) {
                     try {
                         InetAddress.getByName(transaction.serverIp)
-                    }catch(ex : UnknownHostException){
+                    } catch (ex: UnknownHostException) {
                         null
                     }
                 } else {
@@ -84,7 +85,7 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                 } else {
                     dnsLogs.resolver = transaction.serverIp
                 }
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 Log.w(LOG_TAG, "DNSLogTracker - exception while fetching the resolver: ${e.message}", e)
                 dnsLogs.resolver = transaction.serverIp
             }
@@ -104,7 +105,7 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                         if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "transaction.response - ${destination.address}")
                         val countryCode: String = getCountryCode(destination, context) //TODO : Check on the country code stuff
                         dnsLogs.response = makeAddressPair(countryCode, destination.hostAddress)
-                        if (destination.hostAddress.contains("0.0.0.0")){
+                        if (destination.hostAddress.contains("0.0.0.0")) {
                             dnsLogs.isBlocked = true
                         }
 
@@ -133,11 +134,23 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                     context.getString(R.string.unicode_warning_sign) // Warning sign
                 }
             }
-            if(dnsLogs.isBlocked){
+            if (dnsLogs.isBlocked) {
                 persistentState.incrementBlockedReq()
             }
             persistentState.setNumOfReq()
             dnsLogRepository.insertAsync(dnsLogs)
+            fetchFavIcon(dnsLogs)
+        }
+    }
+
+    private fun fetchFavIcon(dnsLogs: DNSLogs) {
+        if (persistentState.fetchFavIcon) {
+            if (dnsLogs.status == Transaction.Status.COMPLETE.toString() && dnsLogs.response != Constants.NXDOMAIN && !dnsLogs.isBlocked) {
+                val url = "${Constants.FAV_ICON_URL}${dnsLogs.queryStr}ico"
+                if(DEBUG) Log.d(LOG_TAG, "Glide - fetchFavIcon() -$url")
+                val favIconFetcher = FavIconDownloader(context, url)
+                favIconFetcher.run()
+            }
         }
     }
 }

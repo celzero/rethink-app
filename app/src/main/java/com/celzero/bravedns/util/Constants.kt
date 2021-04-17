@@ -124,6 +124,8 @@ class Constants {
         const val NOTIFICATION_ACTION = "NOTIFICATION_VALUE"
         const val VPN_NOTIFICATION_ACTION = "STOP_RETHINKDNS"
 
+        const val NXDOMAIN = "NXDOMAIN"
+
         const val WORK_MANAGER_TIMEOUT = 1*40*60*1000
 
         const val FAV_ICON_URL = "https://icons.duckduckgo.com/ip2/"

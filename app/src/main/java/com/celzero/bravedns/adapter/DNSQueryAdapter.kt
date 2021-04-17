@@ -18,33 +18,31 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.os.Handler
-import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.annotation.Nullable
 import androidx.fragment.app.FragmentActivity
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomViewTarget
+import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DNSLogs
 import com.celzero.bravedns.databinding.TransactionRowBinding
+import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.DNSBlockListBottomSheetFragment
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Utilities
 import java.text.SimpleDateFormat
 import java.util.*
@@ -96,15 +94,17 @@ class DNSQueryAdapter(val context: Context, private val persistentState: Persist
                 b.flag.visibility = View.VISIBLE
                 b.favIcon.visibility = View.GONE
                 if (favIcon) {
-                    if (transaction.status == Transaction.Status.COMPLETE.toString()
-                        && transaction.response != "NXDOMAIN" && !transaction.isBlocked) {
+                    if (transaction.status == Transaction.Status.COMPLETE.toString() && transaction.response != Constants.NXDOMAIN && !transaction.isBlocked) {
                         val url = "${Constants.FAV_ICON_URL}${transaction.queryStr}ico"
-                        updateImage(url, true)
+                        val subDomainURL = Utilities.getETldPlus1(transaction.queryStr).toString()
+                        val cacheKey = "${Constants.FAV_ICON_URL}${subDomainURL}.ico"
+                        if(DEBUG) Log.d(LOG_TAG, "Glide - TransactionViewHolder favIcon -$url")
+                        updateImage(url, cacheKey)
                     } else {
-                        Glide.with(context).clear(b.favIcon)
+                        GlideApp.with(context.applicationContext).clear(b.favIcon)
                     }
-                }else{
-                    Glide.with(context).clear(b.favIcon)
+                } else {
+                    GlideApp.with(context.applicationContext).clear(b.favIcon)
                 }
                 if (transaction.isBlocked) {
                     b.queryLogIndicator.visibility = View.VISIBLE
@@ -132,50 +132,44 @@ class DNSQueryAdapter(val context: Context, private val persistentState: Persist
             return format.format(date)
         }
 
-        private fun updateImage(url: String, retry: Boolean) {
-            try {
-                val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
-                Glide.with(context)
-                    .load(url)
-                    .apply(RequestOptions())
-                    .transition(withCrossFade(factory))
-                    .listener(object : RequestListener<Drawable?> {
-                        override fun onLoadFailed(@Nullable e: GlideException?, model: Any?, target: com.bumptech.glide.request.target.Target<Drawable?>?, isFirstResource: Boolean): Boolean {
-                            Handler(Looper.getMainLooper()).post {
-                                if (retry) {
-                                    val extractURL = url.substringAfter(Constants.FAV_ICON_URL).dropLast(4)
-                                    val domainURL = Utilities.getETldPlus1(extractURL)
-                                    val glideURL = "${Constants.FAV_ICON_URL}$domainURL.ico"
-                                    updateImage(glideURL, false)
-                                }
-                            }
-                            return false
-                        }
 
-                        override fun onResourceReady(resource: Drawable?, model: Any?, target: com.bumptech.glide.request.target.Target<Drawable?>?, dataSource: com.bumptech.glide.load.DataSource, isFirstResource: Boolean): Boolean {
-                            return false
-                        }
-                    })
-                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+        /**
+         * Loads the fav icons from the cache, the icons are cached by favIconDownloader.
+         * On failure, will check if there is a icon for top level domain is available in cache.
+         * Else, will show the Flag.
+         *
+         * This method will be executed only when show fav icon setting is turned on.
+         */
+        private fun updateImage(url: String, cacheKey : String) {
+            try {
+                Log.d(LOG_TAG, "Glide - TransactionViewHolder updateImage() -$url, $cacheKey")
+                val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
+                GlideApp.with(context.applicationContext)
+                    .load(url)
+                    .onlyRetrieveFromCache(true)
+                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                    .override(SIZE_ORIGINAL,SIZE_ORIGINAL)
+                    .error(GlideApp.with(context.applicationContext).load(cacheKey).onlyRetrieveFromCache(true))
+                    .transition(withCrossFade(factory))
                     .into(object : CustomViewTarget<ImageView, Drawable>(b.favIcon) {
                         override fun onLoadFailed(errorDrawable: Drawable?) {
                             b.flag.visibility = View.VISIBLE
                             b.favIcon.visibility = View.GONE
                             b.favIcon.setImageDrawable(null)
                         }
-
                         override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                            if(DEBUG) Log.d(LOG_TAG, "Glide - CustomViewTarget onResourceReady() -$url")
                             b.flag.visibility = View.GONE
                             b.favIcon.visibility = View.VISIBLE
                             b.favIcon.setImageDrawable(resource)
                         }
-
                         override fun onResourceCleared(placeholder: Drawable?) {
                             b.favIcon.visibility = View.GONE
                             b.flag.visibility = View.VISIBLE
                         }
                     })
             } catch (e: Exception) {
+                if(DEBUG) Log.d(LOG_TAG, "Glide - TransactionViewHolder Exception() -${e.message}")
                 b.flag.visibility = View.VISIBLE
                 b.favIcon.visibility = View.GONE
             }
