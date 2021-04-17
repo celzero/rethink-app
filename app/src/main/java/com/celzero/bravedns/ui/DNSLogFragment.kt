@@ -25,12 +25,12 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DNSQueryAdapter
 import com.celzero.bravedns.database.DNSLogDAO
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.databinding.ActivityQueryDetailBinding
+import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.lifeTimeQ
@@ -191,7 +191,7 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         //performing positive action
         builder.setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
             GlobalScope.launch(Dispatchers.IO) {
-                Glide.get(requireActivity()).clearDiskCache()
+                GlideApp.get(requireActivity()).clearDiskCache()
                 dnsLogDAO.clearAllData()
             }
         }

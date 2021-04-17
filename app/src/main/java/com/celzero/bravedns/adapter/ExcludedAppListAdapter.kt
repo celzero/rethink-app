@@ -29,12 +29,12 @@ import androidx.core.content.ContextCompat
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.databinding.ExcludedAppListItemBinding
+import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
@@ -77,16 +77,16 @@ class ExcludedAppListAdapter(private val context: Context,
             b.excludedAppListCheckbox.isChecked = appInfo.isExcluded
             try {
                 if(!appInfo.packageInfo.contains(Constants.APP_NON_APP) || appInfo.appName != Constants.UNKNOWN_APP){
-                  Glide.with(context).load(context.packageManager.getApplicationIcon(appInfo.packageInfo))
+                    GlideApp.with(context).load(context.packageManager.getApplicationIcon(appInfo.packageInfo))
                         .into(b.excludedAppListApkIconIv)
                 } else {
-                    Glide.with(context).load(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
+                    GlideApp.with(context).load(ContextCompat.getDrawable(context, R.drawable.default_app_icon))
                         .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                         .into(b.excludedAppListApkIconIv)
                 }
 
             } catch (e: Exception) {
-                Glide.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
+                GlideApp.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                         .into(b.excludedAppListApkIconIv)
                 Log.e(LOG_TAG, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message, e)
             }
