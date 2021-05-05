@@ -61,7 +61,7 @@
         <item name="primaryDarkColorText">@color/colorPrimary_white</item>
         <item name="primaryLightColorText">@color/black_white</item>
         <item name="secondaryTextColor">@color/colorPrimaryDark_white</item>
-        <item name="divider">@color/border_white</item>
+        <item name="divider">@color/main_button_disabled</item>
         <item name="roundedCornersButton">@drawable/rounded_corners_button_primary</item>
         <item name="homeScreenBtnBackground">@color/lightColorPrimary_white</item>
         <item name="svgStrokeColor">@color/stroke_color_white</item>
