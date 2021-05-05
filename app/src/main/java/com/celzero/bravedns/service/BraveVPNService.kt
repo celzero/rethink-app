@@ -65,14 +65,17 @@ import settings.Settings
 import java.net.InetAddress
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import kotlin.collections.LinkedHashSet
 import kotlin.random.Random
 
 
-class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListener, Protector, Blocker,
+class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protector, Blocker,
     OnSharedPreferenceChangeListener {
 
-    @GuardedBy("vpnController") private var connectionCapabilityMonitor : ConnectionCapabilityMonitor ?= null
+    //@GuardedBy("vpnController") private var connectionCapabilityMonitor : ConnectionCapabilityMonitor ?= null
+    @GuardedBy("vpnController") private var connectionMonitor : ConnectionMonitor ?= null
     @GuardedBy("vpnController") private var vpnAdapter: GoVpnAdapter? = null
 
     companion object {
@@ -408,7 +411,7 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
         // (apps lose connectivity during switch over Mobile Data from WiFi)
         // Whenever the VPN is started the list which is stored in the ConnectionCapabilityMonitor
         // class is set for the underlying networks.
-        builder.setUnderlyingNetworks(connectionCapabilityMonitor?.getNetworkList()?.toTypedArray())
+        builder.setUnderlyingNetworks(connectionMonitor?.getNetworkList()?.toTypedArray())
 
         //Fix - Cloud Backups were failing thinking that the VPN connection is metered.
         //The below code will fix that.
@@ -621,13 +624,13 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
                 if(DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Registering the shared pref changes with the vpn service")
                 persistentState.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
 
-                if (connectionCapabilityMonitor != null) {
+                if (connectionMonitor != null) {
                     spawnServerUpdate()
                     return Service.START_REDELIVER_INTENT
                 }
 
                 // Register for ConnectivityManager
-                connectionCapabilityMonitor = ConnectionCapabilityMonitor(this, this)
+                connectionMonitor = ConnectionMonitor(this, this)
 
                 // Part of issue fix(#242) - StartVPN thread that for some reason is waiting
                 // Avoiding the call from ConnectivityManager to invoke startVPN is removed.
@@ -682,7 +685,7 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
     private fun spawnServerUpdate() {
         if (vpnController != null) {
             synchronized(vpnController) {
-                if (connectionCapabilityMonitor != null) {
+                if (connectionMonitor != null) {
                     Thread({ updateServerConnection() }, "updateServerConnection-onStartCommand").start()
                 }
             }
@@ -823,6 +826,11 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
             Log.i(LOG_TAG, "$FILE_LOG_TAG ORBOT proxy change - restart vpn ${appMode.getProxyMode()}")
             restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
         }
+
+        if(PersistentState.NETWORK == key){
+            connectionMonitor?.removeCallBack()
+            connectionMonitor = ConnectionMonitor(this, this)
+        }
     }
 
     fun signalStopService(userInitiated: Boolean) {
@@ -919,11 +927,21 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
         vpnController!!.onConnectionStateChanged(this, State.FAILING)
     }
 
-    override fun onNetworkChange(networkSet: MutableSet<Network>) {
+    override fun onNetworkChange(networkSet: LinkedHashSet<Network>) {
         setUnderlyingNetworks(networkSet.toTypedArray())
     }
 
-    override fun checkLockDown() {
+    override fun onUpdateActiveNetwork(network: Network?) {
+        if(network == null){
+            setUnderlyingNetworks(null)
+            return
+        }
+        val networkList = ArrayList<Network?>()
+        networkList.add(network)
+        setUnderlyingNetworks(networkList.toTypedArray())
+    }
+
+    private fun checkLockDown() {
         if (VERSION.SDK_INT >= VERSION_CODES.Q) {
             if (DEBUG) Log.d(LOG_TAG, "BraveVPNService Value for isLockDownEnabled - ${isLockdownEnabled}, $isLockDownPrevious")
             if (isLockdownEnabled != isLockDownPrevious) {
@@ -960,7 +978,7 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
         synchronized(vpnController!!) {
             Log.w(LOG_TAG, "$FILE_LOG_TAG Destroying DNS VPN service")
             persistentState.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
-            connectionCapabilityMonitor?.removeCallBack()
+            connectionMonitor?.removeCallBack()
             vpnController.setBraveVpnService(null)
             stopForeground(true)
             if (vpnAdapter != null) {

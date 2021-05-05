@@ -149,6 +149,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
         b.settingsActivityThemeRl.isEnabled = true
         b.settingsActivityFavIconSwitch.isChecked = persistentState.fetchFavIcon
+        b.settingsActivityAllNetworkSwitch.isChecked = persistentState.isAddAllNetwork
 
         when(persistentState.theme){
             0 -> {
@@ -300,6 +301,10 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
         b.settingsActivityFavIconSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             persistentState.fetchFavIcon = b
+        }
+
+        b.settingsActivityAllNetworkSwitch.setOnCheckedChangeListener{ _:CompoundButton, b: Boolean ->
+            persistentState.isAddAllNetwork = b
         }
 
         b.settingsActivityAllowBypassSwitch.setOnCheckedChangeListener { _: CompoundButton, bool: Boolean ->

@@ -49,6 +49,7 @@ class PersistentState(private val context: Context):SimpleKrate(context) {
         const val DNS_PROXY_ID = "dns_proxy_change"
         const val BLOCK_UDP_OTHER_THAN_DNS = "block_udp_traffic_other_than_dns"
         const val ORBOT_MODE_CHANGE = "orbot_mode_enabled"
+        const val NETWORK = "add_all_network_VPN"
 
         fun expandUrl(context: Context, url: String?): String {
             return if (url == null || url.isEmpty()) {
@@ -100,10 +101,10 @@ class PersistentState(private val context: Context):SimpleKrate(context) {
     var numberOfBlockedRequests by intPref("blocked_request", 0)
     var backgroundEnabled by booleanPref("background_mode", false)
     var checkForAppUpdate by booleanPref("check_for_app_update", true)
-        //private set
     var isScreenOff by booleanPref("screen_off", false)
     private var connectedDNSName by stringPref("connected_dns_name","RethinkDNS Basic")
     var theme by intPref("app_theme", 0)
+    var isAddAllNetwork by booleanPref("add_all_network_VPN", false)
 
     var orbotConnectionStatus : MutableLiveData<Boolean> = MutableLiveData()
     //var orbotConnectionInitiated by booleanPref("orbot_connection_initiated", false)

@@ -112,8 +112,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         //Screen off state - set - 0 if screen is off, 1 - screen is on, -1 not initialized.
         var isScreenLocked : Int = -1
-
-
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -195,11 +193,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
     }
 
-    private fun updateForDownload(){
-        persistentState.remoteBraveDNSDownloaded = false
-        persistentState.remoteBlockListDownloadTime = 0
-    }
-
     private fun updateNewVersion() {
         try {
             val pInfo: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
@@ -235,7 +228,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun showNewFeaturesDialog() {
         if (checkToShowNewFeatures()) {
             updateInstallSource()
-            updateForDownload()
             val inflater: LayoutInflater = LayoutInflater.from(this)
             val view: View = inflater.inflate(R.layout.dialog_whatsnew, null)
             val builder = AlertDialog.Builder(this)

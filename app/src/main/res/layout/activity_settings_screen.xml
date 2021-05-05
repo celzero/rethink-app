@@ -519,6 +519,65 @@
         </RelativeLayout>
 
         <TextView
+            android:id="@+id/settings_network"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:fontFamily="sans-serif-smallcaps"
+            android:lineSpacingExtra="5dp"
+            android:padding="10dp"
+            android:text="@string/settings_network_header"
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/large_font_text_view"
+            android:textStyle="bold" />
+
+        <RelativeLayout
+            android:id="@+id/settings_activity_all_network_rl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="20dp"
+            android:paddingTop="15dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="15dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/settings_activity_all_network_switch"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/gen_settings_all_network_txt"
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_network_all_network"
+                    android:textSize="@dimen/large_font_text_view" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:text="@string/settings_network_all_network_desc"
+                    android:textSize="@dimen/default_font_text_view" />
+            </LinearLayout>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/settings_activity_all_network_switch"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:padding="10dp" />
+
+        </RelativeLayout>
+
+
+        <TextView
             android:id="@+id/settings_heading"
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
@@ -665,7 +724,6 @@
                 android:padding="10dp" />
 
         </RelativeLayout>
-
 
 
         <RelativeLayout
