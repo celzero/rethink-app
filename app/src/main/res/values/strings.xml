@@ -608,8 +608,8 @@
     <string name="settings_autostart_bootup_desc">On device power-up, start RethinkDNS if it was running before shut down.</string>
 
     <string name="settings_network_header">NETWORK</string>
-    <string name="settings_network_all_network">Set all available network</string>
-    <string name="settings_network_all_network_desc">Set VPN with all the available networks in the device.</string>
+    <string name="settings_network_all_network">Use all available networks</string>
+    <string name="settings_network_all_network_desc">When enabled, RethinkDNS uses all available networks to connect to the Internet. If not, it uses only one currently active network.</string>
 
 
     <string name="settings_local_blockList_desc1">Choose from 170+ blocklists.</string>

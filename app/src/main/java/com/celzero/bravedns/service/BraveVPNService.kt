@@ -828,8 +828,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         }
 
         if(PersistentState.NETWORK == key){
-            connectionMonitor?.removeCallBack()
-            connectionMonitor = ConnectionMonitor(this, this)
+            connectionMonitor?.onPreferenceChanged()
         }
     }
 
@@ -927,7 +926,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         vpnController!!.onConnectionStateChanged(this, State.FAILING)
     }
 
-    override fun onNetworkChange(networkSet: LinkedHashSet<Network>) {
+    override fun onNetworkConnected(networkSet: LinkedHashSet<Network>) {
         setUnderlyingNetworks(networkSet.toTypedArray())
     }
 

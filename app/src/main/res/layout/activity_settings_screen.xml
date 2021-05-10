@@ -565,14 +565,12 @@
                     android:textSize="@dimen/default_font_text_view" />
             </LinearLayout>
 
-            <com.google.android.material.switchmaterial.SwitchMaterial
+            <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/settings_activity_all_network_switch"
                 style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:padding="10dp" />
+                android:layout_alignParentEnd="true" />
 
         </RelativeLayout>
 
