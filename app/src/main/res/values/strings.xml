@@ -499,12 +499,11 @@
     <string name="features_disabled">(disabled)</string>
     <string name="firewall_app_info_not_available">Cannot block the app</string>
 
-    <string name="whats_dialog_title">What\'s new in v053e</string>
-    <string name="whats_new_version_name">🎁 Press Freedom Day (3 May) 🎁</string>
+    <string name="whats_dialog_title">What\'s new in v053f</string>
+    <string name="whats_new_version_name">🎁 World Environment Day (5 June) 🎁</string>
     <string name="whats_new_version_update">Fixes and improvements:\n\n
-        1. DNS Logs UI now shows website icons corresponding to DNS queries. These icons are fetched from DuckDuckGo. To enable / disable this see the Settings screen.\n\n
-        2. An edge case during app start-up where all connections were allowed while the firewall rules were being loaded has been fixed.\n\n
-        3. Changes to the way the app recovers from the \'Waiting\' state.\n\n
+        1. Connection issues fix - Changes to the way the app using the underlying network options. Introduced new setting \"Use all available network\" - whether to add all the available in the underlying VPN or to add active network to the VPN. By default, the value is set as false.\n\n
+        2. Minor fix for loading the website icons corresponding to DNS queries.\n\n
     </string>
 
     <!-- Settings Fragment strings -->

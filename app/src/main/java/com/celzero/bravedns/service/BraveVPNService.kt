@@ -409,8 +409,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
 
         // Part of issue fix, internet connection showing metered even if its not the case.
         // (apps lose connectivity during switch over Mobile Data from WiFi)
-        // Whenever the VPN is started the list which is stored in the ConnectionCapabilityMonitor
-        // class is set for the underlying networks.
+        // Whenever the VPN is started the network list which is stored in the ConnectionMonitor
+        // class is set as underlying network.
         builder.setUnderlyingNetworks(connectionMonitor?.getNetworkList()?.toTypedArray())
 
         //Fix - Cloud Backups were failing thinking that the VPN connection is metered.
@@ -624,6 +624,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 if(DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Registering the shared pref changes with the vpn service")
                 persistentState.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
 
+                // In case if the service is already running and service restart is called
+                // then no need to process the below initializations instead call spawnServerUpdate()
+                // spawnServerUpdate() - Will overwrite the tunnel values with new values.
                 if (connectionMonitor != null) {
                     spawnServerUpdate()
                     return Service.START_REDELIVER_INTENT
@@ -685,6 +688,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     private fun spawnServerUpdate() {
         if (vpnController != null) {
             synchronized(vpnController) {
+                // Connection monitor can be null if onDestroy() of service
+                // is called, in that case no need to call updateServerConnection()
                 if (connectionMonitor != null) {
                     Thread({ updateServerConnection() }, "updateServerConnection-onStartCommand").start()
                 }
@@ -926,18 +931,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         vpnController!!.onConnectionStateChanged(this, State.FAILING)
     }
 
-    override fun onNetworkConnected(networkSet: LinkedHashSet<Network>) {
-        setUnderlyingNetworks(networkSet.toTypedArray())
-    }
-
-    override fun onUpdateActiveNetwork(network: Network?) {
-        if(network == null){
+    override fun onNetworkConnected(networkSet: LinkedHashSet<Network>?) {
+        Log.i(LOG_TAG, "$FILE_LOG_TAG connecting to networks: $networkSet")
+        if(networkSet == null){
             setUnderlyingNetworks(null)
             return
         }
-        val networkList = ArrayList<Network?>()
-        networkList.add(network)
-        setUnderlyingNetworks(networkList.toTypedArray())
+        setUnderlyingNetworks(networkSet.toTypedArray())
     }
 
     private fun checkLockDown() {
