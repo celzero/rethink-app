@@ -117,8 +117,8 @@ class ConnectionMonitor(context: Context, val networkListener: NetworkListener) 
      * If isAddAllNetwork preference is selected then returns the list of available networks.
      * else return the current active network.
      */
-    fun getNetworkList(): MutableSet<Network> {
-        val networkList : MutableSet<Network> = mutableSetOf()
+    fun getNetworkList(): LinkedHashSet<Network> {
+        val networkList : LinkedHashSet<Network> = linkedSetOf()
         if(persistentState.isAddAllNetwork){
             networkList.addAll(currentNetworkList)
         }else{

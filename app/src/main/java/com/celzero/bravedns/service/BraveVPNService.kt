@@ -624,8 +624,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 if(DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Registering the shared pref changes with the vpn service")
                 persistentState.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
 
-                // In case if the service is already running and service restart is called
-                // then no need to process the below initializations instead call spawnServerUpdate()
+                // In case if the service already running(connectionMonitor will not be null)
+                // and onStartCommand is called then no need to process the below initializations
+                // instead call spawnServerUpdate()
                 // spawnServerUpdate() - Will overwrite the tunnel values with new values.
                 if (connectionMonitor != null) {
                     spawnServerUpdate()
@@ -927,6 +928,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     }
 
     override fun onNetworkDisconnected() {
+        Log.i(LOG_TAG, "$FILE_LOG_TAG onNetworkDisconnected()")
         setUnderlyingNetworks(null)
         vpnController!!.onConnectionStateChanged(this, State.FAILING)
     }
