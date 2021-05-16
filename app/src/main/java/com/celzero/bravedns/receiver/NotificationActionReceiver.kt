@@ -25,24 +25,46 @@ import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import com.celzero.bravedns.R
+import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.HomeScreenFragment
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
+import org.koin.android.ext.android.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class NotificationActionReceiver : BroadcastReceiver() {
+class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
+    private val persistentState by inject<PersistentState>()
+
     override fun onReceive(context: Context?, intent: Intent?) {
-        Log.d(Constants.LOG_TAG, "OrbotNotificationReceiver: onReceive")
         val action: String? = intent?.getStringExtra(Constants.NOTIFICATION_ACTION)
-        if(action == OrbotHelper.ORBOT_NOTIFICATION_ACTION_TEXT){
-            openOrbotApp(context)
-            val manager = context?.getSystemService(Context. NOTIFICATION_SERVICE) as NotificationManager
-            manager.cancel(OrbotHelper.ORBOT_SERVICE_ID)
-        } else if(action == Constants.VPN_NOTIFICATION_ACTION){
-            stopDnsVpnService(context)
-            val manager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            manager.cancel(BraveVPNService.SERVICE_ID)
+        Log.d(Constants.LOG_TAG, "NotificationActionReceiver: onReceive - $action")
+        when(action){
+            OrbotHelper.ORBOT_NOTIFICATION_ACTION_TEXT -> {
+                openOrbotApp(context)
+                val manager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                manager.cancel(OrbotHelper.ORBOT_SERVICE_ID)
+            }
+            Constants.STOP_VPN_NOTIFICATION_ACTION -> {
+                stopDnsVpnService(context)
+                val manager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                manager.cancel(BraveVPNService.SERVICE_ID)
+            }
+            Constants.DNS_VPN_NOTIFICATION_ACTION -> {
+                dnsMode()
+                val manager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                manager.cancel(BraveVPNService.SERVICE_ID)
+            }
+            Constants.DNS_FIREWALL_VPN_NOTIFICATION_ACTION -> {
+                dnsFirewallMode()
+                val manager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                manager.cancel(BraveVPNService.SERVICE_ID)
+            }
         }
     }
 
@@ -69,7 +91,20 @@ class NotificationActionReceiver : BroadcastReceiver() {
     }
 
     private fun stopDnsVpnService(context: Context?) {
+        Log.d(Constants.LOG_TAG, "NotificationActionReceiver: onReceive")
         VpnController.getInstance().stop(context)
+    }
+
+    private fun dnsMode(){
+        Log.d(Constants.LOG_TAG, "NotificationActionReceiver: dnsMode")
+        HomeScreenActivity.GlobalVariable.braveMode = HomeScreenFragment.DNS_MODE
+        persistentState.setBraveMode(HomeScreenFragment.DNS_MODE)
+    }
+
+    private fun dnsFirewallMode(){
+        Log.d(Constants.LOG_TAG, "NotificationActionReceiver: dnsFirewallMode")
+        HomeScreenActivity.GlobalVariable.braveMode = HomeScreenFragment.DNS_FIREWALL_MODE
+        persistentState.setBraveMode(HomeScreenFragment.DNS_FIREWALL_MODE)
     }
 
 }

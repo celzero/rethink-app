@@ -18,7 +18,6 @@ package com.celzero.bravedns.util
 class Constants {
 
     companion object{
-
         //Log
         const val LOG_TAG = "RethinkDNS"
 
@@ -122,7 +121,9 @@ class Constants {
         const val PORT_VAL_UNKNOWN = "unknown"
 
         const val NOTIFICATION_ACTION = "NOTIFICATION_VALUE"
-        const val VPN_NOTIFICATION_ACTION = "STOP_RETHINKDNS"
+        const val STOP_VPN_NOTIFICATION_ACTION = "STOP_RETHINKDNS"
+        const val DNS_VPN_NOTIFICATION_ACTION = "DNS_RETHINKDNS"
+        const val DNS_FIREWALL_VPN_NOTIFICATION_ACTION = "DNS_FIREWALL_RETHINKDNS"
 
         const val NXDOMAIN = "NXDOMAIN"
 
@@ -130,5 +131,4 @@ class Constants {
 
         const val FAV_ICON_URL = "https://icons.duckduckgo.com/ip2/"
     }
-
 }

@@ -148,10 +148,11 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityKillAppSwitch.isChecked = persistentState.killAppOnFirewall
         b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
         b.settingsActivityThemeRl.isEnabled = true
+        b.settingsActivityNotificationRl.isEnabled = true
         b.settingsActivityFavIconSwitch.isChecked = persistentState.fetchFavIcon
         b.settingsActivityAllNetworkSwitch.isChecked = persistentState.isAddAllNetwork
 
-        when(persistentState.theme){
+        when (persistentState.theme) {
             0 -> {
                 b.genSettingsThemeDesc.text = getString(R.string.settings_selected_theme, getString(R.string.settings_theme_dialog_themes_1))
             }
@@ -163,6 +164,18 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             }
             else -> {
                 b.genSettingsThemeDesc.text = getString(R.string.settings_selected_theme, getString(R.string.settings_theme_dialog_themes_4))
+            }
+        }
+
+        when (persistentState.notificationAction) {
+            0 -> {
+                b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,getString(R.string.settings_notification_desc1) )
+            }
+            1 -> {
+                b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,getString(R.string.settings_notification_desc2) )
+            }
+            2 -> {
+                b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,getString(R.string.settings_notification_desc3) )
             }
         }
 
@@ -442,7 +455,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             }
         }
 
-
         b.settingsActivityExcludeAppsImg.setOnClickListener {
             b.settingsActivityExcludeAppsImg.isEnabled = false
             showExcludeAppDialog(requireContext(), excludeAppAdapter!!, excludeAppViewModel)
@@ -473,7 +485,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             }.start()
         }
 
-
         b.settingsActivityOnDeviceBlockConfigureBtn.setOnClickListener {
             val intent = Intent(requireContext(), DNSConfigureWebViewActivity::class.java)
             val stamp = persistentState.getLocalBlockListStamp()
@@ -491,12 +502,25 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             b.settingsActivityThemeRl.isEnabled = false
             showDialogForTheme()
             object : CountDownTimer(500, 500) {
-                override fun onTick(millisUntilFinished: Long) {
-                }
+                override fun onTick(millisUntilFinished: Long) {}
 
                 override fun onFinish() {
                     if(isAdded) {
                         b.settingsActivityThemeRl.isEnabled = true
+                    }
+                }
+            }.start()
+        }
+
+        b.settingsActivityNotificationRl.setOnClickListener {
+            b.settingsActivityNotificationRl.isEnabled = false
+            showDialogForNotificationAction()
+            object : CountDownTimer(500, 500) {
+                override fun onTick(millisUntilFinished: Long) {}
+
+                override fun onFinish() {
+                    if (isAdded) {
+                        b.settingsActivityNotificationRl.isEnabled = true
                     }
                 }
             }.start()
@@ -609,6 +633,36 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                         persistentState.theme = 3
                         requireActivity().setTheme(R.style.AppThemeTrueBlack)
                         requireActivity().recreate()
+                    }
+                }
+            }
+        }
+        // Create the AlertDialog
+        val alertDialog: AlertDialog = alertBuilder.create()
+        // Set other dialog properties
+        alertDialog.show()
+    }
+
+    private fun showDialogForNotificationAction() {
+        val alertBuilder = AlertDialog.Builder(requireContext())
+        alertBuilder.setTitle(getString(R.string.settings_notification_dialog_title))
+        val items = arrayOf(getString(R.string.settings_notification_dialog_option_1), getString(R.string.settings_notification_dialog_option_2), getString(R.string.settings_notification_dialog_option_3))
+        val checkedItem = persistentState.notificationAction
+        alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
+            dialog.dismiss()
+            if (persistentState.notificationAction != which) {
+                when (which) {
+                    0 -> {
+                        b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,getString(R.string.settings_notification_desc1) )
+                        persistentState.notificationAction = 0
+                    }
+                    1 -> {
+                        b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,getString(R.string.settings_notification_desc2) )
+                        persistentState.notificationAction = 1
+                    }
+                    2 -> {
+                        b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,getString(R.string.settings_notification_desc3) )
+                        persistentState.notificationAction = 2
                     }
                 }
             }

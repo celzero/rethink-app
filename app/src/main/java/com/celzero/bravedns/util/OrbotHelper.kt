@@ -91,6 +91,8 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
         private const val EXTRA_HTTP_PROXY_PORT = "org.torproject.android.intent.extra.HTTP_PROXY_PORT"
 
         private const val EXTRA_STATUS = "org.torproject.android.intent.extra.STATUS"
+
+        private const val ORBOT_REQUEST_CODE = 200 // ORBOT App
     }
 
     var socks5Port: Int? = null
@@ -289,7 +291,7 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
     private fun getOrbotOpenIntent(context: Context): PendingIntent? {
         val intentAction = Intent(context, NotificationActionReceiver::class.java)
         intentAction.putExtra(Constants.NOTIFICATION_ACTION, ORBOT_NOTIFICATION_ACTION_TEXT)
-        return PendingIntent.getBroadcast(context, 1, intentAction, PendingIntent.FLAG_UPDATE_CURRENT)
+        return PendingIntent.getBroadcast(context, ORBOT_REQUEST_CODE, intentAction, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
     /**

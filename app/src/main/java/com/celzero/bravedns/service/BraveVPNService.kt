@@ -99,6 +99,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         var privateDNSOverride: Boolean = false
         var blockUDPTraffic: Boolean = false
 
+        // Request code for the Notification.
+        private const val VPN_STOP_NOTIFICATION = 100
+        private const val VPN_DNS_NOTIFICATION = 101
+        private const val VPN_DNS_FIREWALL_NOTIFICATION = 102
     }
 
     private var isLockDownPrevious : Boolean  = false
@@ -548,7 +552,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         registerReceiver(braveAutoStartReceiver, autoStartFilter)
     }
 
-
     private fun updateBuilder(context: Context): NotificationCompat.Builder {
         val mainActivityIntent = PendingIntent.getActivity(context, 0, Intent(context, HomeScreenActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT)
         var builder: NotificationCompat.Builder
@@ -575,10 +578,32 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
 
         builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(mainActivityIntent)
 
-        // v053d - New action button in the notification, STOP - stops the VPN service.
-        val openIntent = getBraveVPNIntent(context)
-        val notificationAction: NotificationCompat.Action = NotificationCompat.Action(0, context.resources.getString(R.string.notification_action_stop_vpn), openIntent)
-        builder.addAction(notificationAction)
+        // v053f - New action button options in the notification
+        // 1. No action button.
+        // 2. STOP action button.
+        // 3. RethinkDNS modes (DNS & DNS+Firewall mode)
+        if(DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Notification - ${persistentState.notificationAction}")
+        when(persistentState.notificationAction){
+            0 -> {
+                // User preference is set to no action button.
+                Log.i(LOG_TAG, "$FILE_LOG_TAG No notification action")
+            }
+            1 -> {
+                // Add STOP button to notification action.
+                val openIntent = getVPNIntent(context, VPN_STOP_NOTIFICATION, Constants.STOP_VPN_NOTIFICATION_ACTION)
+                val notificationAction: NotificationCompat.Action = NotificationCompat.Action(0, context.resources.getString(R.string.notification_action_stop_vpn), openIntent)
+                builder.addAction(notificationAction)
+            }
+            2 -> {
+                // Add DNS and DNS+Firewall action button in notification.
+                val openIntent1 = getVPNIntent(context, VPN_DNS_NOTIFICATION, Constants.DNS_VPN_NOTIFICATION_ACTION)
+                val openIntent2 = getVPNIntent(context, VPN_DNS_FIREWALL_NOTIFICATION, Constants.DNS_FIREWALL_VPN_NOTIFICATION_ACTION)
+                val notificationAction: NotificationCompat.Action = NotificationCompat.Action(0, context.resources.getString(R.string.notification_action_dns_mode), openIntent1)
+                val notificationAction2: NotificationCompat.Action = NotificationCompat.Action(0, context.resources.getString(R.string.notification_action_dns_firewall_mode), openIntent2)
+                builder.addAction(notificationAction)
+                builder.addAction(notificationAction2)
+            }
+        }
 
         // Secret notifications are not shown on the lock screen.  No need for this app to show there.
         // Only available in API >= 21
@@ -587,11 +612,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         return builder
     }
 
-
-    private fun getBraveVPNIntent(context: Context): PendingIntent? {
+    private fun getVPNIntent(context: Context, notificationID : Int, intentExtra : String): PendingIntent? {
         val intentAction = Intent(context, NotificationActionReceiver::class.java)
-        intentAction.putExtra(Constants.NOTIFICATION_ACTION, Constants.VPN_NOTIFICATION_ACTION)
-        return PendingIntent.getBroadcast(context, 1, intentAction, PendingIntent.FLAG_UPDATE_CURRENT)
+        intentAction.putExtra(Constants.NOTIFICATION_ACTION, intentExtra)
+        return PendingIntent.getBroadcast(context, notificationID, intentAction, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -835,6 +859,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
 
         if(PersistentState.NETWORK == key){
             connectionMonitor?.onPreferenceChanged()
+        }
+
+        if(PersistentState.NOTIFICATION_ACTION == key){
+            Log.i(LOG_TAG, "$FILE_LOG_TAG preference change - notification action ${persistentState.notificationAction}")
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            val builder = updateBuilder(this)
+            notificationManager.notify(SERVICE_ID, builder.build())
         }
     }
 

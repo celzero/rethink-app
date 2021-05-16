@@ -220,6 +220,8 @@
     </integer-array>
 
     <string name="notification_action_stop_vpn">STOP</string>
+    <string name="notification_action_dns_mode">DNS</string>
+    <string name="notification_action_dns_firewall_mode">DNS+Firewall</string>
     <string name="dns_mode_info_title">DNS</string>
 
     <string name="firewall_rules">Firewall Rules</string>
@@ -503,7 +505,8 @@
     <string name="whats_new_version_name">🎁 World Environment Day (5 June) 🎁</string>
     <string name="whats_new_version_update">Fixes and improvements:\n\n
         1. Connection issues fix - Changes to the way the app using the underlying network options. Introduced new setting \"Use all available network\" - whether to add all the available in the underlying VPN or to add active network to the VPN. By default, the value is set as false.\n\n
-        2. Minor fix for loading the website icons corresponding to DNS queries.\n\n
+        2. Introduced new setting for notification action - \"Choose Notification Action\" - Now user can choose the what action button should be visible in notification.\n\n
+        3. Minor fix for loading the website icons corresponding to DNS queries.\n\n
     </string>
 
     <!-- Settings Fragment strings -->
@@ -636,6 +639,12 @@
     <string name="settings_theme_heading">Appearance</string>
     <string name="settings_theme_desc">Dark/light theme</string>
 
+    <string name="settings_notification_heading">Choose Notification Action</string>
+    <string name="settings_notification_desc">Current action button for notification : %1$s</string>
+    <string name="settings_notification_desc1">Nothing</string>
+    <string name="settings_notification_desc2">STOP</string>
+    <string name="settings_notification_desc3">DNS &amp; DNS+Firewall</string>
+
     <string name="settings_http_proxy_desc">Forwarding to %1$s:%2$s</string>
     <string name="settings_http_proxy_desc_default">This proxy is only a recommendation and it is possible that some apps will ignore it.</string>
     <string name="settings_http_proxy_dialog_title">Custom Server URL</string>
@@ -674,6 +683,11 @@
     <string name="settings_theme_dialog_themes_2">Light</string>
     <string name="settings_theme_dialog_themes_3">Dark</string>
     <string name="settings_theme_dialog_themes_4">True Black</string>
+
+    <string name="settings_notification_dialog_title">Notification Action</string>
+    <string name="settings_notification_dialog_option_1">No action button</string>
+    <string name="settings_notification_dialog_option_2">STOP button</string>
+    <string name="settings_notification_dialog_option_3">RethinkDNS mode (DNS &amp; DNS+Firewall mode)</string>
 
     <string name="settings_selected_theme">Current theme: %1$s</string>
 
