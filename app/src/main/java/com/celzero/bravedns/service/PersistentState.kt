@@ -106,7 +106,7 @@ class PersistentState(private val context: Context):SimpleKrate(context) {
     private var connectedDNSName by stringPref("connected_dns_name","RethinkDNS Basic")
     var theme by intPref("app_theme", 0)
     var notificationAction by intPref("notification_action", 1)
-    var isAddAllNetwork by booleanPref("add_all_network_VPN", false)
+    var isAddAllNetworks by booleanPref("add_all_network_VPN", false)
 
     var orbotConnectionStatus : MutableLiveData<Boolean> = MutableLiveData()
     //var orbotConnectionInitiated by booleanPref("orbot_connection_initiated", false)

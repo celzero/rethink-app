@@ -150,7 +150,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityThemeRl.isEnabled = true
         b.settingsActivityNotificationRl.isEnabled = true
         b.settingsActivityFavIconSwitch.isChecked = persistentState.fetchFavIcon
-        b.settingsActivityAllNetworkSwitch.isChecked = persistentState.isAddAllNetwork
+        b.settingsActivityAllNetworkSwitch.isChecked = persistentState.isAddAllNetworks
 
         when (persistentState.theme) {
             0 -> {
@@ -317,7 +317,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
 
         b.settingsActivityAllNetworkSwitch.setOnCheckedChangeListener{ _:CompoundButton, b: Boolean ->
-            persistentState.isAddAllNetwork = b
+            persistentState.isAddAllNetworks = b
         }
 
         b.settingsActivityAllowBypassSwitch.setOnCheckedChangeListener { _: CompoundButton, bool: Boolean ->
@@ -512,6 +512,10 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             }.start()
         }
 
+        // Ideally this property should be part of VPN.
+        // As of now the VPN section will be disabled when the
+        // VPN is in lockdown mode.
+        // TODO - Find a way to place this property to place in correct section.
         b.settingsActivityNotificationRl.setOnClickListener {
             b.settingsActivityNotificationRl.isEnabled = false
             showDialogForNotificationAction()

@@ -44,25 +44,22 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
     override fun onReceive(context: Context?, intent: Intent?) {
         val action: String? = intent?.getStringExtra(Constants.NOTIFICATION_ACTION)
         Log.d(Constants.LOG_TAG, "NotificationActionReceiver: onReceive - $action")
+        val manager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         when(action){
             OrbotHelper.ORBOT_NOTIFICATION_ACTION_TEXT -> {
                 openOrbotApp(context)
-                val manager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 manager.cancel(OrbotHelper.ORBOT_SERVICE_ID)
             }
             Constants.STOP_VPN_NOTIFICATION_ACTION -> {
                 stopDnsVpnService(context)
-                val manager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 manager.cancel(BraveVPNService.SERVICE_ID)
             }
             Constants.DNS_VPN_NOTIFICATION_ACTION -> {
                 dnsMode()
-                val manager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 manager.cancel(BraveVPNService.SERVICE_ID)
             }
             Constants.DNS_FIREWALL_VPN_NOTIFICATION_ACTION -> {
                 dnsFirewallMode()
-                val manager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 manager.cancel(BraveVPNService.SERVICE_ID)
             }
         }
@@ -91,19 +88,17 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
     }
 
     private fun stopDnsVpnService(context: Context?) {
-        Log.d(Constants.LOG_TAG, "NotificationActionReceiver: onReceive")
+        Log.i(Constants.LOG_TAG, "NotificationAction: Stopping the VPN")
         VpnController.getInstance().stop(context)
     }
 
     private fun dnsMode(){
-        Log.d(Constants.LOG_TAG, "NotificationActionReceiver: dnsMode")
-        HomeScreenActivity.GlobalVariable.braveMode = HomeScreenFragment.DNS_MODE
+        Log.i(Constants.LOG_TAG, "NotificationAction: Setting global state to DNS Mode")
         persistentState.setBraveMode(HomeScreenFragment.DNS_MODE)
     }
 
     private fun dnsFirewallMode(){
-        Log.d(Constants.LOG_TAG, "NotificationActionReceiver: dnsFirewallMode")
-        HomeScreenActivity.GlobalVariable.braveMode = HomeScreenFragment.DNS_FIREWALL_MODE
+        Log.d(Constants.LOG_TAG, "NotificationActionReceiver: Setting global state to DNS + Firewall Mode")
         persistentState.setBraveMode(HomeScreenFragment.DNS_FIREWALL_MODE)
     }
 

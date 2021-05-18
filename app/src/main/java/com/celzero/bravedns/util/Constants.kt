@@ -15,6 +15,9 @@ limitations under the License.
 */
 package com.celzero.bravedns.util
 
+import java.util.concurrent.TimeUnit
+
+
 class Constants {
 
     companion object{
@@ -121,13 +124,13 @@ class Constants {
         const val PORT_VAL_UNKNOWN = "unknown"
 
         const val NOTIFICATION_ACTION = "NOTIFICATION_VALUE"
-        const val STOP_VPN_NOTIFICATION_ACTION = "STOP_RETHINKDNS"
-        const val DNS_VPN_NOTIFICATION_ACTION = "DNS_RETHINKDNS"
-        const val DNS_FIREWALL_VPN_NOTIFICATION_ACTION = "DNS_FIREWALL_RETHINKDNS"
+        const val STOP_VPN_NOTIFICATION_ACTION = "RETHINK_STOP"
+        const val DNS_VPN_NOTIFICATION_ACTION = "RETHINK_DNSONLY" // battery-saver dns-only
+        const val DNS_FIREWALL_VPN_NOTIFICATION_ACTION = "RETHINK_FULLMODE" // default dns+firewall
 
         const val NXDOMAIN = "NXDOMAIN"
 
-        const val WORK_MANAGER_TIMEOUT = 1*40*60*1000
+        val WORK_MANAGER_TIMEOUT = TimeUnit.MINUTES.toMillis(40) //1*40*60*1000
 
         const val FAV_ICON_URL = "https://icons.duckduckgo.com/ip2/"
     }

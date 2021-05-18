@@ -35,17 +35,17 @@ class ConnectionMonitor(context: Context, val networkListener: NetworkListener) 
     // An Android handler thread internally operates on a looper.
     // Defined as @Volatile so that the looper in the Handler thread so that
     // the value loaded from memory instead of Thread's local cache.
+    // ref - https://alvinalexander.com/java/jwarehouse/android/core/java/android/app/IntentService.java.shtml
     @Volatile private var handlerThread: HandlerThread? = null
     private var serviceHandler: NetworkRequestHandler? = null
     private val persistentState by inject<PersistentState>()
 
-    // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-linked-hash-set/
-    // https://developer.android.com/reference/kotlin/java/util/LinkedHashSet
-    // LinkedHashSet maintains the iteration ordering, which is the order in which elements were
-    // inserted into the set (insertion-order)
-    // CurrentNetworkList first element should be always active network. So need to maintain the
-    // insertion order for this Set. (Using LinkedHashSet).
-    var currentNetworkList: LinkedHashSet<Network> = linkedSetOf()
+    // ref - https://developer.android.com/reference/kotlin/java/util/LinkedHashSet
+    // The network list is maintained in a linked-hash-set to preserve insertion and iteration
+    // order. This is required because {@link android.net.VpnService#setUnderlyingNetworks}
+    // defines network priority depending on the iteration order, that is, the network
+    // in the 0th index is preferred over the one at 1st index, and so on.
+    var currentNetworks: LinkedHashSet<Network> = linkedSetOf()
     var currentActiveNetwork: Network? = null
 
     var connectivityManager: ConnectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -67,7 +67,7 @@ class ConnectionMonitor(context: Context, val networkListener: NetworkListener) 
 
     interface NetworkListener {
         fun onNetworkDisconnected()
-        fun onNetworkConnected(networkSet: LinkedHashSet<Network>?)
+        fun onNetworkConnected(networks: LinkedHashSet<Network>?)
     }
 
     fun removeCallBack() {
@@ -84,22 +84,22 @@ class ConnectionMonitor(context: Context, val networkListener: NetworkListener) 
 
     override fun onAvailable(network: Network) {
         if(DEBUG) Log.d(LOG_TAG, "ConnectionMonitor - onAvailable")
-        handleNetworkChange()
+        handleNetworkChange(isForceUpdate = false)
     }
 
     override fun onLost(network: Network) {
         if(DEBUG) Log.d(LOG_TAG, "ConnectionMonitor - onLost")
-        handleNetworkChange()
+        handleNetworkChange(isForceUpdate = false)
     }
 
     override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
         if(DEBUG) Log.d(LOG_TAG, "ConnectionMonitor - onCapabilitiesChanged")
-        handleNetworkChange()
+        handleNetworkChange(isForceUpdate = false)
     }
 
     override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
         if(DEBUG) Log.d(LOG_TAG, "ConnectionMonitor - onLinkPropertiesChanged")
-        handleNetworkChange()
+        handleNetworkChange(isForceUpdate = false)
     }
 
     /**
@@ -107,9 +107,9 @@ class ConnectionMonitor(context: Context, val networkListener: NetworkListener) 
      * if the preference is true, add only active network
      * else, add all available network.
      */
-    fun onPreferenceChanged(){
-        if (DEBUG) Log.d(LOG_TAG, "ConnectionMonitor - onPreferenceChanged")
-        handleNetworkChange()
+    fun onUserPreferenceChanged(){
+        if (DEBUG) Log.d(LOG_TAG, "ConnectionMonitor - onUserPreferenceChanged")
+        handleNetworkChange(isForceUpdate = true)
     }
 
     /**
@@ -118,17 +118,17 @@ class ConnectionMonitor(context: Context, val networkListener: NetworkListener) 
      * else return the current active network.
      */
     fun getNetworkList(): LinkedHashSet<Network> {
-        val networkList : LinkedHashSet<Network> = linkedSetOf()
-        if(persistentState.isAddAllNetwork){
-            networkList.addAll(currentNetworkList)
-        }else{
-            currentActiveNetwork?.let { networkList.add(it) }
+        val networks: LinkedHashSet<Network> = linkedSetOf()
+        if (persistentState.isAddAllNetworks) {
+            networks.addAll(currentNetworks)
+        } else {
+            currentActiveNetwork?.let { networks.add(it) }
         }
-        return networkList
+        return networks
     }
 
-    private fun handleNetworkChange() {
-        val message = constructMessage(if (persistentState.isAddAllNetwork) MSG_ADD_ALL_NETWORKS else MSG_ADD_ACTIVE_NETWORK)
+    private fun handleNetworkChange(isForceUpdate : Boolean) {
+        val message = constructMessage(if (persistentState.isAddAllNetworks) MSG_ADD_ALL_NETWORKS else MSG_ADD_ACTIVE_NETWORK, isForceUpdate)
         serviceHandler?.removeMessages(MSG_ADD_ACTIVE_NETWORK, null)
         serviceHandler?.removeMessages(MSG_ADD_ALL_NETWORKS, null)
         serviceHandler?.sendMessage(message)
@@ -139,18 +139,22 @@ class ConnectionMonitor(context: Context, val networkListener: NetworkListener) 
      * Add the active network to the message object
      * in case of setUnderlying network has only active networks.
      */
-    private fun constructMessage(what: Int): Message {
+    private fun constructMessage(what: Int, isForceUpdate: Boolean): Message {
         val message = Message.obtain()
         message?.what = what
+        message?.obj = isForceUpdate
         return message!!
     }
 
     // Handles the network messages from the callback from the connectivity manager
     private class NetworkRequestHandler(looper: Looper?, val connectionMonitor: ConnectionMonitor) : Handler(looper!!) {
         override fun handleMessage(msg: Message) {
+            // isForceUpdate - true if onUserPreferenceChanged is changes, the messages should be
+            // processed forcefully regardless of the current and new networks.
+            val isForceUpdate : Boolean = msg.obj as Boolean
             when(msg.what) {
-                MSG_ADD_ACTIVE_NETWORK -> processActiveNetwork()
-                MSG_ADD_ALL_NETWORKS -> processAllNetworks()
+                MSG_ADD_ACTIVE_NETWORK -> processActiveNetwork(isForceUpdate)
+                MSG_ADD_ALL_NETWORKS -> processAllNetworks(isForceUpdate)
             }
         }
 
@@ -160,17 +164,17 @@ class ConnectionMonitor(context: Context, val networkListener: NetworkListener) 
          * Set the vpn underlying network when the current active network is different from
          * already assigned active network or if there is difference in the available network set
          */
-        private fun processActiveNetwork(){
-            val currentActiveNetwork: Network? = connectionMonitor.connectivityManager.activeNetwork
-            val isNewNetwork = connectionMonitor.currentActiveNetwork?.networkHandle == currentActiveNetwork?.networkHandle
-            if (DEBUG) Log.d(LOG_TAG, "ConnectionMonitor - ${connectionMonitor.connectivityManager.getNetworkInfo(currentActiveNetwork)?.typeName.toString()}, $isNewNetwork")
-            connectionMonitor.currentActiveNetwork = currentActiveNetwork
-            connectionMonitor.currentNetworkList.clear()
-            if(isNewNetwork){
+        private fun processActiveNetwork(isForceUpdate : Boolean){
+            val newActiveNetwork: Network? = connectionMonitor.connectivityManager.activeNetwork
+            val isNewNetwork = connectionMonitor.currentActiveNetwork?.networkHandle != newActiveNetwork?.networkHandle
+            if (DEBUG) Log.d(LOG_TAG, "ConnectionMonitor - ${connectionMonitor.connectivityManager.getNetworkInfo(newActiveNetwork)?.typeName.toString()}, $isNewNetwork")
+            connectionMonitor.currentActiveNetwork = newActiveNetwork
+            connectionMonitor.currentNetworks.clear()
+            if(!isNewNetwork && !isForceUpdate){
                 return
             }
-            if (currentActiveNetwork != null) {
-                if (DEBUG) Log.d(LOG_TAG, "ConnectionMonitor - process message onNetworkConnected- $currentActiveNetwork")
+            if (connectionMonitor.currentActiveNetwork != null) {
+                if (DEBUG) Log.d(LOG_TAG, "ConnectionMonitor - process message onNetworkConnected- $newActiveNetwork")
                 // Setting the setUnderLyingNetwork to null which by default will set the
                 // active network.
                 connectionMonitor.networkListener.onNetworkConnected(null)
@@ -178,31 +182,26 @@ class ConnectionMonitor(context: Context, val networkListener: NetworkListener) 
                 if (DEBUG) Log.d(LOG_TAG, "ConnectionMonitor - process message onNetworkDisconnected")
                 connectionMonitor.networkListener.onNetworkDisconnected()
             }
-            Log.i(LOG_TAG, "ConnectionMonitor - currentActiveNetwork- ${connectionMonitor.connectivityManager.getNetworkInfo(currentActiveNetwork)?.typeName.toString()}")
+            Log.i(LOG_TAG, "ConnectionMonitor - currentActiveNetwork- ${connectionMonitor.connectivityManager.getNetworkInfo(newActiveNetwork)?.typeName.toString()}")
         }
 
         /**
          * Adds all the available network to the underlying network.
          */
-        private fun processAllNetworks() {
+        private fun processAllNetworks(isForceUpdate : Boolean) {
             val newActiveNetwork = connectionMonitor.connectivityManager.activeNetwork
             var isNewNetwork = connectionMonitor.currentActiveNetwork?.networkHandle != newActiveNetwork?.networkHandle
             val newNetworks = createNetworksSet(newActiveNetwork)
-            isNewNetwork = isNewNetwork || hasDifference(connectionMonitor.currentNetworkList, newNetworks)
+            isNewNetwork = isNewNetwork || hasDifference(connectionMonitor.currentNetworks, newNetworks)
             connectionMonitor.currentActiveNetwork  = newActiveNetwork
-            connectionMonitor.currentNetworkList = newNetworks
-            if (DEBUG) Log.d(LOG_TAG, "ConnectionMonitor - process message MESSAGE_AVAILABLE_NETWORK, ${connectionMonitor.currentNetworkList.size},${newNetworks.size}")
-            if (connectionMonitor.currentNetworkList.size > 0 && newNetworks.size > 0) {
-                if (DEBUG) Log.d(LOG_TAG, "ConnectionMonitor - Current Network -" + "${connectionMonitor.connectivityManager.getNetworkInfo(connectionMonitor.currentNetworkList.elementAt(0))?.typeName.toString()}, "
-                + "already added network- ${connectionMonitor.connectivityManager.getNetworkInfo(newNetworks.elementAt(0))?.typeName.toString()}")
-                Log.i(LOG_TAG, "ConnectionMonitor - isNewNetwork - $isNewNetwork, currentNetworks - ${connectionMonitor.currentNetworkList}, newNetworks- $newNetworks")
-            }
-            if (connectionMonitor.currentNetworkList.size == 0) {
+            connectionMonitor.currentNetworks = newNetworks
+            if (DEBUG) Log.d(LOG_TAG, "ConnectionMonitor - process message MESSAGE_AVAILABLE_NETWORK, ${connectionMonitor.currentNetworks.size},${newNetworks.size}")
+            if (connectionMonitor.currentNetworks.size == 0) {
                 connectionMonitor.networkListener.onNetworkDisconnected()
                 return
             }
-            if(!isNewNetwork) return
-            connectionMonitor.networkListener.onNetworkConnected(connectionMonitor.currentNetworkList)
+            if(!isNewNetwork && !isForceUpdate) return
+            connectionMonitor.networkListener.onNetworkConnected(connectionMonitor.currentNetworks)
         }
 
         private fun hasDifference(currentNetworks : LinkedHashSet<Network>, newNetworks : LinkedHashSet<Network>): Boolean{
