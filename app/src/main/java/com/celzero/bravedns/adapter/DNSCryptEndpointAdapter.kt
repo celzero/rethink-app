@@ -39,6 +39,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.QueryTracker
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.UIUpdateInterface
 import com.celzero.bravedns.util.Utilities
@@ -199,7 +200,7 @@ class DNSCryptEndpointAdapter(private val context: Context,
 
                 override fun onFinish() {
                     notifyDataSetChanged()
-                    persistentState.dnsType = 2
+                    persistentState.dnsType = Constants.DNS_TYPE_CRYPT_CHANGE
                     val connectedDNS = dnsCryptEndpointRepository.getConnectedCount()
                     val text = context.getString(R.string.configure_dns_crypt, connectedDNS)
                     persistentState.setConnectedDNS(text)

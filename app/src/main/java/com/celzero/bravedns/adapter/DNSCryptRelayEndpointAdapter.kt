@@ -37,6 +37,7 @@ import com.celzero.bravedns.database.DNSCryptRelayEndpointRepository
 import com.celzero.bravedns.databinding.DnsCryptEndpointListItemBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.cryptRelayToRemove
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -185,7 +186,7 @@ class DNSCryptRelayEndpointAdapter(
                         notifyDataSetChanged()
                     }
                 }.start()
-                persistentState.dnsType = 2
+                persistentState.dnsType = Constants.DNS_TYPE_CRYPT_CHANGE
                 persistentState.connectionModeChange = dnsCryptRelayEndpoint.dnsCryptRelayURL
                 return true
             } else {

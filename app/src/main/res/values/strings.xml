@@ -610,7 +610,7 @@
     <string name="settings_autostart_bootup_heading">Auto-start on power-up (experimental)</string>
     <string name="settings_autostart_bootup_desc">On device power-up, start RethinkDNS if it was running before shut down.</string>
 
-    <string name="settings_network_header">NETWORK</string>
+    <string name="settings_network_header">NETWORK(experimental)</string>
     <string name="settings_network_all_network">Use all available networks</string>
     <string name="settings_network_all_network_desc">When enabled, RethinkDNS uses all available networks to connect to the Internet. If not, it uses the one network, whichever is deemed active by Android.</string>
 
@@ -638,12 +638,6 @@
 
     <string name="settings_theme_heading">Appearance</string>
     <string name="settings_theme_desc">Dark/light theme</string>
-
-    <string name="settings_notification_heading">Choose Notification Action</string>
-    <string name="settings_notification_desc">Choose which action buttons to show with the RethinkDNS notification: %1$s</string>
-    <string name="settings_notification_desc1">Stop (default): Shows one button, tapping on which stops RethinkDNS</string>
-    <string name="settings_notification_desc2">DNS / DNS + Firewall: Shows two buttons to quickly switch between the battery-saver DNS mode and the regular DNS + Firewall mode.</string>
-    <string name="settings_notification_desc3">Empty: Shows no button.</string>
 
     <string name="settings_http_proxy_desc">Forwarding to %1$s:%2$s</string>
     <string name="settings_http_proxy_desc_default">This proxy is only a recommendation and it is possible that some apps will ignore it.</string>
@@ -684,10 +678,16 @@
     <string name="settings_theme_dialog_themes_3">Dark</string>
     <string name="settings_theme_dialog_themes_4">True Black</string>
 
+    <string name="settings_notification_heading">Choose Notification Action</string>
+    <string name="settings_notification_desc">Choose which action buttons to show with the RethinkDNS notification: %1$s</string>
+    <string name="settings_notification_desc1">Stop (default)</string>
+    <string name="settings_notification_desc2">DNS / DNS + Firewall</string>
+    <string name="settings_notification_desc3">Empty</string>
+
     <string name="settings_notification_dialog_title">Notification Action</string>
-    <string name="settings_notification_dialog_option_1">Stop (default)</string>
-    <string name="settings_notification_dialog_option_2">DNS / DNS + Firewall</string>
-    <string name="settings_notification_dialog_option_3">Empty</string>
+    <string name="settings_notification_dialog_option_1">Stop (default): Shows one button, tapping on which stops RethinkDNS</string>
+    <string name="settings_notification_dialog_option_2">DNS / DNS + Firewall: Shows two buttons to quickly switch between the battery-saver DNS mode and the regular DNS + Firewall mode.</string>
+    <string name="settings_notification_dialog_option_3">Empty: Shows no button.</string>
 
     <string name="settings_selected_theme">Current theme: %1$s</string>
 

@@ -38,6 +38,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.QueryTracker
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.UIUpdateInterface
 import com.celzero.bravedns.util.Utilities
@@ -218,7 +219,7 @@ class DNSProxyEndpointAdapter(private val context: Context,
             HomeScreenActivity.GlobalVariable.appMode?.setDNSMode(Settings.DNSModeProxyIP)
         }
         listener.updateUIFromAdapter(3)
-        persistentState.dnsType = 3
+        persistentState.dnsType = Constants.DNS_TYPE_PROXY_CHANGE
         persistentState.setConnectedDNS(dnsProxyEndpoint.proxyName)
         persistentState.connectionModeChange = dnsProxyEndpoint.proxyIP!!
         dnsProxyEndpointRepository.updateAsync(dnsProxyEndpoint)

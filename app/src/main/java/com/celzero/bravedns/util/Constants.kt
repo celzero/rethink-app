@@ -130,8 +130,29 @@ class Constants {
 
         const val NXDOMAIN = "NXDOMAIN"
 
-        val WORK_MANAGER_TIMEOUT = TimeUnit.MINUTES.toMillis(40) //1*40*60*1000
+        val WORK_MANAGER_TIMEOUT = TimeUnit.MINUTES.toMillis(40)
 
         const val FAV_ICON_URL = "https://icons.duckduckgo.com/ip2/"
+
+        //Application theme constants
+        const val THEME_SYSTEM_DEFAULT = 0
+        const val THEME_LIGHT = 1
+        const val THEME_DARK = 2
+        const val THEME_TRUE_BLACK = 3
+
+        // Notification action buttons
+        const val NOTIFICATION_STOP = 0
+        const val NOTIFICATION_DNS_FIREWALL = 1
+        const val NOTIFICATION_NO_ACTION = 2
+
+        //DNS MODES
+        const val DNS_MODE = 0
+        const val FIREWALL_MODE = 1
+        const val DNS_FIREWALL_MODE = 2
+
+        //DNS TYPES
+        const val DNS_TYPE_PROXY_CHANGE = 3
+        const val DNS_TYPE_CRYPT_CHANGE = 2
+        const val DNS_TYPE_DNS_CHANGE = 1
     }
 }

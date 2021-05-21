@@ -51,7 +51,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
                 manager.cancel(OrbotHelper.ORBOT_SERVICE_ID)
             }
             Constants.STOP_VPN_NOTIFICATION_ACTION -> {
-                stopDnsVpnService(context)
+                stopVpn(context)
                 manager.cancel(BraveVPNService.SERVICE_ID)
             }
             Constants.DNS_VPN_NOTIFICATION_ACTION -> {
@@ -87,7 +87,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
         }
     }
 
-    private fun stopDnsVpnService(context: Context?) {
+    private fun stopVpn(context: Context?) {
         Log.i(Constants.LOG_TAG, "NotificationAction: Stopping the VPN")
         VpnController.getInstance().stop(context)
     }
@@ -101,5 +101,4 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
         Log.d(Constants.LOG_TAG, "NotificationActionReceiver: Setting global state to DNS + Firewall Mode")
         persistentState.setBraveMode(HomeScreenFragment.DNS_FIREWALL_MODE)
     }
-
 }

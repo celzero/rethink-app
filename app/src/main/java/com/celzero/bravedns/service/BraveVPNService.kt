@@ -57,6 +57,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.backgroundAllowedUID
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
+import com.celzero.bravedns.ui.HomeScreenFragment
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
@@ -566,9 +567,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         }
 
         val contentTitle: String = when(braveMode){
-            0 -> context.resources.getString(R.string.dns_mode_notification_title)
-            1 -> context.resources.getString(R.string.firewall_mode_notification_title)
-            2 -> context.resources.getString(R.string.hybrid_mode_notification_title)
+            Constants.DNS_MODE -> context.resources.getString(R.string.dns_mode_notification_title)
+            Constants.FIREWALL_MODE -> context.resources.getString(R.string.firewall_mode_notification_title)
+            Constants.DNS_FIREWALL_MODE -> context.resources.getString(R.string.hybrid_mode_notification_title)
             else -> context.resources.getString(R.string.notification_title)
         }
 
@@ -581,13 +582,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         if(DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Notification - ${persistentState.notificationAction}")
         builder.color = ContextCompat.getColor(this, fetchColor())
         when(persistentState.notificationAction){
-            0 -> {
+            Constants.NOTIFICATION_STOP -> {
                 val openIntent = getVPNIntent(context, VPN_STOP_NOTIFICATION, Constants.STOP_VPN_NOTIFICATION_ACTION)
                 val notificationAction: NotificationCompat.Action = NotificationCompat.Action(0, context.resources.getString(R.string.notification_action_stop_vpn), openIntent)
                 builder.addAction(notificationAction)
-
             }
-            1 -> {
+            Constants.NOTIFICATION_DNS_FIREWALL -> {
                 val openIntent1 = getVPNIntent(context, VPN_DNS_NOTIFICATION, Constants.DNS_VPN_NOTIFICATION_ACTION)
                 val openIntent2 = getVPNIntent(context, VPN_DNS_FIREWALL_NOTIFICATION, Constants.DNS_FIREWALL_VPN_NOTIFICATION_ACTION)
                 val notificationAction: NotificationCompat.Action = NotificationCompat.Action(0, context.resources.getString(R.string.notification_action_dns_mode), openIntent1)
@@ -595,7 +595,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 builder.addAction(notificationAction)
                 builder.addAction(notificationAction2)
             }
-            2 -> {
+            Constants.NOTIFICATION_NO_ACTION-> {
                 Log.i(LOG_TAG, "$FILE_LOG_TAG No notification action")
             }
         }
@@ -609,17 +609,17 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
 
     private fun fetchColor() : Int{
         return when (persistentState.theme) {
-            0 -> {
+            Constants.THEME_SYSTEM_DEFAULT -> {
                 if (isDarkThemeOn()) {
                     R.color.accentGoodBlack
                 } else {
                     R.color.negative_white
                 }
             }
-            1 -> {
+            Constants.THEME_LIGHT -> {
                 R.color.negative_white
             }
-            2 -> {
+            Constants.THEME_DARK -> {
                 R.color.accent_good
             }
             else -> {
@@ -780,6 +780,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         /*TODO Check on the Persistent State variable
             Check on updating the values for Package change and for mode change.
            As of now handled manually*/
+        Log.i(LOG_TAG, "$FILE_LOG_TAG - SharedPref- $key - ${appMode.getDNSMode()}, with " +
+         "notification action -${persistentState.notificationAction}, proxy - ${appMode.getProxyMode()}")
         when(key) {
             PersistentState.BRAVE_MODE -> {
                 if(vpnAdapter == null) {
@@ -791,80 +793,65 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 notificationManager.notify(SERVICE_ID, builder.build())
             }
             PersistentState.DNS_TYPE -> {
-                Log.i(LOG_TAG, "$FILE_LOG_TAG DNSType- ${appMode.getDNSType()}")
                 /**
-                 * The code has been modified to restart the VPN service when there is a
-                 * change in the DNS Type. Earlier the restart of the VPN is performed
-                 * when the mode is changed to DNS Proxy, now the code is modified in
-                 * such a way that, the restart is performed when there mode is Crypt/Proxy
+                 * The restart of the VPN service is required when there is need to update
+                 * the VPN builder else we can set the values of the tunnel.
+                 * In the below case, when there is proxy change, then restart is called.
+                 * in case of crypt changes, update the crypt by calling setCryptMode()
+                 * spawnServerUpdate() - Will overwrite the tunnel values with new values.
                  */
-                if (appMode.getDNSType() == 3) {
+                if (appMode.getDNSType() == Constants.DNS_TYPE_PROXY_CHANGE) {
                     restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
                 } else {
-                    if (appMode.getDNSType() == 2) {
+                    if (appMode.getDNSType() == Constants.DNS_TYPE_CRYPT_CHANGE) {
                         setCryptMode()
                     }
                     spawnServerUpdate()
                 }
             }
             PersistentState.PROXY_MODE -> {
-                Log.i(LOG_TAG, "$FILE_LOG_TAG PROXY_MODE- ${appMode.getProxyMode()}")
                 restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
             }
             PersistentState.CONNECTION_CHANGE -> {
-                Log.i(LOG_TAG, "$FILE_LOG_TAG CONNECTION_CHANGE- ${appMode.getDNSMode()}")
                 spawnServerUpdate()
             }
             PersistentState.DNS_PROXY_ID -> {
-                Log.i(LOG_TAG, "$FILE_LOG_TAG DNS PROXY CHANGE- ${appMode.getDNSMode()}")
                 restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
             }
             PersistentState.EXCLUDE_FROM_VPN -> {
-                Log.i(LOG_TAG, "$FILE_LOG_TAG EXCLUDE_FROM_VPN - restartVpn- ${appMode.getDNSMode()}")
                 restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
             }
             PersistentState.IS_SCREEN_OFF -> {
                 isScreenLocked = persistentState.getScreenLockData()
-                Log.i(LOG_TAG, "$FILE_LOG_TAG preference for screen off mode is modified - $isScreenLocked")
             }
             PersistentState.BACKGROUND_MODE -> {
                 isBackgroundEnabled = persistentState.backgroundEnabled && Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
-                Log.i(LOG_TAG, "$FILE_LOG_TAG preference for background mode is modified - $isBackgroundEnabled")
             }
             PersistentState.BLOCK_UNKNOWN_CONNECTIONS -> {
-                Log.i(LOG_TAG, "$FILE_LOG_TAG preference for block unknown connections is modified")
                 blockUnknownConnection = persistentState.blockUnknownConnections
             }
             PersistentState.LOCAL_BLOCK_LIST -> {
-                Log.i(LOG_TAG, "$FILE_LOG_TAG preference for local block list is changed - restart vpn")
                 spawnServerUpdate()
             }
             PersistentState.LOCAL_BLOCK_LIST_STAMP -> {
-                Log.i(LOG_TAG, "$FILE_LOG_TAG configuration stamp for local block list is changed- restart vpn")
                 spawnServerUpdate()
             }
             PersistentState.ALLOW_BYPASS -> {
-                Log.i(LOG_TAG, "$FILE_LOG_TAG preference for allow by pass is changed - restart vpn")
                 restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
             }
             PersistentState.HTTP_PROXY_ENABLED -> {
-                Log.i(LOG_TAG, "$FILE_LOG_TAG preference for http proxy is changed - restart vpn")
                 restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
             }
             PersistentState.BLOCK_UDP_OTHER_THAN_DNS -> {
                 blockUDPTraffic = persistentState.udpBlockedSettings
-                Log.i(LOG_TAG, "$FILE_LOG_TAG preference for UDP - $blockUDPTraffic")
             }
             PersistentState.ORBOT_MODE_CHANGE -> {
-                Log.i(LOG_TAG, "$FILE_LOG_TAG ORBOT proxy change - restart vpn ${appMode.getProxyMode()}")
                 restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
             }
             PersistentState.NETWORK -> {
-                Log.i(LOG_TAG, "$FILE_LOG_TAG NETWORK setting change - inform connectionMonitor")
                 connectionMonitor?.onUserPreferenceChanged()
             }
             PersistentState.NOTIFICATION_ACTION -> {
-                Log.i(LOG_TAG, "$FILE_LOG_TAG preference change - notification action ${persistentState.notificationAction}")
                 val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
                 val builder = updateBuilder(this)
                 notificationManager.notify(SERVICE_ID, builder.build())

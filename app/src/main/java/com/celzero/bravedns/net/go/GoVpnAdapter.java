@@ -334,7 +334,7 @@ public class GoVpnAdapter {
                         tunnel.stopDNSCryptProxy();
                         dnsCryptEndpointRepository.updateFailingConnections();
                         DoHEndpoint doHEndpoint = doHEndpointRepository.updateConnectionDefault();
-                        persistentState.setDnsType(1);
+                        persistentState.setDnsType(Constants.DNS_TYPE_DNS_CHANGE);
                         if(doHEndpoint != null)
                             persistentState.setConnectionModeChange(doHEndpoint.getDohURL());
                         persistentState.setConnectedDNS(doHEndpoint.getDohName());
@@ -349,7 +349,7 @@ public class GoVpnAdapter {
                             }
                         });
                     }else{
-                        if(persistentState.getDnsType() == 2) {
+                        if(persistentState.getDnsType() == Constants.DNS_TYPE_CRYPT_CHANGE) {
                             int proxyMode = (int) appMode.getProxyMode();
                             tunnel.setTunMode(Settings.DNSModeCryptPort, firewallMode, appMode.getProxyMode());
                             if (proxyMode == Settings.ProxyModeSOCKS5 || proxyMode == Constants.ORBOT_SOCKS) {
@@ -359,10 +359,10 @@ public class GoVpnAdapter {
                         }
                     }
                 }else{
-                    if(persistentState.getDnsType() == 2) {
+                    if(persistentState.getDnsType() == Constants.DNS_TYPE_CRYPT_CHANGE) {
                         dnsCryptEndpointRepository.updateFailingConnections();
                         DoHEndpoint doHEndpoint = doHEndpointRepository.updateConnectionDefault();
-                        persistentState.setDnsType(1);
+                        persistentState.setDnsType(Constants.DNS_TYPE_DNS_CHANGE);
                         if(doHEndpoint != null)
                             persistentState.setConnectionModeChange(doHEndpoint.getDohURL());
                         appMode.setDNSMode(Settings.DNSModePort);
@@ -375,11 +375,11 @@ public class GoVpnAdapter {
                     }
                 }
             } catch (Exception e) {
-                if(persistentState.getDnsType() == 2) {
+                if(persistentState.getDnsType() == Constants.DNS_TYPE_CRYPT_CHANGE) {
                     Log.e(LOG_TAG, "GoVPNAdapter celzero connect-tunnel: dns crypt", e);
                     dnsCryptEndpointRepository.updateFailingConnections();
                     DoHEndpoint doHEndpoint = doHEndpointRepository.updateConnectionDefault();
-                    persistentState.setDnsType(1);
+                    persistentState.setDnsType(Constants.DNS_TYPE_DNS_CHANGE);
                     if(doHEndpoint != null)
                         persistentState.setConnectionModeChange(doHEndpoint.getDohURL());
                     if (appMode != null) {

@@ -257,7 +257,7 @@ class DoHEndpointAdapter(private val context: Context,
 
                 override fun onFinish() {
                     notifyDataSetChanged()
-                    persistentState.dnsType = 1
+                    persistentState.dnsType = Constants.DNS_TYPE_DNS_CHANGE
                     persistentState.connectionModeChange = doHEndpoint.dohURL
                     persistentState.setConnectedDNS(doHEndpoint.dohName)
                     queryTracker.reinitializeQuantileEstimator()

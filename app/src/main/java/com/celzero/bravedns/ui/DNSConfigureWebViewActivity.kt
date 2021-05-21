@@ -199,7 +199,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                 HomeScreenActivity.GlobalVariable.appMode?.setDNSMode(Settings.DNSModePort)
                 persistentState.connectionModeChange = receivedStamp
                 persistentState.setConnectedDNS(Constants.RETHINK_DNS_PLUS)
-                persistentState.dnsType = 1
+                persistentState.dnsType = Constants.DNS_TYPE_DNS_CHANGE
             }
         }.start()
 

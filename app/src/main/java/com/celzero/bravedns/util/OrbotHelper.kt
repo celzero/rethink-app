@@ -92,7 +92,7 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
 
         private const val EXTRA_STATUS = "org.torproject.android.intent.extra.STATUS"
 
-        private const val ORBOT_REQUEST_CODE = 200 // ORBOT App
+        private const val ORBOT_REQUEST_CODE = 200 //Orbot App
     }
 
     var socks5Port: Int? = null

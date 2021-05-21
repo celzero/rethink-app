@@ -153,13 +153,13 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityAllNetworkSwitch.isChecked = persistentState.isAddAllNetworks
 
         when (persistentState.theme) {
-            0 -> {
+            Constants.THEME_SYSTEM_DEFAULT -> {
                 b.genSettingsThemeDesc.text = getString(R.string.settings_selected_theme, getString(R.string.settings_theme_dialog_themes_1))
             }
-            1 -> {
+            Constants.THEME_LIGHT -> {
                 b.genSettingsThemeDesc.text = getString(R.string.settings_selected_theme, getString(R.string.settings_theme_dialog_themes_2))
             }
-            2 -> {
+            Constants.THEME_DARK -> {
                 b.genSettingsThemeDesc.text = getString(R.string.settings_selected_theme, getString(R.string.settings_theme_dialog_themes_3))
             }
             else -> {
@@ -325,6 +325,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             b.settingsActivityAllowBypassSwitch.isEnabled = false
             b.settingsActivityAllowBypassSwitch.visibility = View.INVISIBLE
             b.settingsActivityAllowBypassProgress.visibility = View.VISIBLE
+            // the count-down-timer ticks once after 1000ms, at the completion of which
+            // the settingsActivityAllowBypassSwitch [is re-enabled again or add whatever is appropriate.
             object : CountDownTimer(1000, 500) {
                 override fun onTick(millisUntilFinished: Long) {
                 }
@@ -373,6 +375,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blockList_desc1)
                 persistentState.localBlocklistEnabled = false
             }
+            // the count-down-timer ticks once after 1000ms, at the completion of which
+            // the settingsActivityOnDeviceBlockSwitch [is re-enabled again or add whatever is appropriate.
             object : CountDownTimer(1000, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
                 }
@@ -458,6 +462,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityExcludeAppsImg.setOnClickListener {
             b.settingsActivityExcludeAppsImg.isEnabled = false
             showExcludeAppDialog(requireContext(), excludeAppAdapter!!, excludeAppViewModel)
+            // the count-down-timer ticks once after 500ms, at the completion of which
+            // the settingsActivityExcludeAppsImg [is re-enabled again or add whatever is appropriate.
             object : CountDownTimer(500, 500) {
                 override fun onTick(millisUntilFinished: Long) {
                 }
@@ -473,6 +479,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityExcludeAppsRl.setOnClickListener {
             b.settingsActivityExcludeAppsRl.isEnabled = false
             showExcludeAppDialog(requireContext(), excludeAppAdapter!!, excludeAppViewModel)
+            // the count-down-timer ticks once after 500ms, at the completion of which
+            // the settingsActivityExcludeAppsRl [is re-enabled again or add whatever is appropriate.
             object : CountDownTimer(500, 500) {
                 override fun onTick(millisUntilFinished: Long) {
                 }
@@ -501,6 +509,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityThemeRl.setOnClickListener{
             b.settingsActivityThemeRl.isEnabled = false
             showDialogForTheme()
+            // the count-down-timer ticks once after 500ms, at the completion of which
+            // the settingsActivityThemeRl [is re-enabled again or add whatever is appropriate.
             object : CountDownTimer(500, 500) {
                 override fun onTick(millisUntilFinished: Long) {}
 
@@ -519,6 +529,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityNotificationRl.setOnClickListener {
             b.settingsActivityNotificationRl.isEnabled = false
             showDialogForNotificationAction()
+            // the count-down-timer ticks once after 500ms, at the completion of which
+            // the settingsActivityNotificationRl [is re-enabled again or add whatever is appropriate.
             object : CountDownTimer(500, 500) {
                 override fun onTick(millisUntilFinished: Long) {}
 
@@ -613,8 +625,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             dialog.dismiss()
             if(persistentState.theme != which) {
                 when (which) {
-                    0 -> {
-                        persistentState.theme = 0
+                    Constants.THEME_SYSTEM_DEFAULT -> {
+                        persistentState.theme = Constants.THEME_SYSTEM_DEFAULT
                         if (requireActivity().isDarkThemeOn()) {
                             requireActivity().setTheme(R.style.AppTheme)
                             requireActivity().recreate()
@@ -623,18 +635,18 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                             requireActivity().recreate()
                         }
                     }
-                    1 -> {
-                        persistentState.theme = 1
+                    Constants.THEME_LIGHT -> {
+                        persistentState.theme = Constants.THEME_LIGHT
                         requireActivity().setTheme(R.style.AppThemeWhite)
                         requireActivity().recreate()
                     }
-                    2 -> {
-                        persistentState.theme = 2
+                    Constants.THEME_DARK -> {
+                        persistentState.theme = Constants.THEME_DARK
                         requireActivity().setTheme(R.style.AppTheme)
                         requireActivity().recreate()
                     }
-                    3 -> {
-                        persistentState.theme = 3
+                    Constants.THEME_TRUE_BLACK -> {
+                        persistentState.theme = Constants.THEME_TRUE_BLACK
                         requireActivity().setTheme(R.style.AppThemeTrueBlack)
                         requireActivity().recreate()
                     }
@@ -656,17 +668,17 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             dialog.dismiss()
             if (persistentState.notificationAction != which) {
                 when (which) {
-                    0 -> {
+                    Constants.NOTIFICATION_STOP -> {
                         b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,getString(R.string.settings_notification_desc1) )
-                        persistentState.notificationAction = 0
+                        persistentState.notificationAction = Constants.NOTIFICATION_STOP
                     }
-                    1 -> {
+                    Constants.NOTIFICATION_DNS_FIREWALL -> {
                         b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,getString(R.string.settings_notification_desc2) )
-                        persistentState.notificationAction = 1
+                        persistentState.notificationAction = Constants.NOTIFICATION_DNS_FIREWALL
                     }
-                    2 -> {
+                    Constants.NOTIFICATION_NO_ACTION -> {
                         b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,getString(R.string.settings_notification_desc3) )
-                        persistentState.notificationAction = 2
+                        persistentState.notificationAction = Constants.NOTIFICATION_NO_ACTION
                     }
                 }
             }
@@ -696,7 +708,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blockList_desc1)
             }
         }
-
         // Checks whether the Orbot is installed.
         // If not, then prompt the user for installation.
         // Else, enable the Orbot bottom sheet fragment.
@@ -822,7 +833,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.INVISIBLE
     }
 
-
     private fun showDialogForHTTPProxy(isEnabled: Boolean) {
         if (isEnabled) {
             var isValid: Boolean
@@ -901,7 +911,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                     b.settingsActivityHttpProxySwitch.visibility = View.VISIBLE
                 }
             }
-
             cancelURLBtn.setOnClickListener {
                 dialog.dismiss()
                 persistentState.httpProxyEnabled = false
@@ -918,7 +927,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             b.settingsActivityHttpProxyDesc.text =  getString(R.string.settings_http_proxy_desc_default)
         }
     }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -956,8 +964,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             }
         }
     }
-
-
 
     private fun removeBraveDNSLocal() {
         appMode?.setBraveDNSMode(null)
@@ -1062,7 +1068,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         // Set other dialog properties
         alertDialog.show()
     }
-
 
     private fun showDownloadDialog() {
         val builder = AlertDialog.Builder(requireContext())
@@ -1169,18 +1174,23 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     }
 
     private fun getCurrentTheme(): Int {
-        if (persistentState.theme == 0) {
-            if (isDarkThemeOn()) {
-                return R.style.AppThemeTrueBlack
-            } else {
-                return R.style.AppThemeWhite
+        return when (persistentState.theme){
+            Constants.THEME_SYSTEM_DEFAULT -> {
+                if (isDarkThemeOn()) {
+                    R.style.AppThemeTrueBlack
+                } else {
+                    R.style.AppThemeWhite
+                }
             }
-        } else if (persistentState.theme == 1) {
-            return R.style.AppThemeWhite
-        } else if (persistentState.theme == 2) {
-            return R.style.AppTheme
-        } else {
-            return R.style.AppThemeTrueBlack
+            Constants.THEME_LIGHT -> {
+                R.style.AppThemeWhite
+            }
+            Constants.THEME_DARK -> {
+                R.style.AppTheme
+            }
+            else -> {
+                R.style.AppThemeTrueBlack
+            }
         }
     }
 
@@ -1203,7 +1213,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         dialog.setCanceledOnTouchOutside(false)
         dialog.window!!.attributes = lp
 
-
         val applyURLBtn = dialogBinding.dialogProxyApplyBtn
         val cancelURLBtn = dialogBinding.dialogProxyCancelBtn
         val ipAddressEditText: EditText = dialogBinding.dialogProxyEditIp
@@ -1213,7 +1222,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         val userNameEditText: EditText = dialogBinding.dialogProxyEditUsername
         val passwordEditText: EditText = dialogBinding.dialogProxyEditPassword
         val udpBlockCheckBox: CheckBox = dialogBinding.dialogProxyUdpCheck
-
 
         val sock5Proxy = proxyEndpointRepository.getConnectedProxy()
 
@@ -1318,6 +1326,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         val proxyEndpoint = ProxyEndpoint(-1, proxyName, 1, mode, appName, ip, port, userName, password, true, true, isUDPBlock, 0L, 0)
         proxyEndpointRepository.clearAllData()
         proxyEndpointRepository.insertAsync(proxyEndpoint)
+        // the count-down-timer ticks once after 1000ms, at the completion of which
+        // the settingsActivitySocks5Switch [is re-enabled again or add whatever is appropriate.
         object : CountDownTimer(1000, 500) {
             override fun onTick(millisUntilFinished: Long) {
                 b.settingsActivitySocks5Switch.isEnabled = false
@@ -1334,6 +1344,4 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             }
         }.start()
     }
-
-
 }
