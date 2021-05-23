@@ -31,7 +31,7 @@ import com.celzero.bravedns.util.Constants.Companion.ORBAT_MODE_NONE
 import hu.autsoft.krate.*
 import settings.Settings
 
-class PersistentState(private val context: Context):SimpleKrate(context) {
+class PersistentState(private val context: Context) : SimpleKrate(context) {
     companion object {
         const val BRAVE_MODE = "brave_mode"
         const val BACKGROUND_MODE = "background_mode"
@@ -81,7 +81,7 @@ class PersistentState(private val context: Context):SimpleKrate(context) {
     var tempRemoteBlockListDownloadTime by longPref("temp_remote_block_list_downloaded_time", 0)
     var workManagerStartTime by longPref("work_manager_start_time", 0)
     var localBlockListDownloadTime by longPref("local_block_list_downloaded_time", 0)
-    var tempBlocklistDownloadTime by longPref("temp_time_during_download",0)
+    var tempBlocklistDownloadTime by longPref("temp_time_during_download", 0)
     var httpProxyPort by intPref("http_proxy_port", 0)
     var httpProxyEnabled by booleanPref("http_proxy_enabled", false)
     var httpProxyHostAddress by stringPref("http_proxy_ipaddress", "")
@@ -100,12 +100,12 @@ class PersistentState(private val context: Context):SimpleKrate(context) {
     var backgroundEnabled by booleanPref("background_mode", false)
     var checkForAppUpdate by booleanPref("check_for_app_update", true)
     var isScreenOff by booleanPref("screen_off", false)
-    private var connectedDNSName by stringPref("connected_dns_name","RethinkDNS Basic")
+    private var connectedDNSName by stringPref("connected_dns_name", "RethinkDNS Basic")
     var theme by intPref("app_theme", 0)
     var notificationAction by intPref("notification_action", 1)
     var isAddAllNetworks by booleanPref("add_all_networks_to_vpn", false)
 
-    var orbotConnectionStatus : MutableLiveData<Boolean> = MutableLiveData()
+    var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var orbotEnabled by booleanPref("orbot_enabled", false)
     private var orbotMode by intPref("orbot_mode", ORBAT_MODE_NONE)
     var downloadIDs by stringSetPref("download_ids", emptySet())
@@ -115,40 +115,40 @@ class PersistentState(private val context: Context):SimpleKrate(context) {
 
     var isAccessibilityCrashDetected by booleanPref("accessibility_crash", false)
 
-    var orbotModeConst : Int = 0
+    var orbotModeConst: Int = 0
     var median50: MutableLiveData<Long> = MutableLiveData()
     var blockedCount: MutableLiveData<Int> = MutableLiveData()
 
-    fun wifiAllowed(forPackage:String):Boolean = !excludedPackagesWifi.contains(forPackage)
+    fun wifiAllowed(forPackage: String): Boolean = !excludedPackagesWifi.contains(forPackage)
 
-    fun modifyAllowedWifi(forPackage:String, remove:Boolean) {
-        excludedPackagesWifi = if(remove) {
+    fun modifyAllowedWifi(forPackage: String, remove: Boolean) {
+        excludedPackagesWifi = if (remove) {
             excludedPackagesWifi - forPackage
         } else {
             excludedPackagesWifi + forPackage
         }
     }
 
-    fun modifyAllowedData(forPackage:String, remove:Boolean) {
-        excludedPackagesData = if(remove) {
+    fun modifyAllowedData(forPackage: String, remove: Boolean) {
+        excludedPackagesData = if (remove) {
             excludedPackagesData - forPackage
         } else {
             excludedPackagesData + forPackage
         }
     }
 
-    fun getBraveMode() = if(braveMode == -1) _braveMode else braveMode // TODO remove app logic from settings
+    fun getBraveMode() = if (braveMode == -1) _braveMode else braveMode // TODO remove app logic from settings
 
-    fun setBraveMode(mode:Int) {
+    fun setBraveMode(mode: Int) {
         _braveMode = mode
     }
 
-    fun setMedianLatency(medianP90 : Long){
+    fun setMedianLatency(medianP90: Long) {
         median50.postValue(medianP90)
     }
 
-    fun setNumOfReq(){
-        val numReq = if(lifeTimeQueries > 0) lifeTimeQueries + 1
+    fun setNumOfReq() {
+        val numReq = if (lifeTimeQueries > 0) lifeTimeQueries + 1
         else {
             _numberOfRequests + 1
         }
@@ -177,10 +177,10 @@ class PersistentState(private val context: Context):SimpleKrate(context) {
     }
 
     //fixme replace the below logic once the DNS data is streamlined.
-    fun getConnectedDNS() : String{
-        if(connectedDNS.value.isNullOrEmpty()){
+    fun getConnectedDNS(): String {
+        if (connectedDNS.value.isNullOrEmpty()) {
             val dnsType = appMode?.getDNSType()
-            return if(dnsType == 1){
+            return if (dnsType == 1) {
                 val dohDetail: DoHEndpoint?
                 try {
                     dohDetail = appMode?.getDOHDetails()
@@ -188,36 +188,32 @@ class PersistentState(private val context: Context):SimpleKrate(context) {
                 } catch (e: Exception) {
                     connectedDNSName
                 }
-            }else if(dnsType == 2){
-                if(appMode?.getDNSCryptServerCount() != null) {
+            } else if (dnsType == 2) {
+                if (appMode?.getDNSCryptServerCount() != null) {
                     val cryptDetails = appMode?.getDNSCryptServerCount()
-                     context.getString(R.string.configure_dns_crypt, cryptDetails.toString())
-                }else {
+                    context.getString(R.string.configure_dns_crypt, cryptDetails.toString())
+                } else {
                     context.getString(R.string.configure_dns_crypt, "0")
                 }
-            }else{
+            } else {
                 val proxyDetails = appMode?.getDNSProxyServerDetails()
                 proxyDetails?.proxyAppName!!
             }
-        }
-        else
-            return connectedDNS.value!!
+        } else return connectedDNS.value!!
     }
 
-    fun setConnectedDNS(name : String) {
+    fun setConnectedDNS(name: String) {
         connectedDNS.postValue(name)
         connectedDNSName = name
     }
 
-    fun setOrbotModePersistence(mode : Int){
+    fun setOrbotModePersistence(mode: Int) {
         orbotModeConst = mode
         orbotMode = mode
     }
 
-    fun getOrbotModePersistence(): Int{
-        if(orbotModeConst == 0)
-            return orbotMode
-        else
-            return orbotModeConst
+    fun getOrbotModePersistence(): Int {
+        if (orbotModeConst == 0) return orbotMode
+        else return orbotModeConst
     }
 }

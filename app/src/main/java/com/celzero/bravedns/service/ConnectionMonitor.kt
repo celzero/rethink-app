@@ -139,8 +139,6 @@ class ConnectionMonitor(context: Context, val networkListener: NetworkListener) 
         // defines network priority depending on the iteration order, that is, the network
         // in the 0th index is preferred over the one at 1st index, and so on.
         var currentNetworks: LinkedHashSet<Network> = linkedSetOf()
-        //var currentActiveNetwork: Network? = null
-
 
         override fun handleMessage(msg: Message) {
             // isForceUpdate - true if onUserPreferenceChanged is changes, the messages should be
@@ -235,6 +233,5 @@ class ConnectionMonitor(context: Context, val networkListener: NetworkListener) 
         private fun isVPN(network : Network) : Boolean? {
             return connectionMonitor.connectivityManager.getNetworkCapabilities(network)?.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
         }
-
     }
 }

@@ -20,13 +20,13 @@ import java.util.concurrent.TimeUnit
 
 class Constants {
 
-    companion object{
+    companion object {
         //Log
         const val LOG_TAG = "RethinkDNS"
 
         //Download path and file names
         const val DOWNLOAD_PATH = "/downloads/"
-        const val FILE_TAG_NAME ="/filetag.json"
+        const val FILE_TAG_NAME = "/filetag.json"
         const val FILE_BASIC_CONFIG = "/basicconfig.json"
         const val FILE_RD_FILE = "/rd.txt"
         const val FILE_TD_FILE = "/td.txt"
@@ -34,18 +34,18 @@ class Constants {
 
         //Download URL's
         const val JSON_DOWNLOAD_BLOCKLIST_LINK = "https://download.bravedns.com/blocklists"
+
         //const val JSON_DOWNLOAD_BASIC_CONFIG_LINK = "https://download.bravedns.com/basicconfig"
         //const val JSON_DOWNLOAD_BASIC_RANK_LINK = "https://download.bravedns.com/rank"
         //const val JSON_DOWNLOAD_BASIC_TRIE_LINK = "https://download.bravedns.com/trie"
         const val REFRESH_BLOCKLIST_URL = "https://download.bravedns.com/update/blocklists?tstamp="
         const val APP_DOWNLOAD_AVAILABLE_CHECK = "https://download.bravedns.com/update/app?vcode="
         const val CONFIGURE_BLOCKLIST_URL_LOCAL = "https://bravedns.com/configure?v=app&tstamp="
-        const val CONFIGURE_BLOCKLIST_URL_REMOTE =  "https://bravedns.com/configure?v=app"
+        const val CONFIGURE_BLOCKLIST_URL_REMOTE = "https://bravedns.com/configure?v=app"
 
-        val DOWNLOAD_URLS  = listOf("https://download.bravedns.com/blocklists","https://download.bravedns.com/basicconfig",
-                            "https://download.bravedns.com/rank","https://download.bravedns.com/trie")
+        val DOWNLOAD_URLS = listOf("https://download.bravedns.com/blocklists", "https://download.bravedns.com/basicconfig", "https://download.bravedns.com/rank", "https://download.bravedns.com/trie")
 
-        val FILE_NAMES = listOf("/filetag.json","/basicconfig.json", "/rd.txt", "/td.txt")
+        val FILE_NAMES = listOf("/filetag.json", "/basicconfig.json", "/rd.txt", "/td.txt")
 
         // Earlier the link was https://bravedns.com/downloads
         // modified below link post v053c release
@@ -83,7 +83,7 @@ class Constants {
         const val RETHINK_DNS_PLUS = "RethinkDNS Plus"
         const val RETHINK_DNS = "RethinkDNS Basic (default)"
 
-        const val DELAY_FOR_BLOCK_RESPONSE : Long = 30000
+        const val DELAY_FOR_BLOCK_RESPONSE: Long = 30000
 
         const val DNS_TYPE_DOH = 1
         const val DNS_TYPE_DNS_CRYPT = 2
@@ -143,7 +143,7 @@ class Constants {
         // Notification action buttons
         const val NOTIFICATION_ACTION_STOP = 0
         const val NOTIFICATION_ACTION_DNS_FIREWALL = 1
-        const val NOTIFICATION_ACTION_NONE= 2
+        const val NOTIFICATION_ACTION_NONE = 2
 
         //DNS MODES
         const val APP_MODE_DNS = 0

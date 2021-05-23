@@ -97,9 +97,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         var lifeTimeQueries: Int = -1
 
-        var lifeTimeQ : MutableLiveData<Int> = MutableLiveData()
-        var braveModeToggler : MutableLiveData<Int> = MutableLiveData()
-        var connectedDNS : MutableLiveData<String> = MutableLiveData()
+        var lifeTimeQ: MutableLiveData<Int> = MutableLiveData()
+        var braveModeToggler: MutableLiveData<Int> = MutableLiveData()
+        var connectedDNS: MutableLiveData<String> = MutableLiveData()
         var cryptRelayToRemove: String = ""
 
         var appStartTime: Long = System.currentTimeMillis()
@@ -109,8 +109,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and
-                Configuration.UI_MODE_NIGHT_MASK == UI_MODE_NIGHT_YES
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == UI_MODE_NIGHT_YES
     }
 
     companion object {
@@ -142,7 +141,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             launchOnBoardingActivity()
             updateNewVersion()
             updateInstallSource()
-        }else{
+        } else {
             showNewFeaturesDialog()
         }
 
@@ -203,12 +202,14 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     private fun updateInstallSource() {
         try {
-            when(BuildConfig.FLAVOR){
+            when (BuildConfig.FLAVOR) {
                 Constants.FLAVOR_PLAY -> {
                     persistentState.downloadSource = DOWNLOAD_SOURCE_PLAY_STORE
-                } Constants.FLAVOR_FDROID -> {
+                }
+                Constants.FLAVOR_FDROID -> {
                     persistentState.downloadSource = Constants.DOWNLOAD_SOURCE_FDROID
-                } else -> {
+                }
+                else -> {
                     persistentState.downloadSource = Constants.DOWNLOAD_SOURCE_WEBSITE
                 }
             }
@@ -280,7 +281,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     fun checkForUpdate(userInitiation: Boolean = false) {
         if (BuildConfig.FLAVOR == Constants.FLAVOR_PLAY) {
             appUpdateManager.checkForAppUpdate(userInitiation, this, installStateUpdatedListener) // Might be play updater or web updater
-        } else if(BuildConfig.FLAVOR == Constants.FLAVOR_WEBSITE){
+        } else if (BuildConfig.FLAVOR == Constants.FLAVOR_WEBSITE) {
             get<NonStoreAppUpdater>().checkForAppUpdate(userInitiation, this, installStateUpdatedListener) // Always web updater
         }
     }
@@ -453,7 +454,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 builder.setPositiveButton(getString(R.string.hs_download_positive_play_store)) { _, _ ->
                     appUpdateManager.completeUpdate()
                 }
-            }else{
+            } else {
                 builder.setPositiveButton(getString(R.string.hs_download_positive_website)) { _, _ ->
                     initiateDownload()
                 }
@@ -529,7 +530,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             Log.w(LOG_TAG, "Download unsuccessful - ${e.message}", e)
         }
     }
-                
+
     override fun onResume() {
         super.onResume()
         GlobalVariable.isBackgroundEnabled = persistentState.backgroundEnabled
@@ -558,6 +559,4 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
         false
     }
-
-
 }

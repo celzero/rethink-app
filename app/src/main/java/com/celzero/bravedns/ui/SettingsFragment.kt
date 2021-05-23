@@ -80,7 +80,7 @@ import java.io.IOException
 class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     private val b by viewBinding(ActivitySettingsScreenBinding::bind)
 
-    private val FILETAG : String = "Settings Fragment-"
+    private val FILETAG: String = "Settings Fragment-"
 
     //For exclude apps dialog
     private var excludeAppAdapter: ExcludedAppListAdapter? = null
@@ -129,7 +129,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             //b.settingsHeadingDns.visibility = View.GONE
         }
 
-        if(BuildConfig.FLAVOR == FLAVOR_FDROID){
+        if (BuildConfig.FLAVOR == FLAVOR_FDROID) {
             b.settingsActivityCheckUpdateRl.visibility = View.GONE
         }
 
@@ -169,13 +169,13 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
         when (persistentState.notificationAction) {
             Constants.NOTIFICATION_ACTION_STOP -> {
-                b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,getString(R.string.settings_notification_desc1) )
+                b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc, getString(R.string.settings_notification_desc1))
             }
             Constants.NOTIFICATION_ACTION_DNS_FIREWALL -> {
-                b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,getString(R.string.settings_notification_desc2) )
+                b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc, getString(R.string.settings_notification_desc2))
             }
             Constants.NOTIFICATION_ACTION_NONE -> {
-                b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,getString(R.string.settings_notification_desc3) )
+                b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc, getString(R.string.settings_notification_desc3))
             }
         }
 
@@ -234,7 +234,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
      * Disable all the layouts related with DNS
      */
     private fun disableDNSRelatedUI() {
-        b.settingsHeadingDns.text  = getString(R.string.dns_mode_disabled)
+        b.settingsHeadingDns.text = getString(R.string.dns_mode_disabled)
         b.settingsActivityOnDeviceBlockRl.isEnabled = false
         b.settingsActivityOnDeviceBlockSwitch.isEnabled = false
         b.settingsActivityOnDeviceBlockRefreshBtn.isEnabled = false
@@ -308,7 +308,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
 
 
-        b.settingsActivityCheckUpdateSwitch.setOnCheckedChangeListener{ _: CompoundButton, b: Boolean ->
+        b.settingsActivityCheckUpdateSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             persistentState.checkForAppUpdate = b
         }
 
@@ -316,7 +316,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             persistentState.fetchFavIcon = b
         }
 
-        b.settingsActivityAllNetworkSwitch.setOnCheckedChangeListener{ _:CompoundButton, b: Boolean ->
+        b.settingsActivityAllNetworkSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             persistentState.isAddAllNetworks = b
         }
 
@@ -330,8 +330,9 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             object : CountDownTimer(1000, 500) {
                 override fun onTick(millisUntilFinished: Long) {
                 }
+
                 override fun onFinish() {
-                    if(isAdded) {
+                    if (isAdded) {
                         b.settingsActivityAllowBypassSwitch.isEnabled = true
                         b.settingsActivityAllowBypassProgress.visibility = View.GONE
                         b.settingsActivityAllowBypassSwitch.visibility = View.VISIBLE
@@ -350,12 +351,12 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 if (!persistentState.blockListFilesDownloaded) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         val vpnService = VpnController.getInstance().getBraveVpnService()
-                        if(vpnService != null && vpnService.isLockdownEnabled){
+                        if (vpnService != null && vpnService.isLockdownEnabled) {
                             showDownloadDialogWithLockdown()
-                        }else{
+                        } else {
                             showDownloadDialog()
                         }
-                    }else{
+                    } else {
                         showDownloadDialog()
                     }
                 } else {
@@ -382,14 +383,14 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 }
 
                 override fun onFinish() {
-                    if(isAdded) {
+                    if (isAdded) {
                         b.settingsActivityOnDeviceBlockSwitch.isEnabled = true
                     }
                 }
             }.start()
         }
 
-        b.settingsActivityVpnLockdownDesc.setOnClickListener{
+        b.settingsActivityVpnLockdownDesc.setOnClickListener {
             try {
                 val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     Intent(ACTION_VPN_SETTINGS)
@@ -407,7 +408,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             if (persistentState.getOrbotModePersistence() != Constants.ORBAT_MODE_NONE) {
                 Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_disabled_error), Toast.LENGTH_SHORT)
                 b.settingsActivitySocks5Switch.isChecked = false
-            }else {
+            } else {
                 persistentState.socks5Enabled = bool
                 if (bool) {
                     showDialogForSocks5Proxy()
@@ -422,8 +423,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             }
         }
 
-        b.settingsActivityOrbotImg.setOnClickListener{
-            if(get<OrbotHelper>().isOrbotInstalled()) {
+        b.settingsActivityOrbotImg.setOnClickListener {
+            if (get<OrbotHelper>().isOrbotInstalled()) {
                 if (b.settingsActivityHttpProxySwitch.isChecked) {
                     Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_https_orbot_disabled_error), Toast.LENGTH_SHORT)
                 } else if (b.settingsActivitySocks5Switch.isChecked) {
@@ -431,12 +432,12 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 } else {
                     openBottomSheetForOrbot()
                 }
-            }else{
+            } else {
                 showOrbotInstallDialog()
             }
         }
 
-        b.settingsActivityOrbotContainer.setOnClickListener{
+        b.settingsActivityOrbotContainer.setOnClickListener {
             if (get<OrbotHelper>().isOrbotInstalled()) {
                 if (b.settingsActivityHttpProxySwitch.isChecked) {
                     Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_https_orbot_disabled_error), Toast.LENGTH_SHORT)
@@ -469,7 +470,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 }
 
                 override fun onFinish() {
-                    if(isAdded) {
+                    if (isAdded) {
                         b.settingsActivityExcludeAppsImg.isEnabled = true
                     }
                 }
@@ -486,7 +487,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 }
 
                 override fun onFinish() {
-                    if(isAdded) {
+                    if (isAdded) {
                         b.settingsActivityExcludeAppsRl.isEnabled = true
                     }
                 }
@@ -506,7 +507,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             checkForDownload(isUserInitiated = true, isRetry = true)
         }
 
-        b.settingsActivityThemeRl.setOnClickListener{
+        b.settingsActivityThemeRl.setOnClickListener {
             b.settingsActivityThemeRl.isEnabled = false
             showDialogForTheme()
             // the count-down-timer ticks once after 500ms, at the completion of which
@@ -515,7 +516,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 override fun onTick(millisUntilFinished: Long) {}
 
                 override fun onFinish() {
-                    if(isAdded) {
+                    if (isAdded) {
                         b.settingsActivityThemeRl.isEnabled = true
                     }
                 }
@@ -600,7 +601,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
     }
 
-    private fun openBottomSheetForOrbot(){
+    private fun openBottomSheetForOrbot() {
         val vpnService = VpnController.getInstance().getBraveVpnService()
         if (vpnService != null) {
             val bottomSheetFragment = OrbotBottomSheetFragment()
@@ -619,11 +620,11 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     private fun showDialogForTheme() {
         val alertBuilder = AlertDialog.Builder(requireContext())
         alertBuilder.setTitle(getString(R.string.settings_theme_dialog_title))
-        val items  = arrayOf(getString(R.string.settings_theme_dialog_themes_1), getString(R.string.settings_theme_dialog_themes_2), getString(R.string.settings_theme_dialog_themes_3), getString(R.string.settings_theme_dialog_themes_4))
+        val items = arrayOf(getString(R.string.settings_theme_dialog_themes_1), getString(R.string.settings_theme_dialog_themes_2), getString(R.string.settings_theme_dialog_themes_3), getString(R.string.settings_theme_dialog_themes_4))
         val checkedItem = persistentState.theme
         alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
             dialog.dismiss()
-            if(persistentState.theme != which) {
+            if (persistentState.theme != which) {
                 when (which) {
                     Constants.THEME_SYSTEM_DEFAULT -> {
                         persistentState.theme = Constants.THEME_SYSTEM_DEFAULT
@@ -669,15 +670,15 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             if (persistentState.notificationAction != which) {
                 when (which) {
                     Constants.NOTIFICATION_ACTION_STOP -> {
-                        b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,getString(R.string.settings_notification_desc1) )
+                        b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc, getString(R.string.settings_notification_desc1))
                         persistentState.notificationAction = Constants.NOTIFICATION_ACTION_STOP
                     }
                     Constants.NOTIFICATION_ACTION_DNS_FIREWALL -> {
-                        b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,getString(R.string.settings_notification_desc2) )
+                        b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc, getString(R.string.settings_notification_desc2))
                         persistentState.notificationAction = Constants.NOTIFICATION_ACTION_DNS_FIREWALL
                     }
                     Constants.NOTIFICATION_ACTION_NONE -> {
-                        b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,getString(R.string.settings_notification_desc3) )
+                        b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc, getString(R.string.settings_notification_desc3))
                         persistentState.notificationAction = Constants.NOTIFICATION_ACTION_NONE
                     }
                 }
@@ -694,17 +695,17 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         detectLockDownMode()
         if (!persistentState.localBlocklistEnabled) {
             b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blockList_desc1)
-        }else {
+        } else {
             val count = persistentState.numberOfLocalBlocklists
             if (persistentState.localBlocklistEnabled && persistentState.blockListFilesDownloaded && persistentState.localBlockListStamp.isNotEmpty()) {
-                if(count !=0 ){
+                if (count != 0) {
                     b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_in_use, count.toString())
-                }else {
+                } else {
                     b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc6)
                 }
-            } else if(count != 0){
+            } else if (count != 0) {
                 b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_in_use, count.toString())
-            }else {
+            } else {
                 b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blockList_desc1)
             }
         }
@@ -735,9 +736,9 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             override fun onFailure(call: Call, e: IOException) {
                 Log.i(LOG_TAG, "$FILETAG onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
                 activity?.runOnUiThread {
-                    if(isRetry) {
-                        Utilities.showToastInMidLayout(requireContext(),getString(R.string.local_blocklist_update_check_failure), Toast.LENGTH_SHORT)
-                    }else{
+                    if (isRetry) {
+                        Utilities.showToastInMidLayout(requireContext(), getString(R.string.local_blocklist_update_check_failure), Toast.LENGTH_SHORT)
+                    } else {
                         updateDownloadFailure()
                     }
                 }
@@ -793,7 +794,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         })
     }
 
-    private fun updateDownloadFailure(){
+    private fun updateDownloadFailure() {
         b.settingsActivityOnDeviceBlockConfigureBtn.visibility = View.GONE
         b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.GONE
         b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.GONE
@@ -804,7 +805,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         persistentState.workManagerStartTime = 0
     }
 
-    private fun updateDownloadSuccess(){
+    private fun updateDownloadSuccess() {
         b.settingsActivityOnDeviceBlockConfigureBtn.visibility = View.VISIBLE
         b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.VISIBLE
         b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.VISIBLE
@@ -817,7 +818,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         persistentState.workManagerStartTime = 0
     }
 
-    private fun initialUI(){
+    private fun initialUI() {
         b.settingsActivityOnDeviceBlockConfigureBtn.visibility = View.GONE
         b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.GONE
         b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.GONE
@@ -826,7 +827,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blockList_desc1)
     }
 
-    private fun updateDownloadInitiated(){
+    private fun updateDownloadInitiated() {
         b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc2)
         b.settingsActivityOnDeviceBlockSwitch.visibility = View.GONE
         b.settingsActivityOnDeviceBlockProgress.visibility = View.VISIBLE
@@ -915,7 +916,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 dialog.dismiss()
                 persistentState.httpProxyEnabled = false
                 persistentState.httpProxyHostAddress = ""
-                persistentState.httpProxyPort  = 0
+                persistentState.httpProxyPort = 0
                 b.settingsActivityHttpProxyDesc.text = getString(R.string.settings_http_proxy_desc_default)
                 b.settingsActivityHttpProxySwitch.isChecked = false
             }
@@ -924,7 +925,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             persistentState.httpProxyHostAddress = ""
             persistentState.httpProxyPort = 0
             b.settingsActivityHttpProxySwitch.isChecked = false
-            b.settingsActivityHttpProxyDesc.text =  getString(R.string.settings_http_proxy_desc_default)
+            b.settingsActivityHttpProxyDesc.text = getString(R.string.settings_http_proxy_desc_default)
         }
     }
 
@@ -943,7 +944,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.VISIBLE
         val timeStamp = persistentState.localBlockListDownloadTime
         b.settingsActivityOnDeviceLastUpdatedTimeTxt.text = getString(R.string.settings_local_blocklist_version, Utilities.convertLongToDate(timeStamp))
-        val path: String = requireContext().filesDir.canonicalPath + "/" +timeStamp
+        val path: String = requireContext().filesDir.canonicalPath + "/" + timeStamp
         if (appMode?.getBraveDNS() == null) {
             GlobalScope.launch(Dispatchers.IO) {
                 try {
@@ -951,7 +952,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                     val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
                     appMode?.setBraveDNSMode(braveDNS)
                     persistentState.localBlocklistEnabled = true
-                }catch (e: Exception){
+                } catch (e: Exception) {
                     Log.w(LOG_TAG, "Exception while setting blocklist: ${e.message}", e)
                     persistentState.localBlocklistEnabled = false
                     if (isAdded) {
@@ -981,21 +982,21 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         builder.setMessage(R.string.orbot_install_dialog_message)
 
         //Play store install intent
-        if(BuildConfig.FLAVOR == Constants.FLAVOR_PLAY){
-            builder.setPositiveButton(getString(R.string.orbot_install_dialog_positive)){ _, _ ->
+        if (BuildConfig.FLAVOR == Constants.FLAVOR_PLAY) {
+            builder.setPositiveButton(getString(R.string.orbot_install_dialog_positive)) { _, _ ->
                 val intent = get<OrbotHelper>().getIntentForDownload(requireContext(), DOWNLOAD_SOURCE_PLAY_STORE)
-                if(intent != null){
+                if (intent != null) {
                     try {
                         startActivity(intent)
-                    }catch (e: ActivityNotFoundException){
+                    } catch (e: ActivityNotFoundException) {
                         Utilities.showToastInMidLayout(requireContext(), getString(R.string.orbot_install_activity_error), Toast.LENGTH_SHORT)
                     }
-                }else{
+                } else {
                     Utilities.showToastInMidLayout(requireContext(), getString(R.string.orbot_install_activity_error), Toast.LENGTH_SHORT)
                 }
             }
 
-        }else if(BuildConfig.FLAVOR == FLAVOR_FDROID){//fDroid install intent
+        } else if (BuildConfig.FLAVOR == FLAVOR_FDROID) {//fDroid install intent
             builder.setPositiveButton(getString(R.string.orbot_install_dialog_positive)) { _, _ ->
                 val intent = get<OrbotHelper>().getIntentForDownload(requireContext(), DOWNLOAD_SOURCE_FDROID)
                 if (intent != null) {
@@ -1008,7 +1009,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                     Utilities.showToastInMidLayout(requireContext(), getString(R.string.orbot_install_activity_error), Toast.LENGTH_SHORT)
                 }
             }
-        }else{//Orbot website download link
+        } else {//Orbot website download link
             builder.setPositiveButton(getString(R.string.orbot_install_dialog_positive)) { _, _ ->
                 val intent = get<OrbotHelper>().getIntentForDownload(requireContext(), DOWNLOAD_SOURCE_WEBSITE)
                 if (intent != null) {
@@ -1039,7 +1040,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         alertDialog.show()
     }
 
-    private fun showDownloadDialogWithLockdown(){
+    private fun showDownloadDialogWithLockdown() {
         val builder = AlertDialog.Builder(requireContext())
         //set title for alert dialog
         builder.setTitle(R.string.download_lockdown_dialog_heading)
@@ -1174,7 +1175,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     }
 
     private fun getCurrentTheme(): Int {
-        return when (persistentState.theme){
+        return when (persistentState.theme) {
             Constants.THEME_SYSTEM_DEFAULT -> {
                 if (isDarkThemeOn()) {
                     R.style.AppThemeTrueBlack
@@ -1258,7 +1259,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             var isIPValid = true
             var isUDPBlock = false
             val mode: String = getString(R.string.cd_dns_proxy_mode_external)
-            val appName : String = appNames[appNameSpinner.selectedItemPosition]
+            val appName: String = appNames[appNameSpinner.selectedItemPosition]
             val appPackageName = if (appName.isEmpty() || appName == getString(R.string.settings_app_list_default_app)) {
                 appNames[0]
             } else {
@@ -1334,9 +1335,10 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 b.settingsActivitySocks5Switch.visibility = View.GONE
                 b.settingsActivitySocks5Progress.visibility = View.VISIBLE
             }
+
             override fun onFinish() {
                 appMode?.setProxyMode(Settings.ProxyModeSOCKS5)
-                if(isAdded) {
+                if (isAdded) {
                     b.settingsActivitySocks5Switch.isEnabled = true
                     b.settingsActivitySocks5Progress.visibility = View.GONE
                     b.settingsActivitySocks5Switch.visibility = View.VISIBLE
