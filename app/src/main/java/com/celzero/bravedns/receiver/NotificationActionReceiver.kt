@@ -43,7 +43,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         val action: String? = intent?.getStringExtra(Constants.NOTIFICATION_ACTION)
-        Log.d(Constants.LOG_TAG, "NotificationActionReceiver: onReceive - $action")
+        Log.i(Constants.LOG_TAG, "NotificationActionReceiver: onReceive - $action")
         val manager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         when(action){
             OrbotHelper.ORBOT_NOTIFICATION_ACTION_TEXT -> {
@@ -67,7 +67,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
 
     private fun openOrbotApp(context: Context?) {
         val packageName = OrbotHelper.ORBOT_PACKAGE_NAME
-        Log.d(Constants.LOG_TAG, "appInfoForPackage: $packageName")
+        Log.i(Constants.LOG_TAG, "appInfoForPackage: $packageName")
         try {
             val launchIntent: Intent? = context?.packageManager?.getLaunchIntentForPackage(packageName)
             if (launchIntent != null) {//null pointer check in case package name was not found
@@ -98,7 +98,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
     }
 
     private fun dnsFirewallMode(){
-        Log.d(Constants.LOG_TAG, "NotificationActionReceiver: Setting global state to DNS + Firewall Mode")
+        Log.i(Constants.LOG_TAG, "NotificationActionReceiver: Setting global state to DNS + Firewall Mode")
         persistentState.setBraveMode(HomeScreenFragment.DNS_FIREWALL_MODE)
     }
 }

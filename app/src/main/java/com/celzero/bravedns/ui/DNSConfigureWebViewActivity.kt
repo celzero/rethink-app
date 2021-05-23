@@ -199,7 +199,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                 HomeScreenActivity.GlobalVariable.appMode?.setDNSMode(Settings.DNSModePort)
                 persistentState.connectionModeChange = receivedStamp
                 persistentState.setConnectedDNS(Constants.RETHINK_DNS_PLUS)
-                persistentState.dnsType = Constants.DNS_TYPE_DNS_CHANGE
+                persistentState.dnsType = Constants.PREF_DNS_MODE_DOH
             }
         }.start()
 
@@ -209,18 +209,18 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     private fun updateLocalStamp() {
         Log.i(LOG_TAG, "Webview: Local stamp has been set from webview - $receivedStamp")
         if (receivedStamp.isEmpty() || receivedStamp == Constants.BRAVE_BASE_STAMP) {
-            val localStamp = persistentState.getLocalBlockListStamp()
+            val localStamp = persistentState.localBlockListStamp
             if (localStamp.isNotEmpty()) {
                 return
             }
-            persistentState.setLocalBlockListStamp("")
+            persistentState.localBlockListStamp = ""
             return
         }
         val stamp = Xdns.getBlocklistStampFromURL(receivedStamp)
         if (DEBUG) Log.d(LOG_TAG, "Split stamp - $stamp")
         val path: String = this.filesDir.canonicalPath + "/"+ persistentState.localBlockListDownloadTime
         if (HomeScreenActivity.GlobalVariable.appMode?.getBraveDNS() == null) {
-            persistentState.setLocalBlockListStamp(stamp)
+            persistentState.localBlockListStamp = stamp
             GlobalScope.launch(Dispatchers.IO) {
                 if (DEBUG) Log.d(LOG_TAG, "Split stamp newBraveDNSLocal - $path")
                 try {
@@ -232,7 +232,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                 }
             }
         } else {
-            persistentState.setLocalBlockListStamp(stamp)
+            persistentState.localBlockListStamp = stamp
             GlobalScope.launch(Dispatchers.IO) {
                 val braveDNS = HomeScreenActivity.GlobalVariable.appMode?.getBraveDNS()
                 HomeScreenActivity.GlobalVariable.appMode?.setBraveDNSMode(braveDNS)

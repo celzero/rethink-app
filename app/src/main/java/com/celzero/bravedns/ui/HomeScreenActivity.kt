@@ -106,12 +106,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         var isBackgroundEnabled: Boolean = false
         var firewallRules: HashMultimap<Int, String> = HashMultimap.create()
         var DEBUG = false
-
-        //Screen off - whether the screen preference is set 0-off, 1- on. -1 not initialized
-        var isScreenLockedSetting: Int = -1
-
-        //Screen off state - set - 0 if screen is off, 1 - screen is on, -1 not initialized.
-        var isScreenLocked : Int = -1
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -176,7 +170,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             persistentState.insertionCompleted = true
         }
 
-        persistentState.setScreenLockData(false)
+        persistentState.isScreenOff = false
         lifeTimeQ.postValue(persistentState.getNumOfReq())
         initUpdateCheck()
 

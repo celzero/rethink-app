@@ -186,7 +186,7 @@ class DNSCryptRelayEndpointAdapter(
                         notifyDataSetChanged()
                     }
                 }.start()
-                persistentState.dnsType = Constants.DNS_TYPE_CRYPT_CHANGE
+                persistentState.dnsType = Constants.PREF_DNS_MODE_DNSCRYPT
                 persistentState.connectionModeChange = dnsCryptRelayEndpoint.dnsCryptRelayURL
                 return true
             } else {

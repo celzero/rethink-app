@@ -206,7 +206,7 @@ class AppMode internal constructor(
 
     fun getBraveDNS(): BraveDNS? {
         if(braveDNS == null && persistentState.localBlocklistEnabled
-            && persistentState.blockListFilesDownloaded && persistentState.getLocalBlockListStamp().isNotEmpty()){
+            && persistentState.blockListFilesDownloaded && persistentState.localBlockListStamp.isNotEmpty()){
             val path: String = context.filesDir.canonicalPath +"/"+ persistentState.localBlockListDownloadTime
             if (DEBUG) Log.d(LOG_TAG, "Local brave dns set call from AppMode path newBraveDNSLocal :$path")
             try{

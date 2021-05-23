@@ -315,9 +315,15 @@
     <string name="private_dns_toast">Private DNS has been set.</string>
     <string name="always_on_dialog_heading">Disable Always-on VPN</string>
     <string name="always_on_dialog">\"Always-On VPN\" is enabled on this device. To start RethinkDNS, please go to Settings app and disable \"Always-on VPN\".</string>
-    <string name="always_on_rethink_enabled">\"Always-on VPN\" enabled. Go to Settings app and disable \"Always-on VPN\" setting to stop RethinkDNS.</string>
     <string name="always_on_dialog_positive_btn">Go to Settings</string>
     <string name="always_on_dialog_negative_btn">Cancel</string>
+
+    <string name="always_on_dialog_stop_heading">Stop RethinkDNS</string>
+    <string name="always_on_dialog_stop_message">Always-on VPN is enabled. Are you sure you want to stop RethinkDNS anyway?</string>
+    <string name="always_on_dialog_lockdown_stop_message">RethinkDNS is running VPN in lockdown mode. Stopping it would result in loss of Internet connectivity on this user profile. Do you want to continue anyway?</string>
+    <string name="always_on_dialog_positive">Stop</string>
+    <string name="always_on_dialog_negative">Cancel</string>
+    <string name="always_on_dialog_neutral">Settings</string>
 
     <string name="system_apps_warning_title">Block System Apps</string>
     <string name="system_components_warning_title">Block System Components</string>
@@ -610,9 +616,9 @@
     <string name="settings_autostart_bootup_heading">Auto-start on power-up (experimental)</string>
     <string name="settings_autostart_bootup_desc">On device power-up, start RethinkDNS if it was running before shut down.</string>
 
-    <string name="settings_network_header">NETWORK(experimental)</string>
-    <string name="settings_network_all_network">Use all available networks</string>
-    <string name="settings_network_all_network_desc">When enabled, RethinkDNS uses all available networks to connect to the Internet. If not, it uses the one network, whichever is deemed active by Android.</string>
+    <string name="settings_network_header">NETWORK</string>
+    <string name="settings_network_all_networks">Use all available networks (experimental)</string>
+    <string name="settings_network_all_networks_desc">When enabled, RethinkDNS uses all available networks to connect to the Internet. If not, it uses the one network, whichever is deemed active by Android.</string>
 
     <string name="settings_local_blockList_desc1">Choose from 170+ blocklists.</string>
     <string name="settings_local_blocklist_desc2">Download in progress…</string>
@@ -682,12 +688,12 @@
     <string name="settings_notification_desc">Choose which action buttons to show with the RethinkDNS notification: %1$s</string>
     <string name="settings_notification_desc1">Stop (default)</string>
     <string name="settings_notification_desc2">DNS / DNS + Firewall</string>
-    <string name="settings_notification_desc3">Empty</string>
+    <string name="settings_notification_desc3">None</string>
 
     <string name="settings_notification_dialog_title">Notification Action</string>
-    <string name="settings_notification_dialog_option_1">Stop (default): Shows one button, tapping on which stops RethinkDNS</string>
-    <string name="settings_notification_dialog_option_2">DNS / DNS + Firewall: Shows two buttons to quickly switch between the battery-saver DNS mode and the regular DNS + Firewall mode.</string>
-    <string name="settings_notification_dialog_option_3">Empty: Shows no button.</string>
+    <string name="settings_notification_dialog_option_1">\nStop (default):\nShows one button, tapping on which stops RethinkDNS.\n</string>
+    <string name="settings_notification_dialog_option_2">\nDNS / DNS + Firewall:\nShows two buttons to quickly switch between the battery-saver DNS mode and the regular DNS + Firewall mode.\n</string>
+    <string name="settings_notification_dialog_option_3">None:\nShows no button.</string>
 
     <string name="settings_selected_theme">Current theme: %1$s</string>
 

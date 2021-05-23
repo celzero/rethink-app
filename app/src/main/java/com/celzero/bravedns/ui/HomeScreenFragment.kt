@@ -22,10 +22,12 @@ import android.net.ConnectivityManager
 import android.net.LinkProperties
 import android.net.NetworkCapabilities
 import android.net.VpnService
+import android.os.Build
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.provider.Settings.ACTION_VPN_SETTINGS
 import android.text.TextUtils
 import android.text.format.DateUtils
 import android.text.format.DateUtils.FORMAT_ABBREV_RELATIVE
@@ -270,7 +272,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 b.fhsCardFirewallConfigure.setTextColor(fetchTextColor(R.color.textColorMain))
                 braveModeToggler.postValue(braveMode)
                 b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_disconnected)
-                stopDnsVpnService()
+                stopVpnService()
             } else {
                 b.fhsCardDnsConfigure.alpha = 1F
                 b.fhsCardFirewallConfigure.alpha = 1F
@@ -287,7 +289,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 prepareAndStartDnsVpn()
             }
         } else if (status) {
-            Utilities.showToastInMidLayout(requireContext(), getString(R.string.always_on_rethink_enabled), Toast.LENGTH_SHORT)
+            showStopDialogAlwaysOn()
         }
         object : CountDownTimer(500, 500) {
             override fun onTick(millisUntilFinished: Long) {
@@ -297,6 +299,60 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 b.fhsDnsOnOffBtn.isEnabled = true
             }
         }.start()
+    }
+
+    private fun showStopDialogAlwaysOn() {
+        val builder = AlertDialog.Builder(requireContext())
+        var isLockDownEnabled = false
+        if (VERSION.SDK_INT >= VERSION_CODES.Q) {
+            val vpnService = VpnController.getInstance().getBraveVpnService()
+            if (vpnService != null) {
+                isLockDownEnabled = vpnService.isLockdownEnabled
+            }
+        }
+        //set title for alert dialog
+        builder.setTitle(R.string.always_on_dialog_stop_heading)
+        if (isLockDownEnabled) {
+            //set message for alert dialog
+            builder.setMessage(R.string.always_on_dialog_lockdown_stop_message)
+        } else {
+            //set message for alert dialog
+            builder.setMessage(R.string.always_on_dialog_stop_message)
+        }
+
+        builder.setCancelable(true)
+        //performing positive action
+        builder.setPositiveButton(R.string.always_on_dialog_positive) { _, _ ->
+            stopVpnService()
+        }
+
+        builder.setNegativeButton(R.string.always_on_dialog_negative) { _, _ ->
+        }
+
+        builder.setNeutralButton(R.string.always_on_dialog_neutral){ _, _ ->
+            openVPNProfile()
+        }
+
+        // Create the AlertDialog
+        val alertDialog: AlertDialog = builder.create()
+        // Set other dialog properties
+        alertDialog.setCancelable(false)
+        alertDialog.show()
+    }
+
+    private fun openVPNProfile() {
+        try {
+            val intent = if (VERSION.SDK_INT >= VERSION_CODES.N) {
+                Intent(ACTION_VPN_SETTINGS)
+            } else {
+                Intent("android.net.vpn.SETTINGS")
+            }
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Utilities.showToastInMidLayout(requireContext(), getString(R.string.vpn_profile_error), Toast.LENGTH_SHORT)
+            Log.w(LOG_TAG, "Exception while opening app info: ${e.message}", e)
+        }
     }
 
     private fun openBottomSheet() {
@@ -353,7 +409,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         // Set other dialog properties
         alertDialog.setCancelable(false)
         alertDialog.show()
-
     }
 
     override fun onResume() {
@@ -603,7 +658,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.shimmerViewContainer1.startShimmer()
     }
 
-    private fun stopDnsVpnService() {
+    private fun stopVpnService() {
         VpnController.getInstance().stop(context)
     }
 
@@ -678,7 +733,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         if (requestCode == REQUEST_CODE_PREPARE_VPN && resultCode == Activity.RESULT_OK) {
             startDnsVpnService()
         } else {
-            stopDnsVpnService()
+            stopVpnService()
         }
     }
 
@@ -769,10 +824,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             statusId = R.string.status_protected
         }
 
-        if(statusId == R.string.status_protected && persistentState.getOrbotModePersistence() != Constants.ORBAT_MODE_NONE){
-            statusId = R.string.status_protected_with_tor
-        }
-
         var colorId: Int
         colorId = if (status.on) {
             if (status.connectionState != BraveVPNService.State.FAILING) fetchTextColor(R.color.positive) else fetchTextColor(R.color.accent_bad)
@@ -787,6 +838,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         if (appMode?.getDNSType() == 3 && status.activationRequested) {
             statusId = R.string.status_protected
             colorId = fetchTextColor(R.color.positive)
+        }
+        if (statusId == R.string.status_protected && persistentState.getOrbotModePersistence() != Constants.ORBAT_MODE_NONE) {
+            statusId = R.string.status_protected_with_tor
         }
 
         b.fhsProtectionLevelTxt.setTextColor(colorId)

@@ -200,7 +200,7 @@ class DNSCryptEndpointAdapter(private val context: Context,
 
                 override fun onFinish() {
                     notifyDataSetChanged()
-                    persistentState.dnsType = Constants.DNS_TYPE_CRYPT_CHANGE
+                    persistentState.dnsType = Constants.PREF_DNS_MODE_DNSCRYPT
                     val connectedDNS = dnsCryptEndpointRepository.getConnectedCount()
                     val text = context.getString(R.string.configure_dns_crypt, connectedDNS)
                     persistentState.setConnectedDNS(text)

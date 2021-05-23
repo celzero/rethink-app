@@ -38,7 +38,6 @@ class PersistentState(private val context: Context):SimpleKrate(context) {
         const val DNS_TYPE = "dns_type"
         const val PROXY_MODE = "proxy_mode"
         const val ALLOW_BYPASS = "allow_bypass"
-        const val PRIVATE_DNS = "private_dns"
         const val EXCLUDE_FROM_VPN = "exclude_apps_vpn"
         const val IS_SCREEN_OFF = "screen_off"
         const val CONNECTION_CHANGE = "change_in_url"
@@ -74,7 +73,7 @@ class PersistentState(private val context: Context):SimpleKrate(context) {
     var udpBlockedSettings by booleanPref("block_udp_traffic_other_than_dns", false)
     var insertionCompleted by booleanPref("initial_insert_servers_complete", false)
     var remoteBraveDNSDownloaded by booleanPref("download_remote_block_list", false)
-    private var _localBlockListStamp by stringPref("local_block_list_stamp", "")
+    var localBlockListStamp by stringPref("local_block_list_stamp", "")
     var blockUnknownConnections by booleanPref("block_unknown_connections", false)
     var blockListFilesDownloaded by booleanPref("download_block_list_files", false)
     var localBlocklistEnabled by booleanPref("enable_local_list", false)
@@ -90,14 +89,12 @@ class PersistentState(private val context: Context):SimpleKrate(context) {
     var connectionModeChange by stringPref("change_in_url", "")
     var socks5Enabled by booleanPref("socks5_proxy", false)
     var killAppOnFirewall by booleanPref("kill_app_on_firewall", true)
-    var allowPrivateDNS by booleanPref("private_dns", false)
     var allowByPass by booleanPref("allow_bypass", true)
     var allowDNSTraffic by booleanPref("dns_all_traffic", true)
     var proxyMode by longPref("proxy_mode", Settings.ProxyModeNone)
     var dnsType by intPref("dns_type", 1)
     var prefAutoStartBootUp by booleanPref("auto_start_on_boot", true)
-    var _screenState by booleanPref("screen_state", false)
-    //private var _median90 by longPref("median_p90", 0)
+    var screenState by booleanPref("screen_state", false)
     private var _numberOfRequests by intPref("number_request", 0)
     var numberOfBlockedRequests by intPref("blocked_request", 0)
     var backgroundEnabled by booleanPref("background_mode", false)
@@ -109,7 +106,6 @@ class PersistentState(private val context: Context):SimpleKrate(context) {
     var isAddAllNetworks by booleanPref("add_all_networks_to_vpn", false)
 
     var orbotConnectionStatus : MutableLiveData<Boolean> = MutableLiveData()
-    //var orbotConnectionInitiated by booleanPref("orbot_connection_initiated", false)
     var orbotEnabled by booleanPref("orbot_enabled", false)
     private var orbotMode by intPref("orbot_mode", ORBAT_MODE_NONE)
     var downloadIDs by stringSetPref("download_ids", emptySet())
@@ -147,39 +143,8 @@ class PersistentState(private val context: Context):SimpleKrate(context) {
         _braveMode = mode
     }
 
-    fun setLocalBlockListStamp(stamp: String) {
-        if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(Constants.LOG_TAG, "In preference, Set local stamp: $stamp")
-        _localBlockListStamp = stamp
-    }
-
-    fun getLocalBlockListStamp(): String {
-        if (HomeScreenActivity.GlobalVariable.DEBUG)
-            Log.d(Constants.LOG_TAG, "In preference, Get local stamp: $_localBlockListStamp")
-        return _localBlockListStamp
-    }
-
-    fun setFirewallModeForScreenState(state : Boolean) {
-        // TODO Remove UI logic from settings
-        _screenState = state
-        if (state) {
-            HomeScreenActivity.GlobalVariable.isScreenLockedSetting = 1
-        } else {
-            HomeScreenActivity.GlobalVariable.isScreenLockedSetting = 0
-        }
-    }
-
-    fun getFirewallModeForScreenState() : Boolean{
-        // TODO Remove UI logic from settings
-        return when (HomeScreenActivity.GlobalVariable.isScreenLockedSetting) {
-            0 -> false
-            1 -> true
-            else -> _screenState
-        }
-    }
-
     fun setMedianLatency(medianP90 : Long){
         median50.postValue(medianP90)
-        //_median90 = medianP90
     }
 
     fun setNumOfReq(){
@@ -209,20 +174,6 @@ class PersistentState(private val context: Context):SimpleKrate(context) {
     fun setIsBackgroundEnabled(isEnabled: Boolean) {
         backgroundEnabled = isEnabled
         HomeScreenActivity.GlobalVariable.isBackgroundEnabled = backgroundEnabled
-    }
-
-    fun setScreenLockData(isEnabled : Boolean) {
-        HomeScreenActivity.GlobalVariable.isScreenLocked = if(isEnabled) 1
-        else 0
-        isScreenOff = isEnabled
-    }
-
-    fun getScreenLockData(): Boolean {
-        return when (HomeScreenActivity.GlobalVariable.isScreenLocked) {
-            0 -> false
-            1 -> true
-            else -> isScreenOff
-        }
     }
 
     //fixme replace the below logic once the DNS data is streamlined.

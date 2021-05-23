@@ -554,14 +554,14 @@
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/settings_network_all_network"
+                    android:text="@string/settings_network_all_networks"
                     android:textSize="@dimen/large_font_text_view" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="5dp"
-                    android:text="@string/settings_network_all_network_desc"
+                    android:text="@string/settings_network_all_networks_desc"
                     android:textSize="@dimen/default_font_text_view" />
             </LinearLayout>
 

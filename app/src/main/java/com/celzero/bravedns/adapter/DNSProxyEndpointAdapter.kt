@@ -219,7 +219,7 @@ class DNSProxyEndpointAdapter(private val context: Context,
             HomeScreenActivity.GlobalVariable.appMode?.setDNSMode(Settings.DNSModeProxyIP)
         }
         listener.updateUIFromAdapter(3)
-        persistentState.dnsType = Constants.DNS_TYPE_PROXY_CHANGE
+        persistentState.dnsType = Constants.PREF_DNS_MODE_PROXY
         persistentState.setConnectedDNS(dnsProxyEndpoint.proxyName)
         persistentState.connectionModeChange = dnsProxyEndpoint.proxyIP!!
         dnsProxyEndpointRepository.updateAsync(dnsProxyEndpoint)

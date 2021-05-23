@@ -168,13 +168,13 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
 
         when (persistentState.notificationAction) {
-            0 -> {
+            Constants.NOTIFICATION_ACTION_STOP -> {
                 b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,getString(R.string.settings_notification_desc1) )
             }
-            1 -> {
+            Constants.NOTIFICATION_ACTION_DNS_FIREWALL -> {
                 b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,getString(R.string.settings_notification_desc2) )
             }
-            2 -> {
+            Constants.NOTIFICATION_ACTION_NONE -> {
                 b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,getString(R.string.settings_notification_desc3) )
             }
         }
@@ -495,7 +495,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
         b.settingsActivityOnDeviceBlockConfigureBtn.setOnClickListener {
             val intent = Intent(requireContext(), DNSConfigureWebViewActivity::class.java)
-            val stamp = persistentState.getLocalBlockListStamp()
+            val stamp = persistentState.localBlockListStamp
             if (DEBUG) Log.d(LOG_TAG, "$FILETAG Stamp value in settings screen - $stamp")
             intent.putExtra(Constants.LOCATION_INTENT_EXTRA, DNSConfigureWebViewActivity.LOCAL)
             intent.putExtra(Constants.STAMP_INTENT_EXTRA, stamp)
@@ -668,17 +668,17 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             dialog.dismiss()
             if (persistentState.notificationAction != which) {
                 when (which) {
-                    Constants.NOTIFICATION_STOP -> {
+                    Constants.NOTIFICATION_ACTION_STOP -> {
                         b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,getString(R.string.settings_notification_desc1) )
-                        persistentState.notificationAction = Constants.NOTIFICATION_STOP
+                        persistentState.notificationAction = Constants.NOTIFICATION_ACTION_STOP
                     }
-                    Constants.NOTIFICATION_DNS_FIREWALL -> {
+                    Constants.NOTIFICATION_ACTION_DNS_FIREWALL -> {
                         b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,getString(R.string.settings_notification_desc2) )
-                        persistentState.notificationAction = Constants.NOTIFICATION_DNS_FIREWALL
+                        persistentState.notificationAction = Constants.NOTIFICATION_ACTION_DNS_FIREWALL
                     }
-                    Constants.NOTIFICATION_NO_ACTION -> {
+                    Constants.NOTIFICATION_ACTION_NONE -> {
                         b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,getString(R.string.settings_notification_desc3) )
-                        persistentState.notificationAction = Constants.NOTIFICATION_NO_ACTION
+                        persistentState.notificationAction = Constants.NOTIFICATION_ACTION_NONE
                     }
                 }
             }
@@ -696,7 +696,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blockList_desc1)
         }else {
             val count = persistentState.numberOfLocalBlocklists
-            if (persistentState.localBlocklistEnabled && persistentState.blockListFilesDownloaded && persistentState.getLocalBlockListStamp().isNotEmpty()) {
+            if (persistentState.localBlocklistEnabled && persistentState.blockListFilesDownloaded && persistentState.localBlockListStamp.isNotEmpty()) {
                 if(count !=0 ){
                     b.settingsActivityOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_in_use, count.toString())
                 }else {

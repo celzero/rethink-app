@@ -141,18 +141,18 @@ class Constants {
         const val THEME_TRUE_BLACK = 3
 
         // Notification action buttons
-        const val NOTIFICATION_STOP = 0
-        const val NOTIFICATION_DNS_FIREWALL = 1
-        const val NOTIFICATION_NO_ACTION = 2
+        const val NOTIFICATION_ACTION_STOP = 0
+        const val NOTIFICATION_ACTION_DNS_FIREWALL = 1
+        const val NOTIFICATION_ACTION_NONE= 2
 
         //DNS MODES
-        const val DNS_MODE = 0
-        const val FIREWALL_MODE = 1
-        const val DNS_FIREWALL_MODE = 2
+        const val APP_MODE_DNS = 0
+        const val APP_MODE_FIREWALL = 1
+        const val APP_MODE_DNS_FIREWALL = 2
 
         //DNS TYPES
-        const val DNS_TYPE_PROXY_CHANGE = 3
-        const val DNS_TYPE_CRYPT_CHANGE = 2
-        const val DNS_TYPE_DNS_CHANGE = 1
+        const val PREF_DNS_MODE_PROXY = 3
+        const val PREF_DNS_MODE_DNSCRYPT = 2
+        const val PREF_DNS_MODE_DOH = 1
     }
 }

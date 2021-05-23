@@ -22,12 +22,14 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.res.Configuration
 import android.net.Uri
 import android.net.VpnService
 import android.os.Build
 import android.text.TextUtils
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ProxyEndpoint
@@ -276,6 +278,7 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
         val contentText = context.resources.getString(R.string.settings_orbot_notification_content)
         builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(mainActivityIntent).setContentText(contentText)
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
+        builder.color = ContextCompat.getColor(context, fetchColor(context))
         val openIntent = getOrbotOpenIntent(context)
         val notificationAction : NotificationCompat.Action = NotificationCompat.Action(0, context.resources.getString(R.string.settings_orbot_notification_action), openIntent)
         builder.addAction(notificationAction)
@@ -286,6 +289,31 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
 
         builder.build()
         return builder
+    }
+
+    private fun fetchColor(context : Context): Int {
+        return when (persistentState.theme) {
+            Constants.THEME_SYSTEM_DEFAULT -> {
+                if (isDarkThemeOn(context)) {
+                    R.color.accentGoodBlack
+                } else {
+                    R.color.negative_white
+                }
+            }
+            Constants.THEME_LIGHT -> {
+                R.color.negative_white
+            }
+            Constants.THEME_DARK -> {
+                R.color.accent_good
+            }
+            else -> {
+                R.color.accentGoodBlack
+            }
+        }
+    }
+
+    private fun isDarkThemeOn(context : Context): Boolean {
+        return context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
     private fun getOrbotOpenIntent(context: Context): PendingIntent? {

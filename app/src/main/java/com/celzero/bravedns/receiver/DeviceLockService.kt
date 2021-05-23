@@ -66,9 +66,9 @@ class DeviceLockService  : Service(){
             this.stopSelf()
         } else {
             if (isProtected && isLocked) {
-                if (persistentState.getFirewallModeForScreenState() && !persistentState.getScreenLockData()) {
+                if (persistentState.screenState && !persistentState.isScreenOff) {
                     if(DEBUG) Log.d(LOG_TAG,"DeviceLockService : Screen lock detected at $delayIndex")
-                    persistentState.setScreenLockData(true)
+                    persistentState.isScreenOff = true
                     checkLockTask?.cancel()
                     timer.cancel()
                     this.stopSelf()

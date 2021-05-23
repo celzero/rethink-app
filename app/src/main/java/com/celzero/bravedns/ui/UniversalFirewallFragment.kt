@@ -106,22 +106,22 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
 
         if (DEBUG) Log.d(LOG_TAG, "UniversalFirewallFragment - post observer")
 
-        includeView.firewallAllAppsCheck.isChecked = persistentState.getFirewallModeForScreenState()
+        includeView.firewallAllAppsCheck.isChecked = persistentState.screenState
 
         includeView.firewallUdpConnectionModeCheck.isChecked = persistentState.udpBlockedSettings
         includeView.firewallUnknownConnectionModeCheck.isChecked = persistentState.blockUnknownConnections
 
         includeView.firewallAllAppsCheck.setOnCheckedChangeListener { _, b ->
-            persistentState.setFirewallModeForScreenState(b)
+            persistentState.screenState = b
         }
 
         includeView.firewallAllAppsTxt.setOnClickListener {
-            if (persistentState.getFirewallModeForScreenState()) {
+            if (persistentState.screenState) {
                 includeView.firewallAllAppsCheck.isChecked = false
-                persistentState.setFirewallModeForScreenState(false)
+                persistentState.screenState = false
             } else {
                 includeView.firewallAllAppsCheck.isChecked = true
-                persistentState.setFirewallModeForScreenState(true)
+                persistentState.screenState = true
             }
         }
 
