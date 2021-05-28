@@ -159,6 +159,7 @@ class ConnectionMonitor(context: Context, val networkListener: NetworkListener) 
             val newActiveNetwork = connectionMonitor.connectivityManager.activeNetwork
             val newNetworks = createNetworksSet(newActiveNetwork)
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
+
             currentNetworks = newNetworks
             Log.i(LOG_TAG, "$FILE_LOG_TAG - is Network connected?- ${connectionMonitor.connectivityManager.getNetworkInfo(newActiveNetwork)?.typeName.toString()}, $isNewNetwork, force update is $isForceUpdate")
             if (!isNewNetwork && !isForceUpdate) return
@@ -172,6 +173,7 @@ class ConnectionMonitor(context: Context, val networkListener: NetworkListener) 
             val newActiveNetwork = connectionMonitor.connectivityManager.activeNetwork
             val newNetworks = createNetworksSet(newActiveNetwork, true)
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
+
             Log.i(LOG_TAG, "$FILE_LOG_TAG - process message MESSAGE_AVAILABLE_NETWORK, ${currentNetworks.size},${newNetworks.size}. isNewNetwork - $isNewNetwork, force update is $isForceUpdate")
             currentNetworks = newNetworks
             if (!isNewNetwork && !isForceUpdate) return
