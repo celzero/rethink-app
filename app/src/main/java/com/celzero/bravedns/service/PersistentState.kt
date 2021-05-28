@@ -16,6 +16,7 @@
 package com.celzero.bravedns.service
 
 import android.content.Context
+import android.os.SystemClock
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.BuildConfig
@@ -23,11 +24,11 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.connectedDNS
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.lifeTimeQueries
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.ORBAT_MODE_NONE
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.ORBOT_MODE_NONE
 import hu.autsoft.krate.*
 import settings.Settings
 
@@ -45,7 +46,6 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
         const val LOCAL_BLOCK_LIST_STAMP = "local_block_list_stamp"
         const val BLOCK_UNKNOWN_CONNECTIONS = "block_unknown_connections"
         const val HTTP_PROXY_ENABLED = "http_proxy_enabled"
-        const val DNS_PROXY_ID = "dns_proxy_change"
         const val BLOCK_UDP_OTHER_THAN_DNS = "block_udp_traffic_other_than_dns"
         const val ORBOT_MODE_CHANGE = "orbot_mode_enabled"
         const val NETWORK = "add_all_network_VPN"
@@ -97,7 +97,7 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
     var screenState by booleanPref("screen_state", false)
     private var _numberOfRequests by intPref("number_request", 0)
     var numberOfBlockedRequests by intPref("blocked_request", 0)
-    var backgroundEnabled by booleanPref("background_mode", false)
+    var isBackgroundEnabled by booleanPref("background_mode", false)
     var checkForAppUpdate by booleanPref("check_for_app_update", true)
     var isScreenOff by booleanPref("screen_off", false)
     private var connectedDNSName by stringPref("connected_dns_name", "RethinkDNS Basic")
@@ -107,17 +107,17 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var orbotEnabled by booleanPref("orbot_enabled", false)
-    private var orbotMode by intPref("orbot_mode", ORBAT_MODE_NONE)
+    var orbotMode by intPref("orbot_mode", ORBOT_MODE_NONE)
     var downloadIDs by stringSetPref("download_ids", emptySet())
-    var orbotEnabledMode by intPref("orbot_mode_enabled", ORBAT_MODE_NONE)
+    var orbotEnabledMode by intPref("orbot_mode_enabled", ORBOT_MODE_NONE)
 
     var fetchFavIcon by booleanPref("fav_icon_enabled", BuildConfig.FLAVOR != Constants.FLAVOR_FDROID)
 
     var isAccessibilityCrashDetected by booleanPref("accessibility_crash", false)
 
-    var orbotModeConst: Int = 0
-    var median50: MutableLiveData<Long> = MutableLiveData()
+    var median: MutableLiveData<Long> = MutableLiveData()
     var blockedCount: MutableLiveData<Int> = MutableLiveData()
+    var networkRequestHeartbeatTimestamp : Long = 0L
 
     fun wifiAllowed(forPackage: String): Boolean = !excludedPackagesWifi.contains(forPackage)
 
@@ -137,32 +137,34 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
         }
     }
 
-    fun getBraveMode() = if (braveMode == -1) _braveMode else braveMode // TODO remove app logic from settings
+    fun getBraveMode() = _braveMode // TODO remove app logic from settings
 
     fun setBraveMode(mode: Int) {
         _braveMode = mode
     }
 
-    fun setMedianLatency(medianP90: Long) {
-        median50.postValue(medianP90)
+    fun setMedianLatency(median: Long) {
+        this.median.postValue(median)
     }
 
-    fun setNumOfReq() {
+    fun setLifetimeQueries() {
         val numReq = if (lifeTimeQueries > 0) lifeTimeQueries + 1
         else {
             _numberOfRequests + 1
         }
-        _numberOfRequests = numReq
         lifeTimeQueries = numReq
-        HomeScreenActivity.GlobalVariable.lifeTimeQ.postValue(numReq)
+        val now = SystemClock.elapsedRealtime()
+        if (Math.abs(now - networkRequestHeartbeatTimestamp) > Constants.NETWORK_REQUEST_WRITE_THRESHOLD_MS) {
+            networkRequestHeartbeatTimestamp = now
+            _numberOfRequests = numReq
+            HomeScreenActivity.GlobalVariable.lifeTimeQ.postValue(numReq)
+        }
     }
 
-    fun getNumOfReq(): Int {
+    fun getLifetimeQueries(): Int {
         if (lifeTimeQueries >= 0) {
-            HomeScreenActivity.GlobalVariable.lifeTimeQ.postValue(lifeTimeQueries)
             return lifeTimeQueries
         }
-        HomeScreenActivity.GlobalVariable.lifeTimeQ.postValue(_numberOfRequests)
         return _numberOfRequests
     }
 
@@ -171,24 +173,20 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
         blockedCount.postValue(numberOfBlockedRequests)
     }
 
-    fun setIsBackgroundEnabled(isEnabled: Boolean) {
-        backgroundEnabled = isEnabled
-        HomeScreenActivity.GlobalVariable.isBackgroundEnabled = backgroundEnabled
-    }
-
     //fixme replace the below logic once the DNS data is streamlined.
     fun getConnectedDNS(): String {
         if (connectedDNS.value.isNullOrEmpty()) {
             val dnsType = appMode?.getDNSType()
-            return if (dnsType == 1) {
+            return if (dnsType == Constants.PREF_DNS_MODE_DOH) {
                 val dohDetail: DoHEndpoint?
                 try {
                     dohDetail = appMode?.getDOHDetails()
                     dohDetail?.dohName!!
                 } catch (e: Exception) {
+                    Log.e(LOG_TAG, "Exception while fetching DOH from the database", e)
                     connectedDNSName
                 }
-            } else if (dnsType == 2) {
+            } else if (dnsType == Constants.PREF_DNS_MODE_DNSCRYPT) {
                 if (appMode?.getDNSCryptServerCount() != null) {
                     val cryptDetails = appMode?.getDNSCryptServerCount()
                     context.getString(R.string.configure_dns_crypt, cryptDetails.toString())
@@ -205,15 +203,5 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
     fun setConnectedDNS(name: String) {
         connectedDNS.postValue(name)
         connectedDNSName = name
-    }
-
-    fun setOrbotModePersistence(mode: Int) {
-        orbotModeConst = mode
-        orbotMode = mode
-    }
-
-    fun getOrbotModePersistence(): Int {
-        if (orbotModeConst == 0) return orbotMode
-        else return orbotModeConst
     }
 }

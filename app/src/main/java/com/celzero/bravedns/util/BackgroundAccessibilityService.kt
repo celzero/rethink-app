@@ -21,10 +21,14 @@ import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
+import org.koin.android.ext.android.inject
 
 class BackgroundAccessibilityService  : AccessibilityService() {
 
     private val firewallManager = FirewallManager(this)
+    private val persistentState by inject<PersistentState>()
     override fun onInterrupt() {
         Log.w("BraveDNS","BackgroundAccessibilityService Interrupted")
     }
@@ -92,7 +96,7 @@ class BackgroundAccessibilityService  : AccessibilityService() {
         /*Log.w("______","onAEvent: sourcepack " + event.source?.packageName + " text? " +
                 eventText + " class? " + event.className +
                 " package? ppp " + event.packageName)*/
-        if(BraveVPNService.isBackgroundEnabled) {
+        if(persistentState.isBackgroundEnabled) {
             firewallManager.onAccessibilityEvent(event, rootInActiveWindow)
         }
     }

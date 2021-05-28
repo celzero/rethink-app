@@ -103,7 +103,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         var cryptRelayToRemove: String = ""
 
         var appStartTime: Long = System.currentTimeMillis()
-        var isBackgroundEnabled: Boolean = false
         var firewallRules: HashMultimap<Int, String> = HashMultimap.create()
         var DEBUG = false
     }
@@ -170,7 +169,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
 
         persistentState.isScreenOff = false
-        lifeTimeQ.postValue(persistentState.getNumOfReq())
+        lifeTimeQ.postValue(persistentState.getLifetimeQueries())
         initUpdateCheck()
 
         backgroundAccessibilityCheck()
@@ -179,8 +178,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     private fun backgroundAccessibilityCheck() {
         if (Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)) {
-            if (!Utilities.isAccessibilityServiceEnabled(this, BackgroundAccessibilityService::class.java) && persistentState.backgroundEnabled) {
-                persistentState.backgroundEnabled = false
+            if (!Utilities.isAccessibilityServiceEnabled(this, BackgroundAccessibilityService::class.java) && persistentState.isBackgroundEnabled) {
+                persistentState.isBackgroundEnabled = false
                 persistentState.isAccessibilityCrashDetected = true
             }
         }
@@ -533,7 +532,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     override fun onResume() {
         super.onResume()
-        GlobalVariable.isBackgroundEnabled = persistentState.backgroundEnabled
         refreshDatabase.refreshAppInfoDatabase()
     }
 

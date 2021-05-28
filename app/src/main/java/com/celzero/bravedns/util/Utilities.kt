@@ -24,6 +24,7 @@ import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
+import android.content.res.Configuration
 import android.graphics.Color
 import android.provider.Settings
 import android.text.TextUtils.SimpleStringSplitter
@@ -36,6 +37,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
+import com.celzero.bravedns.R
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
@@ -249,6 +251,20 @@ class Utilities {
                 names[type]
             } else String.format(Locale.ROOT, "%d", type)
         }
+
+        fun fetchColor(context: Context): Int {
+            return if (isDarkThemeOn(context)) {
+                R.color.accentGoodBlack
+            } else {
+                R.color.negative_white
+            }
+        }
+
+        private fun isDarkThemeOn(context: Context): Boolean {
+            return context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        }
+
+
 
     }
 }

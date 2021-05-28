@@ -100,12 +100,11 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
             showDialogForDelete()
         }
 
-        persistentState.getNumOfReq()
+        persistentState.getLifetimeQueries()
         registerForObservers()
     }
 
     private fun registerForObservers(){
-
         lifeTimeQ.observe(viewLifecycleOwner, {
             val lifeTimeConversion = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT).format(lifeTimeQ.value)

@@ -129,8 +129,8 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         b.bsOrbotRadioNone.setOnClickListener{
             if (b.bsOrbotRadioNone.isChecked) {
                 HomeScreenActivity.GlobalVariable.appMode?.setProxyMode(settings.Settings.ProxyModeNone)
-                persistentState.setOrbotModePersistence(Constants.ORBAT_MODE_NONE)
-                persistentState.orbotEnabledMode = Constants.ORBAT_MODE_NONE
+                persistentState.orbotMode = Constants.ORBOT_MODE_NONE
+                persistentState.orbotEnabledMode = Constants.ORBOT_MODE_NONE
                 b.bsOrbotRadioNone.isChecked = true
                 persistentState.orbotEnabled = false
                 persistentState.orbotConnectionStatus.postValue(false)
@@ -142,8 +142,8 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         b.bsOrbotNoneRl.setOnClickListener{
             if (!b.bsOrbotRadioNone.isChecked) {
                 HomeScreenActivity.GlobalVariable.appMode?.setProxyMode(settings.Settings.ProxyModeNone)
-                persistentState.setOrbotModePersistence(Constants.ORBAT_MODE_NONE)
-                persistentState.orbotEnabledMode = Constants.ORBAT_MODE_NONE
+                persistentState.orbotMode = Constants.ORBOT_MODE_NONE
+                persistentState.orbotEnabledMode = Constants.ORBOT_MODE_NONE
                 persistentState.orbotEnabled = false
                 b.bsOrbotRadioNone.isChecked = true
                 persistentState.orbotConnectionStatus.postValue(false)
@@ -154,7 +154,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
 
         b.bsOrbotRadioSocks5.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
             if (isSelected) {
-                persistentState.setOrbotModePersistence(Constants.ORBAT_MODE_SOCKS5)
+                persistentState.orbotMode = Constants.ORBOT_MODE_SOCKS5
                 persistentState.orbotConnectionStatus.postValue(true)
                 enableLoading()
                 enableSOCKS5Orbot()
@@ -163,7 +163,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
 
         b.bsSocks5OrbotRl.setOnClickListener {
             if (!b.bsOrbotRadioSocks5.isChecked) {
-                persistentState.setOrbotModePersistence(Constants.ORBAT_MODE_SOCKS5)
+                persistentState.orbotMode = Constants.ORBOT_MODE_SOCKS5
                 b.bsOrbotRadioSocks5.isChecked = true
                 persistentState.orbotConnectionStatus.postValue(true)
                 enableLoading()
@@ -173,7 +173,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
 
         b.bsOrbotRadioHttp.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
             if (isSelected) {
-                persistentState.setOrbotModePersistence(Constants.ORBAT_MODE_HTTP)
+                persistentState.orbotMode = Constants.ORBOT_MODE_HTTP
                 persistentState.orbotConnectionStatus.postValue(true)
                 enableLoading()
                 enableHTTPOrbot()
@@ -182,7 +182,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
 
         b.bsOrbotHttpRl.setOnClickListener{
             if (!b.bsOrbotRadioHttp.isChecked) {
-                persistentState.setOrbotModePersistence(Constants.ORBAT_MODE_HTTP)
+                persistentState.orbotMode = Constants.ORBOT_MODE_HTTP
                 persistentState.orbotConnectionStatus.postValue(true)
                 b.bsOrbotRadioHttp.isChecked = true
                 enableLoading()
@@ -192,7 +192,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
 
         b.bsOrbotRadioBoth.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
             if (isSelected) {
-                persistentState.setOrbotModePersistence(Constants.ORBAT_MODE_BOTH)
+                persistentState.orbotMode = Constants.ORBOT_MODE_BOTH
                 persistentState.orbotConnectionStatus.postValue(true)
                 enableLoading()
                 enableSOCKS5HTTPOrbot()
@@ -201,7 +201,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
 
         b.bsOrbotBothRl.setOnClickListener{
             if (!b.bsOrbotRadioBoth.isChecked) {
-                persistentState.setOrbotModePersistence(Constants.ORBAT_MODE_BOTH)
+                persistentState.orbotMode = Constants.ORBOT_MODE_BOTH
                 persistentState.orbotConnectionStatus.postValue(true)
                 enableLoading()
                 b.bsOrbotRadioBoth.isChecked = true
@@ -228,23 +228,23 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun updateUI(){
-        when (persistentState.getOrbotModePersistence()) {
-            Constants.ORBAT_MODE_SOCKS5 -> {
+        when (persistentState.orbotMode) {
+            Constants.ORBOT_MODE_SOCKS5 -> {
                 b.bsOrbotRadioSocks5.isChecked = true
                 b.orbotIcon.setImageResource(R.drawable.orbot_enabled)
                 b.orbotStatus.text = getString(R.string.orbot_bs_status_1)
             }
-            Constants.ORBAT_MODE_HTTP -> {
+            Constants.ORBOT_MODE_HTTP -> {
                 b.bsOrbotRadioHttp.isChecked = true
                 b.orbotIcon.setImageResource(R.drawable.orbot_enabled)
                 b.orbotStatus.text = getString(R.string.orbot_bs_status_2)
             }
-            Constants.ORBAT_MODE_BOTH -> {
+            Constants.ORBOT_MODE_BOTH -> {
                 b.bsOrbotRadioBoth.isChecked = true
                 b.orbotIcon.setImageResource(R.drawable.orbot_enabled)
                 b.orbotStatus.text = getString(R.string.orbot_bs_status_3)
             }
-            Constants.ORBAT_MODE_NONE -> {
+            Constants.ORBOT_MODE_NONE -> {
                 b.bsOrbotRadioNone.isChecked = true
                 b.bsOrbotRadioSocks5.isChecked = false
                 b.bsOrbotRadioHttp.isChecked = false

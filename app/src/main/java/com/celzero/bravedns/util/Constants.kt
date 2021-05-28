@@ -107,10 +107,10 @@ class Constants {
 
         const val ORBOT_SOCKS = 10L
 
-        const val ORBAT_MODE_NONE = 1
-        const val ORBAT_MODE_SOCKS5 = 2
-        const val ORBAT_MODE_HTTP = 3
-        const val ORBAT_MODE_BOTH = 4
+        const val ORBOT_MODE_NONE = 1
+        const val ORBOT_MODE_SOCKS5 = 2
+        const val ORBOT_MODE_HTTP = 3
+        const val ORBOT_MODE_BOTH = 4
 
         //Application download source
         const val DOWNLOAD_SOURCE_PLAY_STORE = 1
@@ -127,6 +127,7 @@ class Constants {
         const val STOP_VPN_NOTIFICATION_ACTION = "RETHINK_STOP"
         const val DNS_VPN_NOTIFICATION_ACTION = "RETHINK_DNSONLY" // battery-saver dns-only
         const val DNS_FIREWALL_VPN_NOTIFICATION_ACTION = "RETHINK_FULLMODE" // default dns+firewall
+        const val RULES_FAILURE_NOTIFICATION_ACTION = "RETHINK_RULES_RELOAD" //
 
         const val NXDOMAIN = "NXDOMAIN"
 
@@ -154,5 +155,8 @@ class Constants {
         const val PREF_DNS_MODE_PROXY = 3
         const val PREF_DNS_MODE_DNSCRYPT = 2
         const val PREF_DNS_MODE_DOH = 1
+
+        val ACCESSIBILITY_SERVICE_HEARTBEAT_THRESHOLD_MS = TimeUnit.MINUTES.toMillis(5)
+        val NETWORK_REQUEST_WRITE_THRESHOLD_MS = TimeUnit.MINUTES.toMillis(1)
     }
 }

@@ -137,7 +137,7 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
             if (dnsLogs.isBlocked) {
                 persistentState.incrementBlockedReq()
             }
-            persistentState.setNumOfReq()
+            persistentState.setLifetimeQueries()
             dnsLogRepository.insertAsync(dnsLogs)
             fetchFavIcon(dnsLogs)
         }

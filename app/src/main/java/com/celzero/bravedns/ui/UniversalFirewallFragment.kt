@@ -116,13 +116,8 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         }
 
         includeView.firewallAllAppsTxt.setOnClickListener {
-            if (persistentState.screenState) {
-                includeView.firewallAllAppsCheck.isChecked = false
-                persistentState.screenState = false
-            } else {
-                includeView.firewallAllAppsCheck.isChecked = true
-                persistentState.screenState = true
-            }
+            includeView.firewallAllAppsCheck.isChecked = !persistentState.screenState
+            persistentState.screenState = !persistentState.screenState
         }
 
         includeView.firewallUnknownConnectionModeCheck.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
@@ -151,23 +146,22 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
                     if (!Utilities.isAccessibilityServiceEnabled(requireContext(), BackgroundAccessibilityService::class.java)) {
                         if (!showAlertForPermission(true)) {
                             includeView.firewallBackgroundModeCheck.isChecked = false
-                            persistentState.setIsBackgroundEnabled(false)
+                            persistentState.isBackgroundEnabled = false
                         }
                     } else {
-                        GlobalVariable.isBackgroundEnabled = !checkedVal
-                        persistentState.setIsBackgroundEnabled(!checkedVal)
+                        persistentState.isBackgroundEnabled = !checkedVal
                         //persistentState.isAccessibilityCrashDetected = checkedVal
                         includeView.firewallBackgroundModeCheck.isChecked = !checkedVal
                     }
                 } else {
                     if (!showAlertForPermission(false)) {
                         includeView.firewallBackgroundModeCheck.isChecked = false
-                        persistentState.setIsBackgroundEnabled(false)
+                        persistentState.isBackgroundEnabled = false
                     }
                 }
             } else {
                 includeView.firewallBackgroundModeCheck.isChecked = false
-                persistentState.setIsBackgroundEnabled(false)
+                persistentState.isBackgroundEnabled = false
             }
         }
 
@@ -180,22 +174,21 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
                     if (!Utilities.isAccessibilityServiceEnabled(requireContext(), BackgroundAccessibilityService::class.java)) {
                         if (!showAlertForPermission(true)) {
                             includeView.firewallBackgroundModeCheck.isChecked = false
-                            persistentState.setIsBackgroundEnabled(false)
+                            persistentState.isBackgroundEnabled = false
                         }
                     }else {
-                        GlobalVariable.isBackgroundEnabled = !checkedVal
-                        persistentState.setIsBackgroundEnabled(!checkedVal)
+                        persistentState.isBackgroundEnabled = !checkedVal
                         includeView.firewallBackgroundModeCheck.isChecked = !checkedVal
                     }
                 } else {
                     if (!showAlertForPermission(false)) {
                         includeView.firewallBackgroundModeCheck.isChecked = false
-                        persistentState.setIsBackgroundEnabled(false)
+                        persistentState.isBackgroundEnabled = false
                     }
                 }
             } else {
                 includeView.firewallBackgroundModeCheck.isChecked = false
-                persistentState.setIsBackgroundEnabled(false)
+                persistentState.isBackgroundEnabled = false
             }
         }
 
@@ -333,15 +326,15 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         if (Utilities.isAccessibilityServiceEnabledEnhanced(requireContext(), BackgroundAccessibilityService::class.java)) {
             if(!Utilities.isAccessibilityServiceEnabled(requireContext(), BackgroundAccessibilityService::class.java) && persistentState.isAccessibilityCrashDetected){
                 b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = false
-                persistentState.backgroundEnabled = false
+                persistentState.isBackgroundEnabled = false
                 showAlertForPermission(true)
             }else{
                 if (DEBUG) Log.d(LOG_TAG, "Background - onLoad accessibility is true")
-                b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = persistentState.backgroundEnabled
+                b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = persistentState.isBackgroundEnabled
             }
         } else {
             if (DEBUG) Log.d(LOG_TAG, "Background - onLoad accessibility is true, changed pref")
-            persistentState.setIsBackgroundEnabled(false)
+            persistentState.isBackgroundEnabled = false
             b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = false
         }
     }
@@ -362,7 +355,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             }
             //performing negative action
             builder.setNegativeButton(getString(R.string.univ_accessibility_crash_dialog_negative)) { _, _ ->
-                persistentState.backgroundEnabled = false
+                persistentState.isBackgroundEnabled = false
                 persistentState.isAccessibilityCrashDetected  = false
             }
         } else {
@@ -375,7 +368,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             }
             //performing negative action
             builder.setNegativeButton(getString(R.string.univ_accessibility_dialog_negative)) { _, _ ->
-                persistentState.backgroundEnabled = false
+                persistentState.isBackgroundEnabled = false
             }
         }
 

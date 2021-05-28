@@ -34,6 +34,9 @@ import com.celzero.bravedns.ui.HomeScreenFragment
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -61,6 +64,18 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
             Constants.DNS_FIREWALL_VPN_NOTIFICATION_ACTION -> {
                 dnsFirewallMode()
                 manager.cancel(BraveVPNService.SERVICE_ID)
+            }
+            Constants.RULES_FAILURE_NOTIFICATION_ACTION -> {
+                reloadRules()
+                manager.cancel(BraveVPNService.SERVICE_ID)
+            }
+        }
+    }
+
+    private fun reloadRules() {
+        runBlocking {
+            withContext(Dispatchers.IO) {
+                VpnController.getInstance().getBraveVpnService()?.loadAppFirewallRules()
             }
         }
     }

@@ -22,7 +22,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.res.Configuration
 import android.net.Uri
 import android.net.VpnService
 import android.os.Build
@@ -41,6 +40,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Utilities.Companion.fetchColor
 import settings.Settings
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
@@ -83,7 +83,6 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
 
         private const val orbot = "ORBOT"
 
-        //const val ORBOT_NOTIFICATION_ACTION = "OPEN_ORBOT"
         const val ORBOT_NOTIFICATION_ACTION_TEXT = "OPEN_ORBOT_INTENT"
 
         //https://github.com/guardianproject/orbot/blob/master/orbotservice/src/main/java/org/torproject/android/service/TorServiceConstants.java
@@ -94,7 +93,7 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
 
         private const val EXTRA_STATUS = "org.torproject.android.intent.extra.STATUS"
 
-        private const val ORBOT_REQUEST_CODE = 200 //Orbot App
+        private const val ORBOT_REQUEST_CODE = 200 // Request code for the Orbot Notification.
     }
 
     var socks5Port: Int? = null
@@ -236,14 +235,14 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
      * The notification will be sent if the user not initiated the stop.
      */
     fun stopOrbot(context: Context, isUserInitiated: Boolean) {
-        if (!isUserInitiated && persistentState.getOrbotModePersistence() != Constants.ORBAT_MODE_NONE) {
+        if (!isUserInitiated && persistentState.orbotMode != Constants.ORBOT_MODE_NONE) {
             val notificationManager = context.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.cancelAll()
             val builder = createNotification(context)
             notificationManager.notify(ORBOT_SERVICE_ID, builder.build())
         }
-        persistentState.setOrbotModePersistence(Constants.ORBAT_MODE_NONE)
-        persistentState.orbotEnabledMode = Constants.ORBAT_MODE_NONE
+        persistentState.orbotMode = Constants.ORBOT_MODE_NONE
+        persistentState.orbotEnabledMode = Constants.ORBOT_MODE_NONE
         persistentState.orbotConnectionStatus.postValue(false)
         persistentState.orbotEnabled = false
         persistentState.httpProxyPort = 0
@@ -291,31 +290,6 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
         return builder
     }
 
-    private fun fetchColor(context : Context): Int {
-        return when (persistentState.theme) {
-            Constants.THEME_SYSTEM_DEFAULT -> {
-                if (isDarkThemeOn(context)) {
-                    R.color.accentGoodBlack
-                } else {
-                    R.color.negative_white
-                }
-            }
-            Constants.THEME_LIGHT -> {
-                R.color.negative_white
-            }
-            Constants.THEME_DARK -> {
-                R.color.accent_good
-            }
-            else -> {
-                R.color.accentGoodBlack
-            }
-        }
-    }
-
-    private fun isDarkThemeOn(context : Context): Boolean {
-        return context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-    }
-
     private fun getOrbotOpenIntent(context: Context): PendingIntent? {
         val intentAction = Intent(context, NotificationActionReceiver::class.java)
         intentAction.putExtra(Constants.NOTIFICATION_ACTION, ORBOT_NOTIFICATION_ACTION_TEXT)
@@ -333,24 +307,24 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
 
 
     private fun setOrbotMode() {
-        if (persistentState.getOrbotModePersistence() == Constants.ORBAT_MODE_SOCKS5) {
+        if (persistentState.orbotMode == Constants.ORBOT_MODE_SOCKS5) {
             val proxyEndpoint = constructProxy()
             if (proxyEndpoint != null) {
                 proxyEndpointRepository.clearOrbotData()
                 proxyEndpointRepository.insertAsync(proxyEndpoint)
             }
             HomeScreenActivity.GlobalVariable.appMode?.setProxyMode(Constants.ORBOT_SOCKS)
-            persistentState.orbotEnabledMode = Constants.ORBAT_MODE_SOCKS5
+            persistentState.orbotEnabledMode = Constants.ORBOT_MODE_SOCKS5
             if (DEBUG) Log.d(LOG_TAG, "OrbotHelper - Orbot - startOrbot")
-        } else if (persistentState.getOrbotModePersistence() == Constants.ORBAT_MODE_HTTP) {
+        } else if (persistentState.orbotMode == Constants.ORBOT_MODE_HTTP) {
             if (httpsIP != null && httpsPort != null) {
                 persistentState.httpProxyHostAddress = httpsIP!!
                 persistentState.httpProxyPort = httpsPort!!
             }
             if (DEBUG) Log.d(LOG_TAG, "OrbotHelper - Orbot - startOrbot")
             HomeScreenActivity.GlobalVariable.appMode?.setProxyMode(Settings.ProxyModeNone)
-            persistentState.orbotEnabledMode = Constants.ORBAT_MODE_HTTP
-        } else if (persistentState.getOrbotModePersistence() == Constants.ORBAT_MODE_BOTH) {
+            persistentState.orbotEnabledMode = Constants.ORBOT_MODE_HTTP
+        } else if (persistentState.orbotMode == Constants.ORBOT_MODE_BOTH) {
             val proxyEndpoint = constructProxy()
             if (proxyEndpoint != null) {
                 proxyEndpointRepository.clearOrbotData()
@@ -361,10 +335,10 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
                 persistentState.httpProxyPort = httpsPort!!
             }
             HomeScreenActivity.GlobalVariable.appMode?.setProxyMode(Constants.ORBOT_SOCKS)
-            persistentState.orbotEnabledMode = Constants.ORBAT_MODE_BOTH
+            persistentState.orbotEnabledMode = Constants.ORBOT_MODE_BOTH
         } else{
             HomeScreenActivity.GlobalVariable.appMode?.setProxyMode(Settings.ProxyModeNone)
-            persistentState.orbotEnabledMode = Constants.ORBAT_MODE_NONE
+            persistentState.orbotEnabledMode = Constants.ORBOT_MODE_NONE
         }
 
     }

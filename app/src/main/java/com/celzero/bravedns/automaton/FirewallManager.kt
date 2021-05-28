@@ -32,19 +32,22 @@ import com.celzero.bravedns.util.FileSystemUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 /*TODO : Initial check is for firewall app completely
            Later modification required for Data, WiFi, ScreenOn/Off, Background
            Lot of redundant code - streamline the code.
            */
 
-class FirewallManager(service: BackgroundAccessibilityService) {
+class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
 
     private val accessibilityService: BackgroundAccessibilityService = service
     private lateinit var packageManager: PackageManager
     private val packagesStack = LinkedHashSet<String>()
     private var latestTrackedPackage: String? = null
     private var packageElect: String? = null
+    private val persistentState by inject<PersistentState>()
 
     companion object{
 
@@ -197,8 +200,8 @@ class FirewallManager(service: BackgroundAccessibilityService) {
 
 
     private fun addOrRemovePackageForBackground(isAllowed: Boolean){
-        if(DEBUG) Log.d(LOG_TAG,"FirewallManager: isBackgroundEnabled: ${GlobalVariable.isBackgroundEnabled}")
-        if(!GlobalVariable.isBackgroundEnabled)
+        if(DEBUG) Log.d(LOG_TAG,"FirewallManager: isBackgroundEnabled: ${persistentState.isBackgroundEnabled}")
+        if(!persistentState.isBackgroundEnabled)
             return
         if (latestTrackedPackage.isNullOrEmpty()) {
             return

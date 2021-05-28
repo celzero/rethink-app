@@ -320,7 +320,7 @@
 
     <string name="always_on_dialog_stop_heading">Stop RethinkDNS</string>
     <string name="always_on_dialog_stop_message">Always-on VPN is enabled. Are you sure you want to stop RethinkDNS anyway?</string>
-    <string name="always_on_dialog_lockdown_stop_message">RethinkDNS is running VPN in lockdown mode. Stopping it would result in loss of Internet connectivity on this user profile. Do you want to continue anyway?</string>
+    <string name="always_on_dialog_lockdown_stop_message">RethinkDNS is running VPN in <i>Lockdown</i> mode. Stopping it would result in loss of Internet connectivity on this user profile. Do you want to continue anyway?</string>
     <string name="always_on_dialog_positive">Stop</string>
     <string name="always_on_dialog_negative">Cancel</string>
     <string name="always_on_dialog_neutral">Settings</string>
@@ -690,7 +690,7 @@
     <string name="settings_notification_desc2">DNS / DNS + Firewall</string>
     <string name="settings_notification_desc3">None</string>
 
-    <string name="settings_notification_dialog_title">Notification Action</string>
+    <string name="settings_notification_dialog_title">Choose Notification Action</string>
     <string name="settings_notification_dialog_option_1">\nStop (default):\nShows one button, tapping on which stops RethinkDNS.\n</string>
     <string name="settings_notification_dialog_option_2">\nDNS / DNS + Firewall:\nShows two buttons to quickly switch between the battery-saver DNS mode and the regular DNS + Firewall mode.\n</string>
     <string name="settings_notification_dialog_option_3">None:\nShows no button.</string>
@@ -977,5 +977,10 @@
     <string name="unicode_x_sign">\u274c</string>
     <string name="unicode_question_sign">\u2754</string>
     <string name="fav_icon">fav_icon</string>
+
+    <!-- BraveVPN service rules failure -->
+    <string name="rules_load_failure_heading">Warning</string>
+    <string name="rules_load_failure_desc">Failure to initiate the firewall rules</string>
+    <string name="rules_load_failure_reload">reload</string>
 
 </resources>

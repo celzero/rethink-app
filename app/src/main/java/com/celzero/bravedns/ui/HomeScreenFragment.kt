@@ -22,12 +22,12 @@ import android.net.ConnectivityManager
 import android.net.LinkProperties
 import android.net.NetworkCapabilities
 import android.net.VpnService
-import android.os.Build
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.provider.Settings.ACTION_VPN_SETTINGS
+import android.text.Html
 import android.text.TextUtils
 import android.text.format.DateUtils
 import android.text.format.DateUtils.FORMAT_ABBREV_RELATIVE
@@ -37,6 +37,7 @@ import android.util.TypedValue
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -104,7 +105,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         modifyBraveMode(braveMode)
 
-        lifeTimeQueries = persistentState.getNumOfReq()
+        lifeTimeQueries = persistentState.getLifetimeQueries()
 
         persistentState.blockedCount.postValue(persistentState.numberOfBlockedRequests)
         connectedDNS.postValue(persistentState.getConnectedDNS())
@@ -203,7 +204,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * The observers are register to update the UI in the home screen
      */
     private fun registerObserversForDNS() {
-        persistentState.median50.observe(viewLifecycleOwner, {
+        persistentState.median.observe(viewLifecycleOwner, {
             b.fhsCardDnsLatency.text = getString(R.string.dns_card_latency_active, it.toString())
         })
 
@@ -216,7 +217,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * Unregister all the DNS related observers which updates the dns card.
      */
     private fun unregisterObserversForDNS() {
-        persistentState.median50.removeObservers(viewLifecycleOwner)
+        persistentState.median.removeObservers(viewLifecycleOwner)
         connectedDNS.removeObservers(viewLifecycleOwner)
     }
 
@@ -314,7 +315,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setTitle(R.string.always_on_dialog_stop_heading)
         if (isLockDownEnabled) {
             //set message for alert dialog
-            builder.setMessage(R.string.always_on_dialog_lockdown_stop_message)
+            if (VERSION.SDK_INT >= VERSION_CODES.N) {
+                builder.setMessage(Html.fromHtml(getString(R.string.always_on_dialog_lockdown_stop_message), HtmlCompat.FROM_HTML_MODE_COMPACT))
+            } else {
+                builder.setMessage(HtmlCompat.fromHtml(getString(R.string.always_on_dialog_lockdown_stop_message), HtmlCompat.FROM_HTML_MODE_COMPACT))
+            }
         } else {
             //set message for alert dialog
             builder.setMessage(R.string.always_on_dialog_stop_message)
@@ -541,7 +546,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             val prepareVpnIntent: Intent? = try {
                 VpnService.prepare(context)
             } catch (e: NullPointerException) {
-                Log.w(LOG_TAG, "Prepare VPN Exception - ${e.message}")
+                Log.w(LOG_TAG, "Prepare VPN Exception - ${e.message}", e)
                 null
             }
             //If the VPN.prepare is not null, then the first time VPN dialog is shown.
@@ -686,7 +691,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         } catch (e: NullPointerException) {
             // This exception is not mentioned in the documentation, but it has been encountered by Intra
             // users and also by other developers, e.g. https://stackoverflow.com/questions/45470113.
-            Log.e("BraveVPN", "Device does not support system-wide VPN mode.")
+            Log.e("BraveVPN", "Device does not support system-wide VPN mode.", e)
             return false
         }
         //If the VPN.prepare is not null, then the first time VPN dialog is shown, Show info dialog
@@ -766,8 +771,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             b.fhsDnsOnOffBtn.text = getString(R.string.hsf_stop_btn_state)
             //b.fhsDnsOnOffBtn.setTextColor(fetchTextColor(R.color.black_white))
             when (braveMode) {
-                0 -> b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_dns_connected)
-                1 -> b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_firewall_connected)
+                Constants.APP_MODE_DNS -> b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_dns_connected)
+                Constants.APP_MODE_FIREWALL -> b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_firewall_connected)
                 else -> b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_connected)
             }
         } else {
@@ -839,7 +844,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             statusId = R.string.status_protected
             colorId = fetchTextColor(R.color.positive)
         }
-        if (statusId == R.string.status_protected && persistentState.getOrbotModePersistence() != Constants.ORBAT_MODE_NONE) {
+        if (statusId == R.string.status_protected && persistentState.orbotMode != Constants.ORBOT_MODE_NONE) {
             statusId = R.string.status_protected_with_tor
         }
 

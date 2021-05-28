@@ -349,13 +349,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             if (isSelected) {
                 b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
                 if (!persistentState.blockListFilesDownloaded) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        val vpnService = VpnController.getInstance().getBraveVpnService()
-                        if (vpnService != null && vpnService.isLockdownEnabled) {
-                            showDownloadDialogWithLockdown()
-                        } else {
-                            showDownloadDialog()
-                        }
+                    if (isVpnLockdown() == true) {
+                        showDownloadDialogWithLockdown()
                     } else {
                         showDownloadDialog()
                     }
@@ -405,7 +400,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
 
         b.settingsActivitySocks5Switch.setOnCheckedChangeListener { _: CompoundButton, bool: Boolean ->
-            if (persistentState.getOrbotModePersistence() != Constants.ORBAT_MODE_NONE) {
+            if (persistentState.orbotMode != Constants.ORBOT_MODE_NONE) {
                 Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_disabled_error), Toast.LENGTH_SHORT)
                 b.settingsActivitySocks5Switch.isChecked = false
             } else {
@@ -452,7 +447,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
 
         b.settingsActivityHttpProxySwitch.setOnCheckedChangeListener { _: CompoundButton, isEnabled: Boolean ->
-            if (persistentState.getOrbotModePersistence() != Constants.ORBAT_MODE_NONE) {
+            if (persistentState.orbotMode != Constants.ORBOT_MODE_NONE) {
                 Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_https_disabled_error), Toast.LENGTH_SHORT)
                 b.settingsActivityHttpProxySwitch.isChecked = false
             } else {
@@ -523,7 +518,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             }.start()
         }
 
-        // Ideally this property should be part of VPN.
+        // Ideally this property should be part of VPN category / section.
         // As of now the VPN section will be disabled when the
         // VPN is in lockdown mode.
         // TODO - Find a way to place this property to place in correct section.
@@ -580,19 +575,25 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     }
 
+    private fun isVpnLockdown(): Boolean? {
+        // lockdown vpn mode only on Q and above
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return false
+        val vpnService = VpnController.getInstance().getBraveVpnService()
+        return vpnService?.isLockdownEnabled
+    }
 
     private fun updateUI() {
-        when (persistentState.getOrbotModePersistence()) {
-            Constants.ORBAT_MODE_SOCKS5 -> {
+        when (persistentState.orbotMode) {
+            Constants.ORBOT_MODE_SOCKS5 -> {
                 b.settingsActivityHttpOrbotDesc.text = getString(R.string.orbot_bs_status_1)
             }
-            Constants.ORBAT_MODE_HTTP -> {
+            Constants.ORBOT_MODE_HTTP -> {
                 b.settingsActivityHttpOrbotDesc.text = getString(R.string.orbot_bs_status_2)
             }
-            Constants.ORBAT_MODE_BOTH -> {
+            Constants.ORBOT_MODE_BOTH -> {
                 b.settingsActivityHttpOrbotDesc.text = getString(R.string.orbot_bs_status_3)
             }
-            Constants.ORBAT_MODE_NONE -> {
+            Constants.ORBOT_MODE_NONE -> {
                 b.settingsActivityHttpOrbotDesc.text = getString(R.string.orbot_bs_status_4)
             }
             else -> {

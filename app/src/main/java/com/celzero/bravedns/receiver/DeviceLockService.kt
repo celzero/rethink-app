@@ -65,14 +65,13 @@ class DeviceLockService  : Service(){
             timer.schedule(checkLockTask, checkLockDelays[delayIndex].toLong())
             this.stopSelf()
         } else {
-            if (isProtected && isLocked) {
-                if (persistentState.screenState && !persistentState.isScreenOff) {
-                    if(DEBUG) Log.d(LOG_TAG,"DeviceLockService : Screen lock detected at $delayIndex")
-                    persistentState.isScreenOff = true
-                    checkLockTask?.cancel()
-                    timer.cancel()
-                    this.stopSelf()
-                }
+            if (!isProtected || !isLocked) return
+            if (persistentState.screenState && !persistentState.isScreenOff) {
+                if (DEBUG) Log.d(LOG_TAG, "DeviceLockService : Screen lock detected at $delayIndex")
+                persistentState.isScreenOff = true
+                checkLockTask?.cancel()
+                timer.cancel()
+                this.stopSelf()
             }
         }
     }

@@ -115,7 +115,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                 }
             }
         } catch (e: Exception) {
-            Log.i(LOG_TAG, "Webview: Exception: ${e.message}", e)
+            Log.e(LOG_TAG, "Webview: Exception: ${e.message}", e)
             showDialogOnError(null)
         }
         loadUrl(url)
@@ -209,18 +209,13 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     private fun updateLocalStamp() {
         Log.i(LOG_TAG, "Webview: Local stamp has been set from webview - $receivedStamp")
         if (receivedStamp.isEmpty() || receivedStamp == Constants.BRAVE_BASE_STAMP) {
-            val localStamp = persistentState.localBlockListStamp
-            if (localStamp.isNotEmpty()) {
-                return
-            }
-            persistentState.localBlockListStamp = ""
             return
         }
         val stamp = Xdns.getBlocklistStampFromURL(receivedStamp)
         if (DEBUG) Log.d(LOG_TAG, "Split stamp - $stamp")
         val path: String = this.filesDir.canonicalPath + "/"+ persistentState.localBlockListDownloadTime
+        persistentState.localBlockListStamp = stamp
         if (HomeScreenActivity.GlobalVariable.appMode?.getBraveDNS() == null) {
-            persistentState.localBlockListStamp = stamp
             GlobalScope.launch(Dispatchers.IO) {
                 if (DEBUG) Log.d(LOG_TAG, "Split stamp newBraveDNSLocal - $path")
                 try {
@@ -228,11 +223,10 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                     HomeScreenActivity.GlobalVariable.appMode?.setBraveDNSMode(braveDNS)
                     if (DEBUG) Log.d(LOG_TAG, "Webview: Local brave dns set call from web view -stamp: $stamp")
                 } catch (e: Exception) {
-                    if (DEBUG) Log.d(LOG_TAG, "Local brave dns set exception :${e.message}")
+                    Log.e(LOG_TAG, "Local brave dns set exception :${e.message}", e)
                 }
             }
         } else {
-            persistentState.localBlockListStamp = stamp
             GlobalScope.launch(Dispatchers.IO) {
                 val braveDNS = HomeScreenActivity.GlobalVariable.appMode?.getBraveDNS()
                 HomeScreenActivity.GlobalVariable.appMode?.setBraveDNSMode(braveDNS)
@@ -484,7 +478,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
             //Register or UnRegister your broadcast receiver here
             this.unregisterReceiver(onComplete)
         } catch (e: IllegalArgumentException) {
-            Log.w(LOG_TAG, "Unregister receiver exception")
+            Log.w(LOG_TAG, "Unregister receiver exception", e)
         }
     }
 
