@@ -104,6 +104,7 @@ class IPTracker internal constructor(
             val countryCode: String = getCountryCode(serverAddress!!, context)
             connTracker.flag = getFlag(countryCode)
         } catch (ex: UnknownHostException) {
+            Log.e(LOG_TAG, "Exception on InetAddress", ex)
         }
 
 

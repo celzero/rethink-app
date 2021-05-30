@@ -516,15 +516,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                             builder = builder.addDisallowedApplication(it)
                             Log.i(LOG_TAG, "$FILE_LOG_TAG Excluded package - $it")
                         }
-                        builder = builder.addDisallowedApplication(this.packageName)
                     }
                 } else {
                     excludedApps.forEach {
                         builder = builder.addDisallowedApplication(it)
                         Log.i(LOG_TAG, "$FILE_LOG_TAG Excluded package - $it")
                     }
-                    builder = builder.addDisallowedApplication(this.packageName)
                 }
+                builder = builder.addDisallowedApplication(this.packageName)
             }
             Log.i(LOG_TAG, "$FILE_LOG_TAG Proxy mode set to Socks5 ${appMode.getProxyMode()}")
             if (appMode.getProxyMode() == Settings.ProxyModeSOCKS5) {

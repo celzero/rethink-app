@@ -692,7 +692,7 @@ class KnownPorts {
             portMap[833] = "netconfsoapbeep"
             portMap[847] = "dhcp-failover2"
             portMap[848] = "gdoi"
-            portMap[853] = "domain-s"
+            portMap[853] = "secure-dns"
             portMap[860] = "iscsi"
             portMap[861] = "owamp-control"
             portMap[862] = "twamp-control"
