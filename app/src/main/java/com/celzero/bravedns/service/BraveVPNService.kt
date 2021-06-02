@@ -942,6 +942,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                     Log.i(LOG_TAG, "$FILE_LOG_TAG restartVpn? ${vpnAdapter == null}")
                     if (vpnAdapter != null) {
                         vpnAdapter!!.start(dnsModeL, firewallModeL, proxyMode)
+                    } else {
+                        signalStopService(false)
                     }
                 }, "restartvpn-onCommand").start()
             }

@@ -19,14 +19,18 @@ package com.celzero.bravedns.util
 import android.Manifest
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
+import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.content.res.Configuration
 import android.graphics.Color
+import android.os.Build
 import android.provider.Settings
+import android.provider.Settings.ACTION_VPN_SETTINGS
 import android.text.TextUtils.SimpleStringSplitter
 import android.util.Log
 import android.view.Gravity
@@ -50,7 +54,6 @@ import java.util.*
 
 class Utilities {
 
-
     companion object {
 
         private const val STORAGE_PERMISSION_CODE = 1008
@@ -63,8 +66,8 @@ class Utilities {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                     val rootView: View = (activity).window.decorView.findViewById(android.R.id.content)
                     Snackbar.make(rootView, "Storage permission required", Snackbar.LENGTH_LONG).setAction("Allow") {
-                            ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_PERMISSION_CODE)
-                        }.setActionTextColor(Color.WHITE).show()
+                        ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_PERMISSION_CODE)
+                    }.setActionTextColor(Color.WHITE).show()
                 } else {
                     ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_PERMISSION_CODE)
                 }
@@ -115,15 +118,14 @@ class Utilities {
             val enabledServices = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
             for (enabledService in enabledServices) {
                 val enabledServiceInfo: ServiceInfo = enabledService.resolveInfo.serviceInfo
-                if(DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled checking for: ${enabledServiceInfo.packageName}")
-                if (enabledServiceInfo.packageName == context.packageName && enabledServiceInfo.name == service.name){
+                if (DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled checking for: ${enabledServiceInfo.packageName}")
+                if (enabledServiceInfo.packageName == context.packageName && enabledServiceInfo.name == service.name) {
                     return true
                 }
             }
-            if(DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled failure: ${context.packageName},  ${service.name}, return size: ${enabledServices.size}")
+            if (DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled failure: ${context.packageName},  ${service.name}, return size: ${enabledServices.size}")
             return false
         }
-
 
         fun isAccessibilityServiceEnabledEnhanced(context: Context, accessibilityService: Class<out AccessibilityService?>): Boolean {
             try {
@@ -135,19 +137,17 @@ class Utilities {
                     val componentNameString = colonSplitter.next()
                     val enabledService = ComponentName.unflattenFromString(componentNameString)
                     if (enabledService != null && enabledService == expectedComponentName) {
-                        if(DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled Enhanced: ${expectedComponentName.packageName}")
+                        if (DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled Enhanced: ${expectedComponentName.packageName}")
                         return true
                     }
                 }
-                if(DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled Enhanced: failed calling isAccessibilityServiceEnabled()")
+                if (DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled Enhanced: failed calling isAccessibilityServiceEnabled()")
                 return isAccessibilityServiceEnabled(context, accessibilityService)
-            }catch (e: Exception){
-                if(DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled Exception: failed calling isAccessibilityServiceEnabled() ${e.message}")
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "isAccessibilityServiceEnabled Exception: failed calling isAccessibilityServiceEnabled() ${e.message}", e)
                 return isAccessibilityServiceEnabled(context, accessibilityService)
             }
         }
-
-
 
         private var countryMap: CountryMap? = null
 
@@ -201,43 +201,43 @@ class Utilities {
             return format.format(date)
         }
 
-        fun convertLongToDate(timeStamp: Long): String{
+        fun convertLongToDate(timeStamp: Long): String {
             val date = Date(timeStamp)
             val format = SimpleDateFormat("yy.MM (dd)", Locale.US)
             return format.format(date)
         }
 
-        fun prepareServersToRemove(servers: String, liveServers: String): String{
-            val serverList  = servers.split(",")
+        fun prepareServersToRemove(servers: String, liveServers: String): String {
+            val serverList = servers.split(",")
             val liveServerList = liveServers.split(",")
-            if(DEBUG) Log.d(LOG_TAG, "Servers to remove - $serverList -- $liveServerList")
-            var serversToSend : String =""
-            serverList.forEach{
-                if(!liveServerList.contains(it)){
+            if (DEBUG) Log.d(LOG_TAG, "Servers to remove - $serverList -- $liveServerList")
+            var serversToSend: String = ""
+            serverList.forEach {
+                if (!liveServerList.contains(it)) {
                     serversToSend += "$it,"
                 }
             }
-            if(DEBUG) Log.d(LOG_TAG, "Servers to remove - $serversToSend")
+            if (DEBUG) Log.d(LOG_TAG, "Servers to remove - $serversToSend")
             serversToSend = serversToSend.dropLast(1)
             return serversToSend
         }
 
-        fun showToastInMidLayout(context: Context?, message: String, toastLength: Int){
+        fun showToastInMidLayout(context: Context?, message: String, toastLength: Int) {
             try {
                 val toast = Toast.makeText(context, message, toastLength)
                 toast.setGravity(Gravity.CENTER, 0, 0)
                 toast.show()
-            }catch (e: java.lang.IllegalStateException){
+            } catch (e: java.lang.IllegalStateException) {
                 Log.w(LOG_TAG, "Show Toast issue : ${e.message}", e)
             }
         }
 
-        fun isIPLocal(ipAddress: String): Boolean{
-            return try{
+        fun isIPLocal(ipAddress: String): Boolean {
+            return try {
                 val ip = InetAddress.getByName(ipAddress)
                 val regex = Regex("(^127\\.0\\.0\\.1)|(^10\\.)|(^172\\.1[6-9]\\.)|(^172\\.2[0-9]\\.)|(^172\\.3[0-1]\\.)|(^192\\.168\\.)")
                 ip.isAnyLocalAddress || ipAddress.matches(regex) || ipAddress == "0.0.0.0"
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 Log.w(LOG_TAG, "Exception while converting string to inetaddress, ${e.message}", e)
                 false
             }
@@ -264,8 +264,20 @@ class Utilities {
             return context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
         }
 
-
-
+        fun openVPNProfile(context: Context) {
+            try {
+                val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    Intent(ACTION_VPN_SETTINGS)
+                } else {
+                    Intent("android.net.vpn.SETTINGS")
+                }
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                context.startActivity(intent)
+            } catch (e: ActivityNotFoundException) {
+                showToastInMidLayout(context, context.getString(R.string.vpn_profile_error), Toast.LENGTH_SHORT)
+                Log.w(LOG_TAG, "Exception while opening app info: ${e.message}", e)
+            }
+        }
     }
 }
 

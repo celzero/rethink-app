@@ -56,6 +56,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.lifeTimeQueries
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.Companion.openVPNProfile
 import com.facebook.shimmer.Shimmer
 import org.koin.android.ext.android.inject
 import settings.Settings
@@ -335,7 +336,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         builder.setNeutralButton(R.string.always_on_dialog_neutral) { _, _ ->
-            openVPNProfile()
+            openVPNProfile(requireContext())
         }
 
         // Create the AlertDialog
@@ -343,21 +344,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         // Set other dialog properties
         alertDialog.setCancelable(false)
         alertDialog.show()
-    }
-
-    private fun openVPNProfile() {
-        try {
-            val intent = if (VERSION.SDK_INT >= VERSION_CODES.N) {
-                Intent(ACTION_VPN_SETTINGS)
-            } else {
-                Intent("android.net.vpn.SETTINGS")
-            }
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            Utilities.showToastInMidLayout(requireContext(), getString(R.string.vpn_profile_error), Toast.LENGTH_SHORT)
-            Log.w(LOG_TAG, "Exception while opening app info: ${e.message}", e)
-        }
     }
 
     private fun openBottomSheet() {

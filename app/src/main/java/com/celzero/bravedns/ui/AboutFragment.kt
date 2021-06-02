@@ -39,6 +39,7 @@ import com.celzero.bravedns.databinding.FragmentAboutBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.Companion.openVPNProfile
 import org.koin.android.ext.android.inject
 
 
@@ -126,7 +127,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
                 openAppInfo()
             }
             b.aboutVpnProfile -> {
-                openVPNProfile()
+                openVPNProfile(requireContext())
             }
             b.aboutAppNotification -> {
                 openNotificationSettings()
@@ -143,21 +144,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             Utilities.showToastInMidLayout(requireContext(), getString(R.string.app_info_error), Toast.LENGTH_SHORT)
-            Log.w(Constants.LOG_TAG, "Exception while opening app info: ${e.message}", e)
-        }
-    }
-
-    private fun openVPNProfile(){
-        try {
-            val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                Intent(Settings.ACTION_VPN_SETTINGS)
-            } else {
-                Intent("android.net.vpn.SETTINGS")
-            }
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            Utilities.showToastInMidLayout(requireContext(), getString(R.string.vpn_profile_error), Toast.LENGTH_SHORT)
             Log.w(Constants.LOG_TAG, "Exception while opening app info: ${e.message}", e)
         }
     }
