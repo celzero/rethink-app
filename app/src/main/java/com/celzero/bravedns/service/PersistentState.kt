@@ -48,7 +48,7 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
         const val HTTP_PROXY_ENABLED = "http_proxy_enabled"
         const val BLOCK_UDP_OTHER_THAN_DNS = "block_udp_traffic_other_than_dns"
         const val ORBOT_MODE_CHANGE = "orbot_mode_enabled"
-        const val NETWORK = "add_all_network_VPN"
+        const val NETWORK = "add_all_networks_to_vpn"
         const val NOTIFICATION_ACTION = "notification_action"
 
         fun expandUrl(context: Context, url: String?): String {
@@ -117,10 +117,11 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
 
     var median: MutableLiveData<Long> = MutableLiveData()
     var blockedCount: MutableLiveData<Int> = MutableLiveData()
-    var networkRequestHeartbeatTimestamp : Long = 0L
+    var networkRequestHeartbeatTimestamp: Long = 0L
 
     fun wifiAllowed(forPackage: String): Boolean = !excludedPackagesWifi.contains(forPackage)
 
+    // FIXME #200 - Removed the list from the persistent state.
     fun modifyAllowedWifi(forPackage: String, remove: Boolean) {
         excludedPackagesWifi = if (remove) {
             excludedPackagesWifi - forPackage
@@ -129,6 +130,7 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
         }
     }
 
+    // FIXME #200 - Removed the list from the persistent state.
     fun modifyAllowedData(forPackage: String, remove: Boolean) {
         excludedPackagesData = if (remove) {
             excludedPackagesData - forPackage
@@ -137,7 +139,7 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
         }
     }
 
-    fun getBraveMode() = _braveMode // TODO remove app logic from settings
+    fun getBraveMode() = _braveMode // TODO #200 - remove app logic from settings
 
     fun setBraveMode(mode: Int) {
         _braveMode = mode

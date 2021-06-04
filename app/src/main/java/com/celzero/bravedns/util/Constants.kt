@@ -22,7 +22,7 @@ class Constants {
 
     companion object {
         //Log
-        const val LOG_TAG = "RethinkDNS"
+        const val LOG_TAG = "com.celzero.bravedns"
 
         //Download path and file names
         const val DOWNLOAD_PATH = "/downloads/"
@@ -78,6 +78,8 @@ class Constants {
         //Network monitor
         const val FIREWALL_CONNECTIONS_IN_DB = 5000
 
+        // UID used in Vpn service (block())
+        const val INVALID_UID = -1
         const val MISSING_UID = -2000
 
         const val RETHINK_DNS_PLUS = "RethinkDNS Plus"
@@ -107,6 +109,7 @@ class Constants {
 
         const val ORBOT_SOCKS = 10L
 
+        // Orbot mode constants
         const val ORBOT_MODE_NONE = 1
         const val ORBOT_MODE_SOCKS5 = 2
         const val ORBOT_MODE_HTTP = 3
@@ -117,20 +120,23 @@ class Constants {
         const val DOWNLOAD_SOURCE_FDROID = 2
         const val DOWNLOAD_SOURCE_WEBSITE = 3
 
+        // build flavours constants
         const val FLAVOR_PLAY = "play"
         const val FLAVOR_FDROID = "fdroid"
         const val FLAVOR_WEBSITE = "website"
 
         const val PORT_VAL_UNKNOWN = "unknown"
 
+        // Notification action constants.
         const val NOTIFICATION_ACTION = "NOTIFICATION_VALUE"
         const val STOP_VPN_NOTIFICATION_ACTION = "RETHINK_STOP"
         const val DNS_VPN_NOTIFICATION_ACTION = "RETHINK_DNSONLY" // battery-saver dns-only
         const val DNS_FIREWALL_VPN_NOTIFICATION_ACTION = "RETHINK_FULLMODE" // default dns+firewall
-        const val RULES_FAILURE_NOTIFICATION_ACTION = "RETHINK_RULES_RELOAD" //
+        const val RULES_FAILURE_NOTIFICATION_ACTION = "RETHINK_RULES_RELOAD" // load rules failure
 
         const val NXDOMAIN = "NXDOMAIN"
 
+        // Time out to download of on-device blocklist.
         val WORK_MANAGER_TIMEOUT = TimeUnit.MINUTES.toMillis(40)
 
         const val FAV_ICON_URL = "https://icons.duckduckgo.com/ip2/"
@@ -146,17 +152,20 @@ class Constants {
         const val NOTIFICATION_ACTION_DNS_FIREWALL = 1
         const val NOTIFICATION_ACTION_NONE = 2
 
-        //DNS MODES
+        // DNS MODES
         const val APP_MODE_DNS = 0
         const val APP_MODE_FIREWALL = 1
         const val APP_MODE_DNS_FIREWALL = 2
 
-        //DNS TYPES
+        // DNS TYPES
         const val PREF_DNS_MODE_PROXY = 3
         const val PREF_DNS_MODE_DNSCRYPT = 2
         const val PREF_DNS_MODE_DOH = 1
 
+        // Time limit to check if accessibility service is running - every 5 minutes.
         val ACCESSIBILITY_SERVICE_HEARTBEAT_THRESHOLD_MS = TimeUnit.MINUTES.toMillis(5)
+
+        // Threshold time to put network request in shared preference.
         val NETWORK_REQUEST_WRITE_THRESHOLD_MS = TimeUnit.MINUTES.toMillis(1)
     }
 }

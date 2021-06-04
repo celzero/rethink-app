@@ -29,6 +29,9 @@ import com.celzero.bravedns.databinding.BottomSheetHomeScreenBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS
+import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS_FIREWALL
+import com.celzero.bravedns.util.Constants.Companion.APP_MODE_FIREWALL
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
@@ -43,7 +46,7 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
 
     private var firewallMode = -1L
     private val LOG_FILE = "HOMESCREEN_BTM_SHEET"
-    private var connectedDetails : String = ""
+    private var connectedDetails: String = ""
 
     private val persistentState by inject<PersistentState>()
 
@@ -75,7 +78,7 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
         _binding = null
     }
 
-    constructor(connectedDetails : String) : this(){
+    constructor(connectedDetails: String) : this() {
         this.connectedDetails = connectedDetails
     }
 
@@ -91,57 +94,59 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
         var selectedIndex = HomeScreenActivity.GlobalVariable.braveMode
         if (DEBUG) Log.d(LOG_TAG, "$LOG_FILE - selectedIndex: $selectedIndex")
         updateBraveModeUI()
-        if(selectedIndex == -1)
-            selectedIndex = persistentState.getBraveMode()
+        if (selectedIndex == -1) selectedIndex = persistentState.getBraveMode()
 
         when (selectedIndex) {
-            HomeScreenFragment.DNS_MODE -> {
+            APP_MODE_DNS -> {
                 b.bsHomeScreenRadioDns.isChecked = true   //bs_home_screen_radio_dns
-            }HomeScreenFragment.FIREWALL_MODE -> {
+            }
+            APP_MODE_FIREWALL -> {
                 b.bsHomeScreenRadioFirewall.isChecked = true //bs_home_screen_radio_firewall
-            }HomeScreenFragment.DNS_FIREWALL_MODE-> {
+            }
+            APP_MODE_DNS_FIREWALL -> {
                 b.bsHomeScreenRadioDnsFirewall.isChecked = true //bs_home_screen_radio_dns_firewall
-            }else -> {
+            }
+            else -> {
                 b.bsHomeScreenRadioDnsFirewall.isChecked = true
             }
         }
     }
 
     private fun initializeClickListeners() {
-        b.bsHomeScreenRadioDns.setOnCheckedChangeListener{ _: CompoundButton, isSelected: Boolean ->
-            if(isSelected){
-               enableDNSMode()
+        b.bsHomeScreenRadioDns.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
+            if (isSelected) {
+                enableDNSMode()
             }
         }
 
-        b.bsHomeScreenRadioFirewall.setOnCheckedChangeListener{ _: CompoundButton, isSelected: Boolean ->
+        b.bsHomeScreenRadioFirewall.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
             if (isSelected) {
-               enableFirewallMode()
+                enableFirewallMode()
             }
         }
 
-        b.bsHomeScreenRadioDnsFirewall.setOnCheckedChangeListener{ _: CompoundButton, isSelected: Boolean ->
+        b.bsHomeScreenRadioDnsFirewall.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
             if (isSelected) {
-               enableDNSFirewallMode()
+                enableDNSFirewallMode()
             }
         }
 
         //bs_hs_dns_firewall_rl
-        b.bsHsDnsRl.setOnClickListener{
-            if(!b.bsHomeScreenRadioDns.isChecked){
+        b.bsHsDnsRl.setOnClickListener {
+            if (!b.bsHomeScreenRadioDns.isChecked) {
                 b.bsHomeScreenRadioDns.isChecked = true
-               enableDNSMode()
+                enableDNSMode()
             }
         }
 
-        b.bsHsFirewallRl.setOnClickListener{
+        b.bsHsFirewallRl.setOnClickListener {
             if (!b.bsHomeScreenRadioFirewall.isChecked) {
                 b.bsHomeScreenRadioFirewall.isChecked = true
                 enableFirewallMode()
             }
         }
 
-        b.bsHsDnsFirewallRl.setOnClickListener{
+        b.bsHsDnsFirewallRl.setOnClickListener {
             if (!b.bsHomeScreenRadioDnsFirewall.isChecked) {
                 b.bsHomeScreenRadioDnsFirewall.isChecked = true
                 enableDNSFirewallMode()
@@ -149,29 +154,29 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
         }
     }
 
-    private fun enableDNSMode(){
+    private fun enableDNSMode() {
         b.bsHomeScreenRadioFirewall.isChecked = false
         b.bsHomeScreenRadioDnsFirewall.isChecked = false
         firewallMode = Settings.BlockModeNone
-        HomeScreenActivity.GlobalVariable.braveMode = HomeScreenFragment.DNS_MODE
+        HomeScreenActivity.GlobalVariable.braveMode = APP_MODE_DNS
         modifyBraveMode()
     }
 
-    private fun enableFirewallMode(){
+    private fun enableFirewallMode() {
         b.bsHomeScreenRadioDns.isChecked = false
         b.bsHomeScreenRadioDnsFirewall.isChecked = false
         firewallMode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) Settings.BlockModeFilterProc
         else Settings.BlockModeFilter
-        HomeScreenActivity.GlobalVariable.braveMode = HomeScreenFragment.FIREWALL_MODE
+        HomeScreenActivity.GlobalVariable.braveMode = APP_MODE_FIREWALL
         modifyBraveMode()
     }
 
-    private fun enableDNSFirewallMode(){
+    private fun enableDNSFirewallMode() {
         b.bsHomeScreenRadioDns.isChecked = false
         b.bsHomeScreenRadioFirewall.isChecked = false
         firewallMode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) Settings.BlockModeFilterProc
         else Settings.BlockModeFilter
-        HomeScreenActivity.GlobalVariable.braveMode = HomeScreenFragment.DNS_FIREWALL_MODE
+        HomeScreenActivity.GlobalVariable.braveMode = APP_MODE_DNS_FIREWALL
         modifyBraveMode()
     }
 
@@ -182,7 +187,7 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
 
     private fun modifyBraveMode() {
         HomeScreenActivity.GlobalVariable.appMode?.setFirewallMode(firewallMode)
-        if (HomeScreenActivity.GlobalVariable.braveMode == HomeScreenFragment.FIREWALL_MODE) {
+        if (HomeScreenActivity.GlobalVariable.braveMode == APP_MODE_FIREWALL) {
             HomeScreenActivity.GlobalVariable.appMode?.setDNSMode(Settings.DNSModeNone)
         } else {
             HomeScreenActivity.GlobalVariable.appMode?.setDNSMode(-1)
@@ -194,7 +199,7 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
         }
     }
 
-    private fun updateBraveModeUI(){
+    private fun updateBraveModeUI() {
         when (HomeScreenActivity.GlobalVariable.braveMode) {
             0 -> {
                 b.bsHomeScreenConnectedStatus.text = getString(R.string.dns_explanation_dns_connected)
@@ -207,5 +212,4 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
             }
         }
     }
-
 }

@@ -30,10 +30,10 @@ import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.FileSystemUID
 import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
 import com.celzero.bravedns.util.Utilities.Companion.getFlag
+import com.google.common.net.InetAddresses
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.net.InetAddress
 import java.net.UnknownHostException
 import java.util.*
 
@@ -41,8 +41,7 @@ class IPTracker internal constructor(
     private val appInfoRepository: AppInfoRepository,
     private val connectionTrackerRepository: ConnectionTrackerRepository,
     private val refreshDatabase: RefreshDatabase,
-    private val context: Context
-) {
+    private val context: Context) {
 
 
     private val recentTrackers: Queue<IPDetails> = LinkedList()
@@ -54,7 +53,6 @@ class IPTracker internal constructor(
         return LinkedList(recentTrackers)
     }
 
-
     fun recordTransaction(ipDetails: IPDetails?) {
         //Modified the call of the insert to database inside the coroutine scope.
         GlobalScope.launch(Dispatchers.IO) {
@@ -62,30 +60,6 @@ class IPTracker internal constructor(
                 insertToDB(ipDetails)
             }
         }
-        //recentIPActivity.add(ipDetails.timeStamp)
-        //if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG,"Record Transaction")
-        /*if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(Constants.LOG_TAG, "Conn tracker Record Transaction: ${ipDetails.uid},${recentTrackers.size}")
-        if(context != null) {
-            if (PersistentState.getBackgroundEnabled(context)) {
-                recentTrackers.add(ipDetails)
-
-                if (recentTrackers.size >= 10) {
-                    val insertValues = recentTrackers
-                    insertToDB(context, insertValues)
-                    //recentTrackers.clear()
-                }
-            } else {
-                recentTrackers.add(ipDetails)
-                insertToDB(context, recentTrackers)
-                //recentTrackers.clear()
-            }
-        }*/
-        /*if (historyEnabled) {
-            recentTrackers.add(ipDetails)
-            if (recentTrackers.size > HISTORY_SIZE) {
-                recentTrackers.remove()
-            }
-        }*/
     }
 
     private fun insertToDB(ipDetails: IPDetails) {
@@ -98,23 +72,22 @@ class IPTracker internal constructor(
         connTracker.timeStamp = ipDetails.timeStamp
         connTracker.blockedByRule = ipDetails.blockedByRule
 
-        val serverAddress: InetAddress?
         try {
-            serverAddress = InetAddress.getByName(ipDetails.destIP)
+            // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
+            // Unlike InetAddress.getByName(), the methods of this class never cause DNS services
+            // to be accessed
+            val serverAddress = InetAddresses.forString(ipDetails.destIP)
             val countryCode: String = getCountryCode(serverAddress!!, context)
             connTracker.flag = getFlag(countryCode)
         } catch (ex: UnknownHostException) {
             Log.e(LOG_TAG, "Exception on InetAddress", ex)
         }
 
-
         //app-name
         val packageNameList = context.packageManager.getPackagesForUid(ipDetails.uid)
-        //val appName = context.packageManager.getNameForUid(ipDetails.uid)
 
         if (packageNameList != null) {
             if (DEBUG) Log.d(LOG_TAG, "IPTracker - Package for uid : ${ipDetails.uid}, ${packageNameList.size}")
-            //connTracker.appName = appName
             val packageName = packageNameList[0]
             val appDetails = HomeScreenActivity.GlobalVariable.appList[packageName]
             if (appDetails != null) {
@@ -135,12 +108,12 @@ class IPTracker internal constructor(
                 connTracker.appName = "Unknown"
             } else if (fileSystemUID.uid == -1) {
                 connTracker.appName = "Unnamed(${ipDetails.uid})"
-                if(!isAvailableInDatabase(ipDetails.uid)) {
+                if (!isAvailableInDatabase(ipDetails.uid)) {
                     insertNonAppToAppInfo(ipDetails.uid, connTracker.appName.toString())
                 }
             } else {
                 connTracker.appName = fileSystemUID.name
-                if(!isAvailableInDatabase(ipDetails.uid)) {
+                if (!isAvailableInDatabase(ipDetails.uid)) {
                     insertNonAppToAppInfo(ipDetails.uid, connTracker.appName.toString())
                 }
             }
@@ -152,7 +125,7 @@ class IPTracker internal constructor(
         refreshDatabase.insertNonAppToAppInfo(uid, appName)
     }
 
-    private fun isAvailableInDatabase(uid: Int) : Boolean{
+    private fun isAvailableInDatabase(uid: Int): Boolean {
         val appName = appInfoRepository.getAppNameForUID(uid)
         return !appName.isNullOrEmpty()
     }

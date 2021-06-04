@@ -55,6 +55,8 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS_FIREWALL
+import com.celzero.bravedns.util.Constants.Companion.APP_MODE_FIREWALL
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_FDROID
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_WEBSITE
@@ -136,9 +138,9 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         initialUI()
 
         HomeScreenActivity.GlobalVariable.braveModeToggler.observe(viewLifecycleOwner, {
-            if (HomeScreenActivity.GlobalVariable.braveMode == HomeScreenFragment.FIREWALL_MODE) {
+            if (HomeScreenActivity.GlobalVariable.braveMode == APP_MODE_FIREWALL) {
                 disableDNSRelatedUI()
-            } else if (HomeScreenActivity.GlobalVariable.braveMode == HomeScreenFragment.DNS_FIREWALL_MODE) {
+            } else if (HomeScreenActivity.GlobalVariable.braveMode == APP_MODE_DNS_FIREWALL) {
                 enableDNSFirewallUI()
             }
         })
@@ -278,6 +280,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     private fun detectLockDownMode() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // FIXME #200 - Move it to Koin
             val vpnService = VpnController.getInstance().getBraveVpnService()
             if (vpnService != null) {
                 val lockDown = vpnService.isLockdownEnabled
@@ -578,6 +581,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     private fun isVpnLockdown(): Boolean? {
         // lockdown vpn mode only on Q and above
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return false
+        // FIXME #200 - Move it to Koin
         val vpnService = VpnController.getInstance().getBraveVpnService()
         return vpnService?.isLockdownEnabled
     }
@@ -603,6 +607,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     }
 
     private fun openBottomSheetForOrbot() {
+        // FIXME #200 - Move it to Koin
         val vpnService = VpnController.getInstance().getBraveVpnService()
         if (vpnService != null) {
             val bottomSheetFragment = OrbotBottomSheetFragment()

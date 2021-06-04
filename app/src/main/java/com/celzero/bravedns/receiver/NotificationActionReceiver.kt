@@ -32,6 +32,8 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenFragment
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS
+import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS_FIREWALL
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
@@ -44,11 +46,11 @@ import org.koin.core.component.inject
 class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
     private val persistentState by inject<PersistentState>()
 
-    override fun onReceive(context: Context?, intent: Intent?) {
-        val action: String? = intent?.getStringExtra(Constants.NOTIFICATION_ACTION)
+    override fun onReceive(context: Context, intent: Intent) {
+        val action: String? = intent.getStringExtra(Constants.NOTIFICATION_ACTION)
         Log.i(Constants.LOG_TAG, "NotificationActionReceiver: onReceive - $action")
-        val manager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        when(action){
+        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        when (action) {
             OrbotHelper.ORBOT_NOTIFICATION_ACTION_TEXT -> {
                 openOrbotApp(context)
                 manager.cancel(OrbotHelper.ORBOT_SERVICE_ID)
@@ -90,7 +92,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
                 context.startActivity(launchIntent)
             } else {
                 val text = context?.getString(R.string.orbot_app_issue)
-                if(text != null) {
+                if (text != null) {
                     Utilities.showToastInMidLayout(context, text, Toast.LENGTH_SHORT)
                 }
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
@@ -103,17 +105,14 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
     }
 
     private fun stopVpn(context: Context?) {
-        Log.i(Constants.LOG_TAG, "NotificationAction: Stopping the VPN")
         VpnController.getInstance().stop(context)
     }
 
-    private fun dnsMode(){
-        Log.i(Constants.LOG_TAG, "NotificationAction: Setting global state to DNS Mode")
-        persistentState.setBraveMode(HomeScreenFragment.DNS_MODE)
+    private fun dnsMode() {
+        persistentState.setBraveMode(APP_MODE_DNS)
     }
 
-    private fun dnsFirewallMode(){
-        Log.i(Constants.LOG_TAG, "NotificationActionReceiver: Setting global state to DNS + Firewall Mode")
-        persistentState.setBraveMode(HomeScreenFragment.DNS_FIREWALL_MODE)
+    private fun dnsFirewallMode() {
+        persistentState.setBraveMode(APP_MODE_DNS_FIREWALL)
     }
 }

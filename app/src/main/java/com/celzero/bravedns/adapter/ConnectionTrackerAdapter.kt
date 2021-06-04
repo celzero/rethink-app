@@ -33,6 +33,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
 import com.celzero.bravedns.glide.GlideApp
+import com.celzero.bravedns.service.BlockedRuleNames
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
 import com.celzero.bravedns.util.Constants
@@ -78,9 +79,9 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
             // known ports(reserved port and protocol identifiers).
             // https://github.com/celzero/rethink-app/issues/42 - #3 - transport + protocol.
             val resolvedPort = KnownPorts.resolvePort(connTracker.port)
-            if(resolvedPort != Constants.PORT_VAL_UNKNOWN){
+            if (resolvedPort != Constants.PORT_VAL_UNKNOWN) {
                 b.connLatencyTxt.text = resolvedPort?.toUpperCase(Locale.ROOT)
-            }else {
+            } else {
                 b.connLatencyTxt.text = Protocol.getProtocolName(connTracker.protocol).name
             }
             b.connectionAppName.text = connTracker.appName
@@ -89,7 +90,7 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
                     b.connectionStatusIndicator.visibility = View.VISIBLE
                     b.connectionStatusIndicator.setBackgroundColor(ContextCompat.getColor(context, R.color.colorRed_A400))
                 }
-                connTracker.blockedByRule.equals(BraveVPNService.BlockedRuleNames.RULE7.ruleName) -> {
+                connTracker.blockedByRule.equals(BlockedRuleNames.RULE7.ruleName) -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
                     b.connectionStatusIndicator.setBackgroundColor(fetchTextColor(R.color.dividerColor))
                 }

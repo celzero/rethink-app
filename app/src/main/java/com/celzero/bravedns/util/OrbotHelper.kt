@@ -40,7 +40,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
-import com.celzero.bravedns.util.Utilities.Companion.fetchColor
+import com.celzero.bravedns.util.Utilities.Companion.getThemeAccent
 import settings.Settings
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
@@ -136,8 +136,8 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
     }
 
 
-    fun getIntentForDownload(context: Context, mode: Int) : Intent? {
-        if(mode == 1){ //For play store
+    fun getIntentForDownload(context: Context, mode: Int): Intent? {
+        if (mode == 1) { //For play store
             var intent = Intent(Intent.ACTION_VIEW)
             intent.data = Uri.parse(ORBOT_MARKET_URI)
 
@@ -159,7 +159,7 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
             }
             return intent
 
-        } else if( mode == 2) {  //For fdroid
+        } else if (mode == 2) {  //For fdroid
             // Orbot is not available in fDroid for now, So commenting the below code
             // and taking the user to website download link.
             // Will add the below commented code in later versions if the fdroid added Orbot.
@@ -246,7 +246,7 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
         persistentState.orbotConnectionStatus.postValue(false)
         persistentState.orbotEnabled = false
         persistentState.httpProxyPort = 0
-        persistentState.httpProxyHostAddress=""
+        persistentState.httpProxyHostAddress = ""
         HomeScreenActivity.GlobalVariable.appMode?.setProxyMode(Settings.ProxyModeNone)
         val intent = getOrbotStopIntent(context)
         context.sendBroadcast(intent)
@@ -277,9 +277,9 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
         val contentText = context.resources.getString(R.string.settings_orbot_notification_content)
         builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(mainActivityIntent).setContentText(contentText)
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-        builder.color = ContextCompat.getColor(context, fetchColor(context))
+        builder.color = ContextCompat.getColor(context, getThemeAccent(context))
         val openIntent = getOrbotOpenIntent(context)
-        val notificationAction : NotificationCompat.Action = NotificationCompat.Action(0, context.resources.getString(R.string.settings_orbot_notification_action), openIntent)
+        val notificationAction: NotificationCompat.Action = NotificationCompat.Action(0, context.resources.getString(R.string.settings_orbot_notification_action), openIntent)
         builder.addAction(notificationAction)
 
         // Secret notifications are not shown on the lock screen.  No need for this app to show there.
@@ -336,7 +336,7 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
             }
             HomeScreenActivity.GlobalVariable.appMode?.setProxyMode(Constants.ORBOT_SOCKS)
             persistentState.orbotEnabledMode = Constants.ORBOT_MODE_BOTH
-        } else{
+        } else {
             HomeScreenActivity.GlobalVariable.appMode?.setProxyMode(Settings.ProxyModeNone)
             persistentState.orbotEnabledMode = Constants.ORBOT_MODE_NONE
         }

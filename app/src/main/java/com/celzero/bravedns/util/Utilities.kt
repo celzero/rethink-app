@@ -28,6 +28,8 @@ import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.content.res.Configuration
 import android.graphics.Color
+import android.net.Uri
+import android.net.VpnManager
 import android.os.Build
 import android.provider.Settings
 import android.provider.Settings.ACTION_VPN_SETTINGS
@@ -37,6 +39,7 @@ import android.view.Gravity
 import android.view.View
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -44,13 +47,17 @@ import androidx.core.content.getSystemService
 import com.celzero.bravedns.R
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
 import com.google.android.material.snackbar.Snackbar
+import com.google.common.net.InetAddresses
 import com.google.common.net.InternetDomainName
 import java.io.IOException
 import java.net.InetAddress
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 class Utilities {
 
@@ -234,7 +241,8 @@ class Utilities {
 
         fun isIPLocal(ipAddress: String): Boolean {
             return try {
-                val ip = InetAddress.getByName(ipAddress)
+                // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
+                val ip = InetAddresses.forString(ipAddress)
                 val regex = Regex("(^127\\.0\\.0\\.1)|(^10\\.)|(^172\\.1[6-9]\\.)|(^172\\.2[0-9]\\.)|(^172\\.3[0-1]\\.)|(^192\\.168\\.)")
                 ip.isAnyLocalAddress || ipAddress.matches(regex) || ipAddress == "0.0.0.0"
             } catch (e: Exception) {
@@ -252,15 +260,15 @@ class Utilities {
             } else String.format(Locale.ROOT, "%d", type)
         }
 
-        fun fetchColor(context: Context): Int {
-            return if (isDarkThemeOn(context)) {
+        fun getThemeAccent(context: Context): Int {
+            return if (isDarkSystemTheme(context)) {
                 R.color.accentGoodBlack
             } else {
                 R.color.negative_white
             }
         }
 
-        private fun isDarkThemeOn(context: Context): Boolean {
+        private fun isDarkSystemTheme(context: Context): Boolean {
             return context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
         }
 
@@ -277,6 +285,10 @@ class Utilities {
                 showToastInMidLayout(context, context.getString(R.string.vpn_profile_error), Toast.LENGTH_SHORT)
                 Log.w(LOG_TAG, "Exception while opening app info: ${e.message}", e)
             }
+        }
+
+        fun isValidUid(uid: Int): Boolean {
+            return uid != INVALID_UID || uid != MISSING_UID
         }
     }
 }

@@ -17,6 +17,7 @@ limitations under the License.
 package com.celzero.bravedns.service
 
 import android.content.Context
+import android.net.InetAddresses
 import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DNSLogRepository
@@ -34,6 +35,7 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
 import com.celzero.bravedns.util.Utilities.Companion.getFlag
 import com.celzero.bravedns.util.Utilities.Companion.makeAddressPair
+import com.google.common.net.InetAddresses.forString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -72,7 +74,8 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
             try {
                 val serverAddress = if (transaction.serverIp != null) {
                     try {
-                        InetAddress.getByName(transaction.serverIp)
+                        // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
+                        com.google.common.net.InetAddresses.forString(transaction.serverIp)
                     } catch (ex: UnknownHostException) {
                         null
                     }
@@ -147,7 +150,7 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
         if (persistentState.fetchFavIcon) {
             if (dnsLogs.status == Transaction.Status.COMPLETE.toString() && dnsLogs.response != Constants.NXDOMAIN && !dnsLogs.isBlocked) {
                 val url = "${Constants.FAV_ICON_URL}${dnsLogs.queryStr}ico"
-                if(DEBUG) Log.d(LOG_TAG, "Glide - fetchFavIcon() -$url")
+                if (DEBUG) Log.d(LOG_TAG, "Glide - fetchFavIcon() -$url")
                 val favIconFetcher = FavIconDownloader(context, url)
                 favIconFetcher.run()
             }

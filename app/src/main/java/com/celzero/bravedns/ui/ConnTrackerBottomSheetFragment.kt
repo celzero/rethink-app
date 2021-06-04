@@ -46,6 +46,7 @@ import com.celzero.bravedns.data.ConnectionRules
 import com.celzero.bravedns.database.*
 import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
+import com.celzero.bravedns.service.BlockedRuleNames
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -156,7 +157,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
             try {
                 val appArray = contextVal.packageManager.getPackagesForUid(ipDetails.uid)
                 val appCount = (appArray?.size)?.minus(1)
-                if(ipDetails.uid != 0) {
+                if (ipDetails.uid != 0) {
                     b.bsConnTrackAppName.text = ipDetails.appName + "      ❯"
                 } else {
                     b.bsConnTrackAppName.text = ipDetails.appName
@@ -183,7 +184,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
 
         val listBlocked = blockedConnectionsRepository.getAllBlockedConnectionsForUID(ipDetails.uid)
         listBlocked.forEach {
-            if (it.ruleType == (BraveVPNService.BlockedRuleNames.RULE2.ruleName) && ipDetails.ipAddress.equals(it.ipAddress) && it.uid == UNIVERSAL_RULES_UID) {
+            if (it.ruleType == (BlockedRuleNames.RULE2.ruleName) && ipDetails.ipAddress.equals(it.ipAddress) && it.uid == UNIVERSAL_RULES_UID) {
                 b.bsConnBlockConnAllSwitch.isChecked = true
             }
         }
@@ -215,7 +216,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         } else {
             text = getString(R.string.bsct_conn_conn_desc_allowed, protocol, ipDetails.port.toString(), time)
             b.bsConnTrackAppKill.visibility = View.GONE
-            if (ipDetails.blockedByRule.equals(BraveVPNService.BlockedRuleNames.RULE7.ruleName)) {
+            if (ipDetails.blockedByRule.equals(BlockedRuleNames.RULE7.ruleName)) {
                 b.bsConnTrackAppKill.visibility = View.VISIBLE
                 b.bsConnTrackAppKill.text = getString(R.string.ctbs_whitelisted)
             }
@@ -239,13 +240,13 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
         b.bsConnBlockConnAllSwitch.setOnCheckedChangeListener(null)
         b.bsConnBlockConnAllSwitch.setOnClickListener {
             if (isRuleUniversal) {
-                if (DEBUG) Log.d(LOG_TAG, "Universal Remove - ${connRules.ipAddress}, ${BraveVPNService.BlockedRuleNames.RULE2.ruleName}")
-                firewallRules.removeFirewallRules(UNIVERSAL_RULES_UID, connRules.ipAddress,  blockedConnectionsRepository)
+                if (DEBUG) Log.d(LOG_TAG, "Universal Remove - ${connRules.ipAddress}, ${BlockedRuleNames.RULE2.ruleName}")
+                firewallRules.removeFirewallRules(UNIVERSAL_RULES_UID, connRules.ipAddress, blockedConnectionsRepository)
                 isRuleUniversal = false
                 Utilities.showToastInMidLayout(contextVal, getString(R.string.ctbs_unblocked_app, connRules.ipAddress), Toast.LENGTH_SHORT)
             } else {
-                if (DEBUG) Log.d(LOG_TAG, "Universal Add - ${connRules.ipAddress}, ${BraveVPNService.BlockedRuleNames.RULE2.ruleName}")
-                firewallRules.addFirewallRules(UNIVERSAL_RULES_UID, connRules.ipAddress, BraveVPNService.BlockedRuleNames.RULE2.ruleName, blockedConnectionsRepository)
+                if (DEBUG) Log.d(LOG_TAG, "Universal Add - ${connRules.ipAddress}, ${BlockedRuleNames.RULE2.ruleName}")
+                firewallRules.addFirewallRules(UNIVERSAL_RULES_UID, connRules.ipAddress, BlockedRuleNames.RULE2.ruleName, blockedConnectionsRepository)
                 isRuleUniversal = true
                 Utilities.showToastInMidLayout(contextVal, getString(R.string.ctbs_block_connections, connRules.ipAddress), Toast.LENGTH_SHORT)
             }
@@ -276,14 +277,14 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
     }
 
     private fun appInfoForPackage(packageName: String) {
-        if(DEBUG) Log.d(LOG_TAG, "appInfoForPackage: $packageName")
+        if (DEBUG) Log.d(LOG_TAG, "appInfoForPackage: $packageName")
         try {
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
             intent.data = Uri.fromParts("package", packageName, null)
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             //Open the generic Apps page:
-            Log.w(LOG_TAG,"Exception while opening app info: ${e.message}",e)
+            Log.w(LOG_TAG, "Exception while opening app info: ${e.message}", e)
             val intent = Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS)
             startActivity(intent)
         }
@@ -350,8 +351,8 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
 
     private fun showAlertForClearRules() {
         val builder = AlertDialog.Builder(contextVal)
-        //set title for alert dialog
-        .setTitle(R.string.bsct_alert_message_clear_rules_heading)
+            //set title for alert dialog
+            .setTitle(R.string.bsct_alert_message_clear_rules_heading)
         //set message for alert dialog
 
         builder.setMessage(R.string.bsct_alert_message_clear_rules)

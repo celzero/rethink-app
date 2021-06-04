@@ -29,7 +29,7 @@ import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import org.koin.android.ext.android.inject
 import java.util.*
 
-class DeviceLockService  : Service(){
+class DeviceLockService : Service() {
 
     private val timer = Timer()
     private var checkLockTask: CheckLockTask? = null
@@ -40,7 +40,7 @@ class DeviceLockService  : Service(){
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if(intent != null && intent.action == ACTION_CHECK_LOCK){
+        if (intent != null && intent.action == ACTION_CHECK_LOCK) {
             checkLock(intent)
         }
         return super.onStartCommand(intent, flags, startId)
@@ -52,13 +52,11 @@ class DeviceLockService  : Service(){
 
         val isProtected = keyguardManager.isKeyguardSecure
         val isLocked = keyguardManager.isKeyguardLocked
+        // ref - https://developer.android.com/reference/android/os/PowerManager#isInteractive()
         val isInteractive = powerManager.isInteractive
         val delayIndex: Int = getSafeCheckLockDelay(intent.getIntExtra(EXTRA_CHECK_LOCK_DELAY_INDEX, -1))
 
-
-        if (checkLockTask != null) {
-            checkLockTask!!.cancel()
-        }
+        checkLockTask?.cancel()
 
         if (isProtected && !isLocked && !isInteractive) {
             checkLockTask = CheckLockTask(this, delayIndex)
@@ -66,20 +64,18 @@ class DeviceLockService  : Service(){
             this.stopSelf()
         } else {
             if (!isProtected || !isLocked) return
-            if (persistentState.screenState && !persistentState.isScreenOff) {
+            if (!persistentState.isScreenOff) {
                 if (DEBUG) Log.d(LOG_TAG, "DeviceLockService : Screen lock detected at $delayIndex")
                 persistentState.isScreenOff = true
-                checkLockTask?.cancel()
                 timer.cancel()
                 this.stopSelf()
             }
         }
     }
 
-
-    companion object{
-        const val ACTION_CHECK_LOCK  = "com.celzero.bravedns.receiver.DeviceLockService.ACTION_START_SERVICE"
-        const val EXTRA_CHECK_LOCK_DELAY_INDEX ="com.celzero.bravedns.receiver.DeviceLockService.EXTRA_CHECK_LOCK_DELAY_INDEX"
+    companion object {
+        const val ACTION_CHECK_LOCK = "com.celzero.bravedns.receiver.DeviceLockService.ACTION_START_SERVICE"
+        const val EXTRA_CHECK_LOCK_DELAY_INDEX = "com.celzero.bravedns.receiver.DeviceLockService.EXTRA_CHECK_LOCK_DELAY_INDEX"
         const val EXTRA_STATE = "com.celzero.bravedns.receiver.DeviceLockService.EXTRA_STATE"
 
         private const val SECOND = 1000
@@ -116,5 +112,4 @@ class DeviceLockService  : Service(){
             context.startService(newIntent)
         }
     }
-
 }
