@@ -178,7 +178,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             }
 
             if (persistentState.blockUnknownConnections && destIp != GoVpnAdapter.FAKE_DNS_IP) {
-                if (Utilities.isValidUid(uid)) {
+                if (!Utilities.isValidUid(uid)) {
                     ipDetails.isBlocked = true
                     ipDetails.blockedByRule = BlockedRuleNames.RULE5.ruleName
                     connTrack(ipDetails)
