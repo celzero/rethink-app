@@ -21,10 +21,12 @@ import android.os.SystemClock
 import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.receiver.ReceiverHelper
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DOWNLOAD
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 /**
  * The download watcher  - Worker initiated from AppDownloadManager class.
@@ -33,14 +35,17 @@ import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DOWNLOAD
  * Once the download is completed, the Worker will send a Result.success().
  * Else, the Result.retry() will be triggered to check again.
  */
-class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) : Worker(context, workerParameters) {
+class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) : Worker(context, workerParameters), KoinComponent {
+
+    val persistentState by inject<PersistentState>()
+
     override fun doWork(): Result {
 
-        val startTime = ReceiverHelper.persistentState.workManagerStartTime
+        val startTime = persistentState.workManagerStartTime
         val currentTime = SystemClock.elapsedRealtime()
         Log.d(LOG_TAG_DOWNLOAD, "AppDownloadManager - $startTime, $currentTime")
         if (currentTime - startTime > Constants.WORK_MANAGER_TIMEOUT) {
-            ReceiverHelper.persistentState.workManagerStartTime = 0
+            persistentState.workManagerStartTime = 0
             return Result.failure()
         }
 
@@ -61,7 +66,7 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
 
     private fun checkForDownload(context: Context): Int {
         //Check for the download success from the receiver
-        ReceiverHelper.persistentState.downloadIDs.forEach { downloadID ->
+        persistentState.downloadIDs.forEach { downloadID ->
             val query = DownloadManager.Query()
             query.setFilterById(downloadID.toLong())
             val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
@@ -75,10 +80,10 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "onReceive status $status $downloadID")
                 if (status == DownloadManager.STATUS_RUNNING) {
                 } else if (status == DownloadManager.STATUS_SUCCESSFUL) {
-                    if (ReceiverHelper.persistentState.downloadIDs.contains(downloadID)) {
-                        ReceiverHelper.persistentState.downloadIDs = ReceiverHelper.persistentState.downloadIDs.minusElement(downloadID)
+                    if (persistentState.downloadIDs.contains(downloadID)) {
+                        persistentState.downloadIDs = persistentState.downloadIDs.minusElement(downloadID)
                     }
-                    if (ReceiverHelper.persistentState.downloadIDs.isEmpty()) {
+                    if (persistentState.downloadIDs.isEmpty()) {
                         cursor.close()
                         return 1
                     }

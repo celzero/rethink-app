@@ -20,11 +20,13 @@ import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.celzero.bravedns.receiver.ReceiverHelper
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DOWNLOAD
 import dnsx.Dnsx
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.io.File
 
 /**
@@ -38,7 +40,9 @@ import java.io.File
  */
 
 class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
-        : Worker(context, workerParameters){
+        : Worker(context, workerParameters), KoinComponent{
+
+    val persistentState by inject<PersistentState>()
 
     override fun doWork(): Result {
         try{
@@ -57,7 +61,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
 
     private fun copyFiles(context : Context): Boolean {
         try {
-            val timeStamp = ReceiverHelper.persistentState.tempBlocklistDownloadTime
+            val timeStamp = persistentState.tempBlocklistDownloadTime
             if (DownloadHelper.isLocalDownloadValid(context, timeStamp.toString())) {
                 DownloadHelper.deleteFromCanonicalPath(context)
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Copy file Directory isLocalDownloadValid- true")
@@ -78,11 +82,11 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
                                 //Update the shared pref values
                                 val isValid = isDownloadValid()
                                 if(isValid) {
-                                    ReceiverHelper.persistentState.localBlockListDownloadTime = timeStamp
-                                    ReceiverHelper.persistentState.localBlocklistEnabled = true
-                                    ReceiverHelper.persistentState.blockListFilesDownloaded = true
-                                    ReceiverHelper.persistentState.tempBlocklistDownloadTime = 0
-                                    ReceiverHelper.persistentState.workManagerStartTime = 0
+                                    persistentState.localBlockListDownloadTime = timeStamp
+                                    persistentState.localBlocklistEnabled = true
+                                    persistentState.blockListFilesDownloaded = true
+                                    persistentState.tempBlocklistDownloadTime = 0
+                                    persistentState.workManagerStartTime = 0
                                     DownloadHelper.deleteOldFiles(context)
                                     return true
                                 }
@@ -110,7 +114,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
      */
     private fun isDownloadValid(): Boolean {
         try{
-            val timeStamp = ReceiverHelper.persistentState.tempBlocklistDownloadTime
+            val timeStamp = persistentState.tempBlocklistDownloadTime
             val path: String = context.filesDir.canonicalPath +"/"+ timeStamp
             val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
             if(braveDNS != null){

@@ -72,7 +72,7 @@ class Constants {
         //No package applications
         const val NO_PACKAGE = "no_package"
 
-        const val TOTAL_NETWORK_LOG_ENTRIES_THRESHOLD = 5000
+        val TOTAL_NETWORK_LOG_ENTRIES_THRESHOLD = TimeUnit.SECONDS.toMillis(5)
 
         const val INVALID_UID = -1
         const val MISSING_UID = -2000
@@ -80,7 +80,7 @@ class Constants {
         const val RETHINK_DNS_PLUS = "RethinkDNS Plus"
         const val RETHINK_DNS = "RethinkDNS Basic (default)"
 
-        const val DELAY_FIREWALL_RESPONSE_MS: Long = 30000
+        val DELAY_FIREWALL_RESPONSE_MS: Long = TimeUnit.SECONDS.toMillis(30)
 
         const val DNS_TYPE_DOH = 1
         const val DNS_TYPE_DNS_CRYPT = 2
@@ -166,7 +166,6 @@ class Constants {
         // it for every request. The value is set as 1 minute.
         val NETWORK_REQUEST_WRITE_THRESHOLD_MS = TimeUnit.MINUTES.toMillis(1)
 
-        // Log tag
         const val LOG_TAG_APP_UPDATE = "NonStoreAppUpdater"
         const val LOG_TAG_FIREWALL_LOG = "FirewallLogs"
         const val LOG_TAG_DNS_LOG = "DnsLogs"
@@ -188,5 +187,14 @@ class Constants {
         const val DEFAULT_ROUTE_IP = "0.0.0.0"
 
         const val ACTION_VPN_SETTINGS_INTENT = "android.net.vpn.SETTINGS"
+
+        // For DNS screen, the tabs for FragmentStateAdapter to load.
+        const val DNS_SCREEN_LOGS = 0
+        const val DNS_SCREEN_CONFIG = 1
+
+        // For Firewall screen, the tabs for FragmentStateAdapter to load.
+        const val FIREWALL_SCREEN_UNIVERSAL = 0
+        const val FIREWALL_SCREEN_LOG = 1
+        const val FIREWALL_SCREEN_ALL_APPS = 2
     }
 }
