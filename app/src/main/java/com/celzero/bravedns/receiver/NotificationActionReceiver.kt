@@ -25,21 +25,18 @@ import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.HomeScreenActivity
-import com.celzero.bravedns.ui.HomeScreenFragment
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS_FIREWALL
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -48,26 +45,26 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
 
     override fun onReceive(context: Context, intent: Intent) {
         val action: String? = intent.getStringExtra(Constants.NOTIFICATION_ACTION)
-        Log.i(Constants.LOG_TAG, "NotificationActionReceiver: onReceive - $action")
+        Log.i(LOG_TAG_VPN, "NotificationActionReceiver: onReceive - $action")
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         when (action) {
             OrbotHelper.ORBOT_NOTIFICATION_ACTION_TEXT -> {
                 openOrbotApp(context)
                 manager.cancel(OrbotHelper.ORBOT_SERVICE_ID)
             }
-            Constants.STOP_VPN_NOTIFICATION_ACTION -> {
+            Constants.NOTIF_ACTION_STOP_VPN -> {
                 stopVpn(context)
                 manager.cancel(BraveVPNService.SERVICE_ID)
             }
-            Constants.DNS_VPN_NOTIFICATION_ACTION -> {
+            Constants.NOTIF_ACTION_DNS_VPN -> {
                 dnsMode()
                 manager.cancel(BraveVPNService.SERVICE_ID)
             }
-            Constants.DNS_FIREWALL_VPN_NOTIFICATION_ACTION -> {
+            Constants.NOTIF_ACTION_DNS_FIREWALL_VPN -> {
                 dnsFirewallMode()
                 manager.cancel(BraveVPNService.SERVICE_ID)
             }
-            Constants.RULES_FAILURE_NOTIFICATION_ACTION -> {
+            Constants.NOTIF_ACTION_RULES_FAILURE -> {
                 reloadRules()
                 manager.cancel(BraveVPNService.SERVICE_ID)
             }
@@ -82,25 +79,23 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
         }
     }
 
-    private fun openOrbotApp(context: Context?) {
+    private fun openOrbotApp(context: Context) {
         val packageName = OrbotHelper.ORBOT_PACKAGE_NAME
-        Log.i(Constants.LOG_TAG, "appInfoForPackage: $packageName")
+        Log.i(LOG_TAG_VPN, "appInfoForPackage: $packageName")
         try {
-            val launchIntent: Intent? = context?.packageManager?.getLaunchIntentForPackage(packageName)
+            val launchIntent: Intent? = context.packageManager?.getLaunchIntentForPackage(packageName)
             if (launchIntent != null) {//null pointer check in case package name was not found
-                Log.d(Constants.LOG_TAG, "launchIntent: $packageName")
+                Log.d(LOG_TAG_VPN, "launchIntent: $packageName")
                 context.startActivity(launchIntent)
             } else {
-                val text = context?.getString(R.string.orbot_app_issue)
-                if (text != null) {
-                    Utilities.showToastInMidLayout(context, text, Toast.LENGTH_SHORT)
-                }
+                val text = context.getString(R.string.orbot_app_issue)
+                Utilities.showToastUiCentered(context, text, Toast.LENGTH_SHORT)
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                 intent.data = Uri.fromParts("package", packageName, null)
-                context?.startActivity(intent)
+                context.startActivity(intent)
             }
         } catch (e: ActivityNotFoundException) {
-            Log.w(Constants.LOG_TAG, "Exception while opening app info: ${e.message}", e)
+            Log.w(LOG_TAG_VPN, "Exception while opening app info: ${e.message}", e)
         }
     }
 

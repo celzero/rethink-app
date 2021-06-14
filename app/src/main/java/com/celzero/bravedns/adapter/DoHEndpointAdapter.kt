@@ -39,7 +39,7 @@ import com.celzero.bravedns.ui.DNSConfigureWebViewActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_DNS_PLUS
 import com.celzero.bravedns.util.UIUpdateInterface
 import com.celzero.bravedns.util.Utilities
@@ -82,12 +82,11 @@ class DoHEndpointAdapter(private val context: Context,
             b.dohEndpointListUrlName.text = doHEndpoint.dohName
             if (doHEndpoint.isSelected) {
                 b.dohEndpointListUrlExplanation.text = context.getString(R.string.dns_connected)
-                Log.i(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}")
+                Log.i(LOG_TAG_DNS, "DOH Endpoint connected - ${doHEndpoint.dohName}")
                 if (doHEndpoint.dohName == RETHINK_DNS_PLUS) {
                     val count = persistentState.numberOfRemoteBlocklists
-                    Log.i(LOG_TAG, "DOH Endpoint connected - ${doHEndpoint.dohName}, count- $count")
                     if (count != 0) {
-                        b.dohEndpointListUrlExplanation.text =  context.getString(R.string.dns_connected_rethink_plus, count.toString())
+                        b.dohEndpointListUrlExplanation.text = context.getString(R.string.dns_connected_rethink_plus, count.toString())
                     }
                 }
             } else {
@@ -121,11 +120,11 @@ class DoHEndpointAdapter(private val context: Context,
                 var stamp = ""
                 try {
                     stamp = getBlocklistStampFromURL(doHEndpoint.dohURL)
-                    if (DEBUG) Log.d(LOG_TAG, "Configure btn click: ${doHEndpoint.dohURL}, $stamp")
+                    if (DEBUG) Log.d(LOG_TAG_DNS, "Configure btn click: ${doHEndpoint.dohURL}, $stamp")
                 } catch (e: Exception) {
-                    Log.w(LOG_TAG, "Exception while fetching stamp from Go ${e.message}", e)
+                    Log.w(LOG_TAG_DNS, "Exception while fetching stamp from Go ${e.message}", e)
                 }
-                if (DEBUG) Log.d(LOG_TAG, "startActivityForResult - DohEndpointadapter")
+                if (DEBUG) Log.d(LOG_TAG_DNS, "startActivityForResult - DohEndpointadapter")
                 val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
                 intent.putExtra("location", DNSConfigureWebViewActivity.REMOTE)
                 intent.putExtra("stamp", stamp)
@@ -135,16 +134,16 @@ class DoHEndpointAdapter(private val context: Context,
 
 
         private fun updateConnection(doHEndpoint: DoHEndpoint) {
-            if (DEBUG) Log.d(LOG_TAG, "updateConnection - ${doHEndpoint.dohName}, ${doHEndpoint.dohURL}")
+            if (DEBUG) Log.d(LOG_TAG_DNS, "updateConnection - ${doHEndpoint.dohName}, ${doHEndpoint.dohURL}")
             doHEndpoint.dohURL = doHEndpointRepository.getConnectionURL(doHEndpoint.id)
             if (doHEndpoint.dohName == RETHINK_DNS_PLUS) {
                 var stamp = ""
                 try {
                     stamp = getBlocklistStampFromURL(doHEndpoint.dohURL)
                 } catch (e: Exception) {
-                    Log.w(LOG_TAG, "Exception while fetching stamp from Go ${e.message}", e)
+                    Log.w(LOG_TAG_DNS, "Exception while fetching stamp from Go ${e.message}", e)
                 }
-                if (DEBUG) Log.d(LOG_TAG, "updateConnection - $stamp")
+                if (DEBUG) Log.d(LOG_TAG_DNS, "updateConnection stamp- $stamp")
                 if (stamp.isEmpty()) {
                     showDialogToConfigure()
                     b.dohEndpointListCheckImage.isChecked = false
@@ -172,21 +171,19 @@ class DoHEndpointAdapter(private val context: Context,
 
         private fun showDialogExplanation(title: String, url: String, message: String) {
             val builder = AlertDialog.Builder(context)
-            //set title for alert dialog
             builder.setTitle(title)
-            //set message for alert dialog
             builder.setMessage(url + "\n\n" + message)
             builder.setCancelable(true)
             //performing positive action
             builder.setPositiveButton(context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
                 dialogInterface.dismiss()
             }
-            builder.setNeutralButton(context.getString(R.string.dns_info_neutral)){ _: DialogInterface, _: Int ->
+            builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
 
                 val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
                 val clip = ClipData.newPlainText("URL", url)
                 clipboard?.setPrimaryClip(clip)
-                Utilities.showToastInMidLayout(context, context.getString(R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(context, context.getString(R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
             }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
@@ -197,9 +194,7 @@ class DoHEndpointAdapter(private val context: Context,
 
         private fun showDialogToDelete(doHEndpoint: DoHEndpoint) {
             val builder = AlertDialog.Builder(context)
-            //set title for alert dialog
             builder.setTitle(R.string.doh_custom_url_remove_dialog_title)
-            //set message for alert dialog
             builder.setMessage(R.string.doh_custom_url_remove_dialog_message)
             builder.setCancelable(true)
             //performing positive action
@@ -223,9 +218,7 @@ class DoHEndpointAdapter(private val context: Context,
 
         private fun showDialogToConfigure() {
             val builder = AlertDialog.Builder(context)
-            //set title for alert dialog
             builder.setTitle(R.string.doh_brave_pro_configure)
-            //set message for alert dialog
             builder.setMessage(R.string.doh_brave_pro_configure_desc)
             builder.setCancelable(true)
             //performing positive action
@@ -268,6 +261,4 @@ class DoHEndpointAdapter(private val context: Context,
             doHEndpointRepository.updateAsync(doHEndpoint)
         }
     }
-
-
 }

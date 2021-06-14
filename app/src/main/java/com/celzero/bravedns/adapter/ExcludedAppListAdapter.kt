@@ -37,7 +37,7 @@ import com.celzero.bravedns.databinding.ExcludedAppListItemBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.ThrowingHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -88,19 +88,19 @@ class ExcludedAppListAdapter(private val context: Context,
             } catch (e: Exception) {
                 GlideApp.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                         .into(b.excludedAppListApkIconIv)
-                Log.e(LOG_TAG, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message, e)
+                Log.e(LOG_TAG_FIREWALL, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message, e)
             }
 
 
             b.excludedAppListContainer.setOnClickListener {
-                if (DEBUG) Log.d(LOG_TAG, "parentView- whitelist - ${appInfo.appName},${appInfo.isExcluded}")
+                if (DEBUG) Log.d(LOG_TAG_FIREWALL, "parentView- whitelist - ${appInfo.appName},${appInfo.isExcluded}")
                 appInfo.isExcluded = !appInfo.isExcluded
                 excludeAppsFromVPN(appInfo, appInfo.isExcluded)
             }
 
             b.excludedAppListCheckbox.setOnCheckedChangeListener(null)
             b.excludedAppListCheckbox.setOnClickListener {
-                if (DEBUG) Log.d(LOG_TAG, "CheckBox- whitelist - ${appInfo.appName},${appInfo.isExcluded}")
+                if (DEBUG) Log.d(LOG_TAG_FIREWALL, "CheckBox- whitelist - ${appInfo.appName},${appInfo.isExcluded}")
                 appInfo.isExcluded = !appInfo.isExcluded
                 excludeAppsFromVPN(appInfo, appInfo.isExcluded)
             }
@@ -124,11 +124,11 @@ class ExcludedAppListAdapter(private val context: Context,
                     categoryInfoRepository.updateExcludedCount(appInfo.appCategory, excludedCount)
                     categoryInfoRepository.updateWhitelistCount(appInfo.appCategory, whitelistCount)
                 }
-                if(DEBUG) Log.d(LOG_TAG,"Apps excluded - ${appInfo.appName}, $status")
+                if(DEBUG) Log.d(LOG_TAG_FIREWALL,"Apps excluded - ${appInfo.appName}, $status")
             } else {
                 b.excludedAppListCheckbox.isChecked = !status
                 appInfo.isExcluded = !status
-                if (DEBUG) Log.d(LOG_TAG, "App not excluded - ${appInfo.appName}, $status")
+                if (DEBUG) Log.d(LOG_TAG_FIREWALL, "App not excluded - ${appInfo.appName}, $status")
             }
         }
 

@@ -25,7 +25,7 @@ import android.os.PowerManager
 import android.util.Log
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_VPN
 import org.koin.android.ext.android.inject
 import java.util.*
 
@@ -65,7 +65,7 @@ class DeviceLockService : Service() {
         } else {
             if (!isProtected || !isLocked) return
             if (!persistentState.isScreenOff) {
-                if (DEBUG) Log.d(LOG_TAG, "DeviceLockService : Screen lock detected at $delayIndex")
+                if (DEBUG) Log.d(LOG_TAG_VPN, "DeviceLockService : Screen lock detected at $delayIndex")
                 persistentState.isScreenOff = true
                 timer.cancel()
                 this.stopSelf()

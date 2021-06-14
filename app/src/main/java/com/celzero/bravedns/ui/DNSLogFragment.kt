@@ -182,9 +182,7 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
 
     private fun showDialogForDelete() {
         val builder = AlertDialog.Builder(requireContext())
-        //set title for alert dialog
         builder.setTitle(R.string.dns_query_clear_logs_title)
-        //set message for alert dialog
         builder.setMessage(R.string.dns_query_clear_logs_message)
         builder.setCancelable(true)
         //performing positive action

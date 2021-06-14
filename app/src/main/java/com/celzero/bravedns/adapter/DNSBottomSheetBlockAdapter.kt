@@ -23,7 +23,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.databinding.DnsBlockListItemBinding
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 
 class DNSBottomSheetBlockAdapter(val context: Context, val data: List<String>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -54,7 +53,6 @@ class DNSBottomSheetBlockAdapter(val context: Context, val data: List<String>) :
 
         fun update(dnsBlockItem: String?) {
             if (dnsBlockItem != null) {
-                if (DEBUG) Log.d(LOG_TAG, "Update - blocklist ==> $dnsBlockItem")
                 val items = dnsBlockItem.split(":").toTypedArray()
                 if (items.size == 1) {
                     b.dnsBlockListUrlName.text = items[0]

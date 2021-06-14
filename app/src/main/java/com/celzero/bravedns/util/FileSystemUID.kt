@@ -17,7 +17,7 @@ package com.celzero.bravedns.util
 
 import android.util.Log
 import com.celzero.bravedns.ui.HomeScreenActivity
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_FIREWALL
 
 // https://android.googlesource.com/platform/development/+/da84168fb2f5eb5ca012c3f430f701bc64472f34/ndk/platforms/android-21/include/linux/in.h
 enum class FileSystemUID(val uid : Int) {
@@ -192,7 +192,7 @@ enum class FileSystemUID(val uid : Int) {
             private val map = values().associateBy(FileSystemUID::uid)
 
             fun fromFileSystemUID(uid: Int): FileSystemUID {
-                if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG,"UID: $uid, hashed val : ${uid.hashCode()}, map Vale: ${map[uid.hashCode()]}")
+                if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG_FIREWALL,"UID: $uid, hashed val : ${uid.hashCode()}, map Vale: ${map[uid.hashCode()]}")
                 return map[uid.hashCode()] ?: OTHER
             }
 

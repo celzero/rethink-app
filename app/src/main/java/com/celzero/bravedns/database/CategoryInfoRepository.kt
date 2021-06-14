@@ -19,7 +19,7 @@ package com.celzero.bravedns.database
 import android.util.Log
 import androidx.lifecycle.LiveData
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_APP_DB
 
 class CategoryInfoRepository  (private val categoryInfoDAO: CategoryInfoDAO){
 
@@ -45,11 +45,10 @@ class CategoryInfoRepository  (private val categoryInfoDAO: CategoryInfoDAO){
 
     fun updateCategoryInternet(categoryName: String, isInternetBlocked : Boolean){
         categoryInfoDAO.updateCategoryInternet(categoryName, isInternetBlocked)
-        if(DEBUG) Log.d(LOG_TAG,"updateCategoryInternet - isInternetBlocked 1 -$isInternetBlocked")
+        if(DEBUG) Log.d(LOG_TAG_APP_DB,"updateCategoryInternet - isInternetBlocked -$isInternetBlocked for $categoryName")
         if(isInternetBlocked){
             categoryInfoDAO.updateBlockedCount(categoryName)
         }else{
-            if(DEBUG) Log.d(LOG_TAG,"updateCategoryInternet - isInternetBlocked -$isInternetBlocked")
             categoryInfoDAO.updateBlockedCountToZero(categoryName)
         }
     }
@@ -63,7 +62,6 @@ class CategoryInfoRepository  (private val categoryInfoDAO: CategoryInfoDAO){
             }else{
                 categoryInfoDAO.updateCategoryInternet(categoryName, false)
             }
-            if(DEBUG) Log.d(LOG_TAG, "Updated value: $count")
         }else {
             val count = categoryInfoDAO.decreaseNumberOfBlocked(categoryName)
             val categoryDetail = categoryInfoDAO.getCategoryDetail(categoryName)
@@ -72,7 +70,6 @@ class CategoryInfoRepository  (private val categoryInfoDAO: CategoryInfoDAO){
             } else {
                 categoryInfoDAO.updateCategoryInternet(categoryName, false)
             }
-            if(DEBUG) Log.d(LOG_TAG, "Updated value: $count")
         }
     }
 

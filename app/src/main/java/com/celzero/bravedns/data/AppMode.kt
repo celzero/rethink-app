@@ -21,7 +21,11 @@ import com.celzero.bravedns.database.*
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_APP_MODE
+import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_INVALID
+import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DNSCRYPT
+import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DOH
+import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_PROXY
 import dnsx.BraveDNS
 import dnsx.Dnsx
 import settings.Settings
@@ -45,17 +49,17 @@ class AppMode internal constructor(
     private var braveDNS : BraveDNS ?= null
 
     fun getDNSMode(): Long {
-        if (appDNSMode == -1L) {
+        if (appDNSMode == PREF_DNS_INVALID) {
             val dnsType = persistentState.dnsType
-            if (dnsType == 1) {
+            if (dnsType == PREF_DNS_MODE_DOH) {
                 if (persistentState.allowDNSTraffic) {
                     appDNSMode = Settings.DNSModePort
                 } else {
                     appDNSMode = Settings.DNSModeIP
                 }
-            } else if (dnsType == 2) {
+            } else if (dnsType == PREF_DNS_MODE_DNSCRYPT) {
                 appDNSMode = Settings.DNSModeCryptPort
-            } else if (dnsType == 3) {
+            } else if (dnsType == PREF_DNS_MODE_PROXY) {
                 return getProxyModeSettings()
             }
         }
@@ -63,7 +67,7 @@ class AppMode internal constructor(
     }
 
     fun getFirewallMode(): Long {
-        return if (appFirewallMode == -1L) {
+        return if (appFirewallMode == PREF_DNS_INVALID) {
             persistentState.firewallMode.toLong()
         } else {
             appFirewallMode
@@ -76,10 +80,10 @@ class AppMode internal constructor(
     }
 
     fun getProxyMode(): Long {
-        if (appProxyMode == -1L) {
+        if (appProxyMode == PREF_DNS_INVALID) {
             return persistentState.proxyMode
         }
-        Log.d(LOG_TAG, "proxy mode - $appProxyMode")
+        Log.d(LOG_TAG_APP_MODE, "proxy mode - $appProxyMode")
         return appProxyMode
     }
 
@@ -119,10 +123,10 @@ class AppMode internal constructor(
         val dohEndpoint : DoHEndpoint = doHEndpointRepository.getConnectedDoH() ?: return null
         if (dohEndpoint.dohURL.isEmpty()) {
             if (DEBUG) {
-                Log.i(LOG_TAG, "getDOHDetails -appMode- DoH endpoint is null")
+                Log.i(LOG_TAG_APP_MODE, "getDOHDetails -appMode- DoH endpoint is null")
             }
         }else{
-            if (DEBUG) Log.d(LOG_TAG, "getDOHDetails -appMode- DoH endpoint - ${dohEndpoint.dohURL}")
+            if (DEBUG) Log.d(LOG_TAG_APP_MODE, "getDOHDetails -appMode- DoH endpoint - ${dohEndpoint.dohURL}")
         }
         return dohEndpoint
     }
@@ -172,7 +176,7 @@ class AppMode internal constructor(
                 i++
             }
             servers = servers.dropLast(1)
-            Log.i(LOG_TAG, "Crypt Server - $servers")
+            Log.i(LOG_TAG_APP_MODE, "Crypt Server - $servers")
             servers
         }
     }
@@ -191,7 +195,7 @@ class AppMode internal constructor(
                 relayString += "${it.dnsCryptRelayURL},"
             }
             relayString = relayString.dropLast(1)
-            Log.i(LOG_TAG, "Crypt Server - $relayString")
+            Log.i(LOG_TAG_APP_MODE, "Crypt Server - $relayString")
             relayString
         }
     }
@@ -208,11 +212,11 @@ class AppMode internal constructor(
         if(braveDNS == null && persistentState.localBlocklistEnabled
             && persistentState.blockListFilesDownloaded && persistentState.localBlockListStamp.isNotEmpty()){
             val path: String = context.filesDir.canonicalPath +"/"+ persistentState.localBlockListDownloadTime
-            if (DEBUG) Log.d(LOG_TAG, "Local brave dns set call from AppMode path newBraveDNSLocal :$path")
+            if (DEBUG) Log.d(LOG_TAG_APP_MODE, "Local brave dns set call from AppMode path newBraveDNSLocal :$path")
             try{
                 braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
             }catch (e : Exception){
-                if (DEBUG) Log.d(LOG_TAG, "Local brave dns set exception :${e.message}")
+                if (DEBUG) Log.d(LOG_TAG_APP_MODE, "Local brave dns set exception :${e.message}")
             }
         }
         return braveDNS

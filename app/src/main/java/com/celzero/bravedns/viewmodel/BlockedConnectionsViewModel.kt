@@ -15,14 +15,12 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.toLiveData
-import com.celzero.bravedns.database.AppDatabase
-import com.celzero.bravedns.database.BlockedConnections
 import com.celzero.bravedns.database.BlockedConnectionsDAO
+import com.celzero.bravedns.util.Constants.Companion.FILTER_IS_FILTER
 
 class BlockedConnectionsViewModel(private val blockedConnectionsDAO: BlockedConnectionsDAO) : ViewModel() {
 
@@ -38,7 +36,7 @@ class BlockedConnectionsViewModel(private val blockedConnectionsDAO: BlockedConn
     ) { input ->
         if (input.isBlank()) {
             blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(pageSize = 50)
-        } else if (input!! == "isFilter") {
+        } else if (input!! == FILTER_IS_FILTER) {
             blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(pageSize = 50)
         } else {
             blockedConnectionsDAO.getUnivBlockedConnectionsByIP("%$input%").toLiveData(50)

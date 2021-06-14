@@ -30,7 +30,7 @@ class DNSLogRepository(private val dnsLogDAO: DNSLogDAO) {
     }
 
     fun deleteConnectionTrackerCount() {
-        dnsLogDAO.deleteOlderDataCount(Constants.FIREWALL_CONNECTIONS_IN_DB)
+        dnsLogDAO.deleteOlderDataCount(Constants.TOTAL_NETWORK_LOG_ENTRIES_THRESHOLD)
     }
 
 }

@@ -26,7 +26,7 @@ import androidx.paging.toLiveData
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.FILTER_IS_FILTER
 
 
 class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTrackerDAO) : ViewModel() {
@@ -41,9 +41,8 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
                 filteredList, (Function<String, LiveData<PagedList<ConnectionTracker>>> { input ->
                     if (input.isBlank()) {
                         connectionTrackerDAO.getConnectionTrackerLiveData().toLiveData(pageSize = 30)
-                    } else if(input.contains("isFilter")){
+                    } else if(input.contains(FILTER_IS_FILTER)){
                         val searchText = input.split(":")[0]
-                        if(DEBUG) Log.d(LOG_TAG, "Filter option - Function - $searchText, $input")
                         if(searchText.isEmpty()){
                             connectionTrackerDAO.getConnectionBlockedConnections().toLiveData(pageSize = 30)
                         }else {
@@ -57,12 +56,10 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
             )
 
     fun setFilter(searchString: String, filter : String? ) {
-        if(DEBUG) Log.d(LOG_TAG, "Filter option:$searchString, $filter ")
         filteredList.value = "$searchString$filter"
     }
 
     fun setFilterBlocked(filter: String){
-        if(DEBUG) Log.d(LOG_TAG, "Filter option blocked:, $filter ")
         filteredList.value = filter
     }
 

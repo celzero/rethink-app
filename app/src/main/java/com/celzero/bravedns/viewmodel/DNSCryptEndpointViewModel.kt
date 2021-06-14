@@ -15,13 +15,10 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.toLiveData
-import com.celzero.bravedns.database.AppDatabase
-import com.celzero.bravedns.database.DNSCryptEndpoint
 import com.celzero.bravedns.database.DNSCryptEndpointDAO
 
 class DNSCryptEndpointViewModel(private val dnsCryptEndpointDAO: DNSCryptEndpointDAO) : ViewModel() {

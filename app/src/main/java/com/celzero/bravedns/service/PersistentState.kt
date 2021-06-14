@@ -27,7 +27,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.connectedDNS
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.lifeTimeQueries
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Constants.Companion.ORBOT_MODE_NONE
 import hu.autsoft.krate.*
 import settings.Settings
@@ -130,7 +130,7 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
         }
     }
 
-    // FIXME #200 - Removed the list from the persistent state.
+    // FIXME #200 - Remove the usage of lists from persistent state.
     fun modifyAllowedData(forPackage: String, remove: Boolean) {
         excludedPackagesData = if (remove) {
             excludedPackagesData - forPackage
@@ -177,29 +177,30 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
 
     //fixme replace the below logic once the DNS data is streamlined.
     fun getConnectedDNS(): String {
-        if (connectedDNS.value.isNullOrEmpty()) {
-            val dnsType = appMode?.getDNSType()
-            return if (dnsType == Constants.PREF_DNS_MODE_DOH) {
-                val dohDetail: DoHEndpoint?
-                try {
-                    dohDetail = appMode?.getDOHDetails()
-                    dohDetail?.dohName!!
-                } catch (e: Exception) {
-                    Log.e(LOG_TAG, "Exception while fetching DOH from the database", e)
-                    connectedDNSName
-                }
-            } else if (dnsType == Constants.PREF_DNS_MODE_DNSCRYPT) {
-                if (appMode?.getDNSCryptServerCount() != null) {
-                    val cryptDetails = appMode?.getDNSCryptServerCount()
-                    context.getString(R.string.configure_dns_crypt, cryptDetails.toString())
-                } else {
-                    context.getString(R.string.configure_dns_crypt, "0")
-                }
-            } else {
-                val proxyDetails = appMode?.getDNSProxyServerDetails()
-                proxyDetails?.proxyAppName!!
+        if (!connectedDNS.value.isNullOrEmpty()) {
+            return connectedDNS.value!!
+        }
+        val dnsType = appMode?.getDNSType()
+        return if (Constants.PREF_DNS_MODE_DOH == dnsType) {
+            val dohDetail: DoHEndpoint?
+            try {
+                dohDetail = appMode?.getDOHDetails()
+                dohDetail?.dohName!!
+            } catch (e: Exception) {
+                Log.e(LOG_TAG_VPN, "Exception while fetching DOH from the database", e)
+                connectedDNSName
             }
-        } else return connectedDNS.value!!
+        } else if (Constants.PREF_DNS_MODE_DNSCRYPT == dnsType) {
+            if (appMode?.getDNSCryptServerCount() != null) {
+                val cryptDetails = appMode?.getDNSCryptServerCount()
+                context.getString(R.string.configure_dns_crypt, cryptDetails.toString())
+            } else {
+                context.getString(R.string.configure_dns_crypt, "0")
+            }
+        } else {
+            val proxyDetails = appMode?.getDNSProxyServerDetails()
+            proxyDetails?.proxyAppName!!
+        }
     }
 
     fun setConnectedDNS(name: String) {

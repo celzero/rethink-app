@@ -20,15 +20,15 @@ import android.util.Log
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_APP_UPDATE
 import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
 
-class NonStoreAppUpdater(val baseURL:String, private val persistentState: PersistentState):AppUpdater {
-    private val LOG_TAG = "${Constants.LOG_TAG}/NonStoreAppUpdater"
+class NonStoreAppUpdater(private val baseURL:String, private val persistentState: PersistentState):AppUpdater {
 
     override fun checkForAppUpdate(isUserInitiated: Boolean, activity: Activity, listener: AppUpdater.InstallStateListener) {
-        Log.i(LOG_TAG, "Beginning update check.")
+        Log.i(LOG_TAG_APP_UPDATE, "Beginning update check.")
         val url = baseURL + BuildConfig.VERSION_CODE
 
         val client = OkHttpClient()
@@ -38,7 +38,7 @@ class NonStoreAppUpdater(val baseURL:String, private val persistentState: Persis
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.i(LOG_TAG, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
+                Log.i(LOG_TAG_APP_UPDATE, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
                 if(isUserInitiated) {
                     listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER)
                 }
@@ -54,7 +54,7 @@ class NonStoreAppUpdater(val baseURL:String, private val persistentState: Persis
                     val updateValue = jsonObject.getBoolean("update")
                     val latestVersion = jsonObject.getInt("latest")
                     persistentState.lastAppUpdateCheck = System.currentTimeMillis() // FIXME move to NTP
-                    Log.i(Constants.LOG_TAG, "Server response for the new version download is true, version number-  $latestVersion")
+                    Log.i(LOG_TAG_APP_UPDATE, "Server response for the new version download is true, version number-  $latestVersion")
                     if (responseVersion == 1) {
                         if (updateValue) {
                             listener.onUpdateAvailable(AppUpdater.InstallSource.OTHER)

@@ -21,7 +21,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.provider.Settings
-import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.Toast
@@ -40,9 +39,7 @@ import com.celzero.bravedns.database.BlockedConnectionsRepository
 import com.celzero.bravedns.databinding.UniversalFragementContainerBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.BackgroundAccessibilityService
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.AppListViewModel
 import com.celzero.bravedns.viewmodel.BlockedConnectionsViewModel
@@ -103,8 +100,6 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         recyclerRulesAdapter = UniversalBlockedRulesAdapter(requireContext(), blockedConnectionsRepository)
         recyclerAdapter = UniversalAppListAdapter(requireContext(), appInfoRepository, get(), persistentState)
         includeView.firewallUniversalRecycler.adapter = recyclerRulesAdapter
-
-        if (DEBUG) Log.d(LOG_TAG, "UniversalFirewallFragment - post observer")
 
         includeView.firewallAllAppsCheck.isChecked = persistentState.screenState
 
@@ -295,16 +290,14 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         val count = blockedConnectionsRepository.getBlockedConnectionsCount()
         if (count > 0) {
             val builder = AlertDialog.Builder(requireContext())
-            //set title for alert dialog
             builder.setTitle(R.string.univ_delete_firewall_dialog_title)
-            //set message for alert dialog
             builder.setMessage(R.string.univ_delete_firewall_dialog_message)
             builder.setCancelable(true)
             //performing positive action
             builder.setPositiveButton(getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->
                 blockedConnectionsRepository.deleteAllIPRulesUniversal()
                 GlobalVariable.firewallRules.clear()
-                Utilities.showToastInMidLayout(requireContext(), getString(R.string.univ_ip_delete_toast_success), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(requireContext(), getString(R.string.univ_ip_delete_toast_success), Toast.LENGTH_SHORT)
             }
 
             //performing negative action
@@ -316,7 +309,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             alertDialog.setCancelable(true)
             alertDialog.show()
         } else {
-            Utilities.showToastInMidLayout(requireContext(), getString(R.string.univ_ip_no_rules_set), Toast.LENGTH_SHORT)
+            Utilities.showToastUiCentered(requireContext(), getString(R.string.univ_ip_no_rules_set), Toast.LENGTH_SHORT)
         }
     }
 
@@ -329,11 +322,9 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
                 persistentState.isBackgroundEnabled = false
                 showAlertForPermission(true)
             }else{
-                if (DEBUG) Log.d(LOG_TAG, "Background - onLoad accessibility is true")
                 b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = persistentState.isBackgroundEnabled
             }
         } else {
-            if (DEBUG) Log.d(LOG_TAG, "Background - onLoad accessibility is true, changed pref")
             persistentState.isBackgroundEnabled = false
             b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = false
         }

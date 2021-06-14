@@ -19,6 +19,7 @@ package com.celzero.bravedns.service
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
+import com.bumptech.glide.util.Util
 import com.celzero.bravedns.data.IPDetails
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.ConnectionTracker
@@ -26,15 +27,16 @@ import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_FIREWALL_LOG
 import com.celzero.bravedns.util.FileSystemUID
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
 import com.celzero.bravedns.util.Utilities.Companion.getFlag
 import com.google.common.net.InetAddresses
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.net.UnknownHostException
 import java.util.*
 
 class IPTracker internal constructor(
@@ -72,22 +74,19 @@ class IPTracker internal constructor(
         connTracker.timeStamp = ipDetails.timeStamp
         connTracker.blockedByRule = ipDetails.blockedByRule
 
-        try {
-            // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
-            // Unlike InetAddress.getByName(), the methods of this class never cause DNS services
-            // to be accessed
-            val serverAddress = InetAddresses.forString(ipDetails.destIP)
-            val countryCode: String = getCountryCode(serverAddress!!, context)
-            connTracker.flag = getFlag(countryCode)
-        } catch (ex: UnknownHostException) {
-            Log.e(LOG_TAG, "Exception on InetAddress", ex)
-        }
+        // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
+        // Unlike InetAddress.getByName(), the methods of this class never cause DNS services
+        // to be accessed
+        val serverAddress = InetAddresses.forString(ipDetails.destIP)
+        val countryCode: String = getCountryCode(serverAddress!!, context)
+        connTracker.flag = getFlag(countryCode)
+
 
         //app-name
         val packageNameList = context.packageManager.getPackagesForUid(ipDetails.uid)
 
         if (packageNameList != null) {
-            if (DEBUG) Log.d(LOG_TAG, "IPTracker - Package for uid : ${ipDetails.uid}, ${packageNameList.size}")
+            if (DEBUG) Log.d(LOG_TAG_FIREWALL_LOG, "Package for uid : ${ipDetails.uid}, ${packageNameList.size}")
             val packageName = packageNameList[0]
             val appDetails = HomeScreenActivity.GlobalVariable.appList[packageName]
             if (appDetails != null) {
@@ -103,16 +102,14 @@ class IPTracker internal constructor(
             }
         } else {
             val fileSystemUID = FileSystemUID.fromFileSystemUID(ipDetails.uid)
-            if (DEBUG) Log.d(LOG_TAG, "IPTracker - else part : ${ipDetails.uid}, ${fileSystemUID.name}")
-            if (ipDetails.uid == -1) {
+            if (DEBUG) Log.d(LOG_TAG_FIREWALL_LOG, "Part : ${ipDetails.uid}, ${fileSystemUID.name}")
+            if (ipDetails.uid == INVALID_UID) {
                 connTracker.appName = "Unknown"
-            } else if (fileSystemUID.uid == -1) {
-                connTracker.appName = "Unnamed(${ipDetails.uid})"
-                if (!isAvailableInDatabase(ipDetails.uid)) {
-                    insertNonAppToAppInfo(ipDetails.uid, connTracker.appName.toString())
-                }
             } else {
-                connTracker.appName = fileSystemUID.name
+                when (Utilities.isInvalidUid(fileSystemUID.uid)) {
+                    true -> connTracker.appName = "Unnamed(${ipDetails.uid})"
+                    false -> connTracker.appName = fileSystemUID.name
+                }
                 if (!isAvailableInDatabase(ipDetails.uid)) {
                     insertNonAppToAppInfo(ipDetails.uid, connTracker.appName.toString())
                 }

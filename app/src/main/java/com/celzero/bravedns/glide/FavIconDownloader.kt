@@ -23,7 +23,7 @@ import com.bumptech.glide.request.FutureTarget
 import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.Utilities
 import java.io.File
 
@@ -54,16 +54,16 @@ class FavIconDownloader(val context: Context, val url: String) : Runnable {
             .submit(SIZE_ORIGINAL, SIZE_ORIGINAL)
         try {
             val file = futureTarget.get()
-            if(DEBUG) Log.d(LOG_TAG, "Glide - success() -$url, $cacheKey, ${file.absoluteFile}")
+            if(DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - success() -$url, $cacheKey, ${file.absoluteFile}")
         }catch (e: Exception) {
             // In case of failure the FutureTarget will throw an exception.
             // Will initiate the download of fav icon for the top level domain.
             if (retry) {
-                if(DEBUG) Log.d(LOG_TAG, "Glide - onLoadFailed() -$url")
+                if(DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - onLoadFailed() -$url")
                 updateImage(cacheKey, "", false)
             }
             if (DEBUG) {
-                Log.d(LOG_TAG, "Glide - Got ExecutionException waiting for background downloadOnly ${e.message}")
+                Log.d(LOG_TAG_DNS_LOG, "Glide - Got ExecutionException waiting for background downloadOnly ${e.message}")
             }
         } finally {
             GlideApp.with(context.applicationContext).clear(futureTarget)

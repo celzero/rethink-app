@@ -15,17 +15,13 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.toLiveData
-import com.celzero.bravedns.database.AppDatabase
-import com.celzero.bravedns.database.DNSCryptRelayEndpoint
 import com.celzero.bravedns.database.DNSCryptRelayEndpointDAO
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 
 class DNSCryptRelayEndpointViewModel(private val dnsCryptRelayEndpointDAO: DNSCryptRelayEndpointDAO) : ViewModel() {
 
@@ -39,10 +35,8 @@ class DNSCryptRelayEndpointViewModel(private val dnsCryptRelayEndpointDAO: DNSCr
                 filteredList
     ) { input ->
         if (input.isBlank()) {
-            if (DEBUG) Log.d(LOG_TAG, "InputValue - NULL")
             dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveData().toLiveData(pageSize = 50)
         } else {
-            if (DEBUG) Log.d(LOG_TAG, "InputValue - $input")
             dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveDataByName("%$input%")
                 .toLiveData(pageSize = 50)
         }

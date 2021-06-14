@@ -24,7 +24,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DOWNLOAD
 import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
@@ -43,7 +43,7 @@ class HttpRequestHelper{
 
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
-                    Log.i(LOG_TAG, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
+                    Log.i(LOG_TAG_DOWNLOAD, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
                 }
 
                 override fun onResponse(call: Call, response: Response) {
@@ -53,7 +53,7 @@ class HttpRequestHelper{
                     val responseVersion = jsonObject.getInt("version")
                     val updateValue = jsonObject.getBoolean("update")
                     persistentState.lastAppUpdateCheck = System.currentTimeMillis()
-                    Log.i(LOG_TAG, "Server response for the new version download is true, version number-  $updateValue")
+                    Log.i(LOG_TAG_DOWNLOAD, "Server response for the new version download is true, version number-  $updateValue")
                     if (responseVersion == 1) {
                         if (updateValue) {
                             // TODO handle
@@ -72,7 +72,7 @@ class HttpRequestHelper{
             val uri: Uri = Uri.parse(Constants.JSON_DOWNLOAD_BLOCKLIST_LINK)
             val request = DownloadManager.Request(uri)
             request.setDestinationInExternalFilesDir(context, Constants.DOWNLOAD_PATH, Constants.FILE_TAG_NAME)
-            Log.i(LOG_TAG, "Path - ${context.filesDir.canonicalPath}${Constants.DOWNLOAD_PATH}${Constants.FILE_TAG_NAME}")
+            Log.i(LOG_TAG_DOWNLOAD, "Path - ${context.filesDir.canonicalPath}${Constants.DOWNLOAD_PATH}${Constants.FILE_TAG_NAME}")
             downloadManager.enqueue(request)
             return downloadManager
         }
@@ -120,7 +120,7 @@ class HttpRequestHelper{
                     //reasonText = "Filename:\n$filename"
                 }
             }
-            if(DEBUG) Log.d(LOG_TAG,"Reason: $reasonText")
+            if(DEBUG) Log.d(LOG_TAG_DOWNLOAD,"Reason: $reasonText")
             return statusText
         }
 

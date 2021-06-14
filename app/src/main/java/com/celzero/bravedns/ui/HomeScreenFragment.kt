@@ -56,9 +56,11 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS_FIREWALL
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_FIREWALL
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_PROXY
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.openVPNProfile
+import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 import com.facebook.shimmer.Shimmer
 import org.koin.android.ext.android.inject
 import settings.Settings
@@ -280,12 +282,12 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 b.fhsCardDnsConfigure.setTextColor(fetchTextColor(R.color.secondaryText))
                 b.fhsCardFirewallConfigure.setTextColor(fetchTextColor(R.color.secondaryText))
                 appStartTime = System.currentTimeMillis()
-                if (DEBUG) Log.d(LOG_TAG, "VPN service start initiated with time $appStartTime")
+                if (DEBUG) Log.d(LOG_TAG_VPN, "VPN service start initiated with time $appStartTime")
                 if (VpnController.getInstance().getBraveVpnService() != null) {
                     VpnController.getInstance().stop(requireContext())
-                    if (DEBUG) Log.d(LOG_TAG, "VPN service start initiated but the brave service is already running - so stop called")
+                    if (DEBUG) Log.d(LOG_TAG_VPN, "VPN service start initiated but the brave service is already running - so stop called")
                 } else {
-                    if (DEBUG) Log.d(LOG_TAG, "VPN service start initiated")
+                    if (DEBUG) Log.d(LOG_TAG_VPN, "VPN service start initiated")
                 }
                 prepareAndStartDnsVpn()
             }
@@ -304,17 +306,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun showStopDialogAlwaysOn() {
         val builder = AlertDialog.Builder(requireContext())
-        var isLockDownEnabled = false
-        if (VERSION.SDK_INT >= VERSION_CODES.Q) {
-            val vpnService = VpnController.getInstance().getBraveVpnService()
-            if (vpnService != null) {
-                isLockDownEnabled = vpnService.isLockdownEnabled
-            }
-        }
-        //set title for alert dialog
+        val isLockDownEnabled = isVpnLockdown()
+
         builder.setTitle(R.string.always_on_dialog_stop_heading)
         if (isLockDownEnabled) {
-            //set message for alert dialog
             if (VERSION.SDK_INT >= VERSION_CODES.N) {
                 builder.setMessage(Html.fromHtml(getString(R.string.always_on_dialog_lockdown_stop_message), HtmlCompat.FROM_HTML_MODE_COMPACT))
             } else {
@@ -335,7 +330,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         builder.setNeutralButton(R.string.always_on_dialog_neutral) { _, _ ->
-            openVPNProfile(requireContext())
+            openVpnProfile(requireContext())
         }
 
         // Create the AlertDialog
@@ -343,6 +338,16 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         // Set other dialog properties
         alertDialog.setCancelable(false)
         alertDialog.show()
+    }
+
+    private fun isVpnLockdown(): Boolean {
+        if (VERSION.SDK_INT >= VERSION_CODES.Q) {
+            val vpnService = VpnController.getInstance().getBraveVpnService()
+            if (vpnService != null) {
+                return vpnService.isLockdownEnabled
+            }
+        }
+        return false
     }
 
     private fun openBottomSheet() {
@@ -363,25 +368,23 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 if (status.connectionState == null) {
                     return false
                 }
-                if (DEBUG) Log.i(LOG_TAG, "Status: $stats , alwaysOn: $alwaysOn - lockdown")
+                if (DEBUG) Log.i(LOG_TAG_VPN, "Status: $stats , alwaysOn: $alwaysOn - lockdown")
             } else if (!stats) {
-                if (DEBUG) Log.i(LOG_TAG, "Status: $stats , alwaysOn: $alwaysOn - stats value")
-                showDialogForAlwaysOn()
+                if (DEBUG) Log.i(LOG_TAG_VPN, "Status: $stats , alwaysOn: $alwaysOn - stats value")
+                showAlwaysOnDialog()
             }
             return true
         }
-        if (DEBUG) Log.i(LOG_TAG, "Status: $stats , alwaysOn: $alwaysOn")
+        if (DEBUG) Log.i(LOG_TAG_VPN, "Status: $stats , alwaysOn: $alwaysOn")
         if (getPrivateDnsMode() == PrivateDnsMode.STRICT) {
-            Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.private_dns_toast).toString(), Toast.LENGTH_SHORT)
+            Utilities.showToastUiCentered(requireContext(), resources.getText(R.string.private_dns_toast).toString(), Toast.LENGTH_SHORT)
         }
         return false
     }
 
-    private fun showDialogForAlwaysOn() {
+    private fun showAlwaysOnDialog() {
         val builder = AlertDialog.Builder(requireContext())
-        //set title for alert dialog
         builder.setTitle(R.string.always_on_dialog_heading)
-        //set message for alert dialog
         builder.setMessage(R.string.always_on_dialog)
         builder.setCancelable(true)
         //performing positive action
@@ -418,7 +421,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun startFirewallLogsActivity() {
         val status: VpnState = VpnController.getInstance().getState()
-        if (DEBUG) Log.d(LOG_TAG, "Status : ${status.on} , BraveMode: $braveMode")
+        if (DEBUG) Log.d(LOG_TAG_VPN, "Status : ${status.on} , BraveMode: $braveMode")
         if (status.on) {
             if (braveMode == APP_MODE_DNS_FIREWALL || braveMode == APP_MODE_FIREWALL) {
                 val intent = Intent(requireContext(), FirewallActivity::class.java)
@@ -428,11 +431,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             } else {
                 //when the Firewall is not enabled, but the VPN is active. show the bottom sheet to select the mode
                 openBottomSheet()
-                Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
             }
         } else {
             //when the Firewall is not enabled and VPN is not active. show the dialog to start VPN
-            showDialogToStart()
+            showStartDialog()
         }
     }
 
@@ -446,15 +449,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 startActivity(intent)
             } else {
                 if (getPrivateDnsMode() == PrivateDnsMode.STRICT) {
-                    Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.private_dns_toast).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
+                    Utilities.showToastUiCentered(requireContext(), resources.getText(R.string.private_dns_toast).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
                 }
                 //when the DNS is not enabled, but the VPN is active. show the bottom sheet to select the mode
                 openBottomSheet()
-                Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_dns).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_dns).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
             }
         } else {
             //when the DNS is not enabled and VPN is not active. show the dialog to start VPN
-            showDialogToStart()
+            showStartDialog()
         }
     }
 
@@ -463,7 +466,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      */
     private fun startFirewallActivity() {
         val status: VpnState = VpnController.getInstance().getState()
-        if (DEBUG) Log.d(LOG_TAG, "Status : ${status.on} , BraveMode: $braveMode")
+        if (DEBUG) Log.d(LOG_TAG_VPN, "Status : ${status.on} , BraveMode: $braveMode")
         if (status.on) {
             if (braveMode == APP_MODE_DNS_FIREWALL || braveMode == APP_MODE_FIREWALL) {
                 val intent = Intent(requireContext(), FirewallActivity::class.java)
@@ -473,33 +476,33 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             } else {
                 //when the Firewall is not enabled, but the VPN is active. show the bottom sheet to select the mode
                 openBottomSheet()
-                Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
             }
         } else {
             //when the Firewall is not enabled and VPN is not active. show the dialog to start VPN
-            showDialogToStart()
+            showStartDialog()
         }
     }
 
     private fun startDNSActivity() {
         val status: VpnState = VpnController.getInstance().getState()
         if ((status.on)) {
-            if (braveMode == APP_MODE_DNS_FIREWALL || braveMode == APP_MODE_DNS && (getPrivateDnsMode() != PrivateDnsMode.STRICT)) {
+            if (braveMode == APP_MODE_DNS_FIREWALL || braveMode == APP_MODE_DNS && (PrivateDnsMode.STRICT != getPrivateDnsMode())) {
                 val intent = Intent(requireContext(), DNSDetailActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
                 intent.putExtra(Constants.SCREEN_TO_LOAD, 1)
                 startActivity(intent)
             } else {
                 if (getPrivateDnsMode() == PrivateDnsMode.STRICT) {
-                    Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.private_dns_toast).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
+                    Utilities.showToastUiCentered(requireContext(), resources.getText(R.string.private_dns_toast).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
                 }
                 //when the DNS is not enabled, but the VPN is active. show the bottom sheet to select the mode
                 openBottomSheet()
-                Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_dns).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_dns).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
             }
         } else {
             //when the DNS is not enabled and VPN is not active. show the dialog to start VPN
-            showDialogToStart()
+            showStartDialog()
         }
     }
 
@@ -513,11 +516,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
     }
 
-    private fun showDialogToStart() {
+    private fun showStartDialog() {
         val builder = AlertDialog.Builder(requireContext())
-        //set title for alert dialog
         builder.setTitle(getString(R.string.hsf_start_dialog_header, getModeText()))
-        //set message for alert dialog
         builder.setMessage(getString(R.string.hsf_start_dialog_message))
         builder.setCancelable(true)
         //performing positive action
@@ -530,13 +531,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 // In some cases, VpnService.prepare results in null pointer exception.
                 // java.lang.NullPointerException: Attempt to invoke virtual method
                 // VpnService.prepare(context) on a null object reference
-                Log.w(LOG_TAG, "Prepare VPN Exception - ${e.message}", e)
+                Log.w(LOG_TAG_VPN, "Prepare VPN Exception - ${e.message}", e)
                 null
             }
             //If the VPN.prepare is not null, then the first time VPN dialog is shown.
             if (prepareVpnIntent == null) {
                 openBottomSheet()
-                Utilities.showToastInMidLayout(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_dns).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_dns).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
             }
         }
 
@@ -567,7 +568,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             braveMode = APP_MODE_DNS_FIREWALL
         }
 
-        if (DEBUG) Log.d(LOG_TAG, "Firewall mode : $firewallMode, braveMode: $braveMode, SDK_Version: ${VERSION.SDK_INT}")
+        if (DEBUG) Log.d(LOG_TAG_VPN, "Firewall mode : $firewallMode, braveMode: $braveMode, SDK_Version: ${VERSION.SDK_INT}")
 
         appMode?.setFirewallMode(firewallMode)
 
@@ -586,10 +587,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun updateConnDesc() {
         when (braveMode) {
-            0 -> {
+            APP_MODE_DNS -> {
                 b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_dns_connected)
             }
-            1 -> {
+            APP_MODE_FIREWALL -> {
                 b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_firewall_connected)
             }
             else -> {
@@ -625,18 +626,18 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 //b.fhsDnsOnOffBtn.setTextColor(fetchTextColor(R.color.black_white))
                 //Shimmer
                 shimmerForStart()
-                startDnsVpnService()
+                startVpnService()
                 braveModeToggler.postValue(braveMode)
-                if (DEBUG) Log.d(LOG_TAG, "VPN service start initiated - startDnsVpnService()")
+                if (DEBUG) Log.d(LOG_TAG_VPN, "VPN service start initiated - startDnsVpnService()")
             }
         } else {
-            Log.e("BraveVPN", "Device does not support system-wide VPN mode.")
+            Log.w("BraveVPN", "Device does not support system-wide VPN mode.")
         }
     }
 
     //Shimmer
     private fun shimmerForStart() {
-        if (DEBUG) Log.d(LOG_TAG, "Shimmer stop executed")
+        if (DEBUG) Log.d(LOG_TAG_UI, "Shimmer stop executed")
         b.shimmerViewContainer1.stopShimmer()
     }
 
@@ -647,7 +648,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setDropoff(1f)
         builder.setHighlightAlpha(0.35f)
         b.shimmerViewContainer1.setShimmer(builder.build())
-        if (DEBUG) Log.d(LOG_TAG, "Shimmer Start executed")
+        if (DEBUG) Log.d(LOG_TAG_UI, "Shimmer Start executed")
         b.shimmerViewContainer1.startShimmer()
     }
 
@@ -655,8 +656,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         VpnController.getInstance().stop(context)
     }
 
-    private fun startDnsVpnService() {
-
+    private fun startVpnService() {
         VpnController.getInstance().start(requireContext())
         updateConnDesc()
     }
@@ -678,17 +678,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         //If the VPN.prepare is not null, then the first time VPN dialog is shown, Show info dialog
         //before that.
         if (prepareVpnIntent != null) {
-            showDialogForFirstTimeVPN(prepareVpnIntent)
+            showFirstTimeVpnDialog(prepareVpnIntent)
             return false
         }
         return true
     }
 
-    private fun showDialogForFirstTimeVPN(prepareVpnIntent: Intent) {
+    private fun showFirstTimeVpnDialog(prepareVpnIntent: Intent) {
         val builder = AlertDialog.Builder(requireContext())
-        //set title for alert dialog
         builder.setTitle(R.string.hsf_vpn_dialog_header)
-        //set message for alert dialog
         builder.setMessage(R.string.hsf_vpn_dialog_message)
         builder.setCancelable(true)
         //performing positive action
@@ -717,7 +715,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_PREPARE_VPN && resultCode == Activity.RESULT_OK) {
-            startDnsVpnService()
+            startVpnService()
         } else {
             stopVpnService()
         }
@@ -736,7 +734,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         val controller = VpnController.getInstance()
         val state = controller.getState()
         if (state.activationRequested && !state.on) {
-            Log.d(LOG_TAG, "HOMESCREENFRAGMENT - start VPN (previous state)")
+            Log.d(LOG_TAG_VPN, "HOMESCREENFRAGMENT - start VPN (previous state)")
             prepareAndStartDnsVpn()
         }
     }
@@ -794,13 +792,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 }
             }
         }
-        if (DEBUG) Log.d(LOG_TAG, "Status - ${status.activationRequested}, ${status.connectionState}")
+        if (DEBUG) Log.d(LOG_TAG_VPN, "Status - ${status.activationRequested}, ${status.connectionState}")
 
         if (status.connectionState == BraveVPNService.State.WORKING) {
             statusId = R.string.status_protected
         }
 
-        if (braveMode == 1 && status.activationRequested) {
+        if (braveMode == APP_MODE_FIREWALL && status.activationRequested) {
             statusId = R.string.status_protected
         }
 
@@ -815,7 +813,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             fetchTextColor(R.color.accent_bad)
         }
         if (braveMode == APP_MODE_FIREWALL && status.activationRequested) colorId = fetchTextColor(R.color.positive)
-        if (appMode?.getDNSType() == 3 && status.activationRequested) {
+        if (appMode?.getDNSType() == PREF_DNS_MODE_PROXY && status.activationRequested) {
             statusId = R.string.status_protected
             colorId = fetchTextColor(R.color.positive)
         }
@@ -872,7 +870,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 }
             }
         } catch (e: SocketException) {
-            Log.w(LOG_TAG, e.message, e)
+            Log.w(LOG_TAG_VPN, e.message, e)
         }
         return false
     }

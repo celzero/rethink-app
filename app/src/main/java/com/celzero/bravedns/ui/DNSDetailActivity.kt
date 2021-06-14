@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -29,7 +28,6 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityDnsDetailBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.android.ext.android.inject
 
@@ -88,10 +86,8 @@ class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "onActivityResult")
         if (resultCode == Activity.RESULT_OK) {
             val stamp = data?.getStringArrayExtra(Constants.STAMP_INTENT_EXTRA)
-            if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "onActivityResult - Stamp : $stamp")
         }
     }
 }

@@ -15,13 +15,10 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.toLiveData
-import com.celzero.bravedns.database.AppDatabase
-import com.celzero.bravedns.database.DNSProxyEndpoint
 import com.celzero.bravedns.database.DNSProxyEndpointDAO
 
 class DNSProxyEndpointViewModel(private val dnsProxyEndpointDAO: DNSProxyEndpointDAO) : ViewModel() {

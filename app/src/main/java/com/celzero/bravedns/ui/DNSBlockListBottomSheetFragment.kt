@@ -43,7 +43,7 @@ import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.Utilities.Companion.getETldPlus1
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
@@ -152,7 +152,7 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
 
     private fun updateImage(url: String, cacheKey: String) {
         try {
-            if(DEBUG) Log.d(LOG_TAG, "Glide - TransactionViewHolder updateImage() -$url, $cacheKey")
+            if(DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - TransactionViewHolder updateImage() -$url, $cacheKey")
             val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
             GlideApp.with(contextVal.applicationContext)
                     .load(url).onlyRetrieveFromCache(true)
@@ -168,7 +168,7 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
                         }
 
                         override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
-                            if(DEBUG) Log.d(LOG_TAG, "Glide - CustomViewTarget onResourceReady() -$url")
+                            if(DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - CustomViewTarget onResourceReady() -$url")
                             if(isAdded) {
                                 b.dnsBlockFavIcon.visibility = View.VISIBLE
                                 b.dnsBlockFavIcon.setImageDrawable(resource)
@@ -182,7 +182,7 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
                         }
                     })
         } catch (e: Exception) {
-            if(DEBUG) Log.d(LOG_TAG, "Glide - TransactionViewHolder Exception() -${e.message}")
+            if(DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - TransactionViewHolder Exception() -${e.message}")
             if(isAdded) {
                 b.dnsBlockFavIcon.visibility = View.GONE
             }

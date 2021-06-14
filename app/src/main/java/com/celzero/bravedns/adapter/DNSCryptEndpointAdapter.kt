@@ -21,7 +21,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.DialogInterface
 import android.os.CountDownTimer
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -37,10 +36,8 @@ import com.celzero.bravedns.database.DNSCryptEndpointRepository
 import com.celzero.bravedns.databinding.DnsCryptEndpointListItemBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.QueryTracker
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.UIUpdateInterface
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
@@ -85,7 +82,6 @@ class DNSCryptEndpointAdapter(private val context: Context,
 
 
         fun update(dnsCryptEndpoint: DNSCryptEndpoint) {
-            if (DEBUG) Log.d(LOG_TAG, "dnsCryptEndpoint adapter -- ${dnsCryptEndpoint.dnsCryptName}")
             b.dnsCryptEndpointListUrlName.text = dnsCryptEndpoint.dnsCryptName
             if (dnsCryptEndpoint.isSelected) {
                 b.dnsCryptEndpointListUrlExplanation.text = context.getString(R.string.dns_connected)
@@ -134,9 +130,7 @@ class DNSCryptEndpointAdapter(private val context: Context,
 
         private fun showDialogForDelete(dnsCryptEndpoint: DNSCryptEndpoint?) {
             val builder = AlertDialog.Builder(context)
-            //set title for alert dialog
             builder.setTitle(R.string.dns_crypt_custom_url_remove_dialog_title)
-            //set message for alert dialog
             builder.setMessage(R.string.dns_crypt_url_remove_dialog_message)
             builder.setCancelable(true)
             //performing positive action
@@ -161,9 +155,7 @@ class DNSCryptEndpointAdapter(private val context: Context,
 
         private fun showDialogExplanation(title: String, url: String, message: String) {
             val builder = AlertDialog.Builder(context)
-            //set title for alert dialog
             builder.setTitle(title)
-            //set message for alert dialog
             builder.setMessage(url + "\n\n" + message)
             builder.setCancelable(true)
             //performing positive action
@@ -175,7 +167,7 @@ class DNSCryptEndpointAdapter(private val context: Context,
                 val clipboard: ClipboardManager? = context.getSystemService()
                 val clip = ClipData.newPlainText("URL", url)
                 clipboard?.setPrimaryClip(clip)
-                Utilities.showToastInMidLayout(context, context.getString(R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(context, context.getString(R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
             }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
@@ -186,9 +178,9 @@ class DNSCryptEndpointAdapter(private val context: Context,
 
         private fun updateDNSCryptDetails(dnsCryptEndpoint: DNSCryptEndpoint): Boolean {
             val list = dnsCryptEndpointRepository.getConnectedDNSCrypt()
-            if(list.size == 1){
-                if(!dnsCryptEndpoint.isSelected && list[0].dnsCryptURL == dnsCryptEndpoint.dnsCryptURL){
-                    Toast.makeText(context,context.getString(R.string.dns_select_toast),Toast.LENGTH_SHORT).show()
+            if (list.size == 1) {
+                if (!dnsCryptEndpoint.isSelected && list[0].dnsCryptURL == dnsCryptEndpoint.dnsCryptURL) {
+                    Toast.makeText(context, context.getString(R.string.dns_select_toast), Toast.LENGTH_SHORT).show()
                     return false
                 }
             }
@@ -202,7 +194,7 @@ class DNSCryptEndpointAdapter(private val context: Context,
                     notifyDataSetChanged()
                     persistentState.dnsType = Constants.PREF_DNS_MODE_DNSCRYPT
                     val connectedDNS = dnsCryptEndpointRepository.getConnectedCount()
-                    val text = context.getString(R.string.configure_dns_crypt, connectedDNS)
+                    val text = context.getString(R.string.configure_dns_crypt, connectedDNS.toString())
                     persistentState.setConnectedDNS(text)
                     queryTracker.reinitializeQuantileEstimator()
                 }

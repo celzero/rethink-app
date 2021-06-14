@@ -29,7 +29,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_URLS
 import com.celzero.bravedns.util.Constants.Companion.FILE_NAMES
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_FILE_COUNT
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DOWNLOAD
 import java.util.concurrent.TimeUnit
 
 /**
@@ -63,12 +63,12 @@ class AppDownloadManager(private val persistentState: PersistentState, private v
             for(i in 0 until LOCAL_BLOCKLIST_FILE_COUNT){
                 val url = DOWNLOAD_URLS[i]
                 val fileName = FILE_NAMES[i]
-                if (DEBUG) Log.d(LOG_TAG, "AppDownloadManager ($timeStamp) filename - $fileName, url - $url")
+                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Timestamp - ($timeStamp) filename - $fileName, url - $url")
                 download(url, fileName, timeStamp.toString())
             }
             initiateDownloadStatusCheck()
         }else{
-            Log.i(LOG_TAG, "Context for download is null")
+            Log.i(LOG_TAG_DOWNLOAD, "Context for download is null")
             persistentState.localBlocklistEnabled = false
             persistentState.tempBlocklistDownloadTime = 0
             persistentState.workManagerStartTime = 0
@@ -88,7 +88,7 @@ class AppDownloadManager(private val persistentState: PersistentState, private v
             .build()
 
         //FileHandleWorker manager
-        val timeStampLong = ReceiverHelper.persistentState.tempBlocklistDownloadTime
+        val timeStampLong = persistentState.tempBlocklistDownloadTime
         val timeStamp = workDataOf("timeStamp" to timeStampLong)
 
         val fileHandler = OneTimeWorkRequestBuilder<FileHandleWorker>().setInputData(timeStamp)
@@ -143,7 +143,7 @@ class AppDownloadManager(private val persistentState: PersistentState, private v
             setDescription(fileName)
             request.setDestinationInExternalFilesDir(context, DownloadHelper.getExternalFilePath(null, timeStamp), fileName)
             val downloadID = downloadManager.enqueue(this)
-            if (DEBUG) Log.d(LOG_TAG, "AppDownloadManager filename - $fileName, downloadID - $downloadID")
+            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "filename - $fileName, downloadID - $downloadID")
             persistentState.downloadIDs =  persistentState.downloadIDs + downloadID.toString()
         }
     }

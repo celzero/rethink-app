@@ -42,7 +42,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.DNSBlockListBottomSheetFragment
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.Utilities
 import java.text.SimpleDateFormat
 import java.util.*
@@ -82,7 +82,7 @@ class DNSQueryAdapter(val context: Context, private val persistentState: Persist
     }
 
 
-    inner class TransactionViewHolder(private val b: TransactionRowBinding, private val favIcon: Boolean) : RecyclerView.ViewHolder(b.root){
+    inner class TransactionViewHolder(private val b: TransactionRowBinding, private val favIcon: Boolean) : RecyclerView.ViewHolder(b.root) {
         fun update(transaction: DNSLogs?) {
             // This function can be run up to a dozen times while blocking rendering, so it needs to be
             // as brief as possible.
@@ -98,7 +98,6 @@ class DNSQueryAdapter(val context: Context, private val persistentState: Persist
                         val url = "${Constants.FAV_ICON_URL}${transaction.queryStr}ico"
                         val subDomainURL = Utilities.getETldPlus1(transaction.queryStr).toString()
                         val cacheKey = "${Constants.FAV_ICON_URL}${subDomainURL}.ico"
-                        if(DEBUG) Log.d(LOG_TAG, "Glide - TransactionViewHolder favIcon -$url")
                         updateImage(url, cacheKey)
                     } else {
                         GlideApp.with(context.applicationContext).clear(b.favIcon)
@@ -140,15 +139,14 @@ class DNSQueryAdapter(val context: Context, private val persistentState: Persist
          *
          * This method will be executed only when show fav icon setting is turned on.
          */
-        private fun updateImage(url: String, cacheKey : String) {
+        private fun updateImage(url: String, cacheKey: String) {
             try {
-                Log.d(LOG_TAG, "Glide - TransactionViewHolder updateImage() -$url, $cacheKey")
                 val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
                 GlideApp.with(context.applicationContext)
                     .load(url)
                     .onlyRetrieveFromCache(true)
                     .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                    .override(SIZE_ORIGINAL,SIZE_ORIGINAL)
+                    .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
                     .error(GlideApp.with(context.applicationContext).load(cacheKey).onlyRetrieveFromCache(true))
                     .transition(withCrossFade(factory))
                     .into(object : CustomViewTarget<ImageView, Drawable>(b.favIcon) {
@@ -157,19 +155,20 @@ class DNSQueryAdapter(val context: Context, private val persistentState: Persist
                             b.favIcon.visibility = View.GONE
                             b.favIcon.setImageDrawable(null)
                         }
+
                         override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
-                            if(DEBUG) Log.d(LOG_TAG, "Glide - CustomViewTarget onResourceReady() -$url")
                             b.flag.visibility = View.GONE
                             b.favIcon.visibility = View.VISIBLE
                             b.favIcon.setImageDrawable(resource)
                         }
+
                         override fun onResourceCleared(placeholder: Drawable?) {
                             b.favIcon.visibility = View.GONE
                             b.flag.visibility = View.VISIBLE
                         }
                     })
             } catch (e: Exception) {
-                if(DEBUG) Log.d(LOG_TAG, "Glide - TransactionViewHolder Exception() -${e.message}")
+                if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - TransactionViewHolder Exception() -${e.message}")
                 b.flag.visibility = View.VISIBLE
                 b.favIcon.visibility = View.GONE
             }

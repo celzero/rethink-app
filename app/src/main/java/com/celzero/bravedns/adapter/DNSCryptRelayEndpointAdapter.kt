@@ -125,9 +125,7 @@ class DNSCryptRelayEndpointAdapter(
 
         private fun showDialogExplanation(title: String, url: String, message: String) {
             val builder = AlertDialog.Builder(context)
-            //set title for alert dialog
             builder.setTitle(title)
-            //set message for alert dialog
             builder.setMessage(url + "\n\n" + message)
             builder.setCancelable(true)
             //performing positive action
@@ -139,7 +137,7 @@ class DNSCryptRelayEndpointAdapter(
                 val clipboard: ClipboardManager? = context.getSystemService()
                 val clip = ClipData.newPlainText("URL", url)
                 clipboard?.setPrimaryClip(clip)
-                Utilities.showToastInMidLayout(context, context.getString(R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(context, context.getString(R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
             }
             // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
@@ -150,9 +148,7 @@ class DNSCryptRelayEndpointAdapter(
 
         private fun showDialogForDelete(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint?) {
             val builder = AlertDialog.Builder(context)
-            //set title for alert dialog
             builder.setTitle(R.string.dns_crypt_relay_remove_dialog_title)
-            //set message for alert dialog
             builder.setMessage(R.string.dns_crypt_relay_remove_dialog_message)
             builder.setCancelable(true)
             //performing positive action
@@ -196,6 +192,4 @@ class DNSCryptRelayEndpointAdapter(
 
         }
     }
-
-
 }

@@ -30,7 +30,7 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
-import static com.celzero.bravedns.util.Constants.LOG_TAG;
+import static com.celzero.bravedns.util.Constants.LOG_TAG_VPN;
 
 public class ConnectionTracer {
     private static final boolean DEBUG = false;
@@ -64,7 +64,7 @@ public class ConnectionTracer {
         InetSocketAddress local;
         InetSocketAddress remote;
 
-        if (DEBUG) Log.d(LOG_TAG, sourceIp +  " [" + sourcePort + "] to " + destIp + " [" + destPort + "]");
+        if (DEBUG) Log.d(LOG_TAG_VPN, sourceIp +  " [" + sourcePort + "] to " + destIp + " [" + destPort + "]");
 
         if (TextUtils.isEmpty(sourceIp) || sourceIp.split("\\.").length < 4) {
             //Log.w(TAG, "empty/invalid sourceIp " + sourceIp);
@@ -74,7 +74,7 @@ public class ConnectionTracer {
         }
 
         if (TextUtils.isEmpty(destIp) || destIp.split("\\.").length < 4) {
-            Log.w(LOG_TAG, "empty/invalid destIp " + destIp);
+            Log.w(LOG_TAG_VPN, "empty/invalid destIp " + destIp);
             remote = new InetSocketAddress(destPort);
         } else {
             remote = new InetSocketAddress(destIp, destPort);
@@ -90,10 +90,10 @@ public class ConnectionTracer {
             uid = cm.getConnectionOwnerUid(protocol, local, remote);
             uidCache.put(key, uid);
         }catch(SecurityException secEx){
-            Log.e(LOG_TAG,"NETWORK_STACK permission - "+secEx.getMessage());
+            Log.e(LOG_TAG_VPN,"NETWORK_STACK permission - "+secEx.getMessage());
         }
 
-        if (DEBUG) Log.d(LOG_TAG, "GetUidQ(" + local + "," + remote + "): " + uid);
+        if (DEBUG) Log.d(LOG_TAG_VPN, "GetUidQ(" + local + "," + remote + "): " + uid);
 
         return uid;
     }

@@ -34,7 +34,7 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
     }
 
     fun deleteConnectionTrackerCount()  {
-        connectionTrackerDAO.deleteOlderDataCount(Constants.FIREWALL_CONNECTIONS_IN_DB)
+        connectionTrackerDAO.deleteOlderDataCount(Constants.TOTAL_NETWORK_LOG_ENTRIES_THRESHOLD)
     }
 
     fun deleteOlderData(date: Long) {

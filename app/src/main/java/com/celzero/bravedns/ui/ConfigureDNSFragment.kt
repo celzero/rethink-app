@@ -42,7 +42,7 @@ import com.celzero.bravedns.databinding.FragmentConfigureDnsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.UIUpdateInterface
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.DNSCryptEndpointViewModel
@@ -228,7 +228,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
             val stamp = data?.getStringArrayExtra("stamp")
-            if (DEBUG) Log.d(LOG_TAG, "onActivityResult - Stamp : $stamp")
+            if (DEBUG) Log.d(LOG_TAG_UI, "onActivityResult - Stamp : $stamp")
         }
     }
 
@@ -352,7 +352,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
 
             try {
                 port = portEditText.text.toString().toInt()
-                if (Utilities.isIPLocal(ip)) {
+                if (Utilities.isLanIpv4(ip)) {
                     if (port in 65535 downTo 1024) {
                         isValid = true
                     } else {
@@ -363,19 +363,19 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
                     isValid = true
                 }
             } catch (e: Exception) {
-                Log.w(LOG_TAG, "Error: ${e.message}", e)
+                Log.w(LOG_TAG_UI, "Error: ${e.message}", e)
                 errorTxt.text = getString(R.string.cd_dns_proxy_error_text_3)
                 isValid = false
             }
 
             if (isValid && isIPValid) {
                 //Do the DNS Proxy setting there
-                if (DEBUG) Log.d(LOG_TAG, "new value inserted into DNSProxy")
+                if (DEBUG) Log.d(LOG_TAG_UI, "new value inserted into DNSProxy")
                 insertDNSProxyEndpointDB(mode, name, appName, ip, port)
                 b.recyclerDnsProxyConnections.visibility = View.VISIBLE
                 dialog.dismiss()
             } else {
-                Log.i(LOG_TAG, "Failed to insert new value into DNSProxy: $name, $appName")
+                Log.i(LOG_TAG_UI, "Failed to insert new value into DNSProxy: $name, $appName")
             }
 
         }
@@ -396,7 +396,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
         //id: Int, proxyName: String,  proxyType: String, proxyAppName: String, proxyIP: String,proxyPort : Int, isSelected: Boolean, isCustom: Boolean, modifiedDataTime: Long, latency: Int
         val dnsProxyEndpoint = DNSProxyEndpoint(-1, proxyName, mode, appName, ip, port, false, true, 0L, 0)
         dnsProxyEndpointRepository.insertAsync(dnsProxyEndpoint)
-        if (DEBUG) Log.d(LOG_TAG, "Insert into DNSProxy database- $appName, $port")
+        if (DEBUG) Log.d(LOG_TAG_UI, "Insert into DNSProxy database- $appName, $port")
         object : CountDownTimer(500, 500) {
             override fun onTick(millisUntilFinished: Long) {
             }
@@ -550,9 +550,9 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
     }
 
     override fun updateUIFromAdapter(dnsType: Int) {
-        if (DEBUG) Log.d(LOG_TAG, "UI Update from adapter")
+        if (DEBUG) Log.d(LOG_TAG_UI, "UI Update from adapter")
         if (dnsType == 1) {
-            if (DEBUG) Log.d(LOG_TAG, "DOH has been changed, modify the connection status in the top layout")
+            if (DEBUG) Log.d(LOG_TAG_UI, "DOH has been changed, modify the connection status in the top layout")
             dnsCryptEndpointRepository.removeConnectionStatus()
             dnsCryptRelayEndpointRepository.removeConnectionStatus()
             dnsProxyEndpointRepository.removeConnectionStatus()

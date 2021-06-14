@@ -34,7 +34,7 @@ import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.FragmentFirewallAllAppsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.FirewallAppViewModel
 import org.koin.android.ext.android.get
@@ -121,7 +121,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
             override fun onFinish() {
                 if (isAdded) {
                     b.firewallAppRefreshList.clearAnimation()
-                    Utilities.showToastInMidLayout(requireContext(), getString(R.string.refresh_complete), Toast.LENGTH_SHORT)
+                    Utilities.showToastUiCentered(requireContext(), getString(R.string.refresh_complete), Toast.LENGTH_SHORT)
                 }
             }
         }.start()
@@ -137,7 +137,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
             override fun onFinish() {
                 firewallAppInfoViewModel.setFilter(query)
                 if (query.isNullOrEmpty()) {
-                    if (DEBUG) Log.d(LOG_TAG, "Search bar empty  ${firewallAppInfoViewModel.firewallAppDetailsList.value?.size}")
+                    if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Search bar empty  ${firewallAppInfoViewModel.firewallAppDetailsList.value?.size}")
                     var i = 0
                     titleList!!.forEach { _ ->
                         b.firewallExpandableList.collapseGroup(i)
@@ -153,7 +153,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
                             }
                         }
                     }
-                    if (DEBUG) Log.d(LOG_TAG, "Category block  ${titleList!!.size}")
+                    if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category block  ${titleList!!.size}")
                 }
             }
         }.start()
@@ -170,7 +170,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
                     firewallAppInfoViewModel.setFilter(query)
                     if (query.isNullOrEmpty()) {
                         var i = 0
-                        if(DEBUG) Log.d(LOG_TAG, "Search bar empty  ${firewallAppInfoViewModel.firewallAppDetailsList.value?.size}")
+                        if(DEBUG) Log.d(LOG_TAG_FIREWALL, "Search bar empty  ${firewallAppInfoViewModel.firewallAppDetailsList.value?.size}")
                         titleList!!.forEach { _ ->
                             b.firewallExpandableList.collapseGroup(i)
                             i += 1
@@ -187,7 +187,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
                                 }
                             }
                         }
-                        if (DEBUG) Log.d(LOG_TAG, "Category block ${titleList!!.size}")
+                        if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category block ${titleList!!.size}")
                     }
                 }
             }.start()
@@ -214,7 +214,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
             if(iterator != null) {
                 while (iterator.hasNext()) {
                     val item = iterator.next()
-                    if (DEBUG) Log.d(LOG_TAG, "Category : ${item.categoryName}, ${item.numberOFApps}, ${item.numOfAppsBlocked}, ${item.isInternetBlocked}")
+                    if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category : ${item.categoryName}, ${item.numberOFApps}, ${item.numOfAppsBlocked}, ${item.isInternetBlocked}")
                     val appList = list.filter { a -> a.appCategory == item.categoryName }
                     if (appList.isNotEmpty()) {
                         listData[item] = appList as java.util.ArrayList<AppInfo>

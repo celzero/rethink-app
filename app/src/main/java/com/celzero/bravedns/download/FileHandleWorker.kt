@@ -23,7 +23,7 @@ import androidx.work.workDataOf
 import com.celzero.bravedns.receiver.ReceiverHelper
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DOWNLOAD
 import dnsx.Dnsx
 import java.io.File
 
@@ -50,7 +50,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             else Result.failure()
 
         }catch (e : Exception){
-            Log.w(LOG_TAG, "FileHandleWorker Error while moving files to canonical path ${e.message}")
+            Log.w(LOG_TAG_DOWNLOAD, "FileHandleWorker Error while moving files to canonical path ${e.message}")
         }
         return Result.failure()
     }
@@ -60,18 +60,15 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             val timeStamp = ReceiverHelper.persistentState.tempBlocklistDownloadTime
             if (DownloadHelper.isLocalDownloadValid(context, timeStamp.toString())) {
                 DownloadHelper.deleteFromCanonicalPath(context)
-                if (DEBUG) Log.d(LOG_TAG, "AppDownloadManager Copy file Directory isLocalDownloadValid- true")
+                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Copy file Directory isLocalDownloadValid- true")
                 val dir = File(DownloadHelper.getExternalFilePath(context, timeStamp.toString()))
-                if (DEBUG) Log.d(LOG_TAG, "AppDownloadManager Copy file Directory- ${dir.path}")
                 if (dir.isDirectory) {
                     val children = dir.list()
                     if (children != null && children.isNotEmpty()) {
                         for (i in children.indices) {
-                            if (DEBUG) Log.d(LOG_TAG, "AppDownloadManager Copy file - ${children[i]}")
                             val from = File(dir, children[i])
-                            if (DEBUG) Log.d(LOG_TAG, "AppDownloadManager Copy file from - ${from.path}")
                             val to = File("${context.filesDir.canonicalPath}/$timeStamp/${children[i]}")
-                            Log.i(LOG_TAG, "AppDownloadManager Copy file to - ${to.path}")
+                            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Copy file  ${children[i]} from - ${from.path}, to - ${to.path}")
                             from.copyTo(to, true)
                         }
                         val destinationDir = File("${context.filesDir.canonicalPath}/$timeStamp")
@@ -98,7 +95,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
                 return false
             }
         }catch (e : Exception){
-            Log.w(LOG_TAG, "AppDownloadManager Copy exception - ${e.message}")
+            Log.w(LOG_TAG_DOWNLOAD, "AppDownloadManager Copy exception - ${e.message}")
         }
         return false
     }
@@ -117,11 +114,11 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             val path: String = context.filesDir.canonicalPath +"/"+ timeStamp
             val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
             if(braveDNS != null){
-                if(DEBUG) Log.d(LOG_TAG, "AppDownloadManager isDownloadValid - braveDNS is valid")
+                if(DEBUG) Log.d(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid - braveDNS is valid")
                 return true
             }
         }catch (e : Exception){
-            Log.w(LOG_TAG, "AppDownloadManager isDownloadValid exception - ${e.message}")
+            Log.w(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid exception - ${e.message}")
         }
         return false
     }

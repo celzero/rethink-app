@@ -32,7 +32,8 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS_FIREWALL
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_FIREWALL
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_INVALID
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 import settings.Settings
@@ -92,19 +93,19 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
     private fun initView() {
         b.bsHomeScreenConnectedStatus.text = connectedDetails
         var selectedIndex = HomeScreenActivity.GlobalVariable.braveMode
-        if (DEBUG) Log.d(LOG_TAG, "$LOG_FILE - selectedIndex: $selectedIndex")
+        if (DEBUG) Log.d(LOG_TAG_VPN, "$LOG_FILE - selectedIndex: $selectedIndex")
         updateBraveModeUI()
         if (selectedIndex == -1) selectedIndex = persistentState.getBraveMode()
 
         when (selectedIndex) {
             APP_MODE_DNS -> {
-                b.bsHomeScreenRadioDns.isChecked = true   //bs_home_screen_radio_dns
+                b.bsHomeScreenRadioDns.isChecked = true
             }
             APP_MODE_FIREWALL -> {
-                b.bsHomeScreenRadioFirewall.isChecked = true //bs_home_screen_radio_firewall
+                b.bsHomeScreenRadioFirewall.isChecked = true
             }
             APP_MODE_DNS_FIREWALL -> {
-                b.bsHomeScreenRadioDnsFirewall.isChecked = true //bs_home_screen_radio_dns_firewall
+                b.bsHomeScreenRadioDnsFirewall.isChecked = true
             }
             else -> {
                 b.bsHomeScreenRadioDnsFirewall.isChecked = true
@@ -190,7 +191,7 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
         if (HomeScreenActivity.GlobalVariable.braveMode == APP_MODE_FIREWALL) {
             HomeScreenActivity.GlobalVariable.appMode?.setDNSMode(Settings.DNSModeNone)
         } else {
-            HomeScreenActivity.GlobalVariable.appMode?.setDNSMode(-1)
+            HomeScreenActivity.GlobalVariable.appMode?.setDNSMode(PREF_DNS_INVALID)
         }
         persistentState.setBraveMode(HomeScreenActivity.GlobalVariable.braveMode)
         HomeScreenActivity.GlobalVariable.braveModeToggler.postValue(HomeScreenActivity.GlobalVariable.braveMode)
@@ -201,10 +202,10 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
 
     private fun updateBraveModeUI() {
         when (HomeScreenActivity.GlobalVariable.braveMode) {
-            0 -> {
+            APP_MODE_DNS -> {
                 b.bsHomeScreenConnectedStatus.text = getString(R.string.dns_explanation_dns_connected)
             }
-            1 -> {
+            APP_MODE_FIREWALL -> {
                 b.bsHomeScreenConnectedStatus.text = getString(R.string.dns_explanation_firewall_connected)
             }
             else -> {

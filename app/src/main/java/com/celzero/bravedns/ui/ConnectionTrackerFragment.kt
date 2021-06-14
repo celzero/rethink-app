@@ -30,7 +30,7 @@ import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.databinding.ActivityConnectionTrackerBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -126,7 +126,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
             filterValue = if (which == 0) ":isFilter"
             else ""
             checkedItem = which
-            if (DEBUG) Log.d(LOG_TAG, "Filter Option selected: $filterValue")
+            if (DEBUG) Log.d(LOG_TAG_UI, "Filter Option selected: $filterValue")
             viewModel.setFilterBlocked(filterValue)
             dialog.dismiss()
         }
@@ -137,9 +137,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
 
     private fun showDialogForDelete() {
         val builder = AlertDialog.Builder(requireContext())
-        //set title for alert dialog
         builder.setTitle(R.string.conn_track_clear_logs_title)
-        //set message for alert dialog
         builder.setMessage(R.string.conn_track_clear_logs_message)
         builder.setCancelable(true)
         //performing positive action

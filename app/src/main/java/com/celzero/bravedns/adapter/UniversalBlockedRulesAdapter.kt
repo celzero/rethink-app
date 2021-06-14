@@ -68,9 +68,7 @@ class UniversalBlockedRulesAdapter(private val context: Context, private val blo
 
         private fun showDialogForDelete(blockedConnections: BlockedConnections?) {
             val builder = AlertDialog.Builder(context)
-            //set title for alert dialog
             builder.setTitle(R.string.univ_firewall_dialog_title)
-            //set message for alert dialog
             builder.setMessage(R.string.univ_firewall_dialog_message)
             builder.setCancelable(true)
             //performing positive action

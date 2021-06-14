@@ -22,7 +22,8 @@ import androidx.lifecycle.ViewModel
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.AppInfoDAO
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.FILTER_CATEGORY
+import com.celzero.bravedns.util.Constants.Companion.FILTER_IS_SYSTEM
 
 class ExcludedAppViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
@@ -36,12 +37,11 @@ class ExcludedAppViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         filteredList, ({ input:String ->
             if (input.isBlank()) {
                 appInfoDAO.getExcludedAppDetailsLiveData().toLiveData(pageSize = 50)
-            } else if (input == "isSystem") {
+            } else if (input == FILTER_IS_SYSTEM) {
                 appInfoDAO.getExcludedAAppSystemAppsLiveData().toLiveData(pageSize = 50)
-            } else if (input.contains("category:")) {
+            } else if (input.contains(FILTER_CATEGORY)) {
                 val filterVal = input.split(":")[1]
                 val result = filterVal.split(",").map { it.trim() }
-                if(DEBUG) Log.d(LOG_TAG, "FilterVal - $filterVal")
                 appInfoDAO.getExcludedAppDetailsFilterForCategoryLiveData(result).toLiveData(pageSize = 50)
             } else {
                 appInfoDAO.getExcludedAppDetailsFilterLiveData("%$input%").toLiveData(pageSize = 50)

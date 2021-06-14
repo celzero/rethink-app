@@ -21,29 +21,34 @@ import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.util.Log
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
-import org.koin.core.component.KoinApiExtension
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_VPN
+import org.koin.core.Koin
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 
-class BraveScreenStateReceiver : BroadcastReceiver() {
+class BraveScreenStateReceiver : BroadcastReceiver(), KoinComponent {
+
+    val persistentState by inject<PersistentState>()
 
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action.equals(Intent.ACTION_SCREEN_OFF)) {
-            if (DEBUG) Log.d(LOG_TAG, "BraveScreenStateReceiver : Action_screen_off detected from the receiver")
-            if (ReceiverHelper.persistentState.screenState && !ReceiverHelper.persistentState.isScreenOff) {
-                if (DEBUG) Log.d(LOG_TAG, "BraveScreenStateReceiver : Screen lock data not true, calling DeviceLockService service")
+        if (Intent.ACTION_SCREEN_OFF == intent.action) {
+            if (DEBUG) Log.d(LOG_TAG_VPN, "BraveScreenStateReceiver : Action_screen_off detected from the receiver")
+            if (persistentState.screenState && !persistentState.isScreenOff) {
+                if (DEBUG) Log.d(LOG_TAG_VPN, "BraveScreenStateReceiver : Screen lock data not true, calling DeviceLockService service")
                 val newIntent = Intent(context, DeviceLockService::class.java)
                 newIntent.action = DeviceLockService.ACTION_CHECK_LOCK
                 newIntent.putExtra(DeviceLockService.EXTRA_STATE, intent.action)
                 context.startService(newIntent)
             }
         } else if (intent.action.equals(Intent.ACTION_USER_PRESENT) || intent.action.equals(Intent.ACTION_SCREEN_ON)) {
-            if (DEBUG) Log.d(LOG_TAG, "BraveScreenStateReceiver : ACTION_USER_PRESENT/ACTION_SCREEN_ON detected from the receiver")
-            if (ReceiverHelper.persistentState.screenState) {
-                val state = ReceiverHelper.persistentState.isScreenOff
+            if (DEBUG) Log.d(LOG_TAG_VPN, "BraveScreenStateReceiver : ACTION_USER_PRESENT/ACTION_SCREEN_ON detected from the receiver")
+            if (persistentState.screenState) {
+                val state = persistentState.isScreenOff
                 if (state) {
-                    ReceiverHelper.persistentState.isScreenOff = false
+                    persistentState.isScreenOff = false
                     val connectivityManager: ConnectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
                     connectivityManager.reportNetworkConnectivity(connectivityManager.activeNetwork, true)
                 }

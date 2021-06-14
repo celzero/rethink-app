@@ -35,7 +35,7 @@ import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.databinding.CustomDialogLayoutBinding
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.AppListViewModel
 import com.google.android.material.chip.Chip
@@ -92,9 +92,9 @@ class WhitelistAppDialog(private var activity: Context,
         b.customSelectAllOptionCheckbox.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             modifyAppsInUniversalAppList(b)
             if (b) {
-                Utilities.showToastInMidLayout(activity, act.getString(R.string.whitelist_toast_positive), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(activity, act.getString(R.string.whitelist_toast_positive), Toast.LENGTH_SHORT)
             } else {
-                Utilities.showToastInMidLayout(activity, act.getString(R.string.whitelist_toast_negative), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(activity, act.getString(R.string.whitelist_toast_negative), Toast.LENGTH_SHORT)
             }
             object : CountDownTimer(500, 500) {
                 override fun onTick(millisUntilFinished: Long) {
@@ -127,7 +127,7 @@ class WhitelistAppDialog(private var activity: Context,
                 categoryInfoRepository.updateWhitelistForCategory(it, checked)
                 val countBlocked = appInfoRepository.getBlockedCountForCategory(it)
                 categoryInfoRepository.updateBlockedCount(it, countBlocked)
-                if(DEBUG) Log.d(LOG_TAG, "Update whitelist count: $update")
+                if(DEBUG) Log.d(LOG_TAG_FIREWALL, "Update whitelist count: $update")
             }
 
         }
@@ -136,7 +136,6 @@ class WhitelistAppDialog(private var activity: Context,
 
     private fun categoryListByAppNameFromDB(name: String) {
         category = appInfoRepository.getAppCategoryForAppName("%$name%")
-        if(DEBUG) Log.d(LOG_TAG, "Category - ${category.size}")
         setCategoryChips(category)
     }
 
@@ -213,7 +212,6 @@ class WhitelistAppDialog(private var activity: Context,
                     }
                 }
                 if (filterString.isNotEmpty()) {
-                    if (DEBUG) Log.d(LOG_TAG, "category - $filterString")
                     viewModel.setFilter("category:$filterString")
                 } else {
                     viewModel.setFilter("")

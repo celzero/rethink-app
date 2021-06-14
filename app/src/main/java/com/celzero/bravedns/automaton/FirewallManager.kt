@@ -27,7 +27,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.backgroundAllowedUID
 import com.celzero.bravedns.util.BackgroundAccessibilityService
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.FileSystemUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -80,16 +80,16 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
         fun updateInternetBackground(packageName: String, isAllowed: Boolean){
             val appInfo = GlobalVariable.appList[packageName]
             if(appInfo != null){
-                if(DEBUG) Log.d(LOG_TAG,"FirewallManager: AccessibilityEvent: Update Internet Permission from background: ${appInfo.appName}, ${appInfo.isInternetAllowed}")
+                if(DEBUG) Log.d(LOG_TAG_FIREWALL,"AccessibilityEvent: Update Internet Permission from background: ${appInfo.appName}, ${appInfo.isInternetAllowed}")
                 //appInfo.isInternetAllowed = isAllowed
                 //GlobalVariable.appList.set(packageName,appInfo)
                 if(isAllowed && FileSystemUID.isUIDAppRange(appInfo.uid)){
-                    if(DEBUG) Log.d(LOG_TAG,"FirewallManager: AccessibilityEvent: ${appInfo.appName},${appInfo.packageInfo} is in foreground")
+                    if(DEBUG) Log.d(LOG_TAG_FIREWALL,"AccessibilityEvent: ${appInfo.appName},${appInfo.packageInfo} is in foreground")
                     backgroundAllowedUID[appInfo.uid] = isAllowed
                     //backgroundAllowed = appInfo.uid
                 }else{
                     backgroundAllowedUID.remove(appInfo.uid)
-                    if(DEBUG) Log.d(LOG_TAG,"FirewallManager: AccessibilityEvent: ${appInfo.appName},${appInfo.packageInfo} removed from foreground")
+                    if(DEBUG) Log.d(LOG_TAG_FIREWALL,"AccessibilityEvent: ${appInfo.appName},${appInfo.packageInfo} removed from foreground")
                     //backgroundAllowed = 0
                 }
 
@@ -121,7 +121,7 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
         } else {
             event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
         }
-        if(DEBUG) Log.d(LOG_TAG,"FirewallManager: onAccessibilityEvent: ${event.packageName}, ${event.eventType}, $hasContentDisappeared")
+        if(DEBUG) Log.d(LOG_TAG_FIREWALL,"onAccessibilityEvent: ${event.packageName}, ${event.eventType}, $hasContentDisappeared")
         // is the package showing content and being backgrounded?
         if (hasContentDisappeared) {
             if (GlobalVariable.appList.containsKey(eventPackageName)) {//PermissionsManager.packageRules.contains(eventPackageName)) {
@@ -161,7 +161,7 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
         // FIXME: 18-12-2020 - Figure out why the below code exists
         //probably not required.
         else{
-            if(DEBUG) Log.d(LOG_TAG,"addOrRemovePackageForBackground:isPackageLauncher ${packageName}, true")
+            if(DEBUG) Log.d(LOG_TAG_FIREWALL,"addOrRemovePackageForBackground:isPackageLauncher ${packageName}, true")
             addOrRemovePackageForBackground(true)
         }
 
@@ -176,16 +176,16 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
         var packageName : String? = event.packageName?.toString()
         if(packageName.isNullOrEmpty() && rootInActiveWindow != null){
             packageName = rootInActiveWindow.packageName?.toString()
-            if(DEBUG) Log.d(LOG_TAG,"AccessibilityEvent: Value from rootInActiveWindow : $packageName")
+            if(DEBUG) Log.d(LOG_TAG_FIREWALL,"AccessibilityEvent: Value from rootInActiveWindow : $packageName")
         }
-        if(DEBUG) Log.d(LOG_TAG,"AccessibilityEvent: $packageName")
+        if(DEBUG) Log.d(LOG_TAG_FIREWALL,"AccessibilityEvent: $packageName")
         return packageName
     }
 
     private fun printAllowedUID() {
-        Log.d(LOG_TAG,"AccessibilityEvent: printAllowedUID UID: --------")
+        Log.d(LOG_TAG_FIREWALL,"AccessibilityEvent: printAllowedUID UID: --------")
         backgroundAllowedUID.forEach{
-            Log.d(LOG_TAG,"AccessibilityEvent: printAllowedUID UID: ${it.key}, ${it.value}")
+            Log.d(LOG_TAG_FIREWALL,"AccessibilityEvent: printAllowedUID UID: ${it.key}, ${it.value}")
         }
     }
 
@@ -200,14 +200,14 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
 
 
     private fun addOrRemovePackageForBackground(isAllowed: Boolean){
-        if(DEBUG) Log.d(LOG_TAG,"FirewallManager: isBackgroundEnabled: ${persistentState.isBackgroundEnabled}")
+        if(DEBUG) Log.d(LOG_TAG_FIREWALL,"isBackgroundEnabled: ${persistentState.isBackgroundEnabled}")
         if(!persistentState.isBackgroundEnabled)
             return
         if (latestTrackedPackage.isNullOrEmpty()) {
             return
         }else {
             val currentPackage = latestTrackedPackage
-            if(DEBUG) Log.d(LOG_TAG,"FirewallManager: Package: $currentPackage, $isAllowed")
+            if(DEBUG) Log.d(LOG_TAG_FIREWALL,"Package: $currentPackage, $isAllowed")
             packageElect = currentPackage
             updateInternetBackground(currentPackage!!,isAllowed)
         }

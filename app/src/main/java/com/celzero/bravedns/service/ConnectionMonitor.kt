@@ -23,13 +23,13 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_CONNECTION
 import com.google.common.collect.Sets
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 
-class ConnectionMonitor(context: Context, val networkListener: NetworkListener) : ConnectivityManager.NetworkCallback(), KoinComponent {
+class ConnectionMonitor(context: Context, networkListener: NetworkListener) : ConnectivityManager.NetworkCallback(), KoinComponent {
     private val networkRequest: NetworkRequest = NetworkRequest.Builder().addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET).build()
 
     // An Android handler thread internally operates on a looper.
@@ -48,14 +48,13 @@ class ConnectionMonitor(context: Context, val networkListener: NetworkListener) 
 
         // add all available networks as underlying vpn networks
         const val MSG_ADD_ALL_NETWORKS = 2
-        val FILE_LOG_TAG = javaClass.simpleName
     }
 
     init {
         connectivityManager.registerNetworkCallback(networkRequest, this)
         this.handlerThread = HandlerThread(NetworkRequestHandler::class.simpleName)
         this.handlerThread.start()
-        this.serviceHandler = NetworkRequestHandler(context, handlerThread.looper, this)
+        this.serviceHandler = NetworkRequestHandler(context, handlerThread.looper, networkListener)
     }
 
     interface NetworkListener {
@@ -75,22 +74,22 @@ class ConnectionMonitor(context: Context, val networkListener: NetworkListener) 
     }
 
     override fun onAvailable(network: Network) {
-        if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG - onAvailable")
+        if (DEBUG) Log.d(LOG_TAG_CONNECTION, "onAvailable")
         handleNetworkChange()
     }
 
     override fun onLost(network: Network) {
-        if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG - onLost")
+        if (DEBUG) Log.d(LOG_TAG_CONNECTION, "onLost")
         handleNetworkChange()
     }
 
     override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
-        if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG - onCapabilitiesChanged")
+        if (DEBUG) Log.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged")
         handleNetworkChange()
     }
 
     override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
-        if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG - onLinkPropertiesChanged")
+        if (DEBUG) Log.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged")
         handleNetworkChange()
     }
 
@@ -99,7 +98,7 @@ class ConnectionMonitor(context: Context, val networkListener: NetworkListener) 
      * either multiple underlying networks, or just one (the active network).
      */
     fun onUserPreferenceChanged() {
-        if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG - onUserPreferenceChanged")
+        if (DEBUG) Log.d(LOG_TAG_CONNECTION, "onUserPreferenceChanged")
         handleNetworkChange(isForceUpdate = true)
     }
 
@@ -108,7 +107,7 @@ class ConnectionMonitor(context: Context, val networkListener: NetworkListener) 
      * Will be initiated when the VPN start is completed.
      */
     fun onVpnStarted() {
-        if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG - new vpn is created force update the network")
+        if (DEBUG) Log.d(LOG_TAG_CONNECTION, "new vpn is created force update the network")
         handleNetworkChange(isForceUpdate = true)
     }
 
@@ -132,7 +131,7 @@ class ConnectionMonitor(context: Context, val networkListener: NetworkListener) 
     }
 
     // Handles the network messages from the callback from the connectivity manager
-    private class NetworkRequestHandler(context: Context, looper: Looper, val connectionMonitor: ConnectionMonitor) : Handler(looper) {
+    private class NetworkRequestHandler(context: Context, looper: Looper, val networkListener: NetworkListener) : Handler(looper) {
         // ref - https://developer.android.com/reference/kotlin/java/util/LinkedHashSet
         // The network list is maintained in a linked-hash-set to preserve insertion and iteration
         // order. This is required because {@link android.net.VpnService#setUnderlyingNetworks}
@@ -162,8 +161,10 @@ class ConnectionMonitor(context: Context, val networkListener: NetworkListener) 
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
 
             currentNetworks = newNetworks
-            Log.i(LOG_TAG, "$FILE_LOG_TAG - is Network connected?- ${connectivityManager.getNetworkInfo(newActiveNetwork)?.typeName.toString()}, $isNewNetwork, force update is $isForceUpdate")
+            Log.i(LOG_TAG_CONNECTION, "is Network connected?- ${connectivityManager.getNetworkInfo(newActiveNetwork)?.typeName.toString()}, $isNewNetwork, force update is $isForceUpdate")
+
             if (!isNewNetwork && !isForceUpdate) return
+
             informListener()
         }
 
@@ -175,22 +176,24 @@ class ConnectionMonitor(context: Context, val networkListener: NetworkListener) 
             val newNetworks = createNetworksSet(newActiveNetwork, true)
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
 
-            Log.i(LOG_TAG, "$FILE_LOG_TAG - process message MESSAGE_AVAILABLE_NETWORK, ${currentNetworks.size},${newNetworks.size}. isNewNetwork - $isNewNetwork, force update is $isForceUpdate")
+            Log.i(LOG_TAG_CONNECTION, "process message MESSAGE_AVAILABLE_NETWORK, ${currentNetworks.size},${newNetworks.size}. isNewNetwork - $isNewNetwork, force update is $isForceUpdate")
             currentNetworks = newNetworks
+
             if (!isNewNetwork && !isForceUpdate) return
+
             informListener(requireAllNetworks = true)
         }
 
         private fun informListener(requireAllNetworks: Boolean = false) {
-            Log.i(LOG_TAG, "$FILE_LOG_TAG - inform listerner on network change - ${currentNetworks.size}, is all network - $requireAllNetworks")
+            Log.i(LOG_TAG_CONNECTION, "inform listerner on network change - ${currentNetworks.size}, is all network - $requireAllNetworks")
             if (currentNetworks.size > 0) {
                 val networks = when (requireAllNetworks) {
                     true -> currentNetworks
                     false -> null
                 }
-                connectionMonitor.networkListener.onNetworkConnected(networks)
+                networkListener.onNetworkConnected(networks)
             } else {
-                connectionMonitor.networkListener.onNetworkDisconnected()
+                networkListener.onNetworkDisconnected()
             }
         }
 
@@ -214,6 +217,7 @@ class ConnectionMonitor(context: Context, val networkListener: NetworkListener) 
             if (!requireAllNetworks) {
                 return newNetworks
             }
+
             val tempAllNetwork = connectivityManager.allNetworks
             tempAllNetwork.forEach {
                 if (it.networkHandle == activeNetwork?.networkHandle) {
@@ -223,6 +227,7 @@ class ConnectionMonitor(context: Context, val networkListener: NetworkListener) 
                     newNetworks.add(it)
                 }
             }
+
             return newNetworks
         }
 

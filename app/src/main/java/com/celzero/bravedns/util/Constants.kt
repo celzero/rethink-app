@@ -21,9 +21,6 @@ import java.util.concurrent.TimeUnit
 class Constants {
 
     companion object {
-        //Log
-        const val LOG_TAG = "com.celzero.bravedns"
-
         //Download path and file names
         const val DOWNLOAD_PATH = "/downloads/"
         const val FILE_TAG_NAME = "/filetag.json"
@@ -75,17 +72,15 @@ class Constants {
         //No package applications
         const val NO_PACKAGE = "no_package"
 
-        //Network monitor
-        const val FIREWALL_CONNECTIONS_IN_DB = 5000
+        const val TOTAL_NETWORK_LOG_ENTRIES_THRESHOLD = 5000
 
-        // UID used in Vpn service (block())
         const val INVALID_UID = -1
         const val MISSING_UID = -2000
 
         const val RETHINK_DNS_PLUS = "RethinkDNS Plus"
         const val RETHINK_DNS = "RethinkDNS Basic (default)"
 
-        const val DELAY_FOR_BLOCK_RESPONSE: Long = 30000
+        const val DELAY_FIREWALL_RESPONSE_MS: Long = 30000
 
         const val DNS_TYPE_DOH = 1
         const val DNS_TYPE_DNS_CRYPT = 2
@@ -109,34 +104,34 @@ class Constants {
 
         const val ORBOT_SOCKS = 10L
 
-        // Orbot mode constants
         const val ORBOT_MODE_NONE = 1
         const val ORBOT_MODE_SOCKS5 = 2
         const val ORBOT_MODE_HTTP = 3
         const val ORBOT_MODE_BOTH = 4
 
-        //Application download source
+        // Represents the download source of the application. playstore/fdroid/website
         const val DOWNLOAD_SOURCE_PLAY_STORE = 1
         const val DOWNLOAD_SOURCE_FDROID = 2
         const val DOWNLOAD_SOURCE_WEBSITE = 3
 
-        // build flavours constants
+        // Constants generated as part of BuildConfig.FLAVORS
         const val FLAVOR_PLAY = "play"
         const val FLAVOR_FDROID = "fdroid"
         const val FLAVOR_WEBSITE = "website"
 
         const val PORT_VAL_UNKNOWN = "unknown"
 
-        // Notification action constants.
+        // Various notification action constants used part of NotificationCompat.Action
         const val NOTIFICATION_ACTION = "NOTIFICATION_VALUE"
-        const val STOP_VPN_NOTIFICATION_ACTION = "RETHINK_STOP"
-        const val DNS_VPN_NOTIFICATION_ACTION = "RETHINK_DNSONLY" // battery-saver dns-only
-        const val DNS_FIREWALL_VPN_NOTIFICATION_ACTION = "RETHINK_FULLMODE" // default dns+firewall
-        const val RULES_FAILURE_NOTIFICATION_ACTION = "RETHINK_RULES_RELOAD" // load rules failure
+        const val NOTIF_ACTION_STOP_VPN = "RETHINK_STOP"
+        const val NOTIF_ACTION_DNS_VPN = "RETHINK_DNSONLY" // battery-saver dns-only
+        const val NOTIF_ACTION_DNS_FIREWALL_VPN = "RETHINK_FULLMODE" // default dns+firewall
+        const val NOTIF_ACTION_RULES_FAILURE = "RETHINK_RULES_RELOAD" // load rules failure
 
         const val NXDOMAIN = "NXDOMAIN"
 
-        // Time out to download of on-device blocklist.
+        // Maximum time out for the DownloadManager to wait for download of local blocklist.
+        // The time out value is set as 40 minutes.
         val WORK_MANAGER_TIMEOUT = TimeUnit.MINUTES.toMillis(40)
 
         const val FAV_ICON_URL = "https://icons.duckduckgo.com/ip2/"
@@ -161,11 +156,37 @@ class Constants {
         const val PREF_DNS_MODE_PROXY = 3
         const val PREF_DNS_MODE_DNSCRYPT = 2
         const val PREF_DNS_MODE_DOH = 1
+        const val PREF_DNS_INVALID = -1L
 
-        // Time limit to check if accessibility service is running - every 5 minutes.
+        // For Universal firewall setting - "Block apps not in use". Threshold minutes to check if the
+        // accessibility value is enabled in android settings. Threshold is for 5 minute.
         val ACCESSIBILITY_SERVICE_HEARTBEAT_THRESHOLD_MS = TimeUnit.MINUTES.toMillis(5)
 
-        // Threshold time to put network request in shared preference.
+        // Threshold minutes to save the network queries in shared preference instead of storing
+        // it for every request. The value is set as 1 minute.
         val NETWORK_REQUEST_WRITE_THRESHOLD_MS = TimeUnit.MINUTES.toMillis(1)
+
+        // Log tag
+        const val LOG_TAG_APP_UPDATE = "NonStoreAppUpdater"
+        const val LOG_TAG_FIREWALL_LOG = "FirewallLogs"
+        const val LOG_TAG_DNS_LOG = "DnsLogs"
+        const val LOG_TAG_APP_MODE = "AppMode"
+        const val LOG_TAG_VPN = "VpnLifecycle"
+        const val LOG_TAG_CONNECTION = "ConnectivityEvents"
+        const val LOG_TAG_DNS = "DnsManager"
+        const val LOG_TAG_FIREWALL = "FirewallManager"
+        const val LOG_TAG_PERMISSION = "PermissionManager"
+        const val LOG_TAG_APP_DB = "AppDatabase"
+        const val LOG_TAG_DOWNLOAD = "DownloadManager"
+        const val LOG_TAG_UI = "ActivityManager"
+
+        // View model - filter string
+        const val FILTER_IS_SYSTEM = "isSystem"
+        const val FILTER_IS_FILTER = "isFilter"
+        const val FILTER_CATEGORY = "category:"
+
+        const val DEFAULT_ROUTE_IP = "0.0.0.0"
+
+        const val ACTION_VPN_SETTINGS_INTENT = "android.net.vpn.SETTINGS"
     }
 }

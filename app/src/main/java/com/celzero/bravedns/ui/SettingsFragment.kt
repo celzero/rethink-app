@@ -62,7 +62,9 @@ import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_WEBSITE
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Constants.Companion.REFRESH_BLOCKLIST_URL
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
@@ -284,7 +286,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             val vpnService = VpnController.getInstance().getBraveVpnService()
             if (vpnService != null) {
                 val lockDown = vpnService.isLockdownEnabled
-                if (DEBUG) Log.d(LOG_TAG, "$FILETAG isLockDownEnabled - $lockDown ")
+                if (DEBUG) Log.d(LOG_TAG_VPN, "$FILETAG isLockDownEnabled - $lockDown ")
                 if (lockDown) {
                     disableForLockdownModeUI()
                 } else {
@@ -398,13 +400,13 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 startActivity(intent)
             } catch (e: ActivityNotFoundException) {
-                Log.w(LOG_TAG, "Exception while opening app info: ${e.message}", e)
+                Log.w(LOG_TAG_UI, "Exception while opening app info: ${e.message}", e)
             }
         }
 
         b.settingsActivitySocks5Switch.setOnCheckedChangeListener { _: CompoundButton, bool: Boolean ->
             if (persistentState.orbotMode != Constants.ORBOT_MODE_NONE) {
-                Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_disabled_error), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(requireContext(), getString(R.string.settings_socks5_disabled_error), Toast.LENGTH_SHORT)
                 b.settingsActivitySocks5Switch.isChecked = false
             } else {
                 persistentState.socks5Enabled = bool
@@ -424,9 +426,9 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityOrbotImg.setOnClickListener {
             if (get<OrbotHelper>().isOrbotInstalled()) {
                 if (b.settingsActivityHttpProxySwitch.isChecked) {
-                    Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_https_orbot_disabled_error), Toast.LENGTH_SHORT)
+                    Utilities.showToastUiCentered(requireContext(), getString(R.string.settings_https_orbot_disabled_error), Toast.LENGTH_SHORT)
                 } else if (b.settingsActivitySocks5Switch.isChecked) {
-                    Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_orbot_disabled_error), Toast.LENGTH_SHORT)
+                    Utilities.showToastUiCentered(requireContext(), getString(R.string.settings_socks5_orbot_disabled_error), Toast.LENGTH_SHORT)
                 } else {
                     openBottomSheetForOrbot()
                 }
@@ -438,9 +440,9 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityOrbotContainer.setOnClickListener {
             if (get<OrbotHelper>().isOrbotInstalled()) {
                 if (b.settingsActivityHttpProxySwitch.isChecked) {
-                    Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_https_orbot_disabled_error), Toast.LENGTH_SHORT)
+                    Utilities.showToastUiCentered(requireContext(), getString(R.string.settings_https_orbot_disabled_error), Toast.LENGTH_SHORT)
                 } else if (b.settingsActivitySocks5Switch.isChecked) {
-                    Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_orbot_disabled_error), Toast.LENGTH_SHORT)
+                    Utilities.showToastUiCentered(requireContext(), getString(R.string.settings_socks5_orbot_disabled_error), Toast.LENGTH_SHORT)
                 } else {
                     openBottomSheetForOrbot()
                 }
@@ -451,7 +453,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
         b.settingsActivityHttpProxySwitch.setOnCheckedChangeListener { _: CompoundButton, isEnabled: Boolean ->
             if (persistentState.orbotMode != Constants.ORBOT_MODE_NONE) {
-                Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_https_disabled_error), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(requireContext(), getString(R.string.settings_https_disabled_error), Toast.LENGTH_SHORT)
                 b.settingsActivityHttpProxySwitch.isChecked = false
             } else {
                 showDialogForHTTPProxy(isEnabled)
@@ -495,7 +497,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityOnDeviceBlockConfigureBtn.setOnClickListener {
             val intent = Intent(requireContext(), DNSConfigureWebViewActivity::class.java)
             val stamp = persistentState.localBlockListStamp
-            if (DEBUG) Log.d(LOG_TAG, "$FILETAG Stamp value in settings screen - $stamp")
+            if (DEBUG) Log.d(LOG_TAG_VPN, "$FILETAG Stamp value in settings screen - $stamp")
             intent.putExtra(Constants.LOCATION_INTENT_EXTRA, DNSConfigureWebViewActivity.LOCAL)
             intent.putExtra(Constants.STAMP_INTENT_EXTRA, stamp)
             (requireContext() as Activity).startActivityForResult(intent, Activity.RESULT_OK)
@@ -551,9 +553,9 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                     WorkManager.getInstance().pruneWork()
                     WorkManager.getInstance().cancelAllWorkByTag(DownloadConstants.DOWNLOAD_TAG)
                     WorkManager.getInstance().cancelAllWorkByTag(DownloadConstants.FILE_TAG)
-                    Log.i(LOG_TAG, "AppDownloadManager Work Manager failed - ${DownloadConstants.FILE_TAG}")
+                    Log.i(LOG_TAG_DOWNLOAD, "AppDownloadManager Work Manager failed - ${DownloadConstants.FILE_TAG}")
                 } else {
-                    Log.i(LOG_TAG, "AppDownloadManager Work Manager - ${DownloadConstants.DOWNLOAD_TAG}, ${workInfo.state}")
+                    Log.i(LOG_TAG_DOWNLOAD, "AppDownloadManager Work Manager - ${DownloadConstants.DOWNLOAD_TAG}, ${workInfo.state}")
                 }
             }
         })
@@ -562,16 +564,16 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             if (workInfoList != null && workInfoList.isNotEmpty()) {
                 val workInfo = workInfoList[0]
                 if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
-                    Log.i(LOG_TAG, "AppDownloadManager Work Manager completed - ${DownloadConstants.FILE_TAG}")
+                    Log.i(LOG_TAG_DOWNLOAD, "AppDownloadManager Work Manager completed - ${DownloadConstants.FILE_TAG}")
                     updateDownloadSuccess()
                     WorkManager.getInstance().pruneWork()
                 } else if (workInfo != null && (workInfo.state == WorkInfo.State.CANCELLED || workInfo.state == WorkInfo.State.FAILED)) {
                     updateDownloadFailure()
                     WorkManager.getInstance().pruneWork()
                     WorkManager.getInstance().cancelAllWorkByTag(DownloadConstants.FILE_TAG)
-                    Log.i(LOG_TAG, "AppDownloadManager Work Manager failed - ${DownloadConstants.FILE_TAG}")
+                    Log.i(LOG_TAG_DOWNLOAD, "AppDownloadManager Work Manager failed - ${DownloadConstants.FILE_TAG}")
                 } else {
-                    Log.i(LOG_TAG, "AppDownloadManager Work Manager - ${DownloadConstants.FILE_TAG}, ${workInfo.state}")
+                    Log.i(LOG_TAG_DOWNLOAD, "AppDownloadManager Work Manager - ${DownloadConstants.FILE_TAG}, ${workInfo.state}")
                 }
             }
         })
@@ -614,7 +616,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             val frag = context as FragmentActivity
             bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
         } else {
-            Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_vpn_disabled_error), Toast.LENGTH_SHORT)
+            Utilities.showToastUiCentered(requireContext(), getString(R.string.settings_socks5_vpn_disabled_error), Toast.LENGTH_SHORT)
         }
     }
 
@@ -729,7 +731,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         val timeStamp = persistentState.localBlockListDownloadTime
         val appVersionCode = persistentState.appVersion
         val url = "$REFRESH_BLOCKLIST_URL$timeStamp&${Constants.APPEND_VCODE}$appVersionCode"
-        if (DEBUG) Log.d(LOG_TAG, "$FILETAG Check for local download, url - $url")
+        if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "$FILETAG Check for local download, url - $url")
         run(url, isUserInitiated, isRetry)
         return false
     }
@@ -740,10 +742,10 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.i(LOG_TAG, "$FILETAG onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
+                Log.i(LOG_TAG_DOWNLOAD, "$FILETAG onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
                 activity?.runOnUiThread {
                     if (isRetry) {
-                        Utilities.showToastInMidLayout(requireContext(), getString(R.string.local_blocklist_update_check_failure), Toast.LENGTH_SHORT)
+                        Utilities.showToastUiCentered(requireContext(), getString(R.string.local_blocklist_update_check_failure), Toast.LENGTH_SHORT)
                     } else {
                         updateDownloadFailure()
                     }
@@ -756,11 +758,11 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                     //creating json object
                     val jsonObject = JSONObject(stringResponse)
                     val version = jsonObject.getInt(Constants.JSON_VERSION)
-                    if (DEBUG) Log.d(LOG_TAG, "$FILETAG client onResponse for refresh blocklist files-  $version")
+                    if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "$FILETAG client onResponse for refresh blocklist files-  $version")
                     if (version == 1) {
                         val updateValue = jsonObject.getBoolean(Constants.JSON_UPDATE)
                         val timeStamp = jsonObject.getLong(Constants.JSON_LATEST)
-                        if (DEBUG) Log.d(LOG_TAG, "$FILETAG onResponse -  $updateValue")
+                        if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "$FILETAG onResponse -  $updateValue")
                         if (updateValue) {
                             persistentState.tempBlocklistDownloadTime = timeStamp
                             persistentState.workManagerStartTime = SystemClock.elapsedRealtime()
@@ -783,7 +785,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                                     }
                                 } else {
                                     updateDownloadFailure()
-                                    Utilities.showToastInMidLayout(activity as Context, getString(R.string.settings_local_blocklist_desc4), Toast.LENGTH_SHORT)
+                                    Utilities.showToastUiCentered(activity as Context, getString(R.string.settings_local_blocklist_desc4), Toast.LENGTH_SHORT)
                                 }
                             }
                         }
@@ -791,7 +793,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                     response.body!!.close()
                     client.connectionPool.evictAll()
                 } catch (e: java.lang.Exception) {
-                    Log.w(LOG_TAG, "$FILETAG Exception while downloading: ${e.message}", e)
+                    Log.w(LOG_TAG_DOWNLOAD, "$FILETAG Exception while downloading: ${e.message}", e)
                     activity?.runOnUiThread {
                         updateDownloadFailure()
                     }
@@ -890,7 +892,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                         isValid = false
                     }
                 } catch (e: Exception) {
-                    Log.e(LOG_TAG, "$FILETAG Error: ${e.message}", e)
+                    Log.e(LOG_TAG_VPN, "$FILETAG Error: ${e.message}", e)
                     errorTxt.text = getString(R.string.settings_http_proxy_error_text2)
                     errorTxt.visibility = View.VISIBLE
                     isValid = false
@@ -939,7 +941,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == Activity.RESULT_OK) {
             val stamp = data?.getStringExtra(Constants.STAMP_INTENT_EXTRA)
-            Log.i(LOG_TAG, "$FILETAG onActivityResult - stamp from webview - $stamp")
+            Log.i(LOG_TAG_UI, "$FILETAG onActivityResult - stamp from webview - $stamp")
             setBraveDNSLocal()
         }
     }
@@ -954,12 +956,12 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         if (appMode?.getBraveDNS() == null) {
             GlobalScope.launch(Dispatchers.IO) {
                 try {
-                    if (DEBUG) Log.d(LOG_TAG, "$FILETAG Local brave dns set call from settings fragment newBraveDNSLocal : $path")
+                    if (DEBUG) Log.d(LOG_TAG_VPN, "$FILETAG Local brave dns set call from settings fragment newBraveDNSLocal : $path")
                     val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
                     appMode?.setBraveDNSMode(braveDNS)
                     persistentState.localBlocklistEnabled = true
                 } catch (e: Exception) {
-                    Log.w(LOG_TAG, "Exception while setting blocklist: ${e.message}", e)
+                    Log.w(LOG_TAG_VPN, "Exception while setting blocklist: ${e.message}", e)
                     persistentState.localBlocklistEnabled = false
                     if (isAdded) {
                         (context as HomeScreenActivity).runOnUiThread {
@@ -982,9 +984,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
      */
     private fun showOrbotInstallDialog() {
         val builder = AlertDialog.Builder(requireContext())
-        //set title for alert dialog
         builder.setTitle(R.string.orbot_install_dialog_title)
-        //set message for alert dialog
         builder.setMessage(R.string.orbot_install_dialog_message)
 
         //Play store install intent
@@ -995,10 +995,10 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                     try {
                         startActivity(intent)
                     } catch (e: ActivityNotFoundException) {
-                        Utilities.showToastInMidLayout(requireContext(), getString(R.string.orbot_install_activity_error), Toast.LENGTH_SHORT)
+                        Utilities.showToastUiCentered(requireContext(), getString(R.string.orbot_install_activity_error), Toast.LENGTH_SHORT)
                     }
                 } else {
-                    Utilities.showToastInMidLayout(requireContext(), getString(R.string.orbot_install_activity_error), Toast.LENGTH_SHORT)
+                    Utilities.showToastUiCentered(requireContext(), getString(R.string.orbot_install_activity_error), Toast.LENGTH_SHORT)
                 }
             }
 
@@ -1009,10 +1009,10 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                     try {
                         startActivity(intent)
                     } catch (e: ActivityNotFoundException) {
-                        Utilities.showToastInMidLayout(requireContext(), getString(R.string.orbot_install_activity_error), Toast.LENGTH_SHORT)
+                        Utilities.showToastUiCentered(requireContext(), getString(R.string.orbot_install_activity_error), Toast.LENGTH_SHORT)
                     }
                 } else {
-                    Utilities.showToastInMidLayout(requireContext(), getString(R.string.orbot_install_activity_error), Toast.LENGTH_SHORT)
+                    Utilities.showToastUiCentered(requireContext(), getString(R.string.orbot_install_activity_error), Toast.LENGTH_SHORT)
                 }
             }
         } else {//Orbot website download link
@@ -1022,10 +1022,10 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                     try {
                         startActivity(intent)
                     } catch (e: ActivityNotFoundException) {
-                        Utilities.showToastInMidLayout(requireContext(), getString(R.string.orbot_install_activity_error), Toast.LENGTH_SHORT)
+                        Utilities.showToastUiCentered(requireContext(), getString(R.string.orbot_install_activity_error), Toast.LENGTH_SHORT)
                     }
                 } else {
-                    Utilities.showToastInMidLayout(requireContext(), getString(R.string.orbot_install_activity_error), Toast.LENGTH_SHORT)
+                    Utilities.showToastUiCentered(requireContext(), getString(R.string.orbot_install_activity_error), Toast.LENGTH_SHORT)
                 }
             }
         }
@@ -1048,9 +1048,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     private fun showDownloadDialogWithLockdown() {
         val builder = AlertDialog.Builder(requireContext())
-        //set title for alert dialog
         builder.setTitle(R.string.download_lockdown_dialog_heading)
-        //set message for alert dialog
         builder.setMessage(R.string.download_lockdown_dialog_desc)
         builder.setCancelable(false)
         //performing positive action
@@ -1078,9 +1076,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     private fun showDownloadDialog() {
         val builder = AlertDialog.Builder(requireContext())
-        //set title for alert dialog
         builder.setTitle(R.string.local_blocklist_download)
-        //set message for alert dialog
         builder.setMessage(R.string.local_blocklist_download_desc)
         builder.setCancelable(false)
         //performing positive action
@@ -1102,9 +1098,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     private fun showRedownloadDialogLockdown(timeStamp: Long) {
         val builder = AlertDialog.Builder(requireContext())
-        //set title for alert dialog
         builder.setTitle(R.string.local_blocklist_lockdown_redownload)
-        //set message for alert dialog
         builder.setMessage(getString(R.string.local_blocklist_lockdown_redownload_desc, Utilities.convertLongToDate(timeStamp)))
         builder.setCancelable(false)
         //performing positive action
@@ -1119,9 +1113,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     private fun showRedownloadDialog(timeStamp: Long) {
         val builder = AlertDialog.Builder(requireContext())
-        //set title for alert dialog
         builder.setTitle(R.string.local_blocklist_redownload)
-        //set message for alert dialog
         builder.setMessage(getString(R.string.local_blocklist_redownload_desc, Utilities.convertLongToDate(timeStamp)))
         builder.setCancelable(false)
         //performing positive action
@@ -1146,9 +1138,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     private fun showDialogForFileCorrupt(timeStamp: Long) {
         val builder = AlertDialog.Builder(requireContext())
-        //set title for alert dialog
         builder.setTitle(R.string.local_blocklist_corrupt)
-        //set message for alert dialog
         builder.setMessage(R.string.local_blocklist_corrupt_desc)
         builder.setCancelable(false)
         //performing positive action
@@ -1280,7 +1270,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             }
             try {
                 port = portEditText.text.toString().toInt()
-                if (Utilities.isIPLocal(ip)) {
+                if (Utilities.isLanIpv4(ip)) {
                     if (port in 65535 downTo 1024) {
                         isValid = true
                     } else {
@@ -1291,7 +1281,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                     isValid = true
                 }
             } catch (e: Exception) {
-                Log.w(LOG_TAG, "$FILETAG Error: ${e.message}", e)
+                Log.w(LOG_TAG_VPN, "$FILETAG Error: ${e.message}", e)
                 errorTxt.text = getString(R.string.settings_http_proxy_error_text2)
                 isValid = false
             }

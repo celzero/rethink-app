@@ -28,8 +28,6 @@ import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.content.res.Configuration
 import android.graphics.Color
-import android.net.Uri
-import android.net.VpnManager
 import android.os.Build
 import android.provider.Settings
 import android.provider.Settings.ACTION_VPN_SETTINGS
@@ -39,7 +37,6 @@ import android.view.Gravity
 import android.view.View
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -48,8 +45,9 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
+import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
 import com.google.android.material.snackbar.Snackbar
 import com.google.common.net.InetAddresses
 import com.google.common.net.InternetDomainName
@@ -125,12 +123,12 @@ class Utilities {
             val enabledServices = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
             for (enabledService in enabledServices) {
                 val enabledServiceInfo: ServiceInfo = enabledService.resolveInfo.serviceInfo
-                if (DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled checking for: ${enabledServiceInfo.packageName}")
+                if (DEBUG) Log.e(LOG_TAG_VPN, "isAccessibilityServiceEnabled checking for: ${enabledServiceInfo.packageName}")
                 if (enabledServiceInfo.packageName == context.packageName && enabledServiceInfo.name == service.name) {
                     return true
                 }
             }
-            if (DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled failure: ${context.packageName},  ${service.name}, return size: ${enabledServices.size}")
+            if (DEBUG) Log.e(LOG_TAG_VPN, "isAccessibilityServiceEnabled failure: ${context.packageName},  ${service.name}, return size: ${enabledServices.size}")
             return false
         }
 
@@ -144,14 +142,14 @@ class Utilities {
                     val componentNameString = colonSplitter.next()
                     val enabledService = ComponentName.unflattenFromString(componentNameString)
                     if (enabledService != null && enabledService == expectedComponentName) {
-                        if (DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled Enhanced: ${expectedComponentName.packageName}")
+                        if (DEBUG) Log.e(LOG_TAG_VPN, "isAccessibilityServiceEnabled Enhanced: ${expectedComponentName.packageName}")
                         return true
                     }
                 }
-                if (DEBUG) Log.e(LOG_TAG, "isAccessibilityServiceEnabled Enhanced: failed calling isAccessibilityServiceEnabled()")
+                if (DEBUG) Log.e(LOG_TAG_VPN, "isAccessibilityServiceEnabled Enhanced: failed calling isAccessibilityServiceEnabled()")
                 return isAccessibilityServiceEnabled(context, accessibilityService)
             } catch (e: Exception) {
-                Log.e(LOG_TAG, "isAccessibilityServiceEnabled Exception: failed calling isAccessibilityServiceEnabled() ${e.message}", e)
+                Log.e(LOG_TAG_VPN, "isAccessibilityServiceEnabled Exception: failed calling isAccessibilityServiceEnabled() ${e.message}", e)
                 return isAccessibilityServiceEnabled(context, accessibilityService)
             }
         }
@@ -217,36 +215,37 @@ class Utilities {
         fun prepareServersToRemove(servers: String, liveServers: String): String {
             val serverList = servers.split(",")
             val liveServerList = liveServers.split(",")
-            if (DEBUG) Log.d(LOG_TAG, "Servers to remove - $serverList -- $liveServerList")
+            if (DEBUG) Log.d(LOG_TAG_VPN, "Servers to remove - $serverList -- $liveServerList")
             var serversToSend: String = ""
             serverList.forEach {
                 if (!liveServerList.contains(it)) {
                     serversToSend += "$it,"
                 }
             }
-            if (DEBUG) Log.d(LOG_TAG, "Servers to remove - $serversToSend")
+            if (DEBUG) Log.d(LOG_TAG_VPN, "Servers to remove - $serversToSend")
             serversToSend = serversToSend.dropLast(1)
             return serversToSend
         }
 
-        fun showToastInMidLayout(context: Context?, message: String, toastLength: Int) {
+        fun showToastUiCentered(context: Context?, message: String, toastLength: Int) {
             try {
                 val toast = Toast.makeText(context, message, toastLength)
                 toast.setGravity(Gravity.CENTER, 0, 0)
                 toast.show()
             } catch (e: java.lang.IllegalStateException) {
-                Log.w(LOG_TAG, "Show Toast issue : ${e.message}", e)
+                Log.w(LOG_TAG_VPN, "Show Toast issue : ${e.message}", e)
             }
         }
 
-        fun isIPLocal(ipAddress: String): Boolean {
+        fun isLanIpv4(ipAddress: String): Boolean {
             return try {
                 // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
                 val ip = InetAddresses.forString(ipAddress)
+                // ref - to match a private IP address - https://r.va.gg/2011/07/handling-x-forwarded-for-in-java-and-tomcat.html
                 val regex = Regex("(^127\\.0\\.0\\.1)|(^10\\.)|(^172\\.1[6-9]\\.)|(^172\\.2[0-9]\\.)|(^172\\.3[0-1]\\.)|(^192\\.168\\.)")
                 ip.isAnyLocalAddress || ipAddress.matches(regex) || ipAddress == "0.0.0.0"
             } catch (e: Exception) {
-                Log.w(LOG_TAG, "Exception while converting string to inetaddress, ${e.message}", e)
+                Log.w(LOG_TAG_VPN, "Exception while converting string to inetaddress, ${e.message}", e)
                 false
             }
         }
@@ -272,23 +271,30 @@ class Utilities {
             return context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
         }
 
-        fun openVPNProfile(context: Context) {
+        fun openVpnProfile(context: Context) {
             try {
                 val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     Intent(ACTION_VPN_SETTINGS)
                 } else {
-                    Intent("android.net.vpn.SETTINGS")
+                    Intent(ACTION_VPN_SETTINGS_INTENT)
                 }
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(intent)
             } catch (e: ActivityNotFoundException) {
-                showToastInMidLayout(context, context.getString(R.string.vpn_profile_error), Toast.LENGTH_SHORT)
-                Log.w(LOG_TAG, "Exception while opening app info: ${e.message}", e)
+                showToastUiCentered(context, context.getString(R.string.vpn_profile_error), Toast.LENGTH_SHORT)
+                Log.w(LOG_TAG_VPN, "Exception while opening app info: ${e.message}", e)
             }
         }
 
         fun isValidUid(uid: Int): Boolean {
-            return uid != INVALID_UID || uid != MISSING_UID
+            return uid != INVALID_UID && uid != MISSING_UID
+        }
+
+        fun isInvalidUid(uid: Int): Boolean {
+            return when (uid) {
+                MISSING_UID -> true
+                else -> false
+            }
         }
     }
 }

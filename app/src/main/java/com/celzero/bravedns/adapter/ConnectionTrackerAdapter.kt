@@ -33,11 +33,10 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
 import com.celzero.bravedns.glide.GlideApp
-import com.celzero.bravedns.service.BlockedRuleNames
-import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.FirewallRules
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_FIREWALL_LOG
 import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
@@ -48,6 +47,7 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
 
     companion object {
         private val DIFF_CALLBACK = object :
+
             DiffUtil.ItemCallback<ConnectionTracker>() {
 
             override fun areItemsTheSame(oldConnection: ConnectionTracker, newConnection: ConnectionTracker)
@@ -90,7 +90,7 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
                     b.connectionStatusIndicator.visibility = View.VISIBLE
                     b.connectionStatusIndicator.setBackgroundColor(ContextCompat.getColor(context, R.color.colorRed_A400))
                 }
-                connTracker.blockedByRule.equals(BlockedRuleNames.RULE7.ruleName) -> {
+                connTracker.blockedByRule.equals(FirewallRules.RULE7.ruleName) -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
                     b.connectionStatusIndicator.setBackgroundColor(fetchTextColor(R.color.dividerColor))
                 }
@@ -110,7 +110,7 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
                     GlideApp.with(context).load(context.packageManager.getApplicationIcon(appArray[0]!!)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)
                 } catch (e: Exception) {
                     GlideApp.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)
-                    Log.w(LOG_TAG, "Package Not Found - " + e.message)
+                    Log.w(LOG_TAG_FIREWALL_LOG, "Package Not Found - " + e.message)
                 }
             } else {
                 GlideApp.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)

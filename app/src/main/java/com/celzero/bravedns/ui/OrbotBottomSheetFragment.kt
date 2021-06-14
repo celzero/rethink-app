@@ -44,7 +44,7 @@ import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -375,13 +375,13 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
             if (launchIntent != null) {//null pointer check in case package name was not found
                 startActivity(launchIntent)
             }else{
-                Utilities.showToastInMidLayout(requireContext(), getString(R.string.orbot_app_issue), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(requireContext(), getString(R.string.orbot_app_issue), Toast.LENGTH_SHORT)
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                 intent.data = Uri.fromParts("package", packageName, null)
                 startActivity(intent)
             }
         } catch (e: ActivityNotFoundException) {
-            Log.w(LOG_TAG, "Exception while opening app info: ${e.message}", e)
+            Log.w(LOG_TAG_VPN, "Exception while opening app info: ${e.message}", e)
         }
     }
 
@@ -394,16 +394,14 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
             if (vpnService != null) {
                 get<OrbotHelper>().startOrbot(vpnService)
             } else {
-                Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_vpn_disabled_error), Toast.LENGTH_LONG)
+                Utilities.showToastUiCentered(requireContext(), getString(R.string.settings_socks5_vpn_disabled_error), Toast.LENGTH_LONG)
             }
         }
     }
 
     private fun showOrbotStopDialog() {
         val builder = AlertDialog.Builder(requireContext())
-        //set title for alert dialog
         builder.setTitle(getString(R.string.orbot_stop_dialog_title))
-        //set message for alert dialog
         builder.setMessage(getString(R.string.orbot_stop_dialog_message))
         builder.setCancelable(true)
         //performing positive action
@@ -414,7 +412,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
             dialogInterface.dismiss()
             val launchIntent: Intent? = requireActivity().packageManager.getLaunchIntentForPackage(OrbotHelper.ORBOT_PACKAGE_NAME)
             if (launchIntent != null) {//null pointer check in case package name was not found
-                Log.d(LOG_TAG, "launchIntent: ${OrbotHelper.ORBOT_PACKAGE_NAME}")
+                Log.d(LOG_TAG_VPN, "launchIntent: ${OrbotHelper.ORBOT_PACKAGE_NAME}")
                 startActivity(launchIntent)
             }
         }

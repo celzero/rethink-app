@@ -21,7 +21,7 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_VPN
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -78,7 +78,7 @@ class VpnController {
     fun start(context: Context) {
         //TODO : Code modified to remove the check of null reference - MODIFIED check??
         if (braveVpnService != null) {
-            Log.i(LOG_TAG,"braveVPNService is not null")
+            Log.i(LOG_TAG_VPN,"braveVPNService is not null")
             return
         }
         VpnControllerHelper.persistentState.vpnEnabled = true
@@ -89,7 +89,7 @@ class VpnController {
         } else {
             context.startService(startServiceIntent)
         }
-        Log.i(LOG_TAG,"VPNController - Start(Synchronized) executed - $context")
+        Log.i(LOG_TAG_VPN,"VPNController - Start(Synchronized) executed - $context")
     }
 
     fun onStartComplete(context: Context?, succeeded: Boolean) {
@@ -100,11 +100,11 @@ class VpnController {
         } else {
             stateChanged(context!!)
         }
-        Log.i(LOG_TAG, "onStartComplete - VpnController")
+        Log.i(LOG_TAG_VPN, "onStartComplete - VpnController")
     }
 
     fun stop(context: Context?) {
-        Log.i(LOG_TAG,"VPN Controller stop - ${context!!}")
+        Log.i(LOG_TAG_VPN,"VPN Controller stop - ${context!!}")
         VpnControllerHelper.persistentState.vpnEnabled = false
         connectionState = null
         if (braveVpnService != null) {

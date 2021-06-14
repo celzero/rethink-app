@@ -41,7 +41,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.ThrowingHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -86,18 +86,18 @@ class UniversalAppListAdapter(private val context: Context, private val appInfoR
                 GlideApp.with(context).load(context.packageManager.getApplicationIcon(appInfo.packageInfo)).into(b.univWhitelistApkIconIv)
             } catch (e: Exception) {
                 GlideApp.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.univWhitelistApkIconIv)
-                Log.e(LOG_TAG, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message, e)
+                Log.e(LOG_TAG_FIREWALL, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message, e)
             }
 
             b.univWhitelistContainer.setOnClickListener {
-                if (DEBUG) Log.d(LOG_TAG, "parentView- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
+                if (DEBUG) Log.d(LOG_TAG_FIREWALL, "parentView- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
                 appInfo.whiteListUniv1 = !appInfo.whiteListUniv1
                 modifyWhiteListApps(appInfo)
             }
 
             b.univWhitelistCheckbox.setOnCheckedChangeListener(null)
             b.univWhitelistCheckbox.setOnClickListener {
-                if (DEBUG) Log.d(LOG_TAG, "CheckBox- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
+                if (DEBUG) Log.d(LOG_TAG_FIREWALL, "CheckBox- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
                 appInfo.whiteListUniv1 = !appInfo.whiteListUniv1
                 modifyWhiteListApps(appInfo)
             }

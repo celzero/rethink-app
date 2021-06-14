@@ -46,7 +46,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.APP_CAT_SYSTEM_APPS
 import com.celzero.bravedns.util.Constants.Companion.APP_CAT_SYSTEM_COMPONENTS
 import com.celzero.bravedns.util.Constants.Companion.APP_NON_APP
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.ThrowingHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -105,7 +105,7 @@ class FirewallAppListAdapter internal constructor(
             GlideApp.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                 .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                 .into(mIconImageView)
-            Log.i(LOG_TAG, "Application Icon not available for package: ${appInfoDetail.packageInfo}" + e.message)
+            Log.i(LOG_TAG_FIREWALL, "Application Icon not available for package: ${appInfoDetail.packageInfo}" + e.message)
         }
         mLabelTextView.text = appInfoDetail.appName
 
@@ -178,7 +178,7 @@ class FirewallAppListAdapter internal constructor(
                             try {
                                 activityManager.killBackgroundProcesses(it.packageInfo)
                             } catch (e: Exception) {
-                                Log.w(LOG_TAG, "firewall - kill app - exception" + e.message, e)
+                                Log.w(LOG_TAG_FIREWALL, "firewall - kill app - exception" + e.message, e)
                             }
                         }
                     }
@@ -302,7 +302,7 @@ class FirewallAppListAdapter internal constructor(
                 }
             }
         } catch (e: Exception) {
-            Log.w(LOG_TAG, "One or more application icons are not available" + e.message)
+            Log.w(LOG_TAG_FIREWALL, "One or more application icons are not available" + e.message)
             GlideApp.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                 .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
                 .into(imageHolder1)
@@ -325,7 +325,7 @@ class FirewallAppListAdapter internal constructor(
                 true
             }
             if(listTitle.categoryName == APP_CAT_SYSTEM_COMPONENTS && isInternetAllowed){
-                if(DEBUG) Log.d(LOG_TAG, "Category block - System components, count: ${listTitle.numOfAppWhitelisted}, ${listTitle.numberOFApps}")
+                if(DEBUG) Log.d(LOG_TAG_FIREWALL, "Category block - System components, count: ${listTitle.numOfAppWhitelisted}, ${listTitle.numberOFApps}")
                 proceedBlock = if(listTitle.numOfAppWhitelisted != listTitle.numberOFApps){
                     showDialogForSystemAppBlock(APP_CAT_SYSTEM_COMPONENTS)
                 }else{
@@ -340,7 +340,7 @@ class FirewallAppListAdapter internal constructor(
                 }
             }
             if(proceedBlock) {
-                Log.i(LOG_TAG,"Blocking proceeded - ")
+                Log.i(LOG_TAG_FIREWALL,"Blocking proceeded - ")
                 internetChk.visibility = View.GONE
                 progressBar.visibility = View.VISIBLE
                 object : CountDownTimer(500, 500) {
@@ -363,7 +363,7 @@ class FirewallAppListAdapter internal constructor(
 
                 GlobalScope.launch(Dispatchers.IO) {
                     val count = appInfoRepository.updateInternetForAppCategory(listTitle.categoryName, !isInternet)
-                    if(DEBUG) Log.d(LOG_TAG,"Apps updated : $count, $isInternet")
+                    if(DEBUG) Log.d(LOG_TAG_FIREWALL,"Apps updated : $count, $isInternet")
                     try {
                         if (count == listTitle.numberOFApps) {
                             categoryInfoRepository.updateCategoryInternet(listTitle.categoryName, isInternet)
@@ -371,11 +371,11 @@ class FirewallAppListAdapter internal constructor(
                             categoryInfoRepository.updateBlockedCount(listTitle.categoryName, count)
                         }
                     }catch(e : Exception){
-                        Log.w(LOG_TAG,"Exception when inserting the category internet info: ${e.message}",e)
+                        Log.w(LOG_TAG_FIREWALL,"Exception when inserting the category internet info: ${e.message}",e)
                     }
                 }
             }else{
-                if(DEBUG) Log.d(LOG_TAG,"else - proceedBlock: $proceedBlock")
+                if(DEBUG) Log.d(LOG_TAG_FIREWALL,"else - proceedBlock: $proceedBlock")
                 internetChk.isChecked = proceedBlock
                 internetChk.setCompoundDrawablesWithIntrinsicBounds(
                     ContextCompat.getDrawable(context, R.drawable.allowed), null, null, null)

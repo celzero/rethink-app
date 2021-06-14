@@ -22,7 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.DNSLogDAO
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.FILTER_IS_FILTER
 
 class DNSLogViewModel(private val dnsLogDAO: DNSLogDAO) : ViewModel() {
 
@@ -38,9 +38,8 @@ class DNSLogViewModel(private val dnsLogDAO: DNSLogDAO) : ViewModel() {
     ) { input ->
         if (input.isBlank()) {
             dnsLogDAO.getDNSLogsLiveData().toLiveData(pageSize = 30)
-        } else if (input.contains("isFilter")) {
+        } else if (input.contains(FILTER_IS_FILTER)) {
             val searchString = input.split(":")[0]
-            if (DEBUG) Log.d(LOG_TAG, "DNS logs filter : $input, $searchString")
             if (searchString.isEmpty()) {
                 dnsLogDAO.getBlockedDNSLogsLiveData().toLiveData(pageSize = 30)
             } else {
@@ -48,7 +47,6 @@ class DNSLogViewModel(private val dnsLogDAO: DNSLogDAO) : ViewModel() {
                     .toLiveData(pageSize = 30)
             }
         } else {
-            if (DEBUG) Log.d(LOG_TAG, "DNS logs filter : $input")
             dnsLogDAO.getDNSLogsByQueryLiveData("%$input%").toLiveData(30)
         }
     }

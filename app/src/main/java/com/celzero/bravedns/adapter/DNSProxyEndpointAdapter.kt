@@ -21,7 +21,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.DialogInterface
 import android.os.CountDownTimer
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -39,7 +38,6 @@ import com.celzero.bravedns.service.QueryTracker
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.UIUpdateInterface
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
@@ -83,7 +81,6 @@ class DNSProxyEndpointAdapter(private val context: Context,
                 if (dnsProxyEndpoint.proxyAppName == context.getString(R.string.cd_custom_dns_proxy_default_app)) {
                     b.dnsProxyListUrlExplanation.text = context.getString(R.string.settings_socks_forwarding_desc, dnsProxyEndpoint.proxyIP, dnsProxyEndpoint.proxyPort.toString(), context.getString(R.string.cd_custom_dns_proxy_default_app))
                 } else {
-                    Log.i(LOG_TAG, "Proxy : ${dnsProxyEndpoint.proxyAppName}")
                     b.dnsProxyListUrlExplanation.text = context.getString(R.string.settings_socks_forwarding_desc, dnsProxyEndpoint.proxyIP, dnsProxyEndpoint.proxyPort.toString(), dnsProxyEndpoint.proxyAppName)
 
                 }
@@ -91,7 +88,6 @@ class DNSProxyEndpointAdapter(private val context: Context,
                 if (dnsProxyEndpoint.proxyAppName == context.getString(R.string.cd_custom_dns_proxy_default_app)) {
                     b.dnsProxyListUrlExplanation.text = context.getString(R.string.dns_proxy_desc, dnsProxyEndpoint.proxyIP, dnsProxyEndpoint.proxyPort.toString(), context.getString(R.string.cd_custom_dns_proxy_default_app))
                 } else {
-                    Log.i(LOG_TAG, "Proxy : ${dnsProxyEndpoint.proxyAppName}")
                     b.dnsProxyListUrlExplanation.text = context.getString(R.string.dns_proxy_desc, dnsProxyEndpoint.proxyIP, dnsProxyEndpoint.proxyPort.toString(), dnsProxyEndpoint.proxyAppName)
                 }
             }
@@ -142,10 +138,8 @@ class DNSProxyEndpointAdapter(private val context: Context,
 
     private fun showDialogExplanation(title: String, appName: String, url: String, message: String) {
         val builder = AlertDialog.Builder(context)
-        //set title for alert dialog
         builder.setTitle(title)
         val app = appList[appName]?.appName
-        //set message for alert dialog
 
         if (app != null && !app.isNullOrEmpty()) {
             builder.setMessage(context.getString(R.string.dns_proxy_dialog_message, app, url, message))
@@ -161,7 +155,7 @@ class DNSProxyEndpointAdapter(private val context: Context,
             val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
             val clip = ClipData.newPlainText("URL", url)
             clipboard?.setPrimaryClip(clip)
-            Utilities.showToastInMidLayout(context, context.getString(R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
+            Utilities.showToastUiCentered(context, context.getString(R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
         }
         // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()
@@ -172,9 +166,7 @@ class DNSProxyEndpointAdapter(private val context: Context,
 
     private fun showDialogForDelete(dnsProxyEndpoint: DNSProxyEndpoint?) {
         val builder = AlertDialog.Builder(context)
-        //set title for alert dialog
         builder.setTitle(R.string.dns_proxy_remove_dialog_title)
-        //set message for alert dialog
         builder.setMessage(R.string.dns_proxy_remove_dialog_message)
 
         builder.setCancelable(true)

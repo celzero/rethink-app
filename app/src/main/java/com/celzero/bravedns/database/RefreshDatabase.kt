@@ -26,7 +26,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_APP_DB
 import com.celzero.bravedns.util.FileSystemUID
 import com.celzero.bravedns.util.PlayStoreCategory
 import kotlinx.coroutines.Dispatchers
@@ -52,7 +52,7 @@ class RefreshDatabase internal constructor(
      * Need to rewrite the logic for adding the apps in the database and removing it during uninstall.
      */
     fun refreshAppInfoDatabase() {
-        if(DEBUG) Log.d(LOG_TAG,"Refresh database is called")
+        if(DEBUG) Log.d(LOG_TAG_APP_DB,"Refresh database is called")
         GlobalScope.launch(Dispatchers.IO) {
             val appListDB = appInfoRepository.getAppInfoAsync()
             if (appListDB.isNotEmpty()) {
@@ -65,7 +65,7 @@ class RefreshDatabase internal constructor(
                                 updateCategoryInDB()
                             }
                         } catch (e: Exception) {
-                            Log.w(LOG_TAG, "Application not available ${it.appName}" + e.message, e)
+                            Log.w(LOG_TAG_APP_DB, "Application not available ${it.appName}" + e.message, e)
                             appInfoRepository.delete(it)
                             updateCategoryInDB()
                         }
@@ -84,10 +84,10 @@ class RefreshDatabase internal constructor(
             val appDetailsFromDB = appInfoRepository.getAppInfoAsync()
             val nonAppsCount = appInfoRepository.getNonAppCount()
             //val isRootAvailable = insertRootAndroid(appInfoRepository)
-            if(DEBUG) Log.d(LOG_TAG,"getAppInfo - ${appDetailsFromDB.size}, $nonAppsCount, ${allPackages.size}")
+            if(DEBUG) Log.d(LOG_TAG_APP_DB,"getAppInfo - ${appDetailsFromDB.size}, $nonAppsCount, ${allPackages.size}")
             if (appDetailsFromDB.isEmpty() || ((appDetailsFromDB.size-nonAppsCount) != (allPackages.size - 1)) ) {
                 allPackages.forEach {
-                    if(DEBUG) Log.d(LOG_TAG,"Refresh Database, AppInfo -> ${context.packageManager.getApplicationLabel(it.applicationInfo)}")
+                    if(DEBUG) Log.d(LOG_TAG_APP_DB,"Refresh Database, AppInfo -> ${context.packageManager.getApplicationLabel(it.applicationInfo)}")
                     if (it.applicationInfo.packageName != context.applicationContext.packageName) {
                         val applicationInfo: ApplicationInfo = it.applicationInfo
                         val appInfo = AppInfo()
@@ -102,7 +102,7 @@ class RefreshDatabase internal constructor(
                         if (dbAppInfo != null && dbAppInfo.appName.isNotEmpty()) {
                             HomeScreenActivity.GlobalVariable.appList[applicationInfo.packageName] = dbAppInfo
                         }else{
-                            if(DEBUG) Log.d(LOG_TAG,"Refresh Database, AppInfo - new package found ${appInfo.appName} - " +
+                            if(DEBUG) Log.d(LOG_TAG_APP_DB,"Refresh Database, AppInfo - new package found ${appInfo.appName} - " +
                                         "${context.packageManager.getApplicationLabel(it.applicationInfo)} will be inserted")
                             appInfo.isDataEnabled = true
                             appInfo.isWifiEnabled = true
@@ -220,7 +220,7 @@ class RefreshDatabase internal constructor(
     private val CATEGORY_GAME_STRING = "GAME_" // All games start with this prefix
 
     fun updateCategoryInDB() {
-        if (DEBUG) Log.d(LOG_TAG, "RefreshDatabase - Call for updateCategoryDB")
+        if (DEBUG) Log.d(LOG_TAG_APP_DB, "RefreshDatabase - Call for updateCategoryDB")
         GlobalScope.launch(Dispatchers.IO) {
             //Changes to remove the count queries.
             val categoryFromAppList = appInfoViewRepository.getAllAppDetails()
@@ -240,7 +240,7 @@ class RefreshDatabase internal constructor(
                 categoryInfo.numOfAppsBlocked = appsBlocked.size
                 categoryInfo.isInternetBlocked = (categoryInfo.numberOFApps == categoryInfo.numOfAppsBlocked)
 
-                Log.i(LOG_TAG, "categoryListFromAppList - ${categoryInfo.categoryName}, ${categoryInfo.numberOFApps}, ${categoryInfo.numOfAppsBlocked}, ${categoryInfo.isInternetBlocked}")
+                Log.i(LOG_TAG_APP_DB, "categoryListFromAppList - ${categoryInfo.categoryName}, ${categoryInfo.numberOFApps}, ${categoryInfo.numOfAppsBlocked}, ${categoryInfo.isInternetBlocked}")
                 categoryInfoRepository.insertAsync(categoryInfo)
             }
         }
@@ -306,12 +306,12 @@ class RefreshDatabase internal constructor(
                     doHEndpointRepository.removeConnectionStatus()
                     insertDefaultDOHList()
                 }else{
-                    Log.i(LOG_TAG, "Refresh Database, ALready insertion done. Correct values for Cloudflare alone.")
+                    Log.i(LOG_TAG_APP_DB, "Refresh Database, ALready insertion done. Correct values for Cloudflare alone.")
                     val doHEndpoint = DoHEndpoint(3, urlName[2], urlValues[2], context.getString(R.string.dns_mode_2_explanation), false, false, System.currentTimeMillis(), 0)
                     doHEndpointRepository.insertWithReplaceAsync(doHEndpoint)
                 }
             }catch (e : Exception){
-                Log.i(LOG_TAG, "Refresh Database, No connections available proceed insert- ${e.message}",e)
+                Log.i(LOG_TAG_APP_DB, "Refresh Database, No connections available proceed insert- ${e.message}",e)
                 insertDefaultDOHList()
             }
 
