@@ -197,10 +197,17 @@ enum class FileSystemUID(val uid : Int) {
             }
 
             fun isUIDAppRange(uid: Int): Boolean {
-                    if (uid >= APP_START.uid && uid <= APP_END.uid) {
-                            return true
-                    }
-                    return false
+                if (uid >= APP_START.uid && uid <= APP_END.uid) {
+                    return true
+                }
+                return false
+            }
+
+            fun isValidUid(uid: Int): Boolean {
+                if (uid < 0 && uid > USER_OFFSET.uid) {
+                    return true
+                }
+                return false
             }
         }
 

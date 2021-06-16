@@ -58,19 +58,15 @@ class DeviceLockService : Service() {
 
         checkLockTask?.cancel()
 
-        if (isProtected && !isLocked && !isInteractive) {
+        if(isProtected && isLocked) {
+            Log.i(LOG_TAG_VPN, "DeviceLockService : Screen lock detected at $delayIndex")
+            persistentState.isScreenOff = true
+            timer.cancel()
+        } else if (isProtected && !isLocked && !isInteractive) {
             checkLockTask = CheckLockTask(this, delayIndex)
             timer.schedule(checkLockTask, checkLockDelays[delayIndex].toLong())
-            this.stopSelf()
-        } else {
-            if (!isProtected || !isLocked) return
-            if (!persistentState.isScreenOff) {
-                if (DEBUG) Log.d(LOG_TAG_VPN, "DeviceLockService : Screen lock detected at $delayIndex")
-                persistentState.isScreenOff = true
-                timer.cancel()
-                this.stopSelf()
-            }
         }
+        this.stopSelf()
     }
 
     companion object {

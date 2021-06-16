@@ -287,7 +287,7 @@ class Utilities {
         }
 
         fun isValidUid(uid: Int): Boolean {
-            return uid != INVALID_UID && uid != MISSING_UID
+            return FileSystemUID.isValidUid(uid)
         }
 
         fun isInvalidUid(uid: Int): Boolean {

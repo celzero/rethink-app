@@ -132,7 +132,6 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
                 persistentState.orbotMode = Constants.ORBOT_MODE_NONE
                 persistentState.orbotEnabledMode = Constants.ORBOT_MODE_NONE
                 b.bsOrbotRadioNone.isChecked = true
-                persistentState.orbotEnabled = false
                 persistentState.orbotConnectionStatus.postValue(false)
                 disableOrbot()
                 showOrbotStopDialog()
@@ -144,7 +143,6 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
                 HomeScreenActivity.GlobalVariable.appMode?.setProxyMode(settings.Settings.ProxyModeNone)
                 persistentState.orbotMode = Constants.ORBOT_MODE_NONE
                 persistentState.orbotEnabledMode = Constants.ORBOT_MODE_NONE
-                persistentState.orbotEnabled = false
                 b.bsOrbotRadioNone.isChecked = true
                 persistentState.orbotConnectionStatus.postValue(false)
                 disableOrbot()

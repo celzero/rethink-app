@@ -132,7 +132,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         b.fhsCardDnsConfigureLl.setOnClickListener {
-            startDNSActivity(DNS_SCREEN_CONFIG)
+            startDNSActivity(DNS_SCREEN_LOGS)
         }
 
         b.fhsCardFirewallConfigure.setOnClickListener {
@@ -452,7 +452,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             if (braveMode == APP_MODE_DNS_FIREWALL || braveMode == APP_MODE_DNS && (PrivateDnsMode.STRICT != getPrivateDnsMode())) {
                 val intent = Intent(requireContext(), DNSDetailActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                intent.putExtra(Constants.SCREEN_TO_LOAD, 1)
+                intent.putExtra(Constants.SCREEN_TO_LOAD, screenToLoad)
                 startActivity(intent)
             } else {
                 if (getPrivateDnsMode() == PrivateDnsMode.STRICT) {

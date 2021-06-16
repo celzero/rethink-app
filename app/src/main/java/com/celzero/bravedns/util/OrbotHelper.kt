@@ -95,6 +95,7 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
 
         private const val EXTRA_STATUS = "org.torproject.android.intent.extra.STATUS"
 
+        // Orbot requestCode for PendingIntent.getBroadcast() for the notification action.
         private const val ORBOT_REQUEST_CODE = 200
     }
 
@@ -246,7 +247,6 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
         persistentState.orbotMode = Constants.ORBOT_MODE_NONE
         persistentState.orbotEnabledMode = Constants.ORBOT_MODE_NONE
         persistentState.orbotConnectionStatus.postValue(false)
-        persistentState.orbotEnabled = false
         persistentState.httpProxyPort = 0
         persistentState.httpProxyHostAddress = ""
         HomeScreenActivity.GlobalVariable.appMode?.setProxyMode(Settings.ProxyModeNone)
@@ -302,7 +302,6 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
      * Updates the shared pref values - Orbot started status
      */
     private fun orbotStarted() {
-        persistentState.orbotEnabled = true
         persistentState.orbotConnectionStatus.postValue(false)
         setOrbotMode()
     }

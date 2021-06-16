@@ -106,7 +106,6 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
     var isAddAllNetworks by booleanPref("add_all_networks_to_vpn", false)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
-    var orbotEnabled by booleanPref("orbot_enabled", false)
     var orbotMode by intPref("orbot_mode", ORBOT_MODE_NONE)
     var downloadIDs by stringSetPref("download_ids", emptySet())
     var orbotEnabledMode by intPref("orbot_mode_enabled", ORBOT_MODE_NONE)

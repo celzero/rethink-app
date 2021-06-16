@@ -122,9 +122,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     private var isAccessibilityServiceRunning: Boolean = false
     private var accessibilityHearbeatTimestamp: Long = 0L
 
-    private val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-    private val activityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
-    private val accessibilityManager = getSystemService(ACCESSIBILITY_SERVICE) as AccessibilityManager
+    private lateinit var notificationManager : NotificationManager
+    private lateinit var activityManager : ActivityManager
+    private lateinit var accessibilityManager : AccessibilityManager
 
     enum class State {
         NEW, WORKING, FAILING
@@ -655,6 +655,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        notificationManager = this.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        activityManager = this.getSystemService(ACTIVITY_SERVICE) as ActivityManager
+        accessibilityManager = this.getSystemService(ACCESSIBILITY_SERVICE) as AccessibilityManager
+
         vpnScope.launch {
             loadAppFirewallRules()
         }
@@ -667,7 +671,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         if (persistentState.isBackgroundEnabled) {
             registerAccessibilityServiceState()
         }
-        if (persistentState.isScreenOff) {
+        if (persistentState.screenState) {
             registerScreenStateReceiver()
         }
         registerBootCompleteReceiver()

@@ -72,7 +72,8 @@ class Constants {
         //No package applications
         const val NO_PACKAGE = "no_package"
 
-        val TOTAL_NETWORK_LOG_ENTRIES_THRESHOLD = TimeUnit.SECONDS.toMillis(5)
+        // Number of network log entries to store in the database.
+        const val TOTAL_NETWORK_LOG_ENTRIES_THRESHOLD = 5000
 
         const val INVALID_UID = -1
         const val MISSING_UID = -2000
@@ -80,11 +81,8 @@ class Constants {
         const val RETHINK_DNS_PLUS = "RethinkDNS Plus"
         const val RETHINK_DNS = "RethinkDNS Basic (default)"
 
+        // maximum time delay before sending block connection response.
         val DELAY_FIREWALL_RESPONSE_MS: Long = TimeUnit.SECONDS.toMillis(30)
-
-        const val DNS_TYPE_DOH = 1
-        const val DNS_TYPE_DNS_CRYPT = 2
-        //const val DNS_TYPE_DNS_PROXY = 3
 
         const val SCREEN_TO_LOAD = "view_pager_screen"
 
