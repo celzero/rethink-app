@@ -21,25 +21,23 @@ import androidx.lifecycle.ViewModel
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.BlockedConnectionsDAO
 import com.celzero.bravedns.util.Constants.Companion.FILTER_IS_FILTER
+import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class BlockedConnectionsViewModel(private val blockedConnectionsDAO: BlockedConnectionsDAO) : ViewModel() {
 
-    private var filteredList : MutableLiveData<String> = MutableLiveData()
+    private var filteredList: MutableLiveData<String> = MutableLiveData()
 
     init {
         filteredList.value = ""
     }
 
-    var blockedUnivRulesList = Transformations.switchMap(
-                filteredList
-
-    ) { input ->
+    var blockedUnivRulesList = Transformations.switchMap(filteredList) { input ->
         if (input.isBlank()) {
-            blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(pageSize = 50)
+            blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
         } else if (input!! == FILTER_IS_FILTER) {
-            blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(pageSize = 50)
+            blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
         } else {
-            blockedConnectionsDAO.getUnivBlockedConnectionsByIP("%$input%").toLiveData(50)
+            blockedConnectionsDAO.getUnivBlockedConnectionsByIP("%$input%").toLiveData(LIVEDATA_PAGE_SIZE)
         }
     }
 
@@ -47,7 +45,7 @@ class BlockedConnectionsViewModel(private val blockedConnectionsDAO: BlockedConn
         filteredList.value = filter
     }
 
-    fun setFilterBlocked(filter: String){
+    fun setFilterBlocked(filter: String) {
         filteredList.value = filter
     }
 }

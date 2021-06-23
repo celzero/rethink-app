@@ -174,7 +174,6 @@ class DoHEndpointAdapter(private val context: Context,
             builder.setTitle(title)
             builder.setMessage(url + "\n\n" + message)
             builder.setCancelable(true)
-            //performing positive action
             builder.setPositiveButton(context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
                 dialogInterface.dismiss()
             }
@@ -185,9 +184,7 @@ class DoHEndpointAdapter(private val context: Context,
                 clipboard?.setPrimaryClip(clip)
                 Utilities.showToastUiCentered(context, context.getString(R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
             }
-            // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
-            // Set other dialog properties
             alertDialog.setCancelable(true)
             alertDialog.show()
         }
@@ -197,7 +194,6 @@ class DoHEndpointAdapter(private val context: Context,
             builder.setTitle(R.string.doh_custom_url_remove_dialog_title)
             builder.setMessage(R.string.doh_custom_url_remove_dialog_message)
             builder.setCancelable(true)
-            //performing positive action
             builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { _, _ ->
                 GlobalScope.launch(Dispatchers.IO) {
                     doHEndpointRepository.deleteDoHEndpoint(doHEndpoint.dohURL)
@@ -205,13 +201,10 @@ class DoHEndpointAdapter(private val context: Context,
                 Toast.makeText(context, R.string.doh_custom_url_remove_success, Toast.LENGTH_SHORT).show()
             }
 
-            //performing negative action
             builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
 
             }
-            // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
-            // Set other dialog properties
             alertDialog.setCancelable(true)
             alertDialog.show()
         }
@@ -221,7 +214,6 @@ class DoHEndpointAdapter(private val context: Context,
             builder.setTitle(R.string.doh_brave_pro_configure)
             builder.setMessage(R.string.doh_brave_pro_configure_desc)
             builder.setCancelable(true)
-            //performing positive action
             builder.setPositiveButton(context.getString(R.string.dns_connected_rethink_configure)) { _, _ ->
                 val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
                 intent.putExtra(Constants.LOCATION_INTENT_EXTRA, DNSConfigureWebViewActivity.REMOTE)
@@ -230,13 +222,10 @@ class DoHEndpointAdapter(private val context: Context,
 
             }
 
-            //performing negative action
             builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
                 b.dohEndpointListCheckImage.isChecked = false
             }
-            // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
-            // Set other dialog properties
             alertDialog.setCancelable(true)
             alertDialog.show()
         }

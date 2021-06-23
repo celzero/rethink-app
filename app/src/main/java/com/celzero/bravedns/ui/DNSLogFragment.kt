@@ -185,19 +185,15 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         builder.setTitle(R.string.dns_query_clear_logs_title)
         builder.setMessage(R.string.dns_query_clear_logs_message)
         builder.setCancelable(true)
-        //performing positive action
         builder.setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
             GlobalScope.launch(Dispatchers.IO) {
                 GlideApp.get(requireActivity()).clearDiskCache()
                 dnsLogDAO.clearAllData()
             }
         }
-        //performing negative action
         builder.setNegativeButton(getString(R.string.dns_log_dialog_negative)) { _, _ ->
         }
-        // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()
-        // Set other dialog properties
         alertDialog.setCancelable(true)
         alertDialog.show()
     }

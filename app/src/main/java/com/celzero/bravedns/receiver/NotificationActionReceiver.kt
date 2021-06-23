@@ -85,7 +85,6 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
         try {
             val launchIntent: Intent? = context.packageManager?.getLaunchIntentForPackage(packageName)
             if (launchIntent != null) {//null pointer check in case package name was not found
-                Log.d(LOG_TAG_VPN, "launchIntent: $packageName")
                 context.startActivity(launchIntent)
             } else {
                 val text = context.getString(R.string.orbot_app_issue)

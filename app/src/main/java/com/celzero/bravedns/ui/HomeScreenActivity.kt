@@ -53,11 +53,13 @@ import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.Constants.Companion.RESPONSE_VERSION
 import com.celzero.bravedns.util.HttpRequestHelper.Companion.checkStatus
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.common.collect.HashMultimap
 import okhttp3.*
+import org.json.JSONException
 import org.json.JSONObject
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
@@ -192,7 +194,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             val version = pInfo.versionCode
             persistentState.appVersion = version
         } catch (e: PackageManager.NameNotFoundException) {
-            Log.e(LOG_TAG_UI, "Error while fetching version code: ${e.message}", e)
+            Log.e(LOG_TAG_UI, "package not found, cannot fetch version code: ${e.message}", e)
         }
     }
 
@@ -201,21 +203,16 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun updateInstallSource() {
-        try {
-            when (BuildConfig.FLAVOR) {
-                Constants.FLAVOR_PLAY -> {
-                    persistentState.downloadSource = DOWNLOAD_SOURCE_PLAY_STORE
-                }
-                Constants.FLAVOR_FDROID -> {
-                    persistentState.downloadSource = Constants.DOWNLOAD_SOURCE_FDROID
-                }
-                else -> {
-                    persistentState.downloadSource = Constants.DOWNLOAD_SOURCE_WEBSITE
-                }
+        when (BuildConfig.FLAVOR) {
+            Constants.FLAVOR_PLAY -> {
+                persistentState.downloadSource = DOWNLOAD_SOURCE_PLAY_STORE
             }
-
-        } catch (e: java.lang.Exception) {
-            Log.e(LOG_TAG_UI, "Exception while fetching the app download source: ${e.message}", e)
+            Constants.FLAVOR_FDROID -> {
+                persistentState.downloadSource = Constants.DOWNLOAD_SOURCE_FDROID
+            }
+            else -> {
+                persistentState.downloadSource = Constants.DOWNLOAD_SOURCE_WEBSITE
+            }
         }
     }
 
@@ -268,12 +265,10 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         val calendar: Calendar = Calendar.getInstance()
         val day: Int = calendar.get(Calendar.DAY_OF_WEEK)
         if ((day == Calendar.FRIDAY || day == Calendar.SATURDAY) && persistentState.checkForAppUpdate) {
+            Log.i(LOG_TAG_UI, "App update check initiated, number of days: $numOfDays")
             if (numOfDays > 1) {
-                Log.i(LOG_TAG_UI, "App update check initiated, number of days: $numOfDays")
                 checkForUpdate()
                 checkForBlockListUpdate()
-            } else {
-                Log.i(LOG_TAG_UI, "App update check not initiated")
             }
         }
     }
@@ -304,20 +299,17 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     private val installStateUpdatedListener = object : AppUpdater.InstallStateListener {
         override fun onStateUpdate(state: AppUpdater.InstallState) {
+            Log.i(LOG_TAG_UI, "InstallStateUpdatedListener: state: " + state.status)
             when (state.status) {
                 AppUpdater.InstallStatus.DOWNLOADED -> {
                     //CHECK THIS if AppUpdateType.FLEXIBLE, otherwise you can skip
                     popupSnackBarForCompleteUpdate()
-                    //showDownloadDialog(true, getString(R.string.download_update_dialog_title), getString(R.string.download_update_dialog_message))
                 }
                 AppUpdater.InstallStatus.INSTALLED -> {
-                    Log.i(LOG_TAG_UI, "InstallStateUpdatedListener: state: " + state.status)
                     appUpdateManager.unregisterListener(this)
                 }
                 else -> {
                     appUpdateManager.unregisterListener(this)
-                    Log.i(LOG_TAG_UI, "InstallStateUpdatedListener: state: " + state.status)
-                    // checkForDownload()
                 }
             }
         }
@@ -365,7 +357,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
             override fun onResponse(call: Call, response: Response) {
                 val stringResponse = response.body!!.string()
-                //creating json object
                 try {
                     val jsonObject = JSONObject(stringResponse)
                     val responseVersion = jsonObject.getInt(Constants.JSON_VERSION)
@@ -373,33 +364,29 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                     timeStamp = jsonObject.getLong(Constants.JSON_LATEST)
                     persistentState.lastAppUpdateCheck = System.currentTimeMillis()
                     Log.i(LOG_TAG_DOWNLOAD, "Server response for the new version download is $updateValue, response version number- $responseVersion, timestamp- $timeStamp")
-                    if (responseVersion == 1) {
-                        if (updateValue) {
-                            if (persistentState.downloadSource != DOWNLOAD_SOURCE_PLAY_STORE) {
-                                (context as HomeScreenActivity).runOnUiThread {
-                                    popupSnackBarForBlocklistUpdate()
-                                }
-                            } else {
-                                (context as HomeScreenActivity).runOnUiThread {
-                                    registerReceiverForDownloadManager(context)
-                                    handleDownloadFiles()
-                                }
-                            }
-                        }
+                    response.body!!.close()
+                    client.connectionPool.evictAll()
+                    if (responseVersion != RESPONSE_VERSION) return
+                    if (!updateValue) return
+                    if (persistentState.downloadSource != DOWNLOAD_SOURCE_PLAY_STORE) {
+                        popupSnackBarForBlocklistUpdate()
+                    } else {
+                        registerReceiverForDownloadManager(context)
+                        handleDownloadFiles()
                     }
-                } catch (e: Exception) {
+                } catch (e: JSONException) {
                     Log.w(LOG_TAG_DOWNLOAD, "HomeScreenActivity- Exception while fetching blocklist update", e)
                 }
-                response.body!!.close()
-                client.connectionPool.evictAll()
             }
         })
     }
 
     private fun registerReceiverForDownloadManager(context: Context) {
-        context.registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
-    }
+        (context as HomeScreenActivity).runOnUiThread {
+            context.registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+        }
 
+    }
 
     private var onComplete: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(ctxt: Context, intent: Intent) {
@@ -423,7 +410,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                         }
                     }
                 }
-            } catch (e: Exception) {
+            } catch (e: FileAlreadyExistsException) {
+                Log.e(LOG_TAG_DOWNLOAD, "FileAlreadyExistsException: ${e.message}", e)
+            } catch (e: IOException) {
                 Log.e(LOG_TAG_DOWNLOAD, "Error downloading filetag.json file: ${e.message}", e)
             }
         }
@@ -442,7 +431,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         builder.setTitle(title)
         builder.setMessage(message)
         builder.setCancelable(true)
-        //performing positive action
         if (message == getString(R.string.download_update_dialog_message_ok) || message == getString(R.string.download_update_dialog_failure_message) || message == getString(R.string.download_update_dialog_trylater_message)) {
             builder.setPositiveButton(getString(R.string.hs_download_positive_default)) { dialogInterface, _ ->
                 dialogInterface.dismiss()
@@ -462,9 +450,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 dialogInterface.dismiss()
             }
         }
-        // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()
-        // Set other dialog properties
         alertDialog.setCancelable(true)
         alertDialog.show()
     }
@@ -500,31 +486,37 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun popupSnackBarForBlocklistUpdate() {
-        val parentLayout = findViewById<View>(android.R.id.content)
-        Snackbar.make(parentLayout, getString(R.string.hs_snack_bar_blocklist_message), Snackbar.LENGTH_LONG).setAction("Update") {
-            registerReceiverForDownloadManager(this)
-            handleDownloadFiles()
-        }.setActionTextColor(ContextCompat.getColor(context, R.color.accent_bad)).show()
+        (context as HomeScreenActivity).runOnUiThread {
+            val parentLayout = findViewById<View>(android.R.id.content)
+            Snackbar.make(parentLayout, getString(R.string.hs_snack_bar_blocklist_message), Snackbar.LENGTH_LONG).setAction("Update") {
+                registerReceiverForDownloadManager(this)
+                handleDownloadFiles()
+            }.setActionTextColor(ContextCompat.getColor(context, R.color.accent_bad)).show()
+        }
     }
 
     private fun handleDownloadFiles() {
-        downloadManager = this.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-        val timeStamp = persistentState.localBlockListDownloadTime
-        val url = Constants.JSON_DOWNLOAD_BLOCKLIST_LINK + "/" + timeStamp
-        downloadBlockListFiles(url, Constants.FILE_TAG_NAME, this)
+        (context as HomeScreenActivity).runOnUiThread {
+            downloadManager = this.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+            val timeStamp = persistentState.localBlockListDownloadTime
+            val url = Constants.JSON_DOWNLOAD_BLOCKLIST_LINK + File.separator + timeStamp
+            downloadBlockListFiles(url, Constants.FILE_TAG_NAME, this)
+        }
     }
 
     private fun downloadBlockListFiles(url: String, fileName: String, context: Context) {
         try {
-            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "downloadBlockListFiles - url: $url")
             val uri: Uri = Uri.parse(url)
             val request = DownloadManager.Request(uri)
             request.setTitle(getString(R.string.hs_download_blocklist_heading))
             request.setDescription(getString(R.string.hs_download_blocklist_desc, fileName))
-            request.setDestinationInExternalFilesDir(context, getExternalFilePath(this, false), fileName)
-            Log.i(LOG_TAG_DOWNLOAD, "Path - ${getExternalFilePath(this, true)}${fileName}")
+            val path = getExternalFilePath(this, false)
+            request.setDestinationInExternalFilesDir(context, path, fileName)
+            Log.i(LOG_TAG_DOWNLOAD, "Path - $path, filename- $fileName, uri - $uri")
             enqueue = downloadManager.enqueue(request)
-        } catch (e: java.lang.Exception) {
+        } catch (e: SecurityException) {
+            Log.w(LOG_TAG_DOWNLOAD, "Download unsuccessful - ${e.message}", e)
+        } catch (e: IllegalStateException) {
             Log.w(LOG_TAG_DOWNLOAD, "Download unsuccessful - ${e.message}", e)
         }
     }

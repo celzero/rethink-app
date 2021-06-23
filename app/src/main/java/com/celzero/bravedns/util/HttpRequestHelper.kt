@@ -25,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Constants.Companion.RESPONSE_VERSION
 import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
@@ -33,7 +34,7 @@ class HttpRequestHelper{
 
     companion object{
 
-        //fixme - Come up with a logic where onResponse should call for an interface and proceed
+        //fixme - #319 Come up with a logic where onResponse should call for an interface and proceed
         //with the result returned from server.
         private fun serverCheckForUpdate(url: String, persistentState:PersistentState) {
             val client = OkHttpClient()
@@ -54,11 +55,11 @@ class HttpRequestHelper{
                     val updateValue = jsonObject.getBoolean("update")
                     persistentState.lastAppUpdateCheck = System.currentTimeMillis()
                     Log.i(LOG_TAG_DOWNLOAD, "Server response for the new version download is true, version number-  $updateValue")
-                    if (responseVersion == 1) {
+                    if (responseVersion == RESPONSE_VERSION) {
                         if (updateValue) {
-                            // TODO handle
+                            // TODO handle - #319
                         } else {
-                            // TODO handle
+                            // TODO handle - #319
                         }
                     }
                     response.body!!.close()
@@ -117,7 +118,6 @@ class HttpRequestHelper{
                 DownloadManager.STATUS_RUNNING -> statusText = "STATUS_RUNNING"
                 DownloadManager.STATUS_SUCCESSFUL -> {
                     statusText = "STATUS_SUCCESSFUL"
-                    //reasonText = "Filename:\n$filename"
                 }
             }
             if(DEBUG) Log.d(LOG_TAG_DOWNLOAD,"Reason: $reasonText")

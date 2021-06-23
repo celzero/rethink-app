@@ -29,6 +29,7 @@ import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_PROXY
 import dnsx.BraveDNS
 import dnsx.Dnsx
 import settings.Settings
+import java.io.File
 
 class AppMode internal constructor(
     private val context: Context,
@@ -40,8 +41,6 @@ class AppMode internal constructor(
     private val persistentState:PersistentState
 ) {
     private var appDNSMode: Long = -1L
-    private var appFirewallMode: Long = -1L
-    private var appProxyMode: Long = -1L
     private val proxyTypeInternal = "Internal"
     private val proxyTypeExternal = "External"
     private var dnsType: Int = -1
@@ -67,28 +66,18 @@ class AppMode internal constructor(
     }
 
     fun getFirewallMode(): Long {
-        return if (appFirewallMode == PREF_DNS_INVALID) {
-            persistentState.firewallMode.toLong()
-        } else {
-            appFirewallMode
-        }
+        return persistentState.firewallMode.toLong()
     }
 
     fun setFirewallMode(fMode: Long) {
-        appFirewallMode = fMode
         persistentState.firewallMode = fMode.toInt()
     }
 
     fun getProxyMode(): Long {
-        if (appProxyMode == PREF_DNS_INVALID) {
-            return persistentState.proxyMode
-        }
-        Log.d(LOG_TAG_APP_MODE, "proxy mode - $appProxyMode")
-        return appProxyMode
+        return persistentState.proxyMode
     }
 
     fun setProxyMode(proxyMode: Long) {
-        appProxyMode = proxyMode
         persistentState.proxyMode = proxyMode
     }
 
@@ -211,7 +200,7 @@ class AppMode internal constructor(
     fun getBraveDNS(): BraveDNS? {
         if(braveDNS == null && persistentState.localBlocklistEnabled
             && persistentState.blockListFilesDownloaded && persistentState.localBlockListStamp.isNotEmpty()){
-            val path: String = context.filesDir.canonicalPath +"/"+ persistentState.localBlockListDownloadTime
+            val path: String = context.filesDir.canonicalPath + File.separator+ persistentState.localBlockListDownloadTime
             if (DEBUG) Log.d(LOG_TAG_APP_MODE, "Local brave dns set call from AppMode path newBraveDNSLocal :$path")
             try{
                 braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)

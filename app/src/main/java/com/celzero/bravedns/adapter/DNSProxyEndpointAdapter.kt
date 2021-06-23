@@ -147,7 +147,6 @@ class DNSProxyEndpointAdapter(private val context: Context,
             builder.setMessage(context.getString(R.string.dns_proxy_dialog_message, context.getString(R.string.cd_custom_dns_proxy_default_app), url, message))
         }
         builder.setCancelable(true)
-        //performing positive action
         builder.setPositiveButton(context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
             dialogInterface.dismiss()
         }
@@ -157,9 +156,7 @@ class DNSProxyEndpointAdapter(private val context: Context,
             clipboard?.setPrimaryClip(clip)
             Utilities.showToastUiCentered(context, context.getString(R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
         }
-        // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()
-        // Set other dialog properties
         alertDialog.setCancelable(true)
         alertDialog.show()
     }
@@ -170,7 +167,6 @@ class DNSProxyEndpointAdapter(private val context: Context,
         builder.setMessage(R.string.dns_proxy_remove_dialog_message)
 
         builder.setCancelable(true)
-        //performing positive action
         builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { _, _ ->
             GlobalScope.launch(Dispatchers.IO) {
                 if (dnsProxyEndpoint != null) {
@@ -180,12 +176,9 @@ class DNSProxyEndpointAdapter(private val context: Context,
             Toast.makeText(context, R.string.dns_proxy_remove_success, Toast.LENGTH_SHORT).show()
         }
 
-        //performing negative action
         builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
         }
-        // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()
-        // Set other dialog properties
         alertDialog.setCancelable(true)
         alertDialog.show()
     }

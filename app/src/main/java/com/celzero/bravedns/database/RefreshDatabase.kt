@@ -27,7 +27,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_APP_DB
-import com.celzero.bravedns.util.FileSystemUID
+import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.PlayStoreCategory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -110,7 +110,7 @@ class RefreshDatabase internal constructor(
                             appInfo.isBackgroundEnabled = false
                             appInfo.whiteListUniv2 = false
                             appInfo.isExcluded = false
-                            appInfo.whiteListUniv1 = ((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) && !FileSystemUID.isUIDAppRange(
+                            appInfo.whiteListUniv1 = ((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) && !AndroidUidConfig.isUIDAppRange(
                                 appInfo.uid
                             )
                             appInfo.mobileDataUsed = 0
@@ -126,7 +126,7 @@ class RefreshDatabase internal constructor(
                             val category = fetchCategory()
                             if (category.toLowerCase(Locale.ROOT) != PlayStoreCategory.OTHER.name.toLowerCase(Locale.ROOT)) {
                                 appInfo.appCategory = category
-                            } else if (((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) && FileSystemUID.isUIDAppRange(appInfo.uid)) {
+                            } else if (((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) && AndroidUidConfig.isUIDAppRange(appInfo.uid)) {
                                 appInfo.appCategory = Constants.APP_CAT_SYSTEM_APPS
                                 appInfo.isSystemApp = true
                             } else if (((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0)) {
@@ -166,7 +166,7 @@ class RefreshDatabase internal constructor(
 
     }
 
-    fun insertNonAppToAppInfo(uid : Int, appName : String){
+    fun registerNonApp(uid : Int, appName : String){
         val appInfo = AppInfo()
         appInfo.appName = appName
         appInfo.packageInfo = "no_package_$uid"

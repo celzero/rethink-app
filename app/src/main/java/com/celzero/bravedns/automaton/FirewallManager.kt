@@ -28,7 +28,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.backgroundAllowedUID
 import com.celzero.bravedns.util.BackgroundAccessibilityService
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_FIREWALL
-import com.celzero.bravedns.util.FileSystemUID
+import com.celzero.bravedns.util.AndroidUidConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -83,7 +83,7 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
                 if(DEBUG) Log.d(LOG_TAG_FIREWALL,"AccessibilityEvent: Update Internet Permission from background: ${appInfo.appName}, ${appInfo.isInternetAllowed}")
                 //appInfo.isInternetAllowed = isAllowed
                 //GlobalVariable.appList.set(packageName,appInfo)
-                if(isAllowed && FileSystemUID.isUIDAppRange(appInfo.uid)){
+                if(isAllowed && AndroidUidConfig.isUIDAppRange(appInfo.uid)){
                     if(DEBUG) Log.d(LOG_TAG_FIREWALL,"AccessibilityEvent: ${appInfo.appName},${appInfo.packageInfo} is in foreground")
                     backgroundAllowedUID[appInfo.uid] = isAllowed
                     //backgroundAllowed = appInfo.uid

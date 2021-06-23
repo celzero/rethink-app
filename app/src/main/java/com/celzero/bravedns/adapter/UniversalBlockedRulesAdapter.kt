@@ -71,7 +71,6 @@ class UniversalBlockedRulesAdapter(private val context: Context, private val blo
             builder.setTitle(R.string.univ_firewall_dialog_title)
             builder.setMessage(R.string.univ_firewall_dialog_message)
             builder.setCancelable(true)
-            //performing positive action
             builder.setPositiveButton(context.getString(R.string.univ_ip_delete_individual_positive)) { _, _ ->
                 if (blockedConnections != null) {
                     GlobalScope.launch(Dispatchers.IO) {
@@ -82,11 +81,8 @@ class UniversalBlockedRulesAdapter(private val context: Context, private val blo
                 }
             }
 
-            //performing negative action
             builder.setNegativeButton(context.getString(R.string.univ_ip_delete_individual_negative)) { _, _ -> }
-            // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
-            // Set other dialog properties
             alertDialog.setCancelable(true)
             alertDialog.show()
         }

@@ -44,14 +44,14 @@ public class ConnectionTracer {
         // the UID will expire after 30 seconds of the write.
         // Key for the cache is protocol, local, remote
         this.uidCache = CacheBuilder.newBuilder()
-            .maximumSize(1000)
-            .expireAfterWrite(30, TimeUnit.SECONDS)
-            .build();
+                .maximumSize(1000)
+                .expireAfterWrite(30, TimeUnit.SECONDS)
+                .build();
     }
 
     @TargetApi(Build.VERSION_CODES.Q)
     public int getUidQ(int protocol, String sourceIp, int sourcePort, String destIp, int destPort) {
-        if (cm == null ){
+        if (cm == null) {
             return MISSING_UID;
         }
 
@@ -64,33 +64,33 @@ public class ConnectionTracer {
         InetSocketAddress local;
         InetSocketAddress remote;
 
-        if (DEBUG) Log.d(LOG_TAG_VPN, sourceIp +  " [" + sourcePort + "] to " + destIp + " [" + destPort + "]");
+        if (DEBUG)
+            Log.d(LOG_TAG_VPN, sourceIp + " [" + sourcePort + "] to " + destIp + " [" + destPort + "]");
 
         if (TextUtils.isEmpty(sourceIp) || sourceIp.split("\\.").length < 4) {
-            //Log.w(TAG, "empty/invalid sourceIp " + sourceIp);
             local = new InetSocketAddress(sourcePort);
         } else {
             local = new InetSocketAddress(sourceIp, sourcePort);
         }
 
         if (TextUtils.isEmpty(destIp) || destIp.split("\\.").length < 4) {
-            Log.w(LOG_TAG_VPN, "empty/invalid destIp " + destIp);
             remote = new InetSocketAddress(destPort);
         } else {
             remote = new InetSocketAddress(destIp, destPort);
         }
         int uid = -1;
-        String key = protocol+local.getAddress().getHostAddress()+remote.getAddress().getHostAddress();
+        String key = protocol + local.getAddress().getHostAddress() + remote.getAddress().getHostAddress();
         try {
             int value = uidCache.getIfPresent(key);
             return value;
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+        }
 
-        try{
+        try {
             uid = cm.getConnectionOwnerUid(protocol, local, remote);
             uidCache.put(key, uid);
-        }catch(SecurityException secEx){
-            Log.e(LOG_TAG_VPN,"NETWORK_STACK permission - "+secEx.getMessage());
+        } catch (SecurityException secEx) {
+            Log.e(LOG_TAG_VPN, "NETWORK_STACK permission - " + secEx.getMessage());
         }
 
         if (DEBUG) Log.d(LOG_TAG_VPN, "GetUidQ(" + local + "," + remote + "): " + uid);

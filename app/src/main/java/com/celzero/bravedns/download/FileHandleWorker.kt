@@ -115,7 +115,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
     private fun isDownloadValid(): Boolean {
         try{
             val timeStamp = persistentState.tempBlocklistDownloadTime
-            val path: String = context.filesDir.canonicalPath +"/"+ timeStamp
+            val path: String = context.filesDir.canonicalPath +File.separator+ timeStamp
             val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
             if(braveDNS != null){
                 if(DEBUG) Log.d(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid - braveDNS is valid")

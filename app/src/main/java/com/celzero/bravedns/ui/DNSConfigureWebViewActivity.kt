@@ -47,6 +47,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Constants.Companion.RESPONSE_VERSION
 import com.celzero.bravedns.util.HttpRequestHelper
 import dnsx.Dnsx
 import kotlinx.coroutines.Dispatchers
@@ -59,8 +60,6 @@ import settings.Settings
 import xdns.Xdns
 import java.io.File
 import java.io.IOException
-
-
 
 class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webview_layout) {
     private val b by viewBinding(ActivityFaqWebviewLayoutBinding::bind)
@@ -116,7 +115,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                 }
             }
         } catch (e: Exception) {
-            Log.e(LOG_TAG_DNS, "Webview: Exception: ${e.message}", e)
+            Log.e(LOG_TAG_DNS, "Exception: ${e.message}", e)
             showDialogOnError(null)
         }
         loadUrl(url)
@@ -185,7 +184,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     }
 
     private fun updateDoHEndPoint() {
-        Log.i(LOG_TAG_DNS, "Webview: Remote stamp has been updated from web view - $receivedStamp")
+        Log.i(LOG_TAG_DNS, "Remote stamp has been updated from web view - $receivedStamp")
         if (receivedStamp.isEmpty() || receivedStamp == Constants.BRAVE_BASE_STAMP) {
             return
         }
@@ -208,21 +207,19 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     }
 
     private fun updateLocalStamp() {
-        Log.i(LOG_TAG_DNS, "Webview: Local stamp has been set from webview - $receivedStamp")
+        Log.i(LOG_TAG_DNS, "Local stamp has been set from webview - $receivedStamp")
         if (receivedStamp.isEmpty() || receivedStamp == Constants.BRAVE_BASE_STAMP) {
             return
         }
         val stamp = Xdns.getBlocklistStampFromURL(receivedStamp)
-        if (DEBUG) Log.d(LOG_TAG_DNS, "Split stamp - $stamp")
-        val path: String = this.filesDir.canonicalPath + "/"+ persistentState.localBlockListDownloadTime
+        val path: String = this.filesDir.canonicalPath + File.separator+ persistentState.localBlockListDownloadTime
+        if (DEBUG) Log.d(LOG_TAG_DNS, "Split stamp - $stamp, path - $path")
         persistentState.localBlockListStamp = stamp
         if (HomeScreenActivity.GlobalVariable.appMode?.getBraveDNS() == null) {
             GlobalScope.launch(Dispatchers.IO) {
-                if (DEBUG) Log.d(LOG_TAG_DNS, "Split stamp newBraveDNSLocal - $path")
                 try {
                     val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
                     HomeScreenActivity.GlobalVariable.appMode?.setBraveDNSMode(braveDNS)
-                    if (DEBUG) Log.d(LOG_TAG_DNS, "Webview: Local brave dns set call from web view -stamp: $stamp")
                 } catch (e: Exception) {
                     Log.e(LOG_TAG_DNS, "Local brave dns set exception :${e.message}", e)
                 }
@@ -231,11 +228,9 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
             GlobalScope.launch(Dispatchers.IO) {
                 val braveDNS = HomeScreenActivity.GlobalVariable.appMode?.getBraveDNS()
                 HomeScreenActivity.GlobalVariable.appMode?.setBraveDNSMode(braveDNS)
-                if (DEBUG) Log.d(LOG_TAG_DNS, "Webview: Local brave dns set call from web view -stamp: $stamp")
             }
         }
         Toast.makeText(this, getString(R.string.wv_local_blocklist_toast), Toast.LENGTH_SHORT).show()
-        //}
     }
 
     private fun getExternalFilePath(context: Context, isAbsolutePathNeeded: Boolean): String {
@@ -272,7 +267,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
             } else {
                 return super.onKeyDown(keyCode, event)
             }
-            if (DEBUG) Log.d(LOG_TAG_DNS, "Webview: URL : ${b.configureWebview.url}")
+            if (DEBUG) Log.d(LOG_TAG_DNS, "URL : ${b.configureWebview.url}")
         }
         // If it wasn't the Back key or there's configure, exit the activity)
         return false
@@ -289,13 +284,11 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         }
         builder.setMessage(desc)
         builder.setCancelable(true)
-        //performing positive action
         builder.setPositiveButton(getString(R.string.webview_configure_dialog_positive)) { dialogInterface, _ ->
             dialogInterface.dismiss()
             finish()
         }
 
-        //performing negative action
         builder.setNegativeButton(getString(R.string.webview_configure_dialog_negative)) { dialogInterface, _ ->
             dialogInterface.dismiss()
         }
@@ -303,9 +296,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         builder.setNeutralButton(getString(R.string.webview_configure_dialog_neutral)) { _: DialogInterface, _: Int ->
             b.configureWebview.reload()
         }
-        // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()
-        // Set other dialog properties
         alertDialog.setCancelable(true)
         alertDialog.show()
     }
@@ -320,7 +311,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         context = this
         b.configureWebview.webViewClient = object : WebViewClient() {
             override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: SslError?) {
-                Log.i(LOG_TAG_DNS, "Webview: SSL error received from webview. ${error?.primaryError}, ${handler?.obtainMessage()}")
+                Log.i(LOG_TAG_DNS, "SSL error received from webview. ${error?.primaryError}, ${handler?.obtainMessage()}")
                 showDialogOnError(handler)
             }
 
@@ -335,7 +326,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                         // Renderer was killed because the system ran out of memory.
                         // The app can recover gracefully by creating a new WebView instance
                         // in the foreground.
-                        Log.w(LOG_TAG_DNS, ("Webview: System killed the WebView rendering process Recreating..."))
+                        Log.w(LOG_TAG_DNS, ("System killed the WebView rendering process Recreating..."))
 
                         view?.also { webView ->
                             webView.destroy()
@@ -350,7 +341,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
 
                 // Renderer crashed because of an internal error, such as a memory
                 // access violation.
-                Log.w(LOG_TAG_DNS, "Webview: The WebView rendering process crashed!")
+                Log.w(LOG_TAG_DNS, "The WebView rendering process crashed!")
 
                 // In this example, the app itself crashes after detecting that the
                 // renderer crashed. If you choose to handle the crash more gracefully
@@ -384,7 +375,6 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         builder.setTitle(R.string.webview_error_title)
         builder.setMessage(R.string.webview_error_message)
         builder.setCancelable(true)
-        //performing positive action
         builder.setPositiveButton(getString(R.string.webview_configure_dialog_neutral)) { _, _ ->
             if (handler != null) {
                 handler.proceed()
@@ -393,7 +383,6 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
             }
         }
 
-        //performing negative action
         builder.setNegativeButton(getString(R.string.webview_configure_dialog_negative)) { dialogInterface, _ ->
             if (handler != null) {
                 handler.cancel()
@@ -403,9 +392,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
             }
         }
 
-        // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()
-        // Set other dialog properties
         alertDialog.setCancelable(true)
         alertDialog.show()
     }
@@ -419,12 +406,12 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
             receivedStamp = stamp
 
             blockListsCount.postValue(count.toInt())
-            if (DEBUG) Log.d(LOG_TAG_DNS, "Webview: - Stamp value - $receivedStamp, $count")
+            if (DEBUG) Log.d(LOG_TAG_DNS, "Stamp value - $receivedStamp, $count")
             finish()
         }
 
         @JavascriptInterface fun dismiss(reason: String) {
-            Log.i(LOG_TAG_DNS, "Webview:  dismiss with reason - $reason")
+            Log.i(LOG_TAG_DNS, "dismiss with reason - $reason")
             finish()
         }
     }
@@ -435,7 +422,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
 
     private var onComplete: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(ctxt: Context, intent: Intent) {
-            if (DEBUG) Log.d(LOG_TAG_DNS, "Webview: Intent on receive ")
+            if (DEBUG) Log.d(LOG_TAG_DNS, "Intent on receive ")
             try {
                 val action = intent.action
                 if (DownloadManager.ACTION_DOWNLOAD_COMPLETE == action) {
@@ -444,25 +431,22 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                     val c: Cursor = downloadManager.query(query)!!
                     if (c.moveToFirst()) {
                         val status = HttpRequestHelper.checkStatus(c)
-                        if (status == Constants.DOWNLOAD_STATUS_SUCCESSFUL) {
+                        if (Constants.DOWNLOAD_STATUS_SUCCESSFUL == status) {
                             val from = File(getExternalFilePath(ctxt, true)+ Constants.FILE_TAG_NAME)
-                            val to = File(ctxt.filesDir.canonicalPath +"/"+persistentState.tempRemoteBlockListDownloadTime + Constants.FILE_TAG_NAME)
-                            val fileDownloaded = from.copyTo(to, true)
-                            if (fileDownloaded.exists()) {
-                                DownloadHelper.deleteOldFiles(ctxt)
-                                persistentState.remoteBraveDNSDownloaded = true
-                                persistentState.remoteBlockListDownloadTime = persistentState.tempRemoteBlockListDownloadTime
-                            }
+                            val to = File(ctxt.filesDir.canonicalPath +File.separator+persistentState.tempRemoteBlockListDownloadTime + Constants.FILE_TAG_NAME)
+                            from.copyTo(to, true)
+                            persistentState.remoteBraveDNSDownloaded = true
+                            persistentState.remoteBlockListDownloadTime = persistentState.tempRemoteBlockListDownloadTime
                         } else {
-                            Log.w(LOG_TAG_DNS, "Webview: Error downloading filetag.json file: $status")
+                            Log.w(LOG_TAG_DNS, "Error downloading filetag.json file: $status")
                         }
                     } else {
-                        Log.w(LOG_TAG_DNS, "Webview: Download status: Error downloading filetag.json file: ${c.count}")
+                        Log.w(LOG_TAG_DNS, "Download status: Error downloading filetag.json file: ${c.count}")
                     }
                     c.close()
                 }
             } catch (e: Exception) {
-                Log.w(LOG_TAG_DNS, "Webview: Error downloading filetag.json file: ${e.message}", e)
+                Log.w(LOG_TAG_DNS, "Error downloading filetag.json file: ${e.message}", e)
                 persistentState.remoteBlockListDownloadTime = 0L
                 persistentState.remoteBraveDNSDownloaded = false
             }
@@ -472,7 +456,6 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     override fun onStop() {
         super.onStop()
         try {
-            //Register or UnRegister your broadcast receiver here
             this.unregisterReceiver(onComplete)
         } catch (e: IllegalArgumentException) {
             Log.w(LOG_TAG_DNS, "Unregister receiver exception", e)
@@ -482,12 +465,12 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     private fun downloadBlockListFiles() {
         registerReceiverForDownloadManager()
         if (timeStamp == 0L) timeStamp = persistentState.tempRemoteBlockListDownloadTime
-        val url = Constants.JSON_DOWNLOAD_BLOCKLIST_LINK + "/" + timeStamp
-        if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Webview: download filetag file with url: $url")
+        val url = Constants.JSON_DOWNLOAD_BLOCKLIST_LINK + File.separator + timeStamp
+        if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "download filetag file with url: $url")
         val uri: Uri = Uri.parse(url)
         val request = DownloadManager.Request(uri)
         request.setDestinationInExternalFilesDir(this, getExternalFilePath(this, false), Constants.FILE_TAG_NAME)
-        Log.i(LOG_TAG_DOWNLOAD, "Webview: Path - ${getExternalFilePath(this, true)}${Constants.FILE_TAG_NAME}")
+        Log.i(LOG_TAG_DOWNLOAD, "Path - ${getExternalFilePath(this, true)}${Constants.FILE_TAG_NAME}")
         enqueue = downloadManager.enqueue(request)
     }
 
@@ -495,7 +478,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         val blockListTimeStamp = persistentState.remoteBlockListDownloadTime
         val appVersionCode = persistentState.appVersion
         val url = "${Constants.REFRESH_BLOCKLIST_URL}$blockListTimeStamp&${Constants.APPEND_VCODE}$appVersionCode"
-        Log.i(LOG_TAG_DOWNLOAD, "Webview: Check for local download, url - $url")
+        Log.i(LOG_TAG_DOWNLOAD, "Check for local download, url - $url")
         run(url)
     }
 
@@ -505,20 +488,19 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.i(LOG_TAG_DOWNLOAD, "Webview: onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
+                Log.i(LOG_TAG_DOWNLOAD, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
             }
 
             override fun onResponse(call: Call, response: Response) {
                 val stringResponse = response.body!!.string()
-                //creating json object
                 val jsonObject = JSONObject(stringResponse)
                 val version = jsonObject.getInt(Constants.JSON_VERSION)
-                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Webview: client onResponse for refresh blocklist files-  $version")
-                if (version == 1) {
+                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "client onResponse for refresh blocklist files-  $version")
+                if (version == RESPONSE_VERSION) {
                     val updateValue = jsonObject.getBoolean(Constants.JSON_UPDATE)
                     timeStamp = jsonObject.getLong(Constants.JSON_LATEST)
                     persistentState.tempRemoteBlockListDownloadTime = timeStamp
-                    if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Webview: onResponse -  $updateValue, $timeStamp")
+                    if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "onResponse -  $updateValue, $timeStamp")
                     if (updateValue) {
                         (context as Activity).runOnUiThread {
                             downloadBlockListFiles()

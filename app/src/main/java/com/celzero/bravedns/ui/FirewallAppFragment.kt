@@ -97,9 +97,8 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
                 }
 
                 override fun onFinish() {
-                    if (isAdded) {
-                        b.firewallAppRefreshList.isEnabled = true
-                    }
+                    if (!isAdded) return
+                    b.firewallAppRefreshList.isEnabled = true
                 }
             }.start()
         }
@@ -119,10 +118,9 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
             override fun onTick(millisUntilFinished: Long) {}
 
             override fun onFinish() {
-                if (isAdded) {
-                    b.firewallAppRefreshList.clearAnimation()
-                    Utilities.showToastUiCentered(requireContext(), getString(R.string.refresh_complete), Toast.LENGTH_SHORT)
-                }
+                if (!isAdded) return
+                b.firewallAppRefreshList.clearAnimation()
+                Utilities.showToastUiCentered(requireContext(), getString(R.string.refresh_complete), Toast.LENGTH_SHORT)
             }
         }.start()
 
@@ -144,13 +142,10 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
                         i += 1
                     }
                 } else {
-                    if (titleList!!.size > 0) {
-                        for (i in titleList!!.indices) {
-                            if (listData[titleList!![i]] != null) {
-                                if (listData[titleList!![i]]!!.size > 0) {
-                                    b.firewallExpandableList.expandGroup(i)
-                                }
-                            }
+                    if (titleList!!.size <= 0) return
+                    for (i in titleList!!.indices) {
+                        if (listData[titleList!![i]]?.size!! > 0) {
+                            b.firewallExpandableList.expandGroup(i)
                         }
                     }
                     if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category block  ${titleList!!.size}")
@@ -177,14 +172,10 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
                         }
 
                     } else {
-                        if (titleList!!.size > 0) {
-
-                            for (i in titleList!!.indices) {
-                                if (listData[titleList!![i]] != null) {
-                                    if (listData[titleList!![i]]!!.size > 0) {
-                                        b.firewallExpandableList.expandGroup(i)
-                                    }
-                                }
+                        if (titleList!!.size <= 0) return
+                        for (i in titleList?.indices!!) {
+                            if (listData[titleList!![i]]?.size!! > 0) {
+                                b.firewallExpandableList.expandGroup(i)
                             }
                         }
                         if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category block ${titleList!!.size}")

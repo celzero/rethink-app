@@ -100,7 +100,7 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
     var isBackgroundEnabled by booleanPref("background_mode", false)
     var checkForAppUpdate by booleanPref("check_for_app_update", true)
     var isScreenOff by booleanPref("screen_off", false)
-    private var connectedDNSName by stringPref("connected_dns_name", "RethinkDNS Basic")
+    private var connectedDNSName by stringPref("connected_dns_name", context.getString(R.string.dns_mode_3))
     var theme by intPref("app_theme", 0)
     var notificationAction by intPref("notification_action", 1)
     var isAddAllNetworks by booleanPref("add_all_networks_to_vpn", false)
@@ -185,17 +185,12 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
             try {
                 dohDetail = appMode?.getDOHDetails()
                 dohDetail?.dohName!!
-            } catch (e: Exception) {
+            } catch (e: Exception) { //FIXME - #320
                 Log.e(LOG_TAG_VPN, "Exception while fetching DOH from the database", e)
                 connectedDNSName
             }
         } else if (Constants.PREF_DNS_MODE_DNSCRYPT == dnsType) {
-            if (appMode?.getDNSCryptServerCount() != null) {
-                val cryptDetails = appMode?.getDNSCryptServerCount()
-                context.getString(R.string.configure_dns_crypt, cryptDetails.toString())
-            } else {
-                context.getString(R.string.configure_dns_crypt, "0")
-            }
+            context.getString(R.string.configure_dns_crypt, appMode?.getDNSCryptServerCount().toString())
         } else {
             val proxyDetails = appMode?.getDNSProxyServerDetails()
             proxyDetails?.proxyAppName!!

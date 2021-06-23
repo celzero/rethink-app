@@ -43,8 +43,12 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DNSCRYPT
+import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DOH
+import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_PROXY
 import com.celzero.bravedns.util.UIUpdateInterface
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.Companion.isValidLocalPort
 import com.celzero.bravedns.viewmodel.DNSCryptEndpointViewModel
 import com.celzero.bravedns.viewmodel.DNSCryptRelayEndpointViewModel
 import com.celzero.bravedns.viewmodel.DNSProxyEndpointViewModel
@@ -352,17 +356,15 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
 
             try {
                 port = portEditText.text.toString().toInt()
-                if (Utilities.isLanIpv4(ip)) {
-                    if (port in 65535 downTo 1024) {
-                        isValid = true
-                    } else {
-                        errorTxt.text = getString(R.string.cd_dns_proxy_error_text_2)
-                        isValid = false
-                    }
+                isValid = if (Utilities.isLanIpv4(ip)) {
+                    isValidLocalPort(port)
                 } else {
-                    isValid = true
+                    true
                 }
-            } catch (e: Exception) {
+                if (!isValid) {
+                    errorTxt.text = getString(R.string.cd_dns_proxy_error_text_2)
+                }
+            } catch (e: NumberFormatException) {
                 Log.w(LOG_TAG_UI, "Error: ${e.message}", e)
                 errorTxt.text = getString(R.string.cd_dns_proxy_error_text_3)
                 isValid = false
@@ -375,7 +377,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
                 b.recyclerDnsProxyConnections.visibility = View.VISIBLE
                 dialog.dismiss()
             } else {
-                Log.i(LOG_TAG_UI, "Failed to insert new value into DNSProxy: $name, $appName")
+                Log.i(LOG_TAG_UI, "cannot insert invalid dns-proxy IPs: $name, $appName")
             }
 
         }
@@ -393,7 +395,6 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
                 appName
             } else ip
         }
-        //id: Int, proxyName: String,  proxyType: String, proxyAppName: String, proxyIP: String,proxyPort : Int, isSelected: Boolean, isCustom: Boolean, modifiedDataTime: Long, latency: Int
         val dnsProxyEndpoint = DNSProxyEndpoint(-1, proxyName, mode, appName, ip, port, false, true, 0L, 0)
         dnsProxyEndpointRepository.insertAsync(dnsProxyEndpoint)
         if (DEBUG) Log.d(LOG_TAG_UI, "Insert into DNSProxy database- $appName, $port")
@@ -475,8 +476,6 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
                     insertDNSCryptRelay(name, urlStamp, desc)
                 }
                 dialog.dismiss()
-            }else{
-
             }
         }
 
@@ -550,29 +549,32 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
     }
 
     override fun updateUIFromAdapter(dnsType: Int) {
-        if (DEBUG) Log.d(LOG_TAG_UI, "UI Update from adapter")
-        if (dnsType == 1) {
-            if (DEBUG) Log.d(LOG_TAG_UI, "DOH has been changed, modify the connection status in the top layout")
-            dnsCryptEndpointRepository.removeConnectionStatus()
-            dnsCryptRelayEndpointRepository.removeConnectionStatus()
-            dnsProxyEndpointRepository.removeConnectionStatus()
-            dohRecyclerAdapter?.notifyDataSetChanged()
-            dnsProxyRecyclerAdapter.notifyDataSetChanged()
-            dnsCryptRecyclerAdapter.notifyDataSetChanged()
-            dnsCryptRelayRecyclerAdapter.notifyDataSetChanged()
-        } else if (dnsType == 2) {
-            doHEndpointRepository.removeConnectionStatus()
-            dnsProxyEndpointRepository.removeConnectionStatus()
-            dnsProxyRecyclerAdapter.notifyDataSetChanged()
-            dohRecyclerAdapter?.notifyDataSetChanged()
-        } else if (dnsType == 3) {
-            b.recyclerDnsProxyConnections.visibility = View.VISIBLE
-            doHEndpointRepository.removeConnectionStatus()
-            dnsCryptEndpointRepository.removeConnectionStatus()
-            dnsCryptRelayEndpointRepository.removeConnectionStatus()
-            dohRecyclerAdapter?.notifyDataSetChanged()
-            dnsCryptRecyclerAdapter.notifyDataSetChanged()
-            dnsCryptRelayRecyclerAdapter.notifyDataSetChanged()
+        if (DEBUG) Log.d(LOG_TAG_UI, "ui update from adapter with dns-type $dnsType")
+        when (dnsType) {
+            PREF_DNS_MODE_DOH -> {
+                dnsCryptEndpointRepository.removeConnectionStatus()
+                dnsCryptRelayEndpointRepository.removeConnectionStatus()
+                dnsProxyEndpointRepository.removeConnectionStatus()
+                dohRecyclerAdapter?.notifyDataSetChanged()
+                dnsProxyRecyclerAdapter.notifyDataSetChanged()
+                dnsCryptRecyclerAdapter.notifyDataSetChanged()
+                dnsCryptRelayRecyclerAdapter.notifyDataSetChanged()
+            }
+            PREF_DNS_MODE_DNSCRYPT -> {
+                doHEndpointRepository.removeConnectionStatus()
+                dnsProxyEndpointRepository.removeConnectionStatus()
+                dnsProxyRecyclerAdapter.notifyDataSetChanged()
+                dohRecyclerAdapter?.notifyDataSetChanged()
+            }
+            PREF_DNS_MODE_PROXY -> {
+                b.recyclerDnsProxyConnections.visibility = View.VISIBLE
+                doHEndpointRepository.removeConnectionStatus()
+                dnsCryptEndpointRepository.removeConnectionStatus()
+                dnsCryptRelayEndpointRepository.removeConnectionStatus()
+                dohRecyclerAdapter?.notifyDataSetChanged()
+                dnsCryptRecyclerAdapter.notifyDataSetChanged()
+                dnsCryptRelayRecyclerAdapter.notifyDataSetChanged()
+            }
         }
         spinnerAdapter.notifyDataSetChanged()
     }

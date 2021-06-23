@@ -48,6 +48,7 @@ import com.celzero.bravedns.util.Utilities;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
 
@@ -62,8 +63,9 @@ import tun2socks.Tun2socks;
 
 import static com.celzero.bravedns.util.Constants.APP_MODE_DNS;
 import static com.celzero.bravedns.util.Constants.APP_MODE_FIREWALL;
-import static com.celzero.bravedns.util.Constants.DEFAULT_ROUTE_IP;
+import static com.celzero.bravedns.util.Constants.UNSPECIFIED_IP;
 import static com.celzero.bravedns.util.Constants.LOG_TAG_VPN;
+import static com.celzero.bravedns.util.Constants.UNSPECIFIED_PORT;
 
 
 /**
@@ -400,10 +402,10 @@ public class GoVpnAdapter {
                 builder.addRoute(LanIp.DNS.make(IPV4_TEMPLATE), 32);
                 builder.addDnsServer(LanIp.DNS.make(IPV4_TEMPLATE));
             } else if (HomeScreenActivity.GlobalVariable.INSTANCE.getBraveMode() == APP_MODE_FIREWALL) {
-                builder.addRoute(DEFAULT_ROUTE_IP, 0);
+                builder.addRoute(UNSPECIFIED_IP, UNSPECIFIED_PORT);
             } else {
                 builder.addDnsServer(LanIp.DNS.make(IPV4_TEMPLATE));
-                builder.addRoute(DEFAULT_ROUTE_IP, 0);
+                builder.addRoute(UNSPECIFIED_IP, UNSPECIFIED_PORT);
             }
 
             return builder.establish();
@@ -542,18 +544,19 @@ public class GoVpnAdapter {
     }
 
     private void setBraveDNSRemoteMode(String dohURL) {
-        if (dohURL.contains(Constants.BRAVE_BASIC_URL)) {
-            try {
-                if (persistentState.getRemoteBraveDNSDownloaded()) {
-                    String path = vpnService.getFilesDir().getCanonicalPath() + "/" + persistentState.getRemoteBlockListDownloadTime();
-                    BraveDNS braveDNS = Dnsx.newBraveDNSRemote(path + Constants.FILE_TAG_NAME);
-                    if (HomeScreenActivity.GlobalVariable.INSTANCE.getDEBUG())
-                        Log.d(LOG_TAG_VPN, "GoVPNAdapter DOH URL set bravedns- " + dohURL + "--" + path);
-                    tunnel.setBraveDNS(braveDNS);
-                }
-            } catch (Exception ex) {
-                Log.e(LOG_TAG_VPN, "GoVPNAdapter Exception while setting bravedns for remote:" + ex.getMessage(), ex);
+        if (!dohURL.contains(Constants.BRAVE_BASIC_URL)) {
+            return;
+        }
+        try {
+            if (persistentState.getRemoteBraveDNSDownloaded()) {
+                String path = vpnService.getFilesDir().getCanonicalPath() + File.separator + persistentState.getRemoteBlockListDownloadTime();
+                BraveDNS braveDNS = Dnsx.newBraveDNSRemote(path + Constants.FILE_TAG_NAME);
+                if (HomeScreenActivity.GlobalVariable.INSTANCE.getDEBUG())
+                    Log.d(LOG_TAG_VPN, "GoVPNAdapter DOH URL set bravedns- " + dohURL + "--" + path);
+                tunnel.setBraveDNS(braveDNS);
             }
+        } catch (Exception ex) {
+            Log.e(LOG_TAG_VPN, "GoVPNAdapter Exception while setting bravedns for remote:" + ex.getMessage(), ex);
         }
     }
 

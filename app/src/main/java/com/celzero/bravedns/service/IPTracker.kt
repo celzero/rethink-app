@@ -19,7 +19,7 @@ package com.celzero.bravedns.service
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
-import com.bumptech.glide.util.Util
+import com.celzero.bravedns.R
 import com.celzero.bravedns.data.IPDetails
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.ConnectionTracker
@@ -29,7 +29,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_FIREWALL_LOG
-import com.celzero.bravedns.util.FileSystemUID
+import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
 import com.celzero.bravedns.util.Utilities.Companion.getFlag
@@ -81,8 +81,6 @@ class IPTracker internal constructor(
         val countryCode: String = getCountryCode(serverAddress!!, context)
         connTracker.flag = getFlag(countryCode)
 
-
-        //app-name
         val packageNameList = context.packageManager.getPackagesForUid(ipDetails.uid)
 
         if (packageNameList != null) {
@@ -101,28 +99,28 @@ class IPTracker internal constructor(
                 connTracker.appName = context.packageManager.getApplicationLabel(appInfo).toString()
             }
         } else {
-            val fileSystemUID = FileSystemUID.fromFileSystemUID(ipDetails.uid)
+            val fileSystemUID = AndroidUidConfig.fromFileSystemUID(ipDetails.uid)
             if (DEBUG) Log.d(LOG_TAG_FIREWALL_LOG, "Part : ${ipDetails.uid}, ${fileSystemUID.name}")
             if (ipDetails.uid == INVALID_UID) {
-                connTracker.appName = "Unknown"
+                connTracker.appName = context.getString(R.string.network_log_app_name_unknown)
             } else {
                 when (Utilities.isInvalidUid(fileSystemUID.uid)) {
-                    true -> connTracker.appName = "Unnamed(${ipDetails.uid})"
+                    true -> connTracker.appName = context.getString(R.string.network_log_app_name_unnamed, ipDetails.uid.toString())
                     false -> connTracker.appName = fileSystemUID.name
                 }
-                if (!isAvailableInDatabase(ipDetails.uid)) {
-                    insertNonAppToAppInfo(ipDetails.uid, connTracker.appName.toString())
-                }
+                registerNonApp(ipDetails.uid, connTracker.appName.toString())
             }
         }
         connectionTrackerRepository.insertAsync(connTracker)
     }
 
-    private fun insertNonAppToAppInfo(uid: Int, appName: String) {
-        refreshDatabase.insertNonAppToAppInfo(uid, appName)
+    private fun registerNonApp(uid: Int, appName: String) {
+        if (!isUidRegistered(uid)) {
+            refreshDatabase.registerNonApp(uid, appName)
+        }
     }
 
-    private fun isAvailableInDatabase(uid: Int): Boolean {
+    private fun isUidRegistered(uid: Int): Boolean {
         val appName = appInfoRepository.getAppNameForUID(uid)
         return !appName.isNullOrEmpty()
     }

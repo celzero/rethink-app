@@ -32,13 +32,13 @@ class Constants {
         //Download URL's
         const val JSON_DOWNLOAD_BLOCKLIST_LINK = "https://download.bravedns.com/blocklists"
 
-        //const val JSON_DOWNLOAD_BASIC_CONFIG_LINK = "https://download.bravedns.com/basicconfig"
-        //const val JSON_DOWNLOAD_BASIC_RANK_LINK = "https://download.bravedns.com/rank"
-        //const val JSON_DOWNLOAD_BASIC_TRIE_LINK = "https://download.bravedns.com/trie"
         const val REFRESH_BLOCKLIST_URL = "https://download.bravedns.com/update/blocklists?tstamp="
         const val APP_DOWNLOAD_AVAILABLE_CHECK = "https://download.bravedns.com/update/app?vcode="
         const val CONFIGURE_BLOCKLIST_URL_LOCAL = "https://bravedns.com/configure?v=app&tstamp="
         const val CONFIGURE_BLOCKLIST_URL_REMOTE = "https://bravedns.com/configure?v=app"
+
+        // The version tag value(response) for the update check.
+        const val RESPONSE_VERSION = 1
 
         val DOWNLOAD_URLS = listOf("https://download.bravedns.com/blocklists", "https://download.bravedns.com/basicconfig", "https://download.bravedns.com/rank", "https://download.bravedns.com/trie")
 
@@ -164,25 +164,13 @@ class Constants {
         // it for every request. The value is set as 1 minute.
         val NETWORK_REQUEST_WRITE_THRESHOLD_MS = TimeUnit.MINUTES.toMillis(1)
 
-        const val LOG_TAG_APP_UPDATE = "NonStoreAppUpdater"
-        const val LOG_TAG_FIREWALL_LOG = "FirewallLogs"
-        const val LOG_TAG_DNS_LOG = "DnsLogs"
-        const val LOG_TAG_APP_MODE = "AppMode"
-        const val LOG_TAG_VPN = "VpnLifecycle"
-        const val LOG_TAG_CONNECTION = "ConnectivityEvents"
-        const val LOG_TAG_DNS = "DnsManager"
-        const val LOG_TAG_FIREWALL = "FirewallManager"
-        const val LOG_TAG_PERMISSION = "PermissionManager"
-        const val LOG_TAG_APP_DB = "AppDatabase"
-        const val LOG_TAG_DOWNLOAD = "DownloadManager"
-        const val LOG_TAG_UI = "ActivityManager"
-
         // View model - filter string
         const val FILTER_IS_SYSTEM = "isSystem"
         const val FILTER_IS_FILTER = "isFilter"
         const val FILTER_CATEGORY = "category:"
 
-        const val DEFAULT_ROUTE_IP = "0.0.0.0"
+        const val UNSPECIFIED_IP = "0.0.0.0"
+        const val UNSPECIFIED_PORT = 0
 
         const val ACTION_VPN_SETTINGS_INTENT = "android.net.vpn.SETTINGS"
 
@@ -194,5 +182,8 @@ class Constants {
         const val FIREWALL_SCREEN_UNIVERSAL = 0
         const val FIREWALL_SCREEN_LOG = 1
         const val FIREWALL_SCREEN_ALL_APPS = 2
+
+        const val LIVEDATA_PAGE_SIZE = 50
+        const val DNS_LIVEDATA_PAGE_SIZE = 30
     }
 }

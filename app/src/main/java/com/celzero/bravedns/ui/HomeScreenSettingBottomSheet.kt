@@ -132,7 +132,6 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
             }
         }
 
-        //bs_hs_dns_firewall_rl
         b.bsHsDnsRl.setOnClickListener {
             if (!b.bsHomeScreenRadioDns.isChecked) {
                 b.bsHomeScreenRadioDns.isChecked = true

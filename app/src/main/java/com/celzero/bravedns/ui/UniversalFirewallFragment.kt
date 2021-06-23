@@ -145,7 +145,6 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
                         }
                     } else {
                         persistentState.isBackgroundEnabled = !checkedVal
-                        //persistentState.isAccessibilityCrashDetected = checkedVal
                         includeView.firewallBackgroundModeCheck.isChecked = !checkedVal
                     }
                 } else {
@@ -171,7 +170,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
                             includeView.firewallBackgroundModeCheck.isChecked = false
                             persistentState.isBackgroundEnabled = false
                         }
-                    }else {
+                    } else {
                         persistentState.isBackgroundEnabled = !checkedVal
                         includeView.firewallBackgroundModeCheck.isChecked = !checkedVal
                     }
@@ -261,8 +260,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
 
 
     private fun isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and
-                Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
 
@@ -276,7 +274,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         b.appScrollingInclFirewall.firewallUnivIpImg.setImageResource(R.drawable.ic_keyboard_arrow_up_gray_24dp)
     }
 
-    private fun setIPRulesInvisible(){
+    private fun setIPRulesInvisible() {
         ipListState = true
         b.appScrollingInclFirewall.firewallSearchViewTop.visibility = View.GONE
         b.appScrollingInclFirewall.firewallUniversalRecycler.visibility = View.GONE
@@ -293,19 +291,15 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             builder.setTitle(R.string.univ_delete_firewall_dialog_title)
             builder.setMessage(R.string.univ_delete_firewall_dialog_message)
             builder.setCancelable(true)
-            //performing positive action
             builder.setPositiveButton(getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->
                 blockedConnectionsRepository.deleteAllIPRulesUniversal()
                 GlobalVariable.firewallRules.clear()
                 Utilities.showToastUiCentered(requireContext(), getString(R.string.univ_ip_delete_toast_success), Toast.LENGTH_SHORT)
             }
 
-            //performing negative action
             builder.setNegativeButton(getString(R.string.univ_ip_delete_dialog_negative)) { _, _ ->
             }
-            // Create the AlertDialog
             val alertDialog: AlertDialog = builder.create()
-            // Set other dialog properties
             alertDialog.setCancelable(true)
             alertDialog.show()
         } else {
@@ -316,12 +310,16 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
     override fun onResume() {
         super.onResume()
         b.appScrollingInclFirewall.firewallUnknownConnectionModeCheck.isChecked = persistentState.blockUnknownConnections
+        checkAppNotInUse()
+    }
+
+    private fun checkAppNotInUse() {
         if (Utilities.isAccessibilityServiceEnabledEnhanced(requireContext(), BackgroundAccessibilityService::class.java)) {
-            if(!Utilities.isAccessibilityServiceEnabled(requireContext(), BackgroundAccessibilityService::class.java) && persistentState.isAccessibilityCrashDetected){
+            if (!Utilities.isAccessibilityServiceEnabled(requireContext(), BackgroundAccessibilityService::class.java) && persistentState.isAccessibilityCrashDetected) {
                 b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = false
                 persistentState.isBackgroundEnabled = false
                 showAlertForPermission(true)
-            }else{
+            } else {
                 b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = persistentState.isBackgroundEnabled
             }
         } else {
@@ -333,21 +331,19 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
     private fun showAlertForPermission(isRegrant: Boolean): Boolean {
         var isAllowed = false
         val builder = AlertDialog.Builder(requireContext())
-        //set title and message for alert dialog
         if (isRegrant) {
             builder.setTitle(R.string.alert_permission_accessibility_regrant)
             builder.setMessage(R.string.alert_firewall_accessibility_regrant_explanation)
             builder.setPositiveButton(getString(R.string.univ_accessibility_crash_dialog_positive)) { _, _ ->
-                persistentState.isAccessibilityCrashDetected  = false
+                persistentState.isAccessibilityCrashDetected = false
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                 val packageName = requireContext().packageName
                 intent.data = Uri.parse("package:$packageName")
                 startActivity(intent)
             }
-            //performing negative action
             builder.setNegativeButton(getString(R.string.univ_accessibility_crash_dialog_negative)) { _, _ ->
                 persistentState.isBackgroundEnabled = false
-                persistentState.isAccessibilityCrashDetected  = false
+                persistentState.isAccessibilityCrashDetected = false
             }
         } else {
             builder.setTitle(R.string.alert_permission_accessibility)
@@ -357,17 +353,12 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
                 val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
                 startActivityForResult(intent, 0)
             }
-            //performing negative action
             builder.setNegativeButton(getString(R.string.univ_accessibility_dialog_negative)) { _, _ ->
                 persistentState.isBackgroundEnabled = false
             }
         }
 
-        //performing positive action
-
-        // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()
-        // Set other dialog properties
         alertDialog.setCancelable(false)
         alertDialog.show()
         alertDialog.setCancelable(false)

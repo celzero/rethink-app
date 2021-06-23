@@ -101,8 +101,7 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
             b.dnsBlockResolver.visibility = View.GONE
         }
         if (persistentState.fetchFavIcon) {
-            if (transaction.status == Transaction.Status.COMPLETE.toString()
-                && transaction.response != Constants.NXDOMAIN && !transaction.isBlocked) {
+            if (transaction.status == Transaction.Status.COMPLETE.toString() && transaction.response != Constants.NXDOMAIN && !transaction.isBlocked) {
                 val trim = transaction.queryStr.dropLast(1)
                 val url = "${Constants.FAV_ICON_URL}$trim.ico"
                 val domainURL = getETldPlus1(trim)
@@ -152,40 +151,30 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context, private v
 
     private fun updateImage(url: String, cacheKey: String) {
         try {
-            if(DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - TransactionViewHolder updateImage() -$url, $cacheKey")
+            if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - TransactionViewHolder updateImage() -$url, $cacheKey")
             val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
-            GlideApp.with(contextVal.applicationContext)
-                    .load(url).onlyRetrieveFromCache(true)
-                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                    .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                    .error(GlideApp.with(contextVal.applicationContext).load(cacheKey).onlyRetrieveFromCache(true))
-                    .transition(DrawableTransitionOptions.withCrossFade(factory))
-                    .into(object : CustomViewTarget<ImageView, Drawable>(b.dnsBlockFavIcon) {
-                        override fun onLoadFailed(errorDrawable: Drawable?) {
-                            if(isAdded) {
-                                b.dnsBlockFavIcon.visibility = View.GONE
-                            }
-                        }
+            GlideApp.with(contextVal.applicationContext).load(url).onlyRetrieveFromCache(true).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL).error(GlideApp.with(contextVal.applicationContext).load(cacheKey).onlyRetrieveFromCache(true)).transition(DrawableTransitionOptions.withCrossFade(factory)).into(object : CustomViewTarget<ImageView, Drawable>(b.dnsBlockFavIcon) {
+                override fun onLoadFailed(errorDrawable: Drawable?) {
+                    if (!isAdded) return
+                    b.dnsBlockFavIcon.visibility = View.GONE
+                }
 
-                        override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
-                            if(DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - CustomViewTarget onResourceReady() -$url")
-                            if(isAdded) {
-                                b.dnsBlockFavIcon.visibility = View.VISIBLE
-                                b.dnsBlockFavIcon.setImageDrawable(resource)
-                            }
-                        }
+                override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                    if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - CustomViewTarget onResourceReady() -$url")
+                    if (!isAdded) return
+                    b.dnsBlockFavIcon.visibility = View.VISIBLE
+                    b.dnsBlockFavIcon.setImageDrawable(resource)
+                }
 
-                        override fun onResourceCleared(placeholder: Drawable?) {
-                            if(isAdded) {
-                                b.dnsBlockFavIcon.visibility = View.GONE
-                            }
-                        }
-                    })
+                override fun onResourceCleared(placeholder: Drawable?) {
+                    if (!isAdded) return
+                    b.dnsBlockFavIcon.visibility = View.GONE
+                }
+            })
         } catch (e: Exception) {
-            if(DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - TransactionViewHolder Exception() -${e.message}")
-            if(isAdded) {
-                b.dnsBlockFavIcon.visibility = View.GONE
-            }
+            if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - TransactionViewHolder Exception() -${e.message}")
+            if (!isAdded) return
+            b.dnsBlockFavIcon.visibility = View.GONE
         }
     }
 

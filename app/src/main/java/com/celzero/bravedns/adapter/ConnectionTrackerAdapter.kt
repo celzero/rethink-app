@@ -37,6 +37,7 @@ import com.celzero.bravedns.service.FirewallRules
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_FIREWALL_LOG
+import com.celzero.bravedns.util.Constants.Companion.UNKNOWN_APP
 import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
@@ -90,7 +91,7 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
                     b.connectionStatusIndicator.visibility = View.VISIBLE
                     b.connectionStatusIndicator.setBackgroundColor(ContextCompat.getColor(context, R.color.colorRed_A400))
                 }
-                connTracker.blockedByRule.equals(FirewallRules.RULE7.ruleName) -> {
+                FirewallRules.RULE7.ruleName == connTracker.blockedByRule -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
                     b.connectionStatusIndicator.setBackgroundColor(fetchTextColor(R.color.dividerColor))
                 }
@@ -98,7 +99,7 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
                     b.connectionStatusIndicator.visibility = View.INVISIBLE
                 }
             }
-            if (connTracker.appName != "Unknown") {
+            if (connTracker.appName != UNKNOWN_APP) {
                 try {
                     val appArray = context.packageManager.getPackagesForUid(connTracker.uid)
                     val appCount = (appArray?.size)?.minus(1)

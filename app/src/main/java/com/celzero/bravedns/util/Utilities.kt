@@ -43,8 +43,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import com.celzero.bravedns.R
 import com.celzero.bravedns.net.doh.CountryMap
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
 import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
@@ -128,7 +128,7 @@ class Utilities {
                     return true
                 }
             }
-            if (DEBUG) Log.e(LOG_TAG_VPN, "isAccessibilityServiceEnabled failure: ${context.packageName},  ${service.name}, return size: ${enabledServices.size}")
+            if (DEBUG) Log.e(LOG_TAG_VPN, "isAccessibilityServiceEnabled failure, ${context.packageName},  ${service.name}, return size: ${enabledServices.size}")
             return false
         }
 
@@ -146,12 +146,11 @@ class Utilities {
                         return true
                     }
                 }
-                if (DEBUG) Log.e(LOG_TAG_VPN, "isAccessibilityServiceEnabled Enhanced: failed calling isAccessibilityServiceEnabled()")
-                return isAccessibilityServiceEnabled(context, accessibilityService)
-            } catch (e: Exception) {
-                Log.e(LOG_TAG_VPN, "isAccessibilityServiceEnabled Exception: failed calling isAccessibilityServiceEnabled() ${e.message}", e)
-                return isAccessibilityServiceEnabled(context, accessibilityService)
+                if (DEBUG) Log.e(LOG_TAG_VPN, "isAccessibilityServiceEnabled Enhanced: Failed to fetch enabledService so invoke isAccessibilityServiceEnabled()")
+            } catch (e: Settings.SettingNotFoundException) {
+                Log.e(LOG_TAG_VPN, "isAccessibilityServiceEnabled Exception on isAccessibilityServiceEnabledEnhanced() ${e.message}", e)
             }
+            return isAccessibilityServiceEnabled(context, accessibilityService)
         }
 
         private var countryMap: CountryMap? = null
@@ -238,16 +237,20 @@ class Utilities {
         }
 
         fun isLanIpv4(ipAddress: String): Boolean {
-            return try {
+            try {
                 // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
                 val ip = InetAddresses.forString(ipAddress)
                 // ref - to match a private IP address - https://r.va.gg/2011/07/handling-x-forwarded-for-in-java-and-tomcat.html
                 val regex = Regex("(^127\\.0\\.0\\.1)|(^10\\.)|(^172\\.1[6-9]\\.)|(^172\\.2[0-9]\\.)|(^172\\.3[0-1]\\.)|(^192\\.168\\.)")
-                ip.isAnyLocalAddress || ipAddress.matches(regex) || ipAddress == "0.0.0.0"
-            } catch (e: Exception) {
+                return ip.isAnyLocalAddress || ipAddress.matches(regex) || ipAddress == "0.0.0.0"
+            } catch (e: IllegalArgumentException) {
                 Log.w(LOG_TAG_VPN, "Exception while converting string to inetaddress, ${e.message}", e)
-                false
             }
+            return false
+        }
+
+        fun isValidLocalPort(port: Int): Boolean {
+            return port in 65535 downTo 1024
         }
 
 
@@ -287,7 +290,7 @@ class Utilities {
         }
 
         fun isValidUid(uid: Int): Boolean {
-            return FileSystemUID.isValidUid(uid)
+            return AndroidUidConfig.isValidUid(uid)
         }
 
         fun isInvalidUid(uid: Int): Boolean {
@@ -295,6 +298,13 @@ class Utilities {
                 MISSING_UID -> true
                 else -> false
             }
+        }
+
+        fun isVpnLockdownEnabled(): Boolean? {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                return false
+            }
+            return VpnController.getInstance().getBraveVpnService()?.isLockdownEnabled
         }
     }
 }

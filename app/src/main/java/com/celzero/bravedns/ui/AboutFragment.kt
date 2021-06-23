@@ -79,7 +79,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             b.aboutAppVersion.text = getString(R.string.about_version_install_source, version, persistentState.downloadSource.toString())
             b.aboutWhatsNew.text = getString(R.string.about_whats_new, getString(R.string.about_version, version))
         } catch (e: PackageManager.NameNotFoundException) {
-            Log.w(LOG_TAG_UI, "Exception on getPackageInfo: ${e.message}", e)
+            Log.w(LOG_TAG_UI, "package name not found: ${e.message}", e)
         }
     }
 
@@ -145,7 +145,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             Utilities.showToastUiCentered(requireContext(), getString(R.string.app_info_error), Toast.LENGTH_SHORT)
-            Log.w(LOG_TAG_UI, "Exception while opening app info: ${e.message}", e)
+            Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
 
@@ -164,7 +164,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             Utilities.showToastUiCentered(requireContext(), getString(R.string.vpn_profile_error), Toast.LENGTH_SHORT)
-            Log.w(LOG_TAG_UI, "Exception while opening app info: ${e.message}", e)
+            Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
 

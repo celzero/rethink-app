@@ -57,6 +57,7 @@ import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
+import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_PROXY
 import com.celzero.bravedns.util.Utilities.Companion.getThemeAccent
 import kotlinx.coroutines.*
 import org.koin.android.ext.android.get
@@ -87,10 +88,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         private const val WARNING_CHANNEL_ID = "warning"
         val vpnController: VpnController? = VpnController.getInstance()
 
-        //var isScreenLocked: Boolean = false
 
         var appWhiteList: MutableMap<Int, Boolean> = HashMap()
-        //var blockUDPTraffic: Boolean = false
 
         // notification request codes
         private const val NOTIF_ACTION_MODE_STOP = 100
@@ -194,7 +193,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             }
 
             //Check whether the screen lock is enabled and act based on it
-            if (DEBUG) Log.d(LOG_TAG_VPN, "isScreenLockEnabled: ${persistentState.isScreenOff}")
+            if (DEBUG) Log.d(LOG_TAG_VPN, "isDeviceLocked: ${persistentState.isScreenOff}")
             if (persistentState.isScreenOff) {
                 //Don't include DNS and private DNS request in the list
                 // FIXME: 04-12-2020 Removed the app range check for testing.
@@ -202,7 +201,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                     ipDetails.isBlocked = true
                     ipDetails.blockedByRule = com.celzero.bravedns.service.FirewallRules.RULE3.ruleName
                     connTrack(ipDetails)
-                    if (DEBUG) Log.d(LOG_TAG_VPN, "isScreenLocked: $uid, $destPort")
+                    if (DEBUG) Log.d(LOG_TAG_VPN, "isDeviceLocked: $uid, $destPort")
                     delayBeforeResponse()
                     return true
                 }
@@ -397,7 +396,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         return tempRemainingWaitMs
     }
 
-    //Exponential calculation - used for app not in use feature (thread wait)
     private fun exp(pow: Int): Long {
         return if (pow == 0) {
             baseWaitMs
@@ -538,16 +536,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 }
             }
 
-            if (appMode.getDNSType() == 3) {
-                try {
-                    //For DNS proxy mode, if any app is set then exclude the application from the list
-                    val dnsProxyEndpoint = dnsProxyEndpointRepository.getConnectedProxy()
-                    Log.i(LOG_TAG_VPN, "DNS Proxy mode is set with the app name as ${dnsProxyEndpoint.proxyAppName!!}")
-                    if (!dnsProxyEndpoint.proxyAppName.isNullOrEmpty() && dnsProxyEndpoint.proxyAppName != "Nobody") {
-                        builder = builder.addDisallowedApplication(dnsProxyEndpoint.proxyAppName!!)
-                    }
-                } catch (e: Exception) {
-                    Log.w(LOG_TAG_VPN, "Exception while excluding the proxy app from VPN", e)
+            if (appMode.getDNSType() == PREF_DNS_MODE_PROXY) {
+                //For DNS proxy mode, if any app is set then exclude the application from the list
+                val dnsProxyEndpoint = dnsProxyEndpointRepository.getConnectedProxy()
+                Log.i(LOG_TAG_VPN, "DNS Proxy mode is set with the app name as ${dnsProxyEndpoint.proxyAppName}")
+                if (!dnsProxyEndpoint.proxyAppName.isNullOrEmpty() && dnsProxyEndpoint.proxyAppName != "Nobody") {
+                    builder = builder.addDisallowedApplication(dnsProxyEndpoint.proxyAppName!!)
                 }
             }
 
@@ -739,12 +733,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     }
 
     private fun spawnServerUpdate() {
+        Log.i(LOG_TAG_VPN, "spawn server update with $vpnController and $connectionMonitor")
         if (vpnController != null) {
             synchronized(vpnController) {
                 // Connection monitor can be null if onDestroy() of service
                 // is called, in that case no need to call updateServerConnection()
                 if (connectionMonitor != null) {
                     Thread({ updateServerConnection() }, "updateServerConnection-onStartCommand").start()
+                } else {
+                    Log.w(LOG_TAG_VPN, "cannot spawn sever update, no connection monitor")
                 }
             }
         }
@@ -915,7 +912,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                     vpnController.getState().activationRequested = false
                     persistentState.vpnEnabled = false
                     vpnController.onConnectionStateChanged(this, null)
-                    Log.e(LOG_TAG_VPN, "Stop Called - stopVpnAdapter closed all states")
+                    Log.e(LOG_TAG_VPN, "Stop vpn adapter/controller")
                 }
             }
         }
@@ -983,7 +980,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         try {
             unregisterReceiver(braveScreenStateReceiver)
             get<OrbotHelper>().unregisterReceiver(this)
-        } catch (e: java.lang.Exception) {
+        } catch (e: IllegalArgumentException) {
             Log.w(LOG_TAG_VPN, "Unregister receiver error: ${e.message}", e)
         }
 
@@ -999,7 +996,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         }
         try {
             unregisterReceiver(braveAutoStartReceiver)
-        } catch (e: java.lang.Exception) {
+        } catch (e: IllegalArgumentException) {
             Log.w(LOG_TAG_VPN, "Unregister receiver error: ${e.message}", e)
         }
     }

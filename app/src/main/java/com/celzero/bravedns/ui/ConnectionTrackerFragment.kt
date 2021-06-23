@@ -79,7 +79,6 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
             recyclerAdapter = ConnectionTrackerAdapter(requireContext())
             viewModel.connectionTrackerList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(recyclerAdapter!!::submitList))
             includeView.recyclerConnection.adapter = recyclerAdapter
-            //recyclerView!!.setItemViewCacheSize(100)
         } else {
             includeView.connectionListLogsDisabledTv.visibility = View.VISIBLE
             includeView.connectionCardViewTop.visibility = View.GONE
@@ -140,19 +139,15 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         builder.setTitle(R.string.conn_track_clear_logs_title)
         builder.setMessage(R.string.conn_track_clear_logs_message)
         builder.setCancelable(true)
-        //performing positive action
         builder.setPositiveButton(getString(R.string.ct_delete_logs_positive_btn)) { _, _ ->
             GlobalScope.launch(Dispatchers.IO) {
                 connectionTrackerDAO.clearAllData()
             }
         }
 
-        //performing negative action
         builder.setNegativeButton(getString(R.string.ct_delete_logs_negative_btn)) { _, _ ->
         }
-        // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()
-        // Set other dialog properties
         alertDialog.setCancelable(true)
         alertDialog.show()
     }

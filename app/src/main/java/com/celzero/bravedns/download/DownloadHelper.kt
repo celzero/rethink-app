@@ -81,7 +81,7 @@ class DownloadHelper {
 
         fun getExternalFilePath(context: Context?, timeStamp: String): String {
             if (context == null) {
-                return Constants.DOWNLOAD_PATH + "/" + timeStamp + "/"
+                return Constants.DOWNLOAD_PATH + File.separator + timeStamp + File.separator
             }
             return context.getExternalFilesDir(null).toString() + Constants.DOWNLOAD_PATH + "/" + timeStamp + "/"
         }

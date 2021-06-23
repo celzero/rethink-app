@@ -60,7 +60,7 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                 dnsLogs.dnsType = PREF_DNS_MODE_DOH
                 dnsLogs.relayIP = ""
             }
-            dnsLogs.latency = transaction.responseTime// - transaction.queryTime
+            dnsLogs.latency = transaction.responseTime
             dnsLogs.queryStr = transaction.name
             dnsLogs.responseTime = transaction.responseTime
             dnsLogs.serverIP = transaction.serverIp
@@ -68,21 +68,16 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
             dnsLogs.time = transaction.responseCalendar.timeInMillis
             dnsLogs.typeName = Utilities.getTypeName(transaction.type.toInt())
 
-            try {
-                val serverAddress = if (transaction.serverIp != null) {
-                    // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
-                    forString(transaction.serverIp)
-                } else {
-                    null
-                }
-                if (serverAddress != null) {
-                    val countryCode: String = getCountryCode(serverAddress, context) //TODO: Country code things
-                    dnsLogs.resolver = makeAddressPair(countryCode, serverAddress.hostAddress)
-                } else {
-                    dnsLogs.resolver = transaction.serverIp
-                }
-            } catch (e: Exception) {
-                Log.w(LOG_TAG_DNS_LOG, "exception while fetching the resolver: ${e.message}", e)
+            val serverAddress = if (transaction.serverIp != null) {
+                // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
+                forString(transaction.serverIp)
+            } else {
+                null
+            }
+            if (serverAddress != null) {
+                val countryCode: String = getCountryCode(serverAddress, context) //TODO: Country code things
+                dnsLogs.resolver = makeAddressPair(countryCode, serverAddress.hostAddress)
+            } else {
                 dnsLogs.resolver = transaction.serverIp
             }
 

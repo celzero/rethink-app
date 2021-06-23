@@ -207,27 +207,27 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
      */
     private val orbotStatusReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (DEBUG) Log.d(LOG_TAG_VPN, "OrbotHelper - Orbot - OnStatusReceiver - ${intent.action}")
-            if (TextUtils.equals(intent.action, ACTION_STATUS)) {
-                val status = intent.getStringExtra(EXTRA_STATUS)
-                if (DEBUG) Log.d(LOG_TAG_VPN, "OrbotHelper - Orbot - status - $status")
-                if (status == STATUS_ON) {
-                    isResponseReceivedFromOrbot = true
-                    if (socks5IP != null && httpsIP != null && socks5IP != null && httpsIP != null) {
-                        orbotStarted()
-                    } else {
-                        updateOrbotProxyData(intent)
-                        orbotStarted()
-                    }
-                } else if (status == STATUS_OFF) {
-                    stopOrbot(context, isUserInitiated = false)
-                    context.unregisterReceiver(this)
-                } else if (status == STATUS_STARTING) {
+            if (!TextUtils.equals(intent.action, ACTION_STATUS)){
+                return
+            }
+            val status = intent.getStringExtra(EXTRA_STATUS)
+            if (DEBUG) Log.d(LOG_TAG_VPN, "OrbotHelper - Orbot - OnStatusReceiver ${intent.action}, status- $status")
+            if (status == STATUS_ON) {
+                isResponseReceivedFromOrbot = true
+                if (socks5IP != null && httpsIP != null && socks5IP != null && httpsIP != null) {
+                    orbotStarted()
+                } else {
                     updateOrbotProxyData(intent)
-                } else if (status == STATUS_STOPPING) {
-                    updateOrbotProxyData(intent)
-                    stopOrbot(context, isUserInitiated = false)
+                    orbotStarted()
                 }
+            } else if (status == STATUS_OFF) {
+                stopOrbot(context, isUserInitiated = false)
+                context.unregisterReceiver(this)
+            } else if (status == STATUS_STARTING) {
+                updateOrbotProxyData(intent)
+            } else if (status == STATUS_STOPPING) {
+                updateOrbotProxyData(intent)
+                stopOrbot(context, isUserInitiated = false)
             }
         }
     }
@@ -395,8 +395,8 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
     fun unregisterReceiver(context: Context) {
         try {
             context.unregisterReceiver(orbotStatusReceiver)
-        } catch (e: Exception) {
-            if (DEBUG) Log.w(LOG_TAG_VPN, "Unregister not needed: ${e.message}")
+        } catch (e: IllegalArgumentException) {
+            Log.e(LOG_TAG_VPN, "Unregister not needed: ${e.message}", e)
         }
     }
 

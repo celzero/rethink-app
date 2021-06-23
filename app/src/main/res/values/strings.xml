@@ -983,4 +983,7 @@
     <string name="rules_load_failure_desc">Failure to initiate the firewall rules</string>
     <string name="rules_load_failure_reload">reload</string>
 
+    <string name="network_log_app_name_unknown">Unknown</string>
+    <string name="network_log_app_name_unnamed">Unnamed (%1$s)</string>
+
 </resources>
