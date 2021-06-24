@@ -20,32 +20,26 @@ import android.os.Build
 import android.util.Log
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import java.io.File
 
 class DownloadHelper {
 
     companion object {
-        fun isLocalDownloadValid(context: Context, timeStamp: String): Boolean {
+        fun isLocalDownloadValid(context: Context, timestamp: String): Boolean {
             try {
-                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Local block list validation: $timeStamp")
-                val dir = File(getExternalFilePath(context, timeStamp))
+                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Local block list validation: $timestamp")
+                val dir = File(getExternalFilePath(context, timestamp))
                 if (dir.isDirectory) {
                     val children = dir.list()
                     if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Local block list validation isDirectory: true, children : ${children?.size}, ${dir.path}")
                     if (children != null && children.size == Constants.LOCAL_BLOCKLIST_FILE_COUNT) return true
                 }
-
             } catch (e: Exception) {
-                Log.w(LOG_TAG_DOWNLOAD, "Local block list validation failed - ${e.message}")
+                Log.w(LOG_TAG_DOWNLOAD, "Local block list validation failed - ${e.message}", e)
             }
             return false
         }
-
-        fun validateRemoteBlocklistDownload() {
-
-        }
-
 
         /**
          * Clean up the folder which had the old download files.
@@ -79,11 +73,11 @@ class DownloadHelper {
             deleteRecursive(canonicalPath)
         }
 
-        fun getExternalFilePath(context: Context?, timeStamp: String): String {
+        fun getExternalFilePath(context: Context?, timestamp: String): String {
             if (context == null) {
-                return Constants.DOWNLOAD_PATH + File.separator + timeStamp + File.separator
+                return Constants.DOWNLOAD_PATH + File.separator + timestamp + File.separator
             }
-            return context.getExternalFilesDir(null).toString() + Constants.DOWNLOAD_PATH + "/" + timeStamp + "/"
+            return context.getExternalFilesDir(null).toString() + Constants.DOWNLOAD_PATH +  File.separator + timestamp +  File.separator
         }
     }
 

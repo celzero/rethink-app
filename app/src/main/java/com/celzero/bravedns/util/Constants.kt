@@ -185,5 +185,12 @@ class Constants {
 
         const val LIVEDATA_PAGE_SIZE = 50
         const val DNS_LIVEDATA_PAGE_SIZE = 30
+
+        // Download status
+        const val DOWNLOAD_FAILURE = -1
+        const val DOWNLOAD_SUCCESS =  1
+        const val DOWNLOAD_RETRY = 0
+
+        const val INIT_TIME_MS = 0L
     }
 }

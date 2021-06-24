@@ -34,7 +34,7 @@ import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.databinding.ExcludeAppDialogLayoutBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.viewmodel.ExcludedAppViewModel
 import com.google.android.material.chip.Chip
 import java.util.stream.Collectors

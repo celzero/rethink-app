@@ -17,6 +17,7 @@ limitations under the License.
 package com.celzero.bravedns.adapter
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.content.res.TypedArray
 import android.util.Log
 import android.util.TypedValue
@@ -33,12 +34,12 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
 import com.celzero.bravedns.glide.GlideApp
-import com.celzero.bravedns.service.FirewallRules
+import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_FIREWALL_LOG
 import com.celzero.bravedns.util.Constants.Companion.UNKNOWN_APP
 import com.celzero.bravedns.util.KnownPorts
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL_LOG
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
 import java.util.*
@@ -91,7 +92,7 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
                     b.connectionStatusIndicator.visibility = View.VISIBLE
                     b.connectionStatusIndicator.setBackgroundColor(ContextCompat.getColor(context, R.color.colorRed_A400))
                 }
-                FirewallRules.RULE7.ruleName == connTracker.blockedByRule -> {
+                FirewallRuleset.RULE7.ruleName == connTracker.blockedByRule -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
                     b.connectionStatusIndicator.setBackgroundColor(fetchTextColor(R.color.dividerColor))
                 }
@@ -109,7 +110,7 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
                         b.connectionAppName.text = context.getString(R.string.ctbs_app_other_app, connTracker.appName, appCount.toString())
                     }
                     GlideApp.with(context).load(context.packageManager.getApplicationIcon(appArray[0]!!)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)
-                } catch (e: Exception) {
+                } catch (e: PackageManager.NameNotFoundException) {
                     GlideApp.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)
                     Log.w(LOG_TAG_FIREWALL_LOG, "Package Not Found - " + e.message)
                 }

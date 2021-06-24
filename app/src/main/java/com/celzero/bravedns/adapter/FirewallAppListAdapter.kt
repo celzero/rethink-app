@@ -46,8 +46,9 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.APP_CAT_SYSTEM_APPS
 import com.celzero.bravedns.util.Constants.Companion.APP_CAT_SYSTEM_COMPONENTS
 import com.celzero.bravedns.util.Constants.Companion.APP_NON_APP
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.ThrowingHandler
+import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -146,11 +147,11 @@ class FirewallAppListAdapter internal constructor(
                 blockAllApps = showDialog(appUIDList, appInfoDetail.appName, isInternetAllowed)
             }
 
-            val activityManager: ActivityManager = context.getSystemService(Activity.ACTIVITY_SERVICE) as ActivityManager
             if (appUIDList.size <= 1 || blockAllApps) {
                 object : CountDownTimer(500, 500) {
                     override fun onTick(millisUntilFinished: Long) {
                     }
+
                     override fun onFinish() {
                         fwWifiImg.isEnabled = true
                     }
@@ -160,10 +161,8 @@ class FirewallAppListAdapter internal constructor(
                 fwWifiImg.isChecked = isInternetAllowed
                 appInfoDetail.isWifiEnabled = !isInternetAllowed
                 appInfoDetail.isInternetAllowed = !isInternetAllowed
-                if (!isInternetAllowed)
-                    mIconIndicator.setBackgroundColor(context.getColor(R.color.colorGreen_900))
-                else
-                    mIconIndicator.setBackgroundColor(context.getColor(R.color.colorAmber_900))
+                if (!isInternetAllowed) mIconIndicator.setBackgroundColor(context.getColor(R.color.colorGreen_900))
+                else mIconIndicator.setBackgroundColor(context.getColor(R.color.colorAmber_900))
                 val uid = appInfoDetail.uid
                 fwWifiImg.isEnabled = true
                 CoroutineScope(Dispatchers.IO).launch {
@@ -172,14 +171,10 @@ class FirewallAppListAdapter internal constructor(
                         persistentState.modifyAllowedWifi(it.packageInfo, !isInternetAllowed)
                         FirewallManager.updateAppInternetPermission(it.packageInfo, !isInternetAllowed)
                         FirewallManager.updateAppInternetPermissionByUID(it.uid, !isInternetAllowed)
-                        categoryInfoRepository.updateNumberOfBlocked(it.appCategory,isInternetAllowed)
+                        categoryInfoRepository.updateNumberOfBlocked(it.appCategory, isInternetAllowed)
 
-                        if(persistentState.killAppOnFirewall) {
-                            try {
-                                activityManager.killBackgroundProcesses(it.packageInfo)
-                            } catch (e: Exception) {
-                                Log.w(LOG_TAG_FIREWALL, "firewall - kill app - exception" + e.message, e)
-                            }
+                        if (persistentState.killAppOnFirewall) {
+                            Utilities.killBg(context, it.packageInfo)
                         }
                     }
                     appInfoRepository.updateInternetForUID(uid, !isInternetAllowed)
@@ -215,8 +210,7 @@ class FirewallAppListAdapter internal constructor(
         var convertView = view
         val listTitle = getGroup(listPosition)
         if (convertView == null) {
-            val layoutInflater =
-                this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val layoutInflater = this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             convertView = layoutInflater.inflate(R.layout.expandable_firewall_header, null)
         }
 
@@ -228,7 +222,7 @@ class FirewallAppListAdapter internal constructor(
         val progressBar: ProgressBar = convertView.findViewById(R.id.expand_header_progress)
         val indicatorTV: TextView = convertView.findViewById(R.id.expand_header_category_indicator)
         val sysAppWarning: TextView = convertView.findViewById(R.id.expand_system_apps_warning)
-        val placeHolder : TextView = convertView.findViewById(R.id.expand_system_place_holder)
+        val placeHolder: TextView = convertView.findViewById(R.id.expand_system_place_holder)
 
         val numberOfApps = listTitle.numberOFApps
         categoryNameTV.text = "${listTitle.categoryName} ($numberOfApps)"
@@ -236,19 +230,9 @@ class FirewallAppListAdapter internal constructor(
 
         internetChk.isChecked = !isInternetAllowed
         if (!isInternetAllowed) {
-            internetChk.setCompoundDrawablesWithIntrinsicBounds(
-                ContextCompat.getDrawable(context, R.drawable.dis_allowed),
-                null,
-                null,
-                null
-            )
+            internetChk.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context, R.drawable.dis_allowed), null, null, null)
         } else {
-            internetChk.setCompoundDrawablesWithIntrinsicBounds(
-                ContextCompat.getDrawable(context, R.drawable.allowed),
-                null,
-                null,
-                null
-            )
+            internetChk.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context, R.drawable.allowed), null, null, null)
         }
         if (isInternetAllowed) {
             indicatorTV.visibility = View.INVISIBLE
@@ -256,44 +240,37 @@ class FirewallAppListAdapter internal constructor(
             indicatorTV.visibility = View.VISIBLE
         }
 
-        if (listTitle.categoryName == APP_CAT_SYSTEM_APPS ) {
+        if (listTitle.categoryName == APP_CAT_SYSTEM_APPS) {
             sysAppWarning.text = context.getString(R.string.system_apps_warning)
             sysAppWarning.visibility = View.VISIBLE
             placeHolder.visibility = View.GONE
-        } else if(listTitle.categoryName == APP_CAT_SYSTEM_COMPONENTS){
+        } else if (listTitle.categoryName == APP_CAT_SYSTEM_COMPONENTS) {
             sysAppWarning.text = context.getString(R.string.system_components_warning)
             sysAppWarning.visibility = View.VISIBLE
-            if(isExpanded){
+            if (isExpanded) {
                 placeHolder.visibility = View.GONE
-            }else {
+            } else {
                 placeHolder.visibility = View.VISIBLE
             }
-        } else if(listTitle.categoryName == APP_NON_APP){
+        } else if (listTitle.categoryName == APP_NON_APP) {
             sysAppWarning.text = context.getString(R.string.system_non_apps_warning)
             sysAppWarning.visibility = View.VISIBLE
             placeHolder.visibility = View.GONE
-        }else{
+        } else {
             sysAppWarning.visibility = View.GONE
             placeHolder.visibility = View.GONE
         }
-        appCountTV.text = context.getString(R.string.ct_app_details, listTitle.numOfAppsBlocked.toString(),
-            listTitle.numOfAppWhitelisted.toString(), listTitle.numOfAppsExcluded.toString())
+        appCountTV.text = context.getString(R.string.ct_app_details, listTitle.numOfAppsBlocked.toString(), listTitle.numOfAppWhitelisted.toString(), listTitle.numOfAppsExcluded.toString())
 
         val list = dataList[listTitle]
         try {
             if (list != null && list.isNotEmpty()) {
                 if (numberOfApps != 0) {
                     if (numberOfApps >= 2) {
-                        GlideApp.with(context).load(context.packageManager.getApplicationIcon(list[0].packageInfo))
-                            .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
-                            .into(imageHolder1)
-                        GlideApp.with(context).load(context.packageManager.getApplicationIcon(list[1].packageInfo))
-                            .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
-                            .into(imageHolder2)
+                        GlideApp.with(context).load(context.packageManager.getApplicationIcon(list[0].packageInfo)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(imageHolder1)
+                        GlideApp.with(context).load(context.packageManager.getApplicationIcon(list[1].packageInfo)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(imageHolder2)
                     } else {
-                        GlideApp.with(context).load(context.packageManager.getApplicationIcon(list[0].packageInfo))
-                            .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
-                            .into(imageHolder1)
+                        GlideApp.with(context).load(context.packageManager.getApplicationIcon(list[0].packageInfo)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(imageHolder1)
                         imageHolder2.visibility = View.GONE
                     }
                 } else {
@@ -303,44 +280,40 @@ class FirewallAppListAdapter internal constructor(
             }
         } catch (e: Exception) {
             Log.w(LOG_TAG_FIREWALL, "One or more application icons are not available" + e.message)
-            GlideApp.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
-                .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
-                .into(imageHolder1)
+            GlideApp.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(imageHolder1)
             if (numberOfApps == 1) {
                 imageHolder2.visibility = View.GONE
-            }else{
-                GlideApp.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
-                    .error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon))
-                    .into(imageHolder2)
+            } else {
+                GlideApp.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(imageHolder2)
             }
         }
         internetChk.setOnClickListener {
             var proceedBlock = if (listTitle.categoryName == APP_CAT_SYSTEM_APPS && isInternetAllowed) {
-                if(listTitle.numOfAppWhitelisted != listTitle.numberOFApps) {
+                if (listTitle.numOfAppWhitelisted != listTitle.numberOFApps) {
                     showDialogForSystemAppBlock(APP_CAT_SYSTEM_APPS)
-                }else{
+                } else {
                     false
                 }
-            }else{
+            } else {
                 true
             }
-            if(listTitle.categoryName == APP_CAT_SYSTEM_COMPONENTS && isInternetAllowed){
-                if(DEBUG) Log.d(LOG_TAG_FIREWALL, "Category block - System components, count: ${listTitle.numOfAppWhitelisted}, ${listTitle.numberOFApps}")
-                proceedBlock = if(listTitle.numOfAppWhitelisted != listTitle.numberOFApps){
+            if (listTitle.categoryName == APP_CAT_SYSTEM_COMPONENTS && isInternetAllowed) {
+                if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category block - System components, count: ${listTitle.numOfAppWhitelisted}, ${listTitle.numberOFApps}")
+                proceedBlock = if (listTitle.numOfAppWhitelisted != listTitle.numberOFApps) {
                     showDialogForSystemAppBlock(APP_CAT_SYSTEM_COMPONENTS)
-                }else{
+                } else {
                     false
                 }
             }
-            if(listTitle.categoryName == APP_NON_APP && isInternetAllowed) {
-                proceedBlock = if(listTitle.numOfAppWhitelisted != listTitle.numberOFApps){
+            if (listTitle.categoryName == APP_NON_APP && isInternetAllowed) {
+                proceedBlock = if (listTitle.numOfAppWhitelisted != listTitle.numberOFApps) {
                     showDialogForSystemAppBlock(APP_NON_APP)
-                }else{
+                } else {
                     false
                 }
             }
-            if(proceedBlock) {
-                Log.i(LOG_TAG_FIREWALL,"Blocking proceeded - ")
+            if (proceedBlock) {
+                Log.i(LOG_TAG_FIREWALL, "Blocking proceeded - ")
                 internetChk.visibility = View.GONE
                 progressBar.visibility = View.VISIBLE
                 object : CountDownTimer(500, 500) {
@@ -363,22 +336,21 @@ class FirewallAppListAdapter internal constructor(
 
                 GlobalScope.launch(Dispatchers.IO) {
                     val count = appInfoRepository.updateInternetForAppCategory(listTitle.categoryName, !isInternet)
-                    if(DEBUG) Log.d(LOG_TAG_FIREWALL,"Apps updated : $count, $isInternet")
+                    if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Apps updated : $count, $isInternet")
                     try {
                         if (count == listTitle.numberOFApps) {
                             categoryInfoRepository.updateCategoryInternet(listTitle.categoryName, isInternet)
                         } else {
                             categoryInfoRepository.updateBlockedCount(listTitle.categoryName, count)
                         }
-                    }catch(e : Exception){
-                        Log.w(LOG_TAG_FIREWALL,"Exception when inserting the category internet info: ${e.message}",e)
+                    } catch (e: Exception) {
+                        Log.w(LOG_TAG_FIREWALL, "Exception when inserting the category internet info: ${e.message}", e)
                     }
                 }
-            }else{
-                if(DEBUG) Log.d(LOG_TAG_FIREWALL,"else - proceedBlock: $proceedBlock")
+            } else {
+                if (DEBUG) Log.d(LOG_TAG_FIREWALL, "else - proceedBlock: $proceedBlock")
                 internetChk.isChecked = proceedBlock
-                internetChk.setCompoundDrawablesWithIntrinsicBounds(
-                    ContextCompat.getDrawable(context, R.drawable.allowed), null, null, null)
+                internetChk.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context, R.drawable.allowed), null, null, null)
             }
         }
         internetChk.setOnCheckedChangeListener(null)
@@ -396,7 +368,7 @@ class FirewallAppListAdapter internal constructor(
 
     private fun showDialog(packageList: List<AppInfo>, appName: String, isInternet: Boolean): Boolean {
         val handler: Handler = ThrowingHandler()
-        val positiveTxt : String
+        val positiveTxt: String
         val packageNameList: List<String> = packageList.map { it.appName }
         var proceedBlocking = false
 
@@ -410,10 +382,7 @@ class FirewallAppListAdapter internal constructor(
             builderSingle.setTitle(context.getString(R.string.ctbs_unblock_other_apps, appName, packageList.size.toString()))
             positiveTxt = context.getString(R.string.ctbs_unblock_other_apps_positive_text, packageList.size.toString())
         }
-        val arrayAdapter = ArrayAdapter<String>(
-            context,
-            android.R.layout.simple_list_item_activated_1
-        )
+        val arrayAdapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_activated_1)
         arrayAdapter.addAll(packageNameList)
         builderSingle.setCancelable(false)
 
@@ -438,7 +407,7 @@ class FirewallAppListAdapter internal constructor(
         return proceedBlocking
     }
 
-    private fun showDialogForSystemAppBlock(isSysComponent : String): Boolean {
+    private fun showDialogForSystemAppBlock(isSysComponent: String): Boolean {
         //Change the handler logic into some other
         val handlerDelete: Handler = ThrowingHandler()
         var proceedBlocking = false
@@ -447,13 +416,13 @@ class FirewallAppListAdapter internal constructor(
 
         builderSingle.setIcon(R.drawable.spinner_firewall)
 
-        if(isSysComponent == APP_CAT_SYSTEM_COMPONENTS){
+        if (isSysComponent == APP_CAT_SYSTEM_COMPONENTS) {
             builderSingle.setTitle(context.resources.getString(R.string.system_components_warning_title))
             builderSingle.setMessage(context.resources.getString(R.string.system_components_warning))
-        }else if(isSysComponent == APP_NON_APP){
+        } else if (isSysComponent == APP_NON_APP) {
             builderSingle.setTitle(context.resources.getString(R.string.system_non_app_warning_title))
             builderSingle.setMessage(context.resources.getString(R.string.system_non_apps_warning))
-        }else{
+        } else {
             builderSingle.setTitle(context.resources.getString(R.string.system_apps_warning_title))
             builderSingle.setMessage(context.resources.getString(R.string.system_apps_warning))
         }

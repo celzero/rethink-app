@@ -19,8 +19,7 @@ import android.app.Activity
 import android.util.Log
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_APP_UPDATE
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
 import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException

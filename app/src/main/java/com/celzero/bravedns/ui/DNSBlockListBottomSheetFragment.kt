@@ -43,7 +43,7 @@ import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DNS_LOG
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.Utilities.Companion.getETldPlus1
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject

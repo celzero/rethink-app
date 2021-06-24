@@ -28,8 +28,8 @@ import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_FIREWALL_LOG
 import com.celzero.bravedns.util.AndroidUidConfig
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL_LOG
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
 import com.celzero.bravedns.util.Utilities.Companion.getFlag

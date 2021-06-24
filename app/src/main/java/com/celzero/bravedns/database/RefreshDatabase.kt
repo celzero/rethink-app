@@ -26,16 +26,15 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_APP_DB
 import com.celzero.bravedns.util.AndroidUidConfig
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
 import com.celzero.bravedns.util.PlayStoreCategory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
 
-class RefreshDatabase internal constructor(
-    private var context: Context,
+class RefreshDatabase internal constructor(private var context: Context,
     private val appInfoRepository: AppInfoRepository,
     private val appInfoViewRepository: AppInfoViewRepository,
     private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
@@ -45,26 +44,25 @@ class RefreshDatabase internal constructor(
     private val dnsLogRepository: DNSLogRepository,
     private val dnsCryptEndpointRepository: DNSCryptEndpointRepository,
     private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
-    private val persistentState:PersistentState
-) {
+    private val persistentState: PersistentState) {
 
     /**
      * Need to rewrite the logic for adding the apps in the database and removing it during uninstall.
      */
     fun refreshAppInfoDatabase() {
-        if(DEBUG) Log.d(LOG_TAG_APP_DB,"Refresh database is called")
+        if (DEBUG) Log.d(LOG_TAG_APP_DB, "Refresh database is called")
         GlobalScope.launch(Dispatchers.IO) {
             val appListDB = appInfoRepository.getAppInfoAsync()
             if (appListDB.isNotEmpty()) {
                 appListDB.forEach {
-                    if(!it.packageInfo.contains(Constants.NO_PACKAGE)) {
+                    if (!it.packageInfo.contains(Constants.NO_PACKAGE)) {
                         try {
                             val packageName = context.packageManager.getPackageInfo(it.packageInfo, PackageManager.GET_META_DATA)
                             if (packageName.applicationInfo == null) {
                                 appInfoRepository.delete(it)
                                 updateCategoryInDB()
                             }
-                        } catch (e: Exception) {
+                        } catch (e: PackageManager.NameNotFoundException) {
                             Log.w(LOG_TAG_APP_DB, "Application not available ${it.appName}" + e.message, e)
                             appInfoRepository.delete(it)
                             updateCategoryInDB()
@@ -84,35 +82,32 @@ class RefreshDatabase internal constructor(
             val appDetailsFromDB = appInfoRepository.getAppInfoAsync()
             val nonAppsCount = appInfoRepository.getNonAppCount()
             //val isRootAvailable = insertRootAndroid(appInfoRepository)
-            if(DEBUG) Log.d(LOG_TAG_APP_DB,"getAppInfo - ${appDetailsFromDB.size}, $nonAppsCount, ${allPackages.size}")
-            if (appDetailsFromDB.isEmpty() || ((appDetailsFromDB.size-nonAppsCount) != (allPackages.size - 1)) ) {
+            if (DEBUG) Log.d(LOG_TAG_APP_DB, "getAppInfo - ${appDetailsFromDB.size}, $nonAppsCount, ${allPackages.size}")
+            if (appDetailsFromDB.isEmpty() || ((appDetailsFromDB.size - nonAppsCount) != (allPackages.size - 1))) {
                 allPackages.forEach {
-                    if(DEBUG) Log.d(LOG_TAG_APP_DB,"Refresh Database, AppInfo -> ${context.packageManager.getApplicationLabel(it.applicationInfo)}")
+                    if (DEBUG) Log.d(LOG_TAG_APP_DB, "Refresh Database, AppInfo -> ${context.packageManager.getApplicationLabel(it.applicationInfo)}")
                     if (it.applicationInfo.packageName != context.applicationContext.packageName) {
                         val applicationInfo: ApplicationInfo = it.applicationInfo
                         val appInfo = AppInfo()
                         appInfo.appName = context.packageManager.getApplicationLabel(applicationInfo).toString()
                         appInfo.packageInfo = applicationInfo.packageName
                         appInfo.uid = applicationInfo.uid
-                        val dbAppInfo = if(appInfo.packageInfo.isNotEmpty()) {
-                             appInfoRepository.getAppInfoForPackageName(appInfo.packageInfo)
-                        }else{
+                        val dbAppInfo = if (appInfo.packageInfo.isNotEmpty()) {
+                            appInfoRepository.getAppInfoForPackageName(appInfo.packageInfo)
+                        } else {
                             null
                         }
                         if (dbAppInfo != null && dbAppInfo.appName.isNotEmpty()) {
                             HomeScreenActivity.GlobalVariable.appList[applicationInfo.packageName] = dbAppInfo
-                        }else{
-                            if(DEBUG) Log.d(LOG_TAG_APP_DB,"Refresh Database, AppInfo - new package found ${appInfo.appName} - " +
-                                        "${context.packageManager.getApplicationLabel(it.applicationInfo)} will be inserted")
+                        } else {
+                            if (DEBUG) Log.d(LOG_TAG_APP_DB, "Refresh Database, AppInfo - new package found ${appInfo.appName} - " + "${context.packageManager.getApplicationLabel(it.applicationInfo)} will be inserted")
                             appInfo.isDataEnabled = true
                             appInfo.isWifiEnabled = true
                             appInfo.isScreenOff = false
                             appInfo.isBackgroundEnabled = false
                             appInfo.whiteListUniv2 = false
                             appInfo.isExcluded = false
-                            appInfo.whiteListUniv1 = ((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) && !AndroidUidConfig.isUIDAppRange(
-                                appInfo.uid
-                            )
+                            appInfo.whiteListUniv1 = ((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) && !AndroidUidConfig.isUIDAppRange(appInfo.uid)
                             appInfo.mobileDataUsed = 0
                             appInfo.trackers = 0
                             appInfo.wifiDataUsed = 0
@@ -166,7 +161,7 @@ class RefreshDatabase internal constructor(
 
     }
 
-    fun registerNonApp(uid : Int, appName : String){
+    fun registerNonApp(uid: Int, appName: String) {
         val appInfo = AppInfo()
         appInfo.appName = appName
         appInfo.packageInfo = "no_package_$uid"
@@ -190,11 +185,11 @@ class RefreshDatabase internal constructor(
 
     fun insertDefaultDNSProxy() {
         GlobalScope.launch(Dispatchers.IO) {
-            val proxyURL  = context.resources.getStringArray(R.array.dns_proxy_names)
-            val proxyIP  = context.resources.getStringArray(R.array.dns_proxy_ips)
-            val dnsProxyEndPoint1 = DNSProxyEndpoint(1,proxyURL[0],"External","Nobody",proxyIP[0],53,false,false,0,0)
-            val dnsProxyEndPoint2 = DNSProxyEndpoint(2,proxyURL[1],"External","Nobody",proxyIP[1],53,false,false,0,0)
-            val dnsProxyEndPoint3 = DNSProxyEndpoint(3,proxyURL[2],"External","Nobody",proxyIP[2],53,false,false,0,0)
+            val proxyURL = context.resources.getStringArray(R.array.dns_proxy_names)
+            val proxyIP = context.resources.getStringArray(R.array.dns_proxy_ips)
+            val dnsProxyEndPoint1 = DNSProxyEndpoint(1, proxyURL[0], "External", "Nobody", proxyIP[0], 53, false, false, 0, 0)
+            val dnsProxyEndPoint2 = DNSProxyEndpoint(2, proxyURL[1], "External", "Nobody", proxyIP[1], 53, false, false, 0, 0)
+            val dnsProxyEndPoint3 = DNSProxyEndpoint(3, proxyURL[2], "External", "Nobody", proxyIP[2], 53, false, false, 0, 0)
             dnsProxyEndpointRepository.insertWithReplace(dnsProxyEndPoint1)
             dnsProxyEndpointRepository.insertWithReplace(dnsProxyEndPoint2)
             dnsProxyEndpointRepository.insertWithReplace(dnsProxyEndPoint3)
@@ -230,11 +225,11 @@ class RefreshDatabase internal constructor(
                 val categoryInfo = CategoryInfo()
                 categoryInfo.categoryName = it.appCategory
 
-                val excludedList = categoryFromAppList.filter { a -> a.isExcluded && a.appCategory == it.appCategory}
-                val appsBlocked = categoryFromAppList.filter { a -> !a.isInternetAllowed && a.appCategory == it.appCategory}
-                val whiteListedApps = categoryFromAppList.filter { a -> a.whiteListUniv1 && a.appCategory == it.appCategory}
+                val excludedList = categoryFromAppList.filter { a -> a.isExcluded && a.appCategory == it.appCategory }
+                val appsBlocked = categoryFromAppList.filter { a -> !a.isInternetAllowed && a.appCategory == it.appCategory }
+                val whiteListedApps = categoryFromAppList.filter { a -> a.whiteListUniv1 && a.appCategory == it.appCategory }
 
-                categoryInfo.numberOFApps = categoryFromAppList.filter { a -> a.appCategory == it.appCategory}.size
+                categoryInfo.numberOFApps = categoryFromAppList.filter { a -> a.appCategory == it.appCategory }.size
                 categoryInfo.numOfAppsExcluded = excludedList.size
                 categoryInfo.numOfAppWhitelisted = whiteListedApps.size
                 categoryInfo.numOfAppsBlocked = appsBlocked.size
@@ -298,27 +293,20 @@ class RefreshDatabase internal constructor(
 
     fun insertDefaultDNSList() {
         GlobalScope.launch(Dispatchers.IO) {
-            try {
-                val isAlreadyConnectionAvailable = doHEndpointRepository.getConnectedDoH()
-                val urlName = context.resources.getStringArray(R.array.doh_endpoint_names)
-                val urlValues = context.resources.getStringArray(R.array.doh_endpoint_urls)
-                if(isAlreadyConnectionAvailable == null || isAlreadyConnectionAvailable.dohName.isEmpty()){
-                    doHEndpointRepository.removeConnectionStatus()
-                    insertDefaultDOHList()
-                }else{
-                    Log.i(LOG_TAG_APP_DB, "Refresh Database, ALready insertion done. Correct values for Cloudflare alone.")
-                    val doHEndpoint = DoHEndpoint(3, urlName[2], urlValues[2], context.getString(R.string.dns_mode_2_explanation), false, false, System.currentTimeMillis(), 0)
-                    doHEndpointRepository.insertWithReplaceAsync(doHEndpoint)
-                }
-            }catch (e : Exception){
-                Log.i(LOG_TAG_APP_DB, "Refresh Database, No connections available proceed insert- ${e.message}",e)
+            val isAlreadyConnectionAvailable = doHEndpointRepository.getConnectedDoH()
+            val urlName = context.resources.getStringArray(R.array.doh_endpoint_names)
+            val urlValues = context.resources.getStringArray(R.array.doh_endpoint_urls)
+            if (isAlreadyConnectionAvailable == null) {
                 insertDefaultDOHList()
+            } else {
+                Log.i(LOG_TAG_APP_DB, "Refresh Database, Already insertion done. Correct values for Cloudflare alone.")
+                val doHEndpoint = DoHEndpoint(3, urlName[2], urlValues[2], context.getString(R.string.dns_mode_2_explanation), false, false, System.currentTimeMillis(), 0)
+                doHEndpointRepository.insertWithReplaceAsync(doHEndpoint)
             }
-
         }
     }
 
-    private fun insertDefaultDOHList(){
+    private fun insertDefaultDOHList() {
         val urlName = context.resources.getStringArray(R.array.doh_endpoint_names)
         val urlValues = context.resources.getStringArray(R.array.doh_endpoint_urls)
         GlobalScope.launch(Dispatchers.IO) {

@@ -49,8 +49,8 @@ import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.AndroidUidConfig
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.ThrowingHandler
 import com.celzero.bravedns.util.Utilities
@@ -184,7 +184,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
 
         val listBlocked = blockedConnectionsRepository.getAllBlockedConnectionsForUID(ipDetails.uid)
         listBlocked.forEach {
-            if (com.celzero.bravedns.service.FirewallRules.RULE2.ruleName == it.ruleType && ipDetails.ipAddress.equals(it.ipAddress) && it.uid == UNIVERSAL_RULES_UID) {
+            if (com.celzero.bravedns.service.FirewallRuleset.RULE2.ruleName == it.ruleType && ipDetails.ipAddress.equals(it.ipAddress) && it.uid == UNIVERSAL_RULES_UID) {
                 b.bsConnBlockConnAllSwitch.isChecked = true
             }
         }
@@ -217,7 +217,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
             text = getString(R.string.bsct_conn_conn_desc_allowed, protocol, ipDetails.port.toString(), time)
             b.bsConnTrackAppKill.visibility = View.GONE
             //FIXME - #306 - Compare the enum instead of the string value of the enum
-            if (com.celzero.bravedns.service.FirewallRules.RULE7.ruleName == ipDetails.blockedByRule) {
+            if (com.celzero.bravedns.service.FirewallRuleset.RULE7.ruleName == ipDetails.blockedByRule) {
                 b.bsConnTrackAppKill.visibility = View.VISIBLE
                 b.bsConnTrackAppKill.text = getString(R.string.ctbs_whitelisted)
             }
@@ -240,13 +240,13 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context, private va
 
         b.bsConnBlockConnAllSwitch.setOnCheckedChangeListener(null)
         b.bsConnBlockConnAllSwitch.setOnClickListener {
-            if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Universal isRemove? isRuleUniversal - ${connRules.ipAddress}, ${com.celzero.bravedns.service.FirewallRules.RULE2.ruleName}")
+            if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Universal isRemove? isRuleUniversal - ${connRules.ipAddress}, ${com.celzero.bravedns.service.FirewallRuleset.RULE2.ruleName}")
             if (isRuleUniversal) {
                 firewallRules.removeFirewallRules(UNIVERSAL_RULES_UID, connRules.ipAddress, blockedConnectionsRepository)
                 isRuleUniversal = false
                 Utilities.showToastUiCentered(contextVal, getString(R.string.ctbs_unblocked_app, connRules.ipAddress), Toast.LENGTH_SHORT)
             } else {
-                firewallRules.addFirewallRules(UNIVERSAL_RULES_UID, connRules.ipAddress, com.celzero.bravedns.service.FirewallRules.RULE2.ruleName, blockedConnectionsRepository)
+                firewallRules.addFirewallRules(UNIVERSAL_RULES_UID, connRules.ipAddress, com.celzero.bravedns.service.FirewallRuleset.RULE2.ruleName, blockedConnectionsRepository)
                 isRuleUniversal = true
                 Utilities.showToastUiCentered(contextVal, getString(R.string.ctbs_block_connections, connRules.ipAddress), Toast.LENGTH_SHORT)
             }

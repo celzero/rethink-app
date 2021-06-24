@@ -39,8 +39,8 @@ import com.celzero.bravedns.ui.DNSConfigureWebViewActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_DNS_PLUS
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.UIUpdateInterface
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers

@@ -32,8 +32,8 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS_FIREWALL
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_FIREWALL
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_INVALID
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 import settings.Settings

@@ -96,7 +96,6 @@ class DNSCryptRelayEndpointAdapter(
                 if (b.dnsCryptEndpointListActionImage.isChecked && !state) {
                     b.dnsCryptEndpointListActionImage.isChecked = state
                 }
-
             }
             b.dnsCryptEndpointListActionImage.setOnClickListener {
                 dnsCryptRelayEndpoint.isSelected = b.dnsCryptEndpointListActionImage.isChecked
@@ -104,7 +103,6 @@ class DNSCryptRelayEndpointAdapter(
                 if (b.dnsCryptEndpointListActionImage.isChecked && !state) {
                     b.dnsCryptEndpointListActionImage.isChecked = state
                 }
-                //showExplanationOnImageClick(dnsCryptRelayEndpoint)
             }
             b.dnsCryptEndpointListInfoImage.setOnClickListener {
                 showExplanationOnImageClick(dnsCryptRelayEndpoint)

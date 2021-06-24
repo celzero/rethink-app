@@ -37,7 +37,7 @@ import com.celzero.bravedns.databinding.ExcludedAppListItemBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.ThrowingHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

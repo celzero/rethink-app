@@ -60,10 +60,10 @@ import com.celzero.bravedns.util.Constants.Companion.DNS_SCREEN_CONFIG
 import com.celzero.bravedns.util.Constants.Companion.DNS_SCREEN_LOGS
 import com.celzero.bravedns.util.Constants.Companion.FIREWALL_SCREEN_ALL_APPS
 import com.celzero.bravedns.util.Constants.Companion.FIREWALL_SCREEN_UNIVERSAL
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_UI
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_INVALID
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_PROXY
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 import com.facebook.shimmer.Shimmer

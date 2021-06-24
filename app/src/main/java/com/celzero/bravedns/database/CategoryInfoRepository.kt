@@ -19,50 +19,50 @@ package com.celzero.bravedns.database
 import android.util.Log
 import androidx.lifecycle.LiveData
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_APP_DB
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
 
-class CategoryInfoRepository  (private val categoryInfoDAO: CategoryInfoDAO){
+class CategoryInfoRepository(private val categoryInfoDAO: CategoryInfoDAO) {
 
-    fun updateAsync(categoryInfo: CategoryInfo){
+    fun updateAsync(categoryInfo: CategoryInfo) {
         categoryInfoDAO.update(categoryInfo)
     }
 
-   /* fun deleteAsync(categoryInfo : CategoryInfo){
-        categoryInfoDAO.delete(categoryInfo)
-    }*/
+    /* fun deleteAsync(categoryInfo : CategoryInfo){
+         categoryInfoDAO.delete(categoryInfo)
+     }*/
 
-    fun insertAsync(categoryInfo : CategoryInfo){
+    fun insertAsync(categoryInfo: CategoryInfo) {
         categoryInfoDAO.insert(categoryInfo)
     }
 
-    fun getAppCategoryForLiveData(): LiveData<List<CategoryInfo>>{
+    fun getAppCategoryForLiveData(): LiveData<List<CategoryInfo>> {
         return categoryInfoDAO.getAppCategoryListLiveData()
     }
 
-    fun getAppCategoryList(): List<CategoryInfo>{
+    fun getAppCategoryList(): List<CategoryInfo> {
         return categoryInfoDAO.getAppCategoryList()
     }
 
-    fun updateCategoryInternet(categoryName: String, isInternetBlocked : Boolean){
+    fun updateCategoryInternet(categoryName: String, isInternetBlocked: Boolean) {
         categoryInfoDAO.updateCategoryInternet(categoryName, isInternetBlocked)
-        if(DEBUG) Log.d(LOG_TAG_APP_DB,"updateCategoryInternet - isInternetBlocked -$isInternetBlocked for $categoryName")
-        if(isInternetBlocked){
+        if (DEBUG) Log.d(LOG_TAG_APP_DB, "updateCategoryInternet - isInternetBlocked -$isInternetBlocked for $categoryName")
+        if (isInternetBlocked) {
             categoryInfoDAO.updateBlockedCount(categoryName)
-        }else{
+        } else {
             categoryInfoDAO.updateBlockedCountToZero(categoryName)
         }
     }
 
-    fun updateNumberOfBlocked(categoryName: String, isAppBlocked: Boolean){
-        if(isAppBlocked) {
+    fun updateNumberOfBlocked(categoryName: String, isAppBlocked: Boolean) {
+        if (isAppBlocked) {
             val count = categoryInfoDAO.increaseNumberOfBlocked(categoryName)
             val categoryDetail = categoryInfoDAO.getCategoryDetail(categoryName)
-            if(categoryDetail.numOfAppsBlocked == categoryDetail.numberOFApps) {
+            if (categoryDetail.numOfAppsBlocked == categoryDetail.numberOFApps) {
                 categoryInfoDAO.updateCategoryInternet(categoryName, true)
-            }else{
+            } else {
                 categoryInfoDAO.updateCategoryInternet(categoryName, false)
             }
-        }else {
+        } else {
             val count = categoryInfoDAO.decreaseNumberOfBlocked(categoryName)
             val categoryDetail = categoryInfoDAO.getCategoryDetail(categoryName)
             if (categoryDetail.numOfAppsBlocked == categoryDetail.numberOFApps) {
@@ -73,7 +73,7 @@ class CategoryInfoRepository  (private val categoryInfoDAO: CategoryInfoDAO){
         }
     }
 
-    fun updateBlockedCount(categoryName: String, blockedCount : Int){
+    fun updateBlockedCount(categoryName: String, blockedCount: Int) {
         categoryInfoDAO.updateBlockedCount(categoryName, blockedCount)
         val categoryDetail = categoryInfoDAO.getCategoryDetail(categoryName)
         if (categoryDetail.numOfAppsBlocked == categoryDetail.numberOFApps) {
@@ -83,46 +83,46 @@ class CategoryInfoRepository  (private val categoryInfoDAO: CategoryInfoDAO){
         }
     }
 
-    fun updateWhitelistCountForAll(checked : Boolean){
-        if(checked){
+    fun updateWhitelistCountForAll(checked: Boolean) {
+        if (checked) {
             categoryInfoDAO.updateWhitelistCountForAll()
-        }else{
+        } else {
             categoryInfoDAO.clearWhitelistCountForAll()
         }
 
     }
 
-    fun updateWhitelistForCategory(categoryName : String, checked: Boolean){
-        if(checked){
+    fun updateWhitelistForCategory(categoryName: String, checked: Boolean) {
+        if (checked) {
             categoryInfoDAO.updateWhitelistForCategory(categoryName)
-        }else{
+        } else {
             categoryInfoDAO.clearWhitelistForCategory(categoryName)
         }
 
     }
 
-    fun updateWhitelistCount(categoryName: String, whitelistCount : Int){
+    fun updateWhitelistCount(categoryName: String, whitelistCount: Int) {
         categoryInfoDAO.updateWhitelistCount(categoryName, whitelistCount)
     }
 
 
-    fun updateExcludedCount(categoryName: String, excludedCount : Int){
+    fun updateExcludedCount(categoryName: String, excludedCount: Int) {
         categoryInfoDAO.updateExcludedCount(categoryName, excludedCount)
     }
 
-    fun updateExcludedCountForAllApp(checked: Boolean){
-        if(checked){
+    fun updateExcludedCountForAllApp(checked: Boolean) {
+        if (checked) {
             categoryInfoDAO.updateExcludedCountForAllApp()
-        }else{
+        } else {
             categoryInfoDAO.clearExcludedCountForAllApp()
         }
 
     }
 
-    fun updateExcludedCountForCategory(categoryName: String, checked: Boolean){
-        if(checked){
+    fun updateExcludedCountForCategory(categoryName: String, checked: Boolean) {
+        if (checked) {
             categoryInfoDAO.updateExcludedCountForCategory(categoryName)
-        }else{
+        } else {
             categoryInfoDAO.clearExcludedCountForCategory(categoryName)
         }
 

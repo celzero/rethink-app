@@ -44,7 +44,7 @@ import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment

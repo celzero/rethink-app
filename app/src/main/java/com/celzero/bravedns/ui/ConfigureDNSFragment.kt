@@ -42,10 +42,10 @@ import com.celzero.bravedns.databinding.FragmentConfigureDnsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DNSCRYPT
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DOH
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_PROXY
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.UIUpdateInterface
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.isValidLocalPort

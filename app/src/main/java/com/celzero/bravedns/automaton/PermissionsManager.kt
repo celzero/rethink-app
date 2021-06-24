@@ -29,7 +29,7 @@ import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.core.text.HtmlCompat
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_PERMISSION
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PERMISSION
 import com.celzero.bravedns.util.MyAccessibilityService
 import java.util.*
 import kotlin.collections.LinkedHashMap

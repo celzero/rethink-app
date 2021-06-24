@@ -64,8 +64,8 @@ import tun2socks.Tun2socks;
 import static com.celzero.bravedns.util.Constants.APP_MODE_DNS;
 import static com.celzero.bravedns.util.Constants.APP_MODE_FIREWALL;
 import static com.celzero.bravedns.util.Constants.UNSPECIFIED_IP;
-import static com.celzero.bravedns.util.Constants.LOG_TAG_VPN;
 import static com.celzero.bravedns.util.Constants.UNSPECIFIED_PORT;
+import static com.celzero.bravedns.util.LoggerConstants.LOG_TAG_VPN;
 
 
 /**
@@ -166,7 +166,7 @@ public class GoVpnAdapter {
         //TODO : The below statement is incorrect, adding the dohURL as const for testing
 
         try {
-            // TODO : As of now the app fallback on an unmaintained url. Requires a rewrite as
+            // TODO : #321 As of now the app fallback on an unmaintained url. Requires a rewrite as
             // part of v055
             String dohURL = getDoHUrl();
 
@@ -175,7 +175,7 @@ public class GoVpnAdapter {
             firewallMode = iBlockMode;
             int proxyMode = (int) appMode.getProxyMode();
 
-            Log.i(LOG_TAG_VPN, "GoVPNAdapter Connect tunnel with url " + dohURL +", dnsMode- " + iDnsMode + ", blockMode-" + iBlockMode + ", proxyMode-" + proxyMode);
+            Log.i(LOG_TAG_VPN, "Connect tunnel with url " + dohURL +", dnsMode- " + iDnsMode + ", blockMode-" + iBlockMode + ", proxyMode-" + proxyMode);
             tunnel = Tun2socks.connectIntraTunnel(tunFd.getFd(), fakeDns,
                     transport, getProtector(), getBlocker(), listener);
 
@@ -185,7 +185,7 @@ public class GoVpnAdapter {
                 //Mode Remote blocklist
                 Boolean isLocalSet = setBraveDNSLocalMode();
                 if (!isLocalSet && dohURL.contains(Constants.BRAVE_BASIC_URL)) {
-                    Log.i(LOG_TAG_VPN, "GoVPNAdapter Set stamp for remote url :" + dohURL);
+                    Log.i(LOG_TAG_VPN, "Set stamp for remote url :" + dohURL);
                     setBraveDNSRemoteMode(dohURL);
                 }
             }
@@ -194,26 +194,31 @@ public class GoVpnAdapter {
                 Tun2socks.enableDebugLog();
             }
 
-            if (iDnsMode != Settings.DNSModeCryptIP && iDnsMode != Settings.DNSModeCryptPort) {
-                if (proxyMode == Constants.ORBOT_SOCKS) {
-                    tunnel.setTunMode(iDnsMode, iBlockMode, Settings.ProxyModeSOCKS5);
-                } else {
-                    tunnel.setTunMode(iDnsMode, iBlockMode, proxyMode);
-                }
-                checkForCryptRemoval();
-                if (iDnsMode == Settings.DNSModeProxyIP || iDnsMode == Settings.DNSModeProxyPort) {
-                    setDNSProxy();
-                }
+            setTunnelMode(iDnsMode, iBlockMode, iProxyMode);
 
-                if (proxyMode == Settings.ProxyModeSOCKS5 || proxyMode == Constants.ORBOT_SOCKS) {
-                    setSocks5TunnelMode();
-                }
-            } else {
-                setCryptMode();
-            }
         } catch (Exception e) {
-            Log.e(LOG_TAG_VPN, "GoVPNAdapter: " + e.getMessage(), e);
+            Log.e(LOG_TAG_VPN, "Exception: " + e.getMessage(), e);
             VpnController.Companion.getInstance().onConnectionStateChanged(vpnService, BraveVPNService.State.FAILING);
+        }
+    }
+
+    private void setTunnelMode(long dnsMode, long blockMode, long proxyMode) {
+        if (dnsMode != Settings.DNSModeCryptIP && dnsMode != Settings.DNSModeCryptPort) {
+            if (proxyMode == Constants.ORBOT_SOCKS) {
+                tunnel.setTunMode(dnsMode, blockMode, Settings.ProxyModeSOCKS5);
+            } else {
+                tunnel.setTunMode(dnsMode, blockMode, proxyMode);
+            }
+            checkForCryptRemoval();
+            if (dnsMode == Settings.DNSModeProxyIP || dnsMode == Settings.DNSModeProxyPort) {
+                setDNSProxy();
+            }
+
+            if (proxyMode == Settings.ProxyModeSOCKS5 || proxyMode == Constants.ORBOT_SOCKS) {
+                setSocks5TunnelMode();
+            }
+        } else {
+            setCryptMode();
         }
     }
 
@@ -222,10 +227,10 @@ public class GoVpnAdapter {
         try {
             if (tunnel.getDNSCryptProxy() != null) {
                 tunnel.stopDNSCryptProxy();
-                Log.i(LOG_TAG_VPN, "GoVPNAdapter Completed - stopDNSCryptProxy");
+                Log.i(LOG_TAG_VPN, "Completed - stopDNSCryptProxy");
             }
         } catch (Exception e) {
-            Log.e(LOG_TAG_VPN, "GoVPNAdapter Exception while removing crypt proxy: " + e.getMessage(), e);
+            Log.e(LOG_TAG_VPN, "Exception while removing crypt proxy: " + e.getMessage(), e);
         }
     }
 
@@ -240,7 +245,7 @@ public class GoVpnAdapter {
             if (tunnel.getDNSCryptProxy() == null) {
                 String response;
                 response = tunnel.startDNSCryptProxy(servers, routes, listener);
-                Log.i(LOG_TAG_VPN, "GoVPNAdapter startDNSCryptProxy: " + servers + "-" + routes + " - Response: " + response);
+                Log.i(LOG_TAG_VPN, "startDNSCryptProxy: " + servers + "-" + routes + " - Response: " + response);
             } else {
                 long serverCount = 0L, relayCount = 0L, rel = 0L;
                 String serversToRemove = Utilities.Companion.prepareServersToRemove(tunnel.getDNSCryptProxy().liveServers(), serversIndex);
@@ -256,10 +261,10 @@ public class GoVpnAdapter {
                 if (!routes.isEmpty())
                     tunnel.getDNSCryptProxy().addRoutes(routes);
 
-                Log.i(LOG_TAG_VPN, "GoVPNAdapter DNSCrypt - Routes: "+routes +", relay count: "+relayCount +", servers: "+servers +", removed count:"+serverCount);
+                Log.i(LOG_TAG_VPN, "DNSCrypt - Routes: "+routes +", relay count: "+relayCount +", servers: "+servers +", removed count:"+serverCount);
             }
         } catch (Exception ex) {
-            Log.e(LOG_TAG_VPN, "GoVPNAdapter celzero connect-tunnel: dns crypt", ex);
+            Log.e(LOG_TAG_VPN, "connect-tunnel: dns crypt", ex);
         }
         if (servers.length() > 0) {
             RefreshOperation runningTask = new RefreshOperation();
@@ -271,10 +276,10 @@ public class GoVpnAdapter {
         try {
             DNSProxyEndpoint dnsProxy = dnsProxyEndpointRepository.getConnectedProxy();
             if (HomeScreenActivity.GlobalVariable.INSTANCE.getDEBUG())
-                Log.d(LOG_TAG_VPN, "GoVPNAdapter setDNSProxy mode set - " + dnsProxy.getProxyIP() + "," + dnsProxy.getProxyPort() + "");
-            tunnel.startDNSProxy(dnsProxy.getProxyIP(), dnsProxy.getProxyPort() + "");
+                Log.d(LOG_TAG_VPN, "setDNSProxy mode set - " + dnsProxy.getProxyIP() + "," + dnsProxy.getProxyPort());
+            tunnel.startDNSProxy(dnsProxy.getProxyIP(), Integer.toString(dnsProxy.getProxyPort()));
         } catch (Exception e) {
-            Log.e(LOG_TAG_VPN, "GoVPNAdapter celzero connect-tunnel: dns proxy" + e.getMessage(), e);
+            Log.e(LOG_TAG_VPN, "connect-tunnel: dns proxy" + e.getMessage(), e);
         }
     }
 
@@ -284,15 +289,18 @@ public class GoVpnAdapter {
      */
     private void setProxyMode(String userName, String password, String ipAddress, int port) {
         try {
-            tunnel.startProxy(userName, password, ipAddress, port + "");
-            Log.i(LOG_TAG_VPN, "GoVPNAdapter Proxy mode set - " + userName + ipAddress + port + "");
+            tunnel.startProxy(userName, password, ipAddress, Integer.toString(port));
+            Log.i(LOG_TAG_VPN, "Proxy mode set - " + userName + ipAddress + port + "");
         } catch (Exception e) {
-            Log.e(LOG_TAG_VPN, "GoVPNAdapter celzero-connect-tunnel: proxy", e);
+            Log.e(LOG_TAG_VPN, "connect-tunnel: proxy", e);
         }
     }
 
 
     private final class RefreshOperation extends AsyncTask<Void, Void, String> {
+
+        //TODO - #321
+        String asyncComplete = "Executed";
 
         @Override
         protected String doInBackground(Void... params) {
@@ -301,11 +309,11 @@ public class GoVpnAdapter {
                     String liveServers = tunnel.getDNSCryptProxy().refresh();
                     dnsCryptEndpointRepository.updateConnectionStatus(liveServers);
                     if (HomeScreenActivity.GlobalVariable.INSTANCE.getDEBUG())
-                        Log.d(LOG_TAG_VPN, "GoVPNAdapter Refresh LiveServers -- " + liveServers);
+                        Log.d(LOG_TAG_VPN, "Refresh LiveServers -- " + liveServers);
 
                     // FIXME: 08-01-2021 - Change the redundant usage of same code in the different places.
                     if (liveServers.isEmpty()) {
-                        Log.i(LOG_TAG_VPN, "GoVPNAdapter No live servers - falling back to default DoH mode");
+                        Log.i(LOG_TAG_VPN, "No live servers - falling back to default DoH mode");
                         tunnel.stopDNSCryptProxy();
                         dnsCryptEndpointRepository.updateFailingConnections();
                         DoHEndpoint doHEndpoint = doHEndpointRepository.updateConnectionDefault();
@@ -330,7 +338,7 @@ public class GoVpnAdapter {
                             if (proxyMode == Settings.ProxyModeSOCKS5 || proxyMode == Constants.ORBOT_SOCKS) {
                                 setSocks5TunnelMode();
                             }
-                            Log.i(LOG_TAG_VPN, "GoVPNAdapter celzero connect crypt else - tunnel mode set with mode -" + Settings.DNSModeCryptPort + firewallMode + proxyMode);
+                            Log.i(LOG_TAG_VPN, "connect crypt else - tunnel mode set with mode -" + Settings.DNSModeCryptPort + firewallMode + proxyMode);
                         }
                     }
                 } else {
@@ -351,7 +359,7 @@ public class GoVpnAdapter {
                 }
             } catch (Exception e) {
                 if (persistentState.getDnsType() == Constants.PREF_DNS_MODE_DNSCRYPT) {
-                    Log.e(LOG_TAG_VPN, "GoVPNAdapter celzero connect-tunnel: dns crypt", e);
+                    Log.e(LOG_TAG_VPN, "connect-tunnel: dns crypt", e);
                     dnsCryptEndpointRepository.updateFailingConnections();
                     DoHEndpoint doHEndpoint = doHEndpointRepository.updateConnectionDefault();
                     persistentState.setDnsType(Constants.PREF_DNS_MODE_DOH);
@@ -366,10 +374,10 @@ public class GoVpnAdapter {
                             Utilities.Companion.showToastUiCentered(vpnService, "Error connecting to DNSCrypt server.", Toast.LENGTH_SHORT);
                         }
                     });
-                    Log.d(LOG_TAG_VPN, "GoVPNAdapter celzero connect crypt exception handling - update dns crypt and remove the servers");
+                    Log.i(LOG_TAG_VPN, "connect crypt exception handling - update dns crypt and remove the servers");
                 }
             }
-            return "Executed";
+            return asyncComplete;
         }
 
         @Override
@@ -386,10 +394,12 @@ public class GoVpnAdapter {
         } else {
             socks5 = appMode.getSocks5ProxyDetails();
         }
-        if (socks5 != null) {
-            setProxyMode(socks5.getUserName(), socks5.getPassword(), socks5.getProxyIP(), socks5.getProxyPort());
+        if (socks5 == null) {
+            Log.w(LOG_TAG_VPN, "could not fetch socks5 details for proxyMode: "+proxyMode);
+            return;
         }
-        Log.i(LOG_TAG_VPN, "GoVPNAdapter Socks5 mode set - " + socks5.getProxyIP() + "," + socks5.getProxyPort());
+        setProxyMode(socks5.getUserName(), socks5.getPassword(), socks5.getProxyIP(), socks5.getProxyPort());
+        Log.i(LOG_TAG_VPN, "Socks5 mode set - " + socks5.getProxyIP() + "," + socks5.getProxyPort());
     }
 
     private static ParcelFileDescriptor establishVpn(BraveVPNService vpnService) {
@@ -432,7 +442,7 @@ public class GoVpnAdapter {
     public synchronized void close() {
         if (tunnel != null) {
             tunnel.disconnect();
-            Log.i(LOG_TAG_VPN, "GoVPNAdapter Tunnel disconnect");
+            Log.i(LOG_TAG_VPN, "Tunnel disconnect");
         }
         if (tunFd != null) {
             try {
@@ -493,7 +503,7 @@ public class GoVpnAdapter {
 
             tunnel.setDNS(dohTransport);
 
-            Log.i(LOG_TAG_VPN, "GoVPNAdapter Connect tunnel with url " + dohURL +", dnsMode- " + dnsMode + ", blockMode-" + blockMode + ", proxyMode-" + proxyMode);
+            Log.i(LOG_TAG_VPN, "Connect tunnel with url " + dohURL +", dnsMode- " + dnsMode + ", blockMode-" + blockMode + ", proxyMode-" + proxyMode);
 
             if (dnsMode == Settings.DNSModeIP || dnsMode == Settings.DNSModePort || dnsMode == Settings.DNSModeNone) {
                 //To set bravedns mode- two modes
@@ -501,28 +511,12 @@ public class GoVpnAdapter {
                 //Mode Remote -
                 Boolean isLocalSet = setBraveDNSLocalMode();
                 if (!isLocalSet && dohURL.contains(Constants.BRAVE_BASIC_URL)) {
-                    Log.i(LOG_TAG_VPN, "GoVPNAdapter Set stamp for remote url :" + dohURL);
+                    Log.i(LOG_TAG_VPN, "Set stamp for remote url :" + dohURL);
                     setBraveDNSRemoteMode(dohURL);
                 }
             }
 
-            if (dnsMode != Settings.DNSModeCryptIP && dnsMode != Settings.DNSModeCryptPort) {
-                if (proxyMode == Constants.ORBOT_SOCKS) {
-                    tunnel.setTunMode(dnsMode, blockMode, Settings.ProxyModeSOCKS5);
-                } else {
-                    tunnel.setTunMode(dnsMode, blockMode, proxyMode);
-                }
-                checkForCryptRemoval();
-                if (dnsMode == Settings.DNSModeProxyIP || dnsMode == Settings.DNSModeProxyPort) {
-                    Log.i(LOG_TAG_VPN, "GoVPNAdapter dnsMode mode - " + dnsMode);
-                    setDNSProxy();
-                }
-                if (proxyMode == Settings.ProxyModeSOCKS5 || proxyMode == Constants.ORBOT_SOCKS) {
-                    setSocks5TunnelMode();
-                }
-            } else {
-                setCryptMode();
-            }
+            setTunnelMode(dnsMode, blockMode, proxyMode);
         } catch (Exception e) {
             Log.e(LOG_TAG_VPN, e.getMessage(), e);
             tunnel.disconnect();
@@ -538,7 +532,7 @@ public class GoVpnAdapter {
                 dohURL = appMode.getDOHDetails().getDohURL();
             }
         } catch (Exception e) {
-            Log.e(LOG_TAG_VPN, "GoVPNAdapter dohURL is null", e);
+            Log.e(LOG_TAG_VPN, "dohURL is null", e);
         }
         return dohURL;
     }
@@ -552,38 +546,33 @@ public class GoVpnAdapter {
                 String path = vpnService.getFilesDir().getCanonicalPath() + File.separator + persistentState.getRemoteBlockListDownloadTime();
                 BraveDNS braveDNS = Dnsx.newBraveDNSRemote(path + Constants.FILE_TAG_NAME);
                 if (HomeScreenActivity.GlobalVariable.INSTANCE.getDEBUG())
-                    Log.d(LOG_TAG_VPN, "GoVPNAdapter DOH URL set bravedns- " + dohURL + "--" + path);
+                    Log.d(LOG_TAG_VPN, "DOH URL set bravedns- " + dohURL + "--" + path);
                 tunnel.setBraveDNS(braveDNS);
             }
         } catch (Exception ex) {
-            Log.e(LOG_TAG_VPN, "GoVPNAdapter Exception while setting bravedns for remote:" + ex.getMessage(), ex);
+            Log.e(LOG_TAG_VPN, "Exception while setting bravedns for remote:" + ex.getMessage(), ex);
         }
     }
 
     private Boolean setBraveDNSLocalMode() {
-        if (persistentState.getBlockListFilesDownloaded() && persistentState.getLocalBlocklistEnabled()) {
-            try {
+        try {
+            if (persistentState.getBlockListFilesDownloaded() && persistentState.getLocalBlocklistEnabled()) {
                 BraveDNS localBraveDNS = appMode.getBraveDNS();
-                if (localBraveDNS != null) {
-                    String stamp = persistentState.getLocalBlockListStamp();
-                    Log.i(LOG_TAG_VPN, "GoVPNAdapter Tunnel is set with local stamp: " + stamp);
-                    if (!stamp.isEmpty()) {
-                        tunnel.setBraveDNS(localBraveDNS);
-                        tunnel.getBraveDNS().setStamp(stamp);
-                        Log.i(LOG_TAG_VPN, "GoVPNAdapter Tunnel is set with local stamp (GetStamp): " + tunnel.getBraveDNS().getStamp());
-                        return true;
-                    }
+                if (localBraveDNS == null) return false;
+
+                String stamp = persistentState.getLocalBlockListStamp();
+                Log.i(LOG_TAG_VPN, "Tunnel is set with local stamp: " + stamp);
+                if (!stamp.isEmpty()) {
+                    tunnel.setBraveDNS(localBraveDNS);
+                    tunnel.getBraveDNS().setStamp(stamp);
+                    return true;
                 }
-            } catch (Exception ex) {
-                Log.e(LOG_TAG_VPN, "GoVPNAdapter Exception while setting brave dns for local:" + ex.getMessage());
-            }
-        } else {
-            try {
+            } else {
                 tunnel.setBraveDNS(null);
-                Log.i(LOG_TAG_VPN, "GoVPNAdapter app dns mode is set to null(on GO) with local stamp");
-            } catch (Exception ex) {
-                Log.e(LOG_TAG_VPN, "GoVPNAdapter Exception while setting null for brave dns local:" + ex.getMessage(), ex);
+                Log.i(LOG_TAG_VPN, "app dns mode is set to null(on GO) with local stamp");
             }
+        } catch (Exception ex) {
+            Log.e(LOG_TAG_VPN, "]Exception while setting brave dns for local:" + ex.getMessage(), ex);
         }
         return false;
     }

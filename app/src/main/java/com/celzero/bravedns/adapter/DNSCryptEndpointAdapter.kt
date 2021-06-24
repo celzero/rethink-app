@@ -37,7 +37,7 @@ import com.celzero.bravedns.databinding.DnsCryptEndpointListItemBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.QueryTracker
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
-import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DNSCRYPT
 import com.celzero.bravedns.util.UIUpdateInterface
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
@@ -54,8 +54,7 @@ class DNSCryptEndpointAdapter(private val context: Context,
 
 
     companion object {
-        private val DIFF_CALLBACK = object :
-            DiffUtil.ItemCallback<DNSCryptEndpoint>() {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DNSCryptEndpoint>() {
 
             override fun areItemsTheSame(oldConnection: DNSCryptEndpoint, newConnection: DNSCryptEndpoint) = oldConnection.id == newConnection.id
 
@@ -171,6 +170,8 @@ class DNSCryptEndpointAdapter(private val context: Context,
 
         private fun updateDNSCryptDetails(dnsCryptEndpoint: DNSCryptEndpoint): Boolean {
             val list = dnsCryptEndpointRepository.getConnectedDNSCrypt()
+            // Below check is to inform user not to unselect the only selected DNSCrypt.
+            // This is true when the connected dns crypt list returned from the database is 1.
             if (list.size == 1) {
                 if (!dnsCryptEndpoint.isSelected && list[0].dnsCryptURL == dnsCryptEndpoint.dnsCryptURL) {
                     Toast.makeText(context, context.getString(R.string.dns_select_toast), Toast.LENGTH_SHORT).show()
@@ -185,7 +186,7 @@ class DNSCryptEndpointAdapter(private val context: Context,
 
                 override fun onFinish() {
                     notifyDataSetChanged()
-                    persistentState.dnsType = Constants.PREF_DNS_MODE_DNSCRYPT
+                    persistentState.dnsType = PREF_DNS_MODE_DNSCRYPT
                     val connectedDNS = dnsCryptEndpointRepository.getConnectedCount()
                     val text = context.getString(R.string.configure_dns_crypt, connectedDNS.toString())
                     persistentState.setConnectedDNS(text)
@@ -194,7 +195,7 @@ class DNSCryptEndpointAdapter(private val context: Context,
             }.start()
 
             persistentState.connectionModeChange = dnsCryptEndpoint.dnsCryptURL
-            listener.updateUIFromAdapter(2)
+            listener.updateUIFromAdapter(PREF_DNS_MODE_DNSCRYPT)
             appMode?.setDNSMode(Settings.DNSModeCryptPort)
 
             return true

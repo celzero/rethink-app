@@ -30,7 +30,7 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
-import static com.celzero.bravedns.util.Constants.LOG_TAG_VPN;
+import static com.celzero.bravedns.util.LoggerConstants.LOG_TAG_VPN;
 
 public class ConnectionTracer {
     private static final boolean DEBUG = false;
@@ -57,7 +57,6 @@ public class ConnectionTracer {
 
         // https://android.googlesource.com/platform/development/+/da84168fb2f5eb5ca012c3f430f701bc64472f34/ndk/platforms/android-21/include/linux/in.h
         if (protocol != 6 /* TCP */ && protocol != 17 /* UDP */) {
-            //if (DEBUG) Log.d(TAG, "protocol is not valid : "+protocol);
             return MISSING_UID;
         }
 

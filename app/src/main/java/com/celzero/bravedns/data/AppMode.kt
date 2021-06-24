@@ -21,44 +21,44 @@ import com.celzero.bravedns.database.*
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_APP_MODE
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_INVALID
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DNSCRYPT
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DOH
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_PROXY
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_MODE
 import dnsx.BraveDNS
 import dnsx.Dnsx
 import settings.Settings
 import java.io.File
 
-class AppMode internal constructor(
-    private val context: Context,
-    private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
-    private val doHEndpointRepository: DoHEndpointRepository,
-    private val dnsCryptEndpointRepository: DNSCryptEndpointRepository,
-    private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
-    private val proxyEndpointRepository: ProxyEndpointRepository,
-    private val persistentState:PersistentState
-) {
+class AppMode internal constructor(private val context: Context,
+        private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
+        private val doHEndpointRepository: DoHEndpointRepository,
+        private val dnsCryptEndpointRepository: DNSCryptEndpointRepository,
+        private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
+        private val proxyEndpointRepository: ProxyEndpointRepository,
+        private val persistentState: PersistentState) {
     private var appDNSMode: Long = -1L
     private val proxyTypeInternal = "Internal"
     private val proxyTypeExternal = "External"
     private var dnsType: Int = -1
-    private var socks5ProxyEndpoint: ProxyEndpoint ?= null
-    private var braveDNS : BraveDNS ?= null
+    private var socks5ProxyEndpoint: ProxyEndpoint? = null
+    private var braveDNS: BraveDNS? = null
 
     fun getDNSMode(): Long {
-        if (appDNSMode == PREF_DNS_INVALID) {
-            val dnsType = persistentState.dnsType
-            if (dnsType == PREF_DNS_MODE_DOH) {
-                if (persistentState.allowDNSTraffic) {
-                    appDNSMode = Settings.DNSModePort
+        if (appDNSMode != PREF_DNS_INVALID) return appDNSMode
+        when (persistentState.dnsType) {
+            PREF_DNS_MODE_DOH -> {
+                appDNSMode = if (persistentState.allowDNSTraffic) {
+                    Settings.DNSModePort
                 } else {
-                    appDNSMode = Settings.DNSModeIP
+                    Settings.DNSModeIP
                 }
-            } else if (dnsType == PREF_DNS_MODE_DNSCRYPT) {
+            }
+            PREF_DNS_MODE_DNSCRYPT -> {
                 appDNSMode = Settings.DNSModeCryptPort
-            } else if (dnsType == PREF_DNS_MODE_PROXY) {
+            }
+            PREF_DNS_MODE_PROXY -> {
                 return getProxyModeSettings()
             }
         }
@@ -109,15 +109,7 @@ class AppMode internal constructor(
     }
 
     fun getDOHDetails(): DoHEndpoint? {
-        val dohEndpoint : DoHEndpoint = doHEndpointRepository.getConnectedDoH() ?: return null
-        if (dohEndpoint.dohURL.isEmpty()) {
-            if (DEBUG) {
-                Log.i(LOG_TAG_APP_MODE, "getDOHDetails -appMode- DoH endpoint is null")
-            }
-        }else{
-            if (DEBUG) Log.d(LOG_TAG_APP_MODE, "getDOHDetails -appMode- DoH endpoint - ${dohEndpoint.dohURL}")
-        }
-        return dohEndpoint
+        return doHEndpointRepository.getConnectedDoH()
     }
 
     fun getDNSCryptServers(): String {
@@ -125,7 +117,7 @@ class AppMode internal constructor(
         return constructServerString(cryptList)
     }
 
-    fun getDNSCryptServerCount() : Int{
+    fun getDNSCryptServerCount(): Int {
         return dnsCryptEndpointRepository.getConnectedCount()
     }
 
@@ -193,19 +185,18 @@ class AppMode internal constructor(
         return dnsProxyEndpointRepository.getConnectedProxy()
     }
 
-    fun setBraveDNSMode( braveDNS : BraveDNS?){
+    fun setBraveDNSMode(braveDNS: BraveDNS?) {
         this.braveDNS = braveDNS
     }
 
     fun getBraveDNS(): BraveDNS? {
-        if(braveDNS == null && persistentState.localBlocklistEnabled
-            && persistentState.blockListFilesDownloaded && persistentState.localBlockListStamp.isNotEmpty()){
-            val path: String = context.filesDir.canonicalPath + File.separator+ persistentState.localBlockListDownloadTime
+        if (braveDNS == null && persistentState.localBlocklistEnabled && persistentState.blockListFilesDownloaded && persistentState.localBlockListStamp.isNotEmpty()) {
+            val path: String = context.filesDir.canonicalPath + File.separator + persistentState.localBlockListDownloadTime
             if (DEBUG) Log.d(LOG_TAG_APP_MODE, "Local brave dns set call from AppMode path newBraveDNSLocal :$path")
-            try{
+            try {
                 braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
-            }catch (e : Exception){
-                if (DEBUG) Log.d(LOG_TAG_APP_MODE, "Local brave dns set exception :${e.message}")
+            } catch (e: Exception) {
+                Log.e(LOG_TAG_APP_MODE, "Local brave dns set exception :${e.message}", e)
             }
         }
         return braveDNS

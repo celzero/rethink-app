@@ -21,7 +21,7 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 

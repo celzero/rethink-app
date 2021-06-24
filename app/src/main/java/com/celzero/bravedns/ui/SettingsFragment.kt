@@ -62,11 +62,11 @@ import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_WEBSITE
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DOWNLOAD
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_UI
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Constants.Companion.REFRESH_BLOCKLIST_URL
 import com.celzero.bravedns.util.Constants.Companion.RESPONSE_VERSION
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.isVpnLockdownEnabled

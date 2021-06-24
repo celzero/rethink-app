@@ -23,7 +23,7 @@ import androidx.work.workDataOf
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import dnsx.Dnsx
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -39,67 +39,69 @@ import java.io.File
  * As of now the code is written only for the local block list copy.
  */
 
-class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
-        : Worker(context, workerParameters), KoinComponent{
+class FileHandleWorker(val context: Context, workerParameters: WorkerParameters) : Worker(context, workerParameters), KoinComponent {
 
     val persistentState by inject<PersistentState>()
 
     override fun doWork(): Result {
-        try{
+        try {
             val response = copyFiles(context)
 
             val outputData = workDataOf(DownloadConstants.OUTPUT_FILES to response)
 
-            return if(response) Result.success(outputData)
+            return if (response) Result.success(outputData)
             else Result.failure()
 
-        }catch (e : Exception){
-            Log.w(LOG_TAG_DOWNLOAD, "FileHandleWorker Error while moving files to canonical path ${e.message}")
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_DOWNLOAD, "FileHandleWorker Error while moving files to canonical path ${e.message}", e)
         }
         return Result.failure()
     }
 
-    private fun copyFiles(context : Context): Boolean {
+    private fun copyFiles(context: Context): Boolean {
         try {
-            val timeStamp = persistentState.tempBlocklistDownloadTime
-            if (DownloadHelper.isLocalDownloadValid(context, timeStamp.toString())) {
-                DownloadHelper.deleteFromCanonicalPath(context)
-                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Copy file Directory isLocalDownloadValid- true")
-                val dir = File(DownloadHelper.getExternalFilePath(context, timeStamp.toString()))
-                if (dir.isDirectory) {
-                    val children = dir.list()
-                    if (children != null && children.isNotEmpty()) {
-                        for (i in children.indices) {
-                            val from = File(dir, children[i])
-                            val to = File("${context.filesDir.canonicalPath}/$timeStamp/${children[i]}")
-                            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Copy file  ${children[i]} from - ${from.path}, to - ${to.path}")
-                            from.copyTo(to, true)
-                        }
-                        val destinationDir = File("${context.filesDir.canonicalPath}/$timeStamp")
-                        if (destinationDir.isDirectory) {
-                            val child = destinationDir.list()
-                            if (child?.size == Constants.LOCAL_BLOCKLIST_FILE_COUNT) {
-                                //Update the shared pref values
-                                val isValid = isDownloadValid()
-                                if(isValid) {
-                                    persistentState.localBlockListDownloadTime = timeStamp
-                                    persistentState.localBlocklistEnabled = true
-                                    persistentState.blockListFilesDownloaded = true
-                                    persistentState.tempBlocklistDownloadTime = 0
-                                    persistentState.workManagerStartTime = 0
-                                    DownloadHelper.deleteOldFiles(context)
-                                    return true
-                                }
-                                return false
-                            }
-                        }
-
-                    }
-                }
+            val timestamp = persistentState.tempBlocklistDownloadTime
+            if (!DownloadHelper.isLocalDownloadValid(context, timestamp.toString())) {
                 return false
             }
-        }catch (e : Exception){
-            Log.w(LOG_TAG_DOWNLOAD, "AppDownloadManager Copy exception - ${e.message}")
+            DownloadHelper.deleteFromCanonicalPath(context)
+            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Copy file Directory isLocalDownloadValid- true")
+            val dir = File(DownloadHelper.getExternalFilePath(context, timestamp.toString()))
+            if (!dir.isDirectory) {
+                return false
+            }
+            val children = dir.list()
+            if (children != null && children.isNotEmpty()) {
+                for (i in children.indices) {
+                    val from = File(dir, children[i])
+                    val to = File("${context.filesDir.canonicalPath}/$timestamp/${children[i]}")
+                    if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Copy file  ${children[i]} from - ${from.path}, to - ${to.path}")
+                    from.copyTo(to, true)
+                }
+                val destinationDir = File("${context.filesDir.canonicalPath}/$timestamp")
+                if (destinationDir.isDirectory) {
+                    val child = destinationDir.list()
+                    if (child?.size == Constants.LOCAL_BLOCKLIST_FILE_COUNT) {
+                        //Update the shared pref values
+                        val isValid = isDownloadValid()
+                        if (isValid) {
+                            persistentState.localBlockListDownloadTime = timestamp
+                            persistentState.localBlocklistEnabled = true
+                            persistentState.blockListFilesDownloaded = true
+                            persistentState.tempBlocklistDownloadTime = 0
+                            persistentState.workManagerStartTime = 0
+                            DownloadHelper.deleteOldFiles(context)
+                            return true
+                        }
+                        return false
+                    }
+                }
+            }
+
+            return false
+
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_DOWNLOAD, "AppDownloadManager Copy exception - ${e.message}", e)
         }
         return false
     }
@@ -113,16 +115,14 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
      * Dnsx is not null then valid. Null/exception will be invalid.
      */
     private fun isDownloadValid(): Boolean {
-        try{
+        try {
             val timeStamp = persistentState.tempBlocklistDownloadTime
-            val path: String = context.filesDir.canonicalPath +File.separator+ timeStamp
+            val path: String = context.filesDir.canonicalPath + File.separator + timeStamp
             val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
-            if(braveDNS != null){
-                if(DEBUG) Log.d(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid - braveDNS is valid")
-                return true
-            }
-        }catch (e : Exception){
-            Log.w(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid exception - ${e.message}")
+            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid? ${braveDNS != null}")
+            return braveDNS != null
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid exception - ${e.message}", e)
         }
         return false
     }

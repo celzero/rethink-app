@@ -19,6 +19,8 @@ package com.celzero.bravedns.util
 import android.Manifest
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
+import android.app.Activity
+import android.app.ActivityManager
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
@@ -45,9 +47,11 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
 import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
+import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.google.android.material.snackbar.Snackbar
 import com.google.common.net.InetAddresses
 import com.google.common.net.InternetDomainName
@@ -205,8 +209,8 @@ class Utilities {
             return format.format(date)
         }
 
-        fun convertLongToDate(timeStamp: Long): String {
-            val date = Date(timeStamp)
+        fun convertLongToDate(timestamp: Long): String {
+            val date = Date(timestamp)
             val format = SimpleDateFormat("yy.MM (dd)", Locale.US)
             return format.format(date)
         }
@@ -296,6 +300,7 @@ class Utilities {
         fun isInvalidUid(uid: Int): Boolean {
             return when (uid) {
                 MISSING_UID -> true
+                INVALID_UID -> true
                 else -> false
             }
         }
@@ -305,6 +310,15 @@ class Utilities {
                 return false
             }
             return VpnController.getInstance().getBraveVpnService()?.isLockdownEnabled
+        }
+
+        fun killBg(context: Context, packageInfo: String) {
+            val activityManager: ActivityManager = context.getSystemService(Activity.ACTIVITY_SERVICE) as ActivityManager
+            try {
+                activityManager.killBackgroundProcesses(packageInfo)
+            } catch (e: Exception) {
+                Log.w(LOG_TAG_FIREWALL, "firewall - kill app - exception" + e.message, e)
+            }
         }
     }
 }

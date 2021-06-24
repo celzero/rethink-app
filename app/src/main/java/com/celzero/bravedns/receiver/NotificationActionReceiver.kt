@@ -31,7 +31,7 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS_FIREWALL
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers

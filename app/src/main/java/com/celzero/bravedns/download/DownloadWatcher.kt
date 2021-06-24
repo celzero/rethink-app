@@ -24,7 +24,11 @@ import androidx.work.WorkerParameters
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_FAILURE
+import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_RETRY
+import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SUCCESS
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -43,20 +47,20 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
 
         val startTime = persistentState.workManagerStartTime
         val currentTime = SystemClock.elapsedRealtime()
-        Log.d(LOG_TAG_DOWNLOAD, "AppDownloadManager - $startTime, $currentTime")
+        if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "AppDownloadManager - $startTime, $currentTime")
         if (currentTime - startTime > Constants.WORK_MANAGER_TIMEOUT) {
-            persistentState.workManagerStartTime = 0
+            persistentState.workManagerStartTime = INIT_TIME_MS
             return Result.failure()
         }
 
         when (checkForDownload(context)) {
-            0 -> {
+            DOWNLOAD_RETRY -> {
                 return Result.retry()
             }
-            -1 -> {
+            DOWNLOAD_FAILURE -> {
                 return Result.failure()
             }
-            1 -> {
+            DOWNLOAD_SUCCESS -> {
                 return Result.success()
             }
         }
@@ -73,31 +77,30 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
             val cursor = downloadManager.query(query)
             if (cursor == null) {
                 Log.i(LOG_TAG_DOWNLOAD, "status is $downloadID cursor null")
-                return -1
+                return DOWNLOAD_FAILURE
             }
             if (cursor.moveToFirst()) {
                 val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "onReceive status $status $downloadID")
-                if (status == DownloadManager.STATUS_RUNNING) {
-                } else if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                if (status == DownloadManager.STATUS_SUCCESSFUL) {
                     if (persistentState.downloadIDs.contains(downloadID)) {
                         persistentState.downloadIDs = persistentState.downloadIDs.minusElement(downloadID)
                     }
                     if (persistentState.downloadIDs.isEmpty()) {
                         cursor.close()
-                        return 1
+                        return DOWNLOAD_SUCCESS
                     }
                 } else if (status == DownloadManager.STATUS_FAILED) {
                     cursor.close()
-                    return -1
+                    return DOWNLOAD_FAILURE
                 }
             } else {
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "moveToFirst is false")
                 cursor.close()
-                return -1
+                return DOWNLOAD_FAILURE
             }
             cursor.close()
         }
-        return 0
+        return DOWNLOAD_RETRY
     }
 }

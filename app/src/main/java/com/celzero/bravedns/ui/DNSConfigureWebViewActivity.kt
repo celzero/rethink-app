@@ -45,10 +45,10 @@ import com.celzero.bravedns.download.DownloadHelper
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DNS
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.Constants.Companion.RESPONSE_VERSION
 import com.celzero.bravedns.util.HttpRequestHelper
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import dnsx.Dnsx
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

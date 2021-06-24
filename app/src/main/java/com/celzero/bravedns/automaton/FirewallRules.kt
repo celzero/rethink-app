@@ -22,7 +22,7 @@ import com.celzero.bravedns.database.BlockedConnectionsRepository
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.firewallRules
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

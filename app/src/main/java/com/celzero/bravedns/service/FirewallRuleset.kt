@@ -1,6 +1,6 @@
 package com.celzero.bravedns.service
 
-enum class FirewallRules(val ruleName: String) {
+enum class FirewallRuleset(val ruleName: String) {
     RULE1("Rule #1"),
     RULE2("Rule #2"),
     RULE3("Rule #3"),

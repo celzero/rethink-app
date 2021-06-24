@@ -51,10 +51,10 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.lifeTimeQ
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_DOWNLOAD
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Constants.Companion.RESPONSE_VERSION
 import com.celzero.bravedns.util.HttpRequestHelper.Companion.checkStatus
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.common.collect.HashMultimap

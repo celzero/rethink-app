@@ -17,7 +17,7 @@ package com.celzero.bravedns.util
 
 import android.util.Log
 import com.celzero.bravedns.ui.HomeScreenActivity
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 
 // https://android.googlesource.com/platform/development/+/da84168fb2f5eb5ca012c3f430f701bc64472f34/ndk/platforms/android-21/include/linux/in.h
 enum class AndroidUidConfig(val uid : Int) {

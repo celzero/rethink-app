@@ -34,7 +34,7 @@ import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.FragmentFirewallAllAppsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.FirewallAppViewModel
 import org.koin.android.ext.android.get
