@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.celzero.bravedns.util
 
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 
@@ -22,11 +23,12 @@ class Constants {
 
     companion object {
         //Download path and file names
-        const val DOWNLOAD_PATH = "/downloads/"
-        const val FILE_TAG_NAME = "/filetag.json"
-        const val FILE_BASIC_CONFIG = "/basicconfig.json"
-        const val FILE_RD_FILE = "/rd.txt"
-        const val FILE_TD_FILE = "/td.txt"
+        val DOWNLOAD_PATH = File.separator+"downloads"+File.separator
+        val FILE_TAG_NAME = File.separator+"filetag.json"
+        val FILE_BASIC_CONFIG = File.separator+"basicconfig.json"
+        val FILE_RD_FILE = File.separator+"rd.txt"
+        val FILE_TD_FILE = File.separator+"td.txt"
+
         const val LOCAL_BLOCKLIST_FILE_COUNT = 4
 
         //Download URL's
@@ -36,13 +38,14 @@ class Constants {
         const val APP_DOWNLOAD_AVAILABLE_CHECK = "https://download.bravedns.com/update/app?vcode="
         const val CONFIGURE_BLOCKLIST_URL_LOCAL = "https://bravedns.com/configure?v=app&tstamp="
         const val CONFIGURE_BLOCKLIST_URL_REMOTE = "https://bravedns.com/configure?v=app"
+        const val FILE_TAG_JSON = "filetag.json"
 
         // The version tag value(response) for the update check.
         const val RESPONSE_VERSION = 1
 
         val DOWNLOAD_URLS = listOf("https://download.bravedns.com/blocklists", "https://download.bravedns.com/basicconfig", "https://download.bravedns.com/rank", "https://download.bravedns.com/trie")
 
-        val FILE_NAMES = listOf("/filetag.json", "/basicconfig.json", "/rd.txt", "/td.txt")
+        val FILE_NAMES = listOf("filetag.json", "basicconfig.json", "rd.txt", "td.txt")
 
         // Earlier the link was https://bravedns.com/downloads
         // modified below link post v053c release
@@ -160,9 +163,9 @@ class Constants {
         // accessibility value is enabled in android settings. Threshold is for 5 minute.
         val ACCESSIBILITY_SERVICE_HEARTBEAT_THRESHOLD_MS = TimeUnit.MINUTES.toMillis(5)
 
-        // Threshold minutes to save the network queries in shared preference instead of storing
-        // it for every request. The value is set as 1 minute.
-        val NETWORK_REQUEST_WRITE_THRESHOLD_MS = TimeUnit.MINUTES.toMillis(1)
+        // Threshold minutes to save the count of dns queries in shared preference instead of
+        // storing it for every request. The value is set as 1 minute.
+        val DNS_REQUEST_WRITE_THRESHOLD_MS = TimeUnit.MINUTES.toMillis(1)
 
         // View model - filter string
         const val FILTER_IS_SYSTEM = "isSystem"

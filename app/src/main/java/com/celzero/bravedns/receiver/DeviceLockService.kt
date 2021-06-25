@@ -38,8 +38,8 @@ class DeviceLockService : Service() {
         return null
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent != null && intent.action == ACTION_CHECK_LOCK) {
+    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        if (intent.action == ACTION_CHECK_LOCK) {
             checkLock(intent)
         }
         return super.onStartCommand(intent, flags, startId)

@@ -31,6 +31,7 @@ import com.celzero.bravedns.util.Constants.Companion.ORBOT_MODE_NONE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import hu.autsoft.krate.*
 import settings.Settings
+import kotlin.math.abs
 
 class PersistentState(private val context: Context) : SimpleKrate(context) {
     companion object {
@@ -106,9 +107,15 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
     var isAddAllNetworks by booleanPref("add_all_networks_to_vpn", false)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
+    
+    // OrbotMode - Once enabled from the app, it will be set to true and then the value
+    // OrbotEnabledMode - Enabled once there is a response from the Orbot intent.
+    // There are two values because in some cases, for e.g., when the vpn service is restarted,
+    // the response from the Orbot is not instant sometimes.
     var orbotMode by intPref("orbot_mode", ORBOT_MODE_NONE)
-    var downloadIDs by stringSetPref("download_ids", emptySet())
     var orbotEnabledMode by intPref("orbot_mode_enabled", ORBOT_MODE_NONE)
+
+    var downloadIDs by stringSetPref("download_ids", emptySet())
 
     var fetchFavIcon by booleanPref("fav_icon_enabled", BuildConfig.FLAVOR != Constants.FLAVOR_FDROID)
 
@@ -155,7 +162,7 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
         }
         lifeTimeQueries = numReq
         val now = SystemClock.elapsedRealtime()
-        if (Math.abs(now - networkRequestHeartbeatTimestamp) > Constants.NETWORK_REQUEST_WRITE_THRESHOLD_MS) {
+        if (abs(now - networkRequestHeartbeatTimestamp) > Constants.DNS_REQUEST_WRITE_THRESHOLD_MS) {
             networkRequestHeartbeatTimestamp = now
             _numberOfRequests = numReq
             HomeScreenActivity.GlobalVariable.lifeTimeQ.postValue(numReq)

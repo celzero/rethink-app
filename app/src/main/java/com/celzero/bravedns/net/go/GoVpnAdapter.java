@@ -544,7 +544,7 @@ public class GoVpnAdapter {
         try {
             if (persistentState.getRemoteBraveDNSDownloaded()) {
                 String path = vpnService.getFilesDir().getCanonicalPath() + File.separator + persistentState.getRemoteBlockListDownloadTime();
-                BraveDNS braveDNS = Dnsx.newBraveDNSRemote(path + Constants.FILE_TAG_NAME);
+                BraveDNS braveDNS = Dnsx.newBraveDNSRemote(path + File.separator + Constants.FILE_TAG_JSON);
                 if (HomeScreenActivity.GlobalVariable.INSTANCE.getDEBUG())
                     Log.d(LOG_TAG_VPN, "DOH URL set bravedns- " + dohURL + "--" + path);
                 tunnel.setBraveDNS(braveDNS);

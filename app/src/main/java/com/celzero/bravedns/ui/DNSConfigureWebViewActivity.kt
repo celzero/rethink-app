@@ -425,26 +425,21 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
             if (DEBUG) Log.d(LOG_TAG_DNS, "Intent on receive ")
             try {
                 val action = intent.action
-                if (DownloadManager.ACTION_DOWNLOAD_COMPLETE == action) {
-                    val query = DownloadManager.Query()
-                    query.setFilterById(enqueue)
-                    val c: Cursor = downloadManager.query(query)!!
-                    if (c.moveToFirst()) {
-                        val status = HttpRequestHelper.checkStatus(c)
-                        if (Constants.DOWNLOAD_STATUS_SUCCESSFUL == status) {
-                            val from = File(getExternalFilePath(ctxt, true)+ Constants.FILE_TAG_NAME)
-                            val to = File(ctxt.filesDir.canonicalPath +File.separator+persistentState.tempRemoteBlockListDownloadTime + Constants.FILE_TAG_NAME)
-                            from.copyTo(to, true)
-                            persistentState.remoteBraveDNSDownloaded = true
-                            persistentState.remoteBlockListDownloadTime = persistentState.tempRemoteBlockListDownloadTime
-                        } else {
-                            Log.w(LOG_TAG_DNS, "Error downloading filetag.json file: $status")
-                        }
-                    } else {
-                        Log.w(LOG_TAG_DNS, "Download status: Error downloading filetag.json file: ${c.count}")
-                    }
-                    c.close()
+                if (DownloadManager.ACTION_DOWNLOAD_COMPLETE != action) return
+                val query = DownloadManager.Query()
+                query.setFilterById(enqueue)
+                val c: Cursor = downloadManager.query(query)!!
+                Log.w(LOG_TAG_DNS, "Download status: downloading filetag.json file count: ${c.count}")
+                if (c.moveToFirst()) {
+                    val status = HttpRequestHelper.checkStatus(c)
+                    if (Constants.DOWNLOAD_STATUS_SUCCESSFUL != status) return
+                    val from = File(getExternalFilePath(ctxt, true) + Constants.FILE_TAG_NAME)
+                    val to = File(ctxt.filesDir.canonicalPath + File.separator + persistentState.tempRemoteBlockListDownloadTime + Constants.FILE_TAG_NAME)
+                    from.copyTo(to, true)
+                    persistentState.remoteBraveDNSDownloaded = true
+                    persistentState.remoteBlockListDownloadTime = persistentState.tempRemoteBlockListDownloadTime
                 }
+                c.close()
             } catch (e: Exception) {
                 Log.w(LOG_TAG_DNS, "Error downloading filetag.json file: ${e.message}", e)
                 persistentState.remoteBlockListDownloadTime = 0L

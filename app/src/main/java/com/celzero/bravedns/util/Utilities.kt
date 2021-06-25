@@ -50,6 +50,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
 import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
+import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.google.android.material.snackbar.Snackbar
@@ -244,9 +245,7 @@ class Utilities {
             try {
                 // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
                 val ip = InetAddresses.forString(ipAddress)
-                // ref - to match a private IP address - https://r.va.gg/2011/07/handling-x-forwarded-for-in-java-and-tomcat.html
-                val regex = Regex("(^127\\.0\\.0\\.1)|(^10\\.)|(^172\\.1[6-9]\\.)|(^172\\.2[0-9]\\.)|(^172\\.3[0-1]\\.)|(^192\\.168\\.)")
-                return ip.isAnyLocalAddress || ipAddress.matches(regex) || ipAddress == "0.0.0.0"
+                return ip.isLoopbackAddress || ip.isSiteLocalAddress || ip.equals(UNSPECIFIED_IP)
             } catch (e: IllegalArgumentException) {
                 Log.w(LOG_TAG_VPN, "Exception while converting string to inetaddress, ${e.message}", e)
             }

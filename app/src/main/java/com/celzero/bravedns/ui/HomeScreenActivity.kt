@@ -110,6 +110,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         var DEBUG = false
     }
 
+    // TODO - #324 - Usage of isDarkTheme() in all activities.
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == UI_MODE_NIGHT_YES
     }

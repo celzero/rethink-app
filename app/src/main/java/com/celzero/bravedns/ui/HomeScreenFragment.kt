@@ -89,7 +89,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         syncDnsStatus()
         initializeValues()
         initializeClickListeners()
-        //updateTime()
         updateUptime()
         registerForBroadCastReceivers()
     }
@@ -121,27 +120,27 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun initializeClickListeners() {
 
         b.fhsCardFirewallLl.setOnClickListener {
-            startFirewallActivity(FIREWALL_SCREEN_UNIVERSAL)
+            startActivity(false, FIREWALL_SCREEN_UNIVERSAL)
         }
 
         b.fhsCardDnsLl.setOnClickListener {
-            startDNSActivity(DNS_SCREEN_LOGS)
+            startActivity(true, DNS_SCREEN_LOGS)
         }
 
         b.fhsCardDnsConfigure.setOnClickListener {
-            startDNSActivity(DNS_SCREEN_CONFIG)
+            startActivity(true, DNS_SCREEN_CONFIG)
         }
 
         b.fhsCardDnsConfigureLl.setOnClickListener {
-            startDNSActivity(DNS_SCREEN_LOGS)
+            startActivity(true, DNS_SCREEN_LOGS)
         }
 
         b.fhsCardFirewallConfigure.setOnClickListener {
-            startFirewallActivity(FIREWALL_SCREEN_ALL_APPS)
+            startActivity(false, FIREWALL_SCREEN_ALL_APPS)
         }
 
         b.fhsCardFirewallConfigureLl.setOnClickListener {
-            startFirewallActivity(FIREWALL_SCREEN_ALL_APPS)
+            startActivity(false, FIREWALL_SCREEN_ALL_APPS)
         }
 
         /**
@@ -311,6 +310,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         builder.setTitle(R.string.always_on_dialog_stop_heading)
         if (isLockDownEnabled == true) {
+            // The Html.fromHtml requires a wrap around with the check or need to add requiresApi for the method so added the check.
             if (VERSION.SDK_INT >= VERSION_CODES.N) {
                 builder.setMessage(Html.fromHtml(getString(R.string.always_on_dialog_lockdown_stop_message), HtmlCompat.FROM_HTML_MODE_COMPACT))
             } else {
@@ -405,49 +405,44 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         syncDnsStatus()
     }
 
-    /**
-     * Start the Firewall activity
-     */
-    private fun startFirewallActivity(screenToLoad: Int) {
+    private fun startActivity(isDns: Boolean, screenToLoad: Int) {
         val status: VpnState = VpnController.getInstance().getState()
         if (DEBUG) Log.d(LOG_TAG_VPN, "Status : ${status.on} , BraveMode: $braveMode")
-        if (status.on) {
-            if (braveMode == APP_MODE_DNS_FIREWALL || braveMode == APP_MODE_FIREWALL) {
-                val intent = Intent(requireContext(), FirewallActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                intent.putExtra(Constants.SCREEN_TO_LOAD, screenToLoad)
-                startActivity(intent)
-            } else {
-                //when the Firewall is not enabled, but the VPN is active. show the bottom sheet to select the mode
-                openBottomSheet()
-                Utilities.showToastUiCentered(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
-            }
-        } else {
-            //when the Firewall is not enabled and VPN is not active. show the dialog to start VPN
+        if (!status.on) {
+            //when the DNS/Firewall is not enabled and VPN is not active. show the dialog to start VPN
             showStartDialog()
+            return
         }
+        when (braveMode) {
+            APP_MODE_DNS_FIREWALL -> {
+                startActivityIntent(isDns, screenToLoad)
+                return
+            }
+            APP_MODE_FIREWALL -> {
+                if (!isDns) {
+                    startActivityIntent(isDns, screenToLoad)
+                    return
+                }
+            }
+            APP_MODE_DNS -> {
+                if (isDns) {
+                    startActivityIntent(isDns, screenToLoad)
+                    return
+                }
+            }
+        }
+        openBottomSheet()
+        Utilities.showToastUiCentered(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
     }
 
-    private fun startDNSActivity(screenToLoad: Int) {
-        val status: VpnState = VpnController.getInstance().getState()
-        if ((status.on)) {
-            if (braveMode == APP_MODE_DNS_FIREWALL || braveMode == APP_MODE_DNS && (PrivateDnsMode.STRICT != getPrivateDnsMode())) {
-                val intent = Intent(requireContext(), DNSDetailActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                intent.putExtra(Constants.SCREEN_TO_LOAD, screenToLoad)
-                startActivity(intent)
-            } else {
-                if (getPrivateDnsMode() == PrivateDnsMode.STRICT) {
-                    Utilities.showToastUiCentered(requireContext(), resources.getText(R.string.private_dns_toast).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
-                }
-                //when the DNS is not enabled, but the VPN is active. show the bottom sheet to select the mode
-                openBottomSheet()
-                Utilities.showToastUiCentered(requireContext(), resources.getText(R.string.brave_dns_connect_mode_change_dns).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
-            }
-        } else {
-            //when the DNS is not enabled and VPN is not active. show the dialog to start VPN
-            showStartDialog()
+    private fun startActivityIntent(isDns: Boolean, screenToLoad: Int) {
+        val intent = when (isDns) {
+            true -> Intent(requireContext(), DNSDetailActivity::class.java)
+            false -> Intent(requireContext(), FirewallActivity::class.java)
         }
+        intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+        intent.putExtra(Constants.SCREEN_TO_LOAD, screenToLoad)
+        startActivity(intent)
     }
 
     private fun getModeText(): String {

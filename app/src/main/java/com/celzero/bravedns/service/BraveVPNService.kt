@@ -195,18 +195,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
 
             //Check whether the screen lock is enabled and act based on it
             if (DEBUG) Log.d(LOG_TAG_VPN, "isDeviceLocked: ${persistentState.isScreenOff}")
-            if (persistentState.isScreenOff) {
-                //Don't include DNS and private DNS request in the list
-                // FIXME: 04-12-2020 Removed the app range check for testing.
-                if (Utilities.isValidUid(uid)) {
-                    ipDetails.isBlocked = true
-                    ipDetails.blockedByRule = FirewallRuleset.RULE3.ruleName
-                    connTrack(ipDetails)
-                    if (DEBUG) Log.d(LOG_TAG_VPN, "isDeviceLocked: $uid, $destPort")
-                    delayBeforeResponse()
-                    return true
-                }
-
+            if (persistentState.isScreenOff && Utilities.isValidUid(uid)) {
+                ipDetails.isBlocked = true
+                ipDetails.blockedByRule = FirewallRuleset.RULE3.ruleName
+                connTrack(ipDetails)
+                if (DEBUG) Log.d(LOG_TAG_VPN, "isDeviceLocked: $uid, $destPort")
+                delayBeforeResponse()
+                return true
             } else if (blockBackgroundData() && Utilities.isValidUid(uid)) { //Check whether the background is enabled and act based on it
                 // FIXME: 04-12-2020 Removed the app range check for testing.
                 var isBGBlock = true

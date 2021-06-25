@@ -29,6 +29,7 @@ import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_URLS
 import com.celzero.bravedns.util.Constants.Companion.FILE_NAMES
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_FILE_COUNT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 /**
@@ -53,7 +54,7 @@ class AppDownloadManager(private val persistentState: PersistentState, private v
             initDownload(context)
             for(i in 0 until LOCAL_BLOCKLIST_FILE_COUNT){
                 val url = DOWNLOAD_URLS[i]
-                val fileName = FILE_NAMES[i]
+                val fileName = File.separator + FILE_NAMES[i]
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Timestamp - ($timestamp) filename - $fileName, url - $url")
                 download(url, fileName, timestamp.toString())
             }

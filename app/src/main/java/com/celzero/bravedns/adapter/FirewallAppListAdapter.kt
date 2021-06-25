@@ -15,8 +15,6 @@ limitations under the License.
 */
 package com.celzero.bravedns.adapter
 
-import android.app.Activity
-import android.app.ActivityManager
 import android.content.Context
 import android.content.DialogInterface
 import android.os.CountDownTimer
@@ -58,12 +56,12 @@ import java.util.*
 
 class FirewallAppListAdapter internal constructor(
     private val context: Context,
-    private val appInfoRepository:AppInfoRepository,
-    private val categoryInfoRepository:CategoryInfoRepository,
+    private val appInfoRepository: AppInfoRepository,
+    private val categoryInfoRepository: CategoryInfoRepository,
     private val persistentState: PersistentState,
     private var titleList: List<CategoryInfo>,
     private var dataList: HashMap<CategoryInfo, ArrayList<AppInfo>>
-) : BaseExpandableListAdapter() {
+    ) : BaseExpandableListAdapter() {
 
 
     override fun getChild(listPosition: Int, expandedListPosition: Int): AppInfo {
