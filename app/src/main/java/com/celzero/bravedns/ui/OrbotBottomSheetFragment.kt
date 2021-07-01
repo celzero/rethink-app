@@ -44,6 +44,9 @@ import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.THEME_DARK
+import com.celzero.bravedns.util.Constants.Companion.THEME_LIGHT
+import com.celzero.bravedns.util.Constants.Companion.THEME_SYSTEM_DEFAULT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
@@ -84,23 +87,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
 
-    override fun getTheme(): Int = if (persistentState.theme == 0) {
-        if (isDarkThemeOn()) {
-            R.style.BottomSheetDialogThemeTrueBlack
-        } else {
-            R.style.BottomSheetDialogThemeWhite
-        }
-    } else if (persistentState.theme == 1) {
-        R.style.BottomSheetDialogThemeWhite
-    } else if (persistentState.theme == 2) {
-        R.style.BottomSheetDialogTheme
-    } else {
-        R.style.BottomSheetDialogThemeTrueBlack
-    }
-
-    private fun isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-    }
+    override fun getTheme(): Int = Utilities.getCurrentTheme(requireContext())
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

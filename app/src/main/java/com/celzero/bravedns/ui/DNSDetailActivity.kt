@@ -28,6 +28,10 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityDnsDetailBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.THEME_DARK
+import com.celzero.bravedns.util.Constants.Companion.THEME_LIGHT
+import com.celzero.bravedns.util.Constants.Companion.THEME_SYSTEM_DEFAULT
+import com.celzero.bravedns.util.Utilities.Companion.getCurrentTheme
 import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.android.ext.android.inject
 
@@ -35,22 +39,9 @@ class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
     private val b by viewBinding(ActivityDnsDetailBinding::bind)
     private val dnsTabsCount = 2
     private var screenToLoad = 0
-    private val persistentState by inject<PersistentState>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (persistentState.theme == 0) {
-            if (isDarkThemeOn()) {
-                setTheme(R.style.AppThemeTrueBlack)
-            } else {
-                setTheme(R.style.AppThemeWhite)
-            }
-        } else if (persistentState.theme == 1) {
-            setTheme(R.style.AppThemeWhite)
-        } else if (persistentState.theme == 2) {
-            setTheme(R.style.AppTheme)
-        } else {
-            setTheme(R.style.AppThemeTrueBlack)
-        }
+        setTheme(getCurrentTheme(this))
         super.onCreate(savedInstanceState)
         screenToLoad = intent.getIntExtra(Constants.SCREEN_TO_LOAD, 0)
         init()
@@ -79,10 +70,6 @@ class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
         }.attach()
 
         b.dnsDetailActViewpager.setCurrentItem(screenToLoad, true)
-    }
-
-    private fun Context.isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

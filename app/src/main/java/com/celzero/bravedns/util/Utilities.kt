@@ -46,6 +46,7 @@ import androidx.core.content.getSystemService
 import com.celzero.bravedns.R
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.VpnControllerHelper.persistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
@@ -343,6 +344,22 @@ class Utilities {
                 activityManager.killBackgroundProcesses(packageInfo)
             } catch (e: Exception) {
                 Log.w(LOG_TAG_FIREWALL, "firewall - kill app - exception" + e.message, e)
+            }
+        }
+
+        fun getCurrentTheme(context: Context): Int {
+            return if (persistentState.theme == Constants.THEME_SYSTEM_DEFAULT) {
+                if (isDarkSystemTheme(context)) {
+                    R.style.AppThemeTrueBlack
+                } else {
+                    R.style.AppThemeWhite
+                }
+            } else if (persistentState.theme == Constants.THEME_LIGHT) {
+                R.style.AppThemeWhite
+            } else if (persistentState.theme == Constants.THEME_DARK) {
+                R.style.AppTheme
+            } else {
+                R.style.AppThemeTrueBlack
             }
         }
     }

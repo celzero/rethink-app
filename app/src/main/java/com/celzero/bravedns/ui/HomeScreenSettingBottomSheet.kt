@@ -33,7 +33,11 @@ import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS_FIREWALL
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_FIREWALL
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_INVALID
+import com.celzero.bravedns.util.Constants.Companion.THEME_DARK
+import com.celzero.bravedns.util.Constants.Companion.THEME_LIGHT
+import com.celzero.bravedns.util.Constants.Companion.THEME_SYSTEM_DEFAULT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Utilities
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 import settings.Settings
@@ -50,23 +54,7 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
 
     private val persistentState by inject<PersistentState>()
 
-    override fun getTheme(): Int = if (persistentState.theme == 0) {
-        if (isDarkThemeOn()) {
-            R.style.BottomSheetDialogThemeTrueBlack
-        } else {
-            R.style.BottomSheetDialogThemeWhite
-        }
-    } else if (persistentState.theme == 1) {
-        R.style.BottomSheetDialogThemeWhite
-    } else if (persistentState.theme == 2) {
-        R.style.BottomSheetDialogTheme
-    } else {
-        R.style.BottomSheetDialogThemeTrueBlack
-    }
-
-    private fun isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-    }
+    override fun getTheme(): Int = Utilities.getCurrentTheme(requireContext())
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {

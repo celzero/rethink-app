@@ -49,11 +49,12 @@ import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.AndroidUidConfig
+import com.celzero.bravedns.util.*
+import com.celzero.bravedns.util.Constants.Companion.THEME_DARK
+import com.celzero.bravedns.util.Constants.Companion.THEME_LIGHT
+import com.celzero.bravedns.util.Constants.Companion.THEME_SYSTEM_DEFAULT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
-import com.celzero.bravedns.util.Protocol
-import com.celzero.bravedns.util.ThrowingHandler
-import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.Companion.getCurrentTheme
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -105,23 +106,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context,
         const val UNIVERSAL_RULES_UID = -1000
     }
 
-    override fun getTheme(): Int = if (persistentState.theme == 0) {
-        if (isDarkThemeOn()) {
-            R.style.BottomSheetDialogThemeTrueBlack
-        } else {
-            R.style.BottomSheetDialogThemeWhite
-        }
-    } else if (persistentState.theme == 1) {
-        R.style.BottomSheetDialogThemeWhite
-    } else if (persistentState.theme == 2) {
-        R.style.BottomSheetDialogTheme
-    } else {
-        R.style.BottomSheetDialogThemeTrueBlack
-    }
-
-    private fun isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-    }
+    override fun getTheme(): Int = getCurrentTheme(contextVal)
 
     private val appInfoRepository: AppInfoRepository by inject()
     private val blockedConnectionsRepository: BlockedConnectionsRepository by inject()

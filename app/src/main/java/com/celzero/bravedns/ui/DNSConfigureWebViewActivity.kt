@@ -45,9 +45,13 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.RESPONSE_VERSION
+import com.celzero.bravedns.util.Constants.Companion.THEME_DARK
+import com.celzero.bravedns.util.Constants.Companion.THEME_LIGHT
+import com.celzero.bravedns.util.Constants.Companion.THEME_SYSTEM_DEFAULT
 import com.celzero.bravedns.util.HttpRequestHelper
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Utilities.Companion.getCurrentTheme
 import dnsx.Dnsx
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -83,19 +87,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (persistentState.theme == 0) {
-            if (isDarkThemeOn()) {
-                setTheme(R.style.AppThemeTrueBlack)
-            } else {
-                setTheme(R.style.AppThemeWhite)
-            }
-        } else if (persistentState.theme == 1) {
-            setTheme(R.style.AppThemeWhite)
-        } else if (persistentState.theme == 2) {
-            setTheme(R.style.AppTheme)
-        } else {
-            setTheme(R.style.AppThemeTrueBlack)
-        }
+        setTheme(getCurrentTheme(this))
         super.onCreate(savedInstanceState)
         context = this
         downloadManager = context.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
@@ -141,7 +133,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
      * FORCE_DARK_OFF - Light mode.
      */
     private fun setWebViewTheme() {
-        if (persistentState.theme == 0) {
+        if (persistentState.theme == THEME_SYSTEM_DEFAULT) {
             if (isDarkThemeOn()) {
                 if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
                     WebSettingsCompat.setForceDark(b.configureWebview.settings,
@@ -153,12 +145,12 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                                                    WebSettingsCompat.FORCE_DARK_OFF)
                 }
             }
-        } else if (persistentState.theme == 1) {
+        } else if (persistentState.theme == THEME_LIGHT) {
             if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
                 WebSettingsCompat.setForceDark(b.configureWebview.settings,
                                                WebSettingsCompat.FORCE_DARK_OFF)
             }
-        } else if (persistentState.theme == 2) {
+        } else if (persistentState.theme == THEME_DARK) {
             if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
                 WebSettingsCompat.setForceDark(b.configureWebview.settings,
                                                WebSettingsCompat.FORCE_DARK_ON)

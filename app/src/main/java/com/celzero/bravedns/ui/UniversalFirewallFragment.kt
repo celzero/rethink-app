@@ -40,7 +40,11 @@ import com.celzero.bravedns.databinding.UniversalFragementContainerBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable
 import com.celzero.bravedns.util.BackgroundAccessibilityService
+import com.celzero.bravedns.util.Constants.Companion.THEME_DARK
+import com.celzero.bravedns.util.Constants.Companion.THEME_LIGHT
+import com.celzero.bravedns.util.Constants.Companion.THEME_SYSTEM_DEFAULT
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.Companion.getCurrentTheme
 import com.celzero.bravedns.viewmodel.AppListViewModel
 import com.celzero.bravedns.viewmodel.BlockedConnectionsViewModel
 import org.koin.android.ext.android.get
@@ -210,7 +214,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
 
         includeView.firewallAppsShowTxt.setOnClickListener {
             includeView.firewallAppsShowTxt.isEnabled = false
-            val themeID = getCurrentTheme()
+            val themeID = getCurrentTheme(requireContext())
             val customDialog = WhitelistAppDialog(requireContext(), get(), get(), get(),
                                                   recyclerAdapter!!, appInfoViewModel, themeID)
             //if we know that the particular variable not null any time ,we can assign !!
@@ -255,28 +259,6 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         }
 
     }
-
-    private fun getCurrentTheme(): Int {
-        if (persistentState.theme == 0) {
-            if (isDarkThemeOn()) {
-                return R.style.AppThemeTrueBlack
-            } else {
-                return R.style.AppThemeWhite
-            }
-        } else if (persistentState.theme == 1) {
-            return R.style.AppThemeWhite
-        } else if (persistentState.theme == 2) {
-            return R.style.AppTheme
-        } else {
-            return R.style.AppThemeTrueBlack
-        }
-    }
-
-
-    private fun isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-    }
-
 
     private fun setIPRulesVisible() {
         ipListState = false

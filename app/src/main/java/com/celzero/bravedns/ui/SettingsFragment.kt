@@ -69,6 +69,7 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.Companion.isVpnLockdownEnabled
 import com.celzero.bravedns.viewmodel.ExcludedAppViewModel
 import dnsx.Dnsx
@@ -1178,38 +1179,13 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     private fun showExcludeAppDialog(context: Context, recyclerAdapter: ExcludedAppListAdapter,
                                      excludeAppViewModel: ExcludedAppViewModel) {
-        val themeID = getCurrentTheme()
+        val themeID = getCurrentTheme(context)
         val excludeAppDialog = ExcludeAppDialog(context, get(), get(), get(), persistentState,
                                                 recyclerAdapter, excludeAppViewModel, themeID)
         //if we know that the particular variable not null any time ,we can assign !! (not null operator ),
         // then  it won't check for null, if it becomes null, it will throw exception
         excludeAppDialog.show()
         excludeAppDialog.setCanceledOnTouchOutside(false)
-    }
-
-    private fun getCurrentTheme(): Int {
-        return when (persistentState.theme) {
-            Constants.THEME_SYSTEM_DEFAULT -> {
-                if (isDarkThemeOn()) {
-                    R.style.AppThemeTrueBlack
-                } else {
-                    R.style.AppThemeWhite
-                }
-            }
-            Constants.THEME_LIGHT -> {
-                R.style.AppThemeWhite
-            }
-            Constants.THEME_DARK -> {
-                R.style.AppTheme
-            }
-            else -> {
-                R.style.AppThemeTrueBlack
-            }
-        }
-    }
-
-    private fun isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
     private fun showDialogForSocks5Proxy() {

@@ -27,6 +27,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityFaqWebviewLayoutBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Utilities.Companion.getCurrentTheme
 import org.koin.android.ext.android.inject
 
 
@@ -36,19 +37,7 @@ class FaqWebViewActivity : AppCompatActivity(R.layout.activity_faq_webview_layou
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (persistentState.theme == 0) {
-            if (isDarkThemeOn()) {
-                setTheme(R.style.AppThemeTrueBlack)
-            } else {
-                setTheme(R.style.AppThemeWhite)
-            }
-        } else if (persistentState.theme == 1) {
-            setTheme(R.style.AppThemeWhite)
-        } else if (persistentState.theme == 2) {
-            setTheme(R.style.AppTheme)
-        } else {
-            setTheme(R.style.AppThemeTrueBlack)
-        }
+        setTheme(getCurrentTheme(this))
         super.onCreate(savedInstanceState)
         b.configureWebview.settings.domStorageEnabled = true
         b.configureWebview.settings.allowContentAccess = true
