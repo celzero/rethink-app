@@ -38,7 +38,6 @@ class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
         }
     }
 
-
     fun insertAsync(proxyEndpoint: ProxyEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
         coroutineScope.launch {
             proxyEndpointDAO.insert(proxyEndpoint)
@@ -79,13 +78,12 @@ class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
         return proxyEndpointDAO.getConnectedOrbotProxy()
     }
 
-    fun clearAllData(){
+    fun clearAllData() {
         proxyEndpointDAO.clearAllData()
     }
 
-    fun clearOrbotData(){
+    fun clearOrbotData() {
         proxyEndpointDAO.clearOrbotData()
     }
-
 
 }

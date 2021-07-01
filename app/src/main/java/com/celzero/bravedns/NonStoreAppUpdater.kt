@@ -24,21 +24,21 @@ import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
 
-class NonStoreAppUpdater(private val baseURL:String, private val persistentState: PersistentState):AppUpdater {
+class NonStoreAppUpdater(private val baseURL: String,
+                         private val persistentState: PersistentState) : AppUpdater {
 
-    override fun checkForAppUpdate(isUserInitiated: Boolean, activity: Activity, listener: AppUpdater.InstallStateListener) {
+    override fun checkForAppUpdate(isUserInitiated: Boolean, activity: Activity,
+                                   listener: AppUpdater.InstallStateListener) {
         Log.i(LOG_TAG_APP_UPDATE, "Beginning update check.")
         val url = baseURL + BuildConfig.VERSION_CODE
 
         val client = OkHttpClient()
-        val request = Request.Builder()
-            .url(url)
-            .build()
+        val request = Request.Builder().url(url).build()
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.i(LOG_TAG_APP_UPDATE, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
-                if(isUserInitiated) {
+                if (isUserInitiated) {
                     listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER)
                 }
                 call.cancel()
@@ -53,12 +53,13 @@ class NonStoreAppUpdater(private val baseURL:String, private val persistentState
                     val updateValue = jsonObject.getBoolean("update")
                     val latestVersion = jsonObject.getInt("latest")
                     persistentState.lastAppUpdateCheck = System.currentTimeMillis() // FIXME move to NTP
-                    Log.i(LOG_TAG_APP_UPDATE, "Server response for the new version download is true, version number-  $latestVersion")
+                    Log.i(LOG_TAG_APP_UPDATE,
+                          "Server response for the new version download is true, version number-  $latestVersion")
                     if (responseVersion == 1) {
                         if (updateValue) {
                             listener.onUpdateAvailable(AppUpdater.InstallSource.OTHER)
                         } else {
-                            if(isUserInitiated) listener.onUpToDate(AppUpdater.InstallSource.OTHER)
+                            if (isUserInitiated) listener.onUpToDate(AppUpdater.InstallSource.OTHER)
                         }
                     }
                     response.close()

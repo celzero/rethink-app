@@ -25,7 +25,6 @@ import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
 import com.celzero.bravedns.ui.HomeScreenActivity
-import org.koin.core.component.KoinApiExtension
 
 @RequiresApi(api = Build.VERSION_CODES.N)
 class BraveTileService : TileService() {
@@ -34,9 +33,9 @@ class BraveTileService : TileService() {
         val vpnState: VpnState = VpnController.getInstance().getState()
 
         //Fix detected null pointer exception. Intra #415
-        val tile = if(qsTile == null){
+        val tile = if (qsTile == null) {
             return
-        }else{
+        } else {
             qsTile
         }
 
@@ -70,12 +69,7 @@ class BraveTileService : TileService() {
     override fun onBind(intent: Intent?): IBinder? {
 
         // Update tile state on boot.
-        requestListeningState(
-            this,
-            ComponentName(this, BraveTileService::class.java)
-        )
+        requestListeningState(this, ComponentName(this, BraveTileService::class.java))
         return super.onBind(intent)
     }
-
-
 }

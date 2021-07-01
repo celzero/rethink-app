@@ -21,13 +21,12 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "DNSProxyEndpoint")
 class DNSProxyEndpoint {
-    @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
-    var proxyName : String = ""
+    @PrimaryKey(autoGenerate = true) var id: Int = 0
+    var proxyName: String = ""
     var proxyType: String = ""
-    var proxyAppName: String ?= null
-    var proxyIP: String ?= null
-    var proxyPort : Int  = 0
+    var proxyAppName: String? = null
+    var proxyIP: String? = null
+    var proxyPort: Int = 0
     var isSelected: Boolean = true
     var isCustom: Boolean = true
     var modifiedDataTime: Long = 0L
@@ -46,9 +45,10 @@ class DNSProxyEndpoint {
     }
 
 
-    constructor(id: Int, proxyName: String,  proxyType: String, proxyAppName: String, proxyIP: String,proxyPort : Int, isSelected: Boolean, isCustom: Boolean, modifiedDataTime: Long, latency: Int) {
-        if(id != -1)
-            this.id = id
+    constructor(id: Int, proxyName: String, proxyType: String, proxyAppName: String,
+                proxyIP: String, proxyPort: Int, isSelected: Boolean, isCustom: Boolean,
+                modifiedDataTime: Long, latency: Int) {
+        if (id != -1) this.id = id
         this.proxyName = proxyName
         this.proxyType = proxyType
         this.proxyAppName = proxyAppName
@@ -56,11 +56,8 @@ class DNSProxyEndpoint {
         this.proxyPort = proxyPort
         this.isSelected = isSelected
         this.isCustom = isCustom
-        if(modifiedDataTime != 0L)
-            this.modifiedDataTime = modifiedDataTime
-        else
-            this.modifiedDataTime = System.currentTimeMillis()
+        if (modifiedDataTime != 0L) this.modifiedDataTime = modifiedDataTime
+        else this.modifiedDataTime = System.currentTimeMillis()
         this.latency = latency
     }
-
 }

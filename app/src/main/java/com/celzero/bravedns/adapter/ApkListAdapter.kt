@@ -31,7 +31,8 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) : RecyclerView.Adapter<ApkListAdapter.ApkListViewHolder>() {
+class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) :
+        RecyclerView.Adapter<ApkListAdapter.ApkListViewHolder>() {
 
 
     var apkListFiltered: ArrayList<Apk> = ArrayList()
@@ -41,12 +42,14 @@ class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) 
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ApkListViewHolder {
-        val itemBinding = LayoutApkItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val itemBinding = LayoutApkItemBinding.inflate(LayoutInflater.from(parent.context), parent,
+                                                       false)
         return ApkListViewHolder(itemBinding, context, apkList)
     }
 
     override fun onBindViewHolder(holder: ApkListViewHolder, position: Int) {
-        holder.mIconImageView.setImageDrawable(context.packageManager.getApplicationIcon(apkList[position].packageName))
+        holder.mIconImageView.setImageDrawable(
+            context.packageManager.getApplicationIcon(apkList[position].packageName))
         holder.mLabelTextView.text = apkList[position].appName
     }
 
@@ -76,14 +79,16 @@ class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) 
     }
 
 
-    inner class ApkListViewHolder(b: LayoutApkItemBinding, context: Context, apkList: ArrayList<Apk>) : RecyclerView.ViewHolder(b.root) {
+    inner class ApkListViewHolder(b: LayoutApkItemBinding, context: Context,
+                                  apkList: ArrayList<Apk>) : RecyclerView.ViewHolder(b.root) {
 
         val mIconImageView: ImageView = b.apkIconIv
         val mLabelTextView: TextView = b.apkLabelTv
 
         init {
             b.root.setOnClickListener {
-                val permissionDetails = Utilities.getPermissionDetails(context, apkList[bindingAdapterPosition].packageName)
+                val permissionDetails = Utilities.getPermissionDetails(context,
+                                                                       apkList[bindingAdapterPosition].packageName)
 
                 var pos = 0
                 if (permissionDetails.requestedPermissionsFlags != null) permissionDetails.requestedPermissionsFlags.forEach {

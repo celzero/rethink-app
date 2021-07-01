@@ -29,22 +29,21 @@ class DNSLogs {
      *  'status' TEXT NOT NULL,'dnsType' INTEGER NOT NULL) "
      */
 
-    @PrimaryKey(autoGenerate = true)
-    var id : Int = 0
-    var queryStr : String = ""
-    var time : Long = 0L
-    var flag : String = ""
-    var resolver : String = ""
-    var latency : Long  = 0L
-    var typeName : String = ""
-    var isBlocked : Boolean = false
-    var blockLists : String = ""
-    var serverIP : String = ""
-    var relayIP : String = ""
-    var responseTime : Long = 0L
-    var response : String = ""
-    var status : String = ""
-    var dnsType : Int = 0
+    @PrimaryKey(autoGenerate = true) var id: Int = 0
+    var queryStr: String = ""
+    var time: Long = 0L
+    var flag: String = ""
+    var resolver: String = ""
+    var latency: Long = 0L
+    var typeName: String = ""
+    var isBlocked: Boolean = false
+    var blockLists: String = ""
+    var serverIP: String = ""
+    var relayIP: String = ""
+    var responseTime: Long = 0L
+    var response: String = ""
+    var status: String = ""
+    var dnsType: Int = 0
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -32,22 +32,27 @@ import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinApiExtension
 
-class UniversalBlockedRulesAdapter(private val context: Context, private val blockedConnectionsRepository: BlockedConnectionsRepository) : PagedListAdapter<BlockedConnections, UniversalBlockedRulesAdapter.UniversalBlockedConnViewHolder>(DIFF_CALLBACK) {
+class UniversalBlockedRulesAdapter(private val context: Context,
+                                   private val blockedConnectionsRepository: BlockedConnectionsRepository) :
+        PagedListAdapter<BlockedConnections, UniversalBlockedRulesAdapter.UniversalBlockedConnViewHolder>(
+            DIFF_CALLBACK) {
 
     companion object {
-        private val DIFF_CALLBACK = object :
-            DiffUtil.ItemCallback<BlockedConnections>() {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<BlockedConnections>() {
 
-            override fun areItemsTheSame(oldConnection: BlockedConnections, newConnection: BlockedConnections) = oldConnection.id == newConnection.id
+            override fun areItemsTheSame(oldConnection: BlockedConnections,
+                                         newConnection: BlockedConnections) = oldConnection.id == newConnection.id
 
-            override fun areContentsTheSame(oldConnection: BlockedConnections, newConnection: BlockedConnections) = oldConnection == newConnection
+            override fun areContentsTheSame(oldConnection: BlockedConnections,
+                                            newConnection: BlockedConnections) = oldConnection == newConnection
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UniversalBlockedConnViewHolder {
-        val itemBinding = UnivWhitelistRulesItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup,
+                                    viewType: Int): UniversalBlockedConnViewHolder {
+        val itemBinding = UnivWhitelistRulesItemBinding.inflate(LayoutInflater.from(parent.context),
+                                                                parent, false)
         return UniversalBlockedConnViewHolder(itemBinding)
     }
 
@@ -57,7 +62,8 @@ class UniversalBlockedRulesAdapter(private val context: Context, private val blo
     }
 
 
-    inner class UniversalBlockedConnViewHolder(private val b: UnivWhitelistRulesItemBinding) : RecyclerView.ViewHolder(b.root) {
+    inner class UniversalBlockedConnViewHolder(private val b: UnivWhitelistRulesItemBinding) :
+            RecyclerView.ViewHolder(b.root) {
 
         fun update(blockedConnections: BlockedConnections) {
             b.univWhitelistRulesApkLabelTv.text = blockedConnections.ipAddress
@@ -71,17 +77,24 @@ class UniversalBlockedRulesAdapter(private val context: Context, private val blo
             builder.setTitle(R.string.univ_firewall_dialog_title)
             builder.setMessage(R.string.univ_firewall_dialog_message)
             builder.setCancelable(true)
-            builder.setPositiveButton(context.getString(R.string.univ_ip_delete_individual_positive)) { _, _ ->
+            builder.setPositiveButton(
+                context.getString(R.string.univ_ip_delete_individual_positive)) { _, _ ->
                 if (blockedConnections != null) {
                     GlobalScope.launch(Dispatchers.IO) {
                         val firewallRules = FirewallRules.getInstance()
-                        firewallRules.removeFirewallRules(ConnTrackerBottomSheetFragment.UNIVERSAL_RULES_UID, blockedConnections.ipAddress!!, blockedConnectionsRepository)
+                        firewallRules.removeFirewallRules(
+                            ConnTrackerBottomSheetFragment.UNIVERSAL_RULES_UID,
+                            blockedConnections.ipAddress!!, blockedConnectionsRepository)
                     }
-                    Toast.makeText(context, context.getString(R.string.univ_ip_delete_individual_toast, blockedConnections.ipAddress), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,
+                                   context.getString(R.string.univ_ip_delete_individual_toast,
+                                                     blockedConnections.ipAddress),
+                                   Toast.LENGTH_SHORT).show()
                 }
             }
 
-            builder.setNegativeButton(context.getString(R.string.univ_ip_delete_individual_negative)) { _, _ -> }
+            builder.setNegativeButton(
+                context.getString(R.string.univ_ip_delete_individual_negative)) { _, _ -> }
             val alertDialog: AlertDialog = builder.create()
             alertDialog.setCancelable(true)
             alertDialog.show()

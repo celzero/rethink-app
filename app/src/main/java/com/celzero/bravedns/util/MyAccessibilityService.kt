@@ -27,10 +27,8 @@ class MyAccessibilityService : AccessibilityService() {
     private val permissionsManager = PermissionsManager(this)
     private val privateDnsManager = PrivateDnsManager(this)
 
-    enum class PrivateDnsMode (val mode: Int) {
-        NONE(0),
-        PRIVATE_DNS_SET(1),
-        PRIVATE_DNS_UNSET(2)
+    enum class PrivateDnsMode(val mode: Int) {
+        NONE(0), PRIVATE_DNS_SET(1), PRIVATE_DNS_UNSET(2)
     }
 
     companion object Mode {
@@ -99,14 +97,14 @@ class MyAccessibilityService : AccessibilityService() {
             else -> "Default: "
         } + event.contentDescription + " " + event.text*/
 
-       /* Log.w("______","onAEvent: sourcepack " + event.source?.packageName + " text? " +
-                eventText + " class? " + event.className +
-                " package? ppp " + event.packageName)
-        for (i in 0 until event.recordCount) {
-            val r: AccessibilityRecord = event.getRecord(i)
-            //Log.w("PermissionsManager", "_____ record record $$$$ ______ ${r.source} ${r.className} ${r.contentDescription}")
-        }
-        */
+        /* Log.w("______","onAEvent: sourcepack " + event.source?.packageName + " text? " +
+                 eventText + " class? " + event.className +
+                 " package? ppp " + event.packageName)
+         for (i in 0 until event.recordCount) {
+             val r: AccessibilityRecord = event.getRecord(i)
+             //Log.w("PermissionsManager", "_____ record record $$$$ ______ ${r.source} ${r.className} ${r.contentDescription}")
+         }
+         */
         if (isPrivateDnsMode()) {
             privateDnsManager.onAccessibilityEvent(event)
         } else {
@@ -116,8 +114,7 @@ class MyAccessibilityService : AccessibilityService() {
     }
 
     private fun isPrivateDnsMode(): Boolean {
-        return privateDnsMode == PrivateDnsMode.PRIVATE_DNS_SET ||
-                privateDnsMode == PrivateDnsMode.PRIVATE_DNS_UNSET
+        return privateDnsMode == PrivateDnsMode.PRIVATE_DNS_SET || privateDnsMode == PrivateDnsMode.PRIVATE_DNS_UNSET
     }
 
     fun privateDnsOver() {
@@ -130,6 +127,6 @@ class MyAccessibilityService : AccessibilityService() {
     }
 
     override fun onInterrupt() {
-        Log.w("______","Interrupted")
+        Log.w("______", "Interrupted")
     }
 }

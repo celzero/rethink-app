@@ -47,9 +47,9 @@ class WhitelistAppDialog(private var activity: Context,
                          private val appInfoViewRepository: AppInfoViewRepository,
                          private val categoryInfoRepository: CategoryInfoRepository,
                          internal var adapter: RecyclerView.Adapter<*>,
-                         var viewModel: AppListViewModel,
-                         themeID :Int)
-    : Dialog(activity, themeID), View.OnClickListener, SearchView.OnQueryTextListener {
+                         var viewModel: AppListViewModel, themeID: Int) : Dialog(activity, themeID),
+                                                                          View.OnClickListener,
+                                                                          SearchView.OnQueryTextListener {
 
     private lateinit var b: CustomDialogLayoutBinding
 
@@ -66,7 +66,8 @@ class WhitelistAppDialog(private var activity: Context,
         setContentView(b.root)
         setCancelable(false)
 
-        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
+        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT,
+                          WindowManager.LayoutParams.MATCH_PARENT)
 
         mLayoutManager = LinearLayoutManager(activity)
 
@@ -86,15 +87,20 @@ class WhitelistAppDialog(private var activity: Context,
         val appCount = appList.size
         val act: FirewallActivity = activity as FirewallActivity
         appInfoViewRepository.getWhitelistCountLiveData().observe(act, {
-            b.customSelectAllOptionCount.text = act.getString(R.string.whitelist_dialog_apps_in_use, it.toString(), appCount.toString())
+            b.customSelectAllOptionCount.text = act.getString(R.string.whitelist_dialog_apps_in_use,
+                                                              it.toString(), appCount.toString())
         })
 
         b.customSelectAllOptionCheckbox.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             modifyAppsInUniversalAppList(b)
             if (b) {
-                Utilities.showToastUiCentered(activity, act.getString(R.string.whitelist_toast_positive), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(activity,
+                                              act.getString(R.string.whitelist_toast_positive),
+                                              Toast.LENGTH_SHORT)
             } else {
-                Utilities.showToastUiCentered(activity, act.getString(R.string.whitelist_toast_negative), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(activity,
+                                              act.getString(R.string.whitelist_toast_negative),
+                                              Toast.LENGTH_SHORT)
             }
             object : CountDownTimer(500, 500) {
                 override fun onTick(millisUntilFinished: Long) {
@@ -127,7 +133,7 @@ class WhitelistAppDialog(private var activity: Context,
                 categoryInfoRepository.updateWhitelistForCategory(it, checked)
                 val countBlocked = appInfoRepository.getBlockedCountForCategory(it)
                 categoryInfoRepository.updateBlockedCount(it, countBlocked)
-                if(DEBUG) Log.d(LOG_TAG_FIREWALL, "Update whitelist count: $update")
+                if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Update whitelist count: $update")
             }
 
         }
@@ -186,7 +192,8 @@ class WhitelistAppDialog(private var activity: Context,
     private fun setCategoryChips(categories: List<String>) {
         b.customDialogChipGroup.removeAllViews()
         for (category in categories) {
-            val mChip = this.layoutInflater.inflate(R.layout.item_chip_category, null, false) as Chip
+            val mChip = this.layoutInflater.inflate(R.layout.item_chip_category, null,
+                                                    false) as Chip
             mChip.text = category
 
             mChip.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->

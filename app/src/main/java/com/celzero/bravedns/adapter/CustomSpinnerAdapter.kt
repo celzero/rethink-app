@@ -27,7 +27,8 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 
 class CustomSpinnerAdapter(val context: Context, var dataSource: List<String>) : BaseAdapter() {
 
-    private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    private val inflater: LayoutInflater = context.getSystemService(
+        Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
 

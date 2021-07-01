@@ -3,9 +3,9 @@ package com.celzero.bravedns
 import android.content.ContentResolver
 import com.celzero.bravedns.data.DataModule
 import com.celzero.bravedns.database.DatabaseModule
+import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.ServiceModule
-import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.viewmodel.ViewModelModule
@@ -32,11 +32,11 @@ private val RootModule = module {
     single<ContentResolver> { androidContext().contentResolver }
 }
 private val updaterModule = module {
-    single { NonStoreAppUpdater(Constants.APP_DOWNLOAD_AVAILABLE_CHECK, get())}
+    single { NonStoreAppUpdater(Constants.APP_DOWNLOAD_AVAILABLE_CHECK, get()) }
     single<AppUpdater> { get<NonStoreAppUpdater>() }
 }
 
-private val orbotHelperModule = module{
+private val orbotHelperModule = module {
     single { OrbotHelper(get(), get()) }
 }
 
@@ -44,7 +44,7 @@ private val appDownloadManagerModule = module {
     single { AppDownloadManager(get(), androidContext()) }
 }
 
-val AppModules:List<Module> by lazy {
+val AppModules: List<Module> by lazy {
     mutableListOf<Module>().apply {
         add(RootModule)
         addAll(DatabaseModule.modules)

@@ -18,29 +18,26 @@ package com.celzero.bravedns.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoDAO
 
 class FirewallAppViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
-    private var filteredList : MutableLiveData<String> = MutableLiveData()
+    private var filteredList: MutableLiveData<String> = MutableLiveData()
 
     init {
         filteredList.value = ""
     }
 
-    var firewallAppDetailsList = Transformations.switchMap<String, List<AppInfo>>(
-        filteredList, ({ input:String ->
-            val inputTxt = "%$input%"
-            appInfoDAO.getAppDetailsForLiveData(inputTxt)
-        })
-    )
+    var firewallAppDetailsList = Transformations.switchMap(filteredList, ({ input: String ->
+        val inputTxt = "%$input%"
+        appInfoDAO.getAppDetailsForLiveData(inputTxt)
+    }))
 
     fun setFilter(filter: String?) {
         filteredList.value = filter
     }
 
-    fun setFilterBlocked(filter: String){
+    fun setFilterBlocked(filter: String) {
         filteredList.value = filter
     }
 

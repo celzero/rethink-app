@@ -47,22 +47,28 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class UniversalAppListAdapter(private val context: Context, private val appInfoRepository: AppInfoRepository, private val categoryInfoRepository: CategoryInfoRepository, private val persistentState: PersistentState) : PagedListAdapter<AppInfo, UniversalAppListAdapter.UniversalAppInfoViewHolder>(DIFF_CALLBACK) {
+class UniversalAppListAdapter(private val context: Context,
+                              private val appInfoRepository: AppInfoRepository,
+                              private val categoryInfoRepository: CategoryInfoRepository,
+                              private val persistentState: PersistentState) :
+        PagedListAdapter<AppInfo, UniversalAppListAdapter.UniversalAppInfoViewHolder>(
+            DIFF_CALLBACK) {
 
     companion object {
 
-        private val DIFF_CALLBACK = object :
-            DiffUtil.ItemCallback<AppInfo>() {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<AppInfo>() {
 
-            override fun areItemsTheSame(oldConnection: AppInfo, newConnection: AppInfo)
-                = oldConnection.packageInfo == newConnection.packageInfo
+            override fun areItemsTheSame(oldConnection: AppInfo,
+                                         newConnection: AppInfo) = oldConnection.packageInfo == newConnection.packageInfo
 
-            override fun areContentsTheSame(oldConnection: AppInfo, newConnection: AppInfo) = oldConnection == newConnection
+            override fun areContentsTheSame(oldConnection: AppInfo,
+                                            newConnection: AppInfo) = oldConnection == newConnection
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UniversalAppInfoViewHolder {
-        val itemBinding = UnivWhitelistListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val itemBinding = UnivWhitelistListItemBinding.inflate(LayoutInflater.from(parent.context),
+                                                               parent, false)
         return UniversalAppInfoViewHolder(itemBinding)
     }
 
@@ -72,7 +78,8 @@ class UniversalAppListAdapter(private val context: Context, private val appInfoR
     }
 
 
-    inner class UniversalAppInfoViewHolder(private val b: UnivWhitelistListItemBinding) : RecyclerView.ViewHolder(b.root) {
+    inner class UniversalAppInfoViewHolder(private val b: UnivWhitelistListItemBinding) :
+            RecyclerView.ViewHolder(b.root) {
 
         fun update(appInfo: AppInfo) {
             if (appInfo.appCategory == Constants.APP_CAT_SYSTEM_COMPONENTS) {
@@ -83,21 +90,29 @@ class UniversalAppListAdapter(private val context: Context, private val appInfoR
 
             b.univWhitelistCheckbox.isChecked = appInfo.whiteListUniv1
             try {
-                GlideApp.with(context).load(context.packageManager.getApplicationIcon(appInfo.packageInfo)).into(b.univWhitelistApkIconIv)
+                GlideApp.with(context).load(
+                    context.packageManager.getApplicationIcon(appInfo.packageInfo)).into(
+                    b.univWhitelistApkIconIv)
             } catch (e: Exception) {
-                GlideApp.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.univWhitelistApkIconIv)
-                Log.e(LOG_TAG_FIREWALL, "Application Icon not available for package: ${appInfo.packageInfo}" + e.message, e)
+                GlideApp.with(context).load(
+                    AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(
+                    b.univWhitelistApkIconIv)
+                Log.e(LOG_TAG_FIREWALL,
+                      "Application Icon not available for package: ${appInfo.packageInfo}" + e.message,
+                      e)
             }
 
             b.univWhitelistContainer.setOnClickListener {
-                if (DEBUG) Log.d(LOG_TAG_FIREWALL, "parentView- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
+                if (DEBUG) Log.d(LOG_TAG_FIREWALL,
+                                 "parentView- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
                 appInfo.whiteListUniv1 = !appInfo.whiteListUniv1
                 modifyWhiteListApps(appInfo)
             }
 
             b.univWhitelistCheckbox.setOnCheckedChangeListener(null)
             b.univWhitelistCheckbox.setOnClickListener {
-                if (DEBUG) Log.d(LOG_TAG_FIREWALL, "CheckBox- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
+                if (DEBUG) Log.d(LOG_TAG_FIREWALL,
+                                 "CheckBox- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
                 appInfo.whiteListUniv1 = !appInfo.whiteListUniv1
                 modifyWhiteListApps(appInfo)
             }
@@ -110,7 +125,7 @@ class UniversalAppListAdapter(private val context: Context, private val appInfoR
 
             val blockAllApps = if (appUIDList.size > 1) {
                 showDialog(appUIDList, appInfo.appName, status)
-            }else{
+            } else {
                 true
             }
             if (blockAllApps) {
@@ -126,10 +141,12 @@ class UniversalAppListAdapter(private val context: Context, private val appInfoR
                         appInfoRepository.updateInternetForUID(appInfo.uid, status)
                     }
                     appInfoRepository.updateWhiteList(appInfo.uid, status)
-                    val countBlocked = appInfoRepository.getBlockedCountForCategory(appInfo.appCategory)
+                    val countBlocked = appInfoRepository.getBlockedCountForCategory(
+                        appInfo.appCategory)
                     val countWhitelisted = appInfoRepository.getWhitelistCount(appInfo.appCategory)
                     categoryInfoRepository.updateBlockedCount(appInfo.appCategory, countBlocked)
-                    categoryInfoRepository.updateWhitelistCount(appInfo.appCategory, countWhitelisted)
+                    categoryInfoRepository.updateWhitelistCount(appInfo.appCategory,
+                                                                countWhitelisted)
                 }
             } else {
                 b.univWhitelistCheckbox.isChecked = !status
@@ -137,7 +154,8 @@ class UniversalAppListAdapter(private val context: Context, private val appInfoR
             }
         }
 
-        private fun showDialog(packageList: List<AppInfo>, appName: String, isInternet: Boolean): Boolean {
+        private fun showDialog(packageList: List<AppInfo>, appName: String,
+                               isInternet: Boolean): Boolean {
             //Change the handler logic into some other
             val handler: Handler = ThrowingHandler()
             val positiveTxt: String
@@ -153,13 +171,20 @@ class UniversalAppListAdapter(private val context: Context, private val appInfoR
                     appNameEllipsis = appNameEllipsis.substring(0, 10)
                     appNameEllipsis = "$appNameEllipsis..."
                 }
-                builderSingle.setTitle(context.getString(R.string.whitelist_add_app, appNameEllipsis, packageList.size.toString()))
-                positiveTxt = context.getString(R.string.whitelist_add_positive, packageList.size.toString())
+                builderSingle.setTitle(
+                    context.getString(R.string.whitelist_add_app, appNameEllipsis,
+                                      packageList.size.toString()))
+                positiveTxt = context.getString(R.string.whitelist_add_positive,
+                                                packageList.size.toString())
             } else {
-                builderSingle.setTitle(context.getString(R.string.whitelist_remove_app, appNameEllipsis, packageList.size.toString()))
-                positiveTxt = context.getString(R.string.whitelist_add_negative, packageList.size.toString())
+                builderSingle.setTitle(
+                    context.getString(R.string.whitelist_remove_app, appNameEllipsis,
+                                      packageList.size.toString()))
+                positiveTxt = context.getString(R.string.whitelist_add_negative,
+                                                packageList.size.toString())
             }
-            val arrayAdapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_activated_1)
+            val arrayAdapter = ArrayAdapter<String>(context,
+                                                    android.R.layout.simple_list_item_activated_1)
             arrayAdapter.addAll(packageNameList)
             builderSingle.setCancelable(false)
             builderSingle.setItems(packageNameList.toTypedArray(), null)
@@ -167,7 +192,8 @@ class UniversalAppListAdapter(private val context: Context, private val appInfoR
             builderSingle.setPositiveButton(positiveTxt) { _: DialogInterface, _: Int ->
                 proceedBlocking = true
                 handler.sendMessage(handler.obtainMessage())
-            }.setNeutralButton(context.getString(R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int ->
+            }.setNeutralButton(context.getString(
+                R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int ->
                 handler.sendMessage(handler.obtainMessage())
                 proceedBlocking = false
             }

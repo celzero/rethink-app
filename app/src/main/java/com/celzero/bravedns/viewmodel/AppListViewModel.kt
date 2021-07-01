@@ -40,9 +40,11 @@ class AppListViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         } else if (input.contains(FILTER_CATEGORY)) {
             val filterVal = input.split(":")[1]
             val result = filterVal.split(",").map { it.trim() }
-            appInfoDAO.getUnivAppDetailsFilterForCategoryLiveData(result).toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+            appInfoDAO.getUnivAppDetailsFilterForCategoryLiveData(result).toLiveData(
+                pageSize = LIVEDATA_PAGE_SIZE)
         } else {
-            appInfoDAO.getUnivAppDetailsFilterLiveData("%$input%").toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+            appInfoDAO.getUnivAppDetailsFilterLiveData("%$input%").toLiveData(
+                pageSize = LIVEDATA_PAGE_SIZE)
         }
     }
 

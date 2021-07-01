@@ -30,11 +30,13 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
-class PermissionManagerActivity : AppCompatActivity(R.layout.activity_permission_manager), SearchView.OnQueryTextListener {
+class PermissionManagerActivity : AppCompatActivity(R.layout.activity_permission_manager),
+                                  SearchView.OnQueryTextListener {
     private val b by viewBinding(ActivityPermissionManagerBinding::bind)
 
     //private lateinit var fastAdapter: FastAdapter<PermissionManagerApk>
     private val apkList = ArrayList<PermissionManagerApk>()
+
     //private lateinit var itemAdapter: ItemAdapter<PermissionManagerApk>
     private lateinit var context: Context
 
@@ -60,17 +62,18 @@ class PermissionManagerActivity : AppCompatActivity(R.layout.activity_permission
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-       /* itemAdapter.filter(query)
-        itemAdapter.itemFilter.filterPredicate = { item: PermissionManagerApk, constraint: CharSequence? ->
-            item.appName?.contains(constraint.toString(), ignoreCase = true)!!
-        }*/
+        /* itemAdapter.filter(query)
+         itemAdapter.itemFilter.filterPredicate = { item: PermissionManagerApk, constraint: CharSequence? ->
+             item.appName?.contains(constraint.toString(), ignoreCase = true)!!
+         }*/
         return false
     }
 
     private fun updateAppList() = GlobalScope.launch(Dispatchers.Default) {
         val appList = appInfoRepository.getAppInfoAsync()
         appList.forEach {
-            val userApk = PermissionManagerApk(packageManager.getPackageInfo(it.packageInfo, 0), context)
+            val userApk = PermissionManagerApk(packageManager.getPackageInfo(it.packageInfo, 0),
+                                               context)
             apkList.add(userApk)
         }
         /*withContext(Dispatchers.Main.immediate) {

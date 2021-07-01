@@ -32,7 +32,8 @@ class DownloadHelper {
                 val dir = File(getExternalFilePath(context, timestamp))
                 if (dir.isDirectory) {
                     val children = dir.list()
-                    if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Local block list validation isDirectory: true, children : ${children?.size}, ${dir.path}")
+                    if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
+                                     "Local block list validation isDirectory: true, children : ${children?.size}, ${dir.path}")
                     if (children != null && children.size == Constants.LOCAL_BLOCKLIST_FILE_COUNT) return true
                 }
             } catch (e: Exception) {
@@ -50,19 +51,22 @@ class DownloadHelper {
          */
         fun deleteOldFiles(context: Context) {
             val dir = File(context.getExternalFilesDir(null).toString() + Constants.DOWNLOAD_PATH)
-            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "deleteOldFiles -- File : ${dir.path}, ${dir.isDirectory}")
+            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
+                             "deleteOldFiles -- File : ${dir.path}, ${dir.isDirectory}")
             deleteRecursive(dir)
         }
 
         private fun deleteRecursive(fileOrDirectory: File) {
             try {
-                if (fileOrDirectory.isDirectory) for (child in fileOrDirectory.listFiles()!!) deleteRecursive(child)
-                val isDeleted : Boolean = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (fileOrDirectory.isDirectory) for (child in fileOrDirectory.listFiles()!!) deleteRecursive(
+                    child)
+                val isDeleted: Boolean = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     fileOrDirectory.deleteRecursively()
                 } else {
                     fileOrDirectory.delete()
                 }
-                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "deleteRecursive -- File : ${fileOrDirectory.path}, $isDeleted")
+                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
+                                 "deleteRecursive -- File : ${fileOrDirectory.path}, $isDeleted")
             } catch (e: Exception) {
                 Log.w(LOG_TAG_DOWNLOAD, "File delete exception: ${e.message}", e)
             }
@@ -77,7 +81,8 @@ class DownloadHelper {
             if (context == null) {
                 return Constants.DOWNLOAD_PATH + File.separator + timestamp + File.separator
             }
-            return context.getExternalFilesDir(null).toString() + Constants.DOWNLOAD_PATH +  File.separator + timestamp +  File.separator
+            return context.getExternalFilesDir(
+                null).toString() + Constants.DOWNLOAD_PATH + File.separator + timestamp + File.separator
         }
     }
 

@@ -20,26 +20,25 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "AppInfo")
 class AppInfo {
-    @PrimaryKey
-    var packageInfo : String = ""
-    var appName : String = ""
-    var uid : Int = 0
-    var trackers : Int = 0
-    var isWifiEnabled : Boolean = true
-    var isDataEnabled : Boolean = true
-    var isSystemApp : Boolean = false
-    var isScreenOff : Boolean = false
-    var isInternetAllowed : Boolean = true
-    var isBackgroundEnabled : Boolean = true
-    var whiteListUniv1 : Boolean = false
-    var whiteListUniv2 : Boolean = false
-    var isExcluded : Boolean = false
-    var appCategory : String = ""
-    var wifiDataUsed : Long = 0
-    var mobileDataUsed : Long = 0
+    @PrimaryKey var packageInfo: String = ""
+    var appName: String = ""
+    var uid: Int = 0
+    var trackers: Int = 0
+    var isWifiEnabled: Boolean = true
+    var isDataEnabled: Boolean = true
+    var isSystemApp: Boolean = false
+    var isScreenOff: Boolean = false
+    var isInternetAllowed: Boolean = true
+    var isBackgroundEnabled: Boolean = true
+    var whiteListUniv1: Boolean = false
+    var whiteListUniv2: Boolean = false
+    var isExcluded: Boolean = false
+    var appCategory: String = ""
+    var wifiDataUsed: Long = 0
+    var mobileDataUsed: Long = 0
 
 
-    override fun equals(other: Any?): Boolean{
+    override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other?.javaClass != javaClass) return false
         other as AppInfo
@@ -47,7 +46,7 @@ class AppInfo {
         return true
     }
 
-    override fun hashCode(): Int{
+    override fun hashCode(): Int {
         return this.hashCode()
     }
 

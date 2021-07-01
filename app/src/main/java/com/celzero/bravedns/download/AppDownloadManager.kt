@@ -38,10 +38,11 @@ import java.util.concurrent.TimeUnit
  * to listen for the download complete and for copying the files from external to canonical path.
  * TODO remote blocklist - implementation pending.
  */
-class AppDownloadManager(private val persistentState: PersistentState, private val context: Context?) {
+class AppDownloadManager(private val persistentState: PersistentState,
+                         private val context: Context?) {
 
     private lateinit var downloadManager: DownloadManager
-    private var downloadReference : MutableList<Long> = mutableListOf()
+    private var downloadReference: MutableList<Long> = mutableListOf()
 
     /**
      * Responsible for downloading the local blocklist files.
@@ -52,14 +53,15 @@ class AppDownloadManager(private val persistentState: PersistentState, private v
     fun downloadLocalBlocklist(timestamp: Long) {
         if (context != null) {
             initDownload(context)
-            for(i in 0 until LOCAL_BLOCKLIST_FILE_COUNT){
+            for (i in 0 until LOCAL_BLOCKLIST_FILE_COUNT) {
                 val url = DOWNLOAD_URLS[i]
                 val fileName = File.separator + FILE_NAMES[i]
-                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Timestamp - ($timestamp) filename - $fileName, url - $url")
+                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
+                                 "Timestamp - ($timestamp) filename - $fileName, url - $url")
                 download(url, fileName, timestamp.toString())
             }
             initiateDownloadStatusCheck()
-        }else{
+        } else {
             Log.i(LOG_TAG_DOWNLOAD, "Context for download is null")
             persistentState.localBlocklistEnabled = false
             persistentState.tempBlocklistDownloadTime = 0
@@ -71,28 +73,20 @@ class AppDownloadManager(private val persistentState: PersistentState, private v
     private fun initiateDownloadStatusCheck() {
         WorkManager.getInstance().pruneWork()
 
-        val downloadWatcher = OneTimeWorkRequestBuilder<DownloadWatcher>()
-            .setBackoffCriteria(BackoffPolicy.LINEAR,
-                                OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
-                                TimeUnit.MILLISECONDS)
-            .addTag(DOWNLOAD_TAG)
-            .setInitialDelay(10, TimeUnit.SECONDS)
-            .build()
+        val downloadWatcher = OneTimeWorkRequestBuilder<DownloadWatcher>().setBackoffCriteria(
+            BackoffPolicy.LINEAR, OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+            TimeUnit.MILLISECONDS).addTag(DOWNLOAD_TAG).setInitialDelay(10,
+                                                                        TimeUnit.SECONDS).build()
 
         val timestampLong = persistentState.tempBlocklistDownloadTime
         val timestamp = workDataOf("timeStamp" to timestampLong)
 
-        val fileHandler = OneTimeWorkRequestBuilder<FileHandleWorker>().setInputData(timestamp)
-            .setBackoffCriteria(BackoffPolicy.LINEAR,
-                                OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
-                                TimeUnit.MILLISECONDS)
-            .addTag(FILE_TAG)
-            .build()
+        val fileHandler = OneTimeWorkRequestBuilder<FileHandleWorker>().setInputData(
+            timestamp).setBackoffCriteria(BackoffPolicy.LINEAR,
+                                          OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+                                          TimeUnit.MILLISECONDS).addTag(FILE_TAG).build()
 
-        WorkManager.getInstance()
-                    .beginWith(downloadWatcher)
-                    .then(fileHandler)
-                    .enqueue()
+        WorkManager.getInstance().beginWith(downloadWatcher).then(fileHandler).enqueue()
 
     }
 
@@ -132,10 +126,13 @@ class AppDownloadManager(private val persistentState: PersistentState, private v
         request.apply {
             setTitle(fileName)
             setDescription(fileName)
-            request.setDestinationInExternalFilesDir(context, DownloadHelper.getExternalFilePath(null, timestamp), fileName)
+            request.setDestinationInExternalFilesDir(context,
+                                                     DownloadHelper.getExternalFilePath(null,
+                                                                                        timestamp),
+                                                     fileName)
             val downloadID = downloadManager.enqueue(this)
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "filename - $fileName, downloadID - $downloadID")
-            persistentState.downloadIDs =  persistentState.downloadIDs + downloadID.toString()
+            persistentState.downloadIDs = persistentState.downloadIDs + downloadID.toString()
         }
     }
 

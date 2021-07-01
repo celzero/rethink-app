@@ -32,7 +32,8 @@ class SettingsBottomSheetFragment : BottomSheetDialogFragment() {
 
     override fun getTheme(): Int = R.style.BottomSheetDialogTheme
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View {
         _binding = ActivitySettingsScreenBinding.inflate(inflater, container, false)
         return b.root
     }

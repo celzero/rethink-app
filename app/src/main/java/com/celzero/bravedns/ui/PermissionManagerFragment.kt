@@ -37,27 +37,24 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener{
+class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener {
     private val apkList = ArrayList<Apk>()
     lateinit var mAdapter: ApkListAdapter
     private lateinit var progressBar: ProgressBar
-    private lateinit var  expandableImage : ImageView
+    private lateinit var expandableImage: ImageView
     lateinit var mRecyclerView: RecyclerView
     private lateinit var mLinearLayoutManager: LinearLayoutManager
-    lateinit var contextVal : Context
+    lateinit var contextVal: Context
     private var editsearch: SearchView? = null
 
-    private lateinit var filterIcon : ImageView
+    private lateinit var filterIcon: ImageView
 
     private val appInfoRepository by inject<AppInfoRepository>()
 
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view: View = inflater.inflate(R.layout.fragment_permission_manager,container,false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+        val view: View = inflater.inflate(R.layout.fragment_permission_manager, container, false)
 
         val includeView = view.findViewById<View>(R.id.app_scrolling_incl)
         expandableImage = view.findViewById(R.id.expandedImage)
@@ -83,26 +80,24 @@ class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener{
         filterIcon.setOnClickListener {
             val bottomFilterSheetFragment = FilterAndSortBottomFragment()
             val frag = context as FragmentActivity
-            bottomFilterSheetFragment.show(
-                frag.supportFragmentManager,
-                bottomFilterSheetFragment.tag
-            )
+            bottomFilterSheetFragment.show(frag.supportFragmentManager,
+                                           bottomFilterSheetFragment.tag)
         }
 
         return view
     }
 
-    private fun updateAppList() = GlobalScope.launch ( Dispatchers.Default ){
-            val appList = appInfoRepository.getAppInfoAsync()
-            appList.forEach{
-                val userApk = Apk(it.appName,it.appName,it.packageInfo,it.uid.toString())
-                apkList.add(userApk)
-            }
-            withContext(Dispatchers.Main.immediate) {
-                progressBar.visibility = View.GONE
-                mAdapter.notifyDataSetChanged()
-            }
+    private fun updateAppList() = GlobalScope.launch(Dispatchers.Default) {
+        val appList = appInfoRepository.getAppInfoAsync()
+        appList.forEach {
+            val userApk = Apk(it.appName, it.appName, it.packageInfo, it.uid.toString())
+            apkList.add(userApk)
         }
+        withContext(Dispatchers.Main.immediate) {
+            progressBar.visibility = View.GONE
+            mAdapter.notifyDataSetChanged()
+        }
+    }
 
     override fun onAttach(context: Context) {
         contextVal = context
@@ -115,8 +110,7 @@ class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener{
     }
 
     override fun onQueryTextChange(newText: String): Boolean {
-        if(mAdapter.apkListFiltered.size == 0)
-            mAdapter.apkListFiltered.addAll(apkList)
+        if (mAdapter.apkListFiltered.size == 0) mAdapter.apkListFiltered.addAll(apkList)
 
         mAdapter.filter(newText)
         return false

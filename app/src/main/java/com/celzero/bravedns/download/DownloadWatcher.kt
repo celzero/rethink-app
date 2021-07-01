@@ -39,7 +39,8 @@ import org.koin.core.component.inject
  * Once the download is completed, the Worker will send a Result.success().
  * Else, the Result.retry() will be triggered to check again.
  */
-class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) : Worker(context, workerParameters), KoinComponent {
+class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) :
+        Worker(context, workerParameters), KoinComponent {
 
     val persistentState by inject<PersistentState>()
 
@@ -73,7 +74,8 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
         persistentState.downloadIDs.forEach { downloadID ->
             val query = DownloadManager.Query()
             query.setFilterById(downloadID.toLong())
-            val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            val downloadManager = context.getSystemService(
+                Context.DOWNLOAD_SERVICE) as DownloadManager
             val cursor = downloadManager.query(query)
             if (cursor == null) {
                 Log.i(LOG_TAG_DOWNLOAD, "status is $downloadID cursor null")
@@ -84,7 +86,8 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "onReceive status $status $downloadID")
                 if (status == DownloadManager.STATUS_SUCCESSFUL) {
                     if (persistentState.downloadIDs.contains(downloadID)) {
-                        persistentState.downloadIDs = persistentState.downloadIDs.minusElement(downloadID)
+                        persistentState.downloadIDs = persistentState.downloadIDs.minusElement(
+                            downloadID)
                     }
                     if (persistentState.downloadIDs.isEmpty()) {
                         cursor.close()

@@ -39,7 +39,8 @@ import java.io.File
  * As of now the code is written only for the local block list copy.
  */
 
-class FileHandleWorker(val context: Context, workerParameters: WorkerParameters) : Worker(context, workerParameters), KoinComponent {
+class FileHandleWorker(val context: Context, workerParameters: WorkerParameters) :
+        Worker(context, workerParameters), KoinComponent {
 
     val persistentState by inject<PersistentState>()
 
@@ -53,7 +54,8 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             else Result.failure()
 
         } catch (e: Exception) {
-            Log.e(LOG_TAG_DOWNLOAD, "FileHandleWorker Error while moving files to canonical path ${e.message}", e)
+            Log.e(LOG_TAG_DOWNLOAD,
+                  "FileHandleWorker Error while moving files to canonical path ${e.message}", e)
         }
         return Result.failure()
     }
@@ -75,7 +77,8 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
                 for (i in children.indices) {
                     val from = File(dir, children[i])
                     val to = File("${context.filesDir.canonicalPath}/$timestamp/${children[i]}")
-                    if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Copy file  ${children[i]} from - ${from.path}, to - ${to.path}")
+                    if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
+                                     "Copy file  ${children[i]} from - ${from.path}, to - ${to.path}")
                     from.copyTo(to, true)
                 }
                 val destinationDir = File("${context.filesDir.canonicalPath}/$timestamp")
@@ -118,11 +121,16 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
         try {
             val timeStamp = persistentState.tempBlocklistDownloadTime
             val path: String = context.filesDir.canonicalPath + File.separator + timeStamp
-            val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
-            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid? ${braveDNS != null}")
+            val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE,
+                                                 path + Constants.FILE_RD_FILE,
+                                                 path + Constants.FILE_BASIC_CONFIG,
+                                                 path + Constants.FILE_TAG_NAME)
+            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
+                             "AppDownloadManager isDownloadValid? ${braveDNS != null}")
             return braveDNS != null
         } catch (e: Exception) {
-            Log.e(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid exception - ${e.message}", e)
+            Log.e(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid exception - ${e.message}",
+                  e)
         }
         return false
     }

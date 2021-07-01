@@ -32,34 +32,34 @@ class FirewallRules {
     companion object {
         var firewallRulesObj: FirewallRules? = null
         fun getInstance(): FirewallRules {
-            if (firewallRulesObj == null)
-                firewallRulesObj = FirewallRules()
+            if (firewallRulesObj == null) firewallRulesObj = FirewallRules()
             return firewallRulesObj as FirewallRules
         }
     }
 
-    fun clearFirewallRules(uid : Int, blockedConnectionsRepository:BlockedConnectionsRepository) {
+    fun clearFirewallRules(uid: Int, blockedConnectionsRepository: BlockedConnectionsRepository) {
         GlobalScope.launch(Dispatchers.IO) {
             blockedConnectionsRepository.clearFirewallRules(uid)
         }
         firewallRules.removeAll(uid)
     }
 
-    fun removeFirewallRules(uid: Int, ipAddress: String, blockedConnectionsRepository:BlockedConnectionsRepository) {
-        if(DEBUG) Log.d(LOG_TAG_FIREWALL,"Remove Firewall: $uid, $ipAddress")
+    fun removeFirewallRules(uid: Int, ipAddress: String,
+                            blockedConnectionsRepository: BlockedConnectionsRepository) {
+        if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Remove Firewall: $uid, $ipAddress")
         GlobalScope.launch(Dispatchers.IO) {
-            if(uid == ConnTrackerBottomSheetFragment.UNIVERSAL_RULES_UID)
-                blockedConnectionsRepository.deleteIPRulesUniversal(ipAddress)
-            else
-                blockedConnectionsRepository.deleteIPRulesForUID(uid, ipAddress)
+            if (uid == ConnTrackerBottomSheetFragment.UNIVERSAL_RULES_UID) blockedConnectionsRepository.deleteIPRulesUniversal(
+                ipAddress)
+            else blockedConnectionsRepository.deleteIPRulesForUID(uid, ipAddress)
         }
         firewallRules.remove(uid, ipAddress)
     }
 
-    fun addFirewallRules(uid: Int, ipAddress: String, ruleType: String, blockedConnectionsRepository:BlockedConnectionsRepository) {
-        if(DEBUG) Log.d(LOG_TAG_FIREWALL,"addFirewallRules: $uid, $ipAddress")
+    fun addFirewallRules(uid: Int, ipAddress: String, ruleType: String,
+                         blockedConnectionsRepository: BlockedConnectionsRepository) {
+        if (DEBUG) Log.d(LOG_TAG_FIREWALL, "addFirewallRules: $uid, $ipAddress")
         GlobalScope.launch(Dispatchers.IO) {
-            val blockedConnection = constructBlockedConnections(uid, ipAddress,ruleType)
+            val blockedConnection = constructBlockedConnections(uid, ipAddress, ruleType)
             blockedConnectionsRepository.insertAsync(blockedConnection)
         }
         firewallRules.put(uid, ipAddress)
@@ -76,7 +76,7 @@ class FirewallRules {
     }
 
 
-    fun loadFirewallRules(blockedConnectionsRepository:BlockedConnectionsRepository) {
+    fun loadFirewallRules(blockedConnectionsRepository: BlockedConnectionsRepository) {
         GlobalScope.launch(Dispatchers.IO) {
             val dbVal = blockedConnectionsRepository.getBlockedConnections()
             dbVal.forEach {
@@ -86,7 +86,8 @@ class FirewallRules {
         }
     }
 
-    private fun constructBlockedConnections(uid: Int, ipAddress: String, ruleType : String): BlockedConnections {
+    private fun constructBlockedConnections(uid: Int, ipAddress: String,
+                                            ruleType: String): BlockedConnections {
         val blockedConnections = BlockedConnections()
         blockedConnections.ipAddress = ipAddress
         blockedConnections.port = 0

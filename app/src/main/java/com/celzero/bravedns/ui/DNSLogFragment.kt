@@ -72,7 +72,8 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
             layoutManager = LinearLayoutManager(requireContext())
             includeView.recyclerQuery.layoutManager = layoutManager
             recyclerAdapter = DNSQueryAdapter(requireContext(), persistentState)
-            viewModel.dnsLogsList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(recyclerAdapter!!::submitList))
+            viewModel.dnsLogsList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
+                recyclerAdapter!!::submitList))
             includeView.recyclerQuery.adapter = recyclerAdapter
         } else {
             includeView.queryListLogsDisabledTv.visibility = View.VISIBLE
@@ -104,19 +105,24 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         registerForObservers()
     }
 
-    private fun registerForObservers(){
+    private fun registerForObservers() {
         lifeTimeQ.observe(viewLifecycleOwner, {
             val lifeTimeConversion = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT).format(lifeTimeQ.value)
+                CompactDecimalFormat.getInstance(Locale.US,
+                                                 CompactDecimalFormat.CompactStyle.SHORT).format(
+                    lifeTimeQ.value)
             } else {
                 lifeTimeQ.value.toString()
             }
-            b.totalQueriesTxt.text  = getString(R.string.dns_logs_lifetime_queries, lifeTimeConversion)
+            b.totalQueriesTxt.text = getString(R.string.dns_logs_lifetime_queries,
+                                               lifeTimeConversion)
         })
 
         persistentState.blockedCount.observe(viewLifecycleOwner, {
             val blocked = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT).format(persistentState.blockedCount.value)
+                CompactDecimalFormat.getInstance(Locale.US,
+                                                 CompactDecimalFormat.CompactStyle.SHORT).format(
+                    persistentState.blockedCount.value)
             } else {
                 persistentState.blockedCount.value.toString()
             }
@@ -138,22 +144,29 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
             } catch (e: Exception) {
                 return
             }
-            b.connectedStatusTitleUrl.text = resources.getString(R.string.configure_dns_connected_doh_status)
-            b.connectedStatusTitle.text = resources.getString(R.string.configure_dns_connection_name, dohDetail?.dohName)
+            b.connectedStatusTitleUrl.text = resources.getString(
+                R.string.configure_dns_connected_doh_status)
+            b.connectedStatusTitle.text = resources.getString(
+                R.string.configure_dns_connection_name, dohDetail?.dohName)
             b.queryListScrollList.recyclerQuery.visibility = View.VISIBLE
             b.queryListScrollList.dnsLogNoLogText.visibility = View.GONE
         } else if (dnsType == 2) {
             val cryptDetails = appMode?.getDNSCryptServerCount()
-            val cryptName = resources.getString(R.string.configure_dns_crypt_name, cryptDetails.toString())
-            b.connectedStatusTitle.text = resources.getString(R.string.configure_dns_connection_name, cryptName)
-            b.connectedStatusTitleUrl.text = resources.getString(R.string.configure_dns_connected_dns_crypt_status)
+            val cryptName = resources.getString(R.string.configure_dns_crypt_name,
+                                                cryptDetails.toString())
+            b.connectedStatusTitle.text = resources.getString(
+                R.string.configure_dns_connection_name, cryptName)
+            b.connectedStatusTitleUrl.text = resources.getString(
+                R.string.configure_dns_connected_dns_crypt_status)
             persistentState.setConnectedDNS("DNSCrypt: $cryptDetails resolvers")
             b.queryListScrollList.recyclerQuery.visibility = View.VISIBLE
             b.queryListScrollList.dnsLogNoLogText.visibility = View.GONE
         } else {
             val proxyDetails = appMode?.getDNSProxyServerDetails()
-            b.connectedStatusTitleUrl.text = resources.getString(R.string.configure_dns_connected_dns_proxy_status)
-            b.connectedStatusTitle.text = resources.getString(R.string.configure_dns_connection_name, proxyDetails?.proxyName)
+            b.connectedStatusTitleUrl.text = resources.getString(
+                R.string.configure_dns_connected_dns_proxy_status)
+            b.connectedStatusTitle.text = resources.getString(
+                R.string.configure_dns_connection_name, proxyDetails?.proxyName)
             b.queryListScrollList.recyclerQuery.visibility = View.GONE
             if (persistentState.logsEnabled) {
                 b.queryListScrollList.dnsLogNoLogText.visibility = View.VISIBLE
@@ -162,7 +175,8 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     }
 
     private fun showDialogForFilter() {
-        val singleItems = arrayOf(getString(R.string.filter_dns_blocked_connections), getString(R.string.filter_dns_all_connections))
+        val singleItems = arrayOf(getString(R.string.filter_dns_blocked_connections),
+                                  getString(R.string.filter_dns_all_connections))
 
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle(getString(R.string.dns_log_dialog_title))

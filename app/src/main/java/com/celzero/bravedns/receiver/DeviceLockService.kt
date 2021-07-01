@@ -53,11 +53,12 @@ class DeviceLockService : Service() {
         val isLocked = keyguardManager.isKeyguardLocked
         // ref - https://developer.android.com/reference/android/os/PowerManager#isInteractive()
         val isInteractive = powerManager.isInteractive
-        val delayIndex: Int = getSafeCheckLockDelay(intent.getIntExtra(EXTRA_CHECK_LOCK_DELAY_INDEX, -1))
+        val delayIndex: Int = getSafeCheckLockDelay(
+            intent.getIntExtra(EXTRA_CHECK_LOCK_DELAY_INDEX, -1))
 
         checkLockTask?.cancel()
 
-        if(isProtected && isLocked) {
+        if (isProtected && isLocked) {
             Log.i(LOG_TAG_VPN, "DeviceLockService : Screen lock detected at $delayIndex")
             persistentState.isScreenOff = true
             timer.cancel()
@@ -75,18 +76,9 @@ class DeviceLockService : Service() {
 
         private const val SECOND = 1000
         private const val MINUTE = 60 * SECOND
-        val checkLockDelays = intArrayOf(
-            1 * SECOND,
-            5 * SECOND,
-            10 * SECOND,
-            20 * SECOND,
-            30 * SECOND,
-            1 * MINUTE,
-            3 * MINUTE,
-            5 * MINUTE,
-            10 * MINUTE,
-            30 * MINUTE
-        )
+        val checkLockDelays = intArrayOf(1 * SECOND, 5 * SECOND, 10 * SECOND, 20 * SECOND,
+                                         30 * SECOND, 1 * MINUTE, 3 * MINUTE, 5 * MINUTE,
+                                         10 * MINUTE, 30 * MINUTE)
 
         fun getSafeCheckLockDelay(delayIndex: Int): Int {
             return if (delayIndex >= checkLockDelays.size) {

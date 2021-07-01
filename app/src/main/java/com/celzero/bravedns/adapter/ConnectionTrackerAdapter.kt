@@ -44,23 +44,27 @@ import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
 import java.util.*
 
-class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(DIFF_CALLBACK) {
+class ConnectionTrackerAdapter(val context: Context) :
+        PagedListAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(
+            DIFF_CALLBACK) {
 
 
     companion object {
         private val DIFF_CALLBACK = object :
 
-            DiffUtil.ItemCallback<ConnectionTracker>() {
+                DiffUtil.ItemCallback<ConnectionTracker>() {
 
-            override fun areItemsTheSame(oldConnection: ConnectionTracker, newConnection: ConnectionTracker)
-                = oldConnection.id == newConnection.id
+            override fun areItemsTheSame(oldConnection: ConnectionTracker,
+                                         newConnection: ConnectionTracker) = oldConnection.id == newConnection.id
 
-            override fun areContentsTheSame(oldConnection: ConnectionTracker, newConnection: ConnectionTracker) = oldConnection == newConnection
+            override fun areContentsTheSame(oldConnection: ConnectionTracker,
+                                            newConnection: ConnectionTracker) = oldConnection == newConnection
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConnectionTrackerViewHolder {
-        val itemBinding = ConnectionTransactionRowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val itemBinding = ConnectionTransactionRowBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false)
         return ConnectionTrackerViewHolder(itemBinding)
     }
 
@@ -70,10 +74,11 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
     }
 
 
-    inner class ConnectionTrackerViewHolder(private val b: ConnectionTransactionRowBinding) : RecyclerView.ViewHolder(b.root) {
+    inner class ConnectionTrackerViewHolder(private val b: ConnectionTransactionRowBinding) :
+            RecyclerView.ViewHolder(b.root) {
 
         fun update(connTracker: ConnectionTracker) {
-            val time = Utilities.convertLongToTime(connTracker.timeStamp)
+            val time = Utilities.convertLongToTime(connTracker.timestamp)
             b.connectionResponseTime.text = time
             b.connectionFlag.text = connTracker.flag
             b.connectionIpAddress.text = connTracker.ipAddress
@@ -90,11 +95,13 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
             when {
                 connTracker.isBlocked -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
-                    b.connectionStatusIndicator.setBackgroundColor(ContextCompat.getColor(context, R.color.colorRed_A400))
+                    b.connectionStatusIndicator.setBackgroundColor(
+                        ContextCompat.getColor(context, R.color.colorRed_A400))
                 }
                 FirewallRuleset.RULE7.ruleName == connTracker.blockedByRule -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
-                    b.connectionStatusIndicator.setBackgroundColor(fetchTextColor(R.color.dividerColor))
+                    b.connectionStatusIndicator.setBackgroundColor(
+                        fetchTextColor(R.color.dividerColor))
                 }
                 else -> {
                     b.connectionStatusIndicator.visibility = View.INVISIBLE
@@ -105,17 +112,30 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
                     val appArray = context.packageManager.getPackagesForUid(connTracker.uid)
                     val appCount = (appArray?.size)?.minus(1)
                     if (appArray?.size!! > 2) {
-                        b.connectionAppName.text = context.getString(R.string.ctbs_app_other_apps, connTracker.appName, appCount.toString())
+                        b.connectionAppName.text = context.getString(R.string.ctbs_app_other_apps,
+                                                                     connTracker.appName,
+                                                                     appCount.toString())
                     } else if (appArray.size == 2) {
-                        b.connectionAppName.text = context.getString(R.string.ctbs_app_other_app, connTracker.appName, appCount.toString())
+                        b.connectionAppName.text = context.getString(R.string.ctbs_app_other_app,
+                                                                     connTracker.appName,
+                                                                     appCount.toString())
                     }
-                    GlideApp.with(context).load(context.packageManager.getApplicationIcon(appArray[0]!!)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)
+                    GlideApp.with(context).load(
+                        context.packageManager.getApplicationIcon(appArray[0]!!)).error(
+                        AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(
+                        b.connectionAppIcon)
                 } catch (e: PackageManager.NameNotFoundException) {
-                    GlideApp.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)
+                    GlideApp.with(context).load(
+                        AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).error(
+                        AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(
+                        b.connectionAppIcon)
                     Log.w(LOG_TAG_FIREWALL_LOG, "Package Not Found - " + e.message)
                 }
             } else {
-                GlideApp.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)
+                GlideApp.with(context).load(
+                    AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).error(
+                    AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(
+                    b.connectionAppIcon)
             }
 
             b.connectionParentLayout.setOnClickListener {
@@ -135,13 +155,12 @@ class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<Connecti
                 R.attr.accentGood
             }
             val typedValue = TypedValue()
-            val a: TypedArray = context.obtainStyledAttributes(typedValue.data, intArrayOf(attributeFetch))
+            val a: TypedArray = context.obtainStyledAttributes(typedValue.data,
+                                                               intArrayOf(attributeFetch))
             val color = a.getColor(0, 0)
             a.recycle()
             return color
         }
-
-
     }
 
 }

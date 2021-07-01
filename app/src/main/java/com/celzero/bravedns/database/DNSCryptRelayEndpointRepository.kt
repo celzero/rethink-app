@@ -23,22 +23,26 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 
-class DNSCryptRelayEndpointRepository(private val dnsCryptRelayEndpointDAO: DNSCryptRelayEndpointDAO) {
+class DNSCryptRelayEndpointRepository(
+        private val dnsCryptRelayEndpointDAO: DNSCryptRelayEndpointDAO) {
 
-    fun updateAsync(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
+    fun updateAsync(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint,
+                    coroutineScope: CoroutineScope = GlobalScope) {
         coroutineScope.launch {
             dnsCryptRelayEndpointDAO.update(dnsCryptRelayEndpoint)
         }
     }
 
-    fun deleteAsync(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
+    fun deleteAsync(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint,
+                    coroutineScope: CoroutineScope = GlobalScope) {
         coroutineScope.launch {
             dnsCryptRelayEndpointDAO.delete(dnsCryptRelayEndpoint)
         }
     }
 
 
-    fun insertAsync(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
+    fun insertAsync(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint,
+                    coroutineScope: CoroutineScope = GlobalScope) {
         coroutineScope.launch {
             dnsCryptRelayEndpointDAO.insert(dnsCryptRelayEndpoint)
         }
@@ -54,8 +58,10 @@ class DNSCryptRelayEndpointRepository(private val dnsCryptRelayEndpointDAO: DNSC
         }
     }
 
-    fun getDNSCryptEndpointLiveDataByName(query: String): LiveData<PagedList<DNSCryptRelayEndpoint>> {
-        return dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveDataByName(query).toLiveData(pageSize = 50)
+    fun getDNSCryptEndpointLiveDataByName(
+            query: String): LiveData<PagedList<DNSCryptRelayEndpoint>> {
+        return dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveDataByName(query).toLiveData(
+            pageSize = 50)
     }
 
     fun deleteDNSCryptRelayEndpoint(url: String) {
@@ -70,9 +76,7 @@ class DNSCryptRelayEndpointRepository(private val dnsCryptRelayEndpointDAO: DNSC
         return dnsCryptRelayEndpointDAO.getConnectedRelays()
     }
 
-    fun getCount(): Int{
+    fun getCount(): Int {
         return dnsCryptRelayEndpointDAO.getCount()
     }
-
-
 }

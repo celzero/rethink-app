@@ -25,20 +25,23 @@ import kotlinx.coroutines.launch
 
 class DNSCryptEndpointRepository(private val dnsCryptEndpointDAO: DNSCryptEndpointDAO) {
 
-    fun updateAsync(dnsCryptEndpoint: DNSCryptEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
+    fun updateAsync(dnsCryptEndpoint: DNSCryptEndpoint,
+                    coroutineScope: CoroutineScope = GlobalScope) {
         coroutineScope.launch {
             dnsCryptEndpointDAO.update(dnsCryptEndpoint)
         }
     }
 
-    fun deleteAsync(dnsCryptEndpoint: DNSCryptEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
+    fun deleteAsync(dnsCryptEndpoint: DNSCryptEndpoint,
+                    coroutineScope: CoroutineScope = GlobalScope) {
         coroutineScope.launch {
             dnsCryptEndpointDAO.delete(dnsCryptEndpoint)
         }
     }
 
 
-    fun insertAsync(dnsCryptEndpoint: DNSCryptEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
+    fun insertAsync(dnsCryptEndpoint: DNSCryptEndpoint,
+                    coroutineScope: CoroutineScope = GlobalScope) {
         coroutineScope.launch {
             dnsCryptEndpointDAO.insert(dnsCryptEndpoint)
         }
@@ -55,7 +58,8 @@ class DNSCryptEndpointRepository(private val dnsCryptEndpointDAO: DNSCryptEndpoi
     }
 
     fun getDNSCryptEndpointLiveDataByName(query: String): LiveData<PagedList<DNSCryptEndpoint>> {
-        return dnsCryptEndpointDAO.getDNSCryptEndpointLiveDataByName(query).toLiveData(pageSize = 50)
+        return dnsCryptEndpointDAO.getDNSCryptEndpointLiveDataByName(query).toLiveData(
+            pageSize = 50)
     }
 
     fun deleteDNSCryptEndpoint(url: String) {
@@ -74,21 +78,20 @@ class DNSCryptEndpointRepository(private val dnsCryptEndpointDAO: DNSCryptEndpoi
         return dnsCryptEndpointDAO.getConnectedCount()
     }
 
-    fun getCount(): Int{
+    fun getCount(): Int {
         return dnsCryptEndpointDAO.getCount()
     }
 
-    fun updateConnectionStatus(liveServersID : String){
+    fun updateConnectionStatus(liveServersID: String) {
         val listServer = liveServersID.split(",")
         removeConnectionStatus()
-        listServer.forEach{
+        listServer.forEach {
             val listServerID = it.toInt()
             dnsCryptEndpointDAO.updateConnectionStatus(listServerID)
         }
     }
 
-    fun updateFailingConnections(){
+    fun updateFailingConnections() {
         dnsCryptEndpointDAO.updateFailingConnections()
     }
-
 }

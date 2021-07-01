@@ -29,8 +29,10 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 
-class ConnectionMonitor(context: Context, networkListener: NetworkListener) : ConnectivityManager.NetworkCallback(), KoinComponent {
-    private val networkRequest: NetworkRequest = NetworkRequest.Builder().addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET).build()
+class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
+        ConnectivityManager.NetworkCallback(), KoinComponent {
+    private val networkRequest: NetworkRequest = NetworkRequest.Builder().addCapability(
+        NetworkCapabilities.NET_CAPABILITY_INTERNET).build()
 
     // An Android handler thread internally operates on a looper.
     // Defined as @Volatile so that the looper in the Handler thread so that
@@ -40,7 +42,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) : Co
     private var serviceHandler: NetworkRequestHandler? = null
     private val persistentState by inject<PersistentState>()
 
-    var connectivityManager: ConnectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    var connectivityManager: ConnectivityManager = context.applicationContext.getSystemService(
+        Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
     companion object {
         // add active network as underlying vpn network
@@ -112,7 +115,9 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) : Co
     }
 
     private fun handleNetworkChange(isForceUpdate: Boolean = false) {
-        val message = constructMessage(if (persistentState.isAddAllNetworks) MSG_ADD_ALL_NETWORKS else MSG_ADD_ACTIVE_NETWORK, isForceUpdate)
+        val message = constructMessage(
+            if (persistentState.isAddAllNetworks) MSG_ADD_ALL_NETWORKS else MSG_ADD_ACTIVE_NETWORK,
+            isForceUpdate)
         serviceHandler?.removeMessages(MSG_ADD_ACTIVE_NETWORK, null)
         serviceHandler?.removeMessages(MSG_ADD_ALL_NETWORKS, null)
         serviceHandler?.sendMessage(message)
@@ -131,14 +136,16 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) : Co
     }
 
     // Handles the network messages from the callback from the connectivity manager
-    private class NetworkRequestHandler(context: Context, looper: Looper, val networkListener: NetworkListener) : Handler(looper) {
+    private class NetworkRequestHandler(context: Context, looper: Looper,
+                                        val networkListener: NetworkListener) : Handler(looper) {
         // ref - https://developer.android.com/reference/kotlin/java/util/LinkedHashSet
         // The network list is maintained in a linked-hash-set to preserve insertion and iteration
         // order. This is required because {@link android.net.VpnService#setUnderlyingNetworks}
         // defines network priority depending on the iteration order, that is, the network
         // in the 0th index is preferred over the one at 1st index, and so on.
         var currentNetworks: LinkedHashSet<Network> = linkedSetOf()
-        var connectivityManager: ConnectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        var connectivityManager: ConnectivityManager = context.applicationContext.getSystemService(
+            Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
         override fun handleMessage(msg: Message) {
             // isForceUpdate - true if onUserPreferenceChanged is changes, the messages should be
@@ -161,7 +168,9 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) : Co
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
 
             currentNetworks = newNetworks
-            Log.i(LOG_TAG_CONNECTION, "is Network connected?- ${connectivityManager.getNetworkInfo(newActiveNetwork)?.typeName.toString()}, $isNewNetwork, force update is $isForceUpdate")
+            Log.i(LOG_TAG_CONNECTION, "is Network connected?- ${
+                connectivityManager.getNetworkInfo(newActiveNetwork)?.typeName.toString()
+            }, $isNewNetwork, force update is $isForceUpdate")
 
             if (!isNewNetwork && !isForceUpdate) return
 
@@ -176,7 +185,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) : Co
             val newNetworks = createNetworksSet(newActiveNetwork, true)
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
 
-            Log.i(LOG_TAG_CONNECTION, "process message MESSAGE_AVAILABLE_NETWORK, ${currentNetworks.size},${newNetworks.size}. isNewNetwork - $isNewNetwork, force update is $isForceUpdate")
+            Log.i(LOG_TAG_CONNECTION,
+                  "process message MESSAGE_AVAILABLE_NETWORK, ${currentNetworks.size},${newNetworks.size}. isNewNetwork - $isNewNetwork, force update is $isForceUpdate")
             currentNetworks = newNetworks
 
             if (!isNewNetwork && !isForceUpdate) return
@@ -185,7 +195,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) : Co
         }
 
         private fun informListener(requireAllNetworks: Boolean = false) {
-            Log.i(LOG_TAG_CONNECTION, "inform listerner on network change - ${currentNetworks.size}, is all network - $requireAllNetworks")
+            Log.i(LOG_TAG_CONNECTION,
+                  "inform listerner on network change - ${currentNetworks.size}, is all network - $requireAllNetworks")
             if (currentNetworks.size > 0) {
                 val networks = when (requireAllNetworks) {
                     true -> currentNetworks
@@ -197,7 +208,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) : Co
             }
         }
 
-        private fun hasDifference(currentNetworks: LinkedHashSet<Network>, newNetworks: LinkedHashSet<Network>): Boolean {
+        private fun hasDifference(currentNetworks: LinkedHashSet<Network>,
+                                  newNetworks: LinkedHashSet<Network>): Boolean {
             return Sets.symmetricDifference(currentNetworks, newNetworks).size != 0
         }
 
@@ -207,7 +219,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) : Co
          * requireAllNetwork - if true adds all networks to the set else adds active network
          * alone to the set.
          */
-        private fun createNetworksSet(activeNetwork: Network?, requireAllNetworks: Boolean = false): LinkedHashSet<Network> {
+        private fun createNetworksSet(activeNetwork: Network?,
+                                      requireAllNetworks: Boolean = false): LinkedHashSet<Network> {
             val newNetworks: LinkedHashSet<Network> = linkedSetOf()
             activeNetwork?.let {
                 if (hasInternet(it) == true && isVPN(it) == false) {
@@ -232,11 +245,13 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) : Co
         }
 
         private fun hasInternet(network: Network): Boolean? {
-            return connectivityManager.getNetworkCapabilities(network)?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            return connectivityManager.getNetworkCapabilities(network)?.hasCapability(
+                NetworkCapabilities.NET_CAPABILITY_INTERNET)
         }
 
         private fun isVPN(network: Network): Boolean? {
-            return connectivityManager.getNetworkCapabilities(network)?.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+            return connectivityManager.getNetworkCapabilities(network)?.hasTransport(
+                NetworkCapabilities.TRANSPORT_VPN)
         }
     }
 }

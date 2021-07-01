@@ -115,10 +115,14 @@ public class GoVpnAdapter {
     private GoIntraListener listener;
 
     private final AppMode appMode;
-    @NonNull private final DNSProxyEndpointRepository dnsProxyEndpointRepository;
-    @NonNull private final DNSCryptEndpointRepository dnsCryptEndpointRepository;
-    @NonNull private final DoHEndpointRepository doHEndpointRepository;
-    @NonNull private final PersistentState persistentState;
+    @NonNull
+    private final DNSProxyEndpointRepository dnsProxyEndpointRepository;
+    @NonNull
+    private final DNSCryptEndpointRepository dnsCryptEndpointRepository;
+    @NonNull
+    private final DoHEndpointRepository doHEndpointRepository;
+    @NonNull
+    private final PersistentState persistentState;
 
     public static GoVpnAdapter establish(@NonNull BraveVPNService vpnService,
                                          @NonNull AppMode appMode,
@@ -175,7 +179,7 @@ public class GoVpnAdapter {
             firewallMode = iBlockMode;
             int proxyMode = (int) appMode.getProxyMode();
 
-            Log.i(LOG_TAG_VPN, "Connect tunnel with url " + dohURL +", dnsMode- " + iDnsMode + ", blockMode-" + iBlockMode + ", proxyMode-" + proxyMode);
+            Log.i(LOG_TAG_VPN, "Connect tunnel with url " + dohURL + ", dnsMode- " + iDnsMode + ", blockMode-" + iBlockMode + ", proxyMode-" + proxyMode);
             tunnel = Tun2socks.connectIntraTunnel(tunFd.getFd(), fakeDns,
                     transport, getProtector(), getBlocker(), listener);
 
@@ -261,7 +265,7 @@ public class GoVpnAdapter {
                 if (!routes.isEmpty())
                     tunnel.getDNSCryptProxy().addRoutes(routes);
 
-                Log.i(LOG_TAG_VPN, "DNSCrypt - Routes: "+routes +", relay count: "+relayCount +", servers: "+servers +", removed count:"+serverCount);
+                Log.i(LOG_TAG_VPN, "DNSCrypt - Routes: " + routes + ", relay count: " + relayCount + ", servers: " + servers + ", removed count:" + serverCount);
             }
         } catch (Exception ex) {
             Log.e(LOG_TAG_VPN, "connect-tunnel: dns crypt", ex);
@@ -395,7 +399,7 @@ public class GoVpnAdapter {
             socks5 = appMode.getSocks5ProxyDetails();
         }
         if (socks5 == null) {
-            Log.w(LOG_TAG_VPN, "could not fetch socks5 details for proxyMode: "+proxyMode);
+            Log.w(LOG_TAG_VPN, "could not fetch socks5 details for proxyMode: " + proxyMode);
             return;
         }
         setProxyMode(socks5.getUserName(), socks5.getPassword(), socks5.getProxyIP(), socks5.getProxyPort());
@@ -503,7 +507,7 @@ public class GoVpnAdapter {
 
             tunnel.setDNS(dohTransport);
 
-            Log.i(LOG_TAG_VPN, "Connect tunnel with url " + dohURL +", dnsMode- " + dnsMode + ", blockMode-" + blockMode + ", proxyMode-" + proxyMode);
+            Log.i(LOG_TAG_VPN, "Connect tunnel with url " + dohURL + ", dnsMode- " + dnsMode + ", blockMode-" + blockMode + ", proxyMode-" + proxyMode);
 
             if (dnsMode == Settings.DNSModeIP || dnsMode == Settings.DNSModePort || dnsMode == Settings.DNSModeNone) {
                 //To set bravedns mode- two modes

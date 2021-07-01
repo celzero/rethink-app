@@ -33,29 +33,31 @@ interface DNSCryptRelayEndpointDAO {
 
     @Transaction
     @Query("select * from DNSCryptRelayEndpoint order by isSelected desc")
-    fun getDNSCryptRelayEndpointLiveData() : DataSource.Factory<Int, DNSCryptRelayEndpoint>
+    fun getDNSCryptRelayEndpointLiveData(): DataSource.Factory<Int, DNSCryptRelayEndpoint>
 
     @Transaction
-    @Query("select * from DNSCryptRelayEndpoint where dnsCryptRelayURL like :query or dnsCryptRelayName like :query order by isSelected desc")
-    fun getDNSCryptRelayEndpointLiveDataByName(query : String) : DataSource.Factory<Int,DNSCryptRelayEndpoint>
+    @Query(
+        "select * from DNSCryptRelayEndpoint where dnsCryptRelayURL like :query or dnsCryptRelayName like :query order by isSelected desc")
+    fun getDNSCryptRelayEndpointLiveDataByName(
+            query: String): DataSource.Factory<Int, DNSCryptRelayEndpoint>
 
     @Query("delete from DNSCryptRelayEndpoint where modifiedDataTime < :date")
-    fun deleteOlderData(date : Long)
+    fun deleteOlderData(date: Long)
 
     @Query("delete from DNSCryptRelayEndpoint")
     fun clearAllData()
 
     @Query("delete from DNSCryptRelayEndpoint where dnsCryptRelayURL like :url and isCustom = 1")
-    fun deleteDNSCryptRelayEndpoint(url : String)
+    fun deleteDNSCryptRelayEndpoint(url: String)
 
     @Query("update DNSCryptRelayEndpoint set isSelected = 0 where isSelected = 1")
     fun removeConnectionStatus()
 
     @Transaction
     @Query("select * from DNSCryptRelayEndpoint where isSelected = 1")
-    fun getConnectedRelays() : List<DNSCryptRelayEndpoint>
+    fun getConnectedRelays(): List<DNSCryptRelayEndpoint>
 
     @Transaction
     @Query("select count(*) from DNSCryptRelayEndpoint")
-    fun getCount() :Int
+    fun getCount(): Int
 }

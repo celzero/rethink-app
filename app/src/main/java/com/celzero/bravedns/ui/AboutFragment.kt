@@ -55,7 +55,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
 
     private fun initView() {
 
-        if(BuildConfig.FLAVOR == Constants.FLAVOR_FDROID){
+        if (BuildConfig.FLAVOR == Constants.FLAVOR_FDROID) {
             b.aboutAppUpdate.visibility = View.GONE
         }
 
@@ -74,10 +74,13 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         b.aboutVpnProfile.setOnClickListener(this)
 
         try {
-            val pInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
+            val pInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName,
+                                                                       0)
             val version = pInfo.versionName
-            b.aboutAppVersion.text = getString(R.string.about_version_install_source, version, persistentState.downloadSource.toString())
-            b.aboutWhatsNew.text = getString(R.string.about_whats_new, getString(R.string.about_version, version))
+            b.aboutAppVersion.text = getString(R.string.about_version_install_source, version,
+                                               persistentState.downloadSource.toString())
+            b.aboutWhatsNew.text = getString(R.string.about_whats_new,
+                                             getString(R.string.about_version, version))
         } catch (e: PackageManager.NameNotFoundException) {
             Log.w(LOG_TAG_UI, "package name not found: ${e.message}", e)
         }
@@ -86,7 +89,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
     override fun onClick(view: View?) {
         when (view) {
             b.aboutTelegram -> {
-                val intent = Intent(Intent.ACTION_VIEW, getString(R.string.about_telegram_link).toUri())
+                val intent = Intent(Intent.ACTION_VIEW,
+                                    getString(R.string.about_telegram_link).toUri())
                 startActivity(intent)
             }
             b.aboutBlog -> {
@@ -98,7 +102,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
                 startActivity(intent)
             }
             b.aboutGithub -> {
-                val intent = Intent(Intent.ACTION_VIEW, getString(R.string.about_github_link).toUri())
+                val intent = Intent(Intent.ACTION_VIEW,
+                                    getString(R.string.about_github_link).toUri())
                 startActivity(intent)
             }
             b.aboutMail -> {
@@ -107,15 +112,18 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
                 startActivity(intent)
             }
             b.aboutTwitter -> {
-                val intent = Intent(Intent.ACTION_VIEW, getString(R.string.about_twitter_handle).toUri())
+                val intent = Intent(Intent.ACTION_VIEW,
+                                    getString(R.string.about_twitter_handle).toUri())
                 startActivity(intent)
             }
             b.aboutWebsite -> {
-                val intent = Intent(Intent.ACTION_VIEW, getString(R.string.about_website_link).toUri())
+                val intent = Intent(Intent.ACTION_VIEW,
+                                    getString(R.string.about_website_link).toUri())
                 startActivity(intent)
             }
             b.mozillaImg -> {
-                val intent = Intent(Intent.ACTION_VIEW, getString(R.string.about_mozilla_alumni_link).toUri())
+                val intent = Intent(Intent.ACTION_VIEW,
+                                    getString(R.string.about_mozilla_alumni_link).toUri())
                 startActivity(intent)
             }
             b.aboutAppUpdate -> {
@@ -144,12 +152,13 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            Utilities.showToastUiCentered(requireContext(), getString(R.string.app_info_error), Toast.LENGTH_SHORT)
+            Utilities.showToastUiCentered(requireContext(), getString(R.string.app_info_error),
+                                          Toast.LENGTH_SHORT)
             Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
 
-    private fun openNotificationSettings(){
+    private fun openNotificationSettings() {
         val packageName = requireContext().packageName
         try {
             val intent = Intent()
@@ -163,24 +172,25 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             }
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            Utilities.showToastUiCentered(requireContext(), getString(R.string.vpn_profile_error), Toast.LENGTH_SHORT)
+            Utilities.showToastUiCentered(requireContext(), getString(R.string.vpn_profile_error),
+                                          Toast.LENGTH_SHORT)
             Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
 
     private fun showNewFeaturesDialog() {
-        val binding = DialogWhatsnewBinding.inflate(LayoutInflater.from(requireContext()), null, false)
-        AlertDialog.Builder(requireContext())
-            .setView(binding.root)
-            .setTitle(getString(R.string.whats_dialog_title))
-            .setPositiveButton(getString(R.string.about_dialog_positive_button)) { dialogInterface, _ ->
-                dialogInterface.dismiss()
-            }.setNeutralButton(getString(R.string.about_dialog_neutral_button)){ _: DialogInterface, _: Int ->
-                val intent = Intent(Intent.ACTION_VIEW, (getString(R.string.about_mail_to)).toUri())
-                intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_subject))
-                startActivity(intent)
-            }
-            .setCancelable(true).create().show()
+        val binding = DialogWhatsnewBinding.inflate(LayoutInflater.from(requireContext()), null,
+                                                    false)
+        AlertDialog.Builder(requireContext()).setView(binding.root).setTitle(
+            getString(R.string.whats_dialog_title)).setPositiveButton(
+            getString(R.string.about_dialog_positive_button)) { dialogInterface, _ ->
+            dialogInterface.dismiss()
+        }.setNeutralButton(
+            getString(R.string.about_dialog_neutral_button)) { _: DialogInterface, _: Int ->
+            val intent = Intent(Intent.ACTION_VIEW, (getString(R.string.about_mail_to)).toUri())
+            intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_subject))
+            startActivity(intent)
+        }.setCancelable(true).create().show()
     }
-    
+
 }

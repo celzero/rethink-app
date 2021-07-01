@@ -30,21 +30,20 @@ import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
 
-class HttpRequestHelper{
+class HttpRequestHelper {
 
-    companion object{
+    companion object {
 
         //fixme - #319 Come up with a logic where onResponse should call for an interface and proceed
         //with the result returned from server.
-        private fun serverCheckForUpdate(url: String, persistentState:PersistentState) {
+        private fun serverCheckForUpdate(url: String, persistentState: PersistentState) {
             val client = OkHttpClient()
-            val request = Request.Builder()
-                .url(url)
-                .build()
+            val request = Request.Builder().url(url).build()
 
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
-                    Log.i(LOG_TAG_DOWNLOAD, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
+                    Log.i(LOG_TAG_DOWNLOAD,
+                          "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
                 }
 
                 override fun onResponse(call: Call, response: Response) {
@@ -54,7 +53,8 @@ class HttpRequestHelper{
                     val responseVersion = jsonObject.getInt("version")
                     val updateValue = jsonObject.getBoolean("update")
                     persistentState.lastAppUpdateCheck = System.currentTimeMillis()
-                    Log.i(LOG_TAG_DOWNLOAD, "Server response for the new version download is true, version number-  $updateValue")
+                    Log.i(LOG_TAG_DOWNLOAD,
+                          "Server response for the new version download is true, version number-  $updateValue")
                     if (responseVersion == RESPONSE_VERSION) {
                         if (updateValue) {
                             // TODO handle - #319
@@ -68,12 +68,15 @@ class HttpRequestHelper{
             })
         }
 
-        fun downloadBlockListFiles(context: Context) : DownloadManager{
-            val downloadManager = context.getSystemService(AppCompatActivity.DOWNLOAD_SERVICE) as DownloadManager
+        fun downloadBlockListFiles(context: Context): DownloadManager {
+            val downloadManager = context.getSystemService(
+                AppCompatActivity.DOWNLOAD_SERVICE) as DownloadManager
             val uri: Uri = Uri.parse(Constants.JSON_DOWNLOAD_BLOCKLIST_LINK)
             val request = DownloadManager.Request(uri)
-            request.setDestinationInExternalFilesDir(context, Constants.DOWNLOAD_PATH, Constants.FILE_TAG_NAME)
-            Log.i(LOG_TAG_DOWNLOAD, "Path - ${context.filesDir.canonicalPath}${Constants.DOWNLOAD_PATH}${Constants.FILE_TAG_NAME}")
+            request.setDestinationInExternalFilesDir(context, Constants.DOWNLOAD_PATH,
+                                                     Constants.FILE_TAG_NAME)
+            Log.i(LOG_TAG_DOWNLOAD,
+                  "Path - ${context.filesDir.canonicalPath}${Constants.DOWNLOAD_PATH}${Constants.FILE_TAG_NAME}")
             downloadManager.enqueue(request)
             return downloadManager
         }
@@ -120,11 +123,9 @@ class HttpRequestHelper{
                     statusText = "STATUS_SUCCESSFUL"
                 }
             }
-            if(DEBUG) Log.d(LOG_TAG_DOWNLOAD,"Reason: $reasonText")
+            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Reason: $reasonText")
             return statusText
         }
 
     }
-
-
 }

@@ -31,13 +31,14 @@ public class QueryTracker {
     private static final int HISTORY_SIZE = 1000;
     private static long numRequests = 0;
     private static P2QuantileEstimation quantileEstimator;
-    @NonNull private final PersistentState persistentState;
+    @NonNull
+    private final PersistentState persistentState;
 
     QueryTracker(@NonNull PersistentState persistentState) {
         this.persistentState = persistentState;
     }
 
-    public void reinitializeQuantileEstimator(){
+    public void reinitializeQuantileEstimator() {
         quantileEstimator = new P2QuantileEstimation(0.5);
         numRequests = 1;
     }
@@ -54,15 +55,14 @@ public class QueryTracker {
     public void sync(Transaction transaction) {
         if (transaction != null && transaction.blockList.isEmpty() && !transaction.serverIp.isEmpty()) {
             // Restore number of requests from storage, or 0 if it isn't defined yet.
-            long val =  transaction.responseTime;
-            if(quantileEstimator == null){
+            long val = transaction.responseTime;
+            if (quantileEstimator == null) {
                 quantileEstimator = new P2QuantileEstimation(0.5);
-            }else{
-                quantileEstimator.addValue((double)val);
+            } else {
+                quantileEstimator.addValue((double) val);
             }
-            long latencyVal = (long)quantileEstimator.getQuantile();
+            long latencyVal = (long) quantileEstimator.getQuantile();
             persistentState.setMedianLatency(latencyVal);
         }
     }
 }
-

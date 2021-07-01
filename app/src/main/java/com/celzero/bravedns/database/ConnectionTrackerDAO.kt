@@ -36,30 +36,34 @@ interface ConnectionTrackerDAO {
     fun delete(connectionTracker: ConnectionTracker)
 
     @Query("select * from ConnectionTracker order by timeStamp desc")
-    fun getConnectionTrackerLiveData() : DataSource.Factory<Int, ConnectionTracker>
+    fun getConnectionTrackerLiveData(): DataSource.Factory<Int, ConnectionTracker>
 
-    @Query("select * from ConnectionTracker where appName like :query or ipAddress like :query order by timeStamp desc")
-    fun getConnectionTrackerByName(query : String) : DataSource.Factory<Int,ConnectionTracker>
+    @Query(
+        "select * from ConnectionTracker where appName like :query or ipAddress like :query order by timeStamp desc")
+    fun getConnectionTrackerByName(query: String): DataSource.Factory<Int, ConnectionTracker>
 
     @Query("select * from ConnectionTracker where isBlocked = 1 order by timeStamp desc")
-    fun getConnectionBlockedConnections(): DataSource.Factory<Int,ConnectionTracker>
+    fun getConnectionBlockedConnections(): DataSource.Factory<Int, ConnectionTracker>
 
-    @Query("select * from ConnectionTracker where (appName like :searchString or ipAddress like :searchString) and isBlocked = 1 order by timeStamp desc")
-    fun getConnectionBlockedConnectionsByName(searchString: String): DataSource.Factory<Int,ConnectionTracker>
+    @Query(
+        "select * from ConnectionTracker where (appName like :searchString or ipAddress like :searchString) and isBlocked = 1 order by timeStamp desc")
+    fun getConnectionBlockedConnectionsByName(
+            searchString: String): DataSource.Factory<Int, ConnectionTracker>
 
     @Query("delete from ConnectionTracker where timeStamp < :date")
-    fun deleteOlderData(date : Long)
+    fun deleteOlderData(date: Long)
 
     @Query("delete from ConnectionTracker")
     fun clearAllData()
 
     @Query("select * from ConnectionTracker where uid = :uid order by ipAddress, timeStamp desc")
-    fun getConnTrackerForAppLiveData(uid: Int) :LiveData<List<ConnectionTracker>>
+    fun getConnTrackerForAppLiveData(uid: Int): LiveData<List<ConnectionTracker>>
 
     @Query("select count(*) from ConnectionTracker")
-    fun getCountConnectionTracker() : Int
+    fun getCountConnectionTracker(): Int
 
-    @Query("delete from ConnectionTracker where id < ((select max(id) from ConnectionTracker) - :count)")
-    fun deleteOlderDataCount(count : Int)
+    @Query(
+        "delete from ConnectionTracker where id < ((select max(id) from ConnectionTracker) - :count)")
+    fun deleteOlderDataCount(count: Int)
 
 }

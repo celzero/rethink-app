@@ -34,7 +34,8 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
     val persistentState by inject<PersistentState>()
 
     override fun onReceive(context: Context, intent: Intent) {
-        val alwaysOnPackage = android.provider.Settings.Secure.getString(context.contentResolver, "always_on_vpn_app")
+        val alwaysOnPackage = android.provider.Settings.Secure.getString(context.contentResolver,
+                                                                         "always_on_vpn_app")
         var isAlwaysOnEnabled = false
         if (!TextUtils.isEmpty(alwaysOnPackage)) {
             if (context.packageName == alwaysOnPackage) {

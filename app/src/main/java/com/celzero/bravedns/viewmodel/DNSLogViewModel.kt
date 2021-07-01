@@ -15,13 +15,11 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.DNSLogDAO
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.DNS_LIVEDATA_PAGE_SIZE
 import com.celzero.bravedns.util.Constants.Companion.FILTER_IS_FILTER
 
@@ -41,7 +39,8 @@ class DNSLogViewModel(private val dnsLogDAO: DNSLogDAO) : ViewModel() {
             if (searchString.isEmpty()) {
                 dnsLogDAO.getBlockedDNSLogsLiveData().toLiveData(pageSize = DNS_LIVEDATA_PAGE_SIZE)
             } else {
-                dnsLogDAO.getBlockedDNSLogsLiveDataByName("%$searchString%").toLiveData(pageSize = DNS_LIVEDATA_PAGE_SIZE)
+                dnsLogDAO.getBlockedDNSLogsLiveDataByName("%$searchString%").toLiveData(
+                    pageSize = DNS_LIVEDATA_PAGE_SIZE)
             }
         } else {
             dnsLogDAO.getDNSLogsByQueryLiveData("%$input%").toLiveData(DNS_LIVEDATA_PAGE_SIZE)

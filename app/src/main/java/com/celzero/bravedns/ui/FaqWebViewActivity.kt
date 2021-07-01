@@ -34,7 +34,8 @@ class FaqWebViewActivity : AppCompatActivity(R.layout.activity_faq_webview_layou
     private val b by viewBinding(ActivityFaqWebviewLayoutBinding::bind)
     private val persistentState by inject<PersistentState>()
 
-    @SuppressLint("SetJavaScriptEnabled") override fun onCreate(savedInstanceState: Bundle?) {
+    @SuppressLint("SetJavaScriptEnabled")
+    override fun onCreate(savedInstanceState: Bundle?) {
         if (persistentState.theme == 0) {
             if (isDarkThemeOn()) {
                 setTheme(R.style.AppThemeTrueBlack)

@@ -21,8 +21,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "DoHEndpoint")
 class DoHEndpoint {
-    @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
+    @PrimaryKey(autoGenerate = true) var id: Int = 0
     var dohName: String = ""
     var dohURL: String = ""
     var dohExplanation: String? = null
@@ -36,7 +35,7 @@ class DoHEndpoint {
         if (other?.javaClass != javaClass) return false
         other as DoHEndpoint
         if (dohURL != other.dohURL) return false
-        if(isSelected != isSelected) return false
+        if (isSelected != isSelected) return false
         return true
     }
 
@@ -45,18 +44,16 @@ class DoHEndpoint {
     }
 
 
-    constructor(id: Int, dohName: String, dohURL: String, dohExplanation: String, isSelected: Boolean, isCustom: Boolean, modifiedDataTime: Long, latency: Int) {
-        if(id != -1)
-            this.id = id
+    constructor(id: Int, dohName: String, dohURL: String, dohExplanation: String,
+                isSelected: Boolean, isCustom: Boolean, modifiedDataTime: Long, latency: Int) {
+        if (id != -1) this.id = id
         this.dohName = dohName
         this.dohURL = dohURL
         this.dohExplanation = dohExplanation
         this.isSelected = isSelected
         this.isCustom = isCustom
-        if(modifiedDataTime != 0L)
-            this.modifiedDataTime = modifiedDataTime
-        else
-            this.modifiedDataTime = System.currentTimeMillis()
+        if (modifiedDataTime != 0L) this.modifiedDataTime = modifiedDataTime
+        else this.modifiedDataTime = System.currentTimeMillis()
         this.latency = latency
     }
 

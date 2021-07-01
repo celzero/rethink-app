@@ -25,7 +25,7 @@ class DNSLogRepository(private val dnsLogDAO: DNSLogDAO) {
         dnsLogDAO.insert(dnsLogs)
     }
 
-    fun deleteOlderData(date: Long){
+    fun deleteOlderData(date: Long) {
         dnsLogDAO.deleteOlderData(date)
     }
 

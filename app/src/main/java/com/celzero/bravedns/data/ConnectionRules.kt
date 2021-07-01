@@ -15,4 +15,4 @@ limitations under the License.
 */
 package com.celzero.bravedns.data
 
-data class ConnectionRules(val ipAddress : String, val port : Int, val protocol: String )
+data class ConnectionRules(val ipAddress: String, val port: Int, val protocol: String)

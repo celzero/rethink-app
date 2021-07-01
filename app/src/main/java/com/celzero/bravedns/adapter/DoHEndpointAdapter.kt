@@ -52,20 +52,23 @@ import xdns.Xdns.getBlocklistStampFromURL
 
 class DoHEndpointAdapter(private val context: Context,
                          private val doHEndpointRepository: DoHEndpointRepository,
-                         private val persistentState:PersistentState,
-                         private val queryTracker: QueryTracker,
-                         val listener: UIUpdateInterface) : PagedListAdapter<DoHEndpoint, DoHEndpointAdapter.DoHEndpointViewHolder>(DIFF_CALLBACK) {
+                         private val persistentState: PersistentState,
+                         private val queryTracker: QueryTracker, val listener: UIUpdateInterface) :
+        PagedListAdapter<DoHEndpoint, DoHEndpointAdapter.DoHEndpointViewHolder>(DIFF_CALLBACK) {
 
     companion object {
-        private val DIFF_CALLBACK = object :
-            DiffUtil.ItemCallback<DoHEndpoint>() {
-            override fun areItemsTheSame(oldConnection: DoHEndpoint, newConnection: DoHEndpoint) = oldConnection.id == newConnection.id
-            override fun areContentsTheSame(oldConnection: DoHEndpoint, newConnection: DoHEndpoint) = oldConnection == newConnection
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DoHEndpoint>() {
+            override fun areItemsTheSame(oldConnection: DoHEndpoint,
+                                         newConnection: DoHEndpoint) = oldConnection.id == newConnection.id
+
+            override fun areContentsTheSame(oldConnection: DoHEndpoint,
+                                            newConnection: DoHEndpoint) = oldConnection == newConnection
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DoHEndpointViewHolder {
-        val itemBinding = DohEndpointListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val itemBinding = DohEndpointListItemBinding.inflate(LayoutInflater.from(parent.context),
+                                                             parent, false)
         return DoHEndpointViewHolder(itemBinding)
     }
 
@@ -75,7 +78,8 @@ class DoHEndpointAdapter(private val context: Context,
     }
 
 
-    inner class DoHEndpointViewHolder(private val b: DohEndpointListItemBinding) : RecyclerView.ViewHolder(b.root) {
+    inner class DoHEndpointViewHolder(private val b: DohEndpointListItemBinding) :
+            RecyclerView.ViewHolder(b.root) {
 
 
         fun update(doHEndpoint: DoHEndpoint) {
@@ -86,7 +90,8 @@ class DoHEndpointAdapter(private val context: Context,
                 if (doHEndpoint.dohName == RETHINK_DNS_PLUS) {
                     val count = persistentState.numberOfRemoteBlocklists
                     if (count != 0) {
-                        b.dohEndpointListUrlExplanation.text = context.getString(R.string.dns_connected_rethink_plus, count.toString())
+                        b.dohEndpointListUrlExplanation.text = context.getString(
+                            R.string.dns_connected_rethink_plus, count.toString())
                     }
                 }
             } else {
@@ -94,9 +99,11 @@ class DoHEndpointAdapter(private val context: Context,
             }
             b.dohEndpointListCheckImage.isChecked = doHEndpoint.isSelected
             if (doHEndpoint.isCustom && !doHEndpoint.isSelected) {
-                b.dohEndpointListActionImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_fab_uninstall))
+                b.dohEndpointListActionImage.setImageDrawable(
+                    ContextCompat.getDrawable(context, R.drawable.ic_fab_uninstall))
             } else {
-                b.dohEndpointListActionImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_fab_appinfo))
+                b.dohEndpointListActionImage.setImageDrawable(
+                    ContextCompat.getDrawable(context, R.drawable.ic_fab_appinfo))
             }
             if (doHEndpoint.dohName == RETHINK_DNS_PLUS) {
 
@@ -120,7 +127,8 @@ class DoHEndpointAdapter(private val context: Context,
                 var stamp = ""
                 try {
                     stamp = getBlocklistStampFromURL(doHEndpoint.dohURL)
-                    if (DEBUG) Log.d(LOG_TAG_DNS, "Configure btn click: ${doHEndpoint.dohURL}, $stamp")
+                    if (DEBUG) Log.d(LOG_TAG_DNS,
+                                     "Configure btn click: ${doHEndpoint.dohURL}, $stamp")
                 } catch (e: Exception) {
                     Log.w(LOG_TAG_DNS, "Exception while fetching stamp from Go ${e.message}", e)
                 }
@@ -134,7 +142,8 @@ class DoHEndpointAdapter(private val context: Context,
 
 
         private fun updateConnection(doHEndpoint: DoHEndpoint) {
-            if (DEBUG) Log.d(LOG_TAG_DNS, "updateConnection - ${doHEndpoint.dohName}, ${doHEndpoint.dohURL}")
+            if (DEBUG) Log.d(LOG_TAG_DNS,
+                             "updateConnection - ${doHEndpoint.dohName}, ${doHEndpoint.dohURL}")
             doHEndpoint.dohURL = doHEndpointRepository.getConnectionURL(doHEndpoint.id)
             if (doHEndpoint.dohName == RETHINK_DNS_PLUS) {
                 var stamp = ""
@@ -163,7 +172,8 @@ class DoHEndpointAdapter(private val context: Context,
                 if (doHEndpoint.dohExplanation.isNullOrEmpty()) {
                     showDialogExplanation(doHEndpoint.dohName, doHEndpoint.dohURL, "")
                 } else {
-                    showDialogExplanation(doHEndpoint.dohName, doHEndpoint.dohURL, doHEndpoint.dohExplanation!!)
+                    showDialogExplanation(doHEndpoint.dohName, doHEndpoint.dohURL,
+                                          doHEndpoint.dohExplanation!!)
                 }
             }
         }
@@ -174,15 +184,19 @@ class DoHEndpointAdapter(private val context: Context,
             builder.setTitle(title)
             builder.setMessage(url + "\n\n" + message)
             builder.setCancelable(true)
-            builder.setPositiveButton(context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
+            builder.setPositiveButton(
+                context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
                 dialogInterface.dismiss()
             }
-            builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
+            builder.setNeutralButton(
+                context.getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
 
-                val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+                val clipboard: ClipboardManager? = context.getSystemService(
+                    Context.CLIPBOARD_SERVICE) as ClipboardManager?
                 val clip = ClipData.newPlainText("URL", url)
                 clipboard?.setPrimaryClip(clip)
-                Utilities.showToastUiCentered(context, context.getString(R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(context, context.getString(
+                    R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
             }
             val alertDialog: AlertDialog = builder.create()
             alertDialog.setCancelable(true)
@@ -198,7 +212,8 @@ class DoHEndpointAdapter(private val context: Context,
                 GlobalScope.launch(Dispatchers.IO) {
                     doHEndpointRepository.deleteDoHEndpoint(doHEndpoint.dohURL)
                 }
-                Toast.makeText(context, R.string.doh_custom_url_remove_success, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.doh_custom_url_remove_success,
+                               Toast.LENGTH_SHORT).show()
             }
 
             builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
@@ -214,7 +229,8 @@ class DoHEndpointAdapter(private val context: Context,
             builder.setTitle(R.string.doh_brave_pro_configure)
             builder.setMessage(R.string.doh_brave_pro_configure_desc)
             builder.setCancelable(true)
-            builder.setPositiveButton(context.getString(R.string.dns_connected_rethink_configure)) { _, _ ->
+            builder.setPositiveButton(
+                context.getString(R.string.dns_connected_rethink_configure)) { _, _ ->
                 val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
                 intent.putExtra(Constants.LOCATION_INTENT_EXTRA, DNSConfigureWebViewActivity.REMOTE)
                 intent.putExtra(Constants.STAMP_INTENT_EXTRA, "")

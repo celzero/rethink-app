@@ -50,7 +50,9 @@ class InternetManagerFragment : Fragment(R.layout.fragment_internet_manager) {
                 val isAccessibilityEnabled = am!!.isEnabled
                 if (isAccessibilityEnabled) openNetworkDashboardActivity(true)
                 else {
-                    Toast.makeText(context, "Please enable Accessibility Service to proceed further", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context,
+                                   "Please enable Accessibility Service to proceed further",
+                                   Toast.LENGTH_LONG).show()
                     buttonView.isChecked = false
                 }
             } else {

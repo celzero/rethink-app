@@ -21,7 +21,7 @@ import org.koin.core.context.startKoin
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-class RethinkDnsApplication:Application() {
+class RethinkDnsApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
@@ -29,7 +29,7 @@ class RethinkDnsApplication:Application() {
         //if(BuildConfig.DEBUG) turnOnStrictMode()
 
         startKoin {
-            if(BuildConfig.DEBUG) androidLogger()
+            if (BuildConfig.DEBUG) androidLogger()
             androidContext(this@RethinkDnsApplication)
             koin.loadModules(AppModules)
         }
@@ -37,19 +37,16 @@ class RethinkDnsApplication:Application() {
 
     private fun turnOnStrictMode() {
         if (BuildConfig.DEBUG) {
-           /* StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()
-                            .detectAll()
-                            .penaltyLog()
-                            .permitDiskReads()
-                            .permitDiskWrites()
-                            .permitNetwork()
-                            .penaltyLog()
-                            .build())*/
-            StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder()
-                            .detectAll()
-                            .detectLeakedSqlLiteObjects()
-                            .penaltyLog()
-                            .build())
+            /* StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()
+                             .detectAll()
+                             .penaltyLog()
+                             .permitDiskReads()
+                             .permitDiskWrites()
+                             .permitNetwork()
+                             .penaltyLog()
+                             .build())*/
+            StrictMode.setVmPolicy(
+                StrictMode.VmPolicy.Builder().detectAll().detectLeakedSqlLiteObjects().penaltyLog().build())
         }
     }
 }

@@ -27,8 +27,9 @@ import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.AndroidUidConfig
+import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
+import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL_LOG
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
@@ -37,13 +38,13 @@ import com.google.common.net.InetAddresses
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.net.InetAddress
 import java.util.*
 
-class IPTracker internal constructor(
-    private val appInfoRepository: AppInfoRepository,
-    private val connectionTrackerRepository: ConnectionTrackerRepository,
-    private val refreshDatabase: RefreshDatabase,
-    private val context: Context) {
+class IPTracker internal constructor(private val appInfoRepository: AppInfoRepository,
+                                     private val connectionTrackerRepository: ConnectionTrackerRepository,
+                                     private val refreshDatabase: RefreshDatabase,
+                                     private val context: Context) {
 
 
     private val recentTrackers: Queue<IPDetails> = LinkedList()
@@ -71,20 +72,27 @@ class IPTracker internal constructor(
         connTracker.uid = ipDetails.uid
         connTracker.port = ipDetails.destPort
         connTracker.protocol = ipDetails.protocol
-        connTracker.timeStamp = ipDetails.timeStamp
+        connTracker.timestamp = ipDetails.timestamp
         connTracker.blockedByRule = ipDetails.blockedByRule
 
         // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
         // Unlike InetAddress.getByName(), the methods of this class never cause DNS services
         // to be accessed
-        val serverAddress = InetAddresses.forString(ipDetails.destIP)
-        val countryCode: String = getCountryCode(serverAddress!!, context)
+        var serverAddress: InetAddress? = null
+        try {
+            serverAddress = InetAddresses.forString(ipDetails.destIP)
+        } catch (e: IllegalArgumentException) {
+            Log.e(LoggerConstants.LOG_TAG_DNS_LOG,
+                  "Exception while converting string to InetAddresses: ${e.message}", e)
+        }
+        val countryCode: String = getCountryCode(serverAddress, context)
         connTracker.flag = getFlag(countryCode)
 
         val packageNameList = context.packageManager.getPackagesForUid(ipDetails.uid)
 
         if (packageNameList != null) {
-            if (DEBUG) Log.d(LOG_TAG_FIREWALL_LOG, "Package for uid : ${ipDetails.uid}, ${packageNameList.size}")
+            if (DEBUG) Log.d(LOG_TAG_FIREWALL_LOG,
+                             "Package for uid : ${ipDetails.uid}, ${packageNameList.size}")
             val packageName = packageNameList[0]
             val appDetails = HomeScreenActivity.GlobalVariable.appList[packageName]
             if (appDetails != null) {
@@ -95,7 +103,8 @@ class IPTracker internal constructor(
                 connTracker.appName = appInfoRepository.getAppNameForUID(ipDetails.uid)
             }
             if (connTracker.appName.isNullOrEmpty()) {
-                val appInfo = context.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+                val appInfo = context.packageManager.getApplicationInfo(packageName,
+                                                                        PackageManager.GET_META_DATA)
                 connTracker.appName = context.packageManager.getApplicationLabel(appInfo).toString()
             }
         } else {
@@ -105,7 +114,8 @@ class IPTracker internal constructor(
                 connTracker.appName = context.getString(R.string.network_log_app_name_unknown)
             } else {
                 when (Utilities.isInvalidUid(fileSystemUID.uid)) {
-                    true -> connTracker.appName = context.getString(R.string.network_log_app_name_unnamed, ipDetails.uid.toString())
+                    true -> connTracker.appName = context.getString(
+                        R.string.network_log_app_name_unnamed, ipDetails.uid.toString())
                     false -> connTracker.appName = fileSystemUID.name
                 }
                 registerNonApp(ipDetails.uid, connTracker.appName.toString())

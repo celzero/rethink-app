@@ -40,14 +40,13 @@ import com.google.android.material.chip.Chip
 import java.util.stream.Collectors
 
 class ExcludeAppDialog(private var activity: Context,
-                    private val appInfoRepository: AppInfoRepository,
-                    private val appInfoViewRepository: AppInfoViewRepository,
-                    private val categoryInfoRepository: CategoryInfoRepository,
-                    private val persistentState: PersistentState,
-                    internal var adapter: RecyclerView.Adapter<*>,
-                    var viewModel: ExcludedAppViewModel,
-                    themeID :Int)
-    : Dialog(activity, themeID), View.OnClickListener, SearchView.OnQueryTextListener {
+                       private val appInfoRepository: AppInfoRepository,
+                       private val appInfoViewRepository: AppInfoViewRepository,
+                       private val categoryInfoRepository: CategoryInfoRepository,
+                       private val persistentState: PersistentState,
+                       internal var adapter: RecyclerView.Adapter<*>,
+                       var viewModel: ExcludedAppViewModel, themeID: Int) :
+        Dialog(activity, themeID), View.OnClickListener, SearchView.OnQueryTextListener {
 
     private lateinit var b: ExcludeAppDialogLayoutBinding
 
@@ -66,7 +65,8 @@ class ExcludeAppDialog(private var activity: Context,
         setContentView(b.root)
         setCancelable(false)
 
-        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
+        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT,
+                          WindowManager.LayoutParams.MATCH_PARENT)
 
         mLayoutManager = LinearLayoutManager(activity)
 
@@ -86,7 +86,8 @@ class ExcludeAppDialog(private var activity: Context,
         val appCount = HomeScreenActivity.GlobalVariable.appList.size
         val act: HomeScreenActivity = activity as HomeScreenActivity
         appInfoViewRepository.getExcludedAppListCountLiveData().observe(act, {
-            b.excludeAppSelectCountText.text = act.getString(R.string.ex_dialog_count, it.toString(), appCount.toString())
+            b.excludeAppSelectCountText.text = act.getString(R.string.ex_dialog_count,
+                                                             it.toString(), appCount.toString())
         })
 
 
@@ -183,7 +184,8 @@ class ExcludeAppDialog(private var activity: Context,
     private fun setCategoryChips(categories: List<String>) {
         b.excludeAppDialogChipGroup.removeAllViews()
         for (category in categories) {
-            val mChip = this.layoutInflater.inflate(R.layout.item_chip_category, null, false) as Chip
+            val mChip = this.layoutInflater.inflate(R.layout.item_chip_category, null,
+                                                    false) as Chip
             mChip.text = category
 
             mChip.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
@@ -217,6 +219,4 @@ class ExcludeAppDialog(private var activity: Context,
             b.excludeAppDialogChipGroup.addView(mChip)
         }
     }
-
-
 }

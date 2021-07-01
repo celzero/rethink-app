@@ -23,11 +23,11 @@ class Constants {
 
     companion object {
         //Download path and file names
-        val DOWNLOAD_PATH = File.separator+"downloads"+File.separator
-        val FILE_TAG_NAME = File.separator+"filetag.json"
-        val FILE_BASIC_CONFIG = File.separator+"basicconfig.json"
-        val FILE_RD_FILE = File.separator+"rd.txt"
-        val FILE_TD_FILE = File.separator+"td.txt"
+        val DOWNLOAD_PATH = File.separator + "downloads" + File.separator
+        val FILE_TAG_NAME = File.separator + "filetag.json"
+        val FILE_BASIC_CONFIG = File.separator + "basicconfig.json"
+        val FILE_RD_FILE = File.separator + "rd.txt"
+        val FILE_TD_FILE = File.separator + "td.txt"
 
         const val LOCAL_BLOCKLIST_FILE_COUNT = 4
 
@@ -43,7 +43,10 @@ class Constants {
         // The version tag value(response) for the update check.
         const val RESPONSE_VERSION = 1
 
-        val DOWNLOAD_URLS = listOf("https://download.bravedns.com/blocklists", "https://download.bravedns.com/basicconfig", "https://download.bravedns.com/rank", "https://download.bravedns.com/trie")
+        val DOWNLOAD_URLS = listOf("https://download.bravedns.com/blocklists",
+                                   "https://download.bravedns.com/basicconfig",
+                                   "https://download.bravedns.com/rank",
+                                   "https://download.bravedns.com/trie")
 
         val FILE_NAMES = listOf("filetag.json", "basicconfig.json", "rd.txt", "td.txt")
 
@@ -191,7 +194,7 @@ class Constants {
 
         // Download status
         const val DOWNLOAD_FAILURE = -1
-        const val DOWNLOAD_SUCCESS =  1
+        const val DOWNLOAD_SUCCESS = 1
         const val DOWNLOAD_RETRY = 0
 
         const val INIT_TIME_MS = 0L

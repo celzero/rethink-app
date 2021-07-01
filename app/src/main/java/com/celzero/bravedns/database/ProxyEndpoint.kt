@@ -21,20 +21,20 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "ProxyEndpoint")
 class ProxyEndpoint {
-    @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
-    var proxyName : String = ""
+    @PrimaryKey(autoGenerate = true) var id: Int = 0
+    var proxyName: String = ""
+
     //Set as 1 for Socks5
-    var proxyMode : Int = 0
+    var proxyMode: Int = 0
     var proxyType: String = ""
-    var proxyAppName: String ?= null
-    var proxyIP: String ?= null
-    var proxyPort : Int  = 0
-    var userName : String ?= null
-    var password : String ?= null
+    var proxyAppName: String? = null
+    var proxyIP: String? = null
+    var proxyPort: Int = 0
+    var userName: String? = null
+    var password: String? = null
     var isSelected: Boolean = true
     var isCustom: Boolean = true
-    var isUDP : Boolean = false
+    var isUDP: Boolean = false
     var modifiedDataTime: Long = 0L
     var latency: Int = 0
 
@@ -51,9 +51,11 @@ class ProxyEndpoint {
     }
 
 
-    constructor(id: Int, proxyName: String, proxyMode : Int,proxyType: String, proxyAppName: String, proxyIP: String,proxyPort : Int, userName : String, password :String, isSelected: Boolean, isCustom: Boolean,isUDP :Boolean, modifiedDataTime: Long, latency: Int) {
-        if(id != -1)
-            this.id = id
+    constructor(id: Int, proxyName: String, proxyMode: Int, proxyType: String, proxyAppName: String,
+                proxyIP: String, proxyPort: Int, userName: String, password: String,
+                isSelected: Boolean, isCustom: Boolean, isUDP: Boolean, modifiedDataTime: Long,
+                latency: Int) {
+        if (id != -1) this.id = id
         this.proxyMode = proxyMode
         this.proxyName = proxyName
         this.proxyType = proxyType
@@ -65,10 +67,8 @@ class ProxyEndpoint {
         this.isUDP = isUDP
         this.userName = userName
         this.password = password
-        if(modifiedDataTime != 0L)
-            this.modifiedDataTime = modifiedDataTime
-        else
-            this.modifiedDataTime = System.currentTimeMillis()
+        if (modifiedDataTime != 0L) this.modifiedDataTime = modifiedDataTime
+        else this.modifiedDataTime = System.currentTimeMillis()
         this.latency = latency
     }
 

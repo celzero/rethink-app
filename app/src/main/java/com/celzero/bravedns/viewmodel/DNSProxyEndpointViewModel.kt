@@ -21,22 +21,21 @@ import androidx.lifecycle.ViewModel
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.DNSProxyEndpointDAO
 
-class DNSProxyEndpointViewModel(private val dnsProxyEndpointDAO: DNSProxyEndpointDAO) : ViewModel() {
+class DNSProxyEndpointViewModel(private val dnsProxyEndpointDAO: DNSProxyEndpointDAO) :
+        ViewModel() {
 
-    private var filteredList : MutableLiveData<String> = MutableLiveData()
+    private var filteredList: MutableLiveData<String> = MutableLiveData()
 
     init {
         filteredList.value = ""
     }
 
-    var dnsProxyEndpointList = Transformations.switchMap(
-                filteredList
-    ) { input ->
+    var dnsProxyEndpointList = Transformations.switchMap(filteredList) { input ->
         if (input.isBlank()) {
             dnsProxyEndpointDAO.getDNSProxyEndpointLiveData().toLiveData(pageSize = 50)
         } else {
-            dnsProxyEndpointDAO.getDNSProxyEndpointLiveDataByType("%$input%")
-                .toLiveData(pageSize = 50)
+            dnsProxyEndpointDAO.getDNSProxyEndpointLiveDataByType("%$input%").toLiveData(
+                pageSize = 50)
         }
     }
 
@@ -44,7 +43,7 @@ class DNSProxyEndpointViewModel(private val dnsProxyEndpointDAO: DNSProxyEndpoin
         filteredList.value = filter
     }
 
-    fun setFilterBlocked(filter: String){
+    fun setFilterBlocked(filter: String) {
         filteredList.value = filter
     }
 

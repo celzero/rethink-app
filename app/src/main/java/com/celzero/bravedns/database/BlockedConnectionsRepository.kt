@@ -28,10 +28,6 @@ class BlockedConnectionsRepository(private val blockedConnectionsDAO: BlockedCon
         blockedConnectionsDAO.update(blockedConnections)
     }
 
-  /*  fun deleteAsync(blockedConnections: BlockedConnections) {
-        blockedConnectionsDAO.delete(blockedConnections)
-    }*/
-
     fun clearFirewallRules(uid: Int) {
         blockedConnectionsDAO.clearFirewallRules(uid)
     }
@@ -62,11 +58,11 @@ class BlockedConnectionsRepository(private val blockedConnectionsDAO: BlockedCon
         }
     }
 
-    fun getBlockedConnectionsCount(): Int{
+    fun getBlockedConnectionsCount(): Int {
         return blockedConnectionsDAO.getBlockedConnectionsCount()
     }
 
-    fun getBlockedConnectionCountLiveData(): LiveData<Int>{
-          return blockedConnectionsDAO.getBlockedConnectionCountLiveData()
+    fun getBlockedConnectionCountLiveData(): LiveData<Int> {
+        return blockedConnectionsDAO.getBlockedConnectionCountLiveData()
     }
 }

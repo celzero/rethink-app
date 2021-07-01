@@ -25,10 +25,6 @@ import androidx.room.Query
 @Dao
 interface DNSLogDAO {
 
-    /*@Update
-    fun update(connectionTracker: ConnectionTracker)*/
-
-    //@Transaction
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(dnsLogs: DNSLogs)
 
@@ -36,21 +32,23 @@ interface DNSLogDAO {
     fun getDNSLogsLiveData(): DataSource.Factory<Int, DNSLogs>
 
     @Query("select * from DNSLogs where isBlocked = 1 order by time desc")
-    fun getBlockedDNSLogsLiveData() : DataSource.Factory<Int, DNSLogs>
+    fun getBlockedDNSLogsLiveData(): DataSource.Factory<Int, DNSLogs>
 
-    @Query("select * from DNSLogs where (queryStr like :searchString or resolver like :searchString or response like :searchString) and isBlocked = 1 order by time desc")
-    fun getBlockedDNSLogsLiveDataByName(searchString : String) : DataSource.Factory<Int, DNSLogs>
+    @Query(
+        "select * from DNSLogs where (queryStr like :searchString or resolver like :searchString or response like :searchString) and isBlocked = 1 order by time desc")
+    fun getBlockedDNSLogsLiveDataByName(searchString: String): DataSource.Factory<Int, DNSLogs>
 
-    @Query("select * from DNSLogs where queryStr like :searchString or resolver like :searchString or response like :searchString order by time desc")
-    fun getDNSLogsByQueryLiveData(searchString : String) : DataSource.Factory<Int, DNSLogs>
+    @Query(
+        "select * from DNSLogs where queryStr like :searchString or resolver like :searchString or response like :searchString order by time desc")
+    fun getDNSLogsByQueryLiveData(searchString: String): DataSource.Factory<Int, DNSLogs>
 
     @Query("delete from DNSLogs")
     fun clearAllData()
 
     @Query("delete from DNSLogs where time < :date")
-    fun deleteOlderData(date : Long)
+    fun deleteOlderData(date: Long)
 
     @Query("delete from DNSLogs where id < ((select max(id) from DNSLogs) - :count)")
-    fun deleteOlderDataCount(count : Int)
+    fun deleteOlderDataCount(count: Int)
 
 }

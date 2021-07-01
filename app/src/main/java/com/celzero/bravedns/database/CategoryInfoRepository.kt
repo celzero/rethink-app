@@ -27,10 +27,6 @@ class CategoryInfoRepository(private val categoryInfoDAO: CategoryInfoDAO) {
         categoryInfoDAO.update(categoryInfo)
     }
 
-    /* fun deleteAsync(categoryInfo : CategoryInfo){
-         categoryInfoDAO.delete(categoryInfo)
-     }*/
-
     fun insertAsync(categoryInfo: CategoryInfo) {
         categoryInfoDAO.insert(categoryInfo)
     }
@@ -45,7 +41,8 @@ class CategoryInfoRepository(private val categoryInfoDAO: CategoryInfoDAO) {
 
     fun updateCategoryInternet(categoryName: String, isInternetBlocked: Boolean) {
         categoryInfoDAO.updateCategoryInternet(categoryName, isInternetBlocked)
-        if (DEBUG) Log.d(LOG_TAG_APP_DB, "updateCategoryInternet - isInternetBlocked -$isInternetBlocked for $categoryName")
+        if (DEBUG) Log.d(LOG_TAG_APP_DB,
+                         "updateCategoryInternet - isInternetBlocked -$isInternetBlocked for $categoryName")
         if (isInternetBlocked) {
             categoryInfoDAO.updateBlockedCount(categoryName)
         } else {
@@ -89,7 +86,6 @@ class CategoryInfoRepository(private val categoryInfoDAO: CategoryInfoDAO) {
         } else {
             categoryInfoDAO.clearWhitelistCountForAll()
         }
-
     }
 
     fun updateWhitelistForCategory(categoryName: String, checked: Boolean) {
@@ -98,7 +94,6 @@ class CategoryInfoRepository(private val categoryInfoDAO: CategoryInfoDAO) {
         } else {
             categoryInfoDAO.clearWhitelistForCategory(categoryName)
         }
-
     }
 
     fun updateWhitelistCount(categoryName: String, whitelistCount: Int) {
@@ -116,7 +111,6 @@ class CategoryInfoRepository(private val categoryInfoDAO: CategoryInfoDAO) {
         } else {
             categoryInfoDAO.clearExcludedCountForAllApp()
         }
-
     }
 
     fun updateExcludedCountForCategory(categoryName: String, checked: Boolean) {
@@ -125,6 +119,5 @@ class CategoryInfoRepository(private val categoryInfoDAO: CategoryInfoDAO) {
         } else {
             categoryInfoDAO.clearExcludedCountForCategory(categoryName)
         }
-
     }
 }

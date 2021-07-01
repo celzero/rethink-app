@@ -47,9 +47,9 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
 import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
+import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
@@ -72,14 +72,20 @@ class Utilities {
         fun checkPermission(activity: AppCompatActivity): Boolean {
             var permissionGranted = false
 
-            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    val rootView: View = (activity).window.decorView.findViewById(android.R.id.content)
-                    Snackbar.make(rootView, "Storage permission required", Snackbar.LENGTH_LONG).setAction("Allow") {
-                        ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_PERMISSION_CODE)
+            if (ContextCompat.checkSelfPermission(activity,
+                                                  Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
+                                                                        Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    val rootView: View = (activity).window.decorView.findViewById(
+                        android.R.id.content)
+                    Snackbar.make(rootView, "Storage permission required",
+                                  Snackbar.LENGTH_LONG).setAction("Allow") {
+                        ActivityCompat.requestPermissions(activity, arrayOf(
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_PERMISSION_CODE)
                     }.setActionTextColor(Color.WHITE).show()
                 } else {
-                    ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_PERMISSION_CODE)
+                    ActivityCompat.requestPermissions(activity, arrayOf(
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_PERMISSION_CODE)
                 }
             } else {
                 permissionGranted = true
@@ -123,37 +129,48 @@ class Utilities {
             }
         }
 
-        fun isAccessibilityServiceEnabled(context: Context, service: Class<out AccessibilityService?>): Boolean {
+        fun isAccessibilityServiceEnabled(context: Context,
+                                          service: Class<out AccessibilityService?>): Boolean {
             val am = context.getSystemService<AccessibilityManager>() ?: return false
-            val enabledServices = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
+            val enabledServices = am.getEnabledAccessibilityServiceList(
+                AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
             for (enabledService in enabledServices) {
                 val enabledServiceInfo: ServiceInfo = enabledService.resolveInfo.serviceInfo
-                if (DEBUG) Log.e(LOG_TAG_VPN, "isAccessibilityServiceEnabled checking for: ${enabledServiceInfo.packageName}")
+                if (DEBUG) Log.e(LOG_TAG_VPN,
+                                 "isAccessibilityServiceEnabled checking for: ${enabledServiceInfo.packageName}")
                 if (enabledServiceInfo.packageName == context.packageName && enabledServiceInfo.name == service.name) {
                     return true
                 }
             }
-            if (DEBUG) Log.e(LOG_TAG_VPN, "isAccessibilityServiceEnabled failure, ${context.packageName},  ${service.name}, return size: ${enabledServices.size}")
+            if (DEBUG) Log.e(LOG_TAG_VPN,
+                             "isAccessibilityServiceEnabled failure, ${context.packageName},  ${service.name}, return size: ${enabledServices.size}")
             return false
         }
 
-        fun isAccessibilityServiceEnabledEnhanced(context: Context, accessibilityService: Class<out AccessibilityService?>): Boolean {
+        fun isAccessibilityServiceEnabledEnhanced(context: Context,
+                                                  accessibilityService: Class<out AccessibilityService?>): Boolean {
             try {
                 val expectedComponentName = ComponentName(context, accessibilityService)
-                val enabledServicesSetting: String = Settings.Secure.getString(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES) ?: return false
+                val enabledServicesSetting: String = Settings.Secure.getString(
+                    context.contentResolver,
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES) ?: return false
                 val colonSplitter = SimpleStringSplitter(':')
                 colonSplitter.setString(enabledServicesSetting)
                 while (colonSplitter.hasNext()) {
                     val componentNameString = colonSplitter.next()
                     val enabledService = ComponentName.unflattenFromString(componentNameString)
                     if (enabledService != null && enabledService == expectedComponentName) {
-                        if (DEBUG) Log.e(LOG_TAG_VPN, "isAccessibilityServiceEnabled Enhanced: ${expectedComponentName.packageName}")
+                        if (DEBUG) Log.e(LOG_TAG_VPN,
+                                         "isAccessibilityServiceEnabled Enhanced: ${expectedComponentName.packageName}")
                         return true
                     }
                 }
-                if (DEBUG) Log.e(LOG_TAG_VPN, "isAccessibilityServiceEnabled Enhanced: Failed to fetch enabledService so invoke isAccessibilityServiceEnabled()")
+                if (DEBUG) Log.e(LOG_TAG_VPN,
+                                 "isAccessibilityServiceEnabled Enhanced: Failed to fetch enabledService so invoke isAccessibilityServiceEnabled()")
             } catch (e: Settings.SettingNotFoundException) {
-                Log.e(LOG_TAG_VPN, "isAccessibilityServiceEnabled Exception on isAccessibilityServiceEnabledEnhanced() ${e.message}", e)
+                Log.e(LOG_TAG_VPN,
+                      "isAccessibilityServiceEnabled Exception on isAccessibilityServiceEnabledEnhanced() ${e.message}",
+                      e)
             }
             return isAccessibilityServiceEnabled(context, accessibilityService)
         }
@@ -161,12 +178,12 @@ class Utilities {
         private var countryMap: CountryMap? = null
 
         // Return a two-letter ISO country code, or null if that fails.
-        fun getCountryCode(address: InetAddress, context: Context): String {
+        fun getCountryCode(address: InetAddress?, context: Context): String {
             activateCountryMap(context)
             return (if (countryMap == null) {
                 null
             } else {
-                countryMap!!.getCountryCode(address)
+                countryMap?.getCountryCode(address)
             })!!
         }
 
@@ -247,7 +264,8 @@ class Utilities {
                 val ip = InetAddresses.forString(ipAddress)
                 return ip.isLoopbackAddress || ip.isSiteLocalAddress || ip.equals(UNSPECIFIED_IP)
             } catch (e: IllegalArgumentException) {
-                Log.w(LOG_TAG_VPN, "Exception while converting string to inetaddress, ${e.message}", e)
+                Log.w(LOG_TAG_VPN,
+                      "Exception while converting string to InetAddresses, ${e.message}", e)
             }
             return false
         }
@@ -259,7 +277,13 @@ class Utilities {
 
         fun getTypeName(type: Int): String {
             // From https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-4
-            val names = arrayOf("0", "A", "NS", "MD", "MF", "CNAME", "SOA", "MB", "MG", "MR", "NULL", "WKS", "PTR", "HINFO", "MINFO", "MX", "TXT", "RP", "AFSDB", "X25", "ISDN", "RT", "NSAP", "NSAP+PTR", "SIG", "KEY", "PX", "GPOS", "AAAA", "LOC", "NXT", "EID", "NIMLOC", "SRV", "ATMA", "NAPTR", "KX", "CERT", "A6", "DNAME", "SINK", "OPT", "APL", "DS", "SSHFP", "IPSECKEY", "RRSIG", "NSEC", "DNSKEY", "DHCID", "NSEC3", "NSEC3PARAM", "TLSA", "SMIMEA")
+            val names = arrayOf("0", "A", "NS", "MD", "MF", "CNAME", "SOA", "MB", "MG", "MR",
+                                "NULL", "WKS", "PTR", "HINFO", "MINFO", "MX", "TXT", "RP", "AFSDB",
+                                "X25", "ISDN", "RT", "NSAP", "NSAP+PTR", "SIG", "KEY", "PX", "GPOS",
+                                "AAAA", "LOC", "NXT", "EID", "NIMLOC", "SRV", "ATMA", "NAPTR", "KX",
+                                "CERT", "A6", "DNAME", "SINK", "OPT", "APL", "DS", "SSHFP",
+                                "IPSECKEY", "RRSIG", "NSEC", "DNSKEY", "DHCID", "NSEC3",
+                                "NSEC3PARAM", "TLSA", "SMIMEA")
             return if (type < names.size) {
                 names[type]
             } else String.format(Locale.ROOT, "%d", type)
@@ -287,7 +311,8 @@ class Utilities {
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(intent)
             } catch (e: ActivityNotFoundException) {
-                showToastUiCentered(context, context.getString(R.string.vpn_profile_error), Toast.LENGTH_SHORT)
+                showToastUiCentered(context, context.getString(R.string.vpn_profile_error),
+                                    Toast.LENGTH_SHORT)
                 Log.w(LOG_TAG_VPN, "Exception while opening app info: ${e.message}", e)
             }
         }
@@ -312,7 +337,8 @@ class Utilities {
         }
 
         fun killBg(context: Context, packageInfo: String) {
-            val activityManager: ActivityManager = context.getSystemService(Activity.ACTIVITY_SERVICE) as ActivityManager
+            val activityManager: ActivityManager = context.getSystemService(
+                Activity.ACTIVITY_SERVICE) as ActivityManager
             try {
                 activityManager.killBackgroundProcesses(packageInfo)
             } catch (e: Exception) {
@@ -321,4 +347,3 @@ class Utilities {
         }
     }
 }
-

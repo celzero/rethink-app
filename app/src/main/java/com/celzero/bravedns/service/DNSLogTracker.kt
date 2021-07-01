@@ -40,7 +40,9 @@ import kotlinx.coroutines.launch
 import java.net.InetAddress
 import java.net.ProtocolException
 
-class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRepository, private val persistentState: PersistentState, private val context: Context) {
+class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRepository,
+                                         private val persistentState: PersistentState,
+                                         private val context: Context) {
 
     fun recordTransaction(transaction: Transaction?) {
         if (transaction != null) {
@@ -67,15 +69,21 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
             dnsLogs.status = transaction.status.name
             dnsLogs.time = transaction.responseCalendar.timeInMillis
             dnsLogs.typeName = Utilities.getTypeName(transaction.type.toInt())
-
-            val serverAddress = if (transaction.serverIp != null) {
-                // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
-                forString(transaction.serverIp)
-            } else {
+            val serverAddress = try {
+                if (transaction.serverIp != null) {
+                    // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
+                    forString(transaction.serverIp)
+                } else {
+                    null
+                }
+            } catch (e: IllegalArgumentException) {
+                Log.e(LOG_TAG_DNS_LOG,
+                      "Exception while converting string to InetAddresses: ${e.message}", e)
                 null
             }
             if (serverAddress != null) {
-                val countryCode: String = getCountryCode(serverAddress, context) //TODO: Country code things
+                val countryCode: String = getCountryCode(serverAddress,
+                                                         context) //TODO: Country code things
                 dnsLogs.resolver = makeAddressPair(countryCode, serverAddress.hostAddress)
             } else {
                 dnsLogs.resolver = transaction.serverIp
@@ -93,25 +101,31 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                     val addresses: List<InetAddress> = packet.responseAddresses
                     if (addresses.isNotEmpty()) {
                         val destination = addresses[0]
-                        if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "transaction.response - ${destination.address}")
-                        val countryCode: String = getCountryCode(destination, context) //TODO : Check on the country code stuff
+                        if (DEBUG) Log.d(LOG_TAG_DNS_LOG,
+                                         "transaction.response - ${destination.address}")
+                        val countryCode: String = getCountryCode(destination,
+                                                                 context) //TODO : Check on the country code stuff
                         dnsLogs.response = makeAddressPair(countryCode, destination.hostAddress)
                         if (destination.hostAddress.contains("0.0.0.0")) {
                             dnsLogs.isBlocked = true
                         }
 
                         if (destination.isAnyLocalAddress) {
-                            if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Local address: ${destination.hostAddress}")
+                            if (DEBUG) Log.d(LOG_TAG_DNS_LOG,
+                                             "Local address: ${destination.hostAddress}")
                             dnsLogs.isBlocked = true
                         } else if (destination.hostAddress == "::0" || destination.hostAddress == "::1") {
-                            if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Local equals(::0): ${destination.hostAddress}")
+                            if (DEBUG) Log.d(LOG_TAG_DNS_LOG,
+                                             "Local equals(::0): ${destination.hostAddress}")
                             dnsLogs.isBlocked = true
                         }
-                        if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "transaction.response - ${destination.hostAddress}")
+                        if (DEBUG) Log.d(LOG_TAG_DNS_LOG,
+                                         "transaction.response - ${destination.hostAddress}")
                         dnsLogs.flag = getFlag(countryCode)
                     } else {
                         dnsLogs.response = "NXDOMAIN"
-                        dnsLogs.flag = context.getString(R.string.unicode_question_sign) // White question mark
+                        dnsLogs.flag = context.getString(
+                            R.string.unicode_question_sign) // White question mark
                     }
                 } else {
                     dnsLogs.response = err

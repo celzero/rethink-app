@@ -28,13 +28,7 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         }
     }
 
-    /*fun deleteAsync(appInfo: AppInfo, coroutineScope: CoroutineScope = GlobalScope) {
-        coroutineScope.launch {
-            appInfoDAO.delete(appInfo)
-        }
-    }*/
-
-    fun delete(appInfo: AppInfo){
+    fun delete(appInfo: AppInfo) {
         appInfoDAO.delete(appInfo)
     }
 
@@ -42,7 +36,7 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         appInfoDAO.insert(appInfo)
     }
 
-    fun isRootUserAvailable(): String?{
+    fun isRootUserAvailable(): String? {
         return appInfoDAO.isRootAvailable()
     }
 
@@ -50,7 +44,7 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.getAllAppDetails()
     }
 
-    fun getNonAppCount() : Int{
+    fun getNonAppCount(): Int {
         return appInfoDAO.getNonAppCount()
     }
 
@@ -62,10 +56,8 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.getAppListForUID(uid)
     }
 
-    fun updateInternetForAppCategory(categoryName: String, isInternetAllowed: Boolean) : Int {
-        //coroutineScope.launch {
+    fun updateInternetForAppCategory(categoryName: String, isInternetAllowed: Boolean): Int {
         return appInfoDAO.updateInternetPermissionForCategory(categoryName, isInternetAllowed)
-        //}
     }
 
     fun getAllAppDetailsForLiveData(): LiveData<List<AppInfo>> {
@@ -112,21 +104,15 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
     }
 
     fun updateWhiteList(uid: Int, isEnabled: Boolean) {
-        //coroutineScope.launch {
-            appInfoDAO.updateWhiteList(uid, isEnabled)
-        //}
+        appInfoDAO.updateWhiteList(uid, isEnabled)
     }
 
-    fun updateWhiteListForAllApp(isEnabled: Boolean) : Int {
-        //coroutineScope.launch {
+    fun updateWhiteListForAllApp(isEnabled: Boolean): Int {
         return appInfoDAO.updateWhiteListForAllApp(isEnabled)
-        //}
     }
 
     fun updateWhiteListForCategories(category: String, isEnabled: Boolean): Int {
-        //coroutineScope.launch {
-            return appInfoDAO.updateWhiteListForCategories(category, isEnabled)
-        //}
+        return appInfoDAO.updateWhiteListForCategories(category, isEnabled)
     }
 
     fun updateExcludedForAllApp(isExcluded: Boolean, coroutineScope: CoroutineScope = GlobalScope) {
@@ -135,38 +121,35 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         }
     }
 
-    fun updateExcludedForCategories(category: String, isExcluded: Boolean, coroutineScope: CoroutineScope = GlobalScope) {
+    fun updateExcludedForCategories(category: String, isExcluded: Boolean,
+                                    coroutineScope: CoroutineScope = GlobalScope) {
         coroutineScope.launch {
             appInfoDAO.updateExcludedForCategories(category, isExcluded)
         }
     }
 
     fun updateExcludedList(uid: Int, isEnabled: Boolean) {
-        //coroutineScope.launch {
-            appInfoDAO.updateExcludedList(uid, isEnabled)
-        //}
+        appInfoDAO.updateExcludedList(uid, isEnabled)
     }
 
-    fun getExcludedAppList() : List<String>{
+    fun getExcludedAppList(): List<String> {
         return appInfoDAO.getExcludedAppList()
     }
 
-    fun getAppInfoForPackageName(packageName : String) : AppInfo? {
+    fun getAppInfoForPackageName(packageName: String): AppInfo? {
         return appInfoDAO.getAppInfoForPackageName(packageName)
     }
 
 
-    fun getWhitelistCount(categoryName : String): Int{
+    fun getWhitelistCount(categoryName: String): Int {
         return appInfoDAO.getWhitelistCount(categoryName)
     }
 
-    fun getAppNameForUID(uid : Int): String{
+    fun getAppNameForUID(uid: Int): String {
         return appInfoDAO.getAppNameForUID(uid)
     }
 
-    fun getExcludedAppCountForCategory(categoryName: String) : Int{
+    fun getExcludedAppCountForCategory(categoryName: String): Int {
         return appInfoDAO.getExcludedAppCountForCategory(categoryName)
     }
-
-
 }

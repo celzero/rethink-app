@@ -16,18 +16,18 @@ limitations under the License.
 package com.celzero.bravedns.adapter
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.databinding.DnsBlockListItemBinding
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 
-class DNSBottomSheetBlockAdapter(val context: Context, val data: List<String>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class DNSBottomSheetBlockAdapter(val context: Context, val data: List<String>) :
+        RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DNSBottomSheetViewHolder {
-        val itemBinding = DnsBlockListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val itemBinding = DnsBlockListItemBinding.inflate(LayoutInflater.from(parent.context),
+                                                          parent, false)
         return DNSBottomSheetViewHolder(itemBinding)
     }
 
@@ -49,7 +49,8 @@ class DNSBottomSheetBlockAdapter(val context: Context, val data: List<String>) :
     }
 
 
-    inner class DNSBottomSheetViewHolder(private val b: DnsBlockListItemBinding) : RecyclerView.ViewHolder(b.root) {
+    inner class DNSBottomSheetViewHolder(private val b: DnsBlockListItemBinding) :
+            RecyclerView.ViewHolder(b.root) {
 
         fun update(dnsBlockItem: String?) {
             if (dnsBlockItem != null) {

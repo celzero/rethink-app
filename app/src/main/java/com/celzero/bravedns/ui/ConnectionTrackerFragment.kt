@@ -44,7 +44,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  * Live data is used to fetch the network details from the database.
  * Database table name - ConnectionTracker.
  */
-class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker), SearchView.OnQueryTextListener {
+class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker),
+                                  SearchView.OnQueryTextListener {
     private val b by viewBinding(ActivityConnectionTrackerBinding::bind)
 
     private var layoutManager: RecyclerView.LayoutManager? = null
@@ -77,7 +78,8 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
             includeView.recyclerConnection.layoutManager = layoutManager
 
             recyclerAdapter = ConnectionTrackerAdapter(requireContext())
-            viewModel.connectionTrackerList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(recyclerAdapter!!::submitList))
+            viewModel.connectionTrackerList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
+                recyclerAdapter!!::submitList))
             includeView.recyclerConnection.adapter = recyclerAdapter
         } else {
             includeView.connectionListLogsDisabledTv.visibility = View.VISIBLE
@@ -114,7 +116,8 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
 
     private fun showDialogForFilter() {
 
-        val singleItems = arrayOf(getString(R.string.filter_network_blocked_connections), getString(R.string.filter_network_all_connections))
+        val singleItems = arrayOf(getString(R.string.filter_network_blocked_connections),
+                                  getString(R.string.filter_network_all_connections))
 
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle(getString(R.string.ct_filter_dialog_title))

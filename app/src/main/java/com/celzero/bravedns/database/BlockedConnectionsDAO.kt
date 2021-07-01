@@ -35,25 +35,27 @@ interface BlockedConnectionsDAO {
 
     @Transaction
     @Query("select uid, * from BlockedConnections order by uid")
-    fun getBlockedConnections() : List<BlockedConnections>
+    fun getBlockedConnections(): List<BlockedConnections>
 
     @Transaction
-    @Query ("select uid,* from BlockedConnections where uid = :uid and isActive = 1")
-    fun getBlockedConnectionsByUID(uid: Int ) :List< BlockedConnections>
+    @Query("select uid,* from BlockedConnections where uid = :uid and isActive = 1")
+    fun getBlockedConnectionsByUID(uid: Int): List<BlockedConnections>
 
-    @Query ("delete from BlockedConnections where uid = :uid")
-    fun clearFirewallRules(uid : Int)
-
-    @Transaction
-    @Query ("select * from BlockedConnections where uid = :uid or uid = -1000")
-    fun getAllBlockedConnectionsForUID(uid : Int) :List< BlockedConnections>
+    @Query("delete from BlockedConnections where uid = :uid")
+    fun clearFirewallRules(uid: Int)
 
     @Transaction
-    @Query("select * from BlockedConnections where isActive = 1 and uid = -1000 order by modifiedDateTime desc")
+    @Query("select * from BlockedConnections where uid = :uid or uid = -1000")
+    fun getAllBlockedConnectionsForUID(uid: Int): List<BlockedConnections>
+
+    @Transaction
+    @Query(
+        "select * from BlockedConnections where isActive = 1 and uid = -1000 order by modifiedDateTime desc")
     fun getUnivBlockedConnectionsLiveData(): DataSource.Factory<Int, BlockedConnections>
 
     @Transaction
-    @Query("select * from BlockedConnections where ipAddress like :query and uid = -1000 and  isActive = 1 order by modifiedDateTime desc")
+    @Query(
+        "select * from BlockedConnections where ipAddress like :query and uid = -1000 and  isActive = 1 order by modifiedDateTime desc")
     fun getUnivBlockedConnectionsByIP(query: String): DataSource.Factory<Int, BlockedConnections>
 
     @Query("delete from BlockedConnections where ipAddress = :ipAddress and uid = -1000")
@@ -67,7 +69,7 @@ interface BlockedConnectionsDAO {
     fun deleteAllIPRulesUniversal()
 
     @Query("select count(*) from BlockedConnections where uid = -1000")
-    fun getBlockedConnectionsCount() : Int
+    fun getBlockedConnectionsCount(): Int
 
     @Query("select count(*) from BlockedConnections where uid = -1000")
     fun getBlockedConnectionCountLiveData(): LiveData<Int>

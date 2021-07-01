@@ -43,24 +43,27 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class DNSCryptRelayEndpointAdapter(
-    private val context: Context,
-    private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
-    private val persistentState:PersistentState,
-    private val dnsCryptEndpointRepository:DNSCryptEndpointRepository
-) : PagedListAdapter<DNSCryptRelayEndpoint, DNSCryptRelayEndpointAdapter.DNSCryptRelayEndpointViewHolder>(DIFF_CALLBACK) {
+class DNSCryptRelayEndpointAdapter(private val context: Context,
+                                   private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
+                                   private val persistentState: PersistentState,
+                                   private val dnsCryptEndpointRepository: DNSCryptEndpointRepository) :
+        PagedListAdapter<DNSCryptRelayEndpoint, DNSCryptRelayEndpointAdapter.DNSCryptRelayEndpointViewHolder>(
+            DIFF_CALLBACK) {
 
     companion object {
-        private val DIFF_CALLBACK = object :
-            DiffUtil.ItemCallback<DNSCryptRelayEndpoint>() {
-            override fun areItemsTheSame(oldConnection: DNSCryptRelayEndpoint, newConnection: DNSCryptRelayEndpoint) = oldConnection.id == newConnection.id
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DNSCryptRelayEndpoint>() {
+            override fun areItemsTheSame(oldConnection: DNSCryptRelayEndpoint,
+                                         newConnection: DNSCryptRelayEndpoint) = oldConnection.id == newConnection.id
 
-            override fun areContentsTheSame(oldConnection: DNSCryptRelayEndpoint, newConnection: DNSCryptRelayEndpoint) = oldConnection == newConnection
+            override fun areContentsTheSame(oldConnection: DNSCryptRelayEndpoint,
+                                            newConnection: DNSCryptRelayEndpoint) = oldConnection == newConnection
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DNSCryptRelayEndpointViewHolder {
-        val itemBinding = DnsCryptEndpointListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup,
+                                    viewType: Int): DNSCryptRelayEndpointViewHolder {
+        val itemBinding = DnsCryptEndpointListItemBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false)
         return DNSCryptRelayEndpointViewHolder(itemBinding)
     }
 
@@ -70,21 +73,25 @@ class DNSCryptRelayEndpointAdapter(
     }
 
 
-    inner class DNSCryptRelayEndpointViewHolder(private val b: DnsCryptEndpointListItemBinding) : RecyclerView.ViewHolder(b.root) {
+    inner class DNSCryptRelayEndpointViewHolder(private val b: DnsCryptEndpointListItemBinding) :
+            RecyclerView.ViewHolder(b.root) {
 
         fun update(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint) {
             b.dnsCryptEndpointListUrlName.text = dnsCryptRelayEndpoint.dnsCryptRelayName
             if (dnsCryptRelayEndpoint.isSelected) {
-                b.dnsCryptEndpointListUrlExplanation.text = context.getString(R.string.dns_connected)
+                b.dnsCryptEndpointListUrlExplanation.text = context.getString(
+                    R.string.dns_connected)
             } else {
                 b.dnsCryptEndpointListUrlExplanation.text = ""
             }
 
             b.dnsCryptEndpointListActionImage.isChecked = dnsCryptRelayEndpoint.isSelected
             if (dnsCryptRelayEndpoint.isCustom && !dnsCryptRelayEndpoint.isSelected) {
-                b.dnsCryptEndpointListInfoImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_fab_uninstall))
+                b.dnsCryptEndpointListInfoImage.setImageDrawable(
+                    ContextCompat.getDrawable(context, R.drawable.ic_fab_uninstall))
             } else {
-                b.dnsCryptEndpointListInfoImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_fab_appinfo))
+                b.dnsCryptEndpointListInfoImage.setImageDrawable(
+                    ContextCompat.getDrawable(context, R.drawable.ic_fab_appinfo))
             }
             b.root.setOnClickListener {
                 b.dnsCryptEndpointListActionImage.isChecked = !b.dnsCryptEndpointListActionImage.isChecked
@@ -111,12 +118,16 @@ class DNSCryptRelayEndpointAdapter(
         }
 
         private fun showExplanationOnImageClick(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint) {
-            if (dnsCryptRelayEndpoint.isCustom && !dnsCryptRelayEndpoint.isSelected) showDialogForDelete(dnsCryptRelayEndpoint)
+            if (dnsCryptRelayEndpoint.isCustom && !dnsCryptRelayEndpoint.isSelected) showDialogForDelete(
+                dnsCryptRelayEndpoint)
             else {
                 if (dnsCryptRelayEndpoint.dnsCryptRelayExplanation.isNullOrEmpty()) {
-                    showDialogExplanation(dnsCryptRelayEndpoint.dnsCryptRelayName, dnsCryptRelayEndpoint.dnsCryptRelayURL, "")
+                    showDialogExplanation(dnsCryptRelayEndpoint.dnsCryptRelayName,
+                                          dnsCryptRelayEndpoint.dnsCryptRelayURL, "")
                 } else {
-                    showDialogExplanation(dnsCryptRelayEndpoint.dnsCryptRelayName, dnsCryptRelayEndpoint.dnsCryptRelayURL, dnsCryptRelayEndpoint.dnsCryptRelayExplanation!!)
+                    showDialogExplanation(dnsCryptRelayEndpoint.dnsCryptRelayName,
+                                          dnsCryptRelayEndpoint.dnsCryptRelayURL,
+                                          dnsCryptRelayEndpoint.dnsCryptRelayExplanation!!)
                 }
             }
         }
@@ -126,15 +137,18 @@ class DNSCryptRelayEndpointAdapter(
             builder.setTitle(title)
             builder.setMessage(url + "\n\n" + message)
             builder.setCancelable(true)
-            builder.setPositiveButton(context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
+            builder.setPositiveButton(
+                context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
                 dialogInterface.dismiss()
             }
 
-            builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
+            builder.setNeutralButton(
+                context.getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
                 val clipboard: ClipboardManager? = context.getSystemService()
                 val clip = ClipData.newPlainText("URL", url)
                 clipboard?.setPrimaryClip(clip)
-                Utilities.showToastUiCentered(context, context.getString(R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(context, context.getString(
+                    R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
             }
             val alertDialog: AlertDialog = builder.create()
             alertDialog.setCancelable(true)
@@ -149,10 +163,12 @@ class DNSCryptRelayEndpointAdapter(
             builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { _, _ ->
                 GlobalScope.launch(Dispatchers.IO) {
                     if (dnsCryptRelayEndpoint != null) {
-                        dnsCryptRelayEndpointRepository.deleteDNSCryptRelayEndpoint(dnsCryptRelayEndpoint.dnsCryptRelayURL)
+                        dnsCryptRelayEndpointRepository.deleteDNSCryptRelayEndpoint(
+                            dnsCryptRelayEndpoint.dnsCryptRelayURL)
                     }
                 }
-                Toast.makeText(context, R.string.dns_crypt_relay_remove_success, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.dns_crypt_relay_remove_success,
+                               Toast.LENGTH_SHORT).show()
             }
 
             builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
@@ -162,7 +178,8 @@ class DNSCryptRelayEndpointAdapter(
             alertDialog.show()
         }
 
-        private fun updateDNSCryptRelayDetails(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint): Boolean {
+        private fun updateDNSCryptRelayDetails(
+                dnsCryptRelayEndpoint: DNSCryptRelayEndpoint): Boolean {
             if (dnsCryptEndpointRepository.getConnectedCount() > 0) {
                 dnsCryptRelayEndpointRepository.updateAsync(dnsCryptRelayEndpoint)
                 object : CountDownTimer(500, 500) {
@@ -177,7 +194,8 @@ class DNSCryptRelayEndpointAdapter(
                 persistentState.connectionModeChange = dnsCryptRelayEndpoint.dnsCryptRelayURL
                 return true
             } else {
-                Toast.makeText(context, context.getString(R.string.dns_crypt_relay_error_toast), Toast.LENGTH_LONG).show()
+                Toast.makeText(context, context.getString(R.string.dns_crypt_relay_error_toast),
+                               Toast.LENGTH_LONG).show()
                 return false
             }
 

@@ -67,7 +67,8 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
 
     private val persistentState by inject<PersistentState>()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View {
         _binding = BottomSheetOrbotBinding.inflate(inflater, container, false)
         return b.root
     }
@@ -128,7 +129,8 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         b.bsOrbotRadioNone.setOnCheckedChangeListener(null)
         b.bsOrbotRadioNone.setOnClickListener {
             if (b.bsOrbotRadioNone.isChecked) {
-                HomeScreenActivity.GlobalVariable.appMode?.setProxyMode(settings.Settings.ProxyModeNone)
+                HomeScreenActivity.GlobalVariable.appMode?.setProxyMode(
+                    settings.Settings.ProxyModeNone)
                 persistentState.orbotMode = Constants.ORBOT_MODE_NONE
                 persistentState.orbotEnabledMode = Constants.ORBOT_MODE_NONE
                 b.bsOrbotRadioNone.isChecked = true
@@ -140,7 +142,8 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
 
         b.bsOrbotNoneRl.setOnClickListener {
             if (!b.bsOrbotRadioNone.isChecked) {
-                HomeScreenActivity.GlobalVariable.appMode?.setProxyMode(settings.Settings.ProxyModeNone)
+                HomeScreenActivity.GlobalVariable.appMode?.setProxyMode(
+                    settings.Settings.ProxyModeNone)
                 persistentState.orbotMode = Constants.ORBOT_MODE_NONE
                 persistentState.orbotEnabledMode = Constants.ORBOT_MODE_NONE
                 b.bsOrbotRadioNone.isChecked = true
@@ -369,11 +372,13 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
     private fun openOrbotApp() {
         val packageName = OrbotHelper.ORBOT_PACKAGE_NAME
         try {
-            val launchIntent: Intent? = requireActivity().packageManager.getLaunchIntentForPackage(packageName)
+            val launchIntent: Intent? = requireActivity().packageManager.getLaunchIntentForPackage(
+                packageName)
             if (launchIntent != null) {//null pointer check in case package name was not found
                 startActivity(launchIntent)
             } else {
-                Utilities.showToastUiCentered(requireContext(), getString(R.string.orbot_app_issue), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(requireContext(), getString(R.string.orbot_app_issue),
+                                              Toast.LENGTH_SHORT)
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                 intent.data = Uri.fromParts("package", packageName, null)
                 startActivity(intent)
@@ -392,7 +397,8 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
             if (vpnService != null) {
                 get<OrbotHelper>().startOrbot(vpnService)
             } else {
-                Utilities.showToastUiCentered(requireContext(), getString(R.string.settings_socks5_vpn_disabled_error), Toast.LENGTH_LONG)
+                Utilities.showToastUiCentered(requireContext(), getString(
+                    R.string.settings_socks5_vpn_disabled_error), Toast.LENGTH_LONG)
             }
         }
     }
@@ -402,12 +408,15 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         builder.setTitle(getString(R.string.orbot_stop_dialog_title))
         builder.setMessage(getString(R.string.orbot_stop_dialog_message))
         builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.orbot_stop_dialog_positive)) { dialogInterface, _ ->
+        builder.setPositiveButton(
+            getString(R.string.orbot_stop_dialog_positive)) { dialogInterface, _ ->
             dialogInterface.dismiss()
         }
-        builder.setNegativeButton(getString(R.string.orbot_stop_dialog_negative)) { dialogInterface: DialogInterface, _: Int ->
+        builder.setNegativeButton(getString(
+            R.string.orbot_stop_dialog_negative)) { dialogInterface: DialogInterface, _: Int ->
             dialogInterface.dismiss()
-            val launchIntent: Intent? = requireActivity().packageManager.getLaunchIntentForPackage(OrbotHelper.ORBOT_PACKAGE_NAME)
+            val launchIntent: Intent? = requireActivity().packageManager.getLaunchIntentForPackage(
+                OrbotHelper.ORBOT_PACKAGE_NAME)
             if (launchIntent != null) {//null pointer check in case package name was not found
                 Log.d(LOG_TAG_VPN, "launchIntent: ${OrbotHelper.ORBOT_PACKAGE_NAME}")
                 startActivity(launchIntent)
@@ -441,6 +450,5 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         dialog.show()
 
     }
-
 
 }

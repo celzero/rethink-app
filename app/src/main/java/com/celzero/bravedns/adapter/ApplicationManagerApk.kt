@@ -25,17 +25,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.databinding.AppScrollListBinding
 
 
-class ApplicationManagerApk (packageInfo: PackageInfo,  var category: String, context : Context) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ApplicationManagerApk(packageInfo: PackageInfo, var category: String, context: Context) :
+        RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    var appInfo: ApplicationInfo?= null
-    var appName: String ?= null
-    var packageName: String ?= null
-    var appIcon : Drawable?= null
+    var appInfo: ApplicationInfo? = null
+    var appName: String? = null
+    var packageName: String? = null
+    var appIcon: Drawable? = null
     var version: String? = ""
-    var context : Context?= null
-    var isChecked : Boolean = false
+    var context: Context? = null
+    var isChecked: Boolean = false
 
-    init{
+    init {
 
         this.appInfo = packageInfo.applicationInfo
         this.context = context
@@ -47,24 +48,25 @@ class ApplicationManagerApk (packageInfo: PackageInfo,  var category: String, co
 
     }
 
-    companion object{
+    companion object {
         private val addedList = ArrayList<ApplicationManagerApk>()
-        fun getAddedList():ArrayList<ApplicationManagerApk>{
+        fun getAddedList(): ArrayList<ApplicationManagerApk> {
             return addedList
         }
 
-        fun cleatList(){
+        fun cleatList() {
             addedList.clear()
         }
     }
 
 
-    inner class ViewHolder(private val b: AppScrollListBinding): RecyclerView.ViewHolder(b.root) {
+    inner class ViewHolder(private val b: AppScrollListBinding) : RecyclerView.ViewHolder(b.root) {
 
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val itemBinding = AppScrollListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val itemBinding = AppScrollListBinding.inflate(LayoutInflater.from(parent.context), parent,
+                                                       false)
         return ViewHolder(itemBinding)
     }
 

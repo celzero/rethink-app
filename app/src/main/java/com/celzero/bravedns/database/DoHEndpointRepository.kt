@@ -45,7 +45,8 @@ class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
         }
     }
 
-    fun insertWithReplaceAsync(doHEndpoint: DoHEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
+    fun insertWithReplaceAsync(doHEndpoint: DoHEndpoint,
+                               coroutineScope: CoroutineScope = GlobalScope) {
         coroutineScope.launch {
             doHEndpointDAO.insertReplace(doHEndpoint)
         }
@@ -81,15 +82,15 @@ class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
         doHEndpointDAO.updateConnectionURL(url)
     }
 
-    fun getConnectionURL(id:Int) : String{
+    fun getConnectionURL(id: Int): String {
         return doHEndpointDAO.getConnectionURL(id)
     }
 
-    fun getCount():Int{
+    fun getCount(): Int {
         return doHEndpointDAO.getCount()
     }
 
-    fun updateConnectionDefault() : DoHEndpoint?{
+    fun updateConnectionDefault(): DoHEndpoint? {
         doHEndpointDAO.updateConnectionDefault()
         return doHEndpointDAO.getConnectedDoH()
     }

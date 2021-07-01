@@ -23,7 +23,8 @@ import kotlinx.coroutines.launch
 
 class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTrackerDAO) {
 
-    fun updateAsync(connectionTracker: ConnectionTracker, coroutineScope: CoroutineScope = GlobalScope) {
+    fun updateAsync(connectionTracker: ConnectionTracker,
+                    coroutineScope: CoroutineScope = GlobalScope) {
         coroutineScope.launch {
             connectionTrackerDAO.update(connectionTracker)
         }
@@ -33,12 +34,11 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
         connectionTrackerDAO.insert(connectionTracker)
     }
 
-    fun deleteConnectionTrackerCount()  {
+    fun deleteConnectionTrackerCount() {
         connectionTrackerDAO.deleteOlderDataCount(Constants.TOTAL_NETWORK_LOG_ENTRIES_THRESHOLD)
     }
 
     fun deleteOlderData(date: Long) {
         connectionTrackerDAO.deleteOlderData(date)
     }
-
 }

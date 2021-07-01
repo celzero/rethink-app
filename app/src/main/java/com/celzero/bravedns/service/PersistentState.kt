@@ -101,13 +101,14 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
     var isBackgroundEnabled by booleanPref("background_mode", false)
     var checkForAppUpdate by booleanPref("check_for_app_update", true)
     var isScreenOff by booleanPref("screen_off", false)
-    private var connectedDNSName by stringPref("connected_dns_name", context.getString(R.string.dns_mode_3))
+    private var connectedDNSName by stringPref("connected_dns_name",
+                                               context.getString(R.string.dns_mode_3))
     var theme by intPref("app_theme", 0)
     var notificationAction by intPref("notification_action", 1)
     var isAddAllNetworks by booleanPref("add_all_networks_to_vpn", false)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
-    
+
     // OrbotMode - Once enabled from the app, it will be set to true and then the value
     // OrbotEnabledMode - Enabled once there is a response from the Orbot intent.
     // There are two values because in some cases, for e.g., when the vpn service is restarted,
@@ -117,7 +118,8 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
 
     var downloadIDs by stringSetPref("download_ids", emptySet())
 
-    var fetchFavIcon by booleanPref("fav_icon_enabled", BuildConfig.FLAVOR != Constants.FLAVOR_FDROID)
+    var fetchFavIcon by booleanPref("fav_icon_enabled",
+                                    BuildConfig.FLAVOR != Constants.FLAVOR_FDROID)
 
     var isAccessibilityCrashDetected by booleanPref("accessibility_crash", false)
 
@@ -197,7 +199,8 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
                 connectedDNSName
             }
         } else if (Constants.PREF_DNS_MODE_DNSCRYPT == dnsType) {
-            context.getString(R.string.configure_dns_crypt, appMode?.getDNSCryptServerCount().toString())
+            context.getString(R.string.configure_dns_crypt,
+                              appMode?.getDNSCryptServerCount().toString())
         } else {
             val proxyDetails = appMode?.getDNSProxyServerDetails()
             proxyDetails?.proxyAppName!!

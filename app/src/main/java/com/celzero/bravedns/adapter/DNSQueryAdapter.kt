@@ -48,15 +48,18 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class DNSQueryAdapter(val context: Context, private val persistentState: PersistentState) : PagedListAdapter<DNSLogs, DNSQueryAdapter.TransactionViewHolder>(DIFF_CALLBACK) {
+class DNSQueryAdapter(val context: Context, private val persistentState: PersistentState) :
+        PagedListAdapter<DNSLogs, DNSQueryAdapter.TransactionViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         const val TYPE_TRANSACTION: Int = 1
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DNSLogs>() {
 
-            override fun areItemsTheSame(oldConnection: DNSLogs, newConnection: DNSLogs) = oldConnection.id == newConnection.id
+            override fun areItemsTheSame(oldConnection: DNSLogs,
+                                         newConnection: DNSLogs) = oldConnection.id == newConnection.id
 
-            override fun areContentsTheSame(oldConnection: DNSLogs, newConnection: DNSLogs) = oldConnection == newConnection
+            override fun areContentsTheSame(oldConnection: DNSLogs,
+                                            newConnection: DNSLogs) = oldConnection == newConnection
         }
     }
 
@@ -77,19 +80,23 @@ class DNSQueryAdapter(val context: Context, private val persistentState: Persist
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
-        val itemBinding = TransactionRowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val itemBinding = TransactionRowBinding.inflate(LayoutInflater.from(parent.context), parent,
+                                                        false)
         return TransactionViewHolder(itemBinding, favIcon)
     }
 
 
-    inner class TransactionViewHolder(private val b: TransactionRowBinding, private val favIcon: Boolean) : RecyclerView.ViewHolder(b.root) {
+    inner class TransactionViewHolder(private val b: TransactionRowBinding,
+                                      private val favIcon: Boolean) :
+            RecyclerView.ViewHolder(b.root) {
         fun update(transaction: DNSLogs?) {
             // This function can be run up to a dozen times while blocking rendering, so it needs to be
             // as brief as possible.
             if (transaction != null) {
                 b.responseTime.text = convertLongToTime(transaction.time)
                 b.fqdn.text = transaction.queryStr
-                b.latencyVal.text = context.getString(R.string.dns_query_latency, transaction.latency.toString())
+                b.latencyVal.text = context.getString(R.string.dns_query_latency,
+                                                      transaction.latency.toString())
                 b.flag.text = transaction.flag
                 b.flag.visibility = View.VISIBLE
                 b.favIcon.visibility = View.GONE
@@ -142,33 +149,34 @@ class DNSQueryAdapter(val context: Context, private val persistentState: Persist
         private fun updateImage(url: String, cacheKey: String) {
             try {
                 val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
-                GlideApp.with(context.applicationContext)
-                    .load(url)
-                    .onlyRetrieveFromCache(true)
-                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                    .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
-                    .error(GlideApp.with(context.applicationContext).load(cacheKey).onlyRetrieveFromCache(true))
-                    .transition(withCrossFade(factory))
-                    .into(object : CustomViewTarget<ImageView, Drawable>(b.favIcon) {
-                        override fun onLoadFailed(errorDrawable: Drawable?) {
-                            b.flag.visibility = View.VISIBLE
-                            b.favIcon.visibility = View.GONE
-                            b.favIcon.setImageDrawable(null)
-                        }
+                GlideApp.with(context.applicationContext).load(url).onlyRetrieveFromCache(
+                    true).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).override(SIZE_ORIGINAL,
+                                                                                  SIZE_ORIGINAL).error(
+                    GlideApp.with(context.applicationContext).load(cacheKey).onlyRetrieveFromCache(
+                        true)).transition(withCrossFade(factory)).into(object :
+                                                                               CustomViewTarget<ImageView, Drawable>(
+                                                                                   b.favIcon) {
+                    override fun onLoadFailed(errorDrawable: Drawable?) {
+                        b.flag.visibility = View.VISIBLE
+                        b.favIcon.visibility = View.GONE
+                        b.favIcon.setImageDrawable(null)
+                    }
 
-                        override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
-                            b.flag.visibility = View.GONE
-                            b.favIcon.visibility = View.VISIBLE
-                            b.favIcon.setImageDrawable(resource)
-                        }
+                    override fun onResourceReady(resource: Drawable,
+                                                 transition: Transition<in Drawable>?) {
+                        b.flag.visibility = View.GONE
+                        b.favIcon.visibility = View.VISIBLE
+                        b.favIcon.setImageDrawable(resource)
+                    }
 
-                        override fun onResourceCleared(placeholder: Drawable?) {
-                            b.favIcon.visibility = View.GONE
-                            b.flag.visibility = View.VISIBLE
-                        }
-                    })
+                    override fun onResourceCleared(placeholder: Drawable?) {
+                        b.favIcon.visibility = View.GONE
+                        b.flag.visibility = View.VISIBLE
+                    }
+                })
             } catch (e: Exception) {
-                if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - TransactionViewHolder Exception() -${e.message}")
+                if (DEBUG) Log.d(LOG_TAG_DNS_LOG,
+                                 "Glide - TransactionViewHolder Exception() -${e.message}")
                 b.flag.visibility = View.VISIBLE
                 b.favIcon.visibility = View.GONE
             }

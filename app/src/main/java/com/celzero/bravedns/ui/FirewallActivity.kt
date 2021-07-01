@@ -32,7 +32,8 @@ import com.google.android.material.tabs.TabLayout
 import org.koin.android.ext.android.inject
 
 
-class FirewallActivity : AppCompatActivity(R.layout.activity_firewall), TabLayout.OnTabSelectedListener {
+class FirewallActivity : AppCompatActivity(R.layout.activity_firewall),
+                         TabLayout.OnTabSelectedListener {
     private val b by viewBinding(ActivityFirewallBinding::bind)
     private var screenToLoad = 0
     private val persistentState by inject<PersistentState>()
@@ -54,14 +55,15 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall), TabLayou
         super.onCreate(savedInstanceState)
         screenToLoad = intent.getIntExtra(Constants.SCREEN_TO_LOAD, 0)
 
-        // FIXME: 22-01-2021 The view pager is migrated from ViewPager2 to Viewpager.  There is a
+        // FIXME: 22-01-2021 The view pager is migrated from ViewPager2 to Viewpager. There is a
         // known bug in viewpager2 - Focus issue, the Firewall activity has search bar in all the
         // screens is causing the issue.
         //https://github.com/material-components/material-components-android/issues/500
         //https://github.com/android/views-widgets-samples/issues/107
 
-        val tabTitles = arrayOf(getString(R.string.firewall_act_universal_tab), getString(R.string.firewall_act_network_monitor_tab),
-                    getString(R.string.firewall_act_apps_tab))
+        val tabTitles = arrayOf(getString(R.string.firewall_act_universal_tab),
+                                getString(R.string.firewall_act_network_monitor_tab),
+                                getString(R.string.firewall_act_apps_tab))
         b.firewallActTabLayout.setupWithViewPager(b.firewallActViewpager)
 
         //Adding the tabs using addTab() method
@@ -78,7 +80,8 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall), TabLayou
         b.firewallActViewpager.setCurrentItem(screenToLoad, false)
         b.firewallActViewpager.offscreenPageLimit = b.firewallActTabLayout.tabCount
 
-        b.firewallActViewpager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(b.firewallActTabLayout))
+        b.firewallActViewpager.addOnPageChangeListener(
+            TabLayout.TabLayoutOnPageChangeListener(b.firewallActTabLayout))
         b.firewallActTabLayout.addOnTabSelectedListener(this)
     }
 
@@ -97,7 +100,8 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall), TabLayou
 
 }
 
-internal class Pager(fm: FragmentManager?, var tabCount: Int, var tabTitles : Array<String>) : FragmentStatePagerAdapter(fm!!) {
+internal class Pager(fm: FragmentManager?, var tabCount: Int, var tabTitles: Array<String>) :
+        FragmentStatePagerAdapter(fm!!) {
     //Overriding method getItem
     override fun getItem(position: Int): Fragment {
         //Returning the current tabs
@@ -114,7 +118,6 @@ internal class Pager(fm: FragmentManager?, var tabCount: Int, var tabTitles : Ar
         }
     }
 
-    //Overridden method getCount to get the number of tabs
     override fun getCount(): Int {
         return tabCount
     }

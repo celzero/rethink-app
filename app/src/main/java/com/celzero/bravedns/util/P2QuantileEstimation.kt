@@ -61,7 +61,7 @@ class P2QuantileEstimation(probability: Double) {
 
             return
         }
-        
+
         val k: Int
         if (x < q[0]) {
             q[0] = x
@@ -86,8 +86,7 @@ class P2QuantileEstimation(probability: Double) {
         for (i in 1..3) {
             val d = ns[i] - n[i]
 
-            if (d >= 1 && n[i + 1] - n[i] > 1 ||
-                        d <= -1 && n[i - 1] - n[i] < -1) {
+            if (d >= 1 && n[i + 1] - n[i] > 1 || d <= -1 && n[i - 1] - n[i] < -1) {
                 val dInt = sign(d).toInt()
                 val qs = parabolic(i, dInt.toDouble())
                 if (q[i - 1] < qs && qs < q[i + 1]) {
@@ -103,10 +102,7 @@ class P2QuantileEstimation(probability: Double) {
     }
 
     private fun parabolic(i: Int, d: Double): Double {
-        return q[i] + d / (n[i + 1] - n[i - 1]) * (
-                    (n[i] - n[i - 1] + d) * (q[i + 1] - q[i]) / (n[i + 1] - n[i]) +
-                    (n[i + 1] - n[i] - d) * (q[i] - q[i - 1]) / (n[i] - n[i - 1])
-                )
+        return q[i] + d / (n[i + 1] - n[i - 1]) * ((n[i] - n[i - 1] + d) * (q[i + 1] - q[i]) / (n[i + 1] - n[i]) + (n[i + 1] - n[i] - d) * (q[i] - q[i - 1]) / (n[i] - n[i - 1]))
     }
 
     private fun linear(i: Int, d: Int): Double {
@@ -119,7 +115,7 @@ class P2QuantileEstimation(probability: Double) {
         if (c > 5) {
             return q[2]
         }
- 
+
         Arrays.sort(q, 0, c)
         val index = ((c - 1) * p).roundToInt()
         return q[index]

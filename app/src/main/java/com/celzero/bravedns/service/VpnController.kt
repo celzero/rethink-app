@@ -1,4 +1,3 @@
-
 /*
 Copyright 2018 Jigsaw Operations LLC
 
@@ -27,9 +26,9 @@ import org.koin.core.component.inject
 
 class VpnController {
 
-    companion object{
+    companion object {
         private var dnsVpnServiceState: VpnController? = null
-        private var braveVpnService : BraveVPNService ? = null
+        private var braveVpnService: BraveVPNService? = null
         private var connectionState: BraveVPNService.State? = null
 
         @Synchronized
@@ -57,7 +56,7 @@ class VpnController {
     }
 
     @Synchronized
-    fun onConnectionStateChanged(context: Context, state: BraveVPNService.State? ) {
+    fun onConnectionStateChanged(context: Context, state: BraveVPNService.State?) {
         if (braveVpnService == null) {
             // User clicked disable while the connection state was changing.
             return
@@ -78,7 +77,7 @@ class VpnController {
     fun start(context: Context) {
         //TODO : Code modified to remove the check of null reference - MODIFIED check??
         if (braveVpnService != null) {
-            Log.i(LOG_TAG_VPN,"braveVPNService is not null")
+            Log.i(LOG_TAG_VPN, "braveVPNService is not null")
             return
         }
         VpnControllerHelper.persistentState.vpnEnabled = true
@@ -89,7 +88,7 @@ class VpnController {
         } else {
             context.startService(startServiceIntent)
         }
-        Log.i(LOG_TAG_VPN,"VPNController - Start(Synchronized) executed - $context")
+        Log.i(LOG_TAG_VPN, "VPNController - Start(Synchronized) executed - $context")
     }
 
     fun onStartComplete(context: Context?, succeeded: Boolean) {
@@ -104,7 +103,7 @@ class VpnController {
     }
 
     fun stop(context: Context?) {
-        Log.i(LOG_TAG_VPN,"VPN Controller stop - ${context!!}")
+        Log.i(LOG_TAG_VPN, "VPN Controller stop - ${context!!}")
         VpnControllerHelper.persistentState.vpnEnabled = false
         connectionState = null
         if (braveVpnService != null) {
@@ -122,6 +121,6 @@ class VpnController {
 
 }
 
-internal object VpnControllerHelper:KoinComponent {
+internal object VpnControllerHelper : KoinComponent {
     val persistentState by inject<PersistentState>()
 }

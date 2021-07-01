@@ -52,7 +52,7 @@ class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
             setTheme(R.style.AppThemeTrueBlack)
         }
         super.onCreate(savedInstanceState)
-        screenToLoad = intent.getIntExtra(Constants.SCREEN_TO_LOAD,0)
+        screenToLoad = intent.getIntExtra(Constants.SCREEN_TO_LOAD, 0)
         init()
     }
 
@@ -70,7 +70,8 @@ class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
             }
         }
 
-        TabLayoutMediator(b.dnsDetailActTabLayout, b.dnsDetailActViewpager) { tab, position -> // Styling each tab here
+        TabLayoutMediator(b.dnsDetailActTabLayout,
+                          b.dnsDetailActViewpager) { tab, position -> // Styling each tab here
             tab.text = when (position) {
                 0 -> getString(R.string.dns_act_log)
                 else -> getString(R.string.dns_act_configure_tab)
@@ -81,7 +82,7 @@ class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
-           return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

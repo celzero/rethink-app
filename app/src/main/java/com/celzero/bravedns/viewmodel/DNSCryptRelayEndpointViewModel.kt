@@ -15,30 +15,27 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.DNSCryptRelayEndpointDAO
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 
-class DNSCryptRelayEndpointViewModel(private val dnsCryptRelayEndpointDAO: DNSCryptRelayEndpointDAO) : ViewModel() {
+class DNSCryptRelayEndpointViewModel(
+        private val dnsCryptRelayEndpointDAO: DNSCryptRelayEndpointDAO) : ViewModel() {
 
-    private var filteredList : MutableLiveData<String> = MutableLiveData()
+    private var filteredList: MutableLiveData<String> = MutableLiveData()
 
     init {
         filteredList.value = ""
     }
 
-    var dnsCryptRelayEndpointList = Transformations.switchMap(
-                filteredList
-    ) { input ->
+    var dnsCryptRelayEndpointList = Transformations.switchMap(filteredList) { input ->
         if (input.isBlank()) {
             dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveData().toLiveData(pageSize = 50)
         } else {
-            dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveDataByName("%$input%")
-                .toLiveData(pageSize = 50)
+            dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveDataByName("%$input%").toLiveData(
+                pageSize = 50)
         }
     }
 
@@ -46,7 +43,7 @@ class DNSCryptRelayEndpointViewModel(private val dnsCryptRelayEndpointDAO: DNSCr
         filteredList.value = filter
     }
 
-    fun setFilterBlocked(filter: String){
+    fun setFilterBlocked(filter: String) {
         filteredList.value = filter
     }
 

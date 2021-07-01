@@ -33,14 +33,13 @@ interface ProxyEndpointDAO {
     fun delete(proxyEndpoint: ProxyEndpoint)
 
     @Query("select * from ProxyEndpoint where proxyMode = 1 order by isSelected desc")
-    fun getDNSProxyEndpointLiveData() : DataSource.Factory<Int, ProxyEndpoint>
+    fun getDNSProxyEndpointLiveData(): DataSource.Factory<Int, ProxyEndpoint>
 
-    //@Query ("select * from ConnectionTracker where appName like :query order by timeStamp desc")
     @Query("select * from ProxyEndpoint where proxyName like :query order by isSelected desc")
-    fun getDNSProxyEndpointLiveDataByType(query : String) : DataSource.Factory<Int,ProxyEndpoint>
+    fun getDNSProxyEndpointLiveDataByType(query: String): DataSource.Factory<Int, ProxyEndpoint>
 
     @Query("delete from ProxyEndpoint where modifiedDataTime < :date")
-    fun deleteOlderData(date : Long)
+    fun deleteOlderData(date: Long)
 
     @Query("delete from ProxyEndpoint")
     fun clearAllData()
@@ -48,18 +47,19 @@ interface ProxyEndpointDAO {
     @Query("delete from ProxyEndpoint where proxyName = 'ORBOT'")
     fun clearOrbotData()
 
-    @Query("delete from ProxyEndpoint where proxyIP like :proxyIP or proxyAppName like :proxyIP and proxyPort = :port")
-    fun deleteDNSProxyEndpoint(proxyIP : String, port : Int)
+    @Query(
+        "delete from ProxyEndpoint where proxyIP like :proxyIP or proxyAppName like :proxyIP and proxyPort = :port")
+    fun deleteDNSProxyEndpoint(proxyIP: String, port: Int)
 
     @Query("update ProxyEndpoint set isSelected = 0 where isSelected = 1")
     fun removeConnectionStatus()
 
     @Query("select count(*) from ProxyEndpoint")
-    fun getCount() : Int
+    fun getCount(): Int
 
     @Query("select * from ProxyEndpoint where isSelected = 1")
-    fun getConnectedProxy() : ProxyEndpoint
+    fun getConnectedProxy(): ProxyEndpoint
 
     @Query("select * from ProxyEndpoint where isSelected = 1 and proxyName = 'ORBOT'")
-    fun getConnectedOrbotProxy() : ProxyEndpoint
+    fun getConnectedOrbotProxy(): ProxyEndpoint
 }

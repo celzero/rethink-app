@@ -75,10 +75,10 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
 
         b.btnNext.setOnClickListener {
             val currentItem = getItem()
-            if (currentItem+1 >= layout.size) {
+            if (currentItem + 1 >= layout.size) {
                 launchHomeScreen()
-            }else {
-                b.viewPager.currentItem = currentItem+1
+            } else {
+                b.viewPager.currentItem = currentItem + 1
             }
         }
 
@@ -86,7 +86,8 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
             override fun onPageScrollStateChanged(state: Int) {
             }
 
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+            override fun onPageScrolled(position: Int, positionOffset: Float,
+                                        positionOffsetPixels: Int) {
             }
 
             override fun onPageSelected(position: Int) {
@@ -95,7 +96,7 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
                     b.btnNext.text = getString(R.string.finish)
                     b.btnNext.visibility = View.VISIBLE
                     b.btnSkip.visibility = View.INVISIBLE
-                }else{
+                } else {
                     b.btnSkip.visibility = View.VISIBLE
                     b.btnNext.visibility = View.INVISIBLE
                 }
@@ -126,7 +127,8 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
         b.layoutDots.removeAllViews()
         for (i in dots.indices) {
             dots[i] = TextView(this)
-            dots[i]?.layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            dots[i]?.layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                                                              ViewGroup.LayoutParams.WRAP_CONTENT)
             dots[i]?.text = HtmlCompat.fromHtml("&#8226;", HtmlCompat.FROM_HTML_MODE_LEGACY)
             dots[i]?.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30F)
             dots[i]?.setTextColor(colorInActive[currentPage])

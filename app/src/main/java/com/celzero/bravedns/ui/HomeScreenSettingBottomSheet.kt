@@ -46,7 +46,6 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
     private val b get() = _binding!!
 
     private var firewallMode = -1L
-    private val LOG_FILE = "HOMESCREEN_BTM_SHEET"
     private var connectedDetails: String = ""
 
     private val persistentState by inject<PersistentState>()
@@ -69,7 +68,8 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View {
         _binding = BottomSheetHomeScreenBinding.inflate(inflater, container, false)
         return b.root
     }
@@ -93,7 +93,7 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
     private fun initView() {
         b.bsHomeScreenConnectedStatus.text = connectedDetails
         var selectedIndex = HomeScreenActivity.GlobalVariable.braveMode
-        if (DEBUG) Log.d(LOG_TAG_VPN, "$LOG_FILE - selectedIndex: $selectedIndex")
+        if (DEBUG) Log.d(LOG_TAG_VPN, "Homescreen bottom sheet selectedIndex: $selectedIndex")
         updateBraveModeUI()
         if (selectedIndex == -1) selectedIndex = persistentState.getBraveMode()
 
@@ -181,7 +181,9 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
     }
 
     private fun updateUptime() {
-        val upTime = DateUtils.getRelativeTimeSpanString(HomeScreenActivity.GlobalVariable.appStartTime, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE)
+        val upTime = DateUtils.getRelativeTimeSpanString(
+            HomeScreenActivity.GlobalVariable.appStartTime, System.currentTimeMillis(),
+            DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE)
         b.bsHomeScreenAppUptime.text = getString(R.string.hsf_uptime, upTime)
     }
 
@@ -193,7 +195,8 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
             HomeScreenActivity.GlobalVariable.appMode?.setDNSMode(PREF_DNS_INVALID)
         }
         persistentState.setBraveMode(HomeScreenActivity.GlobalVariable.braveMode)
-        HomeScreenActivity.GlobalVariable.braveModeToggler.postValue(HomeScreenActivity.GlobalVariable.braveMode)
+        HomeScreenActivity.GlobalVariable.braveModeToggler.postValue(
+            HomeScreenActivity.GlobalVariable.braveMode)
         if (VpnController.getInstance().getState().activationRequested) {
             updateBraveModeUI()
         }
@@ -202,10 +205,12 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
     private fun updateBraveModeUI() {
         when (HomeScreenActivity.GlobalVariable.braveMode) {
             APP_MODE_DNS -> {
-                b.bsHomeScreenConnectedStatus.text = getString(R.string.dns_explanation_dns_connected)
+                b.bsHomeScreenConnectedStatus.text = getString(
+                    R.string.dns_explanation_dns_connected)
             }
             APP_MODE_FIREWALL -> {
-                b.bsHomeScreenConnectedStatus.text = getString(R.string.dns_explanation_firewall_connected)
+                b.bsHomeScreenConnectedStatus.text = getString(
+                    R.string.dns_explanation_firewall_connected)
             }
             else -> {
                 b.bsHomeScreenConnectedStatus.text = getString(R.string.dns_explanation_connected)

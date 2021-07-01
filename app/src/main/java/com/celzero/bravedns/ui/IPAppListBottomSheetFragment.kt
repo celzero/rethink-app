@@ -29,21 +29,23 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import java.util.concurrent.ConcurrentHashMap
 
 
-class IPAppListBottomSheetFragment(private var contextVal: Context, private var appInfo: AppInfo)  : BottomSheetDialogFragment() {
+class IPAppListBottomSheetFragment(private var contextVal: Context, private var appInfo: AppInfo) :
+        BottomSheetDialogFragment() {
 
     private lateinit var fragmentView: View
     lateinit var ipAppRecyclerView: RecyclerView
 
-    lateinit var txtView : TextView
+    lateinit var txtView: TextView
 
     private var titleList: List<ConnectionTracker>? = ArrayList()
-    private var ipDetailsMap : ConcurrentHashMap<String, CustomList> = ConcurrentHashMap()
+    private var ipDetailsMap: ConcurrentHashMap<String, CustomList> = ConcurrentHashMap()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View {
         fragmentView = inflater.inflate(R.layout.bottom_sheet_ip_app_detail, container, false)
         initView(fragmentView)
         return fragmentView
@@ -61,20 +63,22 @@ class IPAppListBottomSheetFragment(private var contextVal: Context, private var 
 
     private fun prepareCustomList() {
         titleList!!.forEach {
-            if(ipDetailsMap.containsKey(it.ipAddress)){
+            if (ipDetailsMap.containsKey(it.ipAddress)) {
                 val cList = ipDetailsMap[it.ipAddress]
                 cList!!.ipCount = +1
-                if(it.isBlocked){
+                if (it.isBlocked) {
                     cList.isAllowedCount = +1
-                }else{
+                } else {
                     cList.isBlockedCount = +1
                 }
-            }else{
-                ipDetailsMap[it.ipAddress!!] = CustomList(1,it.timeStamp,1,1,it.isBlocked,it.ipAddress!!)
+            } else {
+                ipDetailsMap[it.ipAddress!!] = CustomList(1, it.timestamp, 1, 1, it.isBlocked,
+                                                          it.ipAddress!!)
             }
         }
     }
 
-    class CustomList(var ipCount: Int, var timeStamp: Long, var isBlockedCount: Int, var isAllowedCount: Int, var currentStatus: Boolean, var ipAddress: String)
+    class CustomList(var ipCount: Int, var timeStamp: Long, var isBlockedCount: Int,
+                     var isAllowedCount: Int, var currentStatus: Boolean, var ipAddress: String)
 
 }

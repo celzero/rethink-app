@@ -23,7 +23,8 @@ import com.celzero.bravedns.database.BlockedConnectionsDAO
 import com.celzero.bravedns.util.Constants.Companion.FILTER_IS_FILTER
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
-class BlockedConnectionsViewModel(private val blockedConnectionsDAO: BlockedConnectionsDAO) : ViewModel() {
+class BlockedConnectionsViewModel(private val blockedConnectionsDAO: BlockedConnectionsDAO) :
+        ViewModel() {
 
     private var filteredList: MutableLiveData<String> = MutableLiveData()
 
@@ -33,11 +34,14 @@ class BlockedConnectionsViewModel(private val blockedConnectionsDAO: BlockedConn
 
     var blockedUnivRulesList = Transformations.switchMap(filteredList) { input ->
         if (input.isBlank()) {
-            blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+            blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(
+                pageSize = LIVEDATA_PAGE_SIZE)
         } else if (input!! == FILTER_IS_FILTER) {
-            blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+            blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(
+                pageSize = LIVEDATA_PAGE_SIZE)
         } else {
-            blockedConnectionsDAO.getUnivBlockedConnectionsByIP("%$input%").toLiveData(LIVEDATA_PAGE_SIZE)
+            blockedConnectionsDAO.getUnivBlockedConnectionsByIP("%$input%").toLiveData(
+                LIVEDATA_PAGE_SIZE)
         }
     }
 

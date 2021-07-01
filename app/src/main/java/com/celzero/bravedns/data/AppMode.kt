@@ -32,12 +32,12 @@ import settings.Settings
 import java.io.File
 
 class AppMode internal constructor(private val context: Context,
-        private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
-        private val doHEndpointRepository: DoHEndpointRepository,
-        private val dnsCryptEndpointRepository: DNSCryptEndpointRepository,
-        private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
-        private val proxyEndpointRepository: ProxyEndpointRepository,
-        private val persistentState: PersistentState) {
+                                   private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
+                                   private val doHEndpointRepository: DoHEndpointRepository,
+                                   private val dnsCryptEndpointRepository: DNSCryptEndpointRepository,
+                                   private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
+                                   private val proxyEndpointRepository: ProxyEndpointRepository,
+                                   private val persistentState: PersistentState) {
     private var appDNSMode: Long = -1L
     private val proxyTypeInternal = "Internal"
     private val proxyTypeExternal = "External"
@@ -192,14 +192,17 @@ class AppMode internal constructor(private val context: Context,
     fun getBraveDNS(): BraveDNS? {
         if (braveDNS == null && persistentState.localBlocklistEnabled && persistentState.blockListFilesDownloaded && persistentState.localBlockListStamp.isNotEmpty()) {
             val path: String = context.filesDir.canonicalPath + File.separator + persistentState.localBlockListDownloadTime
-            if (DEBUG) Log.d(LOG_TAG_APP_MODE, "Local brave dns set call from AppMode path newBraveDNSLocal :$path")
+            if (DEBUG) Log.d(LOG_TAG_APP_MODE,
+                             "Local brave dns set call from AppMode path newBraveDNSLocal :$path")
             try {
-                braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
+                braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE,
+                                                 path + Constants.FILE_RD_FILE,
+                                                 path + Constants.FILE_BASIC_CONFIG,
+                                                 path + Constants.FILE_TAG_NAME)
             } catch (e: Exception) {
                 Log.e(LOG_TAG_APP_MODE, "Local brave dns set exception :${e.message}", e)
             }
         }
         return braveDNS
     }
-
 }

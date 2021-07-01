@@ -20,19 +20,18 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "ConnectionTracker")
 class ConnectionTracker {
-    @PrimaryKey(autoGenerate = true)
-    var id : Int = 0
-    var appName : String ?= null
-    var uid : Int = 0
-    var ipAddress: String ?= null
-    var port : Int = 0
-    var protocol : Int = 0
-    var isBlocked : Boolean = false
-    var blockedByRule : String ?= null
-    var flag : String? = null
-    var timeStamp : Long = 0L
+    @PrimaryKey(autoGenerate = true) var id: Int = 0
+    var appName: String? = null
+    var uid: Int = 0
+    var ipAddress: String? = null
+    var port: Int = 0
+    var protocol: Int = 0
+    var isBlocked: Boolean = false
+    var blockedByRule: String? = null
+    var flag: String? = null
+    var timestamp: Long = 0L
 
-    override fun equals(other: Any?): Boolean{
+    override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other?.javaClass != javaClass) return false
         other as ConnectionTracker
@@ -40,8 +39,7 @@ class ConnectionTracker {
         return true
     }
 
-    override fun hashCode(): Int{
+    override fun hashCode(): Int {
         return this.hashCode()
     }
-
 }

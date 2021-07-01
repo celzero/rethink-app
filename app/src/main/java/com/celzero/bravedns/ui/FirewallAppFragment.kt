@@ -41,7 +41,8 @@ import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), SearchView.OnQueryTextListener {
+class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
+                            SearchView.OnQueryTextListener {
     private val b by viewBinding(FragmentFirewallAllAppsBinding::bind)
     private var adapterList: FirewallAppListAdapter? = null
 
@@ -64,7 +65,9 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
     private fun initView() {
         categoryState = true
         b.firewallExpandableList.visibility = View.VISIBLE
-        adapterList = FirewallAppListAdapter(requireContext(), get(), categoryInfoRepository, persistentState, titleList as ArrayList<CategoryInfo>, listData)
+        adapterList = FirewallAppListAdapter(requireContext(), get(), categoryInfoRepository,
+                                             persistentState, titleList as ArrayList<CategoryInfo>,
+                                             listData)
         b.firewallExpandableList.setAdapter(adapterList)
 
         b.firewallExpandableList.setOnGroupClickListener { _, _, _, _ ->
@@ -77,7 +80,8 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
 
         b.firewallCategorySearch.setOnQueryTextListener(this)
 
-        animation = RotateAnimation(0.0f, 360.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
+        animation = RotateAnimation(0.0f, 360.0f, Animation.RELATIVE_TO_SELF, 0.5f,
+                                    Animation.RELATIVE_TO_SELF, 0.5f)
         animation.repeatCount = -1
         animation.duration = 750
     }
@@ -120,7 +124,9 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
             override fun onFinish() {
                 if (!isAdded) return
                 b.firewallAppRefreshList.clearAnimation()
-                Utilities.showToastUiCentered(requireContext(), getString(R.string.refresh_complete), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(requireContext(),
+                                              getString(R.string.refresh_complete),
+                                              Toast.LENGTH_SHORT)
             }
         }.start()
 
@@ -135,7 +141,8 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
             override fun onFinish() {
                 firewallAppInfoViewModel.setFilter(query)
                 if (query.isNullOrEmpty()) {
-                    if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Search bar empty  ${firewallAppInfoViewModel.firewallAppDetailsList.value?.size}")
+                    if (DEBUG) Log.d(LOG_TAG_FIREWALL,
+                                     "Search bar empty  ${firewallAppInfoViewModel.firewallAppDetailsList.value?.size}")
                     var i = 0
                     titleList!!.forEach { _ ->
                         b.firewallExpandableList.collapseGroup(i)
@@ -157,31 +164,32 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
     }
 
     override fun onQueryTextChange(query: String?): Boolean {
-            object : CountDownTimer(1000, 1000) {
-                override fun onTick(millisUntilFinished: Long) {
-                }
+        object : CountDownTimer(1000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+            }
 
-                override fun onFinish() {
-                    firewallAppInfoViewModel.setFilter(query)
-                    if (query.isNullOrEmpty()) {
-                        var i = 0
-                        if(DEBUG) Log.d(LOG_TAG_FIREWALL, "Search bar empty  ${firewallAppInfoViewModel.firewallAppDetailsList.value?.size}")
-                        titleList!!.forEach { _ ->
-                            b.firewallExpandableList.collapseGroup(i)
-                            i += 1
-                        }
-
-                    } else {
-                        if (titleList!!.size <= 0) return
-                        for (i in titleList?.indices!!) {
-                            if (listData[titleList!![i]]?.size!! > 0) {
-                                b.firewallExpandableList.expandGroup(i)
-                            }
-                        }
-                        if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category block ${titleList!!.size}")
+            override fun onFinish() {
+                firewallAppInfoViewModel.setFilter(query)
+                if (query.isNullOrEmpty()) {
+                    var i = 0
+                    if (DEBUG) Log.d(LOG_TAG_FIREWALL,
+                                     "Search bar empty  ${firewallAppInfoViewModel.firewallAppDetailsList.value?.size}")
+                    titleList!!.forEach { _ ->
+                        b.firewallExpandableList.collapseGroup(i)
+                        i += 1
                     }
+
+                } else {
+                    if (titleList!!.size <= 0) return
+                    for (i in titleList?.indices!!) {
+                        if (listData[titleList!![i]]?.size!! > 0) {
+                            b.firewallExpandableList.expandGroup(i)
+                        }
+                    }
+                    if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category block ${titleList!!.size}")
                 }
-            }.start()
+            }
+        }.start()
         return true
     }
 
@@ -202,10 +210,11 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps), Searc
             titleList = categoryInfoRepository.getAppCategoryList().toMutableList()
 
             val iterator = titleList?.iterator()
-            if(iterator != null) {
+            if (iterator != null) {
                 while (iterator.hasNext()) {
                     val item = iterator.next()
-                    if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category : ${item.categoryName}, ${item.numberOFApps}, ${item.numOfAppsBlocked}, ${item.isInternetBlocked}")
+                    if (DEBUG) Log.d(LOG_TAG_FIREWALL,
+                                     "Category : ${item.categoryName}, ${item.numberOFApps}, ${item.numOfAppsBlocked}, ${item.isInternetBlocked}")
                     val appList = list.filter { a -> a.appCategory == item.categoryName }
                     if (appList.isNotEmpty()) {
                         listData[item] = appList as java.util.ArrayList<AppInfo>

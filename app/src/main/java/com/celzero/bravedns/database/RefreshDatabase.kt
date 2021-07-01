@@ -25,8 +25,8 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.AndroidUidConfig
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
 import com.celzero.bravedns.util.PlayStoreCategory
 import kotlinx.coroutines.Dispatchers
@@ -35,16 +35,16 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 class RefreshDatabase internal constructor(private var context: Context,
-    private val appInfoRepository: AppInfoRepository,
-    private val appInfoViewRepository: AppInfoViewRepository,
-    private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
-    private val categoryInfoRepository: CategoryInfoRepository,
-    private val doHEndpointRepository: DoHEndpointRepository,
-    private val connTrackerRepository: ConnectionTrackerRepository,
-    private val dnsLogRepository: DNSLogRepository,
-    private val dnsCryptEndpointRepository: DNSCryptEndpointRepository,
-    private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
-    private val persistentState: PersistentState) {
+                                           private val appInfoRepository: AppInfoRepository,
+                                           private val appInfoViewRepository: AppInfoViewRepository,
+                                           private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
+                                           private val categoryInfoRepository: CategoryInfoRepository,
+                                           private val doHEndpointRepository: DoHEndpointRepository,
+                                           private val connTrackerRepository: ConnectionTrackerRepository,
+                                           private val dnsLogRepository: DNSLogRepository,
+                                           private val dnsCryptEndpointRepository: DNSCryptEndpointRepository,
+                                           private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
+                                           private val persistentState: PersistentState) {
 
     /**
      * Need to rewrite the logic for adding the apps in the database and removing it during uninstall.
@@ -57,13 +57,15 @@ class RefreshDatabase internal constructor(private var context: Context,
                 appListDB.forEach {
                     if (!it.packageInfo.contains(Constants.NO_PACKAGE)) {
                         try {
-                            val packageName = context.packageManager.getPackageInfo(it.packageInfo, PackageManager.GET_META_DATA)
+                            val packageName = context.packageManager.getPackageInfo(it.packageInfo,
+                                                                                    PackageManager.GET_META_DATA)
                             if (packageName.applicationInfo == null) {
                                 appInfoRepository.delete(it)
                                 updateCategoryInDB()
                             }
                         } catch (e: PackageManager.NameNotFoundException) {
-                            Log.w(LOG_TAG_APP_DB, "Application not available ${it.appName}" + e.message, e)
+                            Log.w(LOG_TAG_APP_DB,
+                                  "Application not available ${it.appName}" + e.message, e)
                             appInfoRepository.delete(it)
                             updateCategoryInDB()
                         }
@@ -78,18 +80,23 @@ class RefreshDatabase internal constructor(private var context: Context,
     private fun getAppInfo() {
         HomeScreenActivity.isLoadingComplete = false
         GlobalScope.launch(Dispatchers.IO) {
-            val allPackages: List<PackageInfo> = context.packageManager?.getInstalledPackages(PackageManager.GET_META_DATA)!!
+            val allPackages: List<PackageInfo> = context.packageManager?.getInstalledPackages(
+                PackageManager.GET_META_DATA)!!
             val appDetailsFromDB = appInfoRepository.getAppInfoAsync()
             val nonAppsCount = appInfoRepository.getNonAppCount()
             //val isRootAvailable = insertRootAndroid(appInfoRepository)
-            if (DEBUG) Log.d(LOG_TAG_APP_DB, "getAppInfo - ${appDetailsFromDB.size}, $nonAppsCount, ${allPackages.size}")
+            if (DEBUG) Log.d(LOG_TAG_APP_DB,
+                             "getAppInfo - ${appDetailsFromDB.size}, $nonAppsCount, ${allPackages.size}")
             if (appDetailsFromDB.isEmpty() || ((appDetailsFromDB.size - nonAppsCount) != (allPackages.size - 1))) {
                 allPackages.forEach {
-                    if (DEBUG) Log.d(LOG_TAG_APP_DB, "Refresh Database, AppInfo -> ${context.packageManager.getApplicationLabel(it.applicationInfo)}")
+                    if (DEBUG) Log.d(LOG_TAG_APP_DB, "Refresh Database, AppInfo -> ${
+                        context.packageManager.getApplicationLabel(it.applicationInfo)
+                    }")
                     if (it.applicationInfo.packageName != context.applicationContext.packageName) {
                         val applicationInfo: ApplicationInfo = it.applicationInfo
                         val appInfo = AppInfo()
-                        appInfo.appName = context.packageManager.getApplicationLabel(applicationInfo).toString()
+                        appInfo.appName = context.packageManager.getApplicationLabel(
+                            applicationInfo).toString()
                         appInfo.packageInfo = applicationInfo.packageName
                         appInfo.uid = applicationInfo.uid
                         val dbAppInfo = if (appInfo.packageInfo.isNotEmpty()) {
@@ -100,14 +107,19 @@ class RefreshDatabase internal constructor(private var context: Context,
                         if (dbAppInfo != null && dbAppInfo.appName.isNotEmpty()) {
                             HomeScreenActivity.GlobalVariable.appList[applicationInfo.packageName] = dbAppInfo
                         } else {
-                            if (DEBUG) Log.d(LOG_TAG_APP_DB, "Refresh Database, AppInfo - new package found ${appInfo.appName} - " + "${context.packageManager.getApplicationLabel(it.applicationInfo)} will be inserted")
+                            if (DEBUG) Log.d(LOG_TAG_APP_DB,
+                                             "Refresh Database, AppInfo - new package found ${appInfo.appName} - " + "${
+                                                 context.packageManager.getApplicationLabel(
+                                                     it.applicationInfo)
+                                             } will be inserted")
                             appInfo.isDataEnabled = true
                             appInfo.isWifiEnabled = true
                             appInfo.isScreenOff = false
                             appInfo.isBackgroundEnabled = false
                             appInfo.whiteListUniv2 = false
                             appInfo.isExcluded = false
-                            appInfo.whiteListUniv1 = ((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) && !AndroidUidConfig.isUIDAppRange(appInfo.uid)
+                            appInfo.whiteListUniv1 = ((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) && !AndroidUidConfig.isUIDAppRange(
+                                appInfo.uid)
                             appInfo.mobileDataUsed = 0
                             appInfo.trackers = 0
                             appInfo.wifiDataUsed = 0
@@ -119,9 +131,12 @@ class RefreshDatabase internal constructor(private var context: Context,
                             // parameter.
                             //val category = fetchCategory(appInfo.packageInfo)
                             val category = fetchCategory()
-                            if (category.toLowerCase(Locale.ROOT) != PlayStoreCategory.OTHER.name.toLowerCase(Locale.ROOT)) {
+                            if (category.toLowerCase(
+                                    Locale.ROOT) != PlayStoreCategory.OTHER.name.toLowerCase(
+                                    Locale.ROOT)) {
                                 appInfo.appCategory = category
-                            } else if (((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) && AndroidUidConfig.isUIDAppRange(appInfo.uid)) {
+                            } else if (((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) && AndroidUidConfig.isUIDAppRange(
+                                    appInfo.uid)) {
                                 appInfo.appCategory = Constants.APP_CAT_SYSTEM_APPS
                                 appInfo.isSystemApp = true
                             } else if (((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0)) {
@@ -129,16 +144,21 @@ class RefreshDatabase internal constructor(private var context: Context,
                                 appInfo.isSystemApp = true
                             } else {
                                 val temp = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                    ApplicationInfo.getCategoryTitle(context, applicationInfo.category)
+                                    ApplicationInfo.getCategoryTitle(context,
+                                                                     applicationInfo.category)
                                 } else {
                                     Constants.INSTALLED_CAT_APPS
                                 }
                                 if (temp != null) appInfo.appCategory = temp.toString()
                                 else appInfo.appCategory = Constants.APP_CAT_OTHER
                             }
-                            if (appInfo.appCategory.contains("_")) appInfo.appCategory = appInfo.appCategory.replace("_", " ").toLowerCase(Locale.ROOT)
+                            if (appInfo.appCategory.contains(
+                                    "_")) appInfo.appCategory = appInfo.appCategory.replace("_",
+                                                                                            " ").toLowerCase(
+                                Locale.ROOT)
 
-                            appInfo.isInternetAllowed = persistentState.wifiAllowed(appInfo.packageInfo)
+                            appInfo.isInternetAllowed = persistentState.wifiAllowed(
+                                appInfo.packageInfo)
 
                             //TODO Handle this Global scope variable properly. Only half done.
                             HomeScreenActivity.GlobalVariable.appList[applicationInfo.packageName] = appInfo
@@ -187,9 +207,12 @@ class RefreshDatabase internal constructor(private var context: Context,
         GlobalScope.launch(Dispatchers.IO) {
             val proxyURL = context.resources.getStringArray(R.array.dns_proxy_names)
             val proxyIP = context.resources.getStringArray(R.array.dns_proxy_ips)
-            val dnsProxyEndPoint1 = DNSProxyEndpoint(1, proxyURL[0], "External", "Nobody", proxyIP[0], 53, false, false, 0, 0)
-            val dnsProxyEndPoint2 = DNSProxyEndpoint(2, proxyURL[1], "External", "Nobody", proxyIP[1], 53, false, false, 0, 0)
-            val dnsProxyEndPoint3 = DNSProxyEndpoint(3, proxyURL[2], "External", "Nobody", proxyIP[2], 53, false, false, 0, 0)
+            val dnsProxyEndPoint1 = DNSProxyEndpoint(1, proxyURL[0], "External", "Nobody",
+                                                     proxyIP[0], 53, false, false, 0, 0)
+            val dnsProxyEndPoint2 = DNSProxyEndpoint(2, proxyURL[1], "External", "Nobody",
+                                                     proxyIP[1], 53, false, false, 0, 0)
+            val dnsProxyEndPoint3 = DNSProxyEndpoint(3, proxyURL[2], "External", "Nobody",
+                                                     proxyIP[2], 53, false, false, 0, 0)
             dnsProxyEndpointRepository.insertWithReplace(dnsProxyEndPoint1)
             dnsProxyEndpointRepository.insertWithReplace(dnsProxyEndPoint2)
             dnsProxyEndpointRepository.insertWithReplace(dnsProxyEndPoint3)
@@ -235,7 +258,8 @@ class RefreshDatabase internal constructor(private var context: Context,
                 categoryInfo.numOfAppsBlocked = appsBlocked.size
                 categoryInfo.isInternetBlocked = (categoryInfo.numberOFApps == categoryInfo.numOfAppsBlocked)
 
-                Log.i(LOG_TAG_APP_DB, "categoryListFromAppList - ${categoryInfo.categoryName}, ${categoryInfo.numberOFApps}, ${categoryInfo.numOfAppsBlocked}, ${categoryInfo.isInternetBlocked}")
+                Log.i(LOG_TAG_APP_DB,
+                      "categoryListFromAppList - ${categoryInfo.categoryName}, ${categoryInfo.numberOFApps}, ${categoryInfo.numOfAppsBlocked}, ${categoryInfo.isInternetBlocked}")
                 categoryInfoRepository.insertAsync(categoryInfo)
             }
         }
@@ -299,8 +323,11 @@ class RefreshDatabase internal constructor(private var context: Context,
             if (isAlreadyConnectionAvailable == null) {
                 insertDefaultDOHList()
             } else {
-                Log.i(LOG_TAG_APP_DB, "Refresh Database, Already insertion done. Correct values for Cloudflare alone.")
-                val doHEndpoint = DoHEndpoint(3, urlName[2], urlValues[2], context.getString(R.string.dns_mode_2_explanation), false, false, System.currentTimeMillis(), 0)
+                Log.i(LOG_TAG_APP_DB,
+                      "Refresh Database, Already insertion done. Correct values for Cloudflare alone.")
+                val doHEndpoint = DoHEndpoint(3, urlName[2], urlValues[2],
+                                              context.getString(R.string.dns_mode_2_explanation),
+                                              false, false, System.currentTimeMillis(), 0)
                 doHEndpointRepository.insertWithReplaceAsync(doHEndpoint)
             }
         }
@@ -310,11 +337,21 @@ class RefreshDatabase internal constructor(private var context: Context,
         val urlName = context.resources.getStringArray(R.array.doh_endpoint_names)
         val urlValues = context.resources.getStringArray(R.array.doh_endpoint_urls)
         GlobalScope.launch(Dispatchers.IO) {
-            val doHEndpoint1 = DoHEndpoint(1, urlName[0], urlValues[0], context.getString(R.string.dns_mode_0_explanation), false, false, System.currentTimeMillis(), 0)
-            val doHEndpoint2 = DoHEndpoint(2, urlName[1], urlValues[1], context.getString(R.string.dns_mode_1_explanation), false, false, System.currentTimeMillis(), 0)
-            val doHEndpoint3 = DoHEndpoint(3, urlName[2], urlValues[2], context.getString(R.string.dns_mode_2_explanation), false, false, System.currentTimeMillis(), 0)
-            val doHEndpoint4 = DoHEndpoint(4, urlName[3], urlValues[3], context.getString(R.string.dns_mode_3_explanation), true, false, System.currentTimeMillis(), 0)
-            val doHEndpoint5 = DoHEndpoint(5, urlName[5], urlValues[5], context.getString(R.string.dns_mode_5_explanation), false, false, System.currentTimeMillis(), 0)
+            val doHEndpoint1 = DoHEndpoint(1, urlName[0], urlValues[0],
+                                           context.getString(R.string.dns_mode_0_explanation),
+                                           false, false, System.currentTimeMillis(), 0)
+            val doHEndpoint2 = DoHEndpoint(2, urlName[1], urlValues[1],
+                                           context.getString(R.string.dns_mode_1_explanation),
+                                           false, false, System.currentTimeMillis(), 0)
+            val doHEndpoint3 = DoHEndpoint(3, urlName[2], urlValues[2],
+                                           context.getString(R.string.dns_mode_2_explanation),
+                                           false, false, System.currentTimeMillis(), 0)
+            val doHEndpoint4 = DoHEndpoint(4, urlName[3], urlValues[3],
+                                           context.getString(R.string.dns_mode_3_explanation), true,
+                                           false, System.currentTimeMillis(), 0)
+            val doHEndpoint5 = DoHEndpoint(5, urlName[5], urlValues[5],
+                                           context.getString(R.string.dns_mode_5_explanation),
+                                           false, false, System.currentTimeMillis(), 0)
 
             doHEndpointRepository.insertWithReplaceAsync(doHEndpoint1)
             doHEndpointRepository.insertWithReplaceAsync(doHEndpoint2)
@@ -331,11 +368,16 @@ class RefreshDatabase internal constructor(private var context: Context,
             val urlValues = context.resources.getStringArray(R.array.dns_crypt_endpoint_urls)
             val urlDesc = context.resources.getStringArray(R.array.dns_crypt_endpoint_desc)
 
-            val dnsCryptEndpoint1 = DNSCryptEndpoint(1, urlName[0], urlValues[0], urlDesc[0], false, false, System.currentTimeMillis(), 0)
-            val dnsCryptEndpoint2 = DNSCryptEndpoint(2, urlName[1], urlValues[1], urlDesc[1], false, false, System.currentTimeMillis(), 0)
-            val dnsCryptEndpoint3 = DNSCryptEndpoint(3, urlName[2], urlValues[2], urlDesc[2], false, false, System.currentTimeMillis(), 0)
-            val dnsCryptEndpoint4 = DNSCryptEndpoint(4, urlName[3], urlValues[3], urlDesc[3], false, false, System.currentTimeMillis(), 0)
-            val dnsCryptEndpoint5 = DNSCryptEndpoint(5, urlName[4], urlValues[4], urlDesc[4], false, false, System.currentTimeMillis(), 0)
+            val dnsCryptEndpoint1 = DNSCryptEndpoint(1, urlName[0], urlValues[0], urlDesc[0], false,
+                                                     false, System.currentTimeMillis(), 0)
+            val dnsCryptEndpoint2 = DNSCryptEndpoint(2, urlName[1], urlValues[1], urlDesc[1], false,
+                                                     false, System.currentTimeMillis(), 0)
+            val dnsCryptEndpoint3 = DNSCryptEndpoint(3, urlName[2], urlValues[2], urlDesc[2], false,
+                                                     false, System.currentTimeMillis(), 0)
+            val dnsCryptEndpoint4 = DNSCryptEndpoint(4, urlName[3], urlValues[3], urlDesc[3], false,
+                                                     false, System.currentTimeMillis(), 0)
+            val dnsCryptEndpoint5 = DNSCryptEndpoint(5, urlName[4], urlValues[4], urlDesc[4], false,
+                                                     false, System.currentTimeMillis(), 0)
             dnsCryptEndpointRepository.insertAsync(dnsCryptEndpoint1)
             dnsCryptEndpointRepository.insertAsync(dnsCryptEndpoint2)
             dnsCryptEndpointRepository.insertAsync(dnsCryptEndpoint3)
@@ -350,11 +392,21 @@ class RefreshDatabase internal constructor(private var context: Context,
             val urlValues = context.resources.getStringArray(R.array.dns_crypt_relay_endpoint_urls)
             val urlDesc = context.resources.getStringArray(R.array.dns_crypt_relay_endpoint_desc)
 
-            val dnsCryptRelayEndpoint1 = DNSCryptRelayEndpoint(1, urlName[0], urlValues[0], urlDesc[0], false, false, System.currentTimeMillis(), 0)
-            val dnsCryptRelayEndpoint2 = DNSCryptRelayEndpoint(2, urlName[1], urlValues[1], urlDesc[1], false, false, System.currentTimeMillis(), 0)
-            val dnsCryptRelayEndpoint3 = DNSCryptRelayEndpoint(3, urlName[2], urlValues[2], urlDesc[2], false, false, System.currentTimeMillis(), 0)
-            val dnsCryptRelayEndpoint4 = DNSCryptRelayEndpoint(4, urlName[3], urlValues[3], urlDesc[3], false, false, System.currentTimeMillis(), 0)
-            val dnsCryptRelayEndpoint5 = DNSCryptRelayEndpoint(5, urlName[4], urlValues[4], urlDesc[4], false, false, System.currentTimeMillis(), 0)
+            val dnsCryptRelayEndpoint1 = DNSCryptRelayEndpoint(1, urlName[0], urlValues[0],
+                                                               urlDesc[0], false, false,
+                                                               System.currentTimeMillis(), 0)
+            val dnsCryptRelayEndpoint2 = DNSCryptRelayEndpoint(2, urlName[1], urlValues[1],
+                                                               urlDesc[1], false, false,
+                                                               System.currentTimeMillis(), 0)
+            val dnsCryptRelayEndpoint3 = DNSCryptRelayEndpoint(3, urlName[2], urlValues[2],
+                                                               urlDesc[2], false, false,
+                                                               System.currentTimeMillis(), 0)
+            val dnsCryptRelayEndpoint4 = DNSCryptRelayEndpoint(4, urlName[3], urlValues[3],
+                                                               urlDesc[3], false, false,
+                                                               System.currentTimeMillis(), 0)
+            val dnsCryptRelayEndpoint5 = DNSCryptRelayEndpoint(5, urlName[4], urlValues[4],
+                                                               urlDesc[4], false, false,
+                                                               System.currentTimeMillis(), 0)
 
             dnsCryptRelayEndpointRepository.insertAsync(dnsCryptRelayEndpoint1)
             dnsCryptRelayEndpointRepository.insertAsync(dnsCryptRelayEndpoint2)

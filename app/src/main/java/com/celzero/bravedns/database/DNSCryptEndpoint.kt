@@ -20,8 +20,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "DNSCryptEndpoint")
 class DNSCryptEndpoint {
-    @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
+    @PrimaryKey(autoGenerate = true) var id: Int = 0
     var dnsCryptName: String = ""
     var dnsCryptURL: String = ""
     var dnsCryptExplanation: String? = null
@@ -43,19 +42,16 @@ class DNSCryptEndpoint {
     }
 
 
-    constructor(id: Int, dnsCryptName: String, dnsCryptURL: String, dnsCryptExplanation: String, isSelected: Boolean, isCustom: Boolean, modifiedDataTime: Long, latency: Int) {
-        if(id != -1)
-            this.id = id
+    constructor(id: Int, dnsCryptName: String, dnsCryptURL: String, dnsCryptExplanation: String,
+                isSelected: Boolean, isCustom: Boolean, modifiedDataTime: Long, latency: Int) {
+        if (id != -1) this.id = id
         this.dnsCryptName = dnsCryptName
         this.dnsCryptURL = dnsCryptURL
         this.dnsCryptExplanation = dnsCryptExplanation
         this.isSelected = isSelected
         this.isCustom = isCustom
-        if(modifiedDataTime != 0L)
-            this.modifiedDataTime = modifiedDataTime
-        else
-            this.modifiedDataTime = System.currentTimeMillis()
+        if (modifiedDataTime != 0L) this.modifiedDataTime = modifiedDataTime
+        else this.modifiedDataTime = System.currentTimeMillis()
         this.latency = latency
     }
-
 }

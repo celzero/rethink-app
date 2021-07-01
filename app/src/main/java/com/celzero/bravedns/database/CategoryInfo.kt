@@ -20,14 +20,13 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "CategoryInfo")
-class CategoryInfo{
+class CategoryInfo {
 
-    @PrimaryKey
-    var categoryName: String = ""
+    @PrimaryKey var categoryName: String = ""
     var numberOFApps: Int = 0
-    var numOfAppsBlocked : Int = 0
-    var numOfAppWhitelisted : Int = 0
-    var numOfAppsExcluded : Int = 0
+    var numOfAppsBlocked: Int = 0
+    var numOfAppWhitelisted: Int = 0
+    var numOfAppsExcluded: Int = 0
     var isInternetBlocked: Boolean = false
 
 }

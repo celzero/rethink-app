@@ -26,26 +26,30 @@ import kotlinx.coroutines.launch
 
 class DNSProxyEndpointRepository(private val dnsProxyEndpointDAO: DNSProxyEndpointDAO) {
 
-    fun updateAsync(dnsProxyEndpoint: DNSProxyEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
+    fun updateAsync(dnsProxyEndpoint: DNSProxyEndpoint,
+                    coroutineScope: CoroutineScope = GlobalScope) {
         coroutineScope.launch {
             dnsProxyEndpointDAO.update(dnsProxyEndpoint)
         }
     }
 
-    fun deleteAsync(dnsProxyEndpoint: DNSProxyEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
+    fun deleteAsync(dnsProxyEndpoint: DNSProxyEndpoint,
+                    coroutineScope: CoroutineScope = GlobalScope) {
         coroutineScope.launch {
             dnsProxyEndpointDAO.delete(dnsProxyEndpoint)
         }
     }
 
 
-    fun insertAsync(dnsCryptEndpoint: DNSProxyEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
+    fun insertAsync(dnsCryptEndpoint: DNSProxyEndpoint,
+                    coroutineScope: CoroutineScope = GlobalScope) {
         coroutineScope.launch {
             dnsProxyEndpointDAO.insert(dnsCryptEndpoint)
         }
     }
 
-    fun insertWithReplace(dnsProxyEndpoint: DNSProxyEndpoint, coroutineScope: CoroutineScope= GlobalScope){
+    fun insertWithReplace(dnsProxyEndpoint: DNSProxyEndpoint,
+                          coroutineScope: CoroutineScope = GlobalScope) {
         coroutineScope.launch {
             dnsProxyEndpointDAO.insertWithReplace(dnsProxyEndpoint)
         }
@@ -62,10 +66,11 @@ class DNSProxyEndpointRepository(private val dnsProxyEndpointDAO: DNSProxyEndpoi
     }
 
     fun getDNSProxyEndpointLiveDataByType(query: String): LiveData<PagedList<DNSProxyEndpoint>> {
-        return dnsProxyEndpointDAO.getDNSProxyEndpointLiveDataByType(query).toLiveData(pageSize = 50)
+        return dnsProxyEndpointDAO.getDNSProxyEndpointLiveDataByType(query).toLiveData(
+            pageSize = 50)
     }
 
-    fun deleteDNSProxyEndpoint(id : Int) {
+    fun deleteDNSProxyEndpoint(id: Int) {
         dnsProxyEndpointDAO.deleteDNSProxyEndpoint(id)
     }
 
@@ -80,6 +85,5 @@ class DNSProxyEndpointRepository(private val dnsProxyEndpointDAO: DNSProxyEndpoi
     fun getConnectedProxy(): DNSProxyEndpoint {
         return dnsProxyEndpointDAO.getConnectedProxy()
     }
-
 
 }

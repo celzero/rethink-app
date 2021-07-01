@@ -40,9 +40,11 @@ class ExcludedAppViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         } else if (input.contains(FILTER_CATEGORY)) {
             val filterVal = input.split(":")[1]
             val result = filterVal.split(",").map { it.trim() }
-            appInfoDAO.getExcludedAppDetailsFilterForCategoryLiveData(result).toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+            appInfoDAO.getExcludedAppDetailsFilterForCategoryLiveData(result).toLiveData(
+                pageSize = LIVEDATA_PAGE_SIZE)
         } else {
-            appInfoDAO.getExcludedAppDetailsFilterLiveData("%$input%").toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+            appInfoDAO.getExcludedAppDetailsFilterLiveData("%$input%").toLiveData(
+                pageSize = LIVEDATA_PAGE_SIZE)
         }
     }))
 
