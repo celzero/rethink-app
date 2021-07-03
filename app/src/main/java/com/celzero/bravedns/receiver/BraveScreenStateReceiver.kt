@@ -22,7 +22,6 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.util.Log
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -34,30 +33,44 @@ class BraveScreenStateReceiver : BroadcastReceiver(), KoinComponent {
 
     override fun onReceive(context: Context, intent: Intent) {
         if (Intent.ACTION_SCREEN_OFF == intent.action) {
-            if (DEBUG) Log.d(LOG_TAG_VPN,
-                             "BraveScreenStateReceiver : Action_screen_off detected from the receiver")
-            if (persistentState.screenState && !persistentState.isScreenOff) {
-                if (DEBUG) Log.d(LOG_TAG_VPN,
-                                 "BraveScreenStateReceiver : Screen lock data not true, calling DeviceLockService service")
-                val newIntent = Intent(context, DeviceLockService::class.java)
-                newIntent.action = DeviceLockService.ACTION_CHECK_LOCK
-                newIntent.putExtra(DeviceLockService.EXTRA_STATE, intent.action)
-                context.startService(newIntent)
-            }
+            return handleScreenOff(context, intent)
         } else if (intent.action.equals(Intent.ACTION_USER_PRESENT) || intent.action.equals(
                 Intent.ACTION_SCREEN_ON)) {
-            if (DEBUG) Log.d(LOG_TAG_VPN,
-                             "BraveScreenStateReceiver : ACTION_USER_PRESENT/ACTION_SCREEN_ON detected from the receiver")
-            if (persistentState.screenState) {
-                val state = persistentState.isScreenOff
-                if (state) {
-                    persistentState.isScreenOff = false
-                    val connectivityManager: ConnectivityManager = context.applicationContext.getSystemService(
-                        Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                    connectivityManager.reportNetworkConnectivity(connectivityManager.activeNetwork,
-                                                                  true)
-                }
-            }
+            return handleScreenOn(context)
+        } else {
+            Log.w(LOG_TAG_VPN, "unhandled broadcast ${intent.action}")
         }
+    }
+
+    private fun handleScreenOff(context: Context, intent: Intent) {
+        val firewallWhenDeviceLocked = persistentState.screenState
+        val isScreenOff = persistentState.isScreenOff
+        Log.i(LOG_TAG_VPN,
+              "on screen-off: isScreenOff? $isScreenOff, firewallWhenDeviceLocked? $firewallWhenDeviceLocked")
+
+        if (isScreenOff) {
+            return
+        }
+
+        if (firewallWhenDeviceLocked) {
+            val newIntent = Intent(context, DeviceLockService::class.java)
+            newIntent.action = DeviceLockService.ACTION_CHECK_LOCK
+            newIntent.putExtra(DeviceLockService.EXTRA_STATE, intent.action)
+            context.startService(newIntent)
+        }
+    }
+
+    private fun handleScreenOn(context: Context) {
+        val isScreenOff = persistentState.isScreenOff
+        Log.i(LOG_TAG_VPN, "on screen-on: isScreenOff? $isScreenOff")
+
+        if(!isScreenOff) {
+            return
+        }
+
+        persistentState.isScreenOff = false
+        val connectivityManager: ConnectivityManager = context.applicationContext.getSystemService(
+            Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        connectivityManager.reportNetworkConnectivity(connectivityManager.activeNetwork, true)
     }
 }

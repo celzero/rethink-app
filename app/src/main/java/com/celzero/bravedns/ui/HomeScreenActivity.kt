@@ -174,8 +174,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         if (Utilities.isAccessibilityServiceEnabledViaSettingsSecure(this,
                                                                      BackgroundAccessibilityService::class.java)) {
             if (!Utilities.isAccessibilityServiceEnabled(this,
-                                                         BackgroundAccessibilityService::class.java) && persistentState.isBackgroundEnabled) {
-                persistentState.isBackgroundEnabled = false
+                                                         BackgroundAccessibilityService::class.java) && persistentState.backgroundEnabled) {
                 persistentState.isAccessibilityCrashDetected = true
             }
         }

@@ -378,12 +378,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         builder.setNegativeButton(getString(
             R.string.orbot_stop_dialog_negative)) { dialogInterface: DialogInterface, _: Int ->
             dialogInterface.dismiss()
-            val launchIntent: Intent? = requireActivity().packageManager.getLaunchIntentForPackage(
-                OrbotHelper.ORBOT_PACKAGE_NAME)
-            if (launchIntent != null) {//null pointer check in case package name was not found
-                Log.d(LOG_TAG_VPN, "launchIntent: ${OrbotHelper.ORBOT_PACKAGE_NAME}")
-                startActivity(launchIntent)
-            }
+            get<OrbotHelper>().openOrbotApp(requireContext())
         }
         val alertDialog: AlertDialog = builder.create()
         alertDialog.setCancelable(true)

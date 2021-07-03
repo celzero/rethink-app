@@ -141,34 +141,33 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        searchAndExpandCategories(query)
+        object : CountDownTimer(1000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {}
+            override fun onFinish() {
+                searchAndExpandCategories(query)
+            }
+        }.start()
         return true
     }
 
     private fun searchAndExpandCategories(query: String) {
-        object : CountDownTimer(1000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {}
+        firewallAppInfoViewModel.setFilter(query)
+        if (query.isEmpty()) {
+            var i = 0
+            titleList.forEach { _ ->
+                b.firewallExpandableList.collapseGroup(i)
+                i += 1
+            }
+        } else {
+            if (titleList.size <= 0) return
 
-            override fun onFinish() {
-                firewallAppInfoViewModel.setFilter(query)
-                if (query.isEmpty()) {
-                    var i = 0
-                    titleList.forEach { _ ->
-                        b.firewallExpandableList.collapseGroup(i)
-                        i += 1
-                    }
-                } else {
-                    if (titleList.size <= 0) return
-
-                    for (i in titleList.indices) {
-                        if (listData[titleList[i]]?.size!! > 0) {
-                            b.firewallExpandableList.expandGroup(i)
-                        }
-                    }
-                    if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category block ${titleList.size}")
+            for (i in titleList.indices) {
+                if (listData[titleList[i]]?.size!! > 0) {
+                    b.firewallExpandableList.expandGroup(i)
                 }
             }
-        }.start()
+            if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category block ${titleList.size}")
+        }
     }
 
     override fun onResume() {
@@ -187,6 +186,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
             titleList = categoryInfoRepository.getAppCategoryList().toMutableList()
 
             val iterator = titleList.iterator()
+
             while (iterator.hasNext()) {
                 val item = iterator.next()
                 if (DEBUG) Log.d(LOG_TAG_FIREWALL,

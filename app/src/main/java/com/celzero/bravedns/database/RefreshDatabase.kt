@@ -55,12 +55,11 @@ class RefreshDatabase internal constructor(private var context: Context,
         GlobalScope.launch(Dispatchers.IO) {
             val appListDB = appInfoRepository.getAppInfoAsync()
             appListDB.forEach {
-                if (!it.packageInfo.contains(Constants.NO_PACKAGE)) {
-                    val pkgMetadata = Utilities.getPackageMetadata(context.packageManager,
-                                                                   it.packageInfo)
-                    if (pkgMetadata?.applicationInfo == null) {
-                        appInfoRepository.delete(it)
-                    }
+                if (it.packageInfo.contains(Constants.NO_PACKAGE)) return@forEach
+
+                val pkgMetadata = Utilities.getPackageMetadata(context.packageManager, it.packageInfo)
+                if (pkgMetadata?.applicationInfo == null) {
+                    appInfoRepository.delete(it)
                 }
             }
             getAppInfo()

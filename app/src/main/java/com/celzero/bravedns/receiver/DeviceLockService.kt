@@ -21,7 +21,6 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import android.os.PowerManager
 import android.util.Log
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
@@ -47,22 +46,19 @@ class DeviceLockService : Service() {
 
     private fun checkLock(intent: Intent) {
         val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
 
-        val isProtected = keyguardManager.isKeyguardSecure
-        val isLocked = keyguardManager.isKeyguardLocked
-        // ref - https://developer.android.com/reference/android/os/PowerManager#isInteractive()
-        val isInteractive = powerManager.isInteractive
         val delayIndex: Int = getSafeCheckLockDelay(
             intent.getIntExtra(EXTRA_CHECK_LOCK_DELAY_INDEX, -1))
 
         checkLockTask?.cancel()
 
-        if (isProtected && isLocked) {
+        persistentState.isScreenOff = keyguardManager.isKeyguardLocked
+
+        if (keyguardManager.isKeyguardLocked) {
             Log.i(LOG_TAG_VPN, "DeviceLockService : Screen lock detected at $delayIndex")
             persistentState.isScreenOff = true
             timer.cancel()
-        } else if (isProtected && !isLocked && !isInteractive) {
+        } else {
             checkLockTask = CheckLockTask(this, delayIndex)
             timer.schedule(checkLockTask, checkLockDelays[delayIndex].toLong())
         }

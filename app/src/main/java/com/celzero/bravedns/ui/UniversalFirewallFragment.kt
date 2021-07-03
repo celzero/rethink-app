@@ -221,7 +221,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         val includeView = b.appScrollingInclFirewall
         if (isChecked) {
             includeView.firewallBackgroundModeCheck.isChecked = false
-            persistentState.isBackgroundEnabled = false
+            persistentState.backgroundEnabled = false
             return
         }
 
@@ -232,14 +232,14 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         val isAccessibilityServiceFunctional = isAccessibilityServiceRunning && isAccessibilityServiceEnabled
 
         if (isAccessibilityServiceFunctional) {
-            persistentState.isBackgroundEnabled = true
+            persistentState.backgroundEnabled = true
             includeView.firewallBackgroundModeCheck.isChecked = true
             return
         }
 
         showAlertForPermission(isAccessibilityServiceEnabled)
         includeView.firewallBackgroundModeCheck.isChecked = false
-        persistentState.isBackgroundEnabled = false
+        persistentState.backgroundEnabled = false
     }
 
     private fun setIPRulesVisible() {
@@ -299,19 +299,32 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
     }
 
     private fun checkAppNotInUse() {
-        if (Utilities.isAccessibilityServiceEnabledViaSettingsSecure(requireContext(),
-                                                                     BackgroundAccessibilityService::class.java)) {
-            if (!Utilities.isAccessibilityServiceEnabled(requireContext(),
-                                                         BackgroundAccessibilityService::class.java) && persistentState.isAccessibilityCrashDetected) {
-                b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = false
-                persistentState.isBackgroundEnabled = false
-                showAlertForPermission(true)
-            } else {
-                b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = persistentState.isBackgroundEnabled
-            }
-        } else {
-            persistentState.isBackgroundEnabled = false
+
+        if (!persistentState.backgroundEnabled || !persistentState.isAccessibilityCrashDetected) {
+            return
+        }
+
+        val isAccessibilityServiceRunning = Utilities.isAccessibilityServiceEnabled(
+            requireContext(), BackgroundAccessibilityService::class.java)
+        val isAccessibilityServiceEnabled = Utilities.isAccessibilityServiceEnabledViaSettingsSecure(
+            requireContext(), BackgroundAccessibilityService::class.java)
+
+        if (!isAccessibilityServiceEnabled) {
+            persistentState.backgroundEnabled = false
+            persistentState.isAccessibilityCrashDetected = false
             b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = false
+            return
+        }
+
+        if(isAccessibilityServiceRunning) {
+            b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = persistentState.backgroundEnabled
+            return
+        }
+
+        if(persistentState.isAccessibilityCrashDetected){
+            persistentState.backgroundEnabled = false
+            b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = false
+            showAlertForPermission(true)
         }
     }
 
@@ -331,7 +344,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             }
             builder.setNegativeButton(
                 getString(R.string.univ_accessibility_crash_dialog_negative)) { _, _ ->
-                persistentState.isBackgroundEnabled = false
+                persistentState.backgroundEnabled = false
                 persistentState.isAccessibilityCrashDetected = false
             }
         } else {
@@ -345,7 +358,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             }
             builder.setNegativeButton(
                 getString(R.string.univ_accessibility_dialog_negative)) { _, _ ->
-                persistentState.isBackgroundEnabled = false
+                persistentState.backgroundEnabled = false
             }
         }
 

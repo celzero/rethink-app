@@ -29,6 +29,7 @@ import android.os.SystemClock.elapsedRealtime
 import android.service.quicksettings.TileService.requestListeningState
 import android.util.Log
 import android.view.accessibility.AccessibilityManager
+import android.widget.Toast
 import androidx.annotation.GuardedBy
 import androidx.annotation.RequiresApi
 import androidx.annotation.WorkerThread
@@ -58,6 +59,8 @@ import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_PROXY
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities.Companion.getThemeAccent
+import com.celzero.bravedns.util.Utilities.Companion.isVpnLockdownEnabled
+import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import kotlinx.coroutines.*
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
@@ -220,12 +223,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 val bgBlockWaitMs = TimeUnit.SECONDS.toMillis(20)
                 var remainingWaitMs = TimeUnit.SECONDS.toMillis(10)
                 var attempt = 0
-                if (DEBUG) Log.d(LOG_TAG_VPN, "Background blocked? ${
-                    backgroundAllowedUID.containsKey(uid)
-                }, $uid, $destIp, AccessibilityEvent: app in foreground: $uid ")
+                val isUidAllowed = backgroundAllowedUID.containsKey(uid)
+                if (DEBUG) Log.d(LOG_TAG_VPN, "Background blocked? $isUidAllowed, $uid, $destIp, AccessibilityEvent: app in foreground: $uid ")
 
                 while (remainingWaitMs > 0) {
-                    if (backgroundAllowedUID.containsKey(uid)) {
+                    if (isUidAllowed) {
                         isBGBlock = false
                         break
                     }
@@ -297,8 +299,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
 
     private fun blockBackgroundData(): Boolean {
         if (DEBUG) Log.d(LOG_TAG_VPN,
-                         "blockBackgrounddata - ${!persistentState.isBackgroundEnabled} && ${!accessibilityServiceRunning()}")
-        if (!persistentState.isBackgroundEnabled) return false
+                         "blockBackgrounddata - ${!persistentState.backgroundEnabled} && ${!accessibilityServiceRunning()}")
+        if (!persistentState.backgroundEnabled) return false
         if (!accessibilityServiceRunning()) return false
         return true
     }
@@ -419,7 +421,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 if (DEBUG) Log.d(LOG_TAG_VPN,
                                  "app $uid / ${it.packageInfo} killed? ${it.isSystemApp}")
                 if (!it.isSystemApp) {
-                    Utilities.killBg(context, it.packageInfo)
+                    Utilities.killBg(activityManager, it.packageInfo)
                 }
             }
         }
@@ -458,13 +460,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     fun newBuilder(): Builder {
         var builder = Builder()
 
-        if (VERSION.SDK_INT >= VERSION_CODES.Q) {
-            if (DEBUG) Log.d(LOG_TAG_VPN,
-                             "isLockDownEnabled - ${this.isLockdownEnabled}, ${this.isAlwaysOn}")
-            if (!this.isLockdownEnabled && persistentState.allowByPass) {
-                Log.i(LOG_TAG_VPN, "getAllowByPass - true")
-                builder = builder.allowBypass()
-            }
+        if(isVpnLockdownEnabled(this) == false && persistentState.allowByPass) {
+            Log.i(LOG_TAG_VPN, "getAllowByPass - true")
+            builder = builder.allowBypass()
         }
 
         // underlying networks is set to null, which prompts Android to set it to whatever is the
@@ -506,12 +504,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                    enabled. */
                 val excludedApps = persistentState.excludedAppsFromVPN
 
-                if (Utilities.isVpnLockdownEnabled(this) == true) {
-                    excludedApps.forEach {
-                        builder = builder.addDisallowedApplication(it)
-                        Log.i(LOG_TAG_VPN, "Excluded package - $it")
-                    }
-                } else {
+                if (isVpnLockdownEnabled(this) == false) {
                     excludedApps.forEach {
                         builder = builder.addDisallowedApplication(it)
                         Log.i(LOG_TAG_VPN, "Excluded package - $it")
@@ -528,11 +521,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                       "Proxy mode - Socks5 is selected - $socks5ProxyEndpoint, with app name - ${socks5ProxyEndpoint?.proxyAppName}")
                 if (socks5ProxyEndpoint != null && socks5ProxyEndpoint.proxyAppName != getString(
                         R.string.settings_app_list_default_app)) {
-                    builder = builder.addDisallowedApplication(socks5ProxyEndpoint.proxyAppName!!)
+                    if (isExcludePossible(socks5ProxyEndpoint.proxyAppName!!, getString(R.string.socks5_proxy_toast_parameter) )) {
+                        builder = builder.addDisallowedApplication(socks5ProxyEndpoint.proxyAppName!!)
+                    }
                 }
             }
-            if (Utilities.isVpnLockdownEnabled(this) == true) {
-                if (appMode.getProxyMode() == Constants.ORBOT_SOCKS) {
+
+            if (appMode.getProxyMode() == Constants.ORBOT_SOCKS) {
+                if (isExcludePossible(getString(R.string.orbot), getString(R.string.orbot_toast_parameter))) {
                     builder = builder.addDisallowedApplication(OrbotHelper.ORBOT_PACKAGE_NAME)
                 }
             }
@@ -544,7 +540,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                       "DNS Proxy mode is set with the app name as ${dnsProxyEndpoint.proxyAppName}")
                 if (!dnsProxyEndpoint.proxyAppName.isNullOrEmpty() && dnsProxyEndpoint.proxyAppName != getString(
                         R.string.settings_app_list_default_app)) {
-                    builder = builder.addDisallowedApplication(dnsProxyEndpoint.proxyAppName!!)
+                    if (isExcludePossible(dnsProxyEndpoint.proxyAppName!!, getString(R.string.dns_proxy_toast_parameter))) {
+                        builder = builder.addDisallowedApplication(dnsProxyEndpoint.proxyAppName!!)
+                    }
                 }
             }
 
@@ -552,6 +550,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             Log.w(LOG_TAG_VPN, "cannot exclude the dns proxy app", e)
         }
         return builder
+    }
+
+    private fun isExcludePossible(appName: String, message: String): Boolean {
+        if (Utilities.isVpnLockdownEnabled(this) == true) {
+            showToastUiCentered(this, getString(R.string.dns_proxy_connection_failure_lockdown, appName, message),
+                                Toast.LENGTH_SHORT)
+            return false
+        }
+        return true
     }
 
 
@@ -686,7 +693,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         if (persistentState.orbotResponseStatus != Constants.ORBOT_MODE_NONE) {
             get<OrbotHelper>().startOrbot(this)
         }
-        if (persistentState.isBackgroundEnabled) {
+        if (persistentState.backgroundEnabled) {
             registerAccessibilityServiceState()
         }
         if (persistentState.screenState) {
@@ -750,7 +757,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             val isServiceEnabled = Utilities.isAccessibilityServiceEnabledViaSettingsSecure(this,
                                                                                             BackgroundAccessibilityService::class.java)
             if (!b || !isServiceEnabled) {
-                persistentState.isBackgroundEnabled = false
+                persistentState.backgroundEnabled = false
             }
         }
     }
@@ -864,7 +871,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 spawnServerUpdate()
             }
             PersistentState.BACKGROUND_MODE -> {
-                if (persistentState.isBackgroundEnabled) {
+                if (persistentState.backgroundEnabled) {
                     registerAccessibilityServiceState()
                 }
             }
@@ -945,7 +952,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                     vpnController.getState().activationRequested = false
                     persistentState.vpnEnabled = false
                     vpnController.onConnectionStateChanged(this, null)
-                    Log.e(LOG_TAG_VPN, "Stop vpn adapter/controller")
+                    Log.i(LOG_TAG_VPN, "Stop vpn adapter/controller")
                 }
             }
         }

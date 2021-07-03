@@ -15,10 +15,12 @@ limitations under the License.
 */
 package com.celzero.bravedns.adapter
 
+import android.app.ActivityManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
+import android.net.VpnService
 import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
@@ -64,6 +66,7 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
                                                   private var dataList: HashMap<CategoryInfo, ArrayList<AppInfo>>) :
         BaseExpandableListAdapter() {
 
+    private var activityManager: ActivityManager = context.getSystemService(VpnService.ACTIVITY_SERVICE) as ActivityManager
 
     override fun getChild(listPosition: Int, expandedListPosition: Int): AppInfo {
         return this.dataList[this.titleList[listPosition]]!![expandedListPosition]
@@ -182,7 +185,7 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
                                                                      isInternetAllowed)
 
                         if (persistentState.killAppOnFirewall) {
-                            Utilities.killBg(context, it.packageInfo)
+                            Utilities.killBg(activityManager, it.packageInfo)
                         }
                     }
                     appInfoRepository.updateInternetForUID(uid, !isInternetAllowed)
@@ -292,8 +295,7 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
         }
 
         internetChk.setOnClickListener {
-            val shouldBlock = if (isInternetAllowed && isAnySystemCategory(
-                    listTitle.categoryName)) {
+            val shouldBlock = if (isInternetAllowed && isAnySystemCategory(listTitle.categoryName)) {
                 if (listTitle.numOfAppWhitelisted != listTitle.numberOFApps) {
                     showDialogForSystemAppBlock(listTitle.categoryName)
                 } else {
@@ -302,6 +304,7 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
             } else {
                 true
             }
+
             if (!shouldBlock) {
                 internetChk.isChecked = false
                 internetChk.setCompoundDrawablesWithIntrinsicBounds(
@@ -341,7 +344,7 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
                         }
                     } catch (e: Exception) {
                         Log.w(LOG_TAG_FIREWALL,
-                              "Exception when inserting the category internet info: ${e.message}",
+                              "Failure inserting the category internet info: ${e.message}",
                               e)
                     }
                 }

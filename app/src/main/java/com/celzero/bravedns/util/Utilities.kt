@@ -19,7 +19,6 @@ package com.celzero.bravedns.util
 import android.Manifest
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
-import android.app.Activity
 import android.app.ActivityManager
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
@@ -58,6 +57,7 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.google.android.material.snackbar.Snackbar
 import com.google.common.net.InetAddresses
 import com.google.common.net.InternetDomainName
+import java.io.File
 import java.io.IOException
 import java.net.InetAddress
 import java.text.SimpleDateFormat
@@ -318,7 +318,7 @@ class Utilities {
             } catch (e: ActivityNotFoundException) {
                 showToastUiCentered(context, context.getString(R.string.vpn_profile_error),
                                     Toast.LENGTH_SHORT)
-                Log.w(LOG_TAG_VPN, "Exception while opening app info: ${e.message}", e)
+                Log.w(LOG_TAG_VPN, "Failure opening app info: ${e.message}", e)
             }
         }
 
@@ -341,9 +341,7 @@ class Utilities {
             return vpnService?.isLockdownEnabled
         }
 
-        fun killBg(context: Context, packageName: String) {
-            val activityManager: ActivityManager = context.getSystemService(
-                Activity.ACTIVITY_SERVICE) as ActivityManager
+        fun killBg(activityManager: ActivityManager, packageName: String) {
             try {
                 activityManager.killBackgroundProcesses(packageName)
             } catch (e: Exception) {
@@ -391,6 +389,16 @@ class Utilities {
                 Log.w(LOG_TAG_APP_DB, "Application not available $pi" + e.message, e)
             }
             return metadata;
+        }
+
+        fun copy(from: String, to: String): Boolean {
+            val src = File(from)
+            val dest = File(to)
+
+            if (!src.isFile || !dest.isFile) return false
+
+            val res = src.copyTo(dest, true)
+            return res.exists()
         }
     }
 }

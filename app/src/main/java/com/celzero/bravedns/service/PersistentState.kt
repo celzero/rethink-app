@@ -99,7 +99,7 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
     var screenState by booleanPref("screen_state", false)
     private var _numberOfRequests by intPref("number_request", 0)
     var numberOfBlockedRequests by intPref("blocked_request", 0)
-    var isBackgroundEnabled by booleanPref("background_mode", false)
+    var backgroundEnabled by booleanPref("background_mode", false)
     var checkForAppUpdate by booleanPref("check_for_app_update", true)
     var isScreenOff by booleanPref("screen_off", false)
     private var connectedDNSName by stringPref("connected_dns_name",
@@ -198,7 +198,7 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
                 dohDetail = appMode?.getDOHDetails()
                 dohDetail?.dohName!!
             } catch (e: Exception) { //FIXME - #320
-                Log.e(LOG_TAG_VPN, "Exception while fetching DOH from the database", e)
+                Log.e(LOG_TAG_VPN, "Issue while DOH details fetch from the database", e)
                 connectedDNSName
             }
         } else if (Constants.PREF_DNS_MODE_DNSCRYPT == dnsType) {

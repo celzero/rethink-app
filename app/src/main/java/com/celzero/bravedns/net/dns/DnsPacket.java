@@ -221,7 +221,7 @@ public class DnsPacket {
                     try {
                         addresses.add(InetAddress.getByAddress(r.data));
                     } catch (UnknownHostException e) {
-                        Log.e(LOG_TAG_DNS_LOG, "Exception while converting string to InetAddresses: ${e.message}", e);
+                        Log.e(LOG_TAG_DNS_LOG, "Failure converting string to InetAddresses: ${e.message}", e);
                     }
                 }
             }

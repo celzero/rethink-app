@@ -55,13 +55,16 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
             return GlobalVariable.blockedUID[uid] != null
         }
 
-
         fun updateAppInternetPermission(packageName: String, isAllowed: Boolean) {
             val appInfo = GlobalVariable.appList[packageName]
-            if (appInfo != null) {
-                appInfo.isInternetAllowed = isAllowed
-                GlobalVariable.appList[packageName] = appInfo
+            if (appInfo == null) {
+                Log.i(LOG_TAG_FIREWALL,
+                      "updateAppInternetPermission- $packageName is not available in the list")
+                return
             }
+
+            appInfo.isInternetAllowed = isAllowed
+            GlobalVariable.appList[packageName] = appInfo
         }
 
         fun updateAppInternetPermissionByUID(uid: Int, isInternetAllowed: Boolean) {
@@ -200,8 +203,8 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
 
     private fun addOrRemovePackageForBackground(isAllowed: Boolean) {
         if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                         "isBackgroundEnabled: ${persistentState.isBackgroundEnabled}, Package: $latestTrackedPackage, isAllowed: $isAllowed")
-        if (!persistentState.isBackgroundEnabled || latestTrackedPackage.isNullOrEmpty()) return
+                         "isBackgroundEnabled: ${persistentState.backgroundEnabled}, Package: $latestTrackedPackage, isAllowed: $isAllowed")
+        if (!persistentState.backgroundEnabled || latestTrackedPackage.isNullOrEmpty()) return
 
         val currentPackage = latestTrackedPackage
         packageElect = currentPackage

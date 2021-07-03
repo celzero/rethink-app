@@ -267,9 +267,10 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context,
         }
 
         b.bsConnTrackAppNameHeader.setOnClickListener {
+            val unknownApp = getString(R.string.ctbs_unknown_app)
             val appUIDList = appInfoRepository.getAppListForUID(ipDetails.uid)
-            if (appUIDList.size != 1 || ipDetails.appName.isNullOrEmpty() || ipDetails.appName == getString(
-                    R.string.ctbs_unknown_app)) {
+
+            if (appUIDList.size != 1 || ipDetails.appName.isNullOrEmpty() || ipDetails.appName == unknownApp) {
                 Utilities.showToastUiCentered(contextVal,
                                               getString(R.string.ctbs_app_info_not_available_toast),
                                               Toast.LENGTH_SHORT)
@@ -277,6 +278,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context,
             }
 
             val packageName = appInfoRepository.getPackageNameForUid(ipDetails.uid)
+
             appInfoForPackage(packageName)
         }
 
@@ -292,8 +294,8 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context,
             intent.data = Uri.fromParts("package", packageName, null)
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            //Open the generic Apps page:
-            Log.w(LOG_TAG_FIREWALL, "Exception while opening app info: ${e.message}", e)
+            //Open the generic Apps page
+            Log.w(LOG_TAG_FIREWALL, "Failure calling app info: ${e.message}", e)
             val intent = Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS)
             startActivity(intent)
         }
@@ -302,6 +304,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context,
     private fun firewallApp(isBlocked: Boolean) {
         var blockAllApps = false
         val appUIDList = appInfoRepository.getAppListForUID(ipDetails.uid)
+
         if (appUIDList.isNullOrEmpty()) {
             showToast(getString(R.string.firewall_app_info_not_available))
             b.bsConnBlockAppCheck.isChecked = false
@@ -356,19 +359,20 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context,
     private fun clearAppRules() {
         val blockAllApps: Boolean
         val appUIDList = appInfoRepository.getAppListForUID(ipDetails.uid)
-        if (appUIDList.size > 1) {
-            val title = getString(R.string.ctbs_clear_rules_desc, ipDetails.appName,
-                                  appUIDList.size.toString())
-            val positiveText = getString(R.string.ctbs_clear_rules_positive_text)
-            blockAllApps = showDialog(appUIDList, title, positiveText)
-            if (blockAllApps) {
-                firewallRules.clearFirewallRules(ipDetails.uid, blockedConnectionsRepository)
-                Utilities.showToastUiCentered(contextVal,
-                                              getString(R.string.bsct_rules_cleared_toast),
-                                              Toast.LENGTH_SHORT)
-            }
-        } else {
+        if(appUIDList.size <= 1){
             showAlertForClearRules()
+            return
+        }
+
+        val title = getString(R.string.ctbs_clear_rules_desc, ipDetails.appName,
+                              appUIDList.size.toString())
+        val positiveText = getString(R.string.ctbs_clear_rules_positive_text)
+
+        blockAllApps = showDialog(appUIDList, title, positiveText)
+        if (blockAllApps) {
+            firewallRules.clearFirewallRules(ipDetails.uid, blockedConnectionsRepository)
+            Utilities.showToastUiCentered(contextVal, getString(R.string.bsct_rules_cleared_toast),
+                                          Toast.LENGTH_SHORT)
         }
     }
 

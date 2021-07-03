@@ -92,8 +92,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     private var excludeAppAdapter: ExcludedAppListAdapter? = null
     private val excludeAppViewModel: ExcludedAppViewModel by viewModel()
 
-    private lateinit var animation: Animation
-
     private val appInfoRepository by inject<AppInfoRepository>()
     private val appInfoViewRepository by inject<AppInfoViewRepository>()
     private val proxyEndpointRepository by inject<ProxyEndpointRepository>()
@@ -107,12 +105,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     }
 
     private fun initView() {
-
-        animation = RotateAnimation(0.0f, 360.0f, Animation.RELATIVE_TO_SELF, 0.5f,
-                                    Animation.RELATIVE_TO_SELF, 0.5f)
-        animation.repeatCount = -1
-        animation.duration = 1000
-
         b.settingsActivityAllowBypassProgress.visibility = View.GONE
 
         b.settingsActivityHttpProxyProgress.visibility = View.GONE
@@ -412,7 +404,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 startActivity(intent)
             } catch (e: ActivityNotFoundException) {
-                Log.w(LOG_TAG_UI, "Exception while opening app info: ${e.message}", e)
+                Log.w(LOG_TAG_UI, "Failure calling app info: ${e.message}", e)
             }
         }
 
@@ -612,6 +604,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                                           Toast.LENGTH_SHORT)
             return
         }
+
         val bottomSheetFragment = OrbotBottomSheetFragment()
         val frag = context as FragmentActivity
         bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
@@ -719,17 +712,12 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     }
 
     private fun handleOnDeviceBlocklist() {
-        if (!persistentState.localBlocklistEnabled) {
+        if (!persistentState.localBlocklistEnabled || !persistentState.blocklistFilesDownloaded || persistentState.localBlocklistStamp.isEmpty()) {
             b.settingsActivityOnDeviceBlockDesc.text = getString(
                 R.string.settings_local_blocklist_desc1)
             return
         }
 
-        if (!persistentState.blocklistFilesDownloaded || persistentState.localBlocklistStamp.isEmpty()) {
-            b.settingsActivityOnDeviceBlockDesc.text = getString(
-                R.string.settings_local_blocklist_desc1)
-            return
-        }
         val count = persistentState.numberOfLocalBlocklists
         if (count > 0) {
             b.settingsActivityOnDeviceBlockDesc.text = getString(

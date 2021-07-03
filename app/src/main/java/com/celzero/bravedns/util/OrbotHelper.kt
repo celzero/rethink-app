@@ -435,7 +435,7 @@ class OrbotHelper(private val persistentState: PersistentState,
                 openOrbotAppInfo(context)
             }
         } catch (e: ActivityNotFoundException) {
-            Log.w(LOG_TAG_VPN, "Exception while opening app info: ${e.message}", e)
+            Log.w(LOG_TAG_VPN, "Failure calling app info: ${e.message}", e)
         }
     }
 
@@ -447,7 +447,7 @@ class OrbotHelper(private val persistentState: PersistentState,
             intent.data = Uri.fromParts("package", ORBOT_PACKAGE_NAME, null)
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            Log.w(LOG_TAG_VPN, "Exception while opening app info: ${e.message}", e)
+            Log.w(LOG_TAG_VPN, "Failure calling app info: ${e.message}", e)
         }
     }
 }

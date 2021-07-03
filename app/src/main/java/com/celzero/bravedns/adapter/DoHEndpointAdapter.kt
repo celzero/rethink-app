@@ -84,6 +84,7 @@ class DoHEndpointAdapter(private val context: Context,
 
         fun update(doHEndpoint: DoHEndpoint) {
             b.dohEndpointListUrlName.text = doHEndpoint.dohName
+            b.dohEndpointListUrlExplanation.text = ""
             if (doHEndpoint.isSelected) {
                 val count = persistentState.numberOfRemoteBlocklists
                 b.dohEndpointListUrlExplanation.text = if (doHEndpoint.dohName == RETHINK_DNS_PLUS && count > 0) {
@@ -92,8 +93,6 @@ class DoHEndpointAdapter(private val context: Context,
                     context.getString(R.string.dns_connected)
                 }
                 Log.i(LOG_TAG_DNS, "connected to doh - ${doHEndpoint.dohName}")
-            } else {
-                b.dohEndpointListUrlExplanation.text = ""
             }
 
             // Shows either the info/delete icon for the DoH entries.
@@ -124,7 +123,7 @@ class DoHEndpointAdapter(private val context: Context,
             try {
                 stamp = getBlocklistStampFromURL(doHEndpoint.dohURL)
             } catch (e: Exception) {
-                Log.w(LOG_TAG_DNS, "Exception while fetching stamp from Go ${e.message}", e)
+                Log.w(LOG_TAG_DNS, "Failure fetching stamp from Go ${e.message}", e)
             }
             if (DEBUG) Log.d(LOG_TAG_DNS,
                              "startActivityForResult - DohEndpointadapter with DoHURL: ${doHEndpoint.dohURL},and stamp: $stamp")
@@ -154,7 +153,7 @@ class DoHEndpointAdapter(private val context: Context,
                 try {
                     stamp = getBlocklistStampFromURL(doHEndpoint.dohURL)
                 } catch (e: Exception) {
-                    Log.w(LOG_TAG_DNS, "Exception while fetching stamp from Go ${e.message}", e)
+                    Log.w(LOG_TAG_DNS, "Error on retrieving stamp from Go ${e.message}", e)
                 }
                 if (DEBUG) Log.d(LOG_TAG_DNS, "updateConnection stamp- $stamp")
                 if (stamp.isEmpty()) {

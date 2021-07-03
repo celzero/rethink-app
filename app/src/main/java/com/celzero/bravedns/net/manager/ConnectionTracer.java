@@ -30,6 +30,7 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
+import static com.celzero.bravedns.util.Constants.INVALID_UID;
 import static com.celzero.bravedns.util.LoggerConstants.LOG_TAG_VPN;
 
 public class ConnectionTracer {
@@ -79,7 +80,7 @@ public class ConnectionTracer {
         } else {
             remote = new InetSocketAddress(destIp, destPort);
         }
-        int uid = -1;
+        int uid = INVALID_UID;
         String key = protocol + local.getAddress().getHostAddress() + remote.getAddress().getHostAddress();
         try {
             int value = uidCache.getIfPresent(key);

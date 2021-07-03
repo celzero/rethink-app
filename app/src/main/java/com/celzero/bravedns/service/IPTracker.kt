@@ -83,7 +83,7 @@ class IPTracker internal constructor(private val appInfoRepository: AppInfoRepos
             serverAddress = InetAddresses.forString(ipDetails.destIP)
         } catch (e: IllegalArgumentException) {
             Log.e(LoggerConstants.LOG_TAG_DNS_LOG,
-                  "Exception while converting string to InetAddresses: ${e.message}", e)
+                  "Failure converting string to InetAddresses: ${e.message}", e)
         }
         val countryCode: String = getCountryCode(serverAddress, context)
         connTracker.flag = getFlag(countryCode)

@@ -51,6 +51,7 @@ import com.celzero.bravedns.util.Constants.Companion.THEME_SYSTEM_DEFAULT
 import com.celzero.bravedns.util.HttpRequestHelper
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Utilities.Companion.copy
 import com.celzero.bravedns.util.Utilities.Companion.getCurrentTheme
 import dnsx.Dnsx
 import kotlinx.coroutines.Dispatchers
@@ -107,7 +108,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                 }
             }
         } catch (e: Exception) {
-            Log.e(LOG_TAG_DNS, "Exception: ${e.message}", e)
+            Log.e(LOG_TAG_DNS, e.message, e)
             showDialogOnError(null)
         }
         loadUrl(url)
@@ -465,16 +466,6 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                 persistentState.remoteBraveDNSDownloaded = false
             }
         }
-    }
-
-    private fun copy(from: String, to: String): Boolean {
-        val src = File(from)
-        val dest = File(to)
-
-        if (!src.isFile || !dest.isFile) return false
-
-        val res = src.copyTo(dest, true)
-        return res.exists()
     }
 
     override fun onStop() {

@@ -189,12 +189,10 @@ class DNSCryptEndpointAdapter(private val context: Context,
             val list = dnsCryptEndpointRepository.getConnectedDNSCrypt()
             // Below check is to inform user not to unselect the only selected DNSCrypt.
             // This is true when the connected dns crypt list returned from the database is 1.
-            if (list.size == 1) {
-                if (!dnsCryptEndpoint.isSelected && list[0].dnsCryptURL == dnsCryptEndpoint.dnsCryptURL) {
-                    Toast.makeText(context, context.getString(R.string.dns_select_toast),
-                                   Toast.LENGTH_SHORT).show()
-                    return false
-                }
+            if (list.size == 1 && !dnsCryptEndpoint.isSelected && list[0].dnsCryptURL == dnsCryptEndpoint.dnsCryptURL) {
+                Toast.makeText(context, context.getString(R.string.dns_select_toast),
+                               Toast.LENGTH_SHORT).show()
+                return false
             }
             dnsCryptEndpointRepository.updateAsync(dnsCryptEndpoint)
 

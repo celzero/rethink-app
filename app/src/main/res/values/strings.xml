@@ -541,6 +541,7 @@
     <string name="settings_https_heading">Setup HTTP(S) Proxy</string>
     <string name="settings_https_desc">This setting is only a recommendation and it is possible that apps will ignore it.</string>
 
+    <string name="orbot">Orbot</string>
     <string name="orbot_socks5">TCP-only Proxy</string>
     <string name="orbot_socks5_desc">Forwards all TCP connections to Orbot.</string>
     <string name="orbot_http">HTTP Proxy</string>
@@ -987,5 +988,9 @@
     <string name="network_log_app_name_unnamed">Unnamed (%1$s)</string>
 
     <string name="dns_crypt_connection_failure">Error connecting to DNSCrypt server.</string>
+    <string name="dns_proxy_connection_failure_lockdown">Excluding %1$s for %2$s in lockdown mode can cause Internet connectivity issues.</string>
+    <string name="dns_proxy_toast_parameter">DNS Proxy</string>
+    <string name="socks5_proxy_toast_parameter">SOCKS5 Proxy</string>
+    <string name="orbot_toast_parameter">Tor-as-a-proxy</string>
 
 </resources>

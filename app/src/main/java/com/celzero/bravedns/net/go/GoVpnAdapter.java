@@ -266,7 +266,7 @@ public class GoVpnAdapter {
                 Log.i(LOG_TAG_VPN, "DNSCrypt - Routes: " + routes + ", relay count: " + relayCount + ", servers: " + servers + ", removed count:" + serverCount);
             }
         } catch (Exception ex) {
-            Log.e(LOG_TAG_VPN, "connect-tunnel: dns crypt", ex);
+            Log.e(LOG_TAG_VPN, "connect-tunnel: dns crypt failure", ex);
         }
         if (servers.length() > 0) {
             RefreshOperation runningTask = new RefreshOperation();
@@ -546,7 +546,7 @@ public class GoVpnAdapter {
                 tunnel.setBraveDNS(braveDNS);
             }
         } catch (Exception ex) {
-            Log.e(LOG_TAG_VPN, "Exception while setting bravedns for remote:" + ex.getMessage(), ex);
+            Log.e(LOG_TAG_VPN, "Failure setting remote bravedns:" + ex.getMessage(), ex);
         }
     }
 

@@ -725,5 +725,4 @@ class KnownPorts {
             portMap[1022] = "exp2"
         }
     }
-
 }

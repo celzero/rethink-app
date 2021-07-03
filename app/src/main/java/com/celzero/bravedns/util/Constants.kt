@@ -164,8 +164,8 @@ class Constants {
 
         // The minimum interval before checking if the internal accessibility service
         // (used to block apps-not-in-use) is indeed running.
-        // Ref: {@link com.celzero.bravedns.util.Utilities.Companion#isAccessibilityServiceEnabled} and
-        // {@link com.celzero.bravedns.util.Utilities.Companion#isAccessibilityServiceEnabledViaSettingsSecure}
+        // Ref: {@link com.celzero.bravedns.util.Utilities#isAccessibilityServiceEnabled} and
+        // {@link com.celzero.bravedns.util.Utilities#isAccessibilityServiceEnabledViaSettingsSecure}
         val ACCESSIBILITY_SERVICE_HEARTBEAT_THRESHOLD_MS = TimeUnit.MINUTES.toMillis(5)
 
         // Interval before in-memory (total) dns-query counter is flushed to a shared-preference.
@@ -204,7 +204,7 @@ class Constants {
         const val DOWNLOAD_SUCCESS = 1
         const val DOWNLOAD_RETRY = 0
 
-        // Value to initiate timestamp milliseconds.
+        // To initiate / reset the timestamp in milliseconds.
         const val INIT_TIME_MS = 0L
     }
 }

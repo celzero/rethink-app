@@ -95,7 +95,7 @@ class BackgroundAccessibilityService : AccessibilityService() {
         /*Log.w("______","onAEvent: sourcepack " + event.source?.packageName + " text? " +
                 eventText + " class? " + event.className +
                 " package? ppp " + event.packageName)*/
-        if (persistentState.isBackgroundEnabled) {
+        if (persistentState.backgroundEnabled) {
             firewallManager.onAccessibilityEvent(event, rootInActiveWindow)
         }
     }
