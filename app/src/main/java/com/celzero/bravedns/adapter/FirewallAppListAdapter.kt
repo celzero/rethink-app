@@ -17,6 +17,8 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.DialogInterface
+import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
@@ -233,22 +235,18 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
         val sysAppWarning: TextView = convertView.findViewById(R.id.expand_system_apps_warning)
         val placeHolder: TextView = convertView.findViewById(R.id.expand_system_place_holder)
 
-        val numberOfApps = listTitle.numberOFApps
-        categoryNameTV.text = "${listTitle.categoryName} ($numberOfApps)"
+        categoryNameTV.text = "${listTitle.categoryName} (${listTitle.numberOFApps})"
         val isInternetAllowed = !listTitle.isInternetBlocked
 
         internetChk.isChecked = !isInternetAllowed
         if (!isInternetAllowed) {
+            indicatorTV.visibility = View.VISIBLE
             internetChk.setCompoundDrawablesWithIntrinsicBounds(
                 ContextCompat.getDrawable(context, R.drawable.dis_allowed), null, null, null)
         } else {
+            indicatorTV.visibility = View.INVISIBLE
             internetChk.setCompoundDrawablesWithIntrinsicBounds(
                 ContextCompat.getDrawable(context, R.drawable.allowed), null, null, null)
-        }
-        if (isInternetAllowed) {
-            indicatorTV.visibility = View.INVISIBLE
-        } else {
-            indicatorTV.visibility = View.VISIBLE
         }
 
         if (listTitle.categoryName == APP_CAT_SYSTEM_APPS) {
@@ -277,76 +275,38 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
                                             listTitle.numOfAppsExcluded.toString())
 
         val list = dataList[listTitle]
-        try {
-            if (list != null && list.isNotEmpty()) {
-                if (numberOfApps != 0) {
-                    if (numberOfApps >= 2) {
-                        GlideApp.with(context).load(
-                            context.packageManager.getApplicationIcon(list[0].packageInfo)).error(
-                            AppCompatResources.getDrawable(context,
-                                                           R.drawable.default_app_icon)).into(
-                            imageHolder1)
-                        GlideApp.with(context).load(
-                            context.packageManager.getApplicationIcon(list[1].packageInfo)).error(
-                            AppCompatResources.getDrawable(context,
-                                                           R.drawable.default_app_icon)).into(
-                            imageHolder2)
-                    } else {
-                        GlideApp.with(context).load(
-                            context.packageManager.getApplicationIcon(list[0].packageInfo)).error(
-                            AppCompatResources.getDrawable(context,
-                                                           R.drawable.default_app_icon)).into(
-                            imageHolder1)
-                        imageHolder2.visibility = View.GONE
-                    }
-                } else {
-                    imageHolder1.visibility = View.GONE
-                    imageHolder2.visibility = View.GONE
-                }
+        if (!list.isNullOrEmpty()) {
+            if (list.size == 1) {
+                show(imageHolder1)
+                hide(imageHolder2)
+                loadIcon(list[0].packageInfo, imageHolder1)
+            } else if (list.size > 1) {
+                show(imageHolder1)
+                show(imageHolder2)
+                loadIcon(list[0].packageInfo, imageHolder1)
+                loadIcon(list[1].packageInfo, imageHolder2)
             }
-        } catch (e: Exception) {
-            Log.w(LOG_TAG_FIREWALL, "One or more application icons are not available" + e.message)
-            GlideApp.with(context).load(
-                AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).error(
-                AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(
-                imageHolder1)
-            if (numberOfApps == 1) {
-                imageHolder2.visibility = View.GONE
-            } else {
-                GlideApp.with(context).load(
-                    AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).error(
-                    AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(
-                    imageHolder2)
-            }
+        } else {
+            hide(imageHolder1)
+            hide(imageHolder2)
         }
+
         internetChk.setOnClickListener {
-            var proceedBlock = if (listTitle.categoryName == APP_CAT_SYSTEM_APPS && isInternetAllowed) {
+            val shouldBlock = if (isInternetAllowed && isAnySystemCategory(
+                    listTitle.categoryName)) {
                 if (listTitle.numOfAppWhitelisted != listTitle.numberOFApps) {
-                    showDialogForSystemAppBlock(APP_CAT_SYSTEM_APPS)
+                    showDialogForSystemAppBlock(listTitle.categoryName)
                 } else {
                     false
                 }
             } else {
                 true
             }
-            if (listTitle.categoryName == APP_CAT_SYSTEM_COMPONENTS && isInternetAllowed) {
-                if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                                 "Category block - System components, count: ${listTitle.numOfAppWhitelisted}, ${listTitle.numberOFApps}")
-                proceedBlock = if (listTitle.numOfAppWhitelisted != listTitle.numberOFApps) {
-                    showDialogForSystemAppBlock(APP_CAT_SYSTEM_COMPONENTS)
-                } else {
-                    false
-                }
-            }
-            if (listTitle.categoryName == APP_NON_APP && isInternetAllowed) {
-                proceedBlock = if (listTitle.numOfAppWhitelisted != listTitle.numberOFApps) {
-                    showDialogForSystemAppBlock(APP_NON_APP)
-                } else {
-                    false
-                }
-            }
-            if (proceedBlock) {
-                Log.i(LOG_TAG_FIREWALL, "Blocking proceeded - ")
+            if (!shouldBlock) {
+                internetChk.isChecked = false
+                internetChk.setCompoundDrawablesWithIntrinsicBounds(
+                    ContextCompat.getDrawable(context, R.drawable.allowed), null, null, null)
+            } else {
                 internetChk.visibility = View.GONE
                 progressBar.visibility = View.VISIBLE
                 object : CountDownTimer(500, 500) {
@@ -385,15 +345,45 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
                               e)
                     }
                 }
-            } else {
-                if (DEBUG) Log.d(LOG_TAG_FIREWALL, "else - proceedBlock: $proceedBlock")
-                internetChk.isChecked = proceedBlock
-                internetChk.setCompoundDrawablesWithIntrinsicBounds(
-                    ContextCompat.getDrawable(context, R.drawable.allowed), null, null, null)
             }
         }
+
         internetChk.setOnCheckedChangeListener(null)
         return convertView
+    }
+
+    private fun isAnySystemCategory(categoryName: String): Boolean {
+        return APP_CAT_SYSTEM_COMPONENTS == categoryName || APP_NON_APP == categoryName || APP_CAT_SYSTEM_APPS == categoryName
+    }
+
+    private fun show(view: View) {
+        view.visibility = View.VISIBLE
+    }
+
+    private fun hide(view: View) {
+        view.visibility = View.INVISIBLE
+    }
+
+    private fun loadIcon(packageInfo: String, imageView: AppCompatImageView) {
+        return loadImage(appIcon(packageInfo), defaultIcon(), imageView)
+    }
+
+    private fun loadImage(drawable: Drawable?, defaultDrawable: Drawable?,
+                          imageView: AppCompatImageView) {
+        GlideApp.with(context).load(drawable).error(defaultDrawable).into(imageView)
+    }
+
+    private fun appIcon(packageInfo: String): Drawable? {
+        try {
+            return context.packageManager.getApplicationIcon(packageInfo)
+        } catch (e: PackageManager.NameNotFoundException) {
+            Log.w(LOG_TAG_FIREWALL, "failure loading app icon- ${e.message}", e)
+        }
+        return defaultIcon()
+    }
+
+    private fun defaultIcon(): Drawable? {
+        return AppCompatResources.getDrawable(context, R.drawable.default_app_icon)
     }
 
     override fun hasStableIds(): Boolean {
@@ -403,7 +393,6 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
     override fun isChildSelectable(listPosition: Int, expandedListPosition: Int): Boolean {
         return true
     }
-
 
     private fun showDialog(packageList: List<AppInfo>, appName: String,
                            isInternet: Boolean): Boolean {

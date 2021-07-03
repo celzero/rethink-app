@@ -274,7 +274,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             if (status) {
                 appStartTime = System.currentTimeMillis()
                 b.fhsDnsOnOffBtn.text = getString(R.string.hsf_start_btn_state)
-                shimmerForStop()
+                stopShimmer()
                 b.fhsCardDnsConfigure.alpha = 0.5F
                 b.fhsCardFirewallConfigure.alpha = 0.5F
                 b.fhsCardDnsConfigure.setTextColor(fetchTextColor(R.color.textColorMain))
@@ -409,9 +409,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         autoStartCheck()
         updateUptime()
         if (persistentState.vpnEnabled) {
-            shimmerForStart()
+            startShimmer()
         } else {
-            shimmerForStop()
+            stopShimmer()
         }
         braveModeToggler.postValue(braveMode)
         syncDnsStatus()
@@ -574,19 +574,19 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         if (prepareVpnService()) {
             b.fhsDnsOnOffBtn.text = getString(R.string.hsf_stop_btn_state)
             b.fhsDnsOnOffBtn.setBackgroundResource(R.drawable.rounded_corners_button_accent)
-            shimmerForStart()
+            startShimmer()
             startVpnService()
             braveModeToggler.postValue(braveMode)
             if (DEBUG) Log.d(LOG_TAG_VPN, "VPN service start initiated - startDnsVpnService()")
         }
     }
 
-    private fun shimmerForStart() {
+    private fun startShimmer() {
         if (DEBUG) Log.d(LOG_TAG_UI, "Shimmer stop executed")
         b.shimmerViewContainer1.stopShimmer()
     }
 
-    private fun shimmerForStop() {
+    private fun stopShimmer() {
         val builder = Shimmer.AlphaHighlightBuilder()
         builder.setDuration(2000)
         builder.setBaseAlpha(0.85f)
@@ -689,7 +689,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             updateConnDesc()
         } else {
             b.fhsDnsOnOffBtn.setBackgroundResource(R.drawable.rounded_corners_button_primary)
-            shimmerForStop()
+            stopShimmer()
             b.fhsDnsOnOffBtn.text = getString(R.string.hsf_start_btn_state)
             b.fhsAppConnectedDesc.text = getString(R.string.dns_explanation_disconnected)
         }
@@ -757,7 +757,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             statusId = R.string.status_protected
             colorId = fetchTextColor(R.color.positive)
         }
-        if (statusId == R.string.status_protected && persistentState.orbotMode != Constants.ORBOT_MODE_NONE) {
+        if (statusId == R.string.status_protected && persistentState.orbotRequestMode != Constants.ORBOT_MODE_NONE) {
             statusId = R.string.status_protected_with_tor
         }
 

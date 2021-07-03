@@ -36,24 +36,30 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
         filteredList.value = ""
     }
 
-    var connectionTrackerList = Transformations.switchMap(
-        filteredList, (Function<String, LiveData<PagedList<ConnectionTracker>>> { input ->
-            if (input.isBlank()) {
-                connectionTrackerDAO.getConnectionTrackerLiveData().toLiveData(pageSize = 30)
-            } else if (input.contains(FILTER_IS_FILTER)) {
-                val searchText = input.split(":")[0]
-                if (searchText.isEmpty()) {
-                    connectionTrackerDAO.getConnectionBlockedConnections().toLiveData(pageSize = 30)
-                } else {
-                    connectionTrackerDAO.getConnectionBlockedConnectionsByName(
-                        "%$searchText%").toLiveData(pageSize = 30)
-                }
-            } else {
-                connectionTrackerDAO.getConnectionTrackerByName("%$input%").toLiveData(30)
-            }
-        })
+    var connectionTrackerList = Transformations.switchMap(filteredList,
+                                                          (Function<String, LiveData<PagedList<ConnectionTracker>>> { input ->
+                                                              if (input.isBlank()) {
+                                                                  connectionTrackerDAO.getConnectionTrackerLiveData().toLiveData(
+                                                                      pageSize = 30)
+                                                              } else if (input.contains(
+                                                                      FILTER_IS_FILTER)) {
+                                                                  val searchText = input.split(
+                                                                      ":")[0]
+                                                                  if (searchText.isEmpty()) {
+                                                                      connectionTrackerDAO.getConnectionBlockedConnections().toLiveData(
+                                                                          pageSize = 30)
+                                                                  } else {
+                                                                      connectionTrackerDAO.getConnectionBlockedConnectionsByName(
+                                                                          "%$searchText%").toLiveData(
+                                                                          pageSize = 30)
+                                                                  }
+                                                              } else {
+                                                                  connectionTrackerDAO.getConnectionTrackerByName(
+                                                                      "%$input%").toLiveData(30)
+                                                              }
+                                                          })
 
-                                                                                               )
+                                                         )
 
     fun setFilter(searchString: String, filter: String?) {
         filteredList.value = "$searchString$filter"

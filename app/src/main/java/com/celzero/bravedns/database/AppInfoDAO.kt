@@ -68,8 +68,8 @@ interface AppInfoDAO {
         "select count(appCategory) from AppInfo where appCategory = :categoryName and isInternetAllowed = 0")
     fun getBlockedCountForCategory(categoryName: String): Int
 
-    @Query("select packageInfo from AppInfo where appName = :appName")
-    fun getPackageNameForAppName(appName: String): String
+    @Query("select packageInfo from AppInfo where uid = :uid")
+    fun getPackageNameForUid(uid: Int): String
 
     @Query(
         "select * from AppInfo where isExcluded = 0  order by whiteListUniv1 desc,lower(appName) ")

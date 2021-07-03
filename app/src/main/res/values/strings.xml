@@ -620,7 +620,7 @@
     <string name="settings_network_all_networks">Use all available networks (experimental)</string>
     <string name="settings_network_all_networks_desc">When enabled, RethinkDNS uses all available networks to connect to the Internet. If not, it uses the one network, whichever is deemed active by Android.</string>
 
-    <string name="settings_local_blockList_desc1">Choose from 170+ blocklists.</string>
+    <string name="settings_local_blocklist_desc1">Choose from 170+ blocklists.</string>
     <string name="settings_local_blocklist_desc2">Download in progress…</string>
     <string name="settings_local_blocklist_desc3">Download completed, Configure blocklist</string>
     <string name="settings_local_blocklist_desc4">Error downloading file. Try again.</string>
@@ -985,5 +985,7 @@
 
     <string name="network_log_app_name_unknown">Unknown</string>
     <string name="network_log_app_name_unnamed">Unnamed (%1$s)</string>
+
+    <string name="dns_crypt_connection_failure">Error connecting to DNSCrypt server.</string>
 
 </resources>

@@ -201,7 +201,7 @@ enum class AndroidUidConfig(val uid: Int) {
         }
 
         fun isValidUid(uid: Int): Boolean {
-            return (uid < 0 && uid > USER_OFFSET.uid)
+            return (uid > 0 && uid < USER_OFFSET.uid)
         }
     }
 

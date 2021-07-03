@@ -27,6 +27,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.connectedDNS
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.lifeTimeQueries
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.Constants.Companion.ORBOT_MODE_NONE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import hu.autsoft.krate.*
@@ -74,16 +75,16 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
     var udpBlockedSettings by booleanPref("block_udp_traffic_other_than_dns", false)
     var insertionCompleted by booleanPref("initial_insert_servers_complete", false)
     var remoteBraveDNSDownloaded by booleanPref("download_remote_block_list", false)
-    var localBlockListStamp by stringPref("local_block_list_stamp", "")
+    var localBlocklistStamp by stringPref("local_block_list_stamp", "")
     var blockUnknownConnections by booleanPref("block_unknown_connections", false)
-    var blockListFilesDownloaded by booleanPref("download_block_list_files", false)
+    var blocklistFilesDownloaded by booleanPref("download_block_list_files", false)
     var localBlocklistEnabled by booleanPref("enable_local_list", false)
-    var remoteBlockListDownloadTime by longPref("remote_block_list_downloaded_time", 0)
-    var tempRemoteBlockListDownloadTime by longPref("temp_remote_block_list_downloaded_time", 0)
+    var remoteBlocklistDownloadTime by longPref("remote_block_list_downloaded_time", 0)
+    var tempRemoteBlocklistDownloadTime by longPref("temp_remote_block_list_downloaded_time", 0)
     var workManagerStartTime by longPref("work_manager_start_time", 0)
-    var localBlockListDownloadTime by longPref("local_block_list_downloaded_time", 0)
+    var localBlocklistDownloadTime by longPref("local_block_list_downloaded_time", 0)
     var tempBlocklistDownloadTime by longPref("temp_time_during_download", 0)
-    var httpProxyPort by intPref("http_proxy_port", 0)
+    var httpProxyPort by intPref("http_proxy_port", INVALID_PORT)
     var httpProxyEnabled by booleanPref("http_proxy_enabled", false)
     var httpProxyHostAddress by stringPref("http_proxy_ipaddress", "")
     var excludedAppsFromVPN by stringSetPref("exclude_apps_vpn", emptySet())
@@ -109,12 +110,14 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
 
-    // OrbotMode - Once enabled from the app, it will be set to true and then the value
-    // OrbotEnabledMode - Enabled once there is a response from the Orbot intent.
-    // There are two values because in some cases, for e.g., when the vpn service is restarted,
-    // the response from the Orbot is not instant sometimes.
-    var orbotMode by intPref("orbot_mode", ORBOT_MODE_NONE)
-    var orbotEnabledMode by intPref("orbot_mode_enabled", ORBOT_MODE_NONE)
+    // When set, indicates user action to start Orbot and connect to it. The default value
+    // "1"(NONE) indicates no action / action to connect was reset.
+    var orbotRequestMode by intPref("orbot_mode", ORBOT_MODE_NONE)
+
+    // When set, indicates a successful response from Orbot to connect request.
+    // The default value is 1 (NONE). The value will be modified once the orbotMode variable
+    // is set and there is successful response from Orbot app.
+    var orbotResponseStatus by intPref("orbot_mode_enabled", ORBOT_MODE_NONE)
 
     var downloadIDs by stringSetPref("download_ids", emptySet())
 
@@ -183,7 +186,7 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
         blockedCount.postValue(numberOfBlockedRequests)
     }
 
-    //fixme replace the below logic once the DNS data is streamlined.
+    //FIXME replace the below logic once the DNS data is streamlined.
     fun getConnectedDNS(): String {
         if (!connectedDNS.value.isNullOrEmpty()) {
             return connectedDNS.value!!

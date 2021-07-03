@@ -26,8 +26,11 @@ import com.celzero.bravedns.net.dns.DnsPacket
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.LOOPBACK_IPV6
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DNSCRYPT
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DOH
+import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP
+import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IPV6
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
@@ -70,7 +73,7 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
             dnsLogs.time = transaction.responseCalendar.timeInMillis
             dnsLogs.typeName = Utilities.getTypeName(transaction.type.toInt())
             val serverAddress = try {
-                if (transaction.serverIp != null) {
+                if (!transaction.serverIp.isNullOrEmpty()) {
                     // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
                     forString(transaction.serverIp)
                 } else {
@@ -102,25 +105,18 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                     if (addresses.isNotEmpty()) {
                         val destination = addresses[0]
                         if (DEBUG) Log.d(LOG_TAG_DNS_LOG,
-                                         "transaction.response - ${destination.address}")
+                                         "Address - ${destination.address}, HostAddress - ${destination.hostAddress}")
                         val countryCode: String = getCountryCode(destination,
                                                                  context) //TODO : Check on the country code stuff
                         dnsLogs.response = makeAddressPair(countryCode, destination.hostAddress)
-                        if (destination.hostAddress.contains("0.0.0.0")) {
+                        if (destination.hostAddress.contains(UNSPECIFIED_IP)) {
                             dnsLogs.isBlocked = true
                         }
-
                         if (destination.isAnyLocalAddress) {
-                            if (DEBUG) Log.d(LOG_TAG_DNS_LOG,
-                                             "Local address: ${destination.hostAddress}")
                             dnsLogs.isBlocked = true
-                        } else if (destination.hostAddress == "::0" || destination.hostAddress == "::1") {
-                            if (DEBUG) Log.d(LOG_TAG_DNS_LOG,
-                                             "Local equals(::0): ${destination.hostAddress}")
+                        } else if (destination.hostAddress == UNSPECIFIED_IPV6 || destination.hostAddress == LOOPBACK_IPV6) {
                             dnsLogs.isBlocked = true
                         }
-                        if (DEBUG) Log.d(LOG_TAG_DNS_LOG,
-                                         "transaction.response - ${destination.hostAddress}")
                         dnsLogs.flag = getFlag(countryCode)
                     } else {
                         dnsLogs.response = "NXDOMAIN"

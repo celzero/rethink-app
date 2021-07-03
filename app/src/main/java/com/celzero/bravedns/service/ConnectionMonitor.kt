@@ -236,6 +236,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 if (it.networkHandle == activeNetwork?.networkHandle) {
                     return@forEach
                 }
+
                 if (hasInternet(it) == true && isVPN(it) == false) {
                     newNetworks.add(it)
                 }

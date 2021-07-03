@@ -19,6 +19,7 @@ import android.app.Activity
 import android.util.Log
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
 import okhttp3.*
 import org.json.JSONObject
@@ -50,13 +51,13 @@ class NonStoreAppUpdater(private val baseURL: String,
                     //creating json object
                     val jsonObject = JSONObject(stringResponse)
                     val responseVersion = jsonObject.getInt("version")
-                    val updateValue = jsonObject.getBoolean("update")
+                    val shouldUpdate = jsonObject.getBoolean("update")
                     val latestVersion = jsonObject.getInt("latest")
                     persistentState.lastAppUpdateCheck = System.currentTimeMillis() // FIXME move to NTP
                     Log.i(LOG_TAG_APP_UPDATE,
                           "Server response for the new version download is true, version number-  $latestVersion")
-                    if (responseVersion == 1) {
-                        if (updateValue) {
+                    if (responseVersion == Constants.RESPONSE_VERSION) {
+                        if (shouldUpdate) {
                             listener.onUpdateAvailable(AppUpdater.InstallSource.OTHER)
                         } else {
                             if (isUserInitiated) listener.onUpToDate(AppUpdater.InstallSource.OTHER)

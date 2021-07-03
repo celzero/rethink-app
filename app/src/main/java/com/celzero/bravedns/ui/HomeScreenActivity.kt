@@ -52,9 +52,6 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.lifeTimeQ
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
 import com.celzero.bravedns.util.Constants.Companion.RESPONSE_VERSION
-import com.celzero.bravedns.util.Constants.Companion.THEME_DARK
-import com.celzero.bravedns.util.Constants.Companion.THEME_LIGHT
-import com.celzero.bravedns.util.Constants.Companion.THEME_SYSTEM_DEFAULT
 import com.celzero.bravedns.util.HttpRequestHelper.Companion.checkStatus
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
@@ -81,7 +78,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private lateinit var context: Context
     private val refreshDatabase by inject<RefreshDatabase>()
     private lateinit var downloadManager: DownloadManager
-    private var timeStamp = 0L
+    private var timestamp = 0L
 
     private val doHEndpointRepository by inject<DoHEndpointRepository>()
     private val blockedConnectionsRepository by inject<BlockedConnectionsRepository>()
@@ -110,7 +107,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         var appStartTime: Long = System.currentTimeMillis()
         var firewallRules: HashMultimap<Int, String> = HashMultimap.create()
-        var DEBUG = false
+        var DEBUG = true
     }
 
     // TODO - #324 - Usage of isDarkTheme() in all activities.
@@ -126,7 +123,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     //TODO : Remove the unwanted data and the assignments happening
     //TODO : Create methods and segregate the data.
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Utilities.getCurrentTheme(this))
+        setTheme(Utilities.getCurrentTheme(isDarkThemeOn()))
         super.onCreate(savedInstanceState)
         context = this
 
@@ -174,8 +171,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun backgroundAccessibilityCheck() {
-        if (Utilities.isAccessibilityServiceEnabledEnhanced(this,
-                                                            BackgroundAccessibilityService::class.java)) {
+        if (Utilities.isAccessibilityServiceEnabledViaSettingsSecure(this,
+                                                                     BackgroundAccessibilityService::class.java)) {
             if (!Utilities.isAccessibilityServiceEnabled(this,
                                                          BackgroundAccessibilityService::class.java) && persistentState.isBackgroundEnabled) {
                 persistentState.isBackgroundEnabled = false
@@ -289,7 +286,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             }
         }
         if (persistentState.localBlocklistEnabled || isRethinkPlusConnected) {
-            val blockListTimeStamp = persistentState.localBlockListDownloadTime
+            val blockListTimeStamp = persistentState.localBlocklistDownloadTime
             val appVersionCode = persistentState.appVersion
             val url = "${Constants.REFRESH_BLOCKLIST_URL}$blockListTimeStamp&${Constants.APPEND_VCODE}$appVersionCode"
             serverCheckForBlocklistUpdate(url)
@@ -367,15 +364,16 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 try {
                     val jsonObject = JSONObject(stringResponse)
                     val responseVersion = jsonObject.getInt(Constants.JSON_VERSION)
-                    val updateValue = jsonObject.getBoolean(Constants.JSON_UPDATE)
-                    timeStamp = jsonObject.getLong(Constants.JSON_LATEST)
+                    val shouldUpdate = jsonObject.getBoolean(Constants.JSON_UPDATE)
+                    timestamp = jsonObject.getLong(Constants.JSON_LATEST)
                     persistentState.lastAppUpdateCheck = System.currentTimeMillis()
                     Log.i(LOG_TAG_DOWNLOAD,
-                          "Server response for the new version download is $updateValue, response version number- $responseVersion, timestamp- $timeStamp")
+                          "Server response for the new version download is $shouldUpdate, response version number- $responseVersion, timestamp- $timestamp")
                     response.body!!.close()
                     client.connectionPool.evictAll()
-                    if (responseVersion != RESPONSE_VERSION) return
-                    if (!updateValue) return
+
+                    if (responseVersion != RESPONSE_VERSION || !shouldUpdate) return
+
                     if (persistentState.downloadSource != DOWNLOAD_SOURCE_PLAY_STORE) {
                         popupSnackBarForBlocklistUpdate()
                     } else {
@@ -415,7 +413,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                             val to = File(context.filesDir.canonicalPath + Constants.FILE_TAG_NAME)
                             from.copyTo(to, true)
                             persistentState.remoteBraveDNSDownloaded = true
-                            persistentState.remoteBlockListDownloadTime = timeStamp
+                            persistentState.remoteBlocklistDownloadTime = timestamp
                         } else {
                             Log.e(LOG_TAG_DOWNLOAD, "Error downloading filetag.json file: $status")
                         }
@@ -432,9 +430,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun getExternalFilePath(context: Context, isAbsolutePathNeeded: Boolean): String {
         return if (isAbsolutePathNeeded) {
             context.getExternalFilesDir(
-                null).toString() + Constants.DOWNLOAD_PATH + persistentState.localBlockListDownloadTime
+                null).toString() + Constants.DOWNLOAD_PATH + persistentState.localBlocklistDownloadTime
         } else {
-            Constants.DOWNLOAD_PATH + persistentState.localBlockListDownloadTime
+            Constants.DOWNLOAD_PATH + persistentState.localBlocklistDownloadTime
         }
     }
 
@@ -517,10 +515,10 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun handleDownloadFiles() {
+        val timestamp = persistentState.localBlocklistDownloadTime
+        val url = Constants.JSON_DOWNLOAD_BLOCKLIST_LINK + File.separator + timestamp
         (context as HomeScreenActivity).runOnUiThread {
             downloadManager = this.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-            val timeStamp = persistentState.localBlockListDownloadTime
-            val url = Constants.JSON_DOWNLOAD_BLOCKLIST_LINK + File.separator + timeStamp
             downloadBlockListFiles(url, Constants.FILE_TAG_NAME, this)
         }
     }

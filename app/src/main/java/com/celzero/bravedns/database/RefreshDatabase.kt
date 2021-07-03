@@ -29,6 +29,7 @@ import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
 import com.celzero.bravedns.util.PlayStoreCategory
+import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -53,22 +54,12 @@ class RefreshDatabase internal constructor(private var context: Context,
         if (DEBUG) Log.d(LOG_TAG_APP_DB, "Refresh database is called")
         GlobalScope.launch(Dispatchers.IO) {
             val appListDB = appInfoRepository.getAppInfoAsync()
-            if (appListDB.isNotEmpty()) {
-                appListDB.forEach {
-                    if (!it.packageInfo.contains(Constants.NO_PACKAGE)) {
-                        try {
-                            val packageName = context.packageManager.getPackageInfo(it.packageInfo,
-                                                                                    PackageManager.GET_META_DATA)
-                            if (packageName.applicationInfo == null) {
-                                appInfoRepository.delete(it)
-                                updateCategoryInDB()
-                            }
-                        } catch (e: PackageManager.NameNotFoundException) {
-                            Log.w(LOG_TAG_APP_DB,
-                                  "Application not available ${it.appName}" + e.message, e)
-                            appInfoRepository.delete(it)
-                            updateCategoryInDB()
-                        }
+            appListDB.forEach {
+                if (!it.packageInfo.contains(Constants.NO_PACKAGE)) {
+                    val pkgMetadata = Utilities.getPackageMetadata(context.packageManager,
+                                                                   it.packageInfo)
+                    if (pkgMetadata?.applicationInfo == null) {
+                        appInfoRepository.delete(it)
                     }
                 }
             }
@@ -84,7 +75,6 @@ class RefreshDatabase internal constructor(private var context: Context,
                 PackageManager.GET_META_DATA)!!
             val appDetailsFromDB = appInfoRepository.getAppInfoAsync()
             val nonAppsCount = appInfoRepository.getNonAppCount()
-            //val isRootAvailable = insertRootAndroid(appInfoRepository)
             if (DEBUG) Log.d(LOG_TAG_APP_DB,
                              "getAppInfo - ${appDetailsFromDB.size}, $nonAppsCount, ${allPackages.size}")
             if (appDetailsFromDB.isEmpty() || ((appDetailsFromDB.size - nonAppsCount) != (allPackages.size - 1))) {
@@ -323,11 +313,13 @@ class RefreshDatabase internal constructor(private var context: Context,
             if (isAlreadyConnectionAvailable == null) {
                 insertDefaultDOHList()
             } else {
-                Log.i(LOG_TAG_APP_DB,
+                Log.w(LOG_TAG_APP_DB,
                       "Refresh Database, Already insertion done. Correct values for Cloudflare alone.")
-                val doHEndpoint = DoHEndpoint(3, urlName[2], urlValues[2],
+                val doHEndpoint = DoHEndpoint(id = 3, urlName[2], urlValues[2],
                                               context.getString(R.string.dns_mode_2_explanation),
-                                              false, false, System.currentTimeMillis(), 0)
+                                              isSelected = false, isCustom = false,
+                                              modifiedDataTime = System.currentTimeMillis(),
+                                              latency = 0)
                 doHEndpointRepository.insertWithReplaceAsync(doHEndpoint)
             }
         }
@@ -337,21 +329,31 @@ class RefreshDatabase internal constructor(private var context: Context,
         val urlName = context.resources.getStringArray(R.array.doh_endpoint_names)
         val urlValues = context.resources.getStringArray(R.array.doh_endpoint_urls)
         GlobalScope.launch(Dispatchers.IO) {
-            val doHEndpoint1 = DoHEndpoint(1, urlName[0], urlValues[0],
+            val doHEndpoint1 = DoHEndpoint(id = 1, urlName[0], urlValues[0],
                                            context.getString(R.string.dns_mode_0_explanation),
-                                           false, false, System.currentTimeMillis(), 0)
-            val doHEndpoint2 = DoHEndpoint(2, urlName[1], urlValues[1],
+                                           isSelected = false, isCustom = false,
+                                           modifiedDataTime = System.currentTimeMillis(),
+                                           latency = 0)
+            val doHEndpoint2 = DoHEndpoint(id = 2, urlName[1], urlValues[1],
                                            context.getString(R.string.dns_mode_1_explanation),
-                                           false, false, System.currentTimeMillis(), 0)
-            val doHEndpoint3 = DoHEndpoint(3, urlName[2], urlValues[2],
+                                           isSelected = false, isCustom = false,
+                                           modifiedDataTime = System.currentTimeMillis(),
+                                           latency = 0)
+            val doHEndpoint3 = DoHEndpoint(id = 3, urlName[2], urlValues[2],
                                            context.getString(R.string.dns_mode_2_explanation),
-                                           false, false, System.currentTimeMillis(), 0)
-            val doHEndpoint4 = DoHEndpoint(4, urlName[3], urlValues[3],
+                                           isSelected = false, isCustom = false,
+                                           modifiedDataTime = System.currentTimeMillis(),
+                                           latency = 0)
+            val doHEndpoint4 = DoHEndpoint(id = 4, urlName[3], urlValues[3],
                                            context.getString(R.string.dns_mode_3_explanation), true,
-                                           false, System.currentTimeMillis(), 0)
-            val doHEndpoint5 = DoHEndpoint(5, urlName[5], urlValues[5],
+                                           isCustom = false,
+                                           modifiedDataTime = System.currentTimeMillis(),
+                                           latency = 0)
+            val doHEndpoint5 = DoHEndpoint(id = 5, urlName[5], urlValues[5],
                                            context.getString(R.string.dns_mode_5_explanation),
-                                           false, false, System.currentTimeMillis(), 0)
+                                           isSelected = false, isCustom = false,
+                                           modifiedDataTime = System.currentTimeMillis(),
+                                           latency = 0)
 
             doHEndpointRepository.insertWithReplaceAsync(doHEndpoint1)
             doHEndpointRepository.insertWithReplaceAsync(doHEndpoint2)

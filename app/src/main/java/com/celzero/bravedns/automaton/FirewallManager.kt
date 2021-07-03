@@ -51,13 +51,8 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
 
     companion object {
 
-        fun checkInternetPermission(packageName: String): Boolean {
-            return !(GlobalVariable.appList[packageName]!!.isInternetAllowed)
-        }
-
         fun checkInternetPermission(uid: Int): Boolean {
-            if (GlobalVariable.blockedUID[uid] == null) return false
-            return true
+            return GlobalVariable.blockedUID[uid] != null
         }
 
 
@@ -76,19 +71,19 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
 
         fun updateInternetBackground(packageName: String, isAllowed: Boolean) {
             val appInfo = GlobalVariable.appList[packageName]
-            if (appInfo != null) {
-                if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                                 "AccessibilityEvent: Update Internet Permission from background: ${appInfo.appName}, ${appInfo.isInternetAllowed}")
-                if (isAllowed && AndroidUidConfig.isUIDAppRange(appInfo.uid)) {
-                    if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                                     "AccessibilityEvent: ${appInfo.appName},${appInfo.packageInfo} is in foreground")
-                    backgroundAllowedUID[appInfo.uid] = isAllowed
-                } else {
-                    backgroundAllowedUID.remove(appInfo.uid)
-                    if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                                     "AccessibilityEvent: ${appInfo.appName},${appInfo.packageInfo} removed from foreground")
-                }
+            if (appInfo == null) {
+                Log.i(LOG_TAG_FIREWALL,
+                      "updateInternetBackground- $packageName is not available in the list")
+                return
+            }
 
+            val isAppUid = AndroidUidConfig.isUIDAppRange(appInfo.uid)
+            if (DEBUG) Log.d(LOG_TAG_FIREWALL,
+                             "AccessibilityEvent: Update Internet Permission from background: ${appInfo.packageInfo}, isAllowed- $isAllowed, isAppUid - $isAppUid")
+            if (isAllowed && isAppUid) {
+                backgroundAllowedUID[appInfo.uid] = isAllowed
+            } else {
+                backgroundAllowedUID.remove(appInfo.uid)
             }
         }
 
@@ -144,6 +139,7 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
             }
         }
         val packageName = latestTrackedPackage ?: return
+
         if (hasContentDisappeared) {
             // https://stackoverflow.com/a/27642535
             // top window is launcher? try revoke queued up permissions
@@ -174,12 +170,12 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
     private fun getEventPackageName(event: AccessibilityEvent,
                                     rootInActiveWindow: AccessibilityNodeInfo?): String? {
         var packageName: String? = event.packageName?.toString()
+
         if (packageName.isNullOrEmpty() && rootInActiveWindow != null) {
             packageName = rootInActiveWindow.packageName?.toString()
-            if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                             "AccessibilityEvent: Value from rootInActiveWindow : $packageName")
         }
-        if (DEBUG) Log.d(LOG_TAG_FIREWALL, "AccessibilityEvent: $packageName")
+        if (DEBUG) Log.d(LOG_TAG_FIREWALL,
+                         "event.packageName: $packageName, rootWindow.packageName: ${rootInActiveWindow?.packageName}")
         return packageName
     }
 
@@ -193,6 +189,7 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
 
     private fun isPackageLauncher(packageName: String?): Boolean {
         if (TextUtils.isEmpty(packageName)) return false
+
         val intent = Intent("android.intent.action.MAIN")
         intent.addCategory("android.intent.category.HOME")
         val thisPackage = packageManager.resolveActivity(intent,
@@ -203,15 +200,11 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
 
     private fun addOrRemovePackageForBackground(isAllowed: Boolean) {
         if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                         "isBackgroundEnabled: ${persistentState.isBackgroundEnabled}")
-        if (!persistentState.isBackgroundEnabled) return
-        if (latestTrackedPackage.isNullOrEmpty()) {
-            return
-        } else {
-            val currentPackage = latestTrackedPackage
-            if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Package: $currentPackage, $isAllowed")
-            packageElect = currentPackage
-            updateInternetBackground(currentPackage!!, isAllowed)
-        }
+                         "isBackgroundEnabled: ${persistentState.isBackgroundEnabled}, Package: $latestTrackedPackage, isAllowed: $isAllowed")
+        if (!persistentState.isBackgroundEnabled || latestTrackedPackage.isNullOrEmpty()) return
+
+        val currentPackage = latestTrackedPackage
+        packageElect = currentPackage
+        updateInternetBackground(currentPackage!!, isAllowed)
     }
 }

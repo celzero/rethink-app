@@ -420,8 +420,9 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
                 appName
             } else ip
         }
-        val dnsProxyEndpoint = DNSProxyEndpoint(-1, proxyName, mode, appName, ip, port, false, true,
-                                                0L, 0)
+        val dnsProxyEndpoint = DNSProxyEndpoint(id = -1, proxyName, mode, appName, ip, port,
+                                                isSelected = false, isCustom = true,
+                                                modifiedDataTime = 0L, latency = 0)
         dnsProxyEndpointRepository.insertAsync(dnsProxyEndpoint)
         if (DEBUG) Log.d(LOG_TAG_UI, "Insert into DNSProxy database- $appName, $port")
         object : CountDownTimer(500, 500) {
@@ -519,8 +520,9 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
         if (serverName.isEmpty() || serverName.isBlank()) {
             serverName = urlStamp
         }
-        val dnsCryptRelayEndpoint = DNSCryptRelayEndpoint(-1, serverName, urlStamp, desc, false,
-                                                          true, 0L, 0)
+        val dnsCryptRelayEndpoint = DNSCryptRelayEndpoint(id = -1, serverName, urlStamp, desc,
+                                                          isSelected = false, isCustom = true,
+                                                          modifiedDataTime = 0L, latency = 0)
         dnsCryptRelayEndpointRepository.insertAsync(dnsCryptRelayEndpoint)
         object : CountDownTimer(500, 500) {
             override fun onTick(millisUntilFinished: Long) {
@@ -538,7 +540,9 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
             serverName = urlStamp
         }
 
-        val dnsCryptEndpoint = DNSCryptEndpoint(-1, serverName, urlStamp, desc, false, true, 0L, 0)
+        val dnsCryptEndpoint = DNSCryptEndpoint(id = -1, serverName, urlStamp, desc,
+                                                isSelected = false, isCustom = true,
+                                                modifiedDataTime = 0L, latency = 0)
         dnsCryptEndpointRepository.insertAsync(dnsCryptEndpoint)
         object : CountDownTimer(500, 500) {
             override fun onTick(millisUntilFinished: Long) {
@@ -555,7 +559,9 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns), UIUpdate
         if (name.isEmpty() || name.isBlank()) {
             dohName = url
         }
-        val doHEndpoint = DoHEndpoint(-1, dohName, url, "", false, true, 0, 0)
+        val doHEndpoint = DoHEndpoint(id = -1, dohName, url, dohExplanation = "",
+                                      isSelected = false, isCustom = true, modifiedDataTime = 0,
+                                      latency = 0)
         doHEndpointRepository.insertAsync(doHEndpoint)
         object : CountDownTimer(500, 500) {
             override fun onTick(millisUntilFinished: Long) {

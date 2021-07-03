@@ -99,8 +99,8 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.getBlockedCountForCategory(categoryName)
     }
 
-    fun getPackageNameForAppName(appName: String): String {
-        return appInfoDAO.getPackageNameForAppName(appName)
+    fun getPackageNameForUid(uid: Int): String {
+        return appInfoDAO.getPackageNameForUid(uid)
     }
 
     fun updateWhiteList(uid: Int, isEnabled: Boolean) {

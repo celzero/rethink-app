@@ -16,7 +16,7 @@ limitations under the License.
 package com.celzero.bravedns.util
 
 interface UIUpdateInterface {
-    fun updateUIFromAdapter(dnsType : Int)
+    fun updateUIFromAdapter(dnsType: Int)
 
     /*fun notifyInitialLoadToActivity()*/
 }

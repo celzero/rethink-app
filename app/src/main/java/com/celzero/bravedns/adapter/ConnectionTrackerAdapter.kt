@@ -19,11 +19,13 @@ package com.celzero.bravedns.adapter
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.TypedArray
+import android.graphics.drawable.Drawable
 import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
@@ -70,6 +72,7 @@ class ConnectionTrackerAdapter(val context: Context) :
 
     override fun onBindViewHolder(holder: ConnectionTrackerViewHolder, position: Int) {
         val connTracker: ConnectionTracker = getItem(position) ?: return
+
         holder.update(connTracker)
     }
 
@@ -108,10 +111,17 @@ class ConnectionTrackerAdapter(val context: Context) :
                 }
             }
             if (connTracker.appName != UNKNOWN_APP) {
+                val defaultDrawable = AppCompatResources.getDrawable(context,
+                                                                     R.drawable.default_app_icon)
                 try {
                     val appArray = context.packageManager.getPackagesForUid(connTracker.uid)
-                    val appCount = (appArray?.size)?.minus(1)
-                    if (appArray?.size!! > 2) {
+                    if (appArray == null) {
+                        loadAppIcon(defaultDrawable, defaultDrawable, b.connectionAppIcon)
+                        return
+                    }
+
+                    val appCount = (appArray.size).minus(1)
+                    if (appArray.size > 2) {
                         b.connectionAppName.text = context.getString(R.string.ctbs_app_other_apps,
                                                                      connTracker.appName,
                                                                      appCount.toString())
@@ -120,22 +130,16 @@ class ConnectionTrackerAdapter(val context: Context) :
                                                                      connTracker.appName,
                                                                      appCount.toString())
                     }
-                    GlideApp.with(context).load(
-                        context.packageManager.getApplicationIcon(appArray[0]!!)).error(
-                        AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(
-                        b.connectionAppIcon)
+                    loadAppIcon(context.packageManager.getApplicationIcon(appArray[0]!!),
+                                defaultDrawable, b.connectionAppIcon)
                 } catch (e: PackageManager.NameNotFoundException) {
-                    GlideApp.with(context).load(
-                        AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).error(
-                        AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(
-                        b.connectionAppIcon)
+                    loadAppIcon(defaultDrawable, defaultDrawable, b.connectionAppIcon)
                     Log.w(LOG_TAG_FIREWALL_LOG, "Package Not Found - " + e.message)
                 }
             } else {
-                GlideApp.with(context).load(
-                    AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).error(
-                    AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(
-                    b.connectionAppIcon)
+                val defaultDrawable = AppCompatResources.getDrawable(context,
+                                                                     R.drawable.default_app_icon)
+                loadAppIcon(defaultDrawable, defaultDrawable, b.connectionAppIcon)
             }
 
             b.connectionParentLayout.setOnClickListener {
@@ -146,6 +150,11 @@ class ConnectionTrackerAdapter(val context: Context) :
                 b.connectionParentLayout.isEnabled = true
             }
 
+        }
+
+        private fun loadAppIcon(drawable: Drawable?, errorDrawable: Drawable?,
+                                imageView: ImageView) {
+            GlideApp.with(context).load(drawable).error(errorDrawable).into(imageView)
         }
 
         private fun fetchTextColor(attr: Int): Int {

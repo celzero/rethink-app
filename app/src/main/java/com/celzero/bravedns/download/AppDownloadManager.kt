@@ -62,11 +62,11 @@ class AppDownloadManager(private val persistentState: PersistentState,
             }
             initiateDownloadStatusCheck()
         } else {
-            Log.i(LOG_TAG_DOWNLOAD, "Context for download is null")
+            Log.i(LOG_TAG_DOWNLOAD, "Context is null")
             persistentState.localBlocklistEnabled = false
             persistentState.tempBlocklistDownloadTime = 0
             persistentState.workManagerStartTime = 0
-            persistentState.blockListFilesDownloaded = false
+            persistentState.blocklistFilesDownloaded = false
         }
     }
 
@@ -79,7 +79,7 @@ class AppDownloadManager(private val persistentState: PersistentState,
                                                                         TimeUnit.SECONDS).build()
 
         val timestampLong = persistentState.tempBlocklistDownloadTime
-        val timestamp = workDataOf("timeStamp" to timestampLong)
+        val timestamp = workDataOf("timestamp" to timestampLong)
 
         val fileHandler = OneTimeWorkRequestBuilder<FileHandleWorker>().setInputData(
             timestamp).setBackoffCriteria(BackoffPolicy.LINEAR,

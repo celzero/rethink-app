@@ -45,13 +45,14 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import com.celzero.bravedns.R
 import com.celzero.bravedns.net.doh.CountryMap
-import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.VpnControllerHelper.persistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.google.android.material.snackbar.Snackbar
@@ -137,7 +138,7 @@ class Utilities {
                 AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
             for (enabledService in enabledServices) {
                 val enabledServiceInfo: ServiceInfo = enabledService.resolveInfo.serviceInfo
-                if (DEBUG) Log.e(LOG_TAG_VPN,
+                if (DEBUG) Log.i(LOG_TAG_VPN,
                                  "isAccessibilityServiceEnabled checking for: ${enabledServiceInfo.packageName}")
                 if (enabledServiceInfo.packageName == context.packageName && enabledServiceInfo.name == service.name) {
                     return true
@@ -148,8 +149,8 @@ class Utilities {
             return false
         }
 
-        fun isAccessibilityServiceEnabledEnhanced(context: Context,
-                                                  accessibilityService: Class<out AccessibilityService?>): Boolean {
+        fun isAccessibilityServiceEnabledViaSettingsSecure(context: Context,
+                                                           accessibilityService: Class<out AccessibilityService?>): Boolean {
             try {
                 val expectedComponentName = ComponentName(context, accessibilityService)
                 val enabledServicesSetting: String = Settings.Secure.getString(
@@ -161,18 +162,18 @@ class Utilities {
                     val componentNameString = colonSplitter.next()
                     val enabledService = ComponentName.unflattenFromString(componentNameString)
                     if (enabledService != null && enabledService == expectedComponentName) {
-                        if (DEBUG) Log.e(LOG_TAG_VPN,
-                                         "isAccessibilityServiceEnabled Enhanced: ${expectedComponentName.packageName}")
+                        if (DEBUG) Log.i(LOG_TAG_VPN,
+                                         "isAccessibilityServiceEnabled SettingsSecure: ${expectedComponentName.packageName}")
                         return true
                     }
                 }
-                if (DEBUG) Log.e(LOG_TAG_VPN,
-                                 "isAccessibilityServiceEnabled Enhanced: Failed to fetch enabledService so invoke isAccessibilityServiceEnabled()")
             } catch (e: Settings.SettingNotFoundException) {
                 Log.e(LOG_TAG_VPN,
-                      "isAccessibilityServiceEnabled Exception on isAccessibilityServiceEnabledEnhanced() ${e.message}",
+                      "isAccessibilityServiceEnabled Exception on isAccessibilityServiceEnabledViaSettingsSecure() ${e.message}",
                       e)
             }
+            if (DEBUG) Log.w(LOG_TAG_VPN,
+                             "isAccessibilityServiceEnabled SettingsSecure: Failed to fetch enabledService so invoke isAccessibilityServiceEnabled()")
             return isAccessibilityServiceEnabled(context, accessibilityService)
         }
 
@@ -237,14 +238,13 @@ class Utilities {
         fun prepareServersToRemove(servers: String, liveServers: String): String {
             val serverList = servers.split(",")
             val liveServerList = liveServers.split(",")
-            if (DEBUG) Log.d(LOG_TAG_VPN, "Servers to remove - $serverList -- $liveServerList")
-            var serversToSend: String = ""
+            var serversToSend = ""
             serverList.forEach {
                 if (!liveServerList.contains(it)) {
                     serversToSend += "$it,"
                 }
             }
-            if (DEBUG) Log.d(LOG_TAG_VPN, "Servers to remove - $serversToSend")
+            if (DEBUG) Log.d(LOG_TAG_VPN, "In: $serverList / Out: $serversToSend")
             serversToSend = serversToSend.dropLast(1)
             return serversToSend
         }
@@ -254,7 +254,7 @@ class Utilities {
                 val toast = Toast.makeText(context, message, toastLength)
                 toast.setGravity(Gravity.CENTER, 0, 0)
                 toast.show()
-            } catch (e: java.lang.IllegalStateException) {
+            } catch (e: IllegalStateException) {
                 Log.w(LOG_TAG_VPN, "Show Toast issue : ${e.message}", e)
             }
         }
@@ -263,16 +263,20 @@ class Utilities {
             try {
                 // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
                 val ip = InetAddresses.forString(ipAddress)
-                return ip.isLoopbackAddress || ip.isSiteLocalAddress || ip.equals(UNSPECIFIED_IP)
+                return ip.isLoopbackAddress || ip.isSiteLocalAddress || ip.isAnyLocalAddress || UNSPECIFIED_IP.equals(
+                    ip)
             } catch (e: IllegalArgumentException) {
-                Log.w(LOG_TAG_VPN,
-                      "Exception while converting string to InetAddresses, ${e.message}", e)
+                Log.w(LOG_TAG_VPN, "Failed parsing IP from $ipAddress with ${e.message}", e)
             }
             return false
         }
 
         fun isValidLocalPort(port: Int): Boolean {
             return port in 65535 downTo 1024
+        }
+
+        fun isValidPort(port: Int): Boolean {
+            return port in 65535 downTo 0
         }
 
 
@@ -330,26 +334,26 @@ class Utilities {
             }
         }
 
-        fun isVpnLockdownEnabled(): Boolean? {
+        fun isVpnLockdownEnabled(vpnService: BraveVPNService?): Boolean? {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                 return false
             }
-            return VpnController.getInstance().getBraveVpnService()?.isLockdownEnabled
+            return vpnService?.isLockdownEnabled
         }
 
-        fun killBg(context: Context, packageInfo: String) {
+        fun killBg(context: Context, packageName: String) {
             val activityManager: ActivityManager = context.getSystemService(
                 Activity.ACTIVITY_SERVICE) as ActivityManager
             try {
-                activityManager.killBackgroundProcesses(packageInfo)
+                activityManager.killBackgroundProcesses(packageName)
             } catch (e: Exception) {
                 Log.w(LOG_TAG_FIREWALL, "firewall - kill app - exception" + e.message, e)
             }
         }
 
-        fun getCurrentTheme(context: Context): Int {
+        fun getCurrentTheme(isDarkThemeOn: Boolean): Int {
             return if (persistentState.theme == Constants.THEME_SYSTEM_DEFAULT) {
-                if (isDarkSystemTheme(context)) {
+                if (isDarkThemeOn) {
                     R.style.AppThemeTrueBlack
                 } else {
                     R.style.AppThemeWhite
@@ -361,6 +365,32 @@ class Utilities {
             } else {
                 R.style.AppThemeTrueBlack
             }
+        }
+
+        fun getBottomsheetCurrentTheme(isDarkThemeOn: Boolean): Int {
+            return if (persistentState.theme == Constants.THEME_SYSTEM_DEFAULT) {
+                if (isDarkThemeOn) {
+                    R.style.BottomSheetDialogThemeTrueBlack
+                } else {
+                    R.style.BottomSheetDialogThemeWhite
+                }
+            } else if (persistentState.theme == Constants.THEME_LIGHT) {
+                R.style.BottomSheetDialogThemeWhite
+            } else if (persistentState.theme == Constants.THEME_DARK) {
+                R.style.BottomSheetDialogTheme
+            } else {
+                R.style.BottomSheetDialogThemeTrueBlack
+            }
+        }
+
+        fun getPackageMetadata(pm: PackageManager, pi: String): PackageInfo? {
+            var metadata: PackageInfo? = null
+            try {
+                metadata = pm.getPackageInfo(pi, PackageManager.GET_META_DATA)
+            } catch (e: PackageManager.NameNotFoundException) {
+                Log.w(LOG_TAG_APP_DB, "Application not available $pi" + e.message, e)
+            }
+            return metadata;
         }
     }
 }

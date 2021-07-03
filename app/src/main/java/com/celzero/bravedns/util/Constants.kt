@@ -31,7 +31,7 @@ class Constants {
 
         const val LOCAL_BLOCKLIST_FILE_COUNT = 4
 
-        //Download URL's
+        //Download URLs
         const val JSON_DOWNLOAD_BLOCKLIST_LINK = "https://download.bravedns.com/blocklists"
 
         const val REFRESH_BLOCKLIST_URL = "https://download.bravedns.com/update/blocklists?tstamp="
@@ -162,12 +162,13 @@ class Constants {
         const val PREF_DNS_MODE_DOH = 1
         const val PREF_DNS_INVALID = -1L
 
-        // For Universal firewall setting - "Block apps not in use". Threshold minutes to check if the
-        // accessibility value is enabled in android settings. Threshold is for 5 minute.
+        // The minimum interval before checking if the internal accessibility service
+        // (used to block apps-not-in-use) is indeed running.
+        // Ref: {@link com.celzero.bravedns.util.Utilities.Companion#isAccessibilityServiceEnabled} and
+        // {@link com.celzero.bravedns.util.Utilities.Companion#isAccessibilityServiceEnabledViaSettingsSecure}
         val ACCESSIBILITY_SERVICE_HEARTBEAT_THRESHOLD_MS = TimeUnit.MINUTES.toMillis(5)
 
-        // Threshold minutes to save the count of dns queries in shared preference instead of
-        // storing it for every request. The value is set as 1 minute.
+        // Interval before in-memory (total) dns-query counter is flushed to a shared-preference.
         val DNS_REQUEST_WRITE_THRESHOLD_MS = TimeUnit.MINUTES.toMillis(1)
 
         // View model - filter string
@@ -177,6 +178,12 @@ class Constants {
 
         const val UNSPECIFIED_IP = "0.0.0.0"
         const val UNSPECIFIED_PORT = 0
+
+        const val UNSPECIFIED_IPV6 = "::0"
+        const val LOOPBACK_IPV6 = "::1"
+
+        // Invalid port number
+        const val INVALID_PORT = -1
 
         const val ACTION_VPN_SETTINGS_INTENT = "android.net.vpn.SETTINGS"
 
@@ -197,6 +204,7 @@ class Constants {
         const val DOWNLOAD_SUCCESS = 1
         const val DOWNLOAD_RETRY = 0
 
+        // Value to initiate timestamp milliseconds.
         const val INIT_TIME_MS = 0L
     }
 }

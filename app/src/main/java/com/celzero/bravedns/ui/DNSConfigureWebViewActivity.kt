@@ -73,7 +73,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     private var blockListsCount: MutableLiveData<Int> = MutableLiveData()
     private lateinit var context: Context
     private lateinit var downloadManager: DownloadManager
-    private var timeStamp: Long = 0L
+    private var timestamp: Long = 0L
     private var receivedIntentFrom: Int = 0
     private val doHEndpointRepository by inject<DoHEndpointRepository>()
     private val persistentState by inject<PersistentState>()
@@ -87,7 +87,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(getCurrentTheme(this))
+        setTheme(getCurrentTheme(isDarkThemeOn()))
         super.onCreate(savedInstanceState)
         context = this
         downloadManager = context.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
@@ -101,7 +101,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
             }
             if (stamp != null && stamp!!.isNotEmpty()) {
                 if (receivedIntentFrom == LOCAL) {
-                    url = Constants.CONFIGURE_BLOCKLIST_URL_LOCAL + persistentState.localBlockListDownloadTime + "#" + stamp
+                    url = Constants.CONFIGURE_BLOCKLIST_URL_LOCAL + persistentState.localBlocklistDownloadTime + "#" + stamp
                 } else {
                     url = Constants.CONFIGURE_BLOCKLIST_URL_REMOTE + "#" + stamp
                 }
@@ -211,9 +211,9 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
             return
         }
         val stamp = Xdns.getBlocklistStampFromURL(receivedStamp)
-        val path: String = this.filesDir.canonicalPath + File.separator + persistentState.localBlockListDownloadTime
+        val path: String = this.filesDir.canonicalPath + File.separator + persistentState.localBlocklistDownloadTime
         if (DEBUG) Log.d(LOG_TAG_DNS, "Split stamp - $stamp, path - $path")
-        persistentState.localBlockListStamp = stamp
+        persistentState.localBlocklistStamp = stamp
         if (HomeScreenActivity.GlobalVariable.appMode?.getBraveDNS() == null) {
             GlobalScope.launch(Dispatchers.IO) {
                 try {
@@ -239,9 +239,9 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     private fun getExternalFilePath(context: Context, isAbsolutePathNeeded: Boolean): String {
         return if (isAbsolutePathNeeded) {
             context.getExternalFilesDir(
-                null).toString() + Constants.DOWNLOAD_PATH + persistentState.tempRemoteBlockListDownloadTime
+                null).toString() + Constants.DOWNLOAD_PATH + persistentState.tempRemoteBlocklistDownloadTime
         } else {
-            Constants.DOWNLOAD_PATH + persistentState.tempRemoteBlockListDownloadTime
+            Constants.DOWNLOAD_PATH + persistentState.tempRemoteBlocklistDownloadTime
         }
     }
 
@@ -377,7 +377,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                 }
             }
         } catch (e: Exception) {
-            Log.w(LOG_TAG_DNS, "Web view: Issue while loading url: ${e.message}", e)
+            Log.w(LOG_TAG_DNS, "Issue while loading url: ${e.message}", e)
             showDialogOnError(null)
         }
     }
@@ -445,25 +445,36 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                 val query = DownloadManager.Query()
                 query.setFilterById(enqueue)
                 val c: Cursor = downloadManager.query(query)!!
-                Log.w(LOG_TAG_DNS,
+                Log.i(LOG_TAG_DNS,
                       "Download status: downloading filetag.json file count: ${c.count}")
                 if (c.moveToFirst()) {
                     val status = HttpRequestHelper.checkStatus(c)
                     if (Constants.DOWNLOAD_STATUS_SUCCESSFUL != status) return
-                    val from = File(getExternalFilePath(ctxt, true) + Constants.FILE_TAG_NAME)
-                    val to = File(
-                        ctxt.filesDir.canonicalPath + File.separator + persistentState.tempRemoteBlockListDownloadTime + Constants.FILE_TAG_NAME)
-                    from.copyTo(to, true)
-                    persistentState.remoteBraveDNSDownloaded = true
-                    persistentState.remoteBlockListDownloadTime = persistentState.tempRemoteBlockListDownloadTime
+                    val from = getExternalFilePath(ctxt, true) + Constants.FILE_TAG_NAME
+                    val to = ctxt.filesDir.canonicalPath + File.separator + persistentState.tempRemoteBlocklistDownloadTime + Constants.FILE_TAG_NAME
+                    val result = copy(from, to)
+                    if (result) {
+                        persistentState.remoteBraveDNSDownloaded = true
+                        persistentState.remoteBlocklistDownloadTime = persistentState.tempRemoteBlocklistDownloadTime
+                    }
                 }
                 c.close()
             } catch (e: Exception) {
                 Log.w(LOG_TAG_DNS, "Error downloading filetag.json file: ${e.message}", e)
-                persistentState.remoteBlockListDownloadTime = 0L
+                persistentState.remoteBlocklistDownloadTime = 0L
                 persistentState.remoteBraveDNSDownloaded = false
             }
         }
+    }
+
+    private fun copy(from: String, to: String): Boolean {
+        val src = File(from)
+        val dest = File(to)
+
+        if (!src.isFile || !dest.isFile) return false
+
+        val res = src.copyTo(dest, true)
+        return res.exists()
     }
 
     override fun onStop() {
@@ -477,8 +488,8 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
 
     private fun downloadBlockListFiles() {
         registerReceiverForDownloadManager()
-        if (timeStamp == 0L) timeStamp = persistentState.tempRemoteBlockListDownloadTime
-        val url = Constants.JSON_DOWNLOAD_BLOCKLIST_LINK + File.separator + timeStamp
+        if (timestamp == 0L) timestamp = persistentState.tempRemoteBlocklistDownloadTime
+        val url = Constants.JSON_DOWNLOAD_BLOCKLIST_LINK + File.separator + timestamp
         if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "download filetag file with url: $url")
         val uri: Uri = Uri.parse(url)
         val request = DownloadManager.Request(uri)
@@ -490,7 +501,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     }
 
     private fun checkForDownload() {
-        val blockListTimeStamp = persistentState.remoteBlockListDownloadTime
+        val blockListTimeStamp = persistentState.remoteBlocklistDownloadTime
         val appVersionCode = persistentState.appVersion
         val url = "${Constants.REFRESH_BLOCKLIST_URL}$blockListTimeStamp&${Constants.APPEND_VCODE}$appVersionCode"
         Log.i(LOG_TAG_DOWNLOAD, "Check for local download, url - $url")
@@ -512,19 +523,23 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                 val version = jsonObject.getInt(Constants.JSON_VERSION)
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
                                  "client onResponse for refresh blocklist files-  $version")
-                if (version == RESPONSE_VERSION) {
-                    val updateValue = jsonObject.getBoolean(Constants.JSON_UPDATE)
-                    timeStamp = jsonObject.getLong(Constants.JSON_LATEST)
-                    persistentState.tempRemoteBlockListDownloadTime = timeStamp
-                    if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "onResponse -  $updateValue, $timeStamp")
-                    if (updateValue) {
-                        (context as Activity).runOnUiThread {
-                            downloadBlockListFiles()
-                        }
-                    }
-                }
                 response.body!!.close()
                 client.connectionPool.evictAll()
+
+                if (version != RESPONSE_VERSION) {
+                    return
+                }
+
+                val shouldUpdate = jsonObject.getBoolean(Constants.JSON_UPDATE)
+                timestamp = jsonObject.getLong(Constants.JSON_LATEST)
+                persistentState.tempRemoteBlocklistDownloadTime = timestamp
+                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "onResponse -  $shouldUpdate, $timestamp")
+                if (shouldUpdate) {
+                    (context as Activity).runOnUiThread {
+                        downloadBlockListFiles()
+                    }
+                }
+
             }
         })
     }

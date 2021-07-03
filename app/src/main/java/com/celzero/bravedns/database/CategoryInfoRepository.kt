@@ -51,33 +51,25 @@ class CategoryInfoRepository(private val categoryInfoDAO: CategoryInfoDAO) {
     }
 
     fun updateNumberOfBlocked(categoryName: String, isAppBlocked: Boolean) {
-        if (isAppBlocked) {
-            val count = categoryInfoDAO.increaseNumberOfBlocked(categoryName)
-            val categoryDetail = categoryInfoDAO.getCategoryDetail(categoryName)
-            if (categoryDetail.numOfAppsBlocked == categoryDetail.numberOFApps) {
-                categoryInfoDAO.updateCategoryInternet(categoryName, true)
-            } else {
-                categoryInfoDAO.updateCategoryInternet(categoryName, false)
-            }
+        val count = if (isAppBlocked) {
+            categoryInfoDAO.increaseNumberOfBlocked(categoryName)
         } else {
-            val count = categoryInfoDAO.decreaseNumberOfBlocked(categoryName)
-            val categoryDetail = categoryInfoDAO.getCategoryDetail(categoryName)
-            if (categoryDetail.numOfAppsBlocked == categoryDetail.numberOFApps) {
-                categoryInfoDAO.updateCategoryInternet(categoryName, true)
-            } else {
-                categoryInfoDAO.updateCategoryInternet(categoryName, false)
-            }
+            categoryInfoDAO.decreaseNumberOfBlocked(categoryName)
         }
+        val categoryDetail = categoryInfoDAO.getCategoryDetail(categoryName)
+        val allBlocked = isAppCountEqual(categoryDetail)
+        categoryInfoDAO.updateCategoryInternet(categoryName, allBlocked)
     }
 
     fun updateBlockedCount(categoryName: String, blockedCount: Int) {
         categoryInfoDAO.updateBlockedCount(categoryName, blockedCount)
         val categoryDetail = categoryInfoDAO.getCategoryDetail(categoryName)
-        if (categoryDetail.numOfAppsBlocked == categoryDetail.numberOFApps) {
-            categoryInfoDAO.updateCategoryInternet(categoryName, true)
-        } else {
-            categoryInfoDAO.updateCategoryInternet(categoryName, false)
-        }
+        val allBlocked = isAppCountEqual(categoryDetail)
+        categoryInfoDAO.updateCategoryInternet(categoryName, allBlocked)
+    }
+
+    private fun isAppCountEqual(categoryInfo: CategoryInfo): Boolean {
+        return categoryInfo.numOfAppsBlocked == categoryInfo.numberOFApps
     }
 
     fun updateWhitelistCountForAll(checked: Boolean) {

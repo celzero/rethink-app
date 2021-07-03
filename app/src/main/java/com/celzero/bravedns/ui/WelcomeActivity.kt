@@ -32,10 +32,6 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityWelcomeBinding
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.THEME_DARK
-import com.celzero.bravedns.util.Constants.Companion.THEME_LIGHT
-import com.celzero.bravedns.util.Constants.Companion.THEME_SYSTEM_DEFAULT
 import com.celzero.bravedns.util.Utilities
 import org.koin.android.ext.android.inject
 
@@ -48,7 +44,7 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
     private val persistentState by inject<PersistentState>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Utilities.getCurrentTheme(this))
+        setTheme(Utilities.getCurrentTheme(isDarkThemeOn()))
         super.onCreate(savedInstanceState)
 
         if (!persistentState.firstTimeLaunch) {

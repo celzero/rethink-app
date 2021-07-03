@@ -85,29 +85,20 @@ class DoHEndpointAdapter(private val context: Context,
         fun update(doHEndpoint: DoHEndpoint) {
             b.dohEndpointListUrlName.text = doHEndpoint.dohName
             if (doHEndpoint.isSelected) {
-                b.dohEndpointListUrlExplanation.text = context.getString(R.string.dns_connected)
-                Log.i(LOG_TAG_DNS, "DOH Endpoint connected - ${doHEndpoint.dohName}")
-                if (doHEndpoint.dohName == RETHINK_DNS_PLUS) {
-                    val count = persistentState.numberOfRemoteBlocklists
-                    if (count != 0) {
-                        b.dohEndpointListUrlExplanation.text = context.getString(
-                            R.string.dns_connected_rethink_plus, count.toString())
-                    }
+                val count = persistentState.numberOfRemoteBlocklists
+                b.dohEndpointListUrlExplanation.text = if (doHEndpoint.dohName == RETHINK_DNS_PLUS && count > 0) {
+                    context.getString(R.string.dns_connected_rethink_plus, count.toString())
+                } else {
+                    context.getString(R.string.dns_connected)
                 }
+                Log.i(LOG_TAG_DNS, "connected to doh - ${doHEndpoint.dohName}")
             } else {
                 b.dohEndpointListUrlExplanation.text = ""
             }
-            b.dohEndpointListCheckImage.isChecked = doHEndpoint.isSelected
-            if (doHEndpoint.isCustom && !doHEndpoint.isSelected) {
-                b.dohEndpointListActionImage.setImageDrawable(
-                    ContextCompat.getDrawable(context, R.drawable.ic_fab_uninstall))
-            } else {
-                b.dohEndpointListActionImage.setImageDrawable(
-                    ContextCompat.getDrawable(context, R.drawable.ic_fab_appinfo))
-            }
-            if (doHEndpoint.dohName == RETHINK_DNS_PLUS) {
 
-
+            // Shows either the info/delete icon for the DoH entries.
+            showIcon(doHEndpoint)
+            if (isRethinkDns(doHEndpoint)) {
                 b.dohEndpointListConfigure.visibility = View.VISIBLE
             } else {
                 b.dohEndpointListConfigure.visibility = View.GONE
@@ -124,28 +115,41 @@ class DoHEndpointAdapter(private val context: Context,
                 updateConnection(doHEndpoint)
             }
             b.dohEndpointListConfigure.setOnClickListener {
-                var stamp = ""
-                try {
-                    stamp = getBlocklistStampFromURL(doHEndpoint.dohURL)
-                    if (DEBUG) Log.d(LOG_TAG_DNS,
-                                     "Configure btn click: ${doHEndpoint.dohURL}, $stamp")
-                } catch (e: Exception) {
-                    Log.w(LOG_TAG_DNS, "Exception while fetching stamp from Go ${e.message}", e)
-                }
-                if (DEBUG) Log.d(LOG_TAG_DNS, "startActivityForResult - DohEndpointadapter")
-                val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
-                intent.putExtra("location", DNSConfigureWebViewActivity.REMOTE)
-                intent.putExtra("stamp", stamp)
-                (context as Activity).startActivityForResult(intent, Activity.RESULT_OK)
+                configureRethinkEndpoint(doHEndpoint)
             }
         }
 
+        private fun configureRethinkEndpoint(doHEndpoint: DoHEndpoint) {
+            var stamp = ""
+            try {
+                stamp = getBlocklistStampFromURL(doHEndpoint.dohURL)
+            } catch (e: Exception) {
+                Log.w(LOG_TAG_DNS, "Exception while fetching stamp from Go ${e.message}", e)
+            }
+            if (DEBUG) Log.d(LOG_TAG_DNS,
+                             "startActivityForResult - DohEndpointadapter with DoHURL: ${doHEndpoint.dohURL},and stamp: $stamp")
+            val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
+            intent.putExtra("location", DNSConfigureWebViewActivity.REMOTE)
+            intent.putExtra("stamp", stamp)
+            (context as Activity).startActivityForResult(intent, Activity.RESULT_OK)
+        }
+
+        private fun showIcon(doHEndpoint: DoHEndpoint) {
+            b.dohEndpointListCheckImage.isChecked = doHEndpoint.isSelected
+            if (doHEndpoint.isCustom && !doHEndpoint.isSelected) {
+                b.dohEndpointListActionImage.setImageDrawable(
+                    ContextCompat.getDrawable(context, R.drawable.ic_fab_uninstall))
+            } else {
+                b.dohEndpointListActionImage.setImageDrawable(
+                    ContextCompat.getDrawable(context, R.drawable.ic_fab_appinfo))
+            }
+        }
 
         private fun updateConnection(doHEndpoint: DoHEndpoint) {
             if (DEBUG) Log.d(LOG_TAG_DNS,
                              "updateConnection - ${doHEndpoint.dohName}, ${doHEndpoint.dohURL}")
             doHEndpoint.dohURL = doHEndpointRepository.getConnectionURL(doHEndpoint.id)
-            if (doHEndpoint.dohName == RETHINK_DNS_PLUS) {
+            if (isRethinkDns(doHEndpoint)) {
                 var stamp = ""
                 try {
                     stamp = getBlocklistStampFromURL(doHEndpoint.dohURL)
@@ -201,6 +205,10 @@ class DoHEndpointAdapter(private val context: Context,
             val alertDialog: AlertDialog = builder.create()
             alertDialog.setCancelable(true)
             alertDialog.show()
+        }
+
+        private fun isRethinkDns(endpoint: DoHEndpoint?): Boolean {
+            return RETHINK_DNS_PLUS == endpoint?.dohName
         }
 
         private fun showDialogToDelete(doHEndpoint: DoHEndpoint) {

@@ -47,14 +47,11 @@ import com.celzero.bravedns.data.ConnectionRules
 import com.celzero.bravedns.database.*
 import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
+import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.*
-import com.celzero.bravedns.util.Constants.Companion.THEME_DARK
-import com.celzero.bravedns.util.Constants.Companion.THEME_LIGHT
-import com.celzero.bravedns.util.Constants.Companion.THEME_SYSTEM_DEFAULT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
-import com.celzero.bravedns.util.Utilities.Companion.getCurrentTheme
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -106,7 +103,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context,
         const val UNIVERSAL_RULES_UID = -1000
     }
 
-    override fun getTheme(): Int = getCurrentTheme(contextVal)
+    override fun getTheme(): Int = Utilities.getBottomsheetCurrentTheme(isDarkThemeOn())
 
     private val appInfoRepository: AppInfoRepository by inject()
     private val blockedConnectionsRepository: BlockedConnectionsRepository by inject()
@@ -116,6 +113,10 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context,
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
+    }
+
+    private fun isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
 
@@ -182,7 +183,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context,
 
         val listBlocked = blockedConnectionsRepository.getAllBlockedConnectionsForUID(ipDetails.uid)
         listBlocked.forEach {
-            if (com.celzero.bravedns.service.FirewallRuleset.RULE2.ruleName == it.ruleType && ipDetails.ipAddress.equals(
+            if (FirewallRuleset.RULE2.ruleName == it.ruleType && ipDetails.ipAddress.equals(
                     it.ipAddress) && it.uid == UNIVERSAL_RULES_UID) {
                 b.bsConnBlockConnAllSwitch.isChecked = true
             }
@@ -220,7 +221,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context,
                              ipDetails.port.toString(), time)
             b.bsConnTrackAppKill.visibility = View.GONE
             //FIXME - #306 - Compare the enum instead of the string value of the enum
-            if (com.celzero.bravedns.service.FirewallRuleset.RULE7.ruleName == ipDetails.blockedByRule) {
+            if (FirewallRuleset.RULE7.ruleName == ipDetails.blockedByRule) {
                 b.bsConnTrackAppKill.visibility = View.VISIBLE
                 b.bsConnTrackAppKill.text = getString(R.string.ctbs_whitelisted)
             }
@@ -245,7 +246,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context,
         b.bsConnBlockConnAllSwitch.setOnCheckedChangeListener(null)
         b.bsConnBlockConnAllSwitch.setOnClickListener {
             if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                             "Universal isRemove? isRuleUniversal - ${connRules.ipAddress}, ${com.celzero.bravedns.service.FirewallRuleset.RULE2.ruleName}")
+                             "Universal isRemove? isRuleUniversal - ${connRules.ipAddress}, ${FirewallRuleset.RULE2.ruleName}")
             if (isRuleUniversal) {
                 firewallRules.removeFirewallRules(UNIVERSAL_RULES_UID, connRules.ipAddress,
                                                   blockedConnectionsRepository)
@@ -255,7 +256,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context,
                                               Toast.LENGTH_SHORT)
             } else {
                 firewallRules.addFirewallRules(UNIVERSAL_RULES_UID, connRules.ipAddress,
-                                               com.celzero.bravedns.service.FirewallRuleset.RULE2.ruleName,
+                                               FirewallRuleset.RULE2.ruleName,
                                                blockedConnectionsRepository)
                 isRuleUniversal = true
                 Utilities.showToastUiCentered(contextVal, getString(R.string.ctbs_block_connections,
@@ -267,21 +268,16 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context,
 
         b.bsConnTrackAppNameHeader.setOnClickListener {
             val appUIDList = appInfoRepository.getAppListForUID(ipDetails.uid)
-            if (appUIDList.size != 1) {
+            if (appUIDList.size != 1 || ipDetails.appName.isNullOrEmpty() || ipDetails.appName == getString(
+                    R.string.ctbs_unknown_app)) {
                 Utilities.showToastUiCentered(contextVal,
                                               getString(R.string.ctbs_app_info_not_available_toast),
                                               Toast.LENGTH_SHORT)
                 return@setOnClickListener
             }
-            if (ipDetails.appName != null || ipDetails.appName!! != getString(
-                    R.string.ctbs_unknown_app)) {
-                val packageName = appInfoRepository.getPackageNameForAppName(ipDetails.appName!!)
-                appInfoForPackage(packageName)
-            } else {
-                Utilities.showToastUiCentered(contextVal,
-                                              getString(R.string.ctbs_app_info_not_available_toast),
-                                              Toast.LENGTH_SHORT)
-            }
+
+            val packageName = appInfoRepository.getPackageNameForUid(ipDetails.uid)
+            appInfoForPackage(packageName)
         }
 
         b.bsConnTrackAppClearRules.setOnClickListener {
@@ -306,53 +302,55 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context,
     private fun firewallApp(isBlocked: Boolean) {
         var blockAllApps = false
         val appUIDList = appInfoRepository.getAppListForUID(ipDetails.uid)
-        if (!appUIDList.isNullOrEmpty()) {
-            if (appUIDList[0].whiteListUniv1) {
-                Utilities.showToastUiCentered(contextVal, getString(
-                    R.string.bsct_firewall_not_available_whitelist), Toast.LENGTH_SHORT)
-                b.bsConnBlockAppCheck.isChecked = false
-                return
-            } else if (appUIDList[0].isExcluded) {
-                Utilities.showToastUiCentered(contextVal, getString(
-                    R.string.bsct_firewall_not_available_excluded), Toast.LENGTH_SHORT)
-                b.bsConnBlockAppCheck.isChecked = false
-                return
+        if (appUIDList.isNullOrEmpty()) {
+            showToast(getString(R.string.firewall_app_info_not_available))
+            b.bsConnBlockAppCheck.isChecked = false
+            return
+        }
+
+        if (appUIDList[0].whiteListUniv1) {
+            showToast(getString(R.string.bsct_firewall_not_available_whitelist))
+            b.bsConnBlockAppCheck.isChecked = false
+            return
+        } else if (appUIDList[0].isExcluded) {
+            showToast(getString(R.string.bsct_firewall_not_available_excluded))
+            b.bsConnBlockAppCheck.isChecked = false
+            return
+        }
+
+        if (appUIDList.size > 1) {
+            var title = getString(R.string.ctbs_block_other_apps, ipDetails.appName,
+                                  appUIDList.size.toString())
+            var positiveText = getString(R.string.ctbs_block_other_apps_positive_text,
+                                         appUIDList.size.toString())
+            if (isBlocked) {
+                title = getString(R.string.ctbs_unblock_other_apps, ipDetails.appName,
+                                  appUIDList.size.toString())
+                positiveText = getString(R.string.ctbs_unblock_other_apps_positive_text,
+                                         appUIDList.size.toString())
             }
-            if (appUIDList.size > 1) {
-                var title = getString(R.string.ctbs_block_other_apps, ipDetails.appName,
-                                      appUIDList.size.toString())
-                var positiveText = getString(R.string.ctbs_block_other_apps_positive_text,
-                                             appUIDList.size.toString())
-                if (isBlocked) {
-                    title = getString(R.string.ctbs_unblock_other_apps, ipDetails.appName,
-                                      appUIDList.size.toString())
-                    positiveText = getString(R.string.ctbs_unblock_other_apps_positive_text,
-                                             appUIDList.size.toString())
+            blockAllApps = showDialog(appUIDList, title, positiveText)
+        }
+        if (appUIDList.size <= 1 || blockAllApps) {
+            val uid = ipDetails.uid
+            CoroutineScope(Dispatchers.IO).launch {
+                appUIDList.forEach {
+                    persistentState.modifyAllowedWifi(it.packageInfo, isBlocked)
+                    FirewallManager.updateAppInternetPermission(it.packageInfo, isBlocked)
+                    FirewallManager.updateAppInternetPermissionByUID(it.uid, isBlocked)
+                    categoryInfoRepository.updateNumberOfBlocked(it.appCategory, !isBlocked)
+                    if (DEBUG) Log.d(LOG_TAG_FIREWALL,
+                                     "Category block executed with blocked as $isBlocked")
                 }
-                blockAllApps = showDialog(appUIDList, title, positiveText)
-            }
-            if (appUIDList.size <= 1 || blockAllApps) {
-                val uid = ipDetails.uid
-                CoroutineScope(Dispatchers.IO).launch {
-                    appUIDList.forEach {
-                        persistentState.modifyAllowedWifi(it.packageInfo, isBlocked)
-                        FirewallManager.updateAppInternetPermission(it.packageInfo, isBlocked)
-                        FirewallManager.updateAppInternetPermissionByUID(it.uid, isBlocked)
-                        categoryInfoRepository.updateNumberOfBlocked(it.appCategory, !isBlocked)
-                        if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                                         "Category block executed with blocked as $isBlocked")
-                    }
-                    appInfoRepository.updateInternetForUID(uid, isBlocked)
-                }
-            } else {
-                b.bsConnBlockAppCheck.isChecked = isBlocked
+                appInfoRepository.updateInternetForUID(uid, isBlocked)
             }
         } else {
-            Utilities.showToastUiCentered(contextVal,
-                                          getString(R.string.firewall_app_info_not_available),
-                                          Toast.LENGTH_SHORT)
-            b.bsConnBlockAppCheck.isChecked = false
+            b.bsConnBlockAppCheck.isChecked = isBlocked
         }
+    }
+
+    private fun showToast(message: String) {
+        Utilities.showToastUiCentered(contextVal, message, Toast.LENGTH_SHORT)
     }
 
     private fun clearAppRules() {

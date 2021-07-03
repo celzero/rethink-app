@@ -35,6 +35,8 @@ import static com.celzero.bravedns.util.LoggerConstants.LOG_TAG_VPN;
 public class ConnectionTracer {
     private static final boolean DEBUG = false;
     private static final int MISSING_UID = -2000;
+    private static final int CACHE_BUILDER_MAX_SIZE = 1000;
+    private static final int CACHE_BUILDER_WRITE_EXPIRE_SEC = 30;
     private final ConnectivityManager cm;
     private final Cache<String, Integer> uidCache;
 
@@ -44,8 +46,8 @@ public class ConnectionTracer {
         // the UID will expire after 30 seconds of the write.
         // Key for the cache is protocol, local, remote
         this.uidCache = CacheBuilder.newBuilder()
-                .maximumSize(1000)
-                .expireAfterWrite(30, TimeUnit.SECONDS)
+                .maximumSize(CACHE_BUILDER_MAX_SIZE)
+                .expireAfterWrite(CACHE_BUILDER_WRITE_EXPIRE_SEC, TimeUnit.SECONDS)
                 .build();
     }
 

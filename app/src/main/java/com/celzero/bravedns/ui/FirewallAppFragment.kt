@@ -46,7 +46,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
     private val b by viewBinding(FragmentFirewallAllAppsBinding::bind)
     private var adapterList: FirewallAppListAdapter? = null
 
-    private var titleList: MutableList<CategoryInfo>? = ArrayList()
+    private var titleList: MutableList<CategoryInfo> = ArrayList()
     private var listData: HashMap<CategoryInfo, ArrayList<AppInfo>> = HashMap()
     private var categoryState: Boolean = false
 
@@ -102,6 +102,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
 
                 override fun onFinish() {
                     if (!isAdded) return
+
                     b.firewallAppRefreshList.isEnabled = true
                 }
             }.start()
@@ -123,6 +124,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
 
             override fun onFinish() {
                 if (!isAdded) return
+
                 b.firewallAppRefreshList.clearAnimation()
                 Utilities.showToastUiCentered(requireContext(),
                                               getString(R.string.refresh_complete),
@@ -131,68 +133,43 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
         }.start()
 
         refreshDatabase.refreshAppInfoDatabase()
-        //refreshDatabase.updateCategoryInDB()
     }
 
-    override fun onQueryTextSubmit(query: String?): Boolean {
+    override fun onQueryTextSubmit(query: String): Boolean {
+        searchAndExpandCategories(query)
+        return false
+    }
+
+    override fun onQueryTextChange(query: String): Boolean {
+        searchAndExpandCategories(query)
+        return true
+    }
+
+    private fun searchAndExpandCategories(query: String) {
         object : CountDownTimer(1000, 1000) {
             override fun onTick(millisUntilFinished: Long) {}
 
             override fun onFinish() {
                 firewallAppInfoViewModel.setFilter(query)
-                if (query.isNullOrEmpty()) {
-                    if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                                     "Search bar empty  ${firewallAppInfoViewModel.firewallAppDetailsList.value?.size}")
+                if (query.isEmpty()) {
                     var i = 0
-                    titleList!!.forEach { _ ->
+                    titleList.forEach { _ ->
                         b.firewallExpandableList.collapseGroup(i)
                         i += 1
                     }
                 } else {
-                    if (titleList!!.size <= 0) return
-                    for (i in titleList!!.indices) {
-                        if (listData[titleList!![i]]?.size!! > 0) {
+                    if (titleList.size <= 0) return
+
+                    for (i in titleList.indices) {
+                        if (listData[titleList[i]]?.size!! > 0) {
                             b.firewallExpandableList.expandGroup(i)
                         }
                     }
-                    if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category block  ${titleList!!.size}")
+                    if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category block ${titleList.size}")
                 }
             }
         }.start()
-
-        return false
     }
-
-    override fun onQueryTextChange(query: String?): Boolean {
-        object : CountDownTimer(1000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-            }
-
-            override fun onFinish() {
-                firewallAppInfoViewModel.setFilter(query)
-                if (query.isNullOrEmpty()) {
-                    var i = 0
-                    if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                                     "Search bar empty  ${firewallAppInfoViewModel.firewallAppDetailsList.value?.size}")
-                    titleList!!.forEach { _ ->
-                        b.firewallExpandableList.collapseGroup(i)
-                        i += 1
-                    }
-
-                } else {
-                    if (titleList!!.size <= 0) return
-                    for (i in titleList?.indices!!) {
-                        if (listData[titleList!![i]]?.size!! > 0) {
-                            b.firewallExpandableList.expandGroup(i)
-                        }
-                    }
-                    if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category block ${titleList!!.size}")
-                }
-            }
-        }.start()
-        return true
-    }
-
 
     override fun onResume() {
         super.onResume()
@@ -209,23 +186,21 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
             val list = itAppInfo!!
             titleList = categoryInfoRepository.getAppCategoryList().toMutableList()
 
-            val iterator = titleList?.iterator()
-            if (iterator != null) {
-                while (iterator.hasNext()) {
-                    val item = iterator.next()
-                    if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                                     "Category : ${item.categoryName}, ${item.numberOFApps}, ${item.numOfAppsBlocked}, ${item.isInternetBlocked}")
-                    val appList = list.filter { a -> a.appCategory == item.categoryName }
-                    if (appList.isNotEmpty()) {
-                        listData[item] = appList as java.util.ArrayList<AppInfo>
-                    } else {
-                        iterator.remove()
-                    }
+            val iterator = titleList.iterator()
+            while (iterator.hasNext()) {
+                val item = iterator.next()
+                if (DEBUG) Log.d(LOG_TAG_FIREWALL,
+                                 "Category : ${item.categoryName}, ${item.numberOFApps}, ${item.numOfAppsBlocked}, ${item.isInternetBlocked}")
+                val appList = list.filter { a -> a.appCategory == item.categoryName }
+                if (appList.isNotEmpty()) {
+                    listData[item] = appList as java.util.ArrayList<AppInfo>
+                } else {
+                    iterator.remove()
                 }
             }
 
             if (adapterList != null) {
-                (adapterList as FirewallAppListAdapter).updateData(titleList!!, listData)
+                (adapterList as FirewallAppListAdapter).updateData(titleList, listData)
                 b.firewallUpdateProgress.visibility = View.GONE
                 b.firewallExpandableList.visibility = View.VISIBLE
             } else {
