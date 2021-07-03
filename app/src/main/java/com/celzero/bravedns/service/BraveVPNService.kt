@@ -797,7 +797,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         }
 
         if (DEBUG) Log.d(LOG_TAG_VPN,
-                         "Record Transaction: status as ${transaction.status} with blocklist ${transaction.blockList}")
+                         "Record Transaction: status as ${transaction.status} with blocklist ${transaction.blocklist}")
         // Update the connection state.  If the transaction succeeded, then the connection is working.
         // If the transaction failed, then the connection is not working.
         // If the transaction was canceled, then we don't have any new information about the status

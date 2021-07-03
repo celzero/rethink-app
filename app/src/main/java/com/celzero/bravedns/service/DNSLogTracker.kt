@@ -57,7 +57,7 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
         GlobalScope.launch(Dispatchers.IO) {
             val dnsLogs = DNSLogs()
 
-            dnsLogs.blockLists = transaction.blockList
+            dnsLogs.blockLists = transaction.blocklist
             if (transaction.isDNSCrypt) {
                 dnsLogs.dnsType = PREF_DNS_MODE_DNSCRYPT
                 dnsLogs.relayIP = transaction.relayIp

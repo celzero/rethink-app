@@ -285,9 +285,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             }
         }
         if (persistentState.localBlocklistEnabled || isRethinkPlusConnected) {
-            val blockListTimeStamp = persistentState.localBlocklistDownloadTime
+            val blocklistTimeStamp = persistentState.localBlocklistDownloadTime
             val appVersionCode = persistentState.appVersion
-            val url = "${Constants.REFRESH_BLOCKLIST_URL}$blockListTimeStamp&${Constants.APPEND_VCODE}$appVersionCode"
+            val url = "${Constants.REFRESH_BLOCKLIST_URL}$blocklistTimeStamp&${Constants.APPEND_VCODE}$appVersionCode"
             serverCheckForBlocklistUpdate(url)
         }
     }
@@ -516,22 +516,22 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun handleDownloadFiles() {
         val timestamp = persistentState.localBlocklistDownloadTime
         val url = Constants.JSON_DOWNLOAD_BLOCKLIST_LINK + File.separator + timestamp
-        (context as HomeScreenActivity).runOnUiThread {
-            downloadManager = this.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-            downloadBlockListFiles(url, Constants.FILE_TAG_NAME, this)
-        }
+        downloadBlockListFiles(url, Constants.FILE_TAG_NAME, context)
     }
 
     private fun downloadBlockListFiles(url: String, fileName: String, context: Context) {
         try {
             val uri: Uri = Uri.parse(url)
-            val request = DownloadManager.Request(uri)
-            request.setTitle(getString(R.string.hs_download_blocklist_heading))
-            request.setDescription(getString(R.string.hs_download_blocklist_desc, fileName))
-            val path = getExternalFilePath(this, false)
-            request.setDestinationInExternalFilesDir(context, path, fileName)
-            Log.i(LOG_TAG_DOWNLOAD, "Path - $path, filename- $fileName, uri - $uri")
-            enqueue = downloadManager.enqueue(request)
+            (context as HomeScreenActivity).runOnUiThread {
+                downloadManager = context.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+                val request = DownloadManager.Request(uri)
+                request.setTitle(getString(R.string.hs_download_blocklist_heading))
+                request.setDescription(getString(R.string.hs_download_blocklist_desc, fileName))
+                val path = getExternalFilePath(context, false)
+                request.setDestinationInExternalFilesDir(context, path, fileName)
+                Log.i(LOG_TAG_DOWNLOAD, "Path - $path, filename- $fileName, uri - $uri")
+                enqueue = downloadManager.enqueue(request)
+            }
         } catch (e: SecurityException) {
             Log.w(LOG_TAG_DOWNLOAD, "Download unsuccessful - ${e.message}", e)
         } catch (e: IllegalStateException) {

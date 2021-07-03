@@ -71,7 +71,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     private var stamp: String? = ""
     private var url: String = Constants.CONFIGURE_BLOCKLIST_URL_REMOTE //"https://bravedns.com/configure?v=app"
     private var receivedStamp: String = ""
-    private var blockListsCount: MutableLiveData<Int> = MutableLiveData()
+    private var blocklistsCount: MutableLiveData<Int> = MutableLiveData()
     private lateinit var context: Context
     private lateinit var downloadManager: DownloadManager
     private var timestamp: Long = 0L
@@ -113,7 +113,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         }
         loadUrl(url)
 
-        blockListsCount.observe(this, {
+        blocklistsCount.observe(this, {
             if (receivedIntentFrom == LOCAL) {
                 persistentState.numberOfLocalBlocklists = it!!
             } else {
@@ -421,7 +421,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
             }
             receivedStamp = stamp
 
-            blockListsCount.postValue(count.toInt())
+            blocklistsCount.postValue(count.toInt())
             if (DEBUG) Log.d(LOG_TAG_DNS, "Stamp value - $receivedStamp, $count")
             finish()
         }
@@ -492,9 +492,9 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     }
 
     private fun checkForDownload() {
-        val blockListTimeStamp = persistentState.remoteBlocklistDownloadTime
+        val blocklistTimeStamp = persistentState.remoteBlocklistDownloadTime
         val appVersionCode = persistentState.appVersion
-        val url = "${Constants.REFRESH_BLOCKLIST_URL}$blockListTimeStamp&${Constants.APPEND_VCODE}$appVersionCode"
+        val url = "${Constants.REFRESH_BLOCKLIST_URL}$blocklistTimeStamp&${Constants.APPEND_VCODE}$appVersionCode"
         Log.i(LOG_TAG_DOWNLOAD, "Check for local download, url - $url")
         run(url)
     }

@@ -137,10 +137,10 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context,
                                                        transaction.serverIP)
             }
 
-            val blockLists = transaction.blockLists.split(",")
-            if (blockLists.isNotEmpty()) {
+            val blocklists = transaction.blockLists.split(",")
+            if (blocklists.isNotEmpty()) {
                 b.dnsBlockRecyclerview.layoutManager = LinearLayoutManager(contextVal)
-                recyclerAdapter = DNSBottomSheetBlockAdapter(contextVal, blockLists)
+                recyclerAdapter = DNSBottomSheetBlockAdapter(contextVal, blocklists)
                 b.dnsBlockRecyclerview.adapter = recyclerAdapter
                 b.dnsBlockPlaceHolder.visibility = View.GONE
             } else {
