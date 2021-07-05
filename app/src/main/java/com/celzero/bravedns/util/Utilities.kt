@@ -32,6 +32,7 @@ import android.graphics.Color
 import android.os.Build
 import android.provider.Settings
 import android.provider.Settings.ACTION_VPN_SETTINGS
+import android.text.TextUtils
 import android.text.TextUtils.SimpleStringSplitter
 import android.util.Log
 import android.view.Gravity
@@ -399,6 +400,24 @@ class Utilities {
 
             val res = src.copyTo(dest, true)
             return res.exists()
+        }
+
+
+        fun isAlwaysOnEnabled(vpnService: BraveVPNService?, context: Context): Boolean {
+            // Introduced as part of issue fix #325
+            // From android version 12+(R) Settings keys annotated with @hide are restricted to
+            // system_server and system apps only. "always_on_vpn_app" is annotated with @hide.
+
+            // For versions above 29(Q), there is vpnService.isAlwaysOn property to check
+            // whether always-on is enabled.
+            // For versions prior to 29 the check is made with Settings.Secure.
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                vpnService?.isAlwaysOn == true
+            } else {
+                val alwaysOn = Settings.Secure.getString(context.contentResolver,
+                                                                          "always_on_vpn_app")
+                !TextUtils.isEmpty(alwaysOn) && context.packageName == alwaysOn
+            }
         }
     }
 }

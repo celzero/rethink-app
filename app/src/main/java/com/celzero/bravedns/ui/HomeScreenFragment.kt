@@ -65,6 +65,7 @@ import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_PROXY
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.Companion.isAlwaysOnEnabled
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 import com.facebook.shimmer.Shimmer
 import org.koin.android.ext.android.inject
@@ -363,20 +364,18 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     // FIXME: 19-11-2020 - Check the below code for all the edge cases.
     private fun checkForPrivateDNSandAlwaysON(): Boolean {
-        val isVpnEnabled = persistentState.vpnEnabled
-        val alwaysOn = android.provider.Settings.Secure.getString(context?.contentResolver,
-                                                                  "always_on_vpn_app")
-        if (!TextUtils.isEmpty(alwaysOn)) {
-            if (DEBUG) Log.i(LOG_TAG_VPN, "Status: $isVpnEnabled , alwaysOn: $alwaysOn")
-            val status = VpnController.getInstance().getState()
-            if (context?.packageName == alwaysOn && status.connectionState == null) {
-                return false
-            } else if (!isVpnEnabled) {
-                showAlwaysOnDialog()
-            }
+        val vpnService = VpnController.getInstance().getBraveVpnService()
+
+        val alwaysOn = isAlwaysOnEnabled(vpnService, requireContext())
+        if (DEBUG) Log.i(LOG_TAG_VPN, "AlwaysOn: $alwaysOn")
+        val status = VpnController.getInstance().getState()
+        if (alwaysOn && status.connectionState == null) {
+            return false
+        } else if (vpnService != null) {
+            showAlwaysOnDialog()
             return true
         }
-        if (DEBUG) Log.i(LOG_TAG_VPN, "Status: $isVpnEnabled , alwaysOn: $alwaysOn")
+
         if (getPrivateDnsMode() == PrivateDnsMode.STRICT) {
             Utilities.showToastUiCentered(requireContext(),
                                           resources.getText(R.string.private_dns_toast).toString(),

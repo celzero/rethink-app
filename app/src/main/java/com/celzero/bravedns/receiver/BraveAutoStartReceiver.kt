@@ -25,6 +25,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Utilities
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -33,26 +34,30 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
     val persistentState by inject<PersistentState>()
 
     override fun onReceive(context: Context, intent: Intent) {
-        val alwaysOnPackage = android.provider.Settings.Secure.getString(context.contentResolver,
-                                                                         "always_on_vpn_app")
-        val isAlwaysOnEnabled = context.packageName.equals(alwaysOnPackage)
-        if (Intent.ACTION_BOOT_COMPLETED == intent.action || Intent.ACTION_REBOOT == intent.action) {
-            if (persistentState.prefAutoStartBootUp && persistentState.vpnEnabled && !isAlwaysOnEnabled) {
-                val prepareVpnIntent: Intent? = try {
-                    VpnService.prepare(context)
-                } catch (e: NullPointerException) {
-                    Log.w(LOG_TAG_VPN, "Device does not support system-wide VPN mode.")
-                    return
-                }
-                if (prepareVpnIntent != null) {
-                    val startIntent = Intent(context, HomeScreenActivity::class.java)
-                    startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    context.startActivity(startIntent)
-                    return
-                } else {
-                    VpnController.getInstance().start(context)
-                }
+        val vpnService = VpnController.getInstance().getBraveVpnService()
+        val isAlwaysOnEnabled = Utilities.isAlwaysOnEnabled(vpnService, context)
+
+        if (Intent.ACTION_REBOOT != intent.action && Intent.ACTION_BOOT_COMPLETED != intent.action) {
+            Log.w(LOG_TAG_VPN, "unhandled broadcast ${intent.action}")
+            return
+        }
+
+        if (persistentState.prefAutoStartBootUp && persistentState.vpnEnabled && !isAlwaysOnEnabled) {
+            val prepareVpnIntent: Intent? = try {
+                VpnService.prepare(context)
+            } catch (e: NullPointerException) {
+                Log.w(LOG_TAG_VPN, "Device does not support system-wide VPN mode.")
+                return
             }
+
+            if (prepareVpnIntent == null) {
+                VpnController.getInstance().start(context)
+                return
+            }
+
+            val startIntent = Intent(context, HomeScreenActivity::class.java)
+            startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(startIntent)
         }
     }
 }
