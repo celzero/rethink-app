@@ -436,9 +436,10 @@ class Utilities {
             }
         }
 
-        fun isOtherVpnHasAlwaysOn(context: Context): Boolean{
+        fun isOtherVpnHasAlwaysOn(context: Context): Boolean {
             return try {
-                val alwaysOn = Settings.Secure.getString(context.contentResolver, "always_on_vpn_app")
+                val alwaysOn = Settings.Secure.getString(context.contentResolver,
+                                                         "always_on_vpn_app")
                 !TextUtils.isEmpty(alwaysOn) && context.packageName != alwaysOn
             } catch (e: Exception) {
                 Log.e(LOG_TAG_VPN, "Failure while retrieving Settings.Secure value ${e.message}", e)
@@ -455,8 +456,7 @@ class Utilities {
                 context.packageManager.getApplicationIcon(packageName)
             } catch (e: PackageManager.NameNotFoundException) {
                 Log.e(LOG_TAG_FIREWALL,
-                      "Application Icon not available for package: ${packageName}" + e.message,
-                      e)
+                      "Application Icon not available for package: ${packageName}" + e.message, e)
                 getDefaultIcon(context)
             }
         }

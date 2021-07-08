@@ -17,7 +17,6 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.DialogInterface
-import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
@@ -26,7 +25,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -36,7 +34,6 @@ import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.databinding.ExcludedAppListItemBinding
 import com.celzero.bravedns.glide.GlideApp
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.ThrowingHandler
 import com.celzero.bravedns.util.Utilities.Companion.getDefaultIcon
@@ -80,27 +77,29 @@ class ExcludedAppListAdapter(private val context: Context,
         fun update(appInfo: AppInfo) {
             b.excludedAppListApkLabelTv.text = appInfo.appName
             b.excludedAppListCheckbox.isChecked = appInfo.isExcluded
-            displayIcon(getIcon(context, appInfo.appName, appInfo.packageInfo))
+            displayIcon(getIcon(context, appInfo.packageInfo, appInfo.appName))
             clickListeners(appInfo)
         }
 
         private fun clickListeners(appInfo: AppInfo) {
             b.excludedAppListContainer.setOnClickListener {
                 appInfo.isExcluded = !appInfo.isExcluded
-                Log.i(LOG_TAG_FIREWALL,"is app excluded- ${appInfo.appName},${appInfo.isExcluded}")
+                Log.i(LOG_TAG_FIREWALL, "is app excluded- ${appInfo.appName},${appInfo.isExcluded}")
                 excludeAppsFromVPN(appInfo, appInfo.isExcluded)
             }
 
             b.excludedAppListCheckbox.setOnCheckedChangeListener(null)
             b.excludedAppListCheckbox.setOnClickListener {
                 appInfo.isExcluded = !appInfo.isExcluded
-                Log.i(LOG_TAG_FIREWALL, "is app excluded - ${appInfo.appName},${appInfo.isExcluded}")
+                Log.i(LOG_TAG_FIREWALL,
+                      "is app excluded - ${appInfo.appName},${appInfo.isExcluded}")
                 excludeAppsFromVPN(appInfo, appInfo.isExcluded)
             }
         }
 
-        private fun displayIcon(drawable: Drawable?){
-            GlideApp.with(context).load(drawable).error(getDefaultIcon(context)).into(b.excludedAppListApkIconIv)
+        private fun displayIcon(drawable: Drawable?) {
+            GlideApp.with(context).load(drawable).error(getDefaultIcon(context)).into(
+                b.excludedAppListApkIconIv)
         }
 
         private fun excludeAppsFromVPN(appInfo: AppInfo, status: Boolean) {
@@ -111,7 +110,8 @@ class ExcludedAppListAdapter(private val context: Context,
                 true
             }
 
-            Log.i(LOG_TAG_FIREWALL, "App ${appInfo.appName} excluded from vpn? - $status, blockAllApps?- $blockAllApps")
+            Log.i(LOG_TAG_FIREWALL,
+                  "App ${appInfo.appName} excluded from vpn? - $status, blockAllApps?- $blockAllApps")
 
             if (!blockAllApps) {
                 appInfo.isExcluded = !status

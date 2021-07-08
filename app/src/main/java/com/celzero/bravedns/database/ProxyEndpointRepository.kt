@@ -46,7 +46,8 @@ class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
     }
 
     fun getDNSProxyEndpointLiveData(): LiveData<PagedList<ProxyEndpoint>> {
-        return proxyEndpointDAO.getDNSProxyEndpointLiveData().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+        return proxyEndpointDAO.getDNSProxyEndpointLiveData().toLiveData(
+            pageSize = LIVEDATA_PAGE_SIZE)
     }
 
     fun deleteOlderData(date: Long, coroutineScope: CoroutineScope = GlobalScope) {
@@ -56,7 +57,8 @@ class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
     }
 
     fun getDNSProxyEndpointLiveDataByType(query: String): LiveData<PagedList<ProxyEndpoint>> {
-        return proxyEndpointDAO.getDNSProxyEndpointLiveDataByType(query).toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+        return proxyEndpointDAO.getDNSProxyEndpointLiveDataByType(query).toLiveData(
+            pageSize = LIVEDATA_PAGE_SIZE)
     }
 
     fun deleteDNSProxyEndpoint(proxyIP: String, port: Int) {

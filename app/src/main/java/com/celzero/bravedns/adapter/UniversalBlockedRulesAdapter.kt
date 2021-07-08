@@ -93,7 +93,8 @@ class UniversalBlockedRulesAdapter(private val context: Context,
                                Toast.LENGTH_SHORT).show()
             }
 
-            builder.setNegativeButton(context.getString(R.string.univ_ip_delete_individual_negative)) { _, _ -> }
+            builder.setNegativeButton(
+                context.getString(R.string.univ_ip_delete_individual_negative)) { _, _ -> }
 
             val alertDialog: AlertDialog = builder.create()
             alertDialog.setCancelable(true)

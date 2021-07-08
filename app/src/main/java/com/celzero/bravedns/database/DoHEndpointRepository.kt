@@ -64,7 +64,8 @@ class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
     }
 
     fun getDoHEndpointLiveDataByName(query: String): LiveData<PagedList<DoHEndpoint>> {
-        return doHEndpointDAO.getDoHEndpointLiveDataByName(query).toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+        return doHEndpointDAO.getDoHEndpointLiveDataByName(query).toLiveData(
+            pageSize = LIVEDATA_PAGE_SIZE)
     }
 
     fun deleteDoHEndpoint(url: String) {

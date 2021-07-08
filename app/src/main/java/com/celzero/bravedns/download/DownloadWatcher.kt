@@ -105,7 +105,7 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
                     if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "cursor empty")
                     return DOWNLOAD_FAILURE
                 }
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 Log.e(LOG_TAG_DOWNLOAD, "failure download- ${e.message}", e)
             } finally {
                 cursor.close()

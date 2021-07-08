@@ -25,7 +25,6 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.paging.PagedListAdapter
@@ -171,8 +170,8 @@ class ConnectionTrackerAdapter(val context: Context) :
         }
 
         private fun loadAppIcon(drawable: Drawable?) {
-            GlideApp.with(context).load(drawable).error(
-                Utilities.getDefaultIcon(context)).into(b.connectionAppIcon)
+            GlideApp.with(context).load(drawable).error(Utilities.getDefaultIcon(context)).into(
+                b.connectionAppIcon)
         }
 
         private fun fetchTextColor(attr: Int): Int {

@@ -316,12 +316,12 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             return
         }
 
-        if(isAccessibilityServiceRunning) {
+        if (isAccessibilityServiceRunning) {
             b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = persistentState.backgroundEnabled
             return
         }
 
-        if(persistentState.isAccessibilityCrashDetected){
+        if (persistentState.isAccessibilityCrashDetected) {
             persistentState.backgroundEnabled = false
             b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = false
             showAlertForPermission(true)

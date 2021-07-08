@@ -59,7 +59,8 @@ interface BlockedConnectionsDAO {
         "select * from BlockedConnections where ipAddress like :query and uid = $UNIVERSAL_RULES_UID and  isActive = 1 order by modifiedDateTime desc")
     fun getUnivBlockedConnectionsByIP(query: String): DataSource.Factory<Int, BlockedConnections>
 
-    @Query("delete from BlockedConnections where ipAddress = :ipAddress and uid = $UNIVERSAL_RULES_UID")
+    @Query(
+        "delete from BlockedConnections where ipAddress = :ipAddress and uid = $UNIVERSAL_RULES_UID")
     fun deleteIPRulesUniversal(ipAddress: String)
 
     @Transaction

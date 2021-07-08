@@ -59,7 +59,7 @@ class DNSCryptEndpoint {
         this.latency = latency
     }
 
-    fun isDeletable(): Boolean{
+    fun isDeletable(): Boolean {
         return isCustom && !isSelected
     }
 }

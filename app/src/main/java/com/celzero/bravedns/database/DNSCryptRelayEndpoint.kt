@@ -31,7 +31,7 @@ class DNSCryptRelayEndpoint {
     var latency: Int = 0
 
     override fun equals(other: Any?): Boolean {
-        if(other !is DNSCryptRelayEndpoint) return false
+        if (other !is DNSCryptRelayEndpoint) return false
         if (id != other.id) return false
         return true
     }

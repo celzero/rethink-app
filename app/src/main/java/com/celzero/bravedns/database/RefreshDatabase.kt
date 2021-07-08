@@ -62,7 +62,8 @@ class RefreshDatabase internal constructor(private var context: Context,
         GlobalScope.launch(Dispatchers.IO) {
             val appListDB = appInfoRepository.getAppInfoAsync()
             appListDB.forEach {
-                val pkgMetadata = Utilities.getPackageMetadata(context.packageManager, it.packageInfo)
+                val pkgMetadata = Utilities.getPackageMetadata(context.packageManager,
+                                                               it.packageInfo)
                 if (pkgMetadata?.applicationInfo != null) return@forEach
                 appInfoRepository.delete(it)
             }
@@ -88,7 +89,7 @@ class RefreshDatabase internal constructor(private var context: Context,
             if (DEBUG) Log.d(LOG_TAG_APP_DB,
                              "getAppInfo - ${appInfos.size}, $totalNonApps, ${installedPackages.size}")
 
-            if(!needsRefresh(installedPackages.size, appInfos.size, totalNonApps)) {
+            if (!needsRefresh(installedPackages.size, appInfos.size, totalNonApps)) {
                 reloadAppList(appInfos)
                 HomeScreenActivity.setupComplete()
                 return@launch
@@ -104,18 +105,21 @@ class RefreshDatabase internal constructor(private var context: Context,
                 val isSystemComponent = isSystemComponent(it.applicationInfo)
                 val entry = AppInfo()
 
-                entry.appName = context.packageManager.getApplicationLabel(it.applicationInfo).toString()
+                entry.appName = context.packageManager.getApplicationLabel(
+                    it.applicationInfo).toString()
                 entry.packageInfo = it.applicationInfo.packageName
                 entry.uid = it.applicationInfo.uid
 
                 val existingAppInfo = appInfoRepository.getAppInfoForPackageName(entry.packageInfo)
 
                 if (!existingAppInfo?.appName.isNullOrEmpty()) {
-                    HomeScreenActivity.updateGlobalAppInfoEntry(it.applicationInfo.packageName, existingAppInfo)
+                    HomeScreenActivity.updateGlobalAppInfoEntry(it.applicationInfo.packageName,
+                                                                existingAppInfo)
                     return@forEach
                 } else {
 
-                    Log.i(LOG_TAG_APP_DB, "New package ${entry.uid}:${entry.packageInfo} (${entry.appName})")
+                    Log.i(LOG_TAG_APP_DB,
+                          "New package ${entry.uid}:${entry.packageInfo} (${entry.appName})")
 
                     entry.whiteListUniv1 = isSystemApp
                     entry.isSystemApp = isSystemComponent
@@ -124,7 +128,8 @@ class RefreshDatabase internal constructor(private var context: Context,
                         Locale.ROOT)
                     entry.isInternetAllowed = persistentState.wifiAllowed(entry.packageInfo)
 
-                    HomeScreenActivity.updateGlobalAppInfoEntry(it.applicationInfo.packageName, entry)
+                    HomeScreenActivity.updateGlobalAppInfoEntry(it.applicationInfo.packageName,
+                                                                entry)
 
                     appInfoRepository.insertAsync(entry)
                 }
@@ -142,13 +147,14 @@ class RefreshDatabase internal constructor(private var context: Context,
         return (ai.flags and ApplicationInfo.FLAG_SYSTEM > 0)
     }
 
-    private fun needsRefresh(latestActualTotal: Int, knownTotalApps: Int, knownTotalNonApps: Int): Boolean {
+    private fun needsRefresh(latestActualTotal: Int, knownTotalApps: Int,
+                             knownTotalNonApps: Int): Boolean {
         if (DEBUG) Log.d(LOG_TAG_APP_DB,
                          "known: $knownTotalApps, nonApps: $knownTotalNonApps, actual: $latestActualTotal")
         return (knownTotalApps - knownTotalNonApps) == (latestActualTotal - 1)
     }
 
-    private fun determineAppCategory(ai: ApplicationInfo): String{
+    private fun determineAppCategory(ai: ApplicationInfo): String {
         // Removed the package name from the method fetchCategory().
         // As of now, the fetchCategory is returning Category as OTHERS.
         // Instead we can query play store for the category.
@@ -183,7 +189,7 @@ class RefreshDatabase internal constructor(private var context: Context,
         return cat?.toString() ?: Constants.APP_CAT_OTHER
     }
 
-    private fun replaceUnderscore(s: String): String{
+    private fun replaceUnderscore(s: String): String {
         return s.replace("_", " ")
     }
 
@@ -213,12 +219,15 @@ class RefreshDatabase internal constructor(private var context: Context,
         GlobalScope.launch(Dispatchers.IO) {
             val proxyURL = context.resources.getStringArray(R.array.dns_proxy_names)
             val proxyIP = context.resources.getStringArray(R.array.dns_proxy_ips)
-            val dnsProxyEndPoint1 = DNSProxyEndpoint(1, proxyURL[0], PROXY_EXTERNAL, APP_NAME_NO_APP,
-                                                     proxyIP[0], 53, false, false, 0, 0)
-            val dnsProxyEndPoint2 = DNSProxyEndpoint(2, proxyURL[1], PROXY_EXTERNAL, APP_NAME_NO_APP,
-                                                     proxyIP[1], 53, false, false, 0, 0)
-            val dnsProxyEndPoint3 = DNSProxyEndpoint(3, proxyURL[2], PROXY_EXTERNAL, APP_NAME_NO_APP,
-                                                     proxyIP[2], 53, false, false, 0, 0)
+            val dnsProxyEndPoint1 = DNSProxyEndpoint(1, proxyURL[0], PROXY_EXTERNAL,
+                                                     APP_NAME_NO_APP, proxyIP[0], 53, false, false,
+                                                     0, 0)
+            val dnsProxyEndPoint2 = DNSProxyEndpoint(2, proxyURL[1], PROXY_EXTERNAL,
+                                                     APP_NAME_NO_APP, proxyIP[1], 53, false, false,
+                                                     0, 0)
+            val dnsProxyEndPoint3 = DNSProxyEndpoint(3, proxyURL[2], PROXY_EXTERNAL,
+                                                     APP_NAME_NO_APP, proxyIP[2], 53, false, false,
+                                                     0, 0)
             dnsProxyEndpointRepository.insertWithReplace(dnsProxyEndPoint1)
             dnsProxyEndpointRepository.insertWithReplace(dnsProxyEndPoint2)
             dnsProxyEndpointRepository.insertWithReplace(dnsProxyEndPoint3)

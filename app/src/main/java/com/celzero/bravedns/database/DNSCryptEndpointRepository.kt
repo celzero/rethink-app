@@ -49,7 +49,8 @@ class DNSCryptEndpointRepository(private val dnsCryptEndpointDAO: DNSCryptEndpoi
     }
 
     fun getDNSCryptEndpointLiveData(): LiveData<PagedList<DNSCryptEndpoint>> {
-        return dnsCryptEndpointDAO.getDNSCryptEndpointLiveData().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+        return dnsCryptEndpointDAO.getDNSCryptEndpointLiveData().toLiveData(
+            pageSize = LIVEDATA_PAGE_SIZE)
     }
 
     fun deleteOlderData(date: Long, coroutineScope: CoroutineScope = GlobalScope) {

@@ -80,8 +80,8 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                     null
                 }
             } catch (e: IllegalArgumentException) {
-                Log.e(LOG_TAG_DNS_LOG,
-                      "Failure converting string to InetAddresses: ${e.message}", e)
+                Log.e(LOG_TAG_DNS_LOG, "Failure converting string to InetAddresses: ${e.message}",
+                      e)
                 null
             }
             if (serverAddress != null) {

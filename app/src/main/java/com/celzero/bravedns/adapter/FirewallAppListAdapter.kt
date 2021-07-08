@@ -65,7 +65,8 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
                                                   private var dataList: HashMap<CategoryInfo, ArrayList<AppInfo>>) :
         BaseExpandableListAdapter() {
 
-    private var activityManager: ActivityManager = context.getSystemService(VpnService.ACTIVITY_SERVICE) as ActivityManager
+    private var activityManager: ActivityManager = context.getSystemService(
+        VpnService.ACTIVITY_SERVICE) as ActivityManager
 
     override fun getChild(listPosition: Int, expandedListPosition: Int): AppInfo {
         return this.dataList[this.titleList[listPosition]]!![expandedListPosition]
@@ -109,15 +110,18 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
         fwWifiImg.isEnabled = !appInfoDetail.whiteListUniv1 || !appInfoDetail.isExcluded
         fwWifiImg.isChecked = !appInfoDetail.isInternetAllowed
 
-        displayIcon(getIcon(context, appInfoDetail.appName, appInfoDetail.packageInfo), mIconImageView)
+        displayIcon(getIcon(context, appInfoDetail.packageInfo, appInfoDetail.appName),
+                    mIconImageView)
         showVisualHint(appInfoDetail.isInternetAllowed, mIconIndicator)
 
         when {
             appInfoDetail.whiteListUniv1 -> {
-                showAppTextualHint(mPackageTextView, context.getString(R.string.firewall_app_added_in_whitelist))
+                showAppTextualHint(mPackageTextView,
+                                   context.getString(R.string.firewall_app_added_in_whitelist))
             }
             appInfoDetail.isExcluded -> {
-                showAppTextualHint(mPackageTextView, context.getString(R.string.firewall_app_added_in_excluded_list))
+                showAppTextualHint(mPackageTextView,
+                                   context.getString(R.string.firewall_app_added_in_excluded_list))
             }
             else -> {
                 hideAppTextualHint(mPackageTextView)
@@ -142,7 +146,7 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
             if (appUIDList.size > 1) {
                 val blockAllApps = showDialog(appUIDList, appInfoDetail.appName, isInternetAllowed)
 
-                if(!blockAllApps) {
+                if (!blockAllApps) {
                     fwWifiImg.isChecked = !isInternetAllowed
                     return@setOnClickListener
                 }
@@ -161,7 +165,8 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
         return convertView
     }
 
-    private fun persistFirewallRules(appUIDList: List<AppInfo>, isInternetAllowed: Boolean, uid: Int) {
+    private fun persistFirewallRules(appUIDList: List<AppInfo>, isInternetAllowed: Boolean,
+                                     uid: Int) {
         CoroutineScope(Dispatchers.IO).launch {
             appUIDList.forEach {
                 HomeScreenActivity.GlobalVariable.appList[it.packageInfo]!!.isInternetAllowed = isInternetAllowed
@@ -180,16 +185,15 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
     }
 
     private fun showVisualHint(internetAllowed: Boolean, mIconIndicator: TextView) {
-        if(internetAllowed) {
+        if (internetAllowed) {
             mIconIndicator.setBackgroundColor(context.getColor(R.color.colorGreen_900))
         } else {
             mIconIndicator.setBackgroundColor(context.getColor(R.color.colorAmber_900))
         }
     }
 
-    private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView ) {
-        GlideApp.with(context).load(drawable).error(getDefaultIcon(context)).into(
-            mIconImageView)
+    private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
+        GlideApp.with(context).load(drawable).error(getDefaultIcon(context)).into(mIconImageView)
     }
 
     private fun hideAppTextualHint(mPackageTextView: TextView) {
@@ -247,14 +251,15 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
                                             categoryInfo.numOfAppsExcluded.toString())
         internetChk.isChecked = !isInternetAllowed
 
-        showToggleButtonIcon(isInternetAllowed,indicatorTV,internetChk )
+        showToggleButtonIcon(isInternetAllowed, indicatorTV, internetChk)
         displaySystemWarning(categoryInfo.categoryName, sysAppWarning, placeHolder, isExpanded)
         showAppIcon(categoryInfo, app1Icon, app2Icon)
 
         // Click listener
         internetChk.setOnClickListener {
             // TODO - Identify whether the below logic can be simplified.
-            val shouldBlock = if (isInternetAllowed && isAnySystemCategory(categoryInfo.categoryName)) {
+            val shouldBlock = if (isInternetAllowed && isAnySystemCategory(
+                    categoryInfo.categoryName)) {
                 if (categoryInfo.numOfAppWhitelisted != categoryInfo.numberOFApps) {
                     showDialogForSystemAppBlock(categoryInfo.categoryName)
                 } else {
@@ -316,7 +321,8 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
         }
     }
 
-    private fun showAppIcon(categoryInfo: CategoryInfo, app1Icon: AppCompatImageView, app2Icon: AppCompatImageView) {
+    private fun showAppIcon(categoryInfo: CategoryInfo, app1Icon: AppCompatImageView,
+                            app2Icon: AppCompatImageView) {
         val list = dataList[categoryInfo]
 
         if (list.isNullOrEmpty()) {
@@ -340,7 +346,8 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
         }
     }
 
-    private fun showToggleButtonIcon(isInternetAllowed: Boolean,indicatorTV: TextView, internetChk: AppCompatToggleButton) {
+    private fun showToggleButtonIcon(isInternetAllowed: Boolean, indicatorTV: TextView,
+                                     internetChk: AppCompatToggleButton) {
         if (!isInternetAllowed) {
             indicatorTV.visibility = View.VISIBLE
             internetChk.setCompoundDrawablesWithIntrinsicBounds(
@@ -355,7 +362,7 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
     private fun displaySystemWarning(categoryName: String, sysAppWarning: TextView,
                                      placeHolder: TextView, isExpanded: Boolean) {
 
-        if(isAnySystemCategory(categoryName)) {
+        if (isAnySystemCategory(categoryName)) {
             showAppWarningText(sysAppWarning, categoryName)
         } else {
             hideAppWarningText(sysAppWarning)
@@ -369,8 +376,8 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
     }
 
     private fun showAppWarningText(sysAppWarning: TextView, categoryName: String) {
-        sysAppWarning.text = context.getString(R.string.system_app_block_warning, categoryName.toLowerCase(
-                        Locale.ROOT))
+        sysAppWarning.text = context.getString(R.string.system_app_block_warning,
+                                               categoryName.toLowerCase(Locale.ROOT))
         sysAppWarning.visibility = View.VISIBLE
     }
 
@@ -399,7 +406,7 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
     }
 
     private fun loadIcon(packageInfo: String, imageView: AppCompatImageView) {
-        return loadImage(getIcon(context, "", packageInfo), getDefaultIcon(context), imageView)
+        return loadImage(getIcon(context, packageInfo, ""), getDefaultIcon(context), imageView)
     }
 
     private fun loadImage(drawable: Drawable?, defaultDrawable: Drawable?,
@@ -428,11 +435,13 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
         positiveTxt = if (isInternet) {
             builderSingle.setTitle(context.getString(R.string.ctbs_block_other_apps, appName,
                                                      packageList.size.toString()))
-            context.getString(R.string.ctbs_block_other_apps_positive_text, packageList.size.toString())
+            context.getString(R.string.ctbs_block_other_apps_positive_text,
+                              packageList.size.toString())
         } else {
             builderSingle.setTitle(context.getString(R.string.ctbs_unblock_other_apps, appName,
                                                      packageList.size.toString()))
-            context.getString(R.string.ctbs_unblock_other_apps_positive_text, packageList.size.toString())
+            context.getString(R.string.ctbs_unblock_other_apps_positive_text,
+                              packageList.size.toString())
         }
         val arrayAdapter = ArrayAdapter<String>(context,
                                                 android.R.layout.simple_list_item_activated_1)
@@ -470,9 +479,10 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
 
         builderSingle.setIcon(R.drawable.spinner_firewall)
 
-        builderSingle.setTitle(context.resources.getString(R.string.system_apps_warning_dialog_title, categoryName))
-        builderSingle.setMessage(context.resources.getString(R.string.system_app_block_warning, categoryName.toLowerCase(
-            Locale.ROOT)))
+        builderSingle.setTitle(
+            context.resources.getString(R.string.system_apps_warning_dialog_title, categoryName))
+        builderSingle.setMessage(context.resources.getString(R.string.system_app_block_warning,
+                                                             categoryName.toLowerCase(Locale.ROOT)))
 
         builderSingle.setPositiveButton(context.resources.getString(
             R.string.system_apps_dialog_positive)) { _: DialogInterface, _: Int ->

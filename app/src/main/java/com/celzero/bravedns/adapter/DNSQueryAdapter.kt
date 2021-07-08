@@ -108,7 +108,7 @@ class DNSQueryAdapter(val context: Context, private val persistentState: Persist
             b.flag.text = dnsLog.flag
             b.flag.visibility = View.VISIBLE
             b.favIcon.visibility = View.GONE
-            if(!favIcon || dnsLog.failure()) {
+            if (!favIcon || dnsLog.failure()) {
                 clearFavIcon()
                 return
             }
@@ -118,7 +118,7 @@ class DNSQueryAdapter(val context: Context, private val persistentState: Persist
             displayFavIcon(url, subDomainURL)
         }
 
-        private fun clearFavIcon(){
+        private fun clearFavIcon() {
             GlideApp.with(context.applicationContext).clear(b.favIcon)
         }
 
@@ -148,10 +148,10 @@ class DNSQueryAdapter(val context: Context, private val persistentState: Persist
                 GlideApp.with(context.applicationContext).load(url).onlyRetrieveFromCache(
                     true).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).override(SIZE_ORIGINAL,
                                                                                   SIZE_ORIGINAL).error(
-                    GlideApp.with(context.applicationContext).load(subDomainURL).onlyRetrieveFromCache(
-                        true)).transition(withCrossFade(factory)).into(object :
-                                                                               CustomViewTarget<ImageView, Drawable>(
-                                                                                   b.favIcon) {
+                    GlideApp.with(context.applicationContext).load(
+                        subDomainURL).onlyRetrieveFromCache(true)).transition(
+                    withCrossFade(factory)).into(object : CustomViewTarget<ImageView, Drawable>(
+                    b.favIcon) {
                     override fun onLoadFailed(errorDrawable: Drawable?) {
                         showFlag()
                         hideFavIcon()
@@ -176,12 +176,12 @@ class DNSQueryAdapter(val context: Context, private val persistentState: Persist
             }
         }
 
-        private fun showFavIcon(drawable: Drawable){
+        private fun showFavIcon(drawable: Drawable) {
             b.favIcon.visibility = View.VISIBLE
             b.favIcon.setImageDrawable(drawable)
         }
 
-        private fun hideFavIcon(){
+        private fun hideFavIcon() {
             b.favIcon.visibility = View.GONE
             b.favIcon.setImageDrawable(null)
         }

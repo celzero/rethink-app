@@ -52,7 +52,7 @@ class DNSLogs {
     var dnsType: Int = 0
 
     override fun equals(other: Any?): Boolean {
-        if(other !is DNSLogs) return false
+        if (other !is DNSLogs) return false
         if (id != other.id) return false
         return true
     }
@@ -67,7 +67,7 @@ class DNSLogs {
         return format.format(date)
     }
 
-    fun favIcoUrl(): String{
+    fun favIcoUrl(): String {
         return "${Constants.FAV_ICON_URL}${this.queryStr}ico"
     }
 

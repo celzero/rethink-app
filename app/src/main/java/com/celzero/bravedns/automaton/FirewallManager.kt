@@ -32,7 +32,6 @@ import com.celzero.bravedns.util.BackgroundAccessibilityService
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -93,7 +92,7 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
         }
 
         fun updateCategoryAppsInternetPermission(categoryName: String, isAllowed: Boolean) {
-            CoroutineScope(Dispatchers.IO).launch  {
+            CoroutineScope(Dispatchers.IO).launch {
                 GlobalVariable.appList.forEach {
                     if (it.value.appCategory == categoryName && !it.value.whiteListUniv1) {
                         it.value.isInternetAllowed = isAllowed

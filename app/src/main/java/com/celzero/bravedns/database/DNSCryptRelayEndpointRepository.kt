@@ -50,7 +50,8 @@ class DNSCryptRelayEndpointRepository(
     }
 
     fun getDNSCryptRelayEndpointLiveData(): LiveData<PagedList<DNSCryptRelayEndpoint>> {
-        return dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveData().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+        return dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveData().toLiveData(
+            pageSize = LIVEDATA_PAGE_SIZE)
     }
 
     fun deleteOlderData(date: Long, coroutineScope: CoroutineScope = GlobalScope) {

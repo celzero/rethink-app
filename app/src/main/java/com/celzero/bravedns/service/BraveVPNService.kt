@@ -224,7 +224,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 var remainingWaitMs = TimeUnit.SECONDS.toMillis(10)
                 var attempt = 0
                 val isUidAllowed = backgroundAllowedUID.containsKey(uid)
-                if (DEBUG) Log.d(LOG_TAG_VPN, "Background blocked? $isUidAllowed, $uid, $destIp, AccessibilityEvent: app in foreground: $uid ")
+                if (DEBUG) Log.d(LOG_TAG_VPN,
+                                 "Background blocked? $isUidAllowed, $uid, $destIp, AccessibilityEvent: app in foreground: $uid ")
 
                 while (remainingWaitMs > 0) {
                     if (isUidAllowed) {
@@ -460,7 +461,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     fun newBuilder(): Builder {
         var builder = Builder()
 
-        if(isVpnLockdownEnabled(this) == false && persistentState.allowByPass) {
+        if (isVpnLockdownEnabled(this) == false && persistentState.allowByPass) {
             Log.i(LOG_TAG_VPN, "getAllowByPass - true")
             builder = builder.allowBypass()
         }
@@ -521,14 +522,17 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                       "Proxy mode - Socks5 is selected - $socks5ProxyEndpoint, with app name - ${socks5ProxyEndpoint?.proxyAppName}")
                 if (socks5ProxyEndpoint != null && socks5ProxyEndpoint.proxyAppName != getString(
                         R.string.settings_app_list_default_app)) {
-                    if (isExcludePossible(socks5ProxyEndpoint.proxyAppName!!, getString(R.string.socks5_proxy_toast_parameter) )) {
-                        builder = builder.addDisallowedApplication(socks5ProxyEndpoint.proxyAppName!!)
+                    if (isExcludePossible(socks5ProxyEndpoint.proxyAppName!!,
+                                          getString(R.string.socks5_proxy_toast_parameter))) {
+                        builder = builder.addDisallowedApplication(
+                            socks5ProxyEndpoint.proxyAppName!!)
                     }
                 }
             }
 
             if (appMode.getProxyMode() == Constants.ORBOT_SOCKS) {
-                if (isExcludePossible(getString(R.string.orbot), getString(R.string.orbot_toast_parameter))) {
+                if (isExcludePossible(getString(R.string.orbot),
+                                      getString(R.string.orbot_toast_parameter))) {
                     builder = builder.addDisallowedApplication(OrbotHelper.ORBOT_PACKAGE_NAME)
                 }
             }
@@ -540,7 +544,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                       "DNS Proxy mode is set with the app name as ${dnsProxyEndpoint.proxyAppName}")
                 if (!dnsProxyEndpoint.proxyAppName.isNullOrEmpty() && dnsProxyEndpoint.proxyAppName != getString(
                         R.string.settings_app_list_default_app)) {
-                    if (isExcludePossible(dnsProxyEndpoint.proxyAppName!!, getString(R.string.dns_proxy_toast_parameter))) {
+                    if (isExcludePossible(dnsProxyEndpoint.proxyAppName!!,
+                                          getString(R.string.dns_proxy_toast_parameter))) {
                         builder = builder.addDisallowedApplication(dnsProxyEndpoint.proxyAppName!!)
                     }
                 }
@@ -554,8 +559,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
 
     private fun isExcludePossible(appName: String, message: String): Boolean {
         if (Utilities.isVpnLockdownEnabled(this) == true) {
-            showToastUiCentered(this, getString(R.string.dns_proxy_connection_failure_lockdown, appName, message),
-                                Toast.LENGTH_SHORT)
+            showToastUiCentered(this,
+                                getString(R.string.dns_proxy_connection_failure_lockdown, appName,
+                                          message), Toast.LENGTH_SHORT)
             return false
         }
         return true

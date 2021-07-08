@@ -78,7 +78,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
 
             val children = dir.list()
 
-            if(children.isNullOrEmpty()){
+            if (children.isNullOrEmpty()) {
                 return false
             }
             for (i in children.indices) {
@@ -92,7 +92,8 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             }
             val destinationDir = File("${context.filesDir.canonicalPath}/$timestamp")
 
-            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "After copy, dest dir = $destinationDir, ${destinationDir.isDirectory}, ${destinationDir.list()?.size}, ${!isDownloadValid()}  ")
+            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
+                             "After copy, dest dir = $destinationDir, ${destinationDir.isDirectory}, ${destinationDir.list()?.size}, ${!isDownloadValid()}  ")
 
             if (!destinationDir.isDirectory || destinationDir.list()?.size != LOCAL_BLOCKLIST_FILE_COUNT || !isDownloadValid()) {
                 return false

@@ -39,7 +39,7 @@ class FirewallRules {
     }
 
     fun clearFirewallRules(uid: Int, blockedConnectionsRepository: BlockedConnectionsRepository) {
-        CoroutineScope(Dispatchers.IO).launch  {
+        CoroutineScope(Dispatchers.IO).launch {
             blockedConnectionsRepository.clearFirewallRules(uid)
         }
         firewallRules.removeAll(uid)
@@ -48,7 +48,7 @@ class FirewallRules {
     fun removeFirewallRules(uid: Int, ipAddress: String,
                             blockedConnectionsRepository: BlockedConnectionsRepository) {
         if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Remove Firewall: $uid, $ipAddress")
-        CoroutineScope(Dispatchers.IO).launch  {
+        CoroutineScope(Dispatchers.IO).launch {
             if (uid == ConnTrackerBottomSheetFragment.UNIVERSAL_RULES_UID) blockedConnectionsRepository.deleteIPRulesUniversal(
                 ipAddress)
             else blockedConnectionsRepository.deleteIPRulesForUID(uid, ipAddress)
@@ -59,7 +59,7 @@ class FirewallRules {
     fun addFirewallRules(uid: Int, ipAddress: String, ruleType: String,
                          blockedConnectionsRepository: BlockedConnectionsRepository) {
         if (DEBUG) Log.d(LOG_TAG_FIREWALL, "addFirewallRules: $uid, $ipAddress")
-        CoroutineScope(Dispatchers.IO).launch  {
+        CoroutineScope(Dispatchers.IO).launch {
             val blockedConnection = constructBlockedConnections(uid, ipAddress, ruleType)
             blockedConnectionsRepository.insertAsync(blockedConnection)
         }
@@ -77,7 +77,7 @@ class FirewallRules {
     }
 
     fun loadFirewallRules(blockedConnectionsRepository: BlockedConnectionsRepository) {
-        CoroutineScope(Dispatchers.IO).launch  {
+        CoroutineScope(Dispatchers.IO).launch {
             val dbVal = blockedConnectionsRepository.getBlockedConnections()
             dbVal.forEach {
                 val key = it.uid

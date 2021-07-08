@@ -129,8 +129,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
 
         fun updateGlobalAppInfoEntry(pkgName: String, ai: AppInfo?) {
-            if (ai != null)
-        	    GlobalVariable.appList[pkgName] = ai
+            if (ai != null) GlobalVariable.appList[pkgName] = ai
         }
     }
 

@@ -57,7 +57,8 @@ class DNSProxyEndpointRepository(private val dnsProxyEndpointDAO: DNSProxyEndpoi
     }
 
     fun getDNSProxyEndpointLiveData(): LiveData<PagedList<DNSProxyEndpoint>> {
-        return dnsProxyEndpointDAO.getDNSProxyEndpointLiveData().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+        return dnsProxyEndpointDAO.getDNSProxyEndpointLiveData().toLiveData(
+            pageSize = LIVEDATA_PAGE_SIZE)
     }
 
     fun deleteOlderData(date: Long, coroutineScope: CoroutineScope = GlobalScope) {

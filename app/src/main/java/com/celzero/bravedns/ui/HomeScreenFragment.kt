@@ -366,7 +366,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun checkForPrivateDNSandAlwaysON(): Boolean {
         val vpnService = VpnController.getInstance().getBraveVpnService()
         val alwaysOn = isAlwaysOnEnabled(vpnService, requireContext())
-        if (DEBUG) Log.i(LOG_TAG_VPN, "AlwaysOn: $alwaysOn, isVpnService available? ${vpnService != null}")
+        if (DEBUG) Log.i(LOG_TAG_VPN,
+                         "AlwaysOn: $alwaysOn, isVpnService available? ${vpnService != null}")
 
         if (isOtherVpnHasAlwaysOn(requireContext())) {
             showDisableAlwaysOnDialog()

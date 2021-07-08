@@ -20,17 +20,12 @@ import android.util.Log;
 
 import com.google.common.net.InetAddresses;
 
-import org.minidns.util.Base64;
-
 import java.net.InetAddress;
 import java.net.ProtocolException;
 import java.net.UnknownHostException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.celzero.bravedns.util.LoggerConstants.LOG_TAG_DNS_LOG;

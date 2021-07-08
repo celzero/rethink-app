@@ -18,7 +18,6 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.DialogInterface
-import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
@@ -27,7 +26,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -42,7 +40,6 @@ import com.celzero.bravedns.service.BraveVPNService.Companion.appWhiteList
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.ThrowingHandler
 import com.celzero.bravedns.util.Utilities.Companion.getDefaultIcon
@@ -89,7 +86,7 @@ class UniversalAppListAdapter(private val context: Context,
             b.univWhitelistApkLabelTv.text = appInfo.appName
             b.univWhitelistCheckbox.isChecked = appInfo.whiteListUniv1
 
-            displayIcon(getIcon(context, appInfo.appName, appInfo.packageInfo))
+            displayIcon(getIcon(context, appInfo.packageInfo, appInfo.appName))
             clickListeners(appInfo)
         }
 
@@ -132,12 +129,14 @@ class UniversalAppListAdapter(private val context: Context,
                 return
             }
 
-            Log.i(LOG_TAG_FIREWALL, "App ${appInfo.appName} whitelisted from vpn? - $status, blockAllApps?- $blockAllApps")
+            Log.i(LOG_TAG_FIREWALL,
+                  "App ${appInfo.appName} whitelisted from vpn? - $status, blockAllApps?- $blockAllApps")
             b.univWhitelistCheckbox.isChecked = status
             persistAppDetails(appInfo, appUIDList, status)
         }
 
-        private fun persistAppDetails(appInfo: AppInfo, appUIDList: List<AppInfo>, status: Boolean) {
+        private fun persistAppDetails(appInfo: AppInfo, appUIDList: List<AppInfo>,
+                                      status: Boolean) {
             CoroutineScope(Dispatchers.IO).launch {
                 if (status) {
                     appUIDList.forEach {

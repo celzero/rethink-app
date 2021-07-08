@@ -33,7 +33,7 @@ class DoHEndpoint {
     var latency: Int = 0
 
     override fun equals(other: Any?): Boolean {
-        if(other !is DoHEndpoint) return false
+        if (other !is DoHEndpoint) return false
         if (dohURL != other.dohURL) return false
         if (isSelected != isSelected) return false
         return true

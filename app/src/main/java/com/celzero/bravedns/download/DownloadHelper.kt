@@ -28,7 +28,7 @@ class DownloadHelper {
     companion object {
         fun isLocalDownloadValid(context: Context, timestamp: String): Boolean {
             var result = false
-            var total : Int? = 0
+            var total: Int? = 0
             var dir: File? = null
             try {
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Local block list validation: $timestamp")
@@ -44,7 +44,8 @@ class DownloadHelper {
                 Log.w(LOG_TAG_DOWNLOAD, "Local block list validation failed - ${e.message}", e)
             }
 
-            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Valid on-device blocklist ($timestamp) download? $result, files: $total, dir? ${dir?.isDirectory}")
+            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
+                             "Valid on-device blocklist ($timestamp) download? $result, files: $total, dir? ${dir?.isDirectory}")
             return result
         }
 

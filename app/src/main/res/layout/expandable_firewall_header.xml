@@ -137,7 +137,6 @@
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
                     android:paddingBottom="20dp"
-                    android:text="@string/system_apps_warning"
                     android:textSize="@dimen/default_font_text_view"
                     android:visibility="gone" />
             </RelativeLayout>

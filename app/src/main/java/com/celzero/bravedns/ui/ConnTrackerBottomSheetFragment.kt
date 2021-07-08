@@ -359,7 +359,7 @@ class ConnTrackerBottomSheetFragment(private var contextVal: Context,
     private fun clearAppRules() {
         val blockAllApps: Boolean
         val appUIDList = appInfoRepository.getAppListForUID(ipDetails.uid)
-        if(appUIDList.size <= 1){
+        if (appUIDList.size <= 1) {
             showAlertForClearRules()
             return
         }

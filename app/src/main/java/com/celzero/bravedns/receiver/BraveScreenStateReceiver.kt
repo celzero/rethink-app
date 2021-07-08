@@ -64,7 +64,7 @@ class BraveScreenStateReceiver : BroadcastReceiver(), KoinComponent {
         val isScreenOff = persistentState.isScreenOff
         Log.i(LOG_TAG_VPN, "on screen-on: isScreenOff? $isScreenOff")
 
-        if(!isScreenOff) {
+        if (!isScreenOff) {
             return
         }
 

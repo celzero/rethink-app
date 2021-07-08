@@ -48,10 +48,6 @@ class RethinkDnsApplication : Application() {
             .permitNetwork()
             .build())*/
         StrictMode.setVmPolicy(
-            StrictMode.VmPolicy.Builder()
-            .detectAll()
-            .detectLeakedSqlLiteObjects()
-            .penaltyLog()
-            .build())
+            StrictMode.VmPolicy.Builder().detectAll().detectLeakedSqlLiteObjects().penaltyLog().build())
     }
 }

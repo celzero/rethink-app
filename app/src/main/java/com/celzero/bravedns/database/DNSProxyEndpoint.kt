@@ -35,7 +35,7 @@ class DNSProxyEndpoint {
     var latency: Int = 0
 
     override fun equals(other: Any?): Boolean {
-        if(other !is DNSProxyEndpoint) return false
+        if (other !is DNSProxyEndpoint) return false
         if (id != other.id) return false
         return true
     }
@@ -69,13 +69,12 @@ class DNSProxyEndpoint {
     }
 
     fun getExplanationText(context: Context): String {
-        return if (this.isSelected){
-            context.getString(
-                R.string.settings_socks_forwarding_desc, this.proxyIP,
-                this.proxyPort.toString(), this.proxyAppName)
-        } else {
-            context.getString(R.string.dns_proxy_desc, this.proxyIP,
+        return if (this.isSelected) {
+            context.getString(R.string.settings_socks_forwarding_desc, this.proxyIP,
                               this.proxyPort.toString(), this.proxyAppName)
+        } else {
+            context.getString(R.string.dns_proxy_desc, this.proxyIP, this.proxyPort.toString(),
+                              this.proxyAppName)
         }
     }
 }

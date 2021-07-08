@@ -155,8 +155,7 @@ class DNSCryptEndpointAdapter(private val context: Context,
             builder.setCancelable(true)
             builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { _, _ ->
                 GlobalScope.launch(Dispatchers.IO) {
-                    dnsCryptEndpointRepository.deleteDNSCryptEndpoint(
-                        dnsCryptEndpoint.dnsCryptURL)
+                    dnsCryptEndpointRepository.deleteDNSCryptEndpoint(dnsCryptEndpoint.dnsCryptURL)
                 }
                 Toast.makeText(context, R.string.dns_crypt_url_remove_success,
                                Toast.LENGTH_SHORT).show()
@@ -172,10 +171,8 @@ class DNSCryptEndpointAdapter(private val context: Context,
         private fun showDialogExplanation(title: String, url: String, message: String?) {
             val builder = AlertDialog.Builder(context)
             builder.setTitle(title)
-            if(message == null)
-                builder.setMessage(url)
-            else
-                builder.setMessage(url + "\n\n" + message)
+            if (message == null) builder.setMessage(url)
+            else builder.setMessage(url + "\n\n" + message)
             builder.setCancelable(true)
             builder.setPositiveButton(
                 context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->

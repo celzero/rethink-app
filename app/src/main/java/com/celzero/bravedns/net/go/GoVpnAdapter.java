@@ -552,7 +552,7 @@ public class GoVpnAdapter {
 
     private Boolean setBraveDNSLocalMode() {
         try {
-            if(!persistentState.getBlocklistFilesDownloaded() || !persistentState.getLocalBlocklistEnabled()){
+            if (!persistentState.getBlocklistFilesDownloaded() || !persistentState.getLocalBlocklistEnabled()) {
                 Log.i(LOG_TAG_VPN, "app dns mode is set to null(on GO) with local stamp");
                 tunnel.setBraveDNS(null);
                 return false;

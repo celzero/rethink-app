@@ -33,7 +33,7 @@ class BlockedConnections {
     var modifiedDateTime: Long = INIT_TIME_MS
 
     override fun equals(other: Any?): Boolean {
-        if( other !is BlockedConnections) return false
+        if (other !is BlockedConnections) return false
         if (id != other.id) return false
         return true
     }

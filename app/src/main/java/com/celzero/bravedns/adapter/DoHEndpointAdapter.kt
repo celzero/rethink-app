@@ -108,7 +108,8 @@ class DoHEndpointAdapter(private val context: Context,
             b.dohEndpointListUrlName.text = endpoint.dohName
             b.dohEndpointListUrlExplanation.text = ""
             b.dohEndpointListCheckImage.isChecked = endpoint.isSelected
-            Log.i(LOG_TAG_DNS, "connected to doh - ${endpoint.dohName} isSelected? - ${endpoint.isSelected}")
+            Log.i(LOG_TAG_DNS,
+                  "connected to doh - ${endpoint.dohName} isSelected? - ${endpoint.isSelected}")
             if (endpoint.isSelected) {
                 val count = persistentState.numberOfRemoteBlocklists
                 b.dohEndpointListUrlExplanation.text = if (endpoint.isRethinkDns() && count > 0) {
@@ -167,7 +168,7 @@ class DoHEndpointAdapter(private val context: Context,
                              "updateConnection - ${endpoint.dohName}, ${endpoint.dohURL}")
             endpoint.dohURL = doHEndpointRepository.getConnectionURL(endpoint.id)
 
-            if(!endpoint.isRethinkDns()){
+            if (!endpoint.isRethinkDns()) {
                 updateDoHDetails(endpoint)
                 b.dohEndpointListCheckImage.isChecked = true
                 return
