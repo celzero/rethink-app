@@ -184,7 +184,7 @@ public class GoVpnAdapter {
             tunnel = Tun2socks.connectIntraTunnel(tunFd.getFd(), fakeDns,
                     transport, getProtector(), getBlocker(), listener);
 
-            if (iDnsMode == Settings.DNSModeIP || iDnsMode == Settings.DNSModePort || iDnsMode == Settings.DNSModeNone) {
+            if (Settings.DNSModeNone != iDnsMode) {
                 Boolean isLocalSet = setBraveDNSLocalMode();
                 if (!isLocalSet && dohURL.contains(Constants.BRAVE_BASIC_URL)) {
                     Log.i(LOG_TAG_VPN, "Set stamp for remote url :" + dohURL);
@@ -503,7 +503,7 @@ public class GoVpnAdapter {
 
             Log.i(LOG_TAG_VPN, "Connect tunnel with url " + dohURL + ", dnsMode- " + dnsMode + ", blockMode-" + blockMode + ", proxyMode-" + proxyMode);
 
-            if (dnsMode == Settings.DNSModeIP || dnsMode == Settings.DNSModePort || dnsMode == Settings.DNSModeNone) {
+            if (Settings.DNSModeNone != dnsMode) {
                 Boolean isLocalSet = setBraveDNSLocalMode();
                 if (!isLocalSet && dohURL.contains(Constants.BRAVE_BASIC_URL)) {
                     Log.i(LOG_TAG_VPN, "Set stamp for remote url :" + dohURL);
@@ -552,24 +552,24 @@ public class GoVpnAdapter {
 
     private Boolean setBraveDNSLocalMode() {
         try {
-            if (persistentState.getBlocklistFilesDownloaded() && persistentState.getLocalBlocklistEnabled()) {
-                BraveDNS localBraveDNS = appMode.getBraveDNS();
-
-                if (localBraveDNS == null) return false;
-
-                String stamp = persistentState.getLocalBlocklistStamp();
-                Log.i(LOG_TAG_VPN, "Tunnel is set with local stamp: " + stamp);
-                if (!stamp.isEmpty()) {
-                    tunnel.setBraveDNS(localBraveDNS);
-                    tunnel.getBraveDNS().setStamp(stamp);
-                    return true;
-                }
-            } else {
-                tunnel.setBraveDNS(null);
+            if(!persistentState.getBlocklistFilesDownloaded() || !persistentState.getLocalBlocklistEnabled()){
                 Log.i(LOG_TAG_VPN, "app dns mode is set to null(on GO) with local stamp");
+                tunnel.setBraveDNS(null);
+                return false;
+            }
+
+            BraveDNS localBraveDNS = appMode.getBraveDNS();
+            if (localBraveDNS == null) return false;
+
+            String stamp = persistentState.getLocalBlocklistStamp();
+            Log.i(LOG_TAG_VPN, "app dns mode is set with local stamp: " + stamp);
+            if (!stamp.isEmpty()) {
+                tunnel.setBraveDNS(localBraveDNS);
+                tunnel.getBraveDNS().setStamp(stamp);
+                return true;
             }
         } catch (Exception ex) {
-            Log.e(LOG_TAG_VPN, "]Exception while setting brave dns for local:" + ex.getMessage(), ex);
+            Log.e(LOG_TAG_VPN, "Exception while setting brave dns for local:" + ex.getMessage(), ex);
         }
         return false;
     }

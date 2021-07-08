@@ -22,9 +22,10 @@ import com.celzero.bravedns.database.BlockedConnectionsRepository
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.firewallRules
+import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class FirewallRules {
@@ -38,7 +39,7 @@ class FirewallRules {
     }
 
     fun clearFirewallRules(uid: Int, blockedConnectionsRepository: BlockedConnectionsRepository) {
-        GlobalScope.launch(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch  {
             blockedConnectionsRepository.clearFirewallRules(uid)
         }
         firewallRules.removeAll(uid)
@@ -47,7 +48,7 @@ class FirewallRules {
     fun removeFirewallRules(uid: Int, ipAddress: String,
                             blockedConnectionsRepository: BlockedConnectionsRepository) {
         if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Remove Firewall: $uid, $ipAddress")
-        GlobalScope.launch(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch  {
             if (uid == ConnTrackerBottomSheetFragment.UNIVERSAL_RULES_UID) blockedConnectionsRepository.deleteIPRulesUniversal(
                 ipAddress)
             else blockedConnectionsRepository.deleteIPRulesForUID(uid, ipAddress)
@@ -58,26 +59,25 @@ class FirewallRules {
     fun addFirewallRules(uid: Int, ipAddress: String, ruleType: String,
                          blockedConnectionsRepository: BlockedConnectionsRepository) {
         if (DEBUG) Log.d(LOG_TAG_FIREWALL, "addFirewallRules: $uid, $ipAddress")
-        GlobalScope.launch(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch  {
             val blockedConnection = constructBlockedConnections(uid, ipAddress, ruleType)
             blockedConnectionsRepository.insertAsync(blockedConnection)
         }
         firewallRules.put(uid, ipAddress)
     }
 
-    fun checkRules(uid: Int, connectionRules: ConnectionRules): Boolean {
+    fun checkRules(uid: Int, rules: ConnectionRules): Boolean {
         val rule = firewallRules[uid]
         rule?.forEach {
-            if (it!! == connectionRules.ipAddress) {
+            if (rules.ipAddress == it) {
                 return true
             }
         }
         return false
     }
 
-
     fun loadFirewallRules(blockedConnectionsRepository: BlockedConnectionsRepository) {
-        GlobalScope.launch(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch  {
             val dbVal = blockedConnectionsRepository.getBlockedConnections()
             dbVal.forEach {
                 val key = it.uid
@@ -90,7 +90,7 @@ class FirewallRules {
                                             ruleType: String): BlockedConnections {
         val blockedConnections = BlockedConnections()
         blockedConnections.ipAddress = ipAddress
-        blockedConnections.port = 0
+        blockedConnections.port = UNSPECIFIED_PORT
         blockedConnections.protocol = ""
         blockedConnections.isActive = true
         blockedConnections.modifiedDateTime = System.currentTimeMillis()

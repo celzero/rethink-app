@@ -300,7 +300,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
 
     private fun checkAppNotInUse() {
 
-        if (!persistentState.backgroundEnabled || !persistentState.isAccessibilityCrashDetected) {
+        if (!persistentState.isAccessibilityCrashDetected) {
             return
         }
 

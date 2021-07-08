@@ -20,6 +20,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "AppInfo")
 class AppInfo {
+    // packageInfo - wrongly named instead of packageName, consider changing
+    // the name as packageName as part of migration.
     @PrimaryKey var packageInfo: String = ""
     var appName: String = ""
     var uid: Int = 0
@@ -29,7 +31,7 @@ class AppInfo {
     var isSystemApp: Boolean = false
     var isScreenOff: Boolean = false
     var isInternetAllowed: Boolean = true
-    var isBackgroundEnabled: Boolean = true
+    var isBackgroundEnabled: Boolean = false
     var whiteListUniv1: Boolean = false
     var whiteListUniv2: Boolean = false
     var isExcluded: Boolean = false
@@ -39,15 +41,13 @@ class AppInfo {
 
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other?.javaClass != javaClass) return false
-        other as AppInfo
+        if (other !is AppInfo) return false
         if (packageInfo != other.packageInfo) return false
         return true
     }
 
     override fun hashCode(): Int {
-        return this.hashCode()
+        return this.packageInfo.hashCode()
     }
 
 }

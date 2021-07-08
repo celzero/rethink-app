@@ -18,12 +18,19 @@ package com.celzero.bravedns.net.dns;
 
 import android.util.Log;
 
+import com.google.common.net.InetAddresses;
+
+import org.minidns.util.Base64;
+
 import java.net.InetAddress;
 import java.net.ProtocolException;
 import java.net.UnknownHostException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.celzero.bravedns.util.LoggerConstants.LOG_TAG_DNS_LOG;
@@ -219,8 +226,11 @@ public class DnsPacket {
             for (DnsRecord r : src) {
                 if (r.rtype == TYPE_A || r.rtype == TYPE_AAAA) {
                     try {
-                        addresses.add(InetAddress.getByAddress(r.data));
-                    } catch (UnknownHostException e) {
+                        // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
+                        // Unlike InetAddress.getByAddress(), the methods of this class never cause DNS services
+                        // to be accessed.
+                        addresses.add(InetAddresses.fromLittleEndianByteArray(r.data));
+                    } catch (IllegalArgumentException | UnknownHostException e) {
                         Log.e(LOG_TAG_DNS_LOG, "Failure converting string to InetAddresses: ${e.message}", e);
                     }
                 }

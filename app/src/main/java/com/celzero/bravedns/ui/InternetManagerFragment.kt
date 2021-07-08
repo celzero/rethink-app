@@ -30,7 +30,7 @@ import com.celzero.bravedns.util.MyAccessibilityService
 
 class InternetManagerFragment : Fragment(R.layout.fragment_internet_manager) {
     private val b by viewBinding(FragmentInternetManagerBinding::bind)
-    private var contextVal: Context? = null
+    private lateinit var contextVal: Context
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

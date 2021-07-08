@@ -29,6 +29,7 @@ import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.content.res.Configuration
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.provider.Settings
 import android.provider.Settings.ACTION_VPN_SETTINGS
@@ -40,6 +41,7 @@ import android.view.View
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
@@ -53,6 +55,7 @@ import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.google.android.material.snackbar.Snackbar
@@ -70,7 +73,6 @@ class Utilities {
     companion object {
 
         private const val STORAGE_PERMISSION_CODE = 1008
-        private const val READ_PHONE_STATE_REQUEST = 37
 
         fun checkPermission(activity: AppCompatActivity): Boolean {
             var permissionGranted = false
@@ -250,7 +252,7 @@ class Utilities {
             return serversToSend
         }
 
-        fun showToastUiCentered(context: Context?, message: String, toastLength: Int) {
+        fun showToastUiCentered(context: Context, message: String, toastLength: Int) {
             try {
                 val toast = Toast.makeText(context, message, toastLength)
                 toast.setGravity(Gravity.CENTER, 0, 0)
@@ -384,22 +386,34 @@ class Utilities {
 
         fun getPackageMetadata(pm: PackageManager, pi: String): PackageInfo? {
             var metadata: PackageInfo? = null
+
+            if (pi.contains(Constants.NO_PACKAGE)) return metadata
+
             try {
                 metadata = pm.getPackageInfo(pi, PackageManager.GET_META_DATA)
             } catch (e: PackageManager.NameNotFoundException) {
                 Log.w(LOG_TAG_APP_DB, "Application not available $pi" + e.message, e)
             }
-            return metadata;
+            return metadata
         }
 
         fun copy(from: String, to: String): Boolean {
-            val src = File(from)
-            val dest = File(to)
+            try {
+                val src = File(from)
+                val dest = File(to)
 
-            if (!src.isFile || !dest.isFile) return false
+                if (!src.isFile) return false
 
-            val res = src.copyTo(dest, true)
-            return res.exists()
+                src.copyTo(dest, true)
+            } catch (e: NoSuchFileException) { // Throws NoSuchFileException, IOException
+                Log.e(LOG_TAG_DOWNLOAD, "Error copying file ${e.message}", e)
+                return false
+            } catch (e: IOException) {
+                Log.e(LOG_TAG_DOWNLOAD, "Error copying file ${e.message}", e)
+                return false
+            }
+
+            return true
         }
 
 
@@ -411,13 +425,48 @@ class Utilities {
             // For versions above 29(Q), there is vpnService.isAlwaysOn property to check
             // whether always-on is enabled.
             // For versions prior to 29 the check is made with Settings.Secure.
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                vpnService?.isAlwaysOn == true
+            // In our case, the always-on check is for all the vpn profiles. So using
+            // vpnService?.isAlwaysOn will not be much helpful
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                return vpnService?.isAlwaysOn == true
             } else {
                 val alwaysOn = Settings.Secure.getString(context.contentResolver,
-                                                                          "always_on_vpn_app")
-                !TextUtils.isEmpty(alwaysOn) && context.packageName == alwaysOn
+                                                         "always_on_vpn_app")
+                return !TextUtils.isEmpty(alwaysOn) && context.packageName == alwaysOn
             }
+        }
+
+        fun isOtherVpnHasAlwaysOn(context: Context): Boolean{
+            return try {
+                val alwaysOn = Settings.Secure.getString(context.contentResolver, "always_on_vpn_app")
+                !TextUtils.isEmpty(alwaysOn) && context.packageName != alwaysOn
+            } catch (e: Exception) {
+                Log.e(LOG_TAG_VPN, "Failure while retrieving Settings.Secure value ${e.message}", e)
+                false
+            }
+        }
+
+        fun getIcon(context: Context, packageName: String, appName: String): Drawable? {
+            if (!isValidApp(appName, packageName)) {
+                return null
+            }
+
+            return try {
+                context.packageManager.getApplicationIcon(packageName)
+            } catch (e: PackageManager.NameNotFoundException) {
+                Log.e(LOG_TAG_FIREWALL,
+                      "Application Icon not available for package: ${packageName}" + e.message,
+                      e)
+                getDefaultIcon(context)
+            }
+        }
+
+        private fun isValidApp(appName: String, packageName: String): Boolean {
+            return !packageName.contains(Constants.NO_PACKAGE) && appName != Constants.UNKNOWN_APP
+        }
+
+        fun getDefaultIcon(context: Context): Drawable? {
+            return AppCompatResources.getDrawable(context, R.drawable.default_app_icon)
         }
     }
 }

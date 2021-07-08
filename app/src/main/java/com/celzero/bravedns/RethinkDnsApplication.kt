@@ -26,7 +26,7 @@ class RethinkDnsApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        //if(BuildConfig.DEBUG) turnOnStrictMode()
+        //turnOnStrictMode()
 
         startKoin {
             if (BuildConfig.DEBUG) androidLogger()
@@ -36,17 +36,22 @@ class RethinkDnsApplication : Application() {
     }
 
     private fun turnOnStrictMode() {
-        if (BuildConfig.DEBUG) {
-            /* StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()
-                             .detectAll()
-                             .penaltyLog()
-                             .permitDiskReads()
-                             .permitDiskWrites()
-                             .permitNetwork()
-                             .penaltyLog()
-                             .build())*/
-            StrictMode.setVmPolicy(
-                StrictMode.VmPolicy.Builder().detectAll().detectLeakedSqlLiteObjects().penaltyLog().build())
-        }
+        if (!BuildConfig.DEBUG) return
+        // Uncomment the code below to enable the strict mode for app while in DEBUG mode.
+        // Strict mode for disk read/writes, network access.
+        /*StrictMode.setThreadPolicy(
+            StrictMode.ThreadPolicy.Builder()
+            .detectAll()
+            .penaltyLog()
+            .permitDiskReads()
+            .permitDiskWrites()
+            .permitNetwork()
+            .build())*/
+        StrictMode.setVmPolicy(
+            StrictMode.VmPolicy.Builder()
+            .detectAll()
+            .detectLeakedSqlLiteObjects()
+            .penaltyLog()
+            .build())
     }
 }

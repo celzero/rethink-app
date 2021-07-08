@@ -32,11 +32,9 @@ class PermissionManagerApk(packageInfo: PackageInfo, context: Context) :
     private var packageName: String? = null
     private var appIcon: Drawable? = null
     private var version: String? = ""
-    private var context: Context? = null
 
     init {
 
-        this.context = context
         this.appIcon = context.packageManager.getApplicationIcon(appInfo)
         this.appName = context.packageManager.getApplicationLabel(appInfo).toString()
         this.packageName = packageInfo.packageName

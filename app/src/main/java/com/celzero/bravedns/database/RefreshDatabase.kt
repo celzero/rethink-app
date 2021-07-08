@@ -21,6 +21,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
@@ -47,6 +48,12 @@ class RefreshDatabase internal constructor(private var context: Context,
                                            private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
                                            private val persistentState: PersistentState) {
 
+
+    companion object {
+        private const val PROXY_EXTERNAL = "External"
+        private const val APP_NAME_NO_APP = "Nobody"
+    }
+
     /**
      * Need to rewrite the logic for adding the apps in the database and removing it during uninstall.
      */
@@ -55,119 +62,129 @@ class RefreshDatabase internal constructor(private var context: Context,
         GlobalScope.launch(Dispatchers.IO) {
             val appListDB = appInfoRepository.getAppInfoAsync()
             appListDB.forEach {
-                if (it.packageInfo.contains(Constants.NO_PACKAGE)) return@forEach
-
                 val pkgMetadata = Utilities.getPackageMetadata(context.packageManager, it.packageInfo)
-                if (pkgMetadata?.applicationInfo == null) {
-                    appInfoRepository.delete(it)
-                }
+                if (pkgMetadata?.applicationInfo != null) return@forEach
+                appInfoRepository.delete(it)
             }
             getAppInfo()
         }
+    }
 
+    fun reloadAppList(appInfos: List<AppInfo>) {
+        HomeScreenActivity.GlobalVariable.appList.clear()
+        appInfos.forEach {
+            HomeScreenActivity.updateGlobalAppInfoEntry(it.packageInfo, it)
+            HomeScreenActivity.updateGlobalAppFirewallRule(it.uid, it.isInternetAllowed)
+        }
     }
 
     private fun getAppInfo() {
         HomeScreenActivity.isLoadingComplete = false
         GlobalScope.launch(Dispatchers.IO) {
-            val allPackages: List<PackageInfo> = context.packageManager?.getInstalledPackages(
+            val installedPackages: List<PackageInfo> = context.packageManager?.getInstalledPackages(
                 PackageManager.GET_META_DATA)!!
-            val appDetailsFromDB = appInfoRepository.getAppInfoAsync()
-            val nonAppsCount = appInfoRepository.getNonAppCount()
+            val appInfos = appInfoRepository.getAppInfoAsync()
+            val totalNonApps = appInfoRepository.getNonAppCount()
             if (DEBUG) Log.d(LOG_TAG_APP_DB,
-                             "getAppInfo - ${appDetailsFromDB.size}, $nonAppsCount, ${allPackages.size}")
-            if (appDetailsFromDB.isEmpty() || ((appDetailsFromDB.size - nonAppsCount) != (allPackages.size - 1))) {
-                allPackages.forEach {
-                    if (DEBUG) Log.d(LOG_TAG_APP_DB, "Refresh Database, AppInfo -> ${
-                        context.packageManager.getApplicationLabel(it.applicationInfo)
-                    }")
-                    if (it.applicationInfo.packageName != context.applicationContext.packageName) {
-                        val applicationInfo: ApplicationInfo = it.applicationInfo
-                        val appInfo = AppInfo()
-                        appInfo.appName = context.packageManager.getApplicationLabel(
-                            applicationInfo).toString()
-                        appInfo.packageInfo = applicationInfo.packageName
-                        appInfo.uid = applicationInfo.uid
-                        val dbAppInfo = if (appInfo.packageInfo.isNotEmpty()) {
-                            appInfoRepository.getAppInfoForPackageName(appInfo.packageInfo)
-                        } else {
-                            null
-                        }
-                        if (dbAppInfo != null && dbAppInfo.appName.isNotEmpty()) {
-                            HomeScreenActivity.GlobalVariable.appList[applicationInfo.packageName] = dbAppInfo
-                        } else {
-                            if (DEBUG) Log.d(LOG_TAG_APP_DB,
-                                             "Refresh Database, AppInfo - new package found ${appInfo.appName} - " + "${
-                                                 context.packageManager.getApplicationLabel(
-                                                     it.applicationInfo)
-                                             } will be inserted")
-                            appInfo.isDataEnabled = true
-                            appInfo.isWifiEnabled = true
-                            appInfo.isScreenOff = false
-                            appInfo.isBackgroundEnabled = false
-                            appInfo.whiteListUniv2 = false
-                            appInfo.isExcluded = false
-                            appInfo.whiteListUniv1 = ((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) && !AndroidUidConfig.isUIDAppRange(
-                                appInfo.uid)
-                            appInfo.mobileDataUsed = 0
-                            appInfo.trackers = 0
-                            appInfo.wifiDataUsed = 0
+                             "getAppInfo - ${appInfos.size}, $totalNonApps, ${installedPackages.size}")
 
-                            // Removed the package name from the method fetchCategory().
-                            // As of now, the fetchCategory is returning Category as OTHERS.
-                            // Instead we can query play store for the category.
-                            // In that case, fetchCategory method should have packageInfo as
-                            // parameter.
-                            //val category = fetchCategory(appInfo.packageInfo)
-                            val category = fetchCategory()
-                            if (category.toLowerCase(
-                                    Locale.ROOT) != PlayStoreCategory.OTHER.name.toLowerCase(
-                                    Locale.ROOT)) {
-                                appInfo.appCategory = category
-                            } else if (((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0) && AndroidUidConfig.isUIDAppRange(
-                                    appInfo.uid)) {
-                                appInfo.appCategory = Constants.APP_CAT_SYSTEM_APPS
-                                appInfo.isSystemApp = true
-                            } else if (((it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0)) {
-                                appInfo.appCategory = Constants.APP_CAT_SYSTEM_COMPONENTS
-                                appInfo.isSystemApp = true
-                            } else {
-                                val temp = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                    ApplicationInfo.getCategoryTitle(context,
-                                                                     applicationInfo.category)
-                                } else {
-                                    Constants.INSTALLED_CAT_APPS
-                                }
-                                if (temp != null) appInfo.appCategory = temp.toString()
-                                else appInfo.appCategory = Constants.APP_CAT_OTHER
-                            }
-                            if (appInfo.appCategory.contains(
-                                    "_")) appInfo.appCategory = appInfo.appCategory.replace("_",
-                                                                                            " ").toLowerCase(
-                                Locale.ROOT)
+            if(!needsRefresh(installedPackages.size, appInfos.size, totalNonApps)) {
+                reloadAppList(appInfos)
+                HomeScreenActivity.setupComplete()
+                return@launch
+            }
 
-                            appInfo.isInternetAllowed = persistentState.wifiAllowed(
-                                appInfo.packageInfo)
+            installedPackages.forEach {
+                if (DEBUG) Log.d(LOG_TAG_APP_DB, "Refresh Database, AppInfo -> ${
+                    context.packageManager.getApplicationLabel(it.applicationInfo)
+                }")
+                if (it.applicationInfo.packageName == context.applicationContext.packageName) return@forEach
 
-                            //TODO Handle this Global scope variable properly. Only half done.
-                            HomeScreenActivity.GlobalVariable.appList[applicationInfo.packageName] = appInfo
-                            appInfoRepository.insertAsync(appInfo)
-                        }
-                    }
-                }
-                updateCategoryInDB()
-            } else {
-                HomeScreenActivity.GlobalVariable.appList.clear()
-                appDetailsFromDB.forEach {
-                    HomeScreenActivity.GlobalVariable.appList[it.packageInfo] = it
-                    if (!it.isInternetAllowed) {
-                        HomeScreenActivity.GlobalVariable.blockedUID[it.uid] = false
-                    }
+                val isSystemApp = isSystemApp(it.applicationInfo)
+                val isSystemComponent = isSystemComponent(it.applicationInfo)
+                val entry = AppInfo()
+
+                entry.appName = context.packageManager.getApplicationLabel(it.applicationInfo).toString()
+                entry.packageInfo = it.applicationInfo.packageName
+                entry.uid = it.applicationInfo.uid
+
+                val existingAppInfo = appInfoRepository.getAppInfoForPackageName(entry.packageInfo)
+
+                if (!existingAppInfo?.appName.isNullOrEmpty()) {
+                    HomeScreenActivity.updateGlobalAppInfoEntry(it.applicationInfo.packageName, existingAppInfo)
+                    return@forEach
+                } else {
+
+                    Log.i(LOG_TAG_APP_DB, "New package ${entry.uid}:${entry.packageInfo} (${entry.appName})")
+
+                    entry.whiteListUniv1 = isSystemApp
+                    entry.isSystemApp = isSystemComponent
+
+                    entry.appCategory = determineAppCategory(it.applicationInfo).toLowerCase(
+                        Locale.ROOT)
+                    entry.isInternetAllowed = persistentState.wifiAllowed(entry.packageInfo)
+
+                    HomeScreenActivity.updateGlobalAppInfoEntry(it.applicationInfo.packageName, entry)
+
+                    appInfoRepository.insertAsync(entry)
                 }
             }
+            updateCategoryInDB()
             HomeScreenActivity.isLoadingComplete = true
         }
+    }
 
+    private fun isSystemApp(ai: ApplicationInfo): Boolean {
+        return isSystemComponent(ai) && !AndroidUidConfig.isUIDAppRange(ai.uid)
+    }
+
+    private fun isSystemComponent(ai: ApplicationInfo): Boolean {
+        return (ai.flags and ApplicationInfo.FLAG_SYSTEM > 0)
+    }
+
+    private fun needsRefresh(latestActualTotal: Int, knownTotalApps: Int, knownTotalNonApps: Int): Boolean {
+        if (DEBUG) Log.d(LOG_TAG_APP_DB,
+                         "known: $knownTotalApps, nonApps: $knownTotalNonApps, actual: $latestActualTotal")
+        return (knownTotalApps - knownTotalNonApps) == (latestActualTotal - 1)
+    }
+
+    private fun determineAppCategory(ai: ApplicationInfo): String{
+        // Removed the package name from the method fetchCategory().
+        // As of now, the fetchCategory is returning Category as OTHERS.
+        // Instead we can query play store for the category.
+        // In that case, fetchCategory method should have packageInfo as
+        // parameter.
+        //val category = fetchCategory(appInfo.packageInfo)
+        val cat = fetchCategory()
+
+        if (!PlayStoreCategory.OTHER.name.equals(cat, ignoreCase = true)) {
+            return replaceUnderscore(cat)
+        }
+
+        if (isSystemApp(ai)) {
+            return Constants.APP_CAT_SYSTEM_APPS
+        }
+
+        if (isSystemComponent(ai)) {
+            return Constants.APP_CAT_SYSTEM_COMPONENTS
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            return replaceUnderscore(appInfoCategory(ai))
+        }
+
+        return Constants.INSTALLED_CAT_APPS
+
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun appInfoCategory(ai: ApplicationInfo): String {
+        val cat = ApplicationInfo.getCategoryTitle(context, ai.category)
+        return cat?.toString() ?: Constants.APP_CAT_OTHER
+    }
+
+    private fun replaceUnderscore(s: String): String{
+        return s.replace("_", " ")
     }
 
     fun registerNonApp(uid: Int, appName: String) {
@@ -196,11 +213,11 @@ class RefreshDatabase internal constructor(private var context: Context,
         GlobalScope.launch(Dispatchers.IO) {
             val proxyURL = context.resources.getStringArray(R.array.dns_proxy_names)
             val proxyIP = context.resources.getStringArray(R.array.dns_proxy_ips)
-            val dnsProxyEndPoint1 = DNSProxyEndpoint(1, proxyURL[0], "External", "Nobody",
+            val dnsProxyEndPoint1 = DNSProxyEndpoint(1, proxyURL[0], PROXY_EXTERNAL, APP_NAME_NO_APP,
                                                      proxyIP[0], 53, false, false, 0, 0)
-            val dnsProxyEndPoint2 = DNSProxyEndpoint(2, proxyURL[1], "External", "Nobody",
+            val dnsProxyEndPoint2 = DNSProxyEndpoint(2, proxyURL[1], PROXY_EXTERNAL, APP_NAME_NO_APP,
                                                      proxyIP[1], 53, false, false, 0, 0)
-            val dnsProxyEndPoint3 = DNSProxyEndpoint(3, proxyURL[2], "External", "Nobody",
+            val dnsProxyEndPoint3 = DNSProxyEndpoint(3, proxyURL[2], PROXY_EXTERNAL, APP_NAME_NO_APP,
                                                      proxyIP[2], 53, false, false, 0, 0)
             dnsProxyEndpointRepository.insertWithReplace(dnsProxyEndPoint1)
             dnsProxyEndpointRepository.insertWithReplace(dnsProxyEndPoint2)

@@ -51,6 +51,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.lifeTimeQ
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RESPONSE_VERSION
 import com.celzero.bravedns.util.HttpRequestHelper.Companion.checkStatus
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
@@ -118,6 +119,19 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     companion object {
         var isLoadingComplete: Boolean = false
         var enqueue: Long = 0
+
+        fun setupComplete() {
+            isLoadingComplete = true
+        }
+
+        fun updateGlobalAppFirewallRule(uid: Int, allow: Boolean) {
+            GlobalVariable.blockedUID[uid] = allow
+        }
+
+        fun updateGlobalAppInfoEntry(pkgName: String, ai: AppInfo?) {
+            if (ai != null)
+        	    GlobalVariable.appList[pkgName] = ai
+        }
     }
 
     //TODO : Remove the unwanted data and the assignments happening
@@ -176,6 +190,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             if (!Utilities.isAccessibilityServiceEnabled(this,
                                                          BackgroundAccessibilityService::class.java) && persistentState.backgroundEnabled) {
                 persistentState.isAccessibilityCrashDetected = true
+                persistentState.backgroundEnabled = false
             }
         }
     }
@@ -361,17 +376,18 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             override fun onResponse(call: Call, response: Response) {
                 val stringResponse = response.body!!.string()
                 try {
-                    val jsonObject = JSONObject(stringResponse)
-                    val responseVersion = jsonObject.getInt(Constants.JSON_VERSION)
-                    val shouldUpdate = jsonObject.getBoolean(Constants.JSON_UPDATE)
-                    timestamp = jsonObject.getLong(Constants.JSON_LATEST)
+                    val json = JSONObject(stringResponse)
+                    val version = json.optInt(Constants.JSON_VERSION, 0)
+                    val shouldUpdate = json.optBoolean(Constants.JSON_UPDATE, false)
+                    timestamp = json.optLong(Constants.JSON_LATEST, INIT_TIME_MS)
+
                     persistentState.lastAppUpdateCheck = System.currentTimeMillis()
                     Log.i(LOG_TAG_DOWNLOAD,
-                          "Server response for the new version download is $shouldUpdate, response version number- $responseVersion, timestamp- $timestamp")
+                          "Server response for the new version download is $shouldUpdate, response version number- $version, timestamp- $timestamp")
                     response.body!!.close()
                     client.connectionPool.evictAll()
 
-                    if (responseVersion != RESPONSE_VERSION || !shouldUpdate) return
+                    if (version != RESPONSE_VERSION || !shouldUpdate) return
 
                     if (persistentState.downloadSource != DOWNLOAD_SOURCE_PLAY_STORE) {
                         popupSnackBarForBlocklistUpdate()
@@ -572,4 +588,5 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
         false
     }
+
 }

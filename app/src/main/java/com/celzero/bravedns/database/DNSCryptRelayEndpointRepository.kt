@@ -18,6 +18,7 @@ package com.celzero.bravedns.database
 import androidx.lifecycle.LiveData
 import androidx.paging.PagedList
 import androidx.paging.toLiveData
+import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -49,7 +50,7 @@ class DNSCryptRelayEndpointRepository(
     }
 
     fun getDNSCryptRelayEndpointLiveData(): LiveData<PagedList<DNSCryptRelayEndpoint>> {
-        return dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveData().toLiveData(pageSize = 50)
+        return dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveData().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
     }
 
     fun deleteOlderData(date: Long, coroutineScope: CoroutineScope = GlobalScope) {
@@ -61,7 +62,7 @@ class DNSCryptRelayEndpointRepository(
     fun getDNSCryptEndpointLiveDataByName(
             query: String): LiveData<PagedList<DNSCryptRelayEndpoint>> {
         return dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveDataByName(query).toLiveData(
-            pageSize = 50)
+            pageSize = LIVEDATA_PAGE_SIZE)
     }
 
     fun deleteDNSCryptRelayEndpoint(url: String) {

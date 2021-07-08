@@ -23,12 +23,14 @@ import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnControllerHelper.persistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.backgroundAllowedUID
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.BackgroundAccessibilityService
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -59,7 +61,7 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
             val appInfo = GlobalVariable.appList[packageName]
             if (appInfo == null) {
                 Log.i(LOG_TAG_FIREWALL,
-                      "updateAppInternetPermission- $packageName is not available in the list")
+                      "No such app $packageName to update 'dis/allow' firewall rule for")
                 return
             }
 
@@ -76,7 +78,7 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
             val appInfo = GlobalVariable.appList[packageName]
             if (appInfo == null) {
                 Log.i(LOG_TAG_FIREWALL,
-                      "updateInternetBackground- $packageName is not available in the list")
+                      "No such app $packageName to update 'dis/allow' firewall rule for")
                 return
             }
 
@@ -90,9 +92,8 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
             }
         }
 
-        fun updateCategoryAppsInternetPermission(categoryName: String, isAllowed: Boolean,
-                                                 persistentState: PersistentState) {
-            GlobalScope.launch(Dispatchers.IO) {
+        fun updateCategoryAppsInternetPermission(categoryName: String, isAllowed: Boolean) {
+            CoroutineScope(Dispatchers.IO).launch  {
                 GlobalVariable.appList.forEach {
                     if (it.value.appCategory == categoryName && !it.value.whiteListUniv1) {
                         it.value.isInternetAllowed = isAllowed

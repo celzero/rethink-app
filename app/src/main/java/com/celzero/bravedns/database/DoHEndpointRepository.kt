@@ -19,6 +19,7 @@ package com.celzero.bravedns.database
 import androidx.lifecycle.LiveData
 import androidx.paging.PagedList
 import androidx.paging.toLiveData
+import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -53,7 +54,7 @@ class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
     }
 
     fun getDoHEndpointLiveData(): LiveData<PagedList<DoHEndpoint>> {
-        return doHEndpointDAO.getDoHEndpointLiveData().toLiveData(pageSize = 50)
+        return doHEndpointDAO.getDoHEndpointLiveData().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
     }
 
     fun deleteOlderData(date: Long, coroutineScope: CoroutineScope = GlobalScope) {
@@ -63,7 +64,7 @@ class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
     }
 
     fun getDoHEndpointLiveDataByName(query: String): LiveData<PagedList<DoHEndpoint>> {
-        return doHEndpointDAO.getDoHEndpointLiveDataByName(query).toLiveData(pageSize = 50)
+        return doHEndpointDAO.getDoHEndpointLiveDataByName(query).toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
     }
 
     fun deleteDoHEndpoint(url: String) {

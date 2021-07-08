@@ -38,7 +38,7 @@ class AppMode internal constructor(private val context: Context,
                                    private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
                                    private val proxyEndpointRepository: ProxyEndpointRepository,
                                    private val persistentState: PersistentState) {
-    private var appDNSMode: Long = -1L
+    private var appDNSMode: Long = PREF_DNS_INVALID
     private val proxyTypeInternal = "Internal"
     private val proxyTypeExternal = "External"
     private var dnsType: Int = -1
@@ -190,19 +190,22 @@ class AppMode internal constructor(private val context: Context,
     }
 
     fun getBraveDNS(): BraveDNS? {
-        if (braveDNS == null && persistentState.localBlocklistEnabled && persistentState.blocklistFilesDownloaded && persistentState.localBlocklistStamp.isNotEmpty()) {
-            val path: String = context.filesDir.canonicalPath + File.separator + persistentState.localBlocklistDownloadTime
-            if (DEBUG) Log.d(LOG_TAG_APP_MODE,
-                             "Local brave dns set call from AppMode path newBraveDNSLocal :$path")
-            try {
-                braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE,
-                                                 path + Constants.FILE_RD_FILE,
-                                                 path + Constants.FILE_BASIC_CONFIG,
-                                                 path + Constants.FILE_TAG_NAME)
-            } catch (e: Exception) {
-                Log.e(LOG_TAG_APP_MODE, "Local brave dns set exception :${e.message}", e)
-            }
+        if (braveDNS != null) {
+            return braveDNS
         }
+
+        val path: String = context.filesDir.canonicalPath + File.separator + persistentState.localBlocklistDownloadTime
+        if (DEBUG) Log.d(LOG_TAG_APP_MODE,
+                         "Local brave dns set call from AppMode path newBraveDNSLocal :$path")
+        try {
+            braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE,
+                                             path + Constants.FILE_RD_FILE,
+                                             path + Constants.FILE_BASIC_CONFIG,
+                                             path + Constants.FILE_TAG_NAME)
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_APP_MODE, "Local brave dns set exception :${e.message}", e)
+        }
+
         return braveDNS
     }
 }

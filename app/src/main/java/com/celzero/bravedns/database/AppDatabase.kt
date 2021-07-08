@@ -28,11 +28,11 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 abstract class AppDatabase : RoomDatabase() {
 
     companion object {
-        //const val currentVersion:Int = 10
+        private const val DATABASE_NAME = "bravedns.db"
 
         fun buildDatabase(context: Context) = Room.databaseBuilder(context.applicationContext,
                                                                    AppDatabase::class.java,
-                                                                   "bravedns.db").allowMainThreadQueries().addMigrations(
+                                                                   DATABASE_NAME).allowMainThreadQueries().addMigrations(
             MIGRATION_1_2).addMigrations(MIGRATION_2_3).addMigrations(MIGRATION_3_4).addMigrations(
             MIGRATION_4_5).addMigrations(MIGRATION_5_6).addMigrations(MIGRATION_6_7).addMigrations(
             MIGRATION_7_8).addMigrations(MIGRATION_8_9).addMigrations(MIGRATION_9_10).build()

@@ -16,8 +16,10 @@ limitations under the License.
 
 package com.celzero.bravedns.database
 
+import android.content.Context
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.celzero.bravedns.R
 
 @Entity(tableName = "DNSProxyEndpoint")
 class DNSProxyEndpoint {
@@ -33,21 +35,22 @@ class DNSProxyEndpoint {
     var latency: Int = 0
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other?.javaClass != javaClass) return false
-        other as DNSProxyEndpoint
+        if(other !is DNSProxyEndpoint) return false
         if (id != other.id) return false
         return true
     }
 
     override fun hashCode(): Int {
-        return this.hashCode()
+        return this.id.hashCode()
     }
-
 
     constructor(id: Int, proxyName: String, proxyType: String, proxyAppName: String,
                 proxyIP: String, proxyPort: Int, isSelected: Boolean, isCustom: Boolean,
                 modifiedDataTime: Long, latency: Int) {
+        // Insert methods treat 0 as not-set while inserting the item.
+        // The below check is for manual insert of the default Doh entities.
+        // For every other entries the id is assigned as -1 so that the
+        // autoGenerate parameter will generate the id accordingly.
         if (id != -1) this.id = id
         this.proxyName = proxyName
         this.proxyType = proxyType
@@ -59,5 +62,20 @@ class DNSProxyEndpoint {
         if (modifiedDataTime != 0L) this.modifiedDataTime = modifiedDataTime
         else this.modifiedDataTime = System.currentTimeMillis()
         this.latency = latency
+    }
+
+    fun isDeletable(): Boolean {
+        return isCustom && !isSelected
+    }
+
+    fun getExplanationText(context: Context): String {
+        return if (this.isSelected){
+            context.getString(
+                R.string.settings_socks_forwarding_desc, this.proxyIP,
+                this.proxyPort.toString(), this.proxyAppName)
+        } else {
+            context.getString(R.string.dns_proxy_desc, this.proxyIP,
+                              this.proxyPort.toString(), this.proxyAppName)
+        }
     }
 }

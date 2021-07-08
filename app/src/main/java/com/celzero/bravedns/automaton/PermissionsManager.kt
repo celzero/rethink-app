@@ -533,7 +533,7 @@ class PermissionsManager(service: MyAccessibilityService) {
         val paint = TextPaint()
         paint.textSize = 42f
 
-        return TextUtils.ellipsize(labelStr, paint, 500f /* DEFAULT_MAX_LABEL_SIZE_PX */,
+        return TextUtils.ellipsize(labelStr, paint, /* DEFAULT_MAX_LABEL_SIZE_PX */ 500f ,
                                    TextUtils.TruncateAt.END)
     }
 }

@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit
  * TODO remote blocklist - implementation pending.
  */
 class AppDownloadManager(private val persistentState: PersistentState,
-                         private val context: Context?) {
+                         private val context: Context) {
 
     private lateinit var downloadManager: DownloadManager
     private var downloadReference: MutableList<Long> = mutableListOf()
@@ -51,23 +51,15 @@ class AppDownloadManager(private val persistentState: PersistentState,
      * Calls the copy method.
      */
     fun downloadLocalBlocklist(timestamp: Long) {
-        if (context != null) {
-            initDownload(context)
-            for (i in 0 until LOCAL_BLOCKLIST_FILE_COUNT) {
-                val url = DOWNLOAD_URLS[i]
-                val fileName = File.separator + FILE_NAMES[i]
-                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                                 "Timestamp - ($timestamp) filename - $fileName, url - $url")
-                download(url, fileName, timestamp.toString())
-            }
-            initiateDownloadStatusCheck()
-        } else {
-            Log.i(LOG_TAG_DOWNLOAD, "Context is null")
-            persistentState.localBlocklistEnabled = false
-            persistentState.tempBlocklistDownloadTime = 0
-            persistentState.workManagerStartTime = 0
-            persistentState.blocklistFilesDownloaded = false
+        initDownload(context)
+        for (i in 0 until LOCAL_BLOCKLIST_FILE_COUNT) {
+            val url = DOWNLOAD_URLS[i]
+            val fileName = File.separator + FILE_NAMES[i]
+            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
+                             "Timestamp - ($timestamp) filename - $fileName, url - $url")
+            download(url, fileName, timestamp.toString())
         }
+        initiateDownloadStatusCheck()
     }
 
     private fun initiateDownloadStatusCheck() {
@@ -120,7 +112,7 @@ class AppDownloadManager(private val persistentState: PersistentState,
     }
 
     private fun download(url: String, fileName: String, timestamp: String) {
-        downloadManager = context?.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         val downloadUri = Uri.parse(url)
         val request = DownloadManager.Request(downloadUri)
         request.apply {

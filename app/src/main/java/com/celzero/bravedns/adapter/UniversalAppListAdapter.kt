@@ -18,6 +18,8 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.DialogInterface
+import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -43,6 +45,8 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.ThrowingHandler
+import com.celzero.bravedns.util.Utilities.Companion.getDefaultIcon
+import com.celzero.bravedns.util.Utilities.Companion.getIcon
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -82,29 +86,22 @@ class UniversalAppListAdapter(private val context: Context,
             RecyclerView.ViewHolder(b.root) {
 
         fun update(appInfo: AppInfo) {
-            if (appInfo.appCategory == Constants.APP_CAT_SYSTEM_COMPONENTS) {
-                b.univWhitelistApkLabelTv.text = appInfo.appName//+ Constants.RECOMMENDED
-            } else {
-                b.univWhitelistApkLabelTv.text = appInfo.appName
-            }
-
+            b.univWhitelistApkLabelTv.text = appInfo.appName
             b.univWhitelistCheckbox.isChecked = appInfo.whiteListUniv1
-            try {
-                GlideApp.with(context).load(
-                    context.packageManager.getApplicationIcon(appInfo.packageInfo)).into(
-                    b.univWhitelistApkIconIv)
-            } catch (e: Exception) {
-                GlideApp.with(context).load(
-                    AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(
-                    b.univWhitelistApkIconIv)
-                Log.e(LOG_TAG_FIREWALL,
-                      "Application Icon not available for package: ${appInfo.packageInfo}" + e.message,
-                      e)
-            }
 
+            displayIcon(getIcon(context, appInfo.appName, appInfo.packageInfo))
+            clickListeners(appInfo)
+        }
+
+        private fun displayIcon(drawable: Drawable?) {
+            GlideApp.with(context).load(drawable).error(getDefaultIcon(context)).into(
+                b.univWhitelistApkIconIv)
+        }
+
+        private fun clickListeners(appInfo: AppInfo) {
             b.univWhitelistContainer.setOnClickListener {
                 if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                                 "parentView- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
+                                 "is app - ${appInfo.appName} whitelisted? ${appInfo.whiteListUniv1}")
                 appInfo.whiteListUniv1 = !appInfo.whiteListUniv1
                 modifyWhiteListApps(appInfo)
             }
@@ -112,7 +109,7 @@ class UniversalAppListAdapter(private val context: Context,
             b.univWhitelistCheckbox.setOnCheckedChangeListener(null)
             b.univWhitelistCheckbox.setOnClickListener {
                 if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                                 "CheckBox- whitelist - ${appInfo.appName},${appInfo.whiteListUniv1}")
+                                 "is app ${appInfo.appName} whitelisted? ${appInfo.whiteListUniv1}")
                 appInfo.whiteListUniv1 = !appInfo.whiteListUniv1
                 modifyWhiteListApps(appInfo)
             }
@@ -128,29 +125,34 @@ class UniversalAppListAdapter(private val context: Context,
             } else {
                 true
             }
-            if (blockAllApps) {
-                b.univWhitelistCheckbox.isChecked = status
-                CoroutineScope(Dispatchers.IO).launch {
-                    if (status) {
-                        appUIDList.forEach {
-                            HomeScreenActivity.GlobalVariable.appList[it.packageInfo]!!.isInternetAllowed = status
-                            persistentState.modifyAllowedWifi(it.packageInfo, status)
-                            FirewallManager.updateAppInternetPermission(it.packageInfo, status)
-                            FirewallManager.updateAppInternetPermissionByUID(it.uid, status)
-                        }
-                        appInfoRepository.updateInternetForUID(appInfo.uid, status)
-                    }
-                    appInfoRepository.updateWhiteList(appInfo.uid, status)
-                    val countBlocked = appInfoRepository.getBlockedCountForCategory(
-                        appInfo.appCategory)
-                    val countWhitelisted = appInfoRepository.getWhitelistCount(appInfo.appCategory)
-                    categoryInfoRepository.updateBlockedCount(appInfo.appCategory, countBlocked)
-                    categoryInfoRepository.updateWhitelistCount(appInfo.appCategory,
-                                                                countWhitelisted)
-                }
-            } else {
+
+            if (!blockAllApps) {
                 b.univWhitelistCheckbox.isChecked = !status
                 appInfo.whiteListUniv1 = !status
+                return
+            }
+
+            Log.i(LOG_TAG_FIREWALL, "App ${appInfo.appName} whitelisted from vpn? - $status, blockAllApps?- $blockAllApps")
+            b.univWhitelistCheckbox.isChecked = status
+            persistAppDetails(appInfo, appUIDList, status)
+        }
+
+        private fun persistAppDetails(appInfo: AppInfo, appUIDList: List<AppInfo>, status: Boolean) {
+            CoroutineScope(Dispatchers.IO).launch {
+                if (status) {
+                    appUIDList.forEach {
+                        HomeScreenActivity.GlobalVariable.appList[it.packageInfo]!!.isInternetAllowed = status
+                        persistentState.modifyAllowedWifi(it.packageInfo, status)
+                        FirewallManager.updateAppInternetPermission(it.packageInfo, status)
+                        FirewallManager.updateAppInternetPermissionByUID(it.uid, status)
+                    }
+                    appInfoRepository.updateInternetForUID(appInfo.uid, status)
+                }
+                appInfoRepository.updateWhiteList(appInfo.uid, status)
+                val countBlocked = appInfoRepository.getBlockedCountForCategory(appInfo.appCategory)
+                val countWhitelisted = appInfoRepository.getWhitelistCount(appInfo.appCategory)
+                categoryInfoRepository.updateBlockedCount(appInfo.appCategory, countBlocked)
+                categoryInfoRepository.updateWhitelistCount(appInfo.appCategory, countWhitelisted)
             }
         }
 

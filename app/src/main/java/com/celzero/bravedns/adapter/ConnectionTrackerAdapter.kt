@@ -25,7 +25,6 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
@@ -44,6 +43,8 @@ import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL_LOG
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.Companion.getIcon
+import com.celzero.bravedns.util.Utilities.Companion.isValidUid
 import java.util.*
 
 class ConnectionTrackerAdapter(val context: Context) :
@@ -81,80 +82,97 @@ class ConnectionTrackerAdapter(val context: Context) :
             RecyclerView.ViewHolder(b.root) {
 
         fun update(connTracker: ConnectionTracker) {
+            displayTransactionDetails(connTracker)
+            displayProtocol(connTracker.port, connTracker.protocol)
+            displayAppDetails(connTracker)
+            displayFirewallRulesetHint(connTracker.isBlocked, connTracker.blockedByRule)
+
+            b.connectionParentLayout.setOnClickListener {
+                openBottomSheet(connTracker)
+            }
+        }
+
+        private fun openBottomSheet(ct: ConnectionTracker) {
+            val bottomSheetFragment = ConnTrackerBottomSheetFragment(context, ct)
+            val frag = context as FragmentActivity
+            bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
+        }
+
+        private fun displayTransactionDetails(connTracker: ConnectionTracker) {
             val time = Utilities.convertLongToTime(connTracker.timestamp)
             b.connectionResponseTime.text = time
             b.connectionFlag.text = connTracker.flag
             b.connectionIpAddress.text = connTracker.ipAddress
+        }
+
+        private fun displayAppDetails(ct: ConnectionTracker) {
+            b.connectionAppName.text = ct.appName
+
+            val apps = getPackageInfo(ct)
+            if (apps.isNullOrEmpty()) {
+                loadAppIcon(Utilities.getDefaultIcon(context))
+                return
+            }
+
+            val appName = if (apps.size > 1) {
+                context.getString(R.string.ctbs_app_other_apps, ct.appName,
+                                  (apps.size).minus(1).toString())
+            } else {
+                ct.appName
+            }
+
+            b.connectionAppName.text = appName
+            loadAppIcon(getIcon(context, apps[0], /*No app name */""))
+        }
+
+        private fun displayProtocol(port: Int, proto: Int) {
             // Instead of showing the port name and protocol, now the ports are resolved with
             // known ports(reserved port and protocol identifiers).
             // https://github.com/celzero/rethink-app/issues/42 - #3 - transport + protocol.
-            val resolvedPort = KnownPorts.resolvePort(connTracker.port)
+            val resolvedPort = KnownPorts.resolvePort(port)
             if (resolvedPort != Constants.PORT_VAL_UNKNOWN) {
                 b.connLatencyTxt.text = resolvedPort?.toUpperCase(Locale.ROOT)
             } else {
-                b.connLatencyTxt.text = Protocol.getProtocolName(connTracker.protocol).name
+                b.connLatencyTxt.text = Protocol.getProtocolName(proto).name
             }
-            b.connectionAppName.text = connTracker.appName
+        }
+
+        private fun displayFirewallRulesetHint(isBlocked: Boolean, ruleName: String?) {
             when {
-                connTracker.isBlocked -> {
+                // hint red when blocked
+                isBlocked -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
                     b.connectionStatusIndicator.setBackgroundColor(
                         ContextCompat.getColor(context, R.color.colorRed_A400))
                 }
-                FirewallRuleset.RULE7.ruleName == connTracker.blockedByRule -> {
+                // hint white when whitelisted
+                FirewallRuleset.RULE7.ruleName == ruleName -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
                     b.connectionStatusIndicator.setBackgroundColor(
                         fetchTextColor(R.color.dividerColor))
                 }
+                // no hints, otherwise
                 else -> {
                     b.connectionStatusIndicator.visibility = View.INVISIBLE
                 }
             }
-            if (connTracker.appName != UNKNOWN_APP) {
-                val defaultDrawable = AppCompatResources.getDrawable(context,
-                                                                     R.drawable.default_app_icon)
-                try {
-                    val appArray = context.packageManager.getPackagesForUid(connTracker.uid)
-                    if (appArray == null) {
-                        loadAppIcon(defaultDrawable, defaultDrawable, b.connectionAppIcon)
-                        return
-                    }
-
-                    val appCount = (appArray.size).minus(1)
-                    if (appArray.size > 2) {
-                        b.connectionAppName.text = context.getString(R.string.ctbs_app_other_apps,
-                                                                     connTracker.appName,
-                                                                     appCount.toString())
-                    } else if (appArray.size == 2) {
-                        b.connectionAppName.text = context.getString(R.string.ctbs_app_other_app,
-                                                                     connTracker.appName,
-                                                                     appCount.toString())
-                    }
-                    loadAppIcon(context.packageManager.getApplicationIcon(appArray[0]!!),
-                                defaultDrawable, b.connectionAppIcon)
-                } catch (e: PackageManager.NameNotFoundException) {
-                    loadAppIcon(defaultDrawable, defaultDrawable, b.connectionAppIcon)
-                    Log.w(LOG_TAG_FIREWALL_LOG, "Package Not Found - " + e.message)
-                }
-            } else {
-                val defaultDrawable = AppCompatResources.getDrawable(context,
-                                                                     R.drawable.default_app_icon)
-                loadAppIcon(defaultDrawable, defaultDrawable, b.connectionAppIcon)
-            }
-
-            b.connectionParentLayout.setOnClickListener {
-                b.connectionParentLayout.isEnabled = false
-                val bottomSheetFragment = ConnTrackerBottomSheetFragment(context, connTracker)
-                val frag = context as FragmentActivity
-                bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
-                b.connectionParentLayout.isEnabled = true
-            }
-
         }
 
-        private fun loadAppIcon(drawable: Drawable?, errorDrawable: Drawable?,
-                                imageView: ImageView) {
-            GlideApp.with(context).load(drawable).error(errorDrawable).into(imageView)
+        private fun getPackageInfo(ct: ConnectionTracker): Array<out String>? {
+            if (ct.appName == UNKNOWN_APP || !isValidUid(ct.uid)) {
+                return null
+            }
+            try {
+                return context.packageManager.getPackagesForUid(ct.uid)
+            } catch (e: PackageManager.NameNotFoundException) {
+                Log.w(LOG_TAG_FIREWALL_LOG, "Package Not Found - " + e.message)
+            }
+            return null
+        }
+
+        private fun loadAppIcon(drawable: Drawable?) {
+            GlideApp.with(context).load(drawable).error(
+                Utilities.getDefaultIcon(context)).into(b.connectionAppIcon)
         }
 
         private fun fetchTextColor(attr: Int): Int {

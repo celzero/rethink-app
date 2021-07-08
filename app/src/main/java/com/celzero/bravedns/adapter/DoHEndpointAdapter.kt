@@ -39,7 +39,8 @@ import com.celzero.bravedns.ui.DNSConfigureWebViewActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.RETHINK_DNS_PLUS
+import com.celzero.bravedns.util.Constants.Companion.LOCATION_INTENT_EXTRA
+import com.celzero.bravedns.util.Constants.Companion.STAMP_INTENT_EXTRA
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.UIUpdateInterface
 import com.celzero.bravedns.util.Utilities
@@ -82,60 +83,77 @@ class DoHEndpointAdapter(private val context: Context,
             RecyclerView.ViewHolder(b.root) {
 
 
-        fun update(doHEndpoint: DoHEndpoint) {
-            b.dohEndpointListUrlName.text = doHEndpoint.dohName
+        fun update(endpoint: DoHEndpoint) {
+            displayDetails(endpoint)
+
+            clickListeners(endpoint)
+        }
+
+        private fun clickListeners(endpoint: DoHEndpoint) {
+            b.root.setOnClickListener {
+                updateConnection(endpoint)
+            }
+            b.dohEndpointListActionImage.setOnClickListener {
+                showExplanationOnImageClick(endpoint)
+            }
+            b.dohEndpointListCheckImage.setOnClickListener {
+                updateConnection(endpoint)
+            }
+            b.dohEndpointListConfigure.setOnClickListener {
+                configureRethinkEndpoint(endpoint)
+            }
+        }
+
+        private fun displayDetails(endpoint: DoHEndpoint) {
+            b.dohEndpointListUrlName.text = endpoint.dohName
             b.dohEndpointListUrlExplanation.text = ""
-            if (doHEndpoint.isSelected) {
+            b.dohEndpointListCheckImage.isChecked = endpoint.isSelected
+            Log.i(LOG_TAG_DNS, "connected to doh - ${endpoint.dohName} isSelected? - ${endpoint.isSelected}")
+            if (endpoint.isSelected) {
                 val count = persistentState.numberOfRemoteBlocklists
-                b.dohEndpointListUrlExplanation.text = if (doHEndpoint.dohName == RETHINK_DNS_PLUS && count > 0) {
+                b.dohEndpointListUrlExplanation.text = if (endpoint.isRethinkDns() && count > 0) {
                     context.getString(R.string.dns_connected_rethink_plus, count.toString())
                 } else {
                     context.getString(R.string.dns_connected)
                 }
-                Log.i(LOG_TAG_DNS, "connected to doh - ${doHEndpoint.dohName}")
             }
 
             // Shows either the info/delete icon for the DoH entries.
-            showIcon(doHEndpoint)
-            if (isRethinkDns(doHEndpoint)) {
+            showIcon(endpoint)
+
+            if (endpoint.isRethinkDns()) {
                 b.dohEndpointListConfigure.visibility = View.VISIBLE
             } else {
                 b.dohEndpointListConfigure.visibility = View.GONE
             }
-            b.root.setOnClickListener {
-                //TODO - Move the string in a common place and remove the literal.
-                //Maybe to strings.xml or to a Constant file in Util class
-                updateConnection(doHEndpoint)
-            }
-            b.dohEndpointListActionImage.setOnClickListener {
-                showExplanationOnImageClick(doHEndpoint)
-            }
-            b.dohEndpointListCheckImage.setOnClickListener {
-                updateConnection(doHEndpoint)
-            }
-            b.dohEndpointListConfigure.setOnClickListener {
-                configureRethinkEndpoint(doHEndpoint)
-            }
         }
 
-        private fun configureRethinkEndpoint(doHEndpoint: DoHEndpoint) {
-            var stamp = ""
-            try {
-                stamp = getBlocklistStampFromURL(doHEndpoint.dohURL)
-            } catch (e: Exception) {
-                Log.w(LOG_TAG_DNS, "Failure fetching stamp from Go ${e.message}", e)
-            }
+        private fun configureRethinkEndpoint(endpoint: DoHEndpoint) {
+            val stamp = getRemoteBlocklistStamp(endpoint.dohURL)
             if (DEBUG) Log.d(LOG_TAG_DNS,
-                             "startActivityForResult - DohEndpointadapter with DoHURL: ${doHEndpoint.dohURL},and stamp: $stamp")
+                             "startActivityForResult - DohEndpointadapter with DoHURL: ${endpoint.dohURL},and stamp: $stamp")
+            startConfigureBlocklistActivity(stamp)
+        }
+
+        private fun startConfigureBlocklistActivity(stamp: String?) {
             val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
-            intent.putExtra("location", DNSConfigureWebViewActivity.REMOTE)
-            intent.putExtra("stamp", stamp)
+            intent.putExtra(LOCATION_INTENT_EXTRA, DNSConfigureWebViewActivity.REMOTE)
+            intent.putExtra(STAMP_INTENT_EXTRA, stamp)
             (context as Activity).startActivityForResult(intent, Activity.RESULT_OK)
         }
 
-        private fun showIcon(doHEndpoint: DoHEndpoint) {
-            b.dohEndpointListCheckImage.isChecked = doHEndpoint.isSelected
-            if (doHEndpoint.isCustom && !doHEndpoint.isSelected) {
+        private fun getRemoteBlocklistStamp(url: String): String? {
+            // Interacts with GO lib to fetch the stamp (Xdnx#getBlocklistStampFromURL)
+            return try {
+                getBlocklistStampFromURL(url)
+            } catch (e: Exception) {
+                Log.w(LOG_TAG_DNS, "Failure fetching stamp from Go ${e.message}", e)
+                null
+            }
+        }
+
+        private fun showIcon(endpoint: DoHEndpoint) {
+            if (endpoint.isDeletable()) {
                 b.dohEndpointListActionImage.setImageDrawable(
                     ContextCompat.getDrawable(context, R.drawable.ic_fab_uninstall))
             } else {
@@ -144,45 +162,35 @@ class DoHEndpointAdapter(private val context: Context,
             }
         }
 
-        private fun updateConnection(doHEndpoint: DoHEndpoint) {
+        private fun updateConnection(endpoint: DoHEndpoint) {
             if (DEBUG) Log.d(LOG_TAG_DNS,
-                             "updateConnection - ${doHEndpoint.dohName}, ${doHEndpoint.dohURL}")
-            doHEndpoint.dohURL = doHEndpointRepository.getConnectionURL(doHEndpoint.id)
-            if (isRethinkDns(doHEndpoint)) {
-                var stamp = ""
-                try {
-                    stamp = getBlocklistStampFromURL(doHEndpoint.dohURL)
-                } catch (e: Exception) {
-                    Log.w(LOG_TAG_DNS, "Error on retrieving stamp from Go ${e.message}", e)
-                }
-                if (DEBUG) Log.d(LOG_TAG_DNS, "updateConnection stamp- $stamp")
-                if (stamp.isEmpty()) {
-                    showDialogToConfigure()
-                    b.dohEndpointListCheckImage.isChecked = false
-                } else {
-                    updateDoHDetails(doHEndpoint)
-                    b.dohEndpointListCheckImage.isChecked = true
-                }
+                             "updateConnection - ${endpoint.dohName}, ${endpoint.dohURL}")
+            endpoint.dohURL = doHEndpointRepository.getConnectionURL(endpoint.id)
+
+            if(!endpoint.isRethinkDns()){
+                updateDoHDetails(endpoint)
+                b.dohEndpointListCheckImage.isChecked = true
+                return
+            }
+
+            val stamp = getRemoteBlocklistStamp(endpoint.dohURL)
+            if (DEBUG) Log.d(LOG_TAG_DNS, "stamp for remote endpoint- $stamp")
+            if (stamp.isNullOrEmpty()) {
+                showDialogToConfigure()
+                b.dohEndpointListCheckImage.isChecked = false
             } else {
-                updateDoHDetails(doHEndpoint)
+                updateDoHDetails(endpoint)
                 b.dohEndpointListCheckImage.isChecked = true
             }
         }
 
-        private fun showExplanationOnImageClick(doHEndpoint: DoHEndpoint) {
-            if (doHEndpoint.isCustom && !doHEndpoint.isSelected) showDialogToDelete(doHEndpoint)
-            else {
-                if (doHEndpoint.dohExplanation.isNullOrEmpty()) {
-                    showDialogExplanation(doHEndpoint.dohName, doHEndpoint.dohURL, "")
-                } else {
-                    showDialogExplanation(doHEndpoint.dohName, doHEndpoint.dohURL,
-                                          doHEndpoint.dohExplanation!!)
-                }
-            }
+        private fun showExplanationOnImageClick(endpoint: DoHEndpoint) {
+            if (endpoint.isDeletable()) showDialogToDelete(endpoint)
+            else showDialogExplanation(endpoint.dohName, endpoint.dohURL, endpoint.dohExplanation)
         }
 
 
-        private fun showDialogExplanation(title: String, url: String, message: String) {
+        private fun showDialogExplanation(title: String, url: String, message: String?) {
             val builder = AlertDialog.Builder(context)
             builder.setTitle(title)
             builder.setMessage(url + "\n\n" + message)
@@ -206,18 +214,14 @@ class DoHEndpointAdapter(private val context: Context,
             alertDialog.show()
         }
 
-        private fun isRethinkDns(endpoint: DoHEndpoint?): Boolean {
-            return RETHINK_DNS_PLUS == endpoint?.dohName
-        }
-
-        private fun showDialogToDelete(doHEndpoint: DoHEndpoint) {
+        private fun showDialogToDelete(endpoint: DoHEndpoint) {
             val builder = AlertDialog.Builder(context)
             builder.setTitle(R.string.doh_custom_url_remove_dialog_title)
             builder.setMessage(R.string.doh_custom_url_remove_dialog_message)
             builder.setCancelable(true)
             builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { _, _ ->
                 GlobalScope.launch(Dispatchers.IO) {
-                    doHEndpointRepository.deleteDoHEndpoint(doHEndpoint.dohURL)
+                    doHEndpointRepository.deleteDoHEndpoint(endpoint.dohURL)
                 }
                 Toast.makeText(context, R.string.doh_custom_url_remove_success,
                                Toast.LENGTH_SHORT).show()
@@ -238,11 +242,7 @@ class DoHEndpointAdapter(private val context: Context,
             builder.setCancelable(true)
             builder.setPositiveButton(
                 context.getString(R.string.dns_connected_rethink_configure)) { _, _ ->
-                val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
-                intent.putExtra(Constants.LOCATION_INTENT_EXTRA, DNSConfigureWebViewActivity.REMOTE)
-                intent.putExtra(Constants.STAMP_INTENT_EXTRA, "")
-                (context as Activity).startActivityForResult(intent, Activity.RESULT_OK)
-
+                startConfigureBlocklistActivity(/*empty stamp*/"")
             }
 
             builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
@@ -253,8 +253,8 @@ class DoHEndpointAdapter(private val context: Context,
             alertDialog.show()
         }
 
-        private fun updateDoHDetails(doHEndpoint: DoHEndpoint) {
-            doHEndpoint.isSelected = true
+        private fun updateDoHDetails(endpoint: DoHEndpoint) {
+            endpoint.isSelected = true
             doHEndpointRepository.removeConnectionStatus()
             object : CountDownTimer(1000, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
@@ -263,14 +263,14 @@ class DoHEndpointAdapter(private val context: Context,
                 override fun onFinish() {
                     notifyDataSetChanged()
                     persistentState.dnsType = Constants.PREF_DNS_MODE_DOH
-                    persistentState.connectionModeChange = doHEndpoint.dohURL
-                    persistentState.setConnectedDNS(doHEndpoint.dohName)
+                    persistentState.connectionModeChange = endpoint.dohURL
+                    persistentState.setConnectedDNS(endpoint.dohName)
                     queryTracker.reinitializeQuantileEstimator()
                 }
             }.start()
             appMode?.setDNSMode(Settings.DNSModePort)
             listener.updateUIFromAdapter(1)
-            doHEndpointRepository.updateAsync(doHEndpoint)
+            doHEndpointRepository.updateAsync(endpoint)
         }
     }
 }

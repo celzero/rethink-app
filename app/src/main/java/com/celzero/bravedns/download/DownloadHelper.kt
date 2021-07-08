@@ -27,19 +27,25 @@ class DownloadHelper {
 
     companion object {
         fun isLocalDownloadValid(context: Context, timestamp: String): Boolean {
+            var result = false
+            var total : Int? = 0
+            var dir: File? = null
             try {
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Local block list validation: $timestamp")
-                val dir = File(getExternalFilePath(context, timestamp))
-                if (dir.isDirectory) {
+                dir = File(getExternalFilePath(context, timestamp))
+                total = if (dir.isDirectory) {
                     val children = dir.list()
-                    if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                                     "Local block list validation isDirectory: true, children : ${children?.size}, ${dir.path}")
-                    if (children != null && children.size == Constants.LOCAL_BLOCKLIST_FILE_COUNT) return true
+                    children?.size
+                } else {
+                    0
                 }
+                result = Constants.LOCAL_BLOCKLIST_FILE_COUNT == total
             } catch (e: Exception) {
                 Log.w(LOG_TAG_DOWNLOAD, "Local block list validation failed - ${e.message}", e)
             }
-            return false
+
+            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Valid on-device blocklist ($timestamp) download? $result, files: $total, dir? ${dir?.isDirectory}")
+            return result
         }
 
         /**

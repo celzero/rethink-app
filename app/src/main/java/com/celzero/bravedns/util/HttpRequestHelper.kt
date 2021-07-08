@@ -24,6 +24,8 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.util.Constants.Companion.JSON_UPDATE
+import com.celzero.bravedns.util.Constants.Companion.JSON_VERSION
 import com.celzero.bravedns.util.Constants.Companion.RESPONSE_VERSION
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import okhttp3.*
@@ -48,14 +50,13 @@ class HttpRequestHelper {
 
                 override fun onResponse(call: Call, response: Response) {
                     val stringResponse = response.body!!.string()
-                    //creating json object
-                    val jsonObject = JSONObject(stringResponse)
-                    val responseVersion = jsonObject.getInt("version")
-                    val shouldUpdate = jsonObject.getBoolean("update")
+                    val json = JSONObject(stringResponse)
+                    val version = json.optInt(JSON_VERSION)
+                    val shouldUpdate = json.getBoolean(JSON_UPDATE)
                     persistentState.lastAppUpdateCheck = System.currentTimeMillis()
                     Log.i(LOG_TAG_DOWNLOAD,
                           "Server response for the new version download is true, version number-  $shouldUpdate")
-                    if (responseVersion == RESPONSE_VERSION) {
+                    if (version == RESPONSE_VERSION) {
                         if (shouldUpdate) {
                             // TODO handle - #319
                         } else {

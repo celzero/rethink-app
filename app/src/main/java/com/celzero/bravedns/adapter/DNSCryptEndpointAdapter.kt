@@ -85,48 +85,57 @@ class DNSCryptEndpointAdapter(private val context: Context,
             RecyclerView.ViewHolder(b.root) {
 
 
-        fun update(dnsCryptEndpoint: DNSCryptEndpoint) {
-            b.dnsCryptEndpointListUrlName.text = dnsCryptEndpoint.dnsCryptName
-            if (dnsCryptEndpoint.isSelected) {
+        fun update(endpoint: DNSCryptEndpoint) {
+            displayDetails(endpoint)
+            clickListeners(endpoint)
+        }
+
+        private fun clickListeners(endpoint: DNSCryptEndpoint) {
+            b.root.setOnClickListener {
+                b.dnsCryptEndpointListActionImage.isChecked = !b.dnsCryptEndpointListActionImage.isChecked
+                endpoint.isSelected = b.dnsCryptEndpointListActionImage.isChecked
+
+                val state = updateDNSCryptDetails(endpoint)
+                if (!state) {
+                    b.dnsCryptEndpointListActionImage.isChecked = !state
+                }
+            }
+
+            b.dnsCryptEndpointListActionImage.setOnClickListener {
+                endpoint.isSelected = b.dnsCryptEndpointListActionImage.isChecked
+                val state = updateDNSCryptDetails(endpoint)
+                if (!state) {
+                    b.dnsCryptEndpointListActionImage.isChecked = !state
+                }
+            }
+
+            b.dnsCryptEndpointListInfoImage.setOnClickListener {
+                showExplanationOnImageClick(endpoint)
+            }
+        }
+
+        private fun displayDetails(endpoint: DNSCryptEndpoint) {
+            b.dnsCryptEndpointListUrlName.text = endpoint.dnsCryptName
+            b.dnsCryptEndpointListActionImage.isChecked = endpoint.isSelected
+
+            if (endpoint.isSelected) {
                 b.dnsCryptEndpointListUrlExplanation.text = context.getString(
                     R.string.dns_connected)
             } else {
                 b.dnsCryptEndpointListUrlExplanation.text = ""
             }
 
-            if (dnsCryptEndpoint.isCustom && !dnsCryptEndpoint.isSelected) {
+            if (endpoint.isDeletable()) {
                 b.dnsCryptEndpointListInfoImage.setImageDrawable(
                     ContextCompat.getDrawable(context, R.drawable.ic_fab_uninstall))
             } else {
                 b.dnsCryptEndpointListInfoImage.setImageDrawable(
                     ContextCompat.getDrawable(context, R.drawable.ic_fab_appinfo))
             }
-
-            b.dnsCryptEndpointListActionImage.isChecked = dnsCryptEndpoint.isSelected
-            b.root.setOnClickListener {
-                b.dnsCryptEndpointListActionImage.isChecked = !b.dnsCryptEndpointListActionImage.isChecked
-                dnsCryptEndpoint.isSelected = b.dnsCryptEndpointListActionImage.isChecked
-
-                val state = updateDNSCryptDetails(dnsCryptEndpoint)
-                if (!state) {
-                    b.dnsCryptEndpointListActionImage.isChecked = !state
-                }
-            }
-            b.dnsCryptEndpointListActionImage.setOnClickListener {
-                dnsCryptEndpoint.isSelected = b.dnsCryptEndpointListActionImage.isChecked
-                val state = updateDNSCryptDetails(dnsCryptEndpoint)
-                if (!state) {
-                    b.dnsCryptEndpointListActionImage.isChecked = !state
-                }
-            }
-            b.dnsCryptEndpointListInfoImage.setOnClickListener {
-                showExplanationOnImageClick(dnsCryptEndpoint)
-            }
         }
 
         private fun showExplanationOnImageClick(dnsCryptEndpoint: DNSCryptEndpoint) {
-            if (dnsCryptEndpoint.isCustom && !dnsCryptEndpoint.isSelected) showDialogForDelete(
-                dnsCryptEndpoint)
+            if (dnsCryptEndpoint.isDeletable()) showDeleteDialog(dnsCryptEndpoint)
             else {
                 if (dnsCryptEndpoint.dnsCryptExplanation.isNullOrEmpty()) {
                     showDialogExplanation(dnsCryptEndpoint.dnsCryptName,
@@ -134,22 +143,20 @@ class DNSCryptEndpointAdapter(private val context: Context,
                 } else {
                     showDialogExplanation(dnsCryptEndpoint.dnsCryptName,
                                           dnsCryptEndpoint.dnsCryptURL,
-                                          dnsCryptEndpoint.dnsCryptExplanation!!)
+                                          dnsCryptEndpoint.dnsCryptExplanation)
                 }
             }
         }
 
-        private fun showDialogForDelete(dnsCryptEndpoint: DNSCryptEndpoint?) {
+        private fun showDeleteDialog(dnsCryptEndpoint: DNSCryptEndpoint) {
             val builder = AlertDialog.Builder(context)
             builder.setTitle(R.string.dns_crypt_custom_url_remove_dialog_title)
             builder.setMessage(R.string.dns_crypt_url_remove_dialog_message)
             builder.setCancelable(true)
             builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { _, _ ->
                 GlobalScope.launch(Dispatchers.IO) {
-                    if (dnsCryptEndpoint != null) {
-                        dnsCryptEndpointRepository.deleteDNSCryptEndpoint(
-                            dnsCryptEndpoint.dnsCryptURL)
-                    }
+                    dnsCryptEndpointRepository.deleteDNSCryptEndpoint(
+                        dnsCryptEndpoint.dnsCryptURL)
                 }
                 Toast.makeText(context, R.string.dns_crypt_url_remove_success,
                                Toast.LENGTH_SHORT).show()
@@ -162,10 +169,13 @@ class DNSCryptEndpointAdapter(private val context: Context,
             alertDialog.show()
         }
 
-        private fun showDialogExplanation(title: String, url: String, message: String) {
+        private fun showDialogExplanation(title: String, url: String, message: String?) {
             val builder = AlertDialog.Builder(context)
             builder.setTitle(title)
-            builder.setMessage(url + "\n\n" + message)
+            if(message == null)
+                builder.setMessage(url)
+            else
+                builder.setMessage(url + "\n\n" + message)
             builder.setCancelable(true)
             builder.setPositiveButton(
                 context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
@@ -187,8 +197,8 @@ class DNSCryptEndpointAdapter(private val context: Context,
 
         private fun updateDNSCryptDetails(dnsCryptEndpoint: DNSCryptEndpoint): Boolean {
             val list = dnsCryptEndpointRepository.getConnectedDNSCrypt()
-            // Below check is to inform user not to unselect the only selected DNSCrypt.
-            // This is true when the connected dns crypt list returned from the database is 1.
+            // Do not unselect the only user-selected dnscrypt endpoint, that is
+            // when the getConnectedDnsCrypt returns a list of size 1
             if (list.size == 1 && !dnsCryptEndpoint.isSelected && list[0].dnsCryptURL == dnsCryptEndpoint.dnsCryptURL) {
                 Toast.makeText(context, context.getString(R.string.dns_select_toast),
                                Toast.LENGTH_SHORT).show()

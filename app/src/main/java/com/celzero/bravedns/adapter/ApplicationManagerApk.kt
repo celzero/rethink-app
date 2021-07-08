@@ -33,13 +33,11 @@ class ApplicationManagerApk(packageInfo: PackageInfo, var category: String, cont
     var packageName: String? = null
     var appIcon: Drawable? = null
     var version: String? = ""
-    var context: Context? = null
     var isChecked: Boolean = false
 
     init {
 
         this.appInfo = packageInfo.applicationInfo
-        this.context = context
         this.appIcon = context.packageManager.getApplicationIcon(appInfo!!)
         this.appName = context.packageManager.getApplicationLabel(appInfo!!).toString()
         this.packageName = packageInfo.packageName

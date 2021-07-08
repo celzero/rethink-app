@@ -44,6 +44,7 @@ import com.celzero.bravedns.databinding.ActivityFaqWebviewLayoutBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RESPONSE_VERSION
 import com.celzero.bravedns.util.Constants.Companion.THEME_DARK
 import com.celzero.bravedns.util.Constants.Companion.THEME_LIGHT
@@ -68,7 +69,6 @@ import java.io.IOException
 class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webview_layout) {
     private val b by viewBinding(ActivityFaqWebviewLayoutBinding::bind)
     private val maxProgressBar = 100
-    private var stamp: String? = ""
     private var url: String = Constants.CONFIGURE_BLOCKLIST_URL_REMOTE //"https://bravedns.com/configure?v=app"
     private var receivedStamp: String = ""
     private var blocklistsCount: MutableLiveData<Int> = MutableLiveData()
@@ -93,19 +93,22 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         context = this
         downloadManager = context.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
         receivedIntentFrom = intent.getIntExtra(Constants.LOCATION_INTENT_EXTRA, 0)
-        stamp = intent.getStringExtra(Constants.STAMP_INTENT_EXTRA)
+        val stamp = intent.getStringExtra(Constants.STAMP_INTENT_EXTRA)
         try {
             initWebView()
             setWebClient()
             if (receivedIntentFrom == REMOTE) {
                 checkForDownload()
             }
-            if (stamp != null && stamp!!.isNotEmpty()) {
+
+            url = if (!stamp.isNullOrEmpty()) {
                 if (receivedIntentFrom == LOCAL) {
-                    url = Constants.CONFIGURE_BLOCKLIST_URL_LOCAL + persistentState.localBlocklistDownloadTime + "#" + stamp
+                    Constants.CONFIGURE_BLOCKLIST_URL_LOCAL + persistentState.localBlocklistDownloadTime + "#" + stamp
                 } else {
-                    url = Constants.CONFIGURE_BLOCKLIST_URL_REMOTE + "#" + stamp
+                    Constants.CONFIGURE_BLOCKLIST_URL_REMOTE + "#" + stamp
                 }
+            } else {
+                Constants.CONFIGURE_BLOCKLIST_URL_REMOTE
             }
         } catch (e: Exception) {
             Log.e(LOG_TAG_DNS, e.message, e)
@@ -225,6 +228,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                     HomeScreenActivity.GlobalVariable.appMode?.setBraveDNSMode(braveDNS)
                 } catch (e: Exception) {
                     Log.e(LOG_TAG_DNS, "Local brave dns set exception :${e.message}", e)
+                    HomeScreenActivity.GlobalVariable.appMode?.setBraveDNSMode(null)
                 }
             }
         } else {
@@ -510,25 +514,23 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
 
             override fun onResponse(call: Call, response: Response) {
                 val stringResponse = response.body!!.string()
-                val jsonObject = JSONObject(stringResponse)
-                val version = jsonObject.getInt(Constants.JSON_VERSION)
+                val json = JSONObject(stringResponse)
+                val version = json.optInt(Constants.JSON_VERSION, 0)
+                val shouldUpdate = json.optBoolean(Constants.JSON_UPDATE, false)
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
                                  "client onResponse for refresh blocklist files-  $version")
                 response.body!!.close()
                 client.connectionPool.evictAll()
 
-                if (version != RESPONSE_VERSION) {
+                if (version != RESPONSE_VERSION || !shouldUpdate) {
                     return
                 }
 
-                val shouldUpdate = jsonObject.getBoolean(Constants.JSON_UPDATE)
-                timestamp = jsonObject.getLong(Constants.JSON_LATEST)
+                timestamp = json.optLong(Constants.JSON_LATEST, INIT_TIME_MS)
                 persistentState.tempRemoteBlocklistDownloadTime = timestamp
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "onResponse -  $shouldUpdate, $timestamp")
-                if (shouldUpdate) {
-                    (context as Activity).runOnUiThread {
-                        downloadBlockListFiles()
-                    }
+                (context as Activity).runOnUiThread {
+                    downloadBlockListFiles()
                 }
 
             }

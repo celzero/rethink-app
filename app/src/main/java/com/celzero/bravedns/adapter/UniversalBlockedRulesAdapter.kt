@@ -29,8 +29,8 @@ import com.celzero.bravedns.database.BlockedConnections
 import com.celzero.bravedns.database.BlockedConnectionsRepository
 import com.celzero.bravedns.databinding.UnivWhitelistRulesItemBinding
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class UniversalBlockedRulesAdapter(private val context: Context,
@@ -79,22 +79,22 @@ class UniversalBlockedRulesAdapter(private val context: Context,
             builder.setCancelable(true)
             builder.setPositiveButton(
                 context.getString(R.string.univ_ip_delete_individual_positive)) { _, _ ->
-                if (blockedConnections != null) {
-                    GlobalScope.launch(Dispatchers.IO) {
-                        val firewallRules = FirewallRules.getInstance()
-                        firewallRules.removeFirewallRules(
-                            ConnTrackerBottomSheetFragment.UNIVERSAL_RULES_UID,
-                            blockedConnections.ipAddress!!, blockedConnectionsRepository)
-                    }
-                    Toast.makeText(context,
-                                   context.getString(R.string.univ_ip_delete_individual_toast,
-                                                     blockedConnections.ipAddress),
-                                   Toast.LENGTH_SHORT).show()
+
+                if (blockedConnections == null) return@setPositiveButton
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    val firewallRules = FirewallRules.getInstance()
+                    firewallRules.removeFirewallRules(
+                        ConnTrackerBottomSheetFragment.UNIVERSAL_RULES_UID,
+                        blockedConnections.ipAddress!!, blockedConnectionsRepository)
                 }
+                Toast.makeText(context, context.getString(R.string.univ_ip_delete_individual_toast,
+                                                          blockedConnections.ipAddress),
+                               Toast.LENGTH_SHORT).show()
             }
 
-            builder.setNegativeButton(
-                context.getString(R.string.univ_ip_delete_individual_negative)) { _, _ -> }
+            builder.setNegativeButton(context.getString(R.string.univ_ip_delete_individual_negative)) { _, _ -> }
+
             val alertDialog: AlertDialog = builder.create()
             alertDialog.setCancelable(true)
             alertDialog.show()

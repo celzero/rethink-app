@@ -74,7 +74,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
         }
     }
 
-    private fun stopVpn(context: Context?) {
+    private fun stopVpn(context: Context) {
         VpnController.getInstance().stop(context)
     }
 

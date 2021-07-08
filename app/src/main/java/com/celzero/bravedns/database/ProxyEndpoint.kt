@@ -18,6 +18,7 @@ package com.celzero.bravedns.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 
 @Entity(tableName = "ProxyEndpoint")
 class ProxyEndpoint {
@@ -35,11 +36,10 @@ class ProxyEndpoint {
     var isSelected: Boolean = true
     var isCustom: Boolean = true
     var isUDP: Boolean = false
-    var modifiedDataTime: Long = 0L
+    var modifiedDataTime: Long = INIT_TIME_MS
     var latency: Int = 0
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
         if (other?.javaClass != javaClass) return false
         other as ProxyEndpoint
         if (id != other.id) return false
@@ -55,6 +55,10 @@ class ProxyEndpoint {
                 proxyIP: String, proxyPort: Int, userName: String, password: String,
                 isSelected: Boolean, isCustom: Boolean, isUDP: Boolean, modifiedDataTime: Long,
                 latency: Int) {
+        // Insert methods treat 0 as not-set while inserting the item.
+        // The below check is for manual insert of the default Doh entities.
+        // For every other entries the id is assigned as -1 so that the
+        // autoGenerate parameter will generate the id accordingly.
         if (id != -1) this.id = id
         this.proxyMode = proxyMode
         this.proxyName = proxyName

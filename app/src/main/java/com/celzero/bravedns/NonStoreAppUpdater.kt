@@ -19,7 +19,11 @@ import android.app.Activity
 import android.util.Log
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+import com.celzero.bravedns.util.Constants.Companion.JSON_LATEST
+import com.celzero.bravedns.util.Constants.Companion.JSON_UPDATE
+import com.celzero.bravedns.util.Constants.Companion.JSON_VERSION
+import com.celzero.bravedns.util.Constants.Companion.RESPONSE_VERSION
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
 import okhttp3.*
 import org.json.JSONObject
@@ -48,23 +52,35 @@ class NonStoreAppUpdater(private val baseURL: String,
             override fun onResponse(call: Call, response: Response) {
                 try {
                     val stringResponse = response.body!!.string()
-                    //creating json object
-                    val jsonObject = JSONObject(stringResponse)
-                    val responseVersion = jsonObject.getInt("version")
-                    val shouldUpdate = jsonObject.getBoolean("update")
-                    val latestVersion = jsonObject.getInt("latest")
+                    val json = JSONObject(stringResponse)
+                    val version = json.optInt(JSON_VERSION, 0)
+                    val shouldUpdate = json.optBoolean(JSON_UPDATE, false)
+                    val latest = json.optLong(JSON_LATEST, INIT_TIME_MS)
                     persistentState.lastAppUpdateCheck = System.currentTimeMillis() // FIXME move to NTP
-                    Log.i(LOG_TAG_APP_UPDATE,
-                          "Server response for the new version download is true, version number-  $latestVersion")
-                    if (responseVersion == Constants.RESPONSE_VERSION) {
-                        if (shouldUpdate) {
-                            listener.onUpdateAvailable(AppUpdater.InstallSource.OTHER)
-                        } else {
-                            if (isUserInitiated) listener.onUpToDate(AppUpdater.InstallSource.OTHER)
-                        }
-                    }
+
                     response.close()
                     client.connectionPool.evictAll()
+                    Log.i(LOG_TAG_APP_UPDATE,
+                          "Server response for the new version download is $shouldUpdate (json version - $version), version number-  $latest")
+
+                    if (version != RESPONSE_VERSION) {
+                        if (isUserInitiated) {
+                            listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER)
+                        }
+                        return
+                    } else {
+                        /* No Op */
+                        // If the response version is correct, proceed with further checks.
+                    }
+
+                    if (!shouldUpdate) {
+                        if (isUserInitiated) {
+                            listener.onUpToDate(AppUpdater.InstallSource.OTHER)
+                        }
+                    } else {
+                        listener.onUpdateAvailable(AppUpdater.InstallSource.OTHER)
+                    }
+
                 } catch (e: Exception) {
                     if (isUserInitiated) {
                         listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER)

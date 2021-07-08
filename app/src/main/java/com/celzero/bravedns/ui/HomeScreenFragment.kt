@@ -27,7 +27,6 @@ import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.Html
-import android.text.TextUtils
 import android.text.format.DateUtils
 import android.text.format.DateUtils.FORMAT_ABBREV_RELATIVE
 import android.text.format.DateUtils.MINUTE_IN_MILLIS
@@ -66,6 +65,7 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.isAlwaysOnEnabled
+import com.celzero.bravedns.util.Utilities.Companion.isOtherVpnHasAlwaysOn
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 import com.facebook.shimmer.Shimmer
 import org.koin.android.ext.android.inject
@@ -365,14 +365,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     // FIXME: 19-11-2020 - Check the below code for all the edge cases.
     private fun checkForPrivateDNSandAlwaysON(): Boolean {
         val vpnService = VpnController.getInstance().getBraveVpnService()
-
         val alwaysOn = isAlwaysOnEnabled(vpnService, requireContext())
-        if (DEBUG) Log.i(LOG_TAG_VPN, "AlwaysOn: $alwaysOn")
-        val status = VpnController.getInstance().getState()
-        if (alwaysOn && status.connectionState == null) {
-            return false
-        } else if (vpnService != null) {
-            showAlwaysOnDialog()
+        if (DEBUG) Log.i(LOG_TAG_VPN, "AlwaysOn: $alwaysOn, isVpnService available? ${vpnService != null}")
+
+        if (isOtherVpnHasAlwaysOn(requireContext())) {
+            showDisableAlwaysOnDialog()
+            return true
+        }
+
+        if (alwaysOn && vpnService != null) {
             return true
         }
 
@@ -384,7 +385,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         return false
     }
 
-    private fun showAlwaysOnDialog() {
+    private fun showDisableAlwaysOnDialog() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle(R.string.always_on_dialog_heading)
         builder.setMessage(R.string.always_on_dialog)
@@ -597,7 +598,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun stopVpnService() {
-        VpnController.getInstance().stop(context)
+        VpnController.getInstance().stop(requireContext())
     }
 
     private fun startVpnService() {

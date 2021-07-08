@@ -17,6 +17,8 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.DialogInterface
+import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -25,7 +27,6 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.ContextCompat
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -35,12 +36,13 @@ import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.databinding.ExcludedAppListItemBinding
 import com.celzero.bravedns.glide.GlideApp
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.ThrowingHandler
+import com.celzero.bravedns.util.Utilities.Companion.getDefaultIcon
+import com.celzero.bravedns.util.Utilities.Companion.getIcon
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class ExcludedAppListAdapter(private val context: Context,
@@ -78,43 +80,27 @@ class ExcludedAppListAdapter(private val context: Context,
         fun update(appInfo: AppInfo) {
             b.excludedAppListApkLabelTv.text = appInfo.appName
             b.excludedAppListCheckbox.isChecked = appInfo.isExcluded
-            try {
-                if (!appInfo.packageInfo.contains(
-                        Constants.APP_NON_APP) || appInfo.appName != Constants.UNKNOWN_APP) {
-                    GlideApp.with(context).load(
-                        context.packageManager.getApplicationIcon(appInfo.packageInfo)).into(
-                        b.excludedAppListApkIconIv)
-                } else {
-                    GlideApp.with(context).load(
-                        ContextCompat.getDrawable(context, R.drawable.default_app_icon)).error(
-                        AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(
-                        b.excludedAppListApkIconIv)
-                }
+            displayIcon(getIcon(context, appInfo.appName, appInfo.packageInfo))
+            clickListeners(appInfo)
+        }
 
-            } catch (e: Exception) {
-                GlideApp.with(context).load(
-                    AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(
-                    b.excludedAppListApkIconIv)
-                Log.e(LOG_TAG_FIREWALL,
-                      "Application Icon not available for package: ${appInfo.packageInfo}" + e.message,
-                      e)
-            }
-
-
+        private fun clickListeners(appInfo: AppInfo) {
             b.excludedAppListContainer.setOnClickListener {
-                if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                                 "parentView- whitelist - ${appInfo.appName},${appInfo.isExcluded}")
                 appInfo.isExcluded = !appInfo.isExcluded
+                Log.i(LOG_TAG_FIREWALL,"is app excluded- ${appInfo.appName},${appInfo.isExcluded}")
                 excludeAppsFromVPN(appInfo, appInfo.isExcluded)
             }
 
             b.excludedAppListCheckbox.setOnCheckedChangeListener(null)
             b.excludedAppListCheckbox.setOnClickListener {
-                if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                                 "CheckBox- whitelist - ${appInfo.appName},${appInfo.isExcluded}")
                 appInfo.isExcluded = !appInfo.isExcluded
+                Log.i(LOG_TAG_FIREWALL, "is app excluded - ${appInfo.appName},${appInfo.isExcluded}")
                 excludeAppsFromVPN(appInfo, appInfo.isExcluded)
             }
+        }
+
+        private fun displayIcon(drawable: Drawable?){
+            GlideApp.with(context).load(drawable).error(getDefaultIcon(context)).into(b.excludedAppListApkIconIv)
         }
 
         private fun excludeAppsFromVPN(appInfo: AppInfo, status: Boolean) {
@@ -124,24 +110,30 @@ class ExcludedAppListAdapter(private val context: Context,
             } else {
                 true
             }
-            if (blockAllApps) {
-                b.excludedAppListCheckbox.isChecked = status
-                GlobalScope.launch(Dispatchers.IO) {
-                    appInfoRepository.updateExcludedList(appInfo.uid, status)
-                    val count = appInfoRepository.getBlockedCountForCategory(appInfo.appCategory)
-                    val excludedCount = appInfoRepository.getExcludedAppCountForCategory(
-                        appInfo.appCategory)
-                    val whitelistCount = appInfoRepository.getBlockedCountForCategory(
-                        appInfo.appCategory)
-                    categoryInfoRepository.updateBlockedCount(appInfo.appCategory, count)
-                    categoryInfoRepository.updateExcludedCount(appInfo.appCategory, excludedCount)
-                    categoryInfoRepository.updateWhitelistCount(appInfo.appCategory, whitelistCount)
-                }
-                if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Apps excluded - ${appInfo.appName}, $status")
-            } else {
-                b.excludedAppListCheckbox.isChecked = !status
+
+            Log.i(LOG_TAG_FIREWALL, "App ${appInfo.appName} excluded from vpn? - $status, blockAllApps?- $blockAllApps")
+
+            if (!blockAllApps) {
                 appInfo.isExcluded = !status
-                if (DEBUG) Log.d(LOG_TAG_FIREWALL, "App not excluded - ${appInfo.appName}, $status")
+                b.excludedAppListCheckbox.isChecked = !status
+                return
+            }
+
+            b.excludedAppListCheckbox.isChecked = status
+            persistAppDetails(appInfo, status)
+        }
+
+        private fun persistAppDetails(appInfo: AppInfo, status: Boolean) {
+            CoroutineScope(Dispatchers.IO).launch {
+                appInfoRepository.updateExcludedList(appInfo.uid, status)
+                val count = appInfoRepository.getBlockedCountForCategory(appInfo.appCategory)
+                val excludedCount = appInfoRepository.getExcludedAppCountForCategory(
+                    appInfo.appCategory)
+                val whitelistCount = appInfoRepository.getBlockedCountForCategory(
+                    appInfo.appCategory)
+                categoryInfoRepository.updateBlockedCount(appInfo.appCategory, count)
+                categoryInfoRepository.updateExcludedCount(appInfo.appCategory, excludedCount)
+                categoryInfoRepository.updateWhitelistCount(appInfo.appCategory, whitelistCount)
             }
         }
 

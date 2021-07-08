@@ -329,9 +329,11 @@
     <string name="system_components_warning_title">Block System Components</string>
     <string name="system_non_app_warning_title">Block Non-App System</string>
 
-    <string name="system_apps_warning">Some system apps are critical to proper functioning of a device. Block them only if you know what you are doing.</string>
+    <!--<string name="system_apps_warning">Some system apps are critical to proper functioning of a device. Block them only if you know what you are doing.</string>
     <string name="system_components_warning">Some system components are critical to proper functioning of a device. Block them only if you know what you are doing.</string>
-    <string name="system_non_apps_warning">Some non-app system components are critical to proper functioning of a device. Block them only if you know what you are doing.</string>
+    <string name="system_non_apps_warning">Some non-app system components are critical to proper functioning of a device. Block them only if you know what you are doing.</string>-->
+    <string name="system_apps_warning_dialog_title">Block %1$s</string>
+    <string name="system_app_block_warning">Some %1$s are critical to proper functioning of a device. Block them only if you know what you are doing.</string>
 
     <string name="system_apps_dialog_positive">Block anyway</string>
     <string name="system_apps_dialog_negative">Cancel</string>
@@ -831,7 +833,7 @@
     <!-- Connection tracker bottom sheet fragment string -->
     <string name="ctbs_app_info_not_available_toast">App Info not available</string>
     <string name="ctbs_unknown_app">Unknown</string>
-    <string name="ctbs_app_other_apps">%1$s + %2$s other apps</string>
+    <string name="ctbs_app_other_apps">%1$s + %2$s other app(s)</string>
     <string name="ctbs_app_other_app">%1$s + %2$s other app</string>
     <string name="ctbs_rule_5">Rule #5</string>
     <string name="ctbs_whitelisted">Whitelisted</string>

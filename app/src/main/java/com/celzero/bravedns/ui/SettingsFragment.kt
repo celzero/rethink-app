@@ -30,8 +30,6 @@ import android.util.Log
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
-import android.view.animation.Animation
-import android.view.animation.RotateAnimation
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
@@ -62,6 +60,7 @@ import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_WEBSITE
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.REFRESH_BLOCKLIST_URL
 import com.celzero.bravedns.util.Constants.Companion.RESPONSE_VERSION
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
@@ -750,8 +749,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             override fun onResponse(call: Call, response: Response) {
                 try {
                     val stringResponse = response.body!!.string()
-                    val jsonObject = JSONObject(stringResponse)
-                    val version = jsonObject.getInt(Constants.JSON_VERSION)
+                    val json = JSONObject(stringResponse)
+                    val version = json.optInt(Constants.JSON_VERSION, 0)
                     if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
                                      "client onResponse for refresh blocklist files-  $version")
                     response.body!!.close()
@@ -760,8 +759,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                         return
                     }
 
-                    val shouldUpdate = jsonObject.getBoolean(Constants.JSON_UPDATE)
-                    val timestamp = jsonObject.getLong(Constants.JSON_LATEST)
+                    val shouldUpdate = json.optBoolean(Constants.JSON_UPDATE, false)
+                    val timestamp = json.optLong(Constants.JSON_LATEST, INIT_TIME_MS)
                     if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "onResponse -  $shouldUpdate")
                     if (shouldUpdate) {
                         persistentState.tempBlocklistDownloadTime = timestamp
@@ -1103,55 +1102,33 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     }
 
     private fun showRedownloadDialogLockdown(timestamp: Long) {
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle(R.string.local_blocklist_lockdown_redownload)
-        builder.setMessage(getString(R.string.local_blocklist_lockdown_redownload_desc,
-                                     Utilities.convertLongToDate(timestamp)))
-        builder.setCancelable(false)
-        builder.setPositiveButton(
-            getString(R.string.local_blocklist_lockdown_positive)) { dialogInterface, _ ->
-            dialogInterface.dismiss()
+        activity?.runOnUiThread {
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setTitle(R.string.local_blocklist_lockdown_redownload)
+            builder.setMessage(getString(R.string.local_blocklist_lockdown_redownload_desc,
+                                         Utilities.convertLongToDate(timestamp)))
+            builder.setCancelable(false)
+            builder.setPositiveButton(
+                getString(R.string.local_blocklist_lockdown_positive)) { dialogInterface, _ ->
+                dialogInterface.dismiss()
+            }
+            val alertDialog: AlertDialog = builder.create()
+            alertDialog.show()
         }
-        val alertDialog: AlertDialog = builder.create()
-        alertDialog.show()
     }
 
     private fun showRedownloadDialog(timestamp: Long) {
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle(R.string.local_blocklist_redownload)
-        builder.setMessage(getString(R.string.local_blocklist_redownload_desc,
-                                     Utilities.convertLongToDate(timestamp)))
-        builder.setCancelable(false)
-        builder.setPositiveButton(
-            getString(R.string.local_blocklist_positive)) { dialogInterface, _ ->
-            dialogInterface.dismiss()
-        }
-        builder.setNeutralButton(getString(R.string.local_blocklist_neutral)) { _, _ ->
-            b.settingsActivityOnDeviceBlockDesc.text = getString(
-                R.string.settings_local_blocklist_desc2)
-            b.settingsActivityOnDeviceBlockSwitch.visibility = View.GONE
-            b.settingsActivityOnDeviceBlockProgress.visibility = View.VISIBLE
-            b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.INVISIBLE
-            persistentState.tempBlocklistDownloadTime = timestamp
-            persistentState.workManagerStartTime = SystemClock.elapsedRealtime()
-            get<AppDownloadManager>().downloadLocalBlocklist(timestamp)
-        }
-        val alertDialog: AlertDialog = builder.create()
-        alertDialog.show()
-    }
-
-    private fun showFileCorruptionDialog(timestamp: Long) {
         activity?.runOnUiThread {
             val builder = AlertDialog.Builder(requireContext())
-            builder.setTitle(R.string.local_blocklist_corrupt)
-            builder.setMessage(R.string.local_blocklist_corrupt_desc)
+            builder.setTitle(R.string.local_blocklist_redownload)
+            builder.setMessage(getString(R.string.local_blocklist_redownload_desc,
+                                         Utilities.convertLongToDate(timestamp)))
             builder.setCancelable(false)
-            builder.setNegativeButton(
-                getString(R.string.local_blocklist_corrupt_negative)) { dialogInterface, _ ->
+            builder.setPositiveButton(
+                getString(R.string.local_blocklist_positive)) { dialogInterface, _ ->
                 dialogInterface.dismiss()
             }
-            builder.setPositiveButton(
-                getString(R.string.local_blocklist_corrupt_positive)) { _, _ ->
+            builder.setNeutralButton(getString(R.string.local_blocklist_neutral)) { _, _ ->
                 b.settingsActivityOnDeviceBlockDesc.text = getString(
                     R.string.settings_local_blocklist_desc2)
                 b.settingsActivityOnDeviceBlockSwitch.visibility = View.GONE
@@ -1164,6 +1141,29 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             val alertDialog: AlertDialog = builder.create()
             alertDialog.show()
         }
+    }
+
+    private fun showFileCorruptionDialog(timestamp: Long) {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle(R.string.local_blocklist_corrupt)
+        builder.setMessage(R.string.local_blocklist_corrupt_desc)
+        builder.setCancelable(false)
+        builder.setNegativeButton(
+            getString(R.string.local_blocklist_corrupt_negative)) { dialogInterface, _ ->
+            dialogInterface.dismiss()
+        }
+        builder.setPositiveButton(getString(R.string.local_blocklist_corrupt_positive)) { _, _ ->
+            b.settingsActivityOnDeviceBlockDesc.text = getString(
+                R.string.settings_local_blocklist_desc2)
+            b.settingsActivityOnDeviceBlockSwitch.visibility = View.GONE
+            b.settingsActivityOnDeviceBlockProgress.visibility = View.VISIBLE
+            b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.INVISIBLE
+            persistentState.tempBlocklistDownloadTime = timestamp
+            persistentState.workManagerStartTime = SystemClock.elapsedRealtime()
+            get<AppDownloadManager>().downloadLocalBlocklist(timestamp)
+        }
+        val alertDialog: AlertDialog = builder.create()
+        alertDialog.show()
     }
 
     private fun showExcludeAppDialog(context: Context, recyclerAdapter: ExcludedAppListAdapter,

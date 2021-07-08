@@ -19,6 +19,7 @@ package com.celzero.bravedns.database
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.room.*
+import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment.Companion.UNIVERSAL_RULES_UID
 
 
 @Dao
@@ -45,32 +46,32 @@ interface BlockedConnectionsDAO {
     fun clearFirewallRules(uid: Int)
 
     @Transaction
-    @Query("select * from BlockedConnections where uid = :uid or uid = -1000")
+    @Query("select * from BlockedConnections where uid = :uid or uid = $UNIVERSAL_RULES_UID")
     fun getAllBlockedConnectionsForUID(uid: Int): List<BlockedConnections>
 
     @Transaction
     @Query(
-        "select * from BlockedConnections where isActive = 1 and uid = -1000 order by modifiedDateTime desc")
+        "select * from BlockedConnections where isActive = 1 and uid = $UNIVERSAL_RULES_UID order by modifiedDateTime desc")
     fun getUnivBlockedConnectionsLiveData(): DataSource.Factory<Int, BlockedConnections>
 
     @Transaction
     @Query(
-        "select * from BlockedConnections where ipAddress like :query and uid = -1000 and  isActive = 1 order by modifiedDateTime desc")
+        "select * from BlockedConnections where ipAddress like :query and uid = $UNIVERSAL_RULES_UID and  isActive = 1 order by modifiedDateTime desc")
     fun getUnivBlockedConnectionsByIP(query: String): DataSource.Factory<Int, BlockedConnections>
 
-    @Query("delete from BlockedConnections where ipAddress = :ipAddress and uid = -1000")
+    @Query("delete from BlockedConnections where ipAddress = :ipAddress and uid = $UNIVERSAL_RULES_UID")
     fun deleteIPRulesUniversal(ipAddress: String)
 
     @Transaction
     @Query("delete from BlockedConnections where ipAddress = :ipAddress and uid = :uid")
     fun deleteIPRulesForUID(uid: Int, ipAddress: String)
 
-    @Query("delete from BlockedConnections where uid = -1000")
+    @Query("delete from BlockedConnections where uid = $UNIVERSAL_RULES_UID")
     fun deleteAllIPRulesUniversal()
 
-    @Query("select count(*) from BlockedConnections where uid = -1000")
+    @Query("select count(*) from BlockedConnections where uid = $UNIVERSAL_RULES_UID")
     fun getBlockedConnectionsCount(): Int
 
-    @Query("select count(*) from BlockedConnections where uid = -1000")
+    @Query("select count(*) from BlockedConnections where uid = $UNIVERSAL_RULES_UID")
     fun getBlockedConnectionCountLiveData(): LiveData<Int>
 }

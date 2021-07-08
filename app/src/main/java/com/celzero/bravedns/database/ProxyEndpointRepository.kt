@@ -19,6 +19,7 @@ package com.celzero.bravedns.database
 import androidx.lifecycle.LiveData
 import androidx.paging.PagedList
 import androidx.paging.toLiveData
+import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -45,7 +46,7 @@ class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
     }
 
     fun getDNSProxyEndpointLiveData(): LiveData<PagedList<ProxyEndpoint>> {
-        return proxyEndpointDAO.getDNSProxyEndpointLiveData().toLiveData(pageSize = 50)
+        return proxyEndpointDAO.getDNSProxyEndpointLiveData().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
     }
 
     fun deleteOlderData(date: Long, coroutineScope: CoroutineScope = GlobalScope) {
@@ -55,7 +56,7 @@ class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
     }
 
     fun getDNSProxyEndpointLiveDataByType(query: String): LiveData<PagedList<ProxyEndpoint>> {
-        return proxyEndpointDAO.getDNSProxyEndpointLiveDataByType(query).toLiveData(pageSize = 50)
+        return proxyEndpointDAO.getDNSProxyEndpointLiveDataByType(query).toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
     }
 
     fun deleteDNSProxyEndpoint(proxyIP: String, port: Int) {
@@ -70,11 +71,11 @@ class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
         return proxyEndpointDAO.getCount()
     }
 
-    fun getConnectedProxy(): ProxyEndpoint? {
+    fun getConnectedProxy(): ProxyEndpoint {
         return proxyEndpointDAO.getConnectedProxy()
     }
 
-    fun getConnectedOrbotProxy(): ProxyEndpoint? {
+    fun getConnectedOrbotProxy(): ProxyEndpoint {
         return proxyEndpointDAO.getConnectedOrbotProxy()
     }
 

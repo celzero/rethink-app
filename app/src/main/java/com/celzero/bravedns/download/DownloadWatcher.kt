@@ -81,29 +81,40 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
                 Log.i(LOG_TAG_DOWNLOAD, "status is $downloadID cursor null")
                 return DOWNLOAD_FAILURE
             }
-            if (cursor.moveToFirst()) {
-                val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
-                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "onReceive status $status $downloadID")
-                if (status == DownloadManager.STATUS_SUCCESSFUL) {
-                    if (persistentState.downloadIDs.contains(downloadID)) {
+
+            try {
+                if (cursor.moveToFirst()) {
+                    val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
+
+                    if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "onReceive status $status $downloadID")
+
+                    if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                        // status==success is sometimes called-back more than once.
+                        // send a 'success' removing it from persitent-state.
                         persistentState.downloadIDs = persistentState.downloadIDs.minusElement(
                             downloadID)
+                        if (persistentState.downloadIDs.isEmpty()) {
+                            return DOWNLOAD_SUCCESS
+                        }
+                    } else if (status == DownloadManager.STATUS_FAILED) {
+                        if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
+                                         "download status failure for $downloadID")
+                        return DOWNLOAD_FAILURE
                     }
-                    if (persistentState.downloadIDs.isEmpty()) {
-                        cursor.close()
-                        return DOWNLOAD_SUCCESS
-                    }
-                } else if (status == DownloadManager.STATUS_FAILED) {
-                    cursor.close()
+                } else {
+                    if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "cursor empty")
                     return DOWNLOAD_FAILURE
                 }
-            } else {
-                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "moveToFirst is false")
+            }catch (e: Exception){
+                Log.e(LOG_TAG_DOWNLOAD, "failure download- ${e.message}", e)
+            } finally {
                 cursor.close()
-                return DOWNLOAD_FAILURE
             }
-            cursor.close()
         }
+        // occasionally, the download-manager observer fires without a download having
+        // been enqueued and download-ids populated into persitent-state, which keep in
+        // mind, is also eventually consistent with its state propagation. In this case,
+        // count(download-ids) is zero. So: Ask for a retry regardless of the download-status
         return DOWNLOAD_RETRY
     }
 }

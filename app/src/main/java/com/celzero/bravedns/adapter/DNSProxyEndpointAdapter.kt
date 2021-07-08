@@ -79,77 +79,59 @@ class DNSProxyEndpointAdapter(private val context: Context,
     inner class DNSProxyEndpointViewHolder(private val b: DnsProxyListItemBinding) :
             RecyclerView.ViewHolder(b.root) {
 
-        fun update(dnsProxyEndpoint: DNSProxyEndpoint) {
+        fun update(endpoint: DNSProxyEndpoint) {
+            displayDetails(endpoint)
+            clickListeners(endpoint)
+        }
 
-            b.dnsProxyListUrlName.text = dnsProxyEndpoint.proxyName
-            if (dnsProxyEndpoint.isSelected) {
-                if (dnsProxyEndpoint.proxyAppName == context.getString(
-                        R.string.cd_custom_dns_proxy_default_app)) {
-                    b.dnsProxyListUrlExplanation.text = context.getString(
-                        R.string.settings_socks_forwarding_desc, dnsProxyEndpoint.proxyIP,
-                        dnsProxyEndpoint.proxyPort.toString(),
-                        context.getString(R.string.cd_custom_dns_proxy_default_app))
-                } else {
-                    b.dnsProxyListUrlExplanation.text = context.getString(
-                        R.string.settings_socks_forwarding_desc, dnsProxyEndpoint.proxyIP,
-                        dnsProxyEndpoint.proxyPort.toString(), dnsProxyEndpoint.proxyAppName)
-
-                }
-            } else {
-                if (dnsProxyEndpoint.proxyAppName == context.getString(
-                        R.string.cd_custom_dns_proxy_default_app)) {
-                    b.dnsProxyListUrlExplanation.text = context.getString(R.string.dns_proxy_desc,
-                                                                          dnsProxyEndpoint.proxyIP,
-                                                                          dnsProxyEndpoint.proxyPort.toString(),
-                                                                          context.getString(
-                                                                              R.string.cd_custom_dns_proxy_default_app))
-                } else {
-                    b.dnsProxyListUrlExplanation.text = context.getString(R.string.dns_proxy_desc,
-                                                                          dnsProxyEndpoint.proxyIP,
-                                                                          dnsProxyEndpoint.proxyPort.toString(),
-                                                                          dnsProxyEndpoint.proxyAppName)
-                }
+        private fun clickListeners(endpoint: DNSProxyEndpoint) {
+            b.root.setOnClickListener {
+                updateDNSProxyDetails(endpoint)
+                b.dnsProxyListCheckImage.isChecked = true
+            }
+            b.dnsProxyListActionImage.setOnClickListener {
+                showExplanationOnImageClick(endpoint)
             }
 
-            b.dnsProxyListCheckImage.isChecked = dnsProxyEndpoint.isSelected
-            if (dnsProxyEndpoint.isCustom && !dnsProxyEndpoint.isSelected) {
+            b.dnsProxyListCheckImage.setOnClickListener {
+                updateDNSProxyDetails(endpoint)
+                b.dnsProxyListCheckImage.isChecked = true
+                b.dnsProxyListActionImage.setImageDrawable(
+                    AppCompatResources.getDrawable(context, R.drawable.ic_fab_appinfo))
+            }
+
+            b.root.setOnClickListener {
+                updateDNSProxyDetails(endpoint)
+                b.dnsProxyListCheckImage.isChecked = true
+            }
+
+            b.dnsProxyListActionImage.setOnClickListener {
+                showExplanationOnImageClick(endpoint)
+            }
+
+            b.dnsProxyListCheckImage.setOnClickListener {
+                updateDNSProxyDetails(endpoint)
+                b.dnsProxyListCheckImage.isChecked = true
+            }
+        }
+
+        private fun displayDetails(endpoint: DNSProxyEndpoint) {
+            b.dnsProxyListUrlName.text = endpoint.proxyName
+            b.dnsProxyListCheckImage.isChecked = endpoint.isSelected
+
+            b.dnsProxyListUrlExplanation.text = endpoint.getExplanationText(context)
+
+            if (endpoint.isDeletable()) {
                 b.dnsProxyListActionImage.setImageDrawable(
                     AppCompatResources.getDrawable(context, R.drawable.ic_fab_uninstall))
             } else {
                 b.dnsProxyListActionImage.setImageDrawable(
                     AppCompatResources.getDrawable(context, R.drawable.ic_fab_appinfo))
             }
-            b.root.setOnClickListener {
-                updateDNSProxyDetails(dnsProxyEndpoint)
-                b.dnsProxyListCheckImage.isChecked = true
-            }
-            b.dnsProxyListActionImage.setOnClickListener {
-                showExplanationOnImageClick(dnsProxyEndpoint)
-            }
-
-            b.dnsProxyListCheckImage.setOnClickListener {
-                updateDNSProxyDetails(dnsProxyEndpoint)
-                b.dnsProxyListCheckImage.isChecked = true
-                b.dnsProxyListActionImage.setImageDrawable(
-                    AppCompatResources.getDrawable(context, R.drawable.ic_fab_appinfo))
-            }
-            b.root.setOnClickListener {
-                updateDNSProxyDetails(dnsProxyEndpoint)
-                b.dnsProxyListCheckImage.isChecked = true
-            }
-            b.dnsProxyListActionImage.setOnClickListener {
-                showExplanationOnImageClick(dnsProxyEndpoint)
-            }
-
-            b.dnsProxyListCheckImage.setOnClickListener {
-                updateDNSProxyDetails(dnsProxyEndpoint)
-                b.dnsProxyListCheckImage.isChecked = true
-            }
         }
-
-        //checkBox.setOn
-
     }
+
+
 
     private fun showExplanationOnImageClick(dnsProxyEndpoint: DNSProxyEndpoint) {
         if (dnsProxyEndpoint.isCustom && !dnsProxyEndpoint.isSelected) showDialogForDelete(
@@ -195,7 +177,7 @@ class DNSProxyEndpointAdapter(private val context: Context,
         alertDialog.show()
     }
 
-    private fun showDialogForDelete(dnsProxyEndpoint: DNSProxyEndpoint?) {
+    private fun showDialogForDelete(dnsProxyEndpoint: DNSProxyEndpoint) {
         val builder = AlertDialog.Builder(context)
         builder.setTitle(R.string.dns_proxy_remove_dialog_title)
         builder.setMessage(R.string.dns_proxy_remove_dialog_message)
@@ -203,9 +185,7 @@ class DNSProxyEndpointAdapter(private val context: Context,
         builder.setCancelable(true)
         builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { _, _ ->
             GlobalScope.launch(Dispatchers.IO) {
-                if (dnsProxyEndpoint != null) {
-                    dnsProxyEndpointRepository.deleteDNSProxyEndpoint(dnsProxyEndpoint.id)
-                }
+                dnsProxyEndpointRepository.deleteDNSProxyEndpoint(dnsProxyEndpoint.id)
             }
             Toast.makeText(context, R.string.dns_proxy_remove_success, Toast.LENGTH_SHORT).show()
         }

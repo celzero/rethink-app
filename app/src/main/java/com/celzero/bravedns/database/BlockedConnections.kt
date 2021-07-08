@@ -18,6 +18,7 @@ package com.celzero.bravedns.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 
 @Entity(tableName = "BlockedConnections")
 class BlockedConnections {
@@ -29,17 +30,15 @@ class BlockedConnections {
     var protocol: String? = null
     var isActive: Boolean = true
     var ruleType: String = ""
-    var modifiedDateTime: Long = 0L
+    var modifiedDateTime: Long = INIT_TIME_MS
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other?.javaClass != javaClass) return false
-        other as BlockedConnections
+        if( other !is BlockedConnections) return false
         if (id != other.id) return false
         return true
     }
 
     override fun hashCode(): Int {
-        return this.hashCode()
+        return this.id.hashCode()
     }
 }
