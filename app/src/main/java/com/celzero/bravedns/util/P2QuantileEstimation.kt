@@ -66,7 +66,7 @@ class P2QuantileEstimation(probability: Double) {
                 for (i in 0..u-1) {
                     n[i] = i
                     ns[i] = i.toDouble()
-                    dns[i] = 1.0 / u * (i + 1)
+                    dns[i] = (1.0 / (u - 1)) * i
                 }
             }
 
@@ -133,7 +133,7 @@ class P2QuantileEstimation(probability: Double) {
         }
  
         Arrays.sort(q, 0, c)
-        val index = ((c - 1) / 2).roundToInt()
+        val index = ((c - 1) / 2)
         return q[index]
     }
 
