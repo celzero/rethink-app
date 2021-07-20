@@ -55,13 +55,6 @@ object VpnController {
         connectionStatus.postValue(state)
     }
 
-
-    /* private fun stateChanged(context: Context) {
-         val broadcast = Intent(InternalNames.DNS_STATUS.name)
-         LocalBroadcastManager.getInstance(context).sendBroadcast(broadcast)
-     }
- */
-
     @Synchronized
     fun start(context: Context) {
         //TODO : Code modified to remove the check of null reference - MODIFIED check??
@@ -75,7 +68,6 @@ object VpnController {
         } else {
             context.startService(startServiceIntent)
         }
-        //stateChanged(context)
         onConnectionStateChanged(state().connectionState)
         Log.i(LOG_TAG_VPN, "VPNController - Start(Synchronized) executed - $context")
 
@@ -87,7 +79,7 @@ object VpnController {
             // user intent state and reset to the default state.
             stop(context)
         } else {
-            //stateChanged(context)
+            // no op
         }
         Log.i(LOG_TAG_VPN, "onStartComplete - VpnController")
     }
@@ -99,7 +91,6 @@ object VpnController {
         braveVpnService?.signalStopService(true)
         braveVpnService = null
         onConnectionStateChanged(connectionState)
-        //stateChanged(context)
     }
 
     fun state(): VpnState {

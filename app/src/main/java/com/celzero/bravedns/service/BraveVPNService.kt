@@ -51,6 +51,7 @@ import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.net.manager.ConnectionTracer
 import com.celzero.bravedns.receiver.NotificationActionReceiver
+import com.celzero.bravedns.ui.FirewallActivity
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.backgroundAllowedUID
@@ -347,7 +348,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
 
         if (DEBUG) Log.d(LOG_TAG_VPN, "App not in use failure, show notification.")
 
-        val intent = Intent(this, HomeScreenActivity::class.java)
+        val intent = Intent(this, FirewallActivity::class.java)
         intent.putExtra(NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME,
                         NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE)
 

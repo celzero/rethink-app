@@ -89,7 +89,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         var cryptRelayToRemove: String = ""
 
         var appStartTime: Long = System.currentTimeMillis()
-        var DEBUG = true
+        var DEBUG = false
     }
 
     // TODO - #324 - Usage of isDarkTheme() in all activities.
@@ -133,7 +133,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                                                               homeScreenFragment.javaClass.simpleName).commit()
         }
         b.navView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
-        //appMode = get() // Todo don't hold global objects across the app.
 
         FirewallRules.loadFirewallRules(blockedConnectionsRepository)
 
@@ -143,20 +142,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         initUpdateCheck()
 
-    }
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        // Created as part of accessibility failure notification.
-        val extras = intent.extras
-        if (extras != null) {
-            val value = extras.getString(NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME)
-            if (!value.isNullOrEmpty() && value == NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE) {
-                if (DEBUG) Log.d(LOG_TAG_UI,
-                                 "Intent thrown as part of accessibility failure notification.")
-                handleAccessibilitySettings()
-            }
-        }
     }
 
     private fun modifyPersistence() {
@@ -178,32 +163,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun launchOnboardActivity() {
         startActivity(Intent(this, WelcomeActivity::class.java))
     }
-
-    private fun handleAccessibilitySettings() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle(R.string.alert_permission_accessibility_regrant)
-        builder.setMessage(R.string.alert_firewall_accessibility_regrant_explanation)
-        builder.setPositiveButton(
-            getString(R.string.univ_accessibility_crash_dialog_positive)) { _, _ ->
-            persistentState.isAccessibilityCrashDetected = false
-            openRethinkAppInfo(this)
-        }
-        builder.setNegativeButton(
-            getString(R.string.univ_accessibility_crash_dialog_negative)) { _, _ ->
-            persistentState.isAccessibilityCrashDetected = false
-        }
-        builder.setCancelable(false)
-        val dialog: AlertDialog = builder.create()
-        dialog.show()
-    }
-
-    private fun openRethinkAppInfo(context: Context) {
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-        val packageName = context.packageName
-        intent.data = Uri.parse("package:$packageName")
-        ContextCompat.startActivity(context, intent, null)
-    }
-
 
     private fun showNewFeaturesDialog() {
         if (!isNewVersion()) return

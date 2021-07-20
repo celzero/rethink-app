@@ -1004,9 +1004,7 @@
     <string name="settings_local_blocklist_update">Update</string>
 
     <string name="accessibility_notification_title">Action Required</string>
-    <string name="accessibility_notification_content">RethinkDNS accessibility service has stopped or crashed.</string>
+    <string name="accessibility_notification_content">RethinkDNS accessibility service has stopped or crashed. Background apps are not blocked.</string>
     <string name="accessibility_notification_action_positive">DETAILS</string>
-
-    <string name="accessibility_failure_intent_text">ACCESSIBILITY_FAILURE</string>
 
 </resources>

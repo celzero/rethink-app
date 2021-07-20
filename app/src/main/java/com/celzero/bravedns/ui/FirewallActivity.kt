@@ -17,9 +17,15 @@ limitations under the License.
 package com.celzero.bravedns.ui
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
+import android.util.Log
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
@@ -28,6 +34,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityFirewallBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.tabs.TabLayout
 import org.koin.android.ext.android.inject
@@ -86,6 +93,45 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall),
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
+
+    override fun onNewIntent(intent: Intent) {
+           super.onNewIntent(intent)
+           // Created as part of accessibility failure notification.
+           val extras = intent.extras
+           if (extras != null) {
+               val value = extras.getString(Constants.NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME)
+               if (!value.isNullOrEmpty() && value == Constants.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE) {
+                   if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LoggerConstants.LOG_TAG_UI,
+                                                                      "Intent thrown as part of accessibility failure notification.")
+                   handleAccessibilitySettings()
+               }
+           }
+       }
+
+    private fun handleAccessibilitySettings() {
+           val builder = AlertDialog.Builder(this)
+           builder.setTitle(R.string.alert_permission_accessibility_regrant)
+           builder.setMessage(R.string.alert_firewall_accessibility_regrant_explanation)
+           builder.setPositiveButton(
+               getString(R.string.univ_accessibility_crash_dialog_positive)) { _, _ ->
+               persistentState.isAccessibilityCrashDetected = false
+               openRethinkAppInfo(this)
+           }
+           builder.setNegativeButton(
+               getString(R.string.univ_accessibility_crash_dialog_negative)) { _, _ ->
+               persistentState.isAccessibilityCrashDetected = false
+           }
+           builder.setCancelable(false)
+           val dialog: AlertDialog = builder.create()
+           dialog.show()
+       }
+
+       private fun openRethinkAppInfo(context: Context) {
+           val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+           val packageName = context.packageName
+           intent.data = Uri.parse("package:$packageName")
+           ContextCompat.startActivity(context, intent, null)
+       }
 
 }
 
