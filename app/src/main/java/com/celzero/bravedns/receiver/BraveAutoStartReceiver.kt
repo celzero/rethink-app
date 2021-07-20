@@ -34,15 +34,21 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
     val persistentState by inject<PersistentState>()
 
     override fun onReceive(context: Context, intent: Intent) {
-        val vpnService = VpnController.getInstance().getBraveVpnService()
-        val isAlwaysOnEnabled = Utilities.isAlwaysOnEnabled(vpnService, context)
+
+        if (!persistentState.prefAutoStartBootUp) {
+            Log.w(LOG_TAG_VPN, "Auto start is not enabled: ${persistentState.prefAutoStartBootUp}")
+            return
+        }
+
+        val vpnService = VpnController.getBraveVpnService()
+        val isAlwaysOnEnabled = Utilities.isAlwaysOnEnabled(context, vpnService)
 
         if (Intent.ACTION_REBOOT != intent.action && Intent.ACTION_BOOT_COMPLETED != intent.action) {
             Log.w(LOG_TAG_VPN, "unhandled broadcast ${intent.action}")
             return
         }
 
-        if (persistentState.prefAutoStartBootUp && persistentState.vpnEnabled && !isAlwaysOnEnabled) {
+        if (persistentState.getVpnEnabled() && !isAlwaysOnEnabled) {
             val prepareVpnIntent: Intent? = try {
                 VpnService.prepare(context)
             } catch (e: NullPointerException) {
@@ -51,7 +57,7 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
             }
 
             if (prepareVpnIntent == null) {
-                VpnController.getInstance().start(context)
+                VpnController.start(context)
                 return
             }
 

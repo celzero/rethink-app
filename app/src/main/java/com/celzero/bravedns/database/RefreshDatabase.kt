@@ -23,11 +23,13 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.celzero.bravedns.R
+import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.REFRESH_APP_DURATION
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
 import com.celzero.bravedns.util.PlayStoreCategory
 import com.celzero.bravedns.util.Utilities
@@ -35,6 +37,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class RefreshDatabase internal constructor(private var context: Context,
                                            private val appInfoRepository: AppInfoRepository,
@@ -57,34 +60,56 @@ class RefreshDatabase internal constructor(private var context: Context,
     /**
      * Need to rewrite the logic for adding the apps in the database and removing it during uninstall.
      */
-    fun refreshAppInfoDatabase() {
+    fun refreshAppInfoDatabase(isForceRefresh: Boolean) {
         if (DEBUG) Log.d(LOG_TAG_APP_DB, "Refresh database is called")
+
+        if (!isRefreshCheckRequired(isForceRefresh)) return
+
         GlobalScope.launch(Dispatchers.IO) {
-            val appListDB = appInfoRepository.getAppInfoAsync()
+            val appListDB = appInfoRepository.getAppInfo()
             appListDB.forEach {
+                if (it.packageInfo.contains(Constants.NO_PACKAGE)) return@forEach
+
                 val pkgMetadata = Utilities.getPackageMetadata(context.packageManager,
                                                                it.packageInfo)
                 if (pkgMetadata?.applicationInfo != null) return@forEach
+
                 appInfoRepository.delete(it)
             }
-            getAppInfo()
+            rebuildAppInfo()
         }
     }
 
-    fun reloadAppList(appInfos: List<AppInfo>) {
+    // Refresh database is called from Homescreenactivity's onResume().
+    // Now the refresh will be called if the last updated time is greater than
+    // REFRESH_APP_DURATION(3hrs). This will avoid too frequent refresh calls.
+    private fun isRefreshCheckRequired(forceRefresh: Boolean): Boolean {
+        if (forceRefresh) return true
+
+        val timeDifference = System.currentTimeMillis() - persistentState.lastAppRefreshTime
+        val hours = TimeUnit.MILLISECONDS.toHours(timeDifference)
+
+        if (hours > REFRESH_APP_DURATION) {
+            return true
+        }
+
+        return false
+    }
+
+    private fun reloadAppList(appInfos: List<AppInfo>) {
         HomeScreenActivity.GlobalVariable.appList.clear()
         appInfos.forEach {
-            HomeScreenActivity.updateGlobalAppInfoEntry(it.packageInfo, it)
-            HomeScreenActivity.updateGlobalAppFirewallRule(it.uid, it.isInternetAllowed)
+            FirewallManager.updateGlobalAppInfoEntry(it.packageInfo, it)
+            FirewallManager.updateAppInternetPermissionByUID(it.uid, it.isInternetAllowed)
         }
     }
 
-    private fun getAppInfo() {
-        HomeScreenActivity.isLoadingComplete = false
+    private fun rebuildAppInfo() {
+        HomeScreenActivity.setupStart()
         GlobalScope.launch(Dispatchers.IO) {
             val installedPackages: List<PackageInfo> = context.packageManager?.getInstalledPackages(
-                PackageManager.GET_META_DATA)!!
-            val appInfos = appInfoRepository.getAppInfoAsync()
+                PackageManager.GET_META_DATA) as List<PackageInfo>
+            val appInfos = appInfoRepository.getAppInfo()
             val totalNonApps = appInfoRepository.getNonAppCount()
             if (DEBUG) Log.d(LOG_TAG_APP_DB,
                              "getAppInfo - ${appInfos.size}, $totalNonApps, ${installedPackages.size}")
@@ -113,8 +138,8 @@ class RefreshDatabase internal constructor(private var context: Context,
                 val existingAppInfo = appInfoRepository.getAppInfoForPackageName(entry.packageInfo)
 
                 if (!existingAppInfo?.appName.isNullOrEmpty()) {
-                    HomeScreenActivity.updateGlobalAppInfoEntry(it.applicationInfo.packageName,
-                                                                existingAppInfo)
+                    FirewallManager.updateGlobalAppInfoEntry(it.applicationInfo.packageName,
+                                                             existingAppInfo)
                     return@forEach
                 } else {
 
@@ -124,12 +149,10 @@ class RefreshDatabase internal constructor(private var context: Context,
                     entry.whiteListUniv1 = isSystemApp
                     entry.isSystemApp = isSystemComponent
 
-                    entry.appCategory = determineAppCategory(it.applicationInfo).toLowerCase(
-                        Locale.ROOT)
+                    entry.appCategory = determineAppCategory(it.applicationInfo)
                     entry.isInternetAllowed = persistentState.wifiAllowed(entry.packageInfo)
 
-                    HomeScreenActivity.updateGlobalAppInfoEntry(it.applicationInfo.packageName,
-                                                                entry)
+                    FirewallManager.updateGlobalAppInfoEntry(it.applicationInfo.packageName, entry)
 
                     appInfoRepository.insertAsync(entry)
                 }
@@ -140,7 +163,7 @@ class RefreshDatabase internal constructor(private var context: Context,
     }
 
     private fun isSystemApp(ai: ApplicationInfo): Boolean {
-        return isSystemComponent(ai) && !AndroidUidConfig.isUIDAppRange(ai.uid)
+        return isSystemComponent(ai) && !AndroidUidConfig.isUidAppRange(ai.uid)
     }
 
     private fun isSystemComponent(ai: ApplicationInfo): Boolean {
@@ -151,7 +174,7 @@ class RefreshDatabase internal constructor(private var context: Context,
                              knownTotalNonApps: Int): Boolean {
         if (DEBUG) Log.d(LOG_TAG_APP_DB,
                          "known: $knownTotalApps, nonApps: $knownTotalNonApps, actual: $latestActualTotal")
-        return (knownTotalApps - knownTotalNonApps) == (latestActualTotal - 1)
+        return (knownTotalApps - knownTotalNonApps) != (latestActualTotal - 1)
     }
 
     private fun determineAppCategory(ai: ApplicationInfo): String {

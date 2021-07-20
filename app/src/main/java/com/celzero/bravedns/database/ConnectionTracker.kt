@@ -30,7 +30,7 @@ class ConnectionTracker {
     var isBlocked: Boolean = false
     var blockedByRule: String? = null
     var flag: String? = null
-    var timestamp: Long = INIT_TIME_MS
+    var timeStamp: Long = INIT_TIME_MS
 
     override fun equals(other: Any?): Boolean {
         if (other !is ConnectionTracker) return false

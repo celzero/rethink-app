@@ -16,35 +16,30 @@ limitations under the License.
 package com.celzero.bravedns.util
 
 
-import android.Manifest
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.ActivityManager
-import android.content.ActivityNotFoundException
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.content.res.Configuration
-import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.os.CountDownTimer
 import android.provider.Settings
 import android.provider.Settings.ACTION_VPN_SETTINGS
+import android.text.Html
+import android.text.Spanned
 import android.text.TextUtils
 import android.text.TextUtils.SimpleStringSplitter
 import android.util.Log
 import android.view.Gravity
-import android.view.View
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
+import androidx.core.text.HtmlCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
@@ -58,7 +53,6 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.google.android.material.snackbar.Snackbar
 import com.google.common.net.InetAddresses
 import com.google.common.net.InternetDomainName
 import java.io.File
@@ -72,38 +66,9 @@ class Utilities {
 
     companion object {
 
-        private const val STORAGE_PERMISSION_CODE = 1008
-
-        fun checkPermission(activity: AppCompatActivity): Boolean {
-            var permissionGranted = false
-
-            if (ContextCompat.checkSelfPermission(activity,
-                                                  Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
-                                                                        Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    val rootView: View = (activity).window.decorView.findViewById(
-                        android.R.id.content)
-                    Snackbar.make(rootView, "Storage permission required",
-                                  Snackbar.LENGTH_LONG).setAction("Allow") {
-                        ActivityCompat.requestPermissions(activity, arrayOf(
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_PERMISSION_CODE)
-                    }.setActionTextColor(Color.WHITE).show()
-                } else {
-                    ActivityCompat.requestPermissions(activity, arrayOf(
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_PERMISSION_CODE)
-                }
-            } else {
-                permissionGranted = true
-            }
-
-            return permissionGranted
-        }
-
-        fun getPermissionDetails(activity: Context, packageName: String): PackageInfo {
-            val appInstall: PackageInfo
-            val p = activity.packageManager
-            appInstall = p.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
-            return appInstall
+        fun getPermissionDetails(context: Context, packageName: String): PackageInfo {
+            return context.packageManager.getPackageInfo(packageName,
+                                                         PackageManager.GET_PERMISSIONS)
         }
 
         // Convert an FQDN like "www.example.co.uk." to an eTLD + 1 like "example.co.uk".
@@ -142,13 +107,13 @@ class Utilities {
             for (enabledService in enabledServices) {
                 val enabledServiceInfo: ServiceInfo = enabledService.resolveInfo.serviceInfo
                 if (DEBUG) Log.i(LOG_TAG_VPN,
-                                 "isAccessibilityServiceEnabled checking for: ${enabledServiceInfo.packageName}")
+                                 "Accessibility enabled check for: ${enabledServiceInfo.packageName}")
                 if (enabledServiceInfo.packageName == context.packageName && enabledServiceInfo.name == service.name) {
                     return true
                 }
             }
             if (DEBUG) Log.e(LOG_TAG_VPN,
-                             "isAccessibilityServiceEnabled failure, ${context.packageName},  ${service.name}, return size: ${enabledServices.size}")
+                             "Accessibility failure, ${context.packageName},  ${service.name}, return size: ${enabledServices.size}")
             return false
         }
 
@@ -164,9 +129,9 @@ class Utilities {
                 while (colonSplitter.hasNext()) {
                     val componentNameString = colonSplitter.next()
                     val enabledService = ComponentName.unflattenFromString(componentNameString)
-                    if (enabledService != null && enabledService == expectedComponentName) {
+                    if (expectedComponentName.equals(enabledService)) {
                         if (DEBUG) Log.i(LOG_TAG_VPN,
-                                         "isAccessibilityServiceEnabled SettingsSecure: ${expectedComponentName.packageName}")
+                                         "SettingsSecure accessibility enabled for: ${expectedComponentName.packageName}")
                         return true
                     }
                 }
@@ -175,8 +140,7 @@ class Utilities {
                       "isAccessibilityServiceEnabled Exception on isAccessibilityServiceEnabledViaSettingsSecure() ${e.message}",
                       e)
             }
-            if (DEBUG) Log.w(LOG_TAG_VPN,
-                             "isAccessibilityServiceEnabled SettingsSecure: Failed to fetch enabledService so invoke isAccessibilityServiceEnabled()")
+            if (DEBUG) Log.d(LOG_TAG_VPN, "Accessibility enabled check failed")
             return isAccessibilityServiceEnabled(context, accessibilityService)
         }
 
@@ -199,7 +163,7 @@ class Utilities {
             try {
                 countryMap = CountryMap(context.getAssets())
             } catch (e: IOException) {
-                Log.e("BraveDNS Exception", e.message, e)
+                Log.e(LOG_TAG_VPN, "Failure fetching country map ${e.message}", e)
             }
         }
 
@@ -285,6 +249,7 @@ class Utilities {
 
         fun getTypeName(type: Int): String {
             // From https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-4
+            // additional ref: https://www.netmeister.org/blog/dns-rrs.html
             val names = arrayOf("0", "A", "NS", "MD", "MF", "CNAME", "SOA", "MB", "MG", "MR",
                                 "NULL", "WKS", "PTR", "HINFO", "MINFO", "MX", "TXT", "RP", "AFSDB",
                                 "X25", "ISDN", "RT", "NSAP", "NSAP+PTR", "SIG", "KEY", "PX", "GPOS",
@@ -337,11 +302,11 @@ class Utilities {
             }
         }
 
-        fun isVpnLockdownEnabled(vpnService: BraveVPNService?): Boolean? {
+        fun isVpnLockdownEnabled(vpnService: BraveVPNService?): Boolean {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                 return false
             }
-            return vpnService?.isLockdownEnabled
+            return vpnService?.isLockdownEnabled == true
         }
 
         fun killBg(activityManager: ActivityManager, packageName: String) {
@@ -352,16 +317,16 @@ class Utilities {
             }
         }
 
-        fun getCurrentTheme(isDarkThemeOn: Boolean): Int {
-            return if (persistentState.theme == Constants.THEME_SYSTEM_DEFAULT) {
+        fun getCurrentTheme(isDarkThemeOn: Boolean, theme: Int): Int {
+            return if (theme == Constants.THEME_SYSTEM_DEFAULT) {
                 if (isDarkThemeOn) {
                     R.style.AppThemeTrueBlack
                 } else {
                     R.style.AppThemeWhite
                 }
-            } else if (persistentState.theme == Constants.THEME_LIGHT) {
+            } else if (theme == Constants.THEME_LIGHT) {
                 R.style.AppThemeWhite
-            } else if (persistentState.theme == Constants.THEME_DARK) {
+            } else if (theme == Constants.THEME_DARK) {
                 R.style.AppTheme
             } else {
                 R.style.AppThemeTrueBlack
@@ -386,8 +351,6 @@ class Utilities {
 
         fun getPackageMetadata(pm: PackageManager, pi: String): PackageInfo? {
             var metadata: PackageInfo? = null
-
-            if (pi.contains(Constants.NO_PACKAGE)) return metadata
 
             try {
                 metadata = pm.getPackageInfo(pi, PackageManager.GET_META_DATA)
@@ -417,7 +380,7 @@ class Utilities {
         }
 
 
-        fun isAlwaysOnEnabled(vpnService: BraveVPNService?, context: Context): Boolean {
+        fun isAlwaysOnEnabled(context: Context, vpnService: BraveVPNService?): Boolean {
             // Introduced as part of issue fix #325
             // From android version 12+(R) Settings keys annotated with @hide are restricted to
             // system_server and system apps only. "always_on_vpn_app" is annotated with @hide.
@@ -429,13 +392,13 @@ class Utilities {
             // vpnService?.isAlwaysOn will not be much helpful
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 return vpnService?.isAlwaysOn == true
-            } else {
-                val alwaysOn = Settings.Secure.getString(context.contentResolver,
-                                                         "always_on_vpn_app")
-                return !TextUtils.isEmpty(alwaysOn) && context.packageName == alwaysOn
             }
+
+            val alwaysOn = Settings.Secure.getString(context.contentResolver, "always_on_vpn_app")
+            return context.packageName == alwaysOn
         }
 
+        // This function is not supported from version 12 onwards.
         fun isOtherVpnHasAlwaysOn(context: Context): Boolean {
             return try {
                 val alwaysOn = Settings.Secure.getString(context.contentResolver,
@@ -448,25 +411,53 @@ class Utilities {
         }
 
         fun getIcon(context: Context, packageName: String, appName: String): Drawable? {
-            if (!isValidApp(appName, packageName)) {
-                return null
+            if (!isValidAppName(appName, packageName)) {
+                return getDefaultIcon(context)
             }
 
             return try {
                 context.packageManager.getApplicationIcon(packageName)
             } catch (e: PackageManager.NameNotFoundException) {
                 Log.e(LOG_TAG_FIREWALL,
-                      "Application Icon not available for package: ${packageName}" + e.message, e)
+                      "Application Icon not available for package: $packageName" + e.message, e)
                 getDefaultIcon(context)
             }
         }
 
-        private fun isValidApp(appName: String, packageName: String): Boolean {
+        private fun isValidAppName(appName: String, packageName: String): Boolean {
             return !packageName.contains(Constants.NO_PACKAGE) && appName != Constants.UNKNOWN_APP
+        }
+
+        fun isValidAppName(appName: String?): Boolean {
+            return appName != Constants.UNKNOWN_APP
         }
 
         fun getDefaultIcon(context: Context): Drawable? {
             return AppCompatResources.getDrawable(context, R.drawable.default_app_icon)
+        }
+
+        fun clipboardCopy(context: Context, s: String, label: String) {
+            val clipboard: ClipboardManager? = context.getSystemService()
+            val clip = ClipData.newPlainText(label, s)
+            clipboard?.setPrimaryClip(clip)
+        }
+
+        fun updateHtmlEncodedText(text: String): Spanned {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY)
+            } else {
+                HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
+            }
+        }
+
+        fun delay(ms: Long, updateUi: () -> Unit) {
+            object : CountDownTimer(ms, ms) {
+                override fun onTick(millisUntilFinished: Long) {}
+
+                override fun onFinish() {
+                    updateUi()
+                }
+            }.start()
         }
     }
 }

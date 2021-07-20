@@ -41,13 +41,12 @@ public class GoProber extends Prober {
 
     @Override
     public void probe(String url, Callback callback) {
-        VpnController vpnController = VpnController.Companion.getInstance();
         new Thread(() -> {
             String dohIPs = GoVpnAdapter.getIpString(context, url);
             try {
                 // Protection isn't needed for Lollipop+, or if the VPN is not active.
                 Protector protector = VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP ? null :
-                        vpnController.getBraveVpnService();
+                        VpnController.INSTANCE.getBraveVpnService();
                 Transport transport = Tun2socks.newDoHTransport(url, dohIPs, protector, null, null);
                 if (transport == null) {
                     callback.onCompleted(false);

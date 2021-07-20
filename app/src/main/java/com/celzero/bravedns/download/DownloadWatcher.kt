@@ -27,7 +27,6 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_FAILURE
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_RETRY
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SUCCESS
-import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -46,11 +45,10 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
 
     override fun doWork(): Result {
 
-        val startTime = persistentState.workManagerStartTime
+        val startTime = inputData.getLong("workerStartTime", 0)
         val currentTime = SystemClock.elapsedRealtime()
         if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "AppDownloadManager - $startTime, $currentTime")
         if (currentTime - startTime > Constants.WORK_MANAGER_TIMEOUT) {
-            persistentState.workManagerStartTime = INIT_TIME_MS
             return Result.failure()
         }
 
@@ -106,7 +104,7 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
                     return DOWNLOAD_FAILURE
                 }
             } catch (e: Exception) {
-                Log.e(LOG_TAG_DOWNLOAD, "failure download- ${e.message}", e)
+                Log.e(LOG_TAG_DOWNLOAD, "failure download: ${e.message}", e)
             } finally {
                 cursor.close()
             }

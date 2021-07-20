@@ -33,10 +33,10 @@ class BlockedConnectionsViewModel(private val blockedConnectionsDAO: BlockedConn
     }
 
     var blockedUnivRulesList = Transformations.switchMap(filteredList) { input ->
-        if (input.isBlank()) {
+        if (input.isNullOrBlank()) {
             blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(
                 pageSize = LIVEDATA_PAGE_SIZE)
-        } else if (input!! == FILTER_IS_FILTER) {
+        } else if (FILTER_IS_FILTER == input) {
             blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(
                 pageSize = LIVEDATA_PAGE_SIZE)
         } else {
@@ -45,7 +45,7 @@ class BlockedConnectionsViewModel(private val blockedConnectionsDAO: BlockedConn
         }
     }
 
-    fun setFilter(filter: String?) {
+    fun setFilter(filter: String) {
         filteredList.value = filter
     }
 

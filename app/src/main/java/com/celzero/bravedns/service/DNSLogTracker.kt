@@ -47,10 +47,21 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                                          private val persistentState: PersistentState,
                                          private val context: Context) {
 
+    companion object {
+        private const val PERSISTENCE_STATE_INSERT_SIZE = 100L
+    }
+
+    private var numRequests: Long = 0
+    private var numBlockedRequests: Long = 0
+
+    init {
+        numRequests = persistentState.numberOfRequests
+        numBlockedRequests = persistentState.numberOfBlockedRequests
+    }
+
     fun recordTransaction(transaction: Transaction?) {
-        if (transaction != null) {
-            insertToDB(transaction)
-        }
+        if (!persistentState.logsEnabled || transaction == null) return
+        insertToDB(transaction)
     }
 
     private fun insertToDB(transaction: Transaction) {
@@ -84,6 +95,7 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                       e)
                 null
             }
+
             if (serverAddress != null) {
                 val countryCode: String = getCountryCode(serverAddress,
                                                          context) //TODO: Country code things
@@ -135,23 +147,41 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                     context.getString(R.string.unicode_warning_sign) // Warning sign
                 }
             }
-            if (dnsLogs.isBlocked) {
-                persistentState.incrementBlockedReq()
-            }
-            persistentState.setLifetimeQueries()
-            dnsLogRepository.insertAsync(dnsLogs)
+
+            dnsLogRepository.insert(dnsLogs)
             fetchFavIcon(dnsLogs)
+
+            // Post number of requests and blocked count to livedata.
+            persistentState.requestCountLiveData.postValue(++numRequests)
+            if (dnsLogs.isBlocked) persistentState.blockedCountLiveData.postValue(
+                ++numBlockedRequests)
+
+
+            // avoid excessive disk I/O from syncing the counter to disk after every request
+            if (numRequests % PERSISTENCE_STATE_INSERT_SIZE == 0L) {
+                // Blocked request count
+                if (numBlockedRequests > persistentState.numberOfBlockedRequests) {
+                    persistentState.numberOfBlockedRequests = numBlockedRequests
+                } else {
+                    numBlockedRequests = persistentState.numberOfBlockedRequests
+                }
+
+                // Number of request count.
+                if (numRequests > persistentState.numberOfRequests) {
+                    persistentState.numberOfRequests = numRequests
+                } else {
+                    numRequests = persistentState.numberOfRequests
+                }
+            }
         }
     }
 
     private fun fetchFavIcon(dnsLogs: DNSLogs) {
-        if (persistentState.fetchFavIcon) {
-            if (dnsLogs.status == Transaction.Status.COMPLETE.toString() && dnsLogs.response != Constants.NXDOMAIN && !dnsLogs.isBlocked) {
-                val url = "${Constants.FAV_ICON_URL}${dnsLogs.queryStr}ico"
-                if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - fetchFavIcon() -$url")
-                val favIconFetcher = FavIconDownloader(context, url)
-                favIconFetcher.run()
-            }
-        }
+        if (!persistentState.fetchFavIcon || dnsLogs.failure()) return
+
+        val url = "${Constants.FAV_ICON_URL}${dnsLogs.queryStr}ico"
+        if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - fetchFavIcon() -$url")
+        val favIconFetcher = FavIconDownloader(context, url)
+        favIconFetcher.run()
     }
 }

@@ -20,7 +20,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
@@ -44,38 +43,34 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         when (action) {
             OrbotHelper.ORBOT_NOTIFICATION_ACTION_TEXT -> {
-                get<OrbotHelper>().openOrbotApp(context)
-                manager.cancel(OrbotHelper.ORBOT_SERVICE_ID)
+                get<OrbotHelper>().openOrbotApp()
             }
             Constants.NOTIF_ACTION_STOP_VPN -> {
                 stopVpn(context)
-                manager.cancel(BraveVPNService.SERVICE_ID)
             }
             Constants.NOTIF_ACTION_DNS_VPN -> {
                 dnsMode()
-                manager.cancel(BraveVPNService.SERVICE_ID)
             }
             Constants.NOTIF_ACTION_DNS_FIREWALL_VPN -> {
                 dnsFirewallMode()
-                manager.cancel(BraveVPNService.SERVICE_ID)
             }
             Constants.NOTIF_ACTION_RULES_FAILURE -> {
                 reloadRules()
-                manager.cancel(BraveVPNService.SERVICE_ID)
             }
         }
+        manager.cancel(OrbotHelper.ORBOT_SERVICE_ID)
     }
 
     private fun reloadRules() {
         runBlocking {
             withContext(Dispatchers.IO) {
-                VpnController.getInstance().getBraveVpnService()?.loadAppFirewallRules()
+                VpnController.getBraveVpnService()?.loadAppFirewallRules()
             }
         }
     }
 
     private fun stopVpn(context: Context) {
-        VpnController.getInstance().stop(context)
+        VpnController.stop(context)
     }
 
     private fun dnsMode() {

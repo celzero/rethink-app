@@ -16,27 +16,22 @@ limitations under the License.
 
 package com.celzero.bravedns.adapter
 
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.DialogInterface
-import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.content.getSystemService
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
+import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.database.DNSCryptEndpoint
 import com.celzero.bravedns.database.DNSCryptEndpointRepository
 import com.celzero.bravedns.databinding.DnsCryptEndpointListItemBinding
-import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.QueryTracker
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DNSCRYPT
 import com.celzero.bravedns.util.UIUpdateInterface
 import com.celzero.bravedns.util.Utilities
@@ -47,12 +42,10 @@ import settings.Settings
 
 class DNSCryptEndpointAdapter(private val context: Context,
                               private val dnsCryptEndpointRepository: DNSCryptEndpointRepository,
-                              private val persistentState: PersistentState,
-                              private val queryTracker: QueryTracker,
+                              private val appMode: AppMode, private val queryTracker: QueryTracker,
                               var listener: UIUpdateInterface) :
         PagedListAdapter<DNSCryptEndpoint, DNSCryptEndpointAdapter.DNSCryptEndpointViewHolder>(
             DIFF_CALLBACK) {
-
 
     companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DNSCryptEndpoint>() {
@@ -87,26 +80,21 @@ class DNSCryptEndpointAdapter(private val context: Context,
 
         fun update(endpoint: DNSCryptEndpoint) {
             displayDetails(endpoint)
-            clickListeners(endpoint)
+            setupClickListeners(endpoint)
         }
 
-        private fun clickListeners(endpoint: DNSCryptEndpoint) {
+        private fun setupClickListeners(endpoint: DNSCryptEndpoint) {
             b.root.setOnClickListener {
                 b.dnsCryptEndpointListActionImage.isChecked = !b.dnsCryptEndpointListActionImage.isChecked
-                endpoint.isSelected = b.dnsCryptEndpointListActionImage.isChecked
-
-                val state = updateDNSCryptDetails(endpoint)
-                if (!state) {
-                    b.dnsCryptEndpointListActionImage.isChecked = !state
-                }
+                val connected = updateDNSCryptDetails(endpoint,
+                                                      b.dnsCryptEndpointListActionImage.isChecked)
+                b.dnsCryptEndpointListActionImage.isChecked = connected
             }
 
             b.dnsCryptEndpointListActionImage.setOnClickListener {
-                endpoint.isSelected = b.dnsCryptEndpointListActionImage.isChecked
-                val state = updateDNSCryptDetails(endpoint)
-                if (!state) {
-                    b.dnsCryptEndpointListActionImage.isChecked = !state
-                }
+                val connected = updateDNSCryptDetails(endpoint,
+                                                      b.dnsCryptEndpointListActionImage.isChecked)
+                b.dnsCryptEndpointListActionImage.isChecked = connected
             }
 
             b.dnsCryptEndpointListInfoImage.setOnClickListener {
@@ -137,14 +125,8 @@ class DNSCryptEndpointAdapter(private val context: Context,
         private fun showExplanationOnImageClick(dnsCryptEndpoint: DNSCryptEndpoint) {
             if (dnsCryptEndpoint.isDeletable()) showDeleteDialog(dnsCryptEndpoint)
             else {
-                if (dnsCryptEndpoint.dnsCryptExplanation.isNullOrEmpty()) {
-                    showDialogExplanation(dnsCryptEndpoint.dnsCryptName,
-                                          dnsCryptEndpoint.dnsCryptURL, "")
-                } else {
-                    showDialogExplanation(dnsCryptEndpoint.dnsCryptName,
-                                          dnsCryptEndpoint.dnsCryptURL,
-                                          dnsCryptEndpoint.dnsCryptExplanation)
-                }
+                showDialogExplanation(dnsCryptEndpoint.dnsCryptName, dnsCryptEndpoint.dnsCryptURL,
+                                      dnsCryptEndpoint.dnsCryptExplanation)
             }
         }
 
@@ -181,46 +163,37 @@ class DNSCryptEndpointAdapter(private val context: Context,
 
             builder.setNeutralButton(
                 context.getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
-                val clipboard: ClipboardManager? = context.getSystemService()
-                val clip = ClipData.newPlainText("URL", url)
-                clipboard?.setPrimaryClip(clip)
+                Utilities.clipboardCopy(context, url,
+                                        context.getString(R.string.copy_clipboard_label))
                 Utilities.showToastUiCentered(context, context.getString(
-                    R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
+                    R.string.info_dialog_url_copy_toast_msg), Toast.LENGTH_SHORT)
             }
             val alertDialog: AlertDialog = builder.create()
             alertDialog.setCancelable(true)
             alertDialog.show()
         }
 
-        private fun updateDNSCryptDetails(dnsCryptEndpoint: DNSCryptEndpoint): Boolean {
+        private fun updateDNSCryptDetails(endpoint: DNSCryptEndpoint,
+                                          isSelected: Boolean): Boolean {
             val list = dnsCryptEndpointRepository.getConnectedDNSCrypt()
             // Do not unselect the only user-selected dnscrypt endpoint, that is
             // when the getConnectedDnsCrypt returns a list of size 1
-            if (list.size == 1 && !dnsCryptEndpoint.isSelected && list[0].dnsCryptURL == dnsCryptEndpoint.dnsCryptURL) {
+            if (list.size == 1 && !isSelected && list[0].dnsCryptURL == endpoint.dnsCryptURL) {
                 Toast.makeText(context, context.getString(R.string.dns_select_toast),
                                Toast.LENGTH_SHORT).show()
                 return false
             }
-            dnsCryptEndpointRepository.updateAsync(dnsCryptEndpoint)
+            endpoint.isSelected = isSelected
 
-            object : CountDownTimer(500, 500) {
-                override fun onTick(millisUntilFinished: Long) {
-                }
+            dnsCryptEndpointRepository.updateAsync(endpoint)
 
-                override fun onFinish() {
-                    notifyDataSetChanged()
-                    persistentState.dnsType = PREF_DNS_MODE_DNSCRYPT
-                    val connectedDNS = dnsCryptEndpointRepository.getConnectedCount()
-                    val text = context.getString(R.string.configure_dns_crypt,
-                                                 connectedDNS.toString())
-                    persistentState.setConnectedDNS(text)
-                    queryTracker.reinitializeQuantileEstimator()
-                }
-            }.start()
+            Utilities.delay(500) {
+                notifyDataSetChanged()
+                appMode.onNewDnsConnected(PREF_DNS_MODE_DNSCRYPT, Settings.DNSModeCryptPort)
+                queryTracker.reinitializeQuantileEstimator()
+            }
 
-            persistentState.connectionModeChange = dnsCryptEndpoint.dnsCryptURL
             listener.updateUIFromAdapter(PREF_DNS_MODE_DNSCRYPT)
-            appMode?.setDNSMode(Settings.DNSModeCryptPort)
 
             return true
         }

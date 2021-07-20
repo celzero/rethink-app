@@ -40,6 +40,7 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.UNKNOWN_APP
 import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL_LOG
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getIcon
@@ -82,7 +83,7 @@ class ConnectionTrackerAdapter(val context: Context) :
 
         fun update(connTracker: ConnectionTracker) {
             displayTransactionDetails(connTracker)
-            displayProtocol(connTracker.port, connTracker.protocol)
+            displayProtocolDetails(connTracker.port, connTracker.protocol)
             displayAppDetails(connTracker)
             displayFirewallRulesetHint(connTracker.isBlocked, connTracker.blockedByRule)
 
@@ -92,13 +93,16 @@ class ConnectionTrackerAdapter(val context: Context) :
         }
 
         private fun openBottomSheet(ct: ConnectionTracker) {
+            if (context !is FragmentActivity) {
+                Log.w(LOG_TAG_UI, "Can not open bottom sheet. Context is not attached to activity")
+                return
+            }
             val bottomSheetFragment = ConnTrackerBottomSheetFragment(context, ct)
-            val frag = context as FragmentActivity
-            bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
+            bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
 
         private fun displayTransactionDetails(connTracker: ConnectionTracker) {
-            val time = Utilities.convertLongToTime(connTracker.timestamp)
+            val time = Utilities.convertLongToTime(connTracker.timeStamp)
             b.connectionResponseTime.text = time
             b.connectionFlag.text = connTracker.flag
             b.connectionIpAddress.text = connTracker.ipAddress
@@ -124,7 +128,7 @@ class ConnectionTrackerAdapter(val context: Context) :
             loadAppIcon(getIcon(context, apps[0], /*No app name */""))
         }
 
-        private fun displayProtocol(port: Int, proto: Int) {
+        private fun displayProtocolDetails(port: Int, proto: Int) {
             // Instead of showing the port name and protocol, now the ports are resolved with
             // known ports(reserved port and protocol identifiers).
             // https://github.com/celzero/rethink-app/issues/42 - #3 - transport + protocol.

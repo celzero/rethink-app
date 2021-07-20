@@ -31,32 +31,35 @@ import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL_LOG
-import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
 import com.celzero.bravedns.util.Utilities.Companion.getFlag
 import com.google.common.net.InetAddresses
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.net.InetAddress
 import java.util.*
 
 class IPTracker internal constructor(private val appInfoRepository: AppInfoRepository,
                                      private val connectionTrackerRepository: ConnectionTrackerRepository,
                                      private val refreshDatabase: RefreshDatabase,
-                                     private val context: Context) {
+                                     private val context: Context) : KoinComponent {
 
 
     private val recentTrackers: Queue<IPDetails> = LinkedList()
 
-    //private val recentIPActivity: Queue<Long> = LinkedList()
     private var historyEnabled = true
+    private val persistentState by inject<PersistentState>()
 
     fun getRecentIPTransactions(): Queue<IPDetails?>? {
         return LinkedList(recentTrackers)
     }
 
     fun recordTransaction(ipDetails: IPDetails?) {
+        if (!persistentState.logsEnabled) return
+
         //Modified the call of the insert to database inside the coroutine scope.
         GlobalScope.launch(Dispatchers.IO) {
             if (ipDetails != null) {
@@ -72,7 +75,7 @@ class IPTracker internal constructor(private val appInfoRepository: AppInfoRepos
         connTracker.uid = ipDetails.uid
         connTracker.port = ipDetails.destPort
         connTracker.protocol = ipDetails.protocol
-        connTracker.timestamp = ipDetails.timestamp
+        connTracker.timeStamp = ipDetails.timestamp
         connTracker.blockedByRule = ipDetails.blockedByRule
 
         // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
@@ -88,40 +91,54 @@ class IPTracker internal constructor(private val appInfoRepository: AppInfoRepos
         val countryCode: String = getCountryCode(serverAddress, context)
         connTracker.flag = getFlag(countryCode)
 
-        val packageNameList = context.packageManager.getPackagesForUid(ipDetails.uid)
+        connTracker.appName = getApplicationName(connTracker.uid)
+        connectionTrackerRepository.insert(connTracker)
+    }
+
+    private fun getApplicationName(uid: Int): String {
+        val packageNameList = context.packageManager.getPackagesForUid(uid)
+        val appName: String?
 
         if (packageNameList != null) {
             if (DEBUG) Log.d(LOG_TAG_FIREWALL_LOG,
-                             "Package for uid : ${ipDetails.uid}, ${packageNameList.size}")
+                             "Package for uid : ${uid}, ${packageNameList.size}")
             val packageName = packageNameList[0]
-            val appDetails = HomeScreenActivity.GlobalVariable.appList[packageName]
-            if (appDetails != null) {
-                connTracker.appName = appDetails.appName
-            }
-
-            if (connTracker.appName.isNullOrBlank()) {
-                connTracker.appName = appInfoRepository.getAppNameForUID(ipDetails.uid)
-            }
-            if (connTracker.appName.isNullOrEmpty()) {
-                val appInfo = context.packageManager.getApplicationInfo(packageName,
-                                                                        PackageManager.GET_META_DATA)
-                connTracker.appName = context.packageManager.getApplicationLabel(appInfo).toString()
-            }
-        } else {
-            val fileSystemUID = AndroidUidConfig.fromFileSystemUID(ipDetails.uid)
-            if (DEBUG) Log.d(LOG_TAG_FIREWALL_LOG, "Part : ${ipDetails.uid}, ${fileSystemUID.name}")
-            if (ipDetails.uid == INVALID_UID) {
-                connTracker.appName = context.getString(R.string.network_log_app_name_unknown)
+            appName = getValidAppName(packageName, uid)
+        } else { // For UNKNOWN or Non-App.
+            val fileSystemUID = AndroidUidConfig.fromFileSystemUid(uid)
+            Log.i(LOG_TAG_FIREWALL_LOG,
+                  "App name for the uid: ${uid}, AndroidUid: ${fileSystemUID.uid}, fileName: ${fileSystemUID.name}")
+            if (uid == INVALID_UID) {
+                appName = context.getString(R.string.network_log_app_name_unknown)
             } else {
-                when (Utilities.isInvalidUid(fileSystemUID.uid)) {
-                    true -> connTracker.appName = context.getString(
-                        R.string.network_log_app_name_unnamed, ipDetails.uid.toString())
-                    false -> connTracker.appName = fileSystemUID.name
+                if (fileSystemUID.uid == INVALID_UID) {
+                    appName = context.getString(R.string.network_log_app_name_unnamed,
+                                                uid.toString())
+                } else {
+                    appName = fileSystemUID.name
+                    registerNonApp(uid, appName)
                 }
-                registerNonApp(ipDetails.uid, connTracker.appName.toString())
             }
         }
-        connectionTrackerRepository.insertAsync(connTracker)
+        return appName
+    }
+
+    private fun getValidAppName(packageName: String, uid: Int): String {
+        var appName: String? = null
+        val appDetails = HomeScreenActivity.GlobalVariable.appList[packageName]
+        if (appDetails != null) {
+            appName = appDetails.appName
+        }
+
+        if (appName.isNullOrEmpty()) {
+            appName = appInfoRepository.getAppNameForUID(uid)
+        }
+        if (appName.isNullOrEmpty()) {
+            val appInfo = context.packageManager.getApplicationInfo(packageName,
+                                                                    PackageManager.GET_META_DATA)
+            appName = context.packageManager.getApplicationLabel(appInfo).toString()
+        }
+        return appName
     }
 
     private fun registerNonApp(uid: Int, appName: String) {

@@ -17,6 +17,7 @@ package com.celzero.bravedns.ui
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,13 +25,13 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.Apk
 import com.celzero.bravedns.adapter.ApkListAdapter
 import com.celzero.bravedns.database.AppInfoRepository
+import com.celzero.bravedns.util.LoggerConstants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -78,9 +79,13 @@ class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener {
         }
 
         filterIcon.setOnClickListener {
+            if (activity == null) {
+                Log.w(LoggerConstants.LOG_TAG_UI,
+                      "Cannot open orbot-bottom-sheet, activity does not exist")
+                return@setOnClickListener
+            }
             val bottomFilterSheetFragment = FilterAndSortBottomFragment()
-            val frag = context as FragmentActivity
-            bottomFilterSheetFragment.show(frag.supportFragmentManager,
+            bottomFilterSheetFragment.show(activity!!.supportFragmentManager,
                                            bottomFilterSheetFragment.tag)
         }
 
@@ -88,7 +93,7 @@ class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener {
     }
 
     private fun updateAppList() = GlobalScope.launch(Dispatchers.Default) {
-        val appList = appInfoRepository.getAppInfoAsync()
+        val appList = appInfoRepository.getAppInfo()
         appList.forEach {
             val userApk = Apk(it.appName, it.appName, it.packageInfo, it.uid.toString())
             apkList.add(userApk)

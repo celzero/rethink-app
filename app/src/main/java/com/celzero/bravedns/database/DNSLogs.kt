@@ -27,14 +27,6 @@ import java.util.*
 @Entity(tableName = "DNSLogs")
 class DNSLogs {
 
-    /**
-     * "CREATE TABLE 'DNSLogs' ('id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'query' TEXT NOT NULL,
-     * 'time' INTEGER NOT NULL, 'flag' TEXT NOT NULL, 'resolver' TEXT NOT NULL, latency INTEGER NOT NULL,
-     * 'typeName' TEXT NOT NULL, 'isBlocked' INTEGER NOT NULL, 'blockLists' LONGTEXT NOT NULL,
-     * 'serverIP' TEXT NOT NULL, 'relayIP' TEXT, 'responseTime' INTEGER NOT NULL, 'response' TEXT NOT NULL,
-     *  'status' TEXT NOT NULL,'dnsType' INTEGER NOT NULL) "
-     */
-
     @PrimaryKey(autoGenerate = true) var id: Int = 0
     var queryStr: String = ""
     var time: Long = INIT_TIME_MS

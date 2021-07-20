@@ -18,13 +18,13 @@ package com.celzero.bravedns.ui
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.util.Log
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.CompoundButton
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
@@ -35,17 +35,17 @@ import com.celzero.bravedns.databinding.ExcludeAppDialogLayoutBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ExcludedAppViewModel
 import com.google.android.material.chip.Chip
-import java.util.stream.Collectors
 
-class ExcludeAppDialog(private var activity: Context,
-                       private val appInfoRepository: AppInfoRepository,
-                       private val appInfoViewRepository: AppInfoViewRepository,
-                       private val categoryInfoRepository: CategoryInfoRepository,
-                       private val persistentState: PersistentState,
-                       internal var adapter: RecyclerView.Adapter<*>,
-                       var viewModel: ExcludedAppViewModel, themeID: Int) :
+class ExcludeAppsDialog(private var activity: Context,
+                        private val appInfoRepository: AppInfoRepository,
+                        private val appInfoViewRepository: AppInfoViewRepository,
+                        private val categoryInfoRepository: CategoryInfoRepository,
+                        private val persistentState: PersistentState,
+                        internal var adapter: RecyclerView.Adapter<*>,
+                        var viewModel: ExcludedAppViewModel, themeID: Int) :
         Dialog(activity, themeID), View.OnClickListener, SearchView.OnQueryTextListener {
 
     private lateinit var b: ExcludeAppDialogLayoutBinding
@@ -55,7 +55,7 @@ class ExcludeAppDialog(private var activity: Context,
     private var filterCategories: MutableList<String> = ArrayList()
     private var category: List<String> = ArrayList()
 
-    var filterState: Boolean = false
+    private val CATEGORY_FILTER_CONST = "category:"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,7 +79,7 @@ class ExcludeAppDialog(private var activity: Context,
         b.excludeAppDialogWhitelistSearchView.setOnSearchClickListener(this)
 
         b.excludeAppDialogWhitelistSearchView.setOnCloseListener {
-            showCategoryChips()
+            toggleCategoryChipsUi()
             false
         }
 
@@ -92,22 +92,22 @@ class ExcludeAppDialog(private var activity: Context,
 
 
         b.excludeAppSelectAllOptionCheckbox.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
-            modifyAppsInExcludedAppList(b)
-            object : CountDownTimer(1000, 1000) {
-                override fun onTick(millisUntilFinished: Long) {
-                }
-
-                override fun onFinish() {
-                    adapter.notifyDataSetChanged()
-                }
-            }.start()
+            modifyExcludeAppsList(b)
+            Utilities.delay(1000) {
+                adapter.notifyDataSetChanged()
+            }
         }
         b.excludeAppDialogWhitelistSearchFilter.setOnClickListener(this)
 
+        // By default, show all the categories.
+        showAllCategories()
+    }
+
+    private fun showAllCategories() {
         categoryListByAppNameFromDB("")
     }
 
-    private fun modifyAppsInExcludedAppList(checked: Boolean) {
+    private fun modifyExcludeAppsList(checked: Boolean) {
         if (filterCategories.isNullOrEmpty()) {
             appInfoRepository.updateExcludedForAllApp(checked)
             categoryInfoRepository.updateExcludedCountForAllApp(checked)
@@ -125,98 +125,89 @@ class ExcludeAppDialog(private var activity: Context,
         }
     }
 
-
     private fun categoryListByAppNameFromDB(name: String) {
         category = appInfoRepository.getAppCategoryForAppName("%$name%")
         if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category - ${category.size}")
-        setCategoryChips(category)
+        setupCategoryChips(category)
     }
 
     override fun onClick(v: View) {
         when (v.id) {
             R.id.exclude_app_dialog_ok_button -> {
                 applyChanges()
-                filterCategories.clear()
-                viewModel.setFilter("")
+                clearSearch()
                 dismiss()
             }
             R.id.exclude_app_dialog_whitelist_search_filter -> {
-                showCategoryChips()
+                toggleCategoryChipsUi()
             }
             R.id.exclude_app_dialog_whitelist_search_view -> {
-                showCategoryChips()
+                toggleCategoryChipsUi()
             }
             else -> {
-                filterCategories.clear()
-                viewModel.setFilter("")
+                clearSearch()
                 dismiss()
             }
         }
+    }
+
+    private fun clearSearch() {
+        filterCategories.clear()
+        viewModel.setFilter("")
     }
 
     private fun applyChanges() {
         val excludedApps = appInfoRepository.getExcludedAppList()
-        persistentState.excludedAppsFromVPN = excludedApps.toMutableSet()
+        persistentState.updateExcludedListWifi(excludedApps)
     }
 
-    private fun showCategoryChips() {
-        if (!filterState) {
-            filterState = true
+    private fun toggleCategoryChipsUi() {
+        if (!b.excludeAppDialogChipGroup.isVisible) {
             b.excludeAppDialogChipGroup.visibility = View.VISIBLE
         } else {
-            filterState = false
             b.excludeAppDialogChipGroup.visibility = View.GONE
         }
     }
 
-    override fun onQueryTextSubmit(query: String?): Boolean {
-        categoryListByAppNameFromDB(query!!)
+    override fun onQueryTextSubmit(query: String): Boolean {
+        categoryListByAppNameFromDB(query)
         viewModel.setFilter(query)
         return true
     }
 
-    override fun onQueryTextChange(query: String?): Boolean {
-        categoryListByAppNameFromDB(query!!)
+    override fun onQueryTextChange(query: String): Boolean {
+        categoryListByAppNameFromDB(query)
         viewModel.setFilter(query)
         return true
     }
 
-    private fun setCategoryChips(categories: List<String>) {
+    private fun setupCategoryChips(categories: List<String>) {
         b.excludeAppDialogChipGroup.removeAllViews()
         for (category in categories) {
-            val mChip = this.layoutInflater.inflate(R.layout.item_chip_category, null,
-                                                    false) as Chip
-            mChip.text = category
+            val chip = this.layoutInflater.inflate(R.layout.item_chip_category, null, false) as Chip
+            chip.text = category
+            b.excludeAppDialogChipGroup.addView(chip)
 
-            mChip.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
+            chip.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
                 val categoryName = compoundButton.text.toString()
                 if (b) {
                     filterCategories.add(categoryName)
                 } else {
-                    if (filterCategories.contains(categoryName)) {
-                        filterCategories.remove(categoryName)
-                    }
+                    filterCategories.remove(categoryName)
                 }
-                val filterString = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    filterCategories.stream().collect(Collectors.joining(","))
-                } else {
-                    var catTitle = ""
-                    filterCategories.forEach {
-                        catTitle = "$it,$catTitle"
-                    }
-                    if (catTitle.length > 1) {
-                        catTitle.substring(0, catTitle.length - 1)
-                    } else {
-                        catTitle
-                    }
+                var filterString = ""
+                filterCategories.forEach {
+                    filterString = "$it,$filterString"
                 }
+
+                filterString.dropLast(1)
+
                 if (filterString.isNotEmpty()) {
-                    viewModel.setFilter("category:$filterString")
+                    viewModel.setFilter("$CATEGORY_FILTER_CONST$filterString")
                 } else {
-                    viewModel.setFilter("")
+                    viewModel.setFilter(filterString)
                 }
             }
-            b.excludeAppDialogChipGroup.addView(mChip)
         }
     }
 }

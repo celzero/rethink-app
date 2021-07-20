@@ -18,8 +18,6 @@ package com.celzero.bravedns.adapter
 import android.content.Context
 import android.content.DialogInterface
 import android.graphics.drawable.Drawable
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -35,7 +33,6 @@ import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.databinding.ExcludedAppListItemBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
-import com.celzero.bravedns.util.ThrowingHandler
 import com.celzero.bravedns.util.Utilities.Companion.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.Companion.getIcon
 import kotlinx.coroutines.CoroutineScope
@@ -78,14 +75,14 @@ class ExcludedAppListAdapter(private val context: Context,
             b.excludedAppListApkLabelTv.text = appInfo.appName
             b.excludedAppListCheckbox.isChecked = appInfo.isExcluded
             displayIcon(getIcon(context, appInfo.packageInfo, appInfo.appName))
-            clickListeners(appInfo)
+            setupClickListeners(appInfo)
         }
 
-        private fun clickListeners(appInfo: AppInfo) {
+        private fun setupClickListeners(appInfo: AppInfo) {
             b.excludedAppListContainer.setOnClickListener {
                 appInfo.isExcluded = !appInfo.isExcluded
                 Log.i(LOG_TAG_FIREWALL, "is app excluded- ${appInfo.appName},${appInfo.isExcluded}")
-                excludeAppsFromVPN(appInfo, appInfo.isExcluded)
+                excludeAppsFromVPN(appInfo)
             }
 
             b.excludedAppListCheckbox.setOnCheckedChangeListener(null)
@@ -93,7 +90,7 @@ class ExcludedAppListAdapter(private val context: Context,
                 appInfo.isExcluded = !appInfo.isExcluded
                 Log.i(LOG_TAG_FIREWALL,
                       "is app excluded - ${appInfo.appName},${appInfo.isExcluded}")
-                excludeAppsFromVPN(appInfo, appInfo.isExcluded)
+                excludeAppsFromVPN(appInfo)
             }
         }
 
@@ -102,25 +99,23 @@ class ExcludedAppListAdapter(private val context: Context,
                 b.excludedAppListApkIconIv)
         }
 
-        private fun excludeAppsFromVPN(appInfo: AppInfo, status: Boolean) {
+        private fun excludeAppsFromVPN(appInfo: AppInfo) {
             val appUIDList = appInfoRepository.getAppListForUID(appInfo.uid)
-            val blockAllApps: Boolean = if (appUIDList.size > 1) {
-                showDialog(appUIDList, appInfo.appName, status)
+            /*val blockAllApps: Boolean = if (appUIDList.size > 1) {
+                showDialog(appUIDList, appInfo.appName, appInfo.isExcluded)
             } else {
                 true
+            }*/
+
+            if (appUIDList.size > 1) {
+                showDialog(appUIDList, appInfo)
+            } else {
+                b.excludedAppListCheckbox.isChecked = appInfo.isExcluded
+                persistAppDetails(appInfo, appInfo.isExcluded)
             }
 
             Log.i(LOG_TAG_FIREWALL,
-                  "App ${appInfo.appName} excluded from vpn? - $status, blockAllApps?- $blockAllApps")
-
-            if (!blockAllApps) {
-                appInfo.isExcluded = !status
-                b.excludedAppListCheckbox.isChecked = !status
-                return
-            }
-
-            b.excludedAppListCheckbox.isChecked = status
-            persistAppDetails(appInfo, status)
+                  "App ${appInfo.appName} excluded from vpn? - ${appInfo.isExcluded}")
         }
 
         private fun persistAppDetails(appInfo: AppInfo, status: Boolean) {
@@ -137,24 +132,21 @@ class ExcludedAppListAdapter(private val context: Context,
             }
         }
 
-        private fun showDialog(packageList: List<AppInfo>, appName: String,
-                               isInternet: Boolean): Boolean {
-            //Change the handler logic into some other
-            val handler: Handler = ThrowingHandler()
+        private fun showDialog(packageList: List<AppInfo>, appInfo: AppInfo) {
             val positiveTxt: String
             val packageNameList: List<String> = packageList.map { it.appName }
-            var proceedBlocking = false
 
             val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
 
             builderSingle.setIcon(R.drawable.ic_exclude_app)
-            positiveTxt = if (isInternet) {
-                builderSingle.setTitle(context.getString(R.string.exclude_app_desc, appName,
+            positiveTxt = if (appInfo.isExcluded) {
+                builderSingle.setTitle(context.getString(R.string.exclude_app_desc, appInfo.appName,
                                                          packageList.size.toString()))
                 context.getString(R.string.exclude_app_dialog_positive, packageList.size.toString())
             } else {
-                builderSingle.setTitle(context.getString(R.string.unexclude_app_desc, appName,
-                                                         packageList.size.toString()))
+                builderSingle.setTitle(
+                    context.getString(R.string.unexclude_app_desc, appInfo.appName,
+                                      packageList.size.toString()))
                 context.getString(R.string.unexclude_app_dialog_positive,
                                   packageList.size.toString())
             }
@@ -167,23 +159,16 @@ class ExcludedAppListAdapter(private val context: Context,
 
 
             builderSingle.setPositiveButton(positiveTxt) { _: DialogInterface, _: Int ->
-                proceedBlocking = true
-                handler.sendMessage(handler.obtainMessage())
+                persistAppDetails(appInfo, appInfo.isExcluded)
             }.setNeutralButton(context.getString(
                 R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int ->
-                handler.sendMessage(handler.obtainMessage())
-                proceedBlocking = false
+                appInfo.isExcluded = !appInfo.isExcluded
             }
 
             val alertDialog: AlertDialog = builderSingle.show()
             alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
             alertDialog.setCancelable(false)
-            try {
-                Looper.loop()
-            } catch (e2: java.lang.RuntimeException) {
-            }
 
-            return proceedBlocking
         }
     }
 }

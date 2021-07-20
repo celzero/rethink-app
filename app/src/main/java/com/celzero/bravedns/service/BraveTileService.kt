@@ -30,7 +30,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity
 class BraveTileService : TileService() {
 
     override fun onStartListening() {
-        val vpnState: VpnState = VpnController.getInstance().getState()
+        val vpnState: VpnState = VpnController.state()
 
         //Fix detected null pointer exception. Intra #415
         val tile = if (qsTile == null) {
@@ -39,7 +39,7 @@ class BraveTileService : TileService() {
             qsTile
         }
 
-        if (vpnState.activationRequested) {
+        if (vpnState.on) {
             tile.state = Tile.STATE_ACTIVE
         } else {
             tile.state = Tile.STATE_INACTIVE
@@ -49,14 +49,14 @@ class BraveTileService : TileService() {
     }
 
     override fun onClick() {
-        val vpnState: VpnState = VpnController.getInstance().getState()
+        val vpnState: VpnState = VpnController.state()
 
-        if (vpnState.activationRequested) {
-            VpnController.getInstance().stop(this)
+        if (vpnState.on) {
+            VpnController.stop(this)
         } else {
             if (VpnService.prepare(this) == null) {
                 // Start VPN service when VPN permission has been granted.
-                VpnController.getInstance().start(this)
+                VpnController.start(this)
             } else {
                 // Open Main activity when VPN permission has not been granted.
                 val intent = Intent(this, HomeScreenActivity::class.java)
@@ -72,4 +72,5 @@ class BraveTileService : TileService() {
         requestListeningState(this, ComponentName(this, BraveTileService::class.java))
         return super.onBind(intent)
     }
+
 }

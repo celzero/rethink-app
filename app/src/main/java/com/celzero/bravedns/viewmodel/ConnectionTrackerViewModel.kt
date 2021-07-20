@@ -24,6 +24,7 @@ import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerDAO
+import com.celzero.bravedns.util.Constants.Companion.DNS_LIVEDATA_PAGE_SIZE
 import com.celzero.bravedns.util.Constants.Companion.FILTER_IS_FILTER
 
 
@@ -40,33 +41,36 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
                                                           (Function<String, LiveData<PagedList<ConnectionTracker>>> { input ->
                                                               if (input.isBlank()) {
                                                                   connectionTrackerDAO.getConnectionTrackerLiveData().toLiveData(
-                                                                      pageSize = 30)
+                                                                      pageSize = DNS_LIVEDATA_PAGE_SIZE)
                                                               } else if (input.contains(
                                                                       FILTER_IS_FILTER)) {
                                                                   val searchText = input.split(
                                                                       ":")[0]
                                                                   if (searchText.isEmpty()) {
                                                                       connectionTrackerDAO.getConnectionBlockedConnections().toLiveData(
-                                                                          pageSize = 30)
+                                                                          pageSize = DNS_LIVEDATA_PAGE_SIZE)
                                                                   } else {
                                                                       connectionTrackerDAO.getConnectionBlockedConnectionsByName(
                                                                           "%$searchText%").toLiveData(
-                                                                          pageSize = 30)
+                                                                          pageSize = DNS_LIVEDATA_PAGE_SIZE)
                                                                   }
                                                               } else {
                                                                   connectionTrackerDAO.getConnectionTrackerByName(
-                                                                      "%$input%").toLiveData(30)
+                                                                      "%$input%").toLiveData(
+                                                                      DNS_LIVEDATA_PAGE_SIZE)
                                                               }
                                                           })
 
                                                          )
 
-    fun setFilter(searchString: String, filter: String?) {
-        filteredList.value = "$searchString$filter"
+    fun setFilter(searchString: String?, filter: String?) {
+        if (!searchString.isNullOrEmpty()) filteredList.value = "$searchString$filter"
+        else filteredList.value = ""
     }
 
-    fun setFilterBlocked(filter: String) {
-        filteredList.value = filter
+    fun setFilterBlocked(filter: String?) {
+        if (!filter.isNullOrEmpty()) filteredList.value = filter
+        else filteredList.value = ""
     }
 
 }

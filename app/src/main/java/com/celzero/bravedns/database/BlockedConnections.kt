@@ -20,6 +20,20 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 
+/**
+ * The BlockedConnections table will contain the firewall rules
+ * based on IPaddress, port and protocol.
+ *
+ * It has been wrongly names as BlockedConnections which needs to be modified
+ * later as it involved database migration.
+ * TODO - Rename the class and database table name.
+ *
+ * The rules will be added to the database with the combination of uid, ipaddress, port, protocol.
+ * Special case: when the uid is assigned as FirewallRules#EVERYBODY_UID then the rules with
+ * combination of ipaddress, port, protocol will be applied for all the available apps.
+ *
+ */
+
 @Entity(tableName = "BlockedConnections")
 class BlockedConnections {
 

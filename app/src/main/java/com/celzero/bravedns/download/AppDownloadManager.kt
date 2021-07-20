@@ -19,6 +19,7 @@ package com.celzero.bravedns.download
 import android.app.DownloadManager
 import android.content.Context
 import android.net.Uri
+import android.os.SystemClock
 import android.util.Log
 import androidx.work.*
 import com.celzero.bravedns.download.DownloadConstants.Companion.DOWNLOAD_TAG
@@ -51,7 +52,9 @@ class AppDownloadManager(private val persistentState: PersistentState,
      * Calls the copy method.
      */
     fun downloadLocalBlocklist(timestamp: Long) {
-        initDownload(context)
+        purge(context)
+        persistentState.tempBlocklistDownloadTime = timestamp
+
         for (i in 0 until LOCAL_BLOCKLIST_FILE_COUNT) {
             val url = DOWNLOAD_URLS[i]
             val fileName = File.separator + FILE_NAMES[i]
@@ -65,10 +68,13 @@ class AppDownloadManager(private val persistentState: PersistentState,
     private fun initiateDownloadStatusCheck() {
         WorkManager.getInstance().pruneWork()
 
-        val downloadWatcher = OneTimeWorkRequestBuilder<DownloadWatcher>().setBackoffCriteria(
-            BackoffPolicy.LINEAR, OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
-            TimeUnit.MILLISECONDS).addTag(DOWNLOAD_TAG).setInitialDelay(10,
-                                                                        TimeUnit.SECONDS).build()
+        val workerParameter = workDataOf("workerStartTime" to SystemClock.elapsedRealtime())
+
+        val downloadWatcher = OneTimeWorkRequestBuilder<DownloadWatcher>().setInputData(
+            workerParameter).setBackoffCriteria(BackoffPolicy.LINEAR,
+                                                OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+                                                TimeUnit.MILLISECONDS).addTag(
+            DOWNLOAD_TAG).setInitialDelay(10, TimeUnit.SECONDS).build()
 
         val timestampLong = persistentState.tempBlocklistDownloadTime
         val timestamp = workDataOf("timestamp" to timestampLong)
@@ -105,10 +111,10 @@ class AppDownloadManager(private val persistentState: PersistentState,
      * Delete all the old files which are available in the download path.
      * Handles are the preliminary check before initiating the download.
      */
-    private fun initDownload(context: Context) {
+    private fun purge(context: Context) {
         downloadReference.clear()
         persistentState.downloadIDs = emptySet()
-        DownloadHelper.deleteOldFiles(context)
+        BlocklistDownloadHelper.deleteOldFiles(context)
     }
 
     private fun download(url: String, fileName: String, timestamp: String) {
@@ -119,9 +125,8 @@ class AppDownloadManager(private val persistentState: PersistentState,
             setTitle(fileName)
             setDescription(fileName)
             request.setDestinationInExternalFilesDir(context,
-                                                     DownloadHelper.getExternalFilePath(null,
-                                                                                        timestamp),
-                                                     fileName)
+                                                     BlocklistDownloadHelper.getExternalFilePath(
+                                                         timestamp), fileName)
             val downloadID = downloadManager.enqueue(this)
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "filename - $fileName, downloadID - $downloadID")
             persistentState.downloadIDs = persistentState.downloadIDs + downloadID.toString()

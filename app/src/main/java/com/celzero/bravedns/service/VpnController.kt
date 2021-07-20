@@ -19,26 +19,17 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.Log
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class VpnController {
+object VpnController {
 
-    companion object {
-        private var dnsVpnServiceState: VpnController? = null
-        private var braveVpnService: BraveVPNService? = null
-        private var connectionState: BraveVPNService.State? = null
+    private var braveVpnService: BraveVPNService? = null
+    private var connectionState: BraveVPNService.State? = null
 
-        @Synchronized
-        fun getInstance(): VpnController {
-            if (dnsVpnServiceState == null) {
-                dnsVpnServiceState = VpnController()
-            }
-            return dnsVpnServiceState!!
-        }
-    }
+    var connectionStatus: MutableLiveData<BraveVPNService.State> = MutableLiveData()
 
     @Throws(CloneNotSupportedException::class)
     fun clone(): Any? {
@@ -46,9 +37,7 @@ class VpnController {
     }
 
     fun setBraveVpnService(braveVpnService: BraveVPNService?) {
-        if (braveVpnService != null) {
-            VpnController.braveVpnService = braveVpnService
-        }
+        VpnController.braveVpnService = braveVpnService
     }
 
     fun getBraveVpnService(): BraveVPNService? {
@@ -56,22 +45,22 @@ class VpnController {
     }
 
     @Synchronized
-    fun onConnectionStateChanged(context: Context, state: BraveVPNService.State?) {
+    fun onConnectionStateChanged(state: BraveVPNService.State?) {
         if (braveVpnService == null) {
             // User clicked disable while the connection state was changing.
-            return
+            connectionState = null
+        } else {
+            connectionState = state
         }
-        connectionState = state
-        //TODO Changes done to remove the check of context
-        stateChanged(context)
+        connectionStatus.postValue(state)
     }
 
 
-    private fun stateChanged(context: Context) {
-        val broadcast = Intent(InternalNames.DNS_STATUS.name)
-        LocalBroadcastManager.getInstance(context).sendBroadcast(broadcast)
-    }
-
+    /* private fun stateChanged(context: Context) {
+         val broadcast = Intent(InternalNames.DNS_STATUS.name)
+         LocalBroadcastManager.getInstance(context).sendBroadcast(broadcast)
+     }
+ */
 
     @Synchronized
     fun start(context: Context) {
@@ -80,15 +69,16 @@ class VpnController {
             Log.i(LOG_TAG_VPN, "braveVPNService is not null")
             return
         }
-        VpnControllerHelper.persistentState.vpnEnabled = true
-        stateChanged(context)
         val startServiceIntent = Intent(context, BraveVPNService::class.java)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(startServiceIntent)
         } else {
             context.startService(startServiceIntent)
         }
+        //stateChanged(context)
+        onConnectionStateChanged(state().connectionState)
         Log.i(LOG_TAG_VPN, "VPNController - Start(Synchronized) executed - $context")
+
     }
 
     fun onStartComplete(context: Context, succeeded: Boolean) {
@@ -97,25 +87,24 @@ class VpnController {
             // user intent state and reset to the default state.
             stop(context)
         } else {
-            stateChanged(context)
+            //stateChanged(context)
         }
         Log.i(LOG_TAG_VPN, "onStartComplete - VpnController")
     }
 
+    @Synchronized
     fun stop(context: Context) {
-        Log.i(LOG_TAG_VPN, "VPN Controller stop - ${context!!}")
-        VpnControllerHelper.persistentState.vpnEnabled = false
+        Log.i(LOG_TAG_VPN, "VPN Controller stop with context: $context")
         connectionState = null
-        if (braveVpnService != null) {
-            braveVpnService!!.signalStopService(true)
-        }
+        braveVpnService?.signalStopService(true)
         braveVpnService = null
-        stateChanged(context)
+        onConnectionStateChanged(connectionState)
+        //stateChanged(context)
     }
 
-    fun getState(): VpnState {
-        val requested: Boolean = VpnControllerHelper.persistentState.vpnEnabled
-        val on = braveVpnService != null && braveVpnService!!.isOn()
+    fun state(): VpnState {
+        val requested: Boolean = VpnControllerHelper.persistentState.getVpnEnabled()
+        val on = braveVpnService?.isOn() == true
         return VpnState(requested, on, connectionState)
     }
 

@@ -44,12 +44,8 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
     private val persistentState by inject<PersistentState>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Utilities.getCurrentTheme(isDarkThemeOn()))
+        setTheme(Utilities.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-
-        if (!persistentState.firstTimeLaunch) {
-            launchHomeScreen()
-        }
 
         addBottomDots(0)
         changeStatusBarColor()

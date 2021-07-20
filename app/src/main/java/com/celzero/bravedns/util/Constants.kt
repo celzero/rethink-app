@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit
 class Constants {
 
     companion object {
-        //Download path and file names
+        // Download path and file names
         val DOWNLOAD_PATH = File.separator + "downloads" + File.separator
         val FILE_TAG_NAME = File.separator + "filetag.json"
         val FILE_BASIC_CONFIG = File.separator + "basicconfig.json"
@@ -36,12 +36,14 @@ class Constants {
 
         const val REFRESH_BLOCKLIST_URL = "https://download.bravedns.com/update/blocklists?tstamp="
         const val APP_DOWNLOAD_AVAILABLE_CHECK = "https://download.bravedns.com/update/app?vcode="
-        const val CONFIGURE_BLOCKLIST_URL_LOCAL = "https://bravedns.com/configure?v=app&tstamp="
-        const val CONFIGURE_BLOCKLIST_URL_REMOTE = "https://bravedns.com/configure?v=app"
+        const val CONFIGURE_BLOCKLIST_URL = "https://bravedns.com/configure?v=app"
+        const val CONFIGURE_BLOCKLIST_URL_PARAMETER = "tstamp"
         const val FILE_TAG_JSON = "filetag.json"
 
         // The version tag value(response) for the update check.
         const val RESPONSE_VERSION = 1
+
+        //const val
 
         val DOWNLOAD_URLS = listOf("https://download.bravedns.com/blocklists",
                                    "https://download.bravedns.com/basicconfig",
@@ -90,6 +92,8 @@ class Constants {
         // maximum time delay before sending block connection response.
         val DELAY_FIREWALL_RESPONSE_MS: Long = TimeUnit.SECONDS.toMillis(30)
 
+        const val REFRESH_APP_DURATION = 3L
+
         const val SCREEN_TO_LOAD = "view_pager_screen"
 
         const val LOCATION_INTENT_EXTRA = "location"
@@ -106,7 +110,8 @@ class Constants {
 
         const val DATE_FORMAT_PATTERN = "HH:mm:ss"
 
-        const val ORBOT_SOCKS = 10L
+        const val ORBOT_PROXY = 10L
+
 
         const val ORBOT_MODE_NONE = 1
         const val ORBOT_MODE_SOCKS5 = 2
@@ -131,6 +136,10 @@ class Constants {
         const val NOTIF_ACTION_DNS_VPN = "RETHINK_DNSONLY" // battery-saver dns-only
         const val NOTIF_ACTION_DNS_FIREWALL_VPN = "RETHINK_FULLMODE" // default dns+firewall
         const val NOTIF_ACTION_RULES_FAILURE = "RETHINK_RULES_RELOAD" // load rules failure
+
+
+        const val NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME = "ACCESSIBILITY_GRANT"
+        const val NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE = "ACCESSIBILITY_FAILURE"
 
         const val NXDOMAIN = "NXDOMAIN"
 

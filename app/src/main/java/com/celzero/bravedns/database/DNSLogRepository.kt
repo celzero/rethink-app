@@ -21,7 +21,7 @@ import com.celzero.bravedns.util.Constants
 class DNSLogRepository(private val dnsLogDAO: DNSLogDAO) {
 
 
-    fun insertAsync(dnsLogs: DNSLogs) {
+    fun insert(dnsLogs: DNSLogs) {
         dnsLogDAO.insert(dnsLogs)
     }
 

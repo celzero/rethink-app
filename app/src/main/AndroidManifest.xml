@@ -82,31 +82,12 @@
             android:name=".receiver.NotificationActionReceiver"
             android:label="@string/app_name">
         </receiver>
-        <receiver
-            android:name=".receiver.BraveScreenStateReceiver"
-            android:label="@string/app_name">
-            <intent-filter android:priority="999">
-                <data android:scheme="package" />
-                <action android:name="android.intent.action.USER_PRESENT"/>
-                <action android:name="android.intent.action.ACTION_SCREEN_OFF" />
-                <action android:name="android.intent.action.ACTION_SCREEN_ON" />
-            </intent-filter>
-        </receiver>
         <service
             android:name=".service.BraveVPNService"
             android:permission="android.permission.BIND_VPN_SERVICE"
             android:stopWithTask="false">
             <intent-filter>
                 <action android:name="android.net.VpnService" />
-            </intent-filter>
-        </service>
-        <service
-            android:name=".receiver.DeviceLockService"
-            android:enabled="true"
-            android:exported="false"
-            android:stopWithTask="false">
-            <intent-filter>
-                <action android:name="com.celzero.bravedns.receiver.DeviceLockService.ACTION_START_SERVICE" />
             </intent-filter>
         </service>
         <service

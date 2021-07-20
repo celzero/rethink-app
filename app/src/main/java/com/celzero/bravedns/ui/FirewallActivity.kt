@@ -36,13 +36,13 @@ import org.koin.android.ext.android.inject
 class FirewallActivity : AppCompatActivity(R.layout.activity_firewall),
                          TabLayout.OnTabSelectedListener {
     private val b by viewBinding(ActivityFirewallBinding::bind)
-    private var screenToLoad = 0
+    private var fragmentIndex = 0
     private val persistentState by inject<PersistentState>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Utilities.getCurrentTheme(isDarkThemeOn()))
+        setTheme(Utilities.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-        screenToLoad = intent.getIntExtra(Constants.SCREEN_TO_LOAD, 0)
+        fragmentIndex = intent.getIntExtra(Constants.SCREEN_TO_LOAD, 0)
 
         // FIXME: 22-01-2021 The view pager is migrated from ViewPager2 to Viewpager. There is a
         // known bug in viewpager2 - Focus issue, the Firewall activity has search bar in all the
@@ -66,7 +66,7 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall),
 
         //Adding adapter to pager
         b.firewallActViewpager.adapter = adapter
-        b.firewallActViewpager.setCurrentItem(screenToLoad, false)
+        b.firewallActViewpager.setCurrentItem(fragmentIndex, false)
         b.firewallActViewpager.offscreenPageLimit = b.firewallActTabLayout.tabCount
 
         b.firewallActViewpager.addOnPageChangeListener(
@@ -91,9 +91,7 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall),
 
 internal class Pager(fm: FragmentManager?, var tabCount: Int, var tabTitles: Array<String>) :
         FragmentStatePagerAdapter(fm!!) {
-    //Overriding method getItem
     override fun getItem(position: Int): Fragment {
-        //Returning the current tabs
         return when (position) {
             0 -> {
                 UniversalFirewallFragment.newInstance()

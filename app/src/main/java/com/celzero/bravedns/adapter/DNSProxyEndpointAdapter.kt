@@ -16,11 +16,8 @@ limitations under the License.
 
 package com.celzero.bravedns.adapter
 
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.DialogInterface
-import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -30,14 +27,13 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
+import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.database.DNSProxyEndpoint
 import com.celzero.bravedns.database.DNSProxyEndpointRepository
 import com.celzero.bravedns.databinding.DnsProxyListItemBinding
-import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.QueryTracker
-import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
-import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_PROXY
 import com.celzero.bravedns.util.UIUpdateInterface
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
@@ -47,8 +43,7 @@ import settings.Settings
 
 class DNSProxyEndpointAdapter(private val context: Context,
                               private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
-                              private val persistentState: PersistentState,
-                              private val queryTracker: QueryTracker,
+                              private val appMode: AppMode, private val queryTracker: QueryTracker,
                               private val listener: UIUpdateInterface) :
         PagedListAdapter<DNSProxyEndpoint, DNSProxyEndpointAdapter.DNSProxyEndpointViewHolder>(
             DIFF_CALLBACK) {
@@ -81,10 +76,10 @@ class DNSProxyEndpointAdapter(private val context: Context,
 
         fun update(endpoint: DNSProxyEndpoint) {
             displayDetails(endpoint)
-            clickListeners(endpoint)
+            setupClickListeners(endpoint)
         }
 
-        private fun clickListeners(endpoint: DNSProxyEndpoint) {
+        private fun setupClickListeners(endpoint: DNSProxyEndpoint) {
             b.root.setOnClickListener {
                 updateDNSProxyDetails(endpoint)
                 b.dnsProxyListCheckImage.isChecked = true
@@ -132,30 +127,27 @@ class DNSProxyEndpointAdapter(private val context: Context,
     }
 
 
-
-    private fun showExplanationOnImageClick(dnsProxyEndpoint: DNSProxyEndpoint) {
-        if (dnsProxyEndpoint.isCustom && !dnsProxyEndpoint.isSelected) showDialogForDelete(
-            dnsProxyEndpoint)
+    private fun showExplanationOnImageClick(endpoint: DNSProxyEndpoint) {
+        if (endpoint.isDeletable()) showDialogForDelete(endpoint)
         else {
-            showDialogExplanation(dnsProxyEndpoint.proxyName, dnsProxyEndpoint.proxyAppName!!,
-                                  dnsProxyEndpoint.proxyIP!!, dnsProxyEndpoint.proxyPort.toString())
+            showDialogExplanation(endpoint.proxyName, endpoint.getPackageName(), endpoint.proxyIP,
+                                  endpoint.proxyPort.toString())
         }
     }
 
-    private fun showDialogExplanation(title: String, appName: String, url: String,
-                                      message: String) {
+    private fun showDialogExplanation(title: String, packageName: String?, ip: String?,
+                                      port: String) {
         val builder = AlertDialog.Builder(context)
         builder.setTitle(title)
-        val app = appList[appName]?.appName
+        val app = appList[packageName]?.appName
 
         if (app != null && !app.isNullOrEmpty()) {
-            builder.setMessage(
-                context.getString(R.string.dns_proxy_dialog_message, app, url, message))
+            builder.setMessage(context.getString(R.string.dns_proxy_dialog_message, app, ip, port))
         } else {
             builder.setMessage(context.getString(R.string.dns_proxy_dialog_message,
                                                  context.getString(
-                                                     R.string.cd_custom_dns_proxy_default_app), url,
-                                                 message))
+                                                     R.string.cd_custom_dns_proxy_default_app), ip,
+                                                 port))
         }
         builder.setCancelable(true)
         builder.setPositiveButton(
@@ -164,13 +156,15 @@ class DNSProxyEndpointAdapter(private val context: Context,
         }
         builder.setNeutralButton(
             context.getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
-            val clipboard: ClipboardManager? = context.getSystemService(
-                Context.CLIPBOARD_SERVICE) as ClipboardManager?
-            val clip = ClipData.newPlainText("URL", url)
-            clipboard?.setPrimaryClip(clip)
-            Utilities.showToastUiCentered(context,
-                                          context.getString(R.string.info_dialog_copy_toast_msg),
-                                          Toast.LENGTH_SHORT)
+            if (ip != null) {
+                Utilities.clipboardCopy(context, ip,
+                                        context.getString(R.string.copy_clipboard_label))
+                Utilities.showToastUiCentered(context, context.getString(
+                    R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
+            } else {
+                // No op: Copy functionality is for the Ip of the endpoint, no operation needed
+                // when the ip is not available for endpoint.
+            }
         }
         val alertDialog: AlertDialog = builder.create()
         alertDialog.setCancelable(true)
@@ -200,27 +194,14 @@ class DNSProxyEndpointAdapter(private val context: Context,
     private fun updateDNSProxyDetails(dnsProxyEndpoint: DNSProxyEndpoint) {
         dnsProxyEndpoint.isSelected = true
         dnsProxyEndpointRepository.removeConnectionStatus()
-        object : CountDownTimer(500, 500) {
-            override fun onTick(millisUntilFinished: Long) {
-            }
-
-            override fun onFinish() {
-                notifyDataSetChanged()
-                queryTracker.reinitializeQuantileEstimator()
-            }
-        }.start()
-
-        // Capture traffic for particular IP. Based on the setting. need to change the DNS
-        // mode.
-        if (dnsProxyEndpoint.proxyType == context.getString(R.string.cd_dns_proxy_mode_internal)) {
-            HomeScreenActivity.GlobalVariable.appMode?.setDNSMode(Settings.DNSModeProxyIP)
-        } else {
-            HomeScreenActivity.GlobalVariable.appMode?.setDNSMode(Settings.DNSModeProxyIP)
+        Utilities.delay(500) {
+            notifyDataSetChanged()
+            appMode.onNewDnsConnected(PREF_DNS_MODE_PROXY, Settings.DNSModeProxyIP)
+            queryTracker.reinitializeQuantileEstimator()
         }
-        listener.updateUIFromAdapter(3)
-        persistentState.dnsType = Constants.PREF_DNS_MODE_PROXY
-        persistentState.setConnectedDNS(dnsProxyEndpoint.proxyName)
-        persistentState.connectionModeChange = dnsProxyEndpoint.proxyIP!!
+
+        listener.updateUIFromAdapter(PREF_DNS_MODE_PROXY)
         dnsProxyEndpointRepository.updateAsync(dnsProxyEndpoint)
     }
+
 }

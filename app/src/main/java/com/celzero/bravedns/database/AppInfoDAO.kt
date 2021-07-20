@@ -116,7 +116,7 @@ interface AppInfoDAO {
     fun getExcludedAAppSystemAppsLiveData(): DataSource.Factory<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where appCategory in (:filter)  order by isExcluded desc,lower(appName)")
+        "select * from AppInfo where appCategory in (:filter) order by isExcluded desc,lower(appName)")
     fun getExcludedAppDetailsFilterForCategoryLiveData(
             filter: List<String>): DataSource.Factory<Int, AppInfo>
 

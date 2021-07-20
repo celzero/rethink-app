@@ -40,14 +40,13 @@ class ProxyEndpoint {
     var latency: Int = 0
 
     override fun equals(other: Any?): Boolean {
-        if (other?.javaClass != javaClass) return false
-        other as ProxyEndpoint
+        if (other !is ProxyEndpoint) return false
         if (id != other.id) return false
         return true
     }
 
     override fun hashCode(): Int {
-        return this.hashCode()
+        return this.id.hashCode()
     }
 
 
@@ -55,11 +54,9 @@ class ProxyEndpoint {
                 proxyIP: String, proxyPort: Int, userName: String, password: String,
                 isSelected: Boolean, isCustom: Boolean, isUDP: Boolean, modifiedDataTime: Long,
                 latency: Int) {
-        // Insert methods treat 0 as not-set while inserting the item.
-        // The below check is for manual insert of the default Doh entities.
-        // For every other entries the id is assigned as -1 so that the
-        // autoGenerate parameter will generate the id accordingly.
-        if (id != -1) this.id = id
+        // Room auto-increments id when its set to zero.
+        // A non-zero id overrides and sets caller-specified id instead.
+        this.id = id
         this.proxyMode = proxyMode
         this.proxyName = proxyName
         this.proxyType = proxyType

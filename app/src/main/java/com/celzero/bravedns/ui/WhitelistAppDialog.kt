@@ -18,7 +18,6 @@ package com.celzero.bravedns.ui
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.util.Log
 import android.view.View
 import android.view.Window
@@ -26,6 +25,7 @@ import android.view.WindowManager
 import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
@@ -39,7 +39,6 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.AppListViewModel
 import com.google.android.material.chip.Chip
-import java.util.stream.Collectors
 
 
 class WhitelistAppDialog(private var activity: Context,
@@ -57,7 +56,7 @@ class WhitelistAppDialog(private var activity: Context,
     private var filterCategories: MutableList<String> = ArrayList()
     private var category: List<String> = ArrayList()
 
-    var filterState: Boolean = false
+    private val CATEGORY_FILTER_CONST = "category:"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,15 +79,15 @@ class WhitelistAppDialog(private var activity: Context,
         filterCategories.clear()
 
         b.customDialogWhitelistSearchView.setOnCloseListener {
-            showCategoryChips()
+            toggleCategoryChipsUi()
             false
         }
 
-        val appCount = appList.size
         val act: FirewallActivity = activity as FirewallActivity
         appInfoViewRepository.getWhitelistCountLiveData().observe(act, {
             b.customSelectAllOptionCount.text = act.getString(R.string.whitelist_dialog_apps_in_use,
-                                                              it.toString(), appCount.toString())
+                                                              it.toString(),
+                                                              appList.size.toString())
         })
 
         b.customSelectAllOptionCheckbox.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
@@ -102,14 +101,8 @@ class WhitelistAppDialog(private var activity: Context,
                                               act.getString(R.string.whitelist_toast_negative),
                                               Toast.LENGTH_SHORT)
             }
-            object : CountDownTimer(500, 500) {
-                override fun onTick(millisUntilFinished: Long) {
-                }
 
-                override fun onFinish() {
-                    adapter.notifyDataSetChanged()
-                }
-            }.start()
+            Utilities.delay(500) { adapter.notifyDataSetChanged() }
 
         }
         b.customDialogWhitelistSearchFilter.setOnClickListener(this)
@@ -121,8 +114,7 @@ class WhitelistAppDialog(private var activity: Context,
     private fun modifyAppsInUniversalAppList(checked: Boolean) {
         if (filterCategories.isNullOrEmpty()) {
             appInfoRepository.updateWhiteListForAllApp(checked)
-            val categoryList = appInfoRepository.getAppCategoryList()
-            categoryList.forEach {
+            appInfoRepository.getAppCategoryList().forEach {
                 val countBlocked = appInfoRepository.getBlockedCountForCategory(it)
                 categoryInfoRepository.updateBlockedCount(it, countBlocked)
             }
@@ -139,7 +131,6 @@ class WhitelistAppDialog(private var activity: Context,
         }
     }
 
-
     private fun categoryListByAppNameFromDB(name: String) {
         category = appInfoRepository.getAppCategoryForAppName("%$name%")
         setCategoryChips(category)
@@ -153,10 +144,10 @@ class WhitelistAppDialog(private var activity: Context,
                 dismiss()
             }
             R.id.custom_dialog_whitelist_search_filter -> {
-                showCategoryChips()
+                toggleCategoryChipsUi()
             }
             R.id.custom_dialog_whitelist_search_view -> {
-                showCategoryChips()
+                toggleCategoryChipsUi()
             }
             else -> {
                 filterCategories.clear()
@@ -167,12 +158,10 @@ class WhitelistAppDialog(private var activity: Context,
 
     }
 
-    private fun showCategoryChips() {
-        if (!filterState) {
-            filterState = true
+    private fun toggleCategoryChipsUi() {
+        if (!b.customDialogChipGroup.isVisible) {
             b.customDialogChipGroup.visibility = View.VISIBLE
         } else {
-            filterState = false
             b.customDialogChipGroup.visibility = View.GONE
         }
     }
@@ -201,25 +190,18 @@ class WhitelistAppDialog(private var activity: Context,
                 if (b) {
                     filterCategories.add(categoryName)
                 } else {
-                    if (filterCategories.contains(categoryName)) {
-                        filterCategories.remove(categoryName)
-                    }
+                    filterCategories.remove(categoryName)
                 }
-                val filterString = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    filterCategories.stream().collect(Collectors.joining(","))
-                } else {
-                    var catTitle = ""
-                    filterCategories.forEach {
-                        catTitle = "$it,$catTitle"
-                    }
-                    if (catTitle.length > 1) {
-                        catTitle.substring(0, catTitle.length - 1)
-                    } else {
-                        catTitle
-                    }
+
+                var filterString = ""
+                filterCategories.forEach {
+                    filterString = "$it,$filterString"
                 }
+
+                filterString.dropLast(1)
+
                 if (filterString.isNotEmpty()) {
-                    viewModel.setFilter("category:$filterString")
+                    viewModel.setFilter("$CATEGORY_FILTER_CONST$filterString")
                 } else {
                     viewModel.setFilter("")
                 }

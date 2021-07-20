@@ -16,7 +16,6 @@
 package com.celzero.bravedns.ui
 
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.util.Log
@@ -25,31 +24,28 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import com.celzero.bravedns.R
+import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.databinding.BottomSheetHomeScreenBinding
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveModeToggler
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS_FIREWALL
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_FIREWALL
-import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_INVALID
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities.Companion.getBottomsheetCurrentTheme
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
-import settings.Settings
 
-class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
+class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetHomeScreenBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val b get() = _binding!!
 
-    private var firewallMode = -1L
-    private var connectedDetails: String = ""
-
     private val persistentState by inject<PersistentState>()
+    private val appMode by inject<AppMode>()
 
     override fun getTheme(): Int = getBottomsheetCurrentTheme(isDarkThemeOn())
 
@@ -68,9 +64,6 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
         _binding = null
     }
 
-    constructor(connectedDetails: String) : this() {
-        this.connectedDetails = connectedDetails
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -80,13 +73,15 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
     }
 
     private fun initView() {
-        b.bsHomeScreenConnectedStatus.text = connectedDetails
-        var selectedIndex = HomeScreenActivity.GlobalVariable.braveMode
-        if (DEBUG) Log.d(LOG_TAG_VPN, "Homescreen bottom sheet selectedIndex: $selectedIndex")
-        updateBraveModeUI()
-        if (selectedIndex == -1) selectedIndex = persistentState.getBraveMode()
+        b.bsHomeScreenConnectedStatus.text = getConnectionStatus()
+        val selectedIndex = persistentState.getBraveMode()
+        if (DEBUG) Log.d(LOG_TAG_VPN, "Home screen bottom sheet selectedIndex: $selectedIndex")
 
-        when (selectedIndex) {
+        updateStatus(selectedIndex)
+    }
+
+    private fun updateStatus(selectedState: Int) {
+        when (selectedState) {
             APP_MODE_DNS -> {
                 b.bsHomeScreenRadioDns.isChecked = true
             }
@@ -100,73 +95,66 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
                 b.bsHomeScreenRadioDnsFirewall.isChecked = true
             }
         }
+
     }
 
     private fun initializeClickListeners() {
         b.bsHomeScreenRadioDns.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
-            if (isSelected) {
-                enableDNSMode()
-            }
+            handleDNSMode(isSelected)
         }
 
         b.bsHomeScreenRadioFirewall.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
-            if (isSelected) {
-                enableFirewallMode()
-            }
+            handleFirewallMode(isSelected)
         }
 
         b.bsHomeScreenRadioDnsFirewall.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
-            if (isSelected) {
-                enableDNSFirewallMode()
-            }
+            handleDNSFirewallMode(isSelected)
         }
 
         b.bsHsDnsRl.setOnClickListener {
             if (!b.bsHomeScreenRadioDns.isChecked) {
                 b.bsHomeScreenRadioDns.isChecked = true
-                enableDNSMode()
+                handleDNSMode(isChecked = true)
             }
         }
 
         b.bsHsFirewallRl.setOnClickListener {
             if (!b.bsHomeScreenRadioFirewall.isChecked) {
                 b.bsHomeScreenRadioFirewall.isChecked = true
-                enableFirewallMode()
+                handleFirewallMode(isChecked = true)
             }
         }
 
         b.bsHsDnsFirewallRl.setOnClickListener {
             if (!b.bsHomeScreenRadioDnsFirewall.isChecked) {
                 b.bsHomeScreenRadioDnsFirewall.isChecked = true
-                enableDNSFirewallMode()
+                handleDNSFirewallMode(isChecked = true)
             }
         }
     }
 
-    private fun enableDNSMode() {
-        b.bsHomeScreenRadioFirewall.isChecked = false
-        b.bsHomeScreenRadioDnsFirewall.isChecked = false
-        firewallMode = Settings.BlockModeNone
-        HomeScreenActivity.GlobalVariable.braveMode = APP_MODE_DNS
-        modifyBraveMode()
+    private fun handleDNSMode(isChecked: Boolean) {
+        if (isChecked) {
+            b.bsHomeScreenRadioFirewall.isChecked = false
+            b.bsHomeScreenRadioDnsFirewall.isChecked = false
+            modifyBraveMode(APP_MODE_DNS)
+        }
     }
 
-    private fun enableFirewallMode() {
-        b.bsHomeScreenRadioDns.isChecked = false
-        b.bsHomeScreenRadioDnsFirewall.isChecked = false
-        firewallMode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) Settings.BlockModeFilterProc
-        else Settings.BlockModeFilter
-        HomeScreenActivity.GlobalVariable.braveMode = APP_MODE_FIREWALL
-        modifyBraveMode()
+    private fun handleFirewallMode(isChecked: Boolean) {
+        if (isChecked) {
+            b.bsHomeScreenRadioDns.isChecked = false
+            b.bsHomeScreenRadioDnsFirewall.isChecked = false
+            modifyBraveMode(APP_MODE_FIREWALL)
+        }
     }
 
-    private fun enableDNSFirewallMode() {
-        b.bsHomeScreenRadioDns.isChecked = false
-        b.bsHomeScreenRadioFirewall.isChecked = false
-        firewallMode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) Settings.BlockModeFilterProc
-        else Settings.BlockModeFilter
-        HomeScreenActivity.GlobalVariable.braveMode = APP_MODE_DNS_FIREWALL
-        modifyBraveMode()
+    private fun handleDNSFirewallMode(isChecked: Boolean) {
+        if (isChecked) {
+            b.bsHomeScreenRadioDns.isChecked = false
+            b.bsHomeScreenRadioFirewall.isChecked = false
+            modifyBraveMode(APP_MODE_DNS_FIREWALL)
+        }
     }
 
     private fun updateUptime() {
@@ -176,33 +164,21 @@ class HomeScreenSettingBottomSheet() : BottomSheetDialogFragment() {
         b.bsHomeScreenAppUptime.text = getString(R.string.hsf_uptime, upTime)
     }
 
-    private fun modifyBraveMode() {
-        HomeScreenActivity.GlobalVariable.appMode?.setFirewallMode(firewallMode)
-        if (HomeScreenActivity.GlobalVariable.braveMode == APP_MODE_FIREWALL) {
-            HomeScreenActivity.GlobalVariable.appMode?.setDNSMode(Settings.DNSModeNone)
-        } else {
-            HomeScreenActivity.GlobalVariable.appMode?.setDNSMode(PREF_DNS_INVALID)
-        }
-        persistentState.setBraveMode(HomeScreenActivity.GlobalVariable.braveMode)
-        HomeScreenActivity.GlobalVariable.braveModeToggler.postValue(
-            HomeScreenActivity.GlobalVariable.braveMode)
-        if (VpnController.getInstance().getState().activationRequested) {
-            updateBraveModeUI()
-        }
+    private fun modifyBraveMode(braveMode: Int) {
+        appMode.changeBraveMode(braveMode)
+        braveModeToggler.postValue(persistentState.getBraveMode())
     }
 
-    private fun updateBraveModeUI() {
-        when (HomeScreenActivity.GlobalVariable.braveMode) {
+    private fun getConnectionStatus(): String {
+        return when (persistentState.getBraveMode()) {
             APP_MODE_DNS -> {
-                b.bsHomeScreenConnectedStatus.text = getString(
-                    R.string.dns_explanation_dns_connected)
+                getString(R.string.dns_explanation_dns_connected)
             }
             APP_MODE_FIREWALL -> {
-                b.bsHomeScreenConnectedStatus.text = getString(
-                    R.string.dns_explanation_firewall_connected)
+                getString(R.string.dns_explanation_firewall_connected)
             }
             else -> {
-                b.bsHomeScreenConnectedStatus.text = getString(R.string.dns_explanation_connected)
+                getString(R.string.dns_explanation_connected)
             }
         }
     }

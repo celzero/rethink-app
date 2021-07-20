@@ -31,8 +31,8 @@ class KnownPorts {
             }
         }
 
-        //init hash map with reserved ports (1-1024) and protocol identifiers
-        //based on: http://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml
+        // init hash map with reserved ports (1-1024) and protocol identifiers
+        // based on: http://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml
         private fun initPortMap() {
             portMap[1] = "tcpmux"
             portMap[2] = "compressnet"

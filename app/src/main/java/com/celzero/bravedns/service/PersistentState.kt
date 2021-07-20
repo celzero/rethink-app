@@ -16,40 +16,33 @@
 package com.celzero.bravedns.service
 
 import android.content.Context
-import android.os.SystemClock
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
+import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.database.DoHEndpoint
-import com.celzero.bravedns.ui.HomeScreenActivity
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.connectedDNS
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.lifeTimeQueries
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.Constants.Companion.ORBOT_MODE_NONE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import hu.autsoft.krate.*
-import settings.Settings
-import kotlin.math.abs
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class PersistentState(private val context: Context) : SimpleKrate(context) {
+class PersistentState(private val context: Context) : SimpleKrate(context), KoinComponent {
     companion object {
         const val BRAVE_MODE = "brave_mode"
         const val BACKGROUND_MODE = "background_mode"
         const val DNS_TYPE = "dns_type"
-        const val PROXY_MODE = "proxy_mode"
         const val ALLOW_BYPASS = "allow_bypass"
         const val EXCLUDE_FROM_VPN = "exclude_apps_vpn"
-        const val IS_SCREEN_OFF = "screen_off"
-        const val CONNECTION_CHANGE = "change_in_url"
         const val LOCAL_BLOCK_LIST = "enable_local_list"
         const val LOCAL_BLOCK_LIST_STAMP = "local_block_list_stamp"
-        const val BLOCK_UNKNOWN_CONNECTIONS = "block_unknown_connections"
-        const val HTTP_PROXY_ENABLED = "http_proxy_enabled"
-        const val BLOCK_UDP_OTHER_THAN_DNS = "block_udp_traffic_other_than_dns"
-        const val ORBOT_MODE_CHANGE = "orbot_mode_enabled"
+        const val PROXY_TYPE = "proxy_proxytype"
+        const val PROXY_PROVIDER = "proxy_proxyprovider"
         const val NETWORK = "add_all_networks_to_vpn"
         const val NOTIFICATION_ACTION = "notification_action"
 
@@ -60,14 +53,15 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
         }
     }
 
-    var vpnEnabled by booleanPref("enabled", false)
+    private val appMode by inject<AppMode>()
+
+    private var _vpnEnabled by booleanPref("enabled", false)
     var firstTimeLaunch by booleanPref("is_first_time_launch", true)
     var excludedPackagesWifi by stringSetPref("pref_apps_wifi", emptySet())
     var excludedPackagesData by stringSetPref("pref_apps_data", emptySet())
     private var _braveMode by intPref("brave_mode", 2)
     var firewallMode by intPref("firewall_mode", 1)
     var logsEnabled by booleanPref("local_logs", true)
-    var downloadSource by intPref("app_downloaded_source", 0)
     var appVersion by intPref("app_version", 0)
     var lastAppUpdateCheck by longPref("app_update_last_check", 0)
     var numberOfRemoteBlocklists by intPref("remote_block_list_count", 0)
@@ -78,46 +72,46 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
     var localBlocklistStamp by stringPref("local_block_list_stamp", "")
     var blockUnknownConnections by booleanPref("block_unknown_connections", false)
     var blocklistFilesDownloaded by booleanPref("download_block_list_files", false)
-    var localBlocklistEnabled by booleanPref("enable_local_list", false)
+    var blocklistEnabled by booleanPref("enable_local_list", false)
     var remoteBlocklistDownloadTime by longPref("remote_block_list_downloaded_time", 0)
-    var tempRemoteBlocklistDownloadTime by longPref("temp_remote_block_list_downloaded_time", 0)
-    var workManagerStartTime by longPref("work_manager_start_time", 0)
-    var localBlocklistDownloadTime by longPref("local_block_list_downloaded_time", 0)
+    var blocklistDownloadTime by longPref("local_block_list_downloaded_time", 0)
     var tempBlocklistDownloadTime by longPref("temp_time_during_download", 0)
     var httpProxyPort by intPref("http_proxy_port", INVALID_PORT)
-    var httpProxyEnabled by booleanPref("http_proxy_enabled", false)
     var httpProxyHostAddress by stringPref("http_proxy_ipaddress", "")
+
+    // FIXME - excludedAppsFromVPN - Try to remove this persistentState and try to get it from DB
     var excludedAppsFromVPN by stringSetPref("exclude_apps_vpn", emptySet())
-    var connectionModeChange by stringPref("change_in_url", "")
-    var socks5Enabled by booleanPref("socks5_proxy", false)
     var killAppOnFirewall by booleanPref("kill_app_on_firewall", true)
     var allowByPass by booleanPref("allow_bypass", true)
     var allowDNSTraffic by booleanPref("dns_all_traffic", true)
-    var proxyMode by longPref("proxy_mode", Settings.ProxyModeNone)
     var dnsType by intPref("dns_type", 1)
     var prefAutoStartBootUp by booleanPref("auto_start_on_boot", true)
     var screenState by booleanPref("screen_state", false)
-    private var _numberOfRequests by intPref("number_request", 0)
-    var numberOfBlockedRequests by intPref("blocked_request", 0)
+
+    var oldNumberRequests by intPref("number_request", 0)
+    var oldBlockedRequests by intPref("blocked_request", 0)
+    var numberOfRequests by longPref("dns_number_request", 0)
+    var numberOfBlockedRequests by longPref("dns_blocked_request", 0)
+
+
     var backgroundEnabled by booleanPref("background_mode", false)
     var checkForAppUpdate by booleanPref("check_for_app_update", true)
-    var isScreenOff by booleanPref("screen_off", false)
     private var connectedDNSName by stringPref("connected_dns_name",
                                                context.getString(R.string.dns_mode_3))
     var theme by intPref("app_theme", 0)
     var notificationAction by intPref("notification_action", 1)
     var isAddAllNetworks by booleanPref("add_all_networks_to_vpn", false)
 
+    var lastAppRefreshTime by longPref("last_app_refresh_time", INIT_TIME_MS)
+
+    var proxyType by stringPref("proxy_proxytype", AppMode.ProxyType.NONE.name)
+    var proxyProvider by stringPref("proxy_proxyprovider", AppMode.ProxyProvider.NONE.name)
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
 
     // When set, indicates user action to start Orbot and connect to it. The default value
     // "1"(NONE) indicates no action / action to connect was reset.
     var orbotRequestMode by intPref("orbot_mode", ORBOT_MODE_NONE)
-
-    // When set, indicates a successful response from Orbot to connect request.
-    // The default value is 1 (NONE). The value will be modified once the orbotMode variable
-    // is set and there is successful response from Orbot app.
-    var orbotResponseStatus by intPref("orbot_mode_enabled", ORBOT_MODE_NONE)
 
     var downloadIDs by stringSetPref("download_ids", emptySet())
 
@@ -127,18 +121,27 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
     var isAccessibilityCrashDetected by booleanPref("accessibility_crash", false)
 
     var median: MutableLiveData<Long> = MutableLiveData()
-    var blockedCount: MutableLiveData<Int> = MutableLiveData()
-    var networkRequestHeartbeatTimestamp: Long = 0L
+    var blockedCountLiveData: MutableLiveData<Long> = MutableLiveData()
+    var requestCountLiveData: MutableLiveData<Long> = MutableLiveData()
+
+    var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
 
     fun wifiAllowed(forPackage: String): Boolean = !excludedPackagesWifi.contains(forPackage)
 
     // FIXME #200 - Removed the list from the persistent state.
+    // excludedPackagesWifi - is used by the BraveVPNService#newBuilder() when the
+    // firewall mode is set to Settings.BlockModeSink.
+    // Remove this and make use of appInfo database value.
     fun modifyAllowedWifi(forPackage: String, remove: Boolean) {
         excludedPackagesWifi = if (remove) {
             excludedPackagesWifi - forPackage
         } else {
             excludedPackagesWifi + forPackage
         }
+    }
+
+    fun updateExcludedListWifi(excludedApps: List<String>) {
+        excludedAppsFromVPN = excludedApps.toMutableSet()
     }
 
     // FIXME #200 - Remove the usage of lists from persistent state.
@@ -160,42 +163,31 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
         this.median.postValue(median)
     }
 
-    fun setLifetimeQueries() {
-        val numReq = if (lifeTimeQueries > 0) lifeTimeQueries + 1
-        else {
-            _numberOfRequests + 1
-        }
-        lifeTimeQueries = numReq
-        val now = SystemClock.elapsedRealtime()
-        if (abs(now - networkRequestHeartbeatTimestamp) > Constants.DNS_REQUEST_WRITE_THRESHOLD_MS) {
-            networkRequestHeartbeatTimestamp = now
-            _numberOfRequests = numReq
-            HomeScreenActivity.GlobalVariable.lifeTimeQ.postValue(numReq)
-        }
-    }
+    /* fun setLifetimeQueries() {
+         _numberOfRequests += 1
+         lifeTimeQ.postValue(_numberOfRequests)
+     }
 
-    fun getLifetimeQueries(): Int {
-        if (lifeTimeQueries >= 0) {
-            return lifeTimeQueries
-        }
-        return _numberOfRequests
-    }
+     fun getLifetimeQueries(): Long {
+         return _numberOfRequests
+     }
 
-    fun incrementBlockedReq() {
-        numberOfBlockedRequests += 1
-        blockedCount.postValue(numberOfBlockedRequests)
-    }
+     fun incrementBlockedReq() {
+         numberOfBlockedRequests += 1
+         blockedCount.postValue(numberOfBlockedRequests)
+     }*/
 
     //FIXME replace the below logic once the DNS data is streamlined.
     fun getConnectedDNS(): String {
         if (!connectedDNS.value.isNullOrEmpty()) {
             return connectedDNS.value!!
         }
-        val dnsType = appMode?.getDNSType()
+
+        val dnsType = appMode.getDNSType()
         return if (Constants.PREF_DNS_MODE_DOH == dnsType) {
             val dohDetail: DoHEndpoint?
             try {
-                dohDetail = appMode?.getDOHDetails()
+                dohDetail = appMode.getDOHDetails()
                 dohDetail?.dohName!!
             } catch (e: Exception) { //FIXME - #320
                 Log.e(LOG_TAG_VPN, "Issue while DOH details fetch from the database", e)
@@ -203,15 +195,24 @@ class PersistentState(private val context: Context) : SimpleKrate(context) {
             }
         } else if (Constants.PREF_DNS_MODE_DNSCRYPT == dnsType) {
             context.getString(R.string.configure_dns_crypt,
-                              appMode?.getDNSCryptServerCount().toString())
+                              appMode.getDNSCryptServerCount().toString())
         } else {
-            val proxyDetails = appMode?.getDNSProxyServerDetails()
-            proxyDetails?.proxyAppName!!
+            val proxyDetails = appMode.getDNSProxyServerDetails()
+            proxyDetails.proxyAppName!!
         }
     }
 
     fun setConnectedDNS(name: String) {
         connectedDNS.postValue(name)
         connectedDNSName = name
+    }
+
+    fun setVpnEnabled(isOn: Boolean) {
+        vpnEnabledLiveData.postValue(isOn)
+        _vpnEnabled = isOn
+    }
+
+    fun getVpnEnabled(): Boolean {
+        return _vpnEnabled
     }
 }

@@ -19,14 +19,12 @@ import android.content.Context
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.text.Html
 import android.text.format.DateUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -39,7 +37,6 @@ import com.celzero.bravedns.adapter.DNSBottomSheetBlockAdapter
 import com.celzero.bravedns.database.DNSLogs
 import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
 import com.celzero.bravedns.glide.GlideApp
-import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
@@ -50,7 +47,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 
 
-class DNSBlockListBottomSheetFragment(private var contextVal: Context,
+class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
                                       private var transaction: DNSLogs) :
         BottomSheetDialogFragment() {
     private var _binding: BottomSheetDnsLogBinding? = null
@@ -86,54 +83,28 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context,
         b.dnsBlockLatency.visibility = View.GONE
         b.dnsBlockIpLatency.text = getString(R.string.dns_btm_latency_ms,
                                              transaction.latency.toString())
-        if (transaction.serverIP.isNotEmpty()) {
-            b.dnsBlockResolver.visibility = View.VISIBLE
-            b.dnsBlockResolver.text = getString(R.string.dns_btm_resolver, transaction.serverIP)
-            b.dnsBlockResolver.visibility = View.GONE
-        } else {
-            b.dnsBlockResolver.visibility = View.GONE
-        }
-        if (persistentState.fetchFavIcon) {
-            if (transaction.status == Transaction.Status.COMPLETE.toString() && transaction.response != Constants.NXDOMAIN && !transaction.isBlocked) {
-                val trim = transaction.queryStr.dropLast(1)
-                val url = "${Constants.FAV_ICON_URL}$trim.ico"
-                val domainURL = getETldPlus1(trim)
-                val glideURL = "${Constants.FAV_ICON_URL}$domainURL.ico"
-                updateImage(url, glideURL)
-            }
-        }
-        val upTime = DateUtils.getRelativeTimeSpanString(transaction.time,
+
+        displayFavIcon()
+        displayDnsTransactionDetails()
+    }
+
+    private fun displayDnsTransactionDetails() {
+
+        val uptime = DateUtils.getRelativeTimeSpanString(transaction.time,
                                                          System.currentTimeMillis(),
                                                          DateUtils.MINUTE_IN_MILLIS,
                                                          DateUtils.FORMAT_ABBREV_RELATIVE)
-        if (transaction.isBlocked) {
-            b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_blocked_by, upTime,
-                                                   transaction.serverIP)
-        } else {
-            if (transaction.serverIP.isNotEmpty() && transaction.relayIP.isNotEmpty()) {
-                val text = getString(R.string.dns_btm_resolved_crypt, upTime, transaction.serverIP)
-                val styledText = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY).toString()
-                } else {
-                    HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
-                }
-                b.dnsBlockBlockedDesc.text = styledText
-            } else if (transaction.serverIP.isNotEmpty()) {
-                b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh, upTime,
-                                                       transaction.serverIP)
-            } else {
-                b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh_no_server,
-                                                       upTime)
-            }
-        }
+
+        displayDescription(uptime.toString())
+
         if (transaction.blockLists.isEmpty()) {
             b.dnsBlockRecyclerContainer.visibility = View.GONE
             b.dnsBlockPlaceHolder.visibility = View.VISIBLE
         } else {
             if (transaction.serverIP.isEmpty()) {
-                b.dnsBlockBlockedDesc.text = getString(R.string.bsct_conn_block_desc_device, upTime)
+                b.dnsBlockBlockedDesc.text = getString(R.string.bsct_conn_block_desc_device, uptime)
             } else {
-                b.dnsBlockBlockedDesc.text = getString(R.string.bsct_conn_block_desc, upTime,
+                b.dnsBlockBlockedDesc.text = getString(R.string.bsct_conn_block_desc, uptime,
                                                        transaction.serverIP)
             }
 
@@ -147,6 +118,35 @@ class DNSBlockListBottomSheetFragment(private var contextVal: Context,
                 b.dnsBlockPlaceHolder.visibility = View.VISIBLE
             }
         }
+    }
+
+    private fun displayDescription(uptime: String) {
+
+        if (transaction.isBlocked) {
+            b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_blocked_by, uptime,
+                                                   transaction.serverIP)
+        } else {
+            if (transaction.serverIP.isNotEmpty() && transaction.relayIP.isNotEmpty()) {
+                val text = getString(R.string.dns_btm_resolved_crypt, uptime, transaction.serverIP)
+                b.dnsBlockBlockedDesc.text = Utilities.updateHtmlEncodedText(text)
+            } else if (transaction.serverIP.isNotEmpty()) {
+                b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh, uptime,
+                                                       transaction.serverIP)
+            } else {
+                b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh_no_server,
+                                                       uptime)
+            }
+        }
+    }
+
+    private fun displayFavIcon() {
+        if (!persistentState.fetchFavIcon || transaction.failure()) return
+
+        val trim = transaction.queryStr.dropLast(1)
+        val url = "${Constants.FAV_ICON_URL}$trim.ico"
+        val domainURL = getETldPlus1(trim)
+        val glideURL = "${Constants.FAV_ICON_URL}$domainURL.ico"
+        updateImage(url, glideURL)
     }
 
     private fun updateImage(url: String, cacheKey: String) {

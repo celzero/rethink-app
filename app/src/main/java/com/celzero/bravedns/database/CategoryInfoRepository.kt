@@ -39,7 +39,7 @@ class CategoryInfoRepository(private val categoryInfoDAO: CategoryInfoDAO) {
         return categoryInfoDAO.getAppCategoryList()
     }
 
-    fun updateCategoryInternet(categoryName: String, isInternetBlocked: Boolean) {
+    fun updateCategoryDetails(categoryName: String, isInternetBlocked: Boolean) {
         categoryInfoDAO.updateCategoryInternet(categoryName, isInternetBlocked)
         if (DEBUG) Log.d(LOG_TAG_APP_DB,
                          "updateCategoryInternet - isInternetBlocked -$isInternetBlocked for $categoryName")
@@ -66,6 +66,16 @@ class CategoryInfoRepository(private val categoryInfoDAO: CategoryInfoDAO) {
         val categoryDetail = categoryInfoDAO.getCategoryDetail(categoryName)
         val allBlocked = isAppCountEqual(categoryDetail)
         categoryInfoDAO.updateCategoryInternet(categoryName, allBlocked)
+    }
+
+    fun updateCategoryDetails(categoryName: String, blockedCount: Int, isInternetBlocked: Boolean) {
+        // Update the current blocked count for the category.
+        categoryInfoDAO.updateBlockedCount(categoryName, blockedCount)
+        // Get the details of the category, this is to check if the blocked need to be updated.
+        val categoryDetail = categoryInfoDAO.getCategoryDetail(categoryName)
+        // Update the internetBlocked only if the isInternetBlocked is true and all the apps are blocked.
+        val blocked = isAppCountEqual(categoryDetail) && isInternetBlocked
+        categoryInfoDAO.updateCategoryInternet(categoryName, blocked)
     }
 
     private fun isAppCountEqual(categoryInfo: CategoryInfo): Boolean {

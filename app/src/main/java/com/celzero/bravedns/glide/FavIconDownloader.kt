@@ -46,20 +46,20 @@ class FavIconDownloader(val context: Context, val url: String) : Runnable {
     }
 
 
-    private fun updateImage(url: String, cacheKey: String, retry: Boolean) {
+    private fun updateImage(url: String, subUrl: String, retry: Boolean) {
         val futureTarget: FutureTarget<File> = GlideApp.with(
             context.applicationContext).downloadOnly().diskCacheStrategy(
             DiskCacheStrategy.AUTOMATIC).load(url).submit(SIZE_ORIGINAL, SIZE_ORIGINAL)
         try {
             val file = futureTarget.get()
             if (DEBUG) Log.d(LOG_TAG_DNS_LOG,
-                             "Glide - success() -$url, $cacheKey, ${file.absoluteFile}")
+                             "Glide - success() -$url, $subUrl, ${file.absoluteFile}")
         } catch (e: Exception) {
             // In case of failure the FutureTarget will throw an exception.
             // Will initiate the download of fav icon for the top level domain.
             if (retry) {
                 if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - onLoadFailed() -$url")
-                updateImage(cacheKey, "", false)
+                updateImage(subUrl, "", false)
             }
             Log.e(LOG_TAG_DNS_LOG,
                   "Glide - Got ExecutionException waiting for background downloadOnly ${e.message}",

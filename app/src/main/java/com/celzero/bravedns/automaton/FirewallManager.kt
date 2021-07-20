@@ -22,6 +22,7 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
+import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnControllerHelper.persistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable
@@ -65,7 +66,6 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
             }
 
             appInfo.isInternetAllowed = isAllowed
-            GlobalVariable.appList[packageName] = appInfo
         }
 
         fun updateAppInternetPermissionByUID(uid: Int, isInternetAllowed: Boolean) {
@@ -73,7 +73,11 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
             else GlobalVariable.blockedUID[uid] = isInternetAllowed
         }
 
-        fun updateInternetBackground(packageName: String, isAllowed: Boolean) {
+        fun updateGlobalAppInfoEntry(packageName: String, appInfo: AppInfo?) {
+            if (appInfo != null) GlobalVariable.appList[packageName] = appInfo
+        }
+
+        fun updateInternetBackground(packageName: String?, isAllowed: Boolean) {
             val appInfo = GlobalVariable.appList[packageName]
             if (appInfo == null) {
                 Log.i(LOG_TAG_FIREWALL,
@@ -81,7 +85,7 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
                 return
             }
 
-            val isAppUid = AndroidUidConfig.isUIDAppRange(appInfo.uid)
+            val isAppUid = AndroidUidConfig.isUidAppRange(appInfo.uid)
             if (DEBUG) Log.d(LOG_TAG_FIREWALL,
                              "AccessibilityEvent: Update Internet Permission from background: ${appInfo.packageInfo}, isAllowed- $isAllowed, isAppUid - $isAppUid")
             if (isAllowed && isAppUid) {
@@ -96,7 +100,6 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
                 GlobalVariable.appList.forEach {
                     if (it.value.appCategory == categoryName && !it.value.whiteListUniv1) {
                         it.value.isInternetAllowed = isAllowed
-                        GlobalVariable.appList[it.key] = it.value
                         persistentState.modifyAllowedWifi(it.key, isAllowed)
                         updateAppInternetPermissionByUID(it.value.uid, isAllowed)
                     }
@@ -105,7 +108,7 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
         }
     }
 
-
+    // FIXME - Fix the way top-window stack is maintained for purposes of blocking apps not in the foreground.
     fun onAccessibilityEvent(event: AccessibilityEvent,
                              rootInActiveWindow: AccessibilityNodeInfo?) {
         packageManager = accessibilityService.packageManager
@@ -208,6 +211,6 @@ class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
 
         val currentPackage = latestTrackedPackage
         packageElect = currentPackage
-        updateInternetBackground(currentPackage!!, isAllowed)
+        updateInternetBackground(currentPackage, isAllowed)
     }
 }

@@ -18,6 +18,7 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.pm.PackageInfo
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -26,6 +27,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.databinding.LayoutApkItemBinding
 import com.celzero.bravedns.ui.BottomSheetFragment
+import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities
 import java.util.*
 import kotlin.collections.ArrayList
@@ -99,9 +101,13 @@ class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) 
                     pos++
                 }
 
+                if (context !is FragmentActivity) {
+                    Log.w(LoggerConstants.LOG_TAG_UI,
+                          "Can not open bottom sheet. Context is not attached to activity")
+                    return@setOnClickListener
+                }
                 val bottomSheetFragment = BottomSheetFragment(apkList[bindingAdapterPosition])
-                val frag = context as FragmentActivity
-                bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
+                bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
             }
         }
     }

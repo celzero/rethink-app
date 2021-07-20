@@ -20,6 +20,7 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.DNSCryptRelayEndpointDAO
+import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class DNSCryptRelayEndpointViewModel(
         private val dnsCryptRelayEndpointDAO: DNSCryptRelayEndpointDAO) : ViewModel() {
@@ -32,7 +33,8 @@ class DNSCryptRelayEndpointViewModel(
 
     var dnsCryptRelayEndpointList = Transformations.switchMap(filteredList) { input ->
         if (input.isBlank()) {
-            dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveData().toLiveData(pageSize = 50)
+            dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveData().toLiveData(
+                pageSize = LIVEDATA_PAGE_SIZE)
         } else {
             dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveDataByName("%$input%").toLiveData(
                 pageSize = 50)

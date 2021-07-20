@@ -25,10 +25,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallRules
+import com.celzero.bravedns.automaton.FirewallRules.UID_EVERYBODY
 import com.celzero.bravedns.database.BlockedConnections
 import com.celzero.bravedns.database.BlockedConnectionsRepository
 import com.celzero.bravedns.databinding.UnivWhitelistRulesItemBinding
-import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -72,7 +72,7 @@ class UniversalBlockedRulesAdapter(private val context: Context,
             }
         }
 
-        private fun showDialogForDelete(blockedConnections: BlockedConnections?) {
+        private fun showDialogForDelete(blockedConnections: BlockedConnections) {
             val builder = AlertDialog.Builder(context)
             builder.setTitle(R.string.univ_firewall_dialog_title)
             builder.setMessage(R.string.univ_firewall_dialog_message)
@@ -80,13 +80,9 @@ class UniversalBlockedRulesAdapter(private val context: Context,
             builder.setPositiveButton(
                 context.getString(R.string.univ_ip_delete_individual_positive)) { _, _ ->
 
-                if (blockedConnections == null) return@setPositiveButton
-
                 CoroutineScope(Dispatchers.IO).launch {
-                    val firewallRules = FirewallRules.getInstance()
-                    firewallRules.removeFirewallRules(
-                        ConnTrackerBottomSheetFragment.UNIVERSAL_RULES_UID,
-                        blockedConnections.ipAddress!!, blockedConnectionsRepository)
+                    FirewallRules.removeFirewallRules(UID_EVERYBODY, blockedConnections.ipAddress,
+                                                      blockedConnectionsRepository)
                 }
                 Toast.makeText(context, context.getString(R.string.univ_ip_delete_individual_toast,
                                                           blockedConnections.ipAddress),

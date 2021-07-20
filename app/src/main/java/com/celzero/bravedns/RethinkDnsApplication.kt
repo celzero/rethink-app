@@ -37,8 +37,8 @@ class RethinkDnsApplication : Application() {
 
     private fun turnOnStrictMode() {
         if (!BuildConfig.DEBUG) return
-        // Uncomment the code below to enable the strict mode for app while in DEBUG mode.
-        // Strict mode for disk read/writes, network access.
+        // Uncomment the code below to enable the StrictModes.
+        // To test the apps disk read/writes, network usages.
         /*StrictMode.setThreadPolicy(
             StrictMode.ThreadPolicy.Builder()
             .detectAll()

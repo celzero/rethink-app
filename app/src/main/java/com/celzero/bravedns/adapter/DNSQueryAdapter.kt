@@ -37,13 +37,13 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DNSLogs
 import com.celzero.bravedns.databinding.TransactionRowBinding
 import com.celzero.bravedns.glide.GlideApp
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.DNSBlockListBottomSheetFragment
+import com.celzero.bravedns.ui.DNSBlocklistBottomSheetFragment
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 
 
-class DNSQueryAdapter(val context: Context, private val persistentState: PersistentState) :
+class DNSQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
         PagedListAdapter<DNSLogs, DNSQueryAdapter.TransactionViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -57,8 +57,6 @@ class DNSQueryAdapter(val context: Context, private val persistentState: Persist
                                             newConnection: DNSLogs) = oldConnection == newConnection
         }
     }
-
-    private val favIcon = persistentState.fetchFavIcon
 
     override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
         val dnsLog: DNSLogs = getItem(position) ?: return
@@ -77,7 +75,7 @@ class DNSQueryAdapter(val context: Context, private val persistentState: Persist
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
         val itemBinding = TransactionRowBinding.inflate(LayoutInflater.from(parent.context), parent,
                                                         false)
-        return TransactionViewHolder(itemBinding, favIcon)
+        return TransactionViewHolder(itemBinding, loadFavIcon)
     }
 
 
@@ -130,9 +128,13 @@ class DNSQueryAdapter(val context: Context, private val persistentState: Persist
         }
 
         private fun openBottomSheet(dnsLog: DNSLogs) {
-            val bottomSheetFragment = DNSBlockListBottomSheetFragment(context, dnsLog)
-            val frag = context as FragmentActivity
-            bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
+            if (context !is FragmentActivity) {
+                Log.w(LoggerConstants.LOG_TAG_UI,
+                      "Can not open bottom sheet. Context is not attached to activity")
+                return
+            }
+            val bottomSheetFragment = DNSBlocklistBottomSheetFragment(context, dnsLog)
+            bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
 
         /**

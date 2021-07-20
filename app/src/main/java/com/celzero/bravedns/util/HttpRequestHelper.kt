@@ -49,7 +49,9 @@ class HttpRequestHelper {
                 }
 
                 override fun onResponse(call: Call, response: Response) {
-                    val stringResponse = response.body!!.string()
+                    val stringResponse = response.body?.string()
+                    if (stringResponse.isNullOrEmpty()) return
+
                     val json = JSONObject(stringResponse)
                     val version = json.optInt(JSON_VERSION)
                     val shouldUpdate = json.getBoolean(JSON_UPDATE)

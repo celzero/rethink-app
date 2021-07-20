@@ -43,12 +43,9 @@ class DNSCryptRelayEndpoint {
     constructor(id: Int, dnsCryptRelayName: String, dnsCryptRelayURL: String,
                 dnsCryptRelayExplanation: String, isSelected: Boolean, isCustom: Boolean,
                 modifiedDataTime: Long, latency: Int) {
-
-        // Insert methods treat 0 as not-set while inserting the item.
-        // The below check is for manual insert of the default Doh entities.
-        // For every other entries the id is assigned as -1 so that the
-        // autoGenerate parameter will generate the id accordingly.
-        if (id != -1) this.id = id
+        // Room auto-increments id when its set to zero.
+        // A non-zero id overrides and sets caller-specified id instead.
+        this.id = id
         this.dnsCryptRelayName = dnsCryptRelayName
         this.dnsCryptRelayURL = dnsCryptRelayURL
         this.dnsCryptRelayExplanation = dnsCryptRelayExplanation

@@ -30,7 +30,7 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
         }
     }
 
-    fun insertAsync(connectionTracker: ConnectionTracker) {
+    fun insert(connectionTracker: ConnectionTracker) {
         connectionTrackerDAO.insert(connectionTracker)
     }
 

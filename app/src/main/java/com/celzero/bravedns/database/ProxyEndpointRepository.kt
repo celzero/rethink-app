@@ -73,7 +73,7 @@ class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
         return proxyEndpointDAO.getCount()
     }
 
-    fun getConnectedProxy(): ProxyEndpoint {
+    fun getConnectedProxy(): ProxyEndpoint? {
         return proxyEndpointDAO.getConnectedProxy()
     }
 

@@ -23,10 +23,10 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import java.io.File
 
-class DownloadHelper {
+class BlocklistDownloadHelper {
 
     companion object {
-        fun isLocalDownloadValid(context: Context, timestamp: String): Boolean {
+        fun isDownloadComplete(context: Context, timestamp: String): Boolean {
             var result = false
             var total: Int? = 0
             var dir: File? = null
@@ -34,8 +34,7 @@ class DownloadHelper {
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Local block list validation: $timestamp")
                 dir = File(getExternalFilePath(context, timestamp))
                 total = if (dir.isDirectory) {
-                    val children = dir.list()
-                    children?.size
+                    dir.list()?.size
                 } else {
                     0
                 }
@@ -65,8 +64,11 @@ class DownloadHelper {
 
         private fun deleteRecursive(fileOrDirectory: File) {
             try {
-                if (fileOrDirectory.isDirectory) for (child in fileOrDirectory.listFiles()!!) deleteRecursive(
-                    child)
+                if (fileOrDirectory.isDirectory) {
+                    fileOrDirectory.listFiles()?.forEach { child ->
+                        deleteRecursive(child)
+                    }
+                }
                 val isDeleted: Boolean = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     fileOrDirectory.deleteRecursively()
                 } else {
@@ -80,16 +82,17 @@ class DownloadHelper {
         }
 
         fun deleteFromCanonicalPath(context: Context) {
-            val canonicalPath = File("${context.filesDir.canonicalPath}/")
+            val canonicalPath = File("${context.filesDir.canonicalPath}${File.separator}")
             deleteRecursive(canonicalPath)
         }
 
-        fun getExternalFilePath(context: Context?, timestamp: String): String {
-            if (context == null) {
-                return Constants.DOWNLOAD_PATH + File.separator + timestamp + File.separator
-            }
+        fun getExternalFilePath(context: Context, timestamp: String): String {
             return context.getExternalFilesDir(
                 null).toString() + Constants.DOWNLOAD_PATH + File.separator + timestamp + File.separator
+        }
+
+        fun getExternalFilePath(timestamp: String): String {
+            return Constants.DOWNLOAD_PATH + File.separator + timestamp + File.separator
         }
     }
 

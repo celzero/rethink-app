@@ -29,13 +29,13 @@ import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
 
-class NonStoreAppUpdater(private val baseURL: String,
+class NonStoreAppUpdater(private val baseUrl: String,
                          private val persistentState: PersistentState) : AppUpdater {
 
     override fun checkForAppUpdate(isUserInitiated: Boolean, activity: Activity,
                                    listener: AppUpdater.InstallStateListener) {
-        Log.i(LOG_TAG_APP_UPDATE, "Beginning update check.")
-        val url = baseURL + BuildConfig.VERSION_CODE
+        Log.i(LOG_TAG_APP_UPDATE, "Beginning update check")
+        val url = baseUrl + BuildConfig.VERSION_CODE
 
         val client = OkHttpClient()
         val request = Request.Builder().url(url).build()
@@ -61,7 +61,7 @@ class NonStoreAppUpdater(private val baseURL: String,
                     response.close()
                     client.connectionPool.evictAll()
                     Log.i(LOG_TAG_APP_UPDATE,
-                          "Server response for the new version download is $shouldUpdate (json version - $version), version number-  $latest")
+                          "Server response for the new version download is $shouldUpdate (json version: $version), version number:  $latest")
 
                     if (version != RESPONSE_VERSION) {
                         if (isUserInitiated) {

@@ -143,6 +143,10 @@
 
     <string name="status_protected_with_tor">protected with tor</string>
 
+    <string name="status_protected_with_private_dns">protected with private dns</string>
+
+    <string name="status_protected_with_tor_private_dns">protected with tor and private dns</string>
+
     <string name="explanation_protected" description="Expanded form of status_protected">
     Your connection is protected from DNS attacks.
     </string>
@@ -341,6 +345,7 @@
 
     <string name="dns_act_configure_tab">Configure</string>
     <string name="dns_act_log">Logs</string>
+    <string name="dns_act_home">Home</string>
 
     <string name="univ_firewall_dialog_title">Delete IP Rule?</string>
     <string name="univ_firewall_dialog_message">Deleting this rule would allow any app to connect to this IP. Do you want to proceed?</string>
@@ -492,6 +497,7 @@
     <string name="settings_vpn_heading_disabled">VPN &amp; Proxy (disabled)</string>
 
     <string name="info_dialog_copy_toast_msg">IP address copied.</string>
+    <string name="info_dialog_url_copy_toast_msg">URL copied</string>
 
     <string name="settings_enable_logs_desc">Store DNS and Firewall logs locally on-device.</string>
     <string name="settings_enable_logs">Enable on-device logging</string>
@@ -519,12 +525,6 @@
     <string name="settings_firewall_header">FIREWALL</string>
     <string name="settings_kill_app_heading">Kill app when firewalled (experimental)</string>
     <string name="settings_kill_app_desc">Some stubborn apps persistently try to connect to the internet even when firewalled. Enable this setting to kill such apps.</string>
-
-    <string name="settings_dns_header">DNS</string>
-    <string name="settings_local_blocklist_heading">Enable on-device blocklists</string>
-    <string name="settings_local_blocklist_desc_1">Choose from 170+ blocklists.</string>
-    <string name="settings_local_blocklist_configure">configure</string>
-    <string name="settings_local_blocklist_update">Update</string>
 
     <string name="settings_exclude_app_heading">Exclude apps from Firewall and DNS</string>
     <string name="settings_exclude_app_desc">Connections from excluded apps will not monitored or blocked.</string>
@@ -618,29 +618,13 @@
 
     <string name="settings_network_header">NETWORK</string>
     <string name="settings_network_all_networks">Use all available networks (experimental)</string>
-    <string name="settings_network_all_networks_desc">When enabled, RethinkDNS uses all available networks to connect to the Internet. If not, it uses the one network, whichever is deemed active by Android.</string>
-
-    <string name="settings_local_blocklist_desc1">Choose from 170+ blocklists.</string>
-    <string name="settings_local_blocklist_desc2">Download in progress…</string>
-    <string name="settings_local_blocklist_desc3">Download completed, Configure blocklist</string>
-    <string name="settings_local_blocklist_desc4">Error downloading file. Try again.</string>
-    <string name="settings_local_blocklist_desc5">Configure blocklists</string>
-    <string name="settings_local_blocklist_desc6">No list configured.</string>
-    <string name="settings_local_blocklist_in_use">%1$s blocklists are in-use.</string>
-    <string name="settings_local_blocklist_toast_default">Blocklists are up-to-date.</string>
-    <string name="settings_local_blocklist_dialog_positive">Download</string>
-    <string name="settings_local_blocklist_dialog_negative">Cancel</string>
-    <string name="settings_local_blocklist_download_success">Blocklists downloaded successfully.</string>
-    <string name="settings_local_blocklist_version">Version: v%1$s</string>
+    <string name="settings_network_all_networks_desc">When enabled, RethinkDNS uses all available networks to connect to Internet. If not, it uses whichever network is deemed <i>active</i> by Android.</string>
 
     <string name="settings_sync_app_details_desc">Re-sync in progress…</string>
     <string name="settings_sync_app_details_desc_completed">Re-sync completed</string>
 
     <string name="settings_check_update_heading">Check for app updates</string>
     <string name="settings_check_update_desc">Automatically check for app updates once a week.</string>
-
-    <string name="settings_fav_icon_heading">Show website icon in DNS logs</string>
-    <string name="settings_fav_icon_desc">Fetches website icons from <i>duckduckgo.com</i>.</string>
 
     <string name="settings_theme_heading">Appearance</string>
     <string name="settings_theme_desc">Dark/light theme</string>
@@ -684,16 +668,16 @@
     <string name="settings_theme_dialog_themes_3">Dark</string>
     <string name="settings_theme_dialog_themes_4">True Black</string>
 
-    <string name="settings_notification_heading">Choose Notification Action</string>
-    <string name="settings_notification_desc">Choose which action buttons to show with the RethinkDNS notification: %1$s</string>
+    <string name="settings_notification_heading">Choose notification action</string>
+    <string name="settings_notification_desc">Action buttons to show with the RethinkDNS notification: %1$s</string>
     <string name="settings_notification_desc1">Stop (default)</string>
     <string name="settings_notification_desc2">DNS / DNS + Firewall</string>
     <string name="settings_notification_desc3">None</string>
 
-    <string name="settings_notification_dialog_title">Choose Notification Action</string>
+    <string name="settings_notification_dialog_title">Choose notification action</string>
     <string name="settings_notification_dialog_option_1">\nStop (default):\nShows one button, tapping on which stops RethinkDNS.\n</string>
     <string name="settings_notification_dialog_option_2">\nDNS / DNS + Firewall:\nShows two buttons to quickly switch between the battery-saver DNS mode and the regular DNS + Firewall mode.\n</string>
-    <string name="settings_notification_dialog_option_3">None:\nShows no button.</string>
+    <string name="settings_notification_dialog_option_3">None:\nShows no button.\n\n</string>
 
     <string name="settings_selected_theme">Current theme: %1$s</string>
 
@@ -991,5 +975,38 @@
     <string name="dns_proxy_toast_parameter">DNS Proxy</string>
     <string name="socks5_proxy_toast_parameter">SOCKS5 Proxy</string>
     <string name="orbot_toast_parameter">Tor-as-a-proxy</string>
+
+    <string name="copy_clipboard_label">URL</string>
+
+    <string name="update_complete_snack_message">New version downloaded.</string>
+    <string name="update_complete_action_snack">RESTART</string>
+
+    <string name="settings_local_blockList_desc1">Choose from 170+ blocklists.</string>
+    <string name="settings_local_blocklist_desc2">Download in progress…</string>
+    <string name="settings_local_blocklist_desc3">Download completed, Configure blocklist</string>
+    <string name="settings_local_blocklist_desc4">Error downloading file. Try again.</string>
+    <string name="settings_local_blocklist_desc5">Configure blocklists</string>
+    <string name="settings_local_blocklist_desc6">No list configured.</string>
+    <string name="settings_local_blocklist_in_use">%1$s blocklists are in-use.</string>
+    <string name="settings_local_blocklist_toast_default">Blocklists are up-to-date.</string>
+    <string name="settings_local_blocklist_dialog_positive">Download</string>
+    <string name="settings_local_blocklist_dialog_negative">Cancel</string>
+    <string name="settings_local_blocklist_download_success">Blocklists downloaded successfully.</string>
+    <string name="settings_local_blocklist_version">Version: v%1$s</string>
+
+    <string name="settings_fav_icon_heading">Show website icon in DNS logs</string>
+    <string name="settings_fav_icon_desc">Fetches website icons from <i>duckduckgo.com</i>.</string>
+
+    <string name="settings_dns_header">DNS</string>
+    <string name="settings_local_blocklist_heading">Enable on-device blocklists</string>
+    <string name="settings_local_blocklist_desc_1">Choose from 170+ blocklists.</string>
+    <string name="settings_local_blocklist_configure">configure</string>
+    <string name="settings_local_blocklist_update">Update</string>
+
+    <string name="accessibility_notification_title">Action Required</string>
+    <string name="accessibility_notification_content">RethinkDNS accessibility service has stopped or crashed.</string>
+    <string name="accessibility_notification_action_positive">DETAILS</string>
+
+    <string name="accessibility_failure_intent_text">ACCESSIBILITY_FAILURE</string>
 
 </resources>

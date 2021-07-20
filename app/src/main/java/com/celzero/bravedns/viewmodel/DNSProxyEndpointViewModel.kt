@@ -20,6 +20,7 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.DNSProxyEndpointDAO
+import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class DNSProxyEndpointViewModel(private val dnsProxyEndpointDAO: DNSProxyEndpointDAO) :
         ViewModel() {
@@ -32,10 +33,11 @@ class DNSProxyEndpointViewModel(private val dnsProxyEndpointDAO: DNSProxyEndpoin
 
     var dnsProxyEndpointList = Transformations.switchMap(filteredList) { input ->
         if (input.isBlank()) {
-            dnsProxyEndpointDAO.getDNSProxyEndpointLiveData().toLiveData(pageSize = 50)
+            dnsProxyEndpointDAO.getDNSProxyEndpointLiveData().toLiveData(
+                pageSize = LIVEDATA_PAGE_SIZE)
         } else {
             dnsProxyEndpointDAO.getDNSProxyEndpointLiveDataByType("%$input%").toLiveData(
-                pageSize = 50)
+                pageSize = LIVEDATA_PAGE_SIZE)
         }
     }
 

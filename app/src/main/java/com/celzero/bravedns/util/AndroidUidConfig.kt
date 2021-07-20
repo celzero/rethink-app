@@ -1,25 +1,25 @@
 /*
-Copyright 2020 RethinkDNS and its authors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2021 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.celzero.bravedns.util
 
 import android.util.Log
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 
-// https://android.googlesource.com/platform/development/+/da84168fb2f5eb5ca012c3f430f701bc64472f34/ndk/platforms/android-21/include/linux/in.h
+// https://android.googlesource.com/platform/system/core/+/4489ee0a190ad488df8ed9be545986a46c86148e/libcutils/include/private/android_filesystem_config.h
 enum class AndroidUidConfig(val uid: Int) {
     ANDROID(0),//Modified as ANDROID instead of ROOT
     DAEMON(1),
@@ -110,15 +110,6 @@ enum class AndroidUidConfig(val uid: Int) {
     CACHE(2001),
     DIAG(2002),
 
-    /*
-    (The(range(2900-2999(is(reserved(for(the(vendor(partition(
-    /*(Note(that(the(two('OEM'(ranges(pre-dated(the(vendor(partition,(so(they(take(the(legacy('OEM'),
-    (*(name.(Additionally,(they(pre-dated(passwd/group(files,(so(there(are(users(and(groups(named(oem_#),
-    (*(created(automatically(for(all(values(in(these(ranges.If(there(is(a(user/group(in(a(passwd/group),
-    (*(file(corresponding(to(this(range,(both(the(oem_#(and(user/group(names(will(resolve(to(the(same),
-    (*(value.(
-    */
-     */
     OEM_RESERVED_START(2900),
     OEM_RESERVED_END(2999),
 
@@ -134,23 +125,18 @@ enum class AndroidUidConfig(val uid: Int) {
     WAKELOCK(3010),
     UHID(3011),
 
-    /*(The(range(5000-5999(is(also(reserved(for(vendor(partition.( */
     OEM_RESERVED_2_START(5000),
     OEM_RESERVED_2_END(5999),
 
-    /*(The(range(6000-6499(is(reserved(for(the(system(partition.(*/
     SYSTEM_RESERVED_START(6000),
     SYSTEM_RESERVED_END(6499),
 
-    /*(The(range(6500-6999(is(reserved(for(the(odm(partition.(*/
     ODM_RESERVED_START(6500),
     ODM_RESERVED_END(6999),
 
-    /*(The(range(7000-7499(is(reserved(for(the(product(partition.(*/
     PRODUCT_RESERVED_START(7000),
     PRODUCT_RESERVED_END(7499),
 
-    /*(The(range(7500-7999(is(reserved(for(the(system_ext(partition.(*/
     SYSTEM_EXT_RESERVED_START(7500),
     SYSTEM_EXT_RESERVED_END(7999),
 
@@ -177,8 +163,6 @@ enum class AndroidUidConfig(val uid: Int) {
 
     OVERFLOWUID(65534),
 
-    /*(use(the(ranges(below(to(determine(whether(a(process(is(isolated(
-    * ((start(of(uids(for(fully(isolated(sandboxed(processes(*/
     ISOLATED_START(90000),
     ISOLATED_END(99999),
 
@@ -190,13 +174,13 @@ enum class AndroidUidConfig(val uid: Int) {
     companion object {
         private val map = values().associateBy(AndroidUidConfig::uid)
 
-        fun fromFileSystemUID(uid: Int): AndroidUidConfig {
+        fun fromFileSystemUid(uid: Int): AndroidUidConfig {
             if (DEBUG) Log.d(LOG_TAG_FIREWALL,
                              "UID: $uid, hashed val : ${uid.hashCode()}, map Vale: ${map[uid.hashCode()]}")
             return map[uid.hashCode()] ?: OTHER
         }
 
-        fun isUIDAppRange(uid: Int): Boolean {
+        fun isUidAppRange(uid: Int): Boolean {
             return (uid >= APP_START.uid && uid <= APP_END.uid)
         }
 

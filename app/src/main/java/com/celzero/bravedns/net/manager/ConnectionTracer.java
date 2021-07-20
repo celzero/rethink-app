@@ -83,8 +83,7 @@ public class ConnectionTracer {
         int uid = INVALID_UID;
         String key = protocol + local.getAddress().getHostAddress() + remote.getAddress().getHostAddress();
         try {
-            int value = uidCache.getIfPresent(key);
-            return value;
+            return uidCache.getIfPresent(key);
         } catch (Exception ignored) {
         }
 

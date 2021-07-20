@@ -20,8 +20,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "AppInfo")
 class AppInfo {
-    // packageInfo - wrongly named instead of packageName, consider changing
-    // the name as packageName as part of migration.
+    // packageInfo is infact a packageName which is wrongly named.
+    // Renaming involves migration.
     @PrimaryKey var packageInfo: String = ""
     var appName: String = ""
     var uid: Int = 0
@@ -48,6 +48,10 @@ class AppInfo {
 
     override fun hashCode(): Int {
         return this.packageInfo.hashCode()
+    }
+
+    fun canFirewall(): Boolean {
+        return !this.whiteListUniv1 || !this.isExcluded
     }
 
 }

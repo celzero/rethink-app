@@ -49,7 +49,6 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     private val b by viewBinding(ActivityConnectionTrackerBinding::bind)
 
     private var layoutManager: RecyclerView.LayoutManager? = null
-    private var recyclerAdapter: ConnectionTrackerAdapter? = null
     private val viewModel: ConnectionTrackerViewModel by viewModel()
     private var filterValue: String = ""
     private var checkedItem = 1
@@ -57,13 +56,13 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     private val connectionTrackerDAO by inject<ConnectionTrackerDAO>()
     private val persistentState by inject<PersistentState>()
 
+    companion object {
+        fun newInstance() = ConnectionTrackerFragment()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
-    }
-
-    companion object {
-        fun newInstance() = ConnectionTrackerFragment()
     }
 
     private fun initView() {
@@ -76,10 +75,9 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
             includeView.recyclerConnection.setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
             includeView.recyclerConnection.layoutManager = layoutManager
-
-            recyclerAdapter = ConnectionTrackerAdapter(requireContext())
+            val recyclerAdapter = ConnectionTrackerAdapter(requireContext())
             viewModel.connectionTrackerList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
-                recyclerAdapter!!::submitList))
+                recyclerAdapter::submitList))
             includeView.recyclerConnection.adapter = recyclerAdapter
         } else {
             includeView.connectionListLogsDisabledTv.visibility = View.VISIBLE
@@ -94,27 +92,25 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         }
 
         includeView.connectionFilterIcon.setOnClickListener {
-            showDialogForFilter()
+            showFilterDialog()
         }
 
         includeView.connectionDeleteIcon.setOnClickListener {
-            showDialogForDelete()
+            showDeleteDialog()
         }
-
-
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        viewModel.setFilter(query!!, filterValue)
+        viewModel.setFilter(query, filterValue)
         return true
     }
 
     override fun onQueryTextChange(query: String?): Boolean {
-        viewModel.setFilter(query!!, filterValue)
+        viewModel.setFilter(query, filterValue)
         return true
     }
 
-    private fun showDialogForFilter() {
+    private fun showFilterDialog() {
 
         val singleItems = arrayOf(getString(R.string.filter_network_blocked_connections),
                                   getString(R.string.filter_network_all_connections))
@@ -137,7 +133,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     }
 
 
-    private fun showDialogForDelete() {
+    private fun showDeleteDialog() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle(R.string.conn_track_clear_logs_title)
         builder.setMessage(R.string.conn_track_clear_logs_message)

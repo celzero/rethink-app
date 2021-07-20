@@ -17,8 +17,9 @@ limitations under the License.
 package com.celzero.bravedns.adapter
 
 import android.app.Activity
-import android.content.*
-import android.os.CountDownTimer
+import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -30,6 +31,7 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
+import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.database.DoHEndpointRepository
 import com.celzero.bravedns.databinding.DohEndpointListItemBinding
@@ -37,9 +39,8 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.QueryTracker
 import com.celzero.bravedns.ui.DNSConfigureWebViewActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appMode
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOCATION_INTENT_EXTRA
+import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DOH
 import com.celzero.bravedns.util.Constants.Companion.STAMP_INTENT_EXTRA
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.UIUpdateInterface
@@ -53,14 +54,14 @@ import xdns.Xdns.getBlocklistStampFromURL
 
 class DoHEndpointAdapter(private val context: Context,
                          private val doHEndpointRepository: DoHEndpointRepository,
-                         private val persistentState: PersistentState,
+                         private val persistentState: PersistentState, private val appMode: AppMode,
                          private val queryTracker: QueryTracker, val listener: UIUpdateInterface) :
         PagedListAdapter<DoHEndpoint, DoHEndpointAdapter.DoHEndpointViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DoHEndpoint>() {
             override fun areItemsTheSame(oldConnection: DoHEndpoint,
-                                         newConnection: DoHEndpoint) = oldConnection.id == newConnection.id
+                                         newConnection: DoHEndpoint) = (oldConnection.id == newConnection.id && oldConnection.isSelected == newConnection.isSelected)
 
             override fun areContentsTheSame(oldConnection: DoHEndpoint,
                                             newConnection: DoHEndpoint) = oldConnection == newConnection
@@ -86,10 +87,10 @@ class DoHEndpointAdapter(private val context: Context,
         fun update(endpoint: DoHEndpoint) {
             displayDetails(endpoint)
 
-            clickListeners(endpoint)
+            setupClickListeners(endpoint)
         }
 
-        private fun clickListeners(endpoint: DoHEndpoint) {
+        private fun setupClickListeners(endpoint: DoHEndpoint) {
             b.root.setOnClickListener {
                 updateConnection(endpoint)
             }
@@ -132,24 +133,24 @@ class DoHEndpointAdapter(private val context: Context,
         private fun configureRethinkEndpoint(endpoint: DoHEndpoint) {
             val stamp = getRemoteBlocklistStamp(endpoint.dohURL)
             if (DEBUG) Log.d(LOG_TAG_DNS,
-                             "startActivityForResult - DohEndpointadapter with DoHURL: ${endpoint.dohURL},and stamp: $stamp")
+                             "calling configure webview activity with doh url: ${endpoint.dohURL},and stamp: $stamp")
             startConfigureBlocklistActivity(stamp)
         }
 
-        private fun startConfigureBlocklistActivity(stamp: String?) {
+        private fun startConfigureBlocklistActivity(stamp: String) {
             val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
             intent.putExtra(LOCATION_INTENT_EXTRA, DNSConfigureWebViewActivity.REMOTE)
             intent.putExtra(STAMP_INTENT_EXTRA, stamp)
             (context as Activity).startActivityForResult(intent, Activity.RESULT_OK)
         }
 
-        private fun getRemoteBlocklistStamp(url: String): String? {
+        private fun getRemoteBlocklistStamp(url: String): String {
             // Interacts with GO lib to fetch the stamp (Xdnx#getBlocklistStampFromURL)
             return try {
                 getBlocklistStampFromURL(url)
             } catch (e: Exception) {
-                Log.w(LOG_TAG_DNS, "Failure fetching stamp from Go ${e.message}", e)
-                null
+                Log.w(LOG_TAG_DNS, "failure fetching stamp from Go ${e.message}", e)
+                ""
             }
         }
 
@@ -177,7 +178,7 @@ class DoHEndpointAdapter(private val context: Context,
             val stamp = getRemoteBlocklistStamp(endpoint.dohURL)
             if (DEBUG) Log.d(LOG_TAG_DNS, "stamp for remote endpoint- $stamp")
             if (stamp.isNullOrEmpty()) {
-                showDialogToConfigure()
+                showDohConfigureDialog()
                 b.dohEndpointListCheckImage.isChecked = false
             } else {
                 updateDoHDetails(endpoint)
@@ -186,12 +187,12 @@ class DoHEndpointAdapter(private val context: Context,
         }
 
         private fun showExplanationOnImageClick(endpoint: DoHEndpoint) {
-            if (endpoint.isDeletable()) showDialogToDelete(endpoint)
-            else showDialogExplanation(endpoint.dohName, endpoint.dohURL, endpoint.dohExplanation)
+            if (endpoint.isDeletable()) showDeleteDnsDialog(endpoint)
+            else showDohMetadataDialog(endpoint.dohName, endpoint.dohURL, endpoint.dohExplanation)
         }
 
 
-        private fun showDialogExplanation(title: String, url: String, message: String?) {
+        private fun showDohMetadataDialog(title: String, url: String, message: String?) {
             val builder = AlertDialog.Builder(context)
             builder.setTitle(title)
             builder.setMessage(url + "\n\n" + message)
@@ -203,19 +204,17 @@ class DoHEndpointAdapter(private val context: Context,
             builder.setNeutralButton(
                 context.getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
 
-                val clipboard: ClipboardManager? = context.getSystemService(
-                    Context.CLIPBOARD_SERVICE) as ClipboardManager?
-                val clip = ClipData.newPlainText("URL", url)
-                clipboard?.setPrimaryClip(clip)
+                Utilities.clipboardCopy(context, url,
+                                        context.getString(R.string.copy_clipboard_label))
                 Utilities.showToastUiCentered(context, context.getString(
-                    R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
+                    R.string.info_dialog_url_copy_toast_msg), Toast.LENGTH_SHORT)
             }
             val alertDialog: AlertDialog = builder.create()
             alertDialog.setCancelable(true)
             alertDialog.show()
         }
 
-        private fun showDialogToDelete(endpoint: DoHEndpoint) {
+        private fun showDeleteDnsDialog(endpoint: DoHEndpoint) {
             val builder = AlertDialog.Builder(context)
             builder.setTitle(R.string.doh_custom_url_remove_dialog_title)
             builder.setMessage(R.string.doh_custom_url_remove_dialog_message)
@@ -236,7 +235,7 @@ class DoHEndpointAdapter(private val context: Context,
             alertDialog.show()
         }
 
-        private fun showDialogToConfigure() {
+        private fun showDohConfigureDialog() {
             val builder = AlertDialog.Builder(context)
             builder.setTitle(R.string.doh_brave_pro_configure)
             builder.setMessage(R.string.doh_brave_pro_configure_desc)
@@ -257,21 +256,15 @@ class DoHEndpointAdapter(private val context: Context,
         private fun updateDoHDetails(endpoint: DoHEndpoint) {
             endpoint.isSelected = true
             doHEndpointRepository.removeConnectionStatus()
-            object : CountDownTimer(1000, 1000) {
-                override fun onTick(millisUntilFinished: Long) {
-                }
+            Utilities.delay(1000) {
+                notifyDataSetChanged()
+                appMode.onNewDnsConnected(PREF_DNS_MODE_DOH, Settings.DNSModePort)
+                queryTracker.reinitializeQuantileEstimator()
+            }
 
-                override fun onFinish() {
-                    notifyDataSetChanged()
-                    persistentState.dnsType = Constants.PREF_DNS_MODE_DOH
-                    persistentState.connectionModeChange = endpoint.dohURL
-                    persistentState.setConnectedDNS(endpoint.dohName)
-                    queryTracker.reinitializeQuantileEstimator()
-                }
-            }.start()
-            appMode?.setDNSMode(Settings.DNSModePort)
-            listener.updateUIFromAdapter(1)
+            listener.updateUIFromAdapter(PREF_DNS_MODE_DOH)
             doHEndpointRepository.updateAsync(endpoint)
         }
+
     }
 }

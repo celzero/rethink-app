@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.celzero.bravedns.util
 
+// https://android.googlesource.com/platform/development/+/da84168fb2f5eb5ca012c3f430f701bc64472f34/ndk/platforms/android-21/include/linux/in.h
 enum class Protocol(val protocolType: Int) {
     IP(0),
     ICMP(1),

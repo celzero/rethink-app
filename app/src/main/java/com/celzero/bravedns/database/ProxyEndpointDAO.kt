@@ -58,7 +58,7 @@ interface ProxyEndpointDAO {
     fun getCount(): Int
 
     @Query("select * from ProxyEndpoint where isSelected = 1")
-    fun getConnectedProxy(): ProxyEndpoint
+    fun getConnectedProxy(): ProxyEndpoint?
 
     @Query("select * from ProxyEndpoint where isSelected = 1 and proxyName = 'ORBOT'")
     fun getConnectedOrbotProxy(): ProxyEndpoint

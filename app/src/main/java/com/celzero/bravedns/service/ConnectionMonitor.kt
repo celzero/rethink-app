@@ -93,7 +93,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
     override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
         if (DEBUG) Log.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged")
-        handleNetworkChange()
+        handleNetworkChange(isForceUpdate = true)
     }
 
     /**
@@ -110,7 +110,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
      * Will be initiated when the VPN start is completed.
      */
     fun onVpnStarted() {
-        if (DEBUG) Log.d(LOG_TAG_CONNECTION, "new vpn is created force update the network")
+        Log.i(LOG_TAG_CONNECTION, "new vpn is created force update the network")
         handleNetworkChange(isForceUpdate = true)
     }
 
@@ -168,9 +168,9 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
 
             currentNetworks = newNetworks
-            Log.i(LOG_TAG_CONNECTION, "is Network connected?- ${
+            Log.i(LOG_TAG_CONNECTION, "Connected network- ${
                 connectivityManager.getNetworkInfo(newActiveNetwork)?.typeName.toString()
-            }, $isNewNetwork, force update is $isForceUpdate")
+            }, Is new network? $isNewNetwork, is force update? $isForceUpdate")
 
             if (!isNewNetwork && !isForceUpdate) return
 

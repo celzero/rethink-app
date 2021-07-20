@@ -23,6 +23,7 @@ import androidx.work.workDataOf
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_FILE_COUNT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.Utilities
@@ -62,45 +63,53 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
         return Result.failure()
     }
 
+    // Preferred approach is to move the file from external file path to canonical path.
+    // As move is a atomic operation.
+    // Android doesn't support move/rename if the both paths are not having same mount points.
+    // So files are copied from
     private fun copyFiles(context: Context): Boolean {
         try {
             val timestamp = persistentState.tempBlocklistDownloadTime
-            if (!DownloadHelper.isLocalDownloadValid(context, timestamp.toString())) {
+            if (!BlocklistDownloadHelper.isDownloadComplete(context, timestamp.toString())) {
                 return false
             }
 
-            DownloadHelper.deleteFromCanonicalPath(context)
-            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Copy file Directory isLocalDownloadValid- true")
-            val dir = File(DownloadHelper.getExternalFilePath(context, timestamp.toString()))
+            BlocklistDownloadHelper.deleteFromCanonicalPath(context)
+            val dir = File(
+                BlocklistDownloadHelper.getExternalFilePath(context, timestamp.toString()))
             if (!dir.isDirectory) {
+                Log.w(LOG_TAG_DOWNLOAD,
+                      "Abort: file download path ${dir.absolutePath} isn't a directory")
                 return false
             }
 
             val children = dir.list()
-
             if (children.isNullOrEmpty()) {
+                Log.w(LOG_TAG_DOWNLOAD, "Abort: ${dir.absolutePath} is empty directory")
                 return false
             }
+
             for (i in children.indices) {
                 val from = dir.absolutePath + File.separator + children[i]
                 val to = context.filesDir.canonicalPath + File.separator + timestamp + File.separator + children[i]
-                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                                 "Copy file  ${children[i]} from - $from, to - $to")
                 val result = Utilities.copy(from, to)
 
-                if (!result) return false
+                if (!result) {
+                    Log.w(LOG_TAG_DOWNLOAD, "Copy failed from: $from, to: $to")
+                    return false
+                }
             }
             val destinationDir = File("${context.filesDir.canonicalPath}/$timestamp")
 
-            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                             "After copy, dest dir = $destinationDir, ${destinationDir.isDirectory}, ${destinationDir.list()?.size}, ${!isDownloadValid()}  ")
+            Log.i(LOG_TAG_DOWNLOAD,
+                  "After copy, dest dir: $destinationDir, ${destinationDir.isDirectory}, ${destinationDir.list()?.size}, ${!isDownloadValid()}")
 
             if (!destinationDir.isDirectory || destinationDir.list()?.size != LOCAL_BLOCKLIST_FILE_COUNT || !isDownloadValid()) {
                 return false
             }
 
             updatePersistenceOnCopySuccess(timestamp)
-            DownloadHelper.deleteOldFiles(context)
+            BlocklistDownloadHelper.deleteOldFiles(context)
             return true
 
         } catch (e: Exception) {
@@ -110,11 +119,10 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
     }
 
     private fun updatePersistenceOnCopySuccess(timestamp: Long) {
-        persistentState.localBlocklistDownloadTime = timestamp
-        persistentState.localBlocklistEnabled = true
+        persistentState.blocklistDownloadTime = timestamp
+        persistentState.blocklistEnabled = true
         persistentState.blocklistFilesDownloaded = true
-        persistentState.tempBlocklistDownloadTime = 0
-        persistentState.workManagerStartTime = 0
+        persistentState.tempBlocklistDownloadTime = INIT_TIME_MS
     }
 
     /**

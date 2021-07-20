@@ -19,8 +19,6 @@ package com.celzero.bravedns.adapter
 import android.content.Context
 import android.content.DialogInterface
 import android.graphics.drawable.Drawable
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -38,10 +36,8 @@ import com.celzero.bravedns.databinding.UnivWhitelistListItemBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.BraveVPNService.Companion.appWhiteList
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
-import com.celzero.bravedns.util.ThrowingHandler
 import com.celzero.bravedns.util.Utilities.Companion.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.Companion.getIcon
 import kotlinx.coroutines.CoroutineScope
@@ -87,7 +83,7 @@ class UniversalAppListAdapter(private val context: Context,
             b.univWhitelistCheckbox.isChecked = appInfo.whiteListUniv1
 
             displayIcon(getIcon(context, appInfo.packageInfo, appInfo.appName))
-            clickListeners(appInfo)
+            setupClickListeners(appInfo)
         }
 
         private fun displayIcon(drawable: Drawable?) {
@@ -95,7 +91,7 @@ class UniversalAppListAdapter(private val context: Context,
                 b.univWhitelistApkIconIv)
         }
 
-        private fun clickListeners(appInfo: AppInfo) {
+        private fun setupClickListeners(appInfo: AppInfo) {
             b.univWhitelistContainer.setOnClickListener {
                 if (DEBUG) Log.d(LOG_TAG_FIREWALL,
                                  "is app - ${appInfo.appName} whitelisted? ${appInfo.whiteListUniv1}")
@@ -113,26 +109,18 @@ class UniversalAppListAdapter(private val context: Context,
         }
 
         private fun modifyWhiteListApps(appInfo: AppInfo) {
-            val status = appInfo.whiteListUniv1
-            appWhiteList[appInfo.uid] = status
+            val isWhitelist = appInfo.whiteListUniv1
             val appUIDList = appInfoRepository.getAppListForUID(appInfo.uid)
+            Log.i(LOG_TAG_FIREWALL, "App ${appInfo.appName} whitelisted from vpn? - $isWhitelist")
 
-            val blockAllApps = if (appUIDList.size > 1) {
-                showDialog(appUIDList, appInfo.appName, status)
+            if (appUIDList.size > 1) {
+                showDialog(appUIDList, appInfo)
             } else {
-                true
+                b.univWhitelistCheckbox.isChecked = isWhitelist
+                appWhiteList[appInfo.uid] = isWhitelist
+                persistAppDetails(appInfo, appUIDList, isWhitelist)
             }
 
-            if (!blockAllApps) {
-                b.univWhitelistCheckbox.isChecked = !status
-                appInfo.whiteListUniv1 = !status
-                return
-            }
-
-            Log.i(LOG_TAG_FIREWALL,
-                  "App ${appInfo.appName} whitelisted from vpn? - $status, blockAllApps?- $blockAllApps")
-            b.univWhitelistCheckbox.isChecked = status
-            persistAppDetails(appInfo, appUIDList, status)
         }
 
         private fun persistAppDetails(appInfo: AppInfo, appUIDList: List<AppInfo>,
@@ -140,7 +128,6 @@ class UniversalAppListAdapter(private val context: Context,
             CoroutineScope(Dispatchers.IO).launch {
                 if (status) {
                     appUIDList.forEach {
-                        HomeScreenActivity.GlobalVariable.appList[it.packageInfo]!!.isInternetAllowed = status
                         persistentState.modifyAllowedWifi(it.packageInfo, status)
                         FirewallManager.updateAppInternetPermission(it.packageInfo, status)
                         FirewallManager.updateAppInternetPermissionByUID(it.uid, status)
@@ -149,25 +136,24 @@ class UniversalAppListAdapter(private val context: Context,
                 }
                 appInfoRepository.updateWhiteList(appInfo.uid, status)
                 val countBlocked = appInfoRepository.getBlockedCountForCategory(appInfo.appCategory)
-                val countWhitelisted = appInfoRepository.getWhitelistCount(appInfo.appCategory)
+                val countWhitelisted = appInfoRepository.getWhitelistCountForCategory(
+                    appInfo.appCategory)
                 categoryInfoRepository.updateBlockedCount(appInfo.appCategory, countBlocked)
                 categoryInfoRepository.updateWhitelistCount(appInfo.appCategory, countWhitelisted)
             }
         }
 
-        private fun showDialog(packageList: List<AppInfo>, appName: String,
-                               isInternet: Boolean): Boolean {
-            //Change the handler logic into some other
-            val handler: Handler = ThrowingHandler()
+        private fun showDialog(packageList: List<AppInfo>, appInfo: AppInfo) {
+
             val positiveTxt: String
             val packageNameList: List<String> = packageList.map { it.appName }
-            var proceedBlocking = false
+            val status = appInfo.whiteListUniv1
 
             val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
 
             builderSingle.setIcon(R.drawable.ic_whitelist)
-            var appNameEllipsis = appName
-            if (isInternet) {
+            var appNameEllipsis = appInfo.appName
+            if (appInfo.whiteListUniv1) {
                 if (appNameEllipsis.length > 10) {
                     appNameEllipsis = appNameEllipsis.substring(0, 10)
                     appNameEllipsis = "$appNameEllipsis..."
@@ -191,23 +177,16 @@ class UniversalAppListAdapter(private val context: Context,
             builderSingle.setItems(packageNameList.toTypedArray(), null)
 
             builderSingle.setPositiveButton(positiveTxt) { _: DialogInterface, _: Int ->
-                proceedBlocking = true
-                handler.sendMessage(handler.obtainMessage())
+                appWhiteList[appInfo.uid] = status
+                persistAppDetails(appInfo, packageList, status)
             }.setNeutralButton(context.getString(
                 R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int ->
-                handler.sendMessage(handler.obtainMessage())
-                proceedBlocking = false
+                appInfo.whiteListUniv1 = !status
             }
 
             val alertDialog: AlertDialog = builderSingle.show()
             alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
             alertDialog.setCancelable(false)
-            try {
-                Looper.loop()
-            } catch (e2: java.lang.RuntimeException) {
-            }
-
-            return proceedBlocking
         }
 
     }

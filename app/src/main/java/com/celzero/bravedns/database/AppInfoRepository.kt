@@ -40,7 +40,7 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.isRootAvailable()
     }
 
-    fun getAppInfoAsync(): List<AppInfo> {
+    fun getAppInfo(): List<AppInfo> {
         return appInfoDAO.getAllAppDetails()
     }
 
@@ -56,8 +56,9 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.getAppListForUID(uid)
     }
 
-    fun updateInternetForAppCategory(categoryName: String, isInternetAllowed: Boolean): Int {
-        return appInfoDAO.updateInternetPermissionForCategory(categoryName, isInternetAllowed)
+    fun setInternetAllowedForCategory(categoryName: String, isInternetAllowed: Boolean): Int {
+        appInfoDAO.updateInternetPermissionForCategory(categoryName, isInternetAllowed)
+        return appInfoDAO.getBlockedCountForCategory(categoryName)
     }
 
     fun getAllAppDetailsForLiveData(): LiveData<List<AppInfo>> {
@@ -145,7 +146,7 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
     }
 
 
-    fun getWhitelistCount(categoryName: String): Int {
+    fun getWhitelistCountForCategory(categoryName: String): Int {
         return appInfoDAO.getWhitelistCount(categoryName)
     }
 
