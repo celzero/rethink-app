@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.graphics.drawable.Drawable
 import android.net.VpnService
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,16 +31,12 @@ import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.CategoryInfo
-import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.databinding.ApkListItemBinding
 import com.celzero.bravedns.databinding.ExpandableFirewallHeaderBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.APP_CAT_SYSTEM_COMPONENTS
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.Companion.getIcon
@@ -52,11 +47,9 @@ import java.util.*
 
 
 class FirewallAppListAdapter internal constructor(private val context: Context,
-                                                  private val appInfoRepository: AppInfoRepository,
-                                                  private val categoryInfoRepository: CategoryInfoRepository,
                                                   private val persistentState: PersistentState,
                                                   private var titleList: List<CategoryInfo>,
-                                                  private var dataList: HashMap<CategoryInfo, ArrayList<AppInfo>>) :
+                                                  private var dataList: HashMap<CategoryInfo, List<AppInfo>>) :
         BaseExpandableListAdapter() {
 
     private lateinit var groupViewBinding: ExpandableFirewallHeaderBinding
@@ -74,12 +67,11 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
         return expandedListPosition.toLong()
     }
 
-    fun updateData(title: List<CategoryInfo>, list: HashMap<CategoryInfo, ArrayList<AppInfo>>) {
+    fun updateData(title: List<CategoryInfo>, list: HashMap<CategoryInfo, List<AppInfo>>) {
         titleList = title
         dataList = list
         this.notifyDataSetChanged()
     }
-
 
     override fun getChildView(listPosition: Int, expandedListPosition: Int, isLastChild: Boolean,
                               view: View?, parent: ViewGroup): View {
@@ -105,63 +97,51 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
 
         displayIcon(getIcon(context, appInfo.packageInfo, appInfo.appName),
                     childViewBinding.firewallApkIconIv)
-        showHint(childViewBinding.firewallStatusIndicator, appInfo)
+        showAppHint(childViewBinding.firewallStatusIndicator, appInfo)
 
 
     }
 
     private fun setupChildClickListeners(appInfo: AppInfo) {
 
+        childViewBinding.firewallToggleWifi.setOnCheckedChangeListener(null)
         childViewBinding.firewallToggleWifi.setOnClickListener {
-            childViewBinding.firewallToggleWifi.isEnabled = false
-            Utilities.delay(1000) {
-                childViewBinding.firewallToggleWifi.isEnabled = true
-            }
+            enableAfterDelay(1000, childViewBinding.firewallToggleWifi)
 
             val isInternetAllowed = appInfo.isInternetAllowed
-            val appUIDList = appInfoRepository.getAppListForUID(appInfo.uid)
+            val appUidList = FirewallManager.getAppNamesByUid(appInfo.uid)
 
-            if (appUIDList.size > 1) {
-                showDialog(appUIDList, appInfo, isInternetAllowed)
+            if (appUidList.size > 1) {
+                showDialog(appUidList, appInfo, isInternetAllowed)
                 return@setOnClickListener
             }
-            updateBlockApp(appInfo, appUIDList, isInternetAllowed)
+            updateBlockApp(appInfo, isInternetAllowed)
         }
-
-        childViewBinding.firewallToggleWifi.setOnCheckedChangeListener(null)
     }
 
-    private fun updateBlockApp(appInfo: AppInfo, appUIDList: List<AppInfo>,
-                               isInternetAllowed: Boolean) {
+
+    private fun updateBlockApp(appInfo: AppInfo, isInternetAllowed: Boolean) {
+        FirewallManager.updateFirewalledApps(appInfo.uid, !isInternetAllowed)
         childViewBinding.firewallToggleWifi.isChecked = isInternetAllowed
-        appInfo.isWifiEnabled = !isInternetAllowed
-        appInfo.isInternetAllowed = !isInternetAllowed
         if (!isInternetAllowed) childViewBinding.firewallStatusIndicator.setBackgroundColor(
             context.getColor(R.color.colorGreen_900))
         else childViewBinding.firewallStatusIndicator.setBackgroundColor(
             context.getColor(R.color.colorAmber_900))
-        persistFirewallRules(appUIDList, isInternetAllowed, appInfo.uid)
+        killApps(appInfo.uid)
     }
 
-    private fun persistFirewallRules(appUIDList: List<AppInfo>, isInternetAllowed: Boolean,
-                                     uid: Int) {
+    private fun killApps(uid: Int) {
+        if (!persistentState.killAppOnFirewall) return
         CoroutineScope(Dispatchers.IO).launch {
-            appUIDList.forEach {
-                persistentState.modifyAllowedWifi(it.packageInfo, !isInternetAllowed)
-                FirewallManager.updateAppInternetPermission(it.packageInfo, !isInternetAllowed)
-                FirewallManager.updateAppInternetPermissionByUID(it.uid, !isInternetAllowed)
-                categoryInfoRepository.updateNumberOfBlocked(it.appCategory, isInternetAllowed)
-
-                if (persistentState.killAppOnFirewall) {
-                    Utilities.killBg(activityManager, it.packageInfo)
-                }
+            val apps = FirewallManager.getPackageNamesByUid(uid)
+            apps.forEach {
+                Utilities.killBg(activityManager, it)
             }
-            appInfoRepository.updateInternetForUID(uid, !isInternetAllowed)
-
         }
     }
 
-    private fun showHint(mIconIndicator: TextView, appInfo: AppInfo) {
+
+    private fun showAppHint(mIconIndicator: TextView, appInfo: AppInfo) {
         if (appInfo.isInternetAllowed) {
             mIconIndicator.setBackgroundColor(context.getColor(R.color.colorGreen_900))
         } else {
@@ -218,14 +198,13 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
         groupViewBinding = ExpandableFirewallHeaderBinding.inflate(
             LayoutInflater.from(parent.context), parent, false)
 
-        //val isInternetAllowed = !categoryInfo.isInternetBlocked
-
         displayGroupDetails(categoryInfo, isExpanded)
-        setUpGroupClickListeners(categoryInfo)
+        setupGroupClickListeners(categoryInfo)
         return groupViewBinding.root
     }
 
     private fun displayGroupDetails(categoryInfo: CategoryInfo, isExpanded: Boolean) {
+        groupViewBinding.expandHeaderProgress.visibility = View.GONE
         groupViewBinding.expandTextViewCategoryName.text = "${categoryInfo.categoryName} (${categoryInfo.numberOFApps})"
         groupViewBinding.expandTextViewAppCount.text = context.getString(R.string.ct_app_details,
                                                                          categoryInfo.numOfAppsBlocked.toString(),
@@ -241,55 +220,23 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
         showAppIcon(categoryInfo, groupViewBinding.imageLayout1, groupViewBinding.imageLayout2)
     }
 
-    private fun setUpGroupClickListeners(categoryInfo: CategoryInfo) {
+    private fun setupGroupClickListeners(categoryInfo: CategoryInfo) {
 
         groupViewBinding.expandCheckbox.setOnClickListener {
-            // Click listener- Flip the internet blocked value of categoryInfo.
+            // flip categoryInfo's isInternetBlocked
             val isInternetBlocked = !categoryInfo.isInternetBlocked
             if (categoryInfo.isAnySystemCategory()) {
-                if (categoryInfo.numOfAppWhitelisted != categoryInfo.numberOFApps) {
-                    showDialogForSystemAppBlock(categoryInfo)
+                if (isInternetBlocked && categoryInfo.numOfAppWhitelisted != categoryInfo.numberOFApps) {
+                    showSystemAppBlockDialog(categoryInfo)
                     return@setOnClickListener
                 }
             }
-            updateCategoryDetails(categoryInfo, isInternetBlocked)
+            FirewallManager.updateFirewalledAppsByCategory(categoryInfo, isInternetBlocked)
         }
 
         groupViewBinding.expandCheckbox.setOnCheckedChangeListener(null)
     }
 
-    private fun updateCategoryDetails(categoryInfo: CategoryInfo, isInternetBlocked: Boolean) {
-        groupViewBinding.expandCheckbox.visibility = View.GONE
-        groupViewBinding.expandHeaderCategoryIndicator.visibility = View.VISIBLE
-        Utilities.delay(500) {
-            groupViewBinding.expandHeaderCategoryIndicator.visibility = View.GONE
-            groupViewBinding.expandCheckbox.visibility = View.VISIBLE
-        }
-
-        if (isInternetBlocked) {
-            groupViewBinding.expandHeaderCategoryIndicator.visibility = View.VISIBLE
-        } else {
-            groupViewBinding.expandHeaderCategoryIndicator.visibility = View.INVISIBLE
-        }
-        persistAppDetails(categoryInfo, isInternetBlocked)
-    }
-
-    private fun persistAppDetails(categoryInfo: CategoryInfo, isInternetBlocked: Boolean) {
-        FirewallManager.updateCategoryAppsInternetPermission(categoryInfo.categoryName,
-                                                             isInternetBlocked)
-
-        CoroutineScope(Dispatchers.IO).launch {
-            // Flip the value of isInternetBlocked while updating appInfoRepository.
-            // As column used in AppInfo is isInternet where in categoryInfo its internetBlocked.
-            val count = appInfoRepository.setInternetAllowedForCategory(categoryInfo.categoryName,
-                                                                        !isInternetBlocked)
-            if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Apps updated : $count, $isInternetBlocked")
-            // Update the category's internet blocked based on the app's count which is returned
-            // from the app info database.
-            categoryInfoRepository.updateCategoryDetails(categoryInfo.categoryName, count,
-                                                         isInternetBlocked)
-        }
-    }
 
     private fun showAppIcon(categoryInfo: CategoryInfo, app1Icon: AppCompatImageView,
                             app2Icon: AppCompatImageView) {
@@ -388,9 +335,8 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
         return true
     }
 
-    private fun showDialog(packageList: List<AppInfo>, appInfo: AppInfo, isInternet: Boolean) {
+    private fun showDialog(packageList: List<String>, appInfo: AppInfo, isInternet: Boolean) {
         val positiveTxt: String
-        val packageNameList: List<String> = packageList.map { it.appName }
 
         val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
 
@@ -410,13 +356,13 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
         }
         val arrayAdapter = ArrayAdapter<String>(context,
                                                 android.R.layout.simple_list_item_activated_1)
-        arrayAdapter.addAll(packageNameList)
+        arrayAdapter.addAll(packageList)
         builderSingle.setCancelable(false)
 
-        builderSingle.setItems(packageNameList.toTypedArray(), null)
+        builderSingle.setItems(packageList.toTypedArray(), null)
 
         builderSingle.setPositiveButton(positiveTxt) { _: DialogInterface, _: Int ->
-            updateBlockApp(appInfo, packageList, isInternet)
+            updateBlockApp(appInfo, isInternet)
         }.setNeutralButton(
             context.getString(R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int ->
             childViewBinding.firewallToggleWifi.isChecked = !isInternet
@@ -424,13 +370,13 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
 
         val alertDialog: AlertDialog = builderSingle.show()
         alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
-        alertDialog.setCancelable(false)
     }
 
-    private fun showDialogForSystemAppBlock(categoryInfo: CategoryInfo) {
+    private fun showSystemAppBlockDialog(categoryInfo: CategoryInfo) {
         val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
 
         builderSingle.setIcon(R.drawable.spinner_firewall)
+        builderSingle.setCancelable(false)
 
         builderSingle.setTitle(
             context.resources.getString(R.string.system_apps_warning_dialog_title,
@@ -441,15 +387,23 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
 
         builderSingle.setPositiveButton(context.resources.getString(
             R.string.system_apps_dialog_positive)) { _: DialogInterface, _: Int ->
-            updateCategoryDetails(categoryInfo, true)
+            FirewallManager.updateFirewalledAppsByCategory(categoryInfo, isInternetBlocked = true)
         }.setNegativeButton(context.resources.getString(
             R.string.system_apps_dialog_negative)) { _: DialogInterface, _: Int ->
             groupViewBinding.expandCheckbox.isChecked = false
             groupViewBinding.expandCheckbox.setCompoundDrawablesWithIntrinsicBounds(
                 ContextCompat.getDrawable(context, R.drawable.allowed), null, null, null)
+            notifyDataSetChanged()
         }
 
-        val alertDialog: AlertDialog = builderSingle.show()
-        alertDialog.setCancelable(false)
+        builderSingle.show()
+    }
+
+    private fun enableAfterDelay(delay: Long, vararg views: View) {
+        for (v in views) v.isEnabled = false
+
+        Utilities.delay(delay) {
+            for (v in views) v.isEnabled = true
+        }
     }
 }

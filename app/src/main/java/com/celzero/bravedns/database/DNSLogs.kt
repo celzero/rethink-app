@@ -72,4 +72,20 @@ class DNSLogs {
         return (this.status != Transaction.Status.COMPLETE.toString() || this.response == Constants.NXDOMAIN || this.isBlocked)
     }
 
+    fun isAnonymized(): Boolean {
+        return this.relayIP.isNotEmpty()
+    }
+
+    fun isLocallyAnswered(): Boolean {
+        return this.serverIP.isEmpty()
+    }
+
+    fun hasBlocklists(): Boolean {
+        return this.blockLists.isNotEmpty()
+    }
+
+    fun getBlocklists(): List<String> {
+        return this.blockLists.split(",")
+    }
+
 }

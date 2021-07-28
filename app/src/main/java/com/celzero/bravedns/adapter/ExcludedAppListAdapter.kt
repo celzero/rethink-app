@@ -27,21 +27,15 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
+import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.database.AppInfoRepository
-import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.databinding.ExcludedAppListItemBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Utilities.Companion.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.Companion.getIcon
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
-class ExcludedAppListAdapter(private val context: Context,
-                             private val appInfoRepository: AppInfoRepository,
-                             private val categoryInfoRepository: CategoryInfoRepository) :
+class ExcludedAppListAdapter(private val context: Context) :
         PagedListAdapter<AppInfo, ExcludedAppListAdapter.ExcludedAppInfoViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -82,7 +76,7 @@ class ExcludedAppListAdapter(private val context: Context,
             b.excludedAppListContainer.setOnClickListener {
                 appInfo.isExcluded = !appInfo.isExcluded
                 Log.i(LOG_TAG_FIREWALL, "is app excluded- ${appInfo.appName},${appInfo.isExcluded}")
-                excludeAppsFromVPN(appInfo)
+                excludeAppsFromVpn(appInfo)
             }
 
             b.excludedAppListCheckbox.setOnCheckedChangeListener(null)
@@ -90,7 +84,7 @@ class ExcludedAppListAdapter(private val context: Context,
                 appInfo.isExcluded = !appInfo.isExcluded
                 Log.i(LOG_TAG_FIREWALL,
                       "is app excluded - ${appInfo.appName},${appInfo.isExcluded}")
-                excludeAppsFromVPN(appInfo)
+                excludeAppsFromVpn(appInfo)
             }
         }
 
@@ -99,42 +93,22 @@ class ExcludedAppListAdapter(private val context: Context,
                 b.excludedAppListApkIconIv)
         }
 
-        private fun excludeAppsFromVPN(appInfo: AppInfo) {
-            val appUIDList = appInfoRepository.getAppListForUID(appInfo.uid)
-            /*val blockAllApps: Boolean = if (appUIDList.size > 1) {
-                showDialog(appUIDList, appInfo.appName, appInfo.isExcluded)
-            } else {
-                true
-            }*/
+        private fun excludeAppsFromVpn(appInfo: AppInfo) {
+            val appUidList = FirewallManager.getAppNamesByUid(appInfo.uid)
 
-            if (appUIDList.size > 1) {
-                showDialog(appUIDList, appInfo)
+            if (appUidList.size > 1) {
+                showDialog(appUidList, appInfo)
             } else {
                 b.excludedAppListCheckbox.isChecked = appInfo.isExcluded
-                persistAppDetails(appInfo, appInfo.isExcluded)
+                FirewallManager.updateExcludedApps(appInfo, appInfo.isExcluded)
             }
 
             Log.i(LOG_TAG_FIREWALL,
                   "App ${appInfo.appName} excluded from vpn? - ${appInfo.isExcluded}")
         }
 
-        private fun persistAppDetails(appInfo: AppInfo, status: Boolean) {
-            CoroutineScope(Dispatchers.IO).launch {
-                appInfoRepository.updateExcludedList(appInfo.uid, status)
-                val count = appInfoRepository.getBlockedCountForCategory(appInfo.appCategory)
-                val excludedCount = appInfoRepository.getExcludedAppCountForCategory(
-                    appInfo.appCategory)
-                val whitelistCount = appInfoRepository.getBlockedCountForCategory(
-                    appInfo.appCategory)
-                categoryInfoRepository.updateBlockedCount(appInfo.appCategory, count)
-                categoryInfoRepository.updateExcludedCount(appInfo.appCategory, excludedCount)
-                categoryInfoRepository.updateWhitelistCount(appInfo.appCategory, whitelistCount)
-            }
-        }
-
-        private fun showDialog(packageList: List<AppInfo>, appInfo: AppInfo) {
+        private fun showDialog(packageList: List<String>, appInfo: AppInfo) {
             val positiveTxt: String
-            val packageNameList: List<String> = packageList.map { it.appName }
 
             val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
 
@@ -152,18 +126,16 @@ class ExcludedAppListAdapter(private val context: Context,
             }
             val arrayAdapter = ArrayAdapter<String>(context,
                                                     android.R.layout.simple_list_item_activated_1)
-            arrayAdapter.addAll(packageNameList)
+            arrayAdapter.addAll(packageList)
             builderSingle.setCancelable(false)
 
-            builderSingle.setItems(packageNameList.toTypedArray(), null)
+            builderSingle.setItems(packageList.toTypedArray(), null)
 
 
             builderSingle.setPositiveButton(positiveTxt) { _: DialogInterface, _: Int ->
-                persistAppDetails(appInfo, appInfo.isExcluded)
+                FirewallManager.updateExcludedApps(appInfo, appInfo.isExcluded)
             }.setNeutralButton(context.getString(
-                R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int ->
-                appInfo.isExcluded = !appInfo.isExcluded
-            }
+                R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int -> }
 
             val alertDialog: AlertDialog = builderSingle.show()
             alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }

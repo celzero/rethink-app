@@ -33,6 +33,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityFirewallBinding
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities
@@ -50,6 +51,16 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall),
         setTheme(Utilities.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
         fragmentIndex = intent.getIntExtra(Constants.SCREEN_TO_LOAD, 0)
+
+        val extras = intent.extras
+        if (extras != null) {
+            val value = extras.getString(Constants.NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME)
+            if (!value.isNullOrEmpty() && value == Constants.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE) {
+                if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LoggerConstants.LOG_TAG_UI,
+                                                                   "Intent thrown as part of accessibility failure notification.")
+                handleAccessibilitySettings()
+            }
+        }
 
         // FIXME: 22-01-2021 The view pager is migrated from ViewPager2 to Viewpager. There is a
         // known bug in viewpager2 - Focus issue, the Firewall activity has search bar in all the
@@ -95,43 +106,48 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall),
     }
 
     override fun onNewIntent(intent: Intent) {
-           super.onNewIntent(intent)
-           // Created as part of accessibility failure notification.
-           val extras = intent.extras
-           if (extras != null) {
-               val value = extras.getString(Constants.NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME)
-               if (!value.isNullOrEmpty() && value == Constants.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE) {
-                   if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LoggerConstants.LOG_TAG_UI,
-                                                                      "Intent thrown as part of accessibility failure notification.")
-                   handleAccessibilitySettings()
-               }
-           }
-       }
+        super.onNewIntent(intent)
+        // Created as part of accessibility failure notification.
+        val extras = intent.extras
+        if (extras != null) {
+            val value = extras.getString(Constants.NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME)
+            if (!value.isNullOrEmpty() && value == Constants.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE) {
+                if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LoggerConstants.LOG_TAG_UI,
+                                                                   "Intent thrown as part of accessibility failure notification.")
+                // Reset the notification counter once user acts on the notification.
+                // There was a case, where notifications were not shown post the user action.
+                VpnController.getBraveVpnService()?.totalAccessibilityFailureNotifications = 0
+                handleAccessibilitySettings()
+            }
+        }
+    }
 
     private fun handleAccessibilitySettings() {
-           val builder = AlertDialog.Builder(this)
-           builder.setTitle(R.string.alert_permission_accessibility_regrant)
-           builder.setMessage(R.string.alert_firewall_accessibility_regrant_explanation)
-           builder.setPositiveButton(
-               getString(R.string.univ_accessibility_crash_dialog_positive)) { _, _ ->
-               persistentState.isAccessibilityCrashDetected = false
-               openRethinkAppInfo(this)
-           }
-           builder.setNegativeButton(
-               getString(R.string.univ_accessibility_crash_dialog_negative)) { _, _ ->
-               persistentState.isAccessibilityCrashDetected = false
-           }
-           builder.setCancelable(false)
-           val dialog: AlertDialog = builder.create()
-           dialog.show()
-       }
+        if (!persistentState.backgroundEnabled) return
 
-       private fun openRethinkAppInfo(context: Context) {
-           val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-           val packageName = context.packageName
-           intent.data = Uri.parse("package:$packageName")
-           ContextCompat.startActivity(context, intent, null)
-       }
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(R.string.alert_permission_accessibility_regrant)
+        builder.setMessage(R.string.alert_firewall_accessibility_regrant_explanation)
+        builder.setPositiveButton(
+            getString(R.string.univ_accessibility_crash_dialog_positive)) { _, _ ->
+            openRethinkAppInfo(this)
+        }
+        builder.setNegativeButton(
+            getString(R.string.univ_accessibility_crash_dialog_negative)) { _, _ ->
+        }
+        builder.setCancelable(false)
+
+        builder.create().show()
+    }
+
+    // FIXME: Add appropriate to ensure back button navigation.
+    // Today, if user presses back from settings screen, it naivgates to launcher instead
+    private fun openRethinkAppInfo(context: Context) {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        val packageName = context.packageName
+        intent.data = Uri.parse("package:$packageName")
+        ContextCompat.startActivity(context, intent, null)
+    }
 
 }
 

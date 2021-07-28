@@ -47,8 +47,8 @@ interface DNSCryptRelayEndpointDAO {
     @Query("delete from DNSCryptRelayEndpoint")
     fun clearAllData()
 
-    @Query("delete from DNSCryptRelayEndpoint where dnsCryptRelayURL like :url and isCustom = 1")
-    fun deleteDNSCryptRelayEndpoint(url: String)
+    @Query("delete from DNSCryptRelayEndpoint where id = :id and isCustom = 1")
+    fun deleteDNSCryptRelayEndpoint(id: Int)
 
     @Query("update DNSCryptRelayEndpoint set isSelected = 0 where isSelected = 1")
     fun removeConnectionStatus()

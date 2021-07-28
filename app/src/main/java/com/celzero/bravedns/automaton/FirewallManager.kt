@@ -16,201 +16,370 @@ limitations under the License.
 
 package com.celzero.bravedns.automaton
 
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.text.TextUtils
+import android.app.KeyguardManager
 import android.util.Log
-import android.view.accessibility.AccessibilityEvent
-import android.view.accessibility.AccessibilityNodeInfo
+import androidx.lifecycle.MutableLiveData
+import com.celzero.bravedns.automaton.FirewallManager.GlobalVariable.appList
+import com.celzero.bravedns.automaton.FirewallManager.GlobalVariable.appListLiveData
+import com.celzero.bravedns.automaton.FirewallManager.GlobalVariable.foregroundUids
 import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnControllerHelper.persistentState
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable
+import com.celzero.bravedns.database.AppInfoRepository
+import com.celzero.bravedns.database.CategoryInfo
+import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.backgroundAllowedUID
 import com.celzero.bravedns.util.AndroidUidConfig
-import com.celzero.bravedns.util.BackgroundAccessibilityService
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.OrbotHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.concurrent.ConcurrentHashMap
 
 /*TODO : Initial check is for firewall app completely
            Later modification required for Data, WiFi, ScreenOn/Off, Background
            Lot of redundant code - streamline the code.
            */
 
-class FirewallManager(service: BackgroundAccessibilityService) : KoinComponent {
+object FirewallManager : KoinComponent {
 
-    private val accessibilityService: BackgroundAccessibilityService = service
-    private lateinit var packageManager: PackageManager
-    private val packagesStack = LinkedHashSet<String>()
-    private var latestTrackedPackage: String? = null
-    private var packageElect: String? = null
-    private val persistentState by inject<PersistentState>()
+    private val appInfoRepository by inject<AppInfoRepository>()
+    private val categoryInfoRepository by inject<CategoryInfoRepository>()
 
-    companion object {
+    enum class FIREWALL_STATUS {
+        WHITELISTED, EXCLUDED, BLOCKED, ALLOWED, NONE
+    }
 
-        fun checkInternetPermission(uid: Int): Boolean {
-            return GlobalVariable.blockedUID[uid] != null
-        }
+    object GlobalVariable {
+        var appList: MutableMap<String, AppInfo> = ConcurrentHashMap()
 
-        fun updateAppInternetPermission(packageName: String, isAllowed: Boolean) {
-            val appInfo = GlobalVariable.appList[packageName]
-            if (appInfo == null) {
-                Log.i(LOG_TAG_FIREWALL,
-                      "No such app $packageName to update 'dis/allow' firewall rule for")
-                return
+        // TODO: protect access to the foregroundUids (read/write)
+        @Volatile var foregroundUids: HashSet<Int> = HashSet()
+
+        var appListLiveData: MutableLiveData<List<AppInfo>> = MutableLiveData()
+    }
+
+    @Volatile private var isFirewallRulesLoaded: Boolean = false
+
+    fun isFirewallRulesLoaded(): Boolean {
+        return isFirewallRulesLoaded
+    }
+
+    fun isUidFirewalled(uid: Int): Boolean {
+        return !appList.values.filter { it.uid == uid }[0].isInternetAllowed
+    }
+
+    fun isUidWhitelisted(uid: Int): Boolean {
+        if (!appList.isNullOrEmpty()) {
+            val appDetail = appList.values.filter { it.uid == uid }
+            if (appDetail.isNotEmpty()) {
+                return appDetail[0].whiteListUniv1
             }
-
-            appInfo.isInternetAllowed = isAllowed
         }
+        return false
+    }
 
-        fun updateAppInternetPermissionByUID(uid: Int, isInternetAllowed: Boolean) {
-            if (isInternetAllowed) GlobalVariable.blockedUID.remove(uid)
-            else GlobalVariable.blockedUID[uid] = isInternetAllowed
-        }
+    fun getTotalApps(): Int {
+        return appList.size
+    }
 
-        fun updateGlobalAppInfoEntry(packageName: String, appInfo: AppInfo?) {
-            if (appInfo != null) GlobalVariable.appList[packageName] = appInfo
-        }
+    fun isOrbotInstalled(): Boolean {
+        return appList.contains(OrbotHelper.ORBOT_PACKAGE_NAME)
+    }
 
-        fun updateInternetBackground(packageName: String?, isAllowed: Boolean) {
-            val appInfo = GlobalVariable.appList[packageName]
-            if (appInfo == null) {
-                Log.i(LOG_TAG_FIREWALL,
-                      "No such app $packageName to update 'dis/allow' firewall rule for")
-                return
+    fun isUidRegistered(uid: Int): Boolean {
+        return appList.values.any { it.uid == uid }
+    }
+
+    fun isUidExcluded(uid: Int): Boolean {
+        if (!appList.isNullOrEmpty()) {
+            val appDetail = appList.values.filter { it.uid == uid }
+            if (appDetail.isNotEmpty()) {
+                return appDetail[0].isExcluded
             }
+        }
+        return false
+    }
 
-            val isAppUid = AndroidUidConfig.isUidAppRange(appInfo.uid)
-            if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                             "AccessibilityEvent: Update Internet Permission from background: ${appInfo.packageInfo}, isAllowed- $isAllowed, isAppUid - $isAppUid")
-            if (isAllowed && isAppUid) {
-                backgroundAllowedUID[appInfo.uid] = isAllowed
+    fun canFirewall(uid: Int): FIREWALL_STATUS {
+        val appInfo = getAppInfoByUid(uid) ?: return FIREWALL_STATUS.NONE
+
+        if (appInfo.whiteListUniv1) {
+            return FIREWALL_STATUS.WHITELISTED
+        }
+        if (appInfo.isExcluded) {
+            return FIREWALL_STATUS.EXCLUDED
+        }
+        if (!appInfo.isInternetAllowed) {
+            return FIREWALL_STATUS.BLOCKED
+        }
+
+        return FIREWALL_STATUS.ALLOWED
+    }
+
+    fun getApplistObserver(): MutableLiveData<List<AppInfo>> {
+        return appListLiveData
+    }
+
+    fun getExcludedApps(): List<String> {
+        val list = appList.values.filter { it.isExcluded }
+        val excludedList: MutableList<String> = ArrayList()
+        list.forEach {
+            excludedList.add(it.packageInfo)
+        }
+        return excludedList
+    }
+
+    fun getPackageNameByAppName(appName: String): String {
+        val appNames = appList.values.filter { it.appName == appName }
+        if (!appNames.isNullOrEmpty()) return appNames[0].packageInfo
+
+        return appInfoRepository.getPackageNameForAppName(appName)
+    }
+
+    fun getAppNamesByUid(uid: Int): List<String> {
+        return appList.values.filter { it.uid == uid }.map(AppInfo::appName)
+    }
+
+    fun getPackageNamesByUid(uid: Int): List<String> {
+        return appList.values.filter { it.uid == uid && !it.isSystemApp }.map(AppInfo::packageInfo)
+    }
+
+    fun getAllAppNames(): List<String> {
+        return appList.values.map(AppInfo::appName)
+    }
+
+    fun getAppNameByUid(uid: Int): String? {
+        return appList.values.firstOrNull { it.uid == uid }?.appName
+    }
+
+    fun getAppInfoByPackage(packageName: String?): AppInfo? {
+        return appList[packageName]
+    }
+
+    fun getAppInfoByUid(uid: Int): AppInfo? {
+        return appList.values.firstOrNull { it.uid == uid }
+    }
+
+    private fun getAppInfosByUid(uid: Int): List<AppInfo> {
+        return appList.values.filter { it.uid == uid }
+    }
+
+    fun getPackageNameByUid(uid: Int): String? {
+        return appList.values.firstOrNull { it.uid == uid }?.packageInfo
+    }
+
+    fun getCategoryListByAppName(appName: String): List<String> {
+        return appList.values.filter {
+            it.appName.contains(appName)
+        }.map { it.appCategory }.distinct().sorted()
+    }
+
+    suspend fun loadAppFirewallRules() {
+        withContext(Dispatchers.IO) {
+            reloadAppList()
+            isFirewallRulesLoaded = true
+            appListLiveData.postValue(appList.values.toList())
+        }
+    }
+
+    private fun updateAppsInternetPermission(uid: Int, isAllowed: Boolean) {
+        appList.values.filter { it.uid == uid }.forEach {
+            it.isInternetAllowed = isAllowed
+        }
+        appListLiveData.postValue(appList.values.toList())
+    }
+
+    private fun updateAppsExcludedPermission(uid: Int, isExcluded: Boolean) {
+        appList.values.filter { it.uid == uid }.forEach {
+            it.isExcluded = isExcluded
+            if (isExcluded) {
+                it.isInternetAllowed = true
+            }
+        }
+
+        appListLiveData.postValue(appList.values.toList())
+    }
+
+    private fun updateAppsWhitelist(uid: Int, isWhitelisted: Boolean) {
+        appList.values.filter { it.uid == uid }.forEach {
+            it.whiteListUniv1 = isWhitelisted
+            if (isWhitelisted) {
+                it.isInternetAllowed = true
+            }
+        }
+
+        appListLiveData.postValue(appList.values.toList())
+    }
+
+    private fun updateCategoryAppsInternetPermission(categoryName: String, isAllowed: Boolean) {
+        appList.values.filter { it.appCategory == categoryName }.forEach {
+            it.isInternetAllowed = !isAllowed
+        }
+
+        appListLiveData.postValue(appList.values.toList())
+    }
+
+    fun updateGlobalAppInfoEntry(packageName: String, appInfo: AppInfo?) {
+        if (appInfo != null) {
+            appList[packageName] = appInfo
+            appListLiveData.postValue(appList.values.toList())
+        }
+    }
+
+    fun reloadAppList() {
+        val appInfos = appInfoRepository.getAppInfo()
+        appList.clear()
+        appInfos.forEach {
+            appList[it.packageInfo] = it
+        }
+
+        appListLiveData.postValue(appList.values.toList())
+    }
+
+    fun untrackForegroundApps() {
+        Log.i(LOG_TAG_FIREWALL,
+              "launcher in the foreground, clear foreground uids: $foregroundUids")
+        foregroundUids.clear()
+    }
+
+    fun trackForegroundApp(packageName: String?) {
+        val appInfo = appList[packageName]
+
+        if (appInfo == null) {
+            Log.i(LOG_TAG_FIREWALL, "No such app $packageName to update 'dis/allow' firewall rule")
+            return
+        }
+
+        val isAppUid = AndroidUidConfig.isUidAppRange(appInfo.uid)
+        if (DEBUG) Log.d(LOG_TAG_FIREWALL,
+                         "app in foreground: ${appInfo.packageInfo}, isAppUid? $isAppUid")
+
+        // Only track packages within app uid range.
+        if (!isAppUid) return
+
+        foregroundUids.add(appInfo.uid)
+    }
+
+    fun isAppForeground(uid: Int, keyguardManager: KeyguardManager?): Boolean {
+        // isKeyguardLocked check for allow apps in foreground.
+        // When the user engages the app and locks the screen, the app is
+        // considered to be in background and the connections for those apps
+        // should be blocked.
+        val locked = keyguardManager?.isKeyguardLocked == false
+        val isForeground = foregroundUids.contains(uid)
+        if (DEBUG) Log.d(LOG_TAG_FIREWALL,
+                         "is app $uid foreground? ${locked && isForeground}, isLocked? $locked, is available in foreground list? $isForeground")
+        return locked && isForeground
+    }
+
+
+    fun updateExcludedAppsByCategories(filterCategories: List<String>, checked: Boolean) {
+        CoroutineScope(Dispatchers.IO).launch {
+            if (filterCategories.isNullOrEmpty()) {
+                appInfoRepository.updateExcludedForAllApp(checked)
+                categoryInfoRepository.updateExcludedCountForAllApp(checked)
+                if (checked) {
+                    categoryInfoRepository.updateWhitelistCountForAll(!checked)
+                }
             } else {
-                backgroundAllowedUID.remove(appInfo.uid)
-            }
-        }
-
-        fun updateCategoryAppsInternetPermission(categoryName: String, isAllowed: Boolean) {
-            CoroutineScope(Dispatchers.IO).launch {
-                GlobalVariable.appList.forEach {
-                    if (it.value.appCategory == categoryName && !it.value.whiteListUniv1) {
-                        it.value.isInternetAllowed = isAllowed
-                        persistentState.modifyAllowedWifi(it.key, isAllowed)
-                        updateAppInternetPermissionByUID(it.value.uid, isAllowed)
+                filterCategories.forEach {
+                    appInfoRepository.updateExcludedForCategories(it, checked)
+                    categoryInfoRepository.updateExcludedCountForCategory(it, checked)
+                    if (checked) {
+                        categoryInfoRepository.updateWhitelistForCategory(it, !checked)
                     }
                 }
             }
+            // All the apps / some app categories selected and excluded so reload the
+            // app list from database.
+            reloadAppList()
         }
     }
 
-    // FIXME - Fix the way top-window stack is maintained for purposes of blocking apps not in the foreground.
-    fun onAccessibilityEvent(event: AccessibilityEvent,
-                             rootInActiveWindow: AccessibilityNodeInfo?) {
-        packageManager = accessibilityService.packageManager
-
-        val eventPackageName = getEventPackageName(event, rootInActiveWindow)
-
-        val hasContentDisappeared = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-            event.eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED || event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
-        } else {
-            event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
-        }
-        if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                         "onAccessibilityEvent: ${event.packageName}, ${event.eventType}, $hasContentDisappeared")
-        // is the package showing content and being backgrounded?
-        if (hasContentDisappeared) {
-            if (GlobalVariable.appList.containsKey(
-                    eventPackageName)) {//PermissionsManager.packageRules.contains(eventPackageName)) {
-                // FIXME: Gross hack that no one likes
-                // packagesStack tracks apps that have disappeared
-                // after user interaction, and so: check for event.source
-                // to be not null, because the content change disappeared
-                // event may come up even when the app isn't going background
-                // BUT whenever event.source is null, it is observed that
-                // the app is not disappearing... this is fragile.
-                // determine a better heuristic for when to push the
-                // package to the stack.
-                // packagesStack is also used by #revokePermissions
-                // and so, we must be extra careful to when we add to it.
-                if (eventPackageName != null && event.source != null) {
-                    packagesStack.add(eventPackageName)
+    fun updateWhitelistedAppsByCategories(filterCategories: List<String>, checked: Boolean) {
+        CoroutineScope(Dispatchers.IO).launch {
+            if (filterCategories.isNullOrEmpty()) {
+                appInfoRepository.updateWhitelistForAllApp(checked)
+                appInfoRepository.getAppCategoryList().forEach {
+                    val countBlocked = appInfoRepository.getBlockedCountForCategory(it)
+                    categoryInfoRepository.updateBlockedCount(it, countBlocked)
                 }
-                latestTrackedPackage = getEventPackageName(event, rootInActiveWindow)
-
-            }
-        }
-        val packageName = latestTrackedPackage ?: return
-
-        if (hasContentDisappeared) {
-            // https://stackoverflow.com/a/27642535
-            // top window is launcher? try revoke queued up permissions
-            // FIXME: Figure out a fool-proof way to determine is launcher visible
-            if (!isPackageLauncher(packageName)) {
-                // TODO: revoke permissions only if there are any to revoke
-                addOrRemovePackageForBackground(true)
+                categoryInfoRepository.updateWhitelistCountForAll(checked)
             } else {
-                backgroundAllowedUID.clear()
+                filterCategories.forEach {
+                    val update = appInfoRepository.updateWhitelistForCategories(it, checked)
+                    categoryInfoRepository.updateWhitelistForCategory(it, checked)
+                    val countBlocked = appInfoRepository.getBlockedCountForCategory(it)
+                    categoryInfoRepository.updateBlockedCount(it, countBlocked)
+                    if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Update whitelist count: $update")
+                }
             }
-            if (DEBUG) printAllowedUID()
-        }
-        // FIXME: 18-12-2020 - Figure out why the below code exists
-        //probably not required.
-        else {
-            if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                             "addOrRemovePackageForBackground:isPackageLauncher ${packageName}, true")
-            addOrRemovePackageForBackground(true)
-        }
-
-    }
-
-    //https://stackoverflow.com/questions/45620584/event-getsource-returns-null-in-accessibility-service-catch-source-for-a-3rd-p
-    /**
-     * If the event retrieved package name is null then the check for the package name
-     * is carried out in (getRootInActiveWindow)AccessibilityNodeInfo
-     */
-    private fun getEventPackageName(event: AccessibilityEvent,
-                                    rootInActiveWindow: AccessibilityNodeInfo?): String? {
-        var packageName: String? = event.packageName?.toString()
-
-        if (packageName.isNullOrEmpty() && rootInActiveWindow != null) {
-            packageName = rootInActiveWindow.packageName?.toString()
-        }
-        if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                         "event.packageName: $packageName, rootWindow.packageName: ${rootInActiveWindow?.packageName}")
-        return packageName
-    }
-
-    private fun printAllowedUID() {
-        Log.d(LOG_TAG_FIREWALL, "AccessibilityEvent: printAllowedUID UID: --------")
-        backgroundAllowedUID.forEach {
-            Log.d(LOG_TAG_FIREWALL,
-                  "AccessibilityEvent: printAllowedUID UID: ${it.key}, ${it.value}")
+            // All the apps / some app categories selected and whitelisted so reload the
+            // app list from database.
+            reloadAppList()
         }
     }
 
-    private fun isPackageLauncher(packageName: String?): Boolean {
-        if (TextUtils.isEmpty(packageName)) return false
+    fun updateExcludedApps(appInfo: AppInfo, status: Boolean) {
+        CoroutineScope(Dispatchers.IO).launch {
+            updateAppsExcludedPermission(appInfo.uid, status)
+            appInfoRepository.updateExcludedList(appInfo.uid, status)
+            val count = appInfoRepository.getBlockedCountForCategory(appInfo.appCategory)
+            val excludedCount = appInfoRepository.getExcludedAppCountForCategory(
+                appInfo.appCategory)
+            val whitelistCount = appInfoRepository.getBlockedCountForCategory(appInfo.appCategory)
+            categoryInfoRepository.updateBlockedCount(appInfo.appCategory, count)
+            categoryInfoRepository.updateExcludedCount(appInfo.appCategory, excludedCount)
+            categoryInfoRepository.updateWhitelistCount(appInfo.appCategory, whitelistCount)
+        }
+    }
 
-        val intent = Intent("android.intent.action.MAIN")
-        intent.addCategory("android.intent.category.HOME")
-        val thisPackage = packageManager.resolveActivity(intent,
-                                                         PackageManager.MATCH_DEFAULT_ONLY)?.activityInfo?.packageName
-        return thisPackage == packageName
+    fun updateWhitelistedApps(appInfo: AppInfo, isWhitelisted: Boolean) {
+        CoroutineScope(Dispatchers.IO).launch {
+            updateAppsWhitelist(appInfo.uid, isWhitelisted)
+            if (isWhitelisted) {
+                appInfoRepository.updateInternetForUID(appInfo.uid, isWhitelisted)
+            }
+            appInfoRepository.updateWhitelist(appInfo.uid, isWhitelisted)
+            val countBlocked = appInfoRepository.getBlockedCountForCategory(appInfo.appCategory)
+            val countWhitelisted = appInfoRepository.getWhitelistCountForCategory(
+                appInfo.appCategory)
+            categoryInfoRepository.updateBlockedCount(appInfo.appCategory, countBlocked)
+            categoryInfoRepository.updateWhitelistCount(appInfo.appCategory, countWhitelisted)
+        }
+    }
+
+    fun updateFirewalledApps(uid: Int, isBlocked: Boolean) {
+        CoroutineScope(Dispatchers.IO).launch {
+            updateAppsInternetPermission(uid, isBlocked)
+            val appInfo = getAppInfosByUid(uid).distinctBy { it.appCategory }
+            appInfo.forEach {
+                categoryInfoRepository.updateNumberOfBlocked(it.appCategory, !isBlocked)
+                if (DEBUG) Log.d(LOG_TAG_FIREWALL,
+                                 "Category block executed with blocked as $isBlocked")
+            }
+            appInfoRepository.updateInternetForUID(uid, isBlocked)
+        }
+    }
+
+    fun updateFirewalledAppsByCategory(categoryInfo: CategoryInfo, isInternetBlocked: Boolean) {
+        CoroutineScope(Dispatchers.IO).launch {
+            // flip appInfoRepository's isInternetBlocked.
+            // AppInfo's(Database) column name is isInternet but for CategoryInfo(database) the
+            // column name is appInfoRepository.
+            val count = appInfoRepository.setInternetAllowedForCategory(categoryInfo.categoryName,
+                                                                        !isInternetBlocked)
+            if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Apps updated : $count, $isInternetBlocked")
+            // Update the category's internet blocked based on the app's count which is returned
+            // from the app info database.
+            categoryInfoRepository.updateCategoryDetails(categoryInfo.categoryName, count,
+                                                         isInternetBlocked)
+            updateCategoryAppsInternetPermission(categoryInfo.categoryName, isInternetBlocked)
+        }
     }
 
 
-    private fun addOrRemovePackageForBackground(isAllowed: Boolean) {
-        if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                         "isBackgroundEnabled: ${persistentState.backgroundEnabled}, Package: $latestTrackedPackage, isAllowed: $isAllowed")
-        if (!persistentState.backgroundEnabled || latestTrackedPackage.isNullOrEmpty()) return
-
-        val currentPackage = latestTrackedPackage
-        packageElect = currentPackage
-        updateInternetBackground(currentPackage, isAllowed)
-    }
 }

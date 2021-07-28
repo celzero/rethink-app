@@ -35,35 +35,46 @@ import java.io.File
  * The runnable will be executed only if the show fav icon setting is turned on.
  * In Settings -> DNS -> Show fav icon (_TRUE_).
  */
-class FavIconDownloader(val context: Context, val url: String) : Runnable {
+class FavIconDownloader(val context: Context, private val url: String) : Runnable {
 
     override fun run() {
         Process.setThreadPriority(Process.THREAD_PRIORITY_LOWEST)
-        val extractURL = url.substringAfter(Constants.FAV_ICON_URL).dropLast(4)
-        val cacheKey = Utilities.getETldPlus1(extractURL).toString()
-        val glideURL = "${Constants.FAV_ICON_URL}${cacheKey}.ico"
-        updateImage(url, glideURL, true)
+        // url will have . at end of the file, which needs to be removed.
+        val fdqnUrl = url.dropLast(1)
+        val url = constructFavUrl(fdqnUrl)
+        updateImage(url, getDomainUrlFromFdqn(fdqnUrl), true)
+    }
+
+    private fun getDomainUrlFromFdqn(url: String): String {
+        // Convert an FQDN like "www.example.co.uk." to an eTLD + 1 like "example.co.uk".
+        val domainUrl = Utilities.getETldPlus1(url).toString()
+        return constructFavUrl(domainUrl)
+    }
+
+    // Add duckduckgo format to download the favicon.
+    // eg., https://icons.duckduckgo.com/ip2/google.com.ico
+    private fun constructFavUrl(url: String): String {
+        return "${Constants.FAV_ICON_URL}${url}.ico"
     }
 
 
-    private fun updateImage(url: String, subUrl: String, retry: Boolean) {
+    private fun updateImage(subUrl: String, url: String, retry: Boolean) {
         val futureTarget: FutureTarget<File> = GlideApp.with(
             context.applicationContext).downloadOnly().diskCacheStrategy(
-            DiskCacheStrategy.AUTOMATIC).load(url).submit(SIZE_ORIGINAL, SIZE_ORIGINAL)
+            DiskCacheStrategy.AUTOMATIC).load(subUrl).submit(SIZE_ORIGINAL, SIZE_ORIGINAL)
         try {
             val file = futureTarget.get()
             if (DEBUG) Log.d(LOG_TAG_DNS_LOG,
-                             "Glide - success() -$url, $subUrl, ${file.absoluteFile}")
+                             "Glide - success() -$subUrl, $url, ${file.absoluteFile}")
         } catch (e: Exception) {
             // In case of failure the FutureTarget will throw an exception.
             // Will initiate the download of fav icon for the top level domain.
             if (retry) {
-                if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - onLoadFailed() -$url")
-                updateImage(subUrl, "", false)
+                if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - onLoadFailed() -$subUrl")
+                updateImage(url, "", false)
             }
             Log.e(LOG_TAG_DNS_LOG,
-                  "Glide - Got ExecutionException waiting for background downloadOnly ${e.message}",
-                  e)
+                  "Glide - Got ExecutionException waiting for background downloadOnly")
         } finally {
             GlideApp.with(context.applicationContext).clear(futureTarget)
         }

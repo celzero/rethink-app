@@ -50,8 +50,8 @@ interface DoHEndpointDAO {
     @Query("delete from DoHEndpoint")
     fun clearAllData()
 
-    @Query("delete from DoHEndpoint where dohURL like :url and isCustom = 1")
-    fun deleteDoHEndpoint(url: String)
+    @Query("delete from DoHEndpoint where id = :id and isCustom = 1")
+    fun deleteDoHEndpoint(id: Int)
 
     @Query("update DoHEndpoint set isSelected = 0 where isSelected = 1")
     fun removeConnectionStatus()

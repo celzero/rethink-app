@@ -16,9 +16,7 @@ limitations under the License.
 package com.celzero.bravedns.ui
 
 import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -29,22 +27,14 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.database.AppInfoRepository
-import com.celzero.bravedns.database.AppInfoViewRepository
-import com.celzero.bravedns.database.CategoryInfoRepository
+import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.databinding.CustomDialogLayoutBinding
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.AppListViewModel
 import com.google.android.material.chip.Chip
 
 
-class WhitelistAppDialog(private var activity: Context,
-                         private val appInfoRepository: AppInfoRepository,
-                         private val appInfoViewRepository: AppInfoViewRepository,
-                         private val categoryInfoRepository: CategoryInfoRepository,
+class WhitelistAppDialog(val activity: FirewallActivity,
                          internal var adapter: RecyclerView.Adapter<*>,
                          var viewModel: AppListViewModel, themeID: Int) : Dialog(activity, themeID),
                                                                           View.OnClickListener,
@@ -68,7 +58,7 @@ class WhitelistAppDialog(private var activity: Context,
         window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT,
                           WindowManager.LayoutParams.MATCH_PARENT)
 
-        mLayoutManager = LinearLayoutManager(activity)
+        mLayoutManager = LinearLayoutManager(context)
 
         b.recyclerViewDialog.layoutManager = mLayoutManager
         b.recyclerViewDialog.adapter = adapter
@@ -83,22 +73,22 @@ class WhitelistAppDialog(private var activity: Context,
             false
         }
 
-        val act: FirewallActivity = activity as FirewallActivity
-        appInfoViewRepository.getWhitelistCountLiveData().observe(act, {
-            b.customSelectAllOptionCount.text = act.getString(R.string.whitelist_dialog_apps_in_use,
-                                                              it.toString(),
-                                                              appList.size.toString())
+        FirewallManager.getApplistObserver().observe(activity, {
+            val blockedCount = it.filter { a -> !a.isInternetAllowed }.size
+            b.customSelectAllOptionCount.text = context.getString(
+                R.string.whitelist_dialog_apps_in_use, blockedCount.toString(),
+                FirewallManager.getTotalApps().toString())
         })
 
         b.customSelectAllOptionCheckbox.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
-            modifyAppsInUniversalAppList(b)
+            FirewallManager.updateWhitelistedAppsByCategories(filterCategories, b)
             if (b) {
-                Utilities.showToastUiCentered(activity,
-                                              act.getString(R.string.whitelist_toast_positive),
+                Utilities.showToastUiCentered(context,
+                                              context.getString(R.string.whitelist_toast_positive),
                                               Toast.LENGTH_SHORT)
             } else {
-                Utilities.showToastUiCentered(activity,
-                                              act.getString(R.string.whitelist_toast_negative),
+                Utilities.showToastUiCentered(context,
+                                              context.getString(R.string.whitelist_toast_negative),
                                               Toast.LENGTH_SHORT)
             }
 
@@ -111,28 +101,8 @@ class WhitelistAppDialog(private var activity: Context,
     }
 
 
-    private fun modifyAppsInUniversalAppList(checked: Boolean) {
-        if (filterCategories.isNullOrEmpty()) {
-            appInfoRepository.updateWhiteListForAllApp(checked)
-            appInfoRepository.getAppCategoryList().forEach {
-                val countBlocked = appInfoRepository.getBlockedCountForCategory(it)
-                categoryInfoRepository.updateBlockedCount(it, countBlocked)
-            }
-            categoryInfoRepository.updateWhitelistCountForAll(checked)
-        } else {
-            filterCategories.forEach {
-                val update = appInfoRepository.updateWhiteListForCategories(it, checked)
-                categoryInfoRepository.updateWhitelistForCategory(it, checked)
-                val countBlocked = appInfoRepository.getBlockedCountForCategory(it)
-                categoryInfoRepository.updateBlockedCount(it, countBlocked)
-                if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Update whitelist count: $update")
-            }
-
-        }
-    }
-
     private fun categoryListByAppNameFromDB(name: String) {
-        category = appInfoRepository.getAppCategoryForAppName("%$name%")
+        category = FirewallManager.getCategoryListByAppName(name)
         setCategoryChips(category)
     }
 

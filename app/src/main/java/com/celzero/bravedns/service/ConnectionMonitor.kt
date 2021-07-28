@@ -196,7 +196,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
         private fun informListener(requireAllNetworks: Boolean = false) {
             Log.i(LOG_TAG_CONNECTION,
-                  "inform listerner on network change - ${currentNetworks.size}, is all network - $requireAllNetworks")
+                  "inform listener on network change - ${currentNetworks.size}, is all network - $requireAllNetworks")
             if (currentNetworks.size > 0) {
                 val networks = when (requireAllNetworks) {
                     true -> currentNetworks

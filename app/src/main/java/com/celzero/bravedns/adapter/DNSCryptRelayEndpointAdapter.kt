@@ -27,32 +27,28 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.database.DNSCryptEndpointRepository
+import com.celzero.bravedns.data.AppMode
+import com.celzero.bravedns.data.AppMode.Companion.cryptRelayToRemove
 import com.celzero.bravedns.database.DNSCryptRelayEndpoint
-import com.celzero.bravedns.database.DNSCryptRelayEndpointRepository
 import com.celzero.bravedns.databinding.DnsCryptEndpointListItemBinding
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.cryptRelayToRemove
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Utilities
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
-class DNSCryptRelayEndpointAdapter(private val context: Context,
-                                   private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
-                                   private val persistentState: PersistentState,
-                                   private val dnsCryptEndpointRepository: DNSCryptEndpointRepository) :
+class DNSCryptRelayEndpointAdapter(private val context: Context, private val appMode: AppMode) :
         PagedListAdapter<DNSCryptRelayEndpoint, DNSCryptRelayEndpointAdapter.DNSCryptRelayEndpointViewHolder>(
             DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DNSCryptRelayEndpoint>() {
             override fun areItemsTheSame(oldConnection: DNSCryptRelayEndpoint,
-                                         newConnection: DNSCryptRelayEndpoint) = oldConnection.id == newConnection.id
+                                         newConnection: DNSCryptRelayEndpoint): Boolean {
+                return (oldConnection.id == newConnection.id && oldConnection.isSelected == newConnection.isSelected)
+            }
 
             override fun areContentsTheSame(oldConnection: DNSCryptRelayEndpoint,
-                                            newConnection: DNSCryptRelayEndpoint) = oldConnection == newConnection
+                                            newConnection: DNSCryptRelayEndpoint): Boolean {
+                return (oldConnection.id == newConnection.id && oldConnection.isSelected != newConnection.isSelected)
+            }
         }
     }
 
@@ -80,20 +76,15 @@ class DNSCryptRelayEndpointAdapter(private val context: Context,
         private fun setupClickListener(endpoint: DNSCryptRelayEndpoint) {
             b.root.setOnClickListener {
                 b.dnsCryptEndpointListActionImage.isChecked = !b.dnsCryptEndpointListActionImage.isChecked
-
-                val state = updateDNSCryptRelayDetails(endpoint,
-                                                       b.dnsCryptEndpointListActionImage.isChecked)
-                b.dnsCryptEndpointListActionImage.isChecked = state
+                updateDNSCryptRelayDetails(endpoint, b.dnsCryptEndpointListActionImage.isChecked)
             }
 
             b.dnsCryptEndpointListActionImage.setOnClickListener {
-                val state = updateDNSCryptRelayDetails(endpoint,
-                                                       b.dnsCryptEndpointListActionImage.isChecked)
-                b.dnsCryptEndpointListActionImage.isChecked = state
+                updateDNSCryptRelayDetails(endpoint, b.dnsCryptEndpointListActionImage.isChecked)
             }
 
             b.dnsCryptEndpointListInfoImage.setOnClickListener {
-                showExplanationOnImageClick(endpoint)
+                promptUser(endpoint)
             }
         }
 
@@ -116,8 +107,8 @@ class DNSCryptRelayEndpointAdapter(private val context: Context,
             }
         }
 
-        private fun showExplanationOnImageClick(endpoint: DNSCryptRelayEndpoint) {
-            if (endpoint.isDeletable()) showDialogForDelete(endpoint)
+        private fun promptUser(endpoint: DNSCryptRelayEndpoint) {
+            if (endpoint.isDeletable()) showDeleteDialog(endpoint.id)
             else {
                 showDialogExplanation(endpoint.dnsCryptRelayName, endpoint.dnsCryptRelayURL,
                                       endpoint.dnsCryptRelayExplanation)
@@ -142,50 +133,54 @@ class DNSCryptRelayEndpointAdapter(private val context: Context,
                 Utilities.showToastUiCentered(context, context.getString(
                     R.string.info_dialog_url_copy_toast_msg), Toast.LENGTH_SHORT)
             }
-            val alertDialog: AlertDialog = builder.create()
-            alertDialog.setCancelable(true)
-            alertDialog.show()
+            builder.create().show()
         }
 
-        private fun showDialogForDelete(endpoint: DNSCryptRelayEndpoint) {
+        private fun showDeleteDialog(id: Int) {
             val builder = AlertDialog.Builder(context)
             builder.setTitle(R.string.dns_crypt_relay_remove_dialog_title)
             builder.setMessage(R.string.dns_crypt_relay_remove_dialog_message)
             builder.setCancelable(true)
             builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { _, _ ->
-                GlobalScope.launch(Dispatchers.IO) {
-                    dnsCryptRelayEndpointRepository.deleteDNSCryptRelayEndpoint(
-                        endpoint.dnsCryptRelayURL)
-                }
-                Toast.makeText(context, R.string.dns_crypt_relay_remove_success,
-                               Toast.LENGTH_SHORT).show()
+                deleteEndpoint(id)
             }
 
             builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
             }
-            val alertDialog: AlertDialog = builder.create()
-            alertDialog.setCancelable(true)
-            alertDialog.show()
+            builder.create().show()
         }
 
         private fun updateDNSCryptRelayDetails(endpoint: DNSCryptRelayEndpoint,
-                                               isSelected: Boolean): Boolean {
-            if (dnsCryptEndpointRepository.getConnectedCount() < 0) {
-                Toast.makeText(context, context.getString(R.string.dns_crypt_relay_error_toast),
-                               Toast.LENGTH_LONG).show()
-                return false
+                                               isSelected: Boolean) {
+
+            CoroutineScope(Dispatchers.IO).launch {
+                if (isSelected && !appMode.isRelaySelectable()) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context,
+                                       context.getString(R.string.dns_crypt_relay_error_toast),
+                                       Toast.LENGTH_LONG).show()
+                        b.dnsCryptEndpointListActionImage.isChecked = false
+                    }
+                    return@launch
+                }
+
+                endpoint.isSelected = isSelected
+                if (!isSelected) {
+                    cryptRelayToRemove = endpoint.dnsCryptRelayURL
+                }
+                appMode.handleDnsrelayChanges(endpoint)
+
             }
+        }
 
-            endpoint.isSelected = isSelected
-            if (!isSelected) {
-                cryptRelayToRemove = endpoint.dnsCryptRelayURL
+        private fun deleteEndpoint(id: Int) {
+            CoroutineScope(Dispatchers.IO).launch {
+                appMode.deleteDnscryptEndpoint(id)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, R.string.dns_crypt_relay_remove_success,
+                                   Toast.LENGTH_SHORT).show()
+                }
             }
-
-            dnsCryptRelayEndpointRepository.updateAsync(endpoint)
-            Utilities.delay(1000) { notifyDataSetChanged() }
-            persistentState.dnsType = Constants.PREF_DNS_MODE_DNSCRYPT
-            return true
-
         }
     }
 }

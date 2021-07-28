@@ -113,7 +113,7 @@ class AppDownloadManager(private val persistentState: PersistentState,
      */
     private fun purge(context: Context) {
         downloadReference.clear()
-        persistentState.downloadIDs = emptySet()
+        persistentState.downloadIds = emptySet()
         BlocklistDownloadHelper.deleteOldFiles(context)
     }
 
@@ -129,7 +129,7 @@ class AppDownloadManager(private val persistentState: PersistentState,
                                                          timestamp), fileName)
             val downloadID = downloadManager.enqueue(this)
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "filename - $fileName, downloadID - $downloadID")
-            persistentState.downloadIDs = persistentState.downloadIDs + downloadID.toString()
+            persistentState.downloadIds = persistentState.downloadIds + downloadID.toString()
         }
     }
 

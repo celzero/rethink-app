@@ -34,8 +34,8 @@ class DoHEndpoint {
 
     override fun equals(other: Any?): Boolean {
         if (other !is DoHEndpoint) return false
+        if (isSelected != other.isSelected) return false
         if (dohURL != other.dohURL) return false
-        if (isSelected != isSelected) return false
         return true
     }
 
@@ -66,8 +66,13 @@ class DoHEndpoint {
         return isCustom && !isSelected
     }
 
-    fun isRethinkDns(): Boolean {
+    fun isRethinkDnsPlus(): Boolean {
         return Constants.RETHINK_DNS_PLUS == this.dohName
+    }
+
+    fun isRethinkDns(): Boolean {
+        return (this.dohName.contains(Constants.BRAVE_DNS_BASE_NAME) || this.dohName.contains(
+            Constants.RETHINK_DNS_BASE_NAME))
     }
 
 }

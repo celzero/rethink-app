@@ -89,53 +89,55 @@ class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
     }
 
     private fun displayDnsTransactionDetails() {
+        displayDescription()
 
-        val uptime = DateUtils.getRelativeTimeSpanString(transaction.time,
-                                                         System.currentTimeMillis(),
-                                                         DateUtils.MINUTE_IN_MILLIS,
-                                                         DateUtils.FORMAT_ABBREV_RELATIVE)
-
-        displayDescription(uptime.toString())
-
-        if (transaction.blockLists.isEmpty()) {
+        if (!transaction.hasBlocklists()) {
             b.dnsBlockRecyclerContainer.visibility = View.GONE
             b.dnsBlockPlaceHolder.visibility = View.VISIBLE
-        } else {
-            if (transaction.serverIP.isEmpty()) {
-                b.dnsBlockBlockedDesc.text = getString(R.string.bsct_conn_block_desc_device, uptime)
-            } else {
-                b.dnsBlockBlockedDesc.text = getString(R.string.bsct_conn_block_desc, uptime,
-                                                       transaction.serverIP)
-            }
+            return
+        }
 
-            val blocklists = transaction.blockLists.split(",")
-            if (blocklists.isNotEmpty()) {
-                b.dnsBlockRecyclerview.layoutManager = LinearLayoutManager(contextVal)
-                recyclerAdapter = DNSBottomSheetBlockAdapter(contextVal, blocklists)
-                b.dnsBlockRecyclerview.adapter = recyclerAdapter
-                b.dnsBlockPlaceHolder.visibility = View.GONE
-            } else {
-                b.dnsBlockPlaceHolder.visibility = View.VISIBLE
-            }
+        val blocklists = transaction.getBlocklists()
+        if (blocklists.isNotEmpty()) {
+            b.dnsBlockRecyclerview.layoutManager = LinearLayoutManager(contextVal)
+            recyclerAdapter = DNSBottomSheetBlockAdapter(contextVal, blocklists)
+            b.dnsBlockRecyclerview.adapter = recyclerAdapter
+            b.dnsBlockPlaceHolder.visibility = View.GONE
+        } else {
+            b.dnsBlockPlaceHolder.visibility = View.VISIBLE
         }
     }
 
-    private fun displayDescription(uptime: String) {
-
+    private fun displayDescription() {
+        val uptime = DateUtils.getRelativeTimeSpanString(transaction.time,
+                                                         System.currentTimeMillis(),
+                                                         DateUtils.MINUTE_IN_MILLIS,
+                                                         DateUtils.FORMAT_ABBREV_RELATIVE).toString()
         if (transaction.isBlocked) {
-            b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_blocked_by, uptime,
-                                                   transaction.serverIP)
+            showBlockedState(uptime)
         } else {
-            if (transaction.serverIP.isNotEmpty() && transaction.relayIP.isNotEmpty()) {
-                val text = getString(R.string.dns_btm_resolved_crypt, uptime, transaction.serverIP)
-                b.dnsBlockBlockedDesc.text = Utilities.updateHtmlEncodedText(text)
-            } else if (transaction.serverIP.isNotEmpty()) {
-                b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh, uptime,
-                                                       transaction.serverIP)
-            } else {
-                b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh_no_server,
-                                                       uptime)
-            }
+            showResolvedState(uptime)
+        }
+    }
+
+    private fun showResolvedState(uptime: String) {
+        if (transaction.isAnonymized()) { // anonymized queries answered by dnscrypt
+            val text = getString(R.string.dns_btm_resolved_crypt, uptime, transaction.serverIP)
+            b.dnsBlockBlockedDesc.text = Utilities.updateHtmlEncodedText(text)
+        } else if (transaction.isLocallyAnswered()) { // usually happens when there is a network failure
+            b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh_no_server, uptime)
+        } else {
+            b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh, uptime,
+                                                   transaction.serverIP)
+        }
+    }
+
+    private fun showBlockedState(uptime: String) {
+        if (transaction.isLocallyAnswered()) { // usually true when query blocked by on-device blocklists
+            b.dnsBlockBlockedDesc.text = getString(R.string.bsct_conn_block_desc_device, uptime)
+        } else {
+            b.dnsBlockBlockedDesc.text = getString(R.string.bsct_conn_block_desc, uptime,
+                                                   transaction.serverIP)
         }
     }
 
@@ -149,16 +151,16 @@ class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
         updateImage(url, glideURL)
     }
 
-    private fun updateImage(url: String, cacheKey: String) {
+    private fun updateImage(url: String, subDomainUrl: String) {
         try {
             if (DEBUG) Log.d(LOG_TAG_DNS_LOG,
-                             "Glide - TransactionViewHolder updateImage() -$url, $cacheKey")
+                             "Glide - TransactionViewHolder updateImage() -$url, $subDomainUrl")
             val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
             GlideApp.with(contextVal.applicationContext).load(url).onlyRetrieveFromCache(
                 true).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).override(Target.SIZE_ORIGINAL,
                                                                               Target.SIZE_ORIGINAL).error(
-                GlideApp.with(contextVal.applicationContext).load(cacheKey).onlyRetrieveFromCache(
-                    true)).transition(
+                GlideApp.with(contextVal.applicationContext).load(
+                    subDomainUrl).onlyRetrieveFromCache(true)).transition(
                 DrawableTransitionOptions.withCrossFade(factory)).into(object :
                                                                                CustomViewTarget<ImageView, Drawable>(
                                                                                    b.dnsBlockFavIcon) {

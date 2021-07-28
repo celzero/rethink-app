@@ -23,15 +23,16 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.google.common.collect.HashMultimap
+import com.google.common.collect.SetMultimap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 object FirewallRules {
 
-    var appIpRules: HashMultimap<Int, String> = HashMultimap.create()
+    var appIpRules: SetMultimap<Int, String> = HashMultimap.create()
 
-    // The UID used to be generic uid used to block IP addresses which are intented to
+    // The UID used to be generic uid used to block IP addresses which are intended to
     // block for all the applications.
     const val UID_EVERYBODY = -1000
 
@@ -61,19 +62,13 @@ object FirewallRules {
         if (DEBUG) Log.d(LOG_TAG_FIREWALL, "addFirewallRules: $uid, $ipAddress")
         CoroutineScope(Dispatchers.IO).launch {
             val blockedConnection = constructBlockedConnections(uid, ipAddress, ruleType)
-            blockedConnectionsRepository.insertAsync(blockedConnection)
+            blockedConnectionsRepository.insert(blockedConnection)
         }
         appIpRules.put(uid, ipAddress)
     }
 
-    fun checkRules(uid: Int, rules: ConnectionRules): Boolean {
-        val rule = this.appIpRules[uid]
-        rule?.forEach {
-            if (rules.ipAddress == it) {
-                return true
-            }
-        }
-        return false
+    fun hasRule(uid: Int, rules: ConnectionRules): Boolean {
+        return appIpRules.get(uid).contains(rules.ipAddress)
     }
 
     fun clearAllIpRules(blockedConnectionsRepository: BlockedConnectionsRepository) {
@@ -88,7 +83,7 @@ object FirewallRules {
             val rules = blockedConnectionsRepository.getBlockedConnections()
             rules.forEach {
                 val key = it.uid
-                this@FirewallRules.appIpRules.put(key, it.ipAddress)
+                appIpRules.put(key, it.ipAddress)
             }
         }
     }

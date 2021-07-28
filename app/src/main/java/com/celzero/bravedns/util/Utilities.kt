@@ -290,11 +290,11 @@ class Utilities {
             }
         }
 
-        fun isValidUid(uid: Int): Boolean {
-            return AndroidUidConfig.isValidUid(uid)
+        fun isUnknownUid(uid: Int): Boolean {
+            return AndroidUidConfig.isUnknownUid(uid)
         }
 
-        fun isInvalidUid(uid: Int): Boolean {
+        fun isMissingOrInvalidUid(uid: Int): Boolean {
             return when (uid) {
                 MISSING_UID -> true
                 INVALID_UID -> true
@@ -410,7 +410,7 @@ class Utilities {
             }
         }
 
-        fun getIcon(context: Context, packageName: String, appName: String): Drawable? {
+        fun getIcon(context: Context, packageName: String, appName: String?): Drawable? {
             if (!isValidAppName(appName, packageName)) {
                 return getDefaultIcon(context)
             }
@@ -418,18 +418,19 @@ class Utilities {
             return try {
                 context.packageManager.getApplicationIcon(packageName)
             } catch (e: PackageManager.NameNotFoundException) {
+                // Not adding exception details in logs.
                 Log.e(LOG_TAG_FIREWALL,
-                      "Application Icon not available for package: $packageName" + e.message, e)
+                      "Application Icon not available for package: $packageName" + e.message)
                 getDefaultIcon(context)
             }
         }
 
-        private fun isValidAppName(appName: String, packageName: String): Boolean {
-            return !packageName.contains(Constants.NO_PACKAGE) && appName != Constants.UNKNOWN_APP
+        private fun isValidAppName(appName: String?, packageName: String): Boolean {
+            return !packageName.contains(Constants.NO_PACKAGE) && Constants.UNKNOWN_APP != appName
         }
 
         fun isValidAppName(appName: String?): Boolean {
-            return appName != Constants.UNKNOWN_APP
+            return (!appName.isNullOrEmpty() && appName != Constants.UNKNOWN_APP)
         }
 
         fun getDefaultIcon(context: Context): Drawable? {
@@ -458,6 +459,28 @@ class Utilities {
                     updateUi()
                 }
             }.start()
+        }
+
+        fun getPackageInfoForUid(context: Context, uid: Int): Array<out String>? {
+            if (!isUnknownUid(uid)) {
+                Log.i(LOG_TAG_FIREWALL, "Invalid uid, not fetching value from package manager")
+                return null
+            }
+
+            try {
+                return context.packageManager.getPackagesForUid(uid)
+            } catch (e: PackageManager.NameNotFoundException) {
+                Log.w(LoggerConstants.LOG_TAG_FIREWALL_LOG, "Package Not Found - " + e.message)
+            }
+            return null
+        }
+
+        fun isAtleastO(): Boolean {
+            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+        }
+
+        fun isAtleastR(): Boolean {
+            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
         }
     }
 }

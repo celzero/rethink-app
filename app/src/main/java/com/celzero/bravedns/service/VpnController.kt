@@ -17,10 +17,10 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -46,11 +46,11 @@ object VpnController {
 
     @Synchronized
     fun onConnectionStateChanged(state: BraveVPNService.State?) {
-        if (braveVpnService == null) {
+        connectionState = if (braveVpnService == null) {
             // User clicked disable while the connection state was changing.
-            connectionState = null
+            null
         } else {
-            connectionState = state
+            state
         }
         connectionStatus.postValue(state)
     }
@@ -63,7 +63,7 @@ object VpnController {
             return
         }
         val startServiceIntent = Intent(context, BraveVPNService::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (isAtleastO()) {
             context.startForegroundService(startServiceIntent)
         } else {
             context.startService(startServiceIntent)

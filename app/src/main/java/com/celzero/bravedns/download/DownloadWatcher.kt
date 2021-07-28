@@ -69,7 +69,7 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
 
     private fun checkForDownload(context: Context): Int {
         //Check for the download success from the receiver
-        persistentState.downloadIDs.forEach { downloadID ->
+        persistentState.downloadIds.forEach { downloadID ->
             val query = DownloadManager.Query()
             query.setFilterById(downloadID.toLong())
             val downloadManager = context.getSystemService(
@@ -89,9 +89,9 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
                     if (status == DownloadManager.STATUS_SUCCESSFUL) {
                         // status==success is sometimes called-back more than once.
                         // send a 'success' removing it from persitent-state.
-                        persistentState.downloadIDs = persistentState.downloadIDs.minusElement(
+                        persistentState.downloadIds = persistentState.downloadIds.minusElement(
                             downloadID)
-                        if (persistentState.downloadIDs.isEmpty()) {
+                        if (persistentState.downloadIds.isEmpty()) {
                             return DOWNLOAD_SUCCESS
                         }
                     } else if (status == DownloadManager.STATUS_FAILED) {

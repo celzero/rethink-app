@@ -75,12 +75,11 @@ class DNSQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
         val itemBinding = TransactionRowBinding.inflate(LayoutInflater.from(parent.context), parent,
                                                         false)
-        return TransactionViewHolder(itemBinding, loadFavIcon)
+        return TransactionViewHolder(itemBinding)
     }
 
 
-    inner class TransactionViewHolder(private val b: TransactionRowBinding,
-                                      private val favIcon: Boolean) :
+    inner class TransactionViewHolder(private val b: TransactionRowBinding) :
             RecyclerView.ViewHolder(b.root) {
         fun update(dnsLog: DNSLogs?) {
             if (dnsLog == null) return
@@ -106,7 +105,7 @@ class DNSQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
             b.flag.text = dnsLog.flag
             b.flag.visibility = View.VISIBLE
             b.favIcon.visibility = View.GONE
-            if (!favIcon || dnsLog.failure()) {
+            if (!loadFavIcon || dnsLog.failure()) {
                 clearFavIcon()
                 return
             }
@@ -129,8 +128,8 @@ class DNSQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
 
         private fun openBottomSheet(dnsLog: DNSLogs) {
             if (context !is FragmentActivity) {
-                Log.w(LoggerConstants.LOG_TAG_UI,
-                      "Can not open bottom sheet. Context is not attached to activity")
+                Log.wtf(LoggerConstants.LOG_TAG_UI,
+                        "Can not open bottom sheet. Context is not attached to activity")
                 return
             }
             val bottomSheetFragment = DNSBlocklistBottomSheetFragment(context, dnsLog)
@@ -171,8 +170,7 @@ class DNSQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
                     }
                 })
             } catch (e: Exception) {
-                if (DEBUG) Log.d(LOG_TAG_DNS_LOG,
-                                 "Glide - TransactionViewHolder Exception() -${e.message}")
+                if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Error loading icon, load flag instead")
                 showFlag()
                 hideFavIcon()
             }

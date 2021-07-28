@@ -41,6 +41,9 @@ interface AppInfoDAO {
     @Delete
     fun delete(appInfo: AppInfo)
 
+    @Query("delete from AppInfo where packageInfo in (:packageNames)")
+    fun deleteByPackageName(packageNames: List<String>)
+
     @Query("select * from AppInfo order by appCategory,uid")
     fun getAllAppDetails(): List<AppInfo>
 
@@ -100,14 +103,14 @@ interface AppInfoDAO {
 
     @Query(
         "update AppInfo set whiteListUniv1 = :isEnabled , isInternetAllowed = 1 where uid = :uid")
-    fun updateWhiteList(uid: Int, isEnabled: Boolean)
+    fun updateWhitelist(uid: Int, isEnabled: Boolean)
 
     @Query("update AppInfo set whiteListUniv1 = :isEnabled, isInternetAllowed = 1")
-    fun updateWhiteListForAllApp(isEnabled: Boolean): Int
+    fun updateWhitelistForAllApp(isEnabled: Boolean): Int
 
     @Query(
         "update AppInfo set whiteListUniv1 = :isEnabled, isInternetAllowed = 1  where appCategory = :category")
-    fun updateWhiteListForCategories(category: String, isEnabled: Boolean): Int
+    fun updateWhitelistForCategories(category: String, isEnabled: Boolean): Int
 
     @Query("select * from AppInfo  order by isExcluded desc,lower(appName)")
     fun getExcludedAppDetailsLiveData(): DataSource.Factory<Int, AppInfo>
@@ -150,9 +153,6 @@ interface AppInfoDAO {
 
     @Query("select count(*) from AppInfo where whiteListUniv1 = 1 and appCategory = :categoryName")
     fun getWhitelistCount(categoryName: String): Int
-
-    @Query("select appName from AppInfo where uid = :uid")
-    fun getAppNameForUID(uid: Int): String
 
     @Query("select count(*) from AppInfo where isExcluded= 1 and appCategory = :categoryName")
     fun getExcludedAppCountForCategory(categoryName: String): Int

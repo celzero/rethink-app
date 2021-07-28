@@ -23,7 +23,7 @@ object DatabaseModule {
         single { AppDatabase.buildDatabase(androidContext()) }
         single {
             RefreshDatabase(androidContext(), get(), get(), get(), get(), get(), get(), get(),
-                            get(), get(), get())
+                            get(), get())
         }
     }
     private val daoModule = module {

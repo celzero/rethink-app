@@ -25,7 +25,6 @@ import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.dns.DnsPacket
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LOOPBACK_IPV6
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DNSCRYPT
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DOH
@@ -148,14 +147,14 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                 }
             }
 
-            dnsLogRepository.insert(dnsLogs)
             fetchFavIcon(dnsLogs)
 
             // Post number of requests and blocked count to livedata.
-            persistentState.requestCountLiveData.postValue(++numRequests)
-            if (dnsLogs.isBlocked) persistentState.blockedCountLiveData.postValue(
+            persistentState.dnsRequestsCountLiveData.postValue(++numRequests)
+            if (dnsLogs.isBlocked) persistentState.dnsBlockedCountLiveData.postValue(
                 ++numBlockedRequests)
 
+            dnsLogRepository.insert(dnsLogs)
 
             // avoid excessive disk I/O from syncing the counter to disk after every request
             if (numRequests % PERSISTENCE_STATE_INSERT_SIZE == 0L) {
@@ -179,9 +178,8 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
     private fun fetchFavIcon(dnsLogs: DNSLogs) {
         if (!persistentState.fetchFavIcon || dnsLogs.failure()) return
 
-        val url = "${Constants.FAV_ICON_URL}${dnsLogs.queryStr}ico"
-        if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - fetchFavIcon() -$url")
-        val favIconFetcher = FavIconDownloader(context, url)
+        if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - fetchFavIcon() -${dnsLogs.queryStr}")
+        val favIconFetcher = FavIconDownloader(context, dnsLogs.queryStr)
         favIconFetcher.run()
     }
 }

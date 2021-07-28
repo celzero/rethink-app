@@ -16,7 +16,6 @@ limitations under the License.
 
 package com.celzero.bravedns.adapter
 
-import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -33,38 +32,33 @@ import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.database.DoHEndpoint
-import com.celzero.bravedns.database.DoHEndpointRepository
 import com.celzero.bravedns.databinding.DohEndpointListItemBinding
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.QueryTracker
 import com.celzero.bravedns.ui.DNSConfigureWebViewActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOCATION_INTENT_EXTRA
-import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DOH
 import com.celzero.bravedns.util.Constants.Companion.STAMP_INTENT_EXTRA
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
-import com.celzero.bravedns.util.UIUpdateInterface
 import com.celzero.bravedns.util.Utilities
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import settings.Settings
+import kotlinx.coroutines.*
 import xdns.Xdns.getBlocklistStampFromURL
 
 
-class DoHEndpointAdapter(private val context: Context,
-                         private val doHEndpointRepository: DoHEndpointRepository,
-                         private val persistentState: PersistentState, private val appMode: AppMode,
-                         private val queryTracker: QueryTracker, val listener: UIUpdateInterface) :
+class DoHEndpointAdapter(private val context: Context, private val persistentState: PersistentState,
+                         private val appMode: AppMode) :
         PagedListAdapter<DoHEndpoint, DoHEndpointAdapter.DoHEndpointViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DoHEndpoint>() {
             override fun areItemsTheSame(oldConnection: DoHEndpoint,
-                                         newConnection: DoHEndpoint) = (oldConnection.id == newConnection.id && oldConnection.isSelected == newConnection.isSelected)
+                                         newConnection: DoHEndpoint): Boolean {
+                return (oldConnection.id == newConnection.id && oldConnection.isSelected == newConnection.isSelected)
+            }
 
             override fun areContentsTheSame(oldConnection: DoHEndpoint,
-                                            newConnection: DoHEndpoint) = oldConnection == newConnection
+                                            newConnection: DoHEndpoint): Boolean {
+                return (oldConnection.id == newConnection.id && oldConnection.isSelected != newConnection.isSelected)
+            }
         }
     }
 
@@ -86,7 +80,6 @@ class DoHEndpointAdapter(private val context: Context,
 
         fun update(endpoint: DoHEndpoint) {
             displayDetails(endpoint)
-
             setupClickListeners(endpoint)
         }
 
@@ -113,7 +106,7 @@ class DoHEndpointAdapter(private val context: Context,
                   "connected to doh - ${endpoint.dohName} isSelected? - ${endpoint.isSelected}")
             if (endpoint.isSelected) {
                 val count = persistentState.numberOfRemoteBlocklists
-                b.dohEndpointListUrlExplanation.text = if (endpoint.isRethinkDns() && count > 0) {
+                b.dohEndpointListUrlExplanation.text = if (endpoint.isRethinkDnsPlus() && count > 0) {
                     context.getString(R.string.dns_connected_rethink_plus, count.toString())
                 } else {
                     context.getString(R.string.dns_connected)
@@ -123,7 +116,7 @@ class DoHEndpointAdapter(private val context: Context,
             // Shows either the info/delete icon for the DoH entries.
             showIcon(endpoint)
 
-            if (endpoint.isRethinkDns()) {
+            if (endpoint.isRethinkDnsPlus()) {
                 b.dohEndpointListConfigure.visibility = View.VISIBLE
             } else {
                 b.dohEndpointListConfigure.visibility = View.GONE
@@ -141,7 +134,7 @@ class DoHEndpointAdapter(private val context: Context,
             val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
             intent.putExtra(LOCATION_INTENT_EXTRA, DNSConfigureWebViewActivity.REMOTE)
             intent.putExtra(STAMP_INTENT_EXTRA, stamp)
-            (context as Activity).startActivityForResult(intent, Activity.RESULT_OK)
+            context.startActivity(intent)
         }
 
         private fun getRemoteBlocklistStamp(url: String): String {
@@ -166,31 +159,38 @@ class DoHEndpointAdapter(private val context: Context,
 
         private fun updateConnection(endpoint: DoHEndpoint) {
             if (DEBUG) Log.d(LOG_TAG_DNS,
-                             "updateConnection - ${endpoint.dohName}, ${endpoint.dohURL}")
-            endpoint.dohURL = doHEndpointRepository.getConnectionURL(endpoint.id)
+                             "on doh change - ${endpoint.dohName}, ${endpoint.dohURL}, ${endpoint.isSelected}")
 
-            if (!endpoint.isRethinkDns()) {
-                updateDoHDetails(endpoint)
-                b.dohEndpointListCheckImage.isChecked = true
-                return
+            CoroutineScope(Dispatchers.IO).launch {
+                val stamp = getRemoteBlocklistStamp(endpoint.dohURL)
+
+                if (endpoint.isRethinkDnsPlus() && stamp.isNullOrEmpty()) {
+                    withContext(Dispatchers.Main) {
+                        showDohConfigureDialog()
+                        b.dohEndpointListCheckImage.isChecked = false
+                    }
+                    return@launch
+                }
+
+                endpoint.isSelected = true
+                appMode.handleDoHChanges(endpoint)
             }
+        }
 
-            val stamp = getRemoteBlocklistStamp(endpoint.dohURL)
-            if (DEBUG) Log.d(LOG_TAG_DNS, "stamp for remote endpoint- $stamp")
-            if (stamp.isNullOrEmpty()) {
-                showDohConfigureDialog()
-                b.dohEndpointListCheckImage.isChecked = false
-            } else {
-                updateDoHDetails(endpoint)
-                b.dohEndpointListCheckImage.isChecked = true
+        private fun deleteEndpoint(id: Int) {
+            CoroutineScope(Dispatchers.IO).launch {
+                appMode.deleteDohEndpoint(id)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, R.string.doh_custom_url_remove_success,
+                                   Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
         private fun showExplanationOnImageClick(endpoint: DoHEndpoint) {
-            if (endpoint.isDeletable()) showDeleteDnsDialog(endpoint)
+            if (endpoint.isDeletable()) showDeleteDnsDialog(endpoint.id)
             else showDohMetadataDialog(endpoint.dohName, endpoint.dohURL, endpoint.dohExplanation)
         }
-
 
         private fun showDohMetadataDialog(title: String, url: String, message: String?) {
             val builder = AlertDialog.Builder(context)
@@ -214,17 +214,13 @@ class DoHEndpointAdapter(private val context: Context,
             alertDialog.show()
         }
 
-        private fun showDeleteDnsDialog(endpoint: DoHEndpoint) {
+        private fun showDeleteDnsDialog(id: Int) {
             val builder = AlertDialog.Builder(context)
             builder.setTitle(R.string.doh_custom_url_remove_dialog_title)
             builder.setMessage(R.string.doh_custom_url_remove_dialog_message)
             builder.setCancelable(true)
             builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { _, _ ->
-                GlobalScope.launch(Dispatchers.IO) {
-                    doHEndpointRepository.deleteDoHEndpoint(endpoint.dohURL)
-                }
-                Toast.makeText(context, R.string.doh_custom_url_remove_success,
-                               Toast.LENGTH_SHORT).show()
+                deleteEndpoint(id)
             }
 
             builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
@@ -251,19 +247,6 @@ class DoHEndpointAdapter(private val context: Context,
             val alertDialog: AlertDialog = builder.create()
             alertDialog.setCancelable(true)
             alertDialog.show()
-        }
-
-        private fun updateDoHDetails(endpoint: DoHEndpoint) {
-            endpoint.isSelected = true
-            doHEndpointRepository.removeConnectionStatus()
-            Utilities.delay(1000) {
-                notifyDataSetChanged()
-                appMode.onNewDnsConnected(PREF_DNS_MODE_DOH, Settings.DNSModePort)
-                queryTracker.reinitializeQuantileEstimator()
-            }
-
-            listener.updateUIFromAdapter(PREF_DNS_MODE_DOH)
-            doHEndpointRepository.updateAsync(endpoint)
         }
 
     }

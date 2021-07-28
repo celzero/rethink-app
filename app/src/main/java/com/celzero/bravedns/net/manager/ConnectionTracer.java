@@ -31,11 +31,11 @@ import java.util.concurrent.TimeUnit;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
 import static com.celzero.bravedns.util.Constants.INVALID_UID;
+import static com.celzero.bravedns.util.Constants.MISSING_UID;
 import static com.celzero.bravedns.util.LoggerConstants.LOG_TAG_VPN;
 
 public class ConnectionTracer {
     private static final boolean DEBUG = false;
-    private static final int MISSING_UID = -2000;
     private static final int CACHE_BUILDER_MAX_SIZE = 1000;
     private static final int CACHE_BUILDER_WRITE_EXPIRE_SEC = 30;
     private final ConnectivityManager cm;
@@ -91,7 +91,7 @@ public class ConnectionTracer {
             uid = cm.getConnectionOwnerUid(protocol, local, remote);
             uidCache.put(key, uid);
         } catch (SecurityException secEx) {
-            Log.e(LOG_TAG_VPN, "NETWORK_STACK permission - " + secEx.getMessage());
+            Log.e(LOG_TAG_VPN, "NETWORK_STACK permission - " + secEx.getMessage(), secEx);
         }
 
         if (DEBUG) Log.d(LOG_TAG_VPN, "GetUidQ(" + local + "," + remote + "): " + uid);

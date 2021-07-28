@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 
 class BlockedConnectionsRepository(private val blockedConnectionsDAO: BlockedConnectionsDAO) {
 
-    fun updateAsync(blockedConnections: BlockedConnections) {
+    fun update(blockedConnections: BlockedConnections) {
         blockedConnectionsDAO.update(blockedConnections)
     }
 
@@ -32,7 +32,7 @@ class BlockedConnectionsRepository(private val blockedConnectionsDAO: BlockedCon
         blockedConnectionsDAO.clearFirewallRules(uid)
     }
 
-    fun insertAsync(blockedConnections: BlockedConnections) {
+    fun insert(blockedConnections: BlockedConnections) {
         blockedConnectionsDAO.insert(blockedConnections)
     }
 

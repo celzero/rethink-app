@@ -17,6 +17,7 @@ package com.celzero.bravedns.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 
 @Entity(tableName = "ConnectionTracker")
@@ -40,5 +41,9 @@ class ConnectionTracker {
 
     override fun hashCode(): Int {
         return this.id.hashCode()
+    }
+
+    fun isWhitelisted(): Boolean {
+        return this.blockedByRule == FirewallRuleset.RULE7.ruleName
     }
 }

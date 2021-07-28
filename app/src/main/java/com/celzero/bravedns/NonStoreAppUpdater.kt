@@ -32,7 +32,7 @@ import java.io.IOException
 class NonStoreAppUpdater(private val baseUrl: String,
                          private val persistentState: PersistentState) : AppUpdater {
 
-    override fun checkForAppUpdate(isUserInitiated: Boolean, activity: Activity,
+    override fun checkForAppUpdate(isInteractive: AppUpdater.UserPresent, activity: Activity,
                                    listener: AppUpdater.InstallStateListener) {
         Log.i(LOG_TAG_APP_UPDATE, "Beginning update check")
         val url = baseUrl + BuildConfig.VERSION_CODE
@@ -43,9 +43,7 @@ class NonStoreAppUpdater(private val baseUrl: String,
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.i(LOG_TAG_APP_UPDATE, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
-                if (isUserInitiated) {
-                    listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER)
-                }
+                listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER, isInteractive)
                 call.cancel()
             }
 
@@ -64,27 +62,20 @@ class NonStoreAppUpdater(private val baseUrl: String,
                           "Server response for the new version download is $shouldUpdate (json version: $version), version number:  $latest")
 
                     if (version != RESPONSE_VERSION) {
-                        if (isUserInitiated) {
-                            listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER)
-                        }
+                        listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER, isInteractive)
                         return
                     } else {
-                        /* No Op */
-                        // If the response version is correct, proceed with further checks.
+                        /* no-op - If the response version is correct, proceed with further checks. */
                     }
 
                     if (!shouldUpdate) {
-                        if (isUserInitiated) {
-                            listener.onUpToDate(AppUpdater.InstallSource.OTHER)
-                        }
+                        listener.onUpToDate(AppUpdater.InstallSource.OTHER, isInteractive)
                     } else {
                         listener.onUpdateAvailable(AppUpdater.InstallSource.OTHER)
                     }
 
                 } catch (e: Exception) {
-                    if (isUserInitiated) {
-                        listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER)
-                    }
+                    listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER, isInteractive)
                 }
             }
         })

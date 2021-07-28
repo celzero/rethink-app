@@ -248,7 +248,7 @@
 
     <string name="alert_firewall_accessibility_explanation">RethinkDNS uses accessibility service to track which apps are in-use (foreground) versus those that are not in-use (background).\n\nRethinkDNS does not collect any information or spy on you in any way.</string>
 
-    <string name="alert_firewall_accessibility_regrant_explanation">RethinkDNS accessibility service has stopped or crashed. <b>Goto Settings and Force Stop</b> RethinkDNS and start it again to use "Block any app not in use" feature.\n\nRethinkDNS uses accessibility service to track which apps are in-use (foreground) versus those that are not in-use (background).</string>
+    <string name="alert_firewall_accessibility_regrant_explanation">RethinkDNS accessibility service has stopped or crashed. <i><b>Goto Settings and Force Stop</b></i> RethinkDNS and start it again to use <i>Block any app not in use</i> feature.\n\nRethinkDNS uses accessibility service to track which apps are in-use (foreground) versus those that are not in-use (background).</string>
 
     <string name="brave_dns_connect_prompt_firewall">Start Firewall / DNS+Firewall to configure apps.</string>
     <string name="brave_dns_connect_prompt_query">Start DNS / DNS+Firewall to view logs</string>
@@ -561,7 +561,7 @@
     <string name="orbot_stop_dialog_title">Manually Stop Orbot</string>
     <string name="orbot_stop_dialog_message">RethinkDNS has stopped forwarding connections to Orbot, but Orbot maybe running in the background.</string>
     <string name="orbot_stop_dialog_negative">Stop Orbot</string>
-    <string name="orbot_stop_dialog_positive">Okay</string>
+    <string name="orbot_stop_dialog_positive">Dismiss</string>
 
     <string name="orbot_title">Orbot and Proxies</string>
     <string name="orbot_explanation">
@@ -675,9 +675,9 @@
     <string name="settings_notification_desc3">None</string>
 
     <string name="settings_notification_dialog_title">Choose notification action</string>
-    <string name="settings_notification_dialog_option_1">\nStop (default):\nShows one button, tapping on which stops RethinkDNS.\n</string>
-    <string name="settings_notification_dialog_option_2">\nDNS / DNS + Firewall:\nShows two buttons to quickly switch between the battery-saver DNS mode and the regular DNS + Firewall mode.\n</string>
-    <string name="settings_notification_dialog_option_3">None:\nShows no button.\n\n</string>
+    <string name="settings_notification_dialog_option_1">\nStop (default):\nShows one button, tapping on which stops RethinkDNS.</string>
+    <string name="settings_notification_dialog_option_2">\nDNS / DNS + Firewall:\nShows two buttons to quickly switch between the battery-saver DNS mode and the regular DNS + Firewall mode.</string>
+    <string name="settings_notification_dialog_option_3">\nNone:\nShows no button.\n</string>
 
     <string name="settings_selected_theme">Current theme: %1$s</string>
 
@@ -776,8 +776,10 @@
     <string name="cd_dns_crypt_relay_title">relays</string>
     <string name="cd_fab_add_button">Custom DNS</string>
     <string name="cd_custom_doh_dialog_title">Custom Server URL</string>
+    <string name="cd_custom_doh_url_name_default">DoH</string>
     <string name="cd_custom_doh_url_name">DoH %1$s</string>
     <string name="cd_custom_dns_proxy_title">Custom DNS Proxy</string>
+    <string name="cd_custom_dns_proxy_name_default">Proxy</string>
     <string name="cd_custom_dns_proxy_name">Proxy %1$s</string>
     <string name="cd_custom_dns_proxy_default_ip">127.0.0.1</string>
     <string name="cd_custom_dns_proxy_default_app">Nobody</string>
@@ -787,7 +789,9 @@
     <string name="cd_dns_proxy_error_text_2">Port range should be from 1024–65535</string>
     <string name="cd_dns_proxy_error_text_3">Invalid port</string>
     <string name="cd_dns_crypt_dialog_title">Add DNSCrypt Resolver or Relay</string>
+    <string name="cd_dns_crypt_name_default">DNSCrypt</string>
     <string name="cd_dns_crypt_name">DNSCrypt %1$s</string>
+    <string name="cd_dns_crypt_relay_default">DNSRelay</string>
     <string name="cd_dns_crypt_relay_name">DNSRelay %1$s</string>
 
     <string name="cd_dns_crypt_dialog_heading">Add DNSCrypt Resolver or Relay</string>
@@ -812,7 +816,7 @@
     <string name="ct_app_details">%1$s blocked, %2$s whitelisted, %3$s excluded.</string>
 
     <!-- Connection tracker bottom sheet fragment string -->
-    <string name="ctbs_app_info_not_available_toast">App Info not available</string>
+    <string name="ctbs_app_info_not_available_toast">Application not found</string>
     <string name="ctbs_unknown_app">Unknown</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s other app(s)</string>
     <string name="ctbs_app_other_app">%1$s + %2$s other app</string>
@@ -852,7 +856,7 @@
     <!-- Excluded app dialog -->
     <string name="ex_dialog_count">%1$s/%2$s apps excluded.</string>
     <string name="ex_dialog_header">Exclude apps from DNS and Firewall</string>
-    <string name="ex_dialog_button">Go back</string>
+    <string name="ex_dialog_button">Done</string>
     <string name="ex_select_all">select all</string>
 
     <string name="search_hint">Search by app name</string>
@@ -942,7 +946,7 @@
 
     <string name="whitelist_heading">Whitelist Apps</string>
     <string name="whitelist_select_all">select all</string>
-    <string name="whitelist_button">Go back</string>
+    <string name="whitelist_button">Done</string>
 
     <string name="dns_proxy_dialog_header_dns">Add DNS Proxy</string>
     <string name="dns_proxy_name">Proxy Name</string>
@@ -1004,7 +1008,9 @@
     <string name="settings_local_blocklist_update">Update</string>
 
     <string name="accessibility_notification_title">Action Required</string>
-    <string name="accessibility_notification_content">RethinkDNS accessibility service has stopped or crashed. Background apps are not blocked.</string>
+    <string name="accessibility_notification_content">RethinkDNS accessibility service has stopped or crashed. No longer blocking backgrounded apps. Tap to re-enable.</string>
     <string name="accessibility_notification_action_positive">DETAILS</string>
+
+    <string name="accessibility_failure_toast">RethinkDNS accessibility service has stopped or crashed. No longer blocking backgrounded apps.</string>
 
 </resources>

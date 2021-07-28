@@ -27,24 +27,17 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
+import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.database.DNSProxyEndpoint
-import com.celzero.bravedns.database.DNSProxyEndpointRepository
 import com.celzero.bravedns.databinding.DnsProxyListItemBinding
-import com.celzero.bravedns.service.QueryTracker
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
-import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_PROXY
-import com.celzero.bravedns.util.UIUpdateInterface
 import com.celzero.bravedns.util.Utilities
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import settings.Settings
+import kotlinx.coroutines.withContext
 
-class DNSProxyEndpointAdapter(private val context: Context,
-                              private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
-                              private val appMode: AppMode, private val queryTracker: QueryTracker,
-                              private val listener: UIUpdateInterface) :
+class DNSProxyEndpointAdapter(private val context: Context, private val appMode: AppMode) :
         PagedListAdapter<DNSProxyEndpoint, DNSProxyEndpointAdapter.DNSProxyEndpointViewHolder>(
             DIFF_CALLBACK) {
 
@@ -52,10 +45,14 @@ class DNSProxyEndpointAdapter(private val context: Context,
     companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DNSProxyEndpoint>() {
             override fun areItemsTheSame(oldConnection: DNSProxyEndpoint,
-                                         newConnection: DNSProxyEndpoint) = oldConnection.id == newConnection.id
+                                         newConnection: DNSProxyEndpoint): Boolean {
+                return (oldConnection.id == newConnection.id && oldConnection.isSelected == newConnection.isSelected)
+            }
 
             override fun areContentsTheSame(oldConnection: DNSProxyEndpoint,
-                                            newConnection: DNSProxyEndpoint) = oldConnection == newConnection
+                                            newConnection: DNSProxyEndpoint): Boolean {
+                return (oldConnection.id == newConnection.id && oldConnection.isSelected != newConnection.isSelected)
+            }
         }
     }
 
@@ -82,31 +79,25 @@ class DNSProxyEndpointAdapter(private val context: Context,
         private fun setupClickListeners(endpoint: DNSProxyEndpoint) {
             b.root.setOnClickListener {
                 updateDNSProxyDetails(endpoint)
-                b.dnsProxyListCheckImage.isChecked = true
             }
             b.dnsProxyListActionImage.setOnClickListener {
-                showExplanationOnImageClick(endpoint)
+                promptUser(endpoint)
             }
 
             b.dnsProxyListCheckImage.setOnClickListener {
                 updateDNSProxyDetails(endpoint)
-                b.dnsProxyListCheckImage.isChecked = true
-                b.dnsProxyListActionImage.setImageDrawable(
-                    AppCompatResources.getDrawable(context, R.drawable.ic_fab_appinfo))
             }
 
             b.root.setOnClickListener {
                 updateDNSProxyDetails(endpoint)
-                b.dnsProxyListCheckImage.isChecked = true
             }
 
             b.dnsProxyListActionImage.setOnClickListener {
-                showExplanationOnImageClick(endpoint)
+                promptUser(endpoint)
             }
 
             b.dnsProxyListCheckImage.setOnClickListener {
                 updateDNSProxyDetails(endpoint)
-                b.dnsProxyListCheckImage.isChecked = true
             }
         }
 
@@ -126,22 +117,21 @@ class DNSProxyEndpointAdapter(private val context: Context,
         }
     }
 
-
-    private fun showExplanationOnImageClick(endpoint: DNSProxyEndpoint) {
-        if (endpoint.isDeletable()) showDialogForDelete(endpoint)
+    private fun promptUser(endpoint: DNSProxyEndpoint) {
+        if (endpoint.isDeletable()) showDeleteDialog(endpoint)
         else {
-            showDialogExplanation(endpoint.proxyName, endpoint.getPackageName(), endpoint.proxyIP,
-                                  endpoint.proxyPort.toString())
+            showDetailsDialog(endpoint.proxyName, endpoint.getPackageName(), endpoint.proxyIP,
+                              endpoint.proxyPort.toString())
         }
     }
 
-    private fun showDialogExplanation(title: String, packageName: String?, ip: String?,
-                                      port: String) {
+    private fun showDetailsDialog(title: String, packageName: String?, ip: String?, port: String) {
         val builder = AlertDialog.Builder(context)
         builder.setTitle(title)
-        val app = appList[packageName]?.appName
 
-        if (app != null && !app.isNullOrEmpty()) {
+        val app = FirewallManager.getAppInfoByPackage(packageName)?.appName
+
+        if (!app.isNullOrEmpty()) {
             builder.setMessage(context.getString(R.string.dns_proxy_dialog_message, app, ip, port))
         } else {
             builder.setMessage(context.getString(R.string.dns_proxy_dialog_message,
@@ -162,46 +152,43 @@ class DNSProxyEndpointAdapter(private val context: Context,
                 Utilities.showToastUiCentered(context, context.getString(
                     R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
             } else {
-                // No op: Copy functionality is for the Ip of the endpoint, no operation needed
+                // no op: Copy functionality is for the Ip of the endpoint, no operation needed
                 // when the ip is not available for endpoint.
             }
         }
-        val alertDialog: AlertDialog = builder.create()
-        alertDialog.setCancelable(true)
-        alertDialog.show()
+        builder.create().show()
     }
 
-    private fun showDialogForDelete(dnsProxyEndpoint: DNSProxyEndpoint) {
+    private fun showDeleteDialog(dnsProxyEndpoint: DNSProxyEndpoint) {
         val builder = AlertDialog.Builder(context)
         builder.setTitle(R.string.dns_proxy_remove_dialog_title)
         builder.setMessage(R.string.dns_proxy_remove_dialog_message)
 
         builder.setCancelable(true)
         builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { _, _ ->
-            GlobalScope.launch(Dispatchers.IO) {
-                dnsProxyEndpointRepository.deleteDNSProxyEndpoint(dnsProxyEndpoint.id)
-            }
-            Toast.makeText(context, R.string.dns_proxy_remove_success, Toast.LENGTH_SHORT).show()
+            deleteProxyEndpoint(dnsProxyEndpoint.id)
         }
 
         builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
         }
-        val alertDialog: AlertDialog = builder.create()
-        alertDialog.setCancelable(true)
-        alertDialog.show()
+        builder.create().show()
     }
 
-    private fun updateDNSProxyDetails(dnsProxyEndpoint: DNSProxyEndpoint) {
-        dnsProxyEndpoint.isSelected = true
-        dnsProxyEndpointRepository.removeConnectionStatus()
-        Utilities.delay(500) {
-            notifyDataSetChanged()
-            appMode.onNewDnsConnected(PREF_DNS_MODE_PROXY, Settings.DNSModeProxyIP)
-            queryTracker.reinitializeQuantileEstimator()
+    private fun updateDNSProxyDetails(endpoint: DNSProxyEndpoint) {
+        CoroutineScope(Dispatchers.IO).launch {
+            endpoint.isSelected = true
+            appMode.handleDnsProxyChanges(endpoint)
         }
+    }
 
-        listener.updateUIFromAdapter(PREF_DNS_MODE_PROXY)
-        dnsProxyEndpointRepository.updateAsync(dnsProxyEndpoint)
+    private fun deleteProxyEndpoint(id: Int) {
+        CoroutineScope(Dispatchers.IO).launch {
+            appMode.deleteDnsProxyEndpoint(id)
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, R.string.dns_proxy_remove_success,
+                               Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
 }

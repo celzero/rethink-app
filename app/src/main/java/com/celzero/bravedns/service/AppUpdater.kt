@@ -18,7 +18,7 @@ package com.celzero.bravedns.service
 import android.app.Activity
 
 interface AppUpdater {
-    fun checkForAppUpdate(isUserInitiated: Boolean, activity: Activity,
+    fun checkForAppUpdate(isInteractive: UserPresent, activity: Activity,
                           listener: InstallStateListener)
 
     fun completeUpdate()
@@ -27,8 +27,8 @@ interface AppUpdater {
     interface InstallStateListener {
         fun onStateUpdate(state: InstallState)
         fun onUpdateAvailable(installSource: InstallSource)
-        fun onUpToDate(installSource: InstallSource)
-        fun onUpdateCheckFailed(installSource: InstallSource)
+        fun onUpToDate(installSource: InstallSource, isInteractive: UserPresent)
+        fun onUpdateCheckFailed(installSource: InstallSource, isInteractive: UserPresent)
         fun onUpdateQuotaExceeded(installSource: InstallSource)
     }
 
@@ -39,5 +39,9 @@ interface AppUpdater {
 
     enum class InstallSource {
         STORE, OTHER
+    }
+
+    enum class UserPresent {
+        INTERACTIVE, NONINTERACTIVE
     }
 }

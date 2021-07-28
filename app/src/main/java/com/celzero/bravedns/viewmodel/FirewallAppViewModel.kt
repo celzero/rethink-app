@@ -30,7 +30,11 @@ class FirewallAppViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
     var firewallAppDetailsList = Transformations.switchMap(filteredList, ({ input: String ->
         val inputTxt = "%$input%"
-        appInfoDAO.getAppDetailsForLiveData(inputTxt)
+        if (inputTxt.isEmpty()) {
+            appInfoDAO.getAllAppDetailsForLiveData()
+        } else {
+            appInfoDAO.getAppDetailsForLiveData(inputTxt)
+        }
     }))
 
     fun setFilter(filter: String?) {

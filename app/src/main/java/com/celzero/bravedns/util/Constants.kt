@@ -43,8 +43,6 @@ class Constants {
         // The version tag value(response) for the update check.
         const val RESPONSE_VERSION = 1
 
-        //const val
-
         val DOWNLOAD_URLS = listOf("https://download.bravedns.com/blocklists",
                                    "https://download.bravedns.com/basicconfig",
                                    "https://download.bravedns.com/rank",
@@ -57,11 +55,12 @@ class Constants {
         const val APP_DOWNLOAD_LINK = "https://rethinkdns.com/download"
 
         const val BRAVE_BASE_STAMP = "https://basic.bravedns.com/"
-        const val BRAVE_CONFIGURE_BASE_STAMP = "bravedns.com/configure"
+        const val BRAVE_CONFIGURE_BASE_STAMP = "rethinkdns.com/configure"
 
         const val DOWNLOAD_STATUS_SUCCESSFUL = "STATUS_SUCCESSFUL"
 
         const val BRAVE_BASIC_URL = "bravedns.com"
+        const val RETHINK_BASIC_URL = "rethinkdns.com"
         const val APPEND_VCODE = "vcode="
 
         //constants for the server response json
@@ -89,6 +88,9 @@ class Constants {
         const val RETHINK_DNS_PLUS = "RethinkDNS Plus"
         const val RETHINK_DNS = "RethinkDNS Basic (default)"
 
+        const val BRAVE_DNS_BASE_NAME = "bravedns"
+        const val RETHINK_DNS_BASE_NAME = "rethinkdns"
+
         // maximum time delay before sending block connection response.
         val DELAY_FIREWALL_RESPONSE_MS: Long = TimeUnit.SECONDS.toMillis(30)
 
@@ -111,12 +113,6 @@ class Constants {
         const val DATE_FORMAT_PATTERN = "HH:mm:ss"
 
         const val ORBOT_PROXY = 10L
-
-
-        const val ORBOT_MODE_NONE = 1
-        const val ORBOT_MODE_SOCKS5 = 2
-        const val ORBOT_MODE_HTTP = 3
-        const val ORBOT_MODE_BOTH = 4
 
         // Represents the download source of the application. playstore/fdroid/website
         const val DOWNLOAD_SOURCE_PLAY_STORE = 1
@@ -176,9 +172,6 @@ class Constants {
         // Ref: {@link com.celzero.bravedns.util.Utilities#isAccessibilityServiceEnabled} and
         // {@link com.celzero.bravedns.util.Utilities#isAccessibilityServiceEnabledViaSettingsSecure}
         val ACCESSIBILITY_SERVICE_HEARTBEAT_THRESHOLD_MS = TimeUnit.MINUTES.toMillis(5)
-
-        // Interval before in-memory (total) dns-query counter is flushed to a shared-preference.
-        val DNS_REQUEST_WRITE_THRESHOLD_MS = TimeUnit.MINUTES.toMillis(1)
 
         // View model - filter string
         const val FILTER_IS_SYSTEM = "isSystem"

@@ -29,21 +29,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.database.DNSCryptEndpoint
-import com.celzero.bravedns.database.DNSCryptEndpointRepository
 import com.celzero.bravedns.databinding.DnsCryptEndpointListItemBinding
-import com.celzero.bravedns.service.QueryTracker
-import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DNSCRYPT
-import com.celzero.bravedns.util.UIUpdateInterface
 import com.celzero.bravedns.util.Utilities
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import settings.Settings
+import kotlinx.coroutines.*
 
-class DNSCryptEndpointAdapter(private val context: Context,
-                              private val dnsCryptEndpointRepository: DNSCryptEndpointRepository,
-                              private val appMode: AppMode, private val queryTracker: QueryTracker,
-                              var listener: UIUpdateInterface) :
+class DNSCryptEndpointAdapter(private val context: Context, private val appMode: AppMode) :
         PagedListAdapter<DNSCryptEndpoint, DNSCryptEndpointAdapter.DNSCryptEndpointViewHolder>(
             DIFF_CALLBACK) {
 
@@ -51,14 +41,13 @@ class DNSCryptEndpointAdapter(private val context: Context,
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DNSCryptEndpoint>() {
 
             override fun areItemsTheSame(oldConnection: DNSCryptEndpoint,
-                                         newConnection: DNSCryptEndpoint) = oldConnection.id == newConnection.id
+                                         newConnection: DNSCryptEndpoint): Boolean {
+                return (oldConnection.id == newConnection.id && oldConnection.isSelected == newConnection.isSelected)
+            }
 
             override fun areContentsTheSame(oldConnection: DNSCryptEndpoint,
                                             newConnection: DNSCryptEndpoint): Boolean {
-                if (oldConnection.isSelected != newConnection.isSelected) {
-                    return false
-                }
-                return oldConnection == newConnection
+                return (oldConnection.id == newConnection.id && oldConnection.isSelected != newConnection.isSelected)
             }
         }
     }
@@ -86,15 +75,11 @@ class DNSCryptEndpointAdapter(private val context: Context,
         private fun setupClickListeners(endpoint: DNSCryptEndpoint) {
             b.root.setOnClickListener {
                 b.dnsCryptEndpointListActionImage.isChecked = !b.dnsCryptEndpointListActionImage.isChecked
-                val connected = updateDNSCryptDetails(endpoint,
-                                                      b.dnsCryptEndpointListActionImage.isChecked)
-                b.dnsCryptEndpointListActionImage.isChecked = connected
+                updateDNSCryptDetails(endpoint, b.dnsCryptEndpointListActionImage.isChecked)
             }
 
             b.dnsCryptEndpointListActionImage.setOnClickListener {
-                val connected = updateDNSCryptDetails(endpoint,
-                                                      b.dnsCryptEndpointListActionImage.isChecked)
-                b.dnsCryptEndpointListActionImage.isChecked = connected
+                updateDNSCryptDetails(endpoint, b.dnsCryptEndpointListActionImage.isChecked)
             }
 
             b.dnsCryptEndpointListInfoImage.setOnClickListener {
@@ -106,11 +91,10 @@ class DNSCryptEndpointAdapter(private val context: Context,
             b.dnsCryptEndpointListUrlName.text = endpoint.dnsCryptName
             b.dnsCryptEndpointListActionImage.isChecked = endpoint.isSelected
 
-            if (endpoint.isSelected) {
-                b.dnsCryptEndpointListUrlExplanation.text = context.getString(
-                    R.string.dns_connected)
+            b.dnsCryptEndpointListUrlExplanation.text = if (endpoint.isSelected) {
+                context.getString(R.string.dns_connected)
             } else {
-                b.dnsCryptEndpointListUrlExplanation.text = ""
+                ""
             }
 
             if (endpoint.isDeletable()) {
@@ -123,24 +107,20 @@ class DNSCryptEndpointAdapter(private val context: Context,
         }
 
         private fun showExplanationOnImageClick(dnsCryptEndpoint: DNSCryptEndpoint) {
-            if (dnsCryptEndpoint.isDeletable()) showDeleteDialog(dnsCryptEndpoint)
+            if (dnsCryptEndpoint.isDeletable()) showDeleteDialog(dnsCryptEndpoint.id)
             else {
                 showDialogExplanation(dnsCryptEndpoint.dnsCryptName, dnsCryptEndpoint.dnsCryptURL,
                                       dnsCryptEndpoint.dnsCryptExplanation)
             }
         }
 
-        private fun showDeleteDialog(dnsCryptEndpoint: DNSCryptEndpoint) {
+        private fun showDeleteDialog(id: Int) {
             val builder = AlertDialog.Builder(context)
             builder.setTitle(R.string.dns_crypt_custom_url_remove_dialog_title)
             builder.setMessage(R.string.dns_crypt_url_remove_dialog_message)
             builder.setCancelable(true)
             builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { _, _ ->
-                GlobalScope.launch(Dispatchers.IO) {
-                    dnsCryptEndpointRepository.deleteDNSCryptEndpoint(dnsCryptEndpoint.dnsCryptURL)
-                }
-                Toast.makeText(context, R.string.dns_crypt_url_remove_success,
-                               Toast.LENGTH_SHORT).show()
+                deleteEndpoint(id)
             }
 
             builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
@@ -173,29 +153,33 @@ class DNSCryptEndpointAdapter(private val context: Context,
             alertDialog.show()
         }
 
-        private fun updateDNSCryptDetails(endpoint: DNSCryptEndpoint,
-                                          isSelected: Boolean): Boolean {
-            val list = dnsCryptEndpointRepository.getConnectedDNSCrypt()
-            // Do not unselect the only user-selected dnscrypt endpoint, that is
-            // when the getConnectedDnsCrypt returns a list of size 1
-            if (list.size == 1 && !isSelected && list[0].dnsCryptURL == endpoint.dnsCryptURL) {
-                Toast.makeText(context, context.getString(R.string.dns_select_toast),
-                               Toast.LENGTH_SHORT).show()
-                return false
+        private fun updateDNSCryptDetails(endpoint: DNSCryptEndpoint, isSelected: Boolean) {
+            CoroutineScope(Dispatchers.IO).launch {
+                if (!isSelected && !appMode.isRemoveDnscryptAllowed(endpoint)) {
+                    // Do not unselect the only user-selected dnscrypt endpoint, that is
+                    // when the getConnectedDnsCrypt returns a list of size 1
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, context.getString(R.string.dns_select_toast),
+                                       Toast.LENGTH_SHORT).show()
+                        b.dnsCryptEndpointListActionImage.isChecked = true
+                    }
+                    return@launch
+                }
+
+                endpoint.isSelected = isSelected
+                appMode.handleDnscryptChanges(endpoint)
             }
-            endpoint.isSelected = isSelected
-
-            dnsCryptEndpointRepository.updateAsync(endpoint)
-
-            Utilities.delay(500) {
-                notifyDataSetChanged()
-                appMode.onNewDnsConnected(PREF_DNS_MODE_DNSCRYPT, Settings.DNSModeCryptPort)
-                queryTracker.reinitializeQuantileEstimator()
-            }
-
-            listener.updateUIFromAdapter(PREF_DNS_MODE_DNSCRYPT)
-
-            return true
         }
+
+        private fun deleteEndpoint(id: Int) {
+            CoroutineScope(Dispatchers.IO).launch {
+                appMode.deleteDnscryptEndpoint(id)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, R.string.dns_crypt_url_remove_success,
+                                   Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
     }
 }

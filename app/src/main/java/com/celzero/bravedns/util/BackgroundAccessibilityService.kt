@@ -17,17 +17,17 @@ package com.celzero.bravedns.util
 
 import android.accessibilityservice.AccessibilityService
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.text.TextUtils
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import com.celzero.bravedns.automaton.FirewallManager
-import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnControllerHelper
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
-import org.koin.android.ext.android.inject
 
 class BackgroundAccessibilityService : AccessibilityService() {
 
-    private val firewallManager = FirewallManager(this)
-    private val persistentState by inject<PersistentState>()
     override fun onInterrupt() {
         Log.w(LOG_TAG_FIREWALL, "BackgroundAccessibilityService Interrupted")
     }
@@ -95,9 +95,65 @@ class BackgroundAccessibilityService : AccessibilityService() {
         /*Log.w("______","onAEvent: sourcepack " + event.source?.packageName + " text? " +
                 eventText + " class? " + event.className +
                 " package? ppp " + event.packageName)*/
-        if (persistentState.backgroundEnabled) {
-            firewallManager.onAccessibilityEvent(event, rootInActiveWindow)
+        handleAccessibilityEvent(event)
+    }
+
+    // Handle the received event.
+    // Earlier the event handling is taken care in FirewallManager.
+    // Now, the firewall manager usage is modified, so moving this part here. 
+    fun handleAccessibilityEvent(event: AccessibilityEvent) {
+
+        if (!VpnControllerHelper.persistentState.backgroundEnabled) return
+
+        val latestTrackedPackage = getEventPackageName(event)
+
+        if (latestTrackedPackage.isNullOrEmpty()) return
+
+        val hasContentChanged = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            event.eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED || event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
+        } else {
+            event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
         }
+        if (DEBUG) Log.d(LOG_TAG_FIREWALL,
+                         "onAccessibilityEvent: ${event.packageName}, ${event.eventType}, $hasContentChanged")
+
+        if (!hasContentChanged) return
+
+        // If the package received is Rethink, do nothing.
+        if (event.packageName == this.packageName) return
+
+        // https://stackoverflow.com/a/27642535
+        // top window is launcher? try revoke queued up permissions
+        // FIXME: Figure out a fool-proof way to determine is launcher visible
+        if (isPackageLauncher(latestTrackedPackage)) {
+            FirewallManager.untrackForegroundApps()
+        } else {
+            FirewallManager.trackForegroundApp(latestTrackedPackage)
+        }
+
+    }
+
+    // https://stackoverflow.com/questions/45620584/event-getsource-returns-null-in-accessibility-service-catch-source-for-a-3rd-p
+    /**
+     * If the event retrieved package name is null then the check for the package name
+     * is carried out in (getRootInActiveWindow)AccessibilityNodeInfo
+     */
+    private fun getEventPackageName(event: AccessibilityEvent): String? {
+        return if (event.packageName.isNullOrBlank()) {
+            this.rootInActiveWindow?.packageName?.toString()
+        } else {
+            event.packageName.toString()
+        }
+    }
+
+    private fun isPackageLauncher(packageName: String?): Boolean {
+        if (TextUtils.isEmpty(packageName)) return false
+
+        val intent = Intent("android.intent.action.MAIN")
+        intent.addCategory("android.intent.category.HOME")
+        val thisPackage = this.packageManager.resolveActivity(intent,
+                                                              PackageManager.MATCH_DEFAULT_ONLY)?.activityInfo?.packageName
+        return thisPackage == packageName
     }
 
 }

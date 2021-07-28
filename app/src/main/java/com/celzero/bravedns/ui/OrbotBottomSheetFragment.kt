@@ -34,12 +34,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.animation.Rotate3dAnimation
+import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.databinding.BottomSheetOrbotBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -132,52 +132,46 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
 
         b.bsOrbotRadioSocks5.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
             if (isSelected) {
-                persistentState.orbotRequestMode = Constants.ORBOT_MODE_SOCKS5
                 persistentState.orbotConnectionStatus.postValue(true)
-                enableSOCKS5Orbot()
+                enableSocks5Orbot()
             }
         }
 
         b.bsSocks5OrbotRl.setOnClickListener {
             if (!b.bsOrbotRadioSocks5.isChecked) {
-                persistentState.orbotRequestMode = Constants.ORBOT_MODE_SOCKS5
                 b.bsOrbotRadioSocks5.isChecked = true
                 persistentState.orbotConnectionStatus.postValue(true)
-                enableSOCKS5Orbot()
+                enableSocks5Orbot()
             }
         }
 
         b.bsOrbotRadioHttp.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
             if (isSelected) {
-                persistentState.orbotRequestMode = Constants.ORBOT_MODE_HTTP
                 persistentState.orbotConnectionStatus.postValue(true)
-                enableHTTPOrbot()
+                enableHttpOrbot()
             }
         }
 
         b.bsOrbotHttpRl.setOnClickListener {
             if (!b.bsOrbotRadioHttp.isChecked) {
-                persistentState.orbotRequestMode = Constants.ORBOT_MODE_HTTP
                 persistentState.orbotConnectionStatus.postValue(true)
                 b.bsOrbotRadioHttp.isChecked = true
-                enableHTTPOrbot()
+                enableHttpOrbot()
             }
         }
 
         b.bsOrbotRadioBoth.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
             if (isSelected) {
-                persistentState.orbotRequestMode = Constants.ORBOT_MODE_BOTH
                 persistentState.orbotConnectionStatus.postValue(true)
-                enableSOCKS5HTTPOrbot()
+                enableSocks5HttpOrbot()
             }
         }
 
         b.bsOrbotBothRl.setOnClickListener {
             if (!b.bsOrbotRadioBoth.isChecked) {
-                persistentState.orbotRequestMode = Constants.ORBOT_MODE_BOTH
                 persistentState.orbotConnectionStatus.postValue(true)
                 b.bsOrbotRadioBoth.isChecked = true
-                enableSOCKS5HTTPOrbot()
+                enableSocks5HttpOrbot()
             }
         }
 
@@ -200,36 +194,35 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun setOrbotModeNone() {
-        persistentState.orbotRequestMode = Constants.ORBOT_MODE_NONE
         appMode.removeProxy(AppMode.ProxyType.NONE, AppMode.ProxyProvider.ORBOT)
         b.bsOrbotRadioNone.isChecked = true
-        persistentState.orbotConnectionStatus.postValue(false)
     }
 
     private fun updateUi() {
-        when (persistentState.orbotRequestMode) {
-            Constants.ORBOT_MODE_SOCKS5 -> {
+        when (OrbotHelper.selectedProxyType) {
+            AppMode.ProxyType.SOCKS5.name -> {
                 b.bsOrbotRadioSocks5.isChecked = true
                 b.orbotIcon.setImageResource(R.drawable.orbot_enabled)
                 b.orbotStatus.text = getString(R.string.orbot_bs_status_1)
             }
-            Constants.ORBOT_MODE_HTTP -> {
+            AppMode.ProxyType.HTTP.name -> {
                 b.bsOrbotRadioHttp.isChecked = true
                 b.orbotIcon.setImageResource(R.drawable.orbot_enabled)
                 b.orbotStatus.text = getString(R.string.orbot_bs_status_2)
             }
-            Constants.ORBOT_MODE_BOTH -> {
+            AppMode.ProxyType.HTTP_SOCKS5.name -> {
                 b.bsOrbotRadioBoth.isChecked = true
                 b.orbotIcon.setImageResource(R.drawable.orbot_enabled)
                 b.orbotStatus.text = getString(R.string.orbot_bs_status_3)
             }
-            Constants.ORBOT_MODE_NONE -> {
+            AppMode.ProxyType.NONE.name -> {
                 updateOrbotNone()
             }
             else -> {
                 updateOrbotNone()
             }
         }
+
     }
 
     private fun updateOrbotNone() {
@@ -303,54 +296,51 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
      * Stop the Orbot - Calls the Orbot helper to initiate the stop orbot call.
      */
     private fun disableOrbot() {
-        val vpnService = VpnController.getBraveVpnService()
-        if (vpnService != null) {
-            b.bsOrbotRadioSocks5.isChecked = false
-            b.bsOrbotRadioHttp.isChecked = false
-            b.bsOrbotRadioBoth.isChecked = false
-            b.orbotIcon.setImageResource(R.drawable.orbot_disabled)
-            orbotHelper.stopOrbot(isUserInitiated = true)
-        }
+        b.bsOrbotRadioSocks5.isChecked = false
+        b.bsOrbotRadioHttp.isChecked = false
+        b.bsOrbotRadioBoth.isChecked = false
+        b.orbotIcon.setImageResource(R.drawable.orbot_disabled)
+        orbotHelper.stopOrbot(isInteractive = true)
     }
 
     /**
      * Enable - Orbot with SOCKS5 mode
      */
-    private fun enableSOCKS5Orbot() {
+    private fun enableSocks5Orbot() {
         b.bsOrbotRadioNone.isChecked = false
         b.bsOrbotRadioHttp.isChecked = false
         b.bsOrbotRadioBoth.isChecked = false
-        startOrbot()
+        startOrbot(AppMode.ProxyType.SOCKS5.name)
     }
 
     /**
      * Enable - Orbot with HTTP mode
      */
-    private fun enableHTTPOrbot() {
+    private fun enableHttpOrbot() {
         b.bsOrbotRadioNone.isChecked = false
         b.bsOrbotRadioSocks5.isChecked = false
         b.bsOrbotRadioBoth.isChecked = false
-        startOrbot()
+        startOrbot(AppMode.ProxyType.HTTP.name)
     }
 
     /**
      * Enable - Orbot with SOCKS5 + HTTP mode
      */
-    private fun enableSOCKS5HTTPOrbot() {
+    private fun enableSocks5HttpOrbot() {
         b.bsOrbotRadioNone.isChecked = false
         b.bsOrbotRadioSocks5.isChecked = false
         b.bsOrbotRadioHttp.isChecked = false
-        startOrbot()
+        startOrbot(AppMode.ProxyType.HTTP_SOCKS5.name)
     }
 
     /**
      * Start the Orbot(OrbotHelper) - Intent action.
      */
-    private fun startOrbot() {
-        if (orbotHelper.isOrbotInstalled()) {
+    private fun startOrbot(type: String) {
+        if (FirewallManager.isOrbotInstalled()) {
             val vpnService = VpnController.getBraveVpnService()
             if (vpnService != null) {
-                orbotHelper.startOrbot()
+                orbotHelper.startOrbot(type)
             } else {
                 Utilities.showToastUiCentered(requireContext(), getString(
                     R.string.settings_socks5_vpn_disabled_error), Toast.LENGTH_LONG)

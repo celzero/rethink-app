@@ -54,10 +54,9 @@ public class QueryTracker {
     }
 
     public void sync(Transaction transaction) {
-        if (transaction == null || (transaction.serverIp.isEmpty() || Constants.UNSPECIFIED_IP.equals(transaction.serverIp))) {
+        if (transaction == null || (transaction.serverIp.isEmpty() || Constants.UNSPECIFIED_IP.equals(transaction.serverIp)) || transaction.status != Transaction.Status.COMPLETE) {
             return;
         }
-
         // Restore number of requests from storage, or 0 if it isn't defined yet.
         quantileEstimator.addValue((double) transaction.responseTime);
         long latency = (long) quantileEstimator.getQuantile();

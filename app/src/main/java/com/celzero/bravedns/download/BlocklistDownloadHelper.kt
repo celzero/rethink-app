@@ -16,11 +16,11 @@
 package com.celzero.bravedns.download
 
 import android.content.Context
-import android.os.Build
 import android.util.Log
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import java.io.File
 
 class BlocklistDownloadHelper {
@@ -69,7 +69,7 @@ class BlocklistDownloadHelper {
                         deleteRecursive(child)
                     }
                 }
-                val isDeleted: Boolean = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val isDeleted: Boolean = if (isAtleastO()) {
                     fileOrDirectory.deleteRecursively()
                 } else {
                     fileOrDirectory.delete()

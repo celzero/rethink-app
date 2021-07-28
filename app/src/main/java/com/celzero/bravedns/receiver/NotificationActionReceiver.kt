@@ -20,22 +20,23 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.automaton.FirewallManager
+import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS_FIREWALL
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.component.inject
 
 class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
-    private val persistentState by inject<PersistentState>()
+    private val appMode by inject<AppMode>()
 
     override fun onReceive(context: Context, intent: Intent) {
         val action: String? = intent.getStringExtra(Constants.NOTIFICATION_ACTION)
@@ -62,10 +63,8 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
     }
 
     private fun reloadRules() {
-        runBlocking {
-            withContext(Dispatchers.IO) {
-                VpnController.getBraveVpnService()?.loadAppFirewallRules()
-            }
+        CoroutineScope(Dispatchers.IO).launch {
+            FirewallManager.loadAppFirewallRules()
         }
     }
 
@@ -74,10 +73,10 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
     }
 
     private fun dnsMode() {
-        persistentState.setBraveMode(APP_MODE_DNS)
+        appMode.changeBraveMode(APP_MODE_DNS)
     }
 
     private fun dnsFirewallMode() {
-        persistentState.setBraveMode(APP_MODE_DNS_FIREWALL)
+        appMode.changeBraveMode(APP_MODE_DNS_FIREWALL)
     }
 }

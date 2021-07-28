@@ -34,7 +34,6 @@ import com.celzero.bravedns.databinding.ActivityQueryDetailBinding
 import com.celzero.bravedns.databinding.QueryListScrollListBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DNSCRYPT
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DOH
 import com.celzero.bravedns.viewmodel.DNSLogViewModel
@@ -70,23 +69,14 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     private fun initView() {
         val includeView = b.queryListScrollList
 
-        if (persistentState.logsEnabled) {
-            displayPerDnsUi(includeView)
-        } else {
+        if (!persistentState.logsEnabled) {
             includeView.queryListLogsDisabledTv.visibility = View.VISIBLE
             includeView.queryListCardViewTop.visibility = View.GONE
+            return
         }
 
-        val isServiceRunning = VpnController.state().on
-        if (!isServiceRunning) {
-            includeView.queryListRl.visibility = View.GONE
-        } else {
-            includeView.queryListRl.visibility = View.VISIBLE
-        }
-
+        displayPerDnsUi(includeView)
         setupClickListeners(includeView)
-
-        registerForObservers()
     }
 
     private fun setupClickListeners(includeView: QueryListScrollListBinding) {
@@ -118,14 +108,14 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         includeView.recyclerQuery.adapter = recyclerAdapter
     }
 
-    private fun registerForObservers() {
-        persistentState.requestCountLiveData.observe(viewLifecycleOwner, {
+    private fun observeDnsStats() {
+        persistentState.dnsRequestsCountLiveData.observe(viewLifecycleOwner, {
             val lifeTimeConversion = formatDecimal(it)
             b.totalQueriesTxt.text = getString(R.string.dns_logs_lifetime_queries,
                                                lifeTimeConversion)
         })
 
-        persistentState.blockedCountLiveData.observe(viewLifecycleOwner, {
+        persistentState.dnsBlockedCountLiveData.observe(viewLifecycleOwner, {
             val blocked = formatDecimal(it)
             b.latencyTxt.text = getString(R.string.dns_logs_blocked_queries, blocked)
         })
@@ -144,17 +134,13 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     override fun onResume() {
         super.onResume()
         updateConnectedStatus()
+        observeDnsStats()
     }
 
     private fun updateConnectedStatus() {
         val dnsType = appMode.getDNSType()
         if (dnsType == PREF_DNS_MODE_DOH) {
-            val dohDetail: DoHEndpoint?
-            try {
-                dohDetail = appMode.getDOHDetails()
-            } catch (e: Exception) {
-                return
-            }
+            val dohDetail: DoHEndpoint? = appMode.getDOHDetails()
             b.connectedStatusTitleUrl.text = resources.getString(
                 R.string.configure_dns_connected_doh_status)
             b.connectedStatusTitle.text = resources.getString(
@@ -173,7 +159,7 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
             // operation(dnscrypt proxy refresh from Go) so during onResume()
             // the value is fetched from database and force updated in persistent state.
             val connectedCrypt = getString(R.string.configure_dns_crypt, cryptDetails.toString())
-            persistentState.setConnectedDNS(connectedCrypt)
+            persistentState.setConnectedDns(connectedCrypt)
             b.queryListScrollList.recyclerQuery.visibility = View.VISIBLE
             b.queryListScrollList.dnsLogNoLogText.visibility = View.GONE
         } else {
@@ -196,14 +182,14 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     }
 
     private fun showDnsLogsFilterDialog() {
-        val singleItems = arrayOf(getString(R.string.filter_dns_blocked_connections),
-                                  getString(R.string.filter_dns_all_connections))
+        val items = arrayOf(getString(R.string.filter_dns_blocked_connections),
+                            getString(R.string.filter_dns_all_connections))
 
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle(getString(R.string.dns_log_dialog_title))
 
         // Single-choice items (initialized with checked item)
-        builder.setSingleChoiceItems(singleItems, checkedItem) { dialog, which ->
+        builder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
             // Respond to item chosen
             // FIXME - Remove the isFilter constants with introduction of new filter options.
             filterValue = if (which == 0) ":isFilter"
@@ -227,13 +213,9 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
                 dnsLogDAO.clearAllData()
             }
         }
-        builder.setNegativeButton(getString(R.string.dns_log_dialog_negative)) { _, _ ->
-        }
-        val alertDialog: AlertDialog = builder.create()
-        alertDialog.setCancelable(true)
-        alertDialog.show()
+        builder.setNegativeButton(getString(R.string.dns_log_dialog_negative)) { _, _ -> }
+        builder.create().show()
     }
-
 
     override fun onQueryTextSubmit(query: String?): Boolean {
         viewModel.setFilter(query, filterValue)

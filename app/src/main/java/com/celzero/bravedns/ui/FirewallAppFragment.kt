@@ -36,9 +36,9 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.FirewallAppViewModel
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.collections.set
 
 class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
                             SearchView.OnQueryTextListener {
@@ -48,7 +48,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
 
     private var appCategories: MutableList<CategoryInfo> = ArrayList()
     private var filteredCategories: MutableList<CategoryInfo> = ArrayList()
-    private var listData: HashMap<CategoryInfo, ArrayList<AppInfo>> = HashMap()
+    private var listData: HashMap<CategoryInfo, List<AppInfo>> = HashMap()
 
     private lateinit var animation: Animation
 
@@ -77,9 +77,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
         b.firewallUpdateProgress.visibility = View.VISIBLE
         b.firewallAppRefreshList.isEnabled = true
 
-        adapterList = FirewallAppListAdapter(requireContext(), get(), categoryInfoRepository,
-                                             persistentState,
-                                             filteredCategories as ArrayList<CategoryInfo>,
+        adapterList = FirewallAppListAdapter(requireContext(), persistentState, filteredCategories,
                                              listData)
         b.firewallExpandableList.setAdapter(adapterList)
 
@@ -132,7 +130,6 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
     }
 
     private fun refreshDatabase() {
-        appCategories = categoryInfoRepository.getAppCategoryList().toMutableList()
         refreshDatabase.refreshAppInfoDatabase(isForceRefresh = true)
     }
 
@@ -175,24 +172,21 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
 
 
     private fun setupLivedataObservers() {
-        appCategories = categoryInfoRepository.getAppCategoryList().toMutableList()
 
         categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, {
             appCategories = it.toMutableList()
         })
 
         firewallAppInfoViewModel.firewallAppDetailsList.observe(viewLifecycleOwner) { itAppInfo ->
-
+            listData.clear()
             filteredCategories = appCategories.toMutableList()
             val iterator = filteredCategories.iterator()
-
             while (iterator.hasNext()) {
                 val item = iterator.next()
-                if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                                 "Category : ${item.categoryName}, ${item.numberOFApps}, ${item.numOfAppsBlocked}, ${item.isInternetBlocked}")
                 val appList = itAppInfo.filter { a -> a.appCategory == item.categoryName }
+                listData[item] = appList
                 if (appList.isNotEmpty()) {
-                    listData[item] = appList as java.util.ArrayList<AppInfo>
+                    listData[item] = appList
                 } else {
                     iterator.remove()
                 }

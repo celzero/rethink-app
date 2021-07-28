@@ -19,6 +19,7 @@ package com.celzero.bravedns.database
 import androidx.lifecycle.LiveData
 import androidx.paging.PagedList
 import androidx.paging.toLiveData
+import androidx.room.Transaction
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
@@ -27,11 +28,10 @@ import kotlinx.coroutines.launch
 
 class DNSProxyEndpointRepository(private val dnsProxyEndpointDAO: DNSProxyEndpointDAO) {
 
-    fun updateAsync(dnsProxyEndpoint: DNSProxyEndpoint,
-                    coroutineScope: CoroutineScope = GlobalScope) {
-        coroutineScope.launch {
-            dnsProxyEndpointDAO.update(dnsProxyEndpoint)
-        }
+    @Transaction
+    fun update(dnsProxyEndpoint: DNSProxyEndpoint) {
+        dnsProxyEndpointDAO.removeConnectionStatus()
+        dnsProxyEndpointDAO.update(dnsProxyEndpoint)
     }
 
     fun deleteAsync(dnsProxyEndpoint: DNSProxyEndpoint,
@@ -40,7 +40,6 @@ class DNSProxyEndpointRepository(private val dnsProxyEndpointDAO: DNSProxyEndpoi
             dnsProxyEndpointDAO.delete(dnsProxyEndpoint)
         }
     }
-
 
     fun insertAsync(dnsCryptEndpoint: DNSProxyEndpoint,
                     coroutineScope: CoroutineScope = GlobalScope) {

@@ -30,8 +30,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.UniversalAppListAdapter
 import com.celzero.bravedns.adapter.UniversalBlockedRulesAdapter
+import com.celzero.bravedns.adapter.WhitelistedApplistAdapter
+import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.automaton.FirewallRules
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.AppInfoViewRepository
@@ -50,7 +51,6 @@ import com.celzero.bravedns.util.Utilities.Companion.getCurrentTheme
 import com.celzero.bravedns.viewmodel.AppListViewModel
 import com.celzero.bravedns.viewmodel.BlockedConnectionsViewModel
 import com.google.android.material.switchmaterial.SwitchMaterial
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.reflect.KMutableProperty0
@@ -58,14 +58,13 @@ import kotlin.reflect.KMutableProperty0
 
 /**
  * UniversalFirewallFragment - Universal Firewall.
- * TODO: Search feature is removed for firewall header testing
  */
 
 class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_container),
                                   SearchView.OnQueryTextListener {
     private val b by viewBinding(UniversalFragementContainerBinding::bind)
 
-    private lateinit var recyclerAdapter: UniversalAppListAdapter
+    private lateinit var recyclerAdapter: WhitelistedApplistAdapter
     private lateinit var recyclerRulesAdapter: UniversalBlockedRulesAdapter
     private var layoutManager: RecyclerView.LayoutManager? = null
     private val viewModel: BlockedConnectionsViewModel by viewModel()
@@ -85,10 +84,6 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
-        viewModel.blockedUnivRulesList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
-            recyclerRulesAdapter::submitList))
-        appInfoViewModel.appDetailsList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
-            recyclerAdapter::submitList))
     }
 
     private fun initView() {
@@ -110,8 +105,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         includeView.firewallUniversalRecycler.layoutManager = layoutManager
         recyclerRulesAdapter = UniversalBlockedRulesAdapter(requireContext(),
                                                             blockedConnectionsRepository)
-        recyclerAdapter = UniversalAppListAdapter(requireContext(), appInfoRepository, get(),
-                                                  persistentState)
+        recyclerAdapter = WhitelistedApplistAdapter(requireContext())
         includeView.firewallUniversalRecycler.adapter = recyclerRulesAdapter
 
         includeView.firewallAllAppsCheck.isChecked = persistentState.screenState
@@ -121,10 +115,11 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
 
         setupClickListeners(includeView)
 
-        val appCount = GlobalVariable.appList.size
-        appInfoViewRepository.getWhitelistCountLiveData().observe(viewLifecycleOwner, {
+        FirewallManager.getApplistObserver().observe(viewLifecycleOwner, {
+            val whiteListApps = it.filter { a -> a.whiteListUniv1 }.size
             includeView.firewallUnivWhitelistCount.text = getString(
-                R.string.whitelist_dialog_apps_in_use, it.toString(), appCount.toString())
+                R.string.whitelist_dialog_apps_in_use, whiteListApps.toString(),
+                FirewallManager.getTotalApps().toString())
         })
 
         blockedConnectionsRepository.getBlockedConnectionCountLiveData().observe(viewLifecycleOwner,
@@ -133,6 +128,11 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
                                                                                          R.string.univ_blocked_ip_count,
                                                                                          it.toString())
                                                                                  })
+
+        viewModel.blockedUnivRulesList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
+            recyclerRulesAdapter::submitList))
+        appInfoViewModel.appDetailsList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
+            recyclerAdapter::submitList))
 
     }
 
@@ -176,7 +176,8 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         includeView.firewallAppsShowTxt.setOnClickListener {
             includeView.firewallAppsShowTxt.isEnabled = false
             val themeID = getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-            val customDialog = WhitelistAppDialog(requireContext(), get(), get(), get(),
+
+            val customDialog = WhitelistAppDialog(requireActivity() as FirewallActivity,
                                                   recyclerAdapter, appInfoViewModel, themeID)
             customDialog.setCanceledOnTouchOutside(false)
             //if we know that the particular variable not null any time ,we can assign !!
@@ -286,19 +287,25 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         checkAppNotInUse()
     }
 
+
     private fun checkAppNotInUse() {
-        if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                         "App not in use check - isCrashDetected? - ${persistentState.isAccessibilityCrashDetected}" + ", background enabled- ${persistentState.backgroundEnabled}")
+        if (!persistentState.backgroundEnabled) return
 
         val isAccessibilityServiceRunning = Utilities.isAccessibilityServiceEnabled(
             requireContext(), BackgroundAccessibilityService::class.java)
         val isAccessibilityServiceEnabled = Utilities.isAccessibilityServiceEnabledViaSettingsSecure(
             requireContext(), BackgroundAccessibilityService::class.java)
 
-        if (!isAccessibilityServiceEnabled) {
+        if (DEBUG) Log.d(LOG_TAG_FIREWALL,
+                         "backgroundEnabled? ${persistentState.backgroundEnabled}, isServiceEnabled? $isAccessibilityServiceEnabled, isServiceRunning? $isAccessibilityServiceRunning")
+        val isAccessibilityServiceFunctional = isAccessibilityServiceRunning && isAccessibilityServiceEnabled
+
+        if (!isAccessibilityServiceFunctional) {
             persistentState.backgroundEnabled = false
-            persistentState.isAccessibilityCrashDetected = false
             b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = false
+            Utilities.showToastUiCentered(requireContext(),
+                                          getString(R.string.accessibility_failure_toast),
+                                          Toast.LENGTH_SHORT)
             return
         }
 

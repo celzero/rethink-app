@@ -74,7 +74,7 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
 
     private fun initView() {
         b.bsHomeScreenConnectedStatus.text = getConnectionStatus()
-        val selectedIndex = persistentState.getBraveMode()
+        val selectedIndex = appMode.getBraveMode()
         if (DEBUG) Log.d(LOG_TAG_VPN, "Home screen bottom sheet selectedIndex: $selectedIndex")
 
         updateStatus(selectedIndex)
@@ -166,11 +166,11 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
 
     private fun modifyBraveMode(braveMode: Int) {
         appMode.changeBraveMode(braveMode)
-        braveModeToggler.postValue(persistentState.getBraveMode())
+        braveModeToggler.postValue(appMode.getBraveMode())
     }
 
     private fun getConnectionStatus(): String {
-        return when (persistentState.getBraveMode()) {
+        return when (appMode.getBraveMode()) {
             APP_MODE_DNS -> {
                 getString(R.string.dns_explanation_dns_connected)
             }

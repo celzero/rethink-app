@@ -23,11 +23,11 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
 
 class CategoryInfoRepository(private val categoryInfoDAO: CategoryInfoDAO) {
 
-    fun updateAsync(categoryInfo: CategoryInfo) {
+    fun update(categoryInfo: CategoryInfo) {
         categoryInfoDAO.update(categoryInfo)
     }
 
-    fun insertAsync(categoryInfo: CategoryInfo) {
+    fun insert(categoryInfo: CategoryInfo) {
         categoryInfoDAO.insert(categoryInfo)
     }
 

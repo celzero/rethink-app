@@ -30,20 +30,14 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ApplicationManagerApk
 import com.celzero.bravedns.animation.ViewAnimation
-import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.databinding.ActivityApplicationManagerBinding
-import org.koin.android.ext.android.inject
 
 
 class ApplicationManagerActivity : AppCompatActivity(R.layout.activity_application_manager),
                                    SearchView.OnQueryTextListener {
     private val b by viewBinding(ActivityApplicationManagerBinding::bind)
 
-    private val apkList = ArrayList<ApplicationManagerApk>()
-
     private var isRotate: Boolean = false
-
-    private val appInfoRepository by inject<AppInfoRepository>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

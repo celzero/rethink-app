@@ -28,11 +28,8 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.database.AppInfoRepository
-import com.celzero.bravedns.database.AppInfoViewRepository
-import com.celzero.bravedns.database.CategoryInfoRepository
+import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.databinding.ExcludeAppDialogLayoutBinding
-import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Utilities
@@ -40,10 +37,6 @@ import com.celzero.bravedns.viewmodel.ExcludedAppViewModel
 import com.google.android.material.chip.Chip
 
 class ExcludeAppsDialog(private var activity: Context,
-                        private val appInfoRepository: AppInfoRepository,
-                        private val appInfoViewRepository: AppInfoViewRepository,
-                        private val categoryInfoRepository: CategoryInfoRepository,
-                        private val persistentState: PersistentState,
                         internal var adapter: RecyclerView.Adapter<*>,
                         var viewModel: ExcludedAppViewModel, themeID: Int) :
         Dialog(activity, themeID), View.OnClickListener, SearchView.OnQueryTextListener {
@@ -83,20 +76,23 @@ class ExcludeAppsDialog(private var activity: Context,
             false
         }
 
-        val appCount = HomeScreenActivity.GlobalVariable.appList.size
         val act: HomeScreenActivity = activity as HomeScreenActivity
-        appInfoViewRepository.getExcludedAppListCountLiveData().observe(act, {
+
+        FirewallManager.getApplistObserver().observe(act, {
+            val excludedCount = it.filter { a -> a.isExcluded }.size
             b.excludeAppSelectCountText.text = act.getString(R.string.ex_dialog_count,
-                                                             it.toString(), appCount.toString())
+                                                             excludedCount.toString(),
+                                                             FirewallManager.getTotalApps().toString())
         })
 
 
         b.excludeAppSelectAllOptionCheckbox.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
-            modifyExcludeAppsList(b)
+            FirewallManager.updateExcludedAppsByCategories(filterCategories, b)
             Utilities.delay(1000) {
                 adapter.notifyDataSetChanged()
             }
         }
+
         b.excludeAppDialogWhitelistSearchFilter.setOnClickListener(this)
 
         // By default, show all the categories.
@@ -104,37 +100,12 @@ class ExcludeAppsDialog(private var activity: Context,
     }
 
     private fun showAllCategories() {
-        categoryListByAppNameFromDB("")
-    }
-
-    private fun modifyExcludeAppsList(checked: Boolean) {
-        if (filterCategories.isNullOrEmpty()) {
-            appInfoRepository.updateExcludedForAllApp(checked)
-            categoryInfoRepository.updateExcludedCountForAllApp(checked)
-            if (checked) {
-                categoryInfoRepository.updateWhitelistCountForAll(!checked)
-            }
-        } else {
-            filterCategories.forEach {
-                appInfoRepository.updateExcludedForCategories(it, checked)
-                categoryInfoRepository.updateExcludedCountForCategory(it, checked)
-                if (checked) {
-                    categoryInfoRepository.updateWhitelistForCategory(it, !checked)
-                }
-            }
-        }
-    }
-
-    private fun categoryListByAppNameFromDB(name: String) {
-        category = appInfoRepository.getAppCategoryForAppName("%$name%")
-        if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category - ${category.size}")
-        setupCategoryChips(category)
+        setupCategoryChips("")
     }
 
     override fun onClick(v: View) {
         when (v.id) {
             R.id.exclude_app_dialog_ok_button -> {
-                applyChanges()
                 clearSearch()
                 dismiss()
             }
@@ -156,11 +127,6 @@ class ExcludeAppsDialog(private var activity: Context,
         viewModel.setFilter("")
     }
 
-    private fun applyChanges() {
-        val excludedApps = appInfoRepository.getExcludedAppList()
-        persistentState.updateExcludedListWifi(excludedApps)
-    }
-
     private fun toggleCategoryChipsUi() {
         if (!b.excludeAppDialogChipGroup.isVisible) {
             b.excludeAppDialogChipGroup.visibility = View.VISIBLE
@@ -170,19 +136,23 @@ class ExcludeAppsDialog(private var activity: Context,
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
-        categoryListByAppNameFromDB(query)
+        setupCategoryChips(query)
         viewModel.setFilter(query)
         return true
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        categoryListByAppNameFromDB(query)
+        setupCategoryChips(query)
         viewModel.setFilter(query)
         return true
     }
 
-    private fun setupCategoryChips(categories: List<String>) {
+    private fun setupCategoryChips(name: String) {
+        val categories = FirewallManager.getCategoryListByAppName(name)
+        if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category - ${category.size}")
+
         b.excludeAppDialogChipGroup.removeAllViews()
+
         for (category in categories) {
             val chip = this.layoutInflater.inflate(R.layout.item_chip_category, null, false) as Chip
             chip.text = category

@@ -17,7 +17,6 @@ limitations under the License.
 package com.celzero.bravedns.adapter
 
 import android.content.Context
-import android.content.pm.PackageManager
 import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
 import android.util.Log
@@ -37,14 +36,12 @@ import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.UNKNOWN_APP
 import com.celzero.bravedns.util.KnownPorts
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL_LOG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getIcon
-import com.celzero.bravedns.util.Utilities.Companion.isValidUid
+import com.celzero.bravedns.util.Utilities.Companion.getPackageInfoForUid
 import java.util.*
 
 class ConnectionTrackerAdapter(val context: Context) :
@@ -94,10 +91,11 @@ class ConnectionTrackerAdapter(val context: Context) :
 
         private fun openBottomSheet(ct: ConnectionTracker) {
             if (context !is FragmentActivity) {
-                Log.w(LOG_TAG_UI, "Can not open bottom sheet. Context is not attached to activity")
+                Log.wtf(LOG_TAG_UI,
+                        "Can not open bottom sheet. Context is not attached to activity")
                 return
             }
-            val bottomSheetFragment = ConnTrackerBottomSheetFragment(context, ct)
+            val bottomSheetFragment = ConnTrackerBottomSheetFragment(ct)
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
 
@@ -111,7 +109,7 @@ class ConnectionTrackerAdapter(val context: Context) :
         private fun displayAppDetails(ct: ConnectionTracker) {
             b.connectionAppName.text = ct.appName
 
-            val apps = getPackageInfo(ct)
+            val apps = getPackageInfoForUid(context, ct.uid)
             if (apps.isNullOrEmpty()) {
                 loadAppIcon(Utilities.getDefaultIcon(context))
                 return
@@ -133,14 +131,15 @@ class ConnectionTrackerAdapter(val context: Context) :
             // known ports(reserved port and protocol identifiers).
             // https://github.com/celzero/rethink-app/issues/42 - #3 - transport + protocol.
             val resolvedPort = KnownPorts.resolvePort(port)
-            if (resolvedPort != Constants.PORT_VAL_UNKNOWN) {
-                b.connLatencyTxt.text = resolvedPort?.toUpperCase(Locale.ROOT)
+            b.connLatencyTxt.text = if (resolvedPort != Constants.PORT_VAL_UNKNOWN) {
+                resolvedPort?.toUpperCase(Locale.ROOT)
             } else {
-                b.connLatencyTxt.text = Protocol.getProtocolName(proto).name
+                Protocol.getProtocolName(proto).name
             }
         }
 
         private fun displayFirewallRulesetHint(isBlocked: Boolean, ruleName: String?) {
+            Log.d(LOG_TAG_UI, "ConnTrack UI issue: $isBlocked, $ruleName")
             when {
                 // hint red when blocked
                 isBlocked -> {
@@ -152,7 +151,7 @@ class ConnectionTrackerAdapter(val context: Context) :
                 FirewallRuleset.RULE7.ruleName == ruleName -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
                     b.connectionStatusIndicator.setBackgroundColor(
-                        fetchTextColor(R.color.dividerColor))
+                        ContextCompat.getColor(context, R.color.textColorMain))
                 }
                 // no hints, otherwise
                 else -> {
@@ -161,35 +160,9 @@ class ConnectionTrackerAdapter(val context: Context) :
             }
         }
 
-        private fun getPackageInfo(ct: ConnectionTracker): Array<out String>? {
-            if (ct.appName == UNKNOWN_APP || !isValidUid(ct.uid)) {
-                return null
-            }
-            try {
-                return context.packageManager.getPackagesForUid(ct.uid)
-            } catch (e: PackageManager.NameNotFoundException) {
-                Log.w(LOG_TAG_FIREWALL_LOG, "Package Not Found - " + e.message)
-            }
-            return null
-        }
-
         private fun loadAppIcon(drawable: Drawable?) {
             GlideApp.with(context).load(drawable).error(Utilities.getDefaultIcon(context)).into(
                 b.connectionAppIcon)
-        }
-
-        private fun fetchTextColor(attr: Int): Int {
-            val attributeFetch = if (attr == R.color.dividerColor) {
-                R.attr.dividerColor
-            } else {
-                R.attr.accentGood
-            }
-            val typedValue = TypedValue()
-            val a: TypedArray = context.obtainStyledAttributes(typedValue.data,
-                                                               intArrayOf(attributeFetch))
-            val color = a.getColor(0, 0)
-            a.recycle()
-            return color
         }
     }
 

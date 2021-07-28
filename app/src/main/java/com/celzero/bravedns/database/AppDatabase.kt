@@ -30,12 +30,14 @@ abstract class AppDatabase : RoomDatabase() {
     companion object {
         private const val DATABASE_NAME = "bravedns.db"
 
+        // setJournalMode() is added as part of issue #344
         fun buildDatabase(context: Context) = Room.databaseBuilder(context.applicationContext,
                                                                    AppDatabase::class.java,
-                                                                   DATABASE_NAME).allowMainThreadQueries().addMigrations(
-            MIGRATION_1_2).addMigrations(MIGRATION_2_3).addMigrations(MIGRATION_3_4).addMigrations(
-            MIGRATION_4_5).addMigrations(MIGRATION_5_6).addMigrations(MIGRATION_6_7).addMigrations(
-            MIGRATION_7_8).addMigrations(MIGRATION_8_9).addMigrations(MIGRATION_9_10).build()
+                                                                   DATABASE_NAME).allowMainThreadQueries().setJournalMode(
+            JournalMode.TRUNCATE).addMigrations(MIGRATION_1_2).addMigrations(
+            MIGRATION_2_3).addMigrations(MIGRATION_3_4).addMigrations(MIGRATION_4_5).addMigrations(
+            MIGRATION_5_6).addMigrations(MIGRATION_6_7).addMigrations(MIGRATION_7_8).addMigrations(
+            MIGRATION_8_9).addMigrations(MIGRATION_9_10).build()
 
         private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {

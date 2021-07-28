@@ -39,10 +39,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
- * Connection Tracker - Network Monitor.
- * All the network activities are captured and stored in the database.
- * Live data is used to fetch the network details from the database.
- * Database table name - ConnectionTracker.
+ * Captures network logs and stores in ConnectionTracker, a room database.
  */
 class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker),
                                   SearchView.OnQueryTextListener {
@@ -51,6 +48,8 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     private var layoutManager: RecyclerView.LayoutManager? = null
     private val viewModel: ConnectionTrackerViewModel by viewModel()
     private var filterValue: String = ""
+
+    // By default, all connections are shown, Filter dialog will be selected with position 1.
     private var checkedItem = 1
 
     private val connectionTrackerDAO by inject<ConnectionTrackerDAO>()
@@ -68,22 +67,22 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     private fun initView() {
         val includeView = b.connectionListScrollList
 
-        if (persistentState.logsEnabled) {
-            includeView.connectionListLogsDisabledTv.visibility = View.GONE
-            includeView.connectionCardViewTop.visibility = View.VISIBLE
-
-            includeView.recyclerConnection.setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(requireContext())
-            includeView.recyclerConnection.layoutManager = layoutManager
-            val recyclerAdapter = ConnectionTrackerAdapter(requireContext())
-            viewModel.connectionTrackerList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
-                recyclerAdapter::submitList))
-            includeView.recyclerConnection.adapter = recyclerAdapter
-        } else {
+        if (!persistentState.logsEnabled) {
             includeView.connectionListLogsDisabledTv.visibility = View.VISIBLE
             includeView.connectionCardViewTop.visibility = View.GONE
+            return
         }
 
+        includeView.connectionListLogsDisabledTv.visibility = View.GONE
+        includeView.connectionCardViewTop.visibility = View.VISIBLE
+
+        includeView.recyclerConnection.setHasFixedSize(true)
+        layoutManager = LinearLayoutManager(requireContext())
+        includeView.recyclerConnection.layoutManager = layoutManager
+        val recyclerAdapter = ConnectionTrackerAdapter(requireContext())
+        viewModel.connectionTrackerList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
+            recyclerAdapter::submitList))
+        includeView.recyclerConnection.adapter = recyclerAdapter
 
         includeView.connectionSearch.setOnQueryTextListener(this)
         includeView.connectionSearch.setOnClickListener {
@@ -112,26 +111,25 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
 
     private fun showFilterDialog() {
 
-        val singleItems = arrayOf(getString(R.string.filter_network_blocked_connections),
-                                  getString(R.string.filter_network_all_connections))
+        val items = arrayOf(getString(R.string.filter_network_blocked_connections),
+                            getString(R.string.filter_network_all_connections))
 
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle(getString(R.string.ct_filter_dialog_title))
 
         // Single-choice items (initialized with checked item)
-        builder.setSingleChoiceItems(singleItems, checkedItem) { dialog, which ->
-            // Respond to item chosen
-            filterValue = if (which == 0) ":isFilter"
-            else ""
+        builder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
+            // Respond to item chosen, position 0 - blocked filter.
+            filterValue = if (which == 0) {
+                ":isFilter"
+            } else ""
             checkedItem = which
             if (DEBUG) Log.d(LOG_TAG_UI, "Filter Option selected: $filterValue")
             viewModel.setFilterBlocked(filterValue)
             dialog.dismiss()
         }
         builder.show()
-
     }
-
 
     private fun showDeleteDialog() {
         val builder = AlertDialog.Builder(requireContext())

@@ -19,6 +19,7 @@ package com.celzero.bravedns.database
 import androidx.lifecycle.LiveData
 import androidx.paging.PagedList
 import androidx.paging.toLiveData
+import androidx.room.Transaction
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
@@ -27,10 +28,10 @@ import kotlinx.coroutines.launch
 
 class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
 
-    fun updateAsync(doHEndpoint: DoHEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
-        coroutineScope.launch {
-            doHEndpointDAO.update(doHEndpoint)
-        }
+    @Transaction
+    fun update(doHEndpoint: DoHEndpoint) {
+        doHEndpointDAO.removeConnectionStatus()
+        doHEndpointDAO.update(doHEndpoint)
     }
 
     fun deleteAsync(doHEndpoint: DoHEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
@@ -68,8 +69,8 @@ class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
             pageSize = LIVEDATA_PAGE_SIZE)
     }
 
-    fun deleteDoHEndpoint(url: String) {
-        doHEndpointDAO.deleteDoHEndpoint(url)
+    fun deleteDoHEndpoint(id: Int) {
+        doHEndpointDAO.deleteDoHEndpoint(id)
     }
 
     fun removeConnectionStatus() {

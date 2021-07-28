@@ -18,6 +18,7 @@ package com.celzero.bravedns.ui
 import android.content.ActivityNotFoundException
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -36,6 +37,7 @@ import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentAboutBinding
+import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
@@ -72,10 +74,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         b.aboutVpnProfile.setOnClickListener(this)
 
         try {
-            val pInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName,
-                                                                       0)
-            val version = pInfo.versionName
-
+            val version = getVersionName()
             b.aboutAppVersion.text = getString(R.string.about_version_install_source, version,
                                                getDownloadSource().toString())
             b.aboutWhatsNew.text = getString(R.string.about_whats_new,
@@ -83,6 +82,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         } catch (e: PackageManager.NameNotFoundException) {
             Log.w(LOG_TAG_UI, "package name not found: ${e.message}", e)
         }
+    }
+
+    private fun getVersionName(): String {
+        val pInfo: PackageInfo? = Utilities.getPackageMetadata(requireContext().packageManager,
+                                                               requireContext().packageName)
+        return pInfo?.versionName ?: ""
     }
 
     private fun getDownloadSource(): Int {
@@ -140,7 +145,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
                 startActivity(intent)
             }
             b.aboutAppUpdate -> {
-                (requireContext() as HomeScreenActivity).checkForUpdate(true)
+                (requireContext() as HomeScreenActivity).checkForUpdate(
+                    AppUpdater.UserPresent.INTERACTIVE)
             }
             b.aboutWhatsNew -> {
                 showNewFeaturesDialog()

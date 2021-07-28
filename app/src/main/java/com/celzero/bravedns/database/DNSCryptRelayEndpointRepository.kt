@@ -15,10 +15,12 @@ limitations under the License.
 */
 package com.celzero.bravedns.database
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_MODE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -27,11 +29,8 @@ import kotlinx.coroutines.launch
 class DNSCryptRelayEndpointRepository(
         private val dnsCryptRelayEndpointDAO: DNSCryptRelayEndpointDAO) {
 
-    fun updateAsync(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint,
-                    coroutineScope: CoroutineScope = GlobalScope) {
-        coroutineScope.launch {
-            dnsCryptRelayEndpointDAO.update(dnsCryptRelayEndpoint)
-        }
+    fun update(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint) {
+        dnsCryptRelayEndpointDAO.update(dnsCryptRelayEndpoint)
     }
 
     fun deleteAsync(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint,
@@ -40,7 +39,6 @@ class DNSCryptRelayEndpointRepository(
             dnsCryptRelayEndpointDAO.delete(dnsCryptRelayEndpoint)
         }
     }
-
 
     fun insertAsync(dnsCryptRelayEndpoint: DNSCryptRelayEndpoint,
                     coroutineScope: CoroutineScope = GlobalScope) {
@@ -66,8 +64,8 @@ class DNSCryptRelayEndpointRepository(
             pageSize = LIVEDATA_PAGE_SIZE)
     }
 
-    fun deleteDNSCryptRelayEndpoint(url: String) {
-        dnsCryptRelayEndpointDAO.deleteDNSCryptRelayEndpoint(url)
+    fun deleteDNSCryptRelayEndpoint(id: Int) {
+        dnsCryptRelayEndpointDAO.deleteDNSCryptRelayEndpoint(id)
     }
 
     fun removeConnectionStatus() {
@@ -80,5 +78,31 @@ class DNSCryptRelayEndpointRepository(
 
     fun getCount(): Int {
         return dnsCryptRelayEndpointDAO.getCount()
+    }
+
+    fun getServersToAdd(): String {
+        val relays = getConnectedRelays()
+        var relayString = ""
+        return if (relays.isEmpty()) {
+            relayString
+        } else {
+            relays.forEach {
+                relayString += "${it.dnsCryptRelayURL},"
+            }
+            relayString = relayString.dropLast(1)
+            Log.i(LOG_TAG_APP_MODE, "Crypt Server - $relayString")
+            relayString
+        }
+    }
+
+    fun getServersToRemove(): String {
+        val relays = getConnectedRelays()
+        var removeServerString = ""
+
+        relays.forEach {
+            removeServerString += "${it.id},"
+        }
+        removeServerString = removeServerString.dropLast(1)
+        return removeServerString
     }
 }

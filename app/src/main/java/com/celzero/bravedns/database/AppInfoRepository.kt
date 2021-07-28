@@ -32,8 +32,12 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         appInfoDAO.delete(appInfo)
     }
 
-    fun insertAsync(appInfo: AppInfo) {
+    fun insert(appInfo: AppInfo) {
         appInfoDAO.insert(appInfo)
+    }
+
+    fun deleteByPackageName(packageNames: List<String>) {
+        appInfoDAO.deleteByPackageName(packageNames)
     }
 
     fun isRootUserAvailable(): String? {
@@ -108,16 +112,16 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.getPackageNameForUid(uid)
     }
 
-    fun updateWhiteList(uid: Int, isEnabled: Boolean) {
-        appInfoDAO.updateWhiteList(uid, isEnabled)
+    fun updateWhitelist(uid: Int, isEnabled: Boolean) {
+        appInfoDAO.updateWhitelist(uid, isEnabled)
     }
 
-    fun updateWhiteListForAllApp(isEnabled: Boolean): Int {
-        return appInfoDAO.updateWhiteListForAllApp(isEnabled)
+    fun updateWhitelistForAllApp(isEnabled: Boolean): Int {
+        return appInfoDAO.updateWhitelistForAllApp(isEnabled)
     }
 
-    fun updateWhiteListForCategories(category: String, isEnabled: Boolean): Int {
-        return appInfoDAO.updateWhiteListForCategories(category, isEnabled)
+    fun updateWhitelistForCategories(category: String, isEnabled: Boolean): Int {
+        return appInfoDAO.updateWhitelistForCategories(category, isEnabled)
     }
 
     fun updateExcludedForAllApp(isExcluded: Boolean, coroutineScope: CoroutineScope = GlobalScope) {
@@ -148,10 +152,6 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
 
     fun getWhitelistCountForCategory(categoryName: String): Int {
         return appInfoDAO.getWhitelistCount(categoryName)
-    }
-
-    fun getAppNameForUID(uid: Int): String {
-        return appInfoDAO.getAppNameForUID(uid)
     }
 
     fun getExcludedAppCountForCategory(categoryName: String): Int {

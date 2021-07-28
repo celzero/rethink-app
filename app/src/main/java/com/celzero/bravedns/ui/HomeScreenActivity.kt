@@ -15,14 +15,14 @@
  */
 package com.celzero.bravedns.ui
 
+import android.app.ActivityManager
+import android.app.ApplicationExitInfo
 import android.content.*
 import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -47,18 +47,26 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_WEBSITE
-import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME
-import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.Utilities.Companion.getPackageMetadata
+import com.celzero.bravedns.util.Utilities.Companion.isAtleastR
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import okhttp3.*
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
-import kotlin.collections.HashMap
+import kotlin.collections.HashSet
+
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
@@ -73,23 +81,17 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val persistentState by inject<PersistentState>()
     private val appUpdateManager by inject<AppUpdater>()
 
-
-    /*TODO : This task need to be completed.
+    /* TODO : This task need to be completed.
              Add all the appinfo in the global variable during appload
              Handle those things in the application instead of reaching to DB every time
-             Call the coroutine scope to insert/update/delete the values*/
+             Call the coroutine scope to insert/update/delete the values */
 
     object GlobalVariable {
-        var appList: MutableMap<String, AppInfo> = HashMap()
-        var backgroundAllowedUID: MutableMap<Int, Boolean> = HashMap()
-        var blockedUID: MutableMap<Int, Boolean> = HashMap()
 
         var braveModeToggler: MutableLiveData<Int> = MutableLiveData()
-        var connectedDNS: MutableLiveData<String> = MutableLiveData()
-        var cryptRelayToRemove: String = ""
 
         var appStartTime: Long = System.currentTimeMillis()
-        var DEBUG = false
+        var DEBUG = true
     }
 
     // TODO - #324 - Usage of isDarkTheme() in all activities.
@@ -98,17 +100,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     companion object {
-        var isLoadingComplete: Boolean = false
         var enqueue: Long = 0
-
-        fun setupComplete() {
-            isLoadingComplete = true
-        }
-
-        fun setupStart() {
-            isLoadingComplete = false
-        }
-
     }
 
     //TODO : Remove the unwanted data and the assignments happening
@@ -118,7 +110,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         super.onCreate(savedInstanceState)
 
         if (persistentState.firstTimeLaunch) {
-            persistentState.setConnectedDNS(Constants.RETHINK_DNS)
             launchOnboardActivity()
         } else {
             showNewFeaturesDialog()
@@ -141,10 +132,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         insertDefaultData()
 
         initUpdateCheck()
-
     }
 
-    private fun modifyPersistence() {
+    private fun removeThisMethod() {
         persistentState.numberOfRequests = persistentState.oldNumberRequests.toLong()
         persistentState.numberOfBlockedRequests = persistentState.oldBlockedRequests.toLong()
     }
@@ -152,16 +142,19 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun insertDefaultData() {
         if (persistentState.insertionCompleted) return
 
-        refreshDatabase.insertDefaultDNSList()
-        refreshDatabase.insertDefaultDNSCryptList()
-        refreshDatabase.insertDefaultDNSCryptRelayList()
-        refreshDatabase.insertDefaultDNSProxy()
-        refreshDatabase.updateCategoryInDB()
-        persistentState.insertionCompleted = true
+        CoroutineScope(Dispatchers.IO).launch {
+            refreshDatabase.insertDefaultDNSList()
+            refreshDatabase.insertDefaultDNSCryptList()
+            refreshDatabase.insertDefaultDNSCryptRelayList()
+            refreshDatabase.insertDefaultDNSProxy()
+            refreshDatabase.updateCategoryInDB()
+            persistentState.insertionCompleted = true
+        }
     }
 
     private fun launchOnboardActivity() {
         startActivity(Intent(this, WelcomeActivity::class.java))
+        finish()
     }
 
     private fun showNewFeaturesDialog() {
@@ -189,7 +182,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         // FIXME - Remove this after the version v053f
         // this is to fix the persistance state which was saved as Int instead of Long.
         // Modification of persistence state
-        modifyPersistence()
+        removeThisMethod()
     }
 
     private fun updateNewVersion() {
@@ -206,15 +199,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun getLatestVersion(): Int {
-        return try {
-            val pInfo: PackageInfo = this.packageManager.getPackageInfo(this.packageName, 0)
-            pInfo.versionCode
-        } catch (e: PackageManager.NameNotFoundException) {
-            Log.e(LOG_TAG_UI, "package not found, cannot fetch version code: ${e.message}", e)
-            0
-        }
+        val pInfo: PackageInfo? = getPackageMetadata(this.packageManager, this.packageName)
+        return pInfo?.versionCode ?: 0
     }
-
 
     //FIXME - Move it to Android's built-in WorkManager
     private fun initUpdateCheck() {
@@ -236,16 +223,33 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         return (day == Calendar.FRIDAY || day == Calendar.SATURDAY) && persistentState.checkForAppUpdate
     }
 
-    fun checkForUpdate(userInitiation: Boolean = false) {
-        if (BuildConfig.FLAVOR == FLAVOR_PLAY) {
-            appUpdateManager.checkForAppUpdate(userInitiation, this,
+    fun checkForUpdate(
+            isInteractive: AppUpdater.UserPresent = AppUpdater.UserPresent.NONINTERACTIVE) {
+
+        // Check updates only for play store / website version. Not fDroid.
+        if (BuildConfig.FLAVOR != FLAVOR_PLAY && BuildConfig.FLAVOR != FLAVOR_WEBSITE) {
+            if (DEBUG) Log.d(LOG_TAG_APP_UPDATE,
+                             "Check for update: Not play or website- ${BuildConfig.FLAVOR}")
+            return
+        }
+
+        if (isGooglePlayServicesAvailable()) {
+            appUpdateManager.checkForAppUpdate(isInteractive, this,
                                                installStateUpdatedListener) // Might be play updater or web updater
-        } else if (BuildConfig.FLAVOR == FLAVOR_WEBSITE) {
-            get<NonStoreAppUpdater>().checkForAppUpdate(userInitiation, this,
+        } else {
+            get<NonStoreAppUpdater>().checkForAppUpdate(isInteractive, this,
                                                         installStateUpdatedListener) // Always web updater
         }
     }
 
+    private fun isGooglePlayServicesAvailable(): Boolean {
+        val googleApiAvailability: GoogleApiAvailability = GoogleApiAvailability.getInstance()
+        val status: Int = googleApiAvailability.isGooglePlayServicesAvailable(this)
+        if (status != ConnectionResult.SUCCESS) {
+            return false
+        }
+        return true
+    }
 
     private val installStateUpdatedListener = object : AppUpdater.InstallStateListener {
         override fun onStateUpdate(state: AppUpdater.InstallState) {
@@ -261,19 +265,25 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             }
         }
 
-        override fun onUpdateCheckFailed(installSource: AppUpdater.InstallSource) {
+        override fun onUpdateCheckFailed(installSource: AppUpdater.InstallSource,
+                                         isInteractive: AppUpdater.UserPresent) {
             runOnUiThread {
-                showDownloadDialog(installSource,
-                                   getString(R.string.download_update_dialog_failure_title),
-                                   getString(R.string.download_update_dialog_failure_message))
+                if (isInteractive == AppUpdater.UserPresent.INTERACTIVE) {
+                    showDownloadDialog(installSource,
+                                       getString(R.string.download_update_dialog_failure_title),
+                                       getString(R.string.download_update_dialog_failure_message))
+                }
             }
         }
 
-        override fun onUpToDate(installSource: AppUpdater.InstallSource) {
+        override fun onUpToDate(installSource: AppUpdater.InstallSource,
+                                isInteractive: AppUpdater.UserPresent) {
             runOnUiThread {
-                showDownloadDialog(installSource,
-                                   getString(R.string.download_update_dialog_message_ok_title),
-                                   getString(R.string.download_update_dialog_message_ok))
+                if (isInteractive == AppUpdater.UserPresent.INTERACTIVE) {
+                    showDownloadDialog(installSource,
+                                       getString(R.string.download_update_dialog_message_ok_title),
+                                       getString(R.string.download_update_dialog_message_ok))
+                }
             }
         }
 
