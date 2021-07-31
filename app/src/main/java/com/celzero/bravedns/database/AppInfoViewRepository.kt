@@ -19,6 +19,4 @@ class AppInfoViewRepository(private val appInfoViewDAO: AppInfoViewDAO) {
     fun getExcludedAppListCountLiveData(): LiveData<Int> {
         return appInfoViewDAO.getExcludedAppListCountLiveData()
     }
-
-
 }

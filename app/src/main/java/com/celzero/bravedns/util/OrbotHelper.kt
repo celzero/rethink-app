@@ -18,45 +18,45 @@ package com.celzero.bravedns.util
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.net.Uri
 import android.net.VpnService
-import android.os.Build
 import android.text.TextUtils
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.celzero.bravedns.R
+import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.database.ProxyEndpointRepository
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
-import settings.Settings
+import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_FDROID
+import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Utilities.Companion.getThemeAccent
+import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 
 /**
- * OrbotHelper - Integration of One touch Orbot configuration.
+ * Integration of One touch Orbot configuration.
  * Helps to send intent to Orbot application and the receiver registered to listen for the
  * status change of Orbot.
  *
- * ref : github.com/guardianproject/NetCipher/blob/fee8571/libnetcipher/src/info/guardianproject/netcipher/proxy/OrbotHelper.java
+ * adopted from: github.com/guardianproject/NetCipher/blob/fee8571/libnetcipher/src/info/guardianproject/netcipher/proxy/OrbotHelper.java
  */
-class OrbotHelper(private val persistentState: PersistentState, private val proxyEndpointRepository: ProxyEndpointRepository) {
+class OrbotHelper(private val context: Context, private val persistentState: PersistentState,
+                  private val proxyEndpointRepository: ProxyEndpointRepository,
+                  private val appMode: AppMode) {
 
-    /**
-     * Constants - ORBOT constants
-     */
+
     companion object {
         const val ORBOT_NOTIFICATION_ID = "Orbot"
         const val ORBOT_SERVICE_ID = 1111
@@ -81,7 +81,6 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
 
         private const val orbot = "ORBOT"
 
-        //const val ORBOT_NOTIFICATION_ACTION = "OPEN_ORBOT"
         const val ORBOT_NOTIFICATION_ACTION_TEXT = "OPEN_ORBOT_INTENT"
 
         //https://github.com/guardianproject/orbot/blob/master/orbotservice/src/main/java/org/torproject/android/service/TorServiceConstants.java
@@ -91,6 +90,12 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
         private const val EXTRA_HTTP_PROXY_PORT = "org.torproject.android.intent.extra.HTTP_PROXY_PORT"
 
         private const val EXTRA_STATUS = "org.torproject.android.intent.extra.STATUS"
+
+        // Orbot requestCode for PendingIntent.getBroadcast() for the notification action.
+        private const val ORBOT_REQUEST_CODE = 200
+
+        var selectedProxyType: String = AppMode.ProxyType.NONE.name
+
     }
 
     var socks5Port: Int? = null
@@ -101,19 +106,10 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
     private var isResponseReceivedFromOrbot: Boolean = false
 
     /**
-     * Checks whether the Orbot package name in the list
-     */
-    fun isOrbotInstalled(): Boolean {
-        if (appList.contains(ORBOT_PACKAGE_NAME)) return true
-        if (DEBUG) Log.d(LOG_TAG, "Settings - Orbot - isOrbotInstalled is false")
-        return false
-    }
-
-    /**
      * Returns the intent which will initiate the Orbot in non-vpn mode.
      */
-    private fun getOrbotStartIntent(context: Context): Intent? {
-        if (DEBUG) Log.d(LOG_TAG, "Settings - Orbot - getOrbotStartIntent")
+    private fun getOrbotStartIntent(): Intent {
+        if (DEBUG) Log.d(LOG_TAG_VPN, "Settings - Orbot - getOrbotStartIntent")
         val intent = Intent(ACTION_START)
         intent.setPackage(ORBOT_PACKAGE_NAME)
         intent.putExtra(EXTRA_PACKAGE_NAME, context.packageName)
@@ -124,8 +120,8 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
      * Returns the intent which will call the stop of the Orbot.
      * The below intent is not stopping the Orbot.
      */
-    private fun getOrbotStopIntent(context: Context): Intent? {
-        if (DEBUG) Log.d(LOG_TAG, "Settings - Orbot - getOrbotStopIntent")
+    private fun getOrbotStopIntent(): Intent {
+        if (DEBUG) Log.d(LOG_TAG_VPN, "Settings - Orbot - getOrbotStopIntent")
         val intent = Intent(ACTION_STOP_VPN)
         intent.setPackage(ORBOT_PACKAGE_NAME)
         intent.putExtra(EXTRA_PACKAGE_NAME, context.packageName)
@@ -133,8 +129,8 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
     }
 
 
-    fun getIntentForDownload(context: Context, mode: Int) : Intent? {
-        if(mode == 1){ //For play store
+    fun getIntentForDownload(mode: Int): Intent? {
+        if (mode == DOWNLOAD_SOURCE_PLAY_STORE) { //For play store
             var intent = Intent(Intent.ACTION_VIEW)
             intent.data = Uri.parse(ORBOT_MARKET_URI)
 
@@ -151,21 +147,20 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
             }
             if (foundPackageName == null) {
                 return null
-            } else {
-                intent.setPackage(foundPackageName)
             }
+
+            intent.setPackage(foundPackageName)
             return intent
 
-        } else if( mode == 2) {  //For fdroid
+        } else if (mode == DOWNLOAD_SOURCE_FDROID) {  //For fdroid
             // Orbot is not available in fDroid for now, So commenting the below code
             // and taking the user to website download link.
             // Will add the below commented code in later versions if the fdroid added Orbot.
-            /*val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse(ORBOT_FDROID_URI)
-            return intent*/
-            return Intent(Intent.ACTION_VIEW, context.resources.getString(R.string.orbot_download_link_website).toUri())
+            return Intent(Intent.ACTION_VIEW,
+                          context.resources.getString(R.string.orbot_download_link_website).toUri())
         } else {
-            return Intent(Intent.ACTION_VIEW, context.resources.getString(R.string.orbot_download_link_website).toUri())
+            return Intent(Intent.ACTION_VIEW,
+                          context.resources.getString(R.string.orbot_download_link_website).toUri())
         }
     }
 
@@ -173,8 +168,8 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
      * Returns the intent to get the status of the Orbot App.
      * Not used as of now.
      */
-    private fun getOrbotStatusIntent(context: Context): Intent? {
-        if (DEBUG) Log.d(LOG_TAG, "Settings - Orbot - getOrbotStatusIntent")
+    private fun getOrbotStatusIntent(): Intent? {
+        if (DEBUG) Log.d(LOG_TAG_VPN, "Settings - Orbot - getOrbotStatusIntent")
         val intent = Intent(ACTION_STATUS)
         intent.setPackage(ORBOT_PACKAGE_NAME)
         intent.putExtra(EXTRA_PACKAGE_NAME, context.packageName)
@@ -185,13 +180,14 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
      * Sends the intent to initiate the start in Orbot
      * and registers for the Orbot ACTION_STATUS.
      */
-    fun startOrbot(context: Context) {
-        val intent = getOrbotStartIntent(context)
+    fun startOrbot(type: String) {
+        selectedProxyType = type
+        val intent = getOrbotStartIntent()
         isResponseReceivedFromOrbot = false
         context.registerReceiver(orbotStatusReceiver, IntentFilter(ACTION_STATUS))
         context.sendBroadcast(intent)
         timeOutForOrbot()
-        if (DEBUG) Log.d(LOG_TAG, "Settings - Orbot - requestOrbotStatus")
+        if (DEBUG) Log.d(LOG_TAG_VPN, "Settings - Orbot - requestOrbotStatus")
     }
 
     /**
@@ -201,11 +197,16 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
      */
     private val orbotStatusReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (DEBUG) Log.d(LOG_TAG, "OrbotHelper - Orbot - OnStatusReceiver - ${intent.action}")
-            if (TextUtils.equals(intent.action, ACTION_STATUS)) {
-                val status = intent.getStringExtra(EXTRA_STATUS)
-                if (DEBUG) Log.d(LOG_TAG, "OrbotHelper - Orbot - status - $status")
-                if (status == STATUS_ON) {
+            if (ACTION_STATUS != intent.action) {
+                return
+            }
+
+            val status = intent.getStringExtra(EXTRA_STATUS)
+            if (DEBUG) Log.d(LOG_TAG_VPN,
+                             "OrbotHelper - Orbot - OnStatusReceiver ${intent.action}, status- $status")
+
+            when (status) {
+                STATUS_ON -> {
                     isResponseReceivedFromOrbot = true
                     if (socks5IP != null && httpsIP != null && socks5IP != null && httpsIP != null) {
                         orbotStarted()
@@ -213,14 +214,17 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
                         updateOrbotProxyData(intent)
                         orbotStarted()
                     }
-                } else if (status == STATUS_OFF) {
-                    stopOrbot(context, isUserInitiated = false)
+                }
+                STATUS_OFF -> {
+                    stopOrbot(isInteractive = false)
                     context.unregisterReceiver(this)
-                } else if (status == STATUS_STARTING) {
+                }
+                STATUS_STARTING -> {
                     updateOrbotProxyData(intent)
-                } else if (status == STATUS_STOPPING) {
+                }
+                STATUS_STOPPING -> {
                     updateOrbotProxyData(intent)
-                    stopOrbot(context, isUserInitiated = false)
+                    stopOrbot(isInteractive = false)
                 }
             }
         }
@@ -231,40 +235,37 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
      * Notifies the user about the Orbot failure/stop.
      * The notification will be sent if the user not initiated the stop.
      */
-    fun stopOrbot(context: Context, isUserInitiated: Boolean) {
-        if (!isUserInitiated && persistentState.getOrbotModePersistence() != Constants.ORBAT_MODE_NONE) {
-            val notificationManager = context.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
+    fun stopOrbot(isInteractive: Boolean) {
+        if (!isInteractive && selectedProxyType != AppMode.ProxyType.NONE.name) {
+            val notificationManager = context.getSystemService(
+                VpnService.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.cancelAll()
-            val builder = createNotification(context)
-            notificationManager.notify(ORBOT_SERVICE_ID, builder.build())
+            notificationManager.notify(ORBOT_SERVICE_ID, createNotification().build())
         }
-        persistentState.setOrbotModePersistence(Constants.ORBAT_MODE_NONE)
-        persistentState.orbotEnabledMode = Constants.ORBAT_MODE_NONE
+        selectedProxyType = AppMode.ProxyType.NONE.name
+        appMode.removeProxy(AppMode.ProxyType.NONE, AppMode.ProxyProvider.ORBOT)
         persistentState.orbotConnectionStatus.postValue(false)
-        persistentState.orbotEnabled = false
-        persistentState.httpProxyPort = 0
-        persistentState.httpProxyHostAddress=""
-        HomeScreenActivity.GlobalVariable.appMode?.setProxyMode(Settings.ProxyModeNone)
-        val intent = getOrbotStopIntent(context)
-        context.sendBroadcast(intent)
-        if (DEBUG) Log.d(LOG_TAG, "OrbotHelper - Orbot - stopOrbot")
+        context.sendBroadcast(getOrbotStopIntent())
+        if (DEBUG) Log.d(LOG_TAG_VPN, "OrbotHelper - Orbot - stopOrbot")
     }
 
     /**
      * Creates notification for the failure of Orbot.
      * Creates a new notification channel for the Orbot failure update.
      */
-    private fun createNotification(context: Context): NotificationCompat.Builder {
-        val mainActivityIntent = PendingIntent.getActivity(context, 0, Intent(context, HomeScreenActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT)
+    private fun createNotification(): NotificationCompat.Builder {
+        val mainActivityIntent = PendingIntent.getActivity(context, 0, Intent(context,
+                                                                              HomeScreenActivity::class.java),
+                                                           PendingIntent.FLAG_UPDATE_CURRENT)
         var builder: NotificationCompat.Builder
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (isAtleastO()) {
             val name: CharSequence = ORBOT_NOTIFICATION_ID
             val description = context.resources.getString(R.string.settings_orbot_notification_desc)
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(ORBOT_NOTIFICATION_ID, name, importance)
             channel.description = description
             val notificationManager = context.getSystemService(NotificationManager::class.java)
-            notificationManager?.createNotificationChannel(channel)
+            notificationManager.createNotificationChannel(channel)
             builder = NotificationCompat.Builder(context, ORBOT_NOTIFICATION_ID)
         } else {
             builder = NotificationCompat.Builder(context, ORBOT_NOTIFICATION_ID)
@@ -272,55 +273,57 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
 
         val contentTitle = context.resources.getString(R.string.settings_orbot_notification_heading)
         val contentText = context.resources.getString(R.string.settings_orbot_notification_content)
-        builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(mainActivityIntent).setContentText(contentText)
+        builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(
+            mainActivityIntent).setContentText(contentText)
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-        val openIntent = getOrbotOpenIntent(context)
-        val notificationAction : NotificationCompat.Action = NotificationCompat.Action(0, context.resources.getString(R.string.settings_orbot_notification_action), openIntent)
+        builder.color = ContextCompat.getColor(context, getThemeAccent(context))
+        val openIntent = getOrbotOpenIntent()
+        val notificationAction: NotificationCompat.Action = NotificationCompat.Action(0,
+                                                                                      context.resources.getString(
+                                                                                          R.string.settings_orbot_notification_action),
+                                                                                      openIntent)
         builder.addAction(notificationAction)
 
         // Secret notifications are not shown on the lock screen.  No need for this app to show there.
         // Only available in API >= 21
         builder = builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
 
-        builder.build()
         return builder
     }
 
-    private fun getOrbotOpenIntent(context: Context): PendingIntent? {
+    private fun getOrbotOpenIntent(): PendingIntent? {
         val intentAction = Intent(context, NotificationActionReceiver::class.java)
         intentAction.putExtra(Constants.NOTIFICATION_ACTION, ORBOT_NOTIFICATION_ACTION_TEXT)
-        return PendingIntent.getBroadcast(context, 1, intentAction, PendingIntent.FLAG_UPDATE_CURRENT)
+        return PendingIntent.getBroadcast(context, ORBOT_REQUEST_CODE, intentAction,
+                                          PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
     /**
      * Updates the shared pref values - Orbot started status
      */
     private fun orbotStarted() {
-        persistentState.orbotEnabled = true
         persistentState.orbotConnectionStatus.postValue(false)
         setOrbotMode()
     }
 
 
     private fun setOrbotMode() {
-        if (persistentState.getOrbotModePersistence() == Constants.ORBAT_MODE_SOCKS5) {
+        Log.i(LOG_TAG_VPN, "OrbotHelper - Orbot - startOrbot with $selectedProxyType")
+        if (selectedProxyType == AppMode.ProxyType.SOCKS5.name) {
+            appMode.addProxy(AppMode.ProxyType.SOCKS5, AppMode.ProxyProvider.ORBOT)
             val proxyEndpoint = constructProxy()
             if (proxyEndpoint != null) {
                 proxyEndpointRepository.clearOrbotData()
                 proxyEndpointRepository.insertAsync(proxyEndpoint)
             }
-            HomeScreenActivity.GlobalVariable.appMode?.setProxyMode(Constants.ORBOT_SOCKS)
-            persistentState.orbotEnabledMode = Constants.ORBAT_MODE_SOCKS5
-            if (DEBUG) Log.d(LOG_TAG, "OrbotHelper - Orbot - startOrbot")
-        } else if (persistentState.getOrbotModePersistence() == Constants.ORBAT_MODE_HTTP) {
+        } else if (selectedProxyType == AppMode.ProxyType.HTTP.name) {
+            appMode.addProxy(AppMode.ProxyType.HTTP, AppMode.ProxyProvider.ORBOT)
             if (httpsIP != null && httpsPort != null) {
                 persistentState.httpProxyHostAddress = httpsIP!!
                 persistentState.httpProxyPort = httpsPort!!
             }
-            if (DEBUG) Log.d(LOG_TAG, "OrbotHelper - Orbot - startOrbot")
-            HomeScreenActivity.GlobalVariable.appMode?.setProxyMode(Settings.ProxyModeNone)
-            persistentState.orbotEnabledMode = Constants.ORBAT_MODE_HTTP
-        } else if (persistentState.getOrbotModePersistence() == Constants.ORBAT_MODE_BOTH) {
+        } else if (selectedProxyType == AppMode.ProxyType.HTTP_SOCKS5.name) {
+            appMode.addProxy(AppMode.ProxyType.HTTP_SOCKS5, AppMode.ProxyProvider.ORBOT)
             val proxyEndpoint = constructProxy()
             if (proxyEndpoint != null) {
                 proxyEndpointRepository.clearOrbotData()
@@ -330,20 +333,23 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
                 persistentState.httpProxyHostAddress = httpsIP!!
                 persistentState.httpProxyPort = httpsPort!!
             }
-            HomeScreenActivity.GlobalVariable.appMode?.setProxyMode(Constants.ORBOT_SOCKS)
-            persistentState.orbotEnabledMode = Constants.ORBAT_MODE_BOTH
-        } else{
-            HomeScreenActivity.GlobalVariable.appMode?.setProxyMode(Settings.ProxyModeNone)
-            persistentState.orbotEnabledMode = Constants.ORBAT_MODE_NONE
+        } else {
+            appMode.addProxy(AppMode.ProxyType.NONE, AppMode.ProxyProvider.ORBOT)
         }
 
     }
 
     private fun constructProxy(): ProxyEndpoint? {
-        if (socks5IP != null && socks5Port != null) {
-            return ProxyEndpoint(-1, orbot, 1, "NONE", ORBOT_PACKAGE_NAME, socks5IP!!, socks5Port!!, "", "", true, true, true, 0L, 0)
+        if (socks5IP == null || socks5Port == null) {
+            Log.w(LOG_TAG_VPN,
+                  "Cannot construct proxy with values ip: $socks5IP, port: $socks5Port")
+            return null
         }
-        return null
+
+        return ProxyEndpoint(id = 0, orbot, proxyMode = 1, proxyType = "NONE", ORBOT_PACKAGE_NAME,
+                             socks5IP!!, socks5Port!!, userName = "", password = "",
+                             isSelected = true, isCustom = true, isUDP = true,
+                             modifiedDataTime = 0L, latency = 0)
     }
 
     /**
@@ -360,7 +366,8 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
         socks5IP = socks5ProxyHost as String?
         httpsIP = httpsProxyHost as String?
 
-        if (DEBUG) Log.d(LOG_TAG, "OrbotHelper - Orbot - $socks5Port, $httpsPort, $socks5IP, $httpsIP")
+        if (DEBUG) Log.d(LOG_TAG_VPN,
+                         "OrbotHelper - Orbot - $socks5Port, $httpsPort, $socks5IP, $httpsIP")
     }
 
     /**
@@ -377,24 +384,47 @@ class OrbotHelper(private val persistentState: PersistentState, private val prox
         // Some cases where the Orbot won't be responding -eg., force stop of application,
         // user disabled auto-start of the application.
         backgroundExecutor.schedule({
-            Log.i(LOG_TAG, "timeOutForOrbot executor triggered - $isResponseReceivedFromOrbot")
-            if (!isResponseReceivedFromOrbot) {
-                val vpnService = VpnController.getInstance().getBraveVpnService()
-                if (vpnService != null) {
-                    stopOrbot(vpnService, isUserInitiated = false)
-                }
-            }
-            backgroundExecutor.shutdown()
-        }, 25, TimeUnit.SECONDS)
+                                        Log.i(LOG_TAG_VPN,
+                                              "timeOutForOrbot executor triggered - $isResponseReceivedFromOrbot")
+                                        if (!isResponseReceivedFromOrbot) {
+                                            stopOrbot(isInteractive = false)
+                                        }
+                                        backgroundExecutor.shutdown()
+                                    }, 25, TimeUnit.SECONDS)
     }
 
-    fun unregisterReceiver(context: Context) {
+    fun unregisterReceiver() {
         try {
             context.unregisterReceiver(orbotStatusReceiver)
-        } catch (e: Exception) {
-            if (DEBUG) Log.w(LOG_TAG, "Unregister not needed: ${e.message}")
+        } catch (e: IllegalArgumentException) {
+            Log.e(LOG_TAG_VPN, "Unregister not needed: ${e.message}", e)
         }
     }
 
+    // Throw intent to start the Orbot application.
+    fun openOrbotApp() {
+        try {
+            val launchIntent: Intent? = context.packageManager?.getLaunchIntentForPackage(
+                ORBOT_PACKAGE_NAME)
+            if (launchIntent != null) {//null pointer check in case package name was not found
+                context.startActivity(launchIntent)
+            } else {
+                openOrbotAppInfo()
+            }
+        } catch (e: ActivityNotFoundException) {
+            Log.w(LOG_TAG_VPN, "Failure calling app info: ${e.message}", e)
+        }
+    }
 
+    private fun openOrbotAppInfo() {
+        val text = context.getString(R.string.orbot_app_issue)
+        Utilities.showToastUiCentered(context, text, Toast.LENGTH_SHORT)
+        try {
+            val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            intent.data = Uri.fromParts("package", ORBOT_PACKAGE_NAME, null)
+            context.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Log.w(LOG_TAG_VPN, "Failure calling app info: ${e.message}", e)
+        }
+    }
 }

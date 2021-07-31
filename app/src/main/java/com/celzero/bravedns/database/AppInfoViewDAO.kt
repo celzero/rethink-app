@@ -17,5 +17,5 @@ interface AppInfoViewDAO {
     fun getWhitelistCountLiveData(): LiveData<Int>
 
     @Query("select count(*) from AppInfoView where isExcluded = 1")
-    fun getExcludedAppListCountLiveData() : LiveData<Int>
+    fun getExcludedAppListCountLiveData(): LiveData<Int>
 }

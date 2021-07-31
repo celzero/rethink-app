@@ -289,6 +289,7 @@
                         android:paddingEnd="10dp"
                         android:stateListAnimator="@null"
                         android:textColor="?attr/primaryTextColor"
+                        android:text="@string/hsf_start_btn_state"
                         android:textSize="@dimen/home_screen_stat_text" />
 
                     <Button
@@ -311,24 +312,6 @@
                 android:textColor="@color/accent_bad"
                 android:textSize="@dimen/large_font_text_view" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/fhs_app_connected_desc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-smallcaps"
-                android:text="@string/dns_explanation_disconnected"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/large_font_text_view"
-                android:visibility="gone" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/fhs_app_uptime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-smallcaps"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/default_font_text_view"
-                android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

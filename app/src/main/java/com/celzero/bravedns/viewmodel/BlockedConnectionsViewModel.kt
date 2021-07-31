@@ -15,41 +15,41 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.toLiveData
-import com.celzero.bravedns.database.AppDatabase
-import com.celzero.bravedns.database.BlockedConnections
 import com.celzero.bravedns.database.BlockedConnectionsDAO
+import com.celzero.bravedns.util.Constants.Companion.FILTER_IS_FILTER
+import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
-class BlockedConnectionsViewModel(private val blockedConnectionsDAO: BlockedConnectionsDAO) : ViewModel() {
+class BlockedConnectionsViewModel(private val blockedConnectionsDAO: BlockedConnectionsDAO) :
+        ViewModel() {
 
-    private var filteredList : MutableLiveData<String> = MutableLiveData()
+    private var filteredList: MutableLiveData<String> = MutableLiveData()
 
     init {
         filteredList.value = ""
     }
 
-    var blockedUnivRulesList = Transformations.switchMap(
-                filteredList
-
-    ) { input ->
-        if (input.isBlank()) {
-            blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(pageSize = 50)
-        } else if (input!! == "isFilter") {
-            blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(pageSize = 50)
+    var blockedUnivRulesList = Transformations.switchMap(filteredList) { input ->
+        if (input.isNullOrBlank()) {
+            blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(
+                pageSize = LIVEDATA_PAGE_SIZE)
+        } else if (FILTER_IS_FILTER == input) {
+            blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(
+                pageSize = LIVEDATA_PAGE_SIZE)
         } else {
-            blockedConnectionsDAO.getUnivBlockedConnectionsByIP("%$input%").toLiveData(50)
+            blockedConnectionsDAO.getUnivBlockedConnectionsByIP("%$input%").toLiveData(
+                LIVEDATA_PAGE_SIZE)
         }
     }
 
-    fun setFilter(filter: String?) {
+    fun setFilter(filter: String) {
         filteredList.value = filter
     }
 
-    fun setFilterBlocked(filter: String){
+    fun setFilterBlocked(filter: String) {
         filteredList.value = filter
     }
 }

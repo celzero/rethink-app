@@ -18,46 +18,61 @@ package com.celzero.bravedns.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 
 @Entity(tableName = "DoHEndpoint")
 class DoHEndpoint {
-    @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
+    @PrimaryKey(autoGenerate = true) var id: Int = 0
     var dohName: String = ""
     var dohURL: String = ""
     var dohExplanation: String? = null
     var isSelected: Boolean = true
     var isCustom: Boolean = true
-    var modifiedDataTime: Long = 0L
+    var modifiedDataTime: Long = INIT_TIME_MS
     var latency: Int = 0
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other?.javaClass != javaClass) return false
-        other as DoHEndpoint
+        if (other !is DoHEndpoint) return false
+        if (isSelected != other.isSelected) return false
         if (dohURL != other.dohURL) return false
-        if(isSelected != isSelected) return false
         return true
     }
 
     override fun hashCode(): Int {
-        return this.hashCode()
+        var result = 0
+        result += result * 31 + this.dohURL.hashCode()
+        result += result * 31 + this.isSelected.hashCode()
+        return result
     }
 
 
-    constructor(id: Int, dohName: String, dohURL: String, dohExplanation: String, isSelected: Boolean, isCustom: Boolean, modifiedDataTime: Long, latency: Int) {
-        if(id != -1)
-            this.id = id
+    constructor(id: Int, dohName: String, dohURL: String, dohExplanation: String,
+                isSelected: Boolean, isCustom: Boolean, modifiedDataTime: Long, latency: Int) {
+        // Room auto-increments id when its set to zero.
+        // A non-zero id overrides and sets caller-specified id instead.
+        this.id = id
         this.dohName = dohName
         this.dohURL = dohURL
         this.dohExplanation = dohExplanation
         this.isSelected = isSelected
         this.isCustom = isCustom
-        if(modifiedDataTime != 0L)
-            this.modifiedDataTime = modifiedDataTime
-        else
-            this.modifiedDataTime = System.currentTimeMillis()
+        if (modifiedDataTime != INIT_TIME_MS) this.modifiedDataTime = modifiedDataTime
+        else this.modifiedDataTime = System.currentTimeMillis()
         this.latency = latency
+    }
+
+    fun isDeletable(): Boolean {
+        return isCustom && !isSelected
+    }
+
+    fun isRethinkDnsPlus(): Boolean {
+        return Constants.RETHINK_DNS_PLUS == this.dohName
+    }
+
+    fun isRethinkDns(): Boolean {
+        return (this.dohName.contains(Constants.BRAVE_DNS_BASE_NAME) || this.dohName.contains(
+            Constants.RETHINK_DNS_BASE_NAME))
     }
 
 }

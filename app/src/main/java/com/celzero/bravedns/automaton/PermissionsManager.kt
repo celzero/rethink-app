@@ -29,7 +29,7 @@ import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.core.text.HtmlCompat
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PERMISSION
 import com.celzero.bravedns.util.MyAccessibilityService
 import java.util.*
 import kotlin.collections.LinkedHashMap
@@ -38,14 +38,12 @@ import kotlin.collections.LinkedHashSet
 
 class PermissionsManager(service: MyAccessibilityService) {
 
-    companion object{
+    companion object {
         var packageRules = LinkedHashMap<String, Rules>()
     }
 
     enum class Rules(val code: Int) {
-        NONE(0),
-        BG_REMOVE(1),
-        BG_REMOVE_FG_ADD(11)
+        NONE(0), BG_REMOVE(1), BG_REMOVE_FG_ADD(11)
     }
 
     enum class AutoState(val code: Int) {
@@ -66,6 +64,7 @@ class PermissionsManager(service: MyAccessibilityService) {
     private val permissionsListId = "android:id/list"
     private val packageInstallerDenyAnywayId = "android:id/button1"
     private val permissionsAllowButtonId = "com.android.packageinstaller:id/permission_allow_button"
+
     // https://github.com/aosp-mirror/platform_packages_apps_settings/blob/eae6f13389e3ec913db35079ee9e44b5abec19e1/res/xml/app_info_settings.xml#L45
     private val settingsLabelPermission = "Permissions"
     private lateinit var packageManager: PackageManager
@@ -78,7 +77,8 @@ class PermissionsManager(service: MyAccessibilityService) {
 
     fun onAccessibilityEvent(event: AccessibilityEvent, that: MyAccessibilityService) {
         packageManager = accessibilityService.packageManager
-        activityManager = accessibilityService.getSystemService(Activity.ACTIVITY_SERVICE) as ActivityManager
+        activityManager = accessibilityService.getSystemService(
+            Activity.ACTIVITY_SERVICE) as ActivityManager
 
         val eventPackageName = event.packageName?.toString()
 
@@ -119,8 +119,8 @@ class PermissionsManager(service: MyAccessibilityService) {
 
         // regardless of #isRevokeGrant, proceed, since events sometimes arrive out of order
         // and mess up the state machine, unfortunately.
-        if (isPackageInstaller(packageName) && !isDormantOrTracking() &&
-            event.eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED) {
+        if (isPackageInstaller(
+                packageName) && !isDormantOrTracking() && event.eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED) {
             // deny anyway dialog is here?
             if (event.className == "android.app.AlertDialog") {
                 currentAutoState = AutoState.PERMISSIONS_PAGE_DIALOG
@@ -128,8 +128,8 @@ class PermissionsManager(service: MyAccessibilityService) {
             }
         }
 
-        if (isPackageInstaller(packageName) && isDormantOrTracking() &&
-            event.eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED) {
+        if (isPackageInstaller(
+                packageName) && isDormantOrTracking() && event.eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED) {
             if (event.className == "com.android.packageinstaller.permission.ui.GrantPermissionsActivity") {
                 if (isAutoGrant(latestTrackedPackage)) {
                     currentAutoState = AutoState.PERMISSIONS_GRANT
@@ -153,7 +153,7 @@ class PermissionsManager(service: MyAccessibilityService) {
                     isSettingsPage() -> {
                         // if settings shows up, and we're primed to revoke-grant,
                         // click on permissions pref to navigate to package-installer
-                        Log.w(LOG_TAG, "bbbbb ____ settings revokegrant?")
+                        Log.w(LOG_TAG_PERMISSION, "bbbbb ____ settings revokegrant?")
                         revokePermissionsFirstStage(event)
                     }
                 }
@@ -168,16 +168,17 @@ class PermissionsManager(service: MyAccessibilityService) {
                         // if package-installer shows up during revoke-grant,
                         // we might need to either disable perms or get rid
                         // of the "deny anyway" dialog.
-                        Log.w(LOG_TAG, "bbbbb ____ packageinstaller revokegrant?")
+                        Log.w(LOG_TAG_PERMISSION, "bbbbb ____ packageinstaller revokegrant?")
                         revokePermissionsSecondStage(event)
                     }
-                    else -> Log.w(LOG_TAG, "___Last package not signed up for auto-grant $packageName")
+                    else -> Log.w(LOG_TAG_PERMISSION,
+                                  "___Last package not signed up for auto-grant $packageName")
                 }
             }
         }
 
         if (event.eventType == AccessibilityEvent.TYPE_WINDOWS_CHANGED) {
-            Log.w(LOG_TAG, "onAEvent____: window_changed $event")
+            Log.w(LOG_TAG_PERMISSION, "onAEvent____: window_changed $event")
 
             // get the source node of the event
             event.source?.apply {
@@ -197,13 +198,15 @@ class PermissionsManager(service: MyAccessibilityService) {
                 navigateToPermissionsPage(event)
             }
             else -> {
-                Log.w(LOG_TAG, "bbbb revokepermissionfirststage, but nothing to do, reset $event")
+                Log.w(LOG_TAG_PERMISSION,
+                      "bbbb revokepermissionfirststage, but nothing to do, reset $event")
             }
         }
     }
 
     private fun revokePermissionsSecondStage(event: AccessibilityEvent) {
-        Log.w(LOG_TAG,"bbbbb_____ clicktodisable now permissions_page $currentAutoState")
+        Log.w(LOG_TAG_PERMISSION,
+              "bbbbb_____ clicktodisable now permissions_page $currentAutoState")
         clickToDisablePermissions(event)
     }
 
@@ -211,7 +214,7 @@ class PermissionsManager(service: MyAccessibilityService) {
         currentAutoState = AutoState.DORMANT
         packageElect = null
         navigateToLauncher()
-        Log.w(LOG_TAG, "bbbb ____ dismiss node ${event.source}")
+        Log.w(LOG_TAG_PERMISSION, "bbbb ____ dismiss node ${event.source}")
     }
 
     private fun isDormant(): Boolean {
@@ -231,9 +234,7 @@ class PermissionsManager(service: MyAccessibilityService) {
     }
 
     private fun isRevokeGrant(): Boolean {
-        return currentAutoState == AutoState.PERMISSIONS_PAGE ||
-                currentAutoState == AutoState.PERMISSIONS_PAGE_TOGGLE ||
-                currentAutoState == AutoState.PERMISSIONS_PAGE_DIALOG
+        return currentAutoState == AutoState.PERMISSIONS_PAGE || currentAutoState == AutoState.PERMISSIONS_PAGE_TOGGLE || currentAutoState == AutoState.PERMISSIONS_PAGE_DIALOG
     }
 
     private fun isGrant(): Boolean {
@@ -244,7 +245,7 @@ class PermissionsManager(service: MyAccessibilityService) {
 
         // remove from package when launcher-top is the stage
         if (packagesStack.isNullOrEmpty()) {
-            Log.i(LOG_TAG, "PackagesStack is empty, no tasks queued up, nothing to do.")
+            Log.i(LOG_TAG_PERMISSION, "PackagesStack is empty, no tasks queued up, nothing to do.")
             // currentAutoState = AutoState.DORMANT
             return false
         }
@@ -262,8 +263,8 @@ class PermissionsManager(service: MyAccessibilityService) {
 
         val source = event.source
 
-        val listItems: List<AccessibilityNodeInfo>? =
-            source.findAccessibilityNodeInfosByViewId(permissionsListId)
+        val listItems: List<AccessibilityNodeInfo>? = source.findAccessibilityNodeInfosByViewId(
+            permissionsListId)
 
         val togglesRequired: ArrayList<AccessibilityNodeInfo> = ArrayList()
 
@@ -272,14 +273,16 @@ class PermissionsManager(service: MyAccessibilityService) {
 
         val appPermissions = AppPermissions(packageManager, packageInfo)
 
-        Log.w(LOG_TAG, "___________________________________ bbb ${appPermissions.permissionGroups.size}")
+        Log.w(LOG_TAG_PERMISSION,
+              "___________________________________ bbb ${appPermissions.permissionGroups.size}")
 
         for (n in appPermissions.permissionGroups) {
             var px = ""
             for (p in n.permissions) {
                 px = p.key + " " + p
             }
-            Log.w(LOG_TAG, "____ bbb label/name/hasPer: ${n.label}/${n.name} $px ____ bbb")
+            Log.w(LOG_TAG_PERMISSION,
+                  "____ bbb label/name/hasPer: ${n.label}/${n.name} $px ____ bbb")
         }
 
 
@@ -288,41 +291,45 @@ class PermissionsManager(service: MyAccessibilityService) {
             var what = ""
             for (element in children) {
                 val item: AccessibilityNodeInfo = element
-                val switches: List<AccessibilityNodeInfo> =
-                    source.findAccessibilityNodeInfosByViewId(permissionsSwitchId)
+                val switches: List<AccessibilityNodeInfo> = source.findAccessibilityNodeInfosByViewId(
+                    permissionsSwitchId)
                 if (switches.isEmpty()) {
-                    Log.w(LOG_TAG, "____ bbbbb couldn't find toggle-switch for $item")
+                    Log.w(LOG_TAG_PERMISSION, "____ bbbbb couldn't find toggle-switch for $item")
                     continue
                 }
                 val switch = switches[0]
-                val temp: List<AccessibilityNodeInfo>  = item.findAccessibilityNodeInfosByViewId("android:id/title")
+                val temp: List<AccessibilityNodeInfo> = item.findAccessibilityNodeInfosByViewId(
+                    "android:id/title")
 
 
-                val permissionGroup: AppPermissionGroup? = appPermissions.getPermissionGroup(temp[0].text)
+                val permissionGroup: AppPermissionGroup? = appPermissions.getPermissionGroup(
+                    temp[0].text)
                 what = what + permissionGroup?.label + " ${temp[0].text} " + switch.isChecked + " ${switches.size} granted? ${permissionGroup?.areRuntimePermissionsGranted()} ___ bbbb; "
 
                 if ((permissionGroup != null && permissionGroup.areRuntimePermissionsGranted())) {
                     togglesRequired.add(item)
                 }
             }
-            Log.w(LOG_TAG, what)
+            Log.w(LOG_TAG_PERMISSION, what)
 
             for (item in togglesRequired) {
                 // label https://github.com/aosp-mirror/platform_packages_apps_packageinstaller/blob/pie-release-2/src/com/android/packageinstaller/permission/ui/television/AllAppPermissionsFragment.java#L247
                 item.performAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS)
                 val performed2 = item.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-                Log.w(LOG_TAG, "bbbb uncheck _______ perf? " + performed2 + " .... newchecked? " + item.isChecked + " " + item)
+                Log.w(LOG_TAG_PERMISSION,
+                      "bbbb uncheck _______ perf? " + performed2 + " .... newchecked? " + item.isChecked + " " + item)
                 // process just the first successful click
                 if (performed2) break
             }
 
-            Log.w(LOG_TAG, "____ bbbb nocookie " + event.source + " togglesRequired? " + togglesRequired.size)
+            Log.w(LOG_TAG_PERMISSION,
+                  "____ bbbb nocookie " + event.source + " togglesRequired? " + togglesRequired.size)
 
             if (togglesRequired.isEmpty()) {
                 revokePermissionsThirdStage(event)
             }
         } else {
-            Log.w(LOG_TAG, "____ bbbb empty list for android:id/switch_widget ")
+            Log.w(LOG_TAG_PERMISSION, "____ bbbb empty list for android:id/switch_widget ")
         }
     }
 
@@ -339,20 +346,23 @@ class PermissionsManager(service: MyAccessibilityService) {
         // multiple permission grant screens
         // deny anyway not working, because a retry is need after click
         // maintain state after typing deny anyway
-        val preferenceList: List<AccessibilityNodeInfo> =
-            event.source.findAccessibilityNodeInfosByText(settingsLabelPermission)
-        Log.w(LOG_TAG, "bbbbb_____ pereference permission found? " + preferenceList.size + " for " + event)
+        val preferenceList: List<AccessibilityNodeInfo> = event.source.findAccessibilityNodeInfosByText(
+            settingsLabelPermission)
+        Log.w(LOG_TAG_PERMISSION,
+              "bbbbb_____ pereference permission found? " + preferenceList.size + " for " + event)
 
         for (node: AccessibilityNodeInfo in preferenceList) {
-            Log.w(LOG_TAG, "_______ bbbbb parent ###+++ " + node.parent?.parent)
+            Log.w(LOG_TAG_PERMISSION, "_______ bbbbb parent ###+++ " + node.parent?.parent)
             if (node.parent?.parent == null) {
-                Log.w(LOG_TAG, "Something changed with the layout, expected: tv -> relative -> linear")
+                Log.w(LOG_TAG_PERMISSION,
+                      "Something changed with the layout, expected: tv -> relative -> linear")
                 continue
             }
             node.parent?.parent?.performAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS)
             val performed2 = node.parent?.parent?.performAction(AccessibilityNodeInfo.ACTION_SELECT)
             val performed3 = node.parent?.parent?.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-            Log.w(LOG_TAG, "bbbbb uncheck _______ perf? $performed2 .... performed3? $performed3")
+            Log.w(LOG_TAG_PERMISSION,
+                  "bbbbb uncheck _______ perf? $performed2 .... performed3? $performed3")
         }
     }
 
@@ -362,24 +372,25 @@ class PermissionsManager(service: MyAccessibilityService) {
         Intent("android.settings.APPLICATION_DETAILS_SETTINGS").also {
             it.setPackage("com.android.settings")
             it.data = Uri.parse("package:$packageName")
-            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
-                    Intent.FLAG_ACTIVITY_CLEAR_TASK or
-                    Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+            it.addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
             accessibilityService.startActivity(it)
             Log.w("_______", "launched " + it.data)
         }
     }
 
     private fun clickDenyIfPresent(event: AccessibilityEvent): Boolean {
-        val denyButtons = event.source.findAccessibilityNodeInfosByViewId(packageInstallerDenyAnywayId)
+        val denyButtons = event.source.findAccessibilityNodeInfosByViewId(
+            packageInstallerDenyAnywayId)
 
-        Log.w(LOG_TAG, "bbbbb ____ denybuttonpresent? ${denyButtons.size}")
+        Log.w(LOG_TAG_PERMISSION, "bbbbb ____ denybuttonpresent? ${denyButtons.size}")
         for (node in denyButtons) {
-            Log.w(LOG_TAG, "_______ bbbbb node ###+++ $node")
+            Log.w(LOG_TAG_PERMISSION, "_______ bbbbb node ###+++ $node")
             node.performAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS)
             val performed2 = node.performAction(AccessibilityNodeInfo.ACTION_SELECT)
             val performed3 = node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-            Log.w(LOG_TAG, "bbbbb click _______ perf2? $performed2 .... performed3? $performed3")
+            Log.w(LOG_TAG_PERMISSION,
+                  "bbbbb click _______ perf2? $performed2 .... performed3? $performed3")
         }
         return true
     }
@@ -389,23 +400,24 @@ class PermissionsManager(service: MyAccessibilityService) {
         // text? ContentChangeTypeDisappeared: null [Allow Uber to access this device's location?]
         // class? com.android.packageinstaller.permission.ui.GrantPermissionsActivity
 
-        Log.w(LOG_TAG, "_____ bbbb clickallow: $latestTrackedPackage")
+        Log.w(LOG_TAG_PERMISSION, "_____ bbbb clickallow: $latestTrackedPackage")
         val packageInfo = getPackageInfo(latestTrackedPackage) ?: return false
 
         val appLabel = getAppLabel(packageInfo)
         val confirmation = event.text.contains(appLabel)
         AppPermissions(packageManager, packageInfo)
 
-        val list: List<AccessibilityNodeInfo> = event.source.findAccessibilityNodeInfosByViewId(permissionsAllowButtonId)
-        Log.w(LOG_TAG, "____ bbbbb click allow ? ${list.size}")
+        val list: List<AccessibilityNodeInfo> = event.source.findAccessibilityNodeInfosByViewId(
+            permissionsAllowButtonId)
+        Log.w(LOG_TAG_PERMISSION, "____ bbbbb click allow ? ${list.size}")
 
         if (confirmation) {
-            Log.w(LOG_TAG, "click allow bbbbb _______ event text contains appLabel")
+            Log.w(LOG_TAG_PERMISSION, "click allow bbbbb _______ event text contains appLabel")
         }
 
         for (node in list) {
             node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-            Log.w(LOG_TAG, "______ bbbb clicked on allow first $node")
+            Log.w(LOG_TAG_PERMISSION, "______ bbbb clicked on allow first $node")
         }
 
         return true
@@ -438,9 +450,8 @@ class PermissionsManager(service: MyAccessibilityService) {
         if (TextUtils.isEmpty(packageName)) return false
         val intent = Intent("android.intent.action.MAIN")
         intent.addCategory("android.intent.category.HOME")
-        val thisPackage = packageManager.resolveActivity(
-            intent,
-            PackageManager.MATCH_DEFAULT_ONLY)?.activityInfo?.packageName
+        val thisPackage = packageManager.resolveActivity(intent,
+                                                         PackageManager.MATCH_DEFAULT_ONLY)?.activityInfo?.packageName
         return thisPackage == packageName
     }
 
@@ -467,10 +478,9 @@ class PermissionsManager(service: MyAccessibilityService) {
     private fun getPackageInfo(packageName: String?): PackageInfo? {
         if (packageName == null) return null
         return try {
-            packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS
-            )
+            packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
         } catch (e: PackageManager.NameNotFoundException) {
-            Log.i(LOG_TAG, "No package: $packageName", e)
+            Log.i(LOG_TAG_PERMISSION, "No package: $packageName", e)
             null
         }
     }
@@ -478,7 +488,7 @@ class PermissionsManager(service: MyAccessibilityService) {
     private fun getAppLabel(packageInfo: PackageInfo): String {
         return BidiFormatter.getInstance().unicodeWrap(
             loadSafeLabel(packageInfo.applicationInfo.loadLabel(packageManager).toString(),
-                packageInfo.packageName).toString())
+                          packageInfo.packageName).toString())
     }
 
     // https://github.com/aosp-mirror/platform_frameworks_base/blob/pie-dev/core/java/android/content/pm/PackageItemInfo.java#L96
@@ -499,10 +509,7 @@ class PermissionsManager(service: MyAccessibilityService) {
         while (offset < labelLength) {
             val codePoint = labelStr.codePointAt(offset)
             val type = Character.getType(codePoint)
-            if (type == Character.LINE_SEPARATOR.toInt()
-                || type == Character.CONTROL.toInt()
-                || type == Character.PARAGRAPH_SEPARATOR.toInt()
-            ) {
+            if (type == Character.LINE_SEPARATOR.toInt() || type == Character.CONTROL.toInt() || type == Character.PARAGRAPH_SEPARATOR.toInt()) {
                 labelStr.substring(0, offset)
                 break
             }
@@ -526,10 +533,7 @@ class PermissionsManager(service: MyAccessibilityService) {
         val paint = TextPaint()
         paint.textSize = 42f
 
-        return TextUtils.ellipsize(
-            labelStr, paint, 500f /* DEFAULT_MAX_LABEL_SIZE_PX */,
-            TextUtils.TruncateAt.END
-        )
+        return TextUtils.ellipsize(labelStr, paint, /* DEFAULT_MAX_LABEL_SIZE_PX */ 500f,
+                                   TextUtils.TruncateAt.END)
     }
-
 }

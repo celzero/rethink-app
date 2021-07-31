@@ -16,16 +16,11 @@
 package com.celzero.bravedns.ui
 
 import android.app.Dialog
-import android.content.ActivityNotFoundException
 import android.content.DialogInterface
-import android.content.Intent
 import android.content.res.Configuration
 import android.content.res.Resources
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
-import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -39,23 +34,22 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.animation.Rotate3dAnimation
+import com.celzero.bravedns.automaton.FirewallManager
+import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.databinding.BottomSheetOrbotBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 
 
 /**
- * OrbotBottomSheetFragment - One touch Orbot Integration.
- * Bottom sheet dialog fragment will be shown in SettingsFragment.kt.
- * The fragment will prompt for the One touch Integration with Orbot app.
+ * One touch Orbot Integration.
+ * Bottom sheet dialog fragment shows UI that enables One touch
+ * Integration from the settings page.
  */
 class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
     private var _binding: BottomSheetOrbotBinding? = null
@@ -66,8 +60,11 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
 
 
     private val persistentState by inject<PersistentState>()
+    private val appMode by inject<AppMode>()
+    private val orbotHelper by inject<OrbotHelper>()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View {
         _binding = BottomSheetOrbotBinding.inflate(inflater, container, false)
         return b.root
     }
@@ -83,33 +80,24 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
 
-    override fun getTheme(): Int = if (persistentState.theme == 0) {
-        if (isDarkThemeOn()) {
-            R.style.BottomSheetDialogThemeTrueBlack
-        } else {
-            R.style.BottomSheetDialogThemeWhite
-        }
-    } else if (persistentState.theme == 1) {
-        R.style.BottomSheetDialogThemeWhite
-    } else if (persistentState.theme == 2) {
-        R.style.BottomSheetDialogTheme
-    } else {
-        R.style.BottomSheetDialogThemeTrueBlack
+    override fun getTheme(): Int = Utilities.getBottomsheetCurrentTheme(isDarkThemeOn())
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initView()
+        setupClickListeners()
     }
 
     private fun isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initView()
-        initClickListeners()
+    private fun initView() {
+        updateUi()
+        handleHttpUI()
     }
 
-    private fun initView() {
-        updateUI()
-
+    private fun handleHttpUI() {
         //HTTP proxy support in the VPN builder is above Q.
         //The HTTP option and SOCKS5+HTTP option will not be visible for the
         //devices less than Q
@@ -119,34 +107,24 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun initClickListeners() {
+    private fun setupClickListeners() {
 
         b.bsOrbotApp.setOnClickListener {
-            openOrbotApp()
+            orbotHelper.openOrbotApp()
         }
 
         b.bsOrbotRadioNone.setOnCheckedChangeListener(null)
-        b.bsOrbotRadioNone.setOnClickListener{
+        b.bsOrbotRadioNone.setOnClickListener {
             if (b.bsOrbotRadioNone.isChecked) {
-                HomeScreenActivity.GlobalVariable.appMode?.setProxyMode(settings.Settings.ProxyModeNone)
-                persistentState.setOrbotModePersistence(Constants.ORBAT_MODE_NONE)
-                persistentState.orbotEnabledMode = Constants.ORBAT_MODE_NONE
-                b.bsOrbotRadioNone.isChecked = true
-                persistentState.orbotEnabled = false
-                persistentState.orbotConnectionStatus.postValue(false)
+                setOrbotModeNone()
                 disableOrbot()
                 showOrbotStopDialog()
             }
         }
 
-        b.bsOrbotNoneRl.setOnClickListener{
+        b.bsOrbotNoneRl.setOnClickListener {
             if (!b.bsOrbotRadioNone.isChecked) {
-                HomeScreenActivity.GlobalVariable.appMode?.setProxyMode(settings.Settings.ProxyModeNone)
-                persistentState.setOrbotModePersistence(Constants.ORBAT_MODE_NONE)
-                persistentState.orbotEnabledMode = Constants.ORBAT_MODE_NONE
-                persistentState.orbotEnabled = false
-                b.bsOrbotRadioNone.isChecked = true
-                persistentState.orbotConnectionStatus.postValue(false)
+                setOrbotModeNone()
                 disableOrbot()
                 showOrbotStopDialog()
             }
@@ -154,62 +132,50 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
 
         b.bsOrbotRadioSocks5.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
             if (isSelected) {
-                persistentState.setOrbotModePersistence(Constants.ORBAT_MODE_SOCKS5)
                 persistentState.orbotConnectionStatus.postValue(true)
-                enableLoading()
-                enableSOCKS5Orbot()
+                enableSocks5Orbot()
             }
         }
 
         b.bsSocks5OrbotRl.setOnClickListener {
             if (!b.bsOrbotRadioSocks5.isChecked) {
-                persistentState.setOrbotModePersistence(Constants.ORBAT_MODE_SOCKS5)
                 b.bsOrbotRadioSocks5.isChecked = true
                 persistentState.orbotConnectionStatus.postValue(true)
-                enableLoading()
-                enableSOCKS5Orbot()
+                enableSocks5Orbot()
             }
         }
 
         b.bsOrbotRadioHttp.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
             if (isSelected) {
-                persistentState.setOrbotModePersistence(Constants.ORBAT_MODE_HTTP)
                 persistentState.orbotConnectionStatus.postValue(true)
-                enableLoading()
-                enableHTTPOrbot()
+                enableHttpOrbot()
             }
         }
 
-        b.bsOrbotHttpRl.setOnClickListener{
+        b.bsOrbotHttpRl.setOnClickListener {
             if (!b.bsOrbotRadioHttp.isChecked) {
-                persistentState.setOrbotModePersistence(Constants.ORBAT_MODE_HTTP)
                 persistentState.orbotConnectionStatus.postValue(true)
                 b.bsOrbotRadioHttp.isChecked = true
-                enableLoading()
-                enableHTTPOrbot()
+                enableHttpOrbot()
             }
         }
 
         b.bsOrbotRadioBoth.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
             if (isSelected) {
-                persistentState.setOrbotModePersistence(Constants.ORBAT_MODE_BOTH)
                 persistentState.orbotConnectionStatus.postValue(true)
-                enableLoading()
-                enableSOCKS5HTTPOrbot()
+                enableSocks5HttpOrbot()
             }
         }
 
-        b.bsOrbotBothRl.setOnClickListener{
+        b.bsOrbotBothRl.setOnClickListener {
             if (!b.bsOrbotRadioBoth.isChecked) {
-                persistentState.setOrbotModePersistence(Constants.ORBAT_MODE_BOTH)
                 persistentState.orbotConnectionStatus.postValue(true)
-                enableLoading()
                 b.bsOrbotRadioBoth.isChecked = true
-                enableSOCKS5HTTPOrbot()
+                enableSocks5HttpOrbot()
             }
         }
 
-        b.orbotInfoIcon.setOnClickListener{
+        b.orbotInfoIcon.setOnClickListener {
             showDialogForInfo()
         }
 
@@ -222,52 +188,57 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
                 enableLoading()
             } else {
                 disableLoading()
-                updateUI()
+                updateUi()
             }
         })
     }
 
-    private fun updateUI(){
-        when (persistentState.getOrbotModePersistence()) {
-            Constants.ORBAT_MODE_SOCKS5 -> {
+    private fun setOrbotModeNone() {
+        appMode.removeProxy(AppMode.ProxyType.NONE, AppMode.ProxyProvider.ORBOT)
+        b.bsOrbotRadioNone.isChecked = true
+    }
+
+    private fun updateUi() {
+        when (OrbotHelper.selectedProxyType) {
+            AppMode.ProxyType.SOCKS5.name -> {
                 b.bsOrbotRadioSocks5.isChecked = true
                 b.orbotIcon.setImageResource(R.drawable.orbot_enabled)
                 b.orbotStatus.text = getString(R.string.orbot_bs_status_1)
             }
-            Constants.ORBAT_MODE_HTTP -> {
+            AppMode.ProxyType.HTTP.name -> {
                 b.bsOrbotRadioHttp.isChecked = true
                 b.orbotIcon.setImageResource(R.drawable.orbot_enabled)
                 b.orbotStatus.text = getString(R.string.orbot_bs_status_2)
             }
-            Constants.ORBAT_MODE_BOTH -> {
+            AppMode.ProxyType.HTTP_SOCKS5.name -> {
                 b.bsOrbotRadioBoth.isChecked = true
                 b.orbotIcon.setImageResource(R.drawable.orbot_enabled)
                 b.orbotStatus.text = getString(R.string.orbot_bs_status_3)
             }
-            Constants.ORBAT_MODE_NONE -> {
-                b.bsOrbotRadioNone.isChecked = true
-                b.bsOrbotRadioSocks5.isChecked = false
-                b.bsOrbotRadioHttp.isChecked = false
-                b.bsOrbotRadioBoth.isChecked = false
-                b.orbotIcon.setImageResource(R.drawable.orbot_disabled)
-                b.orbotStatus.text = getString(R.string.orbot_bs_status_4)
+            AppMode.ProxyType.NONE.name -> {
+                updateOrbotNone()
             }
             else -> {
-                b.bsOrbotRadioNone.isChecked = true
-                b.bsOrbotRadioSocks5.isChecked = false
-                b.bsOrbotRadioHttp.isChecked = false
-                b.bsOrbotRadioBoth.isChecked = false
-                b.orbotIcon.setImageResource(R.drawable.orbot_disabled)
-                b.orbotStatus.text = getString(R.string.orbot_bs_status_4)
+                updateOrbotNone()
             }
         }
+
+    }
+
+    private fun updateOrbotNone() {
+        b.bsOrbotRadioNone.isChecked = true
+        b.bsOrbotRadioSocks5.isChecked = false
+        b.bsOrbotRadioHttp.isChecked = false
+        b.bsOrbotRadioBoth.isChecked = false
+        b.orbotIcon.setImageResource(R.drawable.orbot_disabled)
+        b.orbotStatus.text = getString(R.string.orbot_bs_status_4)
     }
 
     /**
      * Disables the UI from selecting any other mode until the Orbot connection status is
      * obtained/time out for the Orbot.
      */
-    private fun enableLoading(){
+    private fun enableLoading() {
         b.bsSocks5OrbotRl.isClickable = false
         b.bsOrbotBothRl.isClickable = false
         b.bsOrbotHttpRl.isClickable = false
@@ -288,7 +259,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         // In some cases, the width of orbotIcon is 0 - For both width and measuredWidth.
         // Convert the width(40dp) to pixel and add to animation parameter in case of 0
         var width = b.orbotIcon.measuredWidth
-        if(width == 0){
+        if (width == 0) {
             width = getCalculatedWidth()
         }
         val rotation = Rotate3dAnimation(0.0f, 360.0f * 4f, width / 2f, width / 2f, 20f, true)
@@ -302,13 +273,13 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
     // ref: https://stackoverflow.com/questions/4605527/converting-pixels-to-dp
     // Calculate the width of the icon manually.
     // Invoke this method when the width of the Orbot icon is returned as 0 by viewBinder.
-    private fun getCalculatedWidth() : Int {
+    private fun getCalculatedWidth(): Int {
         val dip = 40f
         val r: Resources = resources
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, r.displayMetrics).toInt()
     }
 
-    private fun disableLoading(){
+    private fun disableLoading() {
         b.bsSocks5OrbotRl.isClickable = true
         b.bsOrbotBothRl.isClickable = true
         b.bsOrbotHttpRl.isClickable = true
@@ -329,98 +300,69 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         b.bsOrbotRadioHttp.isChecked = false
         b.bsOrbotRadioBoth.isChecked = false
         b.orbotIcon.setImageResource(R.drawable.orbot_disabled)
-        val vpnService = VpnController.getInstance().getBraveVpnService()
-        if (vpnService != null) {
-            get<OrbotHelper>().stopOrbot(vpnService, isUserInitiated = true)
-        }
+        orbotHelper.stopOrbot(isInteractive = true)
     }
 
     /**
      * Enable - Orbot with SOCKS5 mode
      */
-    private fun enableSOCKS5Orbot() {
+    private fun enableSocks5Orbot() {
         b.bsOrbotRadioNone.isChecked = false
         b.bsOrbotRadioHttp.isChecked = false
         b.bsOrbotRadioBoth.isChecked = false
-        startOrbot()
+        startOrbot(AppMode.ProxyType.SOCKS5.name)
     }
 
     /**
      * Enable - Orbot with HTTP mode
      */
-    private fun enableHTTPOrbot() {
+    private fun enableHttpOrbot() {
         b.bsOrbotRadioNone.isChecked = false
         b.bsOrbotRadioSocks5.isChecked = false
         b.bsOrbotRadioBoth.isChecked = false
-        startOrbot()
+        startOrbot(AppMode.ProxyType.HTTP.name)
     }
 
     /**
      * Enable - Orbot with SOCKS5 + HTTP mode
      */
-    private fun enableSOCKS5HTTPOrbot(){
+    private fun enableSocks5HttpOrbot() {
         b.bsOrbotRadioNone.isChecked = false
         b.bsOrbotRadioSocks5.isChecked = false
         b.bsOrbotRadioHttp.isChecked = false
-        startOrbot()
-    }
-
-    /**
-     * Throw intent to start the Orbot application.
-     */
-    private fun openOrbotApp() {
-        val packageName =  OrbotHelper.ORBOT_PACKAGE_NAME
-        try {
-            val launchIntent: Intent? = requireActivity().packageManager.getLaunchIntentForPackage(packageName)
-            if (launchIntent != null) {//null pointer check in case package name was not found
-                startActivity(launchIntent)
-            }else{
-                Utilities.showToastInMidLayout(requireContext(), getString(R.string.orbot_app_issue), Toast.LENGTH_SHORT)
-                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                intent.data = Uri.fromParts("package", packageName, null)
-                startActivity(intent)
-            }
-        } catch (e: ActivityNotFoundException) {
-            Log.w(LOG_TAG, "Exception while opening app info: ${e.message}", e)
-        }
+        startOrbot(AppMode.ProxyType.HTTP_SOCKS5.name)
     }
 
     /**
      * Start the Orbot(OrbotHelper) - Intent action.
      */
-    private fun startOrbot() {
-        if ( get<OrbotHelper>().isOrbotInstalled()) {
-            val vpnService = VpnController.getInstance().getBraveVpnService()
+    private fun startOrbot(type: String) {
+        if (FirewallManager.isOrbotInstalled()) {
+            val vpnService = VpnController.getBraveVpnService()
             if (vpnService != null) {
-                get<OrbotHelper>().startOrbot(vpnService)
+                orbotHelper.startOrbot(type)
             } else {
-                Utilities.showToastInMidLayout(requireContext(), getString(R.string.settings_socks5_vpn_disabled_error), Toast.LENGTH_LONG)
+                Utilities.showToastUiCentered(requireContext(), getString(
+                    R.string.settings_socks5_vpn_disabled_error), Toast.LENGTH_LONG)
             }
         }
     }
 
     private fun showOrbotStopDialog() {
         val builder = AlertDialog.Builder(requireContext())
-        //set title for alert dialog
         builder.setTitle(getString(R.string.orbot_stop_dialog_title))
-        //set message for alert dialog
         builder.setMessage(getString(R.string.orbot_stop_dialog_message))
         builder.setCancelable(true)
-        //performing positive action
-        builder.setPositiveButton(getString(R.string.orbot_stop_dialog_positive)) { dialogInterface, _ ->
+        builder.setPositiveButton(
+            getString(R.string.orbot_stop_dialog_positive)) { dialogInterface, _ ->
             dialogInterface.dismiss()
         }
-        builder.setNegativeButton(getString(R.string.orbot_stop_dialog_negative)) { dialogInterface: DialogInterface, _: Int ->
+        builder.setNegativeButton(getString(
+            R.string.orbot_stop_dialog_negative)) { dialogInterface: DialogInterface, _: Int ->
             dialogInterface.dismiss()
-            val launchIntent: Intent? = requireActivity().packageManager.getLaunchIntentForPackage(OrbotHelper.ORBOT_PACKAGE_NAME)
-            if (launchIntent != null) {//null pointer check in case package name was not found
-                Log.d(LOG_TAG, "launchIntent: ${OrbotHelper.ORBOT_PACKAGE_NAME}")
-                startActivity(launchIntent)
-            }
+            orbotHelper.openOrbotApp()
         }
-        // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()
-        // Set other dialog properties
         alertDialog.setCancelable(true)
         alertDialog.show()
     }
@@ -448,6 +390,5 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         dialog.show()
 
     }
-
 
 }

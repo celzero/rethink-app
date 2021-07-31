@@ -25,22 +25,21 @@ import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
 import com.celzero.bravedns.ui.HomeScreenActivity
-import org.koin.core.component.KoinApiExtension
 
 @RequiresApi(api = Build.VERSION_CODES.N)
 class BraveTileService : TileService() {
 
     override fun onStartListening() {
-        val vpnState: VpnState = VpnController.getInstance().getState()
+        val vpnState: VpnState = VpnController.state()
 
         //Fix detected null pointer exception. Intra #415
-        val tile = if(qsTile == null){
+        val tile = if (qsTile == null) {
             return
-        }else{
+        } else {
             qsTile
         }
 
-        if (vpnState.activationRequested) {
+        if (vpnState.on) {
             tile.state = Tile.STATE_ACTIVE
         } else {
             tile.state = Tile.STATE_INACTIVE
@@ -50,14 +49,14 @@ class BraveTileService : TileService() {
     }
 
     override fun onClick() {
-        val vpnState: VpnState = VpnController.getInstance().getState()
+        val vpnState: VpnState = VpnController.state()
 
-        if (vpnState.activationRequested) {
-            VpnController.getInstance().stop(this)
+        if (vpnState.on) {
+            VpnController.stop(this)
         } else {
             if (VpnService.prepare(this) == null) {
                 // Start VPN service when VPN permission has been granted.
-                VpnController.getInstance().start(this)
+                VpnController.start(this)
             } else {
                 // Open Main activity when VPN permission has not been granted.
                 val intent = Intent(this, HomeScreenActivity::class.java)
@@ -70,12 +69,8 @@ class BraveTileService : TileService() {
     override fun onBind(intent: Intent?): IBinder? {
 
         // Update tile state on boot.
-        requestListeningState(
-            this,
-            ComponentName(this, BraveTileService::class.java)
-        )
+        requestListeningState(this, ComponentName(this, BraveTileService::class.java))
         return super.onBind(intent)
     }
-
 
 }

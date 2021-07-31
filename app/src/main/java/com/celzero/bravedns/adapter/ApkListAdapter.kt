@@ -18,6 +18,7 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.pm.PackageInfo
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -26,12 +27,14 @@ import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.databinding.LayoutApkItemBinding
 import com.celzero.bravedns.ui.BottomSheetFragment
+import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities
 import java.util.*
 import kotlin.collections.ArrayList
 
 
-class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) : RecyclerView.Adapter<ApkListAdapter.ApkListViewHolder>() {
+class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) :
+        RecyclerView.Adapter<ApkListAdapter.ApkListViewHolder>() {
 
 
     var apkListFiltered: ArrayList<Apk> = ArrayList()
@@ -41,12 +44,14 @@ class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) 
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ApkListViewHolder {
-        val itemBinding = LayoutApkItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val itemBinding = LayoutApkItemBinding.inflate(LayoutInflater.from(parent.context), parent,
+                                                       false)
         return ApkListViewHolder(itemBinding, context, apkList)
     }
 
     override fun onBindViewHolder(holder: ApkListViewHolder, position: Int) {
-        holder.mIconImageView.setImageDrawable(context.packageManager.getApplicationIcon(apkList[position].packageName))
+        holder.mIconImageView.setImageDrawable(
+            context.packageManager.getApplicationIcon(apkList[position].packageName))
         holder.mLabelTextView.text = apkList[position].appName
     }
 
@@ -76,14 +81,16 @@ class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) 
     }
 
 
-    inner class ApkListViewHolder(b: LayoutApkItemBinding, context: Context, apkList: ArrayList<Apk>) : RecyclerView.ViewHolder(b.root) {
+    inner class ApkListViewHolder(b: LayoutApkItemBinding, context: Context,
+                                  apkList: ArrayList<Apk>) : RecyclerView.ViewHolder(b.root) {
 
         val mIconImageView: ImageView = b.apkIconIv
         val mLabelTextView: TextView = b.apkLabelTv
 
         init {
             b.root.setOnClickListener {
-                val permissionDetails = Utilities.getPermissionDetails(context, apkList[bindingAdapterPosition].packageName)
+                val permissionDetails = Utilities.getPermissionDetails(context,
+                                                                       apkList[bindingAdapterPosition].packageName)
 
                 var pos = 0
                 if (permissionDetails.requestedPermissionsFlags != null) permissionDetails.requestedPermissionsFlags.forEach {
@@ -94,9 +101,13 @@ class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) 
                     pos++
                 }
 
+                if (context !is FragmentActivity) {
+                    Log.w(LoggerConstants.LOG_TAG_UI,
+                          "Can not open bottom sheet. Context is not attached to activity")
+                    return@setOnClickListener
+                }
                 val bottomSheetFragment = BottomSheetFragment(apkList[bindingAdapterPosition])
-                val frag = context as FragmentActivity
-                bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
+                bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
             }
         }
     }

@@ -22,23 +22,9 @@ object DatabaseModule {
     private val databaseModule = module {
         single { AppDatabase.buildDatabase(androidContext()) }
         single {
-            RefreshDatabase(
-                androidContext(),
-                get(),
-                get(),
-                get(),
-                get(),
-                get(),
-                get(),
-                get(),
-                get(),
-                get(),
-                get()
-            )
+            RefreshDatabase(androidContext(), get(), get(), get(), get(), get(), get(), get(),
+                            get(), get())
         }
-        /*single {
-            DatabaseHandler(androidContext())
-        }*/
     }
     private val daoModule = module {
         single<AppInfoDAO> { get<AppDatabase>().appInfoDAO() }
@@ -55,7 +41,7 @@ object DatabaseModule {
     }
     private val repositoryModule = module {
         single { AppInfoRepository(get()) }
-        single { AppInfoViewRepository(get())}
+        single { AppInfoViewRepository(get()) }
         single { BlockedConnectionsRepository(get()) }
         single { CategoryInfoRepository(get()) }
         single { ConnectionTrackerRepository(get()) }
@@ -66,7 +52,6 @@ object DatabaseModule {
         single { DoHEndpointRepository(get()) }
         single { ProxyEndpointRepository(get()) }
     }
-
 
     val modules = listOf(databaseModule, daoModule, repositoryModule)
 }

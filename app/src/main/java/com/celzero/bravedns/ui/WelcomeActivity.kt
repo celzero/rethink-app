@@ -32,6 +32,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityWelcomeBinding
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Utilities
 import org.koin.android.ext.android.inject
 
 class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
@@ -43,24 +44,8 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
     private val persistentState by inject<PersistentState>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (persistentState.theme == 0) {
-            if (isDarkThemeOn()) {
-                setTheme(R.style.AppThemeTrueBlack)
-            } else {
-                setTheme(R.style.AppThemeWhite)
-            }
-        } else if (persistentState.theme == 1) {
-            setTheme(R.style.AppThemeWhite)
-        } else if (persistentState.theme == 2) {
-            setTheme(R.style.AppTheme)
-        } else {
-            setTheme(R.style.AppThemeTrueBlack)
-        }
+        setTheme(Utilities.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-
-        if (!persistentState.firstTimeLaunch) {
-            launchHomeScreen()
-        }
 
         addBottomDots(0)
         changeStatusBarColor()
@@ -75,10 +60,10 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
 
         b.btnNext.setOnClickListener {
             val currentItem = getItem()
-            if (currentItem+1 >= layout.size) {
+            if (currentItem + 1 >= layout.size) {
                 launchHomeScreen()
-            }else {
-                b.viewPager.currentItem = currentItem+1
+            } else {
+                b.viewPager.currentItem = currentItem + 1
             }
         }
 
@@ -86,7 +71,8 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
             override fun onPageScrollStateChanged(state: Int) {
             }
 
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+            override fun onPageScrolled(position: Int, positionOffset: Float,
+                                        positionOffsetPixels: Int) {
             }
 
             override fun onPageSelected(position: Int) {
@@ -95,7 +81,7 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
                     b.btnNext.text = getString(R.string.finish)
                     b.btnNext.visibility = View.VISIBLE
                     b.btnSkip.visibility = View.INVISIBLE
-                }else{
+                } else {
                     b.btnSkip.visibility = View.VISIBLE
                     b.btnNext.visibility = View.INVISIBLE
                 }
@@ -126,7 +112,8 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
         b.layoutDots.removeAllViews()
         for (i in dots.indices) {
             dots[i] = TextView(this)
-            dots[i]?.layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            dots[i]?.layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                                                              ViewGroup.LayoutParams.WRAP_CONTENT)
             dots[i]?.text = HtmlCompat.fromHtml("&#8226;", HtmlCompat.FROM_HTML_MODE_LEGACY)
             dots[i]?.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30F)
             dots[i]?.setTextColor(colorInActive[currentPage])

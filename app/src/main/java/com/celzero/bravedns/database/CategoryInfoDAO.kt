@@ -38,29 +38,33 @@ interface CategoryInfoDAO {
     @Query("select * from CategoryInfo order by categoryName")
     fun getAppCategoryList(): List<CategoryInfo>
 
-    @Query("update CategoryInfo set isInternetBlocked = :isInternetBlocked where categoryName = :categoryName")
+    @Query(
+        "update CategoryInfo set isInternetBlocked = :isInternetBlocked where categoryName = :categoryName")
     fun updateCategoryInternet(categoryName: String, isInternetBlocked: Boolean)
 
     @Query("delete from CategoryInfo")
     fun deleteAllCategory()
 
-    @Query("update CategoryInfo set numOfAppsBlocked = numOfAppsBlocked+1 where categoryName =:categoryName")
+    @Query(
+        "update CategoryInfo set numOfAppsBlocked = numOfAppsBlocked+1 where categoryName =:categoryName")
     fun increaseNumberOfBlocked(categoryName: String)
 
-    @Query("update CategoryInfo set numOfAppsBlocked = numOfAppsBlocked-1 where categoryName =:categoryName")
+    @Query(
+        "update CategoryInfo set numOfAppsBlocked = numOfAppsBlocked-1 where categoryName =:categoryName")
     fun decreaseNumberOfBlocked(categoryName: String)
 
     @Query("select * from CategoryInfo where categoryName = :categoryName")
-    fun getCategoryDetail(categoryName: String) : CategoryInfo
+    fun getCategoryDetail(categoryName: String): CategoryInfo
 
-    @Query("update CategoryInfo set numOfAppsBlocked = numberOFApps where categoryName =:categoryName")
+    @Query(
+        "update CategoryInfo set numOfAppsBlocked = numberOFApps where categoryName =:categoryName")
     fun updateBlockedCount(categoryName: String)
 
     @Query("update CategoryInfo set numOfAppsBlocked = 0 where categoryName =:categoryName")
     fun updateBlockedCountToZero(categoryName: String)
 
     @Query("update CategoryInfo set numOfAppsBlocked = :count where categoryName =:categoryName")
-    fun updateBlockedCount(categoryName: String, count :Int)
+    fun updateBlockedCount(categoryName: String, count: Int)
 
     @Query("update CategoryInfo set numOfAppWhitelisted = numberOFApps")
     fun updateWhitelistCountForAll()
@@ -68,17 +72,20 @@ interface CategoryInfoDAO {
     @Query("update CategoryInfo set numOfAppWhitelisted = 0")
     fun clearWhitelistCountForAll()
 
-    @Query("update CategoryInfo set numOfAppWhitelisted = numberOFApps where categoryName = :categoryName")
+    @Query(
+        "update CategoryInfo set numOfAppWhitelisted = numberOFApps where categoryName = :categoryName")
     fun updateWhitelistForCategory(categoryName: String)
 
     @Query("update CategoryInfo set numOfAppWhitelisted = 0 where categoryName = :categoryName")
     fun clearWhitelistForCategory(categoryName: String)
 
-    @Query("update CategoryInfo set numOfAppWhitelisted = :whitelistCount where categoryName = :categoryName")
-    fun updateWhitelistCount(categoryName: String, whitelistCount : Int)
+    @Query(
+        "update CategoryInfo set numOfAppWhitelisted = :whitelistCount where categoryName = :categoryName")
+    fun updateWhitelistCount(categoryName: String, whitelistCount: Int)
 
-    @Query("update CategoryInfo set numOfAppsExcluded= :excludedCount where categoryName = :categoryName")
-    fun updateExcludedCount(categoryName: String, excludedCount : Int)
+    @Query(
+        "update CategoryInfo set numOfAppsExcluded= :excludedCount where categoryName = :categoryName")
+    fun updateExcludedCount(categoryName: String, excludedCount: Int)
 
     @Query("update CategoryInfo set numOfAppsExcluded = numberOFApps")
     fun updateExcludedCountForAllApp()
@@ -86,7 +93,8 @@ interface CategoryInfoDAO {
     @Query("update CategoryInfo set numOfAppsExcluded = 0")
     fun clearExcludedCountForAllApp()
 
-    @Query("update CategoryInfo set numOfAppsExcluded = numberOFApps where categoryName = :categoryName")
+    @Query(
+        "update CategoryInfo set numOfAppsExcluded = numberOFApps where categoryName = :categoryName")
     fun updateExcludedCountForCategory(categoryName: String)
 
     @Query("update CategoryInfo set numOfAppsExcluded = 0  where categoryName = :categoryName")

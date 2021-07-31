@@ -18,16 +18,21 @@ package com.celzero.bravedns.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.celzero.bravedns.util.Constants
 
 @Entity(tableName = "CategoryInfo")
-class CategoryInfo{
+class CategoryInfo {
 
-    @PrimaryKey
-    var categoryName: String = ""
+    @PrimaryKey var categoryName: String = ""
     var numberOFApps: Int = 0
-    var numOfAppsBlocked : Int = 0
-    var numOfAppWhitelisted : Int = 0
-    var numOfAppsExcluded : Int = 0
+    var numOfAppsBlocked: Int = 0
+    var numOfAppWhitelisted: Int = 0
+    var numOfAppsExcluded: Int = 0
     var isInternetBlocked: Boolean = false
+
+    fun isAnySystemCategory(): Boolean {
+        return Constants.APP_CAT_SYSTEM_COMPONENTS == categoryName || Constants.APP_NON_APP == categoryName || Constants.APP_CAT_SYSTEM_APPS == categoryName
+    }
+
 
 }

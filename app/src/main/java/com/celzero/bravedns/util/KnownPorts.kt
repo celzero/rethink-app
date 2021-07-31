@@ -31,8 +31,8 @@ class KnownPorts {
             }
         }
 
-        //init hash map with reserved ports (1-1024) and protocol identifiers
-        //based on: http://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml
+        // init hash map with reserved ports (1-1024) and protocol identifiers
+        // based on: http://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml
         private fun initPortMap() {
             portMap[1] = "tcpmux"
             portMap[2] = "compressnet"
@@ -692,7 +692,7 @@ class KnownPorts {
             portMap[833] = "netconfsoapbeep"
             portMap[847] = "dhcp-failover2"
             portMap[848] = "gdoi"
-            portMap[853] = "domain-s"
+            portMap[853] = "secure-dns"
             portMap[860] = "iscsi"
             portMap[861] = "owamp-control"
             portMap[862] = "twamp-control"
@@ -725,5 +725,4 @@ class KnownPorts {
             portMap[1022] = "exp2"
         }
     }
-
 }

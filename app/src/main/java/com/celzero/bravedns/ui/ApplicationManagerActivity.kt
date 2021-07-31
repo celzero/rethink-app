@@ -30,38 +30,23 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ApplicationManagerApk
 import com.celzero.bravedns.animation.ViewAnimation
-import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.databinding.ActivityApplicationManagerBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
 
 
-class ApplicationManagerActivity : AppCompatActivity(R.layout.activity_application_manager), SearchView.OnQueryTextListener {
+class ApplicationManagerActivity : AppCompatActivity(R.layout.activity_application_manager),
+                                   SearchView.OnQueryTextListener {
     private val b by viewBinding(ActivityApplicationManagerBinding::bind)
 
-    private val apkList = ArrayList<ApplicationManagerApk>()
-
     private var isRotate: Boolean = false
-
-    private val appInfoRepository by inject<AppInfoRepository>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initView()
-        updateAppList()
     }
 
     private fun initView() {
         b.applicationManagerRecyclerView.layoutManager = LinearLayoutManager(this)
-
-        /*itemAdapter = ItemAdapter()
-        fastAdapter = FastAdapter.with(itemAdapter)*/
-
         b.amSearch.setOnQueryTextListener(this)
-
-        //b.applicationManagerRecyclerView.adapter = fastAdapter
 
         ViewAnimation.init(b.amFabUninstallIcon)
         ViewAnimation.init(b.amFabAppinfoIcon)
@@ -79,13 +64,6 @@ class ApplicationManagerActivity : AppCompatActivity(R.layout.activity_applicati
             }
         }
 
-        b.amFabUninstallIcon.setOnClickListener {
-            /*val list = ApplicationManagerApk.getAddedList()
-            for (app in list) {
-                uninstallPackage(app)
-            }*/
-        }
-
         b.amFabAppinfoIcon.setOnClickListener {
             val list = ApplicationManagerApk.getAddedList()
             if (list.size >= 1) {
@@ -96,7 +74,8 @@ class ApplicationManagerActivity : AppCompatActivity(R.layout.activity_applicati
 
 
     private fun appInfoForPackage(packageName: String) {
-        val activityManager: ActivityManager = getSystemService(Activity.ACTIVITY_SERVICE) as ActivityManager
+        val activityManager: ActivityManager = getSystemService(
+            Activity.ACTIVITY_SERVICE) as ActivityManager
         activityManager.killBackgroundProcesses(packageName)
 
         try {
@@ -111,37 +90,11 @@ class ApplicationManagerActivity : AppCompatActivity(R.layout.activity_applicati
         }
     }
 
-
-    private fun updateAppList() = GlobalScope.launch ( Dispatchers.Default ){
-        /*val appList = appInfoRepository.getAppInfoAsync()
-        appList.forEach{
-           val packageInfo = packageManager.getPackageInfo(it.packageInfo,0)
-            if(packageInfo.packageName != BuildConfig.APPLICATION_ID ) {
-                val userApk =  ApplicationManagerApk(packageManager.getPackageInfo(it.packageInfo, 0), it.appCategory, this@ApplicationManagerActivity)
-                apkList.add(userApk)
-            }
-        }
-        withContext(Dispatchers.Main.immediate) {
-            itemAdapter.add(apkList)
-            fastAdapter.notifyDataSetChanged()
-        }
-        //mDb.close()*/
-    }
-
     override fun onQueryTextSubmit(query: String?): Boolean {
-        /*itemAdapter.filter(query)
-        itemAdapter.itemFilter.filterPredicate = { item: ApplicationManagerApk, constraint: CharSequence? ->
-            item.appName?.contains(constraint.toString(), ignoreCase = true)!!
-        }*/
         return false
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
-        /*itemAdapter.filter(newText)
-        itemAdapter.itemFilter.filterPredicate = { item: ApplicationManagerApk, constraint: CharSequence? ->
-            item.appName?.contains(constraint.toString(), ignoreCase = true)!!
-        }*/
         return true
     }
 }
-

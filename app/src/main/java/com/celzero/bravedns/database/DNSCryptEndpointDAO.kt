@@ -33,20 +33,21 @@ interface DNSCryptEndpointDAO {
 
     @Transaction
     @Query("select * from DNSCryptEndpoint order by isSelected desc")
-    fun getDNSCryptEndpointLiveData() : DataSource.Factory<Int, DNSCryptEndpoint>
+    fun getDNSCryptEndpointLiveData(): DataSource.Factory<Int, DNSCryptEndpoint>
 
     @Transaction
-    @Query("select * from DNSCryptEndpoint where dnsCryptURL like :query or dnsCryptName like :query order by isSelected desc")
-    fun getDNSCryptEndpointLiveDataByName(query : String) : DataSource.Factory<Int,DNSCryptEndpoint>
+    @Query(
+        "select * from DNSCryptEndpoint where dnsCryptURL like :query or dnsCryptName like :query order by isSelected desc")
+    fun getDNSCryptEndpointLiveDataByName(query: String): DataSource.Factory<Int, DNSCryptEndpoint>
 
     @Query("delete from DNSCryptEndpoint where modifiedDataTime < :date")
-    fun deleteOlderData(date : Long)
+    fun deleteOlderData(date: Long)
 
     @Query("delete from DNSCryptEndpoint")
     fun clearAllData()
 
-    @Query("delete from DNSCryptEndpoint where dnsCryptURL like :url and isCustom = 1")
-    fun deleteDNSCryptEndpoint(url : String)
+    @Query("delete from DNSCryptEndpoint where id = :id and isCustom = 1")
+    fun deleteDNSCryptEndpoint(id: Int)
 
     @Query("update DNSCryptEndpoint set isSelected = 0 where isSelected = 1")
     fun removeConnectionStatus()
@@ -56,14 +57,14 @@ interface DNSCryptEndpointDAO {
     fun getConnectedDNSCrypt(): List<DNSCryptEndpoint>
 
     @Query("select count(*) from DNSCryptEndpoint where isSelected = 1")
-    fun getConnectedCount() : Int
+    fun getConnectedCount(): Int
 
     @Query("select count(*) from DNSCryptEndpoint")
-    fun getCount() : Int
+    fun getCount(): Int
 
     @Transaction
     @Query("update DNSCryptEndpoint set isSelected = 1 where id = :liveServerID")
-    fun updateConnectionStatus(liveServerID : Int)
+    fun updateConnectionStatus(liveServerID: Int)
 
     @Transaction
     @Query("update DNSCryptEndpoint set isSelected=0")

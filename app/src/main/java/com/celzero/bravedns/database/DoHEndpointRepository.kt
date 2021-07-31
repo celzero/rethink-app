@@ -19,6 +19,8 @@ package com.celzero.bravedns.database
 import androidx.lifecycle.LiveData
 import androidx.paging.PagedList
 import androidx.paging.toLiveData
+import androidx.room.Transaction
+import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -26,10 +28,10 @@ import kotlinx.coroutines.launch
 
 class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
 
-    fun updateAsync(doHEndpoint: DoHEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
-        coroutineScope.launch {
-            doHEndpointDAO.update(doHEndpoint)
-        }
+    @Transaction
+    fun update(doHEndpoint: DoHEndpoint) {
+        doHEndpointDAO.removeConnectionStatus()
+        doHEndpointDAO.update(doHEndpoint)
     }
 
     fun deleteAsync(doHEndpoint: DoHEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
@@ -45,14 +47,15 @@ class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
         }
     }
 
-    fun insertWithReplaceAsync(doHEndpoint: DoHEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
+    fun insertWithReplaceAsync(doHEndpoint: DoHEndpoint,
+                               coroutineScope: CoroutineScope = GlobalScope) {
         coroutineScope.launch {
             doHEndpointDAO.insertReplace(doHEndpoint)
         }
     }
 
     fun getDoHEndpointLiveData(): LiveData<PagedList<DoHEndpoint>> {
-        return doHEndpointDAO.getDoHEndpointLiveData().toLiveData(pageSize = 50)
+        return doHEndpointDAO.getDoHEndpointLiveData().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
     }
 
     fun deleteOlderData(date: Long, coroutineScope: CoroutineScope = GlobalScope) {
@@ -62,11 +65,12 @@ class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
     }
 
     fun getDoHEndpointLiveDataByName(query: String): LiveData<PagedList<DoHEndpoint>> {
-        return doHEndpointDAO.getDoHEndpointLiveDataByName(query).toLiveData(pageSize = 50)
+        return doHEndpointDAO.getDoHEndpointLiveDataByName(query).toLiveData(
+            pageSize = LIVEDATA_PAGE_SIZE)
     }
 
-    fun deleteDoHEndpoint(url: String) {
-        doHEndpointDAO.deleteDoHEndpoint(url)
+    fun deleteDoHEndpoint(id: Int) {
+        doHEndpointDAO.deleteDoHEndpoint(id)
     }
 
     fun removeConnectionStatus() {
@@ -81,15 +85,15 @@ class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
         doHEndpointDAO.updateConnectionURL(url)
     }
 
-    fun getConnectionURL(id:Int) : String{
+    fun getConnectionURL(id: Int): String {
         return doHEndpointDAO.getConnectionURL(id)
     }
 
-    fun getCount():Int{
+    fun getCount(): Int {
         return doHEndpointDAO.getCount()
     }
 
-    fun updateConnectionDefault() : DoHEndpoint?{
+    fun updateConnectionDefault(): DoHEndpoint? {
         doHEndpointDAO.updateConnectionDefault()
         return doHEndpointDAO.getConnectedDoH()
     }

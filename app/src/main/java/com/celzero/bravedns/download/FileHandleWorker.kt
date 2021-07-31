@@ -20,11 +20,16 @@ import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.celzero.bravedns.receiver.ReceiverHelper
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_FILE_COUNT
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Utilities
 import dnsx.Dnsx
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.io.File
 
 /**
@@ -37,70 +42,87 @@ import java.io.File
  * As of now the code is written only for the local block list copy.
  */
 
-class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
-        : Worker(context, workerParameters){
+class FileHandleWorker(val context: Context, workerParameters: WorkerParameters) :
+        Worker(context, workerParameters), KoinComponent {
+
+    val persistentState by inject<PersistentState>()
 
     override fun doWork(): Result {
-        try{
+        try {
             val response = copyFiles(context)
 
             val outputData = workDataOf(DownloadConstants.OUTPUT_FILES to response)
 
-            return if(response) Result.success(outputData)
+            return if (response) Result.success(outputData)
             else Result.failure()
 
-        }catch (e : Exception){
-            Log.w(LOG_TAG, "FileHandleWorker Error while moving files to canonical path ${e.message}")
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_DOWNLOAD,
+                  "FileHandleWorker Error while moving files to canonical path ${e.message}", e)
         }
         return Result.failure()
     }
 
-    private fun copyFiles(context : Context): Boolean {
+    // Preferred approach is to move the file from external file path to canonical path.
+    // As move is a atomic operation.
+    // Android doesn't support move/rename if the both paths are not having same mount points.
+    // So files are copied from
+    private fun copyFiles(context: Context): Boolean {
         try {
-            val timeStamp = ReceiverHelper.persistentState.tempBlocklistDownloadTime
-            if (DownloadHelper.isLocalDownloadValid(context, timeStamp.toString())) {
-                DownloadHelper.deleteFromCanonicalPath(context)
-                if (DEBUG) Log.d(LOG_TAG, "AppDownloadManager Copy file Directory isLocalDownloadValid- true")
-                val dir = File(DownloadHelper.getExternalFilePath(context, timeStamp.toString()))
-                if (DEBUG) Log.d(LOG_TAG, "AppDownloadManager Copy file Directory- ${dir.path}")
-                if (dir.isDirectory) {
-                    val children = dir.list()
-                    if (children != null && children.isNotEmpty()) {
-                        for (i in children.indices) {
-                            if (DEBUG) Log.d(LOG_TAG, "AppDownloadManager Copy file - ${children[i]}")
-                            val from = File(dir, children[i])
-                            if (DEBUG) Log.d(LOG_TAG, "AppDownloadManager Copy file from - ${from.path}")
-                            val to = File("${context.filesDir.canonicalPath}/$timeStamp/${children[i]}")
-                            Log.i(LOG_TAG, "AppDownloadManager Copy file to - ${to.path}")
-                            from.copyTo(to, true)
-                        }
-                        val destinationDir = File("${context.filesDir.canonicalPath}/$timeStamp")
-                        if (destinationDir.isDirectory) {
-                            val child = destinationDir.list()
-                            if (child?.size == Constants.LOCAL_BLOCKLIST_FILE_COUNT) {
-                                //Update the shared pref values
-                                val isValid = isDownloadValid()
-                                if(isValid) {
-                                    ReceiverHelper.persistentState.localBlockListDownloadTime = timeStamp
-                                    ReceiverHelper.persistentState.localBlocklistEnabled = true
-                                    ReceiverHelper.persistentState.blockListFilesDownloaded = true
-                                    ReceiverHelper.persistentState.tempBlocklistDownloadTime = 0
-                                    ReceiverHelper.persistentState.workManagerStartTime = 0
-                                    DownloadHelper.deleteOldFiles(context)
-                                    return true
-                                }
-                                return false
-                            }
-                        }
-
-                    }
-                }
+            val timestamp = persistentState.tempBlocklistDownloadTime
+            if (!BlocklistDownloadHelper.isDownloadComplete(context, timestamp.toString())) {
                 return false
             }
-        }catch (e : Exception){
-            Log.w(LOG_TAG, "AppDownloadManager Copy exception - ${e.message}")
+
+            BlocklistDownloadHelper.deleteFromCanonicalPath(context)
+            val dir = File(
+                BlocklistDownloadHelper.getExternalFilePath(context, timestamp.toString()))
+            if (!dir.isDirectory) {
+                Log.w(LOG_TAG_DOWNLOAD,
+                      "Abort: file download path ${dir.absolutePath} isn't a directory")
+                return false
+            }
+
+            val children = dir.list()
+            if (children.isNullOrEmpty()) {
+                Log.w(LOG_TAG_DOWNLOAD, "Abort: ${dir.absolutePath} is empty directory")
+                return false
+            }
+
+            for (i in children.indices) {
+                val from = dir.absolutePath + File.separator + children[i]
+                val to = context.filesDir.canonicalPath + File.separator + timestamp + File.separator + children[i]
+                val result = Utilities.copy(from, to)
+
+                if (!result) {
+                    Log.w(LOG_TAG_DOWNLOAD, "Copy failed from: $from, to: $to")
+                    return false
+                }
+            }
+            val destinationDir = File("${context.filesDir.canonicalPath}/$timestamp")
+
+            Log.i(LOG_TAG_DOWNLOAD,
+                  "After copy, dest dir: $destinationDir, ${destinationDir.isDirectory}, ${destinationDir.list()?.size}, ${!isDownloadValid()}")
+
+            if (!destinationDir.isDirectory || destinationDir.list()?.size != LOCAL_BLOCKLIST_FILE_COUNT || !isDownloadValid()) {
+                return false
+            }
+
+            updatePersistenceOnCopySuccess(timestamp)
+            BlocklistDownloadHelper.deleteOldFiles(context)
+            return true
+
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_DOWNLOAD, "AppDownloadManager Copy exception - ${e.message}", e)
         }
         return false
+    }
+
+    private fun updatePersistenceOnCopySuccess(timestamp: Long) {
+        persistentState.blocklistDownloadTime = timestamp
+        persistentState.blocklistEnabled = true
+        persistentState.blocklistFilesDownloaded = true
+        persistentState.tempBlocklistDownloadTime = INIT_TIME_MS
     }
 
     /**
@@ -112,16 +134,19 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
      * Dnsx is not null then valid. Null/exception will be invalid.
      */
     private fun isDownloadValid(): Boolean {
-        try{
-            val timeStamp = ReceiverHelper.persistentState.tempBlocklistDownloadTime
-            val path: String = context.filesDir.canonicalPath +"/"+ timeStamp
-            val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE, path + Constants.FILE_RD_FILE, path + Constants.FILE_BASIC_CONFIG, path + Constants.FILE_TAG_NAME)
-            if(braveDNS != null){
-                if(DEBUG) Log.d(LOG_TAG, "AppDownloadManager isDownloadValid - braveDNS is valid")
-                return true
-            }
-        }catch (e : Exception){
-            Log.w(LOG_TAG, "AppDownloadManager isDownloadValid exception - ${e.message}")
+        try {
+            val timestamp = persistentState.tempBlocklistDownloadTime
+            val path: String = context.filesDir.canonicalPath + File.separator + timestamp
+            val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE,
+                                                 path + Constants.FILE_RD_FILE,
+                                                 path + Constants.FILE_BASIC_CONFIG,
+                                                 path + Constants.FILE_TAG_NAME)
+            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
+                             "AppDownloadManager isDownloadValid? ${braveDNS != null}")
+            return braveDNS != null
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid exception - ${e.message}",
+                  e)
         }
         return false
     }

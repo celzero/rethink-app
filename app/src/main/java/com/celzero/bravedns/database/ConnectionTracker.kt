@@ -17,31 +17,33 @@ package com.celzero.bravedns.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.celzero.bravedns.service.FirewallRuleset
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 
 @Entity(tableName = "ConnectionTracker")
 class ConnectionTracker {
-    @PrimaryKey(autoGenerate = true)
-    var id : Int = 0
-    var appName : String ?= null
-    var uid : Int = 0
-    var ipAddress: String ?= null
-    var port : Int = 0
-    var protocol : Int = 0
-    var isBlocked : Boolean = false
-    var blockedByRule : String ?= null
-    var flag : String? = null
-    var timeStamp : Long = 0L
+    @PrimaryKey(autoGenerate = true) var id: Int = 0
+    var appName: String? = null
+    var uid: Int = 0
+    var ipAddress: String? = null
+    var port: Int = 0
+    var protocol: Int = 0
+    var isBlocked: Boolean = false
+    var blockedByRule: String? = null
+    var flag: String? = null
+    var timeStamp: Long = INIT_TIME_MS
 
-    override fun equals(other: Any?): Boolean{
-        if (this === other) return true
-        if (other?.javaClass != javaClass) return false
-        other as ConnectionTracker
+    override fun equals(other: Any?): Boolean {
+        if (other !is ConnectionTracker) return false
         if (id != other.id) return false
         return true
     }
 
-    override fun hashCode(): Int{
-        return this.hashCode()
+    override fun hashCode(): Int {
+        return this.id.hashCode()
     }
 
+    fun isWhitelisted(): Boolean {
+        return this.blockedByRule == FirewallRuleset.RULE7.ruleName
+    }
 }

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clickable="true"
@@ -124,22 +123,10 @@
             android:visibility="visible" />
 
         <TextView
-            android:id="@+id/dns_block_resolver"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/dns_block_blocked_desc"
-            android:layout_centerInParent="true"
-            android:layout_marginTop="5dp"
-            android:padding="5dp"
-            android:text="@string/bsct_conn_block_desc"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/default_font_text_view" />
-
-        <TextView
             android:id="@+id/dns_block_latency"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/dns_block_resolver"
+            android:layout_below="@id/dns_block_blocked_desc"
             android:layout_centerInParent="true"
             android:layout_marginTop="5dp"
             android:padding="5dp"

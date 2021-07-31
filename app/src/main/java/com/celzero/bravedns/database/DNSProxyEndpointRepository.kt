@@ -19,6 +19,8 @@ package com.celzero.bravedns.database
 import androidx.lifecycle.LiveData
 import androidx.paging.PagedList
 import androidx.paging.toLiveData
+import androidx.room.Transaction
+import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -26,33 +28,36 @@ import kotlinx.coroutines.launch
 
 class DNSProxyEndpointRepository(private val dnsProxyEndpointDAO: DNSProxyEndpointDAO) {
 
-    fun updateAsync(dnsProxyEndpoint: DNSProxyEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
-        coroutineScope.launch {
-            dnsProxyEndpointDAO.update(dnsProxyEndpoint)
-        }
+    @Transaction
+    fun update(dnsProxyEndpoint: DNSProxyEndpoint) {
+        dnsProxyEndpointDAO.removeConnectionStatus()
+        dnsProxyEndpointDAO.update(dnsProxyEndpoint)
     }
 
-    fun deleteAsync(dnsProxyEndpoint: DNSProxyEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
+    fun deleteAsync(dnsProxyEndpoint: DNSProxyEndpoint,
+                    coroutineScope: CoroutineScope = GlobalScope) {
         coroutineScope.launch {
             dnsProxyEndpointDAO.delete(dnsProxyEndpoint)
         }
     }
 
-
-    fun insertAsync(dnsCryptEndpoint: DNSProxyEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
+    fun insertAsync(dnsCryptEndpoint: DNSProxyEndpoint,
+                    coroutineScope: CoroutineScope = GlobalScope) {
         coroutineScope.launch {
             dnsProxyEndpointDAO.insert(dnsCryptEndpoint)
         }
     }
 
-    fun insertWithReplace(dnsProxyEndpoint: DNSProxyEndpoint, coroutineScope: CoroutineScope= GlobalScope){
+    fun insertWithReplace(dnsProxyEndpoint: DNSProxyEndpoint,
+                          coroutineScope: CoroutineScope = GlobalScope) {
         coroutineScope.launch {
             dnsProxyEndpointDAO.insertWithReplace(dnsProxyEndpoint)
         }
     }
 
     fun getDNSProxyEndpointLiveData(): LiveData<PagedList<DNSProxyEndpoint>> {
-        return dnsProxyEndpointDAO.getDNSProxyEndpointLiveData().toLiveData(pageSize = 50)
+        return dnsProxyEndpointDAO.getDNSProxyEndpointLiveData().toLiveData(
+            pageSize = LIVEDATA_PAGE_SIZE)
     }
 
     fun deleteOlderData(date: Long, coroutineScope: CoroutineScope = GlobalScope) {
@@ -62,10 +67,11 @@ class DNSProxyEndpointRepository(private val dnsProxyEndpointDAO: DNSProxyEndpoi
     }
 
     fun getDNSProxyEndpointLiveDataByType(query: String): LiveData<PagedList<DNSProxyEndpoint>> {
-        return dnsProxyEndpointDAO.getDNSProxyEndpointLiveDataByType(query).toLiveData(pageSize = 50)
+        return dnsProxyEndpointDAO.getDNSProxyEndpointLiveDataByType(query).toLiveData(
+            pageSize = LIVEDATA_PAGE_SIZE)
     }
 
-    fun deleteDNSProxyEndpoint(id : Int) {
+    fun deleteDNSProxyEndpoint(id: Int) {
         dnsProxyEndpointDAO.deleteDNSProxyEndpoint(id)
     }
 
@@ -80,6 +86,5 @@ class DNSProxyEndpointRepository(private val dnsProxyEndpointDAO: DNSProxyEndpoi
     fun getConnectedProxy(): DNSProxyEndpoint {
         return dnsProxyEndpointDAO.getConnectedProxy()
     }
-
 
 }

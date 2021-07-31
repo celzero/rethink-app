@@ -15,12 +15,9 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -29,32 +26,25 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityDnsDetailBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Utilities.Companion.getCurrentTheme
 import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.android.ext.android.inject
 
 class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
     private val b by viewBinding(ActivityDnsDetailBinding::bind)
-    private val dnsTabsCount = 2
-    private var screenToLoad = 0
+    private var fragmentIndex = 0
     private val persistentState by inject<PersistentState>()
 
+    companion object {
+        private const val TAB_LAYOUT_LOGS = 0
+        private const val TAB_LAYOUT_CONFIGURE = 1
+        private const val TAB_LAYOUT_TOTAL_COUNT = 2
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (persistentState.theme == 0) {
-            if (isDarkThemeOn()) {
-                setTheme(R.style.AppThemeTrueBlack)
-            } else {
-                setTheme(R.style.AppThemeWhite)
-            }
-        } else if (persistentState.theme == 1) {
-            setTheme(R.style.AppThemeWhite)
-        } else if (persistentState.theme == 2) {
-            setTheme(R.style.AppTheme)
-        } else {
-            setTheme(R.style.AppThemeTrueBlack)
-        }
+        setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-        screenToLoad = intent.getIntExtra(Constants.SCREEN_TO_LOAD,0)
+        fragmentIndex = intent.getIntExtra(Constants.SCREEN_TO_LOAD, fragmentIndex)
         init()
     }
 
@@ -62,36 +52,28 @@ class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
         b.dnsDetailActViewpager.adapter = object : FragmentStateAdapter(this) {
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
-                    0 -> DNSLogFragment.newInstance()
+                    TAB_LAYOUT_LOGS -> DNSLogFragment.newInstance()
                     else -> ConfigureDNSFragment.newInstance()
                 }
             }
 
             override fun getItemCount(): Int {
-                return dnsTabsCount
+                return TAB_LAYOUT_TOTAL_COUNT
             }
         }
 
-        TabLayoutMediator(b.dnsDetailActTabLayout, b.dnsDetailActViewpager) { tab, position -> // Styling each tab here
+        TabLayoutMediator(b.dnsDetailActTabLayout,
+                          b.dnsDetailActViewpager) { tab, position -> // Styling each tab here
             tab.text = when (position) {
-                0 -> getString(R.string.dns_act_log)
+                TAB_LAYOUT_LOGS -> getString(R.string.dns_act_log)
                 else -> getString(R.string.dns_act_configure_tab)
             }
         }.attach()
 
-        b.dnsDetailActViewpager.setCurrentItem(screenToLoad, true)
+        b.dnsDetailActViewpager.setCurrentItem(fragmentIndex, true)
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
-           return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "onActivityResult")
-        if (resultCode == Activity.RESULT_OK) {
-            val stamp = data?.getStringArrayExtra(Constants.STAMP_INTENT_EXTRA)
-            if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "onActivityResult - Stamp : $stamp")
-        }
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 }

@@ -24,19 +24,17 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.databinding.PmListItemBinding
 
-class PermissionManagerApk (packageInfo: PackageInfo, context : Context) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class PermissionManagerApk(packageInfo: PackageInfo, context: Context) :
+        RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var appInfo: ApplicationInfo = packageInfo.applicationInfo
-    var appName: String ?= null
-    private var packageName: String ?= null
-    private var appIcon : Drawable?= null
+    var appName: String? = null
+    private var packageName: String? = null
+    private var appIcon: Drawable? = null
     private var version: String? = ""
-    private var context : Context?= null
 
+    init {
 
-    init{
-
-        this.context = context
         this.appIcon = context.packageManager.getApplicationIcon(appInfo)
         this.appName = context.packageManager.getApplicationLabel(appInfo).toString()
         this.packageName = packageInfo.packageName
@@ -45,11 +43,11 @@ class PermissionManagerApk (packageInfo: PackageInfo, context : Context) : Recyc
     }
 
 
-    inner class ViewHolder (b: PmListItemBinding): RecyclerView.ViewHolder(b.root) {
-    }
+    inner class ViewHolder(b: PmListItemBinding) : RecyclerView.ViewHolder(b.root) {}
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val itemBinding = PmListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val itemBinding = PmListItemBinding.inflate(LayoutInflater.from(parent.context), parent,
+                                                    false)
         return ViewHolder(itemBinding)
     }
 

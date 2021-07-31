@@ -36,14 +36,14 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 class RethinkGlideModule : AppGlideModule() {
 
     override fun applyOptions(context: Context, builder: GlideBuilder) {
-        val memoryCacheSizeBytes = 1024 * 1024 * 50 // 50mb
+        val memoryCacheSizeBytes = 1024 * 1024 * 15 // 15mb
         builder.setMemoryCache(LruResourceCache(memoryCacheSizeBytes.toLong()))
 
-        val diskCacheSizeBytes = 1024 * 1024 * 100 // 100 MB
+        val diskCacheSizeBytes = 1024 * 1024 * 25 // 25 MB
         builder.setDiskCache(InternalCacheDiskCacheFactory(context, diskCacheSizeBytes.toLong()))
 
         if (DEBUG) {
-            builder.setLogLevel(Log.DEBUG)
+            builder.setLogLevel(Log.ERROR)
         } else {
             builder.setLogLevel(Log.ERROR)
         }

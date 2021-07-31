@@ -26,11 +26,7 @@ import com.celzero.bravedns.util.MyAccessibilityService
 class PrivateDnsManager(private val accessibilityService: MyAccessibilityService) {
 
     enum class AutoState(val code: Int) {
-        DASHBOARD(0),
-        DIALOG_DNS(1),
-        RADIO_CLICK(2),
-        TEXT_ENTRY(3),
-        BUTTON_SAVE(4)
+        DASHBOARD(0), DIALOG_DNS(1), RADIO_CLICK(2), TEXT_ENTRY(3), BUTTON_SAVE(4)
     }
 
     var nextState = AutoState.DASHBOARD
@@ -50,10 +46,9 @@ class PrivateDnsManager(private val accessibilityService: MyAccessibilityService
 
         val packageName = event.packageName ?: return
 
-        if (event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
-            packageName == "com.android.settings" &&
-            isDashboard()) {
-            val list: List<AccessibilityNodeInfo> = event.source.findAccessibilityNodeInfosByText("Private DNS")
+        if (event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED && packageName == "com.android.settings" && isDashboard()) {
+            val list: List<AccessibilityNodeInfo> = event.source.findAccessibilityNodeInfosByText(
+                "Private DNS")
             for (node in list) {
                 node.parent?.parent?.performAction(AccessibilityNodeInfo.ACTION_CLICK)
                 nextState = AutoState.DIALOG_DNS
@@ -63,10 +58,7 @@ class PrivateDnsManager(private val accessibilityService: MyAccessibilityService
             return
         }
 
-        if (event.eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED &&
-            packageName == "com.android.settings" &&
-            isDialog() &&
-            event.className == "android.app.AlertDialog") {
+        if (event.eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED && packageName == "com.android.settings" && isDialog() && event.className == "android.app.AlertDialog") {
 
             nextState = AutoState.RADIO_CLICK
 
@@ -83,16 +75,17 @@ class PrivateDnsManager(private val accessibilityService: MyAccessibilityService
                 break
             }
 
-            val list: List<AccessibilityNodeInfo> =
-                event.source.findAccessibilityNodeInfosByViewId(privateDnsModeHostnameViewId)
-            val save: List<AccessibilityNodeInfo> =
-                event.source.findAccessibilityNodeInfosByViewId(saveViewId)
+            val list: List<AccessibilityNodeInfo> = event.source.findAccessibilityNodeInfosByViewId(
+                privateDnsModeHostnameViewId)
+            val save: List<AccessibilityNodeInfo> = event.source.findAccessibilityNodeInfosByViewId(
+                saveViewId)
 
             if (MyAccessibilityService.isSetPrivateDnsMode()) {
                 nextState = AutoState.TEXT_ENTRY
                 for (node in list) {
                     val arguments = Bundle()
-                    arguments.putString(AccessibilityNodeInfoCompat.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, dns)
+                    arguments.putString(
+                        AccessibilityNodeInfoCompat.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, dns)
                     node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments)
                     break
                 }

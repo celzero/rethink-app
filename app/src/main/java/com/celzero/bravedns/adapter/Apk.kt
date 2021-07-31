@@ -16,7 +16,5 @@ limitations under the License.
 package com.celzero.bravedns.adapter
 
 //TODO : IS THIS REQUIRED??
-data class Apk(val appInfo: String,
-               val appName: String,
-               val packageName: String,
+data class Apk(val appInfo: String, val appName: String, val packageName: String,
                val version: String? = "")

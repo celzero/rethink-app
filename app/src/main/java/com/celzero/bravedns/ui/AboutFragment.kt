@@ -18,6 +18,7 @@ package com.celzero.bravedns.ui
 import android.content.ActivityNotFoundException
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -36,15 +37,16 @@ import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentAboutBinding
-import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Utilities
-import org.koin.android.ext.android.inject
+import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 
 
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
     private val b by viewBinding(FragmentAboutBinding::bind)
-    private val persistentState by inject<PersistentState>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -53,7 +55,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
 
     private fun initView() {
 
-        if(BuildConfig.FLAVOR == Constants.FLAVOR_FDROID){
+        if (BuildConfig.FLAVOR == Constants.FLAVOR_FDROID) {
             b.aboutAppUpdate.visibility = View.GONE
         }
 
@@ -72,19 +74,41 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         b.aboutVpnProfile.setOnClickListener(this)
 
         try {
-            val pInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
-            val version = pInfo.versionName
-            b.aboutAppVersion.text = getString(R.string.about_version_install_source, version, persistentState.downloadSource.toString())
-            b.aboutWhatsNew.text = getString(R.string.about_whats_new, getString(R.string.about_version, version))
+            val version = getVersionName()
+            b.aboutAppVersion.text = getString(R.string.about_version_install_source, version,
+                                               getDownloadSource().toString())
+            b.aboutWhatsNew.text = getString(R.string.about_whats_new,
+                                             getString(R.string.about_version, version))
         } catch (e: PackageManager.NameNotFoundException) {
-            e.printStackTrace()
+            Log.w(LOG_TAG_UI, "package name not found: ${e.message}", e)
+        }
+    }
+
+    private fun getVersionName(): String {
+        val pInfo: PackageInfo? = Utilities.getPackageMetadata(requireContext().packageManager,
+                                                               requireContext().packageName)
+        return pInfo?.versionName ?: ""
+    }
+
+    private fun getDownloadSource(): Int {
+        return when (BuildConfig.FLAVOR) {
+            Constants.FLAVOR_PLAY -> {
+                DOWNLOAD_SOURCE_PLAY_STORE
+            }
+            Constants.FLAVOR_FDROID -> {
+                Constants.DOWNLOAD_SOURCE_FDROID
+            }
+            else -> {
+                Constants.DOWNLOAD_SOURCE_WEBSITE
+            }
         }
     }
 
     override fun onClick(view: View?) {
         when (view) {
             b.aboutTelegram -> {
-                val intent = Intent(Intent.ACTION_VIEW, getString(R.string.about_telegram_link).toUri())
+                val intent = Intent(Intent.ACTION_VIEW,
+                                    getString(R.string.about_telegram_link).toUri())
                 startActivity(intent)
             }
             b.aboutBlog -> {
@@ -96,7 +120,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
                 startActivity(intent)
             }
             b.aboutGithub -> {
-                val intent = Intent(Intent.ACTION_VIEW, getString(R.string.about_github_link).toUri())
+                val intent = Intent(Intent.ACTION_VIEW,
+                                    getString(R.string.about_github_link).toUri())
                 startActivity(intent)
             }
             b.aboutMail -> {
@@ -105,19 +130,23 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
                 startActivity(intent)
             }
             b.aboutTwitter -> {
-                val intent = Intent(Intent.ACTION_VIEW, getString(R.string.about_twitter_handle).toUri())
+                val intent = Intent(Intent.ACTION_VIEW,
+                                    getString(R.string.about_twitter_handle).toUri())
                 startActivity(intent)
             }
             b.aboutWebsite -> {
-                val intent = Intent(Intent.ACTION_VIEW, getString(R.string.about_website_link).toUri())
+                val intent = Intent(Intent.ACTION_VIEW,
+                                    getString(R.string.about_website_link).toUri())
                 startActivity(intent)
             }
             b.mozillaImg -> {
-                val intent = Intent(Intent.ACTION_VIEW, getString(R.string.about_mozilla_alumni_link).toUri())
+                val intent = Intent(Intent.ACTION_VIEW,
+                                    getString(R.string.about_mozilla_alumni_link).toUri())
                 startActivity(intent)
             }
             b.aboutAppUpdate -> {
-                (requireContext() as HomeScreenActivity).checkForUpdate(true)
+                (requireContext() as HomeScreenActivity).checkForUpdate(
+                    AppUpdater.UserPresent.INTERACTIVE)
             }
             b.aboutWhatsNew -> {
                 showNewFeaturesDialog()
@@ -126,7 +155,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
                 openAppInfo()
             }
             b.aboutVpnProfile -> {
-                openVPNProfile()
+                openVpnProfile(requireContext())
             }
             b.aboutAppNotification -> {
                 openNotificationSettings()
@@ -142,27 +171,13 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            Utilities.showToastInMidLayout(requireContext(), getString(R.string.app_info_error), Toast.LENGTH_SHORT)
-            Log.w(Constants.LOG_TAG, "Exception while opening app info: ${e.message}", e)
+            Utilities.showToastUiCentered(requireContext(), getString(R.string.app_info_error),
+                                          Toast.LENGTH_SHORT)
+            Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
 
-    private fun openVPNProfile(){
-        try {
-            val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                Intent(Settings.ACTION_VPN_SETTINGS)
-            } else {
-                Intent("android.net.vpn.SETTINGS")
-            }
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            Utilities.showToastInMidLayout(requireContext(), getString(R.string.vpn_profile_error), Toast.LENGTH_SHORT)
-            Log.w(Constants.LOG_TAG, "Exception while opening app info: ${e.message}", e)
-        }
-    }
-
-    private fun openNotificationSettings(){
+    private fun openNotificationSettings() {
         val packageName = requireContext().packageName
         try {
             val intent = Intent()
@@ -176,24 +191,25 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             }
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            Utilities.showToastInMidLayout(requireContext(), getString(R.string.vpn_profile_error), Toast.LENGTH_SHORT)
-            Log.w(Constants.LOG_TAG, "Exception while opening app info: ${e.message}", e)
+            Utilities.showToastUiCentered(requireContext(), getString(R.string.vpn_profile_error),
+                                          Toast.LENGTH_SHORT)
+            Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
 
     private fun showNewFeaturesDialog() {
-        val binding = DialogWhatsnewBinding.inflate(LayoutInflater.from(requireContext()), null, false)
-        AlertDialog.Builder(requireContext())
-            .setView(binding.root)
-            .setTitle(getString(R.string.whats_dialog_title))
-            .setPositiveButton(getString(R.string.about_dialog_positive_button)) { dialogInterface, _ ->
-                dialogInterface.dismiss()
-            }.setNeutralButton(getString(R.string.about_dialog_neutral_button)){ _: DialogInterface, _: Int ->
-                val intent = Intent(Intent.ACTION_VIEW, (getString(R.string.about_mail_to)).toUri())
-                intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_subject))
-                startActivity(intent)
-            }
-            .setCancelable(true).create().show()
+        val binding = DialogWhatsnewBinding.inflate(LayoutInflater.from(requireContext()), null,
+                                                    false)
+        AlertDialog.Builder(requireContext()).setView(binding.root).setTitle(
+            getString(R.string.whats_dialog_title)).setPositiveButton(
+            getString(R.string.about_dialog_positive_button)) { dialogInterface, _ ->
+            dialogInterface.dismiss()
+        }.setNeutralButton(
+            getString(R.string.about_dialog_neutral_button)) { _: DialogInterface, _: Int ->
+            val intent = Intent(Intent.ACTION_VIEW, (getString(R.string.about_mail_to)).toUri())
+            intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_subject))
+            startActivity(intent)
+        }.setCancelable(true).create().show()
     }
-    
+
 }

@@ -30,11 +30,14 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
-import static com.celzero.bravedns.util.Constants.LOG_TAG;
+import static com.celzero.bravedns.util.Constants.INVALID_UID;
+import static com.celzero.bravedns.util.Constants.MISSING_UID;
+import static com.celzero.bravedns.util.LoggerConstants.LOG_TAG_VPN;
 
 public class ConnectionTracer {
     private static final boolean DEBUG = false;
-    private static final int MISSING_UID = -2000;
+    private static final int CACHE_BUILDER_MAX_SIZE = 1000;
+    private static final int CACHE_BUILDER_WRITE_EXPIRE_SEC = 30;
     private final ConnectivityManager cm;
     private final Cache<String, Integer> uidCache;
 
@@ -44,56 +47,54 @@ public class ConnectionTracer {
         // the UID will expire after 30 seconds of the write.
         // Key for the cache is protocol, local, remote
         this.uidCache = CacheBuilder.newBuilder()
-            .maximumSize(1000)
-            .expireAfterWrite(30, TimeUnit.SECONDS)
-            .build();
+                .maximumSize(CACHE_BUILDER_MAX_SIZE)
+                .expireAfterWrite(CACHE_BUILDER_WRITE_EXPIRE_SEC, TimeUnit.SECONDS)
+                .build();
     }
 
     @TargetApi(Build.VERSION_CODES.Q)
     public int getUidQ(int protocol, String sourceIp, int sourcePort, String destIp, int destPort) {
-        if (cm == null ){
+        if (cm == null) {
             return MISSING_UID;
         }
 
         // https://android.googlesource.com/platform/development/+/da84168fb2f5eb5ca012c3f430f701bc64472f34/ndk/platforms/android-21/include/linux/in.h
         if (protocol != 6 /* TCP */ && protocol != 17 /* UDP */) {
-            //if (DEBUG) Log.d(TAG, "protocol is not valid : "+protocol);
             return MISSING_UID;
         }
 
         InetSocketAddress local;
         InetSocketAddress remote;
 
-        if (DEBUG) Log.d(LOG_TAG, sourceIp +  " [" + sourcePort + "] to " + destIp + " [" + destPort + "]");
+        if (DEBUG)
+            Log.d(LOG_TAG_VPN, sourceIp + " [" + sourcePort + "] to " + destIp + " [" + destPort + "]");
 
         if (TextUtils.isEmpty(sourceIp) || sourceIp.split("\\.").length < 4) {
-            //Log.w(TAG, "empty/invalid sourceIp " + sourceIp);
             local = new InetSocketAddress(sourcePort);
         } else {
             local = new InetSocketAddress(sourceIp, sourcePort);
         }
 
         if (TextUtils.isEmpty(destIp) || destIp.split("\\.").length < 4) {
-            Log.w(LOG_TAG, "empty/invalid destIp " + destIp);
             remote = new InetSocketAddress(destPort);
         } else {
             remote = new InetSocketAddress(destIp, destPort);
         }
-        int uid = -1;
-        String key = protocol+local.getAddress().getHostAddress()+remote.getAddress().getHostAddress();
+        int uid = INVALID_UID;
+        String key = protocol + local.getAddress().getHostAddress() + remote.getAddress().getHostAddress();
         try {
-            int value = uidCache.getIfPresent(key);
-            return value;
-        } catch (Exception ignored) { }
-
-        try{
-            uid = cm.getConnectionOwnerUid(protocol, local, remote);
-            uidCache.put(key, uid);
-        }catch(SecurityException secEx){
-            Log.e(LOG_TAG,"NETWORK_STACK permission - "+secEx.getMessage());
+            return uidCache.getIfPresent(key);
+        } catch (Exception ignored) {
         }
 
-        if (DEBUG) Log.d(LOG_TAG, "GetUidQ(" + local + "," + remote + "): " + uid);
+        try {
+            uid = cm.getConnectionOwnerUid(protocol, local, remote);
+            uidCache.put(key, uid);
+        } catch (SecurityException secEx) {
+            Log.e(LOG_TAG_VPN, "NETWORK_STACK permission - " + secEx.getMessage(), secEx);
+        }
+
+        if (DEBUG) Log.d(LOG_TAG_VPN, "GetUidQ(" + local + "," + remote + "): " + uid);
 
         return uid;
     }

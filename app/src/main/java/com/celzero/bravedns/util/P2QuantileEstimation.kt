@@ -16,29 +16,22 @@
 package com.celzero.bravedns.util
 
 import java.util.*
-import kotlin.math.roundToInt
 import kotlin.math.sign
 
 /**
- * P2 quantile estimator: estimate median without storing actual values.
- * While a generic P2 quantile estimator can determine any quantile with
- * minimum computation (typically accurate with just 5 samples for most
- * distributions), the current adopted implementation rigidly computes
- * only the median quantile with increased sample size to account for
- * the wild nature of network latencies which the generic estimator has
- * hard time keeping up with.
+ * Estimate percentiles without storing actual samples.
  */
 class P2QuantileEstimation(probability: Double) {
 
     // details: https://aakinshin.net/posts/p2-quantile-estimator/
     // orig impl: github.com/AndreyAkinshin/perfolizer P2QuantileEstimator.cs
-    
-    // percentile
+
+    // median percentile
     private var p = 0.5
 
-    // total samples, typically 5; higher values improve accuracy; for
-    // lower percentiles (p50) but increase computation cost; for higher
-    // percentiles (p90+), estimates are decent with u as low as 5
+    // total samples, typically 5; higher u improves accuracy for
+    // lower percentiles (p50) at the expense of computational cost;
+    // for higher percentiles (p90+), even u as low as 5 works fine.
     private val u = 31
     private val mid = Math.floor(u/2.0).roundToInt()
 
@@ -57,13 +50,14 @@ class P2QuantileEstimation(probability: Double) {
     fun addValue(x: Double) {
         if (count < u) {
 
-            q[count++] = x
+            q[count] = x
+            count += 1
 
             if (count == u) {
                 Arrays.sort(q)
 
                 val t = u - 1 // 0 index
-                for (i in 0..u-1) {
+                for (i in 0..t) {
                     n[i] = i
                 }
                 
@@ -90,11 +84,11 @@ class P2QuantileEstimation(probability: Double) {
                     // assign i-th portion of smid to dns[mid+i]
                     // [mid+1] => .6, [mid+2] => .7, [mid+3] => .8,
                     // [mid+4] => .9, [mid+5] => 1
-                    dns[mid+i] = (smid * i) + p
+                    dns[mid + i] = (smid * i) + p
                     // assign t-th portion of dns[mid+i] to ns[mid+i]
                     // [mid+1] => 6, [mid+2] => 7, [mid+3] => 8,
                     // [mid+4] => 9, [mid+5] => 10
-                    ns[mid+i] = dns[mid+i] * t
+                    ns[mid + i] = dns[mid + i] * t
                 }
             }
 
@@ -105,12 +99,12 @@ class P2QuantileEstimation(probability: Double) {
         if (x < q[0]) {
             q[0] = x // update min
             k = 0
-        } else if (x > q[u-1]) {
-            q[u-1] = x // update max
+        } else if (x > q[u - 1]) {
+            q[u - 1] = x // update max
             k = u - 2
         } else {
             k = u - 2
-            for (i in 1..u-2) {
+            for (i in 1..u - 2) {
                 if (x < q[i]) {
                     k = i - 1
                     break
@@ -118,15 +112,14 @@ class P2QuantileEstimation(probability: Double) {
             }
         }
 
-        for (i in (k + 1)..u-1) n[i]++
+        for (i in (k + 1) until u) n[i]++
 
-        for (i in 0..u-1) ns[i] += dns[i]
+        for (i in 0 until u) ns[i] += dns[i]
 
-        for (i in 1..u-2) { // update intermediatories
+        for (i in 1 until u - 1) { // update intermediatories
             val d = ns[i] - n[i]
 
-            if (d >= 1 && n[i + 1] - n[i] > 1 ||
-                        d <= -1 && n[i - 1] - n[i] < -1) {
+            if (d >= 1 && n[i + 1] - n[i] > 1 || d <= -1 && n[i - 1] - n[i] < -1) {
                 val dInt = sign(d).toInt()
                 val qs = parabolic(i, dInt.toDouble())
                 if (q[i - 1] < qs && qs < q[i + 1]) {
@@ -159,9 +152,9 @@ class P2QuantileEstimation(probability: Double) {
         if (c > u) {
             return q[mid]
         }
- 
+
         Arrays.sort(q, 0, c)
-        val index = ((c - 1) * p).roundToInt()
+        val index = ((c - 1) * p)).roundToInt()
         return q[index]
     }
 
