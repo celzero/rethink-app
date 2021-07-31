@@ -33,15 +33,14 @@ class P2QuantileEstimation(probability: Double) {
     // details: https://aakinshin.net/posts/p2-quantile-estimator/
     // orig impl: github.com/AndreyAkinshin/perfolizer P2QuantileEstimator.cs
     
-    // ignored, always at p = 0.5; if dynamic probability
-    // is required, then seeding ns and dns when (count == u)
-    // needs to change to account for that, while #getQuantile
-    // needs a tweak when (count < u). ref AndreyAkinshin's impl
+    // percentile
     private var p = 0.5
 
-    // total samples, typically 5; higher values improve
-    // accuracy but increase computation cost
-    private val u = 30
+    // total samples, typically 5; higher values improve accuracy; for
+    // lower percentiles (p50) but increase computation cost; for higher
+    // percentiles (p90+), estimates are decent with u as low as 5
+    private val u = 31
+    private val mid = Math.floor(u/2.0).roundToInt()
 
     private val n = IntArray(u) // marker positions
     private val ns = DoubleArray(u) // desired marker positions
@@ -63,10 +62,39 @@ class P2QuantileEstimation(probability: Double) {
             if (count == u) {
                 Arrays.sort(q)
 
+                val t = u - 1 // 0 index
                 for (i in 0..u-1) {
                     n[i] = i
-                    ns[i] = i.toDouble()
-                    dns[i] = (1.0 / (u - 1)) * i
+                }
+                
+                // divide p into mid no of equal segments
+                // p => 0.5, u = 11, t = 10, mid = 5; pmid => 0.1
+                val pmid = p / mid
+                for (i in 0..mid) {
+                    // assign i-th portion of pmid to dns[i]
+                    // [0] => .0, [1] => .1, [2] => .2,
+                    // [3] => .3, [4] => .4, [5] => .5
+                    dns[i] = pmid * i
+                    // assign t-th portion of dns[i] to ns[i]
+                    // [0] => .0, [1] => 1, [2] => 2,
+                    // [3] => 3, [4] => 4, [5] => 5
+                    ns[i] = dns[i] * t
+                }
+                
+                val rem = t - mid // the rest
+                val s = 1 - p // left-over probability
+                // divide q into rem no of equal segments
+                // q => 0.5, u = 10, mid = 5, rem = 5; smid => 0.5
+                val smid = s / rem
+                for (i in 1..rem) {
+                    // assign i-th portion of smid to dns[mid+i]
+                    // [mid+1] => .6, [mid+2] => .7, [mid+3] => .8,
+                    // [mid+4] => .9, [mid+5] => 1
+                    dns[mid+i] = (smid * i) + p
+                    // assign t-th portion of dns[mid+i] to ns[mid+i]
+                    // [mid+1] => 6, [mid+2] => 7, [mid+3] => 8,
+                    // [mid+4] => 9, [mid+5] => 10
+                    ns[mid+i] = dns[mid+i] * t
                 }
             }
 
@@ -129,11 +157,11 @@ class P2QuantileEstimation(probability: Double) {
         val c = count
 
         if (c > u) {
-            return q[u/2]
+            return q[mid]
         }
  
         Arrays.sort(q, 0, c)
-        val index = ((c - 1) / 2)
+        val index = ((c - 1) * p).roundToInt()
         return q[index]
     }
 
