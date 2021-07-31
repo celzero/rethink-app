@@ -94,7 +94,7 @@ class P2QuantileEstimation(probability: Double) {
 
         for (i in 0..u-1) ns[i] += dns[i]
 
-        for (i in 1..u-1) { // update intermediatories
+        for (i in 1..u-2) { // update intermediatories
             val d = ns[i] - n[i]
 
             if (d >= 1 && n[i + 1] - n[i] > 1 ||
