@@ -19,28 +19,21 @@ import java.util.*
 import kotlin.math.sign
 
 /**
- * P2 quantile estimator: estimate median without storing actual values.
- * While a generic P2 quantile estimator can determine any quantile with
- * minimum computation (typically accurate with just 5 samples for most
- * distributions), the current adopted implementation rigidly computes
- * only the median quantile with increased sample size to account for
- * the wild nature of network latencies which the generic estimator has
- * hard time keeping up with.
+ * Estimate percentiles without storing actual samples.
  */
 class P2QuantileEstimation(probability: Double) {
 
     // details: https://aakinshin.net/posts/p2-quantile-estimator/
     // orig impl: github.com/AndreyAkinshin/perfolizer P2QuantileEstimator.cs
 
-    // ignored, always at p = 0.5; if dynamic probability
-    // is required, then seeding ns and dns when (count == u)
-    // needs to change to account for that, while #getQuantile
-    // needs a tweak when (count < u). ref AndreyAkinshin's impl
+    // median percentile
     private var p = 0.5
 
-    // total samples, typically 5; higher values improve
-    // accuracy but increase computation cost
-    private val u = 30
+    // total samples, typically 5; higher u improves accuracy for
+    // lower percentiles (p50) at the expense of computational cost;
+    // for higher percentiles (p90+), even u as low as 5 works fine.
+    private val u = 31
+    private val mid = Math.floor(u/2.0).roundToInt()
 
     private val n = IntArray(u) // marker positions
     private val ns = DoubleArray(u) // desired marker positions
@@ -48,7 +41,7 @@ class P2QuantileEstimation(probability: Double) {
     private val q = DoubleArray(u) // marker heights
 
     private var count = 0 // total sampled so far
-
+    
     init {
         p = probability
     }
@@ -57,15 +50,45 @@ class P2QuantileEstimation(probability: Double) {
     fun addValue(x: Double) {
         if (count < u) {
 
-            q[count++] = x
+            q[count] = x
+            count += 1
 
             if (count == u) {
                 Arrays.sort(q)
 
-                for (i in 0 until u) {
+                val t = u - 1 // 0 index
+                for (i in 0..t) {
                     n[i] = i
-                    ns[i] = i.toDouble()
-                    dns[i] = 1.0 / u * (i + 1)
+                }
+                
+                // divide p into mid no of equal segments
+                // p => 0.5, u = 11, t = 10, mid = 5; pmid => 0.1
+                val pmid = p / mid
+                for (i in 0..mid) {
+                    // assign i-th portion of pmid to dns[i]
+                    // [0] => .0, [1] => .1, [2] => .2,
+                    // [3] => .3, [4] => .4, [5] => .5
+                    dns[i] = pmid * i
+                    // assign t-th portion of dns[i] to ns[i]
+                    // [0] => .0, [1] => 1, [2] => 2,
+                    // [3] => 3, [4] => 4, [5] => 5
+                    ns[i] = dns[i] * t
+                }
+                
+                val rem = t - mid // the rest
+                val s = 1 - p // left-over probability
+                // divide q into rem no of equal segments
+                // q => 0.5, u = 10, mid = 5, rem = 5; smid => 0.5
+                val smid = s / rem
+                for (i in 1..rem) {
+                    // assign i-th portion of smid to dns[mid+i]
+                    // [mid+1] => .6, [mid+2] => .7, [mid+3] => .8,
+                    // [mid+4] => .9, [mid+5] => 1
+                    dns[mid + i] = (smid * i) + p
+                    // assign t-th portion of dns[mid+i] to ns[mid+i]
+                    // [mid+1] => 6, [mid+2] => 7, [mid+3] => 8,
+                    // [mid+4] => 9, [mid+5] => 10
+                    ns[mid + i] = dns[mid + i] * t
                 }
             }
 
@@ -112,22 +135,26 @@ class P2QuantileEstimation(probability: Double) {
     }
 
     private fun parabolic(i: Int, d: Double): Double {
-        return q[i] + (d / (n[i + 1] - n[i - 1])) * (((n[i] - n[i - 1] + d) * (q[i + 1] - q[i]) / (n[i + 1] - n[i])) + ((n[i + 1] - n[i] - d) * (q[i] - q[i - 1]) / (n[i] - n[i - 1])))
+        return q[i] +
+            (d / (n[i + 1] - n[i - 1])) *
+                (((n[i] - n[i - 1] + d) * (q[i + 1] - q[i]) / (n[i + 1] - n[i])) +
+                ((n[i + 1] - n[i] - d) * (q[i] - q[i - 1]) / (n[i] - n[i - 1])))
     }
 
     private fun linear(i: Int, d: Int): Double {
-        return q[i] + (d * (q[i + d] - q[i]) / (n[i + d] - n[i]))
+        return q[i] +
+            (d * (q[i + d] - q[i]) / (n[i + d] - n[i]))
     }
 
     fun getQuantile(): Double {
         val c = count
 
         if (c > u) {
-            return q[u / 2]
+            return q[mid]
         }
 
         Arrays.sort(q, 0, c)
-        val index = ((c - 1) / 2)
+        val index = ((c - 1) * p)).roundToInt()
         return q[index]
     }
 
