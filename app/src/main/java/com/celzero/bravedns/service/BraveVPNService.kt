@@ -17,7 +17,10 @@
 package com.celzero.bravedns.service
 
 import android.app.*
-import android.content.*
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.pm.PackageManager
 import android.net.Network
@@ -25,113 +28,125 @@ import android.net.ProxyInfo
 import android.net.VpnService
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
+import android.os.SystemClock.elapsedRealtime
 import android.service.quicksettings.TileService.requestListeningState
-import android.text.TextUtils
 import android.util.Log
 import android.view.accessibility.AccessibilityManager
+import android.widget.Toast
 import androidx.annotation.GuardedBy
-import androidx.annotation.RequiresApi
 import androidx.annotation.WorkerThread
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.automaton.FirewallRules
+import com.celzero.bravedns.automaton.FirewallRules.UID_EVERYBODY
 import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.data.ConnectionRules
 import com.celzero.bravedns.data.IPDetails
-import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.DNSProxyEndpointRepository
 import com.celzero.bravedns.database.ProxyEndpointRepository
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.net.manager.ConnectionTracer
-import com.celzero.bravedns.receiver.BraveAutoStartReceiver
-import com.celzero.bravedns.receiver.BraveScreenStateReceiver
 import com.celzero.bravedns.receiver.NotificationActionReceiver
-import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment.Companion.UNIVERSAL_RULES_UID
+import com.celzero.bravedns.ui.FirewallActivity
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.backgroundAllowedUID
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveMode
 import com.celzero.bravedns.util.*
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
-import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
-import kotlinx.coroutines.*
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
+import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME
+import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE
+import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DNSCRYPT
+import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_PROXY
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Utilities.Companion.getThemeAccent
+import com.celzero.bravedns.util.Utilities.Companion.isMissingOrInvalidUid
+import com.celzero.bravedns.util.Utilities.Companion.isVpnLockdownEnabled
+import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import protect.Blocker
 import protect.Protector
 import settings.Settings
-import java.net.InetAddress
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.collections.HashMap
 import kotlin.random.Random
 
 
-class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListener, Protector, Blocker,
-    OnSharedPreferenceChangeListener {
+class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protector, Blocker,
+                        OnSharedPreferenceChangeListener {
 
-    @GuardedBy("vpnController") private var connectionCapabilityMonitor : ConnectionCapabilityMonitor ?= null
+    @GuardedBy("vpnController") private var connectionMonitor: ConnectionMonitor? = null
     @GuardedBy("vpnController") private var vpnAdapter: GoVpnAdapter? = null
 
     companion object {
         private const val DNS_REQUEST_PORT = 53
 
-        var firewallRules = FirewallRules.getInstance()
-        private const val FILE_LOG_TAG = "RethinkVPNService"
         const val SERVICE_ID = 1 // Only has to be unique within this app.
 
-        var braveScreenStateReceiver = BraveScreenStateReceiver()
-        var braveAutoStartReceiver = BraveAutoStartReceiver()
         private const val MAIN_CHANNEL_ID = "vpn"
         private const val WARNING_CHANNEL_ID = "warning"
-        val vpnController: VpnController? = VpnController.getInstance()
 
-        var isScreenLocked: Boolean = false
-        var isBackgroundEnabled: Boolean = false
-        var blockUnknownConnection: Boolean = false
+        // notification request codes
+        private const val NOTIF_ACTION_MODE_STOP = 100
+        private const val NOTIF_ACTION_MODE_DNS_ONLY = 101
+        private const val NOTIF_ACTION_MODE_DNS_FIREWALL = 102
 
-        var appWhiteList: MutableMap<Int, Boolean> = HashMap()
-        var privateDNSOverride: Boolean = false
-        var blockUDPTraffic: Boolean = false
+        private const val NOTIF_LOAD_RULES_FAIL = "warning"
+        private const val NOTIF_ID_LOAD_RULES_FAIL = 103
 
+        private const val NOTIF_ACCESSIBILITY_FAILURE = "Accessibility"
+        private const val NOTIF_ID_ACCESSIBILITY_FAILURE = 104
     }
 
-    private var isLockDownPrevious : Boolean  = false
+    private var isLockDownPrevious: Boolean = false
 
     private val vpnScope = MainScope()
-    private var isLoadFirewallRulesCompleted : Boolean = false
+
+    private var notificationCountForFirewallRules: Int = 0
+    var totalAccessibilityFailureNotifications: Int = 0
 
     private lateinit var connTracer: ConnectionTracer
 
-    private val rand : Random = Random
+    private val rand: Random = Random
 
-    private val appInfoRepository by inject<AppInfoRepository>()
     private val socks5ProxyEndpointRepository by inject<ProxyEndpointRepository>()
-    private val dnsProxyEndpointRepository by inject<DNSProxyEndpointRepository>()
     private val appMode by inject<AppMode>()
     private val ipTracker by inject<IPTracker>()
     private val dnsLogTracker by inject<DNSLogTracker>()
     private val persistentState by inject<PersistentState>()
-    private val tracker by inject<QueryTracker>()
+    private val dnsLatencyTracker by inject<QueryTracker>()
+
+    @Volatile private var isAccessibilityServiceFunctional: Boolean = false
+    @Volatile private var accessibilityHearbeatTimestamp: Long = 0L
+
+    private lateinit var notificationManager: NotificationManager
+    private lateinit var activityManager: ActivityManager
+    private lateinit var accessibilityManager: AccessibilityManager
+    private var keyguardManager: KeyguardManager? = null
+
+    private var accessibilityListener: AccessibilityManager.AccessibilityStateChangeListener? = null
 
     enum class State {
         NEW, WORKING, FAILING
     }
 
-    // FIXME: 12-01-2021 - Fix the rule7 - find a way out for the whitelist.  
-    enum class BlockedRuleNames(val ruleName: String) {
-        RULE1("Rule #1"), RULE2("Rule #2"), RULE3("Rule #3"), RULE4("Rule #4"),
-         RULE5("Rule #5"), RULE6("Rule #6"), RULE7("Whitelist")
-    }
-
-    override fun block(protocol: Int, uid: Long, sourceAddress: String, destAddress: String): Boolean {
+    override fun block(protocol: Int, uid: Long, sourceAddress: String,
+                       destAddress: String): Boolean {
         val isBlocked: Boolean
         val first = sourceAddress.split(":")
         val second = destAddress.split(":")
-        isBlocked = checkConnectionBlocked(uid.toInt(), protocol, first[0], first[first.size - 1].toInt(), second[0], second[second.size - 1].toInt())
-        checkLockDown()
+        isBlocked = checkConnectionBlocked(uid.toInt(), protocol, first[0],
+                                           first[first.size - 1].toInt(), second[0],
+                                           second[second.size - 1].toInt())
+
+        handleVpnLockdownState()
         return isBlocked
     }
 
@@ -144,13 +159,10 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
      * RULE5 - Universal firewall - Block when source app is unknown
      * RULE6 - Universal firewall - Block all UDP connections
      */
-    private fun checkConnectionBlocked(_uid: Int, protocol: Int, sourceIp: String, sourcePort: Int, destIp: String, destPort: Int): Boolean {
+    private fun checkConnectionBlocked(_uid: Int, protocol: Int, sourceIp: String, sourcePort: Int,
+                                       destIp: String, destPort: Int): Boolean {
 
-        if(!isLoadFirewallRulesCompleted){
-            checkIfLoadRulesCompleted()
-        }else{
-            if(DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG isLoadFirewallRulesCompleted checkConnectionBlocked is true")
-        }
+        loadFirewallRulesIfNeeded()
 
         val ipDetails: IPDetails?
         var isBlocked: Boolean
@@ -164,192 +176,343 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
                 uid = connTracer.getUidQ(protocol, sourceIp, sourcePort, destIp, destPort)
             }
 
-            ipDetails = IPDetails(uid, sourceIp, sourcePort, destIp, destPort, System.currentTimeMillis(), false, "", protocol)
+            ipDetails = IPDetails(uid, sourceIp, sourcePort, destIp, destPort,
+                                  System.currentTimeMillis(), false, "", protocol)
 
-            if (appWhiteList.containsKey(uid)) {
+            if (FirewallManager.isUidWhitelisted(uid)) {
                 ipDetails.isBlocked = false
-                ipDetails.blockedByRule = BlockedRuleNames.RULE7.ruleName
-                sendConnTracking(ipDetails)
-                Log.i(LOG_TAG, "$FILE_LOG_TAG appWhiteList: $uid")
+                ipDetails.blockedByRule = FirewallRuleset.RULE7.ruleName
+                connTrack(ipDetails)
+                Log.i(LOG_TAG_VPN, "whitelisted app, uid: $uid")
                 return false
             }
 
-            if (persistentState.blockUnknownConnections && destIp != GoVpnAdapter.FAKE_DNS_IP) {
-                if (uid == -1 || uid == MISSING_UID)  {
+            if (persistentState.blockUnknownConnections) {
+                if (isMissingOrInvalidUid(uid)) {
                     ipDetails.isBlocked = true
-                    ipDetails.blockedByRule = BlockedRuleNames.RULE5.ruleName
-                    sendConnTracking(ipDetails)
+                    ipDetails.blockedByRule = FirewallRuleset.RULE5.ruleName
+                    connTrack(ipDetails)
                     delayBeforeResponse()
                     return true
                 }
             }
 
-            if (protocol == 17 && blockUDPTraffic) {
+            if (isUdpBlocked(protocol)) {
                 ipDetails.isBlocked = true
-                ipDetails.blockedByRule = BlockedRuleNames.RULE6.ruleName
-                sendConnTracking(ipDetails)
+                ipDetails.blockedByRule = FirewallRuleset.RULE6.ruleName
+                connTrack(ipDetails)
                 delayBeforeResponse()
-                if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG blockUDPTraffic: $uid, $destPort")
+                if (DEBUG) Log.d(LOG_TAG_VPN, "blockUDPTraffic: $uid, $destPort")
                 return true
             }
 
             //Check whether the screen lock is enabled and act based on it
-            if(DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG : isScreenLockEnabled: $isScreenLocked")
-            if (isScreenLocked) {
-                //Don't include DNS and private DNS request in the list
+            if (isDeviceLocked() && Utilities.isUnknownUid(uid)) {
+                ipDetails.isBlocked = true
+                ipDetails.blockedByRule = FirewallRuleset.RULE3.ruleName
+                connTrack(ipDetails)
+                if (DEBUG) Log.d(LOG_TAG_VPN,
+                                 "Block connection with delay for screen lock: $uid, $destPort")
+                delayBeforeResponse()
+                return true
+            }
+
+            //Check whether the background is enabled and act based on it
+            if (blockBackgroundData() && Utilities.isUnknownUid(uid)) {
                 // FIXME: 04-12-2020 Removed the app range check for testing.
-                if ((uid != -1 && uid != MISSING_UID)) {
-                    ipDetails.isBlocked = true
-                    ipDetails.blockedByRule = BlockedRuleNames.RULE3.ruleName
-                    sendConnTracking(ipDetails)
-                    if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG isScreenLocked: $uid, $destPort")
-                    delayBeforeResponse()
-                    return true
+                var isBGBlock = true
+
+                //Introducing exponential calculation for the wait time.
+                //initially the thread sleep was done with constant time. for eg., thread
+                //will sleep for 2 secs and will check if the app is in foreground or not.
+                //To avoid the constant time wait introduced the exponential logic below.
+                val bgBlockWaitMs = TimeUnit.SECONDS.toMillis(20)
+                var remainingWaitMs = TimeUnit.SECONDS.toMillis(10)
+                var attempt = 0
+
+                while (remainingWaitMs > 0) {
+                    if (FirewallManager.isAppForeground(uid, keyguardManager)) {
+                        isBGBlock = false
+                        break
+                    }
+                    remainingWaitMs = exponentialBackoff(remainingWaitMs, attempt)
+                    attempt += 1
                 }
 
-            } else if (isBackgroundEnabled) { //Check whether the background is enabled and act based on it
-                // FIXME: 04-12-2020 Removed the app range check for testing.
-                if ((uid != -1 && uid != MISSING_UID)) {
-                    var isBGBlock = true
-                    if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Background blocked $uid, $destIp, before sleep: $uid, $destIp, $isBGBlock, ${System.currentTimeMillis()}")
-
-                    //Introducing exponential calculation for the wait time.
-                    //initially the thread sleep was done with constant time. for eg., thread
-                    //will sleep for 2 secs and will check if the app is in foreground or not.
-                    //To avoid the constant time wait introduced the exponential logic below.
-                    val baseWaitMs = TimeUnit.MILLISECONDS.toMillis(50)
-                    val bgBlockWaitMs = TimeUnit.SECONDS.toMillis(20)
-                    var remainingWaitMs = TimeUnit.SECONDS.toMillis(10)
-                    var attempt = 0
-
-                    while(remainingWaitMs > 0){
-                        if (backgroundAllowedUID.containsKey(uid)) {
-                            if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Background not blocked $uid, $destIp, AccessibilityEvent: app in foreground: $uid")
-                            isBGBlock = false
-                            break
-                        } else {
-                            if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Background blocked $uid, $destIp, AccessibilityEvent: UID: $uid is not available in the foreground, trying again")
-                        }
-                        // ref: https://stackoverflow.com/a/363692
-                        val exponent = exp(baseWaitMs, attempt)
-                        val randomValue = rand.nextLong(exponent - baseWaitMs + 1) + baseWaitMs
-                        val waitTimeMs = Math.min(randomValue, remainingWaitMs)
-                        remainingWaitMs -= waitTimeMs
-                        attempt += 1
-                        Thread.sleep(waitTimeMs)
-                    }
-
-                    //When the app is not in foreground.
-                    if (isBGBlock) {
-                        if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Background blocked $uid, $destIp, after sleep: $uid, $destIp, $isBGBlock, ${System.currentTimeMillis()}")
-                        Thread.sleep((bgBlockWaitMs + remainingWaitMs))
-                        ipDetails.isBlocked = true
-                        ipDetails.blockedByRule = BlockedRuleNames.RULE4.ruleName
-                        sendConnTracking(ipDetails)
-                        Log.i(LOG_TAG, "$FILE_LOG_TAG Background blocked $uid after sleep of: 30 secs")
-                        return isBGBlock
-                    }
+                //When the app is not in foreground.
+                if (isBGBlock) {
+                    if (DEBUG) Log.d(LOG_TAG_VPN,
+                                     "Background blocked uid: $uid, send response after sleep of ${bgBlockWaitMs + remainingWaitMs}")
+                    Thread.sleep((bgBlockWaitMs + remainingWaitMs))
+                    ipDetails.isBlocked = true
+                    ipDetails.blockedByRule = FirewallRuleset.RULE4.ruleName
+                    connTrack(ipDetails)
+                    Log.i(LOG_TAG_VPN, "Background blocked $uid after sleep of: 30 secs")
+                    return isBGBlock
+                } else {
+                    if (DEBUG) Log.d(LOG_TAG_VPN,
+                                     "Background allowed for $uid, $destIp, Remaining time: ${10_000 - remainingWaitMs} ")
                 }
             }
 
             //Check whether any rules are set block the IP/App.
             var blockedBy = ""
-            if (uid != -1 && uid != MISSING_UID) {
-                isBlocked = isUidBlocked(uid)
-                if (isBlocked) {
-                    blockedBy = BlockedRuleNames.RULE1.ruleName
-                    if (persistentState.killAppOnFirewall) {
-                        killFirewalledApplication(uid)
-                    }
+            isBlocked = isUidBlocked(uid)
+            if (Utilities.isUnknownUid(uid) && isBlocked) {
+                blockedBy = FirewallRuleset.RULE1.ruleName
+                if (persistentState.killAppOnFirewall) {
+                    killFirewalledApplication(uid)
                 }
-            } else {
-                isBlocked = false
             }
 
             if (!isBlocked) {
-                val connectionRules = ConnectionRules(destIp, destPort, Protocol.getProtocolName(protocol).name)
-                isBlocked = firewallRules.checkRules(UNIVERSAL_RULES_UID, connectionRules)
-                if (isBlocked) blockedBy = BlockedRuleNames.RULE2.ruleName
+                val connectionRules = ConnectionRules(destIp, destPort,
+                                                      Protocol.getProtocolName(protocol).name)
+                isBlocked = FirewallRules.hasRule(UID_EVERYBODY, connectionRules)
+                if (isBlocked) blockedBy = FirewallRuleset.RULE2.ruleName
             }
             ipDetails.isBlocked = isBlocked
             ipDetails.blockedByRule = blockedBy
-            sendConnTracking(ipDetails)
+            connTrack(ipDetails)
 
         } catch (iex: Exception) {
             //Returning the blocked as true for all the block call from GO with exceptions.
             //So the apps which are hit in exceptions will have the response sent as blocked(true)
             //after a delayed amount of time.
-            /**
+            /*
              * TODO- Check for the possibility of adding the exceptions on alerts(either in-memory
              * or as persistent alert)
              */
             isBlocked = true
-            Log.e(LOG_TAG, iex.message, iex)
+            Log.e(LOG_TAG_VPN, iex.message, iex)
         }
         if (isBlocked) {
-            if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Response for the block: $destIp %Before% $uid, $isBlocked,$sourceIp, $sourcePort, $destIp, $destPort ")
             delayBeforeResponse()
         }
-        if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Response for the block: $destIp  %After% $uid, $isBlocked,$sourceIp, $sourcePort, $destIp, $destPort")
+        if (DEBUG) Log.d(LOG_TAG_VPN,
+                         "Response for the block: $destIp, $uid, $isBlocked, $sourceIp, $sourcePort, $destIp, $destPort")
         return isBlocked
     }
 
-    private fun checkIfLoadRulesCompleted() {
-        // Adding the exponential calculation of wait time until we load the firewall
-        // rules. The other check of the block() method will be executed once we load
-        // the firewall rules.
-        val baseWaitMs = TimeUnit.MILLISECONDS.toMillis(50)
-        val bgBlockWaitMs = TimeUnit.SECONDS.toMillis(20)
-        var remainingWaitMs = TimeUnit.SECONDS.toMillis(10)
-        var attempt = 0
+    private fun isUdpBlocked(protocol: Int): Boolean {
+        return protocol == Protocol.UDP.protocolType && persistentState.udpBlockedSettings
+    }
 
-        while (remainingWaitMs > 0) {
-            if (isLoadFirewallRulesCompleted) {
-                if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG isLoadFirewallRulesCompleted is true")
-                break
-            } else {
-                if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG isLoadFirewallRulesCompleted is false, trying again")
-            }
-            // ref: https://stackoverflow.com/a/363692
-            val exponent = exp(baseWaitMs, attempt)
-            val randomValue = rand.nextLong(exponent - baseWaitMs + 1) + baseWaitMs
-            val waitTimeMs = Math.min(randomValue, remainingWaitMs)
-            remainingWaitMs -= waitTimeMs
-            attempt += 1
-            Thread.sleep(waitTimeMs)
+    private fun loadFirewallRulesIfNeeded() {
+        if (FirewallManager.isFirewallRulesLoaded()) return
+
+        Log.i(LOG_TAG_VPN, "loading rules... waiting")
+        waitForFirewallRules()
+        if (!FirewallManager.isFirewallRulesLoaded()) {
+            notifyLoadFailure()
+        }
+    }
+
+    // Modified the logic of "Block connections when screen is locked".
+    // Earlier the screen lock is detected with receiver received for Action user_present/screen_off.
+    // Now the code only checks whether the KeyguardManager#isKeyguardLocked() is true/false.
+    // if isKeyguardLocked() is true, the connections will be blocked.
+    private fun isDeviceLocked(): Boolean {
+        if (!persistentState.screenState) return false
+
+        if (keyguardManager == null) {
+            keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        }
+        return (keyguardManager?.isKeyguardLocked == true)
+    }
+
+    private fun blockBackgroundData(): Boolean {
+        if (!persistentState.backgroundEnabled) return false
+        if (!accessibilityServiceFunctional()) {
+            if (DEBUG) Log.d(LOG_TAG_VPN,
+                             "App not in use is enabled but accessibility permission got disabled")
+            handleAccessibilityFailure()
+            return false
+        }
+        return true
+    }
+
+    private fun handleAccessibilityFailure() {
+        // Disable app not in use behaviour when the accessibility failure is detected.
+        persistentState.backgroundEnabled = false
+        showAccessibilityStoppedNotification()
+    }
+
+
+    private fun showAccessibilityStoppedNotification() {
+        if (isAccessibilityNotificationNotNeeded()) return
+
+        totalAccessibilityFailureNotifications += 1
+
+        if (DEBUG) Log.d(LOG_TAG_VPN, "App not in use failure, show notification")
+
+        val intent = Intent(this, FirewallActivity::class.java)
+        intent.putExtra(NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME,
+                        NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE)
+
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent,
+                                                      PendingIntent.FLAG_UPDATE_CURRENT)
+        var builder: NotificationCompat.Builder
+        if (VERSION.SDK_INT >= VERSION_CODES.O) {
+            val name: CharSequence = NOTIF_ACCESSIBILITY_FAILURE
+            val description = this.resources.getString(R.string.accessibility_notification_content)
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(NOTIF_ACCESSIBILITY_FAILURE, name, importance)
+            channel.description = description
+            notificationManager.createNotificationChannel(channel)
+            builder = NotificationCompat.Builder(this, NOTIF_ACCESSIBILITY_FAILURE)
+        } else {
+            builder = NotificationCompat.Builder(this, NOTIF_ACCESSIBILITY_FAILURE)
         }
 
-        //When the app is not in foreground.
-        if (!isLoadFirewallRulesCompleted) {
-            Thread.sleep((bgBlockWaitMs + remainingWaitMs))
+        val contentTitle: String = this.resources.getString(
+            R.string.accessibility_notification_title)
+        val contentText: String = this.resources.getString(
+            R.string.accessibility_notification_content)
+
+        builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(
+            pendingIntent).setContentText(contentText)
+
+        builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
+        builder.color = ContextCompat.getColor(this, getThemeAccent(this))
+
+        // Secret notifications are not shown on the lock screen.  No need for this app to show there.
+        // Only available in API >= 21
+        builder = builder.setVisibility(NotificationCompat.VISIBILITY_SECRET)
+
+        // Cancel the notification after clicking.
+        builder.setAutoCancel(true)
+
+        notificationManager.notify(NOTIF_ID_ACCESSIBILITY_FAILURE, builder.build())
+    }
+
+    private fun isAccessibilityNotificationNotNeeded(): Boolean {
+        // The check is to make sure the notification is not shown to the user
+        // more than twice.
+        if (totalAccessibilityFailureNotifications >= 2) {
+            return true
+        }
+        return false
+    }
+
+    private fun accessibilityServiceFunctional(): Boolean {
+        val now = elapsedRealtime()
+        // Added the INIT_TIME_MS check, encountered a bug during phone restart
+        // isAccessibilityServiceRunning default value(false) is passed instead of
+        // checking it from accessibility service for the first time.
+        if (accessibilityHearbeatTimestamp == INIT_TIME_MS || Math.abs(
+                now - accessibilityHearbeatTimestamp) > Constants.ACCESSIBILITY_SERVICE_HEARTBEAT_THRESHOLD_MS) {
+            accessibilityHearbeatTimestamp = now
+
+            isAccessibilityServiceFunctional = Utilities.isAccessibilityServiceEnabled(this,
+                                                                                       BackgroundAccessibilityService::class.java) && Utilities.isAccessibilityServiceEnabledViaSettingsSecure(
+                this, BackgroundAccessibilityService::class.java)
+        }
+        return isAccessibilityServiceFunctional
+    }
+
+    private fun notifyLoadFailure() {
+        if (isLoadFailureNotificationNotNeeded()) return
+
+        notificationCountForFirewallRules += 1
+
+        val mainActivityIntent = PendingIntent.getActivity(this, 0, Intent(this,
+                                                                           HomeScreenActivity::class.java),
+                                                           PendingIntent.FLAG_UPDATE_CURRENT)
+        if (VERSION.SDK_INT >= VERSION_CODES.O) {
+            val name: CharSequence = NOTIF_LOAD_RULES_FAIL
+            val description = resources.getString(R.string.rules_load_failure_heading)
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(NOTIF_LOAD_RULES_FAIL, name, importance)
+            channel.description = description
+            notificationManager.createNotificationChannel(channel)
+        }
+        var builder: NotificationCompat.Builder = NotificationCompat.Builder(this,
+                                                                             NOTIF_LOAD_RULES_FAIL)
+
+        val contentTitle = resources.getString(R.string.rules_load_failure_heading)
+        val contentText = resources.getString(R.string.rules_load_failure_desc)
+        builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(
+            mainActivityIntent).setContentText(contentText)
+        builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
+        builder.color = ContextCompat.getColor(this, getThemeAccent(this))
+        val openIntent = makeVpnIntent(this, NOTIF_ID_LOAD_RULES_FAIL,
+                                       Constants.NOTIF_ACTION_RULES_FAILURE)
+        val notificationAction: NotificationCompat.Action = NotificationCompat.Action(0,
+                                                                                      resources.getString(
+                                                                                          R.string.rules_load_failure_reload),
+                                                                                      openIntent)
+        builder.addAction(notificationAction)
+
+        // Secret notifications are not shown on the lock screen.  No need for this app to show there.
+        // Only available in API >= 21
+        builder = builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+
+        builder.build()
+        notificationManager.notify(NOTIF_ID_LOAD_RULES_FAIL, builder.build())
+
+    }
+
+    private fun isLoadFailureNotificationNotNeeded(): Boolean {
+        // The check is to make sure the notification is not shown to the user
+        // more than twice. Earlier notificationManager#activeNotifications was used
+        // which will return false when the user clears the notification from status bar.
+        if (notificationCountForFirewallRules >= 2) {
+            return true
+        }
+        return false
+    }
+
+    private fun waitForFirewallRules() {
+        // Adding the exponential calculation of wait time until we load the firewall
+        // rules. The other check of the block() method will be executed once we load
+        // the firewall rules
+        var remainingWaitMs = TimeUnit.SECONDS.toMillis(10)
+        var attempt = 0
+        while (remainingWaitMs > 0) {
+            Log.i(LOG_TAG_VPN,
+                  "isLoadFirewallRulesCompleted? ${FirewallManager.isFirewallRulesLoaded()}")
+            if (FirewallManager.isFirewallRulesLoaded()) {
+                break
+            }
+            remainingWaitMs = exponentialBackoff(remainingWaitMs, attempt)
+            attempt += 1
         }
     }
 
     private fun delayBeforeResponse() {
-        Thread.sleep(Constants.DELAY_FOR_BLOCK_RESPONSE)
+        Thread.sleep(Constants.DELAY_FIREWALL_RESPONSE_MS)
     }
 
-    //Exponential calculation - used for app not in use feature (thread wait)
-    private fun exp(base : Long, pow : Int) : Long {
-        return if(pow == 0){
-            base
-        }else{
-            (1 shl pow) * base
+    // ref: https://stackoverflow.com/a/363692
+    val baseWaitMs = TimeUnit.MILLISECONDS.toMillis(50)
+
+    private fun exponentialBackoff(remainingWaitMs: Long, attempt: Int): Long {
+        var tempRemainingWaitMs = remainingWaitMs
+        val exponent = exp(attempt)
+        val randomValue = rand.nextLong(exponent - baseWaitMs + 1) + baseWaitMs
+        val waitTimeMs = Math.min(randomValue, remainingWaitMs)
+        tempRemainingWaitMs -= waitTimeMs
+        Thread.sleep(waitTimeMs)
+        return tempRemainingWaitMs
+    }
+
+    private fun exp(pow: Int): Long {
+        return if (pow == 0) {
+            baseWaitMs
+        } else {
+            (1 shl pow) * baseWaitMs
         }
     }
 
     private fun killFirewalledApplication(uid: Int) {
-        if(DEBUG) Log.i(LOG_TAG, "$FILE_LOG_TAG Firewalled application trying to connect - Kill app is enabled - uid - $uid")
-        val activityManager: ActivityManager = this.getSystemService(Activity.ACTIVITY_SERVICE) as ActivityManager
+        if (DEBUG) Log.i(LOG_TAG_VPN,
+                         "Firewalled application trying to connect - Kill app is enabled - uid - $uid")
         GlobalScope.launch(Dispatchers.IO) {
-            val appUIDList = appInfoRepository.getAppListForUID(uid)
+            val appUIDList = FirewallManager.getPackageNamesByUid(uid)
             appUIDList.forEach {
-                if (!it.isSystemApp) {
-                    activityManager.killBackgroundProcesses(it.packageInfo)
-                    Log.i(LOG_TAG, "$FILE_LOG_TAG Application killed - $uid, ${it.packageInfo}")
-                } else {
-                    if(DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG System application is refrained from kill - $uid, ${it.packageInfo}")
-                }
+                if (DEBUG) Log.d(LOG_TAG_VPN, "app $uid / $it killed")
+                Utilities.killBg(activityManager, it)
             }
         }
     }
@@ -358,33 +521,24 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
      * Records the network transaction in local database
      * The logs will be shown in network monitor screen
      */
-    private fun sendConnTracking(ipDetails: IPDetails?) {
-        if(persistentState.logsEnabled) {
-            ipTracker.recordTransaction(ipDetails)
-        }
+    private fun connTrack(ipDetails: IPDetails?) {
+        ipTracker.recordTransaction(ipDetails)
     }
 
     /**
-     * Checks whether the connection is added in firewall rules.
+     * Checks whether the connection is added in firewall rules
      */
     private fun isUidBlocked(uid: Int): Boolean {
         return try {
-            FirewallManager.checkInternetPermission(uid)
+            FirewallManager.isUidFirewalled(uid)
         } catch (e: Exception) {
             false
         }
     }
 
     override fun getResolvers(): String {
-        val ips: MutableList<String?> = ArrayList()
-        val ipsList : MutableList<InetAddress> = ArrayList()
-        for (ip in ipsList) {
-            val address = ip.hostAddress
-            if (GoVpnAdapter.FAKE_DNS_IP != address) {
-                ips.add(address)
-            }
-        }
-        return TextUtils.join(",", ips)
+        // TODO: remove stub, unused
+        throw UnsupportedOperationException("stub method")
     }
 
     fun isOn(): Boolean {
@@ -394,47 +548,35 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
     fun newBuilder(): Builder {
         var builder = Builder()
 
-        if (VERSION.SDK_INT >= VERSION_CODES.Q) {
-            if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG isLockDownEnabled - ${this.isLockdownEnabled}, ${this.isAlwaysOn}")
-            if (!this.isLockdownEnabled) {
-                if (persistentState.allowByPass) {
-                    Log.i(LOG_TAG, "$FILE_LOG_TAG getAllowByPass - true")
-                    builder = builder.allowBypass()
-                }
-            }
+        if (!isVpnLockdownEnabled(this) && persistentState.allowByPass) {
+            Log.i(LOG_TAG_VPN, "getAllowByPass - true")
+            builder = builder.allowBypass()
         }
 
-        // Part of issue fix, internet connection showing metered even if its not the case.
-        // (apps lose connectivity during switch over Mobile Data from WiFi)
-        // Whenever the VPN is started the list which is stored in the ConnectionCapabilityMonitor
-        // class is set for the underlying networks.
-        builder.setUnderlyingNetworks(connectionCapabilityMonitor?.getNetworkList()?.toTypedArray())
+        // underlying networks is set to null, which prompts Android to set it to whatever is the
+        // current active network. Later, ConnectionMonitor#onVpnStarted, depending on user
+        // chosen preferences, sets appropriate underlying network/s.
+        builder.setUnderlyingNetworks(null)
 
-        //Fix - Cloud Backups were failing thinking that the VPN connection is metered.
-        //The below code will fix that.
+        // Fix - Cloud Backups were failing thinking that the VPN connection is metered.
+        // The below code will fix that.
         if (VERSION.SDK_INT >= VERSION_CODES.Q) {
             builder.setMetered(false)
         }
 
         if (VERSION.SDK_INT >= VERSION_CODES.Q) {
-            if (!this.isLockdownEnabled && (persistentState.orbotEnabledMode ==
-                                Constants.ORBAT_MODE_HTTP || persistentState.orbotEnabledMode == Constants.ORBAT_MODE_BOTH)) {
-                getHttpProxyInfo()?.let { builder.setHttpProxy(it) }
-            }
-
-            if (persistentState.httpProxyEnabled) {
+            if (!this.isLockdownEnabled && (appMode.isHttpProxyTypeEnabled())) {
                 getHttpProxyInfo()?.let { builder.setHttpProxy(it) }
             }
         }
 
         try {
-            // Workaround for any app incompatibility bugs.
-            //TODO : As of now the wifi  packages are considered for blocking the entire traffic
+            val excludedApps = FirewallManager.getExcludedApps()
             if (appMode.getFirewallMode() == Settings.BlockModeSink) {
-                if (persistentState.excludedPackagesWifi.isEmpty()) {
+                if (excludedApps.isEmpty()) {
                     builder.addAllowedApplication("")
                 } else {
-                    for (packageName in persistentState.excludedPackagesWifi) {
+                    for (packageName in excludedApps) {
                         builder = builder.addAllowedApplication(packageName)
                     }
                 }
@@ -443,139 +585,145 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
                    In case of lockdown mode, the excluded apps wont able to connected. so
                    not including the apps in the excluded list if the lockdown mode is
                    enabled. */
-                val excludedApps = persistentState.excludedAppsFromVPN
-                if (VERSION.SDK_INT >= VERSION_CODES.Q) {
-                    if (!this.isLockdownEnabled) {
-                        excludedApps.forEach {
-                            builder = builder.addDisallowedApplication(it)
-                            Log.i(LOG_TAG, "$FILE_LOG_TAG Excluded package - $it")
-                        }
-                    }else{
-                        Log.i(LOG_TAG, "$FILE_LOG_TAG lockdown mode enabled, Ignoring apps to exclude")
-                    }
-                }else{
+                if (!isVpnLockdownEnabled(this)) {
                     excludedApps.forEach {
                         builder = builder.addDisallowedApplication(it)
-                        Log.i(LOG_TAG, "$FILE_LOG_TAG Excluded package - $it")
+                        Log.i(LOG_TAG_VPN, "Excluded package - $it")
                     }
                 }
                 builder = builder.addDisallowedApplication(this.packageName)
             }
-            Log.i(LOG_TAG, "$FILE_LOG_TAG Proxy mode set to Socks5 ${appMode.getProxyMode()}")
-            if (appMode.getProxyMode() == Settings.ProxyModeSOCKS5) {
-                //For Socks5 if there is a app selected, add that app in excluded list
-
+            Log.i(LOG_TAG_VPN, "Proxy mode set to Socks5 ${appMode.getProxyMode()}")
+            if (appMode.isCustomSocks5()) {
+                // For Socks5 if there is a app selected, add that app in excluded list
                 val socks5ProxyEndpoint = socks5ProxyEndpointRepository.getConnectedProxy()
-                if (socks5ProxyEndpoint != null) {
-                    if (!socks5ProxyEndpoint.proxyAppName.isNullOrEmpty() && socks5ProxyEndpoint.proxyAppName != "Nobody") {
-                        Log.i(LOG_TAG, "$FILE_LOG_TAG Proxy mode set to Socks5 with the app - ${socks5ProxyEndpoint.proxyAppName!!}- added to excluded list")
-                        builder = builder.addDisallowedApplication(socks5ProxyEndpoint.proxyAppName!!)
-                    }
-                } else {
-                    Log.i(LOG_TAG, "$FILE_LOG_TAG Proxy mode not set to Socks5 with the app - null - added to excluded list")
-                }
-            }
-            if (VERSION.SDK_INT >= VERSION_CODES.Q) {
-                if (!this.isLockdownEnabled) {
-                    if (appMode.getProxyMode() == Constants.ORBOT_SOCKS) {
-                        builder = builder.addDisallowedApplication(OrbotHelper.ORBOT_PACKAGE_NAME)
-                    }
+                val appName = socks5ProxyEndpoint?.proxyAppName
+                Log.i(LOG_TAG_VPN,
+                      "Proxy mode - Socks5 is selected - $socks5ProxyEndpoint, with app name - $appName")
+                if (isExcludePossible(appName, getString(R.string.socks5_proxy_toast_parameter))) {
+                    // Asserting the appName as there is null check above.
+                    builder = builder.addDisallowedApplication(appName!!)
                 }
             }
 
-            if (appMode.getDNSType() == 3) {
-                try {
-                    //For DNS proxy mode, if any app is set then exclude the application from the list
-                    val dnsProxyEndpoint = dnsProxyEndpointRepository.getConnectedProxy()
-                    if (!dnsProxyEndpoint.proxyAppName.isNullOrEmpty() && dnsProxyEndpoint.proxyAppName != "Nobody") {
-                        Log.i(LOG_TAG, "$FILE_LOG_TAG DNS Proxy mode is set with the app - ${dnsProxyEndpoint.proxyAppName!!}- added to excluded list")
-                        builder = builder.addDisallowedApplication(dnsProxyEndpoint.proxyAppName!!)
-                    } else {
-                        Log.i(LOG_TAG, "$FILE_LOG_TAG DNS Proxy mode is set with the app - ${dnsProxyEndpoint.proxyAppName!!}- added to excluded list")
-                    }
-                }catch (e : Exception){
-                    Log.w(LOG_TAG,"Exception while excluding the proxy app from VPN")
+            if (appMode.isOrbotProxy() && isExcludePossible(getString(R.string.orbot),
+                                                    getString(R.string.orbot_toast_parameter))) {
+                builder = builder.addDisallowedApplication(OrbotHelper.ORBOT_PACKAGE_NAME)
+            }
+
+            if (appMode.isDnsProxy()) {
+                // For DNS proxy mode, if any app is set then exclude the application from the list
+                val dnsProxyEndpoint = appMode.getConnectedProxyDetails()
+                val appName = dnsProxyEndpoint.proxyAppName
+                Log.i(LOG_TAG_VPN, "DNS Proxy mode is set with the app name as $appName")
+                if (isExcludePossible(appName, getString(R.string.dns_proxy_toast_parameter))) {
+                    // Asserting the appName as there is null check above.
+                    builder = builder.addDisallowedApplication(appName!!)
                 }
             }
 
         } catch (e: PackageManager.NameNotFoundException) {
-            Log.e(LOG_TAG, "$FILE_LOG_TAG Failed to exclude an app", e)
+            Log.w(LOG_TAG_VPN, "cannot exclude the dns proxy app", e)
         }
         return builder
+    }
+
+    private fun isExcludePossible(appName: String?, message: String): Boolean {
+        if (isVpnLockdownEnabled(this)) {
+            Log.i(LOG_TAG_VPN, "Vpn in lockdown mode")
+            showToastUiCentered(this,
+                                getString(R.string.dns_proxy_connection_failure_lockdown, appName,
+                                          message), Toast.LENGTH_SHORT)
+            return false
+        }
+        return (appName?.equals(getString(R.string.settings_app_list_default_app)) == false)
     }
 
 
     override fun onCreate() {
         connTracer = ConnectionTracer(this)
-        vpnController!!.setBraveVpnService(this)
-        setPrivateDNSOverrideFromPref()
+        VpnController.setBraveVpnService(this)
     }
 
-    private fun setPrivateDNSOverrideFromPref() {
-        privateDNSOverride = persistentState.allowPrivateDNS
-    }
-
-    private fun getHttpProxyInfo() : ProxyInfo?{
+    private fun getHttpProxyInfo(): ProxyInfo? {
         val proxyInfo: ProxyInfo?
         val host = persistentState.httpProxyHostAddress
         val port = persistentState.httpProxyPort
-        Log.i(LOG_TAG, "$FILE_LOG_TAG Http proxy enabled - builder updated with $host, $port")
-        if (host.isNotEmpty() && port != 0) {
+        Log.i(LOG_TAG_VPN, "Http proxy enabled - builder updated with $host, $port")
+        if (host.isNotEmpty() && port != INVALID_PORT) {
             proxyInfo = ProxyInfo.buildDirectProxy(host, port)
-            Log.i(LOG_TAG, "$FILE_LOG_TAG Http proxy enabled - builder updated with $host, $port")
             return proxyInfo
-        }else{
-            Log.i(LOG_TAG, "$FILE_LOG_TAG Http proxy enabled - else part builder updated with $host, $port")
         }
         return null
     }
 
-    private fun registerReceiversForScreenState() {
-        if(DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Registering for the intent filter for ACTION_SCREEN_OFF,ON and USER_PRESENT")
-        val actionFilter = IntentFilter()
-        actionFilter.addAction(Intent.ACTION_SCREEN_OFF)
-        actionFilter.addAction(Intent.ACTION_USER_PRESENT)
-        actionFilter.addAction(Intent.ACTION_SCREEN_ON)
-        registerReceiver(braveScreenStateReceiver, actionFilter)
-    }
-
-    private fun registerReceiverForBootComplete() {
-        val autoStartFilter = IntentFilter()
-        autoStartFilter.addAction(Intent.ACTION_BOOT_COMPLETED)
-        registerReceiver(braveAutoStartReceiver, autoStartFilter)
-    }
-
-
-    private fun updateBuilder(context: Context): NotificationCompat.Builder {
-        val mainActivityIntent = PendingIntent.getActivity(context, 0, Intent(context, HomeScreenActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT)
+    private fun updateNotificationBuilder(context: Context): NotificationCompat.Builder {
+        val mainActivityIntent = PendingIntent.getActivity(context, 0, Intent(context,
+                                                                              HomeScreenActivity::class.java),
+                                                           PendingIntent.FLAG_UPDATE_CURRENT)
         var builder: NotificationCompat.Builder
         if (VERSION.SDK_INT >= VERSION_CODES.O) {
             val name: CharSequence = context.resources.getString(R.string.app_name)
             val description = context.resources.getString(R.string.notification_content)
-            // LOW is the lowest importance that is allowed with startForeground in Android O.
+            // LOW is the lowest importance that is allowed with startForeground in Android O
             val importance = NotificationManager.IMPORTANCE_LOW
             val channel = NotificationChannel(MAIN_CHANNEL_ID, name, importance)
             channel.description = description
-            val notificationManager = context.getSystemService(NotificationManager::class.java)
-            notificationManager?.createNotificationChannel(channel)
+            notificationManager.createNotificationChannel(channel)
             builder = NotificationCompat.Builder(context, MAIN_CHANNEL_ID)
         } else {
             builder = NotificationCompat.Builder(context, MAIN_CHANNEL_ID)
         }
 
-        val contentTitle: String = when(braveMode){
-            0 -> context.resources.getString(R.string.dns_mode_notification_title)
-            1 -> context.resources.getString(R.string.firewall_mode_notification_title)
-            2 -> context.resources.getString(R.string.hybrid_mode_notification_title)
+        val contentTitle: String = when (appMode.getBraveMode()) {
+            Constants.APP_MODE_DNS -> context.resources.getString(
+                R.string.dns_mode_notification_title)
+            Constants.APP_MODE_FIREWALL -> context.resources.getString(
+                R.string.firewall_mode_notification_title)
+            Constants.APP_MODE_DNS_FIREWALL -> context.resources.getString(
+                R.string.hybrid_mode_notification_title)
             else -> context.resources.getString(R.string.notification_title)
         }
 
-        builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(mainActivityIntent)
+        builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(
+            mainActivityIntent)
 
-        // v053d - New action button in the notification, STOP - stops the VPN service.
-        val openIntent = getBraveVPNIntent(context)
-        val notificationAction: NotificationCompat.Action = NotificationCompat.Action(0, context.resources.getString(R.string.notification_action_stop_vpn), openIntent)
-        builder.addAction(notificationAction)
+        // New action button options in the notification
+        // 1. STOP action button.
+        // 2. RethinkDNS modes (DNS & DNS+Firewall mode)
+        // 3. No action button.
+        if (DEBUG) Log.d(LOG_TAG_VPN, "Notification - ${persistentState.notificationAction}")
+        builder.color = ContextCompat.getColor(this, getThemeAccent(this))
+        when (persistentState.notificationAction) {
+            Constants.NOTIFICATION_ACTION_STOP -> {
+                val openIntent = makeVpnIntent(context, NOTIF_ACTION_MODE_STOP,
+                                               Constants.NOTIF_ACTION_STOP_VPN)
+                val notificationAction: NotificationCompat.Action = NotificationCompat.Action(0,
+                                                                                              context.resources.getString(
+                                                                                                  R.string.notification_action_stop_vpn),
+                                                                                              openIntent)
+                builder.addAction(notificationAction)
+            }
+            Constants.NOTIFICATION_ACTION_DNS_FIREWALL -> {
+                val openIntent1 = makeVpnIntent(context, NOTIF_ACTION_MODE_DNS_ONLY,
+                                                Constants.NOTIF_ACTION_DNS_VPN)
+                val openIntent2 = makeVpnIntent(context, NOTIF_ACTION_MODE_DNS_FIREWALL,
+                                                Constants.NOTIF_ACTION_DNS_FIREWALL_VPN)
+                val notificationAction: NotificationCompat.Action = NotificationCompat.Action(0,
+                                                                                              context.resources.getString(
+                                                                                                  R.string.notification_action_dns_mode),
+                                                                                              openIntent1)
+                val notificationAction2: NotificationCompat.Action = NotificationCompat.Action(0,
+                                                                                               context.resources.getString(
+                                                                                                   R.string.notification_action_dns_firewall_mode),
+                                                                                               openIntent2)
+                builder.addAction(notificationAction)
+                builder.addAction(notificationAction2)
+            }
+            Constants.NOTIFICATION_ACTION_NONE -> {
+                Log.i(LOG_TAG_VPN, "No notification action")
+            }
+        }
 
         // Secret notifications are not shown on the lock screen.  No need for this app to show there.
         // Only available in API >= 21
@@ -584,114 +732,101 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
         return builder
     }
 
-
-    private fun getBraveVPNIntent(context: Context): PendingIntent? {
+    private fun makeVpnIntent(context: Context, notificationID: Int,
+                              intentExtra: String): PendingIntent? {
         val intentAction = Intent(context, NotificationActionReceiver::class.java)
-        intentAction.putExtra(Constants.NOTIFICATION_ACTION, Constants.VPN_NOTIFICATION_ACTION)
-        return PendingIntent.getBroadcast(context, 1, intentAction, PendingIntent.FLAG_UPDATE_CURRENT)
+        intentAction.putExtra(Constants.NOTIFICATION_ACTION, intentExtra)
+        return PendingIntent.getBroadcast(context, notificationID, intentAction,
+                                          PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        notificationManager = this.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        activityManager = this.getSystemService(ACTIVITY_SERVICE) as ActivityManager
+        accessibilityManager = this.getSystemService(ACCESSIBILITY_SERVICE) as AccessibilityManager
+        keyguardManager = this.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+
         vpnScope.launch {
-            loadAppFirewallRules()
+            FirewallManager.loadAppFirewallRules()
         }
-        appInfoRepository.getUIDForUnivWhiteList().observeForever { appInfoList ->
-            appWhiteList = appInfoList.associateBy({ it }, { true }).toMutableMap()
+
+        if (appMode.isOrbotProxyEnabled()) {
+            get<OrbotHelper>().startOrbot(appMode.getProxyType())
         }
-        if(persistentState.orbotEnabledMode != Constants.ORBAT_MODE_NONE){
-            get<OrbotHelper>().startOrbot(this)
-        }
-        blockUDPTraffic = persistentState.udpBlockedSettings
-        privateDNSOverride = persistentState.allowPrivateDNS
-        isScreenLocked = persistentState.getScreenLockData()
-        isBackgroundEnabled = false
         if (persistentState.backgroundEnabled) {
-            if (Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)) {
-                isBackgroundEnabled = Utilities.isAccessibilityServiceEnabled(this, BackgroundAccessibilityService::class.java)
-                HomeScreenActivity.GlobalVariable.isBackgroundEnabled = isBackgroundEnabled
-            }
+            registerAccessibilityServiceState()
         }
-        privateDNSOverride = persistentState.allowPrivateDNS
+        synchronized(VpnController) {
+            VpnController.onConnectionStateChanged(State.NEW)
 
-        registerAccessibilityServiceState()
-        registerReceiversForScreenState()
-        registerReceiverForBootComplete()
-        if (vpnController != null) {
-            synchronized(vpnController) {
-                if(DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Registering the shared pref changes with the vpn service")
-                persistentState.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+            if (DEBUG) Log.d(LOG_TAG_VPN,
+                             "Registering the shared pref changes with the vpn service")
+            persistentState.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
 
-                if (connectionCapabilityMonitor != null) {
-                    spawnServerUpdate()
-                    return Service.START_REDELIVER_INTENT
-                }
-
-                // Register for ConnectivityManager
-                connectionCapabilityMonitor = ConnectionCapabilityMonitor(this, this)
-
-                // Part of issue fix(#242) - StartVPN thread that for some reason is waiting
-                // Avoiding the call from ConnectivityManager to invoke startVPN is removed.
-                // RestartVPN is executed when the VPNService - onStartCommand is called.
-                // Added as part of testing.
-                restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
-
-                // Mark this as a foreground service.  This is normally done to ensure that the service
-                // survives under memory pressure.  Since this is a VPN service, it is presumably protected
-                // anyway, but the foreground service mechanism allows us to set a persistent notification,
-                // which helps users understand what's going on, and return to the app if they want.
-
-                val builder = updateBuilder(this)
-                Log.i(LOG_TAG, "$FILE_LOG_TAG onStart command - start as foreground service. ")
-                startForeground(SERVICE_ID, builder.build())
-                updateQuickSettingsTile()
-                persistentState.vpnEnabled = true
+            // In case if the service already running(connectionMonitor will not be null)
+            // and onStartCommand is called then no need to process the below initializations
+            // instead call spawnServerUpdate()
+            // spawnServerUpdate() - Will overwrite the tunnel values with new values.
+            if (connectionMonitor != null) {
+                spawnServerUpdate()
+                return Service.START_REDELIVER_INTENT
             }
-        } else {
-            Log.i(LOG_TAG, "$FILE_LOG_TAG onStart command not initiated - vpnController is null ")
+
+            // Register for ConnectivityManager
+            // FIXME #200 - Move it to Koin
+            connectionMonitor = ConnectionMonitor(this, this)
+
+            restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
+
+            // Mark this as a foreground service.  This is normally done to ensure that the service
+            // survives under memory pressure.  Since this is a VPN service, it is presumably protected
+            // anyway, but the foreground service mechanism allows us to set a persistent notification,
+            // which helps users understand what's going on, and return to the app if they want.
+
+            val builder = updateNotificationBuilder(this)
+            Log.i(LOG_TAG_VPN, "onStart command - start as foreground service. ")
+            startForeground(SERVICE_ID, builder.build())
+            persistentState.setVpnEnabled(true)
+            updateQuickSettingsTile()
+            connectionMonitor?.onVpnStarted()
         }
         return Service.START_REDELIVER_INTENT
     }
 
-    private suspend fun loadAppFirewallRules() {
-        withContext(Dispatchers.IO) {
-            val appDetailsFromDB = appInfoRepository.getAppInfoAsync()
-            appDetailsFromDB.forEach {
-                HomeScreenActivity.GlobalVariable.appList[it.packageInfo] = it
-                if (!it.isInternetAllowed) {
-                    HomeScreenActivity.GlobalVariable.blockedUID[it.uid] = false
-                }
+
+    private fun registerAccessibilityServiceState() {
+        accessibilityListener = AccessibilityManager.AccessibilityStateChangeListener { b ->
+            if (!b) {
+                persistentState.backgroundEnabled = false
+                handleAccessibilityFailure()
             }
-            isLoadFirewallRulesCompleted = true
         }
     }
 
-    private fun registerAccessibilityServiceState() {
-        val am = getSystemService(ACCESSIBILITY_SERVICE) as AccessibilityManager
-        am.addAccessibilityStateChangeListener { b ->
-            val isServiceEnabled = Utilities.isAccessibilityServiceEnabledEnhanced(
-                this,
-                BackgroundAccessibilityService::class.java
-            )
-            if (!b || !isServiceEnabled) {
-                isBackgroundEnabled = false
-                persistentState.setIsBackgroundEnabled(false)
-            }
+    private fun unregisterAccessibilityServiceState() {
+        accessibilityListener?.let {
+            accessibilityManager.removeAccessibilityStateChangeListener(it)
         }
     }
 
     private fun spawnServerUpdate() {
-        if (vpnController != null) {
-            synchronized(vpnController) {
-                if (connectionCapabilityMonitor != null) {
-                    Thread({ updateServerConnection() }, "updateServerConnection-onStartCommand").start()
-                }
+        synchronized(VpnController) {
+            // Connection monitor can be null if onDestroy() of service
+            // is called, in that case no need to call updateServerConnection()
+            if (connectionMonitor != null) {
+                Thread({ updateServerConnection() },
+                       "updateServerConnection-onStartCommand").start()
+            } else {
+                Log.w(LOG_TAG_VPN, "cannot spawn sever update, no connection monitor")
             }
         }
     }
 
     @WorkerThread
     private fun updateServerConnection() {
-        vpnAdapter?.updateDohUrl(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
+        vpnAdapter?.updateDohUrl(appMode.getDNSMode(), appMode.getFirewallMode(),
+                                 appMode.getProxyMode())
+        handleAdapterChange()
     }
 
     fun recordTransaction(transaction: Transaction) {
@@ -699,138 +834,118 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
         // All the transactions are recorded in the DNS logs.
         // Quantile estimation correction - Not adding the transactions with server IP
         // as null in the quantile estimator.
-        if(!transaction.serverIp.isNullOrEmpty()) {
-            tracker.recordTransaction(transaction)
-        }
-        if(persistentState.logsEnabled) {
-            dnsLogTracker.recordTransaction(transaction)
+        if (!transaction.serverIp.isNullOrEmpty()) {
+            dnsLatencyTracker.recordTransaction(transaction)
         }
 
-        if (DEBUG) Log.d(LOG_TAG, "$FILE_LOG_TAG Record Transaction: status- ${transaction.status}")
-        if (DEBUG) Log.d(LOG_TAG,"$FILE_LOG_TAG Blocklist - ${transaction.blockList}")
+        dnsLogTracker.recordTransaction(transaction)
+
+        if (DEBUG) Log.d(LOG_TAG_VPN,
+                         "Record Transaction: status as ${transaction.status} with blocklist ${transaction.blocklist}")
         // Update the connection state.  If the transaction succeeded, then the connection is working.
         // If the transaction failed, then the connection is not working.
         // If the transaction was canceled, then we don't have any new information about the status
         // of the connection, so we don't send an update.
         // commented the code for reporting good or bad network.
+        // Connection state will be unknown if the transaction is blocked locally in that case,
+        // transaction status will be set as complete. So introduced check while
+        // setting the connection state.
         if (transaction.status === Transaction.Status.COMPLETE) {
-            vpnController!!.onConnectionStateChanged(this, State.WORKING)
-
+            if (isLocallyResolved(transaction)) return
+            VpnController.onConnectionStateChanged(State.WORKING)
         } else if (transaction.status !== Transaction.Status.CANCELED) {
-            vpnController!!.onConnectionStateChanged(this, State.FAILING)
+            VpnController.onConnectionStateChanged(State.FAILING)
         }
+    }
+
+    private fun isLocallyResolved(transaction: Transaction): Boolean {
+        return transaction.serverIp.isNullOrEmpty()
     }
 
     private fun setCryptMode() {
-        vpnAdapter!!.setCryptMode()
+        vpnAdapter?.setCryptMode()
     }
 
+    // FIXME #305 - All the code related to the tunnel should go through the handler.
     override fun onSharedPreferenceChanged(preferences: SharedPreferences?, key: String?) {
-        /*TODO Check on the Persistent State variable
-            Check on updating the values for Package change and for mode change.
-           As of now handled manually*/
-        if ((PersistentState.BRAVE_MODE == key) && vpnAdapter != null) {
-            restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
-
-            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            val builder = updateBuilder(this)
-            notificationManager.notify(SERVICE_ID, builder.build())
-        }
-
-
-        if (PersistentState.DNS_TYPE == key) {
-            Log.i(LOG_TAG, "$FILE_LOG_TAG DNSType- ${appMode.getDNSType()}")
-
-            /**
-             * The code has been modified to restart the VPN service when there is a
-             * change in the DNS Type. Earlier the restart of the VPN is performed
-             * when the mode is changed to DNS Proxy, now the code is modified in
-             * such a way that, the restart is performed when there mode is Crypt/Proxy
-             */
-            if (appMode.getDNSType() == 3) {
-                restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
-            } else {
-                if (appMode.getDNSType() == 2) {
-                    setCryptMode()
+        /* TODO Check on the Persistent State variable
+           Check on updating the values for Package change and for mode change.
+           As of now handled manually */
+        Log.i(LOG_TAG_VPN,
+              "SharedPref value for $key: ${appMode.getDNSMode()}, with " + "notification action: ${persistentState.notificationAction}, proxy: ${appMode.getProxyMode()}")
+        when (key) {
+            PersistentState.BRAVE_MODE -> {
+                if (vpnAdapter == null) {
+                    Log.i(LOG_TAG_VPN,
+                          "vpnAdapter is null nothing to do on firewall/dns mode changes")
+                    return
                 }
+
+                restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
+                val builder = updateNotificationBuilder(this)
+                notificationManager.notify(SERVICE_ID, builder.build())
+            }
+            PersistentState.EXCLUDE_FROM_VPN -> {
+                restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
+            }
+            PersistentState.LOCAL_BLOCK_LIST -> {
                 spawnServerUpdate()
             }
-        }
-
-        if (PersistentState.PROXY_MODE == key) {
-            Log.i(LOG_TAG, "$FILE_LOG_TAG PROXY_MODE- ${appMode.getProxyMode()}")
-            restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
-        }
-
-        if (PersistentState.CONNECTION_CHANGE == key) {
-            Log.i(LOG_TAG, "$FILE_LOG_TAG CONNECTION_CHANGE- ${appMode.getDNSMode()}")
-            spawnServerUpdate()
-        }
-
-        if (PersistentState.DNS_PROXY_ID == key) {
-            Log.i(LOG_TAG, "$FILE_LOG_TAG DNS PROXY CHANGE- ${appMode.getDNSMode()}")
-            restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
-        }
-
-        if (PersistentState.EXCLUDE_FROM_VPN == key) {
-            Log.i(LOG_TAG, "$FILE_LOG_TAG EXCLUDE_FROM_VPN - restartVpn- ${appMode.getDNSMode()}")
-            restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
-        }
-
-        if (PersistentState.IS_SCREEN_OFF == key) {
-            isScreenLocked = persistentState.getScreenLockData()
-            Log.i(LOG_TAG, "$FILE_LOG_TAG preference for screen off mode is modified - $isScreenLocked")
-        }
-
-        if (PersistentState.BACKGROUND_MODE == key) {
-            isBackgroundEnabled = persistentState.backgroundEnabled && Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
-            Log.i(LOG_TAG, "$FILE_LOG_TAG preference for background mode is modified - $isBackgroundEnabled")
-        }
-        if (PersistentState.BLOCK_UNKNOWN_CONNECTIONS == key) {
-            Log.i(LOG_TAG, "$FILE_LOG_TAG preference for block unknown connections is modified")
-            blockUnknownConnection = persistentState.blockUnknownConnections
-        }
-
-        if (PersistentState.LOCAL_BLOCK_LIST == key) {
-            Log.i(LOG_TAG, "$FILE_LOG_TAG preference for local block list is changed - restart vpn")
-            spawnServerUpdate()
-        }
-
-        if (PersistentState.LOCAL_BLOCK_LIST_STAMP == key) {
-            Log.i(LOG_TAG, "$FILE_LOG_TAG configuration stamp for local block list is changed- restart vpn")
-            spawnServerUpdate()
-        }
-
-        if (PersistentState.ALLOW_BYPASS == key) {
-            Log.i(LOG_TAG, "$FILE_LOG_TAG preference for allow by pass is changed - restart vpn")
-            restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
-        }
-
-        if (PersistentState.PRIVATE_DNS == key) {
-            privateDNSOverride = persistentState.allowPrivateDNS
-        }
-
-        if (PersistentState.HTTP_PROXY_ENABLED == key) {
-            Log.i(LOG_TAG, "$FILE_LOG_TAG preference for http proxy is changed - restart vpn")
-            restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
-        }
-
-        if (PersistentState.BLOCK_UDP_OTHER_THAN_DNS == key) {
-            blockUDPTraffic = persistentState.udpBlockedSettings
-        }
-
-        if(PersistentState.ORBOT_MODE_CHANGE == key){
-            Log.i(LOG_TAG, "$FILE_LOG_TAG ORBOT proxy change - restart vpn ${appMode.getProxyMode()}")
-            restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
+            PersistentState.BACKGROUND_MODE -> {
+                if (persistentState.backgroundEnabled) {
+                    registerAccessibilityServiceState()
+                } else {
+                    unregisterAccessibilityServiceState()
+                }
+            }
+            PersistentState.LOCAL_BLOCK_LIST_STAMP -> {
+                spawnServerUpdate()
+            }
+            PersistentState.DNS_CHANGE -> {
+                /*
+                 * Handles the DNS type changes.
+                 * DNS Proxy - Requires restart of the VPN.
+                 * DNSCrypt - Set the tunnel with DNSCrypt mode once the live servers size is not 0.
+                 * DOH - Overwrites the tunnel values with new values.
+                 */
+                when (appMode.getDNSType()) {
+                    PREF_DNS_MODE_PROXY -> {
+                        restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(),
+                                   appMode.getProxyMode())
+                    }
+                    PREF_DNS_MODE_DNSCRYPT -> {
+                        setCryptMode()
+                    }
+                    else -> {
+                        spawnServerUpdate()
+                    }
+                }
+            }
+            PersistentState.DNS_RELAYS -> {
+                setCryptMode()
+            }
+            PersistentState.ALLOW_BYPASS -> {
+                restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
+            }
+            PersistentState.PROXY_TYPE -> {
+                restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
+            }
+            PersistentState.NETWORK -> {
+                connectionMonitor?.onUserPreferenceChanged()
+            }
+            PersistentState.NOTIFICATION_ACTION -> {
+                val builder = updateNotificationBuilder(this)
+                notificationManager.notify(SERVICE_ID, builder.build())
+            }
         }
     }
 
     fun signalStopService(userInitiated: Boolean) {
+        persistentState.setVpnEnabled(false)
         if (!userInitiated) {
             val vibrationPattern = longArrayOf(1000) // Vibrate for one second.
             // Show revocation warning
             val builder: NotificationCompat.Builder
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             if (VERSION.SDK_INT >= VERSION_CODES.O) {
                 val name: CharSequence = getString(R.string.warning_channel_name)
                 val description = getString(R.string.warning_channel_description)
@@ -845,20 +960,21 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
                 builder = NotificationCompat.Builder(this, WARNING_CHANNEL_ID)
                 builder.setVibrate(vibrationPattern)
             }
-            val mainActivityIntent = PendingIntent.getActivity(this, 0, Intent(this, HomeScreenActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT)
-            builder.setSmallIcon(R.drawable.dns_icon)
-                .setContentTitle(resources.getText(R.string.warning_title))
-                .setContentText(resources.getText(R.string.notification_content))
-                .setContentIntent(mainActivityIntent)
+            val mainActivityIntent = PendingIntent.getActivity(this, 0, Intent(this,
+                                                                               HomeScreenActivity::class.java),
+                                                               PendingIntent.FLAG_UPDATE_CURRENT)
+            builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(
+                resources.getText(R.string.warning_title)).setContentText(
+                resources.getText(R.string.notification_content)).setContentIntent(
+                mainActivityIntent)
                 // Open the main UI if possible.
                 .setAutoCancel(true)
             notificationManager.notify(0, builder.build())
         }
-        //persistentState.orbotEnabled = false
         stopVpnAdapter()
         stopSelf()
 
-        Log.i(LOG_TAG, "$FILE_LOG_TAG Stop Foreground")
+        Log.i(LOG_TAG_VPN, "Stop Foreground")
         updateQuickSettingsTile()
     }
 
@@ -869,114 +985,92 @@ class BraveVPNService : VpnService(), ConnectionCapabilityMonitor.NetworkListene
     }
 
     private fun stopVpnAdapter() {
-        if(persistentState.getOrbotModePersistence() != Constants.ORBAT_MODE_NONE)
-            get<OrbotHelper>().unregisterReceiver(this)
-        if (vpnController != null) {
-            synchronized(vpnController) {
-                if (vpnAdapter != null) {
-                    vpnAdapter!!.close()
-                    vpnAdapter = null
-                    vpnController.stop(this)
-                    vpnController.getState().activationRequested = false
-                    persistentState.vpnEnabled = false
-                    vpnController.onConnectionStateChanged(this, null)
-                    Log.e(LOG_TAG, "$FILE_LOG_TAG Stop Called - stopVpnAdapter closed all states")
-                }
+        synchronized(VpnController) {
+            if (vpnAdapter != null) {
+                vpnAdapter?.close()
+                vpnAdapter = null
+                Log.i(LOG_TAG_VPN, "Stop vpn adapter/controller")
             }
-        } else {
-            Log.e(LOG_TAG, "$FILE_LOG_TAG Stop Called with VPN Controller as null")
         }
     }
 
     private fun restartVpn(dnsModeL: Long, firewallModeL: Long, proxyMode: Long) {
-        isBackgroundEnabled = persistentState.backgroundEnabled &&
-            Utilities.isAccessibilityServiceEnabledEnhanced(this, BackgroundAccessibilityService::class.java)
-        if (vpnController != null) {
-            synchronized(vpnController) {
-                Thread({
-                    // Attempt seamless hand off as described in the docs for VpnService.Builder.establish().
-                    val oldAdapter: GoVpnAdapter? = vpnAdapter
-                    vpnAdapter = makeVpnAdapter()
-                    oldAdapter?.close()
-                    if (vpnAdapter != null) {
-                        vpnAdapter!!.start(dnsModeL, firewallModeL, proxyMode)
-                    } else {
-                        Log.i(LOG_TAG, String.format("$FILE_LOG_TAG Restart failed"))
-                    }
-                }, "restartvpn-onCommand").start()
-            }
-        } else {
-            Log.i("VpnService", String.format("$FILE_LOG_TAG vpnController is null"))
+        synchronized(VpnController) {
+            Thread({
+                // Attempt seamless hand off as described in the docs for VpnService.Builder.establish().
+                val oldAdapter: GoVpnAdapter? = vpnAdapter
+                vpnAdapter = makeVpnAdapter()
+                oldAdapter?.close()
+                Log.i(LOG_TAG_VPN, "restartVpn? ${vpnAdapter != null}")
+                if (vpnAdapter != null) {
+                    vpnAdapter?.start(dnsModeL, firewallModeL, proxyMode)
+                    handleAdapterChange()
+                } else {
+                    signalStopService(false)
+                }
+            }, "restartvpn-onCommand").start()
+        }
+    }
+
+    private fun handleAdapterChange() {
+        if (vpnAdapter?.hasTunnel() == false) {
+            VpnController.onConnectionStateChanged(State.FAILING)
         }
     }
 
     private fun makeVpnAdapter(): GoVpnAdapter? {
-        return GoVpnAdapter.establish(this, get(), get(), get(), get(), get())
+        return GoVpnAdapter.establish(this, get(), get())
     }
 
+    // TODO: #294 - Figure out a way to show users that the device is offline instead of status as failing.
     override fun onNetworkDisconnected() {
+        Log.i(LOG_TAG_VPN,
+              "#onNetworkDisconnected: Underlying networks set to null, controller-state set to failing")
         setUnderlyingNetworks(null)
-        vpnController!!.onConnectionStateChanged(this, State.FAILING)
+        VpnController.onConnectionStateChanged(null)
     }
 
-    override fun onNetworkChange(networkSet: MutableSet<Network>) {
-        setUnderlyingNetworks(networkSet.toTypedArray())
+    override fun onNetworkConnected(networks: LinkedHashSet<Network>?) {
+        Log.i(LOG_TAG_VPN, "connecting to networks: $networks")
+        setUnderlyingNetworks(networks?.toTypedArray())
     }
 
-    override fun checkLockDown() {
-        if (VERSION.SDK_INT >= VERSION_CODES.Q) {
-            if (DEBUG) Log.d(LOG_TAG, "BraveVPNService Value for isLockDownEnabled - ${isLockdownEnabled}, $isLockDownPrevious")
-            if (isLockdownEnabled != isLockDownPrevious) {
-                updateLockdown()
-            }
-        }
-    }
-
-    @RequiresApi(VERSION_CODES.Q)
-    private fun updateLockdown(){
-        isLockDownPrevious = isLockdownEnabled
-        //Introducing the lockdown mode and Orbot - proxy mode for the Orbot one touch
-        //configuration. When the lockdown mode is enabled, the exclusion of Orbot will
-        // be avoided which will result in no internet connectivity.
-        //This is temp change, the changes are need to be moved out of capabilities once the
-        //appMode variable is removed.
-        if (isLockdownEnabled && appMode.getProxyMode() == Constants.ORBOT_SOCKS) {
-            if (DEBUG) Log.d(LOG_TAG, "isLockDownEnabled - True, ORBOT is socks5 - restart with proxy mode none")
-            restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), Settings.ProxyModeNone)
-        } else {
-            if (DEBUG) Log.d(LOG_TAG, "isLockDownEnabled - False, ORBOT is ${appMode.getProxyMode()} - restart with set proxy mode")
+    private fun handleVpnLockdownState() {
+        if (syncLockdownState()) {
+            if (DEBUG) Log.d(LOG_TAG_VPN, "Lockdown mode has switched, restarting vpn")
             restartVpn(appMode.getDNSMode(), appMode.getFirewallMode(), appMode.getProxyMode())
         }
     }
 
+    private fun syncLockdownState(): Boolean {
+        if (VERSION.SDK_INT < VERSION_CODES.Q) return false
+
+        val ret = isLockdownEnabled != isLockDownPrevious
+        isLockDownPrevious = this.isLockdownEnabled
+        return ret
+    }
+
+
     override fun onDestroy() {
         try {
-            unregisterReceiver(braveScreenStateReceiver)
-            get<OrbotHelper>().unregisterReceiver(this)
-        } catch (e: java.lang.Exception) {
-            Log.w(LOG_TAG, "$FILE_LOG_TAG Unregister receiver error: ${e.message}", e)
+            unregisterAccessibilityServiceState()
+            get<OrbotHelper>().unregisterReceiver()
+            persistentState.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+        } catch (e: IllegalArgumentException) {
+            Log.w(LOG_TAG_VPN, "Unregister receiver error: ${e.message}", e)
         }
 
-        synchronized(vpnController!!) {
-            Log.w(LOG_TAG, "$FILE_LOG_TAG Destroying DNS VPN service")
-            persistentState.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
-            connectionCapabilityMonitor?.removeCallBack()
-            vpnController.setBraveVpnService(null)
+        persistentState.setVpnEnabled(false)
+
+        synchronized(VpnController) {
+            Log.w(LOG_TAG_VPN, "Destroying DNS VPN service")
+            connectionMonitor?.removeCallBack()
+            VpnController.setBraveVpnService(null)
             stopForeground(true)
             if (vpnAdapter != null) {
                 signalStopService(false)
             }
         }
-        try {
-            unregisterReceiver(braveAutoStartReceiver)
-        } catch (e: java.lang.Exception) {
-            Log.w(LOG_TAG, "$FILE_LOG_TAG Unregister receiver error: ${e.message}", e)
-        }
-    }
-
-    override fun onRevoke() {
-        stopSelf()
-        persistentState.vpnEnabled = false
     }
 
 }

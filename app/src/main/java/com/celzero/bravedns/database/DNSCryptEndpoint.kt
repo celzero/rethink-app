@@ -17,45 +17,46 @@ package com.celzero.bravedns.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 
 @Entity(tableName = "DNSCryptEndpoint")
 class DNSCryptEndpoint {
-    @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
+    @PrimaryKey(autoGenerate = true) var id: Int = 0
     var dnsCryptName: String = ""
     var dnsCryptURL: String = ""
     var dnsCryptExplanation: String? = null
     var isSelected: Boolean = true
     var isCustom: Boolean = true
-    var modifiedDataTime: Long = 0L
+    var modifiedDataTime: Long = INIT_TIME_MS
     var latency: Int = 0
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other?.javaClass != javaClass) return false
-        other as DNSCryptEndpoint
+        if (other !is DNSCryptEndpoint) return false
         if (id != other.id) return false
         return true
     }
 
     override fun hashCode(): Int {
-        return this.hashCode()
+        return this.id.hashCode()
     }
 
 
-    constructor(id: Int, dnsCryptName: String, dnsCryptURL: String, dnsCryptExplanation: String, isSelected: Boolean, isCustom: Boolean, modifiedDataTime: Long, latency: Int) {
-        if(id != -1)
-            this.id = id
+    constructor(id: Int, dnsCryptName: String, dnsCryptURL: String, dnsCryptExplanation: String,
+                isSelected: Boolean, isCustom: Boolean, modifiedDataTime: Long, latency: Int) {
+        // Room auto-increments id when its set to zero.
+        // A non-zero id overrides and sets caller-specified id instead.
+        this.id = id
         this.dnsCryptName = dnsCryptName
         this.dnsCryptURL = dnsCryptURL
         this.dnsCryptExplanation = dnsCryptExplanation
         this.isSelected = isSelected
         this.isCustom = isCustom
-        if(modifiedDataTime != 0L)
-            this.modifiedDataTime = modifiedDataTime
-        else
-            this.modifiedDataTime = System.currentTimeMillis()
+        if (modifiedDataTime <= INIT_TIME_MS) this.modifiedDataTime = modifiedDataTime
+        else this.modifiedDataTime = System.currentTimeMillis()
         this.latency = latency
     }
 
+    fun isDeletable(): Boolean {
+        return isCustom && !isSelected
+    }
 }

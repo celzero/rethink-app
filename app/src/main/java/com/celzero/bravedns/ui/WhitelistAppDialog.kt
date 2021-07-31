@@ -16,40 +16,29 @@ limitations under the License.
 package com.celzero.bravedns.ui
 
 import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
-import android.os.CountDownTimer
-import android.util.Log
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.database.AppInfoRepository
-import com.celzero.bravedns.database.AppInfoViewRepository
-import com.celzero.bravedns.database.CategoryInfoRepository
+import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.databinding.CustomDialogLayoutBinding
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appList
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.AppListViewModel
 import com.google.android.material.chip.Chip
-import java.util.stream.Collectors
 
 
-class WhitelistAppDialog(private var activity: Context,
-                         private val appInfoRepository: AppInfoRepository,
-                         private val appInfoViewRepository: AppInfoViewRepository,
-                         private val categoryInfoRepository: CategoryInfoRepository,
+class WhitelistAppDialog(val activity: FirewallActivity,
                          internal var adapter: RecyclerView.Adapter<*>,
-                         var viewModel: AppListViewModel,
-                         themeID :Int)
-    : Dialog(activity, themeID), View.OnClickListener, SearchView.OnQueryTextListener {
+                         var viewModel: AppListViewModel, themeID: Int) : Dialog(activity, themeID),
+                                                                          View.OnClickListener,
+                                                                          SearchView.OnQueryTextListener {
 
     private lateinit var b: CustomDialogLayoutBinding
 
@@ -57,7 +46,7 @@ class WhitelistAppDialog(private var activity: Context,
     private var filterCategories: MutableList<String> = ArrayList()
     private var category: List<String> = ArrayList()
 
-    var filterState: Boolean = false
+    private val CATEGORY_FILTER_CONST = "category:"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,9 +55,10 @@ class WhitelistAppDialog(private var activity: Context,
         setContentView(b.root)
         setCancelable(false)
 
-        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
+        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT,
+                          WindowManager.LayoutParams.MATCH_PARENT)
 
-        mLayoutManager = LinearLayoutManager(activity)
+        mLayoutManager = LinearLayoutManager(context)
 
         b.recyclerViewDialog.layoutManager = mLayoutManager
         b.recyclerViewDialog.adapter = adapter
@@ -79,31 +69,30 @@ class WhitelistAppDialog(private var activity: Context,
         filterCategories.clear()
 
         b.customDialogWhitelistSearchView.setOnCloseListener {
-            showCategoryChips()
+            toggleCategoryChipsUi()
             false
         }
 
-        val appCount = appList.size
-        val act: FirewallActivity = activity as FirewallActivity
-        appInfoViewRepository.getWhitelistCountLiveData().observe(act, {
-            b.customSelectAllOptionCount.text = act.getString(R.string.whitelist_dialog_apps_in_use, it.toString(), appCount.toString())
+        FirewallManager.getApplistObserver().observe(activity, {
+            val blockedCount = it.filter { a -> !a.isInternetAllowed }.size
+            b.customSelectAllOptionCount.text = context.getString(
+                R.string.whitelist_dialog_apps_in_use, blockedCount.toString(),
+                FirewallManager.getTotalApps().toString())
         })
 
         b.customSelectAllOptionCheckbox.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
-            modifyAppsInUniversalAppList(b)
+            FirewallManager.updateWhitelistedAppsByCategories(filterCategories, b)
             if (b) {
-                Utilities.showToastInMidLayout(activity, act.getString(R.string.whitelist_toast_positive), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(context,
+                                              context.getString(R.string.whitelist_toast_positive),
+                                              Toast.LENGTH_SHORT)
             } else {
-                Utilities.showToastInMidLayout(activity, act.getString(R.string.whitelist_toast_negative), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(context,
+                                              context.getString(R.string.whitelist_toast_negative),
+                                              Toast.LENGTH_SHORT)
             }
-            object : CountDownTimer(500, 500) {
-                override fun onTick(millisUntilFinished: Long) {
-                }
 
-                override fun onFinish() {
-                    adapter.notifyDataSetChanged()
-                }
-            }.start()
+            Utilities.delay(500) { adapter.notifyDataSetChanged() }
 
         }
         b.customDialogWhitelistSearchFilter.setOnClickListener(this)
@@ -112,31 +101,8 @@ class WhitelistAppDialog(private var activity: Context,
     }
 
 
-    private fun modifyAppsInUniversalAppList(checked: Boolean) {
-        if (filterCategories.isNullOrEmpty()) {
-            appInfoRepository.updateWhiteListForAllApp(checked)
-            val categoryList = appInfoRepository.getAppCategoryList()
-            categoryList.forEach {
-                val countBlocked = appInfoRepository.getBlockedCountForCategory(it)
-                categoryInfoRepository.updateBlockedCount(it, countBlocked)
-            }
-            categoryInfoRepository.updateWhitelistCountForAll(checked)
-        } else {
-            filterCategories.forEach {
-                val update = appInfoRepository.updateWhiteListForCategories(it, checked)
-                categoryInfoRepository.updateWhitelistForCategory(it, checked)
-                val countBlocked = appInfoRepository.getBlockedCountForCategory(it)
-                categoryInfoRepository.updateBlockedCount(it, countBlocked)
-                if(DEBUG) Log.d(LOG_TAG, "Update whitelist count: $update")
-            }
-
-        }
-    }
-
-
     private fun categoryListByAppNameFromDB(name: String) {
-        category = appInfoRepository.getAppCategoryForAppName("%$name%")
-        if(DEBUG) Log.d(LOG_TAG, "Category - ${category.size}")
+        category = FirewallManager.getCategoryListByAppName(name)
         setCategoryChips(category)
     }
 
@@ -148,10 +114,10 @@ class WhitelistAppDialog(private var activity: Context,
                 dismiss()
             }
             R.id.custom_dialog_whitelist_search_filter -> {
-                showCategoryChips()
+                toggleCategoryChipsUi()
             }
             R.id.custom_dialog_whitelist_search_view -> {
-                showCategoryChips()
+                toggleCategoryChipsUi()
             }
             else -> {
                 filterCategories.clear()
@@ -162,12 +128,10 @@ class WhitelistAppDialog(private var activity: Context,
 
     }
 
-    private fun showCategoryChips() {
-        if (!filterState) {
-            filterState = true
+    private fun toggleCategoryChipsUi() {
+        if (!b.customDialogChipGroup.isVisible) {
             b.customDialogChipGroup.visibility = View.VISIBLE
         } else {
-            filterState = false
             b.customDialogChipGroup.visibility = View.GONE
         }
     }
@@ -187,7 +151,8 @@ class WhitelistAppDialog(private var activity: Context,
     private fun setCategoryChips(categories: List<String>) {
         b.customDialogChipGroup.removeAllViews()
         for (category in categories) {
-            val mChip = this.layoutInflater.inflate(R.layout.item_chip_category, null, false) as Chip
+            val mChip = this.layoutInflater.inflate(R.layout.item_chip_category, null,
+                                                    false) as Chip
             mChip.text = category
 
             mChip.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
@@ -195,26 +160,18 @@ class WhitelistAppDialog(private var activity: Context,
                 if (b) {
                     filterCategories.add(categoryName)
                 } else {
-                    if (filterCategories.contains(categoryName)) {
-                        filterCategories.remove(categoryName)
-                    }
+                    filterCategories.remove(categoryName)
                 }
-                val filterString = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    filterCategories.stream().collect(Collectors.joining(","))
-                } else {
-                    var catTitle = ""
-                    filterCategories.forEach {
-                        catTitle = "$it,$catTitle"
-                    }
-                    if (catTitle.length > 1) {
-                        catTitle.substring(0, catTitle.length - 1)
-                    } else {
-                        catTitle
-                    }
+
+                var filterString = ""
+                filterCategories.forEach {
+                    filterString = "$it,$filterString"
                 }
+
+                filterString.dropLast(1)
+
                 if (filterString.isNotEmpty()) {
-                    if (DEBUG) Log.d(LOG_TAG, "category - $filterString")
-                    viewModel.setFilter("category:$filterString")
+                    viewModel.setFilter("$CATEGORY_FILTER_CONST$filterString")
                 } else {
                     viewModel.setFilter("")
                 }

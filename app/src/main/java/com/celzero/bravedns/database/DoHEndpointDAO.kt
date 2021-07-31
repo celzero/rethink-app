@@ -37,36 +37,37 @@ interface DoHEndpointDAO {
 
     @Transaction
     @Query("select * from DoHEndpoint order by isSelected desc")
-    fun getDoHEndpointLiveData() : DataSource.Factory<Int, DoHEndpoint>
+    fun getDoHEndpointLiveData(): DataSource.Factory<Int, DoHEndpoint>
 
     @Transaction
-    @Query("select * from DoHEndpoint where dohURL like :query or dohName like :query order by isSelected desc")
-    fun getDoHEndpointLiveDataByName(query : String) : DataSource.Factory<Int,DoHEndpoint>
+    @Query(
+        "select * from DoHEndpoint where dohURL like :query or dohName like :query order by isSelected desc")
+    fun getDoHEndpointLiveDataByName(query: String): DataSource.Factory<Int, DoHEndpoint>
 
     @Query("delete from DoHEndpoint where modifiedDataTime < :date")
-    fun deleteOlderData(date : Long)
+    fun deleteOlderData(date: Long)
 
     @Query("delete from DoHEndpoint")
     fun clearAllData()
 
-    @Query("delete from DoHEndpoint where dohURL like :url and isCustom = 1")
-    fun deleteDoHEndpoint(url : String)
+    @Query("delete from DoHEndpoint where id = :id and isCustom = 1")
+    fun deleteDoHEndpoint(id: Int)
 
     @Query("update DoHEndpoint set isSelected = 0 where isSelected = 1")
     fun removeConnectionStatus()
 
     @Transaction
     @Query("select * from DoHEndpoint where isSelected = 1")
-    fun getConnectedDoH() : DoHEndpoint?
+    fun getConnectedDoH(): DoHEndpoint?
 
     @Query("update DoHEndpoint set dohURL = :url, isSelected = 1 where id = 5")
-    fun updateConnectionURL(url : String)
+    fun updateConnectionURL(url: String)
 
     @Query("select dohURL from DoHEndpoint where id = :id")
-    fun getConnectionURL(id: Int) : String
+    fun getConnectionURL(id: Int): String
 
     @Query("select count(*) from DoHEndpoint")
-    fun getCount():Int
+    fun getCount(): Int
 
     @Query("update DoHEndpoint set isSelected = 1 where id = 4")
     fun updateConnectionDefault()

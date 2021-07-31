@@ -21,35 +21,33 @@ import org.koin.core.context.startKoin
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-class RethinkDnsApplication:Application() {
+class RethinkDnsApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
 
-        //if(BuildConfig.DEBUG) turnOnStrictMode()
+        //turnOnStrictMode()
 
         startKoin {
-            if(BuildConfig.DEBUG) androidLogger()
+            if (BuildConfig.DEBUG) androidLogger()
             androidContext(this@RethinkDnsApplication)
             koin.loadModules(AppModules)
         }
     }
 
     private fun turnOnStrictMode() {
-        if (BuildConfig.DEBUG) {
-           /* StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()
-                            .detectAll()
-                            .penaltyLog()
-                            .permitDiskReads()
-                            .permitDiskWrites()
-                            .permitNetwork()
-                            .penaltyLog()
-                            .build())*/
-            StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder()
-                            .detectAll()
-                            .detectLeakedSqlLiteObjects()
-                            .penaltyLog()
-                            .build())
-        }
+        if (!BuildConfig.DEBUG) return
+        // Uncomment the code below to enable the StrictModes.
+        // To test the apps disk read/writes, network usages.
+        /*StrictMode.setThreadPolicy(
+            StrictMode.ThreadPolicy.Builder()
+            .detectAll()
+            .penaltyLog()
+            .permitDiskReads()
+            .permitDiskWrites()
+            .permitNetwork()
+            .build())*/
+        StrictMode.setVmPolicy(
+            StrictMode.VmPolicy.Builder().detectAll().detectLeakedSqlLiteObjects().penaltyLog().build())
     }
 }

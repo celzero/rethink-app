@@ -16,13 +16,10 @@ limitations under the License.
 package com.celzero.bravedns.ui
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.Apk
-import com.celzero.bravedns.databinding.ActivitySettingsScreenBinding
 import com.celzero.bravedns.databinding.BottomSheetPermissionManagerBinding
 import com.celzero.bravedns.util.DatabaseHandler
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment

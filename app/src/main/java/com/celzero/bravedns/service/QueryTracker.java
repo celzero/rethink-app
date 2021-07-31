@@ -18,6 +18,7 @@ package com.celzero.bravedns.service;
 import androidx.annotation.NonNull;
 
 import com.celzero.bravedns.net.doh.Transaction;
+import com.celzero.bravedns.util.Constants;
 import com.celzero.bravedns.util.P2QuantileEstimation;
 
 /**
@@ -31,13 +32,15 @@ public class QueryTracker {
     private static final int HISTORY_SIZE = 1000;
     private static long numRequests = 0;
     private static P2QuantileEstimation quantileEstimator;
-    @NonNull private final PersistentState persistentState;
+    @NonNull
+    private final PersistentState persistentState;
 
     QueryTracker(@NonNull PersistentState persistentState) {
         this.persistentState = persistentState;
+        reinitializeQuantileEstimator();
     }
 
-    public void reinitializeQuantileEstimator(){
+    public void reinitializeQuantileEstimator() {
         quantileEstimator = new P2QuantileEstimation(0.5);
         numRequests = 1;
     }
@@ -45,24 +48,18 @@ public class QueryTracker {
     void recordTransaction(Transaction transaction) {
         ++numRequests;
         if (numRequests % HISTORY_SIZE == 0) {
-            numRequests = 1;
             reinitializeQuantileEstimator();
         }
         sync(transaction);
     }
 
     public void sync(Transaction transaction) {
-        if (transaction != null && transaction.blockList.isEmpty() && !transaction.serverIp.isEmpty()) {
-            // Restore number of requests from storage, or 0 if it isn't defined yet.
-            long val =  transaction.responseTime;
-            if(quantileEstimator == null){
-                quantileEstimator = new P2QuantileEstimation(0.5);
-            }else{
-                quantileEstimator.addValue((double)val);
-            }
-            long latencyVal = (long)quantileEstimator.getQuantile();
-            persistentState.setMedianLatency(latencyVal);
+        if (transaction == null || (transaction.serverIp.isEmpty() || Constants.UNSPECIFIED_IP.equals(transaction.serverIp)) || transaction.status != Transaction.Status.COMPLETE) {
+            return;
         }
+        // Restore number of requests from storage, or 0 if it isn't defined yet.
+        quantileEstimator.addValue((double) transaction.responseTime);
+        long latency = (long) quantileEstimator.getQuantile();
+        persistentState.setMedianLatency(latency);
     }
 }
-

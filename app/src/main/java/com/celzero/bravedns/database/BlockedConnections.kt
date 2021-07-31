@@ -18,31 +18,41 @@ package com.celzero.bravedns.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+
+/**
+ * The BlockedConnections table will contain the firewall rules
+ * based on IPaddress, port and protocol.
+ *
+ * It has been wrongly names as BlockedConnections which needs to be modified
+ * later as it involved database migration.
+ * TODO - Rename the class and database table name.
+ *
+ * The rules will be added to the database with the combination of uid, ipaddress, port, protocol.
+ * Special case: when the uid is assigned as FirewallRules#EVERYBODY_UID then the rules with
+ * combination of ipaddress, port, protocol will be applied for all the available apps.
+ *
+ */
 
 @Entity(tableName = "BlockedConnections")
 class BlockedConnections {
 
-    @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
+    @PrimaryKey(autoGenerate = true) var id: Int = 0
     var uid: Int = 0
     var ipAddress: String? = null
     var port: Int = 0
     var protocol: String? = null
     var isActive: Boolean = true
     var ruleType: String = ""
-    var modifiedDateTime: Long = 0L
+    var modifiedDateTime: Long = INIT_TIME_MS
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other?.javaClass != javaClass) return false
-        other as BlockedConnections
+        if (other !is BlockedConnections) return false
         if (id != other.id) return false
         return true
     }
 
     override fun hashCode(): Int {
-        return this.hashCode()
+        return this.id.hashCode()
     }
-
-
 }

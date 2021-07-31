@@ -19,73 +19,51 @@ package com.celzero.bravedns.service
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
+import com.celzero.bravedns.R
+import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.data.IPDetails
-import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.RefreshDatabase
-import com.celzero.bravedns.ui.HomeScreenActivity
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
-import com.celzero.bravedns.util.FileSystemUID
+import com.celzero.bravedns.util.AndroidUidConfig
+import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
+import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL_LOG
 import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
 import com.celzero.bravedns.util.Utilities.Companion.getFlag
+import com.celzero.bravedns.util.Utilities.Companion.getPackageInfoForUid
+import com.google.common.net.InetAddresses
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.net.InetAddress
-import java.net.UnknownHostException
 import java.util.*
 
 class IPTracker internal constructor(
-    private val appInfoRepository: AppInfoRepository,
-    private val connectionTrackerRepository: ConnectionTrackerRepository,
-    private val refreshDatabase: RefreshDatabase,
-    private val context: Context
-) {
+        private val connectionTrackerRepository: ConnectionTrackerRepository,
+        private val refreshDatabase: RefreshDatabase, private val context: Context) :
+        KoinComponent {
 
 
     private val recentTrackers: Queue<IPDetails> = LinkedList()
 
-    //private val recentIPActivity: Queue<Long> = LinkedList()
-    private var historyEnabled = true
+    private val persistentState by inject<PersistentState>()
 
     fun getRecentIPTransactions(): Queue<IPDetails?>? {
         return LinkedList(recentTrackers)
     }
 
-
     fun recordTransaction(ipDetails: IPDetails?) {
+        if (!persistentState.logsEnabled) return
+
         //Modified the call of the insert to database inside the coroutine scope.
         GlobalScope.launch(Dispatchers.IO) {
             if (ipDetails != null) {
                 insertToDB(ipDetails)
             }
         }
-        //recentIPActivity.add(ipDetails.timeStamp)
-        //if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG,"Record Transaction")
-        /*if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(Constants.LOG_TAG, "Conn tracker Record Transaction: ${ipDetails.uid},${recentTrackers.size}")
-        if(context != null) {
-            if (PersistentState.getBackgroundEnabled(context)) {
-                recentTrackers.add(ipDetails)
-
-                if (recentTrackers.size >= 10) {
-                    val insertValues = recentTrackers
-                    insertToDB(context, insertValues)
-                    //recentTrackers.clear()
-                }
-            } else {
-                recentTrackers.add(ipDetails)
-                insertToDB(context, recentTrackers)
-                //recentTrackers.clear()
-            }
-        }*/
-        /*if (historyEnabled) {
-            recentTrackers.add(ipDetails)
-            if (recentTrackers.size > HISTORY_SIZE) {
-                recentTrackers.remove()
-            }
-        }*/
     }
 
     private fun insertToDB(ipDetails: IPDetails) {
@@ -95,64 +73,75 @@ class IPTracker internal constructor(
         connTracker.uid = ipDetails.uid
         connTracker.port = ipDetails.destPort
         connTracker.protocol = ipDetails.protocol
-        connTracker.timeStamp = ipDetails.timeStamp
+        connTracker.timeStamp = ipDetails.timestamp
         connTracker.blockedByRule = ipDetails.blockedByRule
 
-        val serverAddress: InetAddress?
+        // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
+        // Unlike InetAddress.getByName(), the methods of this class never cause DNS services
+        // to be accessed
+        var serverAddress: InetAddress? = null
         try {
-            serverAddress = InetAddress.getByName(ipDetails.destIP)
-            val countryCode: String = getCountryCode(serverAddress!!, context)
-            connTracker.flag = getFlag(countryCode)
-        } catch (ex: UnknownHostException) {
+            serverAddress = InetAddresses.forString(ipDetails.destIP)
+        } catch (e: IllegalArgumentException) {
+            Log.e(LoggerConstants.LOG_TAG_DNS_LOG,
+                  "Failure converting string to InetAddresses: ${e.message}", e)
+        }
+        val countryCode: String = getCountryCode(serverAddress, context)
+        connTracker.flag = getFlag(countryCode)
+
+        connTracker.appName = getApplicationName(connTracker.uid)
+        connectionTrackerRepository.insert(connTracker)
+    }
+
+    private fun getApplicationName(uid: Int): String {
+        if (uid == INVALID_UID) {
+            return context.getString(R.string.network_log_app_name_unknown)
         }
 
-
-        //app-name
-        val packageNameList = context.packageManager.getPackagesForUid(ipDetails.uid)
-        //val appName = context.packageManager.getNameForUid(ipDetails.uid)
+        val packageNameList = getPackageInfoForUid(context, uid)
+        val appName: String?
 
         if (packageNameList != null) {
-            if (DEBUG) Log.d(LOG_TAG, "IPTracker - Package for uid : ${ipDetails.uid}, ${packageNameList.size}")
-            //connTracker.appName = appName
             val packageName = packageNameList[0]
-            val appDetails = HomeScreenActivity.GlobalVariable.appList[packageName]
-            if (appDetails != null) {
-                connTracker.appName = appDetails.appName
-            }
+            appName = getValidAppName(packageName, uid)
+        } else { // For UNKNOWN or Non-App.
+            val fileSystemUID = AndroidUidConfig.fromFileSystemUid(uid)
+            Log.i(LOG_TAG_FIREWALL_LOG,
+                  "App name for the uid: ${uid}, AndroidUid: ${fileSystemUID.uid}, fileName: ${fileSystemUID.name}")
 
-            if (connTracker.appName.isNullOrBlank()) {
-                connTracker.appName = appInfoRepository.getAppNameForUID(ipDetails.uid)
-            }
-            if (connTracker.appName.isNullOrEmpty()) {
-                val appInfo = context.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
-                connTracker.appName = context.packageManager.getApplicationLabel(appInfo).toString()
-            }
-        } else {
-            val fileSystemUID = FileSystemUID.fromFileSystemUID(ipDetails.uid)
-            if (DEBUG) Log.d(LOG_TAG, "IPTracker - else part : ${ipDetails.uid}, ${fileSystemUID.name}")
-            if (ipDetails.uid == -1) {
-                connTracker.appName = "Unknown"
-            } else if (fileSystemUID.uid == -1) {
-                connTracker.appName = "Unnamed(${ipDetails.uid})"
-                if(!isAvailableInDatabase(ipDetails.uid)) {
-                    insertNonAppToAppInfo(ipDetails.uid, connTracker.appName.toString())
-                }
+            if (fileSystemUID.uid == INVALID_UID) {
+                appName = context.getString(R.string.network_log_app_name_unnamed, uid.toString())
             } else {
-                connTracker.appName = fileSystemUID.name
-                if(!isAvailableInDatabase(ipDetails.uid)) {
-                    insertNonAppToAppInfo(ipDetails.uid, connTracker.appName.toString())
-                }
+                appName = fileSystemUID.name
+                registerNonApp(uid, appName)
             }
         }
-        connectionTrackerRepository.insertAsync(connTracker)
+        return appName
     }
 
-    private fun insertNonAppToAppInfo(uid: Int, appName: String) {
-        refreshDatabase.insertNonAppToAppInfo(uid, appName)
+    private fun getValidAppName(packageName: String, uid: Int): String {
+        var appName: String? = null
+        val appDetails = FirewallManager.getAppInfoByPackage(packageName)
+        if (appDetails != null) {
+            appName = appDetails.appName
+        }
+
+        if (appName.isNullOrEmpty()) {
+            appName = FirewallManager.getAppNameByUid(uid)
+        }
+        if (appName.isNullOrEmpty()) {
+            val appInfo = context.packageManager.getApplicationInfo(packageName,
+                                                                    PackageManager.GET_META_DATA)
+            appName = context.packageManager.getApplicationLabel(appInfo).toString()
+        }
+        return appName
     }
 
-    private fun isAvailableInDatabase(uid: Int) : Boolean{
-        val appName = appInfoRepository.getAppNameForUID(uid)
-        return !appName.isNullOrEmpty()
+    private fun registerNonApp(uid: Int, appName: String) {
+        if (!FirewallManager.isUidRegistered(uid)) {
+            refreshDatabase.registerNonApp(uid, appName)
+        }
     }
+
+
 }

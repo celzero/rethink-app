@@ -119,7 +119,7 @@ public class GoIntraListener implements Listener {
         transaction.responseTime = (long) (1000 * summary.getLatency());
         transaction.serverIp = summary.getServer();
         transaction.relayIp = summary.getRelayServer();
-        transaction.blockList = summary.getBlocklists();
+        transaction.blocklist = summary.getBlocklists();
         transaction.status = dnscryptStatusMap.get(summary.getStatus());
         transaction.responseCalendar = Calendar.getInstance();
         transaction.isDNSCrypt = true;
@@ -152,7 +152,7 @@ public class GoIntraListener implements Listener {
         transaction.serverIp = summary.getServer();
         transaction.status = goStatusMap.get(summary.getStatus());
         transaction.responseCalendar = Calendar.getInstance();
-        transaction.blockList = summary.getBlocklists();
+        transaction.blocklist = summary.getBlocklists();
         transaction.isDNSCrypt = false;
         vpnService.recordTransaction(transaction);
     }

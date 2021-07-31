@@ -18,12 +18,12 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.res.TypedArray
+import android.graphics.drawable.Drawable
 import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.paging.PagedListAdapter
@@ -33,112 +33,137 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
 import com.celzero.bravedns.glide.GlideApp
-import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
 import com.celzero.bravedns.util.KnownPorts
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.Companion.getIcon
+import com.celzero.bravedns.util.Utilities.Companion.getPackageInfoForUid
 import java.util.*
 
-class ConnectionTrackerAdapter(val context: Context) : PagedListAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(DIFF_CALLBACK) {
+class ConnectionTrackerAdapter(val context: Context) :
+        PagedListAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(
+            DIFF_CALLBACK) {
 
 
     companion object {
         private val DIFF_CALLBACK = object :
-            DiffUtil.ItemCallback<ConnectionTracker>() {
 
-            override fun areItemsTheSame(oldConnection: ConnectionTracker, newConnection: ConnectionTracker)
-                = oldConnection.id == newConnection.id
+                DiffUtil.ItemCallback<ConnectionTracker>() {
 
-            override fun areContentsTheSame(oldConnection: ConnectionTracker, newConnection: ConnectionTracker) = oldConnection == newConnection
+            override fun areItemsTheSame(oldConnection: ConnectionTracker,
+                                         newConnection: ConnectionTracker) = oldConnection.id == newConnection.id
+
+            override fun areContentsTheSame(oldConnection: ConnectionTracker,
+                                            newConnection: ConnectionTracker) = oldConnection == newConnection
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConnectionTrackerViewHolder {
-        val itemBinding = ConnectionTransactionRowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val itemBinding = ConnectionTransactionRowBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false)
         return ConnectionTrackerViewHolder(itemBinding)
     }
 
     override fun onBindViewHolder(holder: ConnectionTrackerViewHolder, position: Int) {
         val connTracker: ConnectionTracker = getItem(position) ?: return
+
         holder.update(connTracker)
     }
 
 
-    inner class ConnectionTrackerViewHolder(private val b: ConnectionTransactionRowBinding) : RecyclerView.ViewHolder(b.root) {
+    inner class ConnectionTrackerViewHolder(private val b: ConnectionTransactionRowBinding) :
+            RecyclerView.ViewHolder(b.root) {
 
         fun update(connTracker: ConnectionTracker) {
+            displayTransactionDetails(connTracker)
+            displayProtocolDetails(connTracker.port, connTracker.protocol)
+            displayAppDetails(connTracker)
+            displayFirewallRulesetHint(connTracker.isBlocked, connTracker.blockedByRule)
+
+            b.connectionParentLayout.setOnClickListener {
+                openBottomSheet(connTracker)
+            }
+        }
+
+        private fun openBottomSheet(ct: ConnectionTracker) {
+            if (context !is FragmentActivity) {
+                Log.wtf(LOG_TAG_UI,
+                        "Can not open bottom sheet. Context is not attached to activity")
+                return
+            }
+            val bottomSheetFragment = ConnTrackerBottomSheetFragment(ct)
+            bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
+        }
+
+        private fun displayTransactionDetails(connTracker: ConnectionTracker) {
             val time = Utilities.convertLongToTime(connTracker.timeStamp)
             b.connectionResponseTime.text = time
             b.connectionFlag.text = connTracker.flag
             b.connectionIpAddress.text = connTracker.ipAddress
+        }
+
+        private fun displayAppDetails(ct: ConnectionTracker) {
+            b.connectionAppName.text = ct.appName
+
+            val apps = getPackageInfoForUid(context, ct.uid)
+            if (apps.isNullOrEmpty()) {
+                loadAppIcon(Utilities.getDefaultIcon(context))
+                return
+            }
+
+            val appName = if (apps.size > 1) {
+                context.getString(R.string.ctbs_app_other_apps, ct.appName,
+                                  (apps.size).minus(1).toString())
+            } else {
+                ct.appName
+            }
+
+            b.connectionAppName.text = appName
+            loadAppIcon(getIcon(context, apps[0], /*No app name */""))
+        }
+
+        private fun displayProtocolDetails(port: Int, proto: Int) {
             // Instead of showing the port name and protocol, now the ports are resolved with
             // known ports(reserved port and protocol identifiers).
             // https://github.com/celzero/rethink-app/issues/42 - #3 - transport + protocol.
-            val resolvedPort = KnownPorts.resolvePort(connTracker.port)
-            if(resolvedPort != Constants.PORT_VAL_UNKNOWN){
-                b.connLatencyTxt.text = resolvedPort?.toUpperCase(Locale.ROOT)
-            }else {
-                b.connLatencyTxt.text = Protocol.getProtocolName(connTracker.protocol).name
+            val resolvedPort = KnownPorts.resolvePort(port)
+            b.connLatencyTxt.text = if (resolvedPort != Constants.PORT_VAL_UNKNOWN) {
+                resolvedPort?.toUpperCase(Locale.ROOT)
+            } else {
+                Protocol.getProtocolName(proto).name
             }
-            b.connectionAppName.text = connTracker.appName
+        }
+
+        private fun displayFirewallRulesetHint(isBlocked: Boolean, ruleName: String?) {
+            Log.d(LOG_TAG_UI, "ConnTrack UI issue: $isBlocked, $ruleName")
             when {
-                connTracker.isBlocked -> {
+                // hint red when blocked
+                isBlocked -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
-                    b.connectionStatusIndicator.setBackgroundColor(ContextCompat.getColor(context, R.color.colorRed_A400))
+                    b.connectionStatusIndicator.setBackgroundColor(
+                        ContextCompat.getColor(context, R.color.colorRed_A400))
                 }
-                connTracker.blockedByRule.equals(BraveVPNService.BlockedRuleNames.RULE7.ruleName) -> {
+                // hint white when whitelisted
+                FirewallRuleset.RULE7.ruleName == ruleName -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
-                    b.connectionStatusIndicator.setBackgroundColor(fetchTextColor(R.color.dividerColor))
+                    b.connectionStatusIndicator.setBackgroundColor(
+                        ContextCompat.getColor(context, R.color.textColorMain))
                 }
+                // no hints, otherwise
                 else -> {
                     b.connectionStatusIndicator.visibility = View.INVISIBLE
                 }
             }
-            if (connTracker.appName != "Unknown") {
-                try {
-                    val appArray = context.packageManager.getPackagesForUid(connTracker.uid)
-                    val appCount = (appArray?.size)?.minus(1)
-                    if (appArray?.size!! > 2) {
-                        b.connectionAppName.text = context.getString(R.string.ctbs_app_other_apps, connTracker.appName, appCount.toString())
-                    } else if (appArray.size == 2) {
-                        b.connectionAppName.text = context.getString(R.string.ctbs_app_other_app, connTracker.appName, appCount.toString())
-                    }
-                    GlideApp.with(context).load(context.packageManager.getApplicationIcon(appArray[0]!!)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)
-                } catch (e: Exception) {
-                    GlideApp.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)
-                    Log.w(LOG_TAG, "Package Not Found - " + e.message)
-                }
-            } else {
-                GlideApp.with(context).load(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).error(AppCompatResources.getDrawable(context, R.drawable.default_app_icon)).into(b.connectionAppIcon)
-            }
-
-            b.connectionParentLayout.setOnClickListener {
-                b.connectionParentLayout.isEnabled = false
-                val bottomSheetFragment = ConnTrackerBottomSheetFragment(context, connTracker)
-                val frag = context as FragmentActivity
-                bottomSheetFragment.show(frag.supportFragmentManager, bottomSheetFragment.tag)
-                b.connectionParentLayout.isEnabled = true
-            }
-
         }
 
-        private fun fetchTextColor(attr: Int): Int {
-            val attributeFetch = if (attr == R.color.dividerColor) {
-                R.attr.dividerColor
-            } else {
-                R.attr.accentGood
-            }
-            val typedValue = TypedValue()
-            val a: TypedArray = context.obtainStyledAttributes(typedValue.data, intArrayOf(attributeFetch))
-            val color = a.getColor(0, 0)
-            a.recycle()
-            return color
+        private fun loadAppIcon(drawable: Drawable?) {
+            GlideApp.with(context).load(drawable).error(Utilities.getDefaultIcon(context)).into(
+                b.connectionAppIcon)
         }
-
-
     }
 
 }

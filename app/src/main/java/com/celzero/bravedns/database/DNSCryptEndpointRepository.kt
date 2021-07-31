@@ -19,8 +19,9 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.paging.PagedList
 import androidx.paging.toLiveData
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import androidx.room.Transaction
+import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
+import com.celzero.bravedns.util.LoggerConstants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -28,27 +29,29 @@ import kotlinx.coroutines.launch
 
 class DNSCryptEndpointRepository(private val dnsCryptEndpointDAO: DNSCryptEndpointDAO) {
 
-    fun updateAsync(dnsCryptEndpoint: DNSCryptEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
-        coroutineScope.launch {
-            dnsCryptEndpointDAO.update(dnsCryptEndpoint)
-        }
+    @Transaction
+    fun update(dnsCryptEndpoint: DNSCryptEndpoint) {
+        dnsCryptEndpointDAO.update(dnsCryptEndpoint)
     }
 
-    fun deleteAsync(dnsCryptEndpoint: DNSCryptEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
+    fun deleteAsync(dnsCryptEndpoint: DNSCryptEndpoint,
+                    coroutineScope: CoroutineScope = GlobalScope) {
         coroutineScope.launch {
             dnsCryptEndpointDAO.delete(dnsCryptEndpoint)
         }
     }
 
 
-    fun insertAsync(dnsCryptEndpoint: DNSCryptEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
+    fun insertAsync(dnsCryptEndpoint: DNSCryptEndpoint,
+                    coroutineScope: CoroutineScope = GlobalScope) {
         coroutineScope.launch {
             dnsCryptEndpointDAO.insert(dnsCryptEndpoint)
         }
     }
 
     fun getDNSCryptEndpointLiveData(): LiveData<PagedList<DNSCryptEndpoint>> {
-        return dnsCryptEndpointDAO.getDNSCryptEndpointLiveData().toLiveData(pageSize = 50)
+        return dnsCryptEndpointDAO.getDNSCryptEndpointLiveData().toLiveData(
+            pageSize = LIVEDATA_PAGE_SIZE)
     }
 
     fun deleteOlderData(date: Long, coroutineScope: CoroutineScope = GlobalScope) {
@@ -58,11 +61,12 @@ class DNSCryptEndpointRepository(private val dnsCryptEndpointDAO: DNSCryptEndpoi
     }
 
     fun getDNSCryptEndpointLiveDataByName(query: String): LiveData<PagedList<DNSCryptEndpoint>> {
-        return dnsCryptEndpointDAO.getDNSCryptEndpointLiveDataByName(query).toLiveData(pageSize = 50)
+        return dnsCryptEndpointDAO.getDNSCryptEndpointLiveDataByName(query).toLiveData(
+            pageSize = LIVEDATA_PAGE_SIZE)
     }
 
-    fun deleteDNSCryptEndpoint(url: String) {
-        dnsCryptEndpointDAO.deleteDNSCryptEndpoint(url)
+    fun deleteDNSCryptEndpoint(id: Int) {
+        dnsCryptEndpointDAO.deleteDNSCryptEndpoint(id)
     }
 
     fun removeConnectionStatus() {
@@ -77,22 +81,42 @@ class DNSCryptEndpointRepository(private val dnsCryptEndpointDAO: DNSCryptEndpoi
         return dnsCryptEndpointDAO.getConnectedCount()
     }
 
-    fun getCount(): Int{
+    fun getCount(): Int {
         return dnsCryptEndpointDAO.getCount()
     }
 
-    fun updateConnectionStatus(liveServersID : String){
+    fun updateConnectionStatus(liveServersID: String) {
         val listServer = liveServersID.split(",")
         removeConnectionStatus()
-        listServer.forEach{
-            val listServerID = it.toInt()
-            if(DEBUG) Log.d(LOG_TAG,"LiveServer Crypt connection update for id $listServerID")
-            dnsCryptEndpointDAO.updateConnectionStatus(listServerID)
+        listServer.forEach {
+            dnsCryptEndpointDAO.updateConnectionStatus(it.toInt())
         }
     }
 
-    fun updateFailingConnections(){
+    fun updateFailingConnections() {
         dnsCryptEndpointDAO.updateFailingConnections()
     }
 
+    fun getServersToAdd(): String {
+        var servers = ""
+        val cryptList = getConnectedDNSCrypt()
+
+        cryptList.forEach {
+            servers += "${it.id}#${it.dnsCryptURL},"
+        }
+        servers = servers.dropLast(1)
+        Log.i(LoggerConstants.LOG_TAG_APP_MODE, "Crypt Server: $servers")
+        return servers
+    }
+
+    fun getServersToRemove(): String {
+        val cryptList = getConnectedDNSCrypt()
+        var removeServerString = ""
+
+        cryptList.forEach {
+            removeServerString += "${it.id},"
+        }
+        removeServerString = removeServerString.dropLast(1)
+        return removeServerString
+    }
 }

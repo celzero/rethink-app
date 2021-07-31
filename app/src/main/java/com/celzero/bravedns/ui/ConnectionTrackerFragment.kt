@@ -30,7 +30,7 @@ import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.databinding.ActivityConnectionTrackerBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -39,52 +39,50 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
- * Connection Tracker - Network Monitor.
- * All the network activities are captured and stored in the database.
- * Live data is used to fetch the network details from the database.
- * Database table name - ConnectionTracker.
+ * Captures network logs and stores in ConnectionTracker, a room database.
  */
-class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker), SearchView.OnQueryTextListener {
+class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker),
+                                  SearchView.OnQueryTextListener {
     private val b by viewBinding(ActivityConnectionTrackerBinding::bind)
 
     private var layoutManager: RecyclerView.LayoutManager? = null
-    private var recyclerAdapter: ConnectionTrackerAdapter? = null
     private val viewModel: ConnectionTrackerViewModel by viewModel()
     private var filterValue: String = ""
+
+    // By default, all connections are shown, Filter dialog will be selected with position 1.
     private var checkedItem = 1
 
     private val connectionTrackerDAO by inject<ConnectionTrackerDAO>()
     private val persistentState by inject<PersistentState>()
+
+    companion object {
+        fun newInstance() = ConnectionTrackerFragment()
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
     }
 
-    companion object {
-        fun newInstance() = ConnectionTrackerFragment()
-    }
-
     private fun initView() {
         val includeView = b.connectionListScrollList
 
-        if (persistentState.logsEnabled) {
-            includeView.connectionListLogsDisabledTv.visibility = View.GONE
-            includeView.connectionCardViewTop.visibility = View.VISIBLE
-
-            includeView.recyclerConnection.setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(requireContext())
-            includeView.recyclerConnection.layoutManager = layoutManager
-
-            recyclerAdapter = ConnectionTrackerAdapter(requireContext())
-            viewModel.connectionTrackerList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(recyclerAdapter!!::submitList))
-            includeView.recyclerConnection.adapter = recyclerAdapter
-            //recyclerView!!.setItemViewCacheSize(100)
-        } else {
+        if (!persistentState.logsEnabled) {
             includeView.connectionListLogsDisabledTv.visibility = View.VISIBLE
             includeView.connectionCardViewTop.visibility = View.GONE
+            return
         }
 
+        includeView.connectionListLogsDisabledTv.visibility = View.GONE
+        includeView.connectionCardViewTop.visibility = View.VISIBLE
+
+        includeView.recyclerConnection.setHasFixedSize(true)
+        layoutManager = LinearLayoutManager(requireContext())
+        includeView.recyclerConnection.layoutManager = layoutManager
+        val recyclerAdapter = ConnectionTrackerAdapter(requireContext())
+        viewModel.connectionTrackerList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
+            recyclerAdapter::submitList))
+        includeView.recyclerConnection.adapter = recyclerAdapter
 
         includeView.connectionSearch.setOnQueryTextListener(this)
         includeView.connectionSearch.setOnClickListener {
@@ -93,68 +91,60 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         }
 
         includeView.connectionFilterIcon.setOnClickListener {
-            showDialogForFilter()
+            showFilterDialog()
         }
 
         includeView.connectionDeleteIcon.setOnClickListener {
-            showDialogForDelete()
+            showDeleteDialog()
         }
-
-
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        viewModel.setFilter(query!!, filterValue)
+        viewModel.setFilter(query, filterValue)
         return true
     }
 
     override fun onQueryTextChange(query: String?): Boolean {
-        viewModel.setFilter(query!!, filterValue)
+        viewModel.setFilter(query, filterValue)
         return true
     }
 
-    private fun showDialogForFilter() {
+    private fun showFilterDialog() {
 
-        val singleItems = arrayOf(getString(R.string.filter_network_blocked_connections), getString(R.string.filter_network_all_connections))
+        val items = arrayOf(getString(R.string.filter_network_blocked_connections),
+                            getString(R.string.filter_network_all_connections))
 
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle(getString(R.string.ct_filter_dialog_title))
 
         // Single-choice items (initialized with checked item)
-        builder.setSingleChoiceItems(singleItems, checkedItem) { dialog, which ->
-            // Respond to item chosen
-            filterValue = if (which == 0) ":isFilter"
-            else ""
+        builder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
+            // Respond to item chosen, position 0 - blocked filter.
+            filterValue = if (which == 0) {
+                ":isFilter"
+            } else ""
             checkedItem = which
-            if (DEBUG) Log.d(LOG_TAG, "Filter Option selected: $filterValue")
+            if (DEBUG) Log.d(LOG_TAG_UI, "Filter Option selected: $filterValue")
             viewModel.setFilterBlocked(filterValue)
             dialog.dismiss()
         }
         builder.show()
-
     }
 
-
-    private fun showDialogForDelete() {
+    private fun showDeleteDialog() {
         val builder = AlertDialog.Builder(requireContext())
-        //set title for alert dialog
         builder.setTitle(R.string.conn_track_clear_logs_title)
-        //set message for alert dialog
         builder.setMessage(R.string.conn_track_clear_logs_message)
         builder.setCancelable(true)
-        //performing positive action
         builder.setPositiveButton(getString(R.string.ct_delete_logs_positive_btn)) { _, _ ->
             GlobalScope.launch(Dispatchers.IO) {
                 connectionTrackerDAO.clearAllData()
             }
         }
 
-        //performing negative action
         builder.setNegativeButton(getString(R.string.ct_delete_logs_negative_btn)) { _, _ ->
         }
-        // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()
-        // Set other dialog properties
         alertDialog.setCancelable(true)
         alertDialog.show()
     }

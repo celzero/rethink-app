@@ -112,7 +112,7 @@ public final class AppPermissionGroup {
         return group;
     }
 
-    private AppPermissionGroup( String name, CharSequence label) {
+    private AppPermissionGroup(String name, CharSequence label) {
         mName = name;
         mLabel = label;
     }

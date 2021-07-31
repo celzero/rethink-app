@@ -21,10 +21,15 @@ import android.os.SystemClock
 import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.receiver.ReceiverHelper
-import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_FAILURE
+import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_RETRY
+import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SUCCESS
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 /**
  * The download watcher  - Worker initiated from AppDownloadManager class.
@@ -33,25 +38,28 @@ import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
  * Once the download is completed, the Worker will send a Result.success().
  * Else, the Result.retry() will be triggered to check again.
  */
-class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) : Worker(context, workerParameters) {
+class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) :
+        Worker(context, workerParameters), KoinComponent {
+
+    val persistentState by inject<PersistentState>()
+
     override fun doWork(): Result {
 
-        val startTime = ReceiverHelper.persistentState.workManagerStartTime
+        val startTime = inputData.getLong("workerStartTime", 0)
         val currentTime = SystemClock.elapsedRealtime()
-        Log.d(LOG_TAG, "AppDownloadManager - $startTime, $currentTime")
+        if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "AppDownloadManager - $startTime, $currentTime")
         if (currentTime - startTime > Constants.WORK_MANAGER_TIMEOUT) {
-            ReceiverHelper.persistentState.workManagerStartTime = 0
             return Result.failure()
         }
 
         when (checkForDownload(context)) {
-            0 -> {
+            DOWNLOAD_RETRY -> {
                 return Result.retry()
             }
-            -1 -> {
+            DOWNLOAD_FAILURE -> {
                 return Result.failure()
             }
-            1 -> {
+            DOWNLOAD_SUCCESS -> {
                 return Result.success()
             }
         }
@@ -61,41 +69,50 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
 
     private fun checkForDownload(context: Context): Int {
         //Check for the download success from the receiver
-        ReceiverHelper.persistentState.downloadIDs.forEach { downloadID ->
+        persistentState.downloadIds.forEach { downloadID ->
             val query = DownloadManager.Query()
             query.setFilterById(downloadID.toLong())
-            val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            val downloadManager = context.getSystemService(
+                Context.DOWNLOAD_SERVICE) as DownloadManager
             val cursor = downloadManager.query(query)
             if (cursor == null) {
-                Log.i(LOG_TAG, "AppDownloadManager status is $downloadID cursor null")
-                return -1
+                Log.i(LOG_TAG_DOWNLOAD, "status is $downloadID cursor null")
+                return DOWNLOAD_FAILURE
             }
-            if (cursor.moveToFirst()) {
-                val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
-                if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "AppDownloadManager onReceive ACTION_DOWNLOAD_COMPLETE $status $downloadID")
-                if (status == DownloadManager.STATUS_RUNNING) {
-                    Log.i(LOG_TAG, "AppDownloadManager status is $downloadID running")
-                } else if (status == DownloadManager.STATUS_SUCCESSFUL) {
-                    if (ReceiverHelper.persistentState.downloadIDs.contains(downloadID)) {
-                        ReceiverHelper.persistentState.downloadIDs = ReceiverHelper.persistentState.downloadIDs.minusElement(downloadID)
+
+            try {
+                if (cursor.moveToFirst()) {
+                    val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
+
+                    if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "onReceive status $status $downloadID")
+
+                    if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                        // status==success is sometimes called-back more than once.
+                        // send a 'success' removing it from persitent-state.
+                        persistentState.downloadIds = persistentState.downloadIds.minusElement(
+                            downloadID)
+                        if (persistentState.downloadIds.isEmpty()) {
+                            return DOWNLOAD_SUCCESS
+                        }
+                    } else if (status == DownloadManager.STATUS_FAILED) {
+                        if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
+                                         "download status failure for $downloadID")
+                        return DOWNLOAD_FAILURE
                     }
-                    Log.i(LOG_TAG, "AppDownloadManager onReceive STATUS_SUCCESSFUL - $downloadID")
-                    if (ReceiverHelper.persistentState.downloadIDs.isEmpty()) {
-                        cursor.close()
-                        return 1
-                    }
-                } else if (status == DownloadManager.STATUS_FAILED) {
-                    Log.i(LOG_TAG, "AppDownloadManager onReceive STATUS_FAILED - $downloadID")
-                    cursor.close()
-                    return -1
+                } else {
+                    if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "cursor empty")
+                    return DOWNLOAD_FAILURE
                 }
-            } else {
-                if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "AppDownloadManager moveToFirst is false")
+            } catch (e: Exception) {
+                Log.e(LOG_TAG_DOWNLOAD, "failure download: ${e.message}", e)
+            } finally {
                 cursor.close()
-                return -1
             }
-            cursor.close()
         }
-        return 0
+        // occasionally, the download-manager observer fires without a download having
+        // been enqueued and download-ids populated into persitent-state, which keep in
+        // mind, is also eventually consistent with its state propagation. In this case,
+        // count(download-ids) is zero. So: Ask for a retry regardless of the download-status
+        return DOWNLOAD_RETRY
     }
 }

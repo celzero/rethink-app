@@ -21,16 +21,16 @@ import com.celzero.bravedns.util.Constants
 class DNSLogRepository(private val dnsLogDAO: DNSLogDAO) {
 
 
-    fun insertAsync(dnsLogs: DNSLogs) {
+    fun insert(dnsLogs: DNSLogs) {
         dnsLogDAO.insert(dnsLogs)
     }
 
-    fun deleteOlderData(date: Long){
+    fun deleteOlderData(date: Long) {
         dnsLogDAO.deleteOlderData(date)
     }
 
     fun deleteConnectionTrackerCount() {
-        dnsLogDAO.deleteOlderDataCount(Constants.FIREWALL_CONNECTIONS_IN_DB)
+        dnsLogDAO.deleteOlderDataCount(Constants.TOTAL_NETWORK_LOG_ENTRIES_THRESHOLD)
     }
 
 }

@@ -19,55 +19,63 @@ import android.app.Activity
 import android.util.Log
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+import com.celzero.bravedns.util.Constants.Companion.JSON_LATEST
+import com.celzero.bravedns.util.Constants.Companion.JSON_UPDATE
+import com.celzero.bravedns.util.Constants.Companion.JSON_VERSION
+import com.celzero.bravedns.util.Constants.Companion.RESPONSE_VERSION
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
 import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
 
-class NonStoreAppUpdater(val baseURL:String, private val persistentState: PersistentState):AppUpdater {
-    private val LOG_TAG = "${Constants.LOG_TAG}/NonStoreAppUpdater"
+class NonStoreAppUpdater(private val baseUrl: String,
+                         private val persistentState: PersistentState) : AppUpdater {
 
-    override fun checkForAppUpdate(isUserInitiated: Boolean, activity: Activity, listener: AppUpdater.InstallStateListener) {
-        Log.i(LOG_TAG, "Beginning update check.")
-        val url = baseURL + BuildConfig.VERSION_CODE
+    override fun checkForAppUpdate(isInteractive: AppUpdater.UserPresent, activity: Activity,
+                                   listener: AppUpdater.InstallStateListener) {
+        Log.i(LOG_TAG_APP_UPDATE, "Beginning update check")
+        val url = baseUrl + BuildConfig.VERSION_CODE
 
         val client = OkHttpClient()
-        val request = Request.Builder()
-            .url(url)
-            .build()
+        val request = Request.Builder().url(url).build()
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.i(LOG_TAG, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
-                if(isUserInitiated) {
-                    listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER)
-                }
+                Log.i(LOG_TAG_APP_UPDATE, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
+                listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER, isInteractive)
                 call.cancel()
             }
 
             override fun onResponse(call: Call, response: Response) {
                 try {
                     val stringResponse = response.body!!.string()
-                    //creating json object
-                    val jsonObject = JSONObject(stringResponse)
-                    val responseVersion = jsonObject.getInt("version")
-                    val updateValue = jsonObject.getBoolean("update")
-                    val latestVersion = jsonObject.getInt("latest")
+                    val json = JSONObject(stringResponse)
+                    val version = json.optInt(JSON_VERSION, 0)
+                    val shouldUpdate = json.optBoolean(JSON_UPDATE, false)
+                    val latest = json.optLong(JSON_LATEST, INIT_TIME_MS)
                     persistentState.lastAppUpdateCheck = System.currentTimeMillis() // FIXME move to NTP
-                    Log.i(Constants.LOG_TAG, "Server response for the new version download is true, version number-  $latestVersion")
-                    if (responseVersion == 1) {
-                        if (updateValue) {
-                            listener.onUpdateAvailable(AppUpdater.InstallSource.OTHER)
-                        } else {
-                            if(isUserInitiated) listener.onUpToDate(AppUpdater.InstallSource.OTHER)
-                        }
-                    }
+
                     response.close()
                     client.connectionPool.evictAll()
-                } catch (e: Exception) {
-                    if (isUserInitiated) {
-                        listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER)
+                    Log.i(LOG_TAG_APP_UPDATE,
+                          "Server response for the new version download is $shouldUpdate (json version: $version), version number:  $latest")
+
+                    if (version != RESPONSE_VERSION) {
+                        listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER, isInteractive)
+                        return
+                    } else {
+                        /* no-op - If the response version is correct, proceed with further checks. */
                     }
+
+                    if (!shouldUpdate) {
+                        listener.onUpToDate(AppUpdater.InstallSource.OTHER, isInteractive)
+                    } else {
+                        listener.onUpdateAvailable(AppUpdater.InstallSource.OTHER)
+                    }
+
+                } catch (e: Exception) {
+                    listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER, isInteractive)
                 }
             }
         })

@@ -16,13 +16,11 @@ limitations under the License.
 package com.celzero.bravedns.net.doh;
 
 import android.content.res.AssetManager;
-import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -36,64 +34,66 @@ import java.util.Arrays;
  */
 public class CountryMap {
 
-  // Number of bytes used to store each country string.
-  private static final int COUNTRY_SIZE = 2;
+    // Number of bytes used to store each country string.
+    private static final int COUNTRY_SIZE = 2;
 
-  private final byte[] v4db;
-  private final byte[] v6db;
+    private final byte[] v4db;
+    private final byte[] v6db;
 
-  public CountryMap(AssetManager assetManager) throws IOException {
-    v4db = read(assetManager.open("dbip.v4"));
-    v6db = read(assetManager.open("dbip.v6"));
-  }
-
-  private static byte[] read(InputStream input) throws IOException {
-    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-    int n;
-    byte[] temp = new byte[4096];
-    while ((n = input.read(temp, 0, temp.length)) != -1) {
-      buffer.write(temp, 0, n);
+    public CountryMap(AssetManager assetManager) throws IOException {
+        v4db = read(assetManager.open("dbip.v4"));
+        v6db = read(assetManager.open("dbip.v6"));
     }
-    return buffer.toByteArray();
-  }
 
-  /**
-   * Compares two arrays of equal length.  The first is an entry in a database, specified by the
-   * index of its first byte.  The second is a standalone array.
-   * @return The lexicographic comparison of the two arrays.
-   */
-  private static boolean lessEqual(byte[] db, int position, byte[] key) {
-    for (int i = 0; i < key.length; ++i) {
-      int ai = db[position + i] & 0xFF;
-      int bi = key[i] & 0xFF;
+    private static byte[] read(InputStream input) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        int n;
+        byte[] temp = new byte[4096];
+        while ((n = input.read(temp, 0, temp.length)) != -1) {
+            buffer.write(temp, 0, n);
+        }
+        return buffer.toByteArray();
+    }
 
-      if (ai < bi) {
+    /**
+     * Compares two arrays of equal length.  The first is an entry in a database, specified by the
+     * index of its first byte.  The second is a standalone array.
+     *
+     * @return The lexicographic comparison of the two arrays.
+     */
+    private static boolean lessEqual(byte[] db, int position, byte[] key) {
+        for (int i = 0; i < key.length; ++i) {
+            int ai = db[position + i] & 0xFF;
+            int bi = key[i] & 0xFF;
+
+            if (ai < bi) {
+                return true;
+            }
+            if (ai > bi) {
+                return false;
+            }
+        }
         return true;
-      }
-      if (ai > bi) {
-        return false;
-      }
     }
-    return true;
-  }
 
-  public String getCountryCode(InetAddress address) {
-    byte[] key = address.getAddress();
-    byte[] db = key.length == 4 ? v4db : v6db;
-    int recordSize = key.length + COUNTRY_SIZE;
-    int low = 0;
-    int high = db.length / recordSize;
-    while (high - low > 1) {
-      int mid = (low + high) / 2;
-      int position = mid * recordSize;
-      if (lessEqual(db, position, key)) {
-        low = mid;
-      } else {
-        high = mid;
-      }
+    public String getCountryCode(InetAddress address) {
+        if (address == null) return null;
+        byte[] key = address.getAddress();
+        byte[] db = key.length == 4 ? v4db : v6db;
+        int recordSize = key.length + COUNTRY_SIZE;
+        int low = 0;
+        int high = db.length / recordSize;
+        while (high - low > 1) {
+            int mid = (low + high) / 2;
+            int position = mid * recordSize;
+            if (lessEqual(db, position, key)) {
+                low = mid;
+            } else {
+                high = mid;
+            }
+        }
+        int position = low * recordSize + key.length;
+        byte[] countryCode = Arrays.copyOfRange(db, position, position + COUNTRY_SIZE);
+        return new String(countryCode, StandardCharsets.UTF_8);
     }
-    int position = low * recordSize + key.length;
-    byte[] countryCode = Arrays.copyOfRange(db, position, position + COUNTRY_SIZE);
-    return new String(countryCode, StandardCharsets.UTF_8);
-  }
 }

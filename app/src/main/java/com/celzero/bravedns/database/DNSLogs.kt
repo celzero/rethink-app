@@ -17,45 +17,75 @@ package com.celzero.bravedns.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.celzero.bravedns.net.doh.Transaction
+import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+import com.celzero.bravedns.util.Utilities
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Entity(tableName = "DNSLogs")
 class DNSLogs {
 
-    /**
-     * "CREATE TABLE 'DNSLogs' ('id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'query' TEXT NOT NULL,
-     * 'time' INTEGER NOT NULL, 'flag' TEXT NOT NULL, 'resolver' TEXT NOT NULL, latency INTEGER NOT NULL,
-     * 'typeName' TEXT NOT NULL, 'isBlocked' INTEGER NOT NULL, 'blockLists' LONGTEXT NOT NULL,
-     * 'serverIP' TEXT NOT NULL, 'relayIP' TEXT, 'responseTime' INTEGER NOT NULL, 'response' TEXT NOT NULL,
-     *  'status' TEXT NOT NULL,'dnsType' INTEGER NOT NULL) "
-     */
-
-    @PrimaryKey(autoGenerate = true)
-    var id : Int = 0
-    var queryStr : String = ""
-    var time : Long = 0L
-    var flag : String = ""
-    var resolver : String = ""
-    var latency : Long  = 0L
-    var typeName : String = ""
-    var isBlocked : Boolean = false
-    var blockLists : String = ""
-    var serverIP : String = ""
-    var relayIP : String = ""
-    var responseTime : Long = 0L
-    var response : String = ""
-    var status : String = ""
-    var dnsType : Int = 0
+    @PrimaryKey(autoGenerate = true) var id: Int = 0
+    var queryStr: String = ""
+    var time: Long = INIT_TIME_MS
+    var flag: String = ""
+    var resolver: String = ""
+    var latency: Long = 0L
+    var typeName: String = ""
+    var isBlocked: Boolean = false
+    var blockLists: String = ""
+    var serverIP: String = ""
+    var relayIP: String = ""
+    var responseTime: Long = INIT_TIME_MS
+    var response: String = ""
+    var status: String = ""
+    var dnsType: Int = 0
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other?.javaClass != javaClass) return false
-        other as DNSLogs
+        if (other !is DNSLogs) return false
         if (id != other.id) return false
         return true
     }
 
     override fun hashCode(): Int {
-        return this.hashCode()
+        return this.id.hashCode()
+    }
+
+    fun wallTime(): String {
+        val date = Date(this.time)
+        val format = SimpleDateFormat(Constants.DATE_FORMAT_PATTERN, Locale.ROOT)
+        return format.format(date)
+    }
+
+    fun favIcoUrl(): String {
+        return "${Constants.FAV_ICON_URL}${this.queryStr}ico"
+    }
+
+    fun subdomain(): String {
+        val subDomainURL = Utilities.getETldPlus1(this.queryStr).toString()
+        return "${Constants.FAV_ICON_URL}${subDomainURL}.ico"
+    }
+
+    fun failure(): Boolean {
+        return (this.status != Transaction.Status.COMPLETE.toString() || this.response == Constants.NXDOMAIN || this.isBlocked)
+    }
+
+    fun isAnonymized(): Boolean {
+        return this.relayIP.isNotEmpty()
+    }
+
+    fun isLocallyAnswered(): Boolean {
+        return this.serverIP.isEmpty()
+    }
+
+    fun hasBlocklists(): Boolean {
+        return this.blockLists.isNotEmpty()
+    }
+
+    fun getBlocklists(): List<String> {
+        return this.blockLists.split(",")
     }
 
 }

@@ -24,69 +24,82 @@ import com.celzero.bravedns.database.DNSLogs
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.dns.DnsPacket
 import com.celzero.bravedns.net.doh.Transaction
-import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.DNS_TYPE_DNS_CRYPT
-import com.celzero.bravedns.util.Constants.Companion.DNS_TYPE_DOH
-import com.celzero.bravedns.util.Constants.Companion.LOG_TAG
+import com.celzero.bravedns.util.Constants.Companion.LOOPBACK_IPV6
+import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DNSCRYPT
+import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DOH
+import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP
+import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IPV6
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
 import com.celzero.bravedns.util.Utilities.Companion.getFlag
 import com.celzero.bravedns.util.Utilities.Companion.makeAddressPair
+import com.google.common.net.InetAddresses.forString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.net.InetAddress
 import java.net.ProtocolException
-import java.net.UnknownHostException
 
-class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRepository, private val persistentState: PersistentState, private val context: Context) {
+class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRepository,
+                                         private val persistentState: PersistentState,
+                                         private val context: Context) {
+
+    companion object {
+        private const val PERSISTENCE_STATE_INSERT_SIZE = 100L
+    }
+
+    private var numRequests: Long = 0
+    private var numBlockedRequests: Long = 0
+
+    init {
+        numRequests = persistentState.numberOfRequests
+        numBlockedRequests = persistentState.numberOfBlockedRequests
+    }
 
     fun recordTransaction(transaction: Transaction?) {
-        if (transaction != null) {
-            insertToDB(transaction)
-        }
+        if (!persistentState.logsEnabled || transaction == null) return
+        insertToDB(transaction)
     }
 
     private fun insertToDB(transaction: Transaction) {
         GlobalScope.launch(Dispatchers.IO) {
             val dnsLogs = DNSLogs()
 
-            dnsLogs.blockLists = transaction.blockList
+            dnsLogs.blockLists = transaction.blocklist
             if (transaction.isDNSCrypt) {
-                dnsLogs.dnsType = DNS_TYPE_DNS_CRYPT
+                dnsLogs.dnsType = PREF_DNS_MODE_DNSCRYPT
                 dnsLogs.relayIP = transaction.relayIp
             } else {
-                dnsLogs.dnsType = DNS_TYPE_DOH
+                dnsLogs.dnsType = PREF_DNS_MODE_DOH
                 dnsLogs.relayIP = ""
             }
-            dnsLogs.latency = transaction.responseTime// - transaction.queryTime
+            dnsLogs.latency = transaction.responseTime
             dnsLogs.queryStr = transaction.name
             dnsLogs.responseTime = transaction.responseTime
             dnsLogs.serverIP = transaction.serverIp
             dnsLogs.status = transaction.status.name
             dnsLogs.time = transaction.responseCalendar.timeInMillis
             dnsLogs.typeName = Utilities.getTypeName(transaction.type.toInt())
-
-            try {
-                val serverAddress = if (transaction.serverIp != null) {
-                    try {
-                        InetAddress.getByName(transaction.serverIp)
-                    } catch (ex: UnknownHostException) {
-                        null
-                    }
+            val serverAddress = try {
+                if (!transaction.serverIp.isNullOrEmpty()) {
+                    // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
+                    forString(transaction.serverIp)
                 } else {
                     null
                 }
-                if (serverAddress != null) {
-                    val countryCode: String = getCountryCode(serverAddress, context) //TODO: Country code things
-                    dnsLogs.resolver = makeAddressPair(countryCode, serverAddress.hostAddress)
-                } else {
-                    dnsLogs.resolver = transaction.serverIp
-                }
-            } catch (e: Exception) {
-                Log.w(LOG_TAG, "DNSLogTracker - exception while fetching the resolver: ${e.message}", e)
+            } catch (e: IllegalArgumentException) {
+                Log.e(LOG_TAG_DNS_LOG, "Failure converting string to InetAddresses: ${e.message}",
+                      e)
+                null
+            }
+
+            if (serverAddress != null) {
+                val countryCode: String = getCountryCode(serverAddress,
+                                                         context) //TODO: Country code things
+                dnsLogs.resolver = makeAddressPair(countryCode, serverAddress.hostAddress)
+            } else {
                 dnsLogs.resolver = transaction.serverIp
             }
 
@@ -102,25 +115,24 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                     val addresses: List<InetAddress> = packet.responseAddresses
                     if (addresses.isNotEmpty()) {
                         val destination = addresses[0]
-                        if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "transaction.response - ${destination.address}")
-                        val countryCode: String = getCountryCode(destination, context) //TODO : Check on the country code stuff
+                        if (DEBUG) Log.d(LOG_TAG_DNS_LOG,
+                                         "Address - ${destination.address}, HostAddress - ${destination.hostAddress}")
+                        val countryCode: String = getCountryCode(destination,
+                                                                 context) //TODO : Check on the country code stuff
                         dnsLogs.response = makeAddressPair(countryCode, destination.hostAddress)
-                        if (destination.hostAddress.contains("0.0.0.0")) {
+                        if (destination.hostAddress.contains(UNSPECIFIED_IP)) {
                             dnsLogs.isBlocked = true
                         }
-
                         if (destination.isAnyLocalAddress) {
-                            if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "Local address: ${destination.hostAddress}")
                             dnsLogs.isBlocked = true
-                        } else if (destination.hostAddress == "::0" || destination.hostAddress == "::1") {
-                            if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "Local equals(::0): ${destination.hostAddress}")
+                        } else if (destination.hostAddress == UNSPECIFIED_IPV6 || destination.hostAddress == LOOPBACK_IPV6) {
                             dnsLogs.isBlocked = true
                         }
-                        if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LOG_TAG, "transaction.response - ${destination.hostAddress}")
                         dnsLogs.flag = getFlag(countryCode)
                     } else {
                         dnsLogs.response = "NXDOMAIN"
-                        dnsLogs.flag = context.getString(R.string.unicode_question_sign) // White question mark
+                        dnsLogs.flag = context.getString(
+                            R.string.unicode_question_sign) // White question mark
                     }
                 } else {
                     dnsLogs.response = err
@@ -134,23 +146,40 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                     context.getString(R.string.unicode_warning_sign) // Warning sign
                 }
             }
-            if (dnsLogs.isBlocked) {
-                persistentState.incrementBlockedReq()
-            }
-            persistentState.setNumOfReq()
-            dnsLogRepository.insertAsync(dnsLogs)
+
             fetchFavIcon(dnsLogs)
+
+            // Post number of requests and blocked count to livedata.
+            persistentState.dnsRequestsCountLiveData.postValue(++numRequests)
+            if (dnsLogs.isBlocked) persistentState.dnsBlockedCountLiveData.postValue(
+                ++numBlockedRequests)
+
+            dnsLogRepository.insert(dnsLogs)
+
+            // avoid excessive disk I/O from syncing the counter to disk after every request
+            if (numRequests % PERSISTENCE_STATE_INSERT_SIZE == 0L) {
+                // Blocked request count
+                if (numBlockedRequests > persistentState.numberOfBlockedRequests) {
+                    persistentState.numberOfBlockedRequests = numBlockedRequests
+                } else {
+                    numBlockedRequests = persistentState.numberOfBlockedRequests
+                }
+
+                // Number of request count.
+                if (numRequests > persistentState.numberOfRequests) {
+                    persistentState.numberOfRequests = numRequests
+                } else {
+                    numRequests = persistentState.numberOfRequests
+                }
+            }
         }
     }
 
     private fun fetchFavIcon(dnsLogs: DNSLogs) {
-        if (persistentState.fetchFavIcon) {
-            if (dnsLogs.status == Transaction.Status.COMPLETE.toString() && dnsLogs.response != Constants.NXDOMAIN && !dnsLogs.isBlocked) {
-                val url = "${Constants.FAV_ICON_URL}${dnsLogs.queryStr}ico"
-                if(DEBUG) Log.d(LOG_TAG, "Glide - fetchFavIcon() -$url")
-                val favIconFetcher = FavIconDownloader(context, url)
-                favIconFetcher.run()
-            }
-        }
+        if (!persistentState.fetchFavIcon || dnsLogs.failure()) return
+
+        if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - fetchFavIcon() -${dnsLogs.queryStr}")
+        val favIconFetcher = FavIconDownloader(context, dnsLogs.queryStr)
+        favIconFetcher.run()
     }
 }

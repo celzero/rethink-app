@@ -33,35 +33,34 @@ import tun2socks.Tun2socks;
  */
 public class GoProber extends Prober {
 
-  private final Context context;
+    private final Context context;
 
-  public GoProber(Context context) {
-    this.context = context;
-  }
+    public GoProber(Context context) {
+        this.context = context;
+    }
 
-  @Override
-  public void probe(String url, Callback callback) {
-    VpnController vpnController = VpnController.Companion.getInstance();
-    new Thread(() -> {
-      String dohIPs = GoVpnAdapter.getIpString(context, url);
-      try {
-        // Protection isn't needed for Lollipop+, or if the VPN is not active.
-        Protector protector = VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP ? null :
-                vpnController.getBraveVpnService();
-        Transport transport = Tun2socks.newDoHTransport(url, dohIPs, protector, null, null);
-        if (transport == null) {
-          callback.onCompleted(false);
-          return;
-        }
-        byte[] response = transport.query(QUERY_DATA);
-        if (response != null && response.length > 0) {
-          callback.onCompleted(true);
-          return;
-        }
-        callback.onCompleted(false);
-      } catch (Exception e) {
-        callback.onCompleted(false);
-      }
-    },"GoProber-probe").start();
-  }
+    @Override
+    public void probe(String url, Callback callback) {
+        new Thread(() -> {
+            String dohIPs = GoVpnAdapter.getIpString(context, url);
+            try {
+                // Protection isn't needed for Lollipop+, or if the VPN is not active.
+                Protector protector = VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP ? null :
+                        VpnController.INSTANCE.getBraveVpnService();
+                Transport transport = Tun2socks.newDoHTransport(url, dohIPs, protector, null, null);
+                if (transport == null) {
+                    callback.onCompleted(false);
+                    return;
+                }
+                byte[] response = transport.query(QUERY_DATA);
+                if (response != null && response.length > 0) {
+                    callback.onCompleted(true);
+                    return;
+                }
+                callback.onCompleted(false);
+            } catch (Exception e) {
+                callback.onCompleted(false);
+            }
+        }, "GoProber-probe").start();
+    }
 }

@@ -16,39 +16,40 @@ limitations under the License.
 
 package com.celzero.bravedns.database
 
+import android.content.Context
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.celzero.bravedns.R
 
 @Entity(tableName = "DNSProxyEndpoint")
 class DNSProxyEndpoint {
-    @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
-    var proxyName : String = ""
+    @PrimaryKey(autoGenerate = true) var id: Int = 0
+    var proxyName: String = ""
     var proxyType: String = ""
-    var proxyAppName: String ?= null
-    var proxyIP: String ?= null
-    var proxyPort : Int  = 0
+    var proxyAppName: String? = null
+    var proxyIP: String? = null
+    var proxyPort: Int = 0
     var isSelected: Boolean = true
     var isCustom: Boolean = true
     var modifiedDataTime: Long = 0L
     var latency: Int = 0
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other?.javaClass != javaClass) return false
-        other as DNSProxyEndpoint
+        if (other !is DNSProxyEndpoint) return false
         if (id != other.id) return false
         return true
     }
 
     override fun hashCode(): Int {
-        return this.hashCode()
+        return this.id.hashCode()
     }
 
-
-    constructor(id: Int, proxyName: String,  proxyType: String, proxyAppName: String, proxyIP: String,proxyPort : Int, isSelected: Boolean, isCustom: Boolean, modifiedDataTime: Long, latency: Int) {
-        if(id != -1)
-            this.id = id
+    constructor(id: Int, proxyName: String, proxyType: String, proxyAppName: String,
+                proxyIP: String, proxyPort: Int, isSelected: Boolean, isCustom: Boolean,
+                modifiedDataTime: Long, latency: Int) {
+        // Room auto-increments id when its set to zero.
+        // A non-zero id overrides and sets caller-specified id instead.
+        this.id = id
         this.proxyName = proxyName
         this.proxyType = proxyType
         this.proxyAppName = proxyAppName
@@ -56,11 +57,26 @@ class DNSProxyEndpoint {
         this.proxyPort = proxyPort
         this.isSelected = isSelected
         this.isCustom = isCustom
-        if(modifiedDataTime != 0L)
-            this.modifiedDataTime = modifiedDataTime
-        else
-            this.modifiedDataTime = System.currentTimeMillis()
+        if (modifiedDataTime != 0L) this.modifiedDataTime = modifiedDataTime
+        else this.modifiedDataTime = System.currentTimeMillis()
         this.latency = latency
     }
 
+    fun isDeletable(): Boolean {
+        return isCustom && !isSelected
+    }
+
+    fun getExplanationText(context: Context): String {
+        return if (this.isSelected) {
+            context.getString(R.string.settings_socks_forwarding_desc, this.proxyIP,
+                              this.proxyPort.toString(), this.proxyAppName)
+        } else {
+            context.getString(R.string.dns_proxy_desc, this.proxyIP, this.proxyPort.toString(),
+                              this.proxyAppName)
+        }
+    }
+
+    fun getPackageName(): String? {
+        return proxyAppName
+    }
 }
