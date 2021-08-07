@@ -65,7 +65,6 @@ class RefreshDatabase internal constructor(private var context: Context,
 
     @GuardedBy("refreshMutex") @Volatile private var isRefreshInProgress: Boolean = false
 
-
     /**
      * Need to rewrite the logic for adding the apps in the database and removing it during uninstall.
      */
@@ -76,7 +75,7 @@ class RefreshDatabase internal constructor(private var context: Context,
             if (isRefreshInProgress) return
         }
 
-        if (!isRefreshCheckRequired(isForceRefresh)) return
+        if (!isRefreshCheckRequired(isForceRefresh) && FirewallManager.getTotalApps() != 0) return
 
         // Synchronization is deprecated in kotlin, so using Lock.withLock with ReentrantLock.
         // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/synchronized.html
@@ -123,6 +122,9 @@ class RefreshDatabase internal constructor(private var context: Context,
             // Add the missing packages to the database
             addMissingPackages(packagesToAdd)
 
+            // update app refresh time to current time in persistent state
+            persistentState.lastAppRefreshTime = System.currentTimeMillis()
+
             isRefreshInProgress = false
         }
     }
@@ -156,7 +158,6 @@ class RefreshDatabase internal constructor(private var context: Context,
             entry.appCategory = determineAppCategory(appInfo)
 
             FirewallManager.persistAppInfo(entry)
-
 
         }
         updateCategoryRepo()

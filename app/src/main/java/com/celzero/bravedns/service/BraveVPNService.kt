@@ -46,7 +46,6 @@ import com.celzero.bravedns.automaton.FirewallRules.UID_EVERYBODY
 import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.data.ConnectionRules
 import com.celzero.bravedns.data.IPDetails
-import com.celzero.bravedns.database.ProxyEndpointRepository
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.net.manager.ConnectionTracer
@@ -67,7 +66,10 @@ import com.celzero.bravedns.util.Utilities.Companion.getThemeAccent
 import com.celzero.bravedns.util.Utilities.Companion.isMissingOrInvalidUid
 import com.celzero.bravedns.util.Utilities.Companion.isVpnLockdownEnabled
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import protect.Blocker
@@ -1004,7 +1006,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 if (appMode.getAppState() == AppMode.AppState.PAUSE.state) {
                     startCountDownTimer(pauseRemainingTime)
                 } else {
-                    stopCountTimer()
+                    stopCountDownTimer()
                 }
                 CoroutineScope(Dispatchers.IO).launch {
                     restartVpn(appMode.makeTunnelDataClass())
@@ -1074,18 +1076,18 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     private fun restartVpn(tunnelMode: AppMode.TunnelMode) {
         synchronized(VpnController) {
             Thread({
-                       // Attempt seamless hand off as described in the docs for VpnService.Builder.establish().
-                       val oldAdapter: GoVpnAdapter? = vpnAdapter
-                       vpnAdapter = makeVpnAdapter()
-                       oldAdapter?.close()
-                       Log.i(LOG_TAG_VPN, "restartVpn? ${vpnAdapter != null}")
-                       if (vpnAdapter != null) {
-                           vpnAdapter?.start(tunnelMode)
-                           handleAdapterChange(tunnelMode)
-                       } else {
-                           signalStopService(false)
-                       }
-                   }, "restartvpn-onCommand").start()
+                // Attempt seamless hand off as described in the docs for VpnService.Builder.establish().
+                val oldAdapter: GoVpnAdapter? = vpnAdapter
+                vpnAdapter = makeVpnAdapter()
+                oldAdapter?.close()
+                Log.i(LOG_TAG_VPN, "restartVpn? ${vpnAdapter != null}")
+                if (vpnAdapter != null) {
+                    vpnAdapter?.start(tunnelMode)
+                    handleAdapterChange(tunnelMode)
+                } else {
+                    Log.w(LOG_TAG_VPN, "failed to restart vpn")
+                }
+            }, "restartvpn-onCommand").start()
         }
     }
 
@@ -1148,6 +1150,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         }
 
         persistentState.setVpnEnabled(false)
+        appMode.setAppState(AppMode.AppState.ACTIVE)
+        stopCountDownTimer()
 
         synchronized(VpnController) {
             Log.w(LOG_TAG_VPN, "Destroying DNS VPN service")
@@ -1183,7 +1187,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         }.start()
     }
 
-    private fun stopCountTimer() {
+    private fun stopCountDownTimer() {
         pauseTimer?.cancel()
         pauseRemainingTime = DEFAULT_PAUSE_TIMER
         updateTimerLiveData.postValue(0)

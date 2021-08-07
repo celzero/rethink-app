@@ -60,9 +60,8 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.getAppListForUID(uid)
     }
 
-    fun setInternetAllowedForCategory(categoryName: String, isInternetAllowed: Boolean): Int {
+    fun setInternetAllowedForCategory(categoryName: String, isInternetAllowed: Boolean) {
         appInfoDAO.updateInternetPermissionForCategory(categoryName, isInternetAllowed)
-        return appInfoDAO.getBlockedCountForCategory(categoryName)
     }
 
     fun getAllAppDetailsForLiveData(): LiveData<List<AppInfo>> {
