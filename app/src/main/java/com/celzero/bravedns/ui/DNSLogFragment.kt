@@ -141,13 +141,14 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         if (dnsType == PREF_DNS_MODE_DOH) {
             b.connectedStatusTitleUrl.text = resources.getString(
                 R.string.configure_dns_connected_doh_status)
-            b.connectedStatusTitle.text = resources.getString(R.string.configure_dns_connection_name, appMode.getConnectedDNS())
+            b.connectedStatusTitle.text = resources.getString(
+                R.string.configure_dns_connection_name, appMode.getConnectedDNS())
             b.queryListScrollList.recyclerQuery.visibility = View.VISIBLE
             b.queryListScrollList.dnsLogNoLogText.visibility = View.GONE
         } else if (dnsType == PREF_DNS_MODE_DNSCRYPT) {
             observeCryptStatus()
             b.connectedStatusTitleUrl.text = resources.getString(
-                            R.string.configure_dns_connected_dns_crypt_status)
+                R.string.configure_dns_connected_dns_crypt_status)
             b.queryListScrollList.recyclerQuery.visibility = View.VISIBLE
             b.queryListScrollList.dnsLogNoLogText.visibility = View.GONE
         } else {

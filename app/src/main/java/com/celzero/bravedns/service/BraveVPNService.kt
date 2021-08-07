@@ -623,7 +623,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 val appName = socks5ProxyEndpoint?.proxyAppName
                 Log.i(LOG_TAG_VPN,
                       "Proxy mode - Socks5 is selected - $socks5ProxyEndpoint, with app name - $appName")
-                if (appName?.equals(getString(R.string.settings_app_list_default_app)) == false && isExcludePossible(appName, getString(R.string.socks5_proxy_toast_parameter))) {
+                if (appName?.equals(getString(
+                        R.string.settings_app_list_default_app)) == false && isExcludePossible(
+                        appName, getString(R.string.socks5_proxy_toast_parameter))) {
                     // Asserting the appName as there is null check above.
                     builder = builder.addDisallowedApplication(appName)
                 }
@@ -639,7 +641,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 val dnsProxyEndpoint = appMode.getConnectedProxyDetails()
                 val appName = dnsProxyEndpoint.proxyAppName
                 Log.i(LOG_TAG_VPN, "DNS Proxy mode is set with the app name as $appName")
-                if (appName?.equals(getString(R.string.settings_app_list_default_app)) == false && isExcludePossible(appName, getString(R.string.dns_proxy_toast_parameter))) {
+                if (appName?.equals(getString(
+                        R.string.settings_app_list_default_app)) == false && isExcludePossible(
+                        appName, getString(R.string.dns_proxy_toast_parameter))) {
                     // Asserting the appName as there is null check above.
                     builder = builder.addDisallowedApplication(appName)
                 }
@@ -656,8 +660,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             Log.i(LOG_TAG_VPN, "Vpn in lockdown mode")
             CoroutineScope(Dispatchers.Main).launch {
                 VpnController.getBraveVpnService()?.let {
-                    showToastUiCentered(it, getString(R.string.dns_proxy_connection_failure_lockdown,
-                                                      appName, message), Toast.LENGTH_SHORT)
+                    showToastUiCentered(it,
+                                        getString(R.string.dns_proxy_connection_failure_lockdown,
+                                                  appName, message), Toast.LENGTH_SHORT)
                 }
             }
             return false
@@ -712,8 +717,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         }
 
         if (appMode.getAppState() == AppMode.AppState.PAUSE.state) {
-            contentTitle = context.resources.getString(
-                                            R.string.pause_mode_notification_title)
+            contentTitle = context.resources.getString(R.string.pause_mode_notification_title)
         }
 
         builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(
@@ -1076,18 +1080,18 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     private fun restartVpn(tunnelMode: AppMode.TunnelMode) {
         synchronized(VpnController) {
             Thread({
-                // Attempt seamless hand off as described in the docs for VpnService.Builder.establish().
-                val oldAdapter: GoVpnAdapter? = vpnAdapter
-                vpnAdapter = makeVpnAdapter()
-                oldAdapter?.close()
-                Log.i(LOG_TAG_VPN, "restartVpn? ${vpnAdapter != null}")
-                if (vpnAdapter != null) {
-                    vpnAdapter?.start(tunnelMode)
-                    handleAdapterChange(tunnelMode)
-                } else {
-                    Log.w(LOG_TAG_VPN, "failed to restart vpn")
-                }
-            }, "restartvpn-onCommand").start()
+                       // Attempt seamless hand off as described in the docs for VpnService.Builder.establish().
+                       val oldAdapter: GoVpnAdapter? = vpnAdapter
+                       vpnAdapter = makeVpnAdapter()
+                       oldAdapter?.close()
+                       Log.i(LOG_TAG_VPN, "restartVpn? ${vpnAdapter != null}")
+                       if (vpnAdapter != null) {
+                           vpnAdapter?.start(tunnelMode)
+                           handleAdapterChange(tunnelMode)
+                       } else {
+                           Log.w(LOG_TAG_VPN, "failed to restart vpn")
+                       }
+                   }, "restartvpn-onCommand").start()
         }
     }
 
@@ -1173,7 +1177,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         }
 
         pauseTimer?.cancel()
-        pauseTimer = object : CountDownTimer(pauseRemainingTime!!, 1000) { // asserting the time as there is null check above
+        pauseTimer = object : CountDownTimer(pauseRemainingTime!!,
+                                             1000) { // asserting the time as there is null check above
             override fun onTick(millisUntilFinished: Long) {
                 pauseRemainingTime = millisUntilFinished
                 updateTimerLiveData.postValue(millisUntilFinished)
