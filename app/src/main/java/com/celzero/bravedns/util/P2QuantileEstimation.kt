@@ -16,6 +16,8 @@
 package com.celzero.bravedns.util
 
 import java.util.*
+import kotlin.math.floor
+import kotlin.math.roundToInt
 import kotlin.math.sign
 
 /**
@@ -33,7 +35,7 @@ class P2QuantileEstimation(probability: Double) {
     // lower percentiles (p50) at the expense of computational cost;
     // for higher percentiles (p90+), even u as low as 5 works fine.
     private val u = 31
-    private val mid = Math.floor(u/2.0).roundToInt()
+    private val mid = floor(u/2.0).roundToInt()
 
     private val n = IntArray(u) // marker positions
     private val ns = DoubleArray(u) // desired marker positions
@@ -146,16 +148,16 @@ class P2QuantileEstimation(probability: Double) {
             (d * (q[i + d] - q[i]) / (n[i + d] - n[i]))
     }
 
-    fun getQuantile(): Double {
+    fun getQuantile(): Long {
         val c = count
 
         if (c > u) {
-            return q[mid]
+            return q[mid].toLong()
         }
 
         Arrays.sort(q, 0, c)
-        val index = ((c - 1) * p)).roundToInt()
-        return q[index]
+        val index = ((c - 1) * p).roundToInt()
+        return q[index].toLong()
     }
 
 }

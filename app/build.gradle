@@ -96,7 +96,8 @@ dependencies {
     implementation 'org.minidns:minidns-hla:1.0.0'
     // To check if the play services is available
     implementation 'com.google.android.gms:play-services-base:17.6.0'
-
+    // For liveData implementation
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.1'
 
     implementation 'com.google.code.gson:gson:2.8.6'
 
@@ -119,6 +120,7 @@ dependencies {
 
 
     implementation 'com.squareup.okhttp3:okhttp:4.9.0'
+    implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.9.0'
     playImplementation 'com.google.android.play:core:1.10.0'//for new version updater
 
     //Glide implementation

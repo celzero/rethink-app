@@ -49,7 +49,7 @@ class CustomSpinnerAdapter(val context: Context, var dataSource: List<String>) :
             vh = view.tag as ItemHolder
         }
         vh.label.text = dataSource[position]
-        if (position == (appMode.getDNSType().minus(1))) {
+        if (position == (appMode.getDnsType().minus(1))) {
             vh.img.visibility = View.VISIBLE
         } else {
             vh.img.visibility = View.INVISIBLE

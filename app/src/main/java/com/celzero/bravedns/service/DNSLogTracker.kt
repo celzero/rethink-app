@@ -56,6 +56,8 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
     init {
         numRequests = persistentState.numberOfRequests
         numBlockedRequests = persistentState.numberOfBlockedRequests
+        persistentState.dnsRequestsCountLiveData.postValue(numRequests)
+        persistentState.dnsBlockedCountLiveData.postValue(numBlockedRequests)
     }
 
     fun recordTransaction(transaction: Transaction?) {

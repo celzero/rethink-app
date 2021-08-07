@@ -48,6 +48,6 @@
     <string name="url14" translatable="false">https://fi.doh.dns.snopyta.org/dns-query</string>
     <string name="ips14" translatable="false">95.216.24.230,2a01:4f9:2a:1919::9301</string>
 
-    <string name="url15" translatable="false">https://basic.bravedns.com</string>
-    <string name="ips15" translatable="false">104.26.6.92,172.67.70.173,104.26.7.92</string>
+    <string name="url15" translatable="false">https://basic.bravedns.com/dns-query</string>
+    <string name="ips15" translatable="false">172.67.195.148,104.21.49.234</string>
 </resources>

@@ -39,10 +39,8 @@ class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
         }
     }
 
-    fun insertAsync(proxyEndpoint: ProxyEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
-        coroutineScope.launch {
-            proxyEndpointDAO.insert(proxyEndpoint)
-        }
+    fun insert(proxyEndpoint: ProxyEndpoint) {
+        proxyEndpointDAO.insert(proxyEndpoint)
     }
 
     fun getDNSProxyEndpointLiveData(): LiveData<PagedList<ProxyEndpoint>> {

@@ -98,4 +98,8 @@ class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
         return doHEndpointDAO.getConnectedDoH()
     }
 
+    fun getRethinkDnsEndpoint(): DoHEndpoint {
+        return doHEndpointDAO.getRethinkDnsEndpoint()
+    }
+
 }

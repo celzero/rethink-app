@@ -19,8 +19,8 @@ package com.celzero.bravedns.automaton
 import android.app.KeyguardManager
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.celzero.bravedns.automaton.FirewallManager.GlobalVariable.appList
-import com.celzero.bravedns.automaton.FirewallManager.GlobalVariable.appListLiveData
+import com.celzero.bravedns.automaton.FirewallManager.GlobalVariable.appInfos
+import com.celzero.bravedns.automaton.FirewallManager.GlobalVariable.appInfosLiveData
 import com.celzero.bravedns.automaton.FirewallManager.GlobalVariable.foregroundUids
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoRepository
@@ -30,13 +30,14 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.OrbotHelper
+import com.google.common.collect.HashMultimap
+import com.google.common.collect.Multimap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.concurrent.ConcurrentHashMap
 
 /*TODO : Initial check is for firewall app completely
            Later modification required for Data, WiFi, ScreenOn/Off, Background
@@ -53,13 +54,16 @@ object FirewallManager : KoinComponent {
     }
 
     object GlobalVariable {
-        var appList: MutableMap<String, AppInfo> = ConcurrentHashMap()
+        var appInfos: Multimap<Int, AppInfo> = HashMultimap.create()
+        //var appInfos: MutableMap<String, AppInfo> = ConcurrentHashMap()
 
         // TODO: protect access to the foregroundUids (read/write)
         @Volatile var foregroundUids: HashSet<Int> = HashSet()
 
-        var appListLiveData: MutableLiveData<List<AppInfo>> = MutableLiveData()
+        var appInfosLiveData: MutableLiveData<Collection<AppInfo>> = MutableLiveData()
     }
+
+    data class AppInfoTuple(val uid: Int, val packageName: String)
 
     @Volatile private var isFirewallRulesLoaded: Boolean = false
 
@@ -68,39 +72,51 @@ object FirewallManager : KoinComponent {
     }
 
     fun isUidFirewalled(uid: Int): Boolean {
-        return !appList.values.filter { it.uid == uid }[0].isInternetAllowed
+        return appInfos.get(uid).any { !it.isInternetAllowed }
     }
 
     fun isUidWhitelisted(uid: Int): Boolean {
-        if (!appList.isNullOrEmpty()) {
-            val appDetail = appList.values.filter { it.uid == uid }
-            if (appDetail.isNotEmpty()) {
-                return appDetail[0].whiteListUniv1
-            }
-        }
-        return false
+        return appInfos.get(uid).any { it.whiteListUniv1 }
     }
 
     fun getTotalApps(): Int {
-        return appList.size
+        return appInfos.values().size
     }
 
+    fun getPackageNames(): Set<AppInfoTuple> {
+        return appInfos.values().map { AppInfoTuple(it.uid, it.packageInfo) }.toHashSet()
+    }
+
+    fun getAppInfos(): Collection<AppInfo> {
+        return appInfos.values()
+    }
+
+    fun deletePackagesFromCache(packageNames: Set<AppInfoTuple>) {
+        packageNames.forEach { tuple ->
+            appInfos.get(tuple.uid).filter { tuple.packageName == it.packageInfo }.forEach { ai ->
+                appInfos.remove(tuple.uid, ai)
+            }
+        }
+        // Delete the uninstalled apps from database
+        appInfoRepository.deleteByPackageName(packageNames.map { it.packageName })
+
+    }
+
+    fun getNonFirewalledAppsPackageNames(): List<AppInfo> {
+        return appInfos.values().filter { it.isInternetAllowed }
+    }
+
+    // TODO: Use the package-manager API instead
     fun isOrbotInstalled(): Boolean {
-        return appList.contains(OrbotHelper.ORBOT_PACKAGE_NAME)
+        return appInfos.values().any { it.packageInfo == OrbotHelper.ORBOT_PACKAGE_NAME }
     }
 
-    fun isUidRegistered(uid: Int): Boolean {
-        return appList.values.any { it.uid == uid }
+    fun hasUid(uid: Int): Boolean {
+        return appInfos.containsKey(uid)
     }
 
     fun isUidExcluded(uid: Int): Boolean {
-        if (!appList.isNullOrEmpty()) {
-            val appDetail = appList.values.filter { it.uid == uid }
-            if (appDetail.isNotEmpty()) {
-                return appDetail[0].isExcluded
-            }
-        }
-        return false
+        return appInfos.get(uid).any { it.isExcluded }
     }
 
     fun canFirewall(uid: Int): FIREWALL_STATUS {
@@ -119,124 +135,140 @@ object FirewallManager : KoinComponent {
         return FIREWALL_STATUS.ALLOWED
     }
 
-    fun getApplistObserver(): MutableLiveData<List<AppInfo>> {
-        return appListLiveData
+    fun getApplistObserver(): MutableLiveData<Collection<AppInfo>> {
+        return appInfosLiveData
     }
 
     fun getExcludedApps(): List<String> {
-        val list = appList.values.filter { it.isExcluded }
-        val excludedList: MutableList<String> = ArrayList()
-        list.forEach {
-            excludedList.add(it.packageInfo)
-        }
-        return excludedList
+        return appInfos.values().filter { it.isExcluded }.map { it.packageInfo }
     }
 
-    fun getPackageNameByAppName(appName: String): String {
-        val appNames = appList.values.filter { it.appName == appName }
-        if (!appNames.isNullOrEmpty()) return appNames[0].packageInfo
-
-        return appInfoRepository.getPackageNameForAppName(appName)
+    fun getPackageNameByAppName(appName: String): String? {
+        return appInfos.values().firstOrNull { it.appName == appName }?.packageInfo
     }
 
     fun getAppNamesByUid(uid: Int): List<String> {
-        return appList.values.filter { it.uid == uid }.map(AppInfo::appName)
+        return appInfos.get(uid).map { it.appName }
     }
 
     fun getPackageNamesByUid(uid: Int): List<String> {
-        return appList.values.filter { it.uid == uid && !it.isSystemApp }.map(AppInfo::packageInfo)
+        return appInfos.get(uid).filter { !it.isSystemApp }.map { it.packageInfo }
     }
 
     fun getAllAppNames(): List<String> {
-        return appList.values.map(AppInfo::appName)
+        return appInfos.values().map { it.appName }
     }
 
     fun getAppNameByUid(uid: Int): String? {
-        return appList.values.firstOrNull { it.uid == uid }?.appName
+        return appInfos.get(uid).firstOrNull()?.appName
     }
 
     fun getAppInfoByPackage(packageName: String?): AppInfo? {
-        return appList[packageName]
+        if (packageName.isNullOrBlank()) return null
+
+        return appInfos.values().firstOrNull { it.packageInfo == packageName }
     }
 
     fun getAppInfoByUid(uid: Int): AppInfo? {
-        return appList.values.firstOrNull { it.uid == uid }
+        return appInfos.get(uid).firstOrNull()
     }
 
-    private fun getAppInfosByUid(uid: Int): List<AppInfo> {
-        return appList.values.filter { it.uid == uid }
+    private fun getAppInfosByUid(uid: Int): Collection<AppInfo> {
+        return appInfos.get(uid)
     }
 
     fun getPackageNameByUid(uid: Int): String? {
-        return appList.values.firstOrNull { it.uid == uid }?.packageInfo
+        return appInfos.get(uid).firstOrNull()?.packageInfo
     }
 
     fun getCategoryListByAppName(appName: String): List<String> {
-        return appList.values.filter {
+        return appInfos.values().filter {
             it.appName.contains(appName)
         }.map { it.appCategory }.distinct().sorted()
     }
 
+    private fun getBlockedCountForCategory(categoryName: String): Int {
+        return appInfos.values().filter {
+            it.appCategory == categoryName && !it.isInternetAllowed
+        }.size
+    }
+
+    private fun getWhitelistCountForCategory(categoryName: String): Int {
+        return appInfos.values().filter {
+            it.appCategory == categoryName && it.whiteListUniv1
+        }.size
+    }
+
+    private fun getExcludedCountForCategory(categoryName: String): Int {
+        return appInfos.values().filter {
+            it.appCategory == categoryName && it.isInternetAllowed
+         }.size
+    }
+
+    fun getWhitelistAppData(): List<AppInfo> {
+        return appInfos.values().filter { !it.isExcluded }
+    }
+
     suspend fun loadAppFirewallRules() {
+        if (isFirewallRulesLoaded) return
+
         withContext(Dispatchers.IO) {
             reloadAppList()
-            isFirewallRulesLoaded = true
-            appListLiveData.postValue(appList.values.toList())
+            appInfosLiveData.postValue(appInfos.values())
         }
     }
 
     private fun updateAppsInternetPermission(uid: Int, isAllowed: Boolean) {
-        appList.values.filter { it.uid == uid }.forEach {
+        appInfos.get(uid).forEach {
             it.isInternetAllowed = isAllowed
         }
-        appListLiveData.postValue(appList.values.toList())
+        appInfosLiveData.postValue(appInfos.values())
     }
 
     private fun updateAppsExcludedPermission(uid: Int, isExcluded: Boolean) {
-        appList.values.filter { it.uid == uid }.forEach {
+        appInfos.get(uid).forEach {
             it.isExcluded = isExcluded
             if (isExcluded) {
                 it.isInternetAllowed = true
             }
         }
 
-        appListLiveData.postValue(appList.values.toList())
+        appInfosLiveData.postValue(appInfos.values())
     }
 
     private fun updateAppsWhitelist(uid: Int, isWhitelisted: Boolean) {
-        appList.values.filter { it.uid == uid }.forEach {
+        appInfos.get(uid).forEach {
             it.whiteListUniv1 = isWhitelisted
             if (isWhitelisted) {
                 it.isInternetAllowed = true
             }
         }
 
-        appListLiveData.postValue(appList.values.toList())
+        appInfosLiveData.postValue(appInfos.values())
     }
 
     private fun updateCategoryAppsInternetPermission(categoryName: String, isAllowed: Boolean) {
-        appList.values.filter { it.appCategory == categoryName }.forEach {
+        appInfos.values().filter { it.appCategory == categoryName }.forEach {
             it.isInternetAllowed = !isAllowed
         }
 
-        appListLiveData.postValue(appList.values.toList())
+        appInfosLiveData.postValue(appInfos.values())
     }
 
-    fun updateGlobalAppInfoEntry(packageName: String, appInfo: AppInfo?) {
-        if (appInfo != null) {
-            appList[packageName] = appInfo
-            appListLiveData.postValue(appList.values.toList())
-        }
+    fun persistAppInfo(appInfo: AppInfo) {
+        appInfoRepository.insert(appInfo)
+        appInfos.put(appInfo.uid, appInfo)
+        appInfosLiveData.postValue(appInfos.values())
     }
 
-    fun reloadAppList() {
-        val appInfos = appInfoRepository.getAppInfo()
-        appList.clear()
-        appInfos.forEach {
-            appList[it.packageInfo] = it
+    private fun reloadAppList() {
+        val apps = appInfoRepository.getAppInfo()
+        appInfos.clear()
+        apps.forEach {
+            appInfos.put(it.uid, it)
         }
-
-        appListLiveData.postValue(appList.values.toList())
+        isFirewallRulesLoaded = true
+        appInfosLiveData.postValue(appInfos.values())
     }
 
     fun untrackForegroundApps() {
@@ -245,22 +277,21 @@ object FirewallManager : KoinComponent {
         foregroundUids.clear()
     }
 
-    fun trackForegroundApp(packageName: String?) {
-        val appInfo = appList[packageName]
+    fun trackForegroundApp(uid: Int) {
+        val appInfo = appInfos[uid]
 
         if (appInfo == null) {
-            Log.i(LOG_TAG_FIREWALL, "No such app $packageName to update 'dis/allow' firewall rule")
+            Log.i(LOG_TAG_FIREWALL, "No such app $uid to update 'dis/allow' firewall rule")
             return
         }
 
-        val isAppUid = AndroidUidConfig.isUidAppRange(appInfo.uid)
-        if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                         "app in foreground: ${appInfo.packageInfo}, isAppUid? $isAppUid")
+        val isAppUid = AndroidUidConfig.isUidAppRange(uid)
+        if (DEBUG) Log.d(LOG_TAG_FIREWALL, "app in foreground with uid? $isAppUid")
 
         // Only track packages within app uid range.
         if (!isAppUid) return
 
-        foregroundUids.add(appInfo.uid)
+        foregroundUids.add(uid)
     }
 
     fun isAppForeground(uid: Int, keyguardManager: KeyguardManager?): Boolean {
@@ -276,7 +307,7 @@ object FirewallManager : KoinComponent {
     }
 
 
-    fun updateExcludedAppsByCategories(filterCategories: List<String>, checked: Boolean) {
+    fun updateExcludedAppsByCategories(filterCategories: Set<String>, checked: Boolean) {
         CoroutineScope(Dispatchers.IO).launch {
             if (filterCategories.isNullOrEmpty()) {
                 appInfoRepository.updateExcludedForAllApp(checked)
@@ -285,21 +316,31 @@ object FirewallManager : KoinComponent {
                     categoryInfoRepository.updateWhitelistCountForAll(!checked)
                 }
             } else {
-                filterCategories.forEach {
-                    appInfoRepository.updateExcludedForCategories(it, checked)
-                    categoryInfoRepository.updateExcludedCountForCategory(it, checked)
+                filterCategories.forEach { category ->
+                    appInfoRepository.updateExcludedForCategories(category, checked)
+                    categoryInfoRepository.updateExcludedCountForCategory(category, checked)
                     if (checked) {
-                        categoryInfoRepository.updateWhitelistForCategory(it, !checked)
+                        categoryInfoRepository.updateWhitelistForCategory(category, !checked)
                     }
                 }
             }
-            // All the apps / some app categories selected and excluded so reload the
-            // app list from database.
-            reloadAppList()
+
+            // If the app is excluded, then remove all the other rules.
+            appInfos.values().forEach {
+                if (filterCategories.isNotEmpty() && !filterCategories.contains(
+                        it.appCategory)) return@forEach
+
+                it.isExcluded = checked
+                if (checked) {
+                    it.whiteListUniv1 = false
+                    it.isInternetAllowed = true
+                }
+            }
+            appInfosLiveData.postValue(appInfos.values())
         }
     }
 
-    fun updateWhitelistedAppsByCategories(filterCategories: List<String>, checked: Boolean) {
+    fun updateWhitelistedAppsByCategories(filterCategories: Set<String>, checked: Boolean) {
         CoroutineScope(Dispatchers.IO).launch {
             if (filterCategories.isNullOrEmpty()) {
                 appInfoRepository.updateWhitelistForAllApp(checked)
@@ -309,17 +350,28 @@ object FirewallManager : KoinComponent {
                 }
                 categoryInfoRepository.updateWhitelistCountForAll(checked)
             } else {
-                filterCategories.forEach {
-                    val update = appInfoRepository.updateWhitelistForCategories(it, checked)
-                    categoryInfoRepository.updateWhitelistForCategory(it, checked)
-                    val countBlocked = appInfoRepository.getBlockedCountForCategory(it)
-                    categoryInfoRepository.updateBlockedCount(it, countBlocked)
+                filterCategories.forEach { category ->
+                    val update = appInfoRepository.updateWhitelistForCategories(category, checked)
+                    categoryInfoRepository.updateWhitelistForCategory(category, checked)
+                    val countBlocked = appInfoRepository.getBlockedCountForCategory(category)
+                    categoryInfoRepository.updateBlockedCount(category, countBlocked)
                     if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Update whitelist count: $update")
                 }
             }
-            // All the apps / some app categories selected and whitelisted so reload the
-            // app list from database.
-            reloadAppList()
+
+            // If the app is whitelisted, then remove from exclude and allow internet to the app.
+            appInfos.values().forEach {
+                if (filterCategories.isNotEmpty() && !filterCategories.contains(
+                        it.appCategory)) return@forEach
+
+                it.whiteListUniv1 = checked
+                if (checked) {
+                    it.isExcluded = false
+                    it.isInternetAllowed = true
+                }
+            }
+
+            appInfosLiveData.postValue(appInfos.values())
         }
     }
 
@@ -327,10 +379,10 @@ object FirewallManager : KoinComponent {
         CoroutineScope(Dispatchers.IO).launch {
             updateAppsExcludedPermission(appInfo.uid, status)
             appInfoRepository.updateExcludedList(appInfo.uid, status)
-            val count = appInfoRepository.getBlockedCountForCategory(appInfo.appCategory)
-            val excludedCount = appInfoRepository.getExcludedAppCountForCategory(
+            val count = getBlockedCountForCategory(appInfo.appCategory)
+            val excludedCount = getExcludedCountForCategory(
                 appInfo.appCategory)
-            val whitelistCount = appInfoRepository.getBlockedCountForCategory(appInfo.appCategory)
+            val whitelistCount = getWhitelistCountForCategory(appInfo.appCategory)
             categoryInfoRepository.updateBlockedCount(appInfo.appCategory, count)
             categoryInfoRepository.updateExcludedCount(appInfo.appCategory, excludedCount)
             categoryInfoRepository.updateWhitelistCount(appInfo.appCategory, whitelistCount)
@@ -340,26 +392,25 @@ object FirewallManager : KoinComponent {
     fun updateWhitelistedApps(appInfo: AppInfo, isWhitelisted: Boolean) {
         CoroutineScope(Dispatchers.IO).launch {
             updateAppsWhitelist(appInfo.uid, isWhitelisted)
+            val countBlocked = getBlockedCountForCategory(appInfo.appCategory)
+            val countWhitelisted = getWhitelistCountForCategory(appInfo.appCategory)
+            categoryInfoRepository.updateBlockedCount(appInfo.appCategory, countBlocked)
+            categoryInfoRepository.updateWhitelistCount(appInfo.appCategory, countWhitelisted)
+            appInfoRepository.updateWhitelist(appInfo.uid, isWhitelisted)
             if (isWhitelisted) {
                 appInfoRepository.updateInternetForUID(appInfo.uid, isWhitelisted)
             }
-            appInfoRepository.updateWhitelist(appInfo.uid, isWhitelisted)
-            val countBlocked = appInfoRepository.getBlockedCountForCategory(appInfo.appCategory)
-            val countWhitelisted = appInfoRepository.getWhitelistCountForCategory(
-                appInfo.appCategory)
-            categoryInfoRepository.updateBlockedCount(appInfo.appCategory, countBlocked)
-            categoryInfoRepository.updateWhitelistCount(appInfo.appCategory, countWhitelisted)
         }
     }
 
     fun updateFirewalledApps(uid: Int, isBlocked: Boolean) {
         CoroutineScope(Dispatchers.IO).launch {
             updateAppsInternetPermission(uid, isBlocked)
-            val appInfo = getAppInfosByUid(uid).distinctBy { it.appCategory }
+            val appInfo = getAppInfosByUid(uid)
             appInfo.forEach {
                 categoryInfoRepository.updateNumberOfBlocked(it.appCategory, !isBlocked)
                 if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                                 "Category block executed with blocked as $isBlocked")
+                                 "Category block executed with blocked as ${!isBlocked}")
             }
             appInfoRepository.updateInternetForUID(uid, isBlocked)
         }

@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.IntentSender
 import android.util.Log
 import com.celzero.bravedns.service.AppUpdater
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PLAY_UPDATE
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
@@ -28,6 +27,7 @@ import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 
 class StoreAppUpdater(context: Context) : AppUpdater {
+    private val LOG_TAG = "StoreAppUpdater"
     private val listenerMapping = mutableMapOf<AppUpdater.InstallStateListener, InstallStateUpdatedListener>()
     private val appUpdateManager by lazy {
         AppUpdateManagerFactory.create(context)
@@ -35,7 +35,7 @@ class StoreAppUpdater(context: Context) : AppUpdater {
 
     override fun checkForAppUpdate(isInteractive: AppUpdater.UserPresent, activity: Activity,
                                    listener: AppUpdater.InstallStateListener) {
-        Log.i(LOG_TAG_APP_UPDATE, "Beginning update check.")
+        Log.i(LOG_TAG, "Beginning update check.")
         val playListener = InstallStateUpdatedListener { state ->
             val mappedStatus = when (state.installStatus()) {
                 InstallStatus.DOWNLOADED -> AppUpdater.InstallStatus.DOWNLOADED
@@ -55,34 +55,34 @@ class StoreAppUpdater(context: Context) : AppUpdater {
         appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(
                     AppUpdateType.FLEXIBLE)) {
-                Log.i(LOG_TAG_APP_UPDATE, "Update available, starting flexible update")
+                Log.i(LOG_TAG, "Update available, starting flexible update")
                 try {
                     appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.FLEXIBLE,
                                                               activity, 1)
                 } catch (e: IntentSender.SendIntentException) {
                     unregisterListener(listener)
-                    Log.e(LOG_TAG_APP_UPDATE, "SendIntentException: ${e.message} ", e)
+                    Log.e(LOG_TAG, "SendIntentException: ${e.message} ", e)
                 }
             } else if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(
                     AppUpdateType.IMMEDIATE)) {
-                Log.i(LOG_TAG_APP_UPDATE, "Update available, starting immediate update")
+                Log.i(LOG_TAG, "Update available, starting immediate update")
                 try {
                     appUpdateManager.startUpdateFlowForResult(appUpdateInfo,
                                                               AppUpdateType.IMMEDIATE, activity, 1)
                 } catch (e: IntentSender.SendIntentException) {
                     unregisterListener(listener)
-                    Log.e(LOG_TAG_APP_UPDATE, "SendIntentException: ${e.message} ", e)
+                    Log.e(LOG_TAG, "SendIntentException: ${e.message} ", e)
                 }
             } else if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE) {
                 listener.onUpdateQuotaExceeded(AppUpdater.InstallSource.STORE)
             } else if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_NOT_AVAILABLE) {
                 unregisterListener(listener)
-                Log.e(LOG_TAG_APP_UPDATE, "no update")
+                Log.e(LOG_TAG, "no update")
                 listener.onUpToDate(AppUpdater.InstallSource.STORE, isInteractive)
             }
         }
         appUpdateManager.appUpdateInfo.addOnFailureListener { e ->
-            Log.e(LOG_TAG_APP_UPDATE, "Update check failed", e)
+            Log.e(LOG_TAG, "Update check failed", e)
             unregisterListener(listener)
             listener.onUpdateCheckFailed(AppUpdater.InstallSource.STORE, isInteractive)
         }

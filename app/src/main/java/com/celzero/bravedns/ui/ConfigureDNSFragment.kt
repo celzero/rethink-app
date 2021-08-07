@@ -150,13 +150,11 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
         b.recyclerDnsProxyConnections.adapter = dnsProxyRecyclerAdapter
 
         b.configureDnsProgressBar.visibility = View.GONE
-        val dnsValue = appMode.getDNSType()
+        val dnsValue = appMode.getDnsType()
         // To select the spinner position
         b.configureScreenSpinner.setSelection(dnsValue - 1)
         showRecycler(dnsValue)
-
     }
-
 
     private fun setupClickListeners() {
 
@@ -210,10 +208,6 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-    }
-
     /**
      * Shows dialog for custom DNS endpoint configuration
      * If entered DNS end point is valid, then the DNS queries are forwarded to that end point
@@ -245,9 +239,9 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
         // Fetch the count from repository and increment by 1 to show the
         // next doh name in the dialog
         CoroutineScope(Dispatchers.IO).launch {
-            val count = appMode.getDohCount().plus(1)
+            val nextIndex = appMode.getDohCount().plus(1)
             withContext(Dispatchers.Main) {
-                customName.setText(getString(R.string.cd_custom_doh_url_name, count.toString()),
+                customName.setText(getString(R.string.cd_custom_doh_url_name, nextIndex.toString()),
                                    TextView.BufferType.EDITABLE)
             }
         }
@@ -307,10 +301,10 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
         // Fetch the count from repository and increment by 1 to show the
         // next doh name in the dialog
         CoroutineScope(Dispatchers.IO).launch {
-            val count = appMode.getDnsProxyCount().plus(1)
+            val nextIndex = appMode.getDnsProxyCount().plus(1)
             withContext(Dispatchers.Main) {
                 proxyNameEditText.setText(
-                    getString(R.string.cd_custom_dns_proxy_name, count.toString()),
+                    getString(R.string.cd_custom_dns_proxy_name, nextIndex.toString()),
                     TextView.BufferType.EDITABLE)
             }
         }
@@ -414,17 +408,17 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
         val errorText = dialogBinding.dialogDnsCryptErrorTxt
 
         radioServer.isChecked = true
-        var dnscryptCount = 0
-        var relayCount = 0
+        var dnscryptNextIndex = 0
+        var relayNextIndex = 0
 
         // Fetch the count from repository and increment by 1 to show the
         // next doh name in the dialog
         CoroutineScope(Dispatchers.IO).launch {
-            dnscryptCount = appMode.getDnscryptCount().plus(1)
-            relayCount = appMode.getRelayCount().plus(1)
+            dnscryptNextIndex = appMode.getDnscryptCount().plus(1)
+            relayNextIndex = appMode.getDnscryptRelayCount().plus(1)
             withContext(Dispatchers.Main) {
                 cryptNameEditText.setText(
-                    getString(R.string.cd_custom_dns_proxy_name, dnscryptCount.toString()),
+                    getString(R.string.cd_custom_dns_proxy_name, dnscryptNextIndex.toString()),
                     TextView.BufferType.EDITABLE)
             }
         }
@@ -433,25 +427,15 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
                                   TextView.BufferType.EDITABLE)
 
         radioServer.setOnClickListener {
-            if (dnscryptCount == 0) {
-                cryptNameEditText.setText(getString(R.string.cd_dns_crypt_name_default),
-                                          TextView.BufferType.EDITABLE)
-            } else {
-                cryptNameEditText.setText(
-                    getString(R.string.cd_dns_crypt_name, dnscryptCount.toString()),
-                    TextView.BufferType.EDITABLE)
-            }
+            cryptNameEditText.setText(
+                getString(R.string.cd_dns_crypt_name, dnscryptNextIndex.toString()),
+                TextView.BufferType.EDITABLE)
         }
 
         radioRelay.setOnClickListener {
-            if (relayCount == 0) {
-                cryptNameEditText.setText(getString(R.string.cd_dns_crypt_relay_default),
-                                          TextView.BufferType.EDITABLE)
-            } else {
-                cryptNameEditText.setText(
-                    getString(R.string.cd_dns_crypt_relay_name, relayCount.toString()),
-                    TextView.BufferType.EDITABLE)
-            }
+            cryptNameEditText.setText(
+                getString(R.string.cd_dns_crypt_relay_name, relayNextIndex.toString()),
+                TextView.BufferType.EDITABLE)
         }
 
         applyURLBtn.setOnClickListener {
@@ -496,7 +480,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
             val dnsCryptRelayEndpoint = DNSCryptRelayEndpoint(id = 0, serverName, urlStamp, desc,
                                                               isSelected = false, isCustom = true,
                                                               modifiedDataTime = 0L, latency = 0)
-            appMode.insertRelayEndpoint(dnsCryptRelayEndpoint)
+            appMode.insertDnscryptRelayEndpoint(dnsCryptRelayEndpoint)
         }
     }
 
@@ -527,8 +511,10 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
         }
     }
 
-    private fun insertDNSProxyEndpointDB(mode: String, name: String, appName: String, ip: String,
+    private fun insertDNSProxyEndpointDB(mode: String, name: String, appName: String?, ip: String,
                                          port: Int) {
+        if (appName == null) return
+
         CoroutineScope(Dispatchers.IO).launch {
             var proxyName = name
             if (proxyName.isBlank()) {

@@ -155,7 +155,7 @@ class DNSCryptEndpointAdapter(private val context: Context, private val appMode:
 
         private fun updateDNSCryptDetails(endpoint: DNSCryptEndpoint, isSelected: Boolean) {
             CoroutineScope(Dispatchers.IO).launch {
-                if (!isSelected && !appMode.isRemoveDnscryptAllowed(endpoint)) {
+                if (!isSelected && !appMode.canRemoveDnscrypt(endpoint)) {
                     // Do not unselect the only user-selected dnscrypt endpoint, that is
                     // when the getConnectedDnsCrypt returns a list of size 1
                     withContext(Dispatchers.Main) {

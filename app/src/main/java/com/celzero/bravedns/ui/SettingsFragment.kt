@@ -20,7 +20,6 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -55,20 +54,30 @@ import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_WEBSITE
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
 import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
+import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_2
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.delay
 import com.celzero.bravedns.util.Utilities.Companion.getCurrentTheme
+import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
+import com.celzero.bravedns.util.Utilities.Companion.isFdroidBuild
+import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreBuild
 import com.celzero.bravedns.util.Utilities.Companion.isVpnLockdownEnabled
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 import com.celzero.bravedns.viewmodel.ExcludedAppViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import okhttp3.*
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.dnsoverhttps.DnsOverHttps
 import org.json.JSONObject
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.IOException
+import java.net.InetAddress
 
 class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     private val b by viewBinding(ActivitySettingsScreenBinding::bind)
@@ -77,10 +86,9 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     private lateinit var excludeAppAdapter: ExcludedAppListAdapter
     private val excludeAppViewModel: ExcludedAppViewModel by viewModel()
 
-    private val appInfoRepository by inject<AppInfoRepository>()
-    private val appInfoViewRepository by inject<AppInfoViewRepository>()
+    private var proxyEndpoint: ProxyEndpoint? = null
+
     private val proxyEndpointRepository by inject<ProxyEndpointRepository>()
-    private val categoryInfoRepository by inject<CategoryInfoRepository>()
     private val persistentState by inject<PersistentState>()
     private val appMode by inject<AppMode>()
     private val orbotHelper by inject<OrbotHelper>()
@@ -104,6 +112,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityAllowBypassSwitch.isChecked = persistentState.allowByPass
         // display fav icon in dns logs
         b.settingsActivityFavIconSwitch.isChecked = persistentState.fetchFavIcon
+        // Use all available network
+        b.settingsActivityAllNetworkSwitch.isChecked = persistentState.isAddAllNetworks
         // enable logs
         b.settingsActivityEnableLogsSwitch.isChecked = persistentState.logsEnabled
         // Auto start app after reboot
@@ -112,9 +122,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityKillAppSwitch.isChecked = persistentState.killAppOnFirewall
         // Check for app update
         b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
-        // Use all available network
-        b.settingsActivityAllNetworkSwitch.isChecked = persistentState.isAddAllNetworks
 
+        observeCustomProxy()
         displayAppThemeUi()
         displayNotificationActionUi()
         displaySocks5Ui()
@@ -135,8 +144,15 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     }
 
+    private fun observeCustomProxy() {
+        appMode.connectedProxy.observe(viewLifecycleOwner, {
+            proxyEndpoint = it
+            displaySocks5Ui()
+        })
+    }
+
     private fun displayHttpProxyUi() {
-        if (!isVersionAtleastQ()) {
+        if (!isAtleastQ()) {
             b.settingsActivityHttpProxyContainer.visibility = View.GONE
             return
         }
@@ -149,18 +165,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
     }
 
-    private fun isVersionAtleastQ(): Boolean {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-    }
-
-    private fun isFdroidBuild(): Boolean {
-        return BuildConfig.FLAVOR == FLAVOR_FDROID
-    }
-
-    private fun isPlayStoreBuild(): Boolean {
-        return BuildConfig.FLAVOR == FLAVOR_PLAY
-    }
-
     private fun displaySocks5Ui() {
         val isCustomSocks5Enabled = appMode.isCustomSocks5Enabled()
 
@@ -170,16 +174,16 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         if (!isCustomSocks5Enabled) {
             return
         }
-        val sock5Proxy = proxyEndpointRepository.getConnectedProxy()
-        val appName = if (sock5Proxy?.proxyAppName == getString(
+
+        val appName = if (proxyEndpoint?.proxyAppName == getString(
                 R.string.settings_app_list_default_app)) {
             getString(R.string.settings_app_list_default_app)
         } else {
-            FirewallManager.getAppInfoByPackage(sock5Proxy?.proxyAppName)?.appName
+            FirewallManager.getAppInfoByPackage(proxyEndpoint?.proxyAppName)?.appName
         }
         b.settingsActivitySocks5Desc.text = getString(R.string.settings_socks_forwarding_desc,
-                                                      sock5Proxy?.proxyIP,
-                                                      sock5Proxy?.proxyPort.toString(), appName)
+                                                      proxyEndpoint?.proxyIP,
+                                                      proxyEndpoint?.proxyPort.toString(), appName)
     }
 
     private fun displayNotificationActionUi() {
@@ -228,12 +232,19 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     private fun handleLockdownModeIfNeeded() {
         val isLockdown = isVpnLockdownEnabled(VpnController.getBraveVpnService())
         if (isLockdown) {
-            b.settingsActivityVpnHeadingText.text = getString(
-                R.string.settings_vpn_heading_disabled)
             b.settingsActivityVpnLockdownDesc.visibility = View.VISIBLE
+            b.settingsActivityExcludeAppsRl.alpha = 0.5f
+            b.settingsActivityAllowBypassRl.alpha = 0.5f
+            b.settingsActivitySocks5Rl.alpha = 0.5f
+            b.settingsActivityHttpProxyContainer.alpha = 0.5f
+            b.settingsActivityOrbotContainer.alpha = 0.5f
         } else {
-            b.settingsActivityVpnHeadingText.text = getString(R.string.settings_vpn_heading)
             b.settingsActivityVpnLockdownDesc.visibility = View.GONE
+            b.settingsActivityExcludeAppsRl.alpha = 1f
+            b.settingsActivityAllowBypassRl.alpha = 1f
+            b.settingsActivitySocks5Rl.alpha = 1f
+            b.settingsActivityHttpProxyContainer.alpha = 1f
+            b.settingsActivityOrbotContainer.alpha = 1f
         }
         b.settingsActivityOnDeviceBlockRl.isEnabled = !isLockdown
         b.settingsActivityExcludeAppsRl.isEnabled = !isLockdown
@@ -324,7 +335,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
 
         b.settingsActivitySocks5Switch.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean ->
-            if (appMode.isOrbotProxyEnabled()) {
+            if (!appMode.canEnableSocks5Proxy()) {
                 Utilities.showToastUiCentered(requireContext(),
                                               getString(R.string.settings_socks5_disabled_error),
                                               Toast.LENGTH_SHORT)
@@ -349,7 +360,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
 
         b.settingsActivityHttpProxySwitch.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean ->
-            if (appMode.isOrbotProxyEnabled()) {
+            if (!appMode.canEnableHttpProxy()) {
                 Utilities.showToastUiCentered(requireContext(),
                                               getString(R.string.settings_https_disabled_error),
                                               Toast.LENGTH_SHORT)
@@ -389,23 +400,24 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             enableAfterDelay(1000, b.settingsActivityOnDeviceBlockSwitch)
 
             b.settingsActivityOnDeviceBlockProgress.visibility = View.VISIBLE
-            if (b.settingsActivityOnDeviceBlockSwitch.isChecked) {
-                b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
-                if (persistentState.blocklistFilesDownloaded) {
-                    setBraveDNSLocal() // TODO: Move this to vpnService observer
-                    b.settingsActivityOnDeviceBlockDesc.text = getString(
-                        R.string.settings_local_blocklist_in_use,
-                        persistentState.numberOfLocalBlocklists.toString())
-                } else {
-                    b.settingsActivityOnDeviceBlockSwitch.isChecked = false
-                    if (isVpnLockdownEnabled(VpnController.getBraveVpnService())) {
-                        showVpnLockdownDownloadDialog()
-                    } else {
-                        showDownloadDialog()
-                    }
-                }
-            } else {
+            if (!b.settingsActivityOnDeviceBlockSwitch.isChecked) {
                 removeBraveDNSLocal()
+                return@setOnClickListener
+            }
+
+            b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
+            if (persistentState.blocklistFilesDownloaded) {
+                setBraveDNSLocal() // TODO: Move this to vpnService observer
+                b.settingsActivityOnDeviceBlockDesc.text = getString(
+                    R.string.settings_local_blocklist_in_use,
+                    persistentState.numberOfLocalBlocklists.toString())
+            } else {
+                b.settingsActivityOnDeviceBlockSwitch.isChecked = false
+                if (isVpnLockdownEnabled(VpnController.getBraveVpnService())) {
+                    showVpnLockdownDownloadDialog()
+                } else {
+                    showDownloadDialog()
+                }
             }
         }
 
@@ -485,10 +497,9 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     }
 
     private fun refreshOnDeviceBlocklistStatus() {
-        if (!persistentState.blocklistFilesDownloaded || !persistentState.blocklistEnabled || persistentState.numberOfLocalBlocklists <= 0) {
+        if (!persistentState.blocklistEnabled) {
             b.settingsActivityOnDeviceBlockDesc.text = getString(
                 R.string.settings_local_blocklist_desc_1)
-            b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.GONE
             return
         }
 
@@ -499,7 +510,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.VISIBLE
         b.settingsActivityOnDeviceLastUpdatedTimeTxt.text = getString(
             R.string.settings_local_blocklist_version,
-            Utilities.convertLongToDate(persistentState.blocklistDownloadTime))
+            Utilities.convertLongToTime(persistentState.blocklistDownloadTime, TIME_FORMAT_2))
     }
 
     private fun updateBlocklistIfNeeded(isRefresh: Boolean) {
@@ -511,7 +522,15 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     }
 
     private fun downloadBlocklistIfNeeded(url: String, isRefresh: Boolean) {
-        val client = OkHttpClient() // FIXME: Move it to the http-request-helper class
+
+        val bootstrapClient = OkHttpClient()
+        // FIXME: Use user set doh provider
+        val dns = DnsOverHttps.Builder().client(bootstrapClient).url(
+            "https://1.1.1.1/dns-query".toHttpUrl()).bootstrapDnsHosts(
+            InetAddress.getByName("1.1.1.1"), InetAddress.getByName("1.0.0.1")).build()
+
+        val client = bootstrapClient.newBuilder().dns(
+            dns).build() // FIXME: Move it to the http-request-helper class
         val request = Request.Builder().url(url).build()
 
         client.newCall(request).enqueue(object : Callback {
@@ -587,7 +606,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             R.string.settings_local_blocklist_desc3)
         b.settingsActivityOnDeviceLastUpdatedTimeTxt.text = getString(
             R.string.settings_local_blocklist_version,
-            Utilities.convertLongToDate(persistentState.blocklistDownloadTime))
+            Utilities.convertLongToTime(persistentState.blocklistDownloadTime, TIME_FORMAT_2))
     }
 
     private fun onDownloadStart() {
@@ -647,7 +666,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             val builder = AlertDialog.Builder(requireContext())
             builder.setTitle(R.string.local_blocklist_lockdown_redownload)
             builder.setMessage(getString(R.string.local_blocklist_lockdown_redownload_desc,
-                                         Utilities.convertLongToDate(timestamp)))
+                                         Utilities.convertLongToTime(timestamp, TIME_FORMAT_2)))
             builder.setCancelable(false)
             builder.setPositiveButton(
                 getString(R.string.local_blocklist_lockdown_positive)) { dialogInterface, _ ->
@@ -662,7 +681,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             val builder = AlertDialog.Builder(requireContext())
             builder.setTitle(R.string.local_blocklist_redownload)
             builder.setMessage(getString(R.string.local_blocklist_redownload_desc,
-                                         Utilities.convertLongToDate(timestamp)))
+                                         Utilities.convertLongToTime(timestamp, TIME_FORMAT_2)))
             builder.setCancelable(false)
             builder.setPositiveButton(
                 getString(R.string.local_blocklist_positive)) { dialogInterface, _ ->
@@ -698,24 +717,9 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             return
         }
 
-        if (b.settingsActivityHttpProxySwitch.isChecked) {
+        if (!appMode.canEnableOrbotProxy()) {
             Utilities.showToastUiCentered(requireContext(),
-                                          getString(R.string.settings_https_orbot_disabled_error),
-                                          Toast.LENGTH_SHORT)
-        } else if (b.settingsActivitySocks5Switch.isChecked) {
-            Utilities.showToastUiCentered(requireContext(),
-                                          getString(R.string.settings_socks5_orbot_disabled_error),
-                                          Toast.LENGTH_SHORT)
-        } else {
-            openBottomSheetForOrbot()
-        }
-    }
-
-    private fun openBottomSheetForOrbot() {
-        // FIXME #200 - Inject VpnController via Koin
-        if (VpnController.getBraveVpnService()?.isOn() == false) {
-            Utilities.showToastUiCentered(requireContext(),
-                                          getString(R.string.settings_socks5_vpn_disabled_error),
+                                          getString(R.string.settings_orbot_disabled_error),
                                           Toast.LENGTH_SHORT)
             return
         }
@@ -724,6 +728,14 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     }
 
     private fun openOrbotBottomSheet() {
+        // FIXME #200 - Inject VpnController via Koin
+        if (!VpnController.hasTunnel()) {
+            Utilities.showToastUiCentered(requireContext(),
+                                          getString(R.string.settings_socks5_vpn_disabled_error),
+                                          Toast.LENGTH_SHORT)
+            return
+        }
+
         val bottomSheetFragment = OrbotBottomSheetFragment()
         bottomSheetFragment.show(requireActivity().supportFragmentManager, bottomSheetFragment.tag)
     }
@@ -1005,8 +1017,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         val passwordEditText: EditText = dialogBinding.dialogProxyEditPassword
         val udpBlockCheckBox: CheckBox = dialogBinding.dialogProxyUdpCheck
 
-        val sock5Proxy = proxyEndpointRepository.getConnectedProxy()
-
         udpBlockCheckBox.isChecked = persistentState.udpBlockedSettings
 
         val appNames: MutableList<String> = ArrayList()
@@ -1016,13 +1026,14 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                                                android.R.layout.simple_spinner_dropdown_item,
                                                appNames)
         appNameSpinner.adapter = proxySpinnerAdapter
-        if (sock5Proxy != null && !sock5Proxy.proxyIP.isNullOrBlank()) {
-            ipAddressEditText.setText(sock5Proxy.proxyIP, TextView.BufferType.EDITABLE)
-            portEditText.setText(sock5Proxy.proxyPort.toString(), TextView.BufferType.EDITABLE)
-            userNameEditText.setText(sock5Proxy.userName.toString(), TextView.BufferType.EDITABLE)
-            if (!sock5Proxy.proxyAppName.isNullOrBlank() && sock5Proxy.proxyAppName != getString(
+        if (proxyEndpoint != null && !proxyEndpoint?.proxyIP.isNullOrBlank()) {
+            ipAddressEditText.setText(proxyEndpoint?.proxyIP, TextView.BufferType.EDITABLE)
+            portEditText.setText(proxyEndpoint?.proxyPort.toString(), TextView.BufferType.EDITABLE)
+            userNameEditText.setText(proxyEndpoint?.userName.toString(),
+                                     TextView.BufferType.EDITABLE)
+            if (!proxyEndpoint?.proxyAppName.isNullOrBlank() && proxyEndpoint?.proxyAppName != getString(
                     R.string.settings_app_list_default_app)) {
-                val packageName = sock5Proxy.proxyAppName
+                val packageName = proxyEndpoint?.proxyAppName
                 val app = FirewallManager.getAppInfoByPackage(packageName)
                 var position = 0
                 for ((i, item) in appNames.withIndex()) {
@@ -1105,24 +1116,11 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     }
 
 
-    private fun insertProxyEndpointDB(mode: String, name: String, appName: String, ip: String,
+    private fun insertProxyEndpointDB(mode: String, name: String, appName: String?, ip: String,
                                       port: Int, userName: String, password: String,
                                       isUDPBlock: Boolean) {
-        appMode.addProxy(AppMode.ProxyType.SOCKS5, AppMode.ProxyProvider.CUSTOM)
-        var proxyName = name
-        if (proxyName.isEmpty() || proxyName.isBlank()) {
-            proxyName = if (mode == getString(R.string.cd_dns_proxy_mode_internal)) {
-                appName
-            } else ip
-        }
-        val proxyEndpoint = ProxyEndpoint(id = 0, proxyName, proxyMode = 1, mode, appName, ip, port,
-                                          userName, password, isSelected = true, isCustom = true,
-                                          isUDP = isUDPBlock, modifiedDataTime = 0L, latency = 0)
-        proxyEndpointRepository.clearAllData()
-        proxyEndpointRepository.insertAsync(proxyEndpoint)
+        if (appName == null) return
 
-        // the count-down-timer ticks once after 1000ms, at the completion of which
-        // the settingsActivitySocks5Switch [is re-enabled again after 1000 ms].
         b.settingsActivitySocks5Switch.isEnabled = false
         b.settingsActivitySocks5Switch.visibility = View.GONE
         b.settingsActivitySocks5Progress.visibility = View.VISIBLE
@@ -1133,15 +1131,31 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 b.settingsActivitySocks5Switch.visibility = View.VISIBLE
             }
         }
+        CoroutineScope(Dispatchers.IO).launch {
+            var proxyName = name
+            if (proxyName.isEmpty() || proxyName.isBlank()) {
+                proxyName = if (mode == getString(R.string.cd_dns_proxy_mode_internal)) {
+                    appName
+                } else ip
+            }
+            val proxyEndpoint = ProxyEndpoint(id = 0, proxyName, proxyMode = 1, mode, appName, ip,
+                                              port, userName, password, isSelected = true,
+                                              isCustom = true, isUDP = isUDPBlock,
+                                              modifiedDataTime = 0L, latency = 0)
+
+            proxyEndpointRepository.clearAllData()
+            proxyEndpointRepository.insert(proxyEndpoint)
+            appMode.addProxy(AppMode.ProxyType.SOCKS5, AppMode.ProxyProvider.CUSTOM)
+        }
     }
 
-    private fun enableAfterDelay(delay: Long, vararg views: View) {
+    private fun enableAfterDelay(ms: Long, vararg views: View) {
         for (v in views) v.isEnabled = false
 
-        delay(delay) {
-            if (isAdded) {
-                for (v in views) v.isEnabled = true
-            }
+        delay(ms) {
+            if (!isAdded) return@delay
+
+            for (v in views) v.isEnabled = true
         }
     }
 

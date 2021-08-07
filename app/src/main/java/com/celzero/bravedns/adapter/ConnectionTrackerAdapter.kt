@@ -17,10 +17,8 @@ limitations under the License.
 package com.celzero.bravedns.adapter
 
 import android.content.Context
-import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
 import android.util.Log
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,6 +34,7 @@ import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
 import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Protocol
@@ -100,7 +99,7 @@ class ConnectionTrackerAdapter(val context: Context) :
         }
 
         private fun displayTransactionDetails(connTracker: ConnectionTracker) {
-            val time = Utilities.convertLongToTime(connTracker.timeStamp)
+            val time = Utilities.convertLongToTime(connTracker.timeStamp, TIME_FORMAT_1)
             b.connectionResponseTime.text = time
             b.connectionFlag.text = connTracker.flag
             b.connectionIpAddress.text = connTracker.ipAddress
@@ -139,7 +138,6 @@ class ConnectionTrackerAdapter(val context: Context) :
         }
 
         private fun displayFirewallRulesetHint(isBlocked: Boolean, ruleName: String?) {
-            Log.d(LOG_TAG_UI, "ConnTrack UI issue: $isBlocked, $ruleName")
             when {
                 // hint red when blocked
                 isBlocked -> {

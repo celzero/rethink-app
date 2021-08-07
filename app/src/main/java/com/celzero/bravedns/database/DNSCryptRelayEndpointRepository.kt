@@ -15,12 +15,10 @@ limitations under the License.
 */
 package com.celzero.bravedns.database
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_MODE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -82,27 +80,15 @@ class DNSCryptRelayEndpointRepository(
 
     fun getServersToAdd(): String {
         val relays = getConnectedRelays()
-        var relayString = ""
-        return if (relays.isEmpty()) {
-            relayString
-        } else {
-            relays.forEach {
-                relayString += "${it.dnsCryptRelayURL},"
-            }
-            relayString = relayString.dropLast(1)
-            Log.i(LOG_TAG_APP_MODE, "Crypt Server - $relayString")
-            relayString
+        return relays.joinToString(separator = ",") {
+            it.dnsCryptRelayURL
         }
     }
 
     fun getServersToRemove(): String {
         val relays = getConnectedRelays()
-        var removeServerString = ""
-
-        relays.forEach {
-            removeServerString += "${it.id},"
+        return relays.joinToString(separator = ",") {
+            "${it.id}"
         }
-        removeServerString = removeServerString.dropLast(1)
-        return removeServerString
     }
 }

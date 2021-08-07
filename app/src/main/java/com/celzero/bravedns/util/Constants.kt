@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.celzero.bravedns.util
 
+import com.celzero.bravedns.BuildConfig
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -128,7 +129,9 @@ class Constants {
 
         // Various notification action constants used part of NotificationCompat.Action
         const val NOTIFICATION_ACTION = "NOTIFICATION_VALUE"
-        const val NOTIF_ACTION_STOP_VPN = "RETHINK_STOP"
+        const val NOTIF_ACTION_STOP_VPN = "RETHINK_STOP" // stop vpn service
+        const val NOTIF_ACTION_PAUSE_VPN = "RETHINK_PAUSE" // pause vpn
+        const val NOTIF_ACTION_RESUME_VPN = "RETHINK_RESUME" // resume vpn
         const val NOTIF_ACTION_DNS_VPN = "RETHINK_DNSONLY" // battery-saver dns-only
         const val NOTIF_ACTION_DNS_FIREWALL_VPN = "RETHINK_FULLMODE" // default dns+firewall
         const val NOTIF_ACTION_RULES_FAILURE = "RETHINK_RULES_RELOAD" // load rules failure
@@ -208,5 +211,25 @@ class Constants {
 
         // To initiate / reset the timestamp in milliseconds.
         const val INIT_TIME_MS = 0L
+
+        // Bug report text file
+        const val BUG_REPORT_FILE = "bug_report.txt"
+
+        // secondary file path
+        const val PREV_REPORT_FILE = "bug_report_1.txt"
+
+        // Bug report file max size - 10mb
+        const val MAX_FILE_SIZE = 10 * 1024 * 1024
+
+        const val FILE_PROVIDER_NAME = BuildConfig.APPLICATION_ID + ".provider"
+
+        const val TIME_FORMAT_1 = "HH:mm:ss"
+        const val TIME_FORMAT_2 = "yy.MM (dd)"
+        const val TIME_FORMAT_3 = "dd MMMM yyyy, HH:mm:ss"
+
+        // default value for the pause timer - 15 mins
+        val DEFAULT_PAUSE_TIMER = TimeUnit.MINUTES.toMillis(15)
+        // increment/decrement value to pause vpn
+        val EXTRA_MILLIS = TimeUnit.MINUTES.toMillis(1)
     }
 }

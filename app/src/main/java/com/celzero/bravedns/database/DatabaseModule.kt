@@ -22,7 +22,7 @@ object DatabaseModule {
     private val databaseModule = module {
         single { AppDatabase.buildDatabase(androidContext()) }
         single {
-            RefreshDatabase(androidContext(), get(), get(), get(), get(), get(), get(), get(),
+            RefreshDatabase(androidContext(), get(), get(), get(), get(), get(), get(),
                             get(), get())
         }
     }

@@ -17,7 +17,6 @@ limitations under the License.
 package com.celzero.bravedns.service
 
 import android.content.Context
-import android.content.pm.PackageManager
 import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
@@ -29,6 +28,7 @@ import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL_LOG
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
 import com.celzero.bravedns.util.Utilities.Companion.getFlag
 import com.celzero.bravedns.util.Utilities.Companion.getPackageInfoForUid
@@ -130,18 +130,16 @@ class IPTracker internal constructor(
             appName = FirewallManager.getAppNameByUid(uid)
         }
         if (appName.isNullOrEmpty()) {
-            val appInfo = context.packageManager.getApplicationInfo(packageName,
-                                                                    PackageManager.GET_META_DATA)
+            val appInfo = Utilities.getApplicationInfo(context, packageName) ?: return ""
+
             appName = context.packageManager.getApplicationLabel(appInfo).toString()
         }
         return appName
     }
 
     private fun registerNonApp(uid: Int, appName: String) {
-        if (!FirewallManager.isUidRegistered(uid)) {
+        if (!FirewallManager.hasUid(uid)) {
             refreshDatabase.registerNonApp(uid, appName)
         }
     }
-
-
 }

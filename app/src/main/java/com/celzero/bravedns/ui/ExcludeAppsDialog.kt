@@ -45,7 +45,7 @@ class ExcludeAppsDialog(private var activity: Context,
 
     private var mLayoutManager: RecyclerView.LayoutManager? = null
 
-    private var filterCategories: MutableList<String> = ArrayList()
+    private var filterCategories: MutableSet<String> = HashSet()
     private var category: List<String> = ArrayList()
 
     private val CATEGORY_FILTER_CONST = "category:"
@@ -149,7 +149,7 @@ class ExcludeAppsDialog(private var activity: Context,
 
     private fun setupCategoryChips(name: String) {
         val categories = FirewallManager.getCategoryListByAppName(name)
-        if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category - ${category.size}")
+        if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category: ${category.size}")
 
         b.excludeAppDialogChipGroup.removeAllViews()
 

@@ -26,8 +26,11 @@ import com.celzero.bravedns.util.Constants.Companion.JSON_VERSION
 import com.celzero.bravedns.util.Constants.Companion.RESPONSE_VERSION
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
 import okhttp3.*
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.dnsoverhttps.DnsOverHttps
 import org.json.JSONObject
 import java.io.IOException
+import java.net.InetAddress
 
 class NonStoreAppUpdater(private val baseUrl: String,
                          private val persistentState: PersistentState) : AppUpdater {
@@ -37,7 +40,12 @@ class NonStoreAppUpdater(private val baseUrl: String,
         Log.i(LOG_TAG_APP_UPDATE, "Beginning update check")
         val url = baseUrl + BuildConfig.VERSION_CODE
 
-        val client = OkHttpClient()
+        val bootstrapClient = OkHttpClient()
+        val dns = DnsOverHttps.Builder().client(bootstrapClient).url(
+            "https://1.1.1.1/dns-query".toHttpUrl()).bootstrapDnsHosts(
+            InetAddress.getByName("1.1.1.1"), InetAddress.getByName("1.0.0.1")).build()
+
+        val client = bootstrapClient.newBuilder().dns(dns).build()
         val request = Request.Builder().url(url).build()
 
         client.newCall(request).enqueue(object : Callback {

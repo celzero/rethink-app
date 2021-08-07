@@ -26,7 +26,7 @@ import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import hu.autsoft.krate.*
 import org.koin.core.component.KoinComponent
 
-class PersistentState(private val context: Context) : SimpleKrate(context), KoinComponent {
+class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     companion object {
         const val BRAVE_MODE = "brave_mode"
         const val BACKGROUND_MODE = "background_mode"
@@ -39,6 +39,7 @@ class PersistentState(private val context: Context) : SimpleKrate(context), Koin
         const val NOTIFICATION_ACTION = "notification_action"
         const val DNS_CHANGE = "connected_dns_name"
         const val DNS_RELAYS = "dnscrypt_relay"
+        const val APP_STATE = "app_state"
 
         fun expandUrl(context: Context, url: String?): String {
             return if (url == null || url.isEmpty()) {
@@ -54,7 +55,7 @@ class PersistentState(private val context: Context) : SimpleKrate(context), Koin
     var logsEnabled by booleanPref("local_logs", true)
     var appVersion by intPref("app_version", 0)
     var lastAppUpdateCheck by longPref("app_update_last_check", 0)
-    var numberOfRemoteBlocklists by intPref("remote_block_list_count", 0)
+    private var numberOfRemoteBlocklists by intPref("remote_block_list_count", 0)
     var numberOfLocalBlocklists by intPref("local_block_list_count", 0)
     var udpBlockedSettings by booleanPref("block_udp_traffic_other_than_dns", false)
     var insertionCompleted by booleanPref("initial_insert_servers_complete", false)
@@ -67,56 +68,45 @@ class PersistentState(private val context: Context) : SimpleKrate(context), Koin
     var tempBlocklistDownloadTime by longPref("temp_time_during_download", 0)
     var httpProxyPort by intPref("http_proxy_port", INVALID_PORT)
     var httpProxyHostAddress by stringPref("http_proxy_ipaddress", "")
-
     var killAppOnFirewall by booleanPref("kill_app_on_firewall", true)
     var allowByPass by booleanPref("allow_bypass", true)
     var allowDNSTraffic by booleanPref("dns_all_traffic", true)
     var dnsType by intPref("dns_type", 1)
     var prefAutoStartBootUp by booleanPref("auto_start_on_boot", true)
     var screenState by booleanPref("screen_state", false)
-
     var oldNumberRequests by intPref("number_request", 0)
     var oldBlockedRequests by intPref("blocked_request", 0)
     var numberOfRequests by longPref("dns_number_request", 0)
     var numberOfBlockedRequests by longPref("dns_blocked_request", 0)
-
     var backgroundEnabled by booleanPref("background_mode", false)
     var checkForAppUpdate by booleanPref("check_for_app_update", true)
-    private var connectedDnsName by stringPref("connected_dns_name", context.getString(R.string.dns_mode_3))
+    var connectedDnsName by stringPref("connected_dns_name",
+                                               context.getString(R.string.dns_mode_3))
     var theme by intPref("app_theme", 0)
     var notificationAction by intPref("notification_action", 1)
     var isAddAllNetworks by booleanPref("add_all_networks_to_vpn", false)
-
     var lastAppRefreshTime by longPref("last_app_refresh_time", INIT_TIME_MS)
-
     var proxyType by stringPref("proxy_proxytype", AppMode.ProxyType.NONE.name)
     var proxyProvider by stringPref("proxy_proxyprovider", AppMode.ProxyProvider.NONE.name)
-
     private var _dnsCryptRelayCount by intPref("dnscrypt_relay", 0)
-
-    var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
-
+    var lastExitTimestamp by longPref("prev_trace_timestamp", INIT_TIME_MS)
     var downloadIds by stringSetPref("download_ids", emptySet())
-
     var fetchFavIcon by booleanPref("fav_icon_enabled",
                                     BuildConfig.FLAVOR != Constants.FLAVOR_FDROID)
+    var appState by intPref("app_state", AppMode.AppState.ACTIVE.state)
+    var showWhatsNewChip by booleanPref("show_whats_new_chip", true)
 
+    var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
     var dnsBlockedCountLiveData: MutableLiveData<Long> = MutableLiveData()
     var dnsRequestsCountLiveData: MutableLiveData<Long> = MutableLiveData()
-
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
+    // requires livedata as the app state can be changed from more than one place
+    var appStateLiveData: MutableLiveData<AppMode.AppState> = MutableLiveData()
+    var remoteBlocklistCount: MutableLiveData<Int> = MutableLiveData()
 
     fun setMedianLatency(median: Long) {
         this.median.postValue(median)
-    }
-
-    fun setConnectedDns(name: String) {
-        connectedDnsName = name
-    }
-
-    fun getConnectedDns(): String {
-        return connectedDnsName
     }
 
     fun setDnsCryptRelayCount(count: Int) {
@@ -134,5 +124,14 @@ class PersistentState(private val context: Context) : SimpleKrate(context), Koin
 
     fun getVpnEnabled(): Boolean {
         return _vpnEnabled
+    }
+
+    fun setRemoteBlocklistCount(c: Int) {
+        numberOfRemoteBlocklists = c
+        remoteBlocklistCount.postValue(c)
+    }
+
+    fun getRemoteBlocklistCount(): Int {
+        return numberOfRemoteBlocklists
     }
 }

@@ -51,7 +51,7 @@ class AppInfo {
     }
 
     fun canFirewall(): Boolean {
-        return !this.whiteListUniv1 || !this.isExcluded
+        return !(this.whiteListUniv1 || this.isExcluded)
     }
 
 }

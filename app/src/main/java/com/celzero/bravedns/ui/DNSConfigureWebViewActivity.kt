@@ -178,8 +178,8 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         Log.i(LOG_TAG_DNS, "Remote stamp has been updated from web view - $stamp")
 
         CoroutineScope(Dispatchers.IO).launch {
-            persistentState.numberOfRemoteBlocklists = count
-            appMode.updateRethinkPlusStamp(stamp)
+            persistentState.setRemoteBlocklistCount(count)
+            appMode.updateDnsRethinkPlusStamp(stamp)
         }
 
         Toast.makeText(this, getString(R.string.webview_toast_configure_success),

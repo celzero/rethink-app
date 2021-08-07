@@ -40,16 +40,19 @@ import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities.Companion.getThemeAccent
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 
 /**
- * Integration of One touch Orbot configuration.
- * Helps to send intent to Orbot application and the receiver registered to listen for the
- * status change of Orbot.
+ * One touch Orbot integration.
  *
+ * Broadcast receiver for Orbot's status change.
  * adopted from: github.com/guardianproject/NetCipher/blob/fee8571/libnetcipher/src/info/guardianproject/netcipher/proxy/OrbotHelper.java
  */
 class OrbotHelper(private val context: Context, private val persistentState: PersistentState,
@@ -100,10 +103,10 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
 
     var socks5Port: Int? = null
     var httpsPort: Int? = null
-    var socks5IP: String? = null
-    var httpsIP: String? = null
+    var socks5Ip: String? = null
+    var httpsIp: String? = null
 
-    private var isResponseReceivedFromOrbot: Boolean = false
+    @Volatile private var isResponseReceivedFromOrbot: Boolean = false
 
     /**
      * Returns the intent which will initiate the Orbot in non-vpn mode.
@@ -208,12 +211,10 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
             when (status) {
                 STATUS_ON -> {
                     isResponseReceivedFromOrbot = true
-                    if (socks5IP != null && httpsIP != null && socks5IP != null && httpsIP != null) {
-                        orbotStarted()
-                    } else {
+                    if (socks5Ip == null || httpsIp == null || socks5Ip == null || httpsIp == null) {
                         updateOrbotProxyData(intent)
-                        orbotStarted()
                     }
+                    setOrbotMode()
                 }
                 STATUS_OFF -> {
                     stopOrbot(isInteractive = false)
@@ -243,7 +244,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
             notificationManager.notify(ORBOT_SERVICE_ID, createNotification().build())
         }
         selectedProxyType = AppMode.ProxyType.NONE.name
-        appMode.removeProxy(AppMode.ProxyType.NONE, AppMode.ProxyProvider.ORBOT)
+        appMode.removeProxy(AppMode.ProxyType.NONE, AppMode.ProxyProvider.NONE)
         persistentState.orbotConnectionStatus.postValue(false)
         context.sendBroadcast(getOrbotStopIntent())
         if (DEBUG) Log.d(LOG_TAG_VPN, "OrbotHelper - Orbot - stopOrbot")
@@ -298,56 +299,69 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
                                           PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
-    /**
-     * Updates the shared pref values - Orbot started status
-     */
-    private fun orbotStarted() {
-        persistentState.orbotConnectionStatus.postValue(false)
-        setOrbotMode()
+    private fun setOrbotMode() {
+        CoroutineScope(Dispatchers.IO).launch {
+            Log.i(LOG_TAG_VPN, "Initiate orbot start with type: $selectedProxyType")
+
+            if (isTypeSocks5() && handleOrbotSocks5DbUpdate()) {
+                appMode.addProxy(AppMode.ProxyType.SOCKS5, AppMode.ProxyProvider.ORBOT)
+            } else if (isTypeHttp() && handleOrbotHttpUpdate()) {
+                appMode.addProxy(AppMode.ProxyType.HTTP, AppMode.ProxyProvider.ORBOT)
+            } else if (isTypeHttpSocks5() && handleOrbotSocks5DbUpdate() && handleOrbotHttpUpdate()) {
+                appMode.addProxy(AppMode.ProxyType.HTTP_SOCKS5, AppMode.ProxyProvider.ORBOT)
+            } else {
+                withContext(Dispatchers.Main) {
+                    stopOrbot(isInteractive = true)
+                }
+            }
+            persistentState.orbotConnectionStatus.postValue(false)
+        }
     }
 
+    private fun isTypeSocks5(): Boolean {
+        return selectedProxyType == AppMode.ProxyType.SOCKS5.name
+    }
 
-    private fun setOrbotMode() {
-        Log.i(LOG_TAG_VPN, "OrbotHelper - Orbot - startOrbot with $selectedProxyType")
-        if (selectedProxyType == AppMode.ProxyType.SOCKS5.name) {
-            appMode.addProxy(AppMode.ProxyType.SOCKS5, AppMode.ProxyProvider.ORBOT)
-            val proxyEndpoint = constructProxy()
-            if (proxyEndpoint != null) {
-                proxyEndpointRepository.clearOrbotData()
-                proxyEndpointRepository.insertAsync(proxyEndpoint)
-            }
-        } else if (selectedProxyType == AppMode.ProxyType.HTTP.name) {
-            appMode.addProxy(AppMode.ProxyType.HTTP, AppMode.ProxyProvider.ORBOT)
-            if (httpsIP != null && httpsPort != null) {
-                persistentState.httpProxyHostAddress = httpsIP!!
-                persistentState.httpProxyPort = httpsPort!!
-            }
-        } else if (selectedProxyType == AppMode.ProxyType.HTTP_SOCKS5.name) {
-            appMode.addProxy(AppMode.ProxyType.HTTP_SOCKS5, AppMode.ProxyProvider.ORBOT)
-            val proxyEndpoint = constructProxy()
-            if (proxyEndpoint != null) {
-                proxyEndpointRepository.clearOrbotData()
-                proxyEndpointRepository.insertAsync(proxyEndpoint)
-            }
-            if (httpsIP != null && httpsPort != null) {
-                persistentState.httpProxyHostAddress = httpsIP!!
-                persistentState.httpProxyPort = httpsPort!!
-            }
+    private fun isTypeHttp(): Boolean {
+        return selectedProxyType == AppMode.ProxyType.HTTP.name
+    }
+
+    private fun isTypeHttpSocks5(): Boolean {
+        return selectedProxyType == AppMode.ProxyType.HTTP_SOCKS5.name
+    }
+
+    private fun handleOrbotSocks5DbUpdate(): Boolean {
+        val proxyEndpoint = constructProxy()
+        return if (proxyEndpoint != null) {
+            proxyEndpointRepository.clearOrbotData()
+            proxyEndpointRepository.insert(proxyEndpoint)
+            true
         } else {
-            appMode.addProxy(AppMode.ProxyType.NONE, AppMode.ProxyProvider.ORBOT)
+            Log.w(LOG_TAG_VPN, "Error inserting value in proxy database")
+            false
         }
+    }
 
+    private fun handleOrbotHttpUpdate(): Boolean {
+        return if (httpsIp != null && httpsPort != null) {
+            persistentState.httpProxyHostAddress = httpsIp!!
+            persistentState.httpProxyPort = httpsPort!!
+            true
+        } else {
+            Log.w(LOG_TAG_VPN, "Error setting http proxy for Orbot")
+            false
+        }
     }
 
     private fun constructProxy(): ProxyEndpoint? {
-        if (socks5IP == null || socks5Port == null) {
+        if (socks5Ip == null || socks5Port == null) {
             Log.w(LOG_TAG_VPN,
-                  "Cannot construct proxy with values ip: $socks5IP, port: $socks5Port")
+                  "Cannot construct proxy with values ip: $socks5Ip, port: $socks5Port")
             return null
         }
 
         return ProxyEndpoint(id = 0, orbot, proxyMode = 1, proxyType = "NONE", ORBOT_PACKAGE_NAME,
-                             socks5IP!!, socks5Port!!, userName = "", password = "",
+                             socks5Ip!!, socks5Port!!, userName = "", password = "",
                              isSelected = true, isCustom = true, isUDP = true,
                              modifiedDataTime = 0L, latency = 0)
     }
@@ -363,11 +377,11 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
 
         socks5Port = socks5ProxyPort as Int?
         httpsPort = httpsProxyPort as Int?
-        socks5IP = socks5ProxyHost as String?
-        httpsIP = httpsProxyHost as String?
+        socks5Ip = socks5ProxyHost as String?
+        httpsIp = httpsProxyHost as String?
 
         if (DEBUG) Log.d(LOG_TAG_VPN,
-                         "OrbotHelper - Orbot - $socks5Port, $httpsPort, $socks5IP, $httpsIP")
+                         "OrbotHelper - Orbot - $socks5Port, $httpsPort, $socks5Ip, $httpsIp")
     }
 
     /**
@@ -397,7 +411,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
         try {
             context.unregisterReceiver(orbotStatusReceiver)
         } catch (e: IllegalArgumentException) {
-            Log.e(LOG_TAG_VPN, "Unregister not needed: ${e.message}", e)
+            Log.w(LOG_TAG_VPN, "Unregister not needed: ${e.message}")
         }
     }
 

@@ -51,7 +51,8 @@ class CategoryInfoRepository(private val categoryInfoDAO: CategoryInfoDAO) {
     }
 
     fun updateNumberOfBlocked(categoryName: String, isAppBlocked: Boolean) {
-        val count = if (isAppBlocked) {
+        // unused is added to make the call synchronous.
+        val unused = if (isAppBlocked) {
             categoryInfoDAO.increaseNumberOfBlocked(categoryName)
         } else {
             categoryInfoDAO.decreaseNumberOfBlocked(categoryName)
@@ -62,7 +63,7 @@ class CategoryInfoRepository(private val categoryInfoDAO: CategoryInfoDAO) {
     }
 
     fun updateBlockedCount(categoryName: String, blockedCount: Int) {
-        categoryInfoDAO.updateBlockedCount(categoryName, blockedCount)
+        val unused = categoryInfoDAO.updateBlockedCount(categoryName, blockedCount)
         val categoryDetail = categoryInfoDAO.getCategoryDetail(categoryName)
         val allBlocked = isAppCountEqual(categoryDetail)
         categoryInfoDAO.updateCategoryInternet(categoryName, allBlocked)

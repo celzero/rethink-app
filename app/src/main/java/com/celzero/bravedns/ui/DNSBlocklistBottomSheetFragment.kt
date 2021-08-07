@@ -15,17 +15,21 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui
 
+import android.app.Dialog
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.text.Spanned
 import android.text.format.DateUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.widget.ImageView
-import androidx.recyclerview.widget.LinearLayoutManager
+import android.widget.Toast
+import androidx.core.text.HtmlCompat
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.target.CustomViewTarget
@@ -33,9 +37,9 @@ import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.DNSBottomSheetBlockAdapter
 import com.celzero.bravedns.database.DNSLogs
 import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
+import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -43,8 +47,11 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getETldPlus1
+import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
+import java.util.*
+import kotlin.collections.HashMap
 
 
 class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
@@ -55,7 +62,7 @@ class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
     // This property is only valid between onCreateView and onDestroyView.
     private val b get() = _binding!!
 
-    private lateinit var recyclerAdapter: DNSBottomSheetBlockAdapter
+    //private lateinit var recyclerAdapter: DNSBottomSheetBlockAdapter
     private val persistentState by inject<PersistentState>()
 
     override fun getTheme(): Int = Utilities.getBottomsheetCurrentTheme(isDarkThemeOn())
@@ -80,9 +87,13 @@ class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
         b.dnsBlockUrl.text = transaction.queryStr
         b.dnsBlockIpAddress.text = transaction.response
         b.dnsBlockConnectionFlag.text = transaction.flag
-        b.dnsBlockLatency.visibility = View.GONE
         b.dnsBlockIpLatency.text = getString(R.string.dns_btm_latency_ms,
                                              transaction.latency.toString())
+
+        b.dnsBlockRuleHeaderLl.setOnClickListener {
+            showToastUiCentered(requireContext(), getString(R.string.coming_soon_toast),
+                                Toast.LENGTH_SHORT)
+        }
 
         displayFavIcon()
         displayDnsTransactionDetails()
@@ -92,20 +103,64 @@ class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
         displayDescription()
 
         if (!transaction.hasBlocklists()) {
-            b.dnsBlockRecyclerContainer.visibility = View.GONE
-            b.dnsBlockPlaceHolder.visibility = View.VISIBLE
+            b.dnsBlockBlocklistChip.visibility = View.GONE
             return
         }
 
+        handleChip()
+    }
+
+    private fun handleChip() {
+        b.dnsBlockBlocklistChip.visibility = View.VISIBLE
         val blocklists = transaction.getBlocklists()
-        if (blocklists.isNotEmpty()) {
-            b.dnsBlockRecyclerview.layoutManager = LinearLayoutManager(contextVal)
-            recyclerAdapter = DNSBottomSheetBlockAdapter(contextVal, blocklists)
-            b.dnsBlockRecyclerview.adapter = recyclerAdapter
-            b.dnsBlockPlaceHolder.visibility = View.GONE
-        } else {
-            b.dnsBlockPlaceHolder.visibility = View.VISIBLE
+        val groupNames: MutableMap<String, String> = HashMap()
+
+        blocklists.forEach {
+            val items = it.split(":")
+            if (groupNames.containsKey(items[0])) {
+                groupNames[items[0]] = groupNames.getValue(items[0]) + "," + items[1]
+            } else {
+                groupNames[items[0]] = items[1]
+            }
         }
+
+        val groupCount = groupNames.keys.count()
+        if (groupCount > 1) {
+            b.dnsBlockBlocklistChip.text = groupNames.keys.elementAt(0) + " +${groupCount - 1}"
+        } else {
+            b.dnsBlockBlocklistChip.text = groupNames.keys.elementAt(0)
+        }
+
+        b.dnsBlockBlocklistChip.setOnClickListener {
+            showBlocklistDialog(groupNames)
+        }
+    }
+
+    private fun showBlocklistDialog(groupNames: Map<String, String>) {
+        val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCanceledOnTouchOutside(true)
+        dialog.setContentView(dialogBinding.root)
+        dialogBinding.infoRulesDialogRulesDesc.text = formatText(groupNames)
+        dialogBinding.infoRulesDialogRulesTitle.visibility = View.GONE
+
+        dialogBinding.infoRulesDialogCancelImg.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
+    private fun formatText(groupNames: Map<String, String>): Spanned {
+        var text = ""
+        groupNames.forEach {
+            val heading = it.key.capitalize(Locale.getDefault())
+            val size = it.value.split(",").size
+            text += getString(R.string.dns_btm_sheet_dialog_message, heading, size.toString(),
+                              it.value)
+        }
+        text = text.replace(",", ", ")
+        return HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
     }
 
     private fun displayDescription() {

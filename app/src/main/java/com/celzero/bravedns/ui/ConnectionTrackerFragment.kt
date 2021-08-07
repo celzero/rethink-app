@@ -49,7 +49,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     private val viewModel: ConnectionTrackerViewModel by viewModel()
     private var filterValue: String = ""
 
-    // By default, all connections are shown, Filter dialog will be selected with position 1.
+    // By default, check item at position 1 (all connections)
     private var checkedItem = 1
 
     private val connectionTrackerDAO by inject<ConnectionTrackerDAO>()

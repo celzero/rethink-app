@@ -95,8 +95,16 @@ object VpnController {
 
     fun state(): VpnState {
         val requested: Boolean = VpnControllerHelper.persistentState.getVpnEnabled()
-        val on = braveVpnService?.isOn() == true
+        val on = isOn()
         return VpnState(requested, on, connectionState)
+    }
+
+    fun isOn(): Boolean {
+        return braveVpnService?.isOn() == true
+    }
+
+    fun hasTunnel(): Boolean {
+        return braveVpnService?.hasTunnel() == true
     }
 
 }
