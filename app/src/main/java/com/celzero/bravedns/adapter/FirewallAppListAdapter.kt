@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.graphics.drawable.Drawable
 import android.net.VpnService
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -99,7 +100,6 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
                     childViewBinding.firewallApkIconIv)
         showAppHint(childViewBinding.firewallStatusIndicator, appInfo)
 
-
     }
 
     private fun setupChildClickListeners(appInfo: AppInfo) {
@@ -108,21 +108,21 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
         childViewBinding.firewallToggleWifi.setOnClickListener {
             enableAfterDelay(1000, childViewBinding.firewallToggleWifi)
 
-            val isInternetAllowed = appInfo.isInternetAllowed
             val appUidList = FirewallManager.getAppNamesByUid(appInfo.uid)
 
             if (appUidList.size > 1) {
-                showDialog(appUidList, appInfo, isInternetAllowed)
+                childViewBinding.firewallToggleWifi.isChecked = !appInfo.isInternetAllowed
+                notifyDataSetChanged()
+                showDialog(appUidList, appInfo)
                 return@setOnClickListener
             }
-            updateBlockApp(appInfo, isInternetAllowed)
+            updateBlockApp(appInfo)
         }
     }
 
-
-    private fun updateBlockApp(appInfo: AppInfo, isInternetAllowed: Boolean) {
+    private fun updateBlockApp(appInfo: AppInfo) {
+        val isInternetAllowed = appInfo.isInternetAllowed
         FirewallManager.updateFirewalledApps(appInfo.uid, !isInternetAllowed)
-        childViewBinding.firewallToggleWifi.isChecked = isInternetAllowed
         if (!isInternetAllowed) childViewBinding.firewallStatusIndicator.setBackgroundColor(
             context.getColor(R.color.colorGreen_900))
         else childViewBinding.firewallStatusIndicator.setBackgroundColor(
@@ -335,13 +335,13 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
         return true
     }
 
-    private fun showDialog(packageList: List<String>, appInfo: AppInfo, isInternet: Boolean) {
+    private fun showDialog(packageList: List<String>, appInfo: AppInfo) {
         val positiveTxt: String
 
         val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
 
         builderSingle.setIcon(R.drawable.spinner_firewall)
-        positiveTxt = if (isInternet) {
+        positiveTxt = if (appInfo.isInternetAllowed) {
             builderSingle.setTitle(
                 context.getString(R.string.ctbs_block_other_apps, appInfo.appName,
                                   packageList.size.toString()))
@@ -362,14 +362,15 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
         builderSingle.setItems(packageList.toTypedArray(), null)
 
         builderSingle.setPositiveButton(positiveTxt) { _: DialogInterface, _: Int ->
-            updateBlockApp(appInfo, isInternet)
+            updateBlockApp(appInfo)
         }.setNeutralButton(
             context.getString(R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int ->
-            childViewBinding.firewallToggleWifi.isChecked = !isInternet
+
         }
 
-        val alertDialog: AlertDialog = builderSingle.show()
+        val alertDialog: AlertDialog = builderSingle.create()
         alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
+        alertDialog.show()
     }
 
     private fun showSystemAppBlockDialog(categoryInfo: CategoryInfo) {

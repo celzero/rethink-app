@@ -29,7 +29,6 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DNSQueryAdapter
 import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.database.DNSLogDAO
-import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.databinding.ActivityQueryDetailBinding
 import com.celzero.bravedns.databinding.QueryListScrollListBinding
 import com.celzero.bravedns.glide.GlideApp
@@ -138,36 +137,24 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     }
 
     private fun updateConnectedStatus() {
-        val dnsType = appMode.getDNSType()
+        val dnsType = appMode.getDnsType()
         if (dnsType == PREF_DNS_MODE_DOH) {
-            val dohDetail: DoHEndpoint? = appMode.getDOHDetails()
             b.connectedStatusTitleUrl.text = resources.getString(
                 R.string.configure_dns_connected_doh_status)
-            b.connectedStatusTitle.text = resources.getString(
-                R.string.configure_dns_connection_name, dohDetail?.dohName)
+            b.connectedStatusTitle.text = resources.getString(R.string.configure_dns_connection_name, appMode.getConnectedDNS())
             b.queryListScrollList.recyclerQuery.visibility = View.VISIBLE
             b.queryListScrollList.dnsLogNoLogText.visibility = View.GONE
         } else if (dnsType == PREF_DNS_MODE_DNSCRYPT) {
-            val cryptDetails = appMode.getDNSCryptServerCount()
-            val cryptName = resources.getString(R.string.configure_dns_crypt_name,
-                                                cryptDetails.toString())
-            b.connectedStatusTitle.text = resources.getString(
-                R.string.configure_dns_connection_name, cryptName)
+            observeCryptStatus()
             b.connectedStatusTitleUrl.text = resources.getString(
-                R.string.configure_dns_connected_dns_crypt_status)
-            // Edge case, the dnscrypt count can change during the refresh
-            // operation(dnscrypt proxy refresh from Go) so during onResume()
-            // the value is fetched from database and force updated in persistent state.
-            val connectedCrypt = getString(R.string.configure_dns_crypt, cryptDetails.toString())
-            persistentState.setConnectedDns(connectedCrypt)
+                            R.string.configure_dns_connected_dns_crypt_status)
             b.queryListScrollList.recyclerQuery.visibility = View.VISIBLE
             b.queryListScrollList.dnsLogNoLogText.visibility = View.GONE
         } else {
-            val proxyDetails = appMode.getDNSProxyServerDetails()
             b.connectedStatusTitleUrl.text = resources.getString(
                 R.string.configure_dns_connected_dns_proxy_status)
             b.connectedStatusTitle.text = resources.getString(
-                R.string.configure_dns_connection_name, proxyDetails.proxyName)
+                R.string.configure_dns_connection_name, appMode.getConnectedDNS())
             b.queryListScrollList.recyclerQuery.visibility = View.GONE
             if (persistentState.logsEnabled) {
                 b.queryListScrollList.dnsLogNoLogText.visibility = View.VISIBLE
@@ -179,6 +166,13 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
                 // ConfigureDNSFragment). Other logs enabled states are handled in onViewCreated().
             }
         }
+    }
+
+    private fun observeCryptStatus() {
+        appMode.getDnscryptCountLiveDataObserver().observe(viewLifecycleOwner, {
+            val connectedCrypt = getString(R.string.configure_dns_crypt, it.toString())
+            b.connectedStatusTitle.text = connectedCrypt
+        })
     }
 
     private fun showDnsLogsFilterDialog() {
@@ -226,5 +220,4 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         viewModel.setFilter(query, filterValue)
         return true
     }
-
 }

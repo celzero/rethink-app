@@ -128,7 +128,8 @@ class BackgroundAccessibilityService : AccessibilityService() {
         if (isPackageLauncher(latestTrackedPackage)) {
             FirewallManager.untrackForegroundApps()
         } else {
-            FirewallManager.trackForegroundApp(latestTrackedPackage)
+            val uid = getEventUid(latestTrackedPackage) ?: return
+            FirewallManager.trackForegroundApp(uid)
         }
 
     }
@@ -144,6 +145,12 @@ class BackgroundAccessibilityService : AccessibilityService() {
         } else {
             event.packageName.toString()
         }
+    }
+
+    private fun getEventUid(pkgName: String): Int? {
+        if (pkgName.isBlank()) return null
+
+        return this.packageManager.getApplicationInfo(pkgName, PackageManager.GET_META_DATA).uid
     }
 
     private fun isPackageLauncher(packageName: String?): Boolean {

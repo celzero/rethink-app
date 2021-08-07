@@ -79,8 +79,6 @@ public class GoVpnAdapter {
     private static final String IPV4_TEMPLATE = "10.111.222.%d";
     private static final int IPV4_PREFIX_LENGTH = 24;
 
-    private long firewallMode = -1;
-
     // The VPN service and tun2socks must agree on the layout of the network.  By convention, we
     // assign the following values to the final byte of an address within a subnet.
     private enum LanIp {
@@ -112,6 +110,7 @@ public class GoVpnAdapter {
     private GoIntraListener listener;
 
     private final AppMode appMode;
+
     @NonNull
     private final PersistentState persistentState;
 
@@ -138,11 +137,11 @@ public class GoVpnAdapter {
         this.persistentState = persistentState;
     }
 
-    public synchronized void start(Long dnsMode, Long blockMode, Long proxyMode) {
-        connectTunnel(dnsMode, blockMode, proxyMode);
+    public synchronized void start(AppMode.TunnelMode tunnelMode) {
+        connectTunnel(tunnelMode);
     }
 
-    private void connectTunnel(Long iDnsMode, Long iBlockMode, Long iProxyMode) {
+    private void connectTunnel(AppMode.TunnelMode tunnelMode) {
         if (tunnel != null) {
             return;
         }
@@ -160,9 +159,7 @@ public class GoVpnAdapter {
 
             Transport transport = makeDohTransport(dohURL);
 
-            firewallMode = iBlockMode;
-
-            Log.i(LOG_TAG_VPN, "Connect tunnel with url " + dohURL + ", dnsMode: " + iDnsMode + ", blockMode: " + iBlockMode + ", proxyMode: " + iProxyMode);
+            Log.i(LOG_TAG_VPN, "Connect tunnel with url " + dohURL + ", dnsMode: " + tunnelMode.getDnsMode() + ", blockMode: " + tunnelMode.getFirewallMode() + ", proxyMode: " + tunnelMode.getProxyMode());
             tunnel = Tun2socks.connectIntraTunnel(tunFd.getFd(), fakeDns,
                     transport, getProtector(), getBlocker(), listener);
 
@@ -170,9 +167,9 @@ public class GoVpnAdapter {
                 Tun2socks.enableDebugLog();
             }
 
-            setBraveMode(iDnsMode, dohURL);
+            setBraveMode(tunnelMode.getDnsMode(), dohURL);
 
-            setTunnelMode(iDnsMode, iBlockMode, iProxyMode);
+            setTunnelMode(tunnelMode);
 
         } catch (Exception e) {
             Log.e(LOG_TAG_VPN, e.getMessage(), e);
@@ -205,23 +202,23 @@ public class GoVpnAdapter {
         return (Settings.DNSModeIP == dnsMode || Settings.DNSModePort == dnsMode);
     }
 
-    private void setTunnelMode(long dnsMode, long blockMode, long proxyMode) {
-        if (!isDnscrypt(dnsMode)) {
-            if (isOrbotProxy(proxyMode)) {
-                tunnel.setTunMode(dnsMode, blockMode, Settings.ProxyModeSOCKS5);
+    private void setTunnelMode(AppMode.TunnelMode tunnelMode) {
+        if (!isDnscrypt(tunnelMode.getDnsMode())) {
+            if (isOrbotProxy(tunnelMode.getProxyMode())) {
+                tunnel.setTunMode(tunnelMode.getDnsMode(), tunnelMode.getFirewallMode(), Settings.ProxyModeSOCKS5);
             } else {
-                tunnel.setTunMode(dnsMode, blockMode, proxyMode);
+                tunnel.setTunMode(tunnelMode.getDnsMode(), tunnelMode.getFirewallMode(), tunnelMode.getProxyMode());
             }
             checkForCryptRemoval();
-            if (isDnsProxy(dnsMode)) {
+            if (isDnsProxy(tunnelMode.getDnsMode())) {
                 setDNSProxy();
             }
 
-            if (isSock5Proxy(proxyMode) || isOrbotProxy(proxyMode)) {
-                setSocks5TunnelMode();
+            if (isSock5Proxy(tunnelMode.getProxyMode()) || isOrbotProxy(tunnelMode.getProxyMode())) {
+                setSocks5TunnelMode(tunnelMode.getProxyMode());
             }
         } else {
-            setCryptMode();
+            setDnscryptMode(tunnelMode);
         }
     }
 
@@ -254,7 +251,7 @@ public class GoVpnAdapter {
             File remoteFile = new File(path);
 
             if (remoteFile.exists()) {
-                BraveDNS rbdns = Dnsx.newBraveDNSRemote(path + File.separator + Constants.FILE_TAG_JSON);
+                BraveDNS rbdns = Dnsx.newBraveDNSRemote(path);
                 tunnel.setBraveDNS(rbdns);
                 Log.i(LOG_TAG_VPN, "Enabled remote bravedns mode");
             } else {
@@ -285,9 +282,19 @@ public class GoVpnAdapter {
         }
     }
 
-    public void setCryptMode() {
+    public void setDnscryptMode(AppMode.TunnelMode tunnelMode) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                setDnscrypt(tunnelMode);
+            }
+        });
+    }
+
+    private void setDnscrypt(AppMode.TunnelMode tunnelMode) {
         String servers = appMode.getDnscryptServers();
-        String routes = appMode.getRelayServers();
+        String routes = appMode.getDnscryptRelayServers();
         String serversIndex = appMode.getDnscryptServersToRemove();
         try {
             if (tunnel.getDNSCryptProxy() == null) {
@@ -316,7 +323,7 @@ public class GoVpnAdapter {
 
         }
         if (servers.length() > 0) {
-            RefreshOperation runningTask = new RefreshOperation();
+            RefreshOperation runningTask = new RefreshOperation(tunnelMode);
             runningTask.execute();
         }
     }
@@ -345,8 +352,14 @@ public class GoVpnAdapter {
         }
     }
 
-
+    // TODO: Change it to ExecutorService
     private final class RefreshOperation extends AsyncTask<Void, Void, String> {
+        long proxyMode;
+        long firewallMode;
+        public RefreshOperation(AppMode.TunnelMode tunnelMode) {
+            this.proxyMode = tunnelMode.getProxyMode();
+            this.firewallMode = tunnelMode.getFirewallMode();
+        }
 
         //TODO - #321
         String asyncComplete = "Executed";
@@ -364,34 +377,33 @@ public class GoVpnAdapter {
                         Log.i(LOG_TAG_VPN, "No live servers, falling back to default DoH mode");
                         tunnel.stopDNSCryptProxy();
                         appMode.setDefaultConnection();
-                        showToastOnCryptConnectionFailure();
+                        showDnscryptConnectionFailureToast();
                     } else {
-                        int proxyMode = (int) appMode.getProxyMode();
-                        tunnel.setTunMode(Settings.DNSModeCryptPort, firewallMode, appMode.getProxyMode());
+                        tunnel.setTunMode(Settings.DNSModeCryptPort, firewallMode, proxyMode);
                         if (proxyMode == Settings.ProxyModeSOCKS5 || proxyMode == Constants.ORBOT_PROXY) {
-                            setSocks5TunnelMode();
+                            setSocks5TunnelMode(proxyMode);
                         }
                         Log.i(LOG_TAG_VPN, "connect crypt tunnel set with mode: " + Settings.DNSModeCryptPort + firewallMode + proxyMode);
                     }
                 } else {
-                    handleCryptFailure();
+                    handleDnscryptFailure();
                 }
             } catch (Exception e) {
-                handleCryptFailure();
+                handleDnscryptFailure();
                 Log.e(LOG_TAG_VPN, "connect-tunnel: dns crypt", e);
             }
             return asyncComplete;
         }
 
-        private void handleCryptFailure() {
+        private void handleDnscryptFailure() {
             if (persistentState.getDnsType() == Constants.PREF_DNS_MODE_DNSCRYPT) {
                 appMode.setDefaultConnection();
-                showToastOnCryptConnectionFailure();
+                showDnscryptConnectionFailureToast();
                 Log.i(LOG_TAG_VPN, "connect-tunnel: failure of dns crypt falling back to doh");
             }
         }
 
-        private void showToastOnCryptConnectionFailure() {
+        private void showDnscryptConnectionFailureToast() {
             Handler handler = new Handler(vpnService.getMainLooper());
             handler.post(new Runnable() {
                 public void run() {
@@ -407,9 +419,8 @@ public class GoVpnAdapter {
         }
     }
 
-    public void setSocks5TunnelMode() {
+    public void setSocks5TunnelMode(long proxyMode) {
         ProxyEndpoint socks5;
-        int proxyMode = (int) appMode.getProxyMode();
         if (proxyMode == Constants.ORBOT_PROXY) {
             socks5 = appMode.getOrbotProxyDetails();
         } else {
@@ -495,7 +506,7 @@ public class GoVpnAdapter {
      * Go, and will not use the Java DoH implementation.  If Go-DoH is not enabled, this method
      * has no effect.
      */
-    public synchronized void updateDohUrl(Long dnsMode, Long blockMode, Long proxyMode) {
+    public synchronized void updateDohUrl(AppMode.TunnelMode tunnelMode) {
         // FIXME: 18-10-2020  - Check for the tunFD null code. Removed because of the connect tunnel
 
         // changes made in connectTunnel()
@@ -511,7 +522,7 @@ public class GoVpnAdapter {
         if (tunnel == null) {
             // Attempt to re-create the tunnel.  Creation may have failed originally because the DoH
             // server could not be reached.  This will update the DoH URL as well.
-            connectTunnel(dnsMode, blockMode, proxyMode);
+            connectTunnel(tunnelMode);
             return;
         }
 
@@ -529,12 +540,12 @@ public class GoVpnAdapter {
 
             tunnel.setDNS(dohTransport);
 
-            Log.i(LOG_TAG_VPN, "Connect tunnel with url " + dohURL + ", dnsMode: " + dnsMode + ", blockMode:" + blockMode + ", proxyMode:" + proxyMode);
+            Log.i(LOG_TAG_VPN, "Connect tunnel with url " + dohURL + ", dnsMode: " + tunnelMode.getDnsMode() + ", blockMode:" + tunnelMode.getFirewallMode() + ", proxyMode:" + tunnelMode.getProxyMode());
 
             // Set brave dns to tunnel - Local/Remote
-            setBraveMode(dnsMode, dohURL);
+            setBraveMode(tunnelMode.getDnsMode(), dohURL);
 
-            setTunnelMode(dnsMode, blockMode, proxyMode);
+            setTunnelMode(tunnelMode);
         } catch (Exception e) {
             Log.e(LOG_TAG_VPN, e.getMessage(), e);
             tunnel.disconnect();
@@ -543,7 +554,7 @@ public class GoVpnAdapter {
     }
 
     private String getDoHUrl() {
-        String dohURL = "https://free.bravedns.com/dns-query";
+        String dohURL = "https://basic.bravedns.com/dns-query";
         try {
             if (appMode.getDOHDetails() != null) {
                 dohURL = appMode.getDOHDetails().getDohURL();

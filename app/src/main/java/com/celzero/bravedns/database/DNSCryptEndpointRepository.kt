@@ -81,6 +81,10 @@ class DNSCryptEndpointRepository(private val dnsCryptEndpointDAO: DNSCryptEndpoi
         return dnsCryptEndpointDAO.getConnectedCount()
     }
 
+    fun getConnectedCountLiveData(): LiveData<Int> {
+        return dnsCryptEndpointDAO.getConnectedCountLiveData()
+    }
+
     fun getCount(): Int {
         return dnsCryptEndpointDAO.getCount()
     }
@@ -89,7 +93,7 @@ class DNSCryptEndpointRepository(private val dnsCryptEndpointDAO: DNSCryptEndpoi
         val listServer = liveServersID.split(",")
         removeConnectionStatus()
         listServer.forEach {
-            dnsCryptEndpointDAO.updateConnectionStatus(it.toInt())
+            dnsCryptEndpointDAO.updateConnectionStatus(it.trim().toInt())
         }
     }
 
@@ -98,25 +102,17 @@ class DNSCryptEndpointRepository(private val dnsCryptEndpointDAO: DNSCryptEndpoi
     }
 
     fun getServersToAdd(): String {
-        var servers = ""
         val cryptList = getConnectedDNSCrypt()
 
-        cryptList.forEach {
-            servers += "${it.id}#${it.dnsCryptURL},"
+        val servers = cryptList.joinToString(separator = ",") {
+            "${it.id}#${it.dnsCryptURL}"
         }
-        servers = servers.dropLast(1)
         Log.i(LoggerConstants.LOG_TAG_APP_MODE, "Crypt Server: $servers")
         return servers
     }
 
     fun getServersToRemove(): String {
         val cryptList = getConnectedDNSCrypt()
-        var removeServerString = ""
-
-        cryptList.forEach {
-            removeServerString += "${it.id},"
-        }
-        removeServerString = removeServerString.dropLast(1)
-        return removeServerString
+        return cryptList.joinToString(separator = ",") { "${it.id}" }
     }
 }

@@ -78,7 +78,7 @@ interface AppInfoDAO {
     fun getPackageNameForUid(uid: Int): String
 
     @Query(
-        "select * from AppInfo where isExcluded = 0  order by whiteListUniv1 desc,lower(appName) ")
+        "select * from AppInfo where isExcluded = 0 order by whiteListUniv1 desc,lower(appName) ")
     fun getUnivAppDetailsLiveData(): DataSource.Factory<Int, AppInfo>
 
     @Query(

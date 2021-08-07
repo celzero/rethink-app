@@ -24,20 +24,17 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
 import androidx.annotation.Nullable
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallRules
-import com.celzero.bravedns.database.AppInfo
+import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.database.BlockedConnectionsRepository
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
@@ -47,11 +44,15 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_WEBSITE
+import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_3
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.Utilities.Companion.convertLongToTime
+import com.celzero.bravedns.util.Utilities.Companion.getBugReportFilePath
 import com.celzero.bravedns.util.Utilities.Companion.getPackageMetadata
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastR
+import com.celzero.bravedns.util.Utilities.Companion.writeTrace
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -62,10 +63,9 @@ import kotlinx.coroutines.launch
 import okhttp3.*
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
+import java.io.File
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
-import kotlin.collections.HashSet
 
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
@@ -80,6 +80,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val blockedConnectionsRepository by inject<BlockedConnectionsRepository>()
     private val persistentState by inject<PersistentState>()
     private val appUpdateManager by inject<AppUpdater>()
+    private val appMode by inject<AppMode>()
 
     /* TODO : This task need to be completed.
              Add all the appinfo in the global variable during appload
@@ -111,8 +112,10 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         if (persistentState.firstTimeLaunch) {
             launchOnboardActivity()
-        } else {
-            showNewFeaturesDialog()
+        }
+
+        if (appMode.getAppState() == AppMode.AppState.PAUSE.state) {
+            openPauseActivity()
         }
 
         updateNewVersion()
@@ -132,6 +135,38 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         insertDefaultData()
 
         initUpdateCheck()
+
+        detectAppExitInfo()
+    }
+
+    private fun detectAppExitInfo() {
+        if (!isAtleastR()) return
+
+        val path = getBugReportFilePath(this)
+        val am: ActivityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
+        CoroutineScope(Dispatchers.IO).launch {
+            // gets all the historical process exit reasons.
+            val appExitInfo = am.getHistoricalProcessExitReasons(null, 0, 0)
+            var latestTimestamp = persistentState.lastExitTimestamp
+            val file = File(path)
+            appExitInfo.forEach {
+                // Write only the latest exit reason
+                if (latestTimestamp < it.timestamp) {
+                    val reportDetails = "${it.packageUid},${it.reason},${it.description},${it.importance},${it.pss},${it.rss},${
+                        convertLongToTime(it.timestamp, TIME_FORMAT_3)
+                    }\n"
+                    file.appendText(reportDetails)
+                    // Reason ANR will contain traceInputStream in it.
+                    // Write into file when the traceInput is available
+                    if (it.reason == ApplicationExitInfo.REASON_ANR) {
+                        writeTrace(file, it.traceInputStream)
+                    }
+                    latestTimestamp = it.timestamp
+                }
+            }
+            // Store the last exit reason time stamp
+            persistentState.lastExitTimestamp = latestTimestamp
+        }
     }
 
     private fun removeThisMethod() {
@@ -147,7 +182,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             refreshDatabase.insertDefaultDNSCryptList()
             refreshDatabase.insertDefaultDNSCryptRelayList()
             refreshDatabase.insertDefaultDNSProxy()
-            refreshDatabase.updateCategoryInDB()
+            refreshDatabase.updateCategoryRepo()
             persistentState.insertionCompleted = true
         }
     }
@@ -157,38 +192,22 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         finish()
     }
 
-    private fun showNewFeaturesDialog() {
-        if (!isNewVersion()) return
-
-        val inflater: LayoutInflater = LayoutInflater.from(this)
-        val view: View = inflater.inflate(R.layout.dialog_whatsnew, null)
-        val builder = AlertDialog.Builder(this)
-        builder.setView(view).setTitle(getString(R.string.whats_dialog_title))
-
-        builder.setPositiveButton(
-            getString(R.string.about_dialog_positive_button)) { dialogInterface, _ ->
-            dialogInterface.dismiss()
-        }
-
-        builder.setNeutralButton(getString(R.string.about_dialog_neutral_button)) { _, _ ->
-            val intent = Intent(Intent.ACTION_VIEW, (getString(R.string.about_mail_to)).toUri())
-            intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_subject))
-            startActivity(intent)
-        }
-
-        builder.setCancelable(false)
-        builder.create().show()
-
-        // FIXME - Remove this after the version v053f
-        // this is to fix the persistance state which was saved as Int instead of Long.
-        // Modification of persistence state
-        removeThisMethod()
+    private fun openPauseActivity() {
+        val intent = Intent()
+        intent.setClass(this, PauseActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
     private fun updateNewVersion() {
         if (isNewVersion()) {
             val version = getLatestVersion()
             persistentState.appVersion = version
+            persistentState.showWhatsNewChip = true
+            // FIXME - Remove this after the version v053f
+            // this is to fix the persistance state which was saved as Int instead of Long.
+            // Modification of persistence state
+            removeThisMethod()
         }
     }
 
@@ -373,15 +392,21 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         } catch (e: IllegalArgumentException) {
             Log.w(LOG_TAG_DOWNLOAD, "Unregister receiver exception")
         }
-
     }
-
 
     override fun onResume() {
         super.onResume()
         refreshDatabase.refreshAppInfoDatabase(isForceRefresh = false)
+        checkAppState()
     }
 
+    private fun checkAppState() {
+        persistentState.appStateLiveData.observe(this, {
+            if(it == AppMode.AppState.PAUSE) {
+                openPauseActivity()
+            }
+        })
+    }
 
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {

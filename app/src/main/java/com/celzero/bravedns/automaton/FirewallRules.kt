@@ -37,7 +37,7 @@ object FirewallRules {
     const val UID_EVERYBODY = -1000
 
     fun clearFirewallRules(uid: Int, blockedConnectionsRepository: BlockedConnectionsRepository) {
-        CoroutineScope(Dispatchers.IO).launch {
+        io() {
             blockedConnectionsRepository.clearFirewallRules(uid)
         }
         appIpRules.removeAll(uid)
@@ -50,7 +50,7 @@ object FirewallRules {
             return
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
+        io() {
             if (uid == UID_EVERYBODY) blockedConnectionsRepository.deleteIPRulesUniversal(ipAddress)
             else blockedConnectionsRepository.deleteIPRulesForUID(uid, ipAddress)
         }
@@ -60,7 +60,7 @@ object FirewallRules {
     fun addFirewallRules(uid: Int, ipAddress: String, ruleType: String,
                          blockedConnectionsRepository: BlockedConnectionsRepository) {
         if (DEBUG) Log.d(LOG_TAG_FIREWALL, "addFirewallRules: $uid, $ipAddress")
-        CoroutineScope(Dispatchers.IO).launch {
+        io() {
             val blockedConnection = constructBlockedConnections(uid, ipAddress, ruleType)
             blockedConnectionsRepository.insert(blockedConnection)
         }
@@ -72,14 +72,14 @@ object FirewallRules {
     }
 
     fun clearAllIpRules(blockedConnectionsRepository: BlockedConnectionsRepository) {
-        CoroutineScope(Dispatchers.IO).launch {
+        io() {
             blockedConnectionsRepository.deleteAllIPRulesUniversal()
         }
         appIpRules.clear()
     }
 
     fun loadFirewallRules(blockedConnectionsRepository: BlockedConnectionsRepository) {
-        CoroutineScope(Dispatchers.IO).launch {
+        io() {
             val rules = blockedConnectionsRepository.getBlockedConnections()
             rules.forEach {
                 val key = it.uid
@@ -99,6 +99,12 @@ object FirewallRules {
         blockedConnections.ruleType = ruleType
         blockedConnections.uid = uid
         return blockedConnections
+    }
+
+    private fun io(f: () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            f()
+        }
     }
 
 }

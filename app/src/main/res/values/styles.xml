@@ -212,4 +212,14 @@
         <item name="chipMinTouchTargetSize">30dp</item>
     </style>
 
+    <style name="ShapeAppearance.MyApp.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+      <item name="cornerFamily">rounded</item>
+      <item name="cornerSize">1dp</item>
+      <item name="cornerRadius">1dp</item>
+      <item name="chipCornerRadius">1dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="chipMinHeight">40dp</item>
+      <item name="chipMinTouchTargetSize">40dp</item>
+    </style>
+
 </resources>

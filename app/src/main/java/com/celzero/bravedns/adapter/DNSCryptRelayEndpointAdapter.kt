@@ -154,7 +154,7 @@ class DNSCryptRelayEndpointAdapter(private val context: Context, private val app
                                                isSelected: Boolean) {
 
             CoroutineScope(Dispatchers.IO).launch {
-                if (isSelected && !appMode.isRelaySelectable()) {
+                if (isSelected && !appMode.isDnscryptRelaySelectable()) {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(context,
                                        context.getString(R.string.dns_crypt_relay_error_toast),
@@ -175,7 +175,7 @@ class DNSCryptRelayEndpointAdapter(private val context: Context, private val app
 
         private fun deleteEndpoint(id: Int) {
             CoroutineScope(Dispatchers.IO).launch {
-                appMode.deleteDnscryptEndpoint(id)
+                appMode.deleteDnscryptRelayEndpoint(id)
                 withContext(Dispatchers.Main) {
                     Toast.makeText(context, R.string.dns_crypt_relay_remove_success,
                                    Toast.LENGTH_SHORT).show()

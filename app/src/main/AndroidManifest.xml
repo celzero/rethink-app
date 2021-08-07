@@ -8,20 +8,22 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
     <uses-permission
         android:name="android.permission.INTERACT_ACROSS_USERS"
         android:protectionLevel="signature"
         tools:ignore="ProtectedPermissions" />
+
     <application
+        android:name=".RethinkDnsApplication"
         android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
-        android:name=".RethinkDnsApplication"
         android:theme="@style/AppThemeInitial">
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
@@ -46,8 +48,8 @@
             android:launchMode="singleTask" />
         <activity
             android:name=".ui.WelcomeActivity"
-            android:noHistory="true"
-            android:launchMode="singleTask"/>
+            android:launchMode="singleTask"
+            android:noHistory="true" />
         <activity
             android:name=".ui.AppInfoActivity"
             android:launchMode="singleInstance" />
@@ -55,8 +57,12 @@
             android:name=".ui.FaqWebViewActivity"
             android:launchMode="singleInstance" />
         <activity
+            android:name=".ui.PauseActivity"
+            android:launchMode="singleTop" />
+        <activity
             android:name=".ui.DNSConfigureWebViewActivity"
             android:launchMode="singleInstance" />
+
         <service
             android:name=".util.BackgroundAccessibilityService"
             android:label="@string/accessibility_service_label"
@@ -80,8 +86,8 @@
         </receiver>
         <receiver
             android:name=".receiver.NotificationActionReceiver"
-            android:label="@string/app_name">
-        </receiver>
+            android:label="@string/app_name"></receiver>
+
         <service
             android:name=".service.BraveVPNService"
             android:permission="android.permission.BIND_VPN_SERVICE"
@@ -103,6 +109,17 @@
                 android:name="android.service.quicksettings.ACTIVE_TILE"
                 android:value="true" />
         </service>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.celzero.bravedns.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider_paths" />
+        </provider>
+
     </application>
 
 </manifest>

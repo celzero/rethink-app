@@ -20,6 +20,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -28,8 +29,11 @@ import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.ScrollView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -40,9 +44,19 @@ import com.celzero.bravedns.databinding.FragmentAboutBinding
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
+import com.celzero.bravedns.util.Constants.Companion.FILE_PROVIDER_NAME
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.Companion.isAtleastR
+import com.celzero.bravedns.util.Utilities.Companion.isFdroidBuild
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
+import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.InputStream
 
 
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
@@ -55,7 +69,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
 
     private fun initView() {
 
-        if (BuildConfig.FLAVOR == Constants.FLAVOR_FDROID) {
+        if (isFdroidBuild()) {
             b.aboutAppUpdate.visibility = View.GONE
         }
 
@@ -72,6 +86,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         b.aboutAppInfo.setOnClickListener(this)
         b.aboutAppNotification.setOnClickListener(this)
         b.aboutVpnProfile.setOnClickListener(this)
+        b.aboutCrashLog.setOnClickListener(this)
 
         try {
             val version = getVersionName()
@@ -124,6 +139,13 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
                                     getString(R.string.about_github_link).toUri())
                 startActivity(intent)
             }
+            b.aboutCrashLog -> {
+                if (isAtleastR()) {
+                    promptCrashLogAction()
+                } else {
+                    showNoLogDialog()
+                }
+            }
             b.aboutMail -> {
                 val intent = Intent(Intent.ACTION_VIEW, (getString(R.string.about_mail_to)).toUri())
                 intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_subject))
@@ -163,6 +185,24 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         }
     }
 
+    private fun showNoLogDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle(R.string.about_bug_no_log_dialog_title)
+        builder.setMessage(R.string.about_bug_no_log_dialog_message)
+        builder.setPositiveButton(
+            getString(R.string.about_bug_no_log_dialog_positive_btn)) { _, _ ->
+            val intent = Intent(Intent.ACTION_VIEW, (getString(R.string.about_mail_to)).toUri())
+            intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_subject))
+            startActivity(intent)
+        }
+        builder.setNegativeButton(
+            getString(R.string.about_bug_no_log_dialog_negative_btn)) { dialog, _ ->
+            dialog.dismiss()
+        }
+        builder.create().show()
+
+    }
+
     private fun openAppInfo() {
         val packageName = requireContext().packageName
         try {
@@ -171,11 +211,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            Utilities.showToastUiCentered(requireContext(), getString(R.string.app_info_error),
-                                          Toast.LENGTH_SHORT)
+            showToastUiCentered(requireContext(), getString(R.string.app_info_error),
+                                Toast.LENGTH_SHORT)
             Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
+
 
     private fun openNotificationSettings() {
         val packageName = requireContext().packageName
@@ -191,8 +232,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             }
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            Utilities.showToastUiCentered(requireContext(), getString(R.string.vpn_profile_error),
-                                          Toast.LENGTH_SHORT)
+            showToastUiCentered(requireContext(), getString(R.string.vpn_profile_error),
+                                Toast.LENGTH_SHORT)
             Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
@@ -210,6 +251,103 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_subject))
             startActivity(intent)
         }.setCancelable(true).create().show()
+    }
+
+    // ref: https://developer.android.com/guide/components/intents-filters
+    private fun emailBugReport() {
+        // ACTION_SEND_MULTIPLE is to send multiple text files in email.
+        val emailIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
+        emailIntent.type = "plain/text"
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.about_mail_to)))
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_bugreport_subject))
+        emailIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.about_mail_bugreport_text))
+        // Get the bug_report.txt file
+        val file0 = File(
+            requireContext().filesDir.canonicalPath + File.separator + Constants.BUG_REPORT_FILE)
+        // Get the bug_report_1.txt file
+        val file1 = File(
+            requireContext().filesDir.canonicalPath + File.separator + Constants.PREV_REPORT_FILE)
+        // list of files added as attachments
+        val uris: ArrayList<Uri> = ArrayList()
+        getFileUri(file0)?.let { uris.add(it) }
+        getFileUri(file1)?.let { uris.add(it) }
+        emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris)
+        emailIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        emailIntent.flags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+        startActivity(
+            Intent.createChooser(emailIntent, getString(R.string.about_mail_bugreport_share_title)))
+    }
+
+    private fun viewBugReport() {
+        Intent(Intent.ACTION_VIEW).apply {
+            val file0 = File(
+                requireContext().filesDir.canonicalPath + File.separator + Constants.BUG_REPORT_FILE)
+            val uri = FileProvider.getUriForFile(requireContext().applicationContext,
+                                                 FILE_PROVIDER_NAME, file0)
+            val mime: String? = requireActivity().applicationContext.contentResolver.getType(uri)
+            setDataAndType(uri, mime)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            startActivity(this)
+        }
+    }
+
+    private fun getFileUri(file: File): Uri? {
+        if (isFileAvailable(file)) {
+            return FileProvider.getUriForFile(requireContext().applicationContext,
+                                              FILE_PROVIDER_NAME, file)
+
+        }
+        return null
+    }
+
+    private fun isFileAvailable(file: File): Boolean {
+        if (!file.isFile) return false
+        return file.exists()
+    }
+
+    private fun promptCrashLogAction() {
+        val builder: AlertDialog.Builder = AlertDialog.Builder(requireContext())
+        builder.setTitle(getString(R.string.about_bug_report))
+        // No layouts added in the alert dialog.
+        // Created scroll view and added textview to it.
+        val scrollView = ScrollView(requireContext())
+        val textView = TextView(requireContext())
+        textView.setPadding(30, 30, 30, 30)
+        textView.typeface = Typeface.MONOSPACE
+        scrollView.addView(textView)
+        builder.setView(scrollView)
+        val file0 = File(
+            requireContext().filesDir.canonicalPath + File.separator + Constants.BUG_REPORT_FILE)
+        if (!isFileAvailable(file0)) {
+            showToastUiCentered(requireContext(), getString(R.string.log_file_not_available),
+                                Toast.LENGTH_SHORT)
+            return
+        }
+
+        CoroutineScope(Dispatchers.Main).launch {
+            var inputString: String
+            withContext(Dispatchers.IO) {
+                val inputStream: InputStream = file0.inputStream()
+                inputString = inputStream.bufferedReader().use { it.readText() }
+            }
+            textView.text = inputString
+        }
+
+        val width = (resources.displayMetrics.widthPixels * 0.75).toInt()
+        val height = (resources.displayMetrics.heightPixels * 0.75).toInt()
+
+        builder.setPositiveButton(
+            getString(R.string.about_bug_report_dialog_positive_btn)) { _, _ ->
+            emailBugReport()
+        }
+        builder.setNegativeButton(
+            getString(R.string.about_bug_report_dialog_negative_btn)) { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        val alert: AlertDialog = builder.create()
+        alert.window?.setLayout(width, height)
+        alert.show()
     }
 
 }

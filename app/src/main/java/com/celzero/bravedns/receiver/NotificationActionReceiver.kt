@@ -20,14 +20,18 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.widget.Toast
+import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.data.AppMode
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS_FIREWALL
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
+import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,6 +41,7 @@ import org.koin.core.component.inject
 
 class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
     private val appMode by inject<AppMode>()
+    private val persistentState by inject<PersistentState>()
 
     override fun onReceive(context: Context, intent: Intent) {
         val action: String? = intent.getStringExtra(Constants.NOTIFICATION_ACTION)
@@ -45,6 +50,12 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
         when (action) {
             OrbotHelper.ORBOT_NOTIFICATION_ACTION_TEXT -> {
                 get<OrbotHelper>().openOrbotApp()
+            }
+            Constants.NOTIF_ACTION_PAUSE_VPN -> {
+                pauseVpn(context)
+            }
+            Constants.NOTIF_ACTION_RESUME_VPN -> {
+                resumeVpn(context)
             }
             Constants.NOTIF_ACTION_STOP_VPN -> {
                 stopVpn(context)
@@ -72,11 +83,51 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
         VpnController.stop(context)
     }
 
+    private fun pauseVpn(context: Context) {
+        if (VpnController.getBraveVpnService() == null) {
+            Utilities.showToastUiCentered(context,
+                                          context.getString(R.string.hsf_pause_vpn_failure),
+                                          Toast.LENGTH_SHORT)
+            return
+        }
+
+        if (Utilities.isVpnLockdownEnabled(VpnController.getBraveVpnService())) {
+            Utilities.showToastUiCentered(context,
+                                          context.getString(R.string.hsf_pause_lockdown_failure),
+                                          Toast.LENGTH_SHORT)
+            return
+        }
+
+        appMode.setAppState(AppMode.AppState.PAUSE)
+    }
+
+    private fun resumeVpn(context: Context) {
+        if (VpnController.getBraveVpnService() == null) {
+            Utilities.showToastUiCentered(context,
+                                          context.getString(R.string.hsf_pause_vpn_failure),
+                                          Toast.LENGTH_SHORT)
+            return
+        }
+
+        if (Utilities.isVpnLockdownEnabled(VpnController.getBraveVpnService())) {
+            Utilities.showToastUiCentered(context,
+                                          context.getString(R.string.hsf_pause_lockdown_failure),
+                                          Toast.LENGTH_SHORT)
+            return
+        }
+
+        appMode.setAppState(AppMode.AppState.ACTIVE)
+    }
+
     private fun dnsMode() {
-        appMode.changeBraveMode(APP_MODE_DNS)
+        CoroutineScope(Dispatchers.IO).launch {
+            appMode.changeBraveMode(APP_MODE_DNS)
+        }
     }
 
     private fun dnsFirewallMode() {
-        appMode.changeBraveMode(APP_MODE_DNS_FIREWALL)
+        CoroutineScope(Dispatchers.IO).launch {
+            appMode.changeBraveMode(APP_MODE_DNS_FIREWALL)
+        }
     }
 }

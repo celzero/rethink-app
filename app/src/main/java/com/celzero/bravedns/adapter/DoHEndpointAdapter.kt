@@ -103,9 +103,9 @@ class DoHEndpointAdapter(private val context: Context, private val persistentSta
             b.dohEndpointListUrlExplanation.text = ""
             b.dohEndpointListCheckImage.isChecked = endpoint.isSelected
             Log.i(LOG_TAG_DNS,
-                  "connected to doh - ${endpoint.dohName} isSelected? - ${endpoint.isSelected}")
+                  "connected to doh: ${endpoint.dohName} isSelected? ${endpoint.isSelected}")
             if (endpoint.isSelected) {
-                val count = persistentState.numberOfRemoteBlocklists
+                val count = persistentState.getRemoteBlocklistCount()
                 b.dohEndpointListUrlExplanation.text = if (endpoint.isRethinkDnsPlus() && count > 0) {
                     context.getString(R.string.dns_connected_rethink_plus, count.toString())
                 } else {
@@ -209,9 +209,7 @@ class DoHEndpointAdapter(private val context: Context, private val persistentSta
                 Utilities.showToastUiCentered(context, context.getString(
                     R.string.info_dialog_url_copy_toast_msg), Toast.LENGTH_SHORT)
             }
-            val alertDialog: AlertDialog = builder.create()
-            alertDialog.setCancelable(true)
-            alertDialog.show()
+            builder.create().show()
         }
 
         private fun showDeleteDnsDialog(id: Int) {
@@ -226,9 +224,7 @@ class DoHEndpointAdapter(private val context: Context, private val persistentSta
             builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
 
             }
-            val alertDialog: AlertDialog = builder.create()
-            alertDialog.setCancelable(true)
-            alertDialog.show()
+            builder.create().show()
         }
 
         private fun showDohConfigureDialog() {
@@ -244,9 +240,7 @@ class DoHEndpointAdapter(private val context: Context, private val persistentSta
             builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
                 b.dohEndpointListCheckImage.isChecked = false
             }
-            val alertDialog: AlertDialog = builder.create()
-            alertDialog.setCancelable(true)
-            alertDialog.show()
+            builder.create().show()
         }
 
     }

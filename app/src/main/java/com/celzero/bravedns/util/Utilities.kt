@@ -20,6 +20,7 @@ import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.ActivityManager
 import android.content.*
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
@@ -40,14 +41,19 @@ import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.getSystemService
 import androidx.core.text.HtmlCompat
+import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.VpnControllerHelper.persistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
+import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
+import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
+import com.celzero.bravedns.util.Constants.Companion.MAX_FILE_SIZE
 import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
+import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
@@ -55,11 +61,11 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.google.common.net.InetAddresses
 import com.google.common.net.InternetDomainName
-import java.io.File
-import java.io.IOException
+import java.io.*
 import java.net.InetAddress
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.Locale
 
 
 class Utilities {
@@ -190,25 +196,25 @@ class Utilities {
             } else String.format("%s (%s)", countryCode, ipAddress)
         }
 
-        fun convertLongToTime(time: Long): String {
+        fun convertLongToTime(time: Long, template: String): String {
             val date = Date(time)
-            val format = SimpleDateFormat("HH:mm:ss", Locale.US)
-            return format.format(date)
+            return SimpleDateFormat(template, Locale.ENGLISH).format(date)
         }
 
-        fun convertLongToDate(timestamp: Long): String {
-            val date = Date(timestamp)
-            val format = SimpleDateFormat("yy.MM (dd)", Locale.US)
-            return format.format(date)
+        fun convertToTime(timestamp: Long): String {
+            val offSet = TimeZone.getDefault().rawOffset + TimeZone.getDefault().dstSavings
+            val now = timestamp - offSet
+            return convertLongToTime(now, TIME_FORMAT_1)
         }
 
         fun prepareServersToRemove(servers: String, liveServers: String): String {
             val serverList = servers.split(",")
             val liveServerList = liveServers.split(",")
             var serversToSend = ""
+
             serverList.forEach {
                 if (!liveServerList.contains(it)) {
-                    serversToSend += "$it,"
+                    serversToSend += "${it.trim()},"
                 }
             }
             if (DEBUG) Log.d(LOG_TAG_VPN, "In: $serverList / Out: $serversToSend")
@@ -481,6 +487,69 @@ class Utilities {
 
         fun isAtleastR(): Boolean {
             return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+        }
+
+        fun isAtleastQ(): Boolean {
+            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+        }
+
+        fun isFdroidBuild(): Boolean {
+            return BuildConfig.FLAVOR == FLAVOR_FDROID
+        }
+
+        fun isPlayStoreBuild(): Boolean {
+            return BuildConfig.FLAVOR == FLAVOR_PLAY
+        }
+
+        fun getBugReportFilePath(context: Context): String {
+            val filePath = context.filesDir.canonicalPath + File.separator + Constants.BUG_REPORT_FILE
+            val file = File(filePath)
+            if (file.exists()) {
+                // Only write if the file is less than 10mb
+                if (isFileLessThan10MB(file)) {
+                    return filePath
+                } else {
+                    // Get the secondary file. bug_report_1.txt
+                    val secondaryFile = File(
+                        context.filesDir.canonicalPath + File.separator + Constants.PREV_REPORT_FILE)
+                    // delete the content of the file if any
+                    secondaryFile.deleteRecursively()
+                    // Copy the content from bug_report.txt to bug_report_1.txt
+                    file.copyTo(secondaryFile)
+                    // clear the content of bug_report.txt
+                    val raf = RandomAccessFile(file, "rw")
+                    raf.setLength(0)
+                }
+            }
+            return filePath
+        }
+
+        private fun isFileLessThan10MB(file: File): Boolean {
+            val l = file.length()
+            val fileSize = l.toString()
+            val finalFileSize = fileSize.toInt()
+            return finalFileSize <= MAX_FILE_SIZE
+        }
+
+        fun writeTrace(file: File, inputStream: InputStream?) {
+            if (inputStream == null) return
+
+            FileOutputStream(file, true).use { output ->
+                while (inputStream.read() != -1) {
+                    output.write(inputStream.readBytes())
+                }
+            }
+        }
+
+        fun getApplicationInfo(context: Context, packageName: String): ApplicationInfo? {
+            return try {
+                context.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+            } catch (e: PackageManager.NameNotFoundException) {
+                Log.w(LOG_TAG_FIREWALL,
+                      "ApplicationInfo is not available for package name: $packageName")
+                null
+            }
+
         }
     }
 }

@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "com.celzero.bravedns",
+  "variantName": "playRelease",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "versionCode": 17,
+      "versionName": "0.5.3f",
+      "outputFile": "app-play-release.apk"
+    }
+  ]
+}

@@ -117,6 +117,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
                     Utilities.showToastUiCentered(requireContext(),
                                                   getString(R.string.refresh_complete),
                                                   Toast.LENGTH_SHORT)
+                    adapterList?.notifyDataSetChanged()
                 }
             }
         }

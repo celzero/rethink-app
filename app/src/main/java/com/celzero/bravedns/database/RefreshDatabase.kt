@@ -21,10 +21,10 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
+import androidx.annotation.GuardedBy
 import androidx.annotation.RequiresApi
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
-import com.celzero.bravedns.automaton.FirewallManager.GlobalVariable.appList
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.AndroidUidConfig
@@ -33,6 +33,7 @@ import com.celzero.bravedns.util.Constants.Companion.NO_PACKAGE
 import com.celzero.bravedns.util.Constants.Companion.REFRESH_APP_DURATION
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
 import com.celzero.bravedns.util.PlayStoreCategory
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import com.google.common.collect.Sets
 import kotlinx.coroutines.CoroutineScope
@@ -40,10 +41,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.collections.HashSet
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.read
+import kotlin.concurrent.write
 
 class RefreshDatabase internal constructor(private var context: Context,
-                                           private val appInfoRepository: AppInfoRepository,
                                            private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
                                            private val categoryInfoRepository: CategoryInfoRepository,
                                            private val doHEndpointRepository: DoHEndpointRepository,
@@ -59,64 +61,82 @@ class RefreshDatabase internal constructor(private var context: Context,
         private const val APP_NAME_NO_APP = "Nobody"
     }
 
+    private val refreshMutex = ReentrantReadWriteLock()
+
+    @GuardedBy("refreshMutex") @Volatile private var isRefreshInProgress: Boolean = false
+
+
     /**
      * Need to rewrite the logic for adding the apps in the database and removing it during uninstall.
      */
     fun refreshAppInfoDatabase(isForceRefresh: Boolean) {
         if (DEBUG) Log.d(LOG_TAG_APP_DB, "Initiated refresh application info")
 
+        refreshMutex.read {
+            if (isRefreshInProgress) return
+        }
+
         if (!isRefreshCheckRequired(isForceRefresh)) return
+
+        // Synchronization is deprecated in kotlin, so using Lock.withLock with ReentrantLock.
+        // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/synchronized.html
+        // ref: https://chris-ribetti.medium.com/synchronized-to-reentrantlock-6f045519577e
+        refreshMutex.write {
+            if (isRefreshInProgress) {
+                return
+            }
+
+            isRefreshInProgress = true
+        }
 
         CoroutineScope(Dispatchers.IO).launch {
 
-            if (appList.isNullOrEmpty()) {
-                FirewallManager.reloadAppList()
-            }
+            FirewallManager.loadAppFirewallRules()
+
             // Get app details from Global variable
-            val appListLocal = appList.keys
+            val trackedApps = FirewallManager.getPackageNames()
 
             val installedPackages: List<PackageInfo> = context.packageManager?.getInstalledPackages(
                 PackageManager.GET_META_DATA) as List<PackageInfo>
 
-            val installedApps: HashSet<String> = HashSet()
-            installedPackages.forEach {
-                installedApps.add(it.packageName)
-            }
+            val installedApps = installedPackages.map {
+                FirewallManager.AppInfoTuple(it.applicationInfo.uid, it.packageName)
+            }.toHashSet()
 
             // packages which are all available in database but not in installed apps(package manager)
-            val packagesToDelete = Sets.difference(appListLocal, installedApps).filter {
-                !it.contains(NO_PACKAGE)
-            }.toList()
-            // packages which are all available in installed apps list but not in database
-            val packagesToAdd = Sets.difference(installedApps, appListLocal).toHashSet()
+            val packagesToDelete = Sets.difference(trackedApps, installedApps).filter {
+                !it.packageName.contains(NO_PACKAGE)
+            }.toHashSet()
 
-            // Delete the uninstalled apps from database
-            appInfoRepository.deleteByPackageName(packagesToDelete)
-            appList.minusAssign(packagesToDelete)
+            // packages which are all available in installed apps list but not in database
+            val packagesToAdd = Sets.difference(installedApps, trackedApps).filter {
+                // Remove this package
+                it.packageName != context.packageName
+            }.toHashSet()
+
+            FirewallManager.deletePackagesFromCache(packagesToDelete)
 
             if (DEBUG) Log.d(LOG_TAG_APP_DB,
                              "Refresh Database, packagesToDelete -> $packagesToDelete")
             if (DEBUG) Log.d(LOG_TAG_APP_DB, "Refresh Database, packagesToAdd -> $packagesToAdd")
 
-            // Remove this package name
-            packagesToAdd.remove(context.packageName)
             // Add the missing packages to the database
             addMissingPackages(packagesToAdd)
 
+            isRefreshInProgress = false
         }
     }
 
     // TODO: Ideally this should be in FirewallManager
-    private fun addMissingPackages(apps: HashSet<String>) {
+    private fun addMissingPackages(apps: HashSet<FirewallManager.AppInfoTuple>) {
         if (apps.size <= 0) return
 
         // Contains the app list which are not part of rethink database but available
         // in package manager's installed list.
         apps.forEach {
-            if (it == context.applicationContext.packageName) return@forEach
+            if (it.packageName == context.applicationContext.packageName) return@forEach
 
-            val appInfo = context.packageManager.getApplicationInfo(it,
-                                                                    PackageManager.GET_META_DATA)
+            val appInfo = Utilities.getApplicationInfo(context, it.packageName) ?: return@forEach
 
             val appName = context.packageManager.getApplicationLabel(appInfo).toString()
             if (DEBUG) Log.d(LOG_TAG_APP_DB, "Refresh Database, AppInfo -> $appName")
@@ -135,11 +155,11 @@ class RefreshDatabase internal constructor(private var context: Context,
 
             entry.appCategory = determineAppCategory(appInfo)
 
-            FirewallManager.updateGlobalAppInfoEntry(appInfo.packageName, entry)
+            FirewallManager.persistAppInfo(entry)
 
-            appInfoRepository.insert(entry)
+
         }
-        updateCategoryInDB()
+        updateCategoryRepo()
     }
 
     // Refresh database is called from Homescreenactivity's onResume().
@@ -148,8 +168,6 @@ class RefreshDatabase internal constructor(private var context: Context,
     // This will avoid too frequent refresh calls.
     private fun isRefreshCheckRequired(forceRefresh: Boolean): Boolean {
         if (forceRefresh) return true
-
-        if (appList.isEmpty()) return true
 
         val timeDifference = System.currentTimeMillis() - persistentState.lastAppRefreshTime
         val hours = TimeUnit.MILLISECONDS.toHours(timeDifference)
@@ -222,9 +240,8 @@ class RefreshDatabase internal constructor(private var context: Context,
         appInfo.mobileDataUsed = 0
         appInfo.trackers = 0
         appInfo.wifiDataUsed = 0
-        appList[appInfo.packageInfo] = appInfo
-        appInfoRepository.insert(appInfo)
-        updateCategoryInDB()
+        FirewallManager.persistAppInfo(appInfo)
+        updateCategoryRepo()
     }
 
     fun insertDefaultDNSProxy() {
@@ -264,11 +281,11 @@ class RefreshDatabase internal constructor(private var context: Context,
     private val CATEGORY_STRING = "category/"
     private val CATEGORY_GAME_STRING = "GAME_" // All games start with this prefix
 
-    fun updateCategoryInDB() {
+    fun updateCategoryRepo() {
         if (DEBUG) Log.d(LOG_TAG_APP_DB, "RefreshDatabase - Call for updateCategoryDB")
         CoroutineScope(Dispatchers.IO).launch {
             //Changes to remove the count queries.
-            val categoryFromAppList = appList.values
+            val categoryFromAppList = FirewallManager.getAppInfos()
             val applications = categoryFromAppList.distinctBy { a -> a.appCategory }
 
             applications.forEach {

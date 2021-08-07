@@ -16,6 +16,7 @@ limitations under the License.
 package com.celzero.bravedns.ui
 
 import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.view.Window
@@ -33,17 +34,16 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.AppListViewModel
 import com.google.android.material.chip.Chip
 
-
-class WhitelistAppDialog(val activity: FirewallActivity,
-                         internal var adapter: RecyclerView.Adapter<*>,
-                         var viewModel: AppListViewModel, themeID: Int) : Dialog(activity, themeID),
-                                                                          View.OnClickListener,
-                                                                          SearchView.OnQueryTextListener {
+class WhitelistAppDialog(var activity: Context, internal var adapter: RecyclerView.Adapter<*>,
+                         var viewModel: AppListViewModel, themeID: Int,
+                         private val isChip: Boolean) : Dialog(activity, themeID),
+                                                        View.OnClickListener,
+                                                        SearchView.OnQueryTextListener {
 
     private lateinit var b: CustomDialogLayoutBinding
 
     private var mLayoutManager: RecyclerView.LayoutManager? = null
-    private var filterCategories: MutableList<String> = ArrayList()
+    private var filterCategories: MutableSet<String> = HashSet()
     private var category: List<String> = ArrayList()
 
     private val CATEGORY_FILTER_CONST = "category:"
@@ -73,12 +73,21 @@ class WhitelistAppDialog(val activity: FirewallActivity,
             false
         }
 
-        FirewallManager.getApplistObserver().observe(activity, {
-            val blockedCount = it.filter { a -> !a.isInternetAllowed }.size
-            b.customSelectAllOptionCount.text = context.getString(
-                R.string.whitelist_dialog_apps_in_use, blockedCount.toString(),
-                FirewallManager.getTotalApps().toString())
-        })
+        if (isChip) {
+            FirewallManager.getApplistObserver().observe(activity as HomeScreenActivity, {
+                val blockedCount = it.filter { a -> a.whiteListUniv1 }.size
+                b.customSelectAllOptionCount.text = context.getString(
+                    R.string.whitelist_dialog_apps_in_use, blockedCount.toString(),
+                    FirewallManager.getTotalApps().toString())
+            })
+        } else {
+            FirewallManager.getApplistObserver().observe(activity as FirewallActivity, {
+                val blockedCount = it.filter { a -> a.whiteListUniv1 }.size
+                b.customSelectAllOptionCount.text = context.getString(
+                    R.string.whitelist_dialog_apps_in_use, blockedCount.toString(),
+                    FirewallManager.getTotalApps().toString())
+            })
+        }
 
         b.customSelectAllOptionCheckbox.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             FirewallManager.updateWhitelistedAppsByCategories(filterCategories, b)
@@ -179,6 +188,4 @@ class WhitelistAppDialog(val activity: FirewallActivity,
             b.customDialogChipGroup.addView(mChip)
         }
     }
-
-
 }

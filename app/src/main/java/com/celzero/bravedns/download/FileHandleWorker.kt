@@ -49,6 +49,8 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
 
     override fun doWork(): Result {
         try {
+            // A file move from external file path to app data dir is preferred because it is an
+            // atomic operation: but Android doesn't support move/rename across mount points.
             val response = copyFiles(context)
 
             val outputData = workDataOf(DownloadConstants.OUTPUT_FILES to response)
@@ -63,10 +65,6 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
         return Result.failure()
     }
 
-    // Preferred approach is to move the file from external file path to canonical path.
-    // As move is a atomic operation.
-    // Android doesn't support move/rename if the both paths are not having same mount points.
-    // So files are copied from
     private fun copyFiles(context: Context): Boolean {
         try {
             val timestamp = persistentState.tempBlocklistDownloadTime
@@ -120,6 +118,8 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
 
     private fun updatePersistenceOnCopySuccess(timestamp: Long) {
         persistentState.blocklistDownloadTime = timestamp
+        // update remote blocklist time stamp to the latest files.
+        persistentState.remoteBlocklistDownloadTime = timestamp
         persistentState.blocklistEnabled = true
         persistentState.blocklistFilesDownloaded = true
         persistentState.tempBlocklistDownloadTime = INIT_TIME_MS

@@ -18,11 +18,13 @@ package com.celzero.bravedns.data
 import android.content.Context
 import android.os.Build
 import android.util.Log
-import android.widget.Toast
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.liveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.*
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS
@@ -33,7 +35,11 @@ import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DNSCRYPT
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DOH
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_PROXY
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
 import settings.Settings
 
 class AppMode internal constructor(private val context: Context,
@@ -43,57 +49,68 @@ class AppMode internal constructor(private val context: Context,
                                    private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
                                    private val proxyEndpointRepository: ProxyEndpointRepository,
                                    private val persistentState: PersistentState) {
-    private val INVALID_DNS_TYPE = -1
-    private var appDNSMode: Long = PREF_DNS_INVALID
-    private val proxyTypeInternal = "Internal"
-    private val proxyTypeExternal = "External"
-    private var dnsType: Int = INVALID_DNS_TYPE
-    private var socks5ProxyEndpoint: ProxyEndpoint? = null
+    private var appDnsMode: Long = PREF_DNS_INVALID
 
     companion object {
         private var connectedDNS: MutableLiveData<String> = MutableLiveData()
         var cryptRelayToRemove: String = ""
     }
 
+    enum class AppState(val state: Int) {
+        PAUSE(10), ACTIVE(11)
+    }
 
-    fun getDNSMode(): Long {
-        if (appDNSMode != PREF_DNS_INVALID) return appDNSMode
+    data class TunnelMode(val dnsMode: Long, val firewallMode: Long, val proxyMode: Long)
 
-        when (persistentState.dnsType) {
+    fun getFirewallMode(): Long {
+        return persistentState.firewallMode.toLong()
+    }
+
+    fun setFirewallMode() {
+        persistentState.firewallMode = determineFirewallMode().toInt()
+    }
+
+    fun getDnsType(): Int {
+        return persistentState.dnsType
+    }
+
+    suspend fun getDnsMode(): Long {
+        if (appDnsMode == PREF_DNS_INVALID) {
+            setDnsMode()
+        }
+
+        return appDnsMode
+    }
+
+    fun setDnsMode() {
+        appDnsMode = determineDnsMode()
+    }
+
+    private fun determineDnsMode(): Long {
+        // Case: app mode - firewall, DNS mode should be none.
+        if (persistentState.braveMode == APP_MODE_FIREWALL) {
+            return Settings.DNSModeNone
+        }
+
+        // app mode - DNS & DNS+Firewall mode
+        return when (persistentState.dnsType) {
             PREF_DNS_MODE_DOH -> {
-                appDNSMode = if (persistentState.allowDNSTraffic) {
+                if (persistentState.allowDNSTraffic) {
                     Settings.DNSModePort
                 } else {
                     Settings.DNSModeIP
                 }
             }
             PREF_DNS_MODE_DNSCRYPT -> {
-                appDNSMode = Settings.DNSModeCryptPort
+                Settings.DNSModeCryptPort
             }
             PREF_DNS_MODE_PROXY -> {
-                appDNSMode = fetchProxyModeFromDb()
+                fetchProxyModeFromDb()
+            }
+            else -> {
+                Settings.DNSModeNone
             }
         }
-        return appDNSMode
-    }
-
-    fun getFirewallMode(): Long {
-        return persistentState.firewallMode.toLong()
-    }
-
-    fun setFirewallMode(fMode: Long) {
-        persistentState.firewallMode = fMode.toInt()
-    }
-
-    fun getDNSType(): Int {
-        if (dnsType == INVALID_DNS_TYPE) {
-            return persistentState.dnsType
-        }
-        return dnsType
-    }
-
-    fun setDNSMode(mode: Long) {
-        appDNSMode = mode
     }
 
     fun isFirewallActive(): Boolean {
@@ -104,6 +121,10 @@ class AppMode internal constructor(private val context: Context,
         return persistentState.braveMode == APP_MODE_DNS || persistentState.braveMode == APP_MODE_DNS_FIREWALL
     }
 
+    fun isDnsProxyActive(): Boolean {
+        return PREF_DNS_MODE_PROXY == getDnsType()
+    }
+
     fun isFirewallMode(): Boolean {
         return persistentState.braveMode == APP_MODE_FIREWALL
     }
@@ -112,12 +133,15 @@ class AppMode internal constructor(private val context: Context,
         return persistentState.braveMode == APP_MODE_DNS
     }
 
-    fun isDnsProxyEnabled(): Boolean {
-        return persistentState.dnsType == PREF_DNS_MODE_PROXY
+    fun isDnsFirewallMode(): Boolean {
+        return persistentState.braveMode == APP_MODE_DNS_FIREWALL
     }
 
     private fun fetchProxyModeFromDb(): Long {
         val dnsProxy = dnsProxyEndpointRepository.getConnectedProxy()
+        val proxyTypeInternal = "Internal"
+        val proxyTypeExternal = "External"
+
         return when (dnsProxy.proxyType) {
             proxyTypeInternal -> {
                 Settings.DNSModeProxyPort
@@ -132,6 +156,7 @@ class AppMode internal constructor(private val context: Context,
     }
 
     fun getConnectedDnsObservable(): MutableLiveData<String> {
+        connectedDNS.postValue(persistentState.connectedDnsName)
         return connectedDNS
     }
 
@@ -144,10 +169,7 @@ class AppMode internal constructor(private val context: Context,
     }
 
     fun getSocks5ProxyDetails(): ProxyEndpoint? {
-        if (socks5ProxyEndpoint == null) {
-            socks5ProxyEndpoint = proxyEndpointRepository.getConnectedProxy()
-        }
-        return socks5ProxyEndpoint
+        return proxyEndpointRepository.getConnectedProxy()
     }
 
     fun getOrbotProxyDetails(): ProxyEndpoint? {
@@ -158,98 +180,87 @@ class AppMode internal constructor(private val context: Context,
         return dnsProxyEndpointRepository.getConnectedProxy()
     }
 
-    private fun onNewDnsConnected(dnsType: Int, dnsMode: Long) {
-        if (PREF_DNS_MODE_DOH == dnsType) {
-            persistentState.dnsType = dnsType
-            setDNSMode(dnsMode)
-            val endpoint = getDOHDetails()
-            if (endpoint != null) {
-                connectedDNS.postValue(endpoint.dohName)
-                persistentState.setConnectedDns(endpoint.dohName)
+    fun getDnscryptCountLiveDataObserver(): LiveData<Int> {
+        return dnsCryptEndpointRepository.getConnectedCountLiveData()
+    }
+
+    // FIXME: Check if the below usage of variables can be reduced.
+    private fun onNewDnsConnected(dt: Int) {
+        if (!isValidDnsType(dt)) return
+
+        persistentState.dnsType = dt
+        setDnsMode()
+        when (dt) {
+            PREF_DNS_MODE_DOH -> {
+                val endpoint = getDOHDetails()
+                if (endpoint != null) {
+                    connectedDNS.postValue(endpoint.dohName)
+                    persistentState.connectedDnsName = endpoint.dohName
+                }
             }
-        } else if (PREF_DNS_MODE_DNSCRYPT == dnsType) {
-            persistentState.dnsType = dnsType
-            setDNSMode(dnsMode)
-            val count = getDNSCryptServerCount()
-            val relayCount = dnsCryptRelayEndpointRepository.getConnectedRelays()
-            val text = context.getString(R.string.configure_dns_crypt, count.toString())
-            connectedDNS.postValue(text)
-            persistentState.setConnectedDns(text)
-            persistentState.setDnsCryptRelayCount(relayCount.size)
-        } else if (PREF_DNS_MODE_PROXY == dnsType) {
-            persistentState.dnsType = dnsType
-            setDNSMode(dnsMode)
-            val endpoint = getDNSProxyServerDetails()
-            connectedDNS.postValue(endpoint.proxyName)
-            persistentState.setConnectedDns(endpoint.proxyName)
+            PREF_DNS_MODE_DNSCRYPT -> {
+                val count = getDNSCryptServerCount()
+                val relayCount = dnsCryptRelayEndpointRepository.getConnectedRelays()
+                val text = context.getString(R.string.configure_dns_crypt, count.toString())
+                connectedDNS.postValue(text)
+                persistentState.connectedDnsName = text
+                persistentState.setDnsCryptRelayCount(relayCount.size)
+            }
+            PREF_DNS_MODE_PROXY -> {
+                val endpoint = getDNSProxyServerDetails()
+                connectedDNS.postValue(endpoint.proxyName)
+                persistentState.connectedDnsName = endpoint.proxyName
+            }
+            else -> {
+                Log.wtf(LOG_TAG_VPN, "Invalid set request for dns type: $dt")
+            }
         }
     }
 
-    // FIXME replace the below logic once the DNS data is streamlined.
+    private fun isValidDnsType(dt: Int): Boolean {
+        return (dt == PREF_DNS_MODE_DOH || dt == PREF_DNS_MODE_DNSCRYPT || dt == PREF_DNS_MODE_PROXY )
+    }
+
     fun getConnectedDNS(): String {
-        if (!connectedDNS.value.isNullOrEmpty()) {
-            return connectedDNS.value!!
-        }
-
-        val dnsType = getDNSType()
-        return if (PREF_DNS_MODE_DOH == dnsType) {
-            val dohDetail: DoHEndpoint?
-            try {
-                dohDetail = getDOHDetails()
-                dohDetail?.dohName!!
-            } catch (e: Exception) { // FIXME - #320
-                Log.e(LOG_TAG_VPN, "could not fetch connected DoH info from db: ${e.message}", e)
-                persistentState.getConnectedDns()
-            }
-        } else if (PREF_DNS_MODE_DNSCRYPT == dnsType) {
-            context.getString(R.string.configure_dns_crypt, getDNSCryptServerCount().toString())
-        } else {
-            val proxyDetails = getDNSProxyServerDetails()
-            proxyDetails.proxyAppName!!
-        }
+        return persistentState.connectedDnsName
     }
 
-    fun changeBraveMode(braveMode: Int) {
+    suspend fun changeBraveMode(braveMode: Int) {
         persistentState.braveMode = braveMode
-        when (braveMode) {
-            APP_MODE_DNS -> {
-                setFirewallMode(Settings.BlockModeNone)
-            }
-            APP_MODE_FIREWALL -> {
-                setDNSMode(Settings.DNSModeNone)
-                setFirewallMode(determineFirewallMode())
-            }
-            APP_MODE_DNS_FIREWALL -> {
-                setFirewallMode(determineFirewallMode())
-            }
-        }
+        setDnsMode()
+        setFirewallMode()
     }
 
     fun getBraveMode(): Int {
         return persistentState.braveMode
     }
 
-    fun syncBraveMode() {
-        when (persistentState.braveMode) {
-            APP_MODE_DNS -> {
-                setFirewallMode(Settings.BlockModeNone)
-            }
-            APP_MODE_FIREWALL -> {
-                setDNSMode(Settings.DNSModeNone)
-                setFirewallMode(determineFirewallMode())
-            }
-            APP_MODE_DNS_FIREWALL -> {
-                setFirewallMode(determineFirewallMode())
-            }
-        }
-    }
-
     private fun determineFirewallMode(): Long {
+        // app mode - DNS, set the firewall mode as NONE.
+        if (persistentState.braveMode == APP_MODE_DNS) {
+            return Settings.BlockModeNone
+        }
+
+        // app mode - Firewall & DNS+Firewall
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             Settings.BlockModeFilterProc
         } else {
             Settings.BlockModeFilter
         }
+    }
+
+    fun setAppState(appState: AppState) {
+        persistentState.appState = appState.state
+        persistentState.appStateLiveData.postValue(appState)
+    }
+
+    // Value stored in persistent state is of type Int (AppState.state)
+    fun getAppState(): Int {
+        return persistentState.appState
+    }
+
+    suspend fun makeTunnelDataClass(): TunnelMode {
+        return TunnelMode(getDnsMode(), getFirewallMode(), getProxyMode())
     }
 
     // -- DNS Manager --
@@ -262,7 +273,7 @@ class AppMode internal constructor(private val context: Context,
         return dnsCryptEndpointRepository.getServersToAdd()
     }
 
-    fun getRelayServers(): String {
+    fun getDnscryptRelayServers(): String {
         return dnsCryptRelayEndpointRepository.getServersToAdd()
     }
 
@@ -282,51 +293,51 @@ class AppMode internal constructor(private val context: Context,
         return dnsCryptEndpointRepository.getCount()
     }
 
-    suspend fun getRelayCount(): Int {
+    suspend fun getDnscryptRelayCount(): Int {
         return dnsCryptRelayEndpointRepository.getCount()
     }
 
     fun updateDnscryptLiveServers(servers: String) {
-        // if the prev connection was not dnscrypt, then remove the connection status
-        if (getDNSType() != PREF_DNS_MODE_DNSCRYPT) {
+        // if the prev connection was not dnscrypt, then remove the connection status from database
+        if (getDnsType() != PREF_DNS_MODE_DNSCRYPT) {
             removeConnectionStatus()
         }
 
         dnsCryptEndpointRepository.updateConnectionStatus(servers)
-        onNewDnsConnected(PREF_DNS_MODE_DNSCRYPT, Settings.DNSModeCryptPort)
+        onNewDnsConnected(PREF_DNS_MODE_DNSCRYPT)
     }
 
     suspend fun handleDoHChanges(doHEndpoint: DoHEndpoint) {
-        // if the prev connection was not doh, then remove the connection status
-        if (getDNSType() != PREF_DNS_MODE_DOH) {
+        // if the prev connection was not doh, then remove the connection status from database
+        if (getDnsType() != PREF_DNS_MODE_DOH) {
             removeConnectionStatus()
         }
 
         doHEndpointRepository.update(doHEndpoint)
-        onNewDnsConnected(PREF_DNS_MODE_DOH, Settings.DNSModePort)
+        onNewDnsConnected(PREF_DNS_MODE_DOH)
     }
 
     suspend fun handleDnsProxyChanges(dnsProxyEndpoint: DNSProxyEndpoint) {
-        // if the prev connection was not dns proxy, then remove the connection status
-        if (getDNSType() != PREF_DNS_MODE_PROXY) {
+        // if the prev connection was not dns proxy, then remove the connection status from database
+        if (getDnsType() != PREF_DNS_MODE_PROXY) {
             removeConnectionStatus()
         }
 
         dnsProxyEndpointRepository.update(dnsProxyEndpoint)
-        onNewDnsConnected(PREF_DNS_MODE_PROXY, Settings.DNSModeProxyIP)
+        onNewDnsConnected(PREF_DNS_MODE_PROXY)
     }
 
     suspend fun handleDnscryptChanges(dnsCryptEndpoint: DNSCryptEndpoint) {
-        // if the prev connection was not dnscrypt, then remove the connection status
-        if (getDNSType() != PREF_DNS_MODE_DNSCRYPT) {
+        // if the prev connection was not dnscrypt, then remove the connection status from database
+        if (getDnsType() != PREF_DNS_MODE_DNSCRYPT) {
             removeConnectionStatus()
         }
 
         dnsCryptEndpointRepository.update(dnsCryptEndpoint)
-        onNewDnsConnected(PREF_DNS_MODE_DNSCRYPT, Settings.DNSModeCryptPort)
+        onNewDnsConnected(PREF_DNS_MODE_DNSCRYPT)
     }
 
-    suspend fun isRemoveDnscryptAllowed(dnsCryptEndpoint: DNSCryptEndpoint): Boolean {
+    suspend fun canRemoveDnscrypt(dnsCryptEndpoint: DNSCryptEndpoint): Boolean {
         val list = dnsCryptEndpointRepository.getConnectedDNSCrypt()
         if (list.size == 1 && list[0].dnsCryptURL == dnsCryptEndpoint.dnsCryptURL) {
             return false
@@ -336,30 +347,30 @@ class AppMode internal constructor(private val context: Context,
 
     suspend fun handleDnsrelayChanges(endpoint: DNSCryptRelayEndpoint) {
         dnsCryptRelayEndpointRepository.update(endpoint)
-        onNewDnsConnected(PREF_DNS_MODE_DNSCRYPT, Settings.DNSModeCryptPort)
+        onNewDnsConnected(PREF_DNS_MODE_DNSCRYPT)
     }
 
     fun setDefaultConnection() {
-        if (getDNSType() != PREF_DNS_MODE_DOH) {
+        if (getDnsType() != PREF_DNS_MODE_DOH) {
             removeConnectionStatus()
         }
 
         doHEndpointRepository.updateConnectionDefault()
-        onNewDnsConnected(PREF_DNS_MODE_DOH, Settings.DNSModePort)
+        onNewDnsConnected(PREF_DNS_MODE_DOH)
     }
 
-    suspend fun updateRethinkPlusStamp(stamp: String) {
+    suspend fun updateDnsRethinkPlusStamp(stamp: String) {
         removeConnectionStatus()
         doHEndpointRepository.updateConnectionURL(stamp)
-        onNewDnsConnected(PREF_DNS_MODE_DOH, Settings.DNSModePort)
+        onNewDnsConnected(PREF_DNS_MODE_DOH)
     }
 
-    suspend fun isRelaySelectable(): Boolean {
+    suspend fun isDnscryptRelaySelectable(): Boolean {
         return dnsCryptEndpointRepository.getConnectedCount() >= 1
     }
 
     private fun removeConnectionStatus() {
-        when (getDNSType()) {
+        when (getDnsType()) {
             PREF_DNS_MODE_DOH -> {
                 doHEndpointRepository.removeConnectionStatus()
             }
@@ -373,7 +384,7 @@ class AppMode internal constructor(private val context: Context,
         }
     }
 
-    suspend fun insertRelayEndpoint(endpoint: DNSCryptRelayEndpoint) {
+    suspend fun insertDnscryptRelayEndpoint(endpoint: DNSCryptRelayEndpoint) {
         dnsCryptRelayEndpointRepository.insertAsync(endpoint)
     }
 
@@ -401,7 +412,7 @@ class AppMode internal constructor(private val context: Context,
         dnsCryptEndpointRepository.deleteDNSCryptEndpoint(id)
     }
 
-    suspend fun deleteDnsrelayEndpoint(id: Int) {
+    suspend fun deleteDnscryptRelayEndpoint(id: Int) {
         dnsCryptRelayEndpointRepository.deleteDNSCryptRelayEndpoint(id)
     }
 
@@ -432,9 +443,8 @@ class AppMode internal constructor(private val context: Context,
             return
         }
 
-        // If the proxy  type is either http/socks5 then check if other proxy is enabled.
-        // if yes, then make the proxy type as HTTP_SOCKS5. This case holds good for
-        // custom proxy setup.
+        // If add proxy request is custom proxy (either http/socks5), check if the other
+        // proxy is already set. if yes, then make the proxy type as HTTP_SOCKS5.
         if (isProxyTypeHttp(proxyType)) {
             if (isSocks5ProxyEnabled()) {
                 setProxy(ProxyType.HTTP_SOCKS5, provider)
@@ -462,12 +472,16 @@ class AppMode internal constructor(private val context: Context,
         return ProxyType.HTTP == proxyType
     }
 
-    private fun isSocks5ProxyEnabled(): Boolean {
-        return ProxyType.SOCKS5.name == getProxyType()
-    }
-
     private fun isProxyTypeSocks5(proxyType: ProxyType): Boolean {
         return ProxyType.SOCKS5 == proxyType
+    }
+
+    fun isProxyEnabled(): Boolean {
+        return ProxyType.NONE.name != getProxyType()
+    }
+
+    private fun isSocks5ProxyEnabled(): Boolean {
+        return ProxyType.SOCKS5.name == getProxyType()
     }
 
     private fun isHttpSocks5ProxyEnabled(): Boolean {
@@ -475,16 +489,16 @@ class AppMode internal constructor(private val context: Context,
     }
 
     private fun removeAllProxies() {
+        removeOrbot()
         persistentState.proxyType = ProxyType.NONE.name
         persistentState.proxyProvider = ProxyProvider.NONE.name
     }
 
-    fun removeProxy(proxyType: ProxyType, provider: ProxyProvider) {
-        if (provider == ProxyProvider.NONE || provider == ProxyProvider.NONE) {
-            removeAllProxies()
-            return
-        }
+    private fun removeOrbot() {
+        OrbotHelper.selectedProxyType = ProxyType.NONE.name
+    }
 
+    fun removeProxy(proxyType: ProxyType, provider: ProxyProvider) {
         when (proxyType) {
             ProxyType.HTTP -> {
                 if (isHttpSocks5ProxyEnabled()) {
@@ -500,7 +514,7 @@ class AppMode internal constructor(private val context: Context,
             }
             ProxyType.HTTP_SOCKS5 -> {
                 if (ProxyProvider.CUSTOM == provider) {
-                    Utilities.showToastUiCentered(context, "Invalid Mode", Toast.LENGTH_SHORT)
+                    removeAllProxies()
                     return
                 }
             }
@@ -509,7 +523,6 @@ class AppMode internal constructor(private val context: Context,
                 return
             }
         }
-        removeAllProxies()
     }
 
     fun getProxyType(): String {
@@ -534,10 +547,6 @@ class AppMode internal constructor(private val context: Context,
         val provider = getProxyProvider()
         if (DEBUG) Log.d(LOG_TAG_VPN, "selected proxy type: $type, with provider as $provider")
 
-        if (ProxyType.NONE.name == type || ProxyProvider.NONE.name == provider) {
-            return Settings.ProxyModeNone
-        }
-
         if (ProxyProvider.ORBOT.name == provider) {
             return Constants.ORBOT_PROXY
         }
@@ -557,15 +566,31 @@ class AppMode internal constructor(private val context: Context,
     }
 
     fun isCustomHttpProxyEnabled(): Boolean {
-        return ((getProxyType() == ProxyType.HTTP.name || getProxyType() == ProxyType.HTTP_SOCKS5.name) && (getProxyProvider() == ProxyProvider.CUSTOM.name))
+        return ((getProxyType() == ProxyType.HTTP.name || getProxyType() == ProxyType.HTTP_SOCKS5.name) && getProxyProvider() == ProxyProvider.CUSTOM.name)
     }
 
     fun isCustomSocks5Enabled(): Boolean {
-        return ((getProxyType() == ProxyType.SOCKS5.name || getProxyType() == ProxyType.HTTP_SOCKS5.name) && (getProxyProvider() == ProxyProvider.CUSTOM.name))
+        return ((getProxyType() == ProxyType.SOCKS5.name || getProxyType() == ProxyType.HTTP_SOCKS5.name) && getProxyProvider() == ProxyProvider.CUSTOM.name)
     }
 
     fun isOrbotProxyEnabled(): Boolean {
         return getProxyProvider() == ProxyProvider.ORBOT.name
+    }
+
+    private fun canEnableProxy(): Boolean {
+        return !Utilities.isVpnLockdownEnabled(VpnController.getBraveVpnService())
+    }
+
+    fun canEnableSocks5Proxy(): Boolean {
+        return canEnableProxy() && !isOrbotProxyEnabled()
+    }
+
+    fun canEnableHttpProxy(): Boolean {
+        return canEnableProxy() && !isOrbotProxyEnabled()
+    }
+
+    fun canEnableOrbotProxy(): Boolean {
+        return canEnableProxy() && !isSocks5ProxyEnabled() && !isHttpProxyEnabled()
     }
 
     fun isHttpProxyTypeEnabled(): Boolean {
@@ -580,8 +605,14 @@ class AppMode internal constructor(private val context: Context,
         return Settings.ProxyModeSOCKS5 == getProxyMode()
     }
 
-    fun isDnsProxy(): Boolean {
-        return PREF_DNS_MODE_PROXY == getDNSType()
+    fun getConnectedSocks5Proxy(): ProxyEndpoint? {
+        return proxyEndpointRepository.getConnectedProxy()
+    }
+
+    val connectedProxy: LiveData<ProxyEndpoint> = liveData {
+        withContext(Dispatchers.IO) {
+            proxyEndpointRepository.getConnectedProxy()?.let { emit(it) }
+        }
     }
 
 }
