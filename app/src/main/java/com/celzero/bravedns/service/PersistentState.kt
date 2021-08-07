@@ -80,8 +80,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var numberOfBlockedRequests by longPref("dns_blocked_request", 0)
     var backgroundEnabled by booleanPref("background_mode", false)
     var checkForAppUpdate by booleanPref("check_for_app_update", true)
-    var connectedDnsName by stringPref("connected_dns_name",
-                                               context.getString(R.string.dns_mode_3))
+    var connectedDnsName by stringPref("connected_dns_name", context.getString(R.string.dns_mode_3))
     var theme by intPref("app_theme", 0)
     var notificationAction by intPref("notification_action", 1)
     var isAddAllNetworks by booleanPref("add_all_networks_to_vpn", false)
@@ -101,6 +100,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var dnsBlockedCountLiveData: MutableLiveData<Long> = MutableLiveData()
     var dnsRequestsCountLiveData: MutableLiveData<Long> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
+
     // requires livedata as the app state can be changed from more than one place
     var appStateLiveData: MutableLiveData<AppMode.AppState> = MutableLiveData()
     var remoteBlocklistCount: MutableLiveData<Int> = MutableLiveData()

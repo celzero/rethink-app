@@ -402,7 +402,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     private fun checkAppState() {
         persistentState.appStateLiveData.observe(this, {
-            if(it == AppMode.AppState.PAUSE) {
+            if (it == AppMode.AppState.PAUSE) {
                 openPauseActivity()
             }
         })

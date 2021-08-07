@@ -129,7 +129,7 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
 
     private fun decrementTimer() {
         if (DEBUG) Log.d(LOG_TAG_UI,
-                                 "Decrement pause timer, remaining time: ${VpnController.getBraveVpnService()?.pauseRemainingTime}, decremented minutes: $DEFAULT_PAUSE_TIMER")
+                         "Decrement pause timer, remaining time: ${VpnController.getBraveVpnService()?.pauseRemainingTime}, decremented minutes: $DEFAULT_PAUSE_TIMER")
         val time = VpnController.getBraveVpnService()?.pauseRemainingTime?.minus(EXTRA_MILLIS)
 
         if (VpnController.getBraveVpnService()?.pauseRemainingTime == null || time == null) return
@@ -144,15 +144,14 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
                          "Increment pause timer, remaining time: ${VpnController.getBraveVpnService()?.pauseRemainingTime}, incremented minutes: $DEFAULT_PAUSE_TIMER")
         if (VpnController.getBraveVpnService()?.pauseRemainingTime == null) return
 
-        val time = VpnController.getBraveVpnService()?.pauseRemainingTime?.plus(
-            EXTRA_MILLIS)
+        val time = VpnController.getBraveVpnService()?.pauseRemainingTime?.plus(EXTRA_MILLIS)
 
         VpnController.getBraveVpnService()?.startCountDownTimer(time)
     }
 
     private fun stopPause() {
         val intent = Intent(this, HomeScreenActivity::class.java)
-        intent.flags = Intent. FLAG_ACTIVITY_NEW_TASK
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()

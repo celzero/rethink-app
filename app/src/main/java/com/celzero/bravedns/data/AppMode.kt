@@ -39,7 +39,6 @@ import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.inject
 import settings.Settings
 
 class AppMode internal constructor(private val context: Context,
@@ -218,7 +217,7 @@ class AppMode internal constructor(private val context: Context,
     }
 
     private fun isValidDnsType(dt: Int): Boolean {
-        return (dt == PREF_DNS_MODE_DOH || dt == PREF_DNS_MODE_DNSCRYPT || dt == PREF_DNS_MODE_PROXY )
+        return (dt == PREF_DNS_MODE_DOH || dt == PREF_DNS_MODE_DNSCRYPT || dt == PREF_DNS_MODE_PROXY)
     }
 
     fun getConnectedDNS(): String {

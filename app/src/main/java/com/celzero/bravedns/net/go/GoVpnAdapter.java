@@ -356,6 +356,7 @@ public class GoVpnAdapter {
     private final class RefreshOperation extends AsyncTask<Void, Void, String> {
         long proxyMode;
         long firewallMode;
+
         public RefreshOperation(AppMode.TunnelMode tunnelMode) {
             this.proxyMode = tunnelMode.getProxyMode();
             this.firewallMode = tunnelMode.getFirewallMode();

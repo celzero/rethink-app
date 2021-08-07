@@ -229,6 +229,7 @@ class Constants {
 
         // default value for the pause timer - 15 mins
         val DEFAULT_PAUSE_TIMER = TimeUnit.MINUTES.toMillis(15)
+
         // increment/decrement value to pause vpn
         val EXTRA_MILLIS = TimeUnit.MINUTES.toMillis(1)
     }

@@ -260,15 +260,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             delay(2000) {
                 b.fhsWhatsNewChip.visibility = View.GONE
             }
-         }
+        }
 
     }
 
     private fun handlePause() {
         if (VpnController.getBraveVpnService() == null) {
             showToastUiCentered(requireContext(),
-                                          requireContext().getString(R.string.hsf_pause_vpn_failure),
-                                          Toast.LENGTH_SHORT)
+                                requireContext().getString(R.string.hsf_pause_vpn_failure),
+                                Toast.LENGTH_SHORT)
             return
         }
 
@@ -405,25 +405,25 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun showNewFeaturesDialog() {
-            val inflater: LayoutInflater = LayoutInflater.from(requireContext())
-            val view: View = inflater.inflate(R.layout.dialog_whatsnew, null)
-            val builder = AlertDialog.Builder(requireContext())
-            builder.setView(view).setTitle(getString(R.string.whats_dialog_title))
+        val inflater: LayoutInflater = LayoutInflater.from(requireContext())
+        val view: View = inflater.inflate(R.layout.dialog_whatsnew, null)
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setView(view).setTitle(getString(R.string.whats_dialog_title))
 
-            builder.setPositiveButton(
-                getString(R.string.about_dialog_positive_button)) { dialogInterface, _ ->
-                dialogInterface.dismiss()
-            }
-
-            builder.setNeutralButton(getString(R.string.about_dialog_neutral_button)) { _, _ ->
-                val intent = Intent(Intent.ACTION_VIEW, (getString(R.string.about_mail_to)).toUri())
-                intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_subject))
-                startActivity(intent)
-            }
-
-            builder.setCancelable(false)
-            builder.create().show()
+        builder.setPositiveButton(
+            getString(R.string.about_dialog_positive_button)) { dialogInterface, _ ->
+            dialogInterface.dismiss()
         }
+
+        builder.setNeutralButton(getString(R.string.about_dialog_neutral_button)) { _, _ ->
+            val intent = Intent(Intent.ACTION_VIEW, (getString(R.string.about_mail_to)).toUri())
+            intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_subject))
+            startActivity(intent)
+        }
+
+        builder.setCancelable(false)
+        builder.create().show()
+    }
 
     private fun enableFirewallCardIfNeeded() {
         // TODO create method in appMode to get the brave modes.
@@ -659,8 +659,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         if (isPrivateDnsActive()) {
-            showToastUiCentered(requireContext(), resources.getText(
-                R.string.private_dns_toast).toString().capitalize(Locale.ROOT), Toast.LENGTH_SHORT)
+            showToastUiCentered(requireContext(),
+                                resources.getText(R.string.private_dns_toast).toString().capitalize(
+                                    Locale.ROOT), Toast.LENGTH_SHORT)
             return
         }
 
