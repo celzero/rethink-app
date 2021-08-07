@@ -92,7 +92,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         var braveModeToggler: MutableLiveData<Int> = MutableLiveData()
 
         var appStartTime: Long = System.currentTimeMillis()
-        var DEBUG = true
+        var DEBUG = false
     }
 
     // TODO - #324 - Usage of isDarkTheme() in all activities.
