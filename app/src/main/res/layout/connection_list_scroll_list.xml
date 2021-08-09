@@ -96,7 +96,9 @@
             android:background="?attr/background"
             android:gravity="top|center"
             android:layout_alignParentTop="true"
-            android:padding="10dp"
+            android:paddingTop="20dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
             android:visibility="gone"
             android:text="@string/show_logs_disabled_network_message"
             android:textSize="@dimen/large_font_text_view" />
