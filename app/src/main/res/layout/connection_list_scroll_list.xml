@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:nestedScrollingEnabled="false"
-    android:background="?attr/background"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_connection_tracker">
 
@@ -13,7 +12,6 @@
         android:id="@+id/connection_list_rl"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
 
         <LinearLayout
             android:id="@+id/connection_card_view_top"
@@ -90,15 +88,14 @@
                 android:orientation="vertical" />
         </com.celzero.bravedns.util.NestedScrollableHost>
 
-
-
         <TextView
             android:id="@+id/connection_list_logs_disabled_tv"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_below="@id/connection_card_view_top"
-            android:layout_margin="10dp"
-            android:gravity="center"
+            android:background="?attr/background"
+            android:gravity="top|center"
+            android:layout_alignParentTop="true"
             android:padding="10dp"
             android:visibility="gone"
             android:text="@string/show_logs_disabled_network_message"

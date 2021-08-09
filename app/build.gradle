@@ -33,13 +33,14 @@ android {
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 17 // For version name 053f
-        versionName "0.5.3f"
+        versionName "053f"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            minifyEnabled true //Disabled this option for open testing to get more log details
+            // Modified as part of #352
+            minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

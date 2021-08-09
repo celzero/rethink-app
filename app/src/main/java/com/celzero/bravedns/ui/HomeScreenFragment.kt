@@ -208,6 +208,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         braveModeToggler.observe(viewLifecycleOwner, {
             updateCardsUi()
             handleQuickSettingChips()
+            syncDnsStatus()
         })
 
         b.fhsDnsConfigureChip.setOnClickListener {
@@ -873,7 +874,12 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         if (statusId == R.string.status_protected) {
-            if (appMode.isOrbotProxyEnabled() && isPrivateDnsActive()) {
+            if (appMode.isDnsMode() && isPrivateDnsActive()) {
+                statusId = R.string.status_protected_with_private_dns
+                colorId = fetchTextColor(R.color.indicator)
+            } else if (appMode.isDnsMode()) {
+                statusId = R.string.status_protected
+            } else if (appMode.isOrbotProxyEnabled() && isPrivateDnsActive()) {
                 statusId = R.string.status_protected_with_tor_private_dns
                 colorId = fetchTextColor(R.color.indicator)
             } else if (appMode.isOrbotProxyEnabled()) {

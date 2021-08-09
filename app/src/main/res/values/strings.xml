@@ -421,8 +421,8 @@
 
     <string name="dns_proxy_no_proxy">Set up a DNS Proxy by clicking on the ADD button below.</string>
 
-    <string name="show_logs_disabled_network_message">Connection logging has been disabled. To re-enable, goto <i>Settings</i> and turn on <i>Enable DNS and Firewall logs.</i></string>
-    <string name="show_logs_disabled_dns_message">DNS request logging has been disabled. To re-enable, goto <i>Settings</i> and turn on <i>Enable DNS and Firewall logs.</i></string>
+    <string name="show_logs_disabled_network_message">Connection logging has been disabled. To re-enable, goto <i>Settings</i> and turn on <i>Enable on-device logging.</i></string>
+    <string name="show_logs_disabled_dns_message">DNS request logging has been disabled. To re-enable, goto <i>Settings</i> and turn on <i>Enable on-device logging.</i></string>
 
     <string-array name="dns_crypt_endpoint_names">
         <item>Cleanbrowsing Family</item>
