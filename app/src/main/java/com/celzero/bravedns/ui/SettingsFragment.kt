@@ -339,7 +339,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             if (!checked) {
                 appMode.removeProxy(AppMode.ProxyType.SOCKS5, AppMode.ProxyProvider.CUSTOM)
                 b.settingsActivitySocks5Desc.text = getString(
-                                   R.string.settings_socks_forwarding_default_desc)
+                    R.string.settings_socks_forwarding_default_desc)
                 return@setOnCheckedChangeListener
             }
 
@@ -366,7 +366,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             if (!checked) {
                 appMode.removeProxy(AppMode.ProxyType.HTTP, AppMode.ProxyProvider.CUSTOM)
                 b.settingsActivityHttpProxyDesc.text = getString(
-                                R.string.settings_http_proxy_desc_default)
+                    R.string.settings_http_proxy_desc_default)
                 return@setOnCheckedChangeListener
             }
 
@@ -902,7 +902,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         if (hostName.isNotBlank()) {
             hostAddressEditText.setText(hostName, TextView.BufferType.EDITABLE)
         }
-        if (portAddr != INVALID_PORT) {
+        // TODO portAddress check for 0 is needed only for version v053f. Remove.
+        if (portAddr != INVALID_PORT || portAddr == 0) {
             portEditText.setText(portAddr.toString(), TextView.BufferType.EDITABLE)
         } else {
             portEditText.setText(Constants.HTTP_PROXY_PORT, TextView.BufferType.EDITABLE)
