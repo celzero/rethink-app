@@ -522,6 +522,7 @@ class AppMode internal constructor(private val context: Context,
                 return
             }
         }
+        removeAllProxies()
     }
 
     fun getProxyType(): String {

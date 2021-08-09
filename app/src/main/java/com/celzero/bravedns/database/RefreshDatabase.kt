@@ -152,8 +152,8 @@ class RefreshDatabase internal constructor(private var context: Context,
             entry.packageInfo = appInfo.packageName
             entry.uid = appInfo.uid
 
-            entry.whiteListUniv1 = isSystemApp
-            entry.isSystemApp = isSystemComponent
+            entry.whiteListUniv1 = isSystemComponent
+            entry.isSystemApp = isSystemApp
 
             entry.appCategory = determineAppCategory(appInfo)
 
@@ -177,11 +177,11 @@ class RefreshDatabase internal constructor(private var context: Context,
     }
 
     private fun isSystemApp(ai: ApplicationInfo): Boolean {
-        return isSystemComponent(ai) && !AndroidUidConfig.isUidAppRange(ai.uid)
+        return (ai.flags and ApplicationInfo.FLAG_SYSTEM > 0)
     }
 
     private fun isSystemComponent(ai: ApplicationInfo): Boolean {
-        return (ai.flags and ApplicationInfo.FLAG_SYSTEM > 0)
+        return isSystemApp(ai) && !AndroidUidConfig.isUidAppRange(ai.uid)
     }
 
     private fun determineAppCategory(ai: ApplicationInfo): String {
@@ -197,12 +197,12 @@ class RefreshDatabase internal constructor(private var context: Context,
             return replaceUnderscore(cat)
         }
 
-        if (isSystemApp(ai)) {
-            return Constants.APP_CAT_SYSTEM_APPS
-        }
-
         if (isSystemComponent(ai)) {
             return Constants.APP_CAT_SYSTEM_COMPONENTS
+        }
+
+        if (isSystemApp(ai)) {
+            return Constants.APP_CAT_SYSTEM_APPS
         }
 
         if (isAtleastO()) {

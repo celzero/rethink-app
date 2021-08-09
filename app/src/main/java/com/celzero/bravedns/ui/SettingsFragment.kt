@@ -156,6 +156,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             b.settingsActivityHttpProxyContainer.visibility = View.GONE
             return
         }
+
         b.settingsActivityHttpProxyContainer.visibility = View.VISIBLE
         b.settingsActivityHttpProxySwitch.isChecked = appMode.isCustomHttpProxyEnabled()
         if (b.settingsActivityHttpProxySwitch.isChecked) {
@@ -335,6 +336,13 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
 
         b.settingsActivitySocks5Switch.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean ->
+            if (!checked) {
+                appMode.removeProxy(AppMode.ProxyType.SOCKS5, AppMode.ProxyProvider.CUSTOM)
+                b.settingsActivitySocks5Desc.text = getString(
+                                   R.string.settings_socks_forwarding_default_desc)
+                return@setOnCheckedChangeListener
+            }
+
             if (!appMode.canEnableSocks5Proxy()) {
                 Utilities.showToastUiCentered(requireContext(),
                                               getString(R.string.settings_socks5_disabled_error),
@@ -342,13 +350,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 b.settingsActivitySocks5Switch.isChecked = false
                 return@setOnCheckedChangeListener
             }
-            if (checked) {
-                showSocks5ProxyDialog()
-            } else {
-                appMode.removeProxy(AppMode.ProxyType.SOCKS5, AppMode.ProxyProvider.CUSTOM)
-                b.settingsActivitySocks5Desc.text = getString(
-                    R.string.settings_socks_forwarding_default_desc)
-            }
+
+            showSocks5ProxyDialog()
         }
 
         b.settingsActivityOrbotImg.setOnClickListener {
@@ -360,6 +363,13 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
 
         b.settingsActivityHttpProxySwitch.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean ->
+            if (!checked) {
+                appMode.removeProxy(AppMode.ProxyType.HTTP, AppMode.ProxyProvider.CUSTOM)
+                b.settingsActivityHttpProxyDesc.text = getString(
+                                R.string.settings_http_proxy_desc_default)
+                return@setOnCheckedChangeListener
+            }
+
             if (!appMode.canEnableHttpProxy()) {
                 Utilities.showToastUiCentered(requireContext(),
                                               getString(R.string.settings_https_disabled_error),
@@ -827,9 +837,31 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         super.onResume()
         refreshOnDeviceBlocklistStatus()
         handleLockdownModeIfNeeded()
+        handleBraveMode()
         refreshOrbotUi()
     }
 
+    // As of now, the BraveMode- APP_MODE_DNS is handled.
+    // When app mode is DNS, proxies should be disabled.
+    private fun handleBraveMode() {
+        val isDnsMode = appMode.isDnsMode()
+        if (isDnsMode) {
+            b.settingsActivitySocks5Rl.alpha = 0.5f
+            b.settingsActivityHttpProxyContainer.alpha = 0.5f
+            b.settingsActivityOrbotContainer.alpha = 0.5f
+        } else {
+            b.settingsActivitySocks5Rl.alpha = 1f
+            b.settingsActivityHttpProxyContainer.alpha = 1f
+            b.settingsActivityOrbotContainer.alpha = 1f
+        }
+        // Orbot
+        b.settingsActivityOrbotImg.isEnabled = !isDnsMode
+        b.settingsActivityOrbotContainer.isEnabled = !isDnsMode
+        // SOCKS5
+        b.settingsActivitySocks5Switch.isEnabled = !isDnsMode
+        // HTTP Proxy
+        b.settingsActivityHttpProxySwitch.isEnabled = !isDnsMode
+    }
 
     private fun showHttpProxyDialog(isEnabled: Boolean) {
         if (!isEnabled) {
