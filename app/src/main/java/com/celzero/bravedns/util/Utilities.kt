@@ -26,6 +26,7 @@ import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Build
 import android.os.CountDownTimer
 import android.provider.Settings
@@ -551,5 +552,16 @@ class Utilities {
             }
 
         }
+
+        fun sendEmailIntent(context: Context) {
+            val intent = Intent(Intent.ACTION_SENDTO).apply {
+                data = Uri.parse(context.getString(R.string.about_mail_to_string))
+                putExtra(Intent.EXTRA_EMAIL, arrayOf(context.getString(R.string.about_mail_to)))
+                putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.about_mail_subject))
+            }
+            context.startActivity(Intent.createChooser(intent, context.getString(
+                            R.string.about_mail_bugreport_share_title)))
+        }
+
     }
 }

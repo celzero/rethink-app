@@ -50,6 +50,7 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastR
 import com.celzero.bravedns.util.Utilities.Companion.isFdroidBuild
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
+import com.celzero.bravedns.util.Utilities.Companion.sendEmailIntent
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -147,9 +148,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
                 }
             }
             b.aboutMail -> {
-                val intent = Intent(Intent.ACTION_VIEW, (getString(R.string.about_mail_to)).toUri())
-                intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_subject))
-                startActivity(intent)
+                sendEmailIntent(requireContext())
             }
             b.aboutTwitter -> {
                 val intent = Intent(Intent.ACTION_VIEW,
@@ -191,9 +190,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         builder.setMessage(R.string.about_bug_no_log_dialog_message)
         builder.setPositiveButton(
             getString(R.string.about_bug_no_log_dialog_positive_btn)) { _, _ ->
-            val intent = Intent(Intent.ACTION_VIEW, (getString(R.string.about_mail_to)).toUri())
-            intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_subject))
-            startActivity(intent)
+            sendEmailIntent(requireContext())
         }
         builder.setNegativeButton(
             getString(R.string.about_bug_no_log_dialog_negative_btn)) { dialog, _ ->
@@ -247,9 +244,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             dialogInterface.dismiss()
         }.setNeutralButton(
             getString(R.string.about_dialog_neutral_button)) { _: DialogInterface, _: Int ->
-            val intent = Intent(Intent.ACTION_VIEW, (getString(R.string.about_mail_to)).toUri())
-            intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_subject))
-            startActivity(intent)
+            sendEmailIntent(requireContext())
         }.setCancelable(true).create().show()
     }
 
@@ -276,19 +271,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         emailIntent.flags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION
         startActivity(
             Intent.createChooser(emailIntent, getString(R.string.about_mail_bugreport_share_title)))
-    }
-
-    private fun viewBugReport() {
-        Intent(Intent.ACTION_VIEW).apply {
-            val file0 = File(
-                requireContext().filesDir.canonicalPath + File.separator + Constants.BUG_REPORT_FILE)
-            val uri = FileProvider.getUriForFile(requireContext().applicationContext,
-                                                 FILE_PROVIDER_NAME, file0)
-            val mime: String? = requireActivity().applicationContext.contentResolver.getType(uri)
-            setDataAndType(uri, mime)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            startActivity(this)
-        }
     }
 
     private fun getFileUri(file: File): Uri? {
