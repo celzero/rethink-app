@@ -65,6 +65,7 @@ import com.celzero.bravedns.util.Utilities.Companion.isAlwaysOnEnabled
 import com.celzero.bravedns.util.Utilities.Companion.isOtherVpnHasAlwaysOn
 import com.celzero.bravedns.util.Utilities.Companion.isVpnLockdownEnabled
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
+import com.celzero.bravedns.util.Utilities.Companion.sendEmailIntent
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
 import com.celzero.bravedns.viewmodel.AppListViewModel
@@ -417,9 +418,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         builder.setNeutralButton(getString(R.string.about_dialog_neutral_button)) { _, _ ->
-            val intent = Intent(Intent.ACTION_VIEW, (getString(R.string.about_mail_to)).toUri())
-            intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_subject))
-            startActivity(intent)
+            sendEmailIntent(requireContext())
         }
 
         builder.setCancelable(false)

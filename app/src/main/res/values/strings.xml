@@ -795,7 +795,7 @@
     <string name="about_app_update_check">Check for app updates</string>
     <string name="about_dialog_positive_button">Let\'s Go</string>
     <string name="about_mail_to">hello@celzero.com</string>
-    <string name="about_bug_report_to_email">hello@celzero.com</string>
+    <string name="about_mail_to_string">mailto:</string>
     <string name="about_mail_subject">[RethinkDNS]:</string>
     <string name="about_mail_bugreport_subject">[RethinkDns]: Bug report</string>
     <string name="about_mail_bugreport_text">Send this email to : hello@celzero.com</string>
