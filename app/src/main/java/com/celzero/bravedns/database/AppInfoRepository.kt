@@ -124,9 +124,7 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
     }
 
     fun updateExcludedForAllApp(isExcluded: Boolean, coroutineScope: CoroutineScope = GlobalScope) {
-        coroutineScope.launch {
-            appInfoDAO.updateExcludedForAllApp(isExcluded)
-        }
+        appInfoDAO.updateExcludedForAllApp(isExcluded)
     }
 
     fun updateExcludedForCategories(category: String, isExcluded: Boolean,
