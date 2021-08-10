@@ -514,7 +514,6 @@ object FirewallManager : KoinComponent {
 
             try {
                 wl.lock()
-                appInfos.clear()
                 // If the app is excluded, then remove all the other rules.
                 appInfos.values().forEach {
                     if (filterCategories.isNotEmpty() && !filterCategories.contains(
@@ -555,7 +554,6 @@ object FirewallManager : KoinComponent {
 
             try {
                 wl.lock()
-                appInfos.clear()
                 // If the app is whitelisted, then remove from exclude and allow internet to the app.
                 appInfos.values().forEach {
                     if (filterCategories.isNotEmpty() && !filterCategories.contains(
