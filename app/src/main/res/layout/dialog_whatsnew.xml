@@ -10,6 +10,17 @@
         android:padding="15dp">
 
         <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:textSize="@dimen/default_font_text_view"
+            android:lineSpacingExtra="4sp"
+            android:textColor="?attr/primaryTextColor"
+            android:textStyle="italic"
+            android:text="@string/whats_new_version_text_v53f"
+            />
+
+        <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/sub_heading"

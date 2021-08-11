@@ -232,5 +232,8 @@ class Constants {
 
         // increment/decrement value to pause vpn
         val EXTRA_MILLIS = TimeUnit.MINUTES.toMillis(1)
+
+        // play services package name
+        const val PLAY_SERVICE_PKG_NAME = "com.android.vending"
     }
 }

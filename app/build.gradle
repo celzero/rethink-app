@@ -32,8 +32,8 @@ android {
         applicationId "com.celzero.bravedns"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 17 // For version name 053f
-        versionName "053f"
+        versionCode 18 // For version name 053g
+        versionName "053g"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -95,8 +95,6 @@ dependencies {
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
     implementation 'org.minidns:minidns-core:1.0.0'
     implementation 'org.minidns:minidns-hla:1.0.0'
-    // To check if the play services is available
-    implementation 'com.google.android.gms:play-services-base:17.6.0'
     // For liveData implementation
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.1'
 

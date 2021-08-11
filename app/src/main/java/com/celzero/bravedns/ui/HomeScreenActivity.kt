@@ -19,6 +19,8 @@ import android.app.ActivityManager
 import android.app.ApplicationExitInfo
 import android.content.*
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
+import android.content.pm.PackageManager.NameNotFoundException
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
@@ -44,6 +46,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_WEBSITE
+import com.celzero.bravedns.util.Constants.Companion.PLAY_SERVICE_PKG_NAME
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_3
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
@@ -53,8 +56,6 @@ import com.celzero.bravedns.util.Utilities.Companion.getBugReportFilePath
 import com.celzero.bravedns.util.Utilities.Companion.getPackageMetadata
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastR
 import com.celzero.bravedns.util.Utilities.Companion.writeTrace
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
@@ -252,7 +253,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             return
         }
 
-        if (isGooglePlayServicesAvailable()) {
+        if (isGooglePlayServicesAvailable() && BuildConfig.FLAVOR == FLAVOR_PLAY) {
             appUpdateManager.checkForAppUpdate(isInteractive, this,
                                                installStateUpdatedListener) // Might be play updater or web updater
         } else {
@@ -262,12 +263,13 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun isGooglePlayServicesAvailable(): Boolean {
-        val googleApiAvailability: GoogleApiAvailability = GoogleApiAvailability.getInstance()
-        val status: Int = googleApiAvailability.isGooglePlayServicesAvailable(this)
-        if (status != ConnectionResult.SUCCESS) {
-            return false
+        return try {
+            // applicationInfo.enabled - When false, indicates that all components within
+            // this application are considered disabled, regardless of their individually set enabled status.
+            packageManager.getApplicationInfo(PLAY_SERVICE_PKG_NAME, 0).enabled
+        } catch (e: NameNotFoundException) {
+            false
         }
-        return true
     }
 
     private val installStateUpdatedListener = object : AppUpdater.InstallStateListener {

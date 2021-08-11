@@ -40,6 +40,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val DNS_CHANGE = "connected_dns_name"
         const val DNS_RELAYS = "dnscrypt_relay"
         const val APP_STATE = "app_state"
+        const val REMOTE_BLOCK_LIST_STAMP = "remote_block_list_count"
 
         fun expandUrl(context: Context, url: String?): String {
             return if (url == null || url.isEmpty()) {

@@ -141,7 +141,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                                                                     excludedCount.toString(),
                                                                     FirewallManager.getTotalApps().toString())
         })
-
     }
 
     private fun observeCustomProxy() {
@@ -236,28 +235,15 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             b.settingsActivityVpnLockdownDesc.visibility = View.VISIBLE
             b.settingsActivityExcludeAppsRl.alpha = 0.5f
             b.settingsActivityAllowBypassRl.alpha = 0.5f
-            b.settingsActivitySocks5Rl.alpha = 0.5f
-            b.settingsActivityHttpProxyContainer.alpha = 0.5f
-            b.settingsActivityOrbotContainer.alpha = 0.5f
         } else {
             b.settingsActivityVpnLockdownDesc.visibility = View.GONE
             b.settingsActivityExcludeAppsRl.alpha = 1f
             b.settingsActivityAllowBypassRl.alpha = 1f
-            b.settingsActivitySocks5Rl.alpha = 1f
-            b.settingsActivityHttpProxyContainer.alpha = 1f
-            b.settingsActivityOrbotContainer.alpha = 1f
         }
         b.settingsActivityOnDeviceBlockRl.isEnabled = !isLockdown
         b.settingsActivityExcludeAppsRl.isEnabled = !isLockdown
         b.settingsActivityAllowBypassSwitch.isEnabled = !isLockdown
         b.settingsActivityExcludeAppsImg.isEnabled = !isLockdown
-        // Orbot
-        b.settingsActivityOrbotImg.isEnabled = !isLockdown
-        b.settingsActivityOrbotContainer.isEnabled = !isLockdown
-        // SOCKS5
-        b.settingsActivitySocks5Switch.isEnabled = !isLockdown
-        // HTTP Proxy
-        b.settingsActivityHttpProxySwitch.isEnabled = !isLockdown
     }
 
     private fun refreshOrbotUi() {
@@ -328,7 +314,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                     b.settingsActivityAllowBypassSwitch.visibility = View.VISIBLE
                 }
             }
-
         }
 
         b.settingsActivityVpnLockdownDesc.setOnClickListener {
@@ -836,31 +821,31 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     override fun onResume() {
         super.onResume()
         refreshOnDeviceBlocklistStatus()
-        handleLockdownModeIfNeeded()
-        handleBraveMode()
         refreshOrbotUi()
+        handleLockdownModeIfNeeded()
+        handleProxyUi()
     }
 
-    // As of now, the BraveMode- APP_MODE_DNS is handled.
-    // When app mode is DNS, proxies should be disabled.
-    private fun handleBraveMode() {
-        val isDnsMode = appMode.isDnsMode()
-        if (isDnsMode) {
-            b.settingsActivitySocks5Rl.alpha = 0.5f
-            b.settingsActivityHttpProxyContainer.alpha = 0.5f
-            b.settingsActivityOrbotContainer.alpha = 0.5f
-        } else {
+    // Should be in disabled state when the brave mode is in DNS only / Vpn in lockdown mode.
+    private fun handleProxyUi() {
+        val canEnableProxy = !appMode.isDnsMode() && !isVpnLockdownEnabled(VpnController.getBraveVpnService())
+
+        if (canEnableProxy) {
             b.settingsActivitySocks5Rl.alpha = 1f
             b.settingsActivityHttpProxyContainer.alpha = 1f
             b.settingsActivityOrbotContainer.alpha = 1f
+        } else {
+            b.settingsActivitySocks5Rl.alpha = 0.5f
+            b.settingsActivityHttpProxyContainer.alpha = 0.5f
+            b.settingsActivityOrbotContainer.alpha = 0.5f
         }
         // Orbot
-        b.settingsActivityOrbotImg.isEnabled = !isDnsMode
-        b.settingsActivityOrbotContainer.isEnabled = !isDnsMode
+        b.settingsActivityOrbotImg.isEnabled = canEnableProxy
+        b.settingsActivityOrbotContainer.isEnabled = canEnableProxy
         // SOCKS5
-        b.settingsActivitySocks5Switch.isEnabled = !isDnsMode
+        b.settingsActivitySocks5Switch.isEnabled = canEnableProxy
         // HTTP Proxy
-        b.settingsActivityHttpProxySwitch.isEnabled = !isDnsMode
+        b.settingsActivityHttpProxySwitch.isEnabled = canEnableProxy
     }
 
     private fun showHttpProxyDialog(isEnabled: Boolean) {

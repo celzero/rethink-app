@@ -253,7 +253,7 @@
 
     <string name="hybrid_mode_info_title">DNS + Firewall</string>
 
-    <string name="dns_mode_info_explanation_new">Block malware and other security threats with configurable, encrypted DNS.</string>
+    <string name="dns_mode_info_explanation_new">Monitor, block, and encrypt DNS requests.</string>
     <string name="firewall_mode_info_explanation_new">Monitor network activity and firewall any app or IP address.</string>
     <string name="dns_firewall_mode_info_explanation_new">All of the above + bypass Internet censorship.</string>
     <string name="wireguard_mode_info_explanation_new">Coming soon.</string>
@@ -528,8 +528,9 @@
     <string name="features_disabled">(disabled)</string>
     <string name="firewall_app_info_not_available">Cannot block the app</string>
 
-    <string name="whats_dialog_title">What\'s new in v053f</string>
+    <string name="whats_dialog_title">What\'s new in v053g</string>
     <string name="whats_new_version_name">🌎🌲 World Humanitarian Day (19 August) 🌲🌎</string>
+    <string name="whats_new_version_text_v53f">If you are upgrading from v053f then there are 3 minor bug fixes.</string>
     <string name="whats_new_version_update">Fixes and improvements:\n\n
         1. Quick action buttons on Home Screen.\n\n
         2. A brand new Pause mode which suspends DNS and Firewall for unblocked apps.\n\n

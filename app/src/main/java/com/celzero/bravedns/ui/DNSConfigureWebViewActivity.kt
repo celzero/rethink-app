@@ -175,11 +175,11 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     }
 
     private fun updateDoHEndPoint(stamp: String, count: Int) {
-        Log.i(LOG_TAG_DNS, "Remote stamp has been updated from web view - $stamp")
+        Log.i(LOG_TAG_DNS, "Remote stamp has been updated from web view: $stamp")
 
         CoroutineScope(Dispatchers.IO).launch {
-            persistentState.setRemoteBlocklistCount(count)
             appMode.updateDnsRethinkPlusStamp(stamp)
+            persistentState.setRemoteBlocklistCount(count)
         }
 
         Toast.makeText(this, getString(R.string.webview_toast_configure_success),
@@ -187,7 +187,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     }
 
     private fun updateLocalBlocklistStamp(stamp: String, count: Int) {
-        Log.i(LOG_TAG_DNS, "Local stamp has been set from webview - $stamp")
+        Log.i(LOG_TAG_DNS, "Local stamp has been set from webview: $stamp")
 
         val stamp = Xdns.getBlocklistStampFromURL(stamp)
         persistentState.localBlocklistStamp = stamp
@@ -374,13 +374,13 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                 updateDoHEndPoint(receivedStamp, count.toInt())
             }
 
-            if (DEBUG) Log.d(LOG_TAG_DNS, "Stamp value - $receivedStamp, $count")
+            if (DEBUG) Log.d(LOG_TAG_DNS, "Stamp value: $receivedStamp, $count")
             finish()
         }
 
         @JavascriptInterface
         fun dismiss(reason: String) {
-            Log.i(LOG_TAG_DNS, "dismiss with reason - $reason")
+            Log.i(LOG_TAG_DNS, "dismiss with reason: $reason")
             finish()
         }
 

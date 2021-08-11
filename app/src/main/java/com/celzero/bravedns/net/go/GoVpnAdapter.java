@@ -582,6 +582,8 @@ public class GoVpnAdapter {
             Log.i(LOG_TAG_VPN, "app dns mode is set with local stamp: " + stamp);
 
             if (stamp.isEmpty() || localBraveDns == null) {
+                // make localBraveDns as null when the stamp is empty
+                localBraveDns = null;
                 return;
             }
 

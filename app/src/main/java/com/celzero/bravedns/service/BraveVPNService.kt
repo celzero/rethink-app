@@ -958,7 +958,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                     unregisterAccessibilityServiceState()
                 }
             }
-            PersistentState.LOCAL_BLOCK_LIST_STAMP -> {
+            PersistentState.LOCAL_BLOCK_LIST_STAMP -> { // update tunnel on local blocklist stamp change
+                CoroutineScope(Dispatchers.IO).launch {
+                    spawnServerUpdate(appMode.makeTunnelDataClass())
+                }
+            }
+            PersistentState.REMOTE_BLOCK_LIST_STAMP -> { // update tunnel on remote blocklist stamp change.
                 CoroutineScope(Dispatchers.IO).launch {
                     spawnServerUpdate(appMode.makeTunnelDataClass())
                 }
