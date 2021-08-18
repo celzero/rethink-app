@@ -18,7 +18,6 @@ package com.celzero.bravedns.net.dns;
 
 import android.util.Log;
 
-import com.google.common.net.InetAddresses;
 
 import java.net.InetAddress;
 import java.net.ProtocolException;
@@ -221,10 +220,8 @@ public class DnsPacket {
             for (DnsRecord r : src) {
                 if (r.rtype == TYPE_A || r.rtype == TYPE_AAAA) {
                     try {
-                        // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
-                        // Unlike InetAddress.getByAddress(), the methods of this class never cause DNS services
-                        // to be accessed.
-                        addresses.add(InetAddresses.fromLittleEndianByteArray(r.data));
+                        // This method doesn't block, i.e. no reverse name service lookup is performed.
+                        addresses.add(InetAddress.getByAddress(r.data));
                     } catch (IllegalArgumentException | UnknownHostException e) {
                         Log.e(LOG_TAG_DNS_LOG, "Failure converting string to InetAddresses: ${e.message}", e);
                     }
