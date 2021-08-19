@@ -64,6 +64,7 @@ class AppMode internal constructor(private val context: Context,
         connectedDNS.postValue(persistentState.connectedDnsName)
     }
 
+    // TODO: Move the app state to BraveVpnService.State- (NEW, WORKING, FAILING, PAUSED).
     enum class AppState(val state: Int) {
         PAUSED(10), ACTIVE(11)
     }

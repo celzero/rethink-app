@@ -41,15 +41,11 @@ class PauseTimer(val appMode: AppMode) {
     }
 
     fun incrementTimer(timeInMills: Long) {
-        if (DEBUG) Log.d(LOG_TAG_UI,
-                         "Increment pause timer, remaining time: $countdownMs, incremented minutes: $timeInMills")
         countdownMs = countdownMs.plus(timeInMills)
         startCountDownTimer(countdownMs)
     }
 
     fun decrementTimer(timeInMills: Long) {
-        if (DEBUG) Log.d(LOG_TAG_UI,
-                         "Decrement pause timer, remaining time: $countdownMs, decremented minutes: $timeInMills")
         countdownMs = countdownMs.minus(timeInMills)
         startCountDownTimer(countdownMs)
     }

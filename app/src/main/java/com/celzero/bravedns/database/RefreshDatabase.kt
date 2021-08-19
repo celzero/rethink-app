@@ -400,7 +400,7 @@ class RefreshDatabase internal constructor(private var context: Context,
                                        context.getString(R.string.dns_mode_3_explanation), true,
                                        isCustom = false,
                                        modifiedDataTime = System.currentTimeMillis(), latency = 0)
-        // rethinkdns plus is accessed using the id(5), query changes required if this id is changed
+        // rethinkdns+ must always be at position 5, change in id requires query changes
         val doHEndpoint5 = DoHEndpoint(id = 5, urlName[5], urlValues[5],
                                        context.getString(R.string.dns_mode_5_explanation),
                                        isSelected = false, isCustom = false,

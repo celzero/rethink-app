@@ -169,6 +169,7 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         }
     }
 
+    // FIXME: Create common observer for dns instead of separate observers
     private fun observeCryptStatus() {
         appMode.getDnscryptCountObserver().observe(viewLifecycleOwner, {
             val connectedCrypt = getString(R.string.configure_dns_crypt, it.toString())

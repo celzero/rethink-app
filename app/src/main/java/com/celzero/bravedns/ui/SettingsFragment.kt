@@ -88,7 +88,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     private var proxyEndpoint: ProxyEndpoint? = null
 
-    // private val proxyEndpointRepository by inject<ProxyEndpointRepository>()
     private val persistentState by inject<PersistentState>()
     private val appMode by inject<AppMode>()
     private val orbotHelper by inject<OrbotHelper>()

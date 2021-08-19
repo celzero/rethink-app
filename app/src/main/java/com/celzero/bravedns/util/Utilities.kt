@@ -501,6 +501,7 @@ class Utilities {
             return BuildConfig.FLAVOR == FLAVOR_PLAY
         }
 
+        // TODO: Make zip file to share instead of file ref: https://archive.is/k0VIa
         fun getBugReportFilePath(context: Context): String {
             val filePath = context.filesDir.canonicalPath + File.separator + Constants.BUG_REPORT_FILE
             val file = File(filePath)
