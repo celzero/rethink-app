@@ -225,14 +225,10 @@ public class GoVpnAdapter {
     private void setBraveMode(long dnsMode, String dohURL) {
         if (DEBUG) Log.d(LOG_TAG_VPN, "Set brave dns mode initiated");
         // Set brave mode only if the selected DNS is either DoH or DnsCrypt
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                if (isDoh(dnsMode) || isDnscrypt(dnsMode)) {
-                    setBraveDNSLocalMode();
-                    setBraveDNSRemoteMode(dohURL);
-                }
+        Executors.newSingleThreadExecutor().execute(() -> {
+            if (isDoh(dnsMode) || isDnscrypt(dnsMode)) {
+                setBraveDNSLocalMode();
+                setBraveDNSRemoteMode(dohURL);
             }
         });
     }

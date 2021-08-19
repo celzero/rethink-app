@@ -83,13 +83,13 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var checkForAppUpdate by booleanPref("check_for_app_update", true)
     var connectedDnsName by stringPref("connected_dns_name", context.getString(R.string.dns_mode_3))
     var theme by intPref("app_theme", 0)
-    var notificationAction by intPref("notification_action", 1)
+    var notificationActionType by intPref("notification_action", 1)
     var isAddAllNetworks by booleanPref("add_all_networks_to_vpn", false)
     var lastAppRefreshTime by longPref("last_app_refresh_time", INIT_TIME_MS)
     var proxyType by stringPref("proxy_proxytype", AppMode.ProxyType.NONE.name)
     var proxyProvider by stringPref("proxy_proxyprovider", AppMode.ProxyProvider.NONE.name)
     private var _dnsCryptRelayCount by intPref("dnscrypt_relay", 0)
-    var lastExitTimestamp by longPref("prev_trace_timestamp", INIT_TIME_MS)
+    var lastAppExitInfoTimestamp by longPref("prev_trace_timestamp", INIT_TIME_MS)
     var downloadIds by stringSetPref("download_ids", emptySet())
     var fetchFavIcon by booleanPref("fav_icon_enabled",
                                     BuildConfig.FLAVOR != Constants.FLAVOR_FDROID)
@@ -103,7 +103,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
 
     // requires livedata as the app state can be changed from more than one place
-    var appStateLiveData: MutableLiveData<AppMode.AppState> = MutableLiveData()
+    var appStateObserver: MutableLiveData<AppMode.AppState> = MutableLiveData()
     var remoteBlocklistCount: MutableLiveData<Int> = MutableLiveData()
 
     fun setMedianLatency(median: Long) {

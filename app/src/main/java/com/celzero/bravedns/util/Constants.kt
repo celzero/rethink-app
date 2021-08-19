@@ -219,7 +219,7 @@ class Constants {
         const val PREV_REPORT_FILE = "bug_report_1.txt"
 
         // Bug report file max size - 10mb
-        const val MAX_FILE_SIZE = 10 * 1024 * 1024
+        const val MAX_BUGREPORT_FILE_SIZE: Long = 10 * 1024 * 1024
 
         const val FILE_PROVIDER_NAME = BuildConfig.APPLICATION_ID + ".provider"
 
@@ -228,7 +228,7 @@ class Constants {
         const val TIME_FORMAT_3 = "dd MMMM yyyy, HH:mm:ss"
 
         // default value for the pause timer - 15 mins
-        val DEFAULT_PAUSE_TIMER = TimeUnit.MINUTES.toMillis(15)
+        val DEFAULT_PAUSE_TIME_MS = TimeUnit.MINUTES.toMillis(15)
 
         // increment/decrement value to pause vpn
         val EXTRA_MILLIS = TimeUnit.MINUTES.toMillis(1)

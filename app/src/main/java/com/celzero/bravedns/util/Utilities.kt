@@ -46,13 +46,12 @@ import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.service.VpnControllerHelper.persistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.Constants.Companion.MAX_FILE_SIZE
+import com.celzero.bravedns.util.Constants.Companion.MAX_BUGREPORT_FILE_SIZE
 import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP
@@ -340,16 +339,16 @@ class Utilities {
             }
         }
 
-        fun getBottomsheetCurrentTheme(isDarkThemeOn: Boolean): Int {
-            return if (persistentState.theme == Constants.THEME_SYSTEM_DEFAULT) {
+        fun getBottomsheetCurrentTheme(isDarkThemeOn: Boolean, theme: Int): Int {
+            return if (theme == Constants.THEME_SYSTEM_DEFAULT) {
                 if (isDarkThemeOn) {
                     R.style.BottomSheetDialogThemeTrueBlack
                 } else {
                     R.style.BottomSheetDialogThemeWhite
                 }
-            } else if (persistentState.theme == Constants.THEME_LIGHT) {
+            } else if (theme == Constants.THEME_LIGHT) {
                 R.style.BottomSheetDialogThemeWhite
-            } else if (persistentState.theme == Constants.THEME_DARK) {
+            } else if (theme == Constants.THEME_DARK) {
                 R.style.BottomSheetDialogTheme
             } else {
                 R.style.BottomSheetDialogThemeTrueBlack
@@ -494,18 +493,18 @@ class Utilities {
             return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
         }
 
-        fun isFdroidBuild(): Boolean {
+        fun isFdroidFlavour(): Boolean {
             return BuildConfig.FLAVOR == FLAVOR_FDROID
         }
 
-        fun isPlayStoreBuild(): Boolean {
+        fun isPlayStoreFlavour(): Boolean {
             return BuildConfig.FLAVOR == FLAVOR_PLAY
         }
 
         fun getBugReportFilePath(context: Context): String {
             val filePath = context.filesDir.canonicalPath + File.separator + Constants.BUG_REPORT_FILE
             val file = File(filePath)
-            if (file.exists()) {
+            if (file.isFile && file.exists()) {
                 // Only write if the file is less than 10mb
                 if (isFileLessThan10MB(file)) {
                     return filePath
@@ -526,10 +525,7 @@ class Utilities {
         }
 
         private fun isFileLessThan10MB(file: File): Boolean {
-            val l = file.length()
-            val fileSize = l.toString()
-            val finalFileSize = fileSize.toInt()
-            return finalFileSize <= MAX_FILE_SIZE
+            return file.length() <= MAX_BUGREPORT_FILE_SIZE
         }
 
         fun writeTrace(file: File, inputStream: InputStream?) {

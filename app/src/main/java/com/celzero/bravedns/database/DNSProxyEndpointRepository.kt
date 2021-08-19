@@ -28,6 +28,11 @@ import kotlinx.coroutines.launch
 
 class DNSProxyEndpointRepository(private val dnsProxyEndpointDAO: DNSProxyEndpointDAO) {
 
+    companion object {
+        const val INTERNAL = "Internal"
+        const val EXTERNAL = "External"
+    }
+
     @Transaction
     fun update(dnsProxyEndpoint: DNSProxyEndpoint) {
         dnsProxyEndpointDAO.removeConnectionStatus()

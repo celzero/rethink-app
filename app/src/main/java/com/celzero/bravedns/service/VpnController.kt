@@ -94,7 +94,7 @@ object VpnController {
     }
 
     fun state(): VpnState {
-        val requested: Boolean = VpnControllerHelper.persistentState.getVpnEnabled()
+        val requested: Boolean = braveVpnService?.persistentState?.getVpnEnabled() == true
         val on = isOn()
         return VpnState(requested, on, connectionState)
     }
@@ -107,8 +107,8 @@ object VpnController {
         return braveVpnService?.hasTunnel() == true
     }
 
-}
+    fun hasStarted(): Boolean {
+        return connectionState == BraveVPNService.State.WORKING || connectionState == BraveVPNService.State.FAILING
+    }
 
-internal object VpnControllerHelper : KoinComponent {
-    val persistentState by inject<PersistentState>()
 }

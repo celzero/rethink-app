@@ -20,7 +20,6 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -30,11 +29,7 @@ import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.databinding.PauseActivityBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.DEFAULT_PAUSE_TIMER
 import com.celzero.bravedns.util.Constants.Companion.EXTRA_MILLIS
-import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.convertToTime
 import org.koin.android.ext.android.inject
@@ -68,7 +63,7 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
     }
 
     private fun checkAppState() {
-        persistentState.appStateLiveData.observe(this, {
+        persistentState.appStateObserver.observe(this, {
             if (it == AppMode.AppState.ACTIVE) {
                 stopPause()
             } else {
@@ -79,7 +74,7 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
     }
 
     private fun observeTimer() {
-        VpnController.getBraveVpnService()?.updateTimerLiveData?.observe(this, {
+        VpnController.getBraveVpnService()?.getPauseCountdownObserver()?.observe(this, {
             b.pacTimer.text = convertToTime(it)
         })
     }
@@ -128,25 +123,11 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
     }
 
     private fun decrementTimer() {
-        if (DEBUG) Log.d(LOG_TAG_UI,
-                         "Decrement pause timer, remaining time: ${VpnController.getBraveVpnService()?.pauseRemainingTime}, decremented minutes: $DEFAULT_PAUSE_TIMER")
-        val time = VpnController.getBraveVpnService()?.pauseRemainingTime?.minus(EXTRA_MILLIS)
-
-        if (VpnController.getBraveVpnService()?.pauseRemainingTime == null || time == null) return
-
-        if (time > INIT_TIME_MS) {
-            VpnController.getBraveVpnService()?.startCountDownTimer(time)
-        }
+        VpnController.getBraveVpnService()?.decrementTimer(EXTRA_MILLIS)
     }
 
     private fun incrementTimer() {
-        if (DEBUG) Log.d(LOG_TAG_UI,
-                         "Increment pause timer, remaining time: ${VpnController.getBraveVpnService()?.pauseRemainingTime}, incremented minutes: $DEFAULT_PAUSE_TIMER")
-        if (VpnController.getBraveVpnService()?.pauseRemainingTime == null) return
-
-        val time = VpnController.getBraveVpnService()?.pauseRemainingTime?.plus(EXTRA_MILLIS)
-
-        VpnController.getBraveVpnService()?.startCountDownTimer(time)
+        VpnController.getBraveVpnService()?.incrementTimer(EXTRA_MILLIS)
     }
 
     private fun stopPause() {
@@ -169,6 +150,8 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
             } else if (autoDecrement) {
                 decrementTimer()
                 repeatUpdateHandler.postDelayed(RptUpdater(), 200)
+            } else {
+                // no-op
             }
         }
     }

@@ -48,7 +48,7 @@ import com.celzero.bravedns.util.Constants.Companion.FILE_PROVIDER_NAME
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastR
-import com.celzero.bravedns.util.Utilities.Companion.isFdroidBuild
+import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 import com.celzero.bravedns.util.Utilities.Companion.sendEmailIntent
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
@@ -70,7 +70,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
 
     private fun initView() {
 
-        if (isFdroidBuild()) {
+        if (isFdroidFlavour()) {
             b.aboutAppUpdate.visibility = View.GONE
         }
 
@@ -283,8 +283,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
     }
 
     private fun isFileAvailable(file: File): Boolean {
-        if (!file.isFile) return false
-        return file.exists()
+        return file.isFile && file.exists()
     }
 
     private fun promptCrashLogAction() {

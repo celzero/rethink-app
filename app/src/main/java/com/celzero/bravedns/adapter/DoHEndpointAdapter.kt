@@ -105,7 +105,7 @@ class DoHEndpointAdapter(private val context: Context, private val persistentSta
             Log.i(LOG_TAG_DNS,
                   "connected to doh: ${endpoint.dohName} isSelected? ${endpoint.isSelected}")
             if (endpoint.isSelected) {
-                val count = persistentState.getRemoteBlocklistCount()
+                val count = appMode.getRemoteBlocklistCount()
                 b.dohEndpointListUrlExplanation.text = if (endpoint.isRethinkDnsPlus() && count > 0) {
                     context.getString(R.string.dns_connected_rethink_plus, count.toString())
                 } else {

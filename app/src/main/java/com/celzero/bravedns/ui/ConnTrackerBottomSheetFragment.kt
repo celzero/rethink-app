@@ -78,7 +78,7 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
         _binding = null
     }
 
-    override fun getTheme(): Int = Utilities.getBottomsheetCurrentTheme(isDarkThemeOn())
+    override fun getTheme(): Int = Utilities.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
     private val blockedConnectionsRepository: BlockedConnectionsRepository by inject()
     private val persistentState by inject<PersistentState>()

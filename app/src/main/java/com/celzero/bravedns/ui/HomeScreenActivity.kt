@@ -19,7 +19,6 @@ import android.app.ActivityManager
 import android.app.ApplicationExitInfo
 import android.content.*
 import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
 import android.content.pm.PackageManager.NameNotFoundException
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -55,6 +54,7 @@ import com.celzero.bravedns.util.Utilities.Companion.convertLongToTime
 import com.celzero.bravedns.util.Utilities.Companion.getBugReportFilePath
 import com.celzero.bravedns.util.Utilities.Companion.getPackageMetadata
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastR
+import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.Companion.writeTrace
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
@@ -82,6 +82,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val persistentState by inject<PersistentState>()
     private val appUpdateManager by inject<AppUpdater>()
     private val appMode by inject<AppMode>()
+    private var am: ActivityManager?= null
 
     /* TODO : This task need to be completed.
              Add all the appinfo in the global variable during appload
@@ -115,8 +116,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             launchOnboardActivity()
         }
 
-        if (appMode.getAppState() == AppMode.AppState.PAUSE.state) {
-            openPauseActivity()
+        if (appMode.isAppPaused()) {
+            openAppPausedActivity()
         }
 
         updateNewVersion()
@@ -143,12 +144,15 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun detectAppExitInfo() {
         if (!isAtleastR()) return
 
+        if (am == null) {
+            am = getSystemService(ACTIVITY_SERVICE) as ActivityManager
+        }
+
         val path = getBugReportFilePath(this)
-        val am: ActivityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
         CoroutineScope(Dispatchers.IO).launch {
             // gets all the historical process exit reasons.
-            val appExitInfo = am.getHistoricalProcessExitReasons(null, 0, 0)
-            var latestTimestamp = persistentState.lastExitTimestamp
+            val appExitInfo = am!!.getHistoricalProcessExitReasons(null, 0, 0)
+            var latestTimestamp = persistentState.lastAppExitInfoTimestamp
             val file = File(path)
             appExitInfo.forEach {
                 // Write only the latest exit reason
@@ -157,7 +161,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                         convertLongToTime(it.timestamp, TIME_FORMAT_3)
                     }\n"
                     file.appendText(reportDetails)
-                    // Reason ANR will contain traceInputStream in it.
+                    // Reason_ANR will contain traceInputStream in it.
                     // Write into file when the traceInput is available
                     if (it.reason == ApplicationExitInfo.REASON_ANR) {
                         writeTrace(file, it.traceInputStream)
@@ -166,7 +170,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 }
             }
             // Store the last exit reason time stamp
-            persistentState.lastExitTimestamp = latestTimestamp
+            persistentState.lastAppExitInfoTimestamp = latestTimestamp
         }
     }
 
@@ -193,7 +197,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         finish()
     }
 
-    private fun openPauseActivity() {
+    private fun openAppPausedActivity() {
         val intent = Intent()
         intent.setClass(this, PauseActivity::class.java)
         startActivity(intent)
@@ -201,15 +205,15 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun updateNewVersion() {
-        if (isNewVersion()) {
-            val version = getLatestVersion()
-            persistentState.appVersion = version
-            persistentState.showWhatsNewChip = true
-            // FIXME - Remove this after the version v053f
-            // this is to fix the persistance state which was saved as Int instead of Long.
-            // Modification of persistence state
-            removeThisMethod()
-        }
+        if (!isNewVersion()) return
+
+        val version = getLatestVersion()
+        persistentState.appVersion = version
+        persistentState.showWhatsNewChip = true
+        // FIXME - Remove this after the version v053g
+        // this is to fix the persistance state which was saved as Int instead of Long.
+        // Modification of persistence state
+        removeThisMethod()
     }
 
     private fun isNewVersion(): Boolean {
@@ -225,16 +229,15 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     //FIXME - Move it to Android's built-in WorkManager
     private fun initUpdateCheck() {
-        val currentTime = System.currentTimeMillis()
-        val diff = currentTime - persistentState.lastAppUpdateCheck
+        if (!isUpdateRequired()) return
 
-        if (isUpdateRequired()) {
-            val numOfDays = TimeUnit.MILLISECONDS.toDays(diff)
-            Log.i(LOG_TAG_UI, "App update check initiated, number of days: $numOfDays")
-            if (numOfDays <= 1L) return
+        val diff = System.currentTimeMillis() - persistentState.lastAppUpdateCheck
 
-            checkForUpdate()
-        }
+        val numOfDays = TimeUnit.MILLISECONDS.toDays(diff)
+        Log.i(LOG_TAG_UI, "App update check initiated, number of days: $numOfDays")
+        if (numOfDays <= 1L) return
+
+        checkForUpdate()
     }
 
     private fun isUpdateRequired(): Boolean {
@@ -253,7 +256,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             return
         }
 
-        if (isGooglePlayServicesAvailable() && BuildConfig.FLAVOR == FLAVOR_PLAY) {
+        if (isGooglePlayServicesAvailable() && isPlayStoreFlavour()) {
             appUpdateManager.checkForAppUpdate(isInteractive, this,
                                                installStateUpdatedListener) // Might be play updater or web updater
         } else {
@@ -403,9 +406,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun checkAppState() {
-        persistentState.appStateLiveData.observe(this, {
-            if (it == AppMode.AppState.PAUSE) {
-                openPauseActivity()
+        persistentState.appStateObserver.observe(this, {
+            if (it == AppMode.AppState.PAUSED) {
+                openAppPausedActivity()
             }
         })
     }

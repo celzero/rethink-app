@@ -37,7 +37,7 @@ private val updaterModule = module {
 }
 
 private val orbotHelperModule = module {
-    single { OrbotHelper(androidContext(), get(), get(), get()) }
+    single { OrbotHelper(androidContext(), get(), get()) }
 }
 
 private val appDownloadManagerModule = module {

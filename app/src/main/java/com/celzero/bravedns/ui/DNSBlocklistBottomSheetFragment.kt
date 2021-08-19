@@ -49,6 +49,9 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getETldPlus1
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.common.collect.HashMultimap
+import com.google.common.collect.Multimap
+import com.google.common.collect.SetMultimap
 import org.koin.android.ext.android.inject
 import java.util.*
 import kotlin.collections.HashMap
@@ -62,10 +65,9 @@ class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
     // This property is only valid between onCreateView and onDestroyView.
     private val b get() = _binding!!
 
-    //private lateinit var recyclerAdapter: DNSBottomSheetBlockAdapter
     private val persistentState by inject<PersistentState>()
 
-    override fun getTheme(): Int = Utilities.getBottomsheetCurrentTheme(isDarkThemeOn())
+    override fun getTheme(): Int = Utilities.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
     private fun isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
@@ -112,31 +114,26 @@ class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
 
     private fun handleChip() {
         b.dnsBlockBlocklistChip.visibility = View.VISIBLE
-        val blocklists = transaction.getBlocklists()
-        val groupNames: MutableMap<String, String> = HashMap()
+        val group: Multimap<String, String> = HashMultimap.create()
 
-        blocklists.forEach {
+        transaction.getBlocklists().forEach {
             val items = it.split(":")
-            if (groupNames.containsKey(items[0])) {
-                groupNames[items[0]] = groupNames.getValue(items[0]) + "," + items[1]
-            } else {
-                groupNames[items[0]] = items[1]
-            }
+            group.putAll(items[0], items)
         }
 
-        val groupCount = groupNames.keys.count()
+        val groupCount = group.keys().distinct().count()
         if (groupCount > 1) {
-            b.dnsBlockBlocklistChip.text = groupNames.keys.elementAt(0) + " +${groupCount - 1}"
+            b.dnsBlockBlocklistChip.text = "${group.keys().first()} +${groupCount - 1}"
         } else {
-            b.dnsBlockBlocklistChip.text = groupNames.keys.elementAt(0)
+            b.dnsBlockBlocklistChip.text = group.keys().first()
         }
 
         b.dnsBlockBlocklistChip.setOnClickListener {
-            showBlocklistDialog(groupNames)
+            showBlocklistDialog(group)
         }
     }
 
-    private fun showBlocklistDialog(groupNames: Map<String, String>) {
+    private fun showBlocklistDialog(groupNames: Multimap<String, String>) {
         val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -151,13 +148,13 @@ class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
         dialog.show()
     }
 
-    private fun formatText(groupNames: Map<String, String>): Spanned {
+    private fun formatText(groupNames: Multimap<String, String>): Spanned {
         var text = ""
-        groupNames.forEach {
-            val heading = it.key.capitalize(Locale.getDefault())
-            val size = it.value.split(",").size
+        groupNames.keys().distinct().forEach {
+            val heading = it.capitalize(Locale.getDefault())
+            val size = groupNames.get(it).size
             text += getString(R.string.dns_btm_sheet_dialog_message, heading, size.toString(),
-                              it.value)
+                              groupNames.get(it))
         }
         text = text.replace(",", ", ")
         return HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)

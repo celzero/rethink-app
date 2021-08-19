@@ -50,13 +50,12 @@ import java.util.concurrent.TimeUnit
 
 
 /**
- * One touch Orbot integration.
+ * One-click Orbot setup.
  *
  * Broadcast receiver for Orbot's status change.
  * adopted from: github.com/guardianproject/NetCipher/blob/fee8571/libnetcipher/src/info/guardianproject/netcipher/proxy/OrbotHelper.java
  */
 class OrbotHelper(private val context: Context, private val persistentState: PersistentState,
-                  private val proxyEndpointRepository: ProxyEndpointRepository,
                   private val appMode: AppMode) {
 
 
@@ -303,11 +302,11 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
         CoroutineScope(Dispatchers.IO).launch {
             Log.i(LOG_TAG_VPN, "Initiate orbot start with type: $selectedProxyType")
 
-            if (isTypeSocks5() && handleOrbotSocks5DbUpdate()) {
+            if (isTypeSocks5() && handleOrbotSocks5Update()) {
                 appMode.addProxy(AppMode.ProxyType.SOCKS5, AppMode.ProxyProvider.ORBOT)
             } else if (isTypeHttp() && handleOrbotHttpUpdate()) {
                 appMode.addProxy(AppMode.ProxyType.HTTP, AppMode.ProxyProvider.ORBOT)
-            } else if (isTypeHttpSocks5() && handleOrbotSocks5DbUpdate() && handleOrbotHttpUpdate()) {
+            } else if (isTypeHttpSocks5() && handleOrbotSocks5Update() && handleOrbotHttpUpdate()) {
                 appMode.addProxy(AppMode.ProxyType.HTTP_SOCKS5, AppMode.ProxyProvider.ORBOT)
             } else {
                 withContext(Dispatchers.Main) {
@@ -330,11 +329,10 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
         return selectedProxyType == AppMode.ProxyType.HTTP_SOCKS5.name
     }
 
-    private fun handleOrbotSocks5DbUpdate(): Boolean {
+    private fun handleOrbotSocks5Update(): Boolean {
         val proxyEndpoint = constructProxy()
         return if (proxyEndpoint != null) {
-            proxyEndpointRepository.clearOrbotData()
-            proxyEndpointRepository.insert(proxyEndpoint)
+            appMode.insertOrbotProxy(proxyEndpoint)
             true
         } else {
             Log.w(LOG_TAG_VPN, "Error inserting value in proxy database")
@@ -348,7 +346,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
             persistentState.httpProxyPort = httpsPort!!
             true
         } else {
-            Log.w(LOG_TAG_VPN, "Error setting http proxy for Orbot")
+            Log.w(LOG_TAG_VPN, "could not setup Orbot http proxy with ${httpsIp}:${httpsPort}")
             false
         }
     }

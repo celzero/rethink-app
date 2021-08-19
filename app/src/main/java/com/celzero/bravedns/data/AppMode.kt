@@ -37,6 +37,7 @@ import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_PROXY
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
+import intra.Tunnel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import settings.Settings
@@ -53,10 +54,18 @@ class AppMode internal constructor(private val context: Context,
     companion object {
         private var connectedDNS: MutableLiveData<String> = MutableLiveData()
         var cryptRelayToRemove: String = ""
+
+        fun isFirewallActive(mode: TunnelMode): Boolean {
+            return mode.dnsMode == Settings.DNSModeNone && mode.firewallMode != Settings.BlockModeNone
+        }
+    }
+
+    init {
+        connectedDNS.postValue(persistentState.connectedDnsName)
     }
 
     enum class AppState(val state: Int) {
-        PAUSE(10), ACTIVE(11)
+        PAUSED(10), ACTIVE(11)
     }
 
     data class TunnelMode(val dnsMode: Long, val firewallMode: Long, val proxyMode: Long)
@@ -138,14 +147,12 @@ class AppMode internal constructor(private val context: Context,
 
     private fun fetchProxyModeFromDb(): Long {
         val dnsProxy = dnsProxyEndpointRepository.getConnectedProxy()
-        val proxyTypeInternal = "Internal"
-        val proxyTypeExternal = "External"
 
         return when (dnsProxy.proxyType) {
-            proxyTypeInternal -> {
+            DNSProxyEndpointRepository.INTERNAL -> {
                 Settings.DNSModeProxyPort
             }
-            proxyTypeExternal -> {
+            DNSProxyEndpointRepository.EXTERNAL -> {
                 Settings.DNSModeProxyIP
             }
             else -> {
@@ -155,7 +162,6 @@ class AppMode internal constructor(private val context: Context,
     }
 
     fun getConnectedDnsObservable(): MutableLiveData<String> {
-        connectedDNS.postValue(persistentState.connectedDnsName)
         return connectedDNS
     }
 
@@ -179,11 +185,10 @@ class AppMode internal constructor(private val context: Context,
         return dnsProxyEndpointRepository.getConnectedProxy()
     }
 
-    fun getDnscryptCountLiveDataObserver(): LiveData<Int> {
+    fun getDnscryptCountObserver(): LiveData<Int> {
         return dnsCryptEndpointRepository.getConnectedCountLiveData()
     }
 
-    // FIXME: Check if the below usage of variables can be reduced.
     private fun onNewDnsConnected(dt: Int) {
         if (!isValidDnsType(dt)) return
 
@@ -250,7 +255,7 @@ class AppMode internal constructor(private val context: Context,
 
     fun setAppState(appState: AppState) {
         persistentState.appState = appState.state
-        persistentState.appStateLiveData.postValue(appState)
+        persistentState.appStateObserver.postValue(appState)
     }
 
     // Value stored in persistent state is of type Int (AppState.state)
@@ -258,7 +263,15 @@ class AppMode internal constructor(private val context: Context,
         return persistentState.appState
     }
 
-    suspend fun makeTunnelDataClass(): TunnelMode {
+    fun isAppPaused(): Boolean {
+        return getAppState() == AppState.PAUSED.state
+    }
+
+    fun isAppActive(): Boolean {
+        return getAppState() == AppState.ACTIVE.state
+    }
+
+    suspend fun newTunnelMode(): TunnelMode {
         return TunnelMode(getDnsMode(), getFirewallMode(), getProxyMode())
     }
 
@@ -358,9 +371,22 @@ class AppMode internal constructor(private val context: Context,
         onNewDnsConnected(PREF_DNS_MODE_DOH)
     }
 
-    suspend fun updateDnsRethinkPlusStamp(stamp: String) {
+    fun getDnsRethinkEndpoint(): DoHEndpoint {
+        return doHEndpointRepository.getRethinkDnsEndpoint()
+    }
+
+    fun getRemoteBlocklistCount(): Int {
+        return persistentState.getRemoteBlocklistCount()
+    }
+
+    fun isRethinkDnsPlus(dohName: String): Boolean {
+        return Constants.RETHINK_DNS_PLUS == dohName
+    }
+
+    suspend fun updateRethinkDnsPlusStamp(stamp: String, count: Int) {
         removeConnectionStatus()
         doHEndpointRepository.updateConnectionURL(stamp)
+        persistentState.setRemoteBlocklistCount(count)
         onNewDnsConnected(PREF_DNS_MODE_DOH)
     }
 
@@ -607,6 +633,17 @@ class AppMode internal constructor(private val context: Context,
 
     fun getConnectedSocks5Proxy(): ProxyEndpoint? {
         return proxyEndpointRepository.getConnectedProxy()
+    }
+
+    fun insertCustomSocks5Proxy(proxyEndpoint: ProxyEndpoint) {
+        proxyEndpointRepository.clearAllData()
+        proxyEndpointRepository.insert(proxyEndpoint)
+        addProxy(ProxyType.SOCKS5, ProxyProvider.CUSTOM)
+    }
+
+    fun insertOrbotProxy(proxyEndpoint: ProxyEndpoint) {
+        proxyEndpointRepository.clearOrbotData()
+        proxyEndpointRepository.insert(proxyEndpoint)
     }
 
     val connectedProxy: LiveData<ProxyEndpoint> = liveData {

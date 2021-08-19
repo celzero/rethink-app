@@ -54,8 +54,10 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
     private var numBlockedRequests: Long = 0
 
     init {
+        // initialize values from persistence state
         numRequests = persistentState.numberOfRequests
         numBlockedRequests = persistentState.numberOfBlockedRequests
+        // initialize the live data values
         persistentState.dnsRequestsCountLiveData.postValue(numRequests)
         persistentState.dnsBlockedCountLiveData.postValue(numBlockedRequests)
     }

@@ -37,7 +37,7 @@ object FirewallRules {
     const val UID_EVERYBODY = -1000
 
     fun clearFirewallRules(uid: Int, blockedConnectionsRepository: BlockedConnectionsRepository) {
-        io() {
+        io {
             blockedConnectionsRepository.clearFirewallRules(uid)
         }
         appIpRules.removeAll(uid)
@@ -50,7 +50,7 @@ object FirewallRules {
             return
         }
 
-        io() {
+        io {
             if (uid == UID_EVERYBODY) blockedConnectionsRepository.deleteIPRulesUniversal(ipAddress)
             else blockedConnectionsRepository.deleteIPRulesForUID(uid, ipAddress)
         }
@@ -60,7 +60,7 @@ object FirewallRules {
     fun addFirewallRules(uid: Int, ipAddress: String, ruleType: String,
                          blockedConnectionsRepository: BlockedConnectionsRepository) {
         if (DEBUG) Log.d(LOG_TAG_FIREWALL, "addFirewallRules: $uid, $ipAddress")
-        io() {
+        io {
             val blockedConnection = constructBlockedConnections(uid, ipAddress, ruleType)
             blockedConnectionsRepository.insert(blockedConnection)
         }
@@ -72,14 +72,14 @@ object FirewallRules {
     }
 
     fun clearAllIpRules(blockedConnectionsRepository: BlockedConnectionsRepository) {
-        io() {
+        io {
             blockedConnectionsRepository.deleteAllIPRulesUniversal()
         }
         appIpRules.clear()
     }
 
     fun loadFirewallRules(blockedConnectionsRepository: BlockedConnectionsRepository) {
-        io() {
+        io {
             val rules = blockedConnectionsRepository.getBlockedConnections()
             rules.forEach {
                 val key = it.uid

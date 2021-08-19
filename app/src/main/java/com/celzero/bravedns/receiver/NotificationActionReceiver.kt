@@ -41,7 +41,7 @@ import org.koin.core.component.inject
 
 class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
     private val appMode by inject<AppMode>()
-    private val persistentState by inject<PersistentState>()
+    private val orbotHelper by inject<OrbotHelper>()
 
     override fun onReceive(context: Context, intent: Intent) {
         val action: String? = intent.getStringExtra(Constants.NOTIFICATION_ACTION)
@@ -49,13 +49,13 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         when (action) {
             OrbotHelper.ORBOT_NOTIFICATION_ACTION_TEXT -> {
-                get<OrbotHelper>().openOrbotApp()
+                orbotHelper.openOrbotApp()
             }
             Constants.NOTIF_ACTION_PAUSE_VPN -> {
-                pauseVpn(context)
+                pauseApp(context)
             }
             Constants.NOTIF_ACTION_RESUME_VPN -> {
-                resumeVpn(context)
+                resumeApp()
             }
             Constants.NOTIF_ACTION_STOP_VPN -> {
                 stopVpn(context)
@@ -83,8 +83,8 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
         VpnController.stop(context)
     }
 
-    private fun pauseVpn(context: Context) {
-        if (VpnController.getBraveVpnService() == null) {
+    private fun pauseApp(context: Context) {
+        if (!VpnController.hasTunnel()) {
             Utilities.showToastUiCentered(context,
                                           context.getString(R.string.hsf_pause_vpn_failure),
                                           Toast.LENGTH_SHORT)
@@ -98,24 +98,10 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
             return
         }
 
-        appMode.setAppState(AppMode.AppState.PAUSE)
+        appMode.setAppState(AppMode.AppState.PAUSED)
     }
 
-    private fun resumeVpn(context: Context) {
-        if (VpnController.getBraveVpnService() == null) {
-            Utilities.showToastUiCentered(context,
-                                          context.getString(R.string.hsf_pause_vpn_failure),
-                                          Toast.LENGTH_SHORT)
-            return
-        }
-
-        if (Utilities.isVpnLockdownEnabled(VpnController.getBraveVpnService())) {
-            Utilities.showToastUiCentered(context,
-                                          context.getString(R.string.hsf_pause_lockdown_failure),
-                                          Toast.LENGTH_SHORT)
-            return
-        }
-
+    private fun resumeApp() {
         appMode.setAppState(AppMode.AppState.ACTIVE)
     }
 

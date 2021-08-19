@@ -27,6 +27,7 @@ import android.widget.Toast
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.databinding.BottomSheetHomeScreenBinding
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.braveModeToggler
 import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS
@@ -49,8 +50,9 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     private val b get() = _binding!!
 
     private val appMode by inject<AppMode>()
+    private val persistentState by inject<PersistentState>()
 
-    override fun getTheme(): Int = getBottomsheetCurrentTheme(isDarkThemeOn())
+    override fun getTheme(): Int = getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
     private fun isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES

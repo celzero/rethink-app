@@ -22,11 +22,15 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import com.celzero.bravedns.automaton.FirewallManager
-import com.celzero.bravedns.service.VpnControllerHelper
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
+import org.koin.android.ext.android.inject
+import org.koin.core.component.KoinComponent
 
-class BackgroundAccessibilityService : AccessibilityService() {
+class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
+
+    private val persistentState by inject<PersistentState>()
 
     override fun onInterrupt() {
         Log.w(LOG_TAG_FIREWALL, "BackgroundAccessibilityService Interrupted")
@@ -103,7 +107,7 @@ class BackgroundAccessibilityService : AccessibilityService() {
     // Now, the firewall manager usage is modified, so moving this part here. 
     fun handleAccessibilityEvent(event: AccessibilityEvent) {
 
-        if (!VpnControllerHelper.persistentState.backgroundEnabled) return
+        if (!persistentState.backgroundEnabled) return
 
         val latestTrackedPackage = getEventPackageName(event)
 

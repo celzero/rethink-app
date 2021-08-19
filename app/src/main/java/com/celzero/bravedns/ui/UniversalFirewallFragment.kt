@@ -172,8 +172,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             val themeID = getCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
             val customDialog = WhitelistAppDialog(requireActivity() as FirewallActivity,
-                                                  recyclerAdapter, appInfoViewModel, themeID,
-                                                  isChip = false)
+                                                  recyclerAdapter, appInfoViewModel, themeID)
             customDialog.setCanceledOnTouchOutside(false)
             customDialog.show()
 

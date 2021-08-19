@@ -15,8 +15,8 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui
 
+import android.app.Activity
 import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.view.Window
@@ -25,6 +25,7 @@ import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
@@ -34,11 +35,10 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.AppListViewModel
 import com.google.android.material.chip.Chip
 
-class WhitelistAppDialog(var activity: Context, internal var adapter: RecyclerView.Adapter<*>,
-                         var viewModel: AppListViewModel, themeID: Int,
-                         private val isChip: Boolean) : Dialog(activity, themeID),
-                                                        View.OnClickListener,
-                                                        SearchView.OnQueryTextListener {
+class WhitelistAppDialog(val activity: Activity, val adapter: RecyclerView.Adapter<*>,
+                         val viewModel: AppListViewModel, val themeID: Int) : Dialog(activity, themeID),
+                                                                      View.OnClickListener,
+                                                                      SearchView.OnQueryTextListener {
 
     private lateinit var b: CustomDialogLayoutBinding
 
@@ -73,21 +73,12 @@ class WhitelistAppDialog(var activity: Context, internal var adapter: RecyclerVi
             false
         }
 
-        if (isChip) {
-            FirewallManager.getApplistObserver().observe(activity as HomeScreenActivity, {
-                val blockedCount = it.filter { a -> a.whiteListUniv1 }.size
-                b.customSelectAllOptionCount.text = context.getString(
-                    R.string.whitelist_dialog_apps_in_use, blockedCount.toString(),
-                    FirewallManager.getTotalApps().toString())
-            })
-        } else {
-            FirewallManager.getApplistObserver().observe(activity as FirewallActivity, {
-                val blockedCount = it.filter { a -> a.whiteListUniv1 }.size
-                b.customSelectAllOptionCount.text = context.getString(
-                    R.string.whitelist_dialog_apps_in_use, blockedCount.toString(),
-                    FirewallManager.getTotalApps().toString())
-            })
-        }
+        FirewallManager.getApplistObserver().observe(activity as LifecycleOwner, {
+            val blockedCount = it.filter { a -> a.whiteListUniv1 }.size
+            b.customSelectAllOptionCount.text = context.getString(
+                R.string.whitelist_dialog_apps_in_use, blockedCount.toString(),
+                FirewallManager.getTotalApps().toString())
+        })
 
         b.customSelectAllOptionCheckbox.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             FirewallManager.updateWhitelistedAppsByCategories(filterCategories, b)

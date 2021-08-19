@@ -118,7 +118,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
 
     private fun updatePersistenceOnCopySuccess(timestamp: Long) {
         persistentState.blocklistDownloadTime = timestamp
-        // update remote blocklist time stamp to the latest files.
+        // update remote blocklist time stamp to the latest
         persistentState.remoteBlocklistDownloadTime = timestamp
         persistentState.blocklistEnabled = true
         persistentState.blocklistFilesDownloaded = true

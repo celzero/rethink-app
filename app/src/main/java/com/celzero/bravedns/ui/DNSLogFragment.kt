@@ -170,7 +170,7 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     }
 
     private fun observeCryptStatus() {
-        appMode.getDnscryptCountLiveDataObserver().observe(viewLifecycleOwner, {
+        appMode.getDnscryptCountObserver().observe(viewLifecycleOwner, {
             val connectedCrypt = getString(R.string.configure_dns_crypt, it.toString())
             b.connectedStatusTitle.text = connectedCrypt
         })

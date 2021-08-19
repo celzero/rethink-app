@@ -28,7 +28,6 @@ import android.net.ProxyInfo
 import android.net.VpnService
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
-import android.os.CountDownTimer
 import android.os.SystemClock.elapsedRealtime
 import android.service.quicksettings.TileService.requestListeningState
 import android.util.Log
@@ -54,7 +53,7 @@ import com.celzero.bravedns.ui.FirewallActivity
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.*
-import com.celzero.bravedns.util.Constants.Companion.DEFAULT_PAUSE_TIMER
+import com.celzero.bravedns.util.Constants.Companion.DEFAULT_PAUSE_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME
@@ -86,6 +85,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
 
     @GuardedBy("vpnController") private var connectionMonitor: ConnectionMonitor? = null
     @GuardedBy("vpnController") private var vpnAdapter: GoVpnAdapter? = null
+    @GuardedBy("vpnController") private var pauseTimer: PauseTimer? = null
 
     companion object {
         private const val DNS_REQUEST_PORT = 53
@@ -121,9 +121,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     private val rand: Random = Random
 
     private val appMode by inject<AppMode>()
+    private val orbotHelper by inject<OrbotHelper>()
     private val ipTracker by inject<IPTracker>()
     private val dnsLogTracker by inject<DNSLogTracker>()
-    private val persistentState by inject<PersistentState>()
+    val persistentState by inject<PersistentState>()
     private val dnsLatencyTracker by inject<QueryTracker>()
 
     @Volatile private var isAccessibilityServiceFunctional: Boolean = false
@@ -133,10 +134,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     private lateinit var activityManager: ActivityManager
     private lateinit var accessibilityManager: AccessibilityManager
     private var keyguardManager: KeyguardManager? = null
-
-    var pauseTimer: CountDownTimer? = null
-    var pauseRemainingTime: Long? = DEFAULT_PAUSE_TIMER
-    var updateTimerLiveData: MutableLiveData<Long> = MutableLiveData()
 
     private var accessibilityListener: AccessibilityManager.AccessibilityStateChangeListener? = null
 
@@ -154,7 +151,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                                            second[second.size - 1].toInt())
 
         // creating reusable IO() method for coroutine call causing compiler error.
-        // so using the coroutine everywhere.
+        // ERROR: Suspend function 'handleVpnLockdownState' should be called only from a coroutine
+        // or another suspend function.
         CoroutineScope(Dispatchers.IO).launch {
             handleVpnLockdownState()
         }
@@ -235,10 +233,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 // FIXME: 04-12-2020 Removed the app range check for testing.
                 var isBGBlock = true
 
-                // Introducing exponential calculation for the wait time.
-                // initially the thread sleep was done with constant time. for eg., thread
-                // will sleep for 2 secs and will check if the app is in foreground or not.
-                // To avoid the constant time wait introduced the exponential logic below.
+                // check if an app happens to come to the foreground and so is unblocked
+                // by exponentially backing-off over a period of remainingTimeMs
                 val bgBlockWaitMs = TimeUnit.SECONDS.toMillis(20)
                 var remainingWaitMs = TimeUnit.SECONDS.toMillis(10)
                 var attempt = 0
@@ -284,6 +280,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 isBlocked = FirewallRules.hasRule(UID_EVERYBODY, connectionRules)
                 if (isBlocked) blockedBy = FirewallRuleset.RULE2.ruleName
             } // fall-through
+
             ipDetails.isBlocked = isBlocked
             ipDetails.blockedByRule = blockedBy
             connTrack(ipDetails)
@@ -577,18 +574,18 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         }
 
         if (VERSION.SDK_INT >= VERSION_CODES.Q) {
-            if (!isVpnLockdownEnabled(this) && (appMode.isHttpProxyTypeEnabled())) {
+            if (!isVpnLockdownEnabled(this) && appMode.isHttpProxyTypeEnabled()) {
                 getHttpProxyInfo()?.let { builder.setHttpProxy(it) }
             }
         }
 
         try {
             if (!isVpnLockdownEnabled(
-                    this) && appMode.getAppState() == AppMode.AppState.PAUSE.state) {
-                val allApps = FirewallManager.getNonFirewalledAppsPackageNames()
+                    this) && appMode.isAppPaused()) {
+                val nonFirewalledApps = FirewallManager.getNonFirewalledAppsPackageNames()
                 Log.i(LOG_TAG_VPN,
-                      "app is in pause state, exclude all the non firewalled apps, size: ${allApps.size}")
-                allApps.forEach {
+                      "app is in pause state, exclude all the non firewalled apps, size: ${nonFirewalledApps.size}")
+                nonFirewalledApps.forEach {
                     builder.addDisallowedApplication(it.packageInfo)
                 }
                 builder = builder.addDisallowedApplication(this.packageName)
@@ -716,7 +713,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             else -> context.resources.getString(R.string.notification_title)
         }
 
-        if (appMode.getAppState() == AppMode.AppState.PAUSE.state) {
+        if (appMode.isAppPaused()) {
             contentTitle = context.resources.getString(R.string.pause_mode_notification_title)
         }
 
@@ -724,37 +721,37 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             mainActivityIntent)
 
         // New action button options in the notification
-        // 1. PAUSE/RESUME, STOP action button.
-        // 2. RethinkDNS modes (DNS & DNS+Firewall mode)
+        // 1. Pause / Resume, Stop action button.
+        // 2. RethinkDNS modes (dns & dns+firewall mode)
         // 3. No action button.
-        if (DEBUG) Log.d(LOG_TAG_VPN, "Notification - ${persistentState.notificationAction}")
+        if (DEBUG) Log.d(LOG_TAG_VPN, "Notification - ${persistentState.notificationActionType}")
         builder.color = ContextCompat.getColor(this, getThemeAccent(this))
-        when (persistentState.notificationAction) {
+        when (persistentState.notificationActionType) {
             Constants.NOTIFICATION_ACTION_STOP -> {
                 // Add the action based on AppState (PAUSE/ACTIVE)
-                if (appMode.getAppState() == AppMode.AppState.PAUSE.state) {
-                    val openIntent1 = makeVpnIntent(context, NOTIF_ACTION_MODE_RESUME,
+                if (appMode.isAppPaused()) {
+                    val openIntent2 = makeVpnIntent(context, NOTIF_ACTION_MODE_RESUME,
                                                     Constants.NOTIF_ACTION_RESUME_VPN)
-                    val notificationAction1 = NotificationCompat.Action(0,
+                    val notificationAction2 = NotificationCompat.Action(0,
                                                                         context.resources.getString(
                                                                             R.string.notification_action_resume_vpn),
-                                                                        openIntent1)
-                    builder.addAction(notificationAction1)
+                                                                        openIntent2)
+                    builder.addAction(notificationAction2)
                 } else {
-                    val openIntent1 = makeVpnIntent(context, NOTIF_ACTION_MODE_PAUSE,
+                    val openIntent2 = makeVpnIntent(context, NOTIF_ACTION_MODE_PAUSE,
                                                     Constants.NOTIF_ACTION_PAUSE_VPN)
-                    val notificationAction1 = NotificationCompat.Action(0,
+                    val notificationAction2 = NotificationCompat.Action(0,
                                                                         context.resources.getString(
                                                                             R.string.notification_action_pause_vpn),
-                                                                        openIntent1)
-                    builder.addAction(notificationAction1)
+                                                                        openIntent2)
+                    builder.addAction(notificationAction2)
                 }
 
-                val openIntent2 = makeVpnIntent(context, NOTIF_ACTION_MODE_STOP,
+                val openIntent1 = makeVpnIntent(context, NOTIF_ACTION_MODE_STOP,
                                                 Constants.NOTIF_ACTION_STOP_VPN)
-                val notificationAction2 = NotificationCompat.Action(0, context.resources.getString(
-                    R.string.notification_action_stop_vpn), openIntent2)
-                builder.addAction(notificationAction2)
+                val notificationAction1 = NotificationCompat.Action(0, context.resources.getString(
+                    R.string.notification_action_stop_vpn), openIntent1)
+                builder.addAction(notificationAction1)
             }
             Constants.NOTIFICATION_ACTION_DNS_FIREWALL -> {
                 val openIntent1 = makeVpnIntent(context, NOTIF_ACTION_MODE_DNS_ONLY,
@@ -806,7 +803,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         accessibilityHearbeatTimestamp = INIT_TIME_MS
 
         if (appMode.isOrbotProxyEnabled()) {
-            get<OrbotHelper>().startOrbot(appMode.getProxyType())
+            orbotHelper.startOrbot(appMode.getProxyType())
         }
         if (persistentState.backgroundEnabled) {
             registerAccessibilityServiceState()
@@ -824,7 +821,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             // spawnServerUpdate() - Will overwrite the tunnel values with new values.
             if (connectionMonitor != null) {
                 CoroutineScope(Dispatchers.IO).launch {
-                    spawnServerUpdate(appMode.makeTunnelDataClass())
+                    spawnServerUpdate(appMode.newTunnelMode())
                 }
                 return Service.START_REDELIVER_INTENT
             }
@@ -833,7 +830,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             // FIXME #200 - Move it to Koin
             connectionMonitor = ConnectionMonitor(this, this)
             CoroutineScope(Dispatchers.IO).launch {
-                restartVpn(appMode.makeTunnelDataClass())
+                restartVpn(appMode.newTunnelMode())
             }
             // Mark this as a foreground service.  This is normally done to ensure that the service
             // survives under memory pressure.  Since this is a VPN service, it is presumably protected
@@ -927,7 +924,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
            Check on updating the values for Package change and for mode change.
            As of now handled manually */
         Log.i(LOG_TAG_VPN,
-              "SharedPref value for key: $key with notification action: ${persistentState.notificationAction}, proxy: ${appMode.getProxyMode()}")
+              "SharedPref value for key: $key with notification action: ${persistentState.notificationActionType}, proxy: ${appMode.getProxyMode()}")
         when (key) {
             PersistentState.BRAVE_MODE -> {
                 if (vpnAdapter == null) {
@@ -936,19 +933,19 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                     return
                 }
                 CoroutineScope(Dispatchers.IO).launch {
-                    restartVpn(appMode.makeTunnelDataClass())
+                    restartVpn(appMode.newTunnelMode())
                 }
                 val builder = updateNotificationBuilder(this)
                 notificationManager.notify(SERVICE_ID, builder.build())
             }
             PersistentState.EXCLUDE_FROM_VPN -> {
                 CoroutineScope(Dispatchers.IO).launch {
-                    restartVpn(appMode.makeTunnelDataClass())
+                    restartVpn(appMode.newTunnelMode())
                 }
             }
             PersistentState.LOCAL_BLOCK_LIST -> {
                 CoroutineScope(Dispatchers.IO).launch {
-                    spawnServerUpdate(appMode.makeTunnelDataClass())
+                    spawnServerUpdate(appMode.newTunnelMode())
                 }
             }
             PersistentState.BACKGROUND_MODE -> {
@@ -960,12 +957,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             }
             PersistentState.LOCAL_BLOCK_LIST_STAMP -> { // update tunnel on local blocklist stamp change
                 CoroutineScope(Dispatchers.IO).launch {
-                    spawnServerUpdate(appMode.makeTunnelDataClass())
+                    spawnServerUpdate(appMode.newTunnelMode())
                 }
             }
             PersistentState.REMOTE_BLOCK_LIST_STAMP -> { // update tunnel on remote blocklist stamp change.
                 CoroutineScope(Dispatchers.IO).launch {
-                    spawnServerUpdate(appMode.makeTunnelDataClass())
+                    spawnServerUpdate(appMode.newTunnelMode())
                 }
             }
             PersistentState.DNS_CHANGE -> {
@@ -978,30 +975,30 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 CoroutineScope(Dispatchers.IO).launch {
                     when (appMode.getDnsType()) {
                         PREF_DNS_MODE_PROXY -> {
-                            restartVpn(appMode.makeTunnelDataClass())
+                            restartVpn(appMode.newTunnelMode())
                         }
                         PREF_DNS_MODE_DNSCRYPT -> {
-                            setCryptMode(appMode.makeTunnelDataClass())
+                            setCryptMode(appMode.newTunnelMode())
                         }
                         else -> {
-                            spawnServerUpdate(appMode.makeTunnelDataClass())
+                            spawnServerUpdate(appMode.newTunnelMode())
                         }
                     }
                 }
             }
             PersistentState.DNS_RELAYS -> {
                 CoroutineScope(Dispatchers.IO).launch {
-                    setCryptMode(appMode.makeTunnelDataClass())
+                    setCryptMode(appMode.newTunnelMode())
                 }
             }
             PersistentState.ALLOW_BYPASS -> {
                 CoroutineScope(Dispatchers.IO).launch {
-                    restartVpn(appMode.makeTunnelDataClass())
+                    restartVpn(appMode.newTunnelMode())
                 }
             }
             PersistentState.PROXY_TYPE -> {
                 CoroutineScope(Dispatchers.IO).launch {
-                    restartVpn(appMode.makeTunnelDataClass())
+                    restartVpn(appMode.newTunnelMode())
                 }
             }
             PersistentState.NETWORK -> {
@@ -1012,13 +1009,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 notificationManager.notify(SERVICE_ID, builder.build())
             }
             PersistentState.APP_STATE -> {
-                if (appMode.getAppState() == AppMode.AppState.PAUSE.state) {
-                    startCountDownTimer(pauseRemainingTime)
+                if (appMode.isAppPaused()) {
+                    startCountDownTimer()
                 } else {
                     stopCountDownTimer()
                 }
                 CoroutineScope(Dispatchers.IO).launch {
-                    restartVpn(appMode.makeTunnelDataClass())
+                    restartVpn(appMode.newTunnelMode())
                 }
                 val builder = updateNotificationBuilder(this)
                 notificationManager.notify(SERVICE_ID, builder.build())
@@ -1102,11 +1099,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
 
     private fun handleAdapterChange(tunnelMode: AppMode.TunnelMode) {
         // Case: Set state to working in case of Firewall mode
-        if (tunnelMode.dnsMode == Settings.DNSModeNone && tunnelMode.firewallMode != Settings.BlockModeNone) {
+        if (AppMode.isFirewallActive(tunnelMode)) {
             return VpnController.onConnectionStateChanged(State.WORKING)
         }
 
-        // Case: Update to failing when the tunnel creation failed.
+        // edge-case: mark connection-state as 'failing' when underlying tunnel does not exist
         if (!hasTunnel()) {
             return VpnController.onConnectionStateChanged(State.FAILING)
         }
@@ -1136,7 +1133,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     private suspend fun handleVpnLockdownState() {
         if (syncLockdownState()) {
             if (DEBUG) Log.d(LOG_TAG_VPN, "Lockdown mode has switched, restarting vpn")
-            restartVpn(appMode.makeTunnelDataClass())
+            restartVpn(appMode.newTunnelMode())
+        }
+
+        // edge-case: there is no call-back for the lockdown mode so using this check, when the
+        // lockdown mode is detected, set the app state as ACTIVE regardless of the current state
+        if (isVpnLockdownEnabled(this)) {
+            appMode.setAppState(AppMode.AppState.ACTIVE)
         }
     }
 
@@ -1152,7 +1155,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     override fun onDestroy() {
         try {
             unregisterAccessibilityServiceState()
-            get<OrbotHelper>().unregisterReceiver()
+            orbotHelper.unregisterReceiver()
             persistentState.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
         } catch (e: IllegalArgumentException) {
             Log.w(LOG_TAG_VPN, "Unregister receiver error: ${e.message}")
@@ -1173,34 +1176,27 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         }
     }
 
-    fun startCountDownTimer(timeInMills: Long?) {
-        pauseRemainingTime = timeInMills
-
-        if (pauseRemainingTime == null) {
-            appMode.setAppState(AppMode.AppState.ACTIVE)
-            return
+    private fun startCountDownTimer() {
+        if(pauseTimer == null) {
+            pauseTimer = PauseTimer(appMode)
         }
 
-        pauseTimer?.cancel()
-        pauseTimer = object : CountDownTimer(pauseRemainingTime!!,
-                                             1000) { // asserting the time as there is null check above
-            override fun onTick(millisUntilFinished: Long) {
-                pauseRemainingTime = millisUntilFinished
-                updateTimerLiveData.postValue(millisUntilFinished)
-            }
-
-            override fun onFinish() {
-                Log.d(LOG_TAG_VPN, "Timer count down timer onFinish.")
-                appMode.setAppState(AppMode.AppState.ACTIVE)
-                updateTimerLiveData.postValue(0)
-            }
-        }.start()
+        pauseTimer!!.startCountDownTimer(DEFAULT_PAUSE_TIME_MS)
     }
 
-    private fun stopCountDownTimer() {
-        pauseTimer?.cancel()
-        pauseRemainingTime = DEFAULT_PAUSE_TIMER
-        updateTimerLiveData.postValue(0)
+    fun stopCountDownTimer() {
+        pauseTimer?.stopCountDownTimer()
     }
 
+    fun incrementTimer(timeInMills: Long) {
+        pauseTimer?.incrementTimer(timeInMills)
+    }
+
+    fun decrementTimer(timeInMills: Long) {
+        pauseTimer?.decrementTimer(timeInMills)
+    }
+
+    fun getPauseCountdownObserver(): MutableLiveData<Long>? {
+        return pauseTimer?.getPauseCountdownObserver()
+    }
 }

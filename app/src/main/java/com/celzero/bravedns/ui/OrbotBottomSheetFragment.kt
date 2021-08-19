@@ -80,7 +80,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
 
-    override fun getTheme(): Int = Utilities.getBottomsheetCurrentTheme(isDarkThemeOn())
+    override fun getTheme(): Int = Utilities.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -98,7 +98,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun handleHttpUI() {
-        // the http proxy api for VPN's is available only on Android Q+.
+        // http proxy is only supported on Android Q and above
         if (!isAtleastQ()) {
             b.bsOrbotHttpRl.visibility = View.GONE
             b.bsOrbotBothRl.visibility = View.GONE
@@ -188,8 +188,8 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun handleOrbotStop() {
-        disableOrbot()
-        showOrbotStopDialog()
+        stopOrbot()
+        showStopOrbotDialog()
     }
 
     private fun updateUi() {
@@ -289,7 +289,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
     /**
      * Stop the Orbot - Calls the Orbot helper to initiate the stop orbot call.
      */
-    private fun disableOrbot() {
+    private fun stopOrbot() {
         appMode.removeProxy(AppMode.ProxyType.NONE, AppMode.ProxyProvider.NONE)
         b.bsOrbotRadioSocks5.isChecked = false
         b.bsOrbotRadioHttp.isChecked = false
@@ -337,8 +337,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
             return
         }
 
-        val vpnService = VpnController.getBraveVpnService()
-        if (vpnService != null) {
+        if (VpnController.hasTunnel()) {
             orbotHelper.startOrbot(type)
         } else {
             Utilities.showToastUiCentered(requireContext(),
@@ -347,7 +346,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun showOrbotStopDialog() {
+    private fun showStopOrbotDialog() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle(getString(R.string.orbot_stop_dialog_title))
         builder.setMessage(getString(R.string.orbot_stop_dialog_message))

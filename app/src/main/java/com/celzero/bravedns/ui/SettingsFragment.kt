@@ -62,8 +62,8 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.delay
 import com.celzero.bravedns.util.Utilities.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
-import com.celzero.bravedns.util.Utilities.Companion.isFdroidBuild
-import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreBuild
+import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
+import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.Companion.isVpnLockdownEnabled
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 import com.celzero.bravedns.viewmodel.ExcludedAppViewModel
@@ -88,7 +88,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     private var proxyEndpoint: ProxyEndpoint? = null
 
-    private val proxyEndpointRepository by inject<ProxyEndpointRepository>()
+    // private val proxyEndpointRepository by inject<ProxyEndpointRepository>()
     private val persistentState by inject<PersistentState>()
     private val appMode by inject<AppMode>()
     private val orbotHelper by inject<OrbotHelper>()
@@ -104,7 +104,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityAllowBypassProgress.visibility = View.GONE
         b.settingsActivityHttpProxyProgress.visibility = View.GONE
 
-        if (isFdroidBuild()) {
+        if (isFdroidFlavour()) {
             b.settingsActivityCheckUpdateRl.visibility = View.GONE
         }
 
@@ -188,7 +188,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     private fun displayNotificationActionUi() {
         b.settingsActivityNotificationRl.isEnabled = true
-        when (persistentState.notificationAction) {
+        when (persistentState.notificationActionType) {
             Constants.NOTIFICATION_ACTION_STOP -> {
                 b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,
                                                                getString(
@@ -465,7 +465,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     }
 
     private fun refreshOnDeviceBlocklistUi() {
-        if (isPlayStoreBuild()) { // hide the parent view
+        if (isPlayStoreFlavour()) { // hide the parent view
             b.settingsActivityOnDeviceBlockRl.visibility = View.GONE
             return
         }
@@ -787,10 +787,10 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         val items = arrayOf(getString(R.string.settings_notification_dialog_option_1),
                             getString(R.string.settings_notification_dialog_option_2),
                             getString(R.string.settings_notification_dialog_option_3))
-        val checkedItem = persistentState.notificationAction
+        val checkedItem = persistentState.notificationActionType
         alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
             dialog.dismiss()
-            if (persistentState.notificationAction == which) {
+            if (persistentState.notificationActionType == which) {
                 return@setSingleChoiceItems
             }
 
@@ -799,19 +799,19 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                     b.genSettingsNotificationDesc.text = getString(
                         R.string.settings_notification_desc,
                         getString(R.string.settings_notification_desc1))
-                    persistentState.notificationAction = Constants.NOTIFICATION_ACTION_STOP
+                    persistentState.notificationActionType = Constants.NOTIFICATION_ACTION_STOP
                 }
                 Constants.NOTIFICATION_ACTION_DNS_FIREWALL -> {
                     b.genSettingsNotificationDesc.text = getString(
                         R.string.settings_notification_desc,
                         getString(R.string.settings_notification_desc2))
-                    persistentState.notificationAction = Constants.NOTIFICATION_ACTION_DNS_FIREWALL
+                    persistentState.notificationActionType = Constants.NOTIFICATION_ACTION_DNS_FIREWALL
                 }
                 Constants.NOTIFICATION_ACTION_NONE -> {
                     b.genSettingsNotificationDesc.text = getString(
                         R.string.settings_notification_desc,
                         getString(R.string.settings_notification_desc3))
-                    persistentState.notificationAction = Constants.NOTIFICATION_ACTION_NONE
+                    persistentState.notificationActionType = Constants.NOTIFICATION_ACTION_NONE
                 }
             }
         }
@@ -1161,9 +1161,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                                               isCustom = true, isUDP = isUDPBlock,
                                               modifiedDataTime = 0L, latency = 0)
 
-            proxyEndpointRepository.clearAllData()
-            proxyEndpointRepository.insert(proxyEndpoint)
-            appMode.addProxy(AppMode.ProxyType.SOCKS5, AppMode.ProxyProvider.CUSTOM)
+            appMode.insertCustomSocks5Proxy(proxyEndpoint)
         }
     }
 
