@@ -1,18 +1,18 @@
 /*
-Copyright 2020 RethinkDNS and its authors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2020 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.celzero.bravedns.util
 
 import android.accessibilityservice.AccessibilityService
@@ -42,7 +42,8 @@ class BackgroundAccessibilityService : AccessibilityService() {
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
         // Commenting out the below code - warning during the build process
-        /*if(DEBUG) {
+        /*
+        if(DEBUG) {
             val eventText = when (event.eventType) {
                 TYPE_VIEW_CLICKED -> "Clicked: "
                 TYPE_WINDOWS_CHANGED -> "WindowsChanged: "
@@ -91,10 +92,10 @@ class BackgroundAccessibilityService : AccessibilityService() {
                 TYPE_VIEW_TEXT_SELECTION_CHANGED -> "TypeViewTextSelectionChanged: "
                 else -> "Default: "
             } + event.contentDescription + " " + event.text
-        }*/
-        /*Log.w("______","onAEvent: sourcepack " + event.source?.packageName + " text? " +
-                eventText + " class? " + event.className +
-                " package? ppp " + event.packageName)*/
+        }
+        Log.w(LOG_TAG_FIREWALL, "onAccessibilityEvent: sourcePkg? " + event.source?.packageName +
+                " text? " + eventText + " class? " + event.className + " eventPkg? " + event.packageName)
+        */
         handleAccessibilityEvent(event)
     }
 
@@ -125,6 +126,7 @@ class BackgroundAccessibilityService : AccessibilityService() {
         // https://stackoverflow.com/a/27642535
         // top window is launcher? try revoke queued up permissions
         // FIXME: Figure out a fool-proof way to determine is launcher visible
+        // TODO: Handle widgets on the homescreen
         if (isPackageLauncher(latestTrackedPackage)) {
             FirewallManager.untrackForegroundApps()
         } else {
