@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/bs_conn_top_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -36,6 +37,21 @@
             android:textSize="@dimen/extra_large_font_text_view"
             android:textStyle="bold" />
     </RelativeLayout>
+
+    <TextView
+        android:id="@+id/bs_home_screen_vpn_lockdown_desc"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        app:drawableStartCompat="@drawable/dis_allowed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawablePadding="10dp"
+        android:paddingStart="10dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="10dp"
+        android:text="@string/hs_btm_sheet_lock_down"
+        android:textSize="@dimen/default_font_text_view"
+        android:visibility="visible" />
 
     <RadioGroup
         android:id="@+id/bs_home_screen_radio_group"
@@ -339,7 +355,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/bs_home_screen_connected_status"
-            android:layout_margin="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
             android:gravity="center"
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/default_font_text_view" />

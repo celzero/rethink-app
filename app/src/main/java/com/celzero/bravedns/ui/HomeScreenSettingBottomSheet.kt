@@ -28,8 +28,10 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.databinding.BottomSheetHomeScreenBinding
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -99,6 +101,11 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        handleLockdownModeIfNeeded()
+    }
+
     private fun initializeClickListeners() {
         b.bsHomeScreenRadioDns.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
             handleDNSMode(isSelected)
@@ -140,6 +147,28 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
             showToastUiCentered(requireContext(), getString(R.string.coming_soon_toast),
                                 Toast.LENGTH_SHORT)
         }
+
+        b.bsHomeScreenVpnLockdownDesc.setOnClickListener {
+            Utilities.openVpnProfile(requireContext())
+        }
+    }
+
+    // disable dns and firewall mode, show user that vpn in lockdown mode indicator if needed
+    private fun handleLockdownModeIfNeeded() {
+        val isLockdown = Utilities.isVpnLockdownEnabled(VpnController.getBraveVpnService())
+        if (isLockdown) {
+            b.bsHomeScreenVpnLockdownDesc.visibility = View.VISIBLE
+            b.bsHsDnsRl.alpha = 0.5f
+            b.bsHsFirewallRl.alpha = 0.5f
+        } else {
+            b.bsHomeScreenVpnLockdownDesc.visibility = View.GONE
+            b.bsHsDnsRl.alpha = 1f
+            b.bsHsFirewallRl.alpha = 1f
+        }
+        b.bsHsDnsRl.isEnabled = !isLockdown
+        b.bsHsFirewallRl.isEnabled = !isLockdown
+        b.bsHomeScreenRadioFirewall.isEnabled = !isLockdown
+        b.bsHomeScreenRadioDns.isEnabled = !isLockdown
     }
 
     private fun handleDNSMode(isChecked: Boolean) {

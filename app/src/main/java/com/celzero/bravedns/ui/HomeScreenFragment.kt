@@ -659,6 +659,16 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         syncDnsStatus()
         observeVpnState()
         handleQuickSettingsChips()
+        handleLockdownModeIfNeeded()
+    }
+
+    // set the app mode to dns+firewall mode when vpn in lockdown state
+    private fun handleLockdownModeIfNeeded() {
+        if (!appMode.getBraveMode().isDnsFirewallMode()) {
+            io {
+                appMode.changeBraveMode(AppMode.BraveMode.DNS_FIREWALL.mode)
+            }
+        }
     }
 
     private fun handleShimmer() {
@@ -999,6 +1009,12 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         val color = a.getColor(0, 0)
         a.recycle()
         return color
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            f()
+        }
     }
 
 }
