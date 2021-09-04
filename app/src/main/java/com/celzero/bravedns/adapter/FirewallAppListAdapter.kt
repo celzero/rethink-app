@@ -45,7 +45,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
-
 class FirewallAppListAdapter internal constructor(private val context: Context,
                                                   private val persistentState: PersistentState,
                                                   private var titleList: List<CategoryInfo>,
@@ -230,7 +229,7 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
                     return@setOnClickListener
                 }
             }
-            FirewallManager.updateFirewalledAppsByCategory(categoryInfo, isInternetBlocked)
+            FirewallManager.updateFirewalledAppsByCategories(categoryInfo, isInternetBlocked)
         }
 
         groupViewBinding.expandCheckbox.setOnCheckedChangeListener(null)
@@ -293,7 +292,7 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
 
     private fun showAppWarningText(sysAppWarning: TextView, categoryName: String) {
         sysAppWarning.text = context.getString(R.string.system_app_block_warning,
-                                               categoryName.toLowerCase(Locale.ROOT))
+                                               categoryName.lowercase(Locale.ROOT))
         sysAppWarning.visibility = View.VISIBLE
     }
 
@@ -382,12 +381,12 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
             context.resources.getString(R.string.system_apps_warning_dialog_title,
                                         categoryInfo.categoryName))
         builderSingle.setMessage(context.resources.getString(R.string.system_app_block_warning,
-                                                             categoryInfo.categoryName.toLowerCase(
+                                                             categoryInfo.categoryName.lowercase(
                                                                  Locale.ROOT)))
 
         builderSingle.setPositiveButton(context.resources.getString(
             R.string.system_apps_dialog_positive)) { _: DialogInterface, _: Int ->
-            FirewallManager.updateFirewalledAppsByCategory(categoryInfo, isInternetBlocked = true)
+            FirewallManager.updateFirewalledAppsByCategories(categoryInfo, isInternetBlocked = true)
         }.setNegativeButton(context.resources.getString(
             R.string.system_apps_dialog_negative)) { _: DialogInterface, _: Int ->
             groupViewBinding.expandCheckbox.isChecked = false

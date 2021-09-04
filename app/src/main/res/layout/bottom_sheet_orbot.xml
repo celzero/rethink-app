@@ -52,10 +52,10 @@
             android:id="@+id/orbot_info_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_toEndOf="@id/bs_orbot_app"
             android:layout_centerVertical="true"
+            android:layout_gravity="end"
             android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/bs_orbot_app"
             android:contentDescription="@string/orbot_explanation"
             android:src="@drawable/brave_mode_info" />
     </RelativeLayout>

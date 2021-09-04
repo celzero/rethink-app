@@ -65,14 +65,14 @@ class ApkListAdapter(var apkList: ArrayList<Apk>, private val context: Context) 
         var charText = c
         println("apkList  : " + apkList.size)
         println("1 apkList Filtered : " + apkListFiltered.size)
-        charText = charText.toLowerCase(Locale.getDefault())
+        charText = charText.lowercase(Locale.getDefault())
         apkList.clear()
         if (charText.isEmpty()) {
             println("apkList Filtered : " + apkListFiltered.size)
             apkList.addAll(apkListFiltered)
         } else {
             for (wp in apkListFiltered) {
-                if (wp.appName.toLowerCase(Locale.getDefault()).contains(charText)) {
+                if (wp.appName.lowercase(Locale.getDefault()).contains(charText)) {
                     apkList.add(wp)
                 }
             }

@@ -21,6 +21,7 @@
     <dimen name="rippleRadius">16dp</dimen>
     <dimen name="maxSize">1000dp</dimen>
 
+    <dimen name="mini_font_text_view">8sp</dimen>
     <dimen name="small_font_text_view">10sp</dimen>
     <dimen name="default_font_text_view">12sp</dimen>
     <dimen name="large_font_text_view">14sp</dimen>

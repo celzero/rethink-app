@@ -65,7 +65,7 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
         try {
             val file = futureTarget.get()
             if (DEBUG) Log.d(LOG_TAG_DNS_LOG,
-                             "Glide - success() -$subUrl, $url, ${file.absoluteFile}")
+                             "Glide - success() -$subUrl, $url")
         } catch (e: Exception) {
             // In case of failure the FutureTarget will throw an exception.
             // Will initiate the download of fav icon for the top level domain.

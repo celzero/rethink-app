@@ -28,6 +28,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ConnectionTrackerAdapter
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.databinding.ActivityConnectionTrackerBinding
+import com.celzero.bravedns.service.DNSLogTracker
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
@@ -54,6 +55,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
 
     private val connectionTrackerDAO by inject<ConnectionTrackerDAO>()
     private val persistentState by inject<PersistentState>()
+    private val dnsLogTracker by inject<DNSLogTracker>()
 
     companion object {
         fun newInstance() = ConnectionTrackerFragment()
@@ -79,7 +81,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         includeView.recyclerConnection.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(requireContext())
         includeView.recyclerConnection.layoutManager = layoutManager
-        val recyclerAdapter = ConnectionTrackerAdapter(requireContext())
+        val recyclerAdapter = ConnectionTrackerAdapter(requireContext(), dnsLogTracker)
         viewModel.connectionTrackerList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
             recyclerAdapter::submitList))
         includeView.recyclerConnection.adapter = recyclerAdapter

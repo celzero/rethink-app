@@ -20,6 +20,7 @@ import android.util.Log
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Utilities.Companion.deleteRecursive
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import java.io.File
 
@@ -60,25 +61,6 @@ class BlocklistDownloadHelper {
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
                              "deleteOldFiles -- File : ${dir.path}, ${dir.isDirectory}")
             deleteRecursive(dir)
-        }
-
-        private fun deleteRecursive(fileOrDirectory: File) {
-            try {
-                if (fileOrDirectory.isDirectory) {
-                    fileOrDirectory.listFiles()?.forEach { child ->
-                        deleteRecursive(child)
-                    }
-                }
-                val isDeleted: Boolean = if (isAtleastO()) {
-                    fileOrDirectory.deleteRecursively()
-                } else {
-                    fileOrDirectory.delete()
-                }
-                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                                 "deleteRecursive -- File : ${fileOrDirectory.path}, $isDeleted")
-            } catch (e: Exception) {
-                Log.w(LOG_TAG_DOWNLOAD, "File delete exception: ${e.message}", e)
-            }
         }
 
         fun deleteFromCanonicalPath(context: Context) {

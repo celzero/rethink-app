@@ -21,15 +21,14 @@ import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.Spanned
+import android.text.TextUtils
 import android.text.format.DateUtils
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.Window
+import android.view.*
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.text.HtmlCompat
+import androidx.core.view.isVisible
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.target.CustomViewTarget
@@ -40,6 +39,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DNSLogs
 import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
+import com.celzero.bravedns.databinding.DialogIpDetailsLayoutBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -48,13 +48,12 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getETldPlus1
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
+import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
-import com.google.common.collect.SetMultimap
 import org.koin.android.ext.android.inject
 import java.util.*
-import kotlin.collections.HashMap
 
 
 class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
@@ -67,7 +66,8 @@ class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
 
     private val persistentState by inject<PersistentState>()
 
-    override fun getTheme(): Int = Utilities.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
+    override fun getTheme(): Int = Utilities.getBottomsheetCurrentTheme(isDarkThemeOn(),
+                                                                        persistentState.theme)
 
     private fun isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
@@ -87,7 +87,7 @@ class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         b.dnsBlockUrl.text = transaction.queryStr
-        b.dnsBlockIpAddress.text = transaction.response
+        b.dnsBlockIpAddress.text = getResponseIp()
         b.dnsBlockConnectionFlag.text = transaction.flag
         b.dnsBlockIpLatency.text = getString(R.string.dns_btm_latency_ms,
                                              transaction.latency.toString())
@@ -101,24 +101,52 @@ class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
         displayDnsTransactionDetails()
     }
 
+    private fun getResponseIp(): String {
+        val ips = transaction.response.split(",")
+        return ips[0]
+    }
+
     private fun displayDnsTransactionDetails() {
         displayDescription()
 
-        if (!transaction.hasBlocklists()) {
-            b.dnsBlockBlocklistChip.visibility = View.GONE
+        if (transaction.hasBlocklists()) {
+            b.dnsBlockBlocklistChip.visibility = View.VISIBLE
+            b.dnsBlockIpsChip.visibility = View.GONE
+            handleBlocklistChip()
             return
         }
 
-        handleChip()
+        b.dnsBlockBlocklistChip.visibility = View.GONE
+        b.dnsBlockIpsChip.visibility = View.VISIBLE
+        handleIpsChip()
     }
 
-    private fun handleChip() {
+    private fun handleIpsChip() {
+        if (transaction.response.isEmpty()) {
+            b.dnsBlockIpsChip.visibility = View.GONE
+            return
+        }
+
+        val ips = transaction.response.split(",")
+
+        if (ips.size > 1) b.dnsBlockIpsChip.text = getString(R.string.dns_btm_sheet_chip,
+                                                             (ips.size - 1).toString())
+        else b.dnsBlockIpsChip.visibility = View.GONE
+
+        b.dnsBlockIpsChip.setOnClickListener {
+            showIpsDialog()
+        }
+    }
+
+    private fun handleBlocklistChip() {
         b.dnsBlockBlocklistChip.visibility = View.VISIBLE
         val group: Multimap<String, String> = HashMultimap.create()
 
         transaction.getBlocklists().forEach {
             val items = it.split(":")
-            group.putAll(items[0], items)
+            if (items.size <= 1) return@forEach
+
+            group.put(items[0], items[1])
         }
 
         val groupCount = group.keys().distinct().count()
@@ -148,13 +176,46 @@ class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
         dialog.show()
     }
 
+    private fun showIpsDialog() {
+        val dialogBinding = DialogIpDetailsLayoutBinding.inflate(layoutInflater)
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCanceledOnTouchOutside(true)
+        dialog.setContentView(dialogBinding.root)
+        val width = (resources.displayMetrics.widthPixels * 0.75).toInt()
+        val height = (resources.displayMetrics.heightPixels * 0.5).toInt()
+        dialog.window?.setLayout(width, height)
+
+        if (b.dnsBlockFavIcon.isVisible) dialogBinding.ipDetailsFavIcon.setImageDrawable(b.dnsBlockFavIcon.drawable)
+        else dialogBinding.ipDetailsFavIcon.visibility = View.GONE
+
+        dialogBinding.ipDetailsFqdnTxt.text = "${transaction.queryStr}\n"
+        dialogBinding.ipDetailsIpDetailsTxt.text = formatIps(transaction.response)
+
+        dialogBinding.infoRulesDialogCancelImg.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
+    private fun formatIps(ips: String): Spanned {
+        val list = ips.split(",")
+        var text = ""
+
+        list.forEach {
+            text += getString(R.string.dns_btm_sheet_dialog_ips,
+                              Utilities.getFlag(it.slice(0..2)), it)
+        }
+        return updateHtmlEncodedText(text)
+    }
+
     private fun formatText(groupNames: Multimap<String, String>): Spanned {
         var text = ""
         groupNames.keys().distinct().forEach {
             val heading = it.capitalize(Locale.getDefault())
             val size = groupNames.get(it).size
             text += getString(R.string.dns_btm_sheet_dialog_message, heading, size.toString(),
-                              groupNames.get(it))
+                              TextUtils.join(", ", groupNames.get(it)))
         }
         text = text.replace(",", ", ")
         return HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)

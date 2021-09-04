@@ -80,7 +80,8 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
 
-    override fun getTheme(): Int = Utilities.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
+    override fun getTheme(): Int = Utilities.getBottomsheetCurrentTheme(isDarkThemeOn(),
+                                                                        persistentState.theme)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

@@ -16,6 +16,7 @@ limitations under the License.
 package com.celzero.bravedns.util
 
 import com.celzero.bravedns.BuildConfig
+import com.celzero.bravedns.R
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -33,21 +34,21 @@ class Constants {
         const val LOCAL_BLOCKLIST_FILE_COUNT = 4
 
         //Download URLs
-        const val JSON_DOWNLOAD_BLOCKLIST_LINK = "https://download.bravedns.com/blocklists"
+        const val JSON_DOWNLOAD_BLOCKLIST_LINK = "https://download.rethinkdns.com/blocklists"
 
         const val REFRESH_BLOCKLIST_URL = "https://download.bravedns.com/update/blocklists?tstamp="
-        const val APP_DOWNLOAD_AVAILABLE_CHECK = "https://download.bravedns.com/update/app?vcode="
-        const val CONFIGURE_BLOCKLIST_URL = "https://bravedns.com/configure?v=app"
+        const val APP_DOWNLOAD_AVAILABLE_CHECK = "https://download.rethinkdns.com/update/app?vcode="
+        const val CONFIGURE_BLOCKLIST_URL = "https://rethinkdns.com/configure?v=app"
         const val CONFIGURE_BLOCKLIST_URL_PARAMETER = "tstamp"
         const val FILE_TAG_JSON = "filetag.json"
 
         // The version tag value(response) for the update check.
         const val RESPONSE_VERSION = 1
 
-        val DOWNLOAD_URLS = listOf("https://download.bravedns.com/blocklists",
-                                   "https://download.bravedns.com/basicconfig",
-                                   "https://download.bravedns.com/rank",
-                                   "https://download.bravedns.com/trie")
+        val DOWNLOAD_URLS = listOf("https://download.rethinkdns.com/blocklists",
+                                   "https://download.rethinkdns.com/basicconfig",
+                                   "https://download.rethinkdns.com/rank",
+                                   "https://download.rethinkdns.com/trie")
 
         val FILE_NAMES = listOf("filetag.json", "basicconfig.json", "rd.txt", "td.txt")
 
@@ -57,8 +58,6 @@ class Constants {
 
         const val BRAVE_BASE_STAMP = "https://basic.bravedns.com/"
         const val BRAVE_CONFIGURE_BASE_STAMP = "rethinkdns.com/configure"
-
-        const val DOWNLOAD_STATUS_SUCCESSFUL = "STATUS_SUCCESSFUL"
 
         const val BRAVE_BASIC_URL = "bravedns.com"
         const val RETHINK_BASIC_URL = "rethinkdns.com"
@@ -148,27 +147,46 @@ class Constants {
 
         const val FAV_ICON_URL = "https://icons.duckduckgo.com/ip2/"
 
-        //Application theme constants
-        const val THEME_SYSTEM_DEFAULT = 0
-        const val THEME_LIGHT = 1
-        const val THEME_DARK = 2
-        const val THEME_TRUE_BLACK = 3
+        // Application themes enum
+        enum class Themes(val id: Int) {
+            SYSTEM_DEFAULT(0), LIGHT(1), DARK(2), TRUE_BLACK(3);
+
+            companion object {
+                fun getThemeCount(): Int {
+                    return values().size
+                }
+
+                fun getTheme(id: Int): Int {
+                    return when (id) {
+                        SYSTEM_DEFAULT.id -> 0
+                        LIGHT.id -> R.style.AppThemeWhite
+                        DARK.id -> R.style.AppTheme
+                        TRUE_BLACK.id -> R.style.AppThemeTrueBlack
+                        else -> 0
+                    }
+                }
+
+                fun getBottomSheetTheme(id: Int): Int {
+                    return when (id) {
+                        SYSTEM_DEFAULT.id -> 0
+                        LIGHT.id -> R.style.BottomSheetDialogThemeWhite
+                        DARK.id -> R.style.BottomSheetDialogTheme
+                        TRUE_BLACK.id -> R.style.BottomSheetDialogThemeTrueBlack
+                        else -> 0
+                    }
+                }
+            }
+        }
 
         // Notification action buttons
         const val NOTIFICATION_ACTION_STOP = 0
         const val NOTIFICATION_ACTION_DNS_FIREWALL = 1
         const val NOTIFICATION_ACTION_NONE = 2
 
-        // DNS MODES
-        const val APP_MODE_DNS = 0
-        const val APP_MODE_FIREWALL = 1
-        const val APP_MODE_DNS_FIREWALL = 2
-
         // DNS TYPES
         const val PREF_DNS_MODE_PROXY = 3
         const val PREF_DNS_MODE_DNSCRYPT = 2
         const val PREF_DNS_MODE_DOH = 1
-        const val PREF_DNS_INVALID = -1L
 
         // The minimum interval before checking if the internal accessibility service
         // (used to block apps-not-in-use) is indeed running.
@@ -213,13 +231,11 @@ class Constants {
         const val INIT_TIME_MS = 0L
 
         // Bug report text file
-        const val BUG_REPORT_FILE = "bug_report.txt"
+        const val BUG_REPORT_DIR_NAME = "bugreport/"
+        const val BUG_REPORT_ZIP_FILE_NAME = "bug_report.zip"
+        const val BUG_REPORT_FILE_NAME = "bugreport_"
 
-        // secondary file path
-        const val PREV_REPORT_FILE = "bug_report_1.txt"
-
-        // Bug report file max size - 10mb
-        const val MAX_BUGREPORT_FILE_SIZE: Long = 10 * 1024 * 1024
+        const val MAX_NUMBER_FILES_ALLOWED = 5
 
         const val FILE_PROVIDER_NAME = BuildConfig.APPLICATION_ID + ".provider"
 
@@ -227,13 +243,13 @@ class Constants {
         const val TIME_FORMAT_2 = "yy.MM (dd)"
         const val TIME_FORMAT_3 = "dd MMMM yyyy, HH:mm:ss"
 
-        // default value for the pause timer - 15 mins
+        // default duration for pause state: 15mins
         val DEFAULT_PAUSE_TIME_MS = TimeUnit.MINUTES.toMillis(15)
 
         // increment/decrement value to pause vpn
         val EXTRA_MILLIS = TimeUnit.MINUTES.toMillis(1)
 
         // play services package name
-        const val PLAY_SERVICE_PKG_NAME = "com.android.vending"
+        const val PKG_NAME_PLAY_STORE = "com.android.vending"
     }
 }

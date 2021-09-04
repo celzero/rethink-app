@@ -71,7 +71,7 @@ class CategoryInfoRepository(private val categoryInfoDAO: CategoryInfoDAO) {
         return categoryInfo.numOfAppsBlocked == categoryInfo.numberOFApps
     }
 
-    fun updateWhitelistCountForAll(checked: Boolean) {
+    fun updateWhitelistCountForAllCategories(checked: Boolean) {
         if (checked) {
             categoryInfoDAO.updateWhitelistCountForAll()
         } else {

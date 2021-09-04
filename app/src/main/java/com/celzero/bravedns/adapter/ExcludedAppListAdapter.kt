@@ -31,12 +31,15 @@ import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.databinding.ExcludedAppListItemBinding
 import com.celzero.bravedns.glide.GlideApp
+import com.celzero.bravedns.ui.ExcludedAppsUpdateInterface
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Utilities.Companion.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.Companion.getIcon
 
 class ExcludedAppListAdapter(private val context: Context) :
         PagedListAdapter<AppInfo, ExcludedAppListAdapter.ExcludedAppInfoViewHolder>(DIFF_CALLBACK) {
+
+    private var updateInterface: ExcludedAppsUpdateInterface? = null
 
     companion object {
 
@@ -61,6 +64,9 @@ class ExcludedAppListAdapter(private val context: Context) :
         holder.update(appInfo)
     }
 
+    fun setUpdateInterface(updateInterface: ExcludedAppsUpdateInterface) {
+        this.updateInterface = updateInterface
+    }
 
     inner class ExcludedAppInfoViewHolder(private val b: ExcludedAppListItemBinding) :
             RecyclerView.ViewHolder(b.root) {
@@ -101,6 +107,7 @@ class ExcludedAppListAdapter(private val context: Context) :
             } else {
                 b.excludedAppListCheckbox.isChecked = appInfo.isExcluded
                 FirewallManager.updateExcludedApps(appInfo, appInfo.isExcluded)
+                updateInterface?.onAppsExcluded()
             }
 
             Log.i(LOG_TAG_FIREWALL,
@@ -131,9 +138,9 @@ class ExcludedAppListAdapter(private val context: Context) :
 
             builderSingle.setItems(packageList.toTypedArray(), null)
 
-
             builderSingle.setPositiveButton(positiveTxt) { _: DialogInterface, _: Int ->
                 FirewallManager.updateExcludedApps(appInfo, appInfo.isExcluded)
+                updateInterface?.onAppsExcluded()
             }.setNeutralButton(context.getString(
                 R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int -> }
 

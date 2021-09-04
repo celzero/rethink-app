@@ -53,6 +53,7 @@ class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
                     TAB_LAYOUT_LOGS -> DNSLogFragment.newInstance()
+                    TAB_LAYOUT_CONFIGURE -> ConfigureDNSFragment.newInstance()
                     else -> ConfigureDNSFragment.newInstance()
                 }
             }
@@ -66,6 +67,7 @@ class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
                           b.dnsDetailActViewpager) { tab, position -> // Styling each tab here
             tab.text = when (position) {
                 TAB_LAYOUT_LOGS -> getString(R.string.dns_act_log)
+                TAB_LAYOUT_CONFIGURE -> getString(R.string.dns_act_configure_tab)
                 else -> getString(R.string.dns_act_configure_tab)
             }
         }.attach()

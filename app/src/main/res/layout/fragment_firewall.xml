@@ -44,16 +44,21 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.9"
+                    android:gravity="start|center"
+                    android:drawablePadding="10dp"
                     android:padding="10dp"
+                    android:foreground="?attr/selectableItemBackground"
                     android:text="@string/univ_firewall_rule_1"
                     android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/large_font_text_view" />
+                    android:textSize="@dimen/large_font_text_view"
+                    app:drawableStartCompat="@drawable/ic_device_lock" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/firewall_all_apps_check"
                     style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:padding="15dp" />
 
 
@@ -65,6 +70,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="2dp"
                 android:layout_marginTop="2dp"
+                android:layout_gravity="center"
                 android:layout_marginRight="2dp">
 
                 <TextView
@@ -72,16 +78,21 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.9"
+                    android:drawablePadding="10dp"
                     android:padding="10dp"
+                    android:gravity="start|center"
                     android:text="@string/univ_firewall_rule_2"
                     android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/large_font_text_view" />
+                    android:foreground="?attr/selectableItemBackground"
+                    android:textSize="@dimen/large_font_text_view"
+                    app:drawableStartCompat="@drawable/ic_foreground" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/firewall_background_mode_check"
                     style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:padding="15dp" />
 
 
@@ -93,6 +104,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="2dp"
                 android:layout_marginTop="2dp"
+                android:layout_gravity="center"
                 android:layout_marginRight="2dp">
 
                 <TextView
@@ -100,15 +112,20 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.9"
+                    android:drawablePadding="10dp"
                     android:padding="10dp"
+                    android:gravity="start|center"
                     android:text="@string/univ_block_unknown_connections"
+                    android:foreground="?attr/selectableItemBackground"
                     android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/large_font_text_view" />
+                    android:textSize="@dimen/large_font_text_view"
+                    app:drawableStartCompat="@drawable/ic_unknown_app" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/firewall_unknown_connection_mode_check"
                     style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                     android:layout_width="wrap_content"
+                    android:layout_gravity="center"
                     android:layout_height="wrap_content"
                     android:padding="15dp" />
 
@@ -119,8 +136,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="2dp"
+                android:layout_gravity="center"
                 android:layout_marginTop="2dp"
-                android:layout_marginBottom="10dp"
                 android:layout_marginRight="2dp">
 
                 <TextView
@@ -128,16 +145,54 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.9"
+                    android:drawablePadding="10dp"
+                    android:gravity="start|center"
                     android:padding="10dp"
+                    android:foreground="?attr/selectableItemBackground"
                     android:text="@string/univ_firewall_rule_4"
                     android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/large_font_text_view" />
+                    android:textSize="@dimen/large_font_text_view"
+                    app:drawableStartCompat="@drawable/ic_udp" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/firewall_udp_connection_mode_check"
                     style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="15dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/firewall_disallow_dns_bypass_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="2dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:id="@+id/firewall_disallow_dns_bypass_mode_txt"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.9"
+                    android:gravity="start|center"
+                    android:drawablePadding="10dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:padding="10dp"
+                    android:text="@string/univ_firewall_rule_5"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="@dimen/large_font_text_view"
+                    app:drawableStartCompat="@drawable/ic_prevent_dns_leaks" />
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/firewall_disallow_dns_bypass_mode_check"
+                    style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:padding="15dp" />
 
             </LinearLayout>
@@ -153,16 +208,23 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="2dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
                 android:layout_marginEnd="2dp"
-                android:padding="10dp">
+                android:layout_marginBottom="10dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/firewall_univ_whitelist_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_whitelist" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
                     android:layout_toStartOf="@id/firewall_univ_whitelist_img"
+                    android:layout_toEndOf="@id/firewall_univ_whitelist_icon"
                     android:orientation="vertical">
 
                     <TextView
@@ -186,16 +248,6 @@
                         android:textColor="@color/neutral"
                         android:textSize="@dimen/default_font_text_view" />
 
-
-                    <TextView
-                        android:id="@+id/firewall_univ_whitelist_exp_txt"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="5dp"
-                        android:paddingBottom="5dp"
-                        android:text="@string/category_firewall_explanation"
-                        android:textColor="@color/neutral"
-                        android:textSize="@dimen/default_font_text_view" />
                 </LinearLayout>
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -219,16 +271,22 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="2dp"
             android:layout_marginTop="10dp"
-            android:layout_marginEnd="2dp"
-            android:padding="10dp">
+            android:layout_marginEnd="2dp">
 
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/firewall_univ_ip_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:padding="10dp"
+                android:src="@drawable/ic_local_blocklist" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/firewall_univ_ip_img"
+                android:layout_toEndOf="@id/firewall_univ_ip_icon"
                 android:orientation="vertical">
 
                 <TextView
@@ -262,20 +320,6 @@
                 android:layout_alignParentEnd="true"
                 android:src="@drawable/ic_keyboard_arrow_down_gray_24dp" />
         </RelativeLayout>
-
-        <TextView
-            android:id="@+id/firewall_univ_whitelist_rules_exp_txt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:paddingBottom="15dp"
-            android:text="@string/ip_details_list_explanation"
-            android:textColor="@color/neutral"
-            android:textSize="@dimen/default_font_text_view"
-            android:visibility="visible" />
 
         <LinearLayout
             android:id="@+id/firewall_search_view_top"

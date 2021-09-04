@@ -18,7 +18,6 @@ android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
-
     signingConfigs {
         config {
             keyAlias keystoreProperties['keyAlias']
@@ -76,22 +75,22 @@ android {
 
 dependencies {
     androidTestImplementation 'androidx.test:rules:1.4.0'
-    def koin_version = '2.2.2'
+    def koin_version = '3.1.2'
     def room_version = "2.3.0"
     def paging_version = "2.1.2"
 
     implementation "com.google.guava:guava:30.1-android"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.3.0-rc01'
-    implementation 'androidx.core:core-ktx:1.6.0-alpha01'
-    implementation("androidx.preference:preference-ktx:1.1.1")
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.appcompat:appcompat:1.4.0-alpha03'
+    implementation 'androidx.core:core-ktx:1.7.0-alpha01'
+    implementation 'androidx.preference:preference-ktx:1.1.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
     implementation 'org.minidns:minidns-core:1.0.0'
     implementation 'org.minidns:minidns-hla:1.0.0'
@@ -111,49 +110,51 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.8.3'
 
-    //For paging - connection tracker
+    // For paging - connection tracker
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
     implementation "androidx.fragment:fragment-ktx:1.3.6"
-    implementation "com.google.android.material:material:1.4.0-alpha02"
-    implementation "androidx.viewpager2:viewpager2:1.1.0-alpha01"
+    implementation "com.google.android.material:material:1.5.0-alpha02"
+    implementation "androidx.viewpager2:viewpager2:1.1.0-beta01"
 
 
-    implementation 'com.squareup.okhttp3:okhttp:4.9.0'
-    implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.9.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.1'
+    implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.9.1'
     playImplementation 'com.google.android.play:core:1.10.0'//for new version updater
 
-    //Glide implementation
+    // Glide implementation
     implementation 'com.github.bumptech.glide:glide:4.11.0'
-    //// Ref - https://stackoverflow.com/questions/46638056/how-to-use-glidemodule-on-glide-4/46638213#46638213
+    // Ref - https://stackoverflow.com/questions/46638056/how-to-use-glidemodule-on-glide-4/46638213#46638213
     kapt 'com.github.bumptech.glide:compiler:4.11.0'
 
-    //Swipe button animation
+    // Swipe button animation
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
 
     leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.6'
 
-    // Koin dependency injection
-    implementation "org.koin:koin-android:$koin_version"
-    // Koin AndroidX Scope features
-    implementation "org.koin:koin-androidx-scope:$koin_version"
-    // Koin AndroidX ViewModel features
-    implementation "org.koin:koin-androidx-viewmodel:$koin_version"
-    // Koin AndroidX Fragment features
-    implementation "org.koin:koin-androidx-fragment:$koin_version"
+    // Koin core features
+    implementation "io.insert-koin:koin-core:$koin_version"
+    // Koin main features for Android (Scope,ViewModel ...)
+    implementation "io.insert-koin:koin-android:$koin_version"
+    // Koin Java Compatibility
+    implementation "io.insert-koin:koin-android-compat:$koin_version"
+    // Koin for Jetpack WorkManager
+    implementation "io.insert-koin:koin-androidx-workmanager:$koin_version"
+    // Koin for Jetpack Compose
+    implementation "io.insert-koin:koin-androidx-compose:$koin_version"
 
     implementation 'hu.autsoft:krate:1.0.0'
 
     // To use only without reflection variants of viewBinding
-    implementation 'com.kirich1409.viewbindingpropertydelegate:vbpd-noreflection:1.4.0'
-    implementation 'com.kirich1409.viewbindingpropertydelegate:viewbindingpropertydelegate:1.4.0'
+    implementation 'com.github.kirich1409:viewbindingpropertydelegate:1.5.0-beta01'
+    implementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.0-beta01'
 
-    //Tun2socks
+    // Tun2socks (https://jitpack.io/#celzero/firestack)
     implementation 'com.github.celzero:firestack:e3ae8df8cf'
 
-    //Work manager
+    // Work manager
     implementation 'android.arch.work:work-runtime-ktx:1.0.1'
 
-    //Webkit
+    // Webkit
     implementation 'androidx.webkit:webkit:1.4.0'
 
 }

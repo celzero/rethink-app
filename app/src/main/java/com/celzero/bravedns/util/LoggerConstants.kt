@@ -29,5 +29,6 @@ class LoggerConstants {
         const val LOG_TAG_APP_DB = "AppDatabase"
         const val LOG_TAG_DOWNLOAD = "DownloadManager"
         const val LOG_TAG_UI = "ActivityManager"
+        const val LOG_TAG_SCHEDULER = "JobScheduler"
     }
 }

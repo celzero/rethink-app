@@ -39,6 +39,7 @@ import android.util.Log
 import android.view.Gravity
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.getSystemService
 import androidx.core.text.HtmlCompat
@@ -51,7 +52,6 @@ import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.Constants.Companion.MAX_BUGREPORT_FILE_SIZE
 import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP
@@ -66,6 +66,10 @@ import java.net.InetAddress
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Locale
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
 
 
 class Utilities {
@@ -201,7 +205,7 @@ class Utilities {
             return SimpleDateFormat(template, Locale.ENGLISH).format(date)
         }
 
-        fun convertToTime(timestamp: Long): String {
+        fun humanReadableTime(timestamp: Long): String {
             val offSet = TimeZone.getDefault().rawOffset + TimeZone.getDefault().dstSavings
             val now = timestamp - offSet
             return convertLongToTime(now, TIME_FORMAT_1)
@@ -324,34 +328,35 @@ class Utilities {
         }
 
         fun getCurrentTheme(isDarkThemeOn: Boolean, theme: Int): Int {
-            return if (theme == Constants.THEME_SYSTEM_DEFAULT) {
+            return if (theme == Constants.Companion.Themes.SYSTEM_DEFAULT.id) {
                 if (isDarkThemeOn) {
-                    R.style.AppThemeTrueBlack
+                    Constants.Companion.Themes.getTheme(Constants.Companion.Themes.TRUE_BLACK.id)
                 } else {
-                    R.style.AppThemeWhite
+                    Constants.Companion.Themes.getTheme(Constants.Companion.Themes.LIGHT.id)
                 }
-            } else if (theme == Constants.THEME_LIGHT) {
-                R.style.AppThemeWhite
-            } else if (theme == Constants.THEME_DARK) {
-                R.style.AppTheme
+            } else if (theme == Constants.Companion.Themes.LIGHT.id) {
+                Constants.Companion.Themes.getTheme(theme)
+            } else if (theme == Constants.Companion.Themes.DARK.id) {
+                Constants.Companion.Themes.getTheme(theme)
             } else {
-                R.style.AppThemeTrueBlack
+                Constants.Companion.Themes.getTheme(Constants.Companion.Themes.TRUE_BLACK.id)
             }
         }
 
         fun getBottomsheetCurrentTheme(isDarkThemeOn: Boolean, theme: Int): Int {
-            return if (theme == Constants.THEME_SYSTEM_DEFAULT) {
+            return if (theme == Constants.Companion.Themes.SYSTEM_DEFAULT.id) {
                 if (isDarkThemeOn) {
-                    R.style.BottomSheetDialogThemeTrueBlack
+                    Constants.Companion.Themes.getBottomSheetTheme(Constants.Companion.Themes.TRUE_BLACK.id)
                 } else {
-                    R.style.BottomSheetDialogThemeWhite
+                    Constants.Companion.Themes.getBottomSheetTheme(Constants.Companion.Themes.LIGHT.id)
                 }
-            } else if (theme == Constants.THEME_LIGHT) {
-                R.style.BottomSheetDialogThemeWhite
-            } else if (theme == Constants.THEME_DARK) {
-                R.style.BottomSheetDialogTheme
+            } else if (theme == Constants.Companion.Themes.LIGHT.id) {
+                Constants.Companion.Themes.getBottomSheetTheme(theme)
+            } else if (theme == Constants.Companion.Themes.DARK.id) {
+                Constants.Companion.Themes.getBottomSheetTheme(theme)
             } else {
-                R.style.BottomSheetDialogThemeTrueBlack
+                Constants.Companion.Themes.getBottomSheetTheme(
+                    Constants.Companion.Themes.TRUE_BLACK.id)
             }
         }
 
@@ -374,10 +379,7 @@ class Utilities {
                 if (!src.isFile) return false
 
                 src.copyTo(dest, true)
-            } catch (e: NoSuchFileException) { // Throws NoSuchFileException, IOException
-                Log.e(LOG_TAG_DOWNLOAD, "Error copying file ${e.message}", e)
-                return false
-            } catch (e: IOException) {
+            } catch (e: Exception) { // Throws NoSuchFileException, IOException
                 Log.e(LOG_TAG_DOWNLOAD, "Error copying file ${e.message}", e)
                 return false
             }
@@ -469,7 +471,8 @@ class Utilities {
 
         fun getPackageInfoForUid(context: Context, uid: Int): Array<out String>? {
             if (!isUnknownUid(uid)) {
-                Log.i(LOG_TAG_FIREWALL, "Invalid uid, not fetching value from package manager")
+                Log.i(LOG_TAG_FIREWALL,
+                      "Invalid uid: $uid, not fetching value from package manager")
                 return null
             }
 
@@ -501,44 +504,6 @@ class Utilities {
             return BuildConfig.FLAVOR == FLAVOR_PLAY
         }
 
-        // TODO: Make zip file to share instead of file ref: https://archive.is/k0VIa
-        fun getBugReportFilePath(context: Context): String {
-            val filePath = context.filesDir.canonicalPath + File.separator + Constants.BUG_REPORT_FILE
-            val file = File(filePath)
-            if (file.isFile && file.exists()) {
-                // Only write if the file is less than 10mb
-                if (isFileLessThan10MB(file)) {
-                    return filePath
-                } else {
-                    // Get the secondary file. bug_report_1.txt
-                    val secondaryFile = File(
-                        context.filesDir.canonicalPath + File.separator + Constants.PREV_REPORT_FILE)
-                    // delete the content of the file if any
-                    secondaryFile.deleteRecursively()
-                    // Copy the content from bug_report.txt to bug_report_1.txt
-                    file.copyTo(secondaryFile)
-                    // clear the content of bug_report.txt
-                    val raf = RandomAccessFile(file, "rw")
-                    raf.setLength(0)
-                }
-            }
-            return filePath
-        }
-
-        private fun isFileLessThan10MB(file: File): Boolean {
-            return file.length() <= MAX_BUGREPORT_FILE_SIZE
-        }
-
-        fun writeTrace(file: File, inputStream: InputStream?) {
-            if (inputStream == null) return
-
-            FileOutputStream(file, true).use { output ->
-                while (inputStream.read() != -1) {
-                    output.write(inputStream.readBytes())
-                }
-            }
-        }
-
         fun getApplicationInfo(context: Context, packageName: String): ApplicationInfo? {
             return try {
                 context.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
@@ -547,7 +512,6 @@ class Utilities {
                       "ApplicationInfo is not available for package name: $packageName")
                 null
             }
-
         }
 
         fun sendEmailIntent(context: Context) {
@@ -557,8 +521,31 @@ class Utilities {
                 putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.about_mail_subject))
             }
             context.startActivity(Intent.createChooser(intent, context.getString(
-                            R.string.about_mail_bugreport_share_title)))
+                R.string.about_mail_bugreport_share_title)))
         }
 
+        fun deleteRecursive(fileOrDirectory: File) {
+            try {
+                if (fileOrDirectory.isDirectory) {
+                    fileOrDirectory.listFiles()?.forEach { child ->
+                        deleteRecursive(child)
+                    }
+                }
+                val isDeleted: Boolean = if (isAtleastO()) {
+                    fileOrDirectory.deleteRecursively()
+                } else {
+                    fileOrDirectory.delete()
+                }
+                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
+                                 "TEST deleteRecursive -- File : ${fileOrDirectory.path}, $isDeleted")
+            } catch (e: Exception) {
+                Log.w(LOG_TAG_DOWNLOAD, "File delete exception: ${e.message}", e)
+            }
+        }
+
+
+
     }
+
+
 }

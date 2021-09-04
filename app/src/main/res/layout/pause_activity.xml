@@ -66,7 +66,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:gravity="center"
-                        android:text="@string/backed_by_mozilla"
+                        android:text="@string/pause_title_desc"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/sub_heading_small"
                         android:visibility="visible" />

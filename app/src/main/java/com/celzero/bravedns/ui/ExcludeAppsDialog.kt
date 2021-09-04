@@ -28,10 +28,14 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
+import com.celzero.bravedns.adapter.ExcludedAppListAdapter
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.databinding.ExcludeAppDialogLayoutBinding
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ExcludedAppViewModel
 import com.google.android.material.chip.Chip
@@ -39,7 +43,8 @@ import com.google.android.material.chip.Chip
 class ExcludeAppsDialog(private var activity: Context,
                         internal var adapter: RecyclerView.Adapter<*>,
                         var viewModel: ExcludedAppViewModel, themeID: Int) :
-        Dialog(activity, themeID), View.OnClickListener, SearchView.OnQueryTextListener {
+        Dialog(activity, themeID), View.OnClickListener, SearchView.OnQueryTextListener,
+        ExcludedAppsUpdateInterface {
 
     private lateinit var b: ExcludeAppDialogLayoutBinding
 
@@ -47,6 +52,8 @@ class ExcludeAppsDialog(private var activity: Context,
 
     private var filterCategories: MutableSet<String> = HashSet()
     private var category: List<String> = ArrayList()
+
+    private var isVpnRestartRequired: Boolean = false
 
     private val CATEGORY_FILTER_CONST = "category:"
 
@@ -58,14 +65,35 @@ class ExcludeAppsDialog(private var activity: Context,
         setContentView(b.root)
         setCancelable(false)
 
+        initializeValues()
+        initializeClickListeners()
+    }
+
+    private fun initializeValues() {
+        isVpnRestartRequired = false
+
         window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT,
                           WindowManager.LayoutParams.MATCH_PARENT)
 
         mLayoutManager = LinearLayoutManager(activity)
 
         b.excludeAppRecyclerViewDialog.layoutManager = mLayoutManager
+        (adapter as ExcludedAppListAdapter).setUpdateInterface(this)
         b.excludeAppRecyclerViewDialog.adapter = adapter
 
+        val act: HomeScreenActivity = activity as HomeScreenActivity
+
+        FirewallManager.getApplistObserver().observe(act, {
+            val excludedCount = it.filter { a -> a.isExcluded }.size
+            b.excludeAppSelectCountText.text = act.getString(R.string.ex_dialog_count,
+                                                             excludedCount.toString())
+        })
+
+        // By default, show all the categories.
+        showAllCategories()
+    }
+
+    private fun initializeClickListeners() {
         b.excludeAppDialogOkButton.setOnClickListener(this)
 
         b.excludeAppDialogWhitelistSearchView.setOnQueryTextListener(this)
@@ -76,27 +104,15 @@ class ExcludeAppsDialog(private var activity: Context,
             false
         }
 
-        val act: HomeScreenActivity = activity as HomeScreenActivity
-
-        FirewallManager.getApplistObserver().observe(act, {
-            val excludedCount = it.filter { a -> a.isExcluded }.size
-            b.excludeAppSelectCountText.text = act.getString(R.string.ex_dialog_count,
-                                                             excludedCount.toString(),
-                                                             FirewallManager.getTotalApps().toString())
-        })
-
-
         b.excludeAppSelectAllOptionCheckbox.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             FirewallManager.updateExcludedAppsByCategories(filterCategories, b)
-            Utilities.delay(1000) {
+            Utilities.delay(500) {
                 adapter.notifyDataSetChanged()
             }
+            onAppsExcluded()
         }
 
         b.excludeAppDialogWhitelistSearchFilter.setOnClickListener(this)
-
-        // By default, show all the categories.
-        showAllCategories()
     }
 
     private fun showAllCategories() {
@@ -106,6 +122,7 @@ class ExcludeAppsDialog(private var activity: Context,
     override fun onClick(v: View) {
         when (v.id) {
             R.id.exclude_app_dialog_ok_button -> {
+                handleVpnRestart()
                 clearSearch()
                 dismiss()
             }
@@ -154,6 +171,9 @@ class ExcludeAppsDialog(private var activity: Context,
         b.excludeAppDialogChipGroup.removeAllViews()
 
         for (category in categories) {
+            // Ignore non-app system category in excluded list
+            if (category == Constants.APP_NON_APP) continue
+
             val chip = this.layoutInflater.inflate(R.layout.item_chip_category, null, false) as Chip
             chip.text = category
             b.excludeAppDialogChipGroup.addView(chip)
@@ -180,4 +200,28 @@ class ExcludeAppsDialog(private var activity: Context,
             }
         }
     }
+
+    // Interface(ExcludedAppsUpdateInterface)
+    // Invoked when there is a change in excluded apps
+    override fun onAppsExcluded() {
+        isVpnRestartRequired = true
+    }
+
+    // Check whether the restart is required.
+    // isVpnRestartRequired: will be updated if there is change in excluded apps.
+    // if true, will initiate the restart of vpn to update the details in vpn builder.
+    private fun handleVpnRestart() {
+        if (!isVpnRestartRequired) return
+
+        Log.i(LOG_TAG_VPN,
+              "Exclude apps dialog: isVpnRestartRequired? $isVpnRestartRequired initiate vpn restart")
+        VpnController.getBraveVpnService()?.restartVpn("restartVpn_exclude_apps")
+    }
+}
+
+// Interface to update the excluded changes from the adapter.
+// whenever, there is a change in the excluded apps list, the method onAppsExcluded()
+// will be invoked.
+interface ExcludedAppsUpdateInterface {
+    fun onAppsExcluded()
 }

@@ -21,8 +21,6 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 object VpnController {
 
@@ -109,6 +107,10 @@ object VpnController {
 
     fun hasStarted(): Boolean {
         return connectionState == BraveVPNService.State.WORKING || connectionState == BraveVPNService.State.FAILING
+    }
+
+    fun isAppPaused(): Boolean {
+        return connectionState == BraveVPNService.State.PAUSED
     }
 
 }

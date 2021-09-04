@@ -36,7 +36,7 @@ import com.celzero.bravedns.viewmodel.AppListViewModel
 import com.google.android.material.chip.Chip
 
 class WhitelistAppDialog(val activity: Activity, val adapter: RecyclerView.Adapter<*>,
-                         val viewModel: AppListViewModel, val themeID: Int) : Dialog(activity, themeID),
+                         val viewModel: AppListViewModel, themeID: Int) : Dialog(activity, themeID),
                                                                       View.OnClickListener,
                                                                       SearchView.OnQueryTextListener {
 
@@ -76,8 +76,7 @@ class WhitelistAppDialog(val activity: Activity, val adapter: RecyclerView.Adapt
         FirewallManager.getApplistObserver().observe(activity as LifecycleOwner, {
             val blockedCount = it.filter { a -> a.whiteListUniv1 }.size
             b.customSelectAllOptionCount.text = context.getString(
-                R.string.whitelist_dialog_apps_in_use, blockedCount.toString(),
-                FirewallManager.getTotalApps().toString())
+                R.string.whitelist_dialog_apps_in_use, blockedCount.toString())
         })
 
         b.customSelectAllOptionCheckbox.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->

@@ -30,7 +30,6 @@ import androidx.core.net.toUri
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.database.ProxyEndpoint
-import com.celzero.bravedns.database.ProxyEndpointRepository
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
@@ -299,7 +298,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
     }
 
     private fun setOrbotMode() {
-        CoroutineScope(Dispatchers.IO).launch {
+        io {
             Log.i(LOG_TAG_VPN, "Initiate orbot start with type: $selectedProxyType")
 
             if (isTypeSocks5() && handleOrbotSocks5Update()) {
@@ -437,6 +436,12 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             Log.w(LOG_TAG_VPN, "Failure calling app info: ${e.message}", e)
+        }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            f()
         }
     }
 }

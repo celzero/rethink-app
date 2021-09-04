@@ -107,7 +107,7 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
     // Now, the firewall manager usage is modified, so moving this part here. 
     fun handleAccessibilityEvent(event: AccessibilityEvent) {
 
-        if (!persistentState.backgroundEnabled) return
+        if (!persistentState.blockAppWhenBackground) return
 
         val latestTrackedPackage = getEventPackageName(event)
 

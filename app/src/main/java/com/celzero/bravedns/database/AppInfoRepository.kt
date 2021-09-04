@@ -123,7 +123,8 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.updateWhitelistForCategories(category, isEnabled)
     }
 
-    fun updateExcludedForAllApp(isExcluded: Boolean, coroutineScope: CoroutineScope = GlobalScope) {
+    fun updateExcludedForAllApps(isExcluded: Boolean,
+                                 coroutineScope: CoroutineScope = GlobalScope) {
         appInfoDAO.updateExcludedForAllApp(isExcluded)
     }
 

@@ -27,17 +27,17 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.databinding.PauseActivityBinding
+import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants.Companion.EXTRA_MILLIS
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.convertToTime
+import com.celzero.bravedns.util.Utilities.Companion.humanReadableTime
 import org.koin.android.ext.android.inject
 
 class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
     private val b by viewBinding(PauseActivityBinding::bind)
     private val persistentState by inject<PersistentState>()
-    private val appMode by inject<AppMode>()
 
     var autoIncrement = false
     var autoDecrement = false
@@ -63,9 +63,9 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
     }
 
     private fun checkAppState() {
-        persistentState.appStateObserver.observe(this, {
-            if (it == AppMode.AppState.ACTIVE) {
-                stopPause()
+        VpnController.connectionStatus.observe(this, {
+            if (it != BraveVPNService.State.PAUSED) {
+                stopPauseActivity()
             } else {
                 observeTimer()
             }
@@ -75,7 +75,7 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
 
     private fun observeTimer() {
         VpnController.getBraveVpnService()?.getPauseCountdownObserver()?.observe(this, {
-            b.pacTimer.text = convertToTime(it)
+            b.pacTimer.text = humanReadableTime(it)
         })
     }
 
@@ -85,8 +85,8 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
         }
 
         b.pacStopIv.setOnClickListener {
-            appMode.setAppState(AppMode.AppState.ACTIVE)
-            stopPause()
+            VpnController.getBraveVpnService()?.resumeApp()
+            stopPauseActivity()
         }
 
         b.pacMinusIv.setOnClickListener {
@@ -130,7 +130,7 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
         VpnController.getBraveVpnService()?.incrementTimer(EXTRA_MILLIS)
     }
 
-    private fun stopPause() {
+    private fun stopPauseActivity() {
         val intent = Intent(this, HomeScreenActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK

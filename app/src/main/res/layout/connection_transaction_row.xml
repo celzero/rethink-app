@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -93,8 +92,9 @@
                         android:gravity="center"
                         android:padding="5dp"
                         android:singleLine="true"
+                        android:textStyle="bold"
                         android:textAppearance="@android:style/TextAppearance.Material.Subhead"
-                        android:textSize="@dimen/small_font_text_view"
+                        android:textSize="@dimen/mini_font_text_view"
                         tools:text="17:54:11" />
 
 
@@ -113,7 +113,8 @@
                         android:layout_gravity="center"
                         android:ellipsize="none"
                         android:gravity="center"
-                        android:minWidth="35dp"
+                        android:minWidth="20dp"
+                        android:maxHeight="20dp"
                         android:singleLine="true"
                         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                         android:textSize="26sp"
@@ -139,8 +140,8 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:orientation="horizontal"
-                        android:layout_weight="0.65">
+                        android:layout_weight="0.65"
+                        android:orientation="horizontal">
 
                         <TextView
                             android:id="@+id/connection_ip_address"
@@ -148,16 +149,17 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:layout_weight="0.65"
-                            android:ellipsize="start"
+                            android:maxLines="1"
+                            android:ellipsize="end"
                             android:focusable="true"
+                            android:typeface="monospace"
                             android:focusableInTouchMode="true"
-                            android:fontFamily="sans-serif-condensed"
                             android:marqueeRepeatLimit="marquee_forever"
                             android:paddingStart="8dp"
                             android:paddingEnd="10dp"
                             android:text="?attr/primaryTextColor"
-                            android:textAppearance="@android:style/TextAppearance.Material.Subhead"
-                            android:textSize="@dimen/large_font_text_view"
+                            android:textSize="@dimen/default_font_text_view"
+                            style="@style/TextAppearance.AppCompat.Subhead"
                             tools:text="sdadasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdss" />
 
                     </LinearLayout>
@@ -174,9 +176,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:padding="5dp"
                             android:singleLine="true"
-                            android:textAppearance="@android:style/TextAppearance.Material.Subhead"
+                            android:text="?attr/primaryTextColor"
+                            android:fontFamily="sans-serif-condensed"
                             android:textSize="@dimen/default_font_text_view"
                             tools:text="10(ms)" />
                     </LinearLayout>

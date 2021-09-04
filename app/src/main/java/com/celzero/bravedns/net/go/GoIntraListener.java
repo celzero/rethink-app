@@ -116,7 +116,7 @@ public class GoIntraListener implements Listener {
         long queryTimeMs = nowMs - latencyMs;
         Transaction transaction = new Transaction(query, queryTimeMs);
         transaction.response = summary.getResponse();
-        transaction.responseTime = (long) (1000 * summary.getLatency());
+        transaction.responseTime = latencyMs;
         transaction.serverIp = summary.getServer();
         transaction.relayIp = summary.getRelayServer();
         transaction.blocklist = summary.getBlocklists();
@@ -148,7 +148,7 @@ public class GoIntraListener implements Listener {
         long queryTimeMs = nowMs - latencyMs;
         Transaction transaction = new Transaction(query, queryTimeMs);
         transaction.response = summary.getResponse();
-        transaction.responseTime = (long) (1000 * summary.getLatency());
+        transaction.responseTime = latencyMs;
         transaction.serverIp = summary.getServer();
         transaction.status = goStatusMap.get(summary.getStatus());
         transaction.responseCalendar = Calendar.getInstance();

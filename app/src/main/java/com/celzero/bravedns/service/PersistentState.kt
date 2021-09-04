@@ -31,7 +31,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val BRAVE_MODE = "brave_mode"
         const val BACKGROUND_MODE = "background_mode"
         const val ALLOW_BYPASS = "allow_bypass"
-        const val EXCLUDE_FROM_VPN = "exclude_apps_vpn"
         const val LOCAL_BLOCK_LIST = "enable_local_list"
         const val LOCAL_BLOCK_LIST_STAMP = "local_block_list_stamp"
         const val PROXY_TYPE = "proxy_proxytype"
@@ -39,7 +38,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val NOTIFICATION_ACTION = "notification_action"
         const val DNS_CHANGE = "connected_dns_name"
         const val DNS_RELAYS = "dnscrypt_relay"
-        const val APP_STATE = "app_state"
+
+        // const val APP_STATE = "app_state"
         const val REMOTE_BLOCK_LIST_STAMP = "remote_block_list_count"
 
         fun expandUrl(context: Context, url: String?): String {
@@ -49,52 +49,127 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         }
     }
 
+    // when vpn is started by the user, this is set to true; set to false when user stops
+    // the vpn. In case vpn crashes, this value remains true, which is expected.
     private var _vpnEnabled by booleanPref("enabled", false)
+
+    // OOBE (out-of-the-box experience) screens are shown if the user
+    // launches the app for the very first time (after install or post clear-data)
     var firstTimeLaunch by booleanPref("is_first_time_launch", true)
-    var braveMode by intPref("brave_mode", 2)
-    var firewallMode by intPref("firewall_mode", 1)
+
+    // One among AppMode.BraveMode enum; 2's default, which is BraveMode.DNS_FIREWAL
+    var braveMode by intPref("brave_mode", AppMode.BraveMode.DNS_FIREWALL.mode)
+
+    // enable / disable logging dns and tcp/udp connections to db
     var logsEnabled by booleanPref("local_logs", true)
+
+    // the last-set app version; useful to detect an update where the current
+    // app version is going to be greater than the one stored, and so, update flow
+    // can be triggered accordingly, if any,
     var appVersion by intPref("app_version", 0)
+
+    // Last known time when app update checks were done (successful?)
     var lastAppUpdateCheck by longPref("app_update_last_check", 0)
+
+    // total blocklists set by the user for RethinkDNS+ (server-side dns blocking)
     private var numberOfRemoteBlocklists by intPref("remote_block_list_count", 0)
+
+    // total blocklists set by the user (on-device dns blocking)
     var numberOfLocalBlocklists by intPref("local_block_list_count", 0)
+
+    // whether all udp connection except dns must be dropped
     var udpBlockedSettings by booleanPref("block_udp_traffic_other_than_dns", false)
+
+
     var insertionCompleted by booleanPref("initial_insert_servers_complete", false)
+
+    // user chosen blocklists stored custom dictionary indexed in base64
     var localBlocklistStamp by stringPref("local_block_list_stamp", "")
+
+    // whether to drop packets when the source app originating the reqs couldn't be determined
     var blockUnknownConnections by booleanPref("block_unknown_connections", false)
+
+    // whether the local blocklist files have been downloaded successfully
     var blocklistFilesDownloaded by booleanPref("download_block_list_files", false)
+
+    // whether user has enable on-device blocklists
     var blocklistEnabled by booleanPref("enable_local_list", false)
+
     var remoteBlocklistDownloadTime by longPref("remote_block_list_downloaded_time", 0)
+
+    // the version (which is a unix timestamp) of the current on-device blocklist files
     var blocklistDownloadTime by longPref("local_block_list_downloaded_time", 0)
-    var tempBlocklistDownloadTime by longPref("temp_time_during_download", 0)
+
+    // user set http proxy port
     var httpProxyPort by intPref("http_proxy_port", INVALID_PORT)
+
+    // user set http proxy ip / hostname
     var httpProxyHostAddress by stringPref("http_proxy_ipaddress", "")
+
+    // whether RethinkDNS should signal activity-manager to kill a firewalled app
     var killAppOnFirewall by booleanPref("kill_app_on_firewall", true)
-    var allowByPass by booleanPref("allow_bypass", true)
-    var allowDNSTraffic by booleanPref("dns_all_traffic", true)
+
+    // whether apps subject to the RethinkDNS VPN tunnel can bypass the tunnel on-demand
+    var allowBypass by booleanPref("allow_bypass", true)
+
+    // user set among AppMode.DnsType enum; 1's the default which is DoH
     var dnsType by intPref("dns_type", 1)
+
+    // whether the app must attempt to startup on reboot if it was running before shutdown
     var prefAutoStartBootUp by booleanPref("auto_start_on_boot", true)
-    var screenState by booleanPref("screen_state", false)
+
+    // user set preference whether firewall should block all connections when device is locked
+    var blockWhenDeviceLocked by booleanPref("screen_state", false)
+
     var oldNumberRequests by intPref("number_request", 0)
     var oldBlockedRequests by intPref("blocked_request", 0)
+
+    // total dns requests the app has served since installation (or post clear data)
     var numberOfRequests by longPref("dns_number_request", 0)
+
+    // total dns requests blocked since installation
     var numberOfBlockedRequests by longPref("dns_blocked_request", 0)
-    var backgroundEnabled by booleanPref("background_mode", false)
+
+    // whether to block connections from apps not in the foreground
+    var blockAppWhenBackground by booleanPref("background_mode", false)
+
+    // whether to check for app updates once-a-week (on website / play-store builds)
     var checkForAppUpdate by booleanPref("check_for_app_update", true)
+
     var connectedDnsName by stringPref("connected_dns_name", context.getString(R.string.dns_mode_3))
+
+    // the current light/dark theme; 0's the default which is "Set by System"
     var theme by intPref("app_theme", 0)
+
     var notificationActionType by intPref("notification_action", 1)
-    var isAddAllNetworks by booleanPref("add_all_networks_to_vpn", false)
+
+    // add all networks (say, both wifi / mobile) with internet capability to the vpn tunnel
+    var useMultipleNetworks by booleanPref("add_all_networks_to_vpn", false)
+
     var lastAppRefreshTime by longPref("last_app_refresh_time", INIT_TIME_MS)
+
     var proxyType by stringPref("proxy_proxytype", AppMode.ProxyType.NONE.name)
+
     var proxyProvider by stringPref("proxy_proxyprovider", AppMode.ProxyProvider.NONE.name)
+
+    // total dnscrypt server currently connected to
     private var _dnsCryptRelayCount by intPref("dnscrypt_relay", 0)
+
     var lastAppExitInfoTimestamp by longPref("prev_trace_timestamp", INIT_TIME_MS)
-    var downloadIds by stringSetPref("download_ids", emptySet())
+
+    // fetch fav icons for domains in dns request
     var fetchFavIcon by booleanPref("fav_icon_enabled",
                                     BuildConfig.FLAVOR != Constants.FLAVOR_FDROID)
-    var appState by intPref("app_state", AppMode.AppState.ACTIVE.state)
+
+    // whether to show "what's new" chip on the homescreen, usually
+    // shown after a update and until the user dismisses it
     var showWhatsNewChip by booleanPref("show_whats_new_chip", true)
+
+    // block dns which are not resolved by app
+    var disallowDnsBypass by booleanPref("disallow_dns_bypass", false)
+
+    // trap all packets on port 53 to be sent to a dns endpoint or just the packets sent to vpn's dns-ip
+    var preventDnsLeaks by booleanPref("prevent_dns_leaks", false)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
@@ -103,7 +178,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
 
     // requires livedata as the app state can be changed from more than one place
-    var appStateObserver: MutableLiveData<AppMode.AppState> = MutableLiveData()
+    //var appStateObserver: MutableLiveData<AppMode.AppState> = MutableLiveData()
     var remoteBlocklistCount: MutableLiveData<Int> = MutableLiveData()
 
     fun setMedianLatency(median: Long) {

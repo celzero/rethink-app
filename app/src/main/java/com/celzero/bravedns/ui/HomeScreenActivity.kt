@@ -29,34 +29,29 @@ import androidx.annotation.Nullable
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.MutableLiveData
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallRules
-import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.database.BlockedConnectionsRepository
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
-import com.celzero.bravedns.service.AppUpdater
-import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.scheduler.ZipUtil
+import com.celzero.bravedns.service.*
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_WEBSITE
-import com.celzero.bravedns.util.Constants.Companion.PLAY_SERVICE_PKG_NAME
+import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_3
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Utilities.Companion.convertLongToTime
-import com.celzero.bravedns.util.Utilities.Companion.getBugReportFilePath
 import com.celzero.bravedns.util.Utilities.Companion.getPackageMetadata
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastR
 import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
-import com.celzero.bravedns.util.Utilities.Companion.writeTrace
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -81,8 +76,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val blockedConnectionsRepository by inject<BlockedConnectionsRepository>()
     private val persistentState by inject<PersistentState>()
     private val appUpdateManager by inject<AppUpdater>()
-    private val appMode by inject<AppMode>()
-    private var am: ActivityManager?= null
 
     /* TODO : This task need to be completed.
              Add all the appinfo in the global variable during appload
@@ -90,9 +83,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
              Call the coroutine scope to insert/update/delete the values */
 
     object GlobalVariable {
-
-        var braveModeToggler: MutableLiveData<Int> = MutableLiveData()
-
         var appStartTime: Long = System.currentTimeMillis()
         var DEBUG = false
     }
@@ -100,10 +90,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     // TODO - #324 - Usage of isDarkTheme() in all activities.
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == UI_MODE_NIGHT_YES
-    }
-
-    companion object {
-        var enqueue: Long = 0
     }
 
     //TODO : Remove the unwanted data and the assignments happening
@@ -116,7 +102,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             launchOnboardActivity()
         }
 
-        if (appMode.isAppPaused()) {
+        if (VpnController.isAppPaused()) {
             openAppPausedActivity()
         }
 
@@ -128,7 +114,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                                                               homeScreenFragment,
                                                               homeScreenFragment.javaClass.simpleName).commit()
         }
-        b.navView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
+
+        setupNavigationItemSelectedListener()
 
         FirewallRules.loadFirewallRules(blockedConnectionsRepository)
 
@@ -138,40 +125,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         initUpdateCheck()
 
-        detectAppExitInfo()
-    }
-
-    private fun detectAppExitInfo() {
-        if (!isAtleastR()) return
-
-        if (am == null) {
-            am = getSystemService(ACTIVITY_SERVICE) as ActivityManager
-        }
-
-        val path = getBugReportFilePath(this)
-        CoroutineScope(Dispatchers.IO).launch {
-            // gets all the historical process exit reasons.
-            val appExitInfo = am!!.getHistoricalProcessExitReasons(null, 0, 0)
-            var latestTimestamp = persistentState.lastAppExitInfoTimestamp
-            val file = File(path)
-            appExitInfo.forEach {
-                // Write only the latest exit reason
-                if (latestTimestamp < it.timestamp) {
-                    val reportDetails = "${it.packageUid},${it.reason},${it.description},${it.importance},${it.pss},${it.rss},${
-                        convertLongToTime(it.timestamp, TIME_FORMAT_3)
-                    }\n"
-                    file.appendText(reportDetails)
-                    // Reason_ANR will contain traceInputStream in it.
-                    // Write into file when the traceInput is available
-                    if (it.reason == ApplicationExitInfo.REASON_ANR) {
-                        writeTrace(file, it.traceInputStream)
-                    }
-                    latestTimestamp = it.timestamp
-                }
-            }
-            // Store the last exit reason time stamp
-            persistentState.lastAppExitInfoTimestamp = latestTimestamp
-        }
     }
 
     private fun removeThisMethod() {
@@ -233,9 +186,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         val diff = System.currentTimeMillis() - persistentState.lastAppUpdateCheck
 
-        val numOfDays = TimeUnit.MILLISECONDS.toDays(diff)
-        Log.i(LOG_TAG_UI, "App update check initiated, number of days: $numOfDays")
-        if (numOfDays <= 1L) return
+        val daysElapsed = TimeUnit.MILLISECONDS.toDays(diff)
+        Log.i(LOG_TAG_UI, "App update check initiated, number of days: $daysElapsed")
+        if (daysElapsed <= 1L) return
 
         checkForUpdate()
     }
@@ -269,7 +222,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         return try {
             // applicationInfo.enabled - When false, indicates that all components within
             // this application are considered disabled, regardless of their individually set enabled status.
-            packageManager.getApplicationInfo(PLAY_SERVICE_PKG_NAME, 0).enabled
+            // TODO: prompt dialog to user that Playservice is disabled, so switch to update
+            // check for website
+            packageManager.getApplicationInfo(PKG_NAME_PLAY_STORE, 0).enabled
         } catch (e: NameNotFoundException) {
             false
         }
@@ -401,45 +356,46 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     override fun onResume() {
         super.onResume()
-        refreshDatabase.refreshAppInfoDatabase(isForceRefresh = false)
         checkAppState()
     }
 
     private fun checkAppState() {
-        persistentState.appStateObserver.observe(this, {
-            if (it == AppMode.AppState.PAUSED) {
+        VpnController.connectionStatus.observe(this, {
+            if (it == BraveVPNService.State.PAUSED) {
                 openAppPausedActivity()
             }
         })
     }
 
-    private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-        when (item.itemId) {
-            R.id.navigation_internet_manager -> {
-                homeScreenFragment = HomeScreenFragment()
-                supportFragmentManager.beginTransaction().replace(R.id.fragment_container,
-                                                                  homeScreenFragment,
-                                                                  homeScreenFragment.javaClass.simpleName).commit()
-                return@OnNavigationItemSelectedListener true
-            }
+    private fun setupNavigationItemSelectedListener() {
+        b.navView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_internet_manager -> {
+                    homeScreenFragment = HomeScreenFragment()
+                    supportFragmentManager.beginTransaction().replace(R.id.fragment_container,
+                                                                      homeScreenFragment,
+                                                                      homeScreenFragment.javaClass.simpleName).commit()
+                    return@setOnItemSelectedListener true
+                }
 
-            R.id.navigation_settings -> {
-                settingsFragment = SettingsFragment()
-                supportFragmentManager.beginTransaction().replace(R.id.fragment_container,
-                                                                  settingsFragment,
-                                                                  settingsFragment.javaClass.simpleName).commit()
-                return@OnNavigationItemSelectedListener true
-            }
+                R.id.navigation_settings -> {
+                    settingsFragment = SettingsFragment()
+                    supportFragmentManager.beginTransaction().replace(R.id.fragment_container,
+                                                                      settingsFragment,
+                                                                      settingsFragment.javaClass.simpleName).commit()
+                    return@setOnItemSelectedListener true
+                }
 
-            R.id.navigation_about -> {
-                aboutFragment = AboutFragment()
-                supportFragmentManager.beginTransaction().replace(R.id.fragment_container,
-                                                                  aboutFragment,
-                                                                  aboutFragment.javaClass.simpleName).commit()
-                return@OnNavigationItemSelectedListener true
+                R.id.navigation_about -> {
+                    aboutFragment = AboutFragment()
+                    supportFragmentManager.beginTransaction().replace(R.id.fragment_container,
+                                                                      aboutFragment,
+                                                                      aboutFragment.javaClass.simpleName).commit()
+                    return@setOnItemSelectedListener true
+                }
             }
+            false
         }
-        false
     }
 
 }

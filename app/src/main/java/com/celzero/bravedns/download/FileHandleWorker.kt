@@ -23,7 +23,6 @@ import androidx.work.workDataOf
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_FILE_COUNT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.Utilities
@@ -49,9 +48,15 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
 
     override fun doWork(): Result {
         try {
+            val timestamp = inputData.getLong("blocklistDownloadInitiatedTime", 0L)
+            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "blocklistDownloadInitiatedTime - $timestamp")
+
+            // invalid download initiated time
+            if(timestamp == 0L) return Result.failure()
+
             // A file move from external file path to app data dir is preferred because it is an
             // atomic operation: but Android doesn't support move/rename across mount points.
-            val response = copyFiles(context)
+            val response = copyFiles(context, timestamp)
 
             val outputData = workDataOf(DownloadConstants.OUTPUT_FILES to response)
 
@@ -65,9 +70,8 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
         return Result.failure()
     }
 
-    private fun copyFiles(context: Context): Boolean {
+    private fun copyFiles(context: Context, timestamp: Long): Boolean {
         try {
-            val timestamp = persistentState.tempBlocklistDownloadTime
             if (!BlocklistDownloadHelper.isDownloadComplete(context, timestamp.toString())) {
                 return false
             }
@@ -100,9 +104,9 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             val destinationDir = File("${context.filesDir.canonicalPath}/$timestamp")
 
             Log.i(LOG_TAG_DOWNLOAD,
-                  "After copy, dest dir: $destinationDir, ${destinationDir.isDirectory}, ${destinationDir.list()?.size}, ${!isDownloadValid()}")
+                  "After copy, dest dir: $destinationDir, ${destinationDir.isDirectory}, ${destinationDir.list()?.size}")
 
-            if (!destinationDir.isDirectory || destinationDir.list()?.size != LOCAL_BLOCKLIST_FILE_COUNT || !isDownloadValid()) {
+            if (!destinationDir.isDirectory || destinationDir.list()?.size != LOCAL_BLOCKLIST_FILE_COUNT || !isDownloadValid(timestamp)) {
                 return false
             }
 
@@ -118,11 +122,8 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
 
     private fun updatePersistenceOnCopySuccess(timestamp: Long) {
         persistentState.blocklistDownloadTime = timestamp
-        // update remote blocklist time stamp to the latest
-        persistentState.remoteBlocklistDownloadTime = timestamp
         persistentState.blocklistEnabled = true
         persistentState.blocklistFilesDownloaded = true
-        persistentState.tempBlocklistDownloadTime = INIT_TIME_MS
     }
 
     /**
@@ -133,9 +134,8 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
      * create localBraveDNS object. If the object returned by the
      * Dnsx is not null then valid. Null/exception will be invalid.
      */
-    private fun isDownloadValid(): Boolean {
+    private fun isDownloadValid(timestamp: Long): Boolean {
         try {
-            val timestamp = persistentState.tempBlocklistDownloadTime
             val path: String = context.filesDir.canonicalPath + File.separator + timestamp
             val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE,
                                                  path + Constants.FILE_RD_FILE,

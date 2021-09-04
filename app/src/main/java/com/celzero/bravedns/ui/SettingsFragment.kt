@@ -108,11 +108,11 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
 
         // allow by-pass
-        b.settingsActivityAllowBypassSwitch.isChecked = persistentState.allowByPass
+        b.settingsActivityAllowBypassSwitch.isChecked = persistentState.allowBypass
         // display fav icon in dns logs
         b.settingsActivityFavIconSwitch.isChecked = persistentState.fetchFavIcon
         // Use all available network
-        b.settingsActivityAllNetworkSwitch.isChecked = persistentState.isAddAllNetworks
+        b.settingsActivityAllNetworkSwitch.isChecked = persistentState.useMultipleNetworks
         // enable logs
         b.settingsActivityEnableLogsSwitch.isChecked = persistentState.logsEnabled
         // Auto start app after reboot
@@ -121,6 +121,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityKillAppSwitch.isChecked = persistentState.killAppOnFirewall
         // Check for app update
         b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
+
+        b.settingsActivityPreventDnsLeaksSwitch.isChecked = persistentState.preventDnsLeaks
 
         observeCustomProxy()
         displayAppThemeUi()
@@ -137,8 +139,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         FirewallManager.getApplistObserver().observe(viewLifecycleOwner, {
             val excludedCount = it.filter { a -> a.isExcluded }.size
             b.settingsActivityExcludeAppsCountText.text = getString(R.string.ex_dialog_count,
-                                                                    excludedCount.toString(),
-                                                                    FirewallManager.getTotalApps().toString())
+                                                                    excludedCount.toString())
         })
     }
 
@@ -209,15 +210,15 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     private fun displayAppThemeUi() {
         b.settingsActivityThemeRl.isEnabled = true
         when (persistentState.theme) {
-            Constants.THEME_SYSTEM_DEFAULT -> {
+            Constants.Companion.Themes.SYSTEM_DEFAULT.id -> {
                 b.genSettingsThemeDesc.text = getString(R.string.settings_selected_theme, getString(
                     R.string.settings_theme_dialog_themes_1))
             }
-            Constants.THEME_LIGHT -> {
+            Constants.Companion.Themes.LIGHT.id -> {
                 b.genSettingsThemeDesc.text = getString(R.string.settings_selected_theme, getString(
                     R.string.settings_theme_dialog_themes_2))
             }
-            Constants.THEME_DARK -> {
+            Constants.Companion.Themes.DARK.id -> {
                 b.genSettingsThemeDesc.text = getString(R.string.settings_selected_theme, getString(
                     R.string.settings_theme_dialog_themes_3))
             }
@@ -284,6 +285,10 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             persistentState.fetchFavIcon = b
         }
 
+        b.settingsActivityPreventDnsLeaksSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
+            persistentState.preventDnsLeaks = b
+        }
+
         b.settingsActivityAutoStartSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             persistentState.prefAutoStartBootUp = b
         }
@@ -298,11 +303,11 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
 
         b.settingsActivityAllNetworkSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
-            persistentState.isAddAllNetworks = b
+            persistentState.useMultipleNetworks = b
         }
 
         b.settingsActivityAllowBypassSwitch.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean ->
-            persistentState.allowByPass = checked
+            persistentState.allowBypass = checked
             b.settingsActivityAllowBypassSwitch.isEnabled = false
             b.settingsActivityAllowBypassSwitch.visibility = View.INVISIBLE
             b.settingsActivityAllowBypassProgress.visibility = View.VISIBLE
@@ -428,7 +433,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             updateBlocklistIfNeeded(isRefresh = true)
         }
 
-        val workManager = WorkManager.getInstance()
+        val workManager = WorkManager.getInstance(requireContext().applicationContext)
 
         workManager.getWorkInfosByTagLiveData(DownloadConstants.DOWNLOAD_TAG).observe(
             viewLifecycleOwner, { workInfoList ->
@@ -519,9 +524,11 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
         val bootstrapClient = OkHttpClient()
         // FIXME: Use user set doh provider
+        // using quad9 doh provider
         val dns = DnsOverHttps.Builder().client(bootstrapClient).url(
-            "https://1.1.1.1/dns-query".toHttpUrl()).bootstrapDnsHosts(
-            InetAddress.getByName("1.1.1.1"), InetAddress.getByName("1.0.0.1")).build()
+            "https://9.9.9.9/dns-query".toHttpUrl()).bootstrapDnsHosts(
+            InetAddress.getByName("9.9.9.9"), InetAddress.getByName("149.112.112.112"),
+            InetAddress.getByName("2620:fe::9"), InetAddress.getByName("2620:fe::fe")).build()
 
         val client = bootstrapClient.newBuilder().dns(
             dns).build() // FIXME: Move it to the http-request-helper class
@@ -754,20 +761,20 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
             persistentState.theme = which
             when (which) {
-                Constants.THEME_SYSTEM_DEFAULT -> {
+                Constants.Companion.Themes.SYSTEM_DEFAULT.id -> {
                     if (requireActivity().isDarkThemeOn()) {
                         setThemeRecreate(R.style.AppTheme)
                     } else {
                         setThemeRecreate(R.style.AppThemeWhite)
                     }
                 }
-                Constants.THEME_LIGHT -> {
+                Constants.Companion.Themes.LIGHT.id -> {
                     setThemeRecreate(R.style.AppThemeWhite)
                 }
-                Constants.THEME_DARK -> {
+                Constants.Companion.Themes.DARK.id -> {
                     setThemeRecreate(R.style.AppTheme)
                 }
-                Constants.THEME_TRUE_BLACK -> {
+                Constants.Companion.Themes.TRUE_BLACK.id -> {
                     setThemeRecreate(R.style.AppThemeTrueBlack)
                 }
             }
@@ -819,15 +826,60 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     override fun onResume() {
         super.onResume()
+        observeBraveMode()
         refreshOnDeviceBlocklistStatus()
         refreshOrbotUi()
         handleLockdownModeIfNeeded()
         handleProxyUi()
     }
 
+    private fun observeBraveMode() {
+        appMode.braveModeObserver.observe(viewLifecycleOwner, {
+            when (it) {
+                AppMode.BraveMode.DNS.mode -> handleDnsModeUi()
+                AppMode.BraveMode.FIREWALL.mode -> handleFirewallModeUi()
+                AppMode.BraveMode.DNS_FIREWALL.mode -> handleDnsFirewallModeUi()
+            }
+        })
+    }
+
+    private fun handleDnsModeUi() {
+        b.settingsActivityPreventDnsLeaksRl.alpha = 0.5f
+        b.settingsActivityOnDeviceBlockRl.alpha = 1f
+        b.settingsActivityFavIconRl.alpha = 1f
+        b.settingsActivityPreventDnsLeaksSwitch.isClickable = false
+        b.settingsActivityOnDeviceBlockConfigureBtn.isClickable = true
+        b.settingsActivityOnDeviceBlockRefreshBtn.isClickable = true
+        b.settingsActivityOnDeviceBlockSwitch.isClickable = true
+        b.settingsActivityFavIconSwitch.isClickable = true
+    }
+
+    private fun handleFirewallModeUi() {
+        b.settingsActivityPreventDnsLeaksRl.alpha = 0.5f
+        b.settingsActivityOnDeviceBlockRl.alpha = 0.5f
+        b.settingsActivityFavIconRl.alpha = 0.5f
+        b.settingsActivityPreventDnsLeaksSwitch.isClickable = false
+        b.settingsActivityOnDeviceBlockConfigureBtn.isClickable = false
+        b.settingsActivityOnDeviceBlockRefreshBtn.isClickable = false
+        b.settingsActivityOnDeviceBlockSwitch.isClickable = false
+        b.settingsActivityFavIconSwitch.isClickable = false
+    }
+
+    private fun handleDnsFirewallModeUi() {
+        b.settingsActivityPreventDnsLeaksRl.alpha = 1f
+        b.settingsActivityOnDeviceBlockRl.alpha = 1f
+        b.settingsActivityFavIconRl.alpha = 1f
+        b.settingsActivityPreventDnsLeaksSwitch.isClickable = true
+        b.settingsActivityOnDeviceBlockConfigureBtn.isClickable = true
+        b.settingsActivityOnDeviceBlockRefreshBtn.isClickable = true
+        b.settingsActivityOnDeviceBlockSwitch.isClickable = true
+        b.settingsActivityFavIconSwitch.isClickable = true
+    }
+
     // Should be in disabled state when the brave mode is in DNS only / Vpn in lockdown mode.
     private fun handleProxyUi() {
-        val canEnableProxy = !appMode.isDnsMode() && !isVpnLockdownEnabled(VpnController.getBraveVpnService())
+        val canEnableProxy = !appMode.getBraveMode().isDnsMode() && !isVpnLockdownEnabled(
+            VpnController.getBraveVpnService())
 
         if (canEnableProxy) {
             b.settingsActivitySocks5Rl.alpha = 1f
@@ -918,8 +970,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             if (isValid && isHostValid) {
                 errorTxt.visibility = View.INVISIBLE
                 appMode.addProxy(AppMode.ProxyType.HTTP, AppMode.ProxyProvider.CUSTOM)
-                persistentState.httpProxyHostAddress = host
-                persistentState.httpProxyPort = port
+                appMode.insertCustomHttpProxy(host, port)
                 dialog.dismiss()
                 Toast.makeText(requireContext(),
                                getString(R.string.settings_http_proxy_toast_success),
@@ -1150,7 +1201,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
         CoroutineScope(Dispatchers.IO).launch {
             var proxyName = name
-            if (proxyName.isEmpty() || proxyName.isBlank()) {
+            if (proxyName.isBlank()) {
                 proxyName = if (mode == getString(R.string.cd_dns_proxy_mode_internal)) {
                     appName
                 } else ip

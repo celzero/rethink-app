@@ -116,7 +116,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
     private fun handleNetworkChange(isForceUpdate: Boolean = false) {
         val message = constructMessage(
-            if (persistentState.isAddAllNetworks) MSG_ADD_ALL_NETWORKS else MSG_ADD_ACTIVE_NETWORK,
+            if (persistentState.useMultipleNetworks) MSG_ADD_ALL_NETWORKS else MSG_ADD_ACTIVE_NETWORK,
             isForceUpdate)
         serviceHandler?.removeMessages(MSG_ADD_ACTIVE_NETWORK, null)
         serviceHandler?.removeMessages(MSG_ADD_ALL_NETWORKS, null)

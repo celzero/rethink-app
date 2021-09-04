@@ -131,7 +131,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
     }
 
     private fun refreshDatabase() {
-        refreshDatabase.refreshAppInfoDatabase(isForceRefresh = true)
+        refreshDatabase.refreshAppInfoDatabase()
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {

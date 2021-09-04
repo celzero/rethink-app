@@ -89,9 +89,9 @@ class DNSCryptEndpointRepository(private val dnsCryptEndpointDAO: DNSCryptEndpoi
         return dnsCryptEndpointDAO.getCount()
     }
 
-    fun updateConnectionStatus(liveServersID: String) {
+    fun updateConnectionStatus(liveServersID: String?) {
         removeConnectionStatus()
-        liveServersID.split(",").forEach {
+        liveServersID?.split(",")?.forEach {
             dnsCryptEndpointDAO.updateConnectionStatus(it.trim().toInt())
         }
     }

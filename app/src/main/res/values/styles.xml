@@ -38,6 +38,10 @@
         <item name="buttonBackground">@color/buttonBackground</item>
         <item name="colorSurface">@color/colorPrimaryDark</item>
         <item name="tabIndicator">@color/accent_good</item>
+        <item name="chipBgColorPositive">@color/chipBgPositiveApp</item>
+        <item name="chipTextPositive">@color/chipTextPositiveApp</item>
+        <item name="chipBgColorNegative">@color/chipBgNegativeApp</item>
+        <item name="chipTextNegative">@color/chipTextNegativeApp</item>
     </style>
 
     <style name="AppThemeWhite" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
@@ -74,6 +78,10 @@
         <item name="buttonBackground">@color/buttonBackgroundWhite</item>
         <item name="colorSurface">@color/navBarBackgroundWhite</item>
         <item name="tabIndicator">@color/accent_bad</item>
+        <item name="chipBgColorPositive">@color/chipBgPositiveWhite</item>
+        <item name="chipTextPositive">@color/chipTextPositiveWhite</item>
+        <item name="chipBgColorNegative">@color/chipBgNegativeWhite</item>
+        <item name="chipTextNegative">@color/chipTextNegativeWhite</item>
     </style>
 
     <style name="AppThemeTrueBlack" parent="Theme.MaterialComponents.NoActionBar.Bridge">
@@ -111,6 +119,10 @@
         <item name="buttonBackground">@color/buttonBackgroundBlack</item>
         <item name="colorSurface">@color/navBarBackgroundBlack</item>
         <item name="tabIndicator">@color/accentGoodBlack</item>
+        <item name="chipBgColorPositive">@color/chipBgPositiveBlack</item>
+        <item name="chipTextPositive">@color/chipTextPositiveBlack</item>
+        <item name="chipBgColorNegative">@color/chipBgNegativeBlack</item>
+        <item name="chipTextNegative">@color/chipTextNegativeBlack</item>
     </style>
 
 
@@ -206,6 +218,14 @@
     </style>
 
     <style name="ThinnerChip_action" parent="Widget.MaterialComponents.Chip.Action">
+        <item name="chipCornerRadius">12dp</item>
+        <item name="chipMinHeight">24dp</item>
+        <item name="android:textSize">11sp</item>
+        <item name="chipMinTouchTargetSize">30dp</item>
+        <item name="chipIconSize">15dp</item>
+    </style>
+
+    <style name="ThinnerChip_entry" parent="Widget.MaterialComponents.Chip.Entry">
         <item name="chipCornerRadius">12dp</item>
         <item name="chipMinHeight">24dp</item>
         <item name="android:textSize">11sp</item>

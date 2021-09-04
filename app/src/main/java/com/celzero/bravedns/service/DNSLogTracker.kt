@@ -17,6 +17,7 @@ limitations under the License.
 package com.celzero.bravedns.service
 
 import android.content.Context
+import android.text.TextUtils
 import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DNSLogRepository
@@ -35,12 +36,15 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
 import com.celzero.bravedns.util.Utilities.Companion.getFlag
 import com.celzero.bravedns.util.Utilities.Companion.makeAddressPair
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
 import com.google.common.net.InetAddresses.forString
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.net.InetAddress
 import java.net.ProtocolException
+import java.util.concurrent.TimeUnit
 
 class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRepository,
                                          private val persistentState: PersistentState,
@@ -48,10 +52,25 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
 
     companion object {
         private const val PERSISTENCE_STATE_INSERT_SIZE = 100L
+        private const val DNS_LEAK_TEST = "dnsleaktest"
+
+        private const val CACHE_BUILDER_MAX_SIZE = 20000L
+        private const val CACHE_BUILDER_WRITE_EXPIRE_HRS = 24L
+
+        // Some apps like firefox, instagram do not respect ttls
+        // add a reasonable grace period to account for that
+        // for eg: https://support.mozilla.org/en-US/questions/1213045
+        private const val DNS_TTL_GRACE_SEC = 300L
     }
 
     private var numRequests: Long = 0
     private var numBlockedRequests: Long = 0
+
+    data class DnsCacheRecord(val ttl: Long, val fqdn: String)
+
+    val dnsResolvedIpsRecord: Cache<String, DnsCacheRecord> = CacheBuilder.newBuilder().maximumSize(
+        CACHE_BUILDER_MAX_SIZE).expireAfterWrite(CACHE_BUILDER_WRITE_EXPIRE_HRS,
+                                                 TimeUnit.HOURS).build()
 
     init {
         // initialize values from persistence state
@@ -68,7 +87,7 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
     }
 
     private fun insertToDB(transaction: Transaction) {
-        GlobalScope.launch(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch {
             val dnsLogs = DNSLogs()
 
             dnsLogs.blockLists = transaction.blocklist
@@ -117,17 +136,31 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                 }
                 if (packet != null) {
                     val addresses: List<InetAddress> = packet.responseAddresses
+                    val ips: MutableList<String> = ArrayList()
+
+                    packet.answer.forEach { r ->
+                        val ip = r.ip ?: return@forEach
+
+                        val dnsCacheRecord = DnsCacheRecord(calculateTtl(r.ttl), transaction.name)
+                        dnsResolvedIpsRecord.put(ip.hostAddress, dnsCacheRecord)
+                    }
+
                     if (addresses.isNotEmpty()) {
                         val destination = addresses[0]
                         if (DEBUG) Log.d(LOG_TAG_DNS_LOG,
                                          "Address - ${destination.address}, HostAddress - ${destination.hostAddress}")
-                        val countryCode: String = getCountryCode(destination,
-                                                                 context) //TODO : Check on the country code stuff
-                        dnsLogs.response = makeAddressPair(countryCode, destination.hostAddress)
+                        val countryCode: String = getCountryCode(destination, context)
+
+                        addresses.forEach {
+                            ips += makeAddressPair(getCountryCode(it, context), it.hostAddress)
+                        }
+                        // Log.d("TEST", "TEST DNS: ip addresses: ${TextUtils.join(",", ips)}")
+                        dnsLogs.response = TextUtils.join(",", ips)
+
                         if (destination.hostAddress.contains(UNSPECIFIED_IP)) {
                             dnsLogs.isBlocked = true
                         }
-                        if (destination.isAnyLocalAddress) {
+                        if (destination.isLoopbackAddress) {
                             dnsLogs.isBlocked = true
                         } else if (destination.hostAddress == UNSPECIFIED_IPV6 || destination.hostAddress == LOOPBACK_IPV6) {
                             dnsLogs.isBlocked = true
@@ -179,11 +212,28 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
         }
     }
 
+    private fun calculateTtl(ttl: Int): Long {
+        val now = System.currentTimeMillis()
+
+        // on negative ttl, cache dns record for a day
+        if (ttl < 0) return now + TimeUnit.DAYS.toMillis(1L)
+
+        return now + TimeUnit.SECONDS.toMillis((ttl + DNS_TTL_GRACE_SEC))
+    }
+
     private fun fetchFavIcon(dnsLogs: DNSLogs) {
         if (!persistentState.fetchFavIcon || dnsLogs.failure()) return
+
+        if (isDgaDomain(dnsLogs.queryStr)) return
 
         if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - fetchFavIcon() -${dnsLogs.queryStr}")
         val favIconFetcher = FavIconDownloader(context, dnsLogs.queryStr)
         favIconFetcher.run()
+    }
+
+    // TODO: Check if the domain is generated by a DGA (Domain Generation Algorithm)
+    private fun isDgaDomain(fqdn: String): Boolean {
+        // dnsleaktest.com fqdn's are auto-generated
+        return fqdn.contains(DNS_LEAK_TEST)
     }
 }

@@ -24,11 +24,8 @@ import android.widget.Toast
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.data.AppMode
-import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS
-import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS_FIREWALL
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
@@ -36,7 +33,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.koin.core.component.inject
 
 class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
@@ -74,7 +70,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
     }
 
     private fun reloadRules() {
-        CoroutineScope(Dispatchers.IO).launch {
+        io {
             FirewallManager.loadAppFirewallRules()
         }
     }
@@ -98,22 +94,28 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
             return
         }
 
-        appMode.setAppState(AppMode.AppState.PAUSED)
+        VpnController.getBraveVpnService()?.pauseApp()
     }
 
     private fun resumeApp() {
-        appMode.setAppState(AppMode.AppState.ACTIVE)
+        VpnController.getBraveVpnService()?.resumeApp()
     }
 
     private fun dnsMode() {
-        CoroutineScope(Dispatchers.IO).launch {
-            appMode.changeBraveMode(APP_MODE_DNS)
+        io {
+            appMode.changeBraveMode(AppMode.BraveMode.DNS.mode)
         }
     }
 
     private fun dnsFirewallMode() {
+        io {
+            appMode.changeBraveMode(AppMode.BraveMode.DNS_FIREWALL.mode)
+        }
+    }
+
+    private fun io(f: suspend () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            appMode.changeBraveMode(APP_MODE_DNS_FIREWALL)
+            f()
         }
     }
 }

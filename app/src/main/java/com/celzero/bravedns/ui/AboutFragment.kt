@@ -20,7 +20,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -29,8 +28,6 @@ import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.ScrollView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
@@ -39,8 +36,10 @@ import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
+import com.celzero.bravedns.databinding.DialogViewLogsBinding
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentAboutBinding
+import com.celzero.bravedns.scheduler.ZipUtil.Companion.getZipFilePath
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
@@ -57,7 +56,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.InputStream
+import java.io.FileInputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+import java.util.zip.ZipInputStream
 
 
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
@@ -251,22 +253,16 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
     // ref: https://developer.android.com/guide/components/intents-filters
     private fun emailBugReport() {
         // ACTION_SEND_MULTIPLE is to send multiple text files in email.
-        val emailIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
-        emailIntent.type = "plain/text"
+        val emailIntent = Intent(Intent.ACTION_SEND)
+        emailIntent.type = "text/plain"
         emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.about_mail_to)))
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_bugreport_subject))
         emailIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.about_mail_bugreport_text))
-        // Get the bug_report.txt file
-        val file0 = File(
-            requireContext().filesDir.canonicalPath + File.separator + Constants.BUG_REPORT_FILE)
-        // Get the bug_report_1.txt file
-        val file1 = File(
-            requireContext().filesDir.canonicalPath + File.separator + Constants.PREV_REPORT_FILE)
-        // list of files added as attachments
-        val uris: ArrayList<Uri> = ArrayList()
-        getFileUri(file0)?.let { uris.add(it) }
-        getFileUri(file1)?.let { uris.add(it) }
-        emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris)
+        // Get the bug_report.zip file
+        val file = File(getZipFilePath(requireContext()))
+        val uri = getFileUri(file)
+        emailIntent.putExtra(Intent.EXTRA_STREAM, uri)
+
         emailIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         emailIntent.flags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION
         startActivity(
@@ -287,31 +283,47 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
     }
 
     private fun promptCrashLogAction() {
-        val builder: AlertDialog.Builder = AlertDialog.Builder(requireContext())
+        val binding = DialogViewLogsBinding.inflate(LayoutInflater.from(requireContext()), null,
+                                                    false)
+        val builder: AlertDialog.Builder = AlertDialog.Builder(requireContext()).setView(
+            binding.root)
         builder.setTitle(getString(R.string.about_bug_report))
-        // No layouts added in the alert dialog.
-        // Created scroll view and added textview to it.
-        val scrollView = ScrollView(requireContext())
-        val textView = TextView(requireContext())
-        textView.setPadding(30, 30, 30, 30)
-        textView.typeface = Typeface.MONOSPACE
-        scrollView.addView(textView)
-        builder.setView(scrollView)
-        val file0 = File(
-            requireContext().filesDir.canonicalPath + File.separator + Constants.BUG_REPORT_FILE)
-        if (!isFileAvailable(file0)) {
+
+        val zipPath = getZipFilePath(requireContext())
+        val zipFile: ZipFile? = try {
+            ZipFile(zipPath)
+        } catch (ignored: Exception) {  // FileNotFound, ZipException
+            null
+        }
+
+        if (zipFile == null || zipFile.size() <= 0) {
             showToastUiCentered(requireContext(), getString(R.string.log_file_not_available),
                                 Toast.LENGTH_SHORT)
             return
         }
 
-        CoroutineScope(Dispatchers.Main).launch {
-            var inputString: String
-            withContext(Dispatchers.IO) {
-                val inputStream: InputStream = file0.inputStream()
-                inputString = inputStream.bufferedReader().use { it.readText() }
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val zin = ZipInputStream(FileInputStream(zipPath))
+                var ze: ZipEntry? = null
+
+                while (zin.nextEntry.also { ze = it } != null) {
+                    val inStream = zipFile.getInputStream(ze)
+                    val inputString = inStream?.bufferedReader().use { it?.readText() }
+                    withContext(Dispatchers.Main) {
+                        binding.logs.append(inputString)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.w(LOG_TAG_UI, "Error loading log files to textview: ${e.message}", e)
+                withContext(Dispatchers.Main) {
+                    binding.logs.text = getString(R.string.error_loading_log_file)
+                }
             }
-            textView.text = inputString
+
+            withContext(Dispatchers.Main) {
+                binding.progressLayout.visibility = View.GONE
+            }
         }
 
         val width = (resources.displayMetrics.widthPixels * 0.75).toInt()
@@ -330,5 +342,4 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         alert.window?.setLayout(width, height)
         alert.show()
     }
-
 }

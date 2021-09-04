@@ -41,9 +41,6 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.CONFIGURE_BLOCKLIST_URL
 import com.celzero.bravedns.util.Constants.Companion.CONFIGURE_BLOCKLIST_URL_PARAMETER
-import com.celzero.bravedns.util.Constants.Companion.THEME_DARK
-import com.celzero.bravedns.util.Constants.Companion.THEME_LIGHT
-import com.celzero.bravedns.util.Constants.Companion.THEME_SYSTEM_DEFAULT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
@@ -69,6 +66,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     companion object {
         const val LOCAL = 1
         const val REMOTE = 2
+        const val BLOCKLIST_REMOTE_FOLDER_NAME = "blocklist_remote"
     }
 
 
@@ -129,6 +127,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
      * FORCE_DARK_ON - For Dark and True black theme
      * FORCE_DARK_OFF - Light mode.
      */
+    @SuppressLint("RequiresFeature")
     private fun setWebViewTheme() {
 
         if (!WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
@@ -136,23 +135,32 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
             return
         }
 
-        if (persistentState.theme == THEME_SYSTEM_DEFAULT) {
-            if (isDarkThemeOn()) {
+        when (persistentState.theme) {
+            Constants.Companion.Themes.SYSTEM_DEFAULT.id -> {
+                if (isDarkThemeOn()) {
+                    WebSettingsCompat.setForceDark(b.configureWebview.settings,
+                                                   WebSettingsCompat.FORCE_DARK_ON)
+                } else {
+                    WebSettingsCompat.setForceDark(b.configureWebview.settings,
+                                                   WebSettingsCompat.FORCE_DARK_OFF)
+                }
+            }
+            Constants.Companion.Themes.DARK.id -> {
                 WebSettingsCompat.setForceDark(b.configureWebview.settings,
                                                WebSettingsCompat.FORCE_DARK_ON)
-            } else {
+            }
+            Constants.Companion.Themes.LIGHT.id -> {
                 WebSettingsCompat.setForceDark(b.configureWebview.settings,
                                                WebSettingsCompat.FORCE_DARK_OFF)
             }
-        } else if (persistentState.theme == THEME_LIGHT) {
-            WebSettingsCompat.setForceDark(b.configureWebview.settings,
-                                           WebSettingsCompat.FORCE_DARK_OFF)
-        } else if (persistentState.theme == THEME_DARK) {
-            WebSettingsCompat.setForceDark(b.configureWebview.settings,
-                                           WebSettingsCompat.FORCE_DARK_ON)
-        } else {
-            WebSettingsCompat.setForceDark(b.configureWebview.settings,
-                                           WebSettingsCompat.FORCE_DARK_ON)
+            Constants.Companion.Themes.TRUE_BLACK.id -> {
+                WebSettingsCompat.setForceDark(b.configureWebview.settings,
+                                               WebSettingsCompat.FORCE_DARK_ON)
+            }
+            else -> {
+                WebSettingsCompat.setForceDark(b.configureWebview.settings,
+                                               WebSettingsCompat.FORCE_DARK_ON)
+            }
         }
 
         setWebViewForceDarkStrategy()
@@ -175,7 +183,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     }
 
     private fun updateDoHEndPoint(stamp: String, count: Int) {
-        Log.i(LOG_TAG_DNS, "Remote stamp has been updated from web view: $stamp")
+        Log.i(LOG_TAG_DNS, "rethinkdns+ stamp updated to: $stamp")
 
         CoroutineScope(Dispatchers.IO).launch {
             appMode.updateRethinkDnsPlusStamp(stamp, count)
@@ -186,10 +194,9 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     }
 
     private fun updateLocalBlocklistStamp(stamp: String, count: Int) {
-        Log.i(LOG_TAG_DNS, "Local stamp has been set from webview: $stamp")
+        Log.i(LOG_TAG_DNS, "local blocklist stamp set to: $stamp")
 
-        val stamp = Xdns.getBlocklistStampFromURL(stamp)
-        persistentState.localBlocklistStamp = stamp
+        persistentState.localBlocklistStamp = Xdns.getBlocklistStampFromURL(stamp)
         persistentState.numberOfLocalBlocklists = count
 
         Toast.makeText(this, getString(R.string.wv_local_blocklist_toast),
@@ -208,7 +215,6 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                     b.progressBar.visibility = ProgressBar.GONE
                 }
             }
-
         }
     }
 
@@ -331,7 +337,6 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         }
     }
 
-
     private fun showErrorDialog(handler: SslErrorHandler?) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle(R.string.webview_error_title)
@@ -373,7 +378,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                 updateDoHEndPoint(receivedStamp, count.toInt())
             }
 
-            if (DEBUG) Log.d(LOG_TAG_DNS, "Stamp value: $receivedStamp, $count")
+            if (DEBUG) Log.d(LOG_TAG_DNS, "stamp, blocklist-count: $receivedStamp, $count")
             finish()
         }
 
@@ -388,29 +393,33 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
                              "Content received from webview for blocklist download with timestamp: $timestamp, string length: ${fileContent.length}")
 
-            if (persistentState.remoteBlocklistDownloadTime.toString() == timestamp) return
+            if (isLocal()) return // Do not save filetag.json in on-device mode
+
             if (fileContent.isEmpty()) return
+
+            val t = parseLong(timestamp)
+
+            if (persistentState.remoteBlocklistDownloadTime >=  t) return
 
             try {
                 makeFile(timestamp).writeText(fileContent)
-                persistentState.remoteBlocklistDownloadTime = toLong(timestamp)
+                persistentState.remoteBlocklistDownloadTime = t
             } catch (e: IOException) {
                 Log.w(LOG_TAG_DOWNLOAD, "Cannot create $timestamp filetag json")
             }
         }
     }
 
-    private fun toLong(timestamp: String): Long {
+    private fun parseLong(s: String): Long {
         return try {
-            timestamp.toLong()
-        } catch (e: NumberFormatException) {
-            Log.e(LOG_TAG_DOWNLOAD, "Error converting timestamp ")
-            0
+            s.toLong()
+        } catch (ignored: NumberFormatException) {
+            Long.MIN_VALUE
         }
     }
 
     private fun makeFile(timestamp: String): File {
-        val dir = File(this.filesDir.canonicalPath + File.separator + timestamp)
+        val dir = File(this.filesDir.canonicalPath + File.separator + BLOCKLIST_REMOTE_FOLDER_NAME + File.separator + timestamp)
         if (!dir.exists()) {
             dir.mkdirs()
         }

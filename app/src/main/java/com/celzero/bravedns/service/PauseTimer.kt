@@ -1,3 +1,18 @@
+/*
+ * Copyright 2021 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.celzero.bravedns.service
 
 import android.os.CountDownTimer
@@ -12,45 +27,44 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 class PauseTimer(val appMode: AppMode) {
 
     private var timer: CountDownTimer? = null
-    private var countdownMs: Long = Constants.DEFAULT_PAUSE_TIME_MS
-    private var pauseCountdownObserver: MutableLiveData<Long> = MutableLiveData()
+    private var countDownMs: Long = Constants.DEFAULT_PAUSE_TIME_MS
+    private var pauseCountDownTimer: MutableLiveData<Long> = MutableLiveData()
 
     fun startCountDownTimer(timeInMills: Long) {
-        countdownMs = timeInMills
-        if (DEBUG) Log.d(LOG_TAG_UI,
-                                 "Timer started with: $timeInMills")
+        countDownMs = timeInMills
+        if (DEBUG) Log.d(LOG_TAG_UI, "Timer started with: $timeInMills")
         timer?.cancel()
-        timer = object : CountDownTimer(countdownMs, 1000) {
+        timer = object : CountDownTimer(countDownMs, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                countdownMs = millisUntilFinished
-                pauseCountdownObserver.postValue(millisUntilFinished)
+                countDownMs = millisUntilFinished
+                pauseCountDownTimer.postValue(millisUntilFinished)
             }
 
             override fun onFinish() {
                 Log.d(LOG_TAG_VPN, "Timer count down timer onFinish.")
-                appMode.setAppState(AppMode.AppState.ACTIVE)
-                pauseCountdownObserver.postValue(0)
+                VpnController.getBraveVpnService()?.resumeApp()
+                pauseCountDownTimer.postValue(0)
             }
         }.start()
     }
 
     fun stopCountDownTimer() {
         timer?.cancel()
-        countdownMs = Constants.DEFAULT_PAUSE_TIME_MS
-        pauseCountdownObserver.postValue(0)
+        countDownMs = Constants.DEFAULT_PAUSE_TIME_MS
+        pauseCountDownTimer.postValue(0)
     }
 
     fun incrementTimer(timeInMills: Long) {
-        countdownMs = countdownMs.plus(timeInMills)
-        startCountDownTimer(countdownMs)
+        countDownMs = countDownMs.plus(timeInMills)
+        startCountDownTimer(countDownMs)
     }
 
     fun decrementTimer(timeInMills: Long) {
-        countdownMs = countdownMs.minus(timeInMills)
-        startCountDownTimer(countdownMs)
+        countDownMs = countDownMs.minus(timeInMills)
+        startCountDownTimer(countDownMs)
     }
 
     fun getPauseCountdownObserver(): MutableLiveData<Long> {
-        return pauseCountdownObserver
+        return pauseCountDownTimer
     }
 }

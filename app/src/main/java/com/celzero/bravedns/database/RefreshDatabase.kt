@@ -68,19 +68,16 @@ class RefreshDatabase internal constructor(private var context: Context,
     /**
      * Need to rewrite the logic for adding the apps in the database and removing it during uninstall.
      */
-    fun refreshAppInfoDatabase(isForceRefresh: Boolean) {
+    fun refreshAppInfoDatabase() {
         if (DEBUG) Log.d(LOG_TAG_APP_DB, "Initiated refresh application info")
 
         refreshMutex.read {
             if (isRefreshInProgress) return
         }
 
-        if (!isRefreshCheckRequired(isForceRefresh) && FirewallManager.getTotalApps() != 0) return
-
-        // Synchronization is deprecated in kotlin, so using Lock.withLock with ReentrantLock.
-        // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/synchronized.html
-        // ref: https://chris-ribetti.medium.com/synchronized-to-reentrantlock-6f045519577e
         refreshMutex.write {
+            if (FirewallManager.getTotalApps() != 0) return
+
             if (isRefreshInProgress) {
                 return
             }
@@ -122,10 +119,10 @@ class RefreshDatabase internal constructor(private var context: Context,
             // Add the missing packages to the database
             addMissingPackages(packagesToAdd)
 
-            // update app refresh time to current time in persistent state
-            persistentState.lastAppRefreshTime = System.currentTimeMillis()
-
             refreshMutex.write {
+                // update app refresh time to current time in persistent state
+                persistentState.lastAppRefreshTime = System.currentTimeMillis()
+
                 isRefreshInProgress = false
             }
         }
@@ -163,19 +160,6 @@ class RefreshDatabase internal constructor(private var context: Context,
 
         }
         updateCategoryRepo()
-    }
-
-    // Refresh database is called from Homescreenactivity's onResume().
-    // Now the refresh will be called if the last updated time is greater than
-    // REFRESH_APP_DURATION(3hrs) / if appList is empty.
-    // This will avoid too frequent refresh calls.
-    private fun isRefreshCheckRequired(forceRefresh: Boolean): Boolean {
-        if (forceRefresh) return true
-
-        val timeDifference = System.currentTimeMillis() - persistentState.lastAppRefreshTime
-        val hours = TimeUnit.MILLISECONDS.toHours(timeDifference)
-
-        return hours > REFRESH_APP_DURATION
     }
 
     private fun isSystemApp(ai: ApplicationInfo): Boolean {
@@ -400,7 +384,8 @@ class RefreshDatabase internal constructor(private var context: Context,
                                        context.getString(R.string.dns_mode_3_explanation), true,
                                        isCustom = false,
                                        modifiedDataTime = System.currentTimeMillis(), latency = 0)
-        // rethinkdns+ must always be at position 5, change in id requires query changes
+        // Note: rethinkdns+ must always be at index 5; if not impl such as
+        // AppMode#getDnsRethinkEndpoint will break
         val doHEndpoint5 = DoHEndpoint(id = 5, urlName[5], urlValues[5],
                                        context.getString(R.string.dns_mode_5_explanation),
                                        isSelected = false, isCustom = false,

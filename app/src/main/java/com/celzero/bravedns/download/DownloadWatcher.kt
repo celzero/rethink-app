@@ -21,7 +21,6 @@ import android.os.SystemClock
 import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_FAILURE
@@ -29,7 +28,6 @@ import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_RETRY
 import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SUCCESS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 /**
  * The download watcher  - Worker initiated from AppDownloadManager class.
@@ -41,18 +39,23 @@ import org.koin.core.component.inject
 class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) :
         Worker(context, workerParameters), KoinComponent {
 
-    val persistentState by inject<PersistentState>()
+    private var downloadIds: MutableList<Long>? = mutableListOf()
 
     override fun doWork(): Result {
 
         val startTime = inputData.getLong("workerStartTime", 0)
+        downloadIds = inputData.getLongArray("downloadIds")?.toMutableList()
+        if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "AppDownloadManager - $startTime, $downloadIds")
+
+        if (downloadIds == null || downloadIds?.isEmpty() == true) return Result.failure()
+
         val currentTime = SystemClock.elapsedRealtime()
         if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "AppDownloadManager - $startTime, $currentTime")
         if (currentTime - startTime > Constants.WORK_MANAGER_TIMEOUT) {
             return Result.failure()
         }
 
-        when (checkForDownload(context)) {
+        when (checkForDownload(context, downloadIds)) {
             DOWNLOAD_RETRY -> {
                 return Result.retry()
             }
@@ -67,11 +70,14 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
         return Result.failure()
     }
 
-    private fun checkForDownload(context: Context): Int {
+    private fun checkForDownload(context: Context, downloadIds: MutableList<Long>?): Int {
         //Check for the download success from the receiver
-        persistentState.downloadIds.forEach { downloadID ->
+        val downloadIdsIterator = downloadIds?.iterator()
+
+        while(downloadIdsIterator?.hasNext() == true) {
+            val downloadID = downloadIdsIterator.next()
             val query = DownloadManager.Query()
-            query.setFilterById(downloadID.toLong())
+            query.setFilterById(downloadID)
             val downloadManager = context.getSystemService(
                 Context.DOWNLOAD_SERVICE) as DownloadManager
             val cursor = downloadManager.query(query)
@@ -87,13 +93,7 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
                     if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "onReceive status $status $downloadID")
 
                     if (status == DownloadManager.STATUS_SUCCESSFUL) {
-                        // status==success is sometimes called-back more than once.
-                        // send a 'success' removing it from persitent-state.
-                        persistentState.downloadIds = persistentState.downloadIds.minusElement(
-                            downloadID)
-                        if (persistentState.downloadIds.isEmpty()) {
-                            return DOWNLOAD_SUCCESS
-                        }
+                        downloadIdsIterator.remove()
                     } else if (status == DownloadManager.STATUS_FAILED) {
                         if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
                                          "download status failure for $downloadID")
@@ -109,6 +109,13 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
                 cursor.close()
             }
         }
+
+        // Send the status as success when the download ids are cleared
+        if (downloadIds?.isEmpty() == true) {
+            Log.i(LOG_TAG_DOWNLOAD, "files downloaded successfully")
+            return DOWNLOAD_SUCCESS
+        }
+
         // occasionally, the download-manager observer fires without a download having
         // been enqueued and download-ids populated into persitent-state, which keep in
         // mind, is also eventually consistent with its state propagation. In this case,

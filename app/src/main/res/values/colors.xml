@@ -24,6 +24,11 @@
     <color name="navBarBackground">#2d2c2c</color>
     <color name="buttonBackground">#006f67</color>
 
+    <color name="chipBgPositiveApp">#80CBC4</color>
+    <color name="chipTextPositiveApp">#00796B</color>
+    <color name="chipBgNegativeApp">#F48FB1</color>
+    <color name="chipTextNegativeApp">#C51162</color>
+
     <color name="stroke_color">#FFFFFF</color>
     <color name="fill_color">#00000000</color>
 
@@ -104,6 +109,10 @@
     <color name="whitelist">#9cff57</color>
     <color name="navBarBackgroundWhite">#FFFFFF</color>
     <color name="buttonBackgroundWhite">#1e88e5</color>
+    <color name="chipBgPositiveWhite">#C5E1A5</color>
+    <color name="chipTextPositiveWhite">#33691E</color>
+    <color name="chipBgNegativeWhite">#F48FB1</color>
+    <color name="chipTextNegativeWhite">#C51162</color>
 
     <!-- Black theme latest colors -->
     <color name="colorBackgroundBlack">#121212</color>
@@ -118,5 +127,9 @@
     <color name="navBarBackgroundBlack">#000000</color>
     <color name="buttonBackgroundBlack">#4fc3f7</color>
     <color name="dividerBlack">#000000</color>
+    <color name="chipBgPositiveBlack">#33004D40</color>
+    <color name="chipTextPositiveBlack">#CC1DE9B6</color>
+    <color name="chipBgNegativeBlack">#33B71C1C</color>
+    <color name="chipTextNegativeBlack">#CCFF5252</color>
 
 </resources>
