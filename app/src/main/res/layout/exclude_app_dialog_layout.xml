@@ -63,6 +63,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="10dp"
+                android:clipToPadding="false"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
                 android:scrollbars="none">
 
                 <com.google.android.material.chip.ChipGroup
