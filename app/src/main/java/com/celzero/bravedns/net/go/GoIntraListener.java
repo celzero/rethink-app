@@ -27,6 +27,7 @@ import com.celzero.bravedns.net.doh.Transaction.Status;
 import com.celzero.bravedns.service.BraveVPNService;
 
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 import dnscrypt.Dnscrypt;
 import dnscrypt.Summary;
@@ -111,7 +112,7 @@ public class GoIntraListener implements Listener {
         } catch (Exception e) {
             return;
         }
-        long latencyMs = (long) (1000 * summary.getLatency());
+        long latencyMs = (long) (TimeUnit.SECONDS.toMillis(1L) * summary.getLatency());
         long nowMs = SystemClock.elapsedRealtime();
         long queryTimeMs = nowMs - latencyMs;
         Transaction transaction = new Transaction(query, queryTimeMs);
@@ -143,7 +144,7 @@ public class GoIntraListener implements Listener {
         } catch (Exception e) {
             return;
         }
-        long latencyMs = (long) (1000 * summary.getLatency());
+        long latencyMs = (long) (TimeUnit.SECONDS.toMillis(1L) * summary.getLatency());
         long nowMs = SystemClock.elapsedRealtime();
         long queryTimeMs = nowMs - latencyMs;
         Transaction transaction = new Transaction(query, queryTimeMs);

@@ -32,10 +32,7 @@ import com.celzero.bravedns.adapter.Apk
 import com.celzero.bravedns.adapter.ApkListAdapter
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.util.LoggerConstants
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.koin.android.ext.android.inject
 
 class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener {
@@ -85,14 +82,14 @@ class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener {
                 return@setOnClickListener
             }
             val bottomFilterSheetFragment = FilterAndSortBottomFragment()
-            bottomFilterSheetFragment.show(activity!!.supportFragmentManager,
+            bottomFilterSheetFragment.show(requireActivity().supportFragmentManager,
                                            bottomFilterSheetFragment.tag)
         }
 
         return view
     }
 
-    private fun updateAppList() = GlobalScope.launch(Dispatchers.Default) {
+    private fun updateAppList() = CoroutineScope(Dispatchers.Default).launch {
         val appList = appInfoRepository.getAppInfo()
         appList.forEach {
             val userApk = Apk(it.appName, it.appName, it.packageInfo, it.uid.toString())

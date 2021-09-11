@@ -16,19 +16,9 @@ limitations under the License.
 package com.celzero.bravedns.database
 
 import com.celzero.bravedns.util.Constants
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 
 class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTrackerDAO) {
-
-    fun updateAsync(connectionTracker: ConnectionTracker,
-                    coroutineScope: CoroutineScope = GlobalScope) {
-        coroutineScope.launch {
-            connectionTrackerDAO.update(connectionTracker)
-        }
-    }
 
     fun insert(connectionTracker: ConnectionTracker) {
         connectionTrackerDAO.insert(connectionTracker)

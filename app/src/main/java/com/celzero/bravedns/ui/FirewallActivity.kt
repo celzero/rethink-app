@@ -22,7 +22,6 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -33,10 +32,8 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityFirewallBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
-import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.android.ext.android.inject
 
@@ -54,7 +51,7 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Utilities.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
         fragmentIndex = intent.getIntExtra(Constants.SCREEN_TO_LOAD, 0)
         init()
@@ -96,26 +93,43 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        checkAccessibilityIntent(intent)
+        if (isAccessibilityIntent(intent)) {
+            handleAccessibilitySettings()
+        } else if (isNewAppInstalledIntent(intent)) {
+            // navigate to all apps screen
+            b.firewallActViewpager.setCurrentItem(TAB_LAYOUT_ALL_APPS, true)
+        }
     }
 
-    private fun checkAccessibilityIntent(intent: Intent) {
+    private fun isAccessibilityIntent(intent: Intent): Boolean {
         // Created as part of accessibility failure notification.
         val extras = intent.extras
         if (extras != null) {
             val value = extras.getString(Constants.NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME)
             if (!value.isNullOrEmpty() && value == Constants.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE) {
-                if (DEBUG) Log.d(LOG_TAG_UI,
-                                 "Intent thrown as part of accessibility failure notification.")
-                // Reset the notification counter once user acts on the notification.
-                // There was a case, where notifications were not shown post the user action.
-                VpnController.getBraveVpnService()?.totalAccessibilityFailureNotifications = 0
-                handleAccessibilitySettings()
+                return true
             }
         }
+        return false
+    }
+
+    private fun isNewAppInstalledIntent(intent: Intent): Boolean {
+        // check whether the intent is from new app installed notification
+        val extras = intent.extras
+        if (extras != null) {
+            val value = extras.getString(Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME)
+            if (!value.isNullOrEmpty() && value == Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE) {
+                return true
+            }
+        }
+        return false
     }
 
     private fun handleAccessibilitySettings() {
+        // Reset the notification counter once user acts on the notification.
+        // There was a case, where notifications were not shown post the user action.
+        VpnController.getBraveVpnService()?.totalAccessibilityFailureNotifications = 0
+
         val builder = AlertDialog.Builder(this)
         builder.setTitle(R.string.alert_permission_accessibility_regrant)
         builder.setMessage(R.string.alert_firewall_accessibility_regrant_explanation)

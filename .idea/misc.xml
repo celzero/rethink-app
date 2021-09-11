@@ -3,9 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/drawable/bg_chip_state_list.xml" value="0.2578125" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/drawable/bs_dns_home_screen.xml" value="0.2578125" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/drawable/bs_firewall_home_screen.xml" value="0.2578125" />
+        <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/drawable/dns_home_screen.xml" value="0.2578125" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/drawable/drawable_purple_gradient.xml" value="0.2578125" />
+        <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/drawable/ic_app_info.xml" value="0.2578125" />
+        <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/drawable/ic_appearance.xml" value="0.2578125" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/drawable/ic_device_lock.xml" value="0.2578125" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/drawable/ic_dns_firewall.xml" value="0.2578125" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/drawable/ic_exclude.xml" value="0.2578125" />
@@ -22,22 +26,34 @@
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/drawable/ic_udp.xml" value="0.2578125" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/drawable/ic_unknown_app.xml" value="0.2578125" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/drawable/ic_whitelist.xml" value="0.2578125" />
+        <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/drawable/rounded_corners_button_accent.xml" value="0.2578125" />
+        <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/drawable/rounded_corners_button_primary.xml" value="0.2578125" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/drawable/spinner_firewall.xml" value="0.2578125" />
+        <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/activity_connection_tracker.xml" value="0.10885416666666667" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/activity_dns_detail.xml" value="0.2269021739130435" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/activity_settings_screen.xml" value="0.2269021739130435" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/bottom_sheet_conn_track.xml" value="0.24166666666666667" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/bottom_sheet_dns_log.xml" value="0.24166666666666667" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/bottom_sheet_home_screen.xml" value="0.2269021739130435" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/bottom_sheet_orbot.xml" value="0.24166666666666667" />
+        <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/connection_list_scroll_list.xml" value="0.24166666666666667" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/connection_transaction_row.xml" value="0.24166666666666667" />
+        <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/custom_dialog_layout.xml" value="0.24166666666666667" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/dialog_info_rules_layout.xml" value="0.24166666666666667" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/dialog_ip_details_layout.xml" value="0.24166666666666667" />
+        <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/dialog_set_http_proxy.xml" value="0.24166666666666667" />
+        <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/dialog_set_proxy.xml" value="0.24166666666666667" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/dialog_view_logs.xml" value="0.24166666666666667" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/dialog_whatsnew.xml" value="0.2269021739130435" />
+        <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/doh_endpoint_list_item.xml" value="0.24166666666666667" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/exclude_app_dialog_layout.xml" value="0.24166666666666667" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/fragment_about.xml" value="0.24166666666666667" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/fragment_firewall.xml" value="0.24166666666666667" />
+        <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/fragment_firewall_all_apps.xml" value="0.24166666666666667" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/fragment_home_screen.xml" value="0.1" />
+        <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/fragment_settings.xml" value="0.24166666666666667" />
+        <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/item_chip_category.xml" value="0.24166666666666667" />
+        <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/item_chip_filter.xml" value="0.24094202898550723" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/pause_activity.xml" value="0.24166666666666667" />
         <entry key="..\:/Celzero/Workspace/v053f_final/rethink-app/app/src/main/res/layout/universal_fragement_container.xml" value="0.2269021739130435" />
       </map>

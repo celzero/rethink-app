@@ -44,8 +44,10 @@ import com.celzero.bravedns.util.Constants.Companion.CONFIGURE_BLOCKLIST_URL_PAR
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.celzero.bravedns.util.Utilities.Companion.getCurrentTheme
+import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
+import com.celzero.bravedns.util.Utilities.Companion.remoteBlocklistDir
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -66,7 +68,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     companion object {
         const val LOCAL = 1
         const val REMOTE = 2
-        const val BLOCKLIST_REMOTE_FOLDER_NAME = "blocklist_remote"
+        const val BLOCKLIST_REMOTE_FOLDER_NAME = "remote_blocklist"
     }
 
 
@@ -100,7 +102,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         return if (isLocal()) {
             val url = CONFIGURE_BLOCKLIST_URL.toHttpUrlOrNull()?.newBuilder()
             url?.addQueryParameter(CONFIGURE_BLOCKLIST_URL_PARAMETER,
-                                   persistentState.blocklistDownloadTime.toString())
+                                   persistentState.localBlocklistTimestamp.toString())
             url?.fragment(stamp)
             url.toString()
         } else {
@@ -136,7 +138,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         }
 
         when (persistentState.theme) {
-            Constants.Companion.Themes.SYSTEM_DEFAULT.id -> {
+            Themes.SYSTEM_DEFAULT.id -> {
                 if (isDarkThemeOn()) {
                     WebSettingsCompat.setForceDark(b.configureWebview.settings,
                                                    WebSettingsCompat.FORCE_DARK_ON)
@@ -145,15 +147,15 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                                                    WebSettingsCompat.FORCE_DARK_OFF)
                 }
             }
-            Constants.Companion.Themes.DARK.id -> {
+            Themes.DARK.id -> {
                 WebSettingsCompat.setForceDark(b.configureWebview.settings,
                                                WebSettingsCompat.FORCE_DARK_ON)
             }
-            Constants.Companion.Themes.LIGHT.id -> {
+            Themes.LIGHT.id -> {
                 WebSettingsCompat.setForceDark(b.configureWebview.settings,
                                                WebSettingsCompat.FORCE_DARK_OFF)
             }
-            Constants.Companion.Themes.TRUE_BLACK.id -> {
+            Themes.TRUE_BLACK.id -> {
                 WebSettingsCompat.setForceDark(b.configureWebview.settings,
                                                WebSettingsCompat.FORCE_DARK_ON)
             }
@@ -215,6 +217,13 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                     b.progressBar.visibility = ProgressBar.GONE
                 }
             }
+
+            override fun onConsoleMessage(message: ConsoleMessage): Boolean {
+                Log.i(LOG_TAG_DNS,
+                      "${message.message()} from line " + "${message.lineNumber()} of ${message.sourceId()}")
+                return true
+            }
+
         }
     }
 
@@ -393,17 +402,19 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
                              "Content received from webview for blocklist download with timestamp: $timestamp, string length: ${fileContent.length}")
 
-            if (isLocal()) return // Do not save filetag.json in on-device mode
+            if (isLocal()) return // do not save filetag.json in on-device mode
 
             if (fileContent.isEmpty()) return
 
             val t = parseLong(timestamp)
 
-            if (persistentState.remoteBlocklistDownloadTime >=  t) return
+            if (persistentState.remoteBlocklistTimestamp >= t) return
 
             try {
-                makeFile(timestamp).writeText(fileContent)
-                persistentState.remoteBlocklistDownloadTime = t
+                val filetag = makeFile(t) ?: return
+
+                filetag.writeText(fileContent)
+                persistentState.remoteBlocklistTimestamp = t
             } catch (e: IOException) {
                 Log.w(LOG_TAG_DOWNLOAD, "Cannot create $timestamp filetag json")
             }
@@ -418,8 +429,9 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         }
     }
 
-    private fun makeFile(timestamp: String): File {
-        val dir = File(this.filesDir.canonicalPath + File.separator + BLOCKLIST_REMOTE_FOLDER_NAME + File.separator + timestamp)
+    private fun makeFile(timestamp: Long): File? {
+        val dir = remoteBlocklistDir(this, BLOCKLIST_REMOTE_FOLDER_NAME, timestamp) ?: return null
+
         if (!dir.exists()) {
             dir.mkdirs()
         }

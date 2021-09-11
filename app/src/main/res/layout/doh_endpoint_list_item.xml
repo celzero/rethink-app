@@ -71,18 +71,21 @@
 
     <Button
         android:id="@+id/doh_endpoint_list_configure"
+        style="@style/Widget.AppCompat.TextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/doh_endpoint_list_container"
-        android:background="@drawable/rounded_corners_button_primary"
         android:layout_alignParentStart="true"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
         android:layout_marginBottom="10dp"
-        android:padding="0dp"
+        android:background="@drawable/rounded_corners_button_primary"
+        android:drawableStart="@drawable/bs_dns_home_screen"
+        android:drawablePadding="5dp"
+        android:padding="10dp"
         android:text="@string/dns_connected_rethink_configure"
-        android:textSize="@dimen/large_font_text_view"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        android:textSize="@dimen/large_font_text_view" />
 
     <TextView
         android:layout_width="match_parent"

@@ -29,11 +29,9 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.celzero.bravedns.util.AndroidUidConfig;
-import com.celzero.bravedns.util.Utilities;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 

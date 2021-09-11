@@ -31,9 +31,6 @@ import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_3
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_SCHEDULER
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.convertLongToTime
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
@@ -45,7 +42,7 @@ class AppExitInfoCollector(val context: Context, workerParameters: WorkerParamet
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun doWork(): Result {
-        if(DEBUG) Log.d(LOG_TAG_SCHEDULER, "App exit info job executed")
+        if (DEBUG) Log.d(LOG_TAG_SCHEDULER, "starting app-exit-info job")
         detectAppExitInfo()
         return Result.success()
     }
@@ -57,7 +54,7 @@ class AppExitInfoCollector(val context: Context, workerParameters: WorkerParamet
 
         val am = context.getSystemService(AppCompatActivity.ACTIVITY_SERVICE) as ActivityManager
 
-        val path = ZipUtil.getBugRptFile(this.applicationContext)
+        val path = ZipUtil.getBugReport(this.applicationContext)
         // gets all the historical process exit reasons.
         val appExitInfo = am.getHistoricalProcessExitReasons(null, 0, 0)
 
@@ -76,8 +73,7 @@ class AppExitInfoCollector(val context: Context, workerParameters: WorkerParamet
                     convertLongToTime(it.timestamp, TIME_FORMAT_3)
                 }\n"
                 file.appendText(reportDetails)
-                // Reason_ANR will contain traceInputStream in it.
-                // Write into file when the traceInput is available
+                // capture traces for ANR exit-infos
                 if (it.reason == ApplicationExitInfo.REASON_ANR) {
                     ZipUtil.writeTrace(file, it.traceInputStream)
                 }

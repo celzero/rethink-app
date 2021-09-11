@@ -44,6 +44,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class FirewallAppListAdapter internal constructor(private val context: Context,
                                                   private val persistentState: PersistentState,
@@ -104,7 +105,7 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
 
         childViewBinding.firewallToggleWifi.setOnCheckedChangeListener(null)
         childViewBinding.firewallToggleWifi.setOnClickListener {
-            enableAfterDelay(1000, childViewBinding.firewallToggleWifi)
+            enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), childViewBinding.firewallToggleWifi)
 
             val appUidList = FirewallManager.getAppNamesByUid(appInfo.uid)
 
@@ -229,7 +230,7 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
                     return@setOnClickListener
                 }
             }
-            FirewallManager.updateFirewalledAppsByCategories(categoryInfo, isInternetBlocked)
+            FirewallManager.updateFirewalledAppsByCategory(categoryInfo, isInternetBlocked)
         }
 
         groupViewBinding.expandCheckbox.setOnCheckedChangeListener(null)
@@ -386,7 +387,7 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
 
         builderSingle.setPositiveButton(context.resources.getString(
             R.string.system_apps_dialog_positive)) { _: DialogInterface, _: Int ->
-            FirewallManager.updateFirewalledAppsByCategories(categoryInfo, isInternetBlocked = true)
+            FirewallManager.updateFirewalledAppsByCategory(categoryInfo, isInternetBlocked = true)
         }.setNegativeButton(context.resources.getString(
             R.string.system_apps_dialog_negative)) { _: DialogInterface, _: Int ->
             groupViewBinding.expandCheckbox.isChecked = false

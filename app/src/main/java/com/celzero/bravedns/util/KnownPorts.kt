@@ -16,10 +16,8 @@
 
 package com.celzero.bravedns.util
 
-import android.util.Log
-
 class KnownPorts {
-    
+
     companion object {
         //get protocol desc based on port number
         private var portMap: HashMap<Int, String> = initPortMap()
@@ -33,7 +31,6 @@ class KnownPorts {
         }
 
         fun isDns(port: Int): Boolean {
-            Log.d("TEST", "TEST: port ${portMap[port]}, ${port}, ${portMap[53]}")
             return portMap[port] == portMap[53]
         }
 

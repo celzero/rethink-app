@@ -30,6 +30,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -58,18 +59,18 @@ import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_2
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
+import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.delay
-import com.celzero.bravedns.util.Utilities.Companion.getCurrentTheme
+import com.celzero.bravedns.util.Utilities.Companion.hasLocalBlocklists
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
 import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.Companion.isVpnLockdownEnabled
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 import com.celzero.bravedns.viewmodel.ExcludedAppViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.dnsoverhttps.DnsOverHttps
@@ -78,6 +79,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.IOException
 import java.net.InetAddress
+import java.util.concurrent.TimeUnit
 
 class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     private val b by viewBinding(ActivitySettingsScreenBinding::bind)
@@ -107,11 +109,11 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             b.settingsActivityCheckUpdateRl.visibility = View.GONE
         }
 
-        // allow by-pass
+        // allow apps part of the vpn to request networks outside of it, effectively letting it bypass the vpn itself
         b.settingsActivityAllowBypassSwitch.isChecked = persistentState.allowBypass
         // display fav icon in dns logs
         b.settingsActivityFavIconSwitch.isChecked = persistentState.fetchFavIcon
-        // Use all available network
+        // use all internet-capable networks, not just the active network, as underlying transports for the vpn tunnel
         b.settingsActivityAllNetworkSwitch.isChecked = persistentState.useMultipleNetworks
         // enable logs
         b.settingsActivityEnableLogsSwitch.isChecked = persistentState.logsEnabled
@@ -119,7 +121,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityAutoStartSwitch.isChecked = persistentState.prefAutoStartBootUp
         // Kill app when firewalled
         b.settingsActivityKillAppSwitch.isChecked = persistentState.killAppOnFirewall
-        // Check for app update
+        // check for app updates
         b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
 
         b.settingsActivityPreventDnsLeaksSwitch.isChecked = persistentState.preventDnsLeaks
@@ -137,7 +139,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             excludeAppAdapter::submitList))
 
         FirewallManager.getApplistObserver().observe(viewLifecycleOwner, {
-            val excludedCount = it.filter { a -> a.isExcluded }.size
+            val excludedCount = it.filter { a -> a.isExcluded }.count()
             b.settingsActivityExcludeAppsCountText.text = getString(R.string.ex_dialog_count,
                                                                     excludedCount.toString())
         })
@@ -210,15 +212,15 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     private fun displayAppThemeUi() {
         b.settingsActivityThemeRl.isEnabled = true
         when (persistentState.theme) {
-            Constants.Companion.Themes.SYSTEM_DEFAULT.id -> {
+            Themes.SYSTEM_DEFAULT.id -> {
                 b.genSettingsThemeDesc.text = getString(R.string.settings_selected_theme, getString(
                     R.string.settings_theme_dialog_themes_1))
             }
-            Constants.Companion.Themes.LIGHT.id -> {
+            Themes.LIGHT.id -> {
                 b.genSettingsThemeDesc.text = getString(R.string.settings_selected_theme, getString(
                     R.string.settings_theme_dialog_themes_2))
             }
-            Constants.Companion.Themes.DARK.id -> {
+            Themes.DARK.id -> {
                 b.genSettingsThemeDesc.text = getString(R.string.settings_selected_theme, getString(
                     R.string.settings_theme_dialog_themes_3))
             }
@@ -311,7 +313,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             b.settingsActivityAllowBypassSwitch.isEnabled = false
             b.settingsActivityAllowBypassSwitch.visibility = View.INVISIBLE
             b.settingsActivityAllowBypassProgress.visibility = View.VISIBLE
-            delay(1000) {
+            delay(TimeUnit.SECONDS.toMillis(1L)) {
                 if (isAdded) {
                     b.settingsActivityAllowBypassSwitch.isEnabled = true
                     b.settingsActivityAllowBypassProgress.visibility = View.GONE
@@ -354,8 +356,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityHttpProxySwitch.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean ->
             if (!checked) {
                 appMode.removeProxy(AppMode.ProxyType.HTTP, AppMode.ProxyProvider.CUSTOM)
-                b.settingsActivityHttpProxyDesc.text = getString(
-                    R.string.settings_http_proxy_desc_default)
+                b.settingsActivityHttpProxyDesc.text = getString(R.string.settings_https_desc)
                 return@setOnCheckedChangeListener
             }
 
@@ -372,12 +373,12 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
         b.settingsActivityExcludeAppsImg.setOnClickListener {
             enableAfterDelay(500, b.settingsActivityExcludeAppsImg)
-            showExcludeAppDialog(requireContext(), excludeAppAdapter, excludeAppViewModel)
+            showExcludeAppDialog(excludeAppAdapter, excludeAppViewModel)
         }
 
         b.settingsActivityExcludeAppsRl.setOnClickListener {
             enableAfterDelay(500, b.settingsActivityExcludeAppsRl)
-            showExcludeAppDialog(requireContext(), excludeAppAdapter, excludeAppViewModel)
+            showExcludeAppDialog(excludeAppAdapter, excludeAppViewModel)
         }
 
         b.settingsActivityThemeRl.setOnClickListener {
@@ -390,32 +391,38 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         // VPN is in lockdown mode.
         // TODO - Find a way to place this property to place in correct section.
         b.settingsActivityNotificationRl.setOnClickListener {
-            enableAfterDelay(1000, b.settingsActivityNotificationRl)
+            enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.settingsActivityNotificationRl)
             showNotificationActionDialog()
         }
 
         b.settingsActivityOnDeviceBlockSwitch.setOnCheckedChangeListener(null)
         b.settingsActivityOnDeviceBlockSwitch.setOnClickListener {
-            enableAfterDelay(1000, b.settingsActivityOnDeviceBlockSwitch)
+            lifecycleScope.launch {
+                enableAfterDelayCo(TimeUnit.SECONDS.toMillis(1L),
+                                   b.settingsActivityOnDeviceBlockSwitch)
 
-            b.settingsActivityOnDeviceBlockProgress.visibility = View.VISIBLE
-            if (!b.settingsActivityOnDeviceBlockSwitch.isChecked) {
-                removeBraveDNSLocal()
-                return@setOnClickListener
-            }
+                b.settingsActivityOnDeviceBlockProgress.visibility = View.VISIBLE
+                if (!b.settingsActivityOnDeviceBlockSwitch.isChecked) {
+                    removeBraveDNSLocal()
+                    return@launch
+                }
 
-            b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
-            if (persistentState.blocklistFilesDownloaded) {
-                setBraveDNSLocal() // TODO: Move this to vpnService observer
-                b.settingsActivityOnDeviceBlockDesc.text = getString(
-                    R.string.settings_local_blocklist_in_use,
-                    persistentState.numberOfLocalBlocklists.toString())
-            } else {
-                b.settingsActivityOnDeviceBlockSwitch.isChecked = false
-                if (isVpnLockdownEnabled(VpnController.getBraveVpnService())) {
-                    showVpnLockdownDownloadDialog()
+                b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
+                val blocklistsExist = withContext(Dispatchers.IO) {
+                    hasLocalBlocklists(requireContext(), persistentState.localBlocklistTimestamp)
+                }
+                if (blocklistsExist) {
+                    setBraveDNSLocal() // TODO: Move this to vpnService observer
+                    b.settingsActivityOnDeviceBlockDesc.text = getString(
+                        R.string.settings_local_blocklist_in_use,
+                        persistentState.numberOfLocalBlocklists.toString())
                 } else {
-                    showDownloadDialog()
+                    b.settingsActivityOnDeviceBlockSwitch.isChecked = false
+                    if (isVpnLockdownEnabled(VpnController.getBraveVpnService())) {
+                        showVpnLockdownDownloadDialog()
+                    } else {
+                        showDownloadDialog()
+                    }
                 }
             }
         }
@@ -509,11 +516,11 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.VISIBLE
         b.settingsActivityOnDeviceLastUpdatedTimeTxt.text = getString(
             R.string.settings_local_blocklist_version,
-            Utilities.convertLongToTime(persistentState.blocklistDownloadTime, TIME_FORMAT_2))
+            Utilities.convertLongToTime(persistentState.localBlocklistTimestamp, TIME_FORMAT_2))
     }
 
     private fun updateBlocklistIfNeeded(isRefresh: Boolean) {
-        val timestamp = persistentState.blocklistDownloadTime
+        val timestamp = persistentState.localBlocklistTimestamp
         val appVersionCode = persistentState.appVersion
         val url = "${Constants.REFRESH_BLOCKLIST_URL}$timestamp&${Constants.APPEND_VCODE}$appVersionCode"
         if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Check for local download, url - $url")
@@ -524,9 +531,9 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
         val bootstrapClient = OkHttpClient()
         // FIXME: Use user set doh provider
-        // using quad9 doh provider
+        // using quad9 doh providerC
         val dns = DnsOverHttps.Builder().client(bootstrapClient).url(
-            "https://9.9.9.9/dns-query".toHttpUrl()).bootstrapDnsHosts(
+            "https://dns.quad9.net/dns-query".toHttpUrl()).bootstrapDnsHosts(
             InetAddress.getByName("9.9.9.9"), InetAddress.getByName("149.112.112.112"),
             InetAddress.getByName("2620:fe::9"), InetAddress.getByName("2620:fe::fe")).build()
 
@@ -607,7 +614,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             R.string.settings_local_blocklist_desc3)
         b.settingsActivityOnDeviceLastUpdatedTimeTxt.text = getString(
             R.string.settings_local_blocklist_version,
-            Utilities.convertLongToTime(persistentState.blocklistDownloadTime, TIME_FORMAT_2))
+            Utilities.convertLongToTime(persistentState.localBlocklistTimestamp, TIME_FORMAT_2))
     }
 
     private fun onDownloadStart() {
@@ -761,20 +768,20 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
             persistentState.theme = which
             when (which) {
-                Constants.Companion.Themes.SYSTEM_DEFAULT.id -> {
+                Themes.SYSTEM_DEFAULT.id -> {
                     if (requireActivity().isDarkThemeOn()) {
                         setThemeRecreate(R.style.AppTheme)
                     } else {
                         setThemeRecreate(R.style.AppThemeWhite)
                     }
                 }
-                Constants.Companion.Themes.LIGHT.id -> {
+                Themes.LIGHT.id -> {
                     setThemeRecreate(R.style.AppThemeWhite)
                 }
-                Constants.Companion.Themes.DARK.id -> {
+                Themes.DARK.id -> {
                     setThemeRecreate(R.style.AppTheme)
                 }
-                Constants.Companion.Themes.TRUE_BLACK.id -> {
+                Themes.TRUE_BLACK.id -> {
                     setThemeRecreate(R.style.AppThemeTrueBlack)
                 }
             }
@@ -878,8 +885,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     // Should be in disabled state when the brave mode is in DNS only / Vpn in lockdown mode.
     private fun handleProxyUi() {
-        val canEnableProxy = !appMode.getBraveMode().isDnsMode() && !isVpnLockdownEnabled(
-            VpnController.getBraveVpnService())
+        val canEnableProxy = appMode.canEnableProxy()
 
         if (canEnableProxy) {
             b.settingsActivitySocks5Rl.alpha = 1f
@@ -903,8 +909,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         if (!isEnabled) {
             appMode.removeProxy(AppMode.ProxyType.HTTP, AppMode.ProxyProvider.CUSTOM)
             b.settingsActivityHttpProxySwitch.isChecked = false
-            b.settingsActivityHttpProxyDesc.text = getString(
-                R.string.settings_http_proxy_desc_default)
+            b.settingsActivityHttpProxyDesc.text = getString(R.string.settings_https_desc)
             return
         }
 
@@ -984,8 +989,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         cancelURLBtn.setOnClickListener {
             dialog.dismiss()
             appMode.removeProxy(AppMode.ProxyType.HTTP, AppMode.ProxyProvider.CUSTOM)
-            b.settingsActivityHttpProxyDesc.text = getString(
-                R.string.settings_http_proxy_desc_default)
+            b.settingsActivityHttpProxyDesc.text = getString(R.string.settings_https_desc)
             b.settingsActivityHttpProxySwitch.isChecked = false
         }
 
@@ -1047,11 +1051,11 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
     }
 
-    private fun showExcludeAppDialog(context: Context, recyclerAdapter: ExcludedAppListAdapter,
+    private fun showExcludeAppDialog(recyclerAdapter: ExcludedAppListAdapter,
                                      excludeAppViewModel: ExcludedAppViewModel) {
         val themeID = getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-        val excludeAppDialog = ExcludeAppsDialog(context, recyclerAdapter, excludeAppViewModel,
-                                                 themeID)
+        val excludeAppDialog = ExcludeAppsDialog(requireActivity(), recyclerAdapter,
+                                                 excludeAppViewModel, themeID)
         excludeAppDialog.setCanceledOnTouchOutside(false)
         excludeAppDialog.show()
     }
@@ -1192,7 +1196,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivitySocks5Switch.isEnabled = false
         b.settingsActivitySocks5Switch.visibility = View.GONE
         b.settingsActivitySocks5Progress.visibility = View.VISIBLE
-        delay(1000) {
+        delay(TimeUnit.SECONDS.toMillis(1L)) {
             if (isAdded) {
                 b.settingsActivitySocks5Switch.isEnabled = true
                 b.settingsActivitySocks5Progress.visibility = View.GONE
@@ -1220,6 +1224,18 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
         delay(ms) {
             if (!isAdded) return@delay
+
+            for (v in views) v.isEnabled = true
+        }
+    }
+
+    private suspend fun enableAfterDelayCo(ms: Long, vararg views: View) {
+        withContext(Dispatchers.Main) {
+            for (v in views) v.isEnabled = false
+
+            delay(ms)
+
+            if (!isAdded) return@withContext
 
             for (v in views) v.isEnabled = true
         }

@@ -26,15 +26,14 @@ import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL_LOG
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
 import com.celzero.bravedns.util.Utilities.Companion.getFlag
 import com.celzero.bravedns.util.Utilities.Companion.getPackageInfoForUid
 import com.google.common.net.InetAddresses
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -56,17 +55,16 @@ class IPTracker internal constructor(
     }
 
     fun recordTransaction(ipDetails: IPDetails?) {
+        if (ipDetails == null) return
         if (!persistentState.logsEnabled) return
 
         //Modified the call of the insert to database inside the coroutine scope.
-        GlobalScope.launch(Dispatchers.IO) {
-            if (ipDetails != null) {
-                insertToDB(ipDetails)
-            }
+        CoroutineScope(Dispatchers.IO).launch {
+            insertToDB(ipDetails)
         }
     }
 
-    private fun insertToDB(ipDetails: IPDetails) {
+    private suspend fun insertToDB(ipDetails: IPDetails) {
         val connTracker = ConnectionTracker()
         connTracker.ipAddress = ipDetails.destIP
         connTracker.isBlocked = ipDetails.isBlocked
@@ -83,8 +81,8 @@ class IPTracker internal constructor(
         try {
             serverAddress = InetAddresses.forString(ipDetails.destIP)
         } catch (e: IllegalArgumentException) {
-            Log.e(LoggerConstants.LOG_TAG_DNS_LOG,
-                  "Failure converting string to InetAddresses: ${e.message}", e)
+            Log.e(LOG_TAG_FIREWALL_LOG, "Failure converting string to InetAddresses: ${e.message}",
+                  e)
         }
         val countryCode: String = getCountryCode(serverAddress, context)
         connTracker.flag = getFlag(countryCode)
@@ -93,7 +91,7 @@ class IPTracker internal constructor(
         connectionTrackerRepository.insert(connTracker)
     }
 
-    private fun getApplicationName(uid: Int): String {
+    private suspend fun getApplicationName(uid: Int): String {
         if (uid == INVALID_UID) {
             return context.getString(R.string.network_log_app_name_unknown)
         }
@@ -132,12 +130,14 @@ class IPTracker internal constructor(
         if (appName.isNullOrEmpty()) {
             val appInfo = Utilities.getApplicationInfo(context, packageName) ?: return ""
 
+            Log.i(LOG_TAG_FIREWALL_LOG,
+                  "App name not available in FirewallManager: $appName but available in android packageManager")
             appName = context.packageManager.getApplicationLabel(appInfo).toString()
         }
         return appName
     }
 
-    private fun registerNonApp(uid: Int, appName: String) {
+    private suspend fun registerNonApp(uid: Int, appName: String) {
         if (!FirewallManager.hasUid(uid)) {
             refreshDatabase.registerNonApp(uid, appName)
         }

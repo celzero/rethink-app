@@ -24,8 +24,8 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.PermissionManagerApk
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.databinding.ActivityPermissionManagerBinding
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
@@ -51,7 +51,7 @@ class PermissionManagerActivity : AppCompatActivity(R.layout.activity_permission
         b.permissionManagerRecyclerView.layoutManager = LinearLayoutManager(this)
     }
 
-    private fun updateAppList() = GlobalScope.launch(Dispatchers.Default) {
+    private fun updateAppList() = CoroutineScope(Dispatchers.Default).launch {
         val appList = appInfoRepository.getAppInfo()
         appList.forEach {
             val userApk = PermissionManagerApk(packageManager.getPackageInfo(it.packageInfo, 0),

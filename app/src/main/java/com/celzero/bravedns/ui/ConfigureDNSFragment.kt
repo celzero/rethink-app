@@ -241,6 +241,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
         CoroutineScope(Dispatchers.IO).launch {
             val nextIndex = appMode.getDohCount().plus(1)
             withContext(Dispatchers.Main) {
+                if (!isAdded) return@withContext
                 customName.setText(getString(R.string.cd_custom_doh_url_name, nextIndex.toString()),
                                    TextView.BufferType.EDITABLE)
             }

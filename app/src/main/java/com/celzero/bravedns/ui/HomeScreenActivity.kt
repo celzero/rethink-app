@@ -15,8 +15,6 @@
  */
 package com.celzero.bravedns.ui
 
-import android.app.ActivityManager
-import android.app.ApplicationExitInfo
 import android.content.*
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager.NameNotFoundException
@@ -37,20 +35,18 @@ import com.celzero.bravedns.automaton.FirewallRules
 import com.celzero.bravedns.database.BlockedConnectionsRepository
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
-import com.celzero.bravedns.scheduler.ZipUtil
 import com.celzero.bravedns.service.*
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_WEBSITE
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
-import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_3
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
-import com.celzero.bravedns.util.Utilities.Companion.convertLongToTime
+import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.Companion.getPackageMetadata
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastR
 import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
@@ -59,7 +55,6 @@ import kotlinx.coroutines.launch
 import okhttp3.*
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -83,7 +78,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
              Call the coroutine scope to insert/update/delete the values */
 
     object GlobalVariable {
-        var appStartTime: Long = System.currentTimeMillis()
+        var appStartTime: Long = INIT_TIME_MS
         var DEBUG = false
     }
 
@@ -95,7 +90,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     //TODO : Remove the unwanted data and the assignments happening
     //TODO : Create methods and segregate the data.
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Utilities.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
 
         if (persistentState.firstTimeLaunch) {
@@ -133,7 +128,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun insertDefaultData() {
-        if (persistentState.insertionCompleted) return
+        if (persistentState.isDefaultDataInsertComplete) return
 
         CoroutineScope(Dispatchers.IO).launch {
             refreshDatabase.insertDefaultDNSList()
@@ -141,7 +136,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             refreshDatabase.insertDefaultDNSCryptRelayList()
             refreshDatabase.insertDefaultDNSProxy()
             refreshDatabase.updateCategoryRepo()
-            persistentState.insertionCompleted = true
+            persistentState.isDefaultDataInsertComplete = true
         }
     }
 
@@ -163,6 +158,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         val version = getLatestVersion()
         persistentState.appVersion = version
         persistentState.showWhatsNewChip = true
+
+        // Refresh the app info cache on new update
+        refreshDatabase.refreshAppInfoDatabase()
         // FIXME - Remove this after the version v053g
         // this is to fix the persistance state which was saved as Int instead of Long.
         // Modification of persistence state

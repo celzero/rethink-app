@@ -42,6 +42,8 @@
         <item name="chipTextPositive">@color/chipTextPositiveApp</item>
         <item name="chipBgColorNegative">@color/chipBgNegativeApp</item>
         <item name="chipTextNegative">@color/chipTextNegativeApp</item>
+        <item name="chipColorBgNormal">@color/chipColorBgNormalApp</item>
+        <item name="chipColorBgHighlight">@color/chipColorBgHighlightApp</item>
     </style>
 
     <style name="AppThemeWhite" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
@@ -82,6 +84,8 @@
         <item name="chipTextPositive">@color/chipTextPositiveWhite</item>
         <item name="chipBgColorNegative">@color/chipBgNegativeWhite</item>
         <item name="chipTextNegative">@color/chipTextNegativeWhite</item>
+        <item name="chipColorBgNormal">@color/chipColorBgNormalWhite</item>
+        <item name="chipColorBgHighlight">@color/chipColorBgHighlightWhite</item>
     </style>
 
     <style name="AppThemeTrueBlack" parent="Theme.MaterialComponents.NoActionBar.Bridge">
@@ -123,6 +127,8 @@
         <item name="chipTextPositive">@color/chipTextPositiveBlack</item>
         <item name="chipBgColorNegative">@color/chipBgNegativeBlack</item>
         <item name="chipTextNegative">@color/chipTextNegativeBlack</item>
+        <item name="chipColorBgNormal">@color/chipColorBgNormalBlack</item>
+        <item name="chipColorBgHighlight">@color/chipColorBgHighlightBlack</item>
     </style>
 
 
@@ -217,6 +223,13 @@
         <item name="chipMinTouchTargetSize">30dp</item>
     </style>
 
+    <style name="ThinnerChip_large" parent="Widget.MaterialComponents.Chip.Filter">
+        <item name="chipCornerRadius">18dp</item>
+        <item name="chipMinHeight">32dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="chipMinTouchTargetSize">40dp</item>
+    </style>
+
     <style name="ThinnerChip_action" parent="Widget.MaterialComponents.Chip.Action">
         <item name="chipCornerRadius">12dp</item>
         <item name="chipMinHeight">24dp</item>
@@ -241,5 +254,6 @@
         <item name="chipMinHeight">40dp</item>
       <item name="chipMinTouchTargetSize">40dp</item>
     </style>
+
 
 </resources>

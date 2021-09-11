@@ -397,7 +397,7 @@
     <string name="doh_brave_pro_configure_desc">Configure RethinkDNS Plus to block adult content, dating and gambling websites, malware, spyware and more.</string>
 
     <string name="local_blocklist_download">Download Blocklists</string>
-    <string name="local_blocklist_download_desc">Download blocklists (around 50MB) to use this feature?</string>
+    <string name="local_blocklist_download_desc">Download blocklists (around 60MB) to use this feature?</string>
 
     <string name="download_lockdown_dialog_heading">Action required</string>
     <string name="download_lockdown_dialog_desc">Cannot download or update blocklists when VPN is in Lockdown Mode. Disable it from VPN settings.</string>
@@ -414,7 +414,7 @@
     <string name="local_blocklist_neutral">Download again</string>
 
     <string name="local_blocklist_corrupt">Re-download blocklists</string>
-    <string name="local_blocklist_corrupt_desc">Something went wrong! Please download blocklists (around 50 mb in size) again.</string>
+    <string name="local_blocklist_corrupt_desc">Something went wrong! Please download blocklists (around 60 mb in size) again.</string>
     <string name="local_blocklist_corrupt_positive">Re-download</string>
     <string name="local_blocklist_corrupt_negative">Cancel</string>
 
@@ -497,7 +497,7 @@
     <string name="dns_logs_not_available_text">Logs not captured when connected to DNS Proxy.</string>
 
     <string name="http_proxy_dialog_heading">Set HTTP(S) Proxy</string>
-    <string name="http_proxy_dialog_desc">HTTP(S) Proxy settings are only a hint to applications but they may or may not use it; however, browsers like Chrome and Firefox do use these.</string>
+    <string name="http_proxy_dialog_desc">HTTP(S) Proxy settings are only a hint to applications but they may or may not use it; however, browsers like Chrome and Firefox do use these. Apps using HTTP(S) proxy will bypass both Firewall and DNS rules.</string>
 
     <string name="download_update_dialog_title">New Update!</string>
     <string name="download_update_dialog_message">A new version of the app is available for download from the website. Do you want to proceed?</string>
@@ -568,7 +568,7 @@
     <string name="settings_socks5_heading">Setup SOCKS5 (TCP) Proxy</string>
     <string name="settings_socks5_desc">Forward connections to SOCKS5 endpoint.</string>
     <string name="settings_https_heading">Setup HTTP(S) Proxy</string>
-    <string name="settings_https_desc">This setting is only a recommendation and it is possible that apps will ignore it. Apps using HTTP(S) proxy will bypass both firewall and dns rules.</string>
+    <string name="settings_https_desc">This setting is only a recommendation and it is possible that apps will ignore it. Apps using HTTP(S) proxy will bypass both Firewall and DNS rules.</string>
 
     <string name="orbot">Orbot</string>
     <string name="orbot_socks5">TCP-only Proxy</string>
@@ -598,7 +598,7 @@
             Orbot is a free proxy app that empowers other apps to use the Internet more &lt;u>securely&lt;/u>.
             \nOrbot uses &lt;u>Tor&lt;/u> to encrypt your Internet traffic which helps you &lt;u>bypass censorship&lt;/u> and defend against forms of &lt;u>network surveillance&lt;/u> that threaten personal freedom and privacy.
             \n&lt;u>TCP Proxy&lt;/u>: RethinkDNS forwards only TCP connections of all but excluded apps to Orbot.
-        \n&lt;u>HTTP Proxy&lt;/u>: RethinkDNS &lt;i>sets&lt;/i> HTTP proxy but does not enforce that the apps use it. Usually, browsers like Chrome and Firefox do use it. Apps using HTTP(S) proxy will bypass both firewall and dns rules.
+        \n&lt;u>HTTP Proxy&lt;/u>: RethinkDNS &lt;i>sets&lt;/i> HTTP proxy but does not enforce that the apps use it. Usually, browsers like Chrome and Firefox do use it. Apps using HTTP(S) proxy will bypass both Firewall and DNS rules.
             </string>
     <string name="orbot_bs_positive_start">start</string>
     <string name="orbot_bs_positive_stop">stop</string>
@@ -658,7 +658,6 @@
     <string name="settings_theme_desc">Dark/light theme</string>
 
     <string name="settings_http_proxy_desc">Forwarding to %1$s:%2$s</string>
-    <string name="settings_http_proxy_desc_default">This proxy is only a recommendation and it is possible that some apps will ignore it.</string>
     <string name="settings_http_proxy_dialog_title">Custom Server URL</string>
     <string name="settings_http_proxy_error_text1">Port range should be from 1024–65535</string>
     <string name="settings_http_proxy_error_text2">Invalid port</string>
@@ -679,6 +678,7 @@
     <string name="settings_dns_proxy_dialog_password">Password</string>
     <string name="settings_dns_proxy_dialog_positive_btn">set</string>
     <string name="settings_dns_proxy_dialog_negative_btn">cancel</string>
+    <string name="settings_dns_proxy_dialog_app_desc">The selected app will be excluded from the VPN to let it proxy connections on your behalf.</string>
 
     <string name="settings_app_list_default_app">Nobody</string>
 
@@ -833,6 +833,8 @@
     <string name="log_file_empty">Log file is empty</string>
     <string name="error_loading_log_file">Error loading log file</string>
 
+    <string name="collecting_logs_progress_text">Capturing…</string>
+
 
     <!-- Configure DNS Fragment string == cd -->
     <string name="cd_dns_type_spinner_tooltip">Select DNS</string>
@@ -881,6 +883,11 @@
     <string name="ct_ip_details">%1$s (%2$s)</string>
 
     <string name="ct_btm_sheet_error">Can not open bottom sheet</string>
+
+    <string name="ct_filter_parent_all">All</string>
+    <string name="ct_filter_parent_allowed">Allowed</string>
+    <string name="ct_filter_parent_blocked">Blocked</string>
+
 
     <!-- Connection tracker bottom sheet fragment string -->
     <string name="ctbs_app_info_not_available_toast">App settings page not found</string>
@@ -952,10 +959,9 @@
     <string name="hs_download_blocklist_desc">%1$s download in progress..</string>
 
     <!-- Whitelist dialog -->
-    <string name="whitelist_dialog_apps_in_use">%1$s whitelisted app(s) exempt from all firewall rules.</string>
+    <string name="whitelist_dialog_apps_in_use">%1$s whitelisted app(s) exempt from all firewall rules (but not DNS rules).</string>
     <string name="whitelist_toast_positive">Selected apps added to the whitelist</string>
     <string name="whitelist_toast_negative">Selected apps removed from the whitelist</string>
-
 
     <!-- Universal Firewall-->
     <string name="univ_firewall_rule_1">Block all apps when device is locked</string>
@@ -963,6 +969,7 @@
     <string name="univ_firewall_rule_3">Block connections when source app is unknown</string>
     <string name="univ_firewall_rule_4">Block all UDP traffic except DNS and NTP</string>
     <string name="univ_firewall_rule_5">Block connections when DNS is bypassed (experimental)</string>
+    <string name="univ_firewall_rule_6">Block newly installed apps by default</string>
 
     <string name="univ_block_unknown_connections">Block connections when source app is unknown</string>
 
@@ -995,7 +1002,7 @@
 
     <!-- DNS adapters -->
     <string name="dns_connected_rethink_plus">Connected. %1$s blocklists in-use</string>
-    <string name="dns_connected_rethink_configure">configure</string>
+    <string name="dns_connected_rethink_configure">Configure</string>
     <string name="dns_connected">Connected</string>
     <string name="dns_delete_positive">Delete</string>
     <string name="dns_delete_negative">Cancel</string>
@@ -1064,7 +1071,7 @@
     <string name="update_complete_snack_message">New version downloaded.</string>
     <string name="update_complete_action_snack">RESTART</string>
 
-    <string name="settings_local_blockList_desc1">Choose from 170+ blocklists.</string>
+    <string name="settings_local_blockList_desc1">Choose from 185+ blocklists.</string>
     <string name="settings_local_blocklist_desc2">Download in progress…</string>
     <string name="settings_local_blocklist_desc3">Download completed, Configure blocklist</string>
     <string name="settings_local_blocklist_desc4">Error downloading file. Try again.</string>
@@ -1085,7 +1092,7 @@
 
     <string name="settings_dns_header">dns</string>
     <string name="settings_local_blocklist_heading">Enable on-device blocklists</string>
-    <string name="settings_local_blocklist_desc_1">Choose from 170+ blocklists.</string>
+    <string name="settings_local_blocklist_desc_1">Choose from 185+ blocklists.</string>
     <string name="settings_local_blocklist_configure">configure</string>
     <string name="settings_local_blocklist_update">Update</string>
 
@@ -1118,11 +1125,11 @@
     <string name="firewall_rule_block_app">App Blocked</string>
     <string name="firewall_rule_block_ip">IP Blocked</string>
     <string name="firewall_rule_device_lock">Device Locked</string>
-    <string name="firewall_rule_foreground">Background App</string>
-    <string name="firewall_rule_unknown">Unknown Source</string>
+    <string name="firewall_rule_foreground">App Not-in-Use</string>
+    <string name="firewall_rule_unknown">Source Unknown</string>
     <string name="firewall_rule_block_udp_ntp">UDP Blocked</string>
     <string name="firewall_rule_block_dns_bypass">DNS Bypassed</string>
-    <string name="firewall_rule_exempt_app_whitelist">Whitelisted</string>
+    <string name="firewall_rule_exempt_app_whitelist">App Whitelisted</string>
     <string name="firewall_rule_exempt_dns_proxied">DNS Proxied</string>
 
     <string name="firewall_rule_no_rule_desc">No firewall rules matched this connection.</string>
@@ -1132,8 +1139,20 @@
     <string name="firewall_rule_foreground_desc"><![CDATA[This connection was firewalled because the source app was <i>not in the foreground</i>.<br/><br/> To change this behaviour go to <i>Universal</i> tab.]]></string>
     <string name="firewall_rule_unknown_desc"><![CDATA[This connection was firewalled because the <i>source app</i> could not be determined.<br/><br/> To change this behaviour go to <i>Universal</i> tab.]]></string>
     <string name="firewall_rule_block_udp_ntp_desc"><![CDATA[A user-set firewall rule blocked this <i>UDP</i> connection.<br/><br/> To change go to <i>Universal</i> tab.]]></string>
-    <string name="firewall_rule_block_dns_bypass_desc"><![CDATA[This connection was blocked because the <i>source app</i> attempted to bypass user-preferred DNS.<br/><br/> To change this behaviour go to <i>Universal</i> tab.]]></string>
+    <string name="firewall_rule_block_dns_bypass_desc"><![CDATA[This connection was blocked because the <i>source app</i> bypassed user-preferred DNS.<br/><br/> To change this behaviour go to <i>Universal</i> tab.]]></string>
     <string name="firewall_rule_exempt_app_whitelist_desc"><![CDATA[This <i>app</i> was allowed to connect in accordance with a user-set <i>whitelist</i>.<br/><br/> To change go to <i>Universal</i> tab.]]></string>
     <string name="firewall_rule_exempt_dns_proxied_desc"><![CDATA[This DNS connection was proxied and forwarded to user-preferred DNS endpoint.<br/><br/> To change go to <i>Settings</i> page.]]></string>
+
+    <!-- New app install Notification -->
+    <string name="new_app_bulk_notification_title">Attention</string>
+    <string name="new_app_bulk_notification_content">RethinkDNS blocked %1$s new apps. Tap to view or modify.</string>
+    <string name="new_app_notification_title">Action Required</string>
+    <string name="new_app_notification_content">RethinkDNS blocked recently installed app, %1$s.</string>
+
+    <string name="new_app_notification_action_allow">Allow</string>
+    <string name="new_app_notification_action_deny">Keep blocking</string>
+
+    <string name="new_app_notification_action_toast_allow">Network connection allowed for the app</string>
+    <string name="new_app_notification_action_toast_deny">Network connection denied for the app</string>
 
 </resources>

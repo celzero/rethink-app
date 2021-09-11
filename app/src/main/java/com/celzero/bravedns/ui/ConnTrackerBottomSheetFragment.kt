@@ -16,7 +16,6 @@
 package com.celzero.bravedns.ui
 
 import android.app.Dialog
-import android.content.ActivityNotFoundException
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -26,11 +25,8 @@ import android.content.res.TypedArray
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.text.Html
-import android.text.Spanned
 import android.text.format.DateUtils
 import android.util.Log
 import android.util.TypedValue
@@ -42,7 +38,6 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.text.HtmlCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.automaton.FirewallRules
@@ -64,12 +59,14 @@ import com.celzero.bravedns.util.Utilities.Companion.isValidAppName
 import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
+import org.koin.core.component.KoinComponent
 
 /**
  * Renders network logs from where user can also set firewall rules.
  */
-class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker, var dnsLogTracker: DNSLogTracker) :
-        BottomSheetDialogFragment() {
+class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
+        BottomSheetDialogFragment(), KoinComponent {
+
     private var _binding: BottomSheetConnTrackBinding? = null
 
     // This property is only valid between onCreateView and
@@ -77,6 +74,7 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker, v
     private val b get() = _binding!!
 
     private var canNav: Boolean = false
+    private val dnsLogTracker by inject<DNSLogTracker>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -89,8 +87,8 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker, v
         _binding = null
     }
 
-    override fun getTheme(): Int = Utilities.getBottomsheetCurrentTheme(isDarkThemeOn(),
-                                                                        persistentState.theme)
+    override fun getTheme(): Int = Themes.getBottomsheetCurrentTheme(isDarkThemeOn(),
+                                                                     persistentState.theme)
 
     private val blockedConnectionsRepository: BlockedConnectionsRepository by inject()
     private val persistentState by inject<PersistentState>()
@@ -112,9 +110,9 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker, v
     private fun displayDetails() {
         val protocol = Protocol.getProtocolName(ipDetails.protocol).name
         val time = DateUtils.getRelativeTimeSpanString(ipDetails.timeStamp,
-                                                               System.currentTimeMillis(),
-                                                               DateUtils.MINUTE_IN_MILLIS,
-                                                               DateUtils.FORMAT_ABBREV_RELATIVE)
+                                                       System.currentTimeMillis(),
+                                                       DateUtils.MINUTE_IN_MILLIS,
+                                                       DateUtils.FORMAT_ABBREV_RELATIVE)
 
         b.bsConnConnectionTypeHeading.text = ipDetails.ipAddress
         b.bsConnConnectionFlag.text = ipDetails.flag.toString()
@@ -150,10 +148,10 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker, v
         b.bsConnBlockConnAllSwitch.isChecked = FirewallRules.hasRule(UID_EVERYBODY, connRules)
 
         ipDetails.ipAddress?.let {
-            val dnsCache = dnsLogTracker.dnsResolvedIpsRecord.getIfPresent(it)
-            dnsCache?.let {
+            val ipToDomain = dnsLogTracker.ipDomainLookup.getIfPresent(it)
+            ipToDomain?.let {
                 b.bsConnConnectionDetails.visibility = View.VISIBLE
-                b.bsConnConnectionDetails.text = dnsCache.fqdn.dropLast(1)
+                b.bsConnConnectionDetails.text = ipToDomain.fqdn
             }
         }
 
@@ -169,27 +167,31 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker, v
         val protocolDetails = "$protocol/${ipDetails.port}"
 
         if (ipDetails.isBlocked) {
-            b.bsConnTrackPortDetailChip.text = getString(R.string.bsct_conn_desc_blocked, protocolDetails, time)
+            b.bsConnTrackPortDetailChip.text = getString(R.string.bsct_conn_desc_blocked,
+                                                         protocolDetails, time)
         } else {
-            b.bsConnTrackPortDetailChip.text = getString(R.string.bsct_conn_desc_allowed, protocolDetails, time)
+            b.bsConnTrackPortDetailChip.text = getString(R.string.bsct_conn_desc_allowed,
+                                                         protocolDetails, time)
         }
         lightenUpChip()
     }
 
     private fun lightenUpChip() {
         // Load icons for the firewall rules if available
-        b.bsConnTrackAppKill.chipIcon = ContextCompat.getDrawable(requireContext(), FirewallRuleset.getRulesIcon(ipDetails.blockedByRule))
+        b.bsConnTrackAppKill.chipIcon = ContextCompat.getDrawable(requireContext(),
+                                                                  FirewallRuleset.getRulesIcon(
+                                                                      ipDetails.blockedByRule))
         if (ipDetails.isBlocked) {
             b.bsConnTrackAppKill.setTextColor(fetchColor(R.attr.chipTextNegative))
-            val colorFilter = PorterDuffColorFilter(
-                fetchColor(R.attr.chipTextNegative), PorterDuff.Mode.SRC_IN)
+            val colorFilter = PorterDuffColorFilter(fetchColor(R.attr.chipTextNegative),
+                                                    PorterDuff.Mode.SRC_IN)
             b.bsConnTrackAppKill.chipBackgroundColor = ColorStateList.valueOf(
                 fetchColor(R.attr.chipBgColorNegative))
             b.bsConnTrackAppKill.chipIcon?.colorFilter = colorFilter
         } else {
-            b.bsConnTrackAppKill.setTextColor(
-                fetchColor(R.attr.chipTextPositive))
-            val colorFilter = PorterDuffColorFilter(fetchColor(R.attr.chipTextPositive), PorterDuff.Mode.SRC_IN)
+            b.bsConnTrackAppKill.setTextColor(fetchColor(R.attr.chipTextPositive))
+            val colorFilter = PorterDuffColorFilter(fetchColor(R.attr.chipTextPositive),
+                                                    PorterDuff.Mode.SRC_IN)
             b.bsConnTrackAppKill.chipBackgroundColor = ColorStateList.valueOf(
                 fetchColor(R.attr.chipBgColorPositive))
             b.bsConnTrackAppKill.chipIcon?.colorFilter = colorFilter
@@ -270,7 +272,7 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker, v
                 } else {
                     // fall-through
                 }
-            } catch (e: ActivityNotFoundException) {
+            } catch (e: Exception) { // ActivityNotFoundException | NullPointerException
                 Log.w(LOG_TAG_FIREWALL, "Failure calling app info: ${e.message}", e)
             }
 
@@ -293,14 +295,14 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker, v
                 b.bsConnBlockAppCheck.isChecked = false
                 return
             }
-            FirewallManager.AppStatus.NONE -> {
+            FirewallManager.AppStatus.UNKNOWN -> {
                 showToast(getString(R.string.firewall_app_info_not_available))
                 b.bsConnBlockAppCheck.isChecked = false
                 return
             }
             else -> {
                 // no-op
-                // fall-through; the app can be firewalled
+                // fall-through; the app may be firewalled
             }
         }
 
@@ -381,12 +383,15 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker, v
         val icon = dialogBinding.infoRulesDialogRulesIcon
         icon.visibility = View.VISIBLE
 
-        heading.text = getFirewallRule(blockedRule)?.let { getString(it.title) } ?: getString(R.string.firewall_rule_no_rule)
-        val text = getFirewallRule(blockedRule)?.let { getString(it.desc) } ?: getString(R.string.firewall_rule_no_rule_desc)
+        heading.text = getFirewallRule(blockedRule)?.let { getString(it.title) } ?: getString(
+            R.string.firewall_rule_no_rule)
+        val text = getFirewallRule(blockedRule)?.let { getString(it.desc) } ?: getString(
+            R.string.firewall_rule_no_rule_desc)
 
         descText.text = updateHtmlEncodedText(text)
 
-        icon.setImageDrawable(ContextCompat.getDrawable(requireContext(), FirewallRuleset.getRulesIcon(blockedRule)))
+        icon.setImageDrawable(
+            ContextCompat.getDrawable(requireContext(), FirewallRuleset.getRulesIcon(blockedRule)))
 
         okBtn.setOnClickListener {
             dialog.dismiss()

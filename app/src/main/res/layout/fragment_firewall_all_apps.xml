@@ -15,6 +15,7 @@
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"
         android:focusable="true"
+        android:textColor="@color/neutral"
         android:focusableInTouchMode="true"
         android:padding="10dp"
         android:text="@string/settings_explanation_text"

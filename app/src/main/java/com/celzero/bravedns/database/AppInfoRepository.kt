@@ -17,16 +17,10 @@ package com.celzero.bravedns.database
 
 import androidx.lifecycle.LiveData
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
-
-    fun updateAsync(appInfo: AppInfo, coroutineScope: CoroutineScope = GlobalScope) {
-        coroutineScope.launch {
-            appInfoDAO.update(appInfo)
-        }
-    }
 
     fun delete(appInfo: AppInfo) {
         appInfoDAO.delete(appInfo)
@@ -115,21 +109,21 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         appInfoDAO.updateWhitelist(uid, isEnabled)
     }
 
-    fun updateWhitelistForAllApp(isEnabled: Boolean): Int {
-        return appInfoDAO.updateWhitelistForAllApp(isEnabled)
+    fun updateWhitelistForAllApps(isEnabled: Boolean): Int {
+        return appInfoDAO.updateWhitelistForAllApps(isEnabled)
     }
 
     fun updateWhitelistForCategories(category: String, isEnabled: Boolean): Int {
         return appInfoDAO.updateWhitelistForCategories(category, isEnabled)
     }
 
-    fun updateExcludedForAllApps(isExcluded: Boolean,
-                                 coroutineScope: CoroutineScope = GlobalScope) {
+    fun updateExcludedForAllApps(isExcluded: Boolean) {
         appInfoDAO.updateExcludedForAllApp(isExcluded)
     }
 
     fun updateExcludedForCategories(category: String, isExcluded: Boolean,
-                                    coroutineScope: CoroutineScope = GlobalScope) {
+                                    coroutineScope: CoroutineScope = CoroutineScope(
+                                        Dispatchers.IO)) {
         coroutineScope.launch {
             appInfoDAO.updateExcludedForCategories(category, isExcluded)
         }

@@ -18,7 +18,6 @@ package com.celzero.bravedns.data
 import android.content.Context
 import android.os.Build
 import android.util.Log
-import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
@@ -237,12 +236,11 @@ class AppMode internal constructor(private val context: Context,
         return dnsCryptEndpointRepository.getConnectedCount()
     }
 
-    fun getSocks5ProxyDetails(): ProxyEndpoint? {
+    suspend fun getSocks5ProxyDetails(): ProxyEndpoint? {
         return proxyEndpointRepository.getConnectedProxy()
     }
 
-    @WorkerThread
-    fun getOrbotProxyDetails(): ProxyEndpoint? {
+    suspend fun getOrbotProxyDetails(): ProxyEndpoint? {
         return proxyEndpointRepository.getConnectedOrbotProxy()
     }
 
@@ -329,14 +327,11 @@ class AppMode internal constructor(private val context: Context,
     }
 
     // -- DNS Manager --
-
-    @WorkerThread
-    fun getConnectedProxyDetails(): DNSProxyEndpoint {
+    suspend fun getConnectedProxyDetails(): DNSProxyEndpoint {
         return dnsProxyEndpointRepository.getConnectedProxy()
     }
 
-    @WorkerThread
-    fun getDnscryptServers(): String {
+    suspend fun getDnscryptServers(): String {
         return dnsCryptEndpointRepository.getServersToAdd()
     }
 
@@ -434,7 +429,7 @@ class AppMode internal constructor(private val context: Context,
         return persistentState.getRemoteBlocklistCount()
     }
 
-    fun isRethinkDnsPlus(dohName: String): Boolean {
+    fun isRethinkDnsPlusUrl(dohName: String): Boolean {
         return Constants.RETHINK_DNS_PLUS == dohName
     }
 
@@ -556,7 +551,7 @@ class AppMode internal constructor(private val context: Context,
         return ProxyType.HTTP_SOCKS5.name == getProxyType()
     }
 
-    private fun removeAllProxies() {
+    fun removeAllProxies() {
         removeOrbot()
         persistentState.proxyType = ProxyType.NONE.name
         persistentState.proxyProvider = ProxyProvider.NONE.name
@@ -646,8 +641,9 @@ class AppMode internal constructor(private val context: Context,
         return getProxyProvider() == ProxyProvider.ORBOT.name
     }
 
-    private fun canEnableProxy(): Boolean {
-        return !Utilities.isVpnLockdownEnabled(VpnController.getBraveVpnService())
+    fun canEnableProxy(): Boolean {
+        return !getBraveMode().isDnsMode() && !Utilities.isVpnLockdownEnabled(
+            VpnController.getBraveVpnService())
     }
 
     fun canEnableSocks5Proxy(): Boolean {

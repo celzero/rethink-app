@@ -37,8 +37,8 @@ import com.google.android.material.chip.Chip
 
 class WhitelistAppDialog(val activity: Activity, val adapter: RecyclerView.Adapter<*>,
                          val viewModel: AppListViewModel, themeID: Int) : Dialog(activity, themeID),
-                                                                      View.OnClickListener,
-                                                                      SearchView.OnQueryTextListener {
+                                                                          View.OnClickListener,
+                                                                          SearchView.OnQueryTextListener {
 
     private lateinit var b: CustomDialogLayoutBinding
 
@@ -74,7 +74,7 @@ class WhitelistAppDialog(val activity: Activity, val adapter: RecyclerView.Adapt
         }
 
         FirewallManager.getApplistObserver().observe(activity as LifecycleOwner, {
-            val blockedCount = it.filter { a -> a.whiteListUniv1 }.size
+            val blockedCount = it.filter { a -> a.whiteListUniv1 }.count()
             b.customSelectAllOptionCount.text = context.getString(
                 R.string.whitelist_dialog_apps_in_use, blockedCount.toString())
         })

@@ -45,6 +45,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
+import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getETldPlus1
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
@@ -66,8 +67,8 @@ class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
 
     private val persistentState by inject<PersistentState>()
 
-    override fun getTheme(): Int = Utilities.getBottomsheetCurrentTheme(isDarkThemeOn(),
-                                                                        persistentState.theme)
+    override fun getTheme(): Int = Themes.getBottomsheetCurrentTheme(isDarkThemeOn(),
+                                                                     persistentState.theme)
 
     private fun isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
@@ -186,7 +187,8 @@ class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
         val height = (resources.displayMetrics.heightPixels * 0.5).toInt()
         dialog.window?.setLayout(width, height)
 
-        if (b.dnsBlockFavIcon.isVisible) dialogBinding.ipDetailsFavIcon.setImageDrawable(b.dnsBlockFavIcon.drawable)
+        if (b.dnsBlockFavIcon.isVisible) dialogBinding.ipDetailsFavIcon.setImageDrawable(
+            b.dnsBlockFavIcon.drawable)
         else dialogBinding.ipDetailsFavIcon.visibility = View.GONE
 
         dialogBinding.ipDetailsFqdnTxt.text = "${transaction.queryStr}\n"
@@ -203,8 +205,8 @@ class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
         var text = ""
 
         list.forEach {
-            text += getString(R.string.dns_btm_sheet_dialog_ips,
-                              Utilities.getFlag(it.slice(0..2)), it)
+            text += getString(R.string.dns_btm_sheet_dialog_ips, Utilities.getFlag(it.slice(0..2)),
+                              it)
         }
         return updateHtmlEncodedText(text)
     }

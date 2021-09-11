@@ -13,18 +13,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
+        <androidx.cardview.widget.CardView
             android:id="@+id/connection_card_view_top"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="2dp"
-            android:orientation="vertical">
+            android:layout_margin="5dp"
+            android:elevation="5dp">
 
-            <androidx.cardview.widget.CardView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="3dp"
-                android:elevation="10dp">
+                android:orientation="vertical">
+
 
                 <LinearLayout
                     android:id="@+id/connection_url_ll"
@@ -43,8 +43,7 @@
                         android:fontFamily="sans-serif"
                         android:isScrollContainer="true"
                         app:iconifiedByDefault="false"
-                        app:queryHint="@string/search_firewall_network_log">
-                    </androidx.appcompat.widget.SearchView>
+                        app:queryHint="@string/search_firewall_network_log"/>
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/connection_filter_icon"
@@ -67,24 +66,54 @@
                         android:visibility="visible" />
 
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
-        </LinearLayout>
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/filter_chip_parent_group"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:paddingBottom="2dp"
+                    android:visibility="gone"
+                    app:selectionRequired="true"
+                    app:singleSelection="true" />
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:scrollbars="none">
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/filter_chip_group"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="2dp"
+                        app:singleLine="true"
+                        android:elevation="5dp"
+                        android:visibility="gone"
+                        app:singleSelection="false" />
+                </HorizontalScrollView>
+
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
         <com.celzero.bravedns.util.NestedScrollableHost
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/connection_card_view_top"
-            android:layout_marginBottom="?attr/actionBarSize"
-            android:layout_margin="2dp">
+            android:layout_margin="2dp"
+            android:layout_marginBottom="?attr/actionBarSize">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_connection"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:nestedScrollingEnabled="false"
-                android:background="?attr/border"
                 android:clickable="true"
                 android:focusable="true"
+                android:nestedScrollingEnabled="false"
                 android:orientation="vertical" />
         </com.celzero.bravedns.util.NestedScrollableHost>
 
@@ -93,15 +122,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/connection_card_view_top"
+            android:layout_alignParentTop="true"
             android:background="?attr/background"
             android:gravity="top|center"
-            android:layout_alignParentTop="true"
-            android:paddingTop="20dp"
             android:paddingStart="10dp"
+            android:paddingTop="20dp"
             android:paddingEnd="10dp"
-            android:visibility="gone"
             android:text="@string/show_logs_disabled_network_message"
-            android:textSize="@dimen/large_font_text_view" />
+            android:textSize="@dimen/large_font_text_view"
+            android:visibility="gone" />
 
     </RelativeLayout>
 </LinearLayout>

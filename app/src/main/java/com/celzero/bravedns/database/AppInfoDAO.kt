@@ -106,7 +106,7 @@ interface AppInfoDAO {
     fun updateWhitelist(uid: Int, isEnabled: Boolean)
 
     @Query("update AppInfo set whiteListUniv1 = :isEnabled, isInternetAllowed = 1")
-    fun updateWhitelistForAllApp(isEnabled: Boolean): Int
+    fun updateWhitelistForAllApps(isEnabled: Boolean): Int
 
     @Query(
         "update AppInfo set whiteListUniv1 = :isEnabled, isInternetAllowed = 1  where appCategory = :category")

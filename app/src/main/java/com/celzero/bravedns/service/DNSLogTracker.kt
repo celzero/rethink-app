@@ -55,7 +55,7 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
         private const val DNS_LEAK_TEST = "dnsleaktest"
 
         private const val CACHE_BUILDER_MAX_SIZE = 20000L
-        private const val CACHE_BUILDER_WRITE_EXPIRE_HRS = 24L
+        private const val CACHE_BUILDER_WRITE_EXPIRE_HRS = 72L
 
         // Some apps like firefox, instagram do not respect ttls
         // add a reasonable grace period to account for that
@@ -68,15 +68,15 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
 
     data class DnsCacheRecord(val ttl: Long, val fqdn: String)
 
-    val dnsResolvedIpsRecord: Cache<String, DnsCacheRecord> = CacheBuilder.newBuilder().maximumSize(
+    val ipDomainLookup: Cache<String, DnsCacheRecord> = CacheBuilder.newBuilder().maximumSize(
         CACHE_BUILDER_MAX_SIZE).expireAfterWrite(CACHE_BUILDER_WRITE_EXPIRE_HRS,
                                                  TimeUnit.HOURS).build()
 
     init {
-        // initialize values from persistence state
+        // init values from persistence state
         numRequests = persistentState.numberOfRequests
         numBlockedRequests = persistentState.numberOfBlockedRequests
-        // initialize the live data values
+        // trigger livedata update with init'd values
         persistentState.dnsRequestsCountLiveData.postValue(numRequests)
         persistentState.dnsBlockedCountLiveData.postValue(numBlockedRequests)
     }
@@ -141,8 +141,9 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                     packet.answer.forEach { r ->
                         val ip = r.ip ?: return@forEach
 
-                        val dnsCacheRecord = DnsCacheRecord(calculateTtl(r.ttl), transaction.name)
-                        dnsResolvedIpsRecord.put(ip.hostAddress, dnsCacheRecord)
+                        val dnsCacheRecord = DnsCacheRecord(calculateTtl(r.ttl),
+                                                            transaction.name.dropLast(1))
+                        ipDomainLookup.put(ip.hostAddress, dnsCacheRecord)
                     }
 
                     if (addresses.isNotEmpty()) {
@@ -154,7 +155,6 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                         addresses.forEach {
                             ips += makeAddressPair(getCountryCode(it, context), it.hostAddress)
                         }
-                        // Log.d("TEST", "TEST DNS: ip addresses: ${TextUtils.join(",", ips)}")
                         dnsLogs.response = TextUtils.join(",", ips)
 
                         if (destination.hostAddress.contains(UNSPECIFIED_IP)) {

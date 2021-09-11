@@ -58,7 +58,7 @@
             android:launchMode="singleInstance" />
         <activity
             android:name=".ui.PauseActivity"
-            android:launchMode="singleTop" />
+            android:launchMode="singleInstance" />
         <activity
             android:name=".ui.DNSConfigureWebViewActivity"
             android:launchMode="singleInstance" />

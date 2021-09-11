@@ -74,7 +74,7 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
         //Check for the download success from the receiver
         val downloadIdsIterator = downloadIds?.iterator()
 
-        while(downloadIdsIterator?.hasNext() == true) {
+        while (downloadIdsIterator?.hasNext() == true) {
             val downloadID = downloadIdsIterator.next()
             val query = DownloadManager.Query()
             query.setFilterById(downloadID)
@@ -95,8 +95,10 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
                     if (status == DownloadManager.STATUS_SUCCESSFUL) {
                         downloadIdsIterator.remove()
                     } else if (status == DownloadManager.STATUS_FAILED) {
+                        val reason = cursor.getInt(
+                            cursor.getColumnIndex(DownloadManager.COLUMN_REASON))
                         if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                                         "download status failure for $downloadID")
+                                         "download status failure for $downloadID, $reason")
                         return DOWNLOAD_FAILURE
                     }
                 } else {
@@ -117,7 +119,7 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
         }
 
         // occasionally, the download-manager observer fires without a download having
-        // been enqueued and download-ids populated into persitent-state, which keep in
+        // been enqueued and download-ids populated into persistent-state, which keep in
         // mind, is also eventually consistent with its state propagation. In this case,
         // count(download-ids) is zero. So: Ask for a retry regardless of the download-status
         return DOWNLOAD_RETRY

@@ -23,9 +23,11 @@ import androidx.work.workDataOf
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_FILE_COUNT
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.Companion.hasLocalBlocklists
+import com.celzero.bravedns.util.Utilities.Companion.localBlocklistDownloadPath
 import dnsx.Dnsx
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -48,11 +50,11 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
 
     override fun doWork(): Result {
         try {
-            val timestamp = inputData.getLong("blocklistDownloadInitiatedTime", 0L)
+            val timestamp = inputData.getLong("blocklistDownloadInitiatedTime", Long.MIN_VALUE)
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "blocklistDownloadInitiatedTime - $timestamp")
 
             // invalid download initiated time
-            if(timestamp == 0L) return Result.failure()
+            if (timestamp <= INIT_TIME_MS) return Result.failure()
 
             // A file move from external file path to app data dir is preferred because it is an
             // atomic operation: but Android doesn't support move/rename across mount points.
@@ -93,7 +95,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
 
             for (i in children.indices) {
                 val from = dir.absolutePath + File.separator + children[i]
-                val to = context.filesDir.canonicalPath + File.separator + timestamp + File.separator + children[i]
+                val to = localBlocklistDownloadPath(context, children[i], timestamp)
                 val result = Utilities.copy(from, to)
 
                 if (!result) {
@@ -106,7 +108,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             Log.i(LOG_TAG_DOWNLOAD,
                   "After copy, dest dir: $destinationDir, ${destinationDir.isDirectory}, ${destinationDir.list()?.size}")
 
-            if (!destinationDir.isDirectory || destinationDir.list()?.size != LOCAL_BLOCKLIST_FILE_COUNT || !isDownloadValid(timestamp)) {
+            if (!hasLocalBlocklists(context, timestamp) || !isDownloadValid(timestamp)) {
                 return false
             }
 
@@ -121,9 +123,8 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
     }
 
     private fun updatePersistenceOnCopySuccess(timestamp: Long) {
-        persistentState.blocklistDownloadTime = timestamp
+        persistentState.localBlocklistTimestamp = timestamp
         persistentState.blocklistEnabled = true
-        persistentState.blocklistFilesDownloaded = true
     }
 
     /**

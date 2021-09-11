@@ -25,10 +25,7 @@ import com.celzero.bravedns.util.Constants.Companion.MAX_NUMBER_FILES_ALLOWED
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_SCHEDULER
 import com.celzero.bravedns.util.Utilities
 import com.google.common.io.Files
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.InputStream
+import java.io.*
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
@@ -38,11 +35,13 @@ class ZipUtil {
     companion object {
 
         @RequiresApi(Build.VERSION_CODES.O)
-        fun getBugRptFile(context: Context): String {
+        fun getBugReport(context: Context): String {
             val filePath = context.filesDir.canonicalPath + File.separator + Constants.BUG_REPORT_DIR_NAME
             val file = File(filePath)
 
-            if (!file.isDirectory) {
+            if (file.exists()) {
+                Utilities.deleteRecursive(file)
+            } else {
                 file.mkdir()
             }
 
@@ -56,8 +55,7 @@ class ZipUtil {
                 return constructFileName(filePath, fileName)
             }
 
-            return constructFileName(filePath,
-                                     Constants.BUG_REPORT_FILE_NAME + nextFileNumber)
+            return constructFileName(filePath, Constants.BUG_REPORT_FILE_NAME + nextFileNumber)
         }
 
         private fun getZipFile(context: Context): ZipFile? {
@@ -78,12 +76,9 @@ class ZipUtil {
         @RequiresApi(Build.VERSION_CODES.O)
         private fun getOlderFile(directory: ZipFile?): String {
             if (directory?.entries() == null) return ""
-            // TODO converting the entries into arrays just to sort based on modifiedTime, find
-            // a better way to do it if any
-            val entries: Array<out ZipEntry> = directory.entries().toList().toTypedArray()
-            Arrays.sort(entries) { o1, o2 -> o2.lastModifiedTime.compareTo(o1.lastModifiedTime) }
 
-            return entries[0].name
+            val entries = directory.entries().toList().sortedBy { it.lastModifiedTime.toMillis() }
+            return entries[0].name ?: ""
         }
 
         fun getZipFilePath(context: Context): String {
@@ -95,14 +90,15 @@ class ZipUtil {
             val zipPath = getZipFilePath(context)
 
             val zipFile = getZipFile(context)
+            FileOutputStream(zipPath, true).use { fo ->
+                ZipOutputStream(fo).use { zo ->
+                    // Issue when a new file is appended to the existing zip file.
+                    // Using the approach similar to this ref=(https://stackoverflow.com/a/2265206)
+                    handleOlderFiles(zo, zipFile, file.name)
 
-            ZipOutputStream(FileOutputStream(zipPath, true)).use { zo ->
-                // Issue when a new file is appended to the existing zip file.
-                // Using the approach similar to this ref=(https://stackoverflow.com/a/2265206)
-                handleOlderFiles(zo, zipFile, file.name)
-
-                // Add new file to zip
-                addNewFile(zo, file)
+                    // Add new file to zip
+                    addNewZipEntry(zo, file)
+                }
             }
             zipFile?.close()
 
@@ -115,7 +111,7 @@ class ZipUtil {
             Utilities.deleteRecursive(File(filePath))
         }
 
-        private fun addNewFile(zo: ZipOutputStream, file: File) {
+        private fun addNewZipEntry(zo: ZipOutputStream, file: File) {
             Log.d(LOG_TAG_SCHEDULER, "Add new file: ${file.name} to bug_report.zip")
             val entry = ZipEntry(file.name)
             zo.putNextEntry(entry)
@@ -124,7 +120,8 @@ class ZipUtil {
             inStream.close()
         }
 
-        private fun handleOlderFiles(zo: ZipOutputStream, zipFile: ZipFile?, ignoreFileName: String) {
+        private fun handleOlderFiles(zo: ZipOutputStream, zipFile: ZipFile?,
+                                     ignoreFileName: String) {
             if (zipFile == null) return
 
             val entries: Enumeration<out ZipEntry> = zipFile.entries()
@@ -147,6 +144,7 @@ class ZipUtil {
                 if (!e.isDirectory) {
                     val inStream = zipFile.getInputStream(e)
                     writeZipContents(zo, inStream)
+                    inStream.close()
                 }
                 zo.closeEntry()
             }
@@ -156,15 +154,17 @@ class ZipUtil {
             if (inputStream == null) return
 
             FileOutputStream(file, true).use { outputStream ->
-                while (inputStream.read() != -1) {
-                    outputStream.write(inputStream.readBytes())
-                }
+                copy(inputStream, outputStream)
             }
         }
 
         private fun writeZipContents(outputStream: ZipOutputStream, inputStream: InputStream) {
-            while (inputStream.read() != -1) {
-                outputStream.write(inputStream.readBytes())
+            copy(inputStream, outputStream)
+        }
+
+        fun copy(input: InputStream, output: OutputStream) {
+            while (input.read() != -1) {
+                output.write(input.readBytes())
             }
         }
     }

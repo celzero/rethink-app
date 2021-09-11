@@ -48,7 +48,7 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
             return
         }
 
-        if (persistentState.getVpnEnabled() && !isAlwaysOnEnabled) {
+        if (VpnController.state().activationRequested && !isAlwaysOnEnabled) {
             val prepareVpnIntent: Intent? = try {
                 VpnService.prepare(context)
             } catch (e: NullPointerException) {

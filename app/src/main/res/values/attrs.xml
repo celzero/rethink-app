@@ -24,4 +24,6 @@
     <attr name="chipTextPositive" format="reference" />
     <attr name="chipBgColorNegative" format="reference" />
     <attr name="chipTextNegative" format="reference" />
+    <attr name="chipColorBgNormal" format="reference" />
+    <attr name="chipColorBgHighlight" format="reference" />
 </resources>

@@ -15,56 +15,82 @@
  */
 package com.celzero.bravedns.service
 
-import android.os.CountDownTimer
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Utilities
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicLong
 
-class PauseTimer(val appMode: AppMode) {
+object PauseTimer {
 
-    private var timer: CountDownTimer? = null
-    private var countDownMs: Long = Constants.DEFAULT_PAUSE_TIME_MS
+    private var countdownMs: AtomicLong = AtomicLong(Constants.DEFAULT_PAUSE_TIME_MS)
     private var pauseCountDownTimer: MutableLiveData<Long> = MutableLiveData()
+    private const val LOCKDOWN_STATUS_CHECK_TIME_IN_SEC = 30L
+    private const val COUNT_DOWN_INTERVAL = 1000L
 
-    fun startCountDownTimer(timeInMills: Long) {
-        countDownMs = timeInMills
-        if (DEBUG) Log.d(LOG_TAG_UI, "Timer started with: $timeInMills")
-        timer?.cancel()
-        timer = object : CountDownTimer(countDownMs, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                countDownMs = millisUntilFinished
-                pauseCountDownTimer.postValue(millisUntilFinished)
+    fun start(durationMs: Long) {
+        if (DEBUG) Log.d(LOG_TAG_UI, "timer started, duration: $durationMs")
+        CoroutineScope(Dispatchers.Main).launch {
+            setCountdown(durationMs)
+            while (countdownMs.get() > 0L) {
+                delay(COUNT_DOWN_INTERVAL)
+                val c = addCountdown(-COUNT_DOWN_INTERVAL)
+
+                // Check vpn lockdown state every 30 secs
+                if (TimeUnit.MILLISECONDS.toSeconds(c) % LOCKDOWN_STATUS_CHECK_TIME_IN_SEC == 0L) {
+                    resumeAppIfVpnLockdown()
+                }
             }
 
-            override fun onFinish() {
-                Log.d(LOG_TAG_VPN, "Timer count down timer onFinish.")
-                VpnController.getBraveVpnService()?.resumeApp()
-                pauseCountDownTimer.postValue(0)
-            }
-        }.start()
+            if (DEBUG) Log.d(LOG_TAG_VPN, "pause timer complete")
+            VpnController.getBraveVpnService()?.resumeApp()
+            setCountdown(INIT_TIME_MS)
+        }
     }
 
-    fun stopCountDownTimer() {
-        timer?.cancel()
-        countDownMs = Constants.DEFAULT_PAUSE_TIME_MS
-        pauseCountDownTimer.postValue(0)
+    private fun resumeAppIfVpnLockdown() {
+        // edge-case: there is no call-back for the lockdown mode so using this check, when the
+        // lockdown mode is detected, set the app state as ACTIVE regardless of the current state
+        if (!Utilities.isVpnLockdownEnabled(VpnController.getBraveVpnService())) return
+
+        VpnController.getBraveVpnService()?.resumeApp()
+
     }
 
-    fun incrementTimer(timeInMills: Long) {
-        countDownMs = countDownMs.plus(timeInMills)
-        startCountDownTimer(countDownMs)
+    private fun setCountdown(c: Long): Long {
+        countdownMs.set(c)
+        pauseCountDownTimer.postValue(c)
+        return c
     }
 
-    fun decrementTimer(timeInMills: Long) {
-        countDownMs = countDownMs.minus(timeInMills)
-        startCountDownTimer(countDownMs)
+    private fun addCountdown(c: Long): Long {
+        val r = countdownMs.getAndAdd(c)
+        pauseCountDownTimer.postValue(r)
+        return r
     }
 
-    fun getPauseCountdownObserver(): MutableLiveData<Long> {
+    fun stop() {
+        setCountdown(INIT_TIME_MS)
+    }
+
+    fun increment(duration: Long) {
+        addCountdown(duration)
+    }
+
+    fun decrement(duration: Long) {
+        addCountdown(-duration)
+    }
+
+    fun getPauseCountDownObserver(): MutableLiveData<Long> {
         return pauseCountDownTimer
     }
 }

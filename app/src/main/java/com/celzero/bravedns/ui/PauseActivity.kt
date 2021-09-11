@@ -19,32 +19,39 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import android.os.Handler
+import android.os.SystemClock
 import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
-import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.databinding.PauseActivityBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants.Companion.EXTRA_MILLIS
-import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.Companion.humanReadableTime
+import kotlinx.coroutines.*
 import org.koin.android.ext.android.inject
+import java.util.concurrent.TimeUnit
 
 class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
     private val b by viewBinding(PauseActivityBinding::bind)
     private val persistentState by inject<PersistentState>()
+    @Volatile var j: CompletableJob? = null
 
-    var autoIncrement = false
-    var autoDecrement = false
-    val repeatUpdateHandler: Handler = Handler()
+    enum class AutoOp {
+        INCREMENT, DECREMENT, NONE
+    }
+
+    @Volatile var autoOp = AutoOp.NONE
+    var lastStopActivityInvokeTime: Long = INIT_TIME_MS
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Utilities.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
     }
 
@@ -70,11 +77,10 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
                 observeTimer()
             }
         })
-
     }
 
     private fun observeTimer() {
-        VpnController.getBraveVpnService()?.getPauseCountdownObserver()?.observe(this, {
+        VpnController.getBraveVpnService()?.getPauseCountDownObserver()?.observe(this, {
             b.pacTimer.text = humanReadableTime(it)
         })
     }
@@ -94,43 +100,48 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
         }
 
         b.pacPlusIv.setOnLongClickListener {
-            autoIncrement = true
-            autoDecrement = false
-            repeatUpdateHandler.post(RptUpdater())
+            autoOp = AutoOp.INCREMENT
+            handleLongPress()
             false
         }
 
         b.pacMinusIv.setOnLongClickListener {
-            autoDecrement = true
-            autoIncrement = false
-            repeatUpdateHandler.post(RptUpdater())
+            autoOp = AutoOp.DECREMENT
+            handleLongPress()
             false
         }
 
         b.pacPlusIv.setOnTouchListener { _, event ->
-            if ((event.action == MotionEvent.ACTION_UP || event.action == MotionEvent.ACTION_CANCEL) && autoIncrement) {
-                autoIncrement = false
+            if ((event.action == MotionEvent.ACTION_UP || event.action == MotionEvent.ACTION_CANCEL)) {
+                autoOp = AutoOp.NONE
             }
             false
         }
 
         b.pacMinusIv.setOnTouchListener { _, event ->
-            if ((event.action == MotionEvent.ACTION_UP || event.action == MotionEvent.ACTION_CANCEL) && autoDecrement) {
-                autoDecrement = false
+            if ((event.action == MotionEvent.ACTION_UP || event.action == MotionEvent.ACTION_CANCEL)) {
+                autoOp = AutoOp.NONE
             }
             false
         }
     }
 
     private fun decrementTimer() {
-        VpnController.getBraveVpnService()?.decrementTimer(EXTRA_MILLIS)
+        VpnController.getBraveVpnService()?.decrementPauseTimer(EXTRA_MILLIS)
     }
 
     private fun incrementTimer() {
-        VpnController.getBraveVpnService()?.incrementTimer(EXTRA_MILLIS)
+        VpnController.getBraveVpnService()?.incrementPauseTimer(EXTRA_MILLIS)
     }
 
     private fun stopPauseActivity() {
+        // refrain from calling start activity multiple times
+        if (SystemClock.elapsedRealtime() - lastStopActivityInvokeTime < TimeUnit.SECONDS.toMillis(
+                1L)) {
+            return
+        }
+
+        lastStopActivityInvokeTime = SystemClock.elapsedRealtime()
         val intent = Intent(this, HomeScreenActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -142,25 +153,30 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
-    inner class RptUpdater : Runnable {
-        override fun run() {
-            if (autoIncrement) {
-                incrementTimer()
-                repeatUpdateHandler.postDelayed(RptUpdater(), 200)
-            } else if (autoDecrement) {
-                decrementTimer()
-                repeatUpdateHandler.postDelayed(RptUpdater(), 200)
-            } else {
-                // no-op
+    private fun handleLongPress() {
+        if (j?.isActive == true) {
+            return
+        }
+
+        j = Job()
+        lifecycleScope.launch(j!! + Dispatchers.Main) {
+            while (autoOp != AutoOp.NONE) {
+                when (autoOp) {
+                    AutoOp.INCREMENT -> {
+                        delay(200)
+                        incrementTimer()
+                    }
+                    AutoOp.DECREMENT -> {
+                        delay(200)
+                        decrementTimer()
+                    }
+                    else -> {
+                        // no-op
+                    }
+                }
             }
+            j?.cancel()
         }
     }
 
-    override fun onBackPressed() {
-        // Go to android home screen instead of going to previous activity
-        val startMain = Intent(Intent.ACTION_MAIN)
-        startMain.addCategory(Intent.CATEGORY_HOME)
-        startMain.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(startMain)
-    }
 }

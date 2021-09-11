@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.celzero.bravedns.viewmodel
 
+import android.util.Log
 import androidx.arch.core.util.Function
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -25,52 +26,74 @@ import androidx.paging.toLiveData
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.util.Constants.Companion.DNS_LIVEDATA_PAGE_SIZE
-import com.celzero.bravedns.util.Constants.Companion.FILTER_IS_FILTER
 
 
 class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTrackerDAO) :
         ViewModel() {
 
-    private var filteredList: MutableLiveData<String> = MutableLiveData()
+    private var filterString: MutableLiveData<String> = MutableLiveData()
+    private var filterRules: MutableList<String> = ArrayList()
+    private var filterType: FilterType = FilterType.ALL
+
+    enum class FilterType {
+        ALL, ALLOWED, BLOCKED
+    }
 
     init {
-        filteredList.value = ""
+        filterString.value = ""
     }
 
-    var connectionTrackerList = Transformations.switchMap(filteredList,
+    var connectionTrackerList = Transformations.switchMap(filterString,
                                                           (Function<String, LiveData<PagedList<ConnectionTracker>>> { input ->
-                                                              if (input.isBlank()) {
-                                                                  connectionTrackerDAO.getConnectionTrackerLiveData().toLiveData(
-                                                                      pageSize = DNS_LIVEDATA_PAGE_SIZE)
-                                                              } else if (input.contains(
-                                                                      FILTER_IS_FILTER)) {
-                                                                  val searchText = input.split(
-                                                                      ":")[0]
-                                                                  if (searchText.isEmpty()) {
-                                                                      connectionTrackerDAO.getConnectionBlockedConnections().toLiveData(
-                                                                          pageSize = DNS_LIVEDATA_PAGE_SIZE)
-                                                                  } else {
-                                                                      connectionTrackerDAO.getConnectionBlockedConnectionsByName(
-                                                                          "%$searchText%").toLiveData(
-                                                                          pageSize = DNS_LIVEDATA_PAGE_SIZE)
-                                                                  }
-                                                              } else {
-                                                                  connectionTrackerDAO.getConnectionTrackerByName(
-                                                                      "%$input%").toLiveData(
-                                                                      DNS_LIVEDATA_PAGE_SIZE)
-                                                              }
-                                                          })
+                                                              fetchNetworkLogs(input)
+                                                          }))
 
-                                                         )
+    fun setFilter(searchString: String?, filter: List<String>, type: FilterType) {
+        filterRules.clear()
 
-    fun setFilter(searchString: String?, filter: String?) {
-        if (!searchString.isNullOrEmpty()) filteredList.value = "$searchString$filter"
-        else filteredList.value = ""
+        filterRules.addAll(filter)
+        filterType = type
+
+        if (!searchString.isNullOrBlank()) filterString.value = searchString
+        else filterString.value = ""
     }
 
-    fun setFilterBlocked(filter: String?) {
-        if (!filter.isNullOrEmpty()) filteredList.value = filter
-        else filteredList.value = ""
+    private fun fetchNetworkLogs(input: String): LiveData<PagedList<ConnectionTracker>> {
+        return when (filterType) {
+            FilterType.ALL -> {
+                getAllNetworkLogs(input)
+            }
+            FilterType.ALLOWED -> {
+                getAllowedNetworkLogs(input)
+            }
+            FilterType.BLOCKED -> {
+                getBlockedNetworkLogs(input)
+            }
+        }
     }
 
+    private fun getBlockedNetworkLogs(input: String): LiveData<PagedList<ConnectionTracker>> {
+        return if (filterRules.size > 0) {
+            connectionTrackerDAO.getBlockedConnectionsFiltered("%$input%", filterRules).toLiveData(
+                pageSize = DNS_LIVEDATA_PAGE_SIZE)
+        } else {
+            connectionTrackerDAO.getBlockedConnections("%$input%").toLiveData(
+                pageSize = DNS_LIVEDATA_PAGE_SIZE)
+        }
+    }
+
+    private fun getAllowedNetworkLogs(input: String): LiveData<PagedList<ConnectionTracker>> {
+        return if (filterRules.size > 0) {
+            connectionTrackerDAO.getAllowedConnectionsFiltered("%$input%", filterRules).toLiveData(
+                pageSize = DNS_LIVEDATA_PAGE_SIZE)
+        } else {
+            connectionTrackerDAO.getAllowedConnections("%$input%").toLiveData(
+                pageSize = DNS_LIVEDATA_PAGE_SIZE)
+        }
+    }
+
+    private fun getAllNetworkLogs(input: String): LiveData<PagedList<ConnectionTracker>> {
+        return connectionTrackerDAO.getConnectionTrackerByName("%$input%").toLiveData(
+            DNS_LIVEDATA_PAGE_SIZE)
+    }
 }

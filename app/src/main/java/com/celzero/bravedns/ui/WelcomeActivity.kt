@@ -32,7 +32,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityWelcomeBinding
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Themes
 import org.koin.android.ext.android.inject
 
 class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
@@ -44,7 +44,7 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
     private val persistentState by inject<PersistentState>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Utilities.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
 
         addBottomDots(0)

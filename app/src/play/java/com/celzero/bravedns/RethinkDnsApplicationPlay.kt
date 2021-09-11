@@ -31,7 +31,9 @@ class RethinkDnsApplicationPlay:Application() {
             androidContext(this@RethinkDnsApplicationPlay)
             koin.loadModules(AppModules)
             koin.loadModules(listOf(module {
-                    single<AppUpdater>(override = true) { StoreAppUpdater(androidContext())}
+                    // New Koin override strategy allow to override any definition by default.
+                    // don't need to specify override = true anymore in module.
+                    single<AppUpdater> { StoreAppUpdater(androidContext())}
             }))
         }
     }

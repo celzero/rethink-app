@@ -24,6 +24,7 @@ import android.widget.Toast
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.data.AppMode
+import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
@@ -40,12 +41,14 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
     private val orbotHelper by inject<OrbotHelper>()
 
     override fun onReceive(context: Context, intent: Intent) {
+        // TODO - Move the NOTIFICATION_ACTIONs value to enum
         val action: String? = intent.getStringExtra(Constants.NOTIFICATION_ACTION)
         Log.i(LOG_TAG_VPN, "NotificationActionReceiver: onReceive - $action")
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         when (action) {
             OrbotHelper.ORBOT_NOTIFICATION_ACTION_TEXT -> {
                 orbotHelper.openOrbotApp()
+                manager.cancel(OrbotHelper.ORBOT_SERVICE_ID)
             }
             Constants.NOTIF_ACTION_PAUSE_VPN -> {
                 pauseApp(context)
@@ -65,8 +68,23 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
             Constants.NOTIF_ACTION_RULES_FAILURE -> {
                 reloadRules()
             }
+            Constants.NOTIF_ACTION_NEW_APP_ALLOW -> {
+                val uid = intent.getIntExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, 0)
+                manager.cancel(RefreshDatabase.NOTIF_ID_NEW_APP.toString(), uid)
+
+                if (uid <= 0) return
+
+                modifyAppFirewallSettings(context, uid, isInternetAllowed = true)
+            }
+            Constants.NOTIF_ACTION_NEW_APP_DENY -> {
+                val uid = intent.getIntExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, 0)
+                manager.cancel(RefreshDatabase.NOTIF_ID_NEW_APP.toString(), uid)
+
+                if (uid <= 0) return
+
+                modifyAppFirewallSettings(context, uid, isInternetAllowed = false)
+            }
         }
-        manager.cancel(OrbotHelper.ORBOT_SERVICE_ID)
     }
 
     private fun reloadRules() {
@@ -111,6 +129,16 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
         io {
             appMode.changeBraveMode(AppMode.BraveMode.DNS_FIREWALL.mode)
         }
+    }
+
+    private fun modifyAppFirewallSettings(context: Context, uid: Int, isInternetAllowed: Boolean) {
+        val text = if (isInternetAllowed) {
+            context.getString(R.string.new_app_notification_action_toast_allow)
+        } else {
+            context.getString(R.string.new_app_notification_action_toast_deny)
+        }
+        Utilities.showToastUiCentered(context, text, Toast.LENGTH_SHORT)
+        FirewallManager.updateFirewalledApps(uid, isInternetAllowed)
     }
 
     private fun io(f: suspend () -> Unit) {

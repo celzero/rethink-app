@@ -242,7 +242,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
             notificationManager.notify(ORBOT_SERVICE_ID, createNotification().build())
         }
         selectedProxyType = AppMode.ProxyType.NONE.name
-        appMode.removeProxy(AppMode.ProxyType.NONE, AppMode.ProxyProvider.NONE)
+        appMode.removeAllProxies()
         persistentState.orbotConnectionStatus.postValue(false)
         context.sendBroadcast(getOrbotStopIntent())
         if (DEBUG) Log.d(LOG_TAG_VPN, "OrbotHelper - Orbot - stopOrbot")

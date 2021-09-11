@@ -31,10 +31,9 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
 import com.celzero.bravedns.glide.GlideApp
-import com.celzero.bravedns.service.DNSLogTracker
 import com.celzero.bravedns.service.FirewallRuleset
-import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
+import com.celzero.bravedns.ui.ConnectionTrackerFragment
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
 import com.celzero.bravedns.util.KnownPorts
@@ -45,10 +44,11 @@ import com.celzero.bravedns.util.Utilities.Companion.getIcon
 import com.celzero.bravedns.util.Utilities.Companion.getPackageInfoForUid
 import java.util.*
 
-class ConnectionTrackerAdapter(val context: Context, val dnsLogTracker: DNSLogTracker) :
+class ConnectionTrackerAdapter(private val connectionTrackerFragment: ConnectionTrackerFragment) :
         PagedListAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(
             DIFF_CALLBACK) {
 
+    val context: Context = connectionTrackerFragment.requireContext()
 
     companion object {
         private val DIFF_CALLBACK = object :
@@ -96,7 +96,7 @@ class ConnectionTrackerAdapter(val context: Context, val dnsLogTracker: DNSLogTr
                 return
             }
 
-            val bottomSheetFragment = ConnTrackerBottomSheetFragment(ct, dnsLogTracker)
+            val bottomSheetFragment = ConnTrackerBottomSheetFragment(ct)
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
 
@@ -107,9 +107,11 @@ class ConnectionTrackerAdapter(val context: Context, val dnsLogTracker: DNSLogTr
             b.connectionIpAddress.text = connTracker.ipAddress
 
             connTracker.ipAddress?.let {
-                val dnsCache = dnsLogTracker.dnsResolvedIpsRecord.getIfPresent(it)
+                val dnsCache = connectionTrackerFragment.ipToDomain(it)
                 dnsCache?.let {
-                    b.connectionIpAddress.text = context.getString(R.string.ct_ip_details, b.connectionIpAddress.text.toString(), dnsCache.fqdn.dropLast(1))
+                    b.connectionIpAddress.text = context.getString(R.string.ct_ip_details,
+                                                                   b.connectionIpAddress.text.toString(),
+                                                                   dnsCache.fqdn)
                 }
             }
         }

@@ -43,9 +43,9 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.BackgroundAccessibilityService
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.delay
-import com.celzero.bravedns.util.Utilities.Companion.getCurrentTheme
 import com.celzero.bravedns.viewmodel.AppListViewModel
 import com.celzero.bravedns.viewmodel.BlockedConnectionsViewModel
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -107,11 +107,12 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         includeView.firewallUdpConnectionModeCheck.isChecked = persistentState.udpBlockedSettings
         includeView.firewallUnknownConnectionModeCheck.isChecked = persistentState.blockUnknownConnections
         includeView.firewallDisallowDnsBypassModeCheck.isChecked = persistentState.disallowDnsBypass
+        includeView.firewallBlockNewAppCheck.isChecked = persistentState.blockNewlyInstalledApp
 
         setupClickListeners(includeView)
 
         FirewallManager.getApplistObserver().observe(viewLifecycleOwner, {
-            val whiteListApps = it.filter { a -> a.whiteListUniv1 }.size
+            val whiteListApps = it.filter { a -> a.whiteListUniv1 }.count()
             includeView.firewallUnivWhitelistCount.text = getString(
                 R.string.whitelist_dialog_apps_in_use, whiteListApps.toString())
         })
@@ -187,6 +188,14 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         includeView.firewallDisallowDnsBypassModeTxt.setOnClickListener {
             toggle(includeView.firewallDisallowDnsBypassModeCheck,
                    persistentState::disallowDnsBypass)
+        }
+
+        includeView.firewallBlockNewAppCheck.setOnCheckedChangeListener { _, b ->
+            persistentState.blockNewlyInstalledApp = b
+        }
+
+        includeView.firewallBlockNewAppTxt.setOnClickListener {
+            toggle(includeView.firewallBlockNewAppCheck, persistentState::blockNewlyInstalledApp)
         }
 
         includeView.firewallUnivIpHeader.setOnClickListener {

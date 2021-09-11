@@ -23,7 +23,7 @@ import androidx.room.Transaction
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 import com.celzero.bravedns.util.LoggerConstants
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
@@ -34,16 +34,9 @@ class DNSCryptEndpointRepository(private val dnsCryptEndpointDAO: DNSCryptEndpoi
         dnsCryptEndpointDAO.update(dnsCryptEndpoint)
     }
 
-    fun deleteAsync(dnsCryptEndpoint: DNSCryptEndpoint,
-                    coroutineScope: CoroutineScope = GlobalScope) {
-        coroutineScope.launch {
-            dnsCryptEndpointDAO.delete(dnsCryptEndpoint)
-        }
-    }
-
 
     fun insertAsync(dnsCryptEndpoint: DNSCryptEndpoint,
-                    coroutineScope: CoroutineScope = GlobalScope) {
+                    coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
         coroutineScope.launch {
             dnsCryptEndpointDAO.insert(dnsCryptEndpoint)
         }
@@ -54,7 +47,8 @@ class DNSCryptEndpointRepository(private val dnsCryptEndpointDAO: DNSCryptEndpoi
             pageSize = LIVEDATA_PAGE_SIZE)
     }
 
-    fun deleteOlderData(date: Long, coroutineScope: CoroutineScope = GlobalScope) {
+    fun deleteOlderData(date: Long,
+                        coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
         coroutineScope.launch {
             dnsCryptEndpointDAO.deleteOlderData(date)
         }

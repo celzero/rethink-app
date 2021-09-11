@@ -21,11 +21,14 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-object VpnController {
+object VpnController : KoinComponent {
 
     private var braveVpnService: BraveVPNService? = null
     private var connectionState: BraveVPNService.State? = null
+    private val persistentState by inject<PersistentState>()
 
     var connectionStatus: MutableLiveData<BraveVPNService.State> = MutableLiveData()
 
@@ -92,7 +95,7 @@ object VpnController {
     }
 
     fun state(): VpnState {
-        val requested: Boolean = braveVpnService?.persistentState?.getVpnEnabled() == true
+        val requested: Boolean = persistentState.getVpnEnabled()
         val on = isOn()
         return VpnState(requested, on, connectionState)
     }

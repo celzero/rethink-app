@@ -18,7 +18,6 @@ package com.celzero.bravedns.net.dns;
 
 import static com.celzero.bravedns.util.LoggerConstants.LOG_TAG_DNS_LOG;
 
-import android.text.TextUtils;
 import android.util.Log;
 
 import java.net.InetAddress;

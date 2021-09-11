@@ -49,6 +49,7 @@
         android:paddingTop="10dp"
         android:paddingEnd="10dp"
         android:paddingBottom="10dp"
+        android:textColor="?attr/primaryTextColor"
         android:text="@string/hs_btm_sheet_lock_down"
         android:textSize="@dimen/default_font_text_view"
         android:visibility="visible" />
@@ -206,8 +207,11 @@
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_gravity="center"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
                 android:alpha="0.5"
-                android:layout_margin="5dp"
                 android:contentDescription="@string/apps_icon_content_desc"
                 android:padding="5dp"
                 android:src="@drawable/ic_dns_firewall" />

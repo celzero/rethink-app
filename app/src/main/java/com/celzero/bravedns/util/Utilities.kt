@@ -39,7 +39,6 @@ import android.util.Log
 import android.view.Gravity
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.getSystemService
 import androidx.core.text.HtmlCompat
@@ -61,15 +60,12 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.google.common.net.InetAddresses
 import com.google.common.net.InternetDomainName
-import java.io.*
+import java.io.File
+import java.io.IOException
 import java.net.InetAddress
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Locale
-import java.util.zip.ZipEntry
-import java.util.zip.ZipFile
-import java.util.zip.ZipInputStream
-import java.util.zip.ZipOutputStream
 
 
 class Utilities {
@@ -327,39 +323,6 @@ class Utilities {
             }
         }
 
-        fun getCurrentTheme(isDarkThemeOn: Boolean, theme: Int): Int {
-            return if (theme == Constants.Companion.Themes.SYSTEM_DEFAULT.id) {
-                if (isDarkThemeOn) {
-                    Constants.Companion.Themes.getTheme(Constants.Companion.Themes.TRUE_BLACK.id)
-                } else {
-                    Constants.Companion.Themes.getTheme(Constants.Companion.Themes.LIGHT.id)
-                }
-            } else if (theme == Constants.Companion.Themes.LIGHT.id) {
-                Constants.Companion.Themes.getTheme(theme)
-            } else if (theme == Constants.Companion.Themes.DARK.id) {
-                Constants.Companion.Themes.getTheme(theme)
-            } else {
-                Constants.Companion.Themes.getTheme(Constants.Companion.Themes.TRUE_BLACK.id)
-            }
-        }
-
-        fun getBottomsheetCurrentTheme(isDarkThemeOn: Boolean, theme: Int): Int {
-            return if (theme == Constants.Companion.Themes.SYSTEM_DEFAULT.id) {
-                if (isDarkThemeOn) {
-                    Constants.Companion.Themes.getBottomSheetTheme(Constants.Companion.Themes.TRUE_BLACK.id)
-                } else {
-                    Constants.Companion.Themes.getBottomSheetTheme(Constants.Companion.Themes.LIGHT.id)
-                }
-            } else if (theme == Constants.Companion.Themes.LIGHT.id) {
-                Constants.Companion.Themes.getBottomSheetTheme(theme)
-            } else if (theme == Constants.Companion.Themes.DARK.id) {
-                Constants.Companion.Themes.getBottomSheetTheme(theme)
-            } else {
-                Constants.Companion.Themes.getBottomSheetTheme(
-                    Constants.Companion.Themes.TRUE_BLACK.id)
-            }
-        }
-
         fun getPackageMetadata(pm: PackageManager, pi: String): PackageInfo? {
             var metadata: PackageInfo? = null
 
@@ -537,15 +500,56 @@ class Utilities {
                     fileOrDirectory.delete()
                 }
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                                 "TEST deleteRecursive -- File : ${fileOrDirectory.path}, $isDeleted")
+                                 "deleteRecursive -- File : ${fileOrDirectory.path}, $isDeleted")
             } catch (e: Exception) {
                 Log.w(LOG_TAG_DOWNLOAD, "File delete exception: ${e.message}", e)
             }
         }
 
+        fun localBlocklistDownloadPath(ctx: Context, which: String, timestamp: Long): String {
+            return ctx.filesDir.canonicalPath + File.separator + timestamp + which
+        }
 
+        fun hasLocalBlocklists(ctx: Context, timestamp: Long): Boolean {
+            val a = Constants.LOCAL_BLOCKLISTS.all {
+                localBlocklistFile(ctx, it.filename, timestamp)?.exists() == true
+            }
+            return a
+        }
 
+        private fun localBlocklistFile(ctx: Context, which: String, timestamp: Long): File? {
+            return try {
+                return File(localBlocklistDownloadPath(ctx, which, timestamp))
+            } catch (e: IOException) {
+                Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
+                null
+            }
+        }
+
+        fun remoteBlocklistDir(ctx: Context?, which: String, timestamp: Long): File? {
+            if (ctx == null) return null
+
+            return try {
+                File(remoteBlocklistDownloadBasePath(ctx, which, timestamp))
+            } catch (e: IOException) {
+                Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
+                null
+            }
+        }
+
+        private fun remoteBlocklistDownloadBasePath(ctx: Context, which: String,
+                                                    timestamp: Long): String {
+            return ctx.filesDir.canonicalPath + File.separator + which + File.separator + timestamp
+        }
+
+        fun remoteBlocklistFile(dirPath: String, fileName: String): File? {
+            return try {
+                return File(dirPath + fileName)
+            } catch (e: IOException) {
+                Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
+                null
+            }
+        }
     }
-
 
 }

@@ -19,7 +19,7 @@
     <color name="positive">#05dfd7</color>
     <color name="negative">#DF3520</color>
     <color name="neutral">#959595</color>
-    <color name="black">#2F2F2F</color>
+    <color name="black">#2d2c2c</color>
     <color name="recycler_selected">#6E7069</color>
     <color name="navBarBackground">#2d2c2c</color>
     <color name="buttonBackground">#006f67</color>
@@ -41,7 +41,10 @@
     <color name="white">#FFFFFF</color>
 
     <color name="borderColor">#444444</color>
-    <color name="borderBlack">#2B2A2A</color>
+    <color name="borderBlack">#444444</color>
+
+    <color name="chipColorBgNormalApp">#90444444</color>
+    <color name="chipColorBgHighlightApp">#9005dfd7</color>
 
     <color name="textColorMain">#BDBDBD</color>
     <color name="blue_background">#405de6</color>
@@ -113,6 +116,8 @@
     <color name="chipTextPositiveWhite">#33691E</color>
     <color name="chipBgNegativeWhite">#F48FB1</color>
     <color name="chipTextNegativeWhite">#C51162</color>
+    <color name="chipColorBgNormalWhite">#FFe1e1e1</color>
+    <color name="chipColorBgHighlightWhite">#901e88e5</color>
 
     <!-- Black theme latest colors -->
     <color name="colorBackgroundBlack">#121212</color>
@@ -131,5 +136,6 @@
     <color name="chipTextPositiveBlack">#CC1DE9B6</color>
     <color name="chipBgNegativeBlack">#33B71C1C</color>
     <color name="chipTextNegativeBlack">#CCFF5252</color>
-
+    <color name="chipColorBgNormalBlack">#444444</color>
+    <color name="chipColorBgHighlightBlack">#904fc3f7</color>
 </resources>

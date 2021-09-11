@@ -16,7 +16,6 @@ limitations under the License.
 package com.celzero.bravedns.util
 
 import com.celzero.bravedns.BuildConfig
-import com.celzero.bravedns.R
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -26,12 +25,11 @@ class Constants {
     companion object {
         // Download path and file names
         val DOWNLOAD_PATH = File.separator + "downloads" + File.separator
+
         val FILE_TAG_NAME = File.separator + "filetag.json"
         val FILE_BASIC_CONFIG = File.separator + "basicconfig.json"
         val FILE_RD_FILE = File.separator + "rd.txt"
         val FILE_TD_FILE = File.separator + "td.txt"
-
-        const val LOCAL_BLOCKLIST_FILE_COUNT = 4
 
         //Download URLs
         const val JSON_DOWNLOAD_BLOCKLIST_LINK = "https://download.rethinkdns.com/blocklists"
@@ -40,17 +38,18 @@ class Constants {
         const val APP_DOWNLOAD_AVAILABLE_CHECK = "https://download.rethinkdns.com/update/app?vcode="
         const val CONFIGURE_BLOCKLIST_URL = "https://rethinkdns.com/configure?v=app"
         const val CONFIGURE_BLOCKLIST_URL_PARAMETER = "tstamp"
-        const val FILE_TAG_JSON = "filetag.json"
 
         // The version tag value(response) for the update check.
         const val RESPONSE_VERSION = 1
 
-        val DOWNLOAD_URLS = listOf("https://download.rethinkdns.com/blocklists",
-                                   "https://download.rethinkdns.com/basicconfig",
-                                   "https://download.rethinkdns.com/rank",
-                                   "https://download.rethinkdns.com/trie")
+        data class LocalBlocklistsMetadata(val url: String, val filename: String)
 
-        val FILE_NAMES = listOf("filetag.json", "basicconfig.json", "rd.txt", "td.txt")
+        val LOCAL_BLOCKLISTS = listOf(
+            LocalBlocklistsMetadata("https://download.rethinkdns.com/blocklists", FILE_TAG_NAME),
+            LocalBlocklistsMetadata("https://download.rethinkdns.com/basicconfig",
+                                    FILE_BASIC_CONFIG),
+            LocalBlocklistsMetadata("https://download.rethinkdns.com/rank", FILE_RD_FILE),
+            LocalBlocklistsMetadata("https://download.rethinkdns.com/trie", FILE_TD_FILE))
 
         // Earlier the link was https://bravedns.com/downloads
         // modified below link post v053c release
@@ -135,9 +134,16 @@ class Constants {
         const val NOTIF_ACTION_DNS_FIREWALL_VPN = "RETHINK_FULLMODE" // default dns+firewall
         const val NOTIF_ACTION_RULES_FAILURE = "RETHINK_RULES_RELOAD" // load rules failure
 
+        const val NOTIF_ACTION_NEW_APP_ALLOW = "NEW_APP_ALLOW"
+        const val NOTIF_ACTION_NEW_APP_DENY = "NEW_APP_DENY"
 
         const val NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME = "ACCESSIBILITY_GRANT"
         const val NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE = "ACCESSIBILITY_FAILURE"
+
+        const val NOTIF_INTENT_EXTRA_NEW_APP_NAME = "NEW_APP_INSTALL"
+        const val NOTIF_INTENT_EXTRA_NEW_APP_VALUE = "NEW_APP_INSTALL_SOURCE"
+
+        const val NOTIF_INTENT_EXTRA_APP_UID = "NEW_APP_UID"
 
         const val NXDOMAIN = "NXDOMAIN"
 
@@ -146,37 +152,6 @@ class Constants {
         val WORK_MANAGER_TIMEOUT = TimeUnit.MINUTES.toMillis(40)
 
         const val FAV_ICON_URL = "https://icons.duckduckgo.com/ip2/"
-
-        // Application themes enum
-        enum class Themes(val id: Int) {
-            SYSTEM_DEFAULT(0), LIGHT(1), DARK(2), TRUE_BLACK(3);
-
-            companion object {
-                fun getThemeCount(): Int {
-                    return values().size
-                }
-
-                fun getTheme(id: Int): Int {
-                    return when (id) {
-                        SYSTEM_DEFAULT.id -> 0
-                        LIGHT.id -> R.style.AppThemeWhite
-                        DARK.id -> R.style.AppTheme
-                        TRUE_BLACK.id -> R.style.AppThemeTrueBlack
-                        else -> 0
-                    }
-                }
-
-                fun getBottomSheetTheme(id: Int): Int {
-                    return when (id) {
-                        SYSTEM_DEFAULT.id -> 0
-                        LIGHT.id -> R.style.BottomSheetDialogThemeWhite
-                        DARK.id -> R.style.BottomSheetDialogTheme
-                        TRUE_BLACK.id -> R.style.BottomSheetDialogThemeTrueBlack
-                        else -> 0
-                    }
-                }
-            }
-        }
 
         // Notification action buttons
         const val NOTIFICATION_ACTION_STOP = 0
@@ -232,7 +207,7 @@ class Constants {
 
         // Bug report text file
         const val BUG_REPORT_DIR_NAME = "bugreport/"
-        const val BUG_REPORT_ZIP_FILE_NAME = "bug_report.zip"
+        const val BUG_REPORT_ZIP_FILE_NAME = "rethinkdns.bugreport.zip"
         const val BUG_REPORT_FILE_NAME = "bugreport_"
 
         const val MAX_NUMBER_FILES_ALLOWED = 5

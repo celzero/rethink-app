@@ -23,6 +23,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.SystemClock
 import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.util.Log
@@ -33,17 +34,23 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.DialogViewLogsBinding
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentAboutBinding
+import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.scheduler.ZipUtil.Companion.getZipFilePath
 import com.celzero.bravedns.service.AppUpdater
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
 import com.celzero.bravedns.util.Constants.Companion.FILE_PROVIDER_NAME
+import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
+import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
+import com.celzero.bravedns.util.Constants.Companion.FLAVOR_WEBSITE
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastR
@@ -55,15 +62,18 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.get
 import java.io.File
 import java.io.FileInputStream
+import java.util.concurrent.TimeUnit
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
 
-
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
     private val b by viewBinding(FragmentAboutBinding::bind)
+
+    private var lastAppExitInfoDialogInvokeTime = INIT_TIME_MS
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -94,7 +104,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         try {
             val version = getVersionName()
             b.aboutAppVersion.text = getString(R.string.about_version_install_source, version,
-                                               getDownloadSource().toString())
+                                               getDownloadSource())
             b.aboutWhatsNew.text = getString(R.string.about_whats_new,
                                              getString(R.string.about_version, version))
         } catch (e: PackageManager.NameNotFoundException) {
@@ -108,16 +118,16 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         return pInfo?.versionName ?: ""
     }
 
-    private fun getDownloadSource(): Int {
+    private fun getDownloadSource(): String {
         return when (BuildConfig.FLAVOR) {
-            Constants.FLAVOR_PLAY -> {
-                DOWNLOAD_SOURCE_PLAY_STORE
+            FLAVOR_PLAY -> {
+                FLAVOR_PLAY
             }
-            Constants.FLAVOR_FDROID -> {
-                Constants.DOWNLOAD_SOURCE_FDROID
+            FLAVOR_FDROID -> {
+                FLAVOR_FDROID
             }
             else -> {
-                Constants.DOWNLOAD_SOURCE_WEBSITE
+                FLAVOR_WEBSITE
             }
         }
     }
@@ -144,7 +154,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             }
             b.aboutCrashLog -> {
                 if (isAtleastR()) {
-                    promptCrashLogAction()
+                    initiateAppExitInfoLogExtract()
                 } else {
                     showNoLogDialog()
                 }
@@ -215,7 +225,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
-
 
     private fun openNotificationSettings() {
         val packageName = requireContext().packageName
@@ -290,7 +299,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         builder.setTitle(getString(R.string.about_bug_report))
 
         val zipPath = getZipFilePath(requireContext())
-        val zipFile: ZipFile? = try {
+        val zipFile = try {
             ZipFile(zipPath)
         } catch (ignored: Exception) {  // FileNotFound, ZipException
             null
@@ -303,25 +312,36 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         }
 
         CoroutineScope(Dispatchers.IO).launch {
+            var fin: FileInputStream? = null
+            var zin: ZipInputStream? = null
             try {
-                val zin = ZipInputStream(FileInputStream(zipPath))
+                fin = FileInputStream(zipPath)
+                zin = ZipInputStream(fin)
                 var ze: ZipEntry? = null
 
                 while (zin.nextEntry.also { ze = it } != null) {
-                    val inStream = zipFile.getInputStream(ze)
+                    val inStream = zipFile?.getInputStream(ze)
                     val inputString = inStream?.bufferedReader().use { it?.readText() }
                     withContext(Dispatchers.Main) {
+                        if (!isAdded) return@withContext
                         binding.logs.append(inputString)
                     }
                 }
             } catch (e: Exception) {
                 Log.w(LOG_TAG_UI, "Error loading log files to textview: ${e.message}", e)
                 withContext(Dispatchers.Main) {
+                    if (!isAdded) return@withContext
+
                     binding.logs.text = getString(R.string.error_loading_log_file)
                 }
+            } finally {
+                fin?.close()
+                zin?.close()
             }
 
             withContext(Dispatchers.Main) {
+                if (!isAdded) return@withContext
+
                 binding.progressLayout.visibility = View.GONE
             }
         }
@@ -341,5 +361,59 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         val alert: AlertDialog = builder.create()
         alert.window?.setLayout(width, height)
         alert.show()
+    }
+
+    private fun initiateAppExitInfoLogExtract() {
+        if (WorkScheduler.isWorkRunning(requireContext(),
+                                        WorkScheduler.APP_EXIT_INFO_JOB_TAG)) return
+
+        get<WorkScheduler>().scheduleOneTimeWorkForAppExitInfo()
+        showBugReportProgressUi()
+
+        val workManager = WorkManager.getInstance(requireContext().applicationContext)
+        workManager.getWorkInfosByTagLiveData(WorkScheduler.APP_EXIT_INFO_ONE_TIME_JOB_TAG).observe(
+            viewLifecycleOwner, { workInfoList ->
+                val workInfo = workInfoList?.getOrNull(0) ?: return@observe
+                Log.i(LoggerConstants.LOG_TAG_SCHEDULER,
+                      "WorkManager state: ${workInfo.state} for ${WorkScheduler.APP_EXIT_INFO_ONE_TIME_JOB_TAG}")
+                if (WorkInfo.State.SUCCEEDED == workInfo.state) {
+                    onAppExitInfoSuccess()
+                    workManager.pruneWork()
+                } else if (WorkInfo.State.CANCELLED == workInfo.state || WorkInfo.State.FAILED == workInfo.state) {
+                    onAppExitInfoFailure()
+                    workManager.pruneWork()
+                    workManager.cancelAllWorkByTag(WorkScheduler.APP_EXIT_INFO_ONE_TIME_JOB_TAG)
+                } else { // state == blocked, queued, or running
+                    // no-op
+                }
+            })
+    }
+
+    private fun onAppExitInfoFailure() {
+        showToastUiCentered(requireContext(), getString(R.string.log_file_not_available),
+                            Toast.LENGTH_SHORT)
+        hideBugReportProgressUi()
+    }
+
+    private fun showBugReportProgressUi() {
+        b.progressLayout.visibility = View.VISIBLE
+        b.aboutCrashLog.visibility = View.GONE
+    }
+
+    private fun hideBugReportProgressUi() {
+        b.progressLayout.visibility = View.GONE
+        b.aboutCrashLog.visibility = View.VISIBLE
+    }
+
+    private fun onAppExitInfoSuccess() {
+        // refrain from calling promptCrashLogAction multiple times
+        if (SystemClock.elapsedRealtime() - lastAppExitInfoDialogInvokeTime < TimeUnit.SECONDS.toMillis(
+                1L)) {
+            return
+        }
+
+        lastAppExitInfoDialogInvokeTime = SystemClock.elapsedRealtime()
+        hideBugReportProgressUi()
+        promptCrashLogAction()
     }
 }

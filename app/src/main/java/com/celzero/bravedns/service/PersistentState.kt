@@ -17,12 +17,11 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
-import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppMode
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
+import com.celzero.bravedns.util.Utilities
 import hu.autsoft.krate.*
 import org.koin.core.component.KoinComponent
 
@@ -80,8 +79,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // whether all udp connection except dns must be dropped
     var udpBlockedSettings by booleanPref("block_udp_traffic_other_than_dns", false)
 
-
-    var insertionCompleted by booleanPref("initial_insert_servers_complete", false)
+    // whether the initial database inserts on first-run completed successfully, see: HomeScreenActivity#insertDefaultData
+    var isDefaultDataInsertComplete by booleanPref("initial_insert_servers_complete", false)
 
     // user chosen blocklists stored custom dictionary indexed in base64
     var localBlocklistStamp by stringPref("local_block_list_stamp", "")
@@ -89,16 +88,14 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // whether to drop packets when the source app originating the reqs couldn't be determined
     var blockUnknownConnections by booleanPref("block_unknown_connections", false)
 
-    // whether the local blocklist files have been downloaded successfully
-    var blocklistFilesDownloaded by booleanPref("download_block_list_files", false)
-
     // whether user has enable on-device blocklists
     var blocklistEnabled by booleanPref("enable_local_list", false)
 
-    var remoteBlocklistDownloadTime by longPref("remote_block_list_downloaded_time", 0)
+    // the version (which is a unix timestamp) of the current rethinkdns+ remote blocklist files
+    var remoteBlocklistTimestamp by longPref("remote_block_list_downloaded_time", 0)
 
     // the version (which is a unix timestamp) of the current on-device blocklist files
-    var blocklistDownloadTime by longPref("local_block_list_downloaded_time", 0)
+    var localBlocklistTimestamp by longPref("local_block_list_downloaded_time", 0)
 
     // user set http proxy port
     var httpProxyPort by intPref("http_proxy_port", INVALID_PORT)
@@ -136,30 +133,32 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // whether to check for app updates once-a-week (on website / play-store builds)
     var checkForAppUpdate by booleanPref("check_for_app_update", true)
 
+    // last connected dns label name
     var connectedDnsName by stringPref("connected_dns_name", context.getString(R.string.dns_mode_3))
 
     // the current light/dark theme; 0's the default which is "Set by System"
     var theme by intPref("app_theme", 0)
 
+    // user selected notification action type, ref: Constants#NOTIFICATION_ACTION_STOP
     var notificationActionType by intPref("notification_action", 1)
 
     // add all networks (say, both wifi / mobile) with internet capability to the vpn tunnel
     var useMultipleNetworks by booleanPref("add_all_networks_to_vpn", false)
 
-    var lastAppRefreshTime by longPref("last_app_refresh_time", INIT_TIME_MS)
-
+    // user selected proxy type (e.g., http, socks5)
     var proxyType by stringPref("proxy_proxytype", AppMode.ProxyType.NONE.name)
 
+    // user selected proxy provider, as of now two providers (custom, orbot)
     var proxyProvider by stringPref("proxy_proxyprovider", AppMode.ProxyProvider.NONE.name)
 
     // total dnscrypt server currently connected to
     private var _dnsCryptRelayCount by intPref("dnscrypt_relay", 0)
 
+    // the last collected app exit info's timestamp
     var lastAppExitInfoTimestamp by longPref("prev_trace_timestamp", INIT_TIME_MS)
 
     // fetch fav icons for domains in dns request
-    var fetchFavIcon by booleanPref("fav_icon_enabled",
-                                    BuildConfig.FLAVOR != Constants.FLAVOR_FDROID)
+    var fetchFavIcon by booleanPref("fav_icon_enabled", Utilities.isFdroidFlavour())
 
     // whether to show "what's new" chip on the homescreen, usually
     // shown after a update and until the user dismisses it
@@ -169,7 +168,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var disallowDnsBypass by booleanPref("disallow_dns_bypass", false)
 
     // trap all packets on port 53 to be sent to a dns endpoint or just the packets sent to vpn's dns-ip
-    var preventDnsLeaks by booleanPref("prevent_dns_leaks", false)
+    var preventDnsLeaks by booleanPref("prevent_dns_leaks", true)
+
+    // block all newly installed apps
+    var blockNewlyInstalledApp by booleanPref("block_new_app", false)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()

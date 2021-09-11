@@ -22,16 +22,11 @@ import androidx.paging.toLiveData
 import androidx.room.Transaction
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
 class DNSProxyEndpointRepository(private val dnsProxyEndpointDAO: DNSProxyEndpointDAO) {
-
-    companion object {
-        const val INTERNAL = "Internal"
-        const val EXTERNAL = "External"
-    }
 
     @Transaction
     fun update(dnsProxyEndpoint: DNSProxyEndpoint) {
@@ -39,22 +34,15 @@ class DNSProxyEndpointRepository(private val dnsProxyEndpointDAO: DNSProxyEndpoi
         dnsProxyEndpointDAO.update(dnsProxyEndpoint)
     }
 
-    fun deleteAsync(dnsProxyEndpoint: DNSProxyEndpoint,
-                    coroutineScope: CoroutineScope = GlobalScope) {
-        coroutineScope.launch {
-            dnsProxyEndpointDAO.delete(dnsProxyEndpoint)
-        }
-    }
-
     fun insertAsync(dnsCryptEndpoint: DNSProxyEndpoint,
-                    coroutineScope: CoroutineScope = GlobalScope) {
+                    coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
         coroutineScope.launch {
             dnsProxyEndpointDAO.insert(dnsCryptEndpoint)
         }
     }
 
     fun insertWithReplace(dnsProxyEndpoint: DNSProxyEndpoint,
-                          coroutineScope: CoroutineScope = GlobalScope) {
+                          coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
         coroutineScope.launch {
             dnsProxyEndpointDAO.insertWithReplace(dnsProxyEndpoint)
         }
@@ -65,7 +53,8 @@ class DNSProxyEndpointRepository(private val dnsProxyEndpointDAO: DNSProxyEndpoi
             pageSize = LIVEDATA_PAGE_SIZE)
     }
 
-    fun deleteOlderData(date: Long, coroutineScope: CoroutineScope = GlobalScope) {
+    fun deleteOlderData(date: Long,
+                        coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
         coroutineScope.launch {
             dnsProxyEndpointDAO.deleteOlderData(date)
         }

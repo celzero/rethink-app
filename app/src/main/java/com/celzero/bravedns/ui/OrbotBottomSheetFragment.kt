@@ -40,6 +40,7 @@ import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.OrbotHelper
+import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -80,8 +81,8 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
 
-    override fun getTheme(): Int = Utilities.getBottomsheetCurrentTheme(isDarkThemeOn(),
-                                                                        persistentState.theme)
+    override fun getTheme(): Int = Themes.getBottomsheetCurrentTheme(isDarkThemeOn(),
+                                                                     persistentState.theme)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -291,7 +292,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
      * Stop the Orbot - Calls the Orbot helper to initiate the stop orbot call.
      */
     private fun stopOrbot() {
-        appMode.removeProxy(AppMode.ProxyType.NONE, AppMode.ProxyProvider.NONE)
+        appMode.removeAllProxies()
         b.bsOrbotRadioSocks5.isChecked = false
         b.bsOrbotRadioHttp.isChecked = false
         b.bsOrbotRadioBoth.isChecked = false

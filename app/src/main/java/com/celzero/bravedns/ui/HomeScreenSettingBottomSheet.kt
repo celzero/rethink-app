@@ -17,6 +17,7 @@ package com.celzero.bravedns.ui
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.os.SystemClock
 import android.text.format.DateUtils
 import android.util.Log
 import android.view.LayoutInflater
@@ -31,8 +32,8 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.CoroutineScope
@@ -197,7 +198,7 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
 
     private fun updateUptime() {
         val upTime = DateUtils.getRelativeTimeSpanString(
-            HomeScreenActivity.GlobalVariable.appStartTime, System.currentTimeMillis(),
+            HomeScreenActivity.GlobalVariable.appStartTime, SystemClock.elapsedRealtime(),
             DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE)
         b.bsHomeScreenAppUptime.text = getString(R.string.hsf_uptime, upTime)
     }

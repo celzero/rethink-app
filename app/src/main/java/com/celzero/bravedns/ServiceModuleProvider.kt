@@ -43,7 +43,7 @@ private val orbotHelperModule = module {
 
 private val appDownloadManagerModule = module {
     single { AppDownloadManager(androidContext()) }
-    single { WorkScheduler(androidContext())}
+    single { WorkScheduler(androidContext()) }
 }
 
 val AppModules: List<Module> by lazy {

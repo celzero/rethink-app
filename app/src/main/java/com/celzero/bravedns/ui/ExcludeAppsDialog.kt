@@ -15,8 +15,8 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui
 
+import android.app.Activity
 import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -25,26 +25,23 @@ import android.view.WindowManager
 import android.widget.CompoundButton
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.ExcludedAppListAdapter
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.databinding.ExcludeAppDialogLayoutBinding
-import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ExcludedAppViewModel
 import com.google.android.material.chip.Chip
 
-class ExcludeAppsDialog(private var activity: Context,
+class ExcludeAppsDialog(private var activity: Activity,
                         internal var adapter: RecyclerView.Adapter<*>,
                         var viewModel: ExcludedAppViewModel, themeID: Int) :
-        Dialog(activity, themeID), View.OnClickListener, SearchView.OnQueryTextListener,
-        ExcludedAppsUpdateInterface {
+        Dialog(activity, themeID), View.OnClickListener, SearchView.OnQueryTextListener {
 
     private lateinit var b: ExcludeAppDialogLayoutBinding
 
@@ -78,15 +75,12 @@ class ExcludeAppsDialog(private var activity: Context,
         mLayoutManager = LinearLayoutManager(activity)
 
         b.excludeAppRecyclerViewDialog.layoutManager = mLayoutManager
-        (adapter as ExcludedAppListAdapter).setUpdateInterface(this)
         b.excludeAppRecyclerViewDialog.adapter = adapter
 
-        val act: HomeScreenActivity = activity as HomeScreenActivity
-
-        FirewallManager.getApplistObserver().observe(act, {
-            val excludedCount = it.filter { a -> a.isExcluded }.size
-            b.excludeAppSelectCountText.text = act.getString(R.string.ex_dialog_count,
-                                                             excludedCount.toString())
+        FirewallManager.getApplistObserver().observe(activity as LifecycleOwner, {
+            val excludedCount = it.filter { a -> a.isExcluded }.count()
+            b.excludeAppSelectCountText.text = activity.getString(R.string.ex_dialog_count,
+                                                                  excludedCount.toString())
         })
 
         // By default, show all the categories.
@@ -109,7 +103,6 @@ class ExcludeAppsDialog(private var activity: Context,
             Utilities.delay(500) {
                 adapter.notifyDataSetChanged()
             }
-            onAppsExcluded()
         }
 
         b.excludeAppDialogWhitelistSearchFilter.setOnClickListener(this)
@@ -122,7 +115,6 @@ class ExcludeAppsDialog(private var activity: Context,
     override fun onClick(v: View) {
         when (v.id) {
             R.id.exclude_app_dialog_ok_button -> {
-                handleVpnRestart()
                 clearSearch()
                 dismiss()
             }
@@ -201,27 +193,4 @@ class ExcludeAppsDialog(private var activity: Context,
         }
     }
 
-    // Interface(ExcludedAppsUpdateInterface)
-    // Invoked when there is a change in excluded apps
-    override fun onAppsExcluded() {
-        isVpnRestartRequired = true
-    }
-
-    // Check whether the restart is required.
-    // isVpnRestartRequired: will be updated if there is change in excluded apps.
-    // if true, will initiate the restart of vpn to update the details in vpn builder.
-    private fun handleVpnRestart() {
-        if (!isVpnRestartRequired) return
-
-        Log.i(LOG_TAG_VPN,
-              "Exclude apps dialog: isVpnRestartRequired? $isVpnRestartRequired initiate vpn restart")
-        VpnController.getBraveVpnService()?.restartVpn("restartVpn_exclude_apps")
-    }
-}
-
-// Interface to update the excluded changes from the adapter.
-// whenever, there is a change in the excluded apps list, the method onAppsExcluded()
-// will be invoked.
-interface ExcludedAppsUpdateInterface {
-    fun onAppsExcluded()
 }

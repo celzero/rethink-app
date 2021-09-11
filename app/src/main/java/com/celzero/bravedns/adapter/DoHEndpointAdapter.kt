@@ -126,7 +126,7 @@ class DoHEndpointAdapter(private val context: Context, private val persistentSta
         private fun configureRethinkEndpoint(endpoint: DoHEndpoint) {
             val stamp = getRemoteBlocklistStamp(endpoint.dohURL)
             if (DEBUG) Log.d(LOG_TAG_DNS,
-                             "calling configure webview activity with doh url: ${endpoint.dohURL},and stamp: $stamp")
+                             "calling configure webview activity with doh url: ${endpoint.dohURL} and stamp: $stamp")
             startConfigureBlocklistActivity(stamp)
         }
 
