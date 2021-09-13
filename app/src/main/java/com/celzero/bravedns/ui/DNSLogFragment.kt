@@ -22,6 +22,7 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -36,9 +37,9 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DNSCRYPT
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DOH
 import com.celzero.bravedns.viewmodel.DNSLogViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
@@ -187,7 +188,7 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         // Single-choice items (initialized with checked item)
         builder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
             // Respond to item chosen
-            // FIXME - Remove the isFilter constants with introduction of new filter options.
+            // FIXME: Remove the isFilter constants with introduction of new filter options.
             filterValue = if (which == 0) ":isFilter"
             else ""
             checkedItem = which
@@ -204,9 +205,11 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         builder.setMessage(R.string.dns_query_clear_logs_message)
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
-            CoroutineScope(Dispatchers.IO).launch {
-                GlideApp.get(requireActivity()).clearDiskCache()
-                dnsLogDAO.clearAllData()
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    GlideApp.get(requireActivity()).clearDiskCache()
+                    dnsLogDAO.clearAllData()
+                }
             }
         }
         builder.setNegativeButton(getString(R.string.dns_log_dialog_negative)) { _, _ -> }

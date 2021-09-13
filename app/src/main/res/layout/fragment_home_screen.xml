@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -30,7 +29,6 @@
                 android:gravity="center"
                 android:orientation="vertical" />
 
-
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -38,7 +36,6 @@
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="10dp">
-
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -109,7 +106,6 @@
                         android:textColor="?attr/primaryDarkColorText"
                         android:textSize="@dimen/extra_large_font_text_view"
                         app:drawableEndCompat="@drawable/dns_home_screen" />
-
 
                     <TextView
                         android:id="@+id/fhs_card_dns_connected_dns"
@@ -358,7 +354,6 @@
             </com.google.android.material.chip.ChipGroup>
         </HorizontalScrollView>
 
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -377,7 +372,6 @@
                 android:fontFamily="sans-serif-smallcaps"
                 android:textColor="@color/accent_bad"
                 android:textSize="@dimen/large_font_text_view" />
-
 
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/shimmer_view_container1"

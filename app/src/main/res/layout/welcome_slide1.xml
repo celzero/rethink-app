@@ -41,6 +41,5 @@
             android:layout_weight="0.5"
             android:src="@drawable/illustrations_welcome_1" />
 
-
     </LinearLayout>
 </RelativeLayout>

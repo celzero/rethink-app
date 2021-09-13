@@ -228,7 +228,7 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
         b.bsConnBlockAppCheck.setOnCheckedChangeListener(null)
         b.bsConnBlockAppCheck.setOnClickListener {
             if (isValidAppName(ipDetails.appName)) {
-                firewallApp(FirewallManager.isUidFirewalled(ipDetails.uid))
+                firewallApp(ipDetails.uid)
             } else {
                 if (DEBUG) Log.d(LOG_TAG_FIREWALL,
                                  "Unknown app, universal firewall settings(block unknown app): ${b.bsConnBlockAppCheck.isChecked} ")
@@ -283,8 +283,9 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
         }
     }
 
-    private fun firewallApp(isBlocked: Boolean) {
-        when (FirewallManager.canFirewall(ipDetails.uid)) {
+    private fun firewallApp(uid: Int) {
+        var isBlocked = false
+        when (FirewallManager.appStatus(uid)) {
             FirewallManager.AppStatus.WHITELISTED -> {
                 showToast(getString(R.string.bsct_firewall_not_available_whitelist))
                 b.bsConnBlockAppCheck.isChecked = false
@@ -300,9 +301,11 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
                 b.bsConnBlockAppCheck.isChecked = false
                 return
             }
-            else -> {
-                // no-op
-                // fall-through; the app may be firewalled
+            FirewallManager.AppStatus.BLOCKED -> {
+                isBlocked = true
+            }
+            FirewallManager.AppStatus.ALLOWED -> {
+                isBlocked = false
             }
         }
 
@@ -385,10 +388,10 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
 
         heading.text = getFirewallRule(blockedRule)?.let { getString(it.title) } ?: getString(
             R.string.firewall_rule_no_rule)
-        val text = getFirewallRule(blockedRule)?.let { getString(it.desc) } ?: getString(
+        val desc = getFirewallRule(blockedRule)?.let { getString(it.desc) } ?: getString(
             R.string.firewall_rule_no_rule_desc)
 
-        descText.text = updateHtmlEncodedText(text)
+        descText.text = updateHtmlEncodedText(desc)
 
         icon.setImageDrawable(
             ContextCompat.getDrawable(requireContext(), FirewallRuleset.getRulesIcon(blockedRule)))

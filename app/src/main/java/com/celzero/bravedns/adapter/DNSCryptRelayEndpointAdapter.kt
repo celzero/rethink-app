@@ -64,7 +64,6 @@ class DNSCryptRelayEndpointAdapter(private val context: Context, private val app
         holder.update(dnsCryptRelayEndpoint)
     }
 
-
     inner class DNSCryptRelayEndpointViewHolder(private val b: DnsCryptEndpointListItemBinding) :
             RecyclerView.ViewHolder(b.root) {
 
@@ -153,15 +152,15 @@ class DNSCryptRelayEndpointAdapter(private val context: Context, private val app
         private fun updateDNSCryptRelayDetails(endpoint: DNSCryptRelayEndpoint,
                                                isSelected: Boolean) {
 
-            CoroutineScope(Dispatchers.IO).launch {
+            io {
                 if (isSelected && !appMode.isDnscryptRelaySelectable()) {
-                    withContext(Dispatchers.Main) {
+                    uiCtx {
                         Toast.makeText(context,
                                        context.getString(R.string.dns_crypt_relay_error_toast),
                                        Toast.LENGTH_LONG).show()
                         b.dnsCryptEndpointListActionImage.isChecked = false
                     }
-                    return@launch
+                    return@io
                 }
 
                 endpoint.isSelected = isSelected
@@ -174,12 +173,26 @@ class DNSCryptRelayEndpointAdapter(private val context: Context, private val app
         }
 
         private fun deleteEndpoint(id: Int) {
-            CoroutineScope(Dispatchers.IO).launch {
+            io {
                 appMode.deleteDnscryptRelayEndpoint(id)
-                withContext(Dispatchers.Main) {
+                uiCtx {
                     Toast.makeText(context, R.string.dns_crypt_relay_remove_success,
                                    Toast.LENGTH_SHORT).show()
                 }
+            }
+        }
+
+        private fun io(f: suspend () -> Unit) {
+            CoroutineScope(Dispatchers.IO).launch {
+                withContext(Dispatchers.IO) {
+                    f()
+                }
+            }
+        }
+
+        private suspend fun uiCtx(f: () -> Unit) {
+            withContext(Dispatchers.Main) {
+                f()
             }
         }
     }

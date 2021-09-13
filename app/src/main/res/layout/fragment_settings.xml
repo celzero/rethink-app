@@ -6,7 +6,6 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     app:layout_scrollFlags="scroll|enterAlways">
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -100,7 +99,6 @@
                     android:paddingEnd="20dp"
                     android:text="@string/firewall_explanation_text" />
 
-
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/configure_firewall_btn"
                     style="@style/TextAppearance.AppCompat.Widget.Button"
@@ -115,7 +113,6 @@
                     android:padding="10dp"
                     android:text="Configure Firewall"
                     android:textColor="@color/primaryText" />
-
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -234,7 +231,6 @@
                     android:padding="10dp"
                     android:text="View DNS logs"
                     android:textColor="@color/primaryText" />
-
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>

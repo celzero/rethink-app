@@ -44,10 +44,10 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.9"
-                    android:gravity="start|center"
                     android:drawablePadding="10dp"
-                    android:padding="10dp"
                     android:foreground="?attr/selectableItemBackground"
+                    android:gravity="start|center"
+                    android:padding="10dp"
                     android:text="@string/univ_firewall_rule_1"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view"
@@ -61,16 +61,15 @@
                     android:layout_gravity="center"
                     android:padding="15dp" />
 
-
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/firewall_background_ll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_marginLeft="2dp"
                 android:layout_marginTop="2dp"
-                android:layout_gravity="center"
                 android:layout_marginRight="2dp">
 
                 <TextView
@@ -79,11 +78,11 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0.9"
                     android:drawablePadding="10dp"
-                    android:padding="10dp"
+                    android:foreground="?attr/selectableItemBackground"
                     android:gravity="start|center"
+                    android:padding="10dp"
                     android:text="@string/univ_firewall_rule_2"
                     android:textColor="?attr/primaryTextColor"
-                    android:foreground="?attr/selectableItemBackground"
                     android:textSize="@dimen/large_font_text_view"
                     app:drawableStartCompat="@drawable/ic_foreground" />
 
@@ -95,16 +94,15 @@
                     android:layout_gravity="center"
                     android:padding="15dp" />
 
-
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/firewall_unknown_connection_ll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_marginLeft="2dp"
                 android:layout_marginTop="2dp"
-                android:layout_gravity="center"
                 android:layout_marginRight="2dp">
 
                 <TextView
@@ -113,10 +111,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0.9"
                     android:drawablePadding="10dp"
-                    android:padding="10dp"
-                    android:gravity="start|center"
-                    android:text="@string/univ_block_unknown_connections"
                     android:foreground="?attr/selectableItemBackground"
+                    android:gravity="start|center"
+                    android:padding="10dp"
+                    android:text="@string/univ_block_unknown_connections"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view"
                     app:drawableStartCompat="@drawable/ic_unknown_app" />
@@ -125,8 +123,8 @@
                     android:id="@+id/firewall_unknown_connection_mode_check"
                     style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                     android:layout_width="wrap_content"
-                    android:layout_gravity="center"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:padding="15dp" />
 
             </LinearLayout>
@@ -135,8 +133,8 @@
                 android:id="@+id/firewall_udp_connection_ll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="2dp"
                 android:layout_gravity="center"
+                android:layout_marginLeft="2dp"
                 android:layout_marginTop="2dp"
                 android:layout_marginRight="2dp">
 
@@ -146,9 +144,9 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0.9"
                     android:drawablePadding="10dp"
+                    android:foreground="?attr/selectableItemBackground"
                     android:gravity="start|center"
                     android:padding="10dp"
-                    android:foreground="?attr/selectableItemBackground"
                     android:text="@string/univ_firewall_rule_4"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view"
@@ -170,17 +168,16 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="2dp"
                 android:layout_marginTop="2dp"
-                android:layout_marginRight="2dp"
-                >
+                android:layout_marginRight="2dp">
 
                 <TextView
                     android:id="@+id/firewall_disallow_dns_bypass_mode_txt"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.9"
-                    android:gravity="start|center"
                     android:drawablePadding="10dp"
                     android:foreground="?attr/selectableItemBackground"
+                    android:gravity="start|center"
                     android:padding="10dp"
                     android:text="@string/univ_firewall_rule_5"
                     android:textColor="?attr/primaryTextColor"

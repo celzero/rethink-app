@@ -1,154 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/expand_firewall_header_ll"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
     android:descendantFocusability="blocksDescendants">
 
+    <TextView
+        android:id="@+id/expand_header_category_indicator"
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="5dp"
+        android:background="@color/colorAmber_900"
+        android:textColor="@color/colorAmber_900"
+        android:textSize="@dimen/large_font_text_view" />
 
-        <TextView
-            android:id="@+id/expand_header_category_indicator"
-            android:layout_width="2dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="5dp"
-            android:background="@color/colorAmber_900"
-            android:textColor="@color/colorAmber_900"
-            android:textSize="@dimen/large_font_text_view" />
+    <RelativeLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <RelativeLayout
-
+            android:id="@+id/expand_header_rl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-
-            <RelativeLayout
-                android:id="@+id/expand_header_rl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-
-                <TextView
-                    android:id="@+id/expand_textView_category_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:paddingTop="15dp"
-                    android:paddingBottom="5dp"
-                    android:text="TextView"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/expand_textView_app_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/expand_textView_category_name"
-                    android:layout_alignStart="@id/expand_textView_category_name"
-                    android:layout_marginEnd="10dp"
-                    android:layout_toStartOf="@id/expand_checkbox"
-                    android:text="Textview"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:textSize="@dimen/default_font_text_view" />
-
-                <androidx.appcompat.widget.AppCompatToggleButton
-                    android:theme="@style/CustomCompoundButton_Switch_bad"
-                    android:id="@+id/expand_checkbox"
-                    android:layout_width="wrap_content"
-                    android:checked="true"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="5dp"
-                    android:drawableStart="@drawable/allowed"
-                    android:drawablePadding="10dp"
-                    android:padding="10dp"
-                    android:textOff="@string/firewall_toggle_unblocked"
-                    android:textOn="@string/firewall_toggle_blocked"
-                    android:textSize="@dimen/default_font_text_view" />
-
-                <ProgressBar
-                    android:id="@+id/expand_header_progress"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="40dp"
-                    android:visibility="gone" />
-
-
-                <LinearLayout
-                    android:id="@+id/imageLayout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/expand_textView_app_count"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="15dp"
-                    android:orientation="horizontal"
-                    android:paddingBottom="10dp">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/imageLayout_1"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:layout_margin="5dp"
-                        android:src="@drawable/ic_launcher_foreground" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/imageLayout_2"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:layout_margin="5dp"
-                        android:src="@drawable/ic_launcher_foreground" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/imageLayout_3"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:layout_margin="5dp"
-                        android:src="@drawable/ic_launcher_foreground"
-                        android:visibility="gone" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/imageLayout_4"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:layout_margin="5dp"
-                        android:src="@drawable/ic_launcher_foreground"
-                        android:visibility="gone" />
-
-                    <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:layout_gravity="center_vertical"
-                        android:src="@drawable/action_right" />
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/expand_system_apps_warning"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/imageLayout"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:paddingStart="5dp"
-                    android:paddingEnd="5dp"
-                    android:paddingBottom="20dp"
-                    android:textSize="@dimen/default_font_text_view"
-                    android:visibility="gone" />
-            </RelativeLayout>
+            <TextView
+                android:id="@+id/expand_textView_category_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:fontFamily="sans-serif-smallcaps"
+                android:paddingTop="15dp"
+                android:paddingBottom="5dp"
+                android:text="TextView"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view"
+                android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/expand_system_place_holder"
-                android:layout_width="match_parent"
+                android:id="@+id/expand_textView_app_count"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/expand_header_rl"
+                android:layout_below="@id/expand_textView_category_name"
+                android:layout_alignStart="@id/expand_textView_category_name"
+                android:layout_marginEnd="10dp"
+                android:layout_toStartOf="@id/expand_checkbox"
+                android:text="Textview"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="@dimen/default_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatToggleButton
+                android:id="@+id/expand_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="5dp"
+                android:checked="true"
+                android:drawableStart="@drawable/allowed"
+                android:drawablePadding="10dp"
+                android:padding="10dp"
+                android:textOff="@string/firewall_toggle_unblocked"
+                android:textOn="@string/firewall_toggle_blocked"
+                android:textSize="@dimen/default_font_text_view"
+                android:theme="@style/CustomCompoundButton_Switch_bad" />
+
+            <ProgressBar
+                android:id="@+id/expand_header_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="40dp"
+                android:visibility="gone" />
+
+
+            <LinearLayout
+                android:id="@+id/imageLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/expand_textView_app_count"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="15dp"
+                android:orientation="horizontal"
+                android:paddingBottom="10dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/imageLayout_1"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_margin="5dp"
+                    android:src="@drawable/ic_launcher_foreground" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/imageLayout_2"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_margin="5dp"
+                    android:src="@drawable/ic_launcher_foreground" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/imageLayout_3"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_margin="5dp"
+                    android:src="@drawable/ic_launcher_foreground"
+                    android:visibility="gone" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/imageLayout_4"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_margin="5dp"
+                    android:src="@drawable/ic_launcher_foreground"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/action_right" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/expand_system_apps_warning"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/imageLayout"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
                 android:paddingBottom="20dp"
+                android:textSize="@dimen/default_font_text_view"
                 android:visibility="gone" />
         </RelativeLayout>
 
+        <TextView
+            android:id="@+id/expand_system_place_holder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/expand_header_rl"
+            android:paddingBottom="20dp"
+            android:visibility="gone" />
+    </RelativeLayout>
 
 </LinearLayout>

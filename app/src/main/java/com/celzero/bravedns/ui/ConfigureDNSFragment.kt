@@ -26,6 +26,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -53,7 +54,6 @@ import com.celzero.bravedns.viewmodel.DNSCryptEndpointViewModel
 import com.celzero.bravedns.viewmodel.DNSCryptRelayEndpointViewModel
 import com.celzero.bravedns.viewmodel.DNSProxyEndpointViewModel
 import com.celzero.bravedns.viewmodel.DoHEndpointViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -238,10 +238,10 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
 
         // Fetch the count from repository and increment by 1 to show the
         // next doh name in the dialog
-        CoroutineScope(Dispatchers.IO).launch {
+        io {
             val nextIndex = appMode.getDohCount().plus(1)
-            withContext(Dispatchers.Main) {
-                if (!isAdded) return@withContext
+            uiCtx {
+                if (!isAdded) return@uiCtx
                 customName.setText(getString(R.string.cd_custom_doh_url_name, nextIndex.toString()),
                                    TextView.BufferType.EDITABLE)
             }
@@ -301,9 +301,9 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
 
         // Fetch the count from repository and increment by 1 to show the
         // next doh name in the dialog
-        CoroutineScope(Dispatchers.IO).launch {
+        io {
             val nextIndex = appMode.getDnsProxyCount().plus(1)
-            withContext(Dispatchers.Main) {
+            uiCtx {
                 proxyNameEditText.setText(
                     getString(R.string.cd_custom_dns_proxy_name, nextIndex.toString()),
                     TextView.BufferType.EDITABLE)
@@ -414,10 +414,10 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
 
         // Fetch the count from repository and increment by 1 to show the
         // next doh name in the dialog
-        CoroutineScope(Dispatchers.IO).launch {
+        io {
             dnscryptNextIndex = appMode.getDnscryptCount().plus(1)
             relayNextIndex = appMode.getDnscryptRelayCount().plus(1)
-            withContext(Dispatchers.Main) {
+            uiCtx {
                 cryptNameEditText.setText(
                     getString(R.string.cd_custom_dns_proxy_name, dnscryptNextIndex.toString()),
                     TextView.BufferType.EDITABLE)
@@ -473,7 +473,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
     }
 
     private fun insertDNSCryptRelay(name: String, urlStamp: String, desc: String) {
-        CoroutineScope(Dispatchers.IO).launch {
+        io {
             var serverName = name
             if (serverName.isBlank()) {
                 serverName = urlStamp
@@ -486,7 +486,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
     }
 
     private fun insertDNSCryptServer(name: String, urlStamp: String, desc: String) {
-        CoroutineScope(Dispatchers.IO).launch {
+        io {
             var serverName = name
             if (serverName.isBlank()) {
                 serverName = urlStamp
@@ -500,7 +500,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
     }
 
     private fun insertDoHEndpoint(name: String, url: String) {
-        CoroutineScope(Dispatchers.IO).launch {
+        io {
             var dohName: String = name
             if (name.isBlank()) {
                 dohName = url
@@ -516,7 +516,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
                                          port: Int) {
         if (appName == null) return
 
-        CoroutineScope(Dispatchers.IO).launch {
+        io {
             var proxyName = name
             if (proxyName.isBlank()) {
                 proxyName = if (mode == getString(R.string.cd_dns_proxy_mode_internal)) {
@@ -539,6 +539,20 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
             parsed.protocol == "https" && parsed.host.isNotEmpty() && parsed.path.isNotEmpty() && parsed.query == null && parsed.ref == null
         } catch (e: MalformedURLException) {
             false
+        }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                f()
+            }
+        }
+    }
+
+    private suspend fun uiCtx(f: () -> Unit) {
+        withContext(Dispatchers.Main) {
+            f()
         }
     }
 

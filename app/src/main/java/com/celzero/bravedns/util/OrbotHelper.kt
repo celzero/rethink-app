@@ -39,12 +39,7 @@ import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities.Companion.getThemeAccent
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
+import kotlinx.coroutines.*
 import java.util.concurrent.TimeUnit
 
 
@@ -181,7 +176,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
      * Sends the intent to initiate the start in Orbot
      * and registers for the Orbot ACTION_STATUS.
      */
-    fun startOrbot(type: String) {
+    suspend fun startOrbot(type: String) {
         selectedProxyType = type
         val intent = getOrbotStartIntent()
         isResponseReceivedFromOrbot = false
@@ -308,7 +303,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
             } else if (isTypeHttpSocks5() && handleOrbotSocks5Update() && handleOrbotHttpUpdate()) {
                 appMode.addProxy(AppMode.ProxyType.HTTP_SOCKS5, AppMode.ProxyProvider.ORBOT)
             } else {
-                withContext(Dispatchers.Main) {
+                uiCtx {
                     stopOrbot(isInteractive = true)
                 }
             }
@@ -385,23 +380,20 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
      * Create a ScheduledExecutorService which will be executed after 30 sec of Orbot status
      * initiation.
      */
-    private fun timeOutForOrbot() {
-        // Create an executor that executes tasks in a background thread.
-        val backgroundExecutor: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
+    private suspend fun timeOutForOrbot() {
+        withContext(Dispatchers.IO) {
+            delay(TimeUnit.SECONDS.toMillis(25L))
+            Log.i(LOG_TAG_VPN, "after timeout, isOrbotUp? $isResponseReceivedFromOrbot")
 
-        // Execute a task in the background thread after 30 sec.
-        // If there is no response for the broadcast from the Orbot,
-        // then the executor will execute and will disable the Orbot settings.
-        // Some cases where the Orbot won't be responding -eg., force stop of application,
-        // user disabled auto-start of the application.
-        backgroundExecutor.schedule({
-                                        Log.i(LOG_TAG_VPN,
-                                              "timeOutForOrbot executor triggered - $isResponseReceivedFromOrbot")
-                                        if (!isResponseReceivedFromOrbot) {
-                                            stopOrbot(isInteractive = false)
-                                        }
-                                        backgroundExecutor.shutdown()
-                                    }, 25, TimeUnit.SECONDS)
+            // Execute a task in the background thread after 25 sec.
+            // If there is no response for the broadcast from the Orbot,
+            // then the executor will execute and will disable the Orbot settings.
+            // Some cases where the Orbot won't be responding -eg., force stop of application,
+            // user disabled auto-start of the application.
+            if (!isResponseReceivedFromOrbot) {
+                stopOrbot(isInteractive = false)
+            }
+        }
     }
 
     fun unregisterReceiver() {
@@ -441,6 +433,12 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
 
     private fun io(f: suspend () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
+            f()
+        }
+    }
+
+    private suspend fun uiCtx(f: () -> Unit) {
+        withContext(Dispatchers.Main) {
             f()
         }
     }

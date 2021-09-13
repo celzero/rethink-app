@@ -161,15 +161,15 @@ class DoHEndpointAdapter(private val context: Context, private val persistentSta
             if (DEBUG) Log.d(LOG_TAG_DNS,
                              "on doh change - ${endpoint.dohName}, ${endpoint.dohURL}, ${endpoint.isSelected}")
 
-            CoroutineScope(Dispatchers.IO).launch {
+            io {
                 val stamp = getRemoteBlocklistStamp(endpoint.dohURL)
 
                 if (endpoint.isRethinkDnsPlus() && stamp.isNullOrEmpty()) {
-                    withContext(Dispatchers.Main) {
+                    uiCtx {
                         showDohConfigureDialog()
                         b.dohEndpointListCheckImage.isChecked = false
                     }
-                    return@launch
+                    return@io
                 }
 
                 endpoint.isSelected = true
@@ -178,9 +178,9 @@ class DoHEndpointAdapter(private val context: Context, private val persistentSta
         }
 
         private fun deleteEndpoint(id: Int) {
-            CoroutineScope(Dispatchers.IO).launch {
+            io {
                 appMode.deleteDohEndpoint(id)
-                withContext(Dispatchers.Main) {
+                uiCtx {
                     Toast.makeText(context, R.string.doh_custom_url_remove_success,
                                    Toast.LENGTH_SHORT).show()
                 }
@@ -222,7 +222,7 @@ class DoHEndpointAdapter(private val context: Context, private val persistentSta
             }
 
             builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
-
+                // no-op
             }
             builder.create().show()
         }
@@ -241,6 +241,20 @@ class DoHEndpointAdapter(private val context: Context, private val persistentSta
                 b.dohEndpointListCheckImage.isChecked = false
             }
             builder.create().show()
+        }
+
+        private suspend fun uiCtx(f: () -> Unit) {
+            withContext(Dispatchers.Main) {
+                f()
+            }
+        }
+
+        private fun io(f: suspend () -> Unit) {
+            CoroutineScope(Dispatchers.IO).launch {
+                withContext(Dispatchers.IO) {
+                    f()
+                }
+            }
         }
 
     }

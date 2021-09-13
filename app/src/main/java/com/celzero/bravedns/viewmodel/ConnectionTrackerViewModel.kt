@@ -15,7 +15,6 @@ limitations under the License.
 */
 package com.celzero.bravedns.viewmodel
 
-import android.util.Log
 import androidx.arch.core.util.Function
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -32,7 +31,7 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
         ViewModel() {
 
     private var filterString: MutableLiveData<String> = MutableLiveData()
-    private var filterRules: MutableList<String> = ArrayList()
+    private var filterRules: MutableSet<String> = HashSet()
     private var filterType: FilterType = FilterType.ALL
 
     enum class FilterType {
@@ -48,7 +47,7 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
                                                               fetchNetworkLogs(input)
                                                           }))
 
-    fun setFilter(searchString: String?, filter: List<String>, type: FilterType) {
+    fun setFilter(searchString: String?, filter: Set<String>, type: FilterType) {
         filterRules.clear()
 
         filterRules.addAll(filter)

@@ -36,6 +36,7 @@ import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.FirewallActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.NO_PACKAGE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
@@ -207,7 +208,7 @@ class RefreshDatabase internal constructor(private var context: Context,
         if (DEBUG) Log.d(LoggerConstants.LOG_TAG_VPN,
                          "Number of new apps: $appSize, show notification")
 
-        val intent = Intent(context, FirewallActivity::class.java)
+        val intent = Intent(context, NotificationHandlerDialog::class.java)
         intent.putExtra(Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME,
                         Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE)
 
@@ -259,7 +260,7 @@ class RefreshDatabase internal constructor(private var context: Context,
         if (DEBUG) Log.d(LoggerConstants.LOG_TAG_VPN,
                          "New app installed: $appName, show notification")
 
-        val intent = Intent(context, FirewallActivity::class.java)
+        val intent = Intent(context, NotificationHandlerDialog::class.java)
         intent.putExtra(Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME,
                         Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE)
 
@@ -311,7 +312,7 @@ class RefreshDatabase internal constructor(private var context: Context,
         // Cancel the notification after clicking.
         nbuilder.setAutoCancel(true)
 
-        notificationManager.notify(NOTIF_ID_NEW_APP.toString(), app.uid, nbuilder.build())
+        notificationManager.notify(NOTIF_NEW_APP, app.uid, nbuilder.build())
     }
 
     private fun makeNewAppVpnIntent(context: Context, intentExtra: String,

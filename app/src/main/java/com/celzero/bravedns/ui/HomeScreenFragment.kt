@@ -64,7 +64,6 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.Companion.delay
 import com.celzero.bravedns.util.Utilities.Companion.isAlwaysOnEnabled
 import com.celzero.bravedns.util.Utilities.Companion.isOtherVpnHasAlwaysOn
-import com.celzero.bravedns.util.Utilities.Companion.isVpnLockdownEnabled
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 import com.celzero.bravedns.util.Utilities.Companion.sendEmailIntent
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
@@ -168,8 +167,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun canShowChips(): Boolean {
-        return !isVpnLockdownEnabled(
-            VpnController.getBraveVpnService()) && appMode.getBraveMode().isDnsFirewallMode()
+        return !VpnController.isVpnLockdown() && appMode.getBraveMode().isDnsFirewallMode()
     }
 
     private fun initializeClickListeners() {
@@ -231,7 +229,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 val stamp = getRemoteBlocklistStamp(endpoint.dohURL)
                 if (appMode.isRethinkDnsPlusUrl(
                         appMode.getConnectedDNS()) || stamp.isNullOrEmpty()) {
-                    withContext(Dispatchers.Main) {
+                    uiCtx {
                         invokeRethinkPlusConfigureActivity(stamp)
                     }
                 } else {
@@ -287,7 +285,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private suspend fun enableRethinkPlusEndpoint(endpoint: DoHEndpoint) {
-        withContext(Dispatchers.Main) {
+        uiCtx {
             b.fhsDnsConfigureChip.text = getString(R.string.hsf_blocklist_updating_text)
         }
 
@@ -295,7 +293,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             kotlinx.coroutines.delay(1500)
             endpoint.isSelected = true
             appMode.handleDoHChanges(endpoint)
-            withContext(Dispatchers.Main) {
+            uiCtx {
                 showToastUiCentered(requireContext(),
                                     getString(R.string.hsf_blocklist_selected_toast,
                                               appMode.getRemoteBlocklistCount().toString()),
@@ -312,7 +310,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             return
         }
 
-        if (isVpnLockdownEnabled(VpnController.getBraveVpnService())) {
+        if (VpnController.isVpnLockdown()) {
             showToastUiCentered(requireContext(), getString(R.string.hsf_pause_lockdown_failure),
                                 Toast.LENGTH_SHORT)
             return
@@ -587,7 +585,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         val builder = AlertDialog.Builder(requireContext())
 
         builder.setTitle(R.string.always_on_dialog_stop_heading)
-        if (isVpnLockdownEnabled(VpnController.getBraveVpnService())) {
+        if (VpnController.isVpnLockdown()) {
             builder.setMessage(
                 updateHtmlEncodedText(getString(R.string.always_on_dialog_lockdown_stop_message)))
         } else {
@@ -663,8 +661,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     // set the app mode to dns+firewall mode when vpn in lockdown state
     private fun handleLockdownModeIfNeeded() {
-        if (isVpnLockdownEnabled(
-                VpnController.getBraveVpnService()) && !appMode.getBraveMode().isDnsFirewallMode()) {
+        if (VpnController.isVpnLockdown() && !appMode.getBraveMode().isDnsFirewallMode()) {
             io {
                 appMode.changeBraveMode(AppMode.BraveMode.DNS_FIREWALL.mode)
             }
@@ -1020,4 +1017,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
     }
 
+    private suspend fun uiCtx(f: () -> Unit) {
+        withContext(Dispatchers.Main) {
+            f()
+        }
+    }
 }

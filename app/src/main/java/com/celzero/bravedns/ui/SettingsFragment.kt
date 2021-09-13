@@ -67,7 +67,6 @@ import com.celzero.bravedns.util.Utilities.Companion.hasLocalBlocklists
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
 import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
-import com.celzero.bravedns.util.Utilities.Companion.isVpnLockdownEnabled
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 import com.celzero.bravedns.viewmodel.ExcludedAppViewModel
 import kotlinx.coroutines.*
@@ -232,7 +231,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     }
 
     private fun handleLockdownModeIfNeeded() {
-        val isLockdown = isVpnLockdownEnabled(VpnController.getBraveVpnService())
+        val isLockdown = VpnController.isVpnLockdown()
         if (isLockdown) {
             b.settingsActivityVpnLockdownDesc.visibility = View.VISIBLE
             b.settingsActivityExcludeAppsRl.alpha = 0.5f
@@ -418,7 +417,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                         persistentState.numberOfLocalBlocklists.toString())
                 } else {
                     b.settingsActivityOnDeviceBlockSwitch.isChecked = false
-                    if (isVpnLockdownEnabled(VpnController.getBraveVpnService())) {
+                    if (VpnController.isVpnLockdown()) {
                         showVpnLockdownDownloadDialog()
                     } else {
                         showDownloadDialog()
@@ -531,7 +530,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
         val bootstrapClient = OkHttpClient()
         // FIXME: Use user set doh provider
-        // using quad9 doh providerC
+        // using quad9 doh provider
         val dns = DnsOverHttps.Builder().client(bootstrapClient).url(
             "https://dns.quad9.net/dns-query".toHttpUrl()).bootstrapDnsHosts(
             InetAddress.getByName("9.9.9.9"), InetAddress.getByName("149.112.112.112"),
@@ -590,7 +589,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             return
         }
 
-        if (isVpnLockdownEnabled(VpnController.getBraveVpnService())) {
+        if (VpnController.isVpnLockdown()) {
             showRedownloadDialogLockdown(timestamp)
         } else {
             showRedownloadDialog(timestamp)
@@ -1229,6 +1228,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
     }
 
+    // TODO: move mixed workloads to coroutines
     private suspend fun enableAfterDelayCo(ms: Long, vararg views: View) {
         withContext(Dispatchers.Main) {
             for (v in views) v.isEnabled = false

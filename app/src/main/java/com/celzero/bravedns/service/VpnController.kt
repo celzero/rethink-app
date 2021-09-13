@@ -20,7 +20,13 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.sync.Mutex
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -29,6 +35,8 @@ object VpnController : KoinComponent {
     private var braveVpnService: BraveVPNService? = null
     private var connectionState: BraveVPNService.State? = null
     private val persistentState by inject<PersistentState>()
+
+    val mutex: Mutex = Mutex()
 
     var connectionStatus: MutableLiveData<BraveVPNService.State> = MutableLiveData()
 
@@ -45,18 +53,26 @@ object VpnController : KoinComponent {
         return braveVpnService
     }
 
-    @Synchronized
-    fun onConnectionStateChanged(state: BraveVPNService.State?) {
-        connectionState = if (braveVpnService == null) {
-            // User clicked disable while the connection state was changing.
-            null
+    @ExperimentalCoroutinesApi
+    fun CoroutineScope.serializeState(
+            state: BraveVPNService.State?): ReceiveChannel<BraveVPNService.State?> = produce {
+        val u = if (braveVpnService == null) {
+            null // User clicked disable while the connection state was changing.
         } else {
             state
         }
-        connectionStatus.postValue(state)
+        send(u)
     }
 
-    @Synchronized
+    fun onConnectionStateChanged(state: BraveVPNService.State?) {
+        runBlocking(Job() + Dispatchers.IO) {
+            serializeState(state).consumeEach {
+                connectionState = it
+                connectionStatus.postValue(it)
+            }
+        }
+    }
+
     fun start(context: Context) {
         //TODO : Code modified to remove the check of null reference - MODIFIED check??
         if (braveVpnService != null) {
@@ -85,7 +101,6 @@ object VpnController : KoinComponent {
         Log.i(LOG_TAG_VPN, "onStartComplete - VpnController")
     }
 
-    @Synchronized
     fun stop(context: Context) {
         Log.i(LOG_TAG_VPN, "VPN Controller stop with context: $context")
         connectionState = null
@@ -114,6 +129,10 @@ object VpnController : KoinComponent {
 
     fun isAppPaused(): Boolean {
         return connectionState == BraveVPNService.State.PAUSED
+    }
+
+    fun isVpnLockdown(): Boolean {
+        return Utilities.isVpnLockdownEnabled(braveVpnService)
     }
 
 }

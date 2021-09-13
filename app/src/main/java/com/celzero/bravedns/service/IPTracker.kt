@@ -41,8 +41,7 @@ import java.net.InetAddress
 import java.util.*
 
 class IPTracker internal constructor(
-        private val connectionTrackerRepository: ConnectionTrackerRepository,
-        private val refreshDatabase: RefreshDatabase, private val context: Context) :
+        private val connectionTrackerRepository: ConnectionTrackerRepository, private val context: Context) :
         KoinComponent {
 
 
@@ -87,11 +86,11 @@ class IPTracker internal constructor(
         val countryCode: String = getCountryCode(serverAddress, context)
         connTracker.flag = getFlag(countryCode)
 
-        connTracker.appName = getApplicationName(connTracker.uid)
+        connTracker.appName = fetchApplicationName(connTracker.uid)
         connectionTrackerRepository.insert(connTracker)
     }
 
-    private suspend fun getApplicationName(uid: Int): String {
+    private suspend fun fetchApplicationName(uid: Int): String {
         if (uid == INVALID_UID) {
             return context.getString(R.string.network_log_app_name_unknown)
         }
@@ -111,7 +110,6 @@ class IPTracker internal constructor(
                 appName = context.getString(R.string.network_log_app_name_unnamed, uid.toString())
             } else {
                 appName = fileSystemUID.name
-                registerNonApp(uid, appName)
             }
         }
         return appName
@@ -131,15 +129,10 @@ class IPTracker internal constructor(
             val appInfo = Utilities.getApplicationInfo(context, packageName) ?: return ""
 
             Log.i(LOG_TAG_FIREWALL_LOG,
-                  "App name not available in FirewallManager: $appName but available in android packageManager")
+                  "app, $appName, in PackageManager's list not tracked by FirewallManager")
             appName = context.packageManager.getApplicationLabel(appInfo).toString()
         }
         return appName
     }
 
-    private suspend fun registerNonApp(uid: Int, appName: String) {
-        if (!FirewallManager.hasUid(uid)) {
-            refreshDatabase.registerNonApp(uid, appName)
-        }
-    }
 }

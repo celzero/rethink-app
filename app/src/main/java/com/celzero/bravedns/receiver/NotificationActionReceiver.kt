@@ -105,7 +105,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
             return
         }
 
-        if (Utilities.isVpnLockdownEnabled(VpnController.getBraveVpnService())) {
+        if (VpnController.isVpnLockdown()) {
             Utilities.showToastUiCentered(context,
                                           context.getString(R.string.hsf_pause_lockdown_failure),
                                           Toast.LENGTH_SHORT)

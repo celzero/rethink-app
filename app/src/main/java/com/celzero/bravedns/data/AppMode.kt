@@ -23,6 +23,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.*
+import com.celzero.bravedns.net.go.GoIntraListener
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -32,9 +33,9 @@ import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DOH
 import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_PROXY
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
-import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import protect.Blocker
 import settings.Settings
 
 class AppMode internal constructor(private val context: Context,
@@ -61,7 +62,8 @@ class AppMode internal constructor(private val context: Context,
     }
 
     data class TunnelOptions(val dnsMode: DnsMode, val firewallMode: FirewallMode,
-                             val proxyMode: ProxyMode)
+                             val proxyMode: ProxyMode, val blocker: Blocker,
+                             val listener: GoIntraListener, val fakeDns: String)
 
     enum class BraveMode(val mode: Int) {
         DNS(0), FIREWALL(1), DNS_FIREWALL(2);
@@ -322,8 +324,10 @@ class AppMode internal constructor(private val context: Context,
         }
     }
 
-    suspend fun newTunnelMode(): TunnelOptions {
-        return TunnelOptions(getDnsMode(), getFirewallMode(), getProxyMode())
+    suspend fun newTunnelMode(blocker: Blocker, listener: GoIntraListener,
+                              fakeDns: String): TunnelOptions {
+        return TunnelOptions(getDnsMode(), getFirewallMode(), getProxyMode(), blocker, listener,
+                             fakeDns)
     }
 
     // -- DNS Manager --
@@ -642,8 +646,7 @@ class AppMode internal constructor(private val context: Context,
     }
 
     fun canEnableProxy(): Boolean {
-        return !getBraveMode().isDnsMode() && !Utilities.isVpnLockdownEnabled(
-            VpnController.getBraveVpnService())
+        return !getBraveMode().isDnsMode() && VpnController.isVpnLockdown()
     }
 
     fun canEnableSocks5Proxy(): Boolean {

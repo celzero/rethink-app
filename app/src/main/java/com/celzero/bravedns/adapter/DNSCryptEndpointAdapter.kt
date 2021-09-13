@@ -154,16 +154,16 @@ class DNSCryptEndpointAdapter(private val context: Context, private val appMode:
         }
 
         private fun updateDNSCryptDetails(endpoint: DNSCryptEndpoint, isSelected: Boolean) {
-            CoroutineScope(Dispatchers.IO).launch {
+            io {
                 if (!isSelected && !appMode.canRemoveDnscrypt(endpoint)) {
                     // Do not unselect the only user-selected dnscrypt endpoint, that is
                     // when the getConnectedDnsCrypt returns a list of size 1
-                    withContext(Dispatchers.Main) {
+                    uiCtx {
                         Toast.makeText(context, context.getString(R.string.dns_select_toast),
                                        Toast.LENGTH_SHORT).show()
                         b.dnsCryptEndpointListActionImage.isChecked = true
                     }
-                    return@launch
+                    return@io
                 }
 
                 endpoint.isSelected = isSelected
@@ -172,11 +172,25 @@ class DNSCryptEndpointAdapter(private val context: Context, private val appMode:
         }
 
         private fun deleteEndpoint(id: Int) {
-            CoroutineScope(Dispatchers.IO).launch {
+            io {
                 appMode.deleteDnscryptEndpoint(id)
-                withContext(Dispatchers.Main) {
+                uiCtx {
                     Toast.makeText(context, R.string.dns_crypt_url_remove_success,
                                    Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        private suspend fun uiCtx(f: () -> Unit) {
+            withContext(Dispatchers.Main) {
+                f()
+            }
+        }
+
+        private fun io(f: suspend () -> Unit) {
+            CoroutineScope(Dispatchers.IO).launch {
+                withContext(Dispatchers.IO) {
+                    f()
                 }
             }
         }

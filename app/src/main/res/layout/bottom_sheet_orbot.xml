@@ -16,8 +16,6 @@
         android:layout_marginBottom="20dp"
         android:background="@color/recycler_selected" />
 
-
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -283,9 +281,7 @@
                     android:textSize="@dimen/default_font_text_view" />
             </LinearLayout>
 
-
         </RelativeLayout>
     </RadioGroup>
-
 
 </LinearLayout>

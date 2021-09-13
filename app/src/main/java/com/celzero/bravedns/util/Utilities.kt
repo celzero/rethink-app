@@ -296,10 +296,6 @@ class Utilities {
             }
         }
 
-        fun isUnknownUid(uid: Int): Boolean {
-            return AndroidUidConfig.isUnknownUid(uid)
-        }
-
         fun isMissingOrInvalidUid(uid: Int): Boolean {
             return when (uid) {
                 MISSING_UID -> true
@@ -433,12 +429,6 @@ class Utilities {
         }
 
         fun getPackageInfoForUid(context: Context, uid: Int): Array<out String>? {
-            if (!isUnknownUid(uid)) {
-                Log.i(LOG_TAG_FIREWALL,
-                      "Invalid uid: $uid, not fetching value from package manager")
-                return null
-            }
-
             try {
                 return context.packageManager.getPackagesForUid(uid)
             } catch (e: PackageManager.NameNotFoundException) {

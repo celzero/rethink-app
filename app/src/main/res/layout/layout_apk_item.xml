@@ -52,7 +52,6 @@
                     android:textColor="@android:color/white"
                     android:textSize="@dimen/default_font_text_view" />
 
-
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 </RelativeLayout>

@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="?attr/background"
     android:orientation="vertical"
-    tools:context=".ui.CustomBlocklistActivity">
+    tools:context=".ui.DomainDetailActivity">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/custom_blocklist_act_tabLayout"

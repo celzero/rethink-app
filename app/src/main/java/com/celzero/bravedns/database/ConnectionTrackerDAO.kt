@@ -52,7 +52,7 @@ interface ConnectionTrackerDAO {
     @Query(
         "select * from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 and (appName like :searchString or ipAddress like :searchString) order by timeStamp desc")
     fun getBlockedConnectionsFiltered(searchString: String,
-                                      filter: List<String>): DataSource.Factory<Int, ConnectionTracker>
+                                      filter: Set<String>): DataSource.Factory<Int, ConnectionTracker>
 
     @Query(
         "select * from ConnectionTracker where  (appName like :searchString or ipAddress like :searchString) and blockedByRule in (:filter) order by timeStamp desc")
@@ -82,6 +82,6 @@ interface ConnectionTrackerDAO {
     @Query(
         "select * from ConnectionTracker where isBlocked = 0 and (appName like :query or ipAddress like :query) and blockedByRule in (:filter) order by timeStamp desc")
     fun getAllowedConnectionsFiltered(query: String,
-                                      filter: List<String>): DataSource.Factory<Int, ConnectionTracker>
+                                      filter: Set<String>): DataSource.Factory<Int, ConnectionTracker>
 
 }

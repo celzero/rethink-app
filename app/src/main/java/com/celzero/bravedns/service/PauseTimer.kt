@@ -22,7 +22,6 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -40,27 +39,30 @@ object PauseTimer {
     fun start(durationMs: Long) {
         if (DEBUG) Log.d(LOG_TAG_UI, "timer started, duration: $durationMs")
         CoroutineScope(Dispatchers.Main).launch {
-            setCountdown(durationMs)
-            while (countdownMs.get() > 0L) {
-                delay(COUNT_DOWN_INTERVAL)
-                val c = addCountdown(-COUNT_DOWN_INTERVAL)
+            try {
+                setCountdown(durationMs)
+                while (countdownMs.get() > 0L) {
+                    delay(COUNT_DOWN_INTERVAL)
+                    val c = addCountdown(-COUNT_DOWN_INTERVAL)
 
-                // Check vpn lockdown state every 30 secs
-                if (TimeUnit.MILLISECONDS.toSeconds(c) % LOCKDOWN_STATUS_CHECK_TIME_IN_SEC == 0L) {
-                    resumeAppIfVpnLockdown()
+                    // Check vpn lockdown state every 30 secs
+                    if (TimeUnit.MILLISECONDS.toSeconds(
+                            c) % LOCKDOWN_STATUS_CHECK_TIME_IN_SEC == 0L) {
+                        resumeAppIfVpnLockdown()
+                    }
                 }
+            } finally {
+                if (DEBUG) Log.d(LOG_TAG_VPN, "pause timer complete")
+                VpnController.getBraveVpnService()?.resumeApp()
+                setCountdown(INIT_TIME_MS)
             }
-
-            if (DEBUG) Log.d(LOG_TAG_VPN, "pause timer complete")
-            VpnController.getBraveVpnService()?.resumeApp()
-            setCountdown(INIT_TIME_MS)
         }
     }
 
     private fun resumeAppIfVpnLockdown() {
         // edge-case: there is no call-back for the lockdown mode so using this check, when the
         // lockdown mode is detected, set the app state as ACTIVE regardless of the current state
-        if (!Utilities.isVpnLockdownEnabled(VpnController.getBraveVpnService())) return
+        if (!VpnController.isVpnLockdown()) return
 
         VpnController.getBraveVpnService()?.resumeApp()
 

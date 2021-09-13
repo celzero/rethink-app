@@ -156,7 +156,7 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
 
     // disable dns and firewall mode, show user that vpn in lockdown mode indicator if needed
     private fun handleLockdownModeIfNeeded() {
-        val isLockdown = Utilities.isVpnLockdownEnabled(VpnController.getBraveVpnService())
+        val isLockdown = VpnController.isVpnLockdown()
         if (isLockdown) {
             b.bsHomeScreenVpnLockdownDesc.visibility = View.VISIBLE
             b.bsHsDnsRl.alpha = 0.5f

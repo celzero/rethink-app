@@ -31,6 +31,7 @@ import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
+import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.animation.Rotate3dAnimation
 import com.celzero.bravedns.automaton.FirewallManager
@@ -44,6 +45,7 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
 
@@ -340,7 +342,9 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         if (VpnController.hasTunnel()) {
-            orbotHelper.startOrbot(type)
+            lifecycleScope.launch {
+                orbotHelper.startOrbot(type)
+            }
         } else {
             Utilities.showToastUiCentered(requireContext(),
                                           getString(R.string.settings_socks5_vpn_disabled_error),

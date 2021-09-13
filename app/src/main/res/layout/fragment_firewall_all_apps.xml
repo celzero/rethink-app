@@ -7,7 +7,6 @@
     android:focusable="true"
     android:focusableInTouchMode="true">
 
-
     <TextView
         android:id="@+id/firewall_category_explain_txt"
         android:layout_width="match_parent"
@@ -20,7 +19,6 @@
         android:padding="10dp"
         android:text="@string/settings_explanation_text"
         android:textSize="@dimen/default_font_text_view" />
-
 
     <LinearLayout
         android:id="@+id/firewall_app_search_view_top"
@@ -70,8 +68,6 @@
         </androidx.cardview.widget.CardView>
     </LinearLayout>
 
-
-
     <ExpandableListView
         android:id="@+id/firewall_expandable_list"
         android:layout_width="match_parent"
@@ -84,7 +80,6 @@
         android:groupIndicator="@null"
         android:nestedScrollingEnabled="true"
         android:scrollbars="none" />
-
 
     <ProgressBar
         android:id="@+id/firewall_update_progress"

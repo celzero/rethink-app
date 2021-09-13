@@ -29,9 +29,9 @@ import java.util.concurrent.TimeUnit
 class WorkScheduler(val context: Context) {
 
     companion object {
-        const val APP_EXIT_INFO_ONE_TIME_JOB_TAG = "OneTimeCollectAppExitInfo"
-        const val APP_EXIT_INFO_JOB_TAG = "CollectAppExitInfo"
-        const val REFRESH_APPS_JOB_TAG = "RefreshApps"
+        const val APP_EXIT_INFO_ONE_TIME_JOB_TAG = "OnDemandCollectAppExitInfoJob"
+        const val APP_EXIT_INFO_JOB_TAG = "ScheduledCollectAppExitInfoJob"
+        const val REFRESH_APPS_JOB_TAG = "ScheduledRefreshAppsJob"
         const val APP_EXIT_INFO_JOB_TIME_INTERVAL_DAYS: Long = 7
         const val REFRESH_TIME_INTERVAL_HOURS: Long = 3
 

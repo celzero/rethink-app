@@ -22,6 +22,7 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -30,6 +31,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityFirewallBinding
+import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
@@ -93,12 +95,33 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        // In two-cases (accessibility failure/new app install action), the app directly launches
+        // firewall activity from notification action. Need to handle the pause state for those cases
+        checkAppState()
+
         if (isAccessibilityIntent(intent)) {
             handleAccessibilitySettings()
         } else if (isNewAppInstalledIntent(intent)) {
             // navigate to all apps screen
             b.firewallActViewpager.setCurrentItem(TAB_LAYOUT_ALL_APPS, true)
+        } else {
+            // no-op
         }
+    }
+
+    private fun checkAppState() {
+        VpnController.connectionStatus.observe(this, {
+            if (it == BraveVPNService.State.PAUSED) {
+                openAppPausedActivity()
+            }
+        })
+    }
+
+    private fun openAppPausedActivity() {
+        val intent = Intent()
+        intent.setClass(this, PauseActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
     private fun isAccessibilityIntent(intent: Intent): Boolean {
@@ -126,10 +149,6 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
     }
 
     private fun handleAccessibilitySettings() {
-        // Reset the notification counter once user acts on the notification.
-        // There was a case, where notifications were not shown post the user action.
-        VpnController.getBraveVpnService()?.totalAccessibilityFailureNotifications = 0
-
         val builder = AlertDialog.Builder(this)
         builder.setTitle(R.string.alert_permission_accessibility_regrant)
         builder.setMessage(R.string.alert_firewall_accessibility_regrant_explanation)

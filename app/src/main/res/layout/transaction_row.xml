@@ -8,7 +8,6 @@
     android:orientation="vertical"
     app:cardElevation="@dimen/activity_horizontal_margin">
 
-
     <LinearLayout
         android:id="@+id/query_screen_ll"
         android:layout_width="match_parent"
@@ -62,7 +61,6 @@
             android:paddingStart="5dp"
             android:paddingEnd="5dp">
 
-
             <TextView
                 android:id="@+id/fqdn"
                 android:layout_width="wrap_content"
@@ -85,7 +83,6 @@
             android:layout_weight="1"
             android:orientation="vertical"
             android:padding="5dp">
-
 
             <TextView
                 android:id="@+id/latency_val"
@@ -120,7 +117,5 @@
         </LinearLayout>
 
     </LinearLayout>
-
-
 
 </LinearLayout>

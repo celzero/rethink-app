@@ -55,12 +55,12 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
         private const val DNS_LEAK_TEST = "dnsleaktest"
 
         private const val CACHE_BUILDER_MAX_SIZE = 20000L
-        private const val CACHE_BUILDER_WRITE_EXPIRE_HRS = 72L
+        private val CACHE_BUILDER_WRITE_EXPIRE_HRS = TimeUnit.DAYS.toHours(3L)
 
         // Some apps like firefox, instagram do not respect ttls
         // add a reasonable grace period to account for that
         // for eg: https://support.mozilla.org/en-US/questions/1213045
-        private const val DNS_TTL_GRACE_SEC = 300L
+        private val DNS_TTL_GRACE_SEC = TimeUnit.MINUTES.toSeconds(5L)
     }
 
     private var numRequests: Long = 0
@@ -140,7 +140,7 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
 
                     packet.answer.forEach { r ->
                         val ip = r.ip ?: return@forEach
-
+                        // drop trailing period . from the fqdn sent in dns-answer, ie a.com. => a.com
                         val dnsCacheRecord = DnsCacheRecord(calculateTtl(r.ttl),
                                                             transaction.name.dropLast(1))
                         ipDomainLookup.put(ip.hostAddress, dnsCacheRecord)

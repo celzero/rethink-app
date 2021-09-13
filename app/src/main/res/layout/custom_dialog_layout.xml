@@ -143,5 +143,4 @@
         android:textColor="?attr/accentGood"
         android:textSize="@dimen/large_font_text_view" />
 
-
 </RelativeLayout>

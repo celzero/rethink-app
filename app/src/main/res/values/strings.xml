@@ -539,8 +539,8 @@
     <string name="firewall_app_info_not_available">Cannot block the app</string>
 
     <string name="whats_dialog_title">What\'s new in v053g</string>
-    <string name="whats_new_version_name">🌎🌲 World Humanitarian Day (19 August) 🌲🌎</string>
-    <string name="whats_new_version_text_v53f">If you are upgrading from v053f then there are 3 minor bug fixes.</string>
+    <string name="whats_new_version_name">🌎🌲 International Day of Democracy (15 September) 🌲🌎</string>
+    <string name="whats_new_version_text_v53f"></string>
     <string name="whats_new_version_update">Fixes and improvements:\n\n
         1. Quick action buttons on Home Screen.\n\n
         2. A brand new Pause mode which suspends DNS and Firewall for unblocked apps.\n\n
@@ -1053,8 +1053,8 @@
     <string name="fav_icon">fav_icon</string>
 
     <!-- BraveVPN service rules failure -->
-    <string name="rules_load_failure_heading">Warning</string>
-    <string name="rules_load_failure_desc">Failure to initiate the firewall rules</string>
+    <string name="rules_load_failure_heading">Note</string>
+    <string name="rules_load_failure_desc">No firewall rules found</string>
     <string name="rules_load_failure_reload">reload</string>
 
     <string name="network_log_app_name_unknown">Unknown</string>
@@ -1154,5 +1154,11 @@
 
     <string name="new_app_notification_action_toast_allow">Network connection allowed for the app</string>
     <string name="new_app_notification_action_toast_deny">Network connection denied for the app</string>
+
+    <!-- Notification dialog activity -->
+    <string name="notif_dialog_pause_dialog_title">App paused!</string>
+    <string name="notif_dialog_pause_dialog_message">Application in pause state, resume to continue</string>
+    <string name="notif_dialog_pause_dialog_positive">Resume</string>
+    <string name="notif_dialog_pause_dialog_negative">Discard</string>
 
 </resources>

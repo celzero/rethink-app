@@ -175,18 +175,32 @@ class DNSProxyEndpointAdapter(private val context: Context, private val appMode:
     }
 
     private fun updateDNSProxyDetails(endpoint: DNSProxyEndpoint) {
-        CoroutineScope(Dispatchers.IO).launch {
+        io {
             endpoint.isSelected = true
             appMode.handleDnsProxyChanges(endpoint)
         }
     }
 
     private fun deleteProxyEndpoint(id: Int) {
-        CoroutineScope(Dispatchers.IO).launch {
+        io {
             appMode.deleteDnsProxyEndpoint(id)
-            withContext(Dispatchers.Main) {
+            uiCtx {
                 Toast.makeText(context, R.string.dns_proxy_remove_success,
                                Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private suspend fun uiCtx(f: () -> Unit) {
+        withContext(Dispatchers.Main) {
+            f()
+        }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            withContext(Dispatchers.IO) {
+                f()
             }
         }
     }

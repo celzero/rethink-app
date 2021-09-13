@@ -45,7 +45,7 @@ public class QueryTracker {
         numRequests = 1;
     }
 
-    void recordTransaction(Transaction transaction) {
+    public void recordTransaction(Transaction transaction) {
         ++numRequests;
         if (numRequests % HISTORY_SIZE == 0) {
             reinitializeQuantileEstimator();

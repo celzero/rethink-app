@@ -54,8 +54,6 @@ object FirewallManager : KoinComponent {
     private val categoryInfoRepository by inject<CategoryInfoRepository>()
     private val lock = ReentrantReadWriteLock()
 
-    val appFirewallRulesObserver: MutableLiveData<Int> = MutableLiveData()
-
     enum class AppStatus {
         ALLOWED, BLOCKED, WHITELISTED, EXCLUDED, UNKNOWN
     }
@@ -74,16 +72,12 @@ object FirewallManager : KoinComponent {
 
     @Volatile private var isFirewallRulesLoaded: Boolean = false
 
-    fun isFirewallRulesLoaded(): Boolean {
-        return isFirewallRulesLoaded
-    }
-
     fun isUidFirewalled(uid: Int): Boolean {
-        return getAppInfosByUidLocked(uid).any { !it.isInternetAllowed }
+         return appStatus(uid) == AppStatus.BLOCKED
     }
 
     fun isUidWhitelisted(uid: Int): Boolean {
-        return getAppInfosByUidLocked(uid).any { it.whiteListUniv1 }
+        return appStatus(uid) == AppStatus.WHITELISTED
     }
 
     fun isUidSystemApp(uid: Int): Boolean {
@@ -130,11 +124,7 @@ object FirewallManager : KoinComponent {
         }
     }
 
-    fun isUidExcluded(uid: Int): Boolean {
-        return getAppInfosByUidLocked(uid).any { it.isExcluded }
-    }
-
-    fun canFirewall(uid: Int): AppStatus {
+    fun appStatus(uid: Int): AppStatus {
         val appInfo = getAppInfoByUid(uid) ?: return AppStatus.UNKNOWN
 
         if (appInfo.whiteListUniv1) {

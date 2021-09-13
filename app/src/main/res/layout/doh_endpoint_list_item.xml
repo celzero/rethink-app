@@ -10,8 +10,8 @@
         android:id="@+id/doh_endpoint_list_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="5dp"
         android:layout_marginStart="5dp"
+        android:padding="5dp"
         android:visibility="visible">
 
         <LinearLayout
@@ -58,14 +58,14 @@
             android:id="@+id/doh_endpoint_list_check_image"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_centerInParent="true"
-            android:gravity="center"
-            android:text="@null"
             android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
             android:buttonTint="?attr/accentGood"
-            android:foregroundTint="?attr/accentGood"
             android:checked="false"
-            android:padding="10dp" />
+            android:foregroundTint="?attr/accentGood"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@null" />
 
     </RelativeLayout>
 
@@ -90,8 +90,6 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
-        android:layout_below="@id/doh_endpoint_list_configure"
-        />
-
+        android:layout_below="@id/doh_endpoint_list_configure" />
 
 </RelativeLayout>

@@ -28,7 +28,7 @@ enum class Themes(val id: Int) {
 
         fun getTheme(id: Int): Int {
             return when (id) {
-                SYSTEM_DEFAULT.id -> 0
+                SYSTEM_DEFAULT.id -> 0 // system default
                 LIGHT.id -> R.style.AppThemeWhite
                 DARK.id -> R.style.AppTheme
                 TRUE_BLACK.id -> R.style.AppThemeTrueBlack
@@ -38,7 +38,7 @@ enum class Themes(val id: Int) {
 
         private fun getBottomSheetTheme(id: Int): Int {
             return when (id) {
-                SYSTEM_DEFAULT.id -> 0
+                SYSTEM_DEFAULT.id -> 0 // system default
                 LIGHT.id -> R.style.BottomSheetDialogThemeWhite
                 DARK.id -> R.style.BottomSheetDialogTheme
                 TRUE_BLACK.id -> R.style.BottomSheetDialogThemeTrueBlack

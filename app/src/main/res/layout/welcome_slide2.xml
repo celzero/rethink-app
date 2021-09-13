@@ -22,7 +22,6 @@
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/slide_title" />
 
-
         <androidx.appcompat.widget.AppCompatTextView
             style="@style/TextAppearance.AppCompat.Body1"
             android:layout_width="wrap_content"
@@ -43,6 +42,5 @@
             android:src="@drawable/illustrations_welcome_2" />
 
     </LinearLayout>
-
 
 </RelativeLayout>

@@ -34,10 +34,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.DialogViewLogsBinding
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
@@ -55,14 +55,15 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastR
 import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
+import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 import com.celzero.bravedns.util.Utilities.Companion.sendEmailIntent
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
+import org.koin.core.component.KoinComponent
 import java.io.File
 import java.io.FileInputStream
 import java.util.concurrent.TimeUnit
@@ -70,10 +71,11 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
 
-class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
+class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, KoinComponent {
     private val b by viewBinding(FragmentAboutBinding::bind)
 
     private var lastAppExitInfoDialogInvokeTime = INIT_TIME_MS
+    private val workScheduler by inject<WorkScheduler>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -119,17 +121,11 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
     }
 
     private fun getDownloadSource(): String {
-        return when (BuildConfig.FLAVOR) {
-            FLAVOR_PLAY -> {
-                FLAVOR_PLAY
-            }
-            FLAVOR_FDROID -> {
-                FLAVOR_FDROID
-            }
-            else -> {
-                FLAVOR_WEBSITE
-            }
-        }
+        if (isFdroidFlavour()) return FLAVOR_FDROID
+
+        if (isPlayStoreFlavour()) return FLAVOR_PLAY
+
+        return FLAVOR_WEBSITE
     }
 
     override fun onClick(view: View?) {
@@ -154,7 +150,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             }
             b.aboutCrashLog -> {
                 if (isAtleastR()) {
-                    initiateAppExitInfoLogExtract()
+                    handleShowAppExitInfo()
                 } else {
                     showNoLogDialog()
                 }
@@ -282,7 +278,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         if (isFileAvailable(file)) {
             return FileProvider.getUriForFile(requireContext().applicationContext,
                                               FILE_PROVIDER_NAME, file)
-
         }
         return null
     }
@@ -311,7 +306,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             return
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
+        io {
             var fin: FileInputStream? = null
             var zin: ZipInputStream? = null
             try {
@@ -322,15 +317,15 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
                 while (zin.nextEntry.also { ze = it } != null) {
                     val inStream = zipFile?.getInputStream(ze)
                     val inputString = inStream?.bufferedReader().use { it?.readText() }
-                    withContext(Dispatchers.Main) {
-                        if (!isAdded) return@withContext
+                    uiCtx {
+                        if (!isAdded) return@uiCtx
                         binding.logs.append(inputString)
                     }
                 }
             } catch (e: Exception) {
                 Log.w(LOG_TAG_UI, "Error loading log files to textview: ${e.message}", e)
-                withContext(Dispatchers.Main) {
-                    if (!isAdded) return@withContext
+                uiCtx {
+                    if (!isAdded) return@uiCtx
 
                     binding.logs.text = getString(R.string.error_loading_log_file)
                 }
@@ -339,8 +334,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
                 zin?.close()
             }
 
-            withContext(Dispatchers.Main) {
-                if (!isAdded) return@withContext
+            uiCtx {
+                if (!isAdded) return@uiCtx
 
                 binding.progressLayout.visibility = View.GONE
             }
@@ -363,11 +358,11 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         alert.show()
     }
 
-    private fun initiateAppExitInfoLogExtract() {
+    private fun handleShowAppExitInfo() {
         if (WorkScheduler.isWorkRunning(requireContext(),
                                         WorkScheduler.APP_EXIT_INFO_JOB_TAG)) return
 
-        get<WorkScheduler>().scheduleOneTimeWorkForAppExitInfo()
+        workScheduler.scheduleOneTimeWorkForAppExitInfo()
         showBugReportProgressUi()
 
         val workManager = WorkManager.getInstance(requireContext().applicationContext)
@@ -415,5 +410,19 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         lastAppExitInfoDialogInvokeTime = SystemClock.elapsedRealtime()
         hideBugReportProgressUi()
         promptCrashLogAction()
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                f()
+            }
+        }
+    }
+
+    private suspend fun uiCtx(f: () -> Unit) {
+        withContext(Dispatchers.Main) {
+            f()
+        }
     }
 }

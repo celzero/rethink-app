@@ -176,7 +176,7 @@ enum class AndroidUidConfig(val uid: Int) {
 
         fun fromFileSystemUid(uid: Int): AndroidUidConfig {
             if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                             "UID: $uid, hashed val : ${uid.hashCode()}, map Vale: ${map[uid.hashCode()]}")
+                             "UID: $uid, hashed val: ${uid.hashCode()}, map Vale: ${map[uid.hashCode()]}")
             return map[uid.hashCode()] ?: OTHER
         }
 
@@ -184,7 +184,7 @@ enum class AndroidUidConfig(val uid: Int) {
             return (uid >= APP_START.uid && uid <= APP_END.uid)
         }
 
-        fun isUnknownUid(uid: Int): Boolean {
+        fun isValidUid(uid: Int): Boolean {
             return (uid > 0 && uid < USER_OFFSET.uid)
         }
     }

@@ -23,6 +23,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -35,9 +36,9 @@ import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
 import com.google.android.material.chip.Chip
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -52,7 +53,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     private val viewModel: ConnectionTrackerViewModel by viewModel()
 
     private var filterQuery: String? = ""
-    private var filterCategories: MutableList<String> = ArrayList()
+    private var filterCategories: MutableSet<String> = mutableSetOf()
     private var filterType: ConnectionTrackerViewModel.FilterType = ConnectionTrackerViewModel.FilterType.ALL
 
     private val connectionTrackerDAO by inject<ConnectionTrackerDAO>()
@@ -61,10 +62,10 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
 
     companion object {
         fun newInstance() = ConnectionTrackerFragment()
+    }
 
-        private const val PARENT_FILTER_ALL = 0
-        private const val PARENT_FILTER_ALLOWED = 1
-        private const val PARENT_FILTER_BLOCKED = 2
+    enum class ParentChipsUi(val id: Int) {
+        PARENT_FILTER_ALL(0), PARENT_FILTER_ALLOWED(1), PARENT_FILTER_BLOCKED(2)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -94,7 +95,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
 
         includeView.connectionSearch.setOnQueryTextListener(this)
         includeView.connectionSearch.setOnClickListener {
-            toggleParentChipsUi()
+            showParentChipsUi()
             includeView.connectionSearch.requestFocus()
             includeView.connectionSearch.onActionViewExpanded()
         }
@@ -107,8 +108,8 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
             showDeleteDialog()
         }
 
-        setParentFilterChips()
-        setChildFilterChips(FirewallRuleset.getBlockedRules())
+        remakeParentFilterChipsUi()
+        remakeChildFilterChipsUi(FirewallRuleset.getBlockedRules())
     }
 
     private fun toggleParentChipsUi() {
@@ -122,64 +123,72 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         hideChildChipsUi()
     }
 
-    private fun setParentFilterChips() {
+    private fun remakeParentFilterChipsUi() {
         val includeView = b.connectionListScrollList
-
         includeView.filterChipParentGroup.removeAllViews()
-        for (i in 0 until 3) {
-            val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, null, false) as Chip
 
-            val text = when (i) {
-                PARENT_FILTER_ALL -> {
-                    chip.isChecked = true
-                    getString(R.string.ct_filter_parent_all)
-                }
-                PARENT_FILTER_ALLOWED -> {
-                    getString(R.string.ct_filter_parent_allowed)
-                }
-                PARENT_FILTER_BLOCKED -> {
-                    getString(R.string.ct_filter_parent_blocked)
-                }
-                else -> {
-                    getString(R.string.ct_filter_parent_all)
-                }
+        val all = makeParentChip(ParentChipsUi.PARENT_FILTER_ALL.id,
+                                 getString(R.string.ct_filter_parent_all), true)
+        val allowed = makeParentChip(ParentChipsUi.PARENT_FILTER_ALLOWED.id,
+                                     getString(R.string.ct_filter_parent_allowed), false)
+        val blocked = makeParentChip(ParentChipsUi.PARENT_FILTER_BLOCKED.id,
+                                     getString(R.string.ct_filter_parent_blocked), false)
+
+        includeView.filterChipParentGroup.addView(all)
+        includeView.filterChipParentGroup.addView(allowed)
+        includeView.filterChipParentGroup.addView(blocked)
+    }
+
+    private fun makeParentChip(id: Int, label: String, checked: Boolean): Chip {
+        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, null, false) as Chip
+        chip.tag = id
+        chip.text = label
+        chip.isChecked = checked
+
+        chip.setOnCheckedChangeListener { button: CompoundButton, isSelected: Boolean ->
+            if (isSelected) { // apply filter only when the CompoundButton is selected
+                applyParentFilter(button.tag)
+            } else { // actions need to be taken when the button is unselected
+                unselectParentsChipsUi(button.tag)
             }
-
-            chip.text = text
-            chip.tag = i
-
-            chip.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
-                if (!b) {
-                    handleCategoryChipsUi(compoundButton.tag)
-                    return@setOnCheckedChangeListener
-                }
-                applyParentFilter(compoundButton.tag)
-            }
-
-            includeView.filterChipParentGroup.addView(chip)
         }
 
+        return chip
+    }
+
+    private fun makeChildChips(id: String, titleResId: Int): Chip {
+        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, null, false) as Chip
+        chip.text = getString(titleResId)
+        chip.chipIcon = ContextCompat.getDrawable(requireContext(),
+                                                  FirewallRuleset.getRulesIcon(id))
+        chip.isCheckedIconVisible = false
+        chip.tag = id
+
+        chip.setOnCheckedChangeListener { compoundButton: CompoundButton, isSelected: Boolean ->
+            applyChildFilter(compoundButton.tag, isSelected)
+        }
+        return chip
     }
 
     private fun applyParentFilter(tag: Any) {
         when (tag) {
-            PARENT_FILTER_ALL -> {
+            ParentChipsUi.PARENT_FILTER_ALL.id -> {
                 filterCategories.clear()
                 filterType = ConnectionTrackerViewModel.FilterType.ALL
                 viewModel.setFilter(filterQuery, filterCategories, filterType)
                 hideChildChipsUi()
             }
-            PARENT_FILTER_ALLOWED -> {
+            ParentChipsUi.PARENT_FILTER_ALLOWED.id -> {
                 filterCategories.clear()
                 filterType = ConnectionTrackerViewModel.FilterType.ALLOWED
                 viewModel.setFilter(filterQuery, filterCategories, filterType)
-                setChildFilterChips(FirewallRuleset.getAllowedRules())
+                remakeChildFilterChipsUi(FirewallRuleset.getAllowedRules())
                 showParentChipsUi()
             }
-            PARENT_FILTER_BLOCKED -> {
+            ParentChipsUi.PARENT_FILTER_BLOCKED.id -> {
                 filterType = ConnectionTrackerViewModel.FilterType.BLOCKED
                 viewModel.setFilter(filterQuery, filterCategories, filterType)
-                setChildFilterChips(FirewallRuleset.getBlockedRules())
+                remakeChildFilterChipsUi(FirewallRuleset.getBlockedRules())
                 showChildChipsUi()
             }
         }
@@ -203,43 +212,34 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         builder.setMessage(R.string.conn_track_clear_logs_message)
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.ct_delete_logs_positive_btn)) { _, _ ->
-            CoroutineScope(Dispatchers.IO).launch {
-                connectionTrackerDAO.clearAllData()
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    connectionTrackerDAO.clearAllData()
+                }
             }
         }
 
         builder.setNegativeButton(getString(R.string.ct_delete_logs_negative_btn)) { _, _ ->
         }
-        val alertDialog: AlertDialog = builder.create()
-        alertDialog.setCancelable(true)
-        alertDialog.show()
+        builder.create().show()
     }
 
     fun ipToDomain(ip: String): DNSLogTracker.DnsCacheRecord? {
         return dnsLogTracker.ipDomainLookup.getIfPresent(ip)
     }
 
-    private fun setChildFilterChips(categories: List<FirewallRuleset>) {
+    private fun remakeChildFilterChipsUi(categories: List<FirewallRuleset>) {
         val includeView = b.connectionListScrollList
 
         includeView.filterChipGroup.removeAllViews()
         for (category in categories) {
-            val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, null, false) as Chip
-            chip.text = getString(category.title)
-            chip.chipIcon = ContextCompat.getDrawable(requireContext(),
-                                                      FirewallRuleset.getRulesIcon(category.id))
-            chip.isCheckedIconVisible = false
-            chip.tag = category.id
-
-            chip.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
-                applyChildFilter(compoundButton.tag, b)
-            }
+            val chip = makeChildChips(category.id, category.title)
             includeView.filterChipGroup.addView(chip)
         }
     }
 
-    private fun applyChildFilter(tag: Any, b: Boolean) {
-        if (b) {
+    private fun applyChildFilter(tag: Any, show: Boolean) {
+        if (show) {
             filterCategories.add(tag.toString())
         } else {
             filterCategories.remove(tag.toString())
@@ -247,9 +247,12 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         viewModel.setFilter(filterQuery, filterCategories, filterType)
     }
 
-    private fun handleCategoryChipsUi(tag: Any) {
+    // chips: all, allowed, blocked
+    // when any chip other than "all" is selected, show the child chips.
+    // ignore unselect events from allowed and blocked chip
+    private fun unselectParentsChipsUi(tag: Any) {
         when (tag) {
-            PARENT_FILTER_ALL -> {
+            ParentChipsUi.PARENT_FILTER_ALL.id -> {
                 showChildChipsUi()
             }
         }

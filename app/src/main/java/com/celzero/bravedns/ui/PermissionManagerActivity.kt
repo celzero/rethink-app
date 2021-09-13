@@ -18,15 +18,16 @@ package com.celzero.bravedns.ui
 import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.PermissionManagerApk
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.databinding.ActivityPermissionManagerBinding
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class PermissionManagerActivity : AppCompatActivity(R.layout.activity_permission_manager) {
@@ -51,12 +52,14 @@ class PermissionManagerActivity : AppCompatActivity(R.layout.activity_permission
         b.permissionManagerRecyclerView.layoutManager = LinearLayoutManager(this)
     }
 
-    private fun updateAppList() = CoroutineScope(Dispatchers.Default).launch {
-        val appList = appInfoRepository.getAppInfo()
-        appList.forEach {
-            val userApk = PermissionManagerApk(packageManager.getPackageInfo(it.packageInfo, 0),
-                                               context)
-            apkList.add(userApk)
+    private fun updateAppList() = lifecycleScope.launch {
+        withContext(Dispatchers.Default) {
+            val appList = appInfoRepository.getAppInfo()
+            appList.forEach {
+                val userApk = PermissionManagerApk(packageManager.getPackageInfo(it.packageInfo, 0),
+                                                   context)
+                apkList.add(userApk)
+            }
         }
     }
 

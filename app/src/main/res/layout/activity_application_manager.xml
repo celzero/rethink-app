@@ -29,19 +29,6 @@
             app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-           <!-- <ImageView
-                android:id="@+id/am_expandable_image"
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:background="@color/colorPrimary"
-                android:scaleType="centerCrop"
-                android:src="@drawable/illustration_app_mgr_bg"
-                app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.7"
-                android:contentDescription="TODO" />-->
-
-
-
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/am_toolbar"
                 android:layout_width="match_parent"

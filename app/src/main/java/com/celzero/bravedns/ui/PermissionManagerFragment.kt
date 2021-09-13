@@ -25,6 +25,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
@@ -89,15 +90,17 @@ class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener {
         return view
     }
 
-    private fun updateAppList() = CoroutineScope(Dispatchers.Default).launch {
-        val appList = appInfoRepository.getAppInfo()
-        appList.forEach {
-            val userApk = Apk(it.appName, it.appName, it.packageInfo, it.uid.toString())
-            apkList.add(userApk)
-        }
-        withContext(Dispatchers.Main.immediate) {
-            progressBar.visibility = View.GONE
-            mAdapter.notifyDataSetChanged()
+    private fun updateAppList() = lifecycleScope.launch {
+        withContext(Dispatchers.Default) {
+            val appList = appInfoRepository.getAppInfo()
+            appList.forEach {
+                val userApk = Apk(it.appName, it.appName, it.packageInfo, it.uid.toString())
+                apkList.add(userApk)
+            }
+            withContext(Dispatchers.Main.immediate) {
+                progressBar.visibility = View.GONE
+                mAdapter.notifyDataSetChanged()
+            }
         }
     }
 

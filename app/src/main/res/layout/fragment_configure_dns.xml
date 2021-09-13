@@ -51,7 +51,6 @@
                     android:layout_centerHorizontal="true"
                     android:visibility="gone" />
 
-
                 <RelativeLayout
                     android:id="@+id/recycler_doh_connections_header"
                     android:layout_width="match_parent"
@@ -82,10 +81,10 @@
                         android:id="@+id/recycler_dns_crypt_servers_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
                         android:layout_marginTop="10dp"
                         android:fontFamily="sans-serif-smallcaps"
                         android:padding="5dp"
-                        android:layout_marginStart="15dp"
                         android:text="@string/cd_dns_crypt_title"
                         android:textColor="?attr/accentGood"
                         android:textSize="@dimen/heading_font_text_view"
@@ -95,7 +94,8 @@
                         android:id="@+id/recycler_dns_crypt_connections"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/recycler_dns_crypt_servers_title"                        android:clickable="true"
+                        android:layout_below="@id/recycler_dns_crypt_servers_title"
+                        android:clickable="true"
                         android:focusable="true"
                         android:nestedScrollingEnabled="true"
                         android:visibility="visible" />
@@ -105,9 +105,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/recycler_dns_crypt_connections"
+                        android:layout_marginStart="15dp"
                         android:layout_marginTop="10dp"
                         android:fontFamily="sans-serif-smallcaps"
-                        android:layout_marginStart="15dp"
                         android:paddingStart="5dp"
                         android:paddingTop="15dp"
                         android:paddingEnd="5dp"
@@ -156,14 +156,14 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="30dp"
-        android:textAllCaps="false"
-        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
+        android:backgroundTint="?attr/buttonBackground"
         android:drawablePadding="10dp"
         android:text="@string/cd_fab_add_button"
+        android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="@dimen/default_font_text_view"
-        android:backgroundTint="?attr/buttonBackground"
         app:fabSize="mini"
         app:icon="@drawable/ic_fab_without_border"
-        app:iconTint="@color/white" />
+        app:iconTint="@color/white"
+        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

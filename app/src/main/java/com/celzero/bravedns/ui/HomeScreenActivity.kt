@@ -27,6 +27,7 @@ import androidx.annotation.Nullable
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.NonStoreAppUpdater
@@ -49,9 +50,7 @@ import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.Companion.getPackageMetadata
 import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import okhttp3.*
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
@@ -130,13 +129,16 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun insertDefaultData() {
         if (persistentState.isDefaultDataInsertComplete) return
 
-        CoroutineScope(Dispatchers.IO).launch {
-            refreshDatabase.insertDefaultDNSList()
-            refreshDatabase.insertDefaultDNSCryptList()
-            refreshDatabase.insertDefaultDNSCryptRelayList()
-            refreshDatabase.insertDefaultDNSProxy()
-            refreshDatabase.updateCategoryRepo()
-            persistentState.isDefaultDataInsertComplete = true
+        lifecycleScope.launch {
+            // FIXME: non-cancellable co-routine ref: https://medium.com/androiddevelopers/coroutines-patterns-for-work-that-shouldnt-be-cancelled-e26c40f142ad
+            withContext(NonCancellable + Dispatchers.IO) {
+                refreshDatabase.insertDefaultDNSList()
+                refreshDatabase.insertDefaultDNSCryptList()
+                refreshDatabase.insertDefaultDNSCryptRelayList()
+                refreshDatabase.insertDefaultDNSProxy()
+                refreshDatabase.updateCategoryRepo()
+                persistentState.isDefaultDataInsertComplete = true
+            }
         }
     }
 
@@ -161,7 +163,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         // Refresh the app info cache on new update
         refreshDatabase.refreshAppInfoDatabase()
-        // FIXME - Remove this after the version v053g
+        // FIXME:  Remove this after the version v053g
         // this is to fix the persistance state which was saved as Int instead of Long.
         // Modification of persistence state
         removeThisMethod()

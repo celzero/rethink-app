@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/background">
@@ -29,7 +26,6 @@
                 android:clickable="true"
                 android:focusable="true"
                 app:cardElevation="16dp">
-
 
                 <RelativeLayout
                     android:id="@+id/on_device_block_rl"
@@ -62,7 +58,6 @@
                         android:text="ENABLED"
                         android:textColor="?attr/colorAccent" />
 
-
                     <TextView
                         android:id="@+id/on_device_block_desc"
                         android:layout_width="wrap_content"
@@ -73,7 +68,6 @@
                         android:text="@string/settings_local_blocklist_desc_1"
                         android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/default_font_text_view" />
-
 
                     <RelativeLayout
                         android:id="@+id/on_device_block_bottom_layout"

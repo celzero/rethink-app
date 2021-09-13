@@ -416,7 +416,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
                 filetag.writeText(fileContent)
                 persistentState.remoteBlocklistTimestamp = t
             } catch (e: IOException) {
-                Log.w(LOG_TAG_DOWNLOAD, "Cannot create $timestamp filetag json")
+                Log.w(LOG_TAG_DOWNLOAD, "could not create filetag.json at version $timestamp", e)
             }
         }
     }
