@@ -51,7 +51,7 @@ class FaqWebViewActivity : AppCompatActivity(R.layout.activity_faq_webview_layou
         b.configureWebview.isClickable = true
         b.configureWebview.webChromeClient = WebChromeClient()
 
-        val url = intent.getStringExtra(Constants.URL_INTENT_EXTRA)
+        val url = intent.getStringExtra(Constants.BLOCKLIST_URL_INTENT_EXTRA)
         if (url == null) {
             b.configureWebview.loadUrl(this.resources.getString(R.string.faq_web_link))
         } else {

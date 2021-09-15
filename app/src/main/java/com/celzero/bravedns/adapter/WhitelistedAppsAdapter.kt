@@ -33,6 +33,7 @@ import com.celzero.bravedns.databinding.UnivWhitelistListItemBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.Companion.getIcon
 
@@ -46,11 +47,14 @@ class WhitelistedAppsAdapter(private val context: Context) :
 
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<AppInfo>() {
 
-            override fun areItemsTheSame(oldConnection: AppInfo,
-                                         newConnection: AppInfo) = oldConnection.packageInfo == newConnection.packageInfo
+            override fun areItemsTheSame(oldConnection: AppInfo, newConnection: AppInfo): Boolean {
+                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.whiteListUniv1 == newConnection.whiteListUniv1)
+            }
 
             override fun areContentsTheSame(oldConnection: AppInfo,
-                                            newConnection: AppInfo) = oldConnection == newConnection
+                                            newConnection: AppInfo): Boolean {
+                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.whiteListUniv1 != newConnection.whiteListUniv1)
+            }
         }
     }
 

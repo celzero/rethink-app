@@ -47,7 +47,7 @@ class ExcludeAppsDialog(private var activity: Activity,
 
     private var mLayoutManager: RecyclerView.LayoutManager? = null
 
-    private var filterCategories: MutableSet<String> = HashSet()
+    private var filterCategories: MutableSet<String> = mutableSetOf()
     private var category: List<String> = ArrayList()
 
     private var isVpnRestartRequired: Boolean = false

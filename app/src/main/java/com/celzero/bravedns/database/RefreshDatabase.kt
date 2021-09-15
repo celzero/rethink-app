@@ -34,7 +34,6 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.FirewallActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.*
@@ -44,6 +43,7 @@ import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import com.google.common.collect.Sets
 import kotlinx.coroutines.*
 import java.util.*
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
@@ -78,7 +78,7 @@ class RefreshDatabase internal constructor(private var context: Context,
     /**
      * Need to rewrite the logic for adding the apps in the database and removing it during uninstall.
      */
-    fun refreshAppInfoDatabase() {
+    suspend fun refreshAppInfoDatabase() {
         if (DEBUG) Log.d(LOG_TAG_APP_DB, "Initiated refresh application info")
 
         refreshMutex.read {
@@ -95,9 +95,9 @@ class RefreshDatabase internal constructor(private var context: Context,
             isRefreshInProgress = true
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
+        withContext(Dispatchers.IO) {
             try {
-                FirewallManager.loadAppFirewallRules()
+                FirewallManager.reloadAppList()
 
                 // Get app details from Global variable
                 val trackedApps = FirewallManager.getPackageNames()
@@ -128,6 +128,9 @@ class RefreshDatabase internal constructor(private var context: Context,
                 // Add the missing packages to the database
                 addMissingPackages(packagesToAdd)
 
+                // whether non-app category apps needs an update
+                refreshNonApps(trackedApps, installedApps)
+
                 updateCategoryRepo()
             } catch (e: RuntimeException) {
                 Log.e(LOG_TAG_APP_DB, e.message, e)
@@ -142,6 +145,24 @@ class RefreshDatabase internal constructor(private var context: Context,
         }
     }
 
+    private suspend fun refreshNonApps(trackedApps: Set<FirewallManager.AppInfoTuple>,
+                                       installedApps: MutableSet<FirewallManager.AppInfoTuple>) {
+        trackedApps.filter { it.packageName.contains(NO_PACKAGE) }.forEach { t ->
+            installedApps.forEach { i ->
+                if (t.uid == i.uid) {
+                    upsertApps(i)
+                }
+            }
+        }
+    }
+
+    private suspend fun upsertApps(appTuple: FirewallManager.AppInfoTuple) {
+        val appInfo = getAppInfo(appTuple.uid) ?: return
+
+        insertApp(appInfo)
+    }
+
+
     // TODO: Ideally this should be in FirewallManager
     private suspend fun addMissingPackages(apps: HashSet<FirewallManager.AppInfoTuple>) {
         if (apps.size <= 0) return
@@ -155,32 +176,130 @@ class RefreshDatabase internal constructor(private var context: Context,
 
             val appInfo = Utilities.getApplicationInfo(context, it.packageName) ?: return@forEach
 
-            val appName = context.packageManager.getApplicationLabel(appInfo).toString()
-            if (DEBUG) Log.d(LOG_TAG_APP_DB, "Refresh Database, AppInfo -> $appName")
-
-            val isSystemApp = isSystemApp(appInfo)
-            val isSystemComponent = isSystemComponent(appInfo)
-            val entry = AppInfo()
-
-            entry.appName = appName
-
-            entry.packageInfo = appInfo.packageName
-            entry.uid = appInfo.uid
-
-            entry.whiteListUniv1 = isSystemComponent
-            entry.isSystemApp = isSystemApp
-
-            // default value of apps internet permission is true, when the universal firewall
-            // parameter (blockNewlyInstalledApp is true) firewall the app
-            if (persistentState.blockNewlyInstalledApp) {
-                entry.isInternetAllowed = false
-            }
-
-            entry.appCategory = determineAppCategory(appInfo)
-
-            FirewallManager.persistAppInfo(entry)
+            insertApp(appInfo)
 
         }
+    }
+
+    suspend fun handleNewlyConnectedApp(uid: Int) {
+        // ignore invalid uid (app source could not be determined)
+        // ignore missing uid (protocol unknown or connectivity mgr missing)
+        if (Utilities.isMissingOrInvalidUid(uid)) return
+
+        var tryWait = true
+        var remainingTimeMs = TimeUnit.SECONDS.toMillis(10L)
+
+        // do not proceed unless a refresh is not in progress
+        // but this block of code doesn't need to acquire isRefreshInProgress mutex
+        // as this is just a one-off insert (FirewallManager app-cache has its own mutex
+        // while db inserts are serialized).
+        while (remainingTimeMs > 0 && tryWait) {
+            refreshMutex.read {
+                if (!isRefreshInProgress) {
+                    tryWait = false
+                }
+            }
+            if (tryWait) delay(TimeUnit.SECONDS.toMillis(1L))
+            remainingTimeMs -= TimeUnit.SECONDS.toMillis(1L)
+        }
+
+        if (tryWait) {
+            Log.i(LOG_TAG_APP_DB, "wait timeout on insert new app")
+            return
+        }
+
+        maybeInsertApp(uid)
+    }
+
+    private suspend fun maybeInsertApp(uid: Int) {
+        if (FirewallManager.hasUid(uid)) {
+            Log.i(LOG_TAG_APP_DB, "uid: $uid already tracked by firewall manager")
+            return
+        }
+
+        val ai = handleAppInAppRange(uid)
+        Log.i(LOG_TAG_APP_DB, "inserting app with uid: $uid, app-info: ${ai?.packageName}")
+        if (ai != null) {
+            insertApp(ai)
+        } else {
+            insertUnknownApp(uid)
+        }
+
+        updateCategoryRepo()
+        showNewAppNotificationIfNeeded(FirewallManager.AppInfoTuple(uid, ai?.packageName ?: ""))
+    }
+
+    private suspend fun handleAppInAppRange(uid: Int): ApplicationInfo? {
+        if (AndroidUidConfig.isUidAppRange(uid)) return null
+
+        return getAppInfo(uid)
+    }
+
+    private suspend fun getAppInfo(uid: Int): ApplicationInfo? {
+        var appInfo: ApplicationInfo? = null
+        // get packages for uid
+        val packageNameList = Utilities.getPackageInfoForUid(context, uid)
+        if (packageNameList.isNullOrEmpty()) return null
+
+        packageNameList.forEach {
+            val info = Utilities.getApplicationInfo(context, it) ?: return@forEach
+
+            appInfo = info
+            return appInfo
+        }
+
+        return appInfo
+    }
+
+    private suspend fun insertUnknownApp(uid: Int) {
+        val appDetail = AndroidUidConfig.fromFileSystemUid(uid)
+        val appInfo = AppInfo()
+
+        val appName = if (appDetail.uid == Constants.INVALID_UID) {
+            appInfo.isSystemApp = false
+            context.getString(R.string.network_log_app_name_unnamed, uid.toString())
+        } else {
+            appInfo.isSystemApp = true
+            appDetail.name
+        }
+
+        appInfo.appName = appName
+        appInfo.packageInfo = "no_package_$uid"
+        appInfo.appCategory = Constants.APP_NON_APP
+
+        appInfo.uid = uid
+        if (persistentState.blockNewlyInstalledApp) {
+            appInfo.isInternetAllowed = false
+        }
+
+        FirewallManager.persistAppInfo(appInfo)
+    }
+
+    private suspend fun insertApp(appInfo: ApplicationInfo) {
+        val appName = context.packageManager.getApplicationLabel(appInfo).toString()
+        Log.i(LOG_TAG_APP_DB, "insert app: $appName")
+
+        val isSystemApp = isSystemApp(appInfo)
+        val isSystemComponent = isSystemComponent(appInfo)
+        val entry = AppInfo()
+
+        entry.appName = appName
+
+        entry.packageInfo = appInfo.packageName
+        entry.uid = appInfo.uid
+
+        entry.whiteListUniv1 = isSystemComponent
+        entry.isSystemApp = isSystemApp
+
+        // default value of apps internet permission is true, when the universal firewall
+        // parameter (blockNewlyInstalledApp is true) firewall the app
+        if (persistentState.blockNewlyInstalledApp) {
+            entry.isInternetAllowed = false
+        }
+
+        entry.appCategory = determineAppCategory(appInfo)
+
+        FirewallManager.persistAppInfo(entry)
     }
 
     private fun handleNewAppNotification(apps: HashSet<FirewallManager.AppInfoTuple>) {
@@ -192,17 +311,20 @@ class RefreshDatabase internal constructor(private var context: Context,
 
         // Show bulk notification when the app size is greater than NEW_APP_BULK_CHECK_COUNT(5)
         if (apps.size > NEW_APP_BULK_CHECK_COUNT) {
-            showNewAppsBulkNotification(apps.size)
+            showNewAppsBulkNotificationIfNeeded(apps.size)
             return
         }
 
         // show notification for particular app (less than NEW_APP_BULK_CHECK_COUNT)
         apps.forEach {
-            showNewAppNotification(it)
+            showNewAppNotificationIfNeeded(it)
         }
     }
 
-    private fun showNewAppsBulkNotification(appSize: Int) {
+    private fun showNewAppsBulkNotificationIfNeeded(appSize: Int) {
+        // no need to notify if the Universal setting is off
+        if (!persistentState.blockNewlyInstalledApp) return
+
         val notificationManager = context.getSystemService(
             VpnService.NOTIFICATION_SERVICE) as NotificationManager
         if (DEBUG) Log.d(LoggerConstants.LOG_TAG_VPN,
@@ -251,9 +373,20 @@ class RefreshDatabase internal constructor(private var context: Context,
         notificationManager.notify(notificationId.nextInt(100), builder.build())
     }
 
-    private fun showNewAppNotification(app: FirewallManager.AppInfoTuple) {
-        val appInfo = Utilities.getApplicationInfo(context, app.packageName) ?: return
-        val appName = context.packageManager.getApplicationLabel(appInfo).toString()
+    private fun showNewAppNotificationIfNeeded(app: FirewallManager.AppInfoTuple) {
+        // no need to notify if the Universal setting is off
+        if (!persistentState.blockNewlyInstalledApp) return
+
+        if (app.packageName.isEmpty()) {
+            app.packageName = FirewallManager.getPackageNameByUid(app.uid) ?: ""
+        }
+
+        val appInfo = Utilities.getApplicationInfo(context, app.packageName)
+        val appName = if (appInfo == null) {
+            app.uid
+        } else {
+            context.packageManager.getApplicationLabel(appInfo).toString()
+        }
 
         val notificationManager = context.getSystemService(
             VpnService.NOTIFICATION_SERVICE) as NotificationManager
@@ -372,25 +505,8 @@ class RefreshDatabase internal constructor(private var context: Context,
     }
 
     // TODO: Ideally this should be in FirewallManager
-    suspend fun registerNonApp(uid: Int, appName: String) {
-        val appInfo = AppInfo()
-        appInfo.appName = appName
-        appInfo.packageInfo = "no_package_$uid"
-        appInfo.appCategory = Constants.APP_NON_APP
-        appInfo.isSystemApp = true
-        appInfo.isDataEnabled = true
-        appInfo.isWifiEnabled = true
-        appInfo.isScreenOff = false
-        appInfo.uid = uid
-        appInfo.isInternetAllowed = true
-        appInfo.isBackgroundEnabled = false
-        appInfo.whiteListUniv1 = false
-        appInfo.whiteListUniv2 = false
-        appInfo.mobileDataUsed = 0
-        appInfo.trackers = 0
-        appInfo.wifiDataUsed = 0
-        FirewallManager.persistAppInfo(appInfo)
-        updateCategoryRepo()
+    private suspend fun registerNonApp(uid: Int, appName: String) {
+
     }
 
     fun insertDefaultDNSProxy() {
@@ -430,7 +546,7 @@ class RefreshDatabase internal constructor(private var context: Context,
     private val CATEGORY_STRING = "category/"
     private val CATEGORY_GAME_STRING = "GAME_" // All games start with this prefix
 
-    suspend fun updateCategoryRepo() {
+    private suspend fun updateCategoryRepo() {
         if (DEBUG) Log.d(LOG_TAG_APP_DB, "RefreshDatabase - Call for updateCategoryDB")
 
         //Changes to remove the count queries.
@@ -445,10 +561,10 @@ class RefreshDatabase internal constructor(private var context: Context,
             val appsBlocked = categoryFromAppList.filter { a -> !a.isInternetAllowed && a.appCategory == it.appCategory }
             val whiteListedApps = categoryFromAppList.filter { a -> a.whiteListUniv1 && a.appCategory == it.appCategory }
 
-            categoryInfo.numberOFApps = categoryFromAppList.filter { a -> a.appCategory == it.appCategory }.size
-            categoryInfo.numOfAppsExcluded = excludedList.size
-            categoryInfo.numOfAppWhitelisted = whiteListedApps.size
-            categoryInfo.numOfAppsBlocked = appsBlocked.size
+            categoryInfo.numberOFApps = categoryFromAppList.filter { a -> a.appCategory == it.appCategory }.count()
+            categoryInfo.numOfAppsExcluded = excludedList.count()
+            categoryInfo.numOfAppWhitelisted = whiteListedApps.count()
+            categoryInfo.numOfAppsBlocked = appsBlocked.count()
             categoryInfo.isInternetBlocked = (categoryInfo.numberOFApps == categoryInfo.numOfAppsBlocked)
 
             Log.i(LOG_TAG_APP_DB,

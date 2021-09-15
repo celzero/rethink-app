@@ -29,6 +29,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebSettingsCompat.DARK_STRATEGY_PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING
 import androidx.webkit.WebViewFeature
@@ -39,8 +40,8 @@ import com.celzero.bravedns.databinding.ActivityFaqWebviewLayoutBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.CONFIGURE_BLOCKLIST_URL
-import com.celzero.bravedns.util.Constants.Companion.CONFIGURE_BLOCKLIST_URL_PARAMETER
+import com.celzero.bravedns.util.Constants.Companion.RETHINK_BLOCKLIST_CONFIGURE_URL
+import com.celzero.bravedns.util.Constants.Companion.RETHINK_BLOCKLIST_CONFIGURE_URL_PARAMETER
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
@@ -48,9 +49,9 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import com.celzero.bravedns.util.Utilities.Companion.remoteBlocklistDir
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.koin.android.ext.android.inject
 import xdns.Xdns
@@ -76,8 +77,8 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-        receivedIntentFrom = intent.getIntExtra(Constants.LOCATION_INTENT_EXTRA, 0)
-        val stamp = intent.getStringExtra(Constants.STAMP_INTENT_EXTRA)
+        receivedIntentFrom = intent.getIntExtra(Constants.BLOCKLIST_LOCATION_INTENT_EXTRA, 0)
+        val stamp = intent.getStringExtra(Constants.BLOCKLIST_STAMP_INTENT_EXTRA)
 
         Log.i(LOG_TAG_VPN, "Is local configure? ${isLocal()}, with stamp as $stamp")
 
@@ -96,17 +97,17 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
 
     private fun constructUrl(stamp: String?): String {
         if (stamp.isNullOrBlank()) {
-            return CONFIGURE_BLOCKLIST_URL
+            return RETHINK_BLOCKLIST_CONFIGURE_URL
         }
 
         return if (isLocal()) {
-            val url = CONFIGURE_BLOCKLIST_URL.toHttpUrlOrNull()?.newBuilder()
-            url?.addQueryParameter(CONFIGURE_BLOCKLIST_URL_PARAMETER,
+            val url = RETHINK_BLOCKLIST_CONFIGURE_URL.toHttpUrlOrNull()?.newBuilder()
+            url?.addQueryParameter(RETHINK_BLOCKLIST_CONFIGURE_URL_PARAMETER,
                                    persistentState.localBlocklistTimestamp.toString())
             url?.fragment(stamp)
             url.toString()
         } else {
-            val url = CONFIGURE_BLOCKLIST_URL.toHttpUrlOrNull()?.newBuilder()
+            val url = RETHINK_BLOCKLIST_CONFIGURE_URL.toHttpUrlOrNull()?.newBuilder()
             url?.fragment(stamp)
             url.toString()
         }
@@ -187,8 +188,10 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     private fun updateDoHEndPoint(stamp: String, count: Int) {
         Log.i(LOG_TAG_DNS, "rethinkdns+ stamp updated to: $stamp")
 
-        CoroutineScope(Dispatchers.IO).launch {
-            appMode.updateRethinkDnsPlusStamp(stamp, count)
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                appMode.updateRethinkDnsPlusStamp(stamp, count)
+            }
         }
 
         Toast.makeText(this, getString(R.string.webview_toast_configure_success),
@@ -231,7 +234,8 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         // Check if the key event was the Back button and if there's changes
         if (keyCode != KeyEvent.KEYCODE_BACK) return false
 
-        if (b.configureWebview.url?.contains(Constants.BRAVE_CONFIGURE_BASE_STAMP) == false) {
+        if (b.configureWebview.url?.contains(
+                Constants.RETHINK_BLOCKLIST_CONFIGURE_BASE_STAMP) == false) {
             b.configureWebview.goBack()
         } else if (receivedStamp.isEmpty()) {
             showDialogForExitWebView()
@@ -435,7 +439,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         if (!dir.exists()) {
             dir.mkdirs()
         }
-        val filePath = File(dir.absolutePath + Constants.FILE_TAG_NAME)
+        val filePath = File(dir.absolutePath + Constants.ONDEVICE_BLOCKLIST_FILE_TAG_NAME)
         if (!filePath.exists()) {
             filePath.createNewFile()
         }

@@ -34,7 +34,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ExcludedAppListAdapter
 import com.celzero.bravedns.automaton.FirewallManager
@@ -48,20 +47,12 @@ import com.celzero.bravedns.download.DownloadConstants
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_FDROID
-import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
-import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_WEBSITE
-import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
-import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
+import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_2
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.celzero.bravedns.util.OrbotHelper
-import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.delay
 import com.celzero.bravedns.util.Utilities.Companion.hasLocalBlocklists
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
@@ -189,18 +180,18 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     private fun displayNotificationActionUi() {
         b.settingsActivityNotificationRl.isEnabled = true
-        when (persistentState.notificationActionType) {
-            Constants.NOTIFICATION_ACTION_STOP -> {
+        when (NotificationActionType.getNotificationActionType(persistentState.notificationActionType)) {
+            NotificationActionType.PAUSE_STOP -> {
                 b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,
                                                                getString(
                                                                    R.string.settings_notification_desc1))
             }
-            Constants.NOTIFICATION_ACTION_DNS_FIREWALL -> {
+            NotificationActionType.DNS_FIREWALL -> {
                 b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,
                                                                getString(
                                                                    R.string.settings_notification_desc2))
             }
-            Constants.NOTIFICATION_ACTION_NONE -> {
+            NotificationActionType.NONE -> {
                 b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,
                                                                getString(
                                                                    R.string.settings_notification_desc3))
@@ -407,7 +398,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 }
 
                 b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
-                val blocklistsExist = withContext(Dispatchers.IO) {
+                val blocklistsExist = withContext(Dispatchers.Default) {
                     hasLocalBlocklists(requireContext(), persistentState.localBlocklistTimestamp)
                 }
                 if (blocklistsExist) {
@@ -430,8 +421,9 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             val intent = Intent(requireContext(), DNSConfigureWebViewActivity::class.java)
             val stamp = persistentState.localBlocklistStamp
             if (DEBUG) Log.d(LOG_TAG_VPN, "Stamp value in settings screen: $stamp")
-            intent.putExtra(Constants.LOCATION_INTENT_EXTRA, DNSConfigureWebViewActivity.LOCAL)
-            intent.putExtra(Constants.STAMP_INTENT_EXTRA, stamp)
+            intent.putExtra(Constants.BLOCKLIST_LOCATION_INTENT_EXTRA,
+                            DNSConfigureWebViewActivity.LOCAL)
+            intent.putExtra(Constants.BLOCKLIST_STAMP_INTENT_EXTRA, stamp)
             requireContext().startActivity(intent)
         }
 
@@ -521,8 +513,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     private fun updateBlocklistIfNeeded(isRefresh: Boolean) {
         val timestamp = persistentState.localBlocklistTimestamp
         val appVersionCode = persistentState.appVersion
-        val url = "${Constants.REFRESH_BLOCKLIST_URL}$timestamp&${Constants.APPEND_VCODE}$appVersionCode"
-        if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Check for local download, url - $url")
+        val url = "${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_URL}$timestamp&${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_PARAMETER_VCODE}$appVersionCode"
+        if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Check for local download, url: $url")
         downloadBlocklistIfNeeded(url, isRefresh)
     }
 
@@ -555,7 +547,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 val version = json.optInt(Constants.JSON_VERSION, 0)
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
                                  "client onResponse for refresh blocklist files-  $version")
-                if (version != Constants.RESPONSE_VERSION) {
+                if (version != Constants.UPDATE_CHECK_RESPONSE_VERSION) {
                     return
                 }
 
@@ -806,24 +798,24 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 return@setSingleChoiceItems
             }
 
-            when (which) {
-                Constants.NOTIFICATION_ACTION_STOP -> {
+            when (NotificationActionType.getNotificationActionType(which)) {
+                NotificationActionType.PAUSE_STOP -> {
                     b.genSettingsNotificationDesc.text = getString(
                         R.string.settings_notification_desc,
                         getString(R.string.settings_notification_desc1))
-                    persistentState.notificationActionType = Constants.NOTIFICATION_ACTION_STOP
+                    persistentState.notificationActionType = NotificationActionType.PAUSE_STOP.action
                 }
-                Constants.NOTIFICATION_ACTION_DNS_FIREWALL -> {
+                NotificationActionType.DNS_FIREWALL -> {
                     b.genSettingsNotificationDesc.text = getString(
                         R.string.settings_notification_desc,
                         getString(R.string.settings_notification_desc2))
-                    persistentState.notificationActionType = Constants.NOTIFICATION_ACTION_DNS_FIREWALL
+                    persistentState.notificationActionType = NotificationActionType.DNS_FIREWALL.action
                 }
-                Constants.NOTIFICATION_ACTION_NONE -> {
+                NotificationActionType.NONE -> {
                     b.genSettingsNotificationDesc.text = getString(
                         R.string.settings_notification_desc,
                         getString(R.string.settings_notification_desc3))
-                    persistentState.notificationActionType = Constants.NOTIFICATION_ACTION_NONE
+                    persistentState.notificationActionType = NotificationActionType.NONE.action
                 }
             }
         }
@@ -1002,7 +994,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         builder.setTitle(R.string.orbot_install_dialog_title)
         builder.setMessage(R.string.orbot_install_dialog_message)
         builder.setPositiveButton(getString(R.string.orbot_install_dialog_positive)) { _, _ ->
-            startOrbotActivity()
+            handleOrbotInstall()
         }
         builder.setNegativeButton(getString(R.string.orbot_install_dialog_negative)) { dialog, _ ->
             dialog.dismiss()
@@ -1018,19 +1010,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         startActivity(intent)
     }
 
-    private fun startOrbotActivity() {
-        startOrbotInstallActivity(when (BuildConfig.FLAVOR) {
-                                      FLAVOR_PLAY -> { // Play store install intent
-                                          orbotHelper.getIntentForDownload(
-                                              DOWNLOAD_SOURCE_PLAY_STORE)
-                                      }
-                                      FLAVOR_FDROID -> { // f-droid install intent
-                                          orbotHelper.getIntentForDownload(DOWNLOAD_SOURCE_FDROID)
-                                      }
-                                      else -> { // Orbot website download link
-                                          orbotHelper.getIntentForDownload(DOWNLOAD_SOURCE_WEBSITE)
-                                      }
-                                  })
+    private fun handleOrbotInstall() {
+        startOrbotInstallActivity(orbotHelper.getIntentForDownload())
     }
 
     private fun startOrbotInstallActivity(intent: Intent?) {
@@ -1202,19 +1183,21 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 b.settingsActivitySocks5Switch.visibility = View.VISIBLE
             }
         }
-        CoroutineScope(Dispatchers.IO).launch {
-            var proxyName = name
-            if (proxyName.isBlank()) {
-                proxyName = if (mode == getString(R.string.cd_dns_proxy_mode_internal)) {
-                    appName
-                } else ip
-            }
-            val proxyEndpoint = ProxyEndpoint(id = 0, proxyName, proxyMode = 1, mode, appName, ip,
-                                              port, userName, password, isSelected = true,
-                                              isCustom = true, isUDP = isUDPBlock,
-                                              modifiedDataTime = 0L, latency = 0)
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                var proxyName = name
+                if (proxyName.isBlank()) {
+                    proxyName = if (mode == getString(R.string.cd_dns_proxy_mode_internal)) {
+                        appName
+                    } else ip
+                }
+                val proxyEndpoint = ProxyEndpoint(id = 0, proxyName, proxyMode = 1, mode, appName,
+                                                  ip, port, userName, password, isSelected = true,
+                                                  isCustom = true, isUDP = isUDPBlock,
+                                                  modifiedDataTime = 0L, latency = 0)
 
-            appMode.insertCustomSocks5Proxy(proxyEndpoint)
+                appMode.insertCustomSocks5Proxy(proxyEndpoint)
+            }
         }
     }
 

@@ -54,12 +54,9 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appStartTime
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.DNS_SCREEN_CONFIG
-import com.celzero.bravedns.util.Constants.Companion.DNS_SCREEN_LOGS
-import com.celzero.bravedns.util.Constants.Companion.FIREWALL_SCREEN_ALL_APPS
-import com.celzero.bravedns.util.Constants.Companion.FIREWALL_SCREEN_UNIVERSAL
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.Companion.delay
 import com.celzero.bravedns.util.Utilities.Companion.isAlwaysOnEnabled
@@ -173,27 +170,27 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun initializeClickListeners() {
 
         b.fhsCardFirewallLl.setOnClickListener {
-            startFirewallActivity(FIREWALL_SCREEN_UNIVERSAL)
+            startFirewallActivity(FirewallActivity.FirewallTabs.UNIVERSAL.screen)
         }
 
         b.fhsCardDnsLl.setOnClickListener {
-            startDnsActivity(DNS_SCREEN_LOGS)
+            startDnsActivity(DNSDetailActivity.DnsTabs.LOGS.screen)
         }
 
         b.fhsCardDnsConfigure.setOnClickListener {
-            startDnsActivity(DNS_SCREEN_CONFIG)
+            startDnsActivity(DNSDetailActivity.DnsTabs.CONFIGURE.screen)
         }
 
         b.fhsCardDnsConfigureLl.setOnClickListener {
-            startDnsActivity(DNS_SCREEN_LOGS)
+            startDnsActivity(DNSDetailActivity.DnsTabs.LOGS.screen)
         }
 
         b.fhsCardFirewallConfigure.setOnClickListener {
-            startFirewallActivity(FIREWALL_SCREEN_ALL_APPS)
+            startFirewallActivity(FirewallActivity.FirewallTabs.ALL_APPS.screen)
         }
 
         b.fhsCardFirewallConfigureLl.setOnClickListener {
-            startFirewallActivity(FIREWALL_SCREEN_ALL_APPS)
+            startFirewallActivity(FirewallActivity.FirewallTabs.ALL_APPS.screen)
         }
 
         b.homeFragmentBottomSheetIcon.setOnClickListener {
@@ -279,8 +276,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun invokeRethinkPlusConfigureActivity(stamp: String) {
         val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
-        intent.putExtra(Constants.LOCATION_INTENT_EXTRA, DNSConfigureWebViewActivity.REMOTE)
-        intent.putExtra(Constants.STAMP_INTENT_EXTRA, stamp)
+        intent.putExtra(Constants.BLOCKLIST_LOCATION_INTENT_EXTRA,
+                        DNSConfigureWebViewActivity.REMOTE)
+        intent.putExtra(Constants.BLOCKLIST_STAMP_INTENT_EXTRA, stamp)
         startActivity(intent)
     }
 
@@ -317,7 +315,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         VpnController.getBraveVpnService()?.pauseApp()
-        persistentState.notificationActionType = Constants.NOTIFICATION_ACTION_STOP
+        persistentState.notificationActionType = NotificationActionType.PAUSE_STOP.action
         openPauseActivity()
     }
 
@@ -692,9 +690,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         if (isPrivateDnsActive()) {
-            showToastUiCentered(requireContext(),
-                                resources.getText(R.string.private_dns_toast).toString().capitalize(
-                                    Locale.ROOT), Toast.LENGTH_SHORT)
+            showToastUiCentered(requireContext(), resources.getText(
+                R.string.private_dns_toast).toString().replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
+            }, Toast.LENGTH_SHORT)
             return
         }
 
@@ -705,8 +704,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         openBottomSheet()
         showToastUiCentered(requireContext(), resources.getText(
-            R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(Locale.ROOT),
-                            Toast.LENGTH_SHORT)
+                    R.string.brave_dns_connect_mode_change_firewall).toString().replaceFirstChar {
+            if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
+        }, Toast.LENGTH_SHORT)
 
     }
 
@@ -726,8 +726,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         openBottomSheet()
         showToastUiCentered(requireContext(), resources.getText(
-            R.string.brave_dns_connect_mode_change_firewall).toString().capitalize(Locale.ROOT),
-                            Toast.LENGTH_SHORT)
+            R.string.brave_dns_connect_mode_change_firewall).toString().replaceFirstChar {
+            if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
+        }, Toast.LENGTH_SHORT)
     }
 
     private fun startActivity(isDns: Boolean, screenToLoad: Int) {
@@ -736,7 +737,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             false -> Intent(requireContext(), FirewallActivity::class.java)
         }
         intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-        intent.putExtra(Constants.SCREEN_TO_LOAD, screenToLoad)
+        intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, screenToLoad)
         startActivity(intent)
     }
 
@@ -759,8 +760,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 if (isVpnStarted) {
                     openBottomSheet()
                     showToastUiCentered(requireContext(), resources.getText(
-                        R.string.brave_dns_connect_mode_change_dns).toString().capitalize(
-                        Locale.ROOT), Toast.LENGTH_SHORT)
+                        R.string.brave_dns_connect_mode_change_dns).toString().replaceFirstChar {
+                        if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
+                    }, Toast.LENGTH_SHORT)
                 }
             }
         }

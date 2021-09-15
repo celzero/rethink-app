@@ -19,7 +19,8 @@ package com.celzero.bravedns.util
 class KnownPorts {
 
     companion object {
-        const val DNS_DEFAULT_PORT: Int = 53
+        const val DNS_PORT: Int = 53
+        const val NTP_PORT: Int = 123
 
         //get protocol desc based on port number
         private var portMap: HashMap<Int, String> = initPortMap()
@@ -29,11 +30,11 @@ class KnownPorts {
         }
 
         fun isNtp(port: Int): Boolean {
-            return portMap[port] == portMap[123]
+            return portMap[port] == portMap[NTP_PORT]
         }
 
         fun isDns(port: Int): Boolean {
-            return portMap[port] == portMap[DNS_DEFAULT_PORT]
+            return portMap[port] == portMap[DNS_PORT]
         }
 
         // init hash map with reserved ports (1-1024) and protocol identifiers

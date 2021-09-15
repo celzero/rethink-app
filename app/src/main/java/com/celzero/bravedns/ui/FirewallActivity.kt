@@ -22,7 +22,6 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -46,16 +45,17 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
     private val persistentState by inject<PersistentState>()
 
     companion object {
-        private const val TAB_LAYOUT_UNIVERSAL = 0
-        private const val TAB_LAYOUT_LOGS = 1
-        private const val TAB_LAYOUT_ALL_APPS = 2
         private const val TAB_LAYOUT_TOTAL_COUNT = 3
+    }
+
+    enum class FirewallTabs(val screen: Int) {
+        UNIVERSAL(0), LOGS(1), ALL_APPS(2)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-        fragmentIndex = intent.getIntExtra(Constants.SCREEN_TO_LOAD, 0)
+        fragmentIndex = intent.getIntExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, 0)
         init()
     }
 
@@ -68,9 +68,9 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
         b.firewallActViewpager.adapter = object : FragmentStateAdapter(this) {
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
-                    TAB_LAYOUT_UNIVERSAL -> UniversalFirewallFragment.newInstance()
-                    TAB_LAYOUT_LOGS -> ConnectionTrackerFragment.newInstance()
-                    TAB_LAYOUT_ALL_APPS -> FirewallAppFragment.newInstance()
+                    FirewallTabs.UNIVERSAL.screen -> UniversalFirewallFragment.newInstance()
+                    FirewallTabs.LOGS.screen -> ConnectionTrackerFragment.newInstance()
+                    FirewallTabs.ALL_APPS.screen -> FirewallAppFragment.newInstance()
                     else -> UniversalFirewallFragment.newInstance()
                 }
             }
@@ -83,9 +83,9 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
         TabLayoutMediator(b.firewallActTabLayout,
                           b.firewallActViewpager) { tab, position -> // Styling each tab here
             tab.text = when (position) {
-                TAB_LAYOUT_UNIVERSAL -> getString(R.string.firewall_act_universal_tab)
-                TAB_LAYOUT_LOGS -> getString(R.string.firewall_act_network_monitor_tab)
-                TAB_LAYOUT_ALL_APPS -> getString(R.string.firewall_act_apps_tab)
+                FirewallTabs.UNIVERSAL.screen  -> getString(R.string.firewall_act_universal_tab)
+                FirewallTabs.LOGS.screen  -> getString(R.string.firewall_act_network_monitor_tab)
+                FirewallTabs.ALL_APPS.screen  -> getString(R.string.firewall_act_apps_tab)
                 else -> getString(R.string.firewall_act_universal_tab)
             }
         }.attach()
@@ -103,7 +103,7 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
             handleAccessibilitySettings()
         } else if (isNewAppInstalledIntent(intent)) {
             // navigate to all apps screen
-            b.firewallActViewpager.setCurrentItem(TAB_LAYOUT_ALL_APPS, true)
+            b.firewallActViewpager.setCurrentItem(FirewallTabs.ALL_APPS.screen, true)
         } else {
             // no-op
         }

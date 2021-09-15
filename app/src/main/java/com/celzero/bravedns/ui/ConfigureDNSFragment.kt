@@ -44,9 +44,6 @@ import com.celzero.bravedns.databinding.DialogSetDnsProxyBinding
 import com.celzero.bravedns.databinding.FragmentConfigureDnsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DNSCRYPT
-import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DOH
-import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_PROXY
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.isValidLocalPort
@@ -126,31 +123,34 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
         dnsProxyLayoutManager = LinearLayoutManager(requireContext())
         b.recyclerDnsProxyConnections.layoutManager = dnsProxyLayoutManager
 
-        dnsCryptRecyclerAdapter = DNSCryptEndpointAdapter(requireContext(), appMode)
+        dnsCryptRecyclerAdapter = DNSCryptEndpointAdapter(requireContext(), viewLifecycleOwner,
+                                                          appMode)
         dnsCryptViewModel.dnsCryptEndpointList.observe(viewLifecycleOwner,
                                                        androidx.lifecycle.Observer(
                                                            dnsCryptRecyclerAdapter::submitList))
         b.recyclerDnsCryptConnections.adapter = dnsCryptRecyclerAdapter
 
-        dnsCryptRelayRecyclerAdapter = DNSCryptRelayEndpointAdapter(requireContext(), appMode)
+        dnsCryptRelayRecyclerAdapter = DNSCryptRelayEndpointAdapter(requireContext(),
+                                                                    viewLifecycleOwner, appMode)
         dnsCryptRelayViewModel.dnsCryptRelayEndpointList.observe(viewLifecycleOwner,
                                                                  androidx.lifecycle.Observer(
                                                                      dnsCryptRelayRecyclerAdapter::submitList))
         b.recyclerDnsCryptRelays.adapter = dnsCryptRelayRecyclerAdapter
 
-        dohRecyclerAdapter = DoHEndpointAdapter(requireContext(), persistentState, appMode)
+        dohRecyclerAdapter = DoHEndpointAdapter(requireContext(), viewLifecycleOwner, appMode)
         viewModel.dohEndpointList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
             dohRecyclerAdapter::submitList))
         b.recyclerDohConnections.adapter = dohRecyclerAdapter
 
-        dnsProxyRecyclerAdapter = DNSProxyEndpointAdapter(requireContext(), appMode)
+        dnsProxyRecyclerAdapter = DNSProxyEndpointAdapter(requireContext(), viewLifecycleOwner,
+                                                          appMode)
         dnsProxyViewModel.dnsProxyEndpointList.observe(viewLifecycleOwner,
                                                        androidx.lifecycle.Observer(
                                                            dnsProxyRecyclerAdapter::submitList))
         b.recyclerDnsProxyConnections.adapter = dnsProxyRecyclerAdapter
 
         b.configureDnsProgressBar.visibility = View.GONE
-        val dnsValue = appMode.getDnsType()
+        val dnsValue = appMode.getDnsType().type
         // To select the spinner position
         b.configureScreenSpinner.setSelection(dnsValue - 1)
         showRecycler(dnsValue)
@@ -190,17 +190,17 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
 
     private fun showRecycler(position: Int) {
         when (position) {
-            PREF_DNS_MODE_DOH -> {
+            AppMode.DnsType.DOH.type -> {
                 b.recyclerDohConnectionsHeader.visibility = View.VISIBLE
                 b.recyclerDnsCryptConnectionsHeader.visibility = View.GONE
                 b.recyclerDnsProxyConnectionsHeader.visibility = View.GONE
             }
-            PREF_DNS_MODE_DNSCRYPT -> {
+            AppMode.DnsType.DNSCRYPT.type -> {
                 b.recyclerDohConnectionsHeader.visibility = View.GONE
                 b.recyclerDnsCryptConnectionsHeader.visibility = View.VISIBLE
                 b.recyclerDnsProxyConnectionsHeader.visibility = View.GONE
             }
-            PREF_DNS_MODE_PROXY -> {
+            AppMode.DnsType.DNS_PROXY.type -> {
                 b.recyclerDohConnectionsHeader.visibility = View.GONE
                 b.recyclerDnsCryptConnectionsHeader.visibility = View.GONE
                 b.recyclerDnsProxyConnectionsHeader.visibility = View.VISIBLE

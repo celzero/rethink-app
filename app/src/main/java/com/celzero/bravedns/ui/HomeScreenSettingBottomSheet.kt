@@ -25,6 +25,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.databinding.BottomSheetHomeScreenBinding
@@ -36,9 +37,9 @@ import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
@@ -204,8 +205,10 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun modifyBraveMode(braveMode: Int) {
-        CoroutineScope(Dispatchers.IO).launch {
-            appMode.changeBraveMode(braveMode)
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                appMode.changeBraveMode(braveMode)
+            }
         }
     }
 

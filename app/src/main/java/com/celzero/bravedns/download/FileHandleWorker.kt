@@ -78,7 +78,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
                 return false
             }
 
-            BlocklistDownloadHelper.deleteFromCanonicalPath(context)
+            BlocklistDownloadHelper.deleteFromCanonicalPath(context, timestamp)
             val dir = File(
                 BlocklistDownloadHelper.getExternalFilePath(context, timestamp.toString()))
             if (!dir.isDirectory) {
@@ -103,7 +103,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
                     return false
                 }
             }
-            val destinationDir = File("${context.filesDir.canonicalPath}/$timestamp")
+            val destinationDir = File("${context.filesDir.canonicalPath}${File.separator}$timestamp${File.separator}")
 
             Log.i(LOG_TAG_DOWNLOAD,
                   "After copy, dest dir: $destinationDir, ${destinationDir.isDirectory}, ${destinationDir.list()?.size}")
@@ -113,7 +113,6 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             }
 
             updatePersistenceOnCopySuccess(timestamp)
-            BlocklistDownloadHelper.deleteOldFiles(context)
             return true
 
         } catch (e: Exception) {
@@ -138,10 +137,10 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
     private fun isDownloadValid(timestamp: Long): Boolean {
         try {
             val path: String = context.filesDir.canonicalPath + File.separator + timestamp
-            val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE,
-                                                 path + Constants.FILE_RD_FILE,
-                                                 path + Constants.FILE_BASIC_CONFIG,
-                                                 path + Constants.FILE_TAG_NAME)
+            val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.ONDEVICE_BLOCKLIST_FILE_TD_FILE,
+                                                 path + Constants.ONDEVICE_BLOCKLIST_FILE_RD_FILE,
+                                                 path + Constants.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,
+                                                 path + Constants.ONDEVICE_BLOCKLIST_FILE_TAG_NAME)
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
                              "AppDownloadManager isDownloadValid? ${braveDNS != null}")
             return braveDNS != null

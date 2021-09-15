@@ -70,9 +70,4 @@ class DoHEndpoint {
         return Constants.RETHINK_DNS_PLUS == this.dohName
     }
 
-    fun isRethinkDns(): Boolean {
-        return (this.dohName.contains(Constants.BRAVE_DNS_BASE_NAME) || this.dohName.contains(
-            Constants.RETHINK_DNS_BASE_NAME))
-    }
-
 }

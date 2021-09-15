@@ -58,13 +58,15 @@ class DNSCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
         dnsCryptRelayLayoutManager = LinearLayoutManager(requireContext())
         b.recyclerDnsCryptRelays.layoutManager = dnsCryptRelayLayoutManager
 
-        dnsCryptRecyclerAdapter = DNSCryptEndpointAdapter(requireContext(), get())
+        dnsCryptRecyclerAdapter = DNSCryptEndpointAdapter(requireContext(), viewLifecycleOwner,
+                                                          get())
         dnsCryptViewModel.dnsCryptEndpointList.observe(viewLifecycleOwner,
                                                        androidx.lifecycle.Observer(
                                                            dnsCryptRecyclerAdapter::submitList))
         b.recyclerDnsCryptConnections.adapter = dnsCryptRecyclerAdapter
 
-        dnsCryptRelayRecyclerAdapter = DNSCryptRelayEndpointAdapter(requireContext(), get())
+        dnsCryptRelayRecyclerAdapter = DNSCryptRelayEndpointAdapter(requireContext(),
+                                                                    viewLifecycleOwner, get())
         dnsCryptRelayViewModel.dnsCryptRelayEndpointList.observe(viewLifecycleOwner,
                                                                  androidx.lifecycle.Observer(
                                                                      dnsCryptRelayRecyclerAdapter::submitList))

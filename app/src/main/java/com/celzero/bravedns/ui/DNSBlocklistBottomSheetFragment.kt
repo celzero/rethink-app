@@ -214,7 +214,9 @@ class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
     private fun formatText(groupNames: Multimap<String, String>): Spanned {
         var text = ""
         groupNames.keys().distinct().forEach {
-            val heading = it.capitalize(Locale.getDefault())
+            val heading = it.replaceFirstChar { a ->
+                if (a.isLowerCase()) a.titlecase(Locale.getDefault()) else a.toString()
+            }
             val size = groupNames.get(it).size
             text += getString(R.string.dns_btm_sheet_dialog_message, heading, size.toString(),
                               TextUtils.join(", ", groupNames.get(it)))

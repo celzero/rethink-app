@@ -97,7 +97,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         includeView.firewallUniversalRecycler.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(requireContext())
         includeView.firewallUniversalRecycler.layoutManager = layoutManager
-        recyclerRulesAdapter = UniversalBlockedRulesAdapter(requireContext(),
+        recyclerRulesAdapter = UniversalBlockedRulesAdapter(requireContext(), viewLifecycleOwner,
                                                             blockedConnectionsRepository)
         recyclerAdapter = WhitelistedAppsAdapter(requireContext())
         includeView.firewallUniversalRecycler.adapter = recyclerRulesAdapter

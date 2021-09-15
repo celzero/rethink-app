@@ -23,7 +23,6 @@ import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.data.IPDetails
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerRepository
-import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL_LOG
@@ -41,8 +40,8 @@ import java.net.InetAddress
 import java.util.*
 
 class IPTracker internal constructor(
-        private val connectionTrackerRepository: ConnectionTrackerRepository, private val context: Context) :
-        KoinComponent {
+        private val connectionTrackerRepository: ConnectionTrackerRepository,
+        private val context: Context) : KoinComponent {
 
 
     private val recentTrackers: Queue<IPDetails> = LinkedList()

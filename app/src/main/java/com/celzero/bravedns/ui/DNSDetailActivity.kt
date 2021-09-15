@@ -28,6 +28,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.google.android.material.tabs.TabLayoutMediator
+import okhttp3.Dns
 import org.koin.android.ext.android.inject
 
 class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
@@ -36,15 +37,17 @@ class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
     private val persistentState by inject<PersistentState>()
 
     companion object {
-        private const val TAB_LAYOUT_LOGS = 0
-        private const val TAB_LAYOUT_CONFIGURE = 1
         private const val TAB_LAYOUT_TOTAL_COUNT = 2
+    }
+
+    enum class DnsTabs(val screen: Int) {
+        LOGS(0), CONFIGURE(1)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-        fragmentIndex = intent.getIntExtra(Constants.SCREEN_TO_LOAD, fragmentIndex)
+        fragmentIndex = intent.getIntExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, fragmentIndex)
         init()
     }
 
@@ -52,8 +55,8 @@ class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
         b.dnsDetailActViewpager.adapter = object : FragmentStateAdapter(this) {
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
-                    TAB_LAYOUT_LOGS -> DNSLogFragment.newInstance()
-                    TAB_LAYOUT_CONFIGURE -> ConfigureDNSFragment.newInstance()
+                    DnsTabs.LOGS.screen -> DNSLogFragment.newInstance()
+                    DnsTabs.CONFIGURE.screen -> ConfigureDNSFragment.newInstance()
                     else -> ConfigureDNSFragment.newInstance()
                 }
             }
@@ -66,8 +69,8 @@ class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
         TabLayoutMediator(b.dnsDetailActTabLayout,
                           b.dnsDetailActViewpager) { tab, position -> // Styling each tab here
             tab.text = when (position) {
-                TAB_LAYOUT_LOGS -> getString(R.string.dns_act_log)
-                TAB_LAYOUT_CONFIGURE -> getString(R.string.dns_act_configure_tab)
+                DnsTabs.LOGS.screen -> getString(R.string.dns_act_log)
+                DnsTabs.CONFIGURE.screen -> getString(R.string.dns_act_configure_tab)
                 else -> getString(R.string.dns_act_configure_tab)
             }
         }.attach()

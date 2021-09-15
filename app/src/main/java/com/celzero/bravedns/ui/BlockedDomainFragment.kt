@@ -49,7 +49,7 @@ class BlockedDomainFragment : Fragment(R.layout.fragment_blocked_domain),
 
         layoutManager = LinearLayoutManager(requireContext())
         b.recyclerBlockedList.layoutManager = layoutManager
-        recyclerRulesAdapter = UniversalBlockedRulesAdapter(requireContext(),
+        recyclerRulesAdapter = UniversalBlockedRulesAdapter(requireContext(), viewLifecycleOwner,
                                                             blockedConnectionsRepository)
         b.recyclerBlockedList.adapter = recyclerRulesAdapter
 

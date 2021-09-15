@@ -168,7 +168,7 @@ enum class AndroidUidConfig(val uid: Int) {
 
     USER(100000),
     USER_OFFSET(100000),
-    OTHER(-1);
+    OTHER(Constants.INVALID_UID);
 
 
     companion object {

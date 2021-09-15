@@ -42,11 +42,14 @@ class ExcludedAppListAdapter(private val context: Context) :
 
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<AppInfo>() {
 
-            override fun areItemsTheSame(oldConnection: AppInfo,
-                                         newConnection: AppInfo) = oldConnection.packageInfo == newConnection.packageInfo
+            override fun areItemsTheSame(oldConnection: AppInfo, newConnection: AppInfo): Boolean {
+                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.isExcluded == newConnection.isExcluded)
+            }
 
             override fun areContentsTheSame(oldConnection: AppInfo,
-                                            newConnection: AppInfo) = oldConnection == newConnection
+                                            newConnection: AppInfo): Boolean {
+                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.isExcluded != newConnection.isExcluded)
+            }
         }
     }
 

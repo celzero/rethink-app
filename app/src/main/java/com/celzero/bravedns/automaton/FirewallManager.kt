@@ -68,12 +68,12 @@ object FirewallManager : KoinComponent {
         var appInfosLiveData: MutableLiveData<Collection<AppInfo>> = MutableLiveData()
     }
 
-    data class AppInfoTuple(val uid: Int, val packageName: String)
+    data class AppInfoTuple(val uid: Int, var packageName: String)
 
     @Volatile private var isFirewallRulesLoaded: Boolean = false
 
     fun isUidFirewalled(uid: Int): Boolean {
-         return appStatus(uid) == AppStatus.BLOCKED
+        return appStatus(uid) == AppStatus.BLOCKED
     }
 
     fun isUidWhitelisted(uid: Int): Boolean {
@@ -144,8 +144,8 @@ object FirewallManager : KoinComponent {
         return appInfosLiveData
     }
 
-    fun getExcludedApps(): List<String> {
-        return getAppInfosLocked().filter { it.isExcluded }.map { it.packageInfo }
+    fun getExcludedApps(): MutableSet<String> {
+        return getAppInfosLocked().filter { it.isExcluded }.map { it.packageInfo }.toMutableSet()
     }
 
     fun getPackageNameByAppName(appName: String): String? {
@@ -229,6 +229,7 @@ object FirewallManager : KoinComponent {
         lock.write {
             appInfos.get(uid).forEach {
                 it.isExcluded = isExcluded
+                it.whiteListUniv1 = it.whiteListUniv1 && !it.isExcluded
                 it.isInternetAllowed = it.isInternetAllowed || it.isExcluded
             }
         }
@@ -254,7 +255,7 @@ object FirewallManager : KoinComponent {
         informObservers()
     }
 
-    private suspend fun reloadAppList() {
+    suspend fun reloadAppList() {
         val apps = appInfoRepository.getAppInfo()
         if (apps.isEmpty()) {
             Log.w(LOG_TAG_FIREWALL, "no apps found in db, no app-based rules to load")
@@ -312,12 +313,12 @@ object FirewallManager : KoinComponent {
             // Adding the category name to a set
             // as of now, the invalidateCachedAppStatuses accepts category names as set
             // This is because, the ui behaviour for whitelist/exclude/block are different.
-            val set: MutableSet<String> = HashSet()
+            val set: MutableSet<String> = mutableSetOf()
             set.add(categoryInfo.categoryName)
-            invalidateCachedAppStatuses(AppStatus.BLOCKED, isInternetBlocked)
+            invalidateCachedAppStatuses(set, AppStatus.BLOCKED, isInternetBlocked)
 
             val count = getBlockedCountForCategory(categoryInfo.categoryName)
-            if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Apps updated : $count, $isInternetBlocked")
+            if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Apps updated: $count, $isInternetBlocked")
             // Update the category's internet blocked based on the app's count which is returned
             // from the app info database.
             categoryInfoRepository.updateCategoryDetails(categoryInfo.categoryName, count,
@@ -349,7 +350,7 @@ object FirewallManager : KoinComponent {
                 }
             }
 
-            invalidateCachedAppStatuses(AppStatus.EXCLUDED, checked)
+            invalidateCachedAppStatuses(filterCategories, AppStatus.EXCLUDED, checked)
         }
     }
 
@@ -372,19 +373,26 @@ object FirewallManager : KoinComponent {
                 }
             }
 
-            invalidateCachedAppStatuses(AppStatus.WHITELISTED, checked)
+            invalidateCachedAppStatuses(filterCategories, AppStatus.WHITELISTED, checked)
         }
     }
 
-    private fun invalidateCachedAppStatuses(state: AppStatus, checked: Boolean) {
+    private fun invalidateCachedAppStatuses(filterCategories: Set<String>, state: AppStatus, checked: Boolean) {
         lock.write {
             appInfos.values().forEach {
+                if (filterCategories.isNotEmpty() && !filterCategories.contains(it.appCategory)) return@forEach
                 // modify the appInfos based on the state.
                 if (checked) {
                     when (state) {
                         AppStatus.BLOCKED -> it.isInternetAllowed = false
-                        AppStatus.WHITELISTED -> it.whiteListUniv1 = true
-                        AppStatus.EXCLUDED -> it.isExcluded = true
+                        AppStatus.WHITELISTED -> {
+                            it.whiteListUniv1 = true
+                            it.isExcluded = false
+                        }
+                        AppStatus.EXCLUDED -> {
+                            it.isExcluded = true
+                            it.whiteListUniv1 = false
+                        }
                         else -> { /* no-op */
                         }
                     }
@@ -451,6 +459,7 @@ object FirewallManager : KoinComponent {
 
     private fun getAppInfosLocked(): MutableCollection<AppInfo> {
         lock.read {
+            Log.d("TEST","TEST values: ${appInfos.values().map { it.isInternetAllowed }}")
             return appInfos.values()
         }
     }

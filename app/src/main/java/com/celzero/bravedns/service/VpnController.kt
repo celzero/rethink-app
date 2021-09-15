@@ -23,9 +23,8 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.sync.Mutex
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -35,6 +34,8 @@ object VpnController : KoinComponent {
     private var braveVpnService: BraveVPNService? = null
     private var connectionState: BraveVPNService.State? = null
     private val persistentState by inject<PersistentState>()
+    private var states: Channel<BraveVPNService.State?>? = null
+    private var controllerScope: CoroutineScope? = null
 
     val mutex: Mutex = Mutex()
 
@@ -45,32 +46,52 @@ object VpnController : KoinComponent {
         throw CloneNotSupportedException()
     }
 
-    fun setBraveVpnService(braveVpnService: BraveVPNService?) {
-        VpnController.braveVpnService = braveVpnService
+    fun onVpnCreated(b: BraveVPNService) {
+        braveVpnService = b
+        controllerScope = CoroutineScope(Dispatchers.IO)
+        states = Channel(Channel.UNLIMITED)
+
+        controllerScope!!.launch {
+            states!!.consumeEach { state ->
+                if (BraveVPNService.State.PAUSED != connectionState) {
+                    updateState(state)
+                    return@consumeEach
+                }
+                // transition from paused connection state only on NEW/NULL
+                when (state) {
+                    null -> {
+                        updateState(null)
+                    }
+                    BraveVPNService.State.NEW -> {
+                        updateState(state)
+                    }
+                    else -> {
+                        return@consumeEach
+                    }
+                }
+            }
+        }
+    }
+
+    fun onVpnDestroyed() {
+        braveVpnService = null
+        controllerScope?.cancel("stop")
+        states?.cancel()
     }
 
     fun getBraveVpnService(): BraveVPNService? {
         return braveVpnService
     }
 
-    @ExperimentalCoroutinesApi
-    fun CoroutineScope.serializeState(
-            state: BraveVPNService.State?): ReceiveChannel<BraveVPNService.State?> = produce {
-        val u = if (braveVpnService == null) {
-            null // User clicked disable while the connection state was changing.
-        } else {
-            state
+    fun onConnectionStateChanged(state: BraveVPNService.State?) {
+        controllerScope?.launch {
+            states?.send(state)
         }
-        send(u)
     }
 
-    fun onConnectionStateChanged(state: BraveVPNService.State?) {
-        runBlocking(Job() + Dispatchers.IO) {
-            serializeState(state).consumeEach {
-                connectionState = it
-                connectionStatus.postValue(it)
-            }
-        }
+    private fun updateState(state: BraveVPNService.State?) {
+        connectionState = state
+        connectionStatus.postValue(state)
     }
 
     fun start(context: Context) {
@@ -79,6 +100,7 @@ object VpnController : KoinComponent {
             Log.i(LOG_TAG_VPN, "braveVPNService is not null")
             return
         }
+
         val startServiceIntent = Intent(context, BraveVPNService::class.java)
         if (isAtleastO()) {
             context.startForegroundService(startServiceIntent)

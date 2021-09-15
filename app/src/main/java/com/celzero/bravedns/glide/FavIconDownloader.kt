@@ -63,7 +63,7 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
             context.applicationContext).downloadOnly().diskCacheStrategy(
             DiskCacheStrategy.AUTOMATIC).load(subUrl).submit(SIZE_ORIGINAL, SIZE_ORIGINAL)
         try {
-            val file = futureTarget.get()
+            futureTarget.get()
             if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - success() -$subUrl, $url")
         } catch (e: Exception) {
             // In case of failure the FutureTarget will throw an exception.

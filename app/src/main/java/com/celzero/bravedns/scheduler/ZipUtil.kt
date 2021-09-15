@@ -21,7 +21,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.MAX_NUMBER_FILES_ALLOWED
+import com.celzero.bravedns.util.Constants.Companion.BUG_REPORT_MAX_FILES_ALLOWED
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_SCHEDULER
 import com.celzero.bravedns.util.Utilities
 import com.google.common.io.Files
@@ -49,7 +49,7 @@ class ZipUtil {
 
             val nextFileNumber = zipFile.entries().toList().size
 
-            if (nextFileNumber >= MAX_NUMBER_FILES_ALLOWED) {
+            if (nextFileNumber >= BUG_REPORT_MAX_FILES_ALLOWED) {
                 val f = File(getOlderFile(zipFile))
                 val fileName = Files.getNameWithoutExtension(f.name)
                 return constructFileName(filePath, fileName)

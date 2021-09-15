@@ -34,11 +34,11 @@ import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_FDROID
-import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities.Companion.getThemeAccent
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
+import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
+import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
 import kotlinx.coroutines.*
 import java.util.concurrent.TimeUnit
 
@@ -125,8 +125,8 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
     }
 
 
-    fun getIntentForDownload(mode: Int): Intent? {
-        if (mode == DOWNLOAD_SOURCE_PLAY_STORE) { //For play store
+    fun getIntentForDownload(): Intent? {
+        if (isPlayStoreFlavour()) { //For play store
             var intent = Intent(Intent.ACTION_VIEW)
             intent.data = Uri.parse(ORBOT_MARKET_URI)
 
@@ -148,10 +148,8 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
             intent.setPackage(foundPackageName)
             return intent
 
-        } else if (mode == DOWNLOAD_SOURCE_FDROID) {  //For fdroid
-            // Orbot is not available in fDroid for now, So commenting the below code
-            // and taking the user to website download link.
-            // Will add the below commented code in later versions if the fdroid added Orbot.
+        } else if (isFdroidFlavour()) {  //For fdroid
+            // Orbot is not available in fDroid for now, So taking the user to website download link.
             return Intent(Intent.ACTION_VIEW,
                           context.resources.getString(R.string.orbot_download_link_website).toUri())
         } else {
@@ -182,7 +180,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
         isResponseReceivedFromOrbot = false
         context.registerReceiver(orbotStatusReceiver, IntentFilter(ACTION_STATUS))
         context.sendBroadcast(intent)
-        timeOutForOrbot()
+        waitForOrbot()
         if (DEBUG) Log.d(LOG_TAG_VPN, "Settings - Orbot - requestOrbotStatus")
     }
 
@@ -380,8 +378,8 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
      * Create a ScheduledExecutorService which will be executed after 30 sec of Orbot status
      * initiation.
      */
-    private suspend fun timeOutForOrbot() {
-        withContext(Dispatchers.IO) {
+    private suspend fun waitForOrbot() {
+        uiCtx {
             delay(TimeUnit.SECONDS.toMillis(25L))
             Log.i(LOG_TAG_VPN, "after timeout, isOrbotUp? $isResponseReceivedFromOrbot")
 
@@ -437,7 +435,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
         }
     }
 
-    private suspend fun uiCtx(f: () -> Unit) {
+    private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) {
             f()
         }

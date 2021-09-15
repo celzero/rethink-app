@@ -182,7 +182,7 @@ class Utilities {
             // order.  Therefore, to convert from a country code to a flag, we simply need to apply an
             // offset to each character, shifting it from the normal A-Z range into the region indicator
             // symbol letter range.
-            val alphaBase = 'A'.toInt() // Start of alphabetic country code characters.
+            val alphaBase = 'A'.code // Start of alphabetic country code characters.
             val flagBase = 0x1F1E6 // Start of regional indicator symbol letters.
             val offset = flagBase - alphaBase
             val firstHalf = Character.codePointAt(countryCode, 0) + offset
@@ -497,11 +497,11 @@ class Utilities {
         }
 
         fun localBlocklistDownloadPath(ctx: Context, which: String, timestamp: Long): String {
-            return ctx.filesDir.canonicalPath + File.separator + timestamp + which
+            return ctx.filesDir.canonicalPath + File.separator + timestamp + File.separator + which
         }
 
         fun hasLocalBlocklists(ctx: Context, timestamp: Long): Boolean {
-            val a = Constants.LOCAL_BLOCKLISTS.all {
+            val a = Constants.ONDEVICE_BLOCKLISTS.all {
                 localBlocklistFile(ctx, it.filename, timestamp)?.exists() == true
             }
             return a

@@ -43,7 +43,7 @@ class WhitelistAppDialog(val activity: Activity, val adapter: RecyclerView.Adapt
     private lateinit var b: CustomDialogLayoutBinding
 
     private var mLayoutManager: RecyclerView.LayoutManager? = null
-    private var filterCategories: MutableSet<String> = HashSet()
+    private var filterCategories: MutableSet<String> = mutableSetOf()
     private var category: List<String> = ArrayList()
 
     private val CATEGORY_FILTER_CONST = "category:"

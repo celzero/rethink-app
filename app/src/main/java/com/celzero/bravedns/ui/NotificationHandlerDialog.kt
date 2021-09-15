@@ -1,26 +1,39 @@
+/*
+ * Copyright 2021 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.celzero.bravedns.ui
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.FIREWALL_SCREEN_ALL_APPS
-import com.celzero.bravedns.util.Themes
-import org.koin.android.ext.android.inject
 
 class NotificationHandlerDialog : AppCompatActivity() {
-    enum class DialogType {
-        ACCESSIBILITY, NEWAPPINSTALL, NONE
+    enum class TrampolineType {
+        ACCESSIBILITY_SERVICE_FAILURE_DIALOG,
+        NEW_APP_INSTAL_DIALOG,
+        HOMESCREEN_ACTIVITY,
+        PAUSE_ACTIVITY,
+        NONE
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,35 +50,47 @@ class NotificationHandlerDialog : AppCompatActivity() {
     // firewall activity from notification action. Need to handle the pause state for those cases
     private fun handleNotificationIntent(intent: Intent) {
 
-        val isAccessibility = isAccessibilityIntent(intent)
-        val isNewApp = isNewAppInstalledIntent(intent)
-
-        val dialogType = if (isAccessibility) {
-            DialogType.ACCESSIBILITY
-        } else if(isNewApp) {
-            DialogType.NEWAPPINSTALL
-        } else {
-            DialogType.NONE
+        when (determineTrampoline(intent)) {
+            TrampolineType.ACCESSIBILITY_SERVICE_FAILURE_DIALOG -> {
+                handleAccessibilitySettings()
+            }
+            TrampolineType.NEW_APP_INSTAL_DIALOG -> {
+                // navigate to all apps screen
+                launchFirewallActivity()
+            }
+            TrampolineType.HOMESCREEN_ACTIVITY -> {
+                launchHomeScreen()
+            }
+            TrampolineType.PAUSE_ACTIVITY -> {
+                showAppPauseDialog(receivedIntentType(intent))
+            }
+            TrampolineType.NONE -> {
+                // no-op
+            }
         }
+    }
 
+    private fun receivedIntentType(intent: Intent): TrampolineType {
+        return if (isAccessibilityIntent(intent)) {
+            TrampolineType.ACCESSIBILITY_SERVICE_FAILURE_DIALOG
+        } else if (isNewAppInstalledIntent(intent)) {
+            TrampolineType.NEW_APP_INSTAL_DIALOG
+        } else {
+            TrampolineType.NONE
+        }
+    }
+
+    private fun determineTrampoline(intent: Intent): TrampolineType {
         // app not started launch home screen
         if (!VpnController.isOn()) {
-            launchHomeScreen()
+            return TrampolineType.HOMESCREEN_ACTIVITY
         }
 
         if (VpnController.isAppPaused()) {
-            showAppPauseDialog(dialogType)
-            return
+            return TrampolineType.PAUSE_ACTIVITY
         }
 
-        if (isAccessibility) {
-            handleAccessibilitySettings()
-        } else if (isNewApp) {
-            // navigate to all apps screen
-            launchFirewallActivity()
-        } else {
-            // no-op
-        }
+        return receivedIntentType(intent)
     }
 
     private fun launchHomeScreen() {
@@ -76,7 +101,7 @@ class NotificationHandlerDialog : AppCompatActivity() {
     private fun launchFirewallActivity() {
         val intent = Intent(this, FirewallActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-        intent.putExtra(Constants.SCREEN_TO_LOAD, FIREWALL_SCREEN_ALL_APPS)
+        intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, FirewallActivity.FirewallTabs.ALL_APPS.screen)
         startActivity(intent)
         finish()
     }
@@ -89,7 +114,8 @@ class NotificationHandlerDialog : AppCompatActivity() {
             getString(R.string.univ_accessibility_crash_dialog_positive)) { _, _ ->
             openRethinkAppInfo(this)
         }
-        builder.setNegativeButton(getString(R.string.univ_accessibility_crash_dialog_negative)) { _, _ ->
+        builder.setNegativeButton(
+            getString(R.string.univ_accessibility_crash_dialog_negative)) { _, _ ->
             finish()
         }
         builder.setCancelable(false)
@@ -97,8 +123,6 @@ class NotificationHandlerDialog : AppCompatActivity() {
         builder.create().show()
     }
 
-    // FIXME: Add appropriate to ensure back button navigation.
-    // Today, if user presses back from settings screen, it naivgates to launcher instead
     private fun openRethinkAppInfo(context: Context) {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
         val packageName = context.packageName
@@ -106,7 +130,7 @@ class NotificationHandlerDialog : AppCompatActivity() {
         ContextCompat.startActivity(context, intent, null)
     }
 
-    private fun showAppPauseDialog(dialogType: DialogType) {
+    private fun showAppPauseDialog(trampolineType: TrampolineType) {
         val builder = AlertDialog.Builder(this)
 
         builder.setTitle(R.string.notif_dialog_pause_dialog_title)
@@ -115,9 +139,16 @@ class NotificationHandlerDialog : AppCompatActivity() {
         builder.setCancelable(false)
         builder.setPositiveButton(R.string.notif_dialog_pause_dialog_positive) { _, _ ->
             VpnController.getBraveVpnService()?.resumeApp()
-            when (dialogType) {
-                DialogType.ACCESSIBILITY -> { handleAccessibilitySettings() }
-                DialogType.NEWAPPINSTALL -> { launchFirewallActivity() }
+            when (trampolineType) {
+                TrampolineType.ACCESSIBILITY_SERVICE_FAILURE_DIALOG -> {
+                    handleAccessibilitySettings()
+                }
+                TrampolineType.NEW_APP_INSTAL_DIALOG -> {
+                    launchFirewallActivity()
+                }
+                else -> {
+                    // no-op
+                }
             }
         }
 

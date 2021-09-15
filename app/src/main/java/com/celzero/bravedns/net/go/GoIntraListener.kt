@@ -1,3 +1,19 @@
+/*
+ * Copyright 2019 Jigsaw Operations LLC
+ * Copyright 2021 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.celzero.bravedns.net.go
 
 import android.os.SystemClock
@@ -73,7 +89,7 @@ object GoIntraListener : Listener, KoinComponent {
 
     override fun onDNSCryptResponse(summary: Summary?) {
         if (summary == null) {
-            Log.i(LOG_TAG_DNS_LOG, "received dnscrypt summary is null")
+            Log.i(LOG_TAG_DNS_LOG, "received null dnscrypt summary")
             return
         }
 
@@ -106,7 +122,7 @@ object GoIntraListener : Listener, KoinComponent {
             // ignore tokens, not used
         }
         if (summary == null) {
-            Log.i(LOG_TAG_DNS_LOG, "received doh summary is null")
+            Log.i(LOG_TAG_DNS_LOG, "received null doh summary")
             return
         }
 
@@ -150,9 +166,6 @@ object GoIntraListener : Listener, KoinComponent {
 
     private fun updateVpnConnectionState(transaction: Transaction?) {
         if (transaction == null) return
-
-        // No need to update the connection state when the app is in pause state
-        if (VpnController.isAppPaused()) return
 
         // Update the connection state.  If the transaction succeeded, then the connection is working.
         // If the transaction failed, then the connection is not working.

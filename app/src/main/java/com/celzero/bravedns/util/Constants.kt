@@ -23,106 +23,142 @@ import java.util.concurrent.TimeUnit
 class Constants {
 
     companion object {
-        // Download path and file names
-        val DOWNLOAD_PATH = File.separator + "downloads" + File.separator
+        // on-device blocklist download path
+        val ONDEVICE_BLOCKLIST_DOWNLOAD_PATH = File.separator + "downloads" + File.separator
 
-        val FILE_TAG_NAME = File.separator + "filetag.json"
-        val FILE_BASIC_CONFIG = File.separator + "basicconfig.json"
-        val FILE_RD_FILE = File.separator + "rd.txt"
-        val FILE_TD_FILE = File.separator + "td.txt"
+        // file names which are downloaded as part of on-device blocklists
+        val ONDEVICE_BLOCKLIST_FILE_TAG_NAME = File.separator + "filetag.json"
+        val ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG = File.separator + "basicconfig.json"
+        val ONDEVICE_BLOCKLIST_FILE_RD_FILE = File.separator + "rd.txt"
+        val ONDEVICE_BLOCKLIST_FILE_TD_FILE = File.separator + "td.txt"
 
-        //Download URLs
-        const val JSON_DOWNLOAD_BLOCKLIST_LINK = "https://download.rethinkdns.com/blocklists"
+        // url to check to check the if there is update available for on-device blocklist
+        const val ONDEVICE_BLOCKLIST_UPDATE_CHECK_URL = "https://download.rethinkdns.com/update/blocklists?tstamp="
 
-        const val REFRESH_BLOCKLIST_URL = "https://download.bravedns.com/update/blocklists?tstamp="
-        const val APP_DOWNLOAD_AVAILABLE_CHECK = "https://download.rethinkdns.com/update/app?vcode="
-        const val CONFIGURE_BLOCKLIST_URL = "https://rethinkdns.com/configure?v=app"
-        const val CONFIGURE_BLOCKLIST_URL_PARAMETER = "tstamp"
+        // url parameter, part of update check for on-device blocklist
+        const val ONDEVICE_BLOCKLIST_UPDATE_CHECK_PARAMETER_VCODE = "vcode="
 
-        // The version tag value(response) for the update check.
-        const val RESPONSE_VERSION = 1
+        // url to check if there is app-update is available (this is for website version only)
+        const val RETHINK_APP_UPDATE_CHECK = "https://download.rethinkdns.com/update/app?vcode="
 
-        data class LocalBlocklistsMetadata(val url: String, val filename: String)
+        // url to launch the blocklist (remote/on-device) configure screen
+        const val RETHINK_BLOCKLIST_CONFIGURE_URL = "https://rethinkdns.com/configure?v=app"
 
-        val LOCAL_BLOCKLISTS = listOf(
-            LocalBlocklistsMetadata("https://download.rethinkdns.com/blocklists", FILE_TAG_NAME),
-            LocalBlocklistsMetadata("https://download.rethinkdns.com/basicconfig",
-                                    FILE_BASIC_CONFIG),
-            LocalBlocklistsMetadata("https://download.rethinkdns.com/rank", FILE_RD_FILE),
-            LocalBlocklistsMetadata("https://download.rethinkdns.com/trie", FILE_TD_FILE))
+        // url parameter used in configure blocklist webview
+        const val RETHINK_BLOCKLIST_CONFIGURE_URL_PARAMETER = "tstamp"
 
-        // Earlier the link was https://bravedns.com/downloads
-        // modified below link post v053c release
-        const val APP_DOWNLOAD_LINK = "https://rethinkdns.com/download"
+        // The version tag value(response) for the update check (both on-device and app update)
+        // TODO: have two different response versions for blocklist update and app update
+        const val UPDATE_CHECK_RESPONSE_VERSION = 1
 
+        // meta data for on-device blocklist
+        data class OnDeviceBlocklistsMetadata(val url: String, val filename: String)
+
+        val ONDEVICE_BLOCKLISTS = listOf(
+            OnDeviceBlocklistsMetadata("https://download.rethinkdns.com/blocklists",
+                                       ONDEVICE_BLOCKLIST_FILE_TAG_NAME),
+            OnDeviceBlocklistsMetadata("https://download.rethinkdns.com/basicconfig",
+                                       ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG),
+            OnDeviceBlocklistsMetadata("https://download.rethinkdns.com/rank",
+                                       ONDEVICE_BLOCKLIST_FILE_RD_FILE),
+            OnDeviceBlocklistsMetadata("https://download.rethinkdns.com/trie",
+                                       ONDEVICE_BLOCKLIST_FILE_TD_FILE))
+
+        // url to download the rethinkdns apk file
+        const val RETHINK_APP_DOWNLOAD_LINK = "https://rethinkdns.com/download"
+
+        // base-url for bravedns
         const val BRAVE_BASE_STAMP = "https://basic.bravedns.com/"
-        const val BRAVE_CONFIGURE_BASE_STAMP = "rethinkdns.com/configure"
 
-        const val BRAVE_BASIC_URL = "bravedns.com"
-        const val RETHINK_BASIC_URL = "rethinkdns.com"
-        const val APPEND_VCODE = "vcode="
+        // base-url stamp for configure blocklist
+        const val RETHINK_BLOCKLIST_CONFIGURE_BASE_STAMP = "rethinkdns.com/configure"
 
-        //constants for the server response json
+        // base-url for bravedns
+        const val BRAVE_BASE_URL = "bravedns.com"
+
+        // base-url for rethinkdns
+        const val RETHINK_BASE_URL = "rethinkdns.com"
+
+        // json object constants received as part of update check
+        // FIXME: Avoid usage of these parameters, map to POJO instead
         const val JSON_VERSION = "version"
         const val JSON_UPDATE = "update"
         const val JSON_LATEST = "latest"
 
-        //Firewall system components
+        // Firewall app category constants
+        // category: system components
         const val APP_CAT_SYSTEM_COMPONENTS = "System Components"
+
+        // category: system apps
         const val APP_CAT_SYSTEM_APPS = "System Apps"
+
+        // category: others
         const val APP_CAT_OTHER = "Other"
+
+        // category: non-app system
         const val APP_NON_APP = "Non-App System"
+
+        // category: installed apps
         const val INSTALLED_CAT_APPS = "Installed Apps"
+
+        // app type unknown
         const val UNKNOWN_APP = "Unknown"
 
-        //No package applications
+        // No package applications
         const val NO_PACKAGE = "no_package"
 
         // Number of network log entries to store in the database.
         const val TOTAL_NETWORK_LOG_ENTRIES_THRESHOLD = 5000
 
+        // invalid application uid
         const val INVALID_UID = -1
+
+        // missing uid, used when the uid is undermined. see ConnectionTracer#getUidQ()
         const val MISSING_UID = -2000
 
+        // label for rethinkdns plus doh endpoint
         const val RETHINK_DNS_PLUS = "RethinkDNS Plus"
-        const val RETHINK_DNS = "RethinkDNS Basic (default)"
 
-        const val BRAVE_DNS_BASE_NAME = "bravedns"
-        const val RETHINK_DNS_BASE_NAME = "rethinkdns"
-
-        // maximum time delay before sending block connection response.
+        // maximum time delay before sending block connection response
         val DELAY_FIREWALL_RESPONSE_MS: Long = TimeUnit.SECONDS.toMillis(30)
 
-        const val REFRESH_APP_DURATION = 3L
+        // constants used as part of intent to load the viewpager's screen
+        const val VIEW_PAGER_SCREEN_TO_LOAD = "view_pager_screen"
 
-        const val SCREEN_TO_LOAD = "view_pager_screen"
+        // name-value to pass as part of intent
+        // determines whether launched from local/remote
+        const val BLOCKLIST_LOCATION_INTENT_EXTRA = "location"
 
-        const val LOCATION_INTENT_EXTRA = "location"
-        const val STAMP_INTENT_EXTRA = "stamp"
-        const val URL_INTENT_EXTRA = "url"
+        // stamp name-value for blocklist configure screen
+        const val BLOCKLIST_STAMP_INTENT_EXTRA = "stamp"
 
-        const val VPN_INTENT = "android.net.vpn.SETTINGS"
+        // url name-value for blocklist configure screen
+        const val BLOCKLIST_URL_INTENT_EXTRA = "url"
 
+        // default custom http proxy port number
         const val HTTP_PROXY_PORT = "8118"
 
+        // default custom socks5 ip
         const val SOCKS_DEFAULT_IP = "127.0.0.1"
+
+        // default custom socks5 port
         const val SOCKS_DEFAULT_PORT = "9050"
+
+        // constants to send type of proxy: for socks5
         const val SOCKS = "Socks5"
 
+        // data-time format used as part of network log adapter
         const val DATE_FORMAT_PATTERN = "HH:mm:ss"
 
+        // represents the orbot proxy mode (see AppMode#ProxyMode)
         const val ORBOT_PROXY = 10L
 
-        // Represents the download source of the application. playstore/fdroid/website
-        const val DOWNLOAD_SOURCE_PLAY_STORE = 1
-        const val DOWNLOAD_SOURCE_FDROID = 2
-        const val DOWNLOAD_SOURCE_WEBSITE = 3
-
-        // Constants generated as part of BuildConfig.FLAVORS
+        // constants generated as part of BuildConfig.FLAVORS (playstore/fdroid/website)
         const val FLAVOR_PLAY = "play"
         const val FLAVOR_FDROID = "fdroid"
         const val FLAVOR_WEBSITE = "website"
 
+        // represents the unknown port in the port map. see class KnownPorts
         const val PORT_VAL_UNKNOWN = "unknown"
 
         // Various notification action constants used part of NotificationCompat.Action
@@ -133,35 +169,27 @@ class Constants {
         const val NOTIF_ACTION_DNS_VPN = "RETHINK_DNSONLY" // battery-saver dns-only
         const val NOTIF_ACTION_DNS_FIREWALL_VPN = "RETHINK_FULLMODE" // default dns+firewall
         const val NOTIF_ACTION_RULES_FAILURE = "RETHINK_RULES_RELOAD" // load rules failure
+        const val NOTIF_ACTION_NEW_APP_ALLOW = "NEW_APP_ALLOW" // allow network access for new apps
+        const val NOTIF_ACTION_NEW_APP_DENY = "NEW_APP_DENY" // deny network access for new apps
 
-        const val NOTIF_ACTION_NEW_APP_ALLOW = "NEW_APP_ALLOW"
-        const val NOTIF_ACTION_NEW_APP_DENY = "NEW_APP_DENY"
+        // various notification intent extra name/values used part of notification's pending-intent
+        const val NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME = "ACCESSIBILITY" // accessibility failure name
+        const val NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE = "ACCESSIBILITY_FAILURE" // accessibility failure value
+        const val NOTIF_INTENT_EXTRA_NEW_APP_NAME = "NEW_APP" // new app install name
+        const val NOTIF_INTENT_EXTRA_NEW_APP_VALUE = "NEW_APP_INSTALL_NOTIFY" // new app install value
 
-        const val NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME = "ACCESSIBILITY_GRANT"
-        const val NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE = "ACCESSIBILITY_FAILURE"
-
-        const val NOTIF_INTENT_EXTRA_NEW_APP_NAME = "NEW_APP_INSTALL"
-        const val NOTIF_INTENT_EXTRA_NEW_APP_VALUE = "NEW_APP_INSTALL_SOURCE"
-
+        // new app install intent extra name for uid. see RefreshDatabase#makeNewAppVpnIntent()
         const val NOTIF_INTENT_EXTRA_APP_UID = "NEW_APP_UID"
 
+        // DNS message type received by the DNS resolver
         const val NXDOMAIN = "NXDOMAIN"
 
         // Maximum time out for the DownloadManager to wait for download of local blocklist.
         // The time out value is set as 40 minutes.
         val WORK_MANAGER_TIMEOUT = TimeUnit.MINUTES.toMillis(40)
 
+        // base-url for fav icon download
         const val FAV_ICON_URL = "https://icons.duckduckgo.com/ip2/"
-
-        // Notification action buttons
-        const val NOTIFICATION_ACTION_STOP = 0
-        const val NOTIFICATION_ACTION_DNS_FIREWALL = 1
-        const val NOTIFICATION_ACTION_NONE = 2
-
-        // DNS TYPES
-        const val PREF_DNS_MODE_PROXY = 3
-        const val PREF_DNS_MODE_DNSCRYPT = 2
-        const val PREF_DNS_MODE_DOH = 1
 
         // The minimum interval before checking if the internal accessibility service
         // (used to block apps-not-in-use) is indeed running.
@@ -174,46 +202,48 @@ class Constants {
         const val FILTER_IS_FILTER = "isFilter"
         const val FILTER_CATEGORY = "category:"
 
+        // IPv4 uses 0.0.0.0 as an unspecified address
         const val UNSPECIFIED_IP = "0.0.0.0"
+        // special port number not assigned to any app
         const val UNSPECIFIED_PORT = 0
 
+        // IPv6 uses ::0 as an unspecified address
         const val UNSPECIFIED_IPV6 = "::0"
+        // IPv6 loopback address
         const val LOOPBACK_IPV6 = "::1"
 
         // Invalid port number
         const val INVALID_PORT = -1
 
+        // intent for settings->vpn screen
         const val ACTION_VPN_SETTINGS_INTENT = "android.net.vpn.SETTINGS"
 
-        // For DNS screen, the tabs for FragmentStateAdapter to load.
-        const val DNS_SCREEN_LOGS = 0
-        const val DNS_SCREEN_CONFIG = 1
-
-        // For Firewall screen, the tabs for FragmentStateAdapter to load.
-        const val FIREWALL_SCREEN_UNIVERSAL = 0
-        const val FIREWALL_SCREEN_LOG = 1
-        const val FIREWALL_SCREEN_ALL_APPS = 2
-
+        // default live data page size used by recycler views
         const val LIVEDATA_PAGE_SIZE = 50
+        // dns logs live data page size
         const val DNS_LIVEDATA_PAGE_SIZE = 30
 
-        // Download status
+        // various download status used as part of Work manager. see DownloadWatcher#checkForDownload()
         const val DOWNLOAD_FAILURE = -1
         const val DOWNLOAD_SUCCESS = 1
         const val DOWNLOAD_RETRY = 0
 
-        // To initiate / reset the timestamp in milliseconds.
+        // To initiate / reset the timestamp in milliseconds
         const val INIT_TIME_MS = 0L
 
-        // Bug report text file
+        // Bug report file and directory constants
         const val BUG_REPORT_DIR_NAME = "bugreport/"
         const val BUG_REPORT_ZIP_FILE_NAME = "rethinkdns.bugreport.zip"
         const val BUG_REPORT_FILE_NAME = "bugreport_"
 
-        const val MAX_NUMBER_FILES_ALLOWED = 5
+        // maximum number of files allowed as part of bugreport zip file
+        const val BUG_REPORT_MAX_FILES_ALLOWED = 20
 
+        // secure sharing of files associated with an app, used in share bugreport file feature
         const val FILE_PROVIDER_NAME = BuildConfig.APPLICATION_ID + ".provider"
 
+
+        // various time formats used in app
         const val TIME_FORMAT_1 = "HH:mm:ss"
         const val TIME_FORMAT_2 = "yy.MM (dd)"
         const val TIME_FORMAT_3 = "dd MMMM yyyy, HH:mm:ss"
@@ -222,7 +252,7 @@ class Constants {
         val DEFAULT_PAUSE_TIME_MS = TimeUnit.MINUTES.toMillis(15)
 
         // increment/decrement value to pause vpn
-        val EXTRA_MILLIS = TimeUnit.MINUTES.toMillis(1)
+        val PAUSE_VPN_EXTRA_MILLIS = TimeUnit.MINUTES.toMillis(1)
 
         // play services package name
         const val PKG_NAME_PLAY_STORE = "com.android.vending"

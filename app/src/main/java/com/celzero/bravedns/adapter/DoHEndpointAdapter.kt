@@ -26,6 +26,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -33,18 +35,17 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.databinding.DohEndpointListItemBinding
-import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.DNSConfigureWebViewActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOCATION_INTENT_EXTRA
-import com.celzero.bravedns.util.Constants.Companion.STAMP_INTENT_EXTRA
+import com.celzero.bravedns.util.Constants.Companion.BLOCKLIST_LOCATION_INTENT_EXTRA
+import com.celzero.bravedns.util.Constants.Companion.BLOCKLIST_STAMP_INTENT_EXTRA
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.*
 import xdns.Xdns.getBlocklistStampFromURL
 
 
-class DoHEndpointAdapter(private val context: Context, private val persistentState: PersistentState,
+class DoHEndpointAdapter(private val context: Context, private val lifecycleOwner: LifecycleOwner,
                          private val appMode: AppMode) :
         PagedListAdapter<DoHEndpoint, DoHEndpointAdapter.DoHEndpointViewHolder>(DIFF_CALLBACK) {
 
@@ -132,8 +133,8 @@ class DoHEndpointAdapter(private val context: Context, private val persistentSta
 
         private fun startConfigureBlocklistActivity(stamp: String) {
             val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
-            intent.putExtra(LOCATION_INTENT_EXTRA, DNSConfigureWebViewActivity.REMOTE)
-            intent.putExtra(STAMP_INTENT_EXTRA, stamp)
+            intent.putExtra(BLOCKLIST_LOCATION_INTENT_EXTRA, DNSConfigureWebViewActivity.REMOTE)
+            intent.putExtra(BLOCKLIST_STAMP_INTENT_EXTRA, stamp)
             context.startActivity(intent)
         }
 
@@ -250,7 +251,7 @@ class DoHEndpointAdapter(private val context: Context, private val persistentSta
         }
 
         private fun io(f: suspend () -> Unit) {
-            CoroutineScope(Dispatchers.IO).launch {
+            lifecycleOwner.lifecycleScope.launch {
                 withContext(Dispatchers.IO) {
                     f()
                 }

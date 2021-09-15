@@ -72,7 +72,7 @@
         <activity
             android:name=".ui.NotificationHandlerDialog"
             android:excludeFromRecents="true"
-            android:launchMode="singleTask"
+            android:launchMode="singleInstance"
             android:taskAffinity=""
             android:theme="@style/AppThemeDialog" />
 

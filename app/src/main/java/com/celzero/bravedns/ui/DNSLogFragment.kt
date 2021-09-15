@@ -29,13 +29,11 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DNSQueryAdapter
 import com.celzero.bravedns.data.AppMode
-import com.celzero.bravedns.database.DNSLogDAO
+import com.celzero.bravedns.database.DNSLogRepository
 import com.celzero.bravedns.databinding.ActivityQueryDetailBinding
 import com.celzero.bravedns.databinding.QueryListScrollListBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DNSCRYPT
-import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DOH
 import com.celzero.bravedns.viewmodel.DNSLogViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -53,7 +51,7 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     private var checkedItem = 1
     private var filterValue: String = ""
 
-    private val dnsLogDAO by inject<DNSLogDAO>()
+    private val dnsLogRepository by inject<DNSLogRepository>()
     private val persistentState by inject<PersistentState>()
     private val appMode by inject<AppMode>()
 
@@ -138,34 +136,37 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     }
 
     private fun updateConnectedStatus() {
-        val dnsType = appMode.getDnsType()
-        if (dnsType == PREF_DNS_MODE_DOH) {
-            b.connectedStatusTitleUrl.text = resources.getString(
-                R.string.configure_dns_connected_doh_status)
-            b.connectedStatusTitle.text = resources.getString(
-                R.string.configure_dns_connection_name, appMode.getConnectedDNS())
-            b.queryListScrollList.recyclerQuery.visibility = View.VISIBLE
-            b.queryListScrollList.dnsLogNoLogText.visibility = View.GONE
-        } else if (dnsType == PREF_DNS_MODE_DNSCRYPT) {
-            observeCryptStatus()
-            b.connectedStatusTitleUrl.text = resources.getString(
-                R.string.configure_dns_connected_dns_crypt_status)
-            b.queryListScrollList.recyclerQuery.visibility = View.VISIBLE
-            b.queryListScrollList.dnsLogNoLogText.visibility = View.GONE
-        } else {
-            b.connectedStatusTitleUrl.text = resources.getString(
-                R.string.configure_dns_connected_dns_proxy_status)
-            b.connectedStatusTitle.text = resources.getString(
-                R.string.configure_dns_connection_name, appMode.getConnectedDNS())
-            b.queryListScrollList.recyclerQuery.visibility = View.GONE
-            if (persistentState.logsEnabled) {
-                b.queryListScrollList.dnsLogNoLogText.visibility = View.VISIBLE
-            } else {
-                /* No op */
-                // As of now, the logs are not shown when the DNS mode is in DNSProxy.
-                // So when pxoxy mode is changed, only onResume() will be called as it
-                // is sharing the same activity. (The proxy mode changes done in the
-                // ConfigureDNSFragment). Other logs enabled states are handled in onViewCreated().
+        when (appMode.getDnsType()) {
+            AppMode.DnsType.DOH -> {
+                b.connectedStatusTitleUrl.text = resources.getString(
+                    R.string.configure_dns_connected_doh_status)
+                b.connectedStatusTitle.text = resources.getString(
+                    R.string.configure_dns_connection_name, appMode.getConnectedDNS())
+                b.queryListScrollList.recyclerQuery.visibility = View.VISIBLE
+                b.queryListScrollList.dnsLogNoLogText.visibility = View.GONE
+            }
+            AppMode.DnsType.DNSCRYPT -> {
+                observeCryptStatus()
+                b.connectedStatusTitleUrl.text = resources.getString(
+                    R.string.configure_dns_connected_dns_crypt_status)
+                b.queryListScrollList.recyclerQuery.visibility = View.VISIBLE
+                b.queryListScrollList.dnsLogNoLogText.visibility = View.GONE
+            }
+            AppMode.DnsType.DNS_PROXY -> {
+                b.connectedStatusTitleUrl.text = resources.getString(
+                    R.string.configure_dns_connected_dns_proxy_status)
+                b.connectedStatusTitle.text = resources.getString(
+                    R.string.configure_dns_connection_name, appMode.getConnectedDNS())
+                b.queryListScrollList.recyclerQuery.visibility = View.GONE
+                if (persistentState.logsEnabled) {
+                    b.queryListScrollList.dnsLogNoLogText.visibility = View.VISIBLE
+                } else {
+                    /* No op */
+                    // As of now, the logs are not shown when the DNS mode is in DNSProxy.
+                    // So when pxoxy mode is changed, only onResume() will be called as it
+                    // is sharing the same activity. (The proxy mode changes done in the
+                    // ConfigureDNSFragment). Other logs enabled states are handled in onViewCreated().
+                }
             }
         }
     }
@@ -205,11 +206,12 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         builder.setMessage(R.string.dns_query_clear_logs_message)
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
-            lifecycleScope.launch {
+            io {
+                // define context for glide api call
                 withContext(Dispatchers.IO) {
                     GlideApp.get(requireActivity()).clearDiskCache()
-                    dnsLogDAO.clearAllData()
                 }
+                dnsLogRepository.clearAllData()
             }
         }
         builder.setNegativeButton(getString(R.string.dns_log_dialog_negative)) { _, _ -> }
@@ -224,5 +226,11 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     override fun onQueryTextChange(query: String?): Boolean {
         viewModel.setFilter(query, filterValue)
         return true
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch {
+            f()
+        }
     }
 }

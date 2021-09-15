@@ -38,7 +38,7 @@ class BlocklistDownloadHelper {
                 } else {
                     0
                 }
-                result = Constants.LOCAL_BLOCKLISTS.size == total
+                result = Constants.ONDEVICE_BLOCKLISTS.size == total
             } catch (e: Exception) {
                 Log.w(LOG_TAG_DOWNLOAD, "Local block list validation failed: ${e.message}", e)
             }
@@ -55,25 +55,26 @@ class BlocklistDownloadHelper {
          * Now in v053 we are moving the files from external dir to canonical path.
          * So deleting the old files in the external directory.
          */
-        fun deleteOldFiles(context: Context) {
-            val dir = File(context.getExternalFilesDir(null).toString() + Constants.DOWNLOAD_PATH)
+        fun deleteOldFiles(context: Context, timestamp: Long) {
+            val dir = File(context.getExternalFilesDir(
+                null).toString() + Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH + timestamp)
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
                              "deleteOldFiles -- File : ${dir.path}, ${dir.isDirectory}")
             deleteRecursive(dir)
         }
 
-        fun deleteFromCanonicalPath(context: Context) {
-            val canonicalPath = File("${context.filesDir.canonicalPath}${File.separator}")
+        fun deleteFromCanonicalPath(context: Context, timestamp: Long) {
+            val canonicalPath = File("${context.filesDir.canonicalPath}${File.separator}$timestamp")
             deleteRecursive(canonicalPath)
         }
 
         fun getExternalFilePath(context: Context, timestamp: String): String {
             return context.getExternalFilesDir(
-                null).toString() + Constants.DOWNLOAD_PATH + File.separator + timestamp + File.separator
+                null).toString() + Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH + File.separator + timestamp + File.separator
         }
 
         fun getExternalFilePath(timestamp: String): String {
-            return Constants.DOWNLOAD_PATH + File.separator + timestamp + File.separator
+            return Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH + File.separator + timestamp + File.separator
         }
     }
 

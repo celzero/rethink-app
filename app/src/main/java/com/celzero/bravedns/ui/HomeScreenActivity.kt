@@ -78,7 +78,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     object GlobalVariable {
         var appStartTime: Long = INIT_TIME_MS
-        var DEBUG = false
+        var DEBUG = true
     }
 
     // TODO - #324 - Usage of isDarkTheme() in all activities.
@@ -130,13 +130,13 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         if (persistentState.isDefaultDataInsertComplete) return
 
         lifecycleScope.launch {
-            // FIXME: non-cancellable co-routine ref: https://medium.com/androiddevelopers/coroutines-patterns-for-work-that-shouldnt-be-cancelled-e26c40f142ad
+            //  FIXME: better ways of doing non-cancellable work in Android
+            //  see: https://medium.com/androiddevelopers/coroutines-patterns-for-work-that-shouldnt-be-cancelled-e26c40f142ad
             withContext(NonCancellable + Dispatchers.IO) {
                 refreshDatabase.insertDefaultDNSList()
                 refreshDatabase.insertDefaultDNSCryptList()
                 refreshDatabase.insertDefaultDNSCryptRelayList()
                 refreshDatabase.insertDefaultDNSProxy()
-                refreshDatabase.updateCategoryRepo()
                 persistentState.isDefaultDataInsertComplete = true
             }
         }
@@ -162,7 +162,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         persistentState.showWhatsNewChip = true
 
         // Refresh the app info cache on new update
-        refreshDatabase.refreshAppInfoDatabase()
+        io {
+            refreshDatabase.refreshAppInfoDatabase()
+        }
         // FIXME:  Remove this after the version v053g
         // this is to fix the persistance state which was saved as Int instead of Long.
         // Modification of persistence state
@@ -329,7 +331,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
 
     private fun initiateDownload() {
-        val url = Constants.APP_DOWNLOAD_LINK
+        val url = Constants.RETHINK_APP_DOWNLOAD_LINK
         val uri = Uri.parse(url)
         val intent = Intent(Intent.ACTION_VIEW)
         intent.data = uri
@@ -360,11 +362,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun checkAppState() {
-        VpnController.connectionStatus.observe(this, {
-            if (it == BraveVPNService.State.PAUSED) {
-                openAppPausedActivity()
-            }
-        })
+        if (VpnController.isAppPaused()) {
+            openAppPausedActivity()
+        }
     }
 
     private fun setupNavigationItemSelectedListener() {
@@ -395,6 +395,14 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 }
             }
             false
+        }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                f()
+            }
         }
     }
 

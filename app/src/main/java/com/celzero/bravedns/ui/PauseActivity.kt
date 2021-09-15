@@ -30,7 +30,7 @@ import com.celzero.bravedns.databinding.PauseActivityBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.util.Constants.Companion.EXTRA_MILLIS
+import com.celzero.bravedns.util.Constants.Companion.PAUSE_VPN_EXTRA_MILLIS
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.Companion.humanReadableTime
@@ -127,11 +127,11 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
     }
 
     private fun decrementTimer() {
-        VpnController.getBraveVpnService()?.decrementPauseTimer(EXTRA_MILLIS)
+        VpnController.getBraveVpnService()?.decrementPauseTimer(PAUSE_VPN_EXTRA_MILLIS)
     }
 
     private fun incrementTimer() {
-        VpnController.getBraveVpnService()?.incrementPauseTimer(EXTRA_MILLIS)
+        VpnController.getBraveVpnService()?.incrementPauseTimer(PAUSE_VPN_EXTRA_MILLIS)
     }
 
     private fun stopPauseActivity() {

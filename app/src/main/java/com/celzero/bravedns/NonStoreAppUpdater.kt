@@ -23,7 +23,7 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.JSON_LATEST
 import com.celzero.bravedns.util.Constants.Companion.JSON_UPDATE
 import com.celzero.bravedns.util.Constants.Companion.JSON_VERSION
-import com.celzero.bravedns.util.Constants.Companion.RESPONSE_VERSION
+import com.celzero.bravedns.util.Constants.Companion.UPDATE_CHECK_RESPONSE_VERSION
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -69,7 +69,7 @@ class NonStoreAppUpdater(private val baseUrl: String,
                     Log.i(LOG_TAG_APP_UPDATE,
                           "Server response for the new version download is $shouldUpdate (json version: $version), version number:  $latest")
 
-                    if (version != RESPONSE_VERSION) {
+                    if (version != UPDATE_CHECK_RESPONSE_VERSION) {
                         listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER, isInteractive)
                         return
                     } else {

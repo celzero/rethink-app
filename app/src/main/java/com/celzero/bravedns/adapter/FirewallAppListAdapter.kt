@@ -28,6 +28,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatToggleButton
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.database.AppInfo
@@ -40,13 +42,14 @@ import com.celzero.bravedns.util.Constants.Companion.APP_CAT_SYSTEM_COMPONENTS
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.Companion.getIcon
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 class FirewallAppListAdapter internal constructor(private val context: Context,
+                                                  private val lifecycleOwner: LifecycleOwner,
                                                   private val persistentState: PersistentState,
                                                   private var titleList: List<CategoryInfo>,
                                                   private var dataList: HashMap<CategoryInfo, List<AppInfo>>) :
@@ -131,10 +134,12 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
 
     private fun killApps(uid: Int) {
         if (!persistentState.killAppOnFirewall) return
-        CoroutineScope(Dispatchers.IO).launch {
-            val apps = FirewallManager.getPackageNamesByUid(uid)
-            apps.forEach {
-                Utilities.killBg(activityManager, it)
+        lifecycleOwner.lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                val apps = FirewallManager.getPackageNamesByUid(uid)
+                apps.forEach {
+                    Utilities.killBg(activityManager, it)
+                }
             }
         }
     }

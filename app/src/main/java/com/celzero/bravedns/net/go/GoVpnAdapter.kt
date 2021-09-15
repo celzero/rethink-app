@@ -36,10 +36,10 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.DNSConfigureWebViewActivity.Companion.BLOCKLIST_REMOTE_FOLDER_NAME
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.FILE_BASIC_CONFIG
-import com.celzero.bravedns.util.Constants.Companion.FILE_RD_FILE
-import com.celzero.bravedns.util.Constants.Companion.FILE_TAG_NAME
-import com.celzero.bravedns.util.Constants.Companion.FILE_TD_FILE
+import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG
+import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_RD_FILE
+import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG_NAME
+import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TD_FILE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities.Companion.prepareServersToRemove
 import com.celzero.bravedns.util.Utilities.Companion.remoteBlocklistDir
@@ -111,7 +111,7 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?) : KoinComponent {
     }
 
     private fun isRethinkDnsUrl(url: String): Boolean {
-        return url.contains(Constants.BRAVE_BASIC_URL) || url.contains(Constants.RETHINK_BASIC_URL)
+        return url.contains(Constants.BRAVE_BASE_URL) || url.contains(Constants.RETHINK_BASE_URL)
     }
 
     private suspend fun setTunnelMode(tunnelOptions: TunnelOptions) {
@@ -136,7 +136,7 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?) : KoinComponent {
     }
 
     private fun setBraveMode(dnsMode: AppMode.DnsMode, dohURL: String) {
-        if (BuildConfig.DEBUG) Log.d(LOG_TAG_VPN, "Set brave dns mode initiated")
+        if (BuildConfig.DEBUG) Log.d(LOG_TAG_VPN, "init bravedns mode")
         // No need to set the brave mode for DNS Proxy (implementation pending in underlying Go library).
         // TODO: remove the check once the implementation completed in underlying Go library
         CoroutineScope(Dispatchers.IO).launch {
@@ -157,15 +157,16 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?) : KoinComponent {
             val remoteDir = remoteBlocklistDir(VpnController.getBraveVpnService(),
                                                BLOCKLIST_REMOTE_FOLDER_NAME,
                                                persistentState.remoteBlocklistTimestamp) ?: return
-            val remoteFile = remoteBlocklistFile(remoteDir.absolutePath, FILE_TAG_NAME) ?: return
+            val remoteFile = remoteBlocklistFile(remoteDir.absolutePath,
+                                                 ONDEVICE_BLOCKLIST_FILE_TAG_NAME) ?: return
             if (remoteFile.exists()) {
                 tunnel?.braveDNS = Dnsx.newBraveDNSRemote(remoteFile.absolutePath)
-                Log.i(LOG_TAG_VPN, "Enabled remote bravedns mode")
+                Log.i(LOG_TAG_VPN, "remote-bravedns enabled")
             } else {
-                Log.w(LOG_TAG_VPN, "Remote blocklist filetag.json does not exists")
+                Log.w(LOG_TAG_VPN, "filetag.json for remote-bravedns missing")
             }
         } catch (ex: Exception) {
-            Log.e(LOG_TAG_VPN, "Cannot set remote bravedns:" + ex.message, ex)
+            Log.e(LOG_TAG_VPN, "cannot set remote-bravedns: ${ex.message}", ex)
         }
     }
 
@@ -232,7 +233,7 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?) : KoinComponent {
                              "setDNSProxy mode set: " + dnsProxy.proxyIP + ", " + dnsProxy.proxyPort)
             tunnel?.startDNSProxy(dnsProxy.proxyIP, dnsProxy.proxyPort.toString())
         } catch (e: Exception) {
-            Log.e(LOG_TAG_VPN, "connect-tunnel: dns proxy" + e.message, e)
+            Log.e(LOG_TAG_VPN, "connect-tunnel: could not connect to dnsproxy: ${e.message}", e)
         }
     }
 
@@ -245,7 +246,7 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?) : KoinComponent {
             tunnel?.startProxy(userName, password, ipAddress, port.toString())
             Log.i(LOG_TAG_VPN, "Proxy mode set: $userName$ipAddress$port")
         } catch (e: Exception) {
-            Log.e(LOG_TAG_VPN, "connect-tunnel: proxy", e)
+            Log.e(LOG_TAG_VPN, "connect-tunnel: could not start proxy $userName@$ipAddress:$port", e)
         }
     }
 
@@ -257,7 +258,7 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?) : KoinComponent {
                     appMode.updateDnscryptLiveServers(liveServers)
                     Log.i(LOG_TAG_VPN, "Refresh LiveServers: $liveServers")
                     if (liveServers.isNullOrEmpty()) {
-                        Log.i(LOG_TAG_VPN, "No live servers, falling back to default DoH mode")
+                        Log.i(LOG_TAG_VPN, "no dnscrypt live-servers, fall back to doh")
                         tunnel?.stopDNSCryptProxy()
                         appMode.setDefaultConnection()
                         showDnscryptConnectionFailureToast()
@@ -276,16 +277,16 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?) : KoinComponent {
                 }
             } catch (e: Exception) {
                 handleDnscryptFailure()
-                Log.e(LOG_TAG_VPN, "connect-tunnel: dns crypt", e)
+                Log.e(LOG_TAG_VPN, "connect-tunnel: could not start dnscrypt-proxy: ${e.message}", e)
             }
         }
     }
 
     private suspend fun handleDnscryptFailure() {
-        if (persistentState.dnsType == Constants.PREF_DNS_MODE_DNSCRYPT) {
+        if (persistentState.dnsType == AppMode.DnsType.DNSCRYPT.type) {
             appMode.setDefaultConnection()
             showDnscryptConnectionFailureToast()
-            Log.i(LOG_TAG_VPN, "connect-tunnel: failure of dns crypt falling back to doh")
+            Log.i(LOG_TAG_VPN, "connect-tunnel: falling back to doh since dnscrypt failed")
         } else {
             // no-op
         }
@@ -416,7 +417,7 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?) : KoinComponent {
     private fun setBraveDNSLocalMode() {
         try {
             if (!persistentState.blocklistEnabled) {
-                Log.i(LOG_TAG_VPN, "local stamp is set to null(on GO)")
+                Log.i(LOG_TAG_VPN, "local-bravedns stamp set to null")
                 tunnel?.braveDNS = null
                 localBraveDns = null
                 return
@@ -425,7 +426,7 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?) : KoinComponent {
             // Set the localBraveDns object
             setupLocalBraveDns()
             val stamp: String = persistentState.localBlocklistStamp
-            Log.i(LOG_TAG_VPN, "app dns mode is set with local stamp: $stamp")
+            Log.i(LOG_TAG_VPN, "local-bravedns stamp: $stamp")
             if (stamp.isEmpty() || localBraveDns == null) {
                 // make localBraveDns as null when the stamp is empty
                 localBraveDns = null
@@ -436,7 +437,7 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?) : KoinComponent {
             tunnel?.braveDNS = localBraveDns
             tunnel?.braveDNS?.stamp = stamp
         } catch (ex: Exception) {
-            Log.e(LOG_TAG_VPN, "Exception while setting brave dns for local:" + ex.message, ex)
+            Log.e(LOG_TAG_VPN, "could not set local-bravedns: ${ex.message}", ex)
         }
     }
 
@@ -451,7 +452,7 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?) : KoinComponent {
                       "bravedns mode is not local but trying to set local stamp, this should not happen")
             }
         } catch (e: java.lang.Exception) {
-            Log.e(LOG_TAG_VPN, "exception while setting stamp for local bravedns:" + e.message, e)
+            Log.e(LOG_TAG_VPN, "could not set set local-bravedns stamp: ${e.message}", e)
         }
     }
 
@@ -463,8 +464,10 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?) : KoinComponent {
         try {
             // FIXME: canonical path may go missing but is unhandled
             val path: String = VpnController.getBraveVpnService()?.filesDir?.canonicalPath + File.separator + persistentState.localBlocklistTimestamp
-            localBraveDns = Dnsx.newBraveDNSLocal(path + FILE_TD_FILE, path + FILE_RD_FILE,
-                                                  path + FILE_BASIC_CONFIG, path + FILE_TAG_NAME)
+            localBraveDns = Dnsx.newBraveDNSLocal(path + ONDEVICE_BLOCKLIST_FILE_TD_FILE,
+                                                  path + ONDEVICE_BLOCKLIST_FILE_RD_FILE,
+                                                  path + ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,
+                                                  path + ONDEVICE_BLOCKLIST_FILE_TAG_NAME)
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "Local brave dns set exception :${e.message}", e)
             // Set local blocklist enabled to false if there is a failure creating bravedns

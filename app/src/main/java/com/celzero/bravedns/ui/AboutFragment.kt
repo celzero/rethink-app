@@ -257,7 +257,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
     // ref: https://developer.android.com/guide/components/intents-filters
     private fun emailBugReport() {
-        // ACTION_SEND_MULTIPLE is to send multiple text files in email.
         val emailIntent = Intent(Intent.ACTION_SEND)
         emailIntent.type = "text/plain"
         emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.about_mail_to)))
@@ -312,10 +311,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             try {
                 fin = FileInputStream(zipPath)
                 zin = ZipInputStream(fin)
-                var ze: ZipEntry? = null
+                var ze: ZipEntry?
 
                 while (zin.nextEntry.also { ze = it } != null) {
-                    val inStream = zipFile?.getInputStream(ze)
+                    val inStream = zipFile.getInputStream(ze)
                     val inputString = inStream?.bufferedReader().use { it?.readText() }
                     uiCtx {
                         if (!isAdded) return@uiCtx

@@ -23,6 +23,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -32,12 +34,12 @@ import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.database.DNSProxyEndpoint
 import com.celzero.bravedns.databinding.DnsProxyListItemBinding
 import com.celzero.bravedns.util.Utilities
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class DNSProxyEndpointAdapter(private val context: Context, private val appMode: AppMode) :
+class DNSProxyEndpointAdapter(private val context: Context, val lifecycleOwner: LifecycleOwner,
+                              private val appMode: AppMode) :
         PagedListAdapter<DNSProxyEndpoint, DNSProxyEndpointAdapter.DNSProxyEndpointViewHolder>(
             DIFF_CALLBACK) {
 
@@ -198,7 +200,7 @@ class DNSProxyEndpointAdapter(private val context: Context, private val appMode:
     }
 
     private fun io(f: suspend () -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleOwner.lifecycleScope.launch {
             withContext(Dispatchers.IO) {
                 f()
             }
