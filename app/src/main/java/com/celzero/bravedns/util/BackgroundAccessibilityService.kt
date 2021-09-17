@@ -23,6 +23,7 @@ import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import org.koin.android.ext.android.inject
@@ -105,7 +106,12 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
     // Handle the received event.
     // Earlier the event handling is taken care in FirewallManager.
     // Now, the firewall manager usage is modified, so moving this part here. 
-    fun handleAccessibilityEvent(event: AccessibilityEvent) {
+    private fun handleAccessibilityEvent(event: AccessibilityEvent) {
+
+        // ref: https://developer.android.com/reference/android/accessibilityservice/AccessibilityService.html#lifecycle
+        // see: https://stackoverflow.com/questions/40433449/how-can-i-programmatically-start-and-stop-an-accessibilityservice
+        // no need ot handle the events when the vpn is not running
+        if (!VpnController.isOn()) return
 
         if (!persistentState.blockAppWhenBackground) return
 

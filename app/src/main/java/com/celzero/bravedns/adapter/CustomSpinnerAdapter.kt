@@ -49,6 +49,8 @@ class CustomSpinnerAdapter(val context: Context, var dataSource: List<String>) :
             vh = view.tag as ItemHolder
         }
         vh.label.text = dataSource[position]
+
+        // ref ConfigureDns#initView():dnsValue
         if (position == (appMode.getDnsType().type.minus(1))) {
             vh.img.visibility = View.VISIBLE
         } else {

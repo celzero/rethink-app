@@ -550,7 +550,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
         }
     }
 
-    private suspend fun uiCtx(f: () -> Unit) {
+    private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) {
             f()
         }

@@ -184,7 +184,7 @@ class DNSCryptEndpointAdapter(private val context: Context, val lifecycleOwner: 
             }
         }
 
-        private suspend fun uiCtx(f: () -> Unit) {
+        private suspend fun uiCtx(f: suspend () -> Unit) {
             withContext(Dispatchers.Main) {
                 f()
             }

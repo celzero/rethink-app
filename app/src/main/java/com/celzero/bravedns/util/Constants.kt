@@ -15,7 +15,6 @@ limitations under the License.
 */
 package com.celzero.bravedns.util
 
-import com.celzero.bravedns.BuildConfig
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -29,8 +28,8 @@ class Constants {
         // file names which are downloaded as part of on-device blocklists
         val ONDEVICE_BLOCKLIST_FILE_TAG_NAME = File.separator + "filetag.json"
         val ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG = File.separator + "basicconfig.json"
-        val ONDEVICE_BLOCKLIST_FILE_RD_FILE = File.separator + "rd.txt"
-        val ONDEVICE_BLOCKLIST_FILE_TD_FILE = File.separator + "td.txt"
+        val ONDEVICE_BLOCKLIST_FILE_RD = File.separator + "rd.txt"
+        val ONDEVICE_BLOCKLIST_FILE_TD = File.separator + "td.txt"
 
         // url to check to check the if there is update available for on-device blocklist
         const val ONDEVICE_BLOCKLIST_UPDATE_CHECK_URL = "https://download.rethinkdns.com/update/blocklists?tstamp="
@@ -60,24 +59,27 @@ class Constants {
             OnDeviceBlocklistsMetadata("https://download.rethinkdns.com/basicconfig",
                                        ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG),
             OnDeviceBlocklistsMetadata("https://download.rethinkdns.com/rank",
-                                       ONDEVICE_BLOCKLIST_FILE_RD_FILE),
+                                       ONDEVICE_BLOCKLIST_FILE_RD),
             OnDeviceBlocklistsMetadata("https://download.rethinkdns.com/trie",
-                                       ONDEVICE_BLOCKLIST_FILE_TD_FILE))
+                                       ONDEVICE_BLOCKLIST_FILE_TD))
 
         // url to download the rethinkdns apk file
         const val RETHINK_APP_DOWNLOAD_LINK = "https://rethinkdns.com/download"
 
         // base-url for bravedns
-        const val BRAVE_BASE_STAMP = "https://basic.bravedns.com/"
+        const val BRAVE_BASE_URL = "https://basic.bravedns.com/"
 
         // base-url stamp for configure blocklist
-        const val RETHINK_BLOCKLIST_CONFIGURE_BASE_STAMP = "rethinkdns.com/configure"
+        const val RETHINK_BLOCKLIST_CONFIGURE_BASE_URL = "rethinkdns.com/configure"
 
         // base-url for bravedns
-        const val BRAVE_BASE_URL = "bravedns.com"
+        const val BRAVEDNS_DOMAIN = "bravedns.com"
 
         // base-url for rethinkdns
-        const val RETHINK_BASE_URL = "rethinkdns.com"
+        const val RETHINKDNS_DOMAIN = "rethinkdns.com"
+
+        // default doh url
+        const val DEFAULT_DOH_URL = "https://basic.bravedns.com/dns-query"
 
         // json object constants received as part of update check
         // FIXME: Avoid usage of these parameters, map to POJO instead
@@ -85,30 +87,11 @@ class Constants {
         const val JSON_UPDATE = "update"
         const val JSON_LATEST = "latest"
 
-        // Firewall app category constants
-        // category: system components
-        const val APP_CAT_SYSTEM_COMPONENTS = "System Components"
-
-        // category: system apps
-        const val APP_CAT_SYSTEM_APPS = "System Apps"
-
-        // category: others
-        const val APP_CAT_OTHER = "Other"
-
-        // category: non-app system
-        const val APP_NON_APP = "Non-App System"
-
-        // category: installed apps
-        const val INSTALLED_CAT_APPS = "Installed Apps"
-
         // app type unknown
         const val UNKNOWN_APP = "Unknown"
 
-        // No package applications
-        const val NO_PACKAGE = "no_package"
-
         // Number of network log entries to store in the database.
-        const val TOTAL_NETWORK_LOG_ENTRIES_THRESHOLD = 5000
+        const val TOTAL_LOG_ENTRIES_THRESHOLD = 10000
 
         // invalid application uid
         const val INVALID_UID = -1
@@ -118,9 +101,6 @@ class Constants {
 
         // label for rethinkdns plus doh endpoint
         const val RETHINK_DNS_PLUS = "RethinkDNS Plus"
-
-        // maximum time delay before sending block connection response
-        val DELAY_FIREWALL_RESPONSE_MS: Long = TimeUnit.SECONDS.toMillis(30)
 
         // constants used as part of intent to load the viewpager's screen
         const val VIEW_PAGER_SCREEN_TO_LOAD = "view_pager_screen"
@@ -150,16 +130,10 @@ class Constants {
         // data-time format used as part of network log adapter
         const val DATE_FORMAT_PATTERN = "HH:mm:ss"
 
-        // represents the orbot proxy mode (see AppMode#ProxyMode)
-        const val ORBOT_PROXY = 10L
-
         // constants generated as part of BuildConfig.FLAVORS (playstore/fdroid/website)
         const val FLAVOR_PLAY = "play"
         const val FLAVOR_FDROID = "fdroid"
         const val FLAVOR_WEBSITE = "website"
-
-        // represents the unknown port in the port map. see class KnownPorts
-        const val PORT_VAL_UNKNOWN = "unknown"
 
         // Various notification action constants used part of NotificationCompat.Action
         const val NOTIFICATION_ACTION = "NOTIFICATION_VALUE"
@@ -184,13 +158,6 @@ class Constants {
         // DNS message type received by the DNS resolver
         const val NXDOMAIN = "NXDOMAIN"
 
-        // Maximum time out for the DownloadManager to wait for download of local blocklist.
-        // The time out value is set as 40 minutes.
-        val WORK_MANAGER_TIMEOUT = TimeUnit.MINUTES.toMillis(40)
-
-        // base-url for fav icon download
-        const val FAV_ICON_URL = "https://icons.duckduckgo.com/ip2/"
-
         // The minimum interval before checking if the internal accessibility service
         // (used to block apps-not-in-use) is indeed running.
         // Ref: {@link com.celzero.bravedns.util.Utilities#isAccessibilityServiceEnabled} and
@@ -204,11 +171,13 @@ class Constants {
 
         // IPv4 uses 0.0.0.0 as an unspecified address
         const val UNSPECIFIED_IP = "0.0.0.0"
+
         // special port number not assigned to any app
         const val UNSPECIFIED_PORT = 0
 
         // IPv6 uses ::0 as an unspecified address
         const val UNSPECIFIED_IPV6 = "::0"
+
         // IPv6 loopback address
         const val LOOPBACK_IPV6 = "::1"
 
@@ -220,39 +189,17 @@ class Constants {
 
         // default live data page size used by recycler views
         const val LIVEDATA_PAGE_SIZE = 50
+
         // dns logs live data page size
         const val DNS_LIVEDATA_PAGE_SIZE = 30
 
-        // various download status used as part of Work manager. see DownloadWatcher#checkForDownload()
-        const val DOWNLOAD_FAILURE = -1
-        const val DOWNLOAD_SUCCESS = 1
-        const val DOWNLOAD_RETRY = 0
-
         // To initiate / reset the timestamp in milliseconds
         const val INIT_TIME_MS = 0L
-
-        // Bug report file and directory constants
-        const val BUG_REPORT_DIR_NAME = "bugreport/"
-        const val BUG_REPORT_ZIP_FILE_NAME = "rethinkdns.bugreport.zip"
-        const val BUG_REPORT_FILE_NAME = "bugreport_"
-
-        // maximum number of files allowed as part of bugreport zip file
-        const val BUG_REPORT_MAX_FILES_ALLOWED = 20
-
-        // secure sharing of files associated with an app, used in share bugreport file feature
-        const val FILE_PROVIDER_NAME = BuildConfig.APPLICATION_ID + ".provider"
-
 
         // various time formats used in app
         const val TIME_FORMAT_1 = "HH:mm:ss"
         const val TIME_FORMAT_2 = "yy.MM (dd)"
         const val TIME_FORMAT_3 = "dd MMMM yyyy, HH:mm:ss"
-
-        // default duration for pause state: 15mins
-        val DEFAULT_PAUSE_TIME_MS = TimeUnit.MINUTES.toMillis(15)
-
-        // increment/decrement value to pause vpn
-        val PAUSE_VPN_EXTRA_MILLIS = TimeUnit.MINUTES.toMillis(1)
 
         // play services package name
         const val PKG_NAME_PLAY_STORE = "com.android.vending"

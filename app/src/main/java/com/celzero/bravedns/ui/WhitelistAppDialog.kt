@@ -90,9 +90,6 @@ class WhitelistAppDialog(val activity: Activity, val adapter: RecyclerView.Adapt
                                               context.getString(R.string.whitelist_toast_negative),
                                               Toast.LENGTH_SHORT)
             }
-
-            Utilities.delay(500) { adapter.notifyDataSetChanged() }
-
         }
         b.customDialogWhitelistSearchFilter.setOnClickListener(this)
 

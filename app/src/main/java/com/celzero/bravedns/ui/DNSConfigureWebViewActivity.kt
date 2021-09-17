@@ -37,7 +37,9 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.databinding.ActivityFaqWebviewLayoutBinding
+import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_BLOCKLIST_CONFIGURE_URL
@@ -47,6 +49,7 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import com.celzero.bravedns.util.Utilities.Companion.remoteBlocklistDir
 import kotlinx.coroutines.Dispatchers
@@ -93,6 +96,16 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         }
 
         setWebViewTheme()
+
+        observeAppState()
+    }
+
+    private fun observeAppState() {
+        VpnController.connectionStatus.observe(this, {
+            if (it == BraveVPNService.State.PAUSED) {
+                Utilities.openPauseActivityAndFinish(this)
+            }
+        })
     }
 
     private fun constructUrl(stamp: String?): String {
@@ -189,7 +202,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         Log.i(LOG_TAG_DNS, "rethinkdns+ stamp updated to: $stamp")
 
         lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
+            ioCtx {
                 appMode.updateRethinkDnsPlusStamp(stamp, count)
             }
         }
@@ -235,7 +248,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         if (keyCode != KeyEvent.KEYCODE_BACK) return false
 
         if (b.configureWebview.url?.contains(
-                Constants.RETHINK_BLOCKLIST_CONFIGURE_BASE_STAMP) == false) {
+                Constants.RETHINK_BLOCKLIST_CONFIGURE_BASE_URL) == false) {
             b.configureWebview.goBack()
         } else if (receivedStamp.isEmpty()) {
             showDialogForExitWebView()
@@ -381,7 +394,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         @JavascriptInterface
         fun setDnsUrl(stamp: String, count: Long) {
             receivedStamp = stamp
-            if (receivedStamp.isEmpty() || receivedStamp == Constants.BRAVE_BASE_STAMP) {
+            if (receivedStamp.isEmpty() || receivedStamp == Constants.BRAVE_BASE_URL) {
                 return
             }
 
@@ -444,6 +457,12 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
             filePath.createNewFile()
         }
         return filePath
+    }
+
+    private suspend fun ioCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.IO) {
+            f()
+        }
     }
 
 }

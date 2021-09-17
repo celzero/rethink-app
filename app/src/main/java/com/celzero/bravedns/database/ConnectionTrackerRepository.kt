@@ -30,7 +30,7 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
 
     suspend fun deleteConnectionTrackerCount() {
         ioCtx {
-            connectionTrackerDAO.deleteOlderDataCount(Constants.TOTAL_NETWORK_LOG_ENTRIES_THRESHOLD)
+            connectionTrackerDAO.deleteOlderDataCount(Constants.TOTAL_LOG_ENTRIES_THRESHOLD)
         }
     }
 
@@ -46,7 +46,7 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
         }
     }
 
-    private suspend fun ioCtx(f: () -> Unit) {
+    private suspend fun ioCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.IO) {
             f()
         }

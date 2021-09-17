@@ -22,9 +22,12 @@ import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -53,10 +56,6 @@ object VpnController : KoinComponent {
 
         controllerScope!!.launch {
             states!!.consumeEach { state ->
-                if (BraveVPNService.State.PAUSED != connectionState) {
-                    updateState(state)
-                    return@consumeEach
-                }
                 // transition from paused connection state only on NEW/NULL
                 when (state) {
                     null -> {
@@ -66,7 +65,10 @@ object VpnController : KoinComponent {
                         updateState(state)
                     }
                     else -> {
-                        return@consumeEach
+                        // do not update if in paused-state unless state is new / null
+                        if (!isAppPaused()) {
+                            updateState(state)
+                        }
                     }
                 }
             }

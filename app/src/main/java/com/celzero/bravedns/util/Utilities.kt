@@ -18,6 +18,7 @@ package com.celzero.bravedns.util
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
+import android.app.Activity
 import android.app.ActivityManager
 import android.content.*
 import android.content.pm.ApplicationInfo
@@ -44,12 +45,15 @@ import androidx.core.content.getSystemService
 import androidx.core.text.HtmlCompat
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.ui.PauseActivity
 import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
+import com.celzero.bravedns.util.Constants.Companion.FLAVOR_WEBSITE
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
@@ -207,7 +211,7 @@ class Utilities {
             return convertLongToTime(now, TIME_FORMAT_1)
         }
 
-        fun prepareServersToRemove(servers: String, liveServers: String): String {
+        fun getNonLiveDnscryptServers(servers: String, liveServers: String): String {
             val serverList = servers.split(",")
             val liveServerList = liveServers.split(",")
             var serversToSend = ""
@@ -218,8 +222,7 @@ class Utilities {
                 }
             }
             if (DEBUG) Log.d(LOG_TAG_VPN, "In: $serverList / Out: $serversToSend")
-            serversToSend = serversToSend.dropLast(1)
-            return serversToSend
+            return serversToSend.dropLast(1)
         }
 
         fun showToastUiCentered(context: Context, message: String, toastLength: Int) {
@@ -393,7 +396,7 @@ class Utilities {
         }
 
         private fun isValidAppName(appName: String?, packageName: String): Boolean {
-            return !packageName.contains(Constants.NO_PACKAGE) && Constants.UNKNOWN_APP != appName
+            return !isNonApp(packageName) && Constants.UNKNOWN_APP != appName
         }
 
         fun isValidAppName(appName: String?): Boolean {
@@ -451,6 +454,10 @@ class Utilities {
 
         fun isFdroidFlavour(): Boolean {
             return BuildConfig.FLAVOR == FLAVOR_FDROID
+        }
+
+        fun isWebsiteFlavour(): Boolean {
+            return BuildConfig.FLAVOR == FLAVOR_WEBSITE
         }
 
         fun isPlayStoreFlavour(): Boolean {
@@ -539,6 +546,17 @@ class Utilities {
                 Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
                 null
             }
+        }
+
+        fun openPauseActivityAndFinish(context: Activity) {
+            val intent = Intent()
+            intent.setClass(context, PauseActivity::class.java)
+            context.startActivity(intent)
+            context.finish()
+        }
+
+        fun isNonApp(p: String): Boolean {
+            return p.contains(NO_PACKAGE)
         }
     }
 

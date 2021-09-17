@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -28,9 +29,9 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.databinding.PauseActivityBinding
 import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.PauseTimer.PAUSE_VPN_EXTRA_MILLIS
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.util.Constants.Companion.PAUSE_VPN_EXTRA_MILLIS
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.Companion.humanReadableTime
@@ -44,7 +45,7 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
     @Volatile var j: CompletableJob? = null
 
     enum class AutoOp {
-        INCREMENT, DECREMENT, NONE
+        INCREASE, DECREASE, NONE
     }
 
     @Volatile var autoOp = AutoOp.NONE
@@ -53,6 +54,10 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+        initView()
+        initClickListeners()
+        observeAppState()
+        observeTimer()
     }
 
     private fun initView() {
@@ -62,19 +67,10 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
         })
     }
 
-    override fun onResume() {
-        super.onResume()
-        initView()
-        initClickListeners()
-        checkAppState()
-    }
-
-    private fun checkAppState() {
+    private fun observeAppState() {
         VpnController.connectionStatus.observe(this, {
             if (it != BraveVPNService.State.PAUSED) {
                 stopPauseActivity()
-            } else {
-                observeTimer()
             }
         })
     }
@@ -85,9 +81,10 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
         })
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun initClickListeners() {
         b.pacPlusIv.setOnClickListener {
-            incrementTimer()
+            increaseTimer()
         }
 
         b.pacStopIv.setOnClickListener {
@@ -96,17 +93,17 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
         }
 
         b.pacMinusIv.setOnClickListener {
-            decrementTimer()
+            decreaseTimer()
         }
 
         b.pacPlusIv.setOnLongClickListener {
-            autoOp = AutoOp.INCREMENT
+            autoOp = AutoOp.INCREASE
             handleLongPress()
             false
         }
 
         b.pacMinusIv.setOnLongClickListener {
-            autoOp = AutoOp.DECREMENT
+            autoOp = AutoOp.DECREASE
             handleLongPress()
             false
         }
@@ -126,12 +123,12 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
         }
     }
 
-    private fun decrementTimer() {
-        VpnController.getBraveVpnService()?.decrementPauseTimer(PAUSE_VPN_EXTRA_MILLIS)
+    private fun decreaseTimer() {
+        VpnController.getBraveVpnService()?.decreasePauseDuration(PAUSE_VPN_EXTRA_MILLIS)
     }
 
-    private fun incrementTimer() {
-        VpnController.getBraveVpnService()?.incrementPauseTimer(PAUSE_VPN_EXTRA_MILLIS)
+    private fun increaseTimer() {
+        VpnController.getBraveVpnService()?.increasePauseDuration(PAUSE_VPN_EXTRA_MILLIS)
     }
 
     private fun stopPauseActivity() {
@@ -162,13 +159,13 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
         lifecycleScope.launch(j!! + Dispatchers.Main) {
             while (autoOp != AutoOp.NONE) {
                 when (autoOp) {
-                    AutoOp.INCREMENT -> {
+                    AutoOp.INCREASE -> {
                         delay(200)
-                        incrementTimer()
+                        increaseTimer()
                     }
-                    AutoOp.DECREMENT -> {
+                    AutoOp.DECREASE -> {
                         delay(200)
-                        decrementTimer()
+                        decreaseTimer()
                     }
                     else -> {
                         // no-op

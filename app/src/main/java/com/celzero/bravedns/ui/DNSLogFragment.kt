@@ -75,6 +75,8 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
 
         displayPerDnsUi(includeView)
         setupClickListeners(includeView)
+        observeDnsStats()
+        observeDnscryptStatus()
     }
 
     private fun setupClickListeners(includeView: QueryListScrollListBinding) {
@@ -132,7 +134,6 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     override fun onResume() {
         super.onResume()
         updateConnectedStatus()
-        observeDnsStats()
     }
 
     private fun updateConnectedStatus() {
@@ -146,7 +147,6 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
                 b.queryListScrollList.dnsLogNoLogText.visibility = View.GONE
             }
             AppMode.DnsType.DNSCRYPT -> {
-                observeCryptStatus()
                 b.connectedStatusTitleUrl.text = resources.getString(
                     R.string.configure_dns_connected_dns_crypt_status)
                 b.queryListScrollList.recyclerQuery.visibility = View.VISIBLE
@@ -172,8 +172,10 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     }
 
     // FIXME: Create common observer for dns instead of separate observers
-    private fun observeCryptStatus() {
+    private fun observeDnscryptStatus() {
         appMode.getDnscryptCountObserver().observe(viewLifecycleOwner, {
+            if (appMode.getDnsType() != AppMode.DnsType.DNSCRYPT) return@observe
+
             val connectedCrypt = getString(R.string.configure_dns_crypt, it.toString())
             b.connectedStatusTitle.text = connectedCrypt
         })
@@ -199,15 +201,13 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         builder.show()
     }
 
-
     private fun showDnsLogsDeleteDialog() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle(R.string.dns_query_clear_logs_title)
         builder.setMessage(R.string.dns_query_clear_logs_message)
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
-            io {
-                // define context for glide api call
+            coroutineLaunch {
                 withContext(Dispatchers.IO) {
                     GlideApp.get(requireActivity()).clearDiskCache()
                 }
@@ -228,7 +228,7 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         return true
     }
 
-    private fun io(f: suspend () -> Unit) {
+    private fun coroutineLaunch(f: suspend () -> Unit) {
         lifecycleScope.launch {
             f()
         }

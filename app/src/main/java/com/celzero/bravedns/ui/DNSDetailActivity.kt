@@ -24,11 +24,13 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityDnsDetailBinding
+import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
+import com.celzero.bravedns.util.Utilities.Companion.openPauseActivityAndFinish
 import com.google.android.material.tabs.TabLayoutMediator
-import okhttp3.Dns
 import org.koin.android.ext.android.inject
 
 class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
@@ -36,12 +38,14 @@ class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
     private var fragmentIndex = 0
     private val persistentState by inject<PersistentState>()
 
-    companion object {
-        private const val TAB_LAYOUT_TOTAL_COUNT = 2
-    }
+    enum class Tabs(val screen: Int) {
+        LOGS(0), CONFIGURE(1);
 
-    enum class DnsTabs(val screen: Int) {
-        LOGS(0), CONFIGURE(1)
+        companion object {
+            fun getCount(): Int {
+                return values().size
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,27 +59,37 @@ class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
         b.dnsDetailActViewpager.adapter = object : FragmentStateAdapter(this) {
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
-                    DnsTabs.LOGS.screen -> DNSLogFragment.newInstance()
-                    DnsTabs.CONFIGURE.screen -> ConfigureDNSFragment.newInstance()
+                    Tabs.LOGS.screen -> DNSLogFragment.newInstance()
+                    Tabs.CONFIGURE.screen -> ConfigureDNSFragment.newInstance()
                     else -> ConfigureDNSFragment.newInstance()
                 }
             }
 
             override fun getItemCount(): Int {
-                return TAB_LAYOUT_TOTAL_COUNT
+                return Tabs.getCount()
             }
         }
 
         TabLayoutMediator(b.dnsDetailActTabLayout,
                           b.dnsDetailActViewpager) { tab, position -> // Styling each tab here
             tab.text = when (position) {
-                DnsTabs.LOGS.screen -> getString(R.string.dns_act_log)
-                DnsTabs.CONFIGURE.screen -> getString(R.string.dns_act_configure_tab)
+                Tabs.LOGS.screen -> getString(R.string.dns_act_log)
+                Tabs.CONFIGURE.screen -> getString(R.string.dns_act_configure_tab)
                 else -> getString(R.string.dns_act_configure_tab)
             }
         }.attach()
 
         b.dnsDetailActViewpager.setCurrentItem(fragmentIndex, true)
+
+        observeAppState()
+    }
+
+    private fun observeAppState() {
+        VpnController.connectionStatus.observe(this, {
+            if (it == BraveVPNService.State.PAUSED) {
+                openPauseActivityAndFinish(this)
+            }
+        })
     }
 
     private fun Context.isDarkThemeOn(): Boolean {

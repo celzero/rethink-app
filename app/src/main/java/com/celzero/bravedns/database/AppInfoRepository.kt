@@ -22,6 +22,11 @@ import kotlinx.coroutines.launch
 
 class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
 
+    companion object {
+        // No package applications
+        const val NO_PACKAGE = "no_package"
+    }
+
     fun delete(appInfo: AppInfo) {
         appInfoDAO.delete(appInfo)
     }

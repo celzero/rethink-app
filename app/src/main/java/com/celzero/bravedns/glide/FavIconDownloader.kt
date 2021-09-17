@@ -22,7 +22,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.FutureTarget
 import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.Utilities
 import java.io.File
@@ -36,6 +35,11 @@ import java.io.File
  * In Settings -> DNS -> Show fav icon (_TRUE_).
  */
 class FavIconDownloader(val context: Context, private val url: String) : Runnable {
+
+    companion object {
+        // base-url for fav icon download
+        const val FAV_ICON_URL = "https://icons.duckduckgo.com/ip2/"
+    }
 
     override fun run() {
         Process.setThreadPriority(Process.THREAD_PRIORITY_LOWEST)
@@ -54,7 +58,7 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
     // Add duckduckgo format to download the favicon.
     // eg., https://icons.duckduckgo.com/ip2/google.com.ico
     private fun constructFavUrl(url: String): String {
-        return "${Constants.FAV_ICON_URL}${url}.ico"
+        return "${FAV_ICON_URL}${url}.ico"
     }
 
 

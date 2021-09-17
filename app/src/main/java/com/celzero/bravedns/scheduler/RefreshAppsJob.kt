@@ -18,7 +18,6 @@ package com.celzero.bravedns.scheduler
 import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
-import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG

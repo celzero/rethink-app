@@ -17,6 +17,7 @@ package com.celzero.bravedns.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
@@ -25,7 +26,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Entity(tableName = "DNSLogs")
-class DNSLogs {
+class DnsLog {
 
     @PrimaryKey(autoGenerate = true) var id: Int = 0
     var queryStr: String = ""
@@ -44,7 +45,7 @@ class DNSLogs {
     var dnsType: Int = 0
 
     override fun equals(other: Any?): Boolean {
-        if (other !is DNSLogs) return false
+        if (other !is DnsLog) return false
         if (id != other.id) return false
         return true
     }
@@ -60,15 +61,15 @@ class DNSLogs {
     }
 
     fun favIcoUrl(): String {
-        return "${Constants.FAV_ICON_URL}${this.queryStr}ico"
+        return "${FavIconDownloader.FAV_ICON_URL}${this.queryStr}ico"
     }
 
     fun subdomain(): String {
         val subDomainURL = Utilities.getETldPlus1(this.queryStr).toString()
-        return "${Constants.FAV_ICON_URL}${subDomainURL}.ico"
+        return "${FavIconDownloader.FAV_ICON_URL}${subDomainURL}.ico"
     }
 
-    fun failure(): Boolean {
+    fun groundedQuery(): Boolean {
         return (this.status != Transaction.Status.COMPLETE.toString() || this.response == Constants.NXDOMAIN || this.isBlocked)
     }
 

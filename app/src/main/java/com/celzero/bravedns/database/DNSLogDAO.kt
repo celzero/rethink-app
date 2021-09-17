@@ -26,21 +26,21 @@ import androidx.room.Query
 interface DNSLogDAO {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(dnsLogs: DNSLogs)
+    fun insert(dnsLog: DnsLog)
 
     @Query("select * from DNSLogs order by time desc")
-    fun getDNSLogsLiveData(): DataSource.Factory<Int, DNSLogs>
+    fun getDNSLogsLiveData(): DataSource.Factory<Int, DnsLog>
 
     @Query("select * from DNSLogs where isBlocked = 1 order by time desc")
-    fun getBlockedDNSLogsLiveData(): DataSource.Factory<Int, DNSLogs>
+    fun getBlockedDNSLogsLiveData(): DataSource.Factory<Int, DnsLog>
 
     @Query(
         "select * from DNSLogs where (queryStr like :searchString or resolver like :searchString or response like :searchString) and isBlocked = 1 order by time desc")
-    fun getBlockedDNSLogsLiveDataByName(searchString: String): DataSource.Factory<Int, DNSLogs>
+    fun getBlockedDNSLogsLiveDataByName(searchString: String): DataSource.Factory<Int, DnsLog>
 
     @Query(
         "select * from DNSLogs where queryStr like :searchString or resolver like :searchString or response like :searchString order by time desc")
-    fun getDNSLogsByQueryLiveData(searchString: String): DataSource.Factory<Int, DNSLogs>
+    fun getDNSLogsByQueryLiveData(searchString: String): DataSource.Factory<Int, DnsLog>
 
     @Query("delete from DNSLogs")
     fun clearAllData()

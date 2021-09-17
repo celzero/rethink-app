@@ -25,6 +25,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.Build
+import android.os.SystemClock
 import android.util.Log
 import androidx.annotation.GuardedBy
 import androidx.annotation.RequiresApi
@@ -37,9 +38,9 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.*
-import com.celzero.bravedns.util.Constants.Companion.NO_PACKAGE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
+import com.celzero.bravedns.util.Utilities.Companion.isNonApp
 import com.google.common.collect.Sets
 import kotlinx.coroutines.*
 import java.util.*
@@ -63,12 +64,15 @@ class RefreshDatabase internal constructor(private var context: Context,
         private const val PROXY_EXTERNAL = "External"
         private const val APP_NAME_NO_APP = "Nobody"
 
-        private const val NEW_APP_BULK_CHECK_COUNT = 5
+        private const val NOTIF_BATCH_NEW_APPS_THRESHOLD = 5
 
-        private const val NOTIF_NEW_APP_BULK = "NewAppBulkInstall"
+        private const val NOTIF_NEW_APPS_BATCH = "NewAppBulkInstall"
 
-        private const val NOTIF_NEW_APP = "NewAppInstall"
-        const val NOTIF_ID_NEW_APP = 106
+        // some per-app unique notification id
+        const val NOTIF_NEW_APP = "NewAppInstall"
+
+        const val PENDING_INTENT_REQUEST_CODE_ALLOW = 107
+        const val PENDING_INTENT_REQUEST_CODE_DENY = 108
     }
 
     private val refreshMutex = ReentrantReadWriteLock()
@@ -95,7 +99,7 @@ class RefreshDatabase internal constructor(private var context: Context,
             isRefreshInProgress = true
         }
 
-        withContext(Dispatchers.IO) {
+        ioCtx {
             try {
                 FirewallManager.reloadAppList()
 
@@ -111,7 +115,7 @@ class RefreshDatabase internal constructor(private var context: Context,
 
                 // packages which are all available in database but not in installed apps(package manager)
                 val packagesToDelete = Sets.difference(trackedApps, installedApps).filter {
-                    !it.packageName.contains(NO_PACKAGE)
+                    !isNonApp(it.packageName)
                 }.toHashSet()
 
                 // packages which are all available in installed apps list but not in database
@@ -122,13 +126,10 @@ class RefreshDatabase internal constructor(private var context: Context,
 
                 FirewallManager.deletePackagesFromCache(packagesToDelete)
 
-                Log.i(LOG_TAG_APP_DB, "Refresh Database, packagesToDelete -> $packagesToDelete")
-                Log.i(LOG_TAG_APP_DB, "Refresh Database, packagesToAdd -> $packagesToAdd")
+                Log.i(LOG_TAG_APP_DB, "remove: $packagesToDelete; insert: $packagesToAdd")
 
-                // Add the missing packages to the database
                 addMissingPackages(packagesToAdd)
 
-                // whether non-app category apps needs an update
                 refreshNonApps(trackedApps, installedApps)
 
                 updateCategoryRepo()
@@ -147,16 +148,17 @@ class RefreshDatabase internal constructor(private var context: Context,
 
     private suspend fun refreshNonApps(trackedApps: Set<FirewallManager.AppInfoTuple>,
                                        installedApps: MutableSet<FirewallManager.AppInfoTuple>) {
-        trackedApps.filter { it.packageName.contains(NO_PACKAGE) }.forEach { t ->
-            installedApps.forEach { i ->
-                if (t.uid == i.uid) {
-                    upsertApps(i)
-                }
+        // if a non-app appears installed-apps group, then upsert its db entry
+        // and give it a proper identity as retrieved from the package-manager
+        val nonApps = trackedApps.filter { isNonApp(it.packageName) }.map { it.uid }.toSet()
+        installedApps.forEach {
+            if (nonApps.contains(it.uid)) {
+                upsertApp(it)
             }
         }
     }
 
-    private suspend fun upsertApps(appTuple: FirewallManager.AppInfoTuple) {
+    private suspend fun upsertApp(appTuple: FirewallManager.AppInfoTuple) {
         val appInfo = getAppInfo(appTuple.uid) ?: return
 
         insertApp(appInfo)
@@ -169,8 +171,7 @@ class RefreshDatabase internal constructor(private var context: Context,
 
         handleNewAppNotification(apps)
 
-        // Contains the app list which are not part of rethink database but available
-        // in package manager's installed list.
+        // add apps missing from app-info-repository
         apps.forEach {
             if (it.packageName == context.applicationContext.packageName) return@forEach
 
@@ -186,28 +187,31 @@ class RefreshDatabase internal constructor(private var context: Context,
         // ignore missing uid (protocol unknown or connectivity mgr missing)
         if (Utilities.isMissingOrInvalidUid(uid)) return
 
-        var tryWait = true
-        var remainingTimeMs = TimeUnit.SECONDS.toMillis(10L)
+        var remainingTimeMs = TimeUnit.SECONDS.toMillis(30L)
 
         // do not proceed unless a refresh is not in progress
         // but this block of code doesn't need to acquire isRefreshInProgress mutex
         // as this is just a one-off insert (FirewallManager app-cache has its own mutex
         // while db inserts are serialized).
-        while (remainingTimeMs > 0 && tryWait) {
+        val waitSliceMs = TimeUnit.SECONDS.toMillis(3L)
+        while (remainingTimeMs > 0) {
+            val startMs = SystemClock.elapsedRealtime()
             refreshMutex.read {
                 if (!isRefreshInProgress) {
-                    tryWait = false
+                    remainingTimeMs = 0 // break out
                 }
             }
-            if (tryWait) delay(TimeUnit.SECONDS.toMillis(1L))
-            remainingTimeMs -= TimeUnit.SECONDS.toMillis(1L)
+            val endMs = SystemClock.elapsedRealtime()
+            remainingTimeMs = remainingTimeMs - waitSliceMs - (endMs - startMs)
+            if (remainingTimeMs > 0) delay(waitSliceMs)
         }
 
-        if (tryWait) {
-            Log.i(LOG_TAG_APP_DB, "wait timeout on insert new app")
-            return
+        refreshMutex.read {
+            if (isRefreshInProgress) {
+                Log.i(LOG_TAG_APP_DB, "wait timeout on insert new app")
+                return
+            }
         }
-
         maybeInsertApp(uid)
     }
 
@@ -230,7 +234,7 @@ class RefreshDatabase internal constructor(private var context: Context,
     }
 
     private suspend fun handleAppInAppRange(uid: Int): ApplicationInfo? {
-        if (AndroidUidConfig.isUidAppRange(uid)) return null
+        if (!AndroidUidConfig.isUidAppRange(uid)) return null
 
         return getAppInfo(uid)
     }
@@ -265,7 +269,8 @@ class RefreshDatabase internal constructor(private var context: Context,
 
         appInfo.appName = appName
         appInfo.packageInfo = "no_package_$uid"
-        appInfo.appCategory = Constants.APP_NON_APP
+        appInfo.appCategory = context.getString(
+            CategoryInfoRepository.CategoryConstants.NON_APP.nameResId)
 
         appInfo.uid = uid
         if (persistentState.blockNewlyInstalledApp) {
@@ -310,7 +315,7 @@ class RefreshDatabase internal constructor(private var context: Context,
         if (FirewallManager.getTotalApps() == 0) return
 
         // Show bulk notification when the app size is greater than NEW_APP_BULK_CHECK_COUNT(5)
-        if (apps.size > NEW_APP_BULK_CHECK_COUNT) {
+        if (apps.size > NOTIF_BATCH_NEW_APPS_THRESHOLD) {
             showNewAppsBulkNotificationIfNeeded(apps.size)
             return
         }
@@ -339,16 +344,15 @@ class RefreshDatabase internal constructor(private var context: Context,
 
         var builder: NotificationCompat.Builder
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name: CharSequence = NOTIF_NEW_APP_BULK
-            val description = context.resources.getString(
-                R.string.new_app_bulk_notification_content, appSize.toString())
+            val name: CharSequence = context.getString(R.string.notif_channel_new_app_batch)
+            val description = context.resources.getString(R.string.notif_channel_desc_new_app_batch)
             val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(NOTIF_NEW_APP_BULK, name, importance)
+            val channel = NotificationChannel(NOTIF_NEW_APPS_BATCH, name, importance)
             channel.description = description
             notificationManager.createNotificationChannel(channel)
-            builder = NotificationCompat.Builder(context, NOTIF_NEW_APP_BULK)
+            builder = NotificationCompat.Builder(context, NOTIF_NEW_APPS_BATCH)
         } else {
-            builder = NotificationCompat.Builder(context, NOTIF_NEW_APP_BULK)
+            builder = NotificationCompat.Builder(context, NOTIF_NEW_APPS_BATCH)
         }
 
         val contentTitle: String = context.resources.getString(
@@ -399,11 +403,10 @@ class RefreshDatabase internal constructor(private var context: Context,
 
         val pendingIntent = PendingIntent.getActivity(context, 0, intent,
                                                       PendingIntent.FLAG_UPDATE_CURRENT)
-        var nbuilder: NotificationCompat.Builder
+        val nbuilder: NotificationCompat.Builder
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name: CharSequence = NOTIF_NEW_APP
-            val description = context.resources.getString(R.string.new_app_notification_content,
-                                                          appName)
+            val name: CharSequence = context.getString(R.string.notif_channel_new_app)
+            val description = context.resources.getString(R.string.notif_channel_desc_new_app)
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(NOTIF_NEW_APP, name, importance)
             channel.description = description
@@ -424,9 +427,10 @@ class RefreshDatabase internal constructor(private var context: Context,
         nbuilder.color = ContextCompat.getColor(context, Utilities.getThemeAccent(context))
 
         val openIntent1 = makeNewAppVpnIntent(context, Constants.NOTIF_ACTION_NEW_APP_ALLOW,
-                                              app.uid)
+                                              app.uid, PENDING_INTENT_REQUEST_CODE_ALLOW)
 
-        val openIntent2 = makeNewAppVpnIntent(context, Constants.NOTIF_ACTION_NEW_APP_DENY, app.uid)
+        val openIntent2 = makeNewAppVpnIntent(context, Constants.NOTIF_ACTION_NEW_APP_DENY, app.uid,
+                                              PENDING_INTENT_REQUEST_CODE_DENY)
         val notificationAction: NotificationCompat.Action = NotificationCompat.Action(0,
                                                                                       context.resources.getString(
                                                                                           R.string.new_app_notification_action_allow),
@@ -448,12 +452,12 @@ class RefreshDatabase internal constructor(private var context: Context,
         notificationManager.notify(NOTIF_NEW_APP, app.uid, nbuilder.build())
     }
 
-    private fun makeNewAppVpnIntent(context: Context, intentExtra: String,
-                                    uid: Int): PendingIntent? {
+    private fun makeNewAppVpnIntent(context: Context, intentExtra: String, uid: Int,
+                                    requestCode: Int): PendingIntent? {
         val intentAction = Intent(context, NotificationActionReceiver::class.java)
         intentAction.putExtra(Constants.NOTIFICATION_ACTION, intentExtra)
         intentAction.putExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, uid)
-        return PendingIntent.getBroadcast(context, uid, intentAction,
+        return PendingIntent.getBroadcast(context, requestCode, intentAction,
                                           PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
@@ -466,11 +470,8 @@ class RefreshDatabase internal constructor(private var context: Context,
     }
 
     private fun determineAppCategory(ai: ApplicationInfo): String {
-        // Removed the package name from the method fetchCategory().
-        // As of now, the fetchCategory is returning Category as OTHERS.
-        // Instead we can query play store for the category.
-        // In that case, fetchCategory method should have packageInfo as
-        // parameter.
+        // fetchCategory returns  category from an unofficial PlayStore endpoint.
+        // disabled for now until there's clarity on its legality
         // val category = fetchCategory(appInfo.packageInfo)
         val cat = fetchCategory()
 
@@ -479,34 +480,31 @@ class RefreshDatabase internal constructor(private var context: Context,
         }
 
         if (isSystemComponent(ai)) {
-            return Constants.APP_CAT_SYSTEM_COMPONENTS
+            return context.getString(
+                CategoryInfoRepository.CategoryConstants.SYSTEM_COMPONENT.nameResId)
         }
 
         if (isSystemApp(ai)) {
-            return Constants.APP_CAT_SYSTEM_APPS
+            return context.getString(CategoryInfoRepository.CategoryConstants.SYSTEM_APP.nameResId)
         }
 
         if (isAtleastO()) {
             return replaceUnderscore(appInfoCategory(ai))
         }
 
-        return Constants.INSTALLED_CAT_APPS
+        return context.getString(CategoryInfoRepository.CategoryConstants.INSTALLED.nameResId)
 
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun appInfoCategory(ai: ApplicationInfo): String {
         val cat = ApplicationInfo.getCategoryTitle(context, ai.category)
-        return cat?.toString() ?: Constants.APP_CAT_OTHER
+        return cat?.toString() ?: context.getString(
+            CategoryInfoRepository.CategoryConstants.OTHER.nameResId)
     }
 
     private fun replaceUnderscore(s: String): String {
         return s.replace("_", " ")
-    }
-
-    // TODO: Ideally this should be in FirewallManager
-    private suspend fun registerNonApp(uid: Int, appName: String) {
-
     }
 
     fun insertDefaultDNSProxy() {
@@ -725,6 +723,12 @@ class RefreshDatabase internal constructor(private var context: Context,
         dnsCryptRelayEndpointRepository.insertAsync(dnsCryptRelayEndpoint3)
         dnsCryptRelayEndpointRepository.insertAsync(dnsCryptRelayEndpoint4)
         dnsCryptRelayEndpointRepository.insertAsync(dnsCryptRelayEndpoint5)
+    }
+
+    private suspend fun ioCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.IO) {
+            f()
+        }
     }
 
 }

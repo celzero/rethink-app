@@ -34,7 +34,6 @@ import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
 import com.celzero.bravedns.ui.ConnectionTrackerFragment
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
 import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
@@ -141,7 +140,7 @@ class ConnectionTrackerAdapter(private val connectionTrackerFragment: Connection
             // known ports(reserved port and protocol identifiers).
             // https://github.com/celzero/rethink-app/issues/42 - #3 - transport + protocol.
             val resolvedPort = KnownPorts.resolvePort(port)
-            b.connLatencyTxt.text = if (resolvedPort != Constants.PORT_VAL_UNKNOWN) {
+            b.connLatencyTxt.text = if (resolvedPort != KnownPorts.PORT_VAL_UNKNOWN) {
                 resolvedPort.uppercase(Locale.ROOT)
             } else {
                 Protocol.getProtocolName(proto).name

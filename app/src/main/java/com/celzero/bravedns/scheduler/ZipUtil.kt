@@ -20,23 +20,34 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.BUG_REPORT_MAX_FILES_ALLOWED
+import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_SCHEDULER
 import com.celzero.bravedns.util.Utilities
 import com.google.common.io.Files
 import java.io.*
 import java.util.*
 import java.util.zip.ZipEntry
+import java.util.zip.ZipException
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 
 class ZipUtil {
     companion object {
 
+        // Bug report file and directory constants
+        private const val BUG_REPORT_DIR_NAME = "bugreport/"
+        private const val BUG_REPORT_ZIP_FILE_NAME = "rethinkdns.bugreport.zip"
+        private const val BUG_REPORT_FILE_NAME = "bugreport_"
+
+        // maximum number of files allowed as part of bugreport zip file
+        private const val BUG_REPORT_MAX_FILES_ALLOWED = 20
+
+        // secure sharing of files associated with an app, used in share bugreport file feature
+        const val FILE_PROVIDER_NAME = BuildConfig.APPLICATION_ID + ".provider"
+
         @RequiresApi(Build.VERSION_CODES.O)
         fun getBugReport(context: Context): String {
-            val filePath = context.filesDir.canonicalPath + File.separator + Constants.BUG_REPORT_DIR_NAME
+            val filePath = context.filesDir.canonicalPath + File.separator + BUG_REPORT_DIR_NAME
             val file = File(filePath)
 
             if (file.exists()) {
@@ -46,22 +57,24 @@ class ZipUtil {
             }
 
             val zipFile = getZipFile(context) ?: return constructFileName(filePath, null)
+            zipFile.use { zf ->
+                val nextFileNumber = zf.entries().toList().size
 
-            val nextFileNumber = zipFile.entries().toList().size
-
-            if (nextFileNumber >= BUG_REPORT_MAX_FILES_ALLOWED) {
-                val f = File(getOlderFile(zipFile))
-                val fileName = Files.getNameWithoutExtension(f.name)
-                return constructFileName(filePath, fileName)
+                if (nextFileNumber >= BUG_REPORT_MAX_FILES_ALLOWED) {
+                    val f = File(getOlderFile(zf))
+                    val fileName = Files.getNameWithoutExtension(f.name)
+                    return constructFileName(filePath, fileName)
+                }
+                return constructFileName(filePath, BUG_REPORT_FILE_NAME + nextFileNumber)
             }
-
-            return constructFileName(filePath, Constants.BUG_REPORT_FILE_NAME + nextFileNumber)
         }
 
         private fun getZipFile(context: Context): ZipFile? {
             return try {
                 ZipFile(getZipFilePath(context))
-            } catch (ignored: Exception) { // FileNotFound, ZipException
+            } catch (ignored: FileNotFoundException) {
+                null
+            } catch (ignored: ZipException) {
                 null
             }
         }
@@ -82,7 +95,7 @@ class ZipUtil {
         }
 
         fun getZipFilePath(context: Context): String {
-            return context.filesDir.canonicalPath + File.separator + Constants.BUG_REPORT_ZIP_FILE_NAME
+            return context.filesDir.canonicalPath + File.separator + BUG_REPORT_ZIP_FILE_NAME
         }
 
         @RequiresApi(Build.VERSION_CODES.O)
@@ -90,24 +103,25 @@ class ZipUtil {
             val zipPath = getZipFilePath(context)
 
             val zipFile = getZipFile(context)
-            FileOutputStream(zipPath, true).use { fo ->
-                ZipOutputStream(fo).use { zo ->
-                    // Issue when a new file is appended to the existing zip file.
-                    // Using the approach similar to this ref=(https://stackoverflow.com/a/2265206)
-                    handleOlderFiles(zo, zipFile, file.name)
+            zipFile.use { zf ->
+                FileOutputStream(zipPath, true).use { fo ->
+                    ZipOutputStream(fo).use { zo ->
+                        // Issue when a new file is appended to the existing zip file.
+                        // Using the approach similar to this ref=(https://stackoverflow.com/a/2265206)
+                        handleOlderFiles(zo, zf, file.name)
 
-                    // Add new file to zip
-                    addNewZipEntry(zo, file)
+                        // Add new file to zip
+                        addNewZipEntry(zo, file)
+                    }
                 }
             }
-            zipFile?.close()
 
             deleteBugReportFile(context)
         }
 
         // delete the file created to store the bug report in zip
         private fun deleteBugReportFile(context: Context) {
-            val filePath = context.filesDir.canonicalPath + File.separator + Constants.BUG_REPORT_DIR_NAME
+            val filePath = context.filesDir.canonicalPath + File.separator + BUG_REPORT_DIR_NAME
             Utilities.deleteRecursive(File(filePath))
         }
 
@@ -115,9 +129,9 @@ class ZipUtil {
             Log.d(LOG_TAG_SCHEDULER, "Add new file: ${file.name} to bug_report.zip")
             val entry = ZipEntry(file.name)
             zo.putNextEntry(entry)
-            val inStream = FileInputStream(file)
-            writeZipContents(zo, inStream)
-            inStream.close()
+            FileInputStream(file).use { inStream ->
+                writeZipContents(zo, inStream)
+            }
         }
 
         private fun handleOlderFiles(zo: ZipOutputStream, zipFile: ZipFile?,
@@ -142,9 +156,9 @@ class ZipUtil {
                 zo.putNextEntry(zipEntry)
 
                 if (!e.isDirectory) {
-                    val inStream = zipFile.getInputStream(e)
-                    writeZipContents(zo, inStream)
-                    inStream.close()
+                    zipFile.getInputStream(e).use { inStream ->
+                        writeZipContents(zo, inStream)
+                    }
                 }
                 zo.closeEntry()
             }

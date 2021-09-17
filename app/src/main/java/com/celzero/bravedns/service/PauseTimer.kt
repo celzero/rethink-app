@@ -18,7 +18,6 @@ package com.celzero.bravedns.service
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
@@ -31,10 +30,16 @@ import java.util.concurrent.atomic.AtomicLong
 
 object PauseTimer {
 
-    private var countdownMs: AtomicLong = AtomicLong(Constants.DEFAULT_PAUSE_TIME_MS)
+    // default duration for pause state: 15mins
+    val DEFAULT_PAUSE_TIME_MS = TimeUnit.MINUTES.toMillis(15)
+
+    private var countdownMs: AtomicLong = AtomicLong(DEFAULT_PAUSE_TIME_MS)
     private var pauseCountDownTimer: MutableLiveData<Long> = MutableLiveData()
     private const val LOCKDOWN_STATUS_CHECK_TIME_IN_SEC = 30L
     private const val COUNT_DOWN_INTERVAL = 1000L
+
+    // increment/decrement value to pause vpn
+    val PAUSE_VPN_EXTRA_MILLIS = TimeUnit.MINUTES.toMillis(1)
 
     fun start(durationMs: Long) {
         if (DEBUG) Log.d(LOG_TAG_UI, "timer started, duration: $durationMs")
@@ -84,11 +89,11 @@ object PauseTimer {
         setCountdown(INIT_TIME_MS)
     }
 
-    fun increment(duration: Long) {
+    fun addDuration(duration: Long) {
         addCountdown(duration)
     }
 
-    fun decrement(duration: Long) {
+    fun subtractDuration(duration: Long) {
         addCountdown(-duration)
     }
 

@@ -30,11 +30,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
+import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.databinding.ExcludeAppDialogLayoutBinding
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
-import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ExcludedAppViewModel
 import com.google.android.material.chip.Chip
 
@@ -100,9 +99,6 @@ class ExcludeAppsDialog(private var activity: Activity,
 
         b.excludeAppSelectAllOptionCheckbox.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             FirewallManager.updateExcludedAppsByCategories(filterCategories, b)
-            Utilities.delay(500) {
-                adapter.notifyDataSetChanged()
-            }
         }
 
         b.excludeAppDialogWhitelistSearchFilter.setOnClickListener(this)
@@ -164,10 +160,9 @@ class ExcludeAppsDialog(private var activity: Activity,
 
         for (category in categories) {
             // Ignore non-app system category in excluded list
-            if (category == Constants.APP_NON_APP) continue
+            if (CategoryInfoRepository.CategoryConstants.isNonApp(context, category)) continue
 
-            val chip = this.layoutInflater.inflate(R.layout.item_chip_category, null, false) as Chip
-            chip.text = category
+            val chip = makeChip(category)
             b.excludeAppDialogChipGroup.addView(chip)
 
             chip.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
@@ -191,6 +186,12 @@ class ExcludeAppsDialog(private var activity: Activity,
                 }
             }
         }
+    }
+
+    private fun makeChip(category: String): Chip {
+        val chip = this.layoutInflater.inflate(R.layout.item_chip_category, null, false) as Chip
+        chip.text = category
+        return chip
     }
 
 }

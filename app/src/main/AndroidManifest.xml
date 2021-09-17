@@ -31,10 +31,10 @@
 
         <activity
             android:name=".ui.FirewallActivity"
-            android:launchMode="singleTask" />
+            android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.PermissionManagerActivity"
-            android:launchMode="singleInstance" />
+            android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.HomeScreenActivity"
             android:launchMode="singleTask"
@@ -46,29 +46,29 @@
         </activity>
         <activity
             android:name=".ui.DNSDetailActivity"
-            android:launchMode="singleTask" />
+            android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.WelcomeActivity"
-            android:launchMode="singleTask"
+            android:finishOnTaskLaunch="true"
             android:noHistory="true" />
         <activity
             android:name=".ui.AppInfoActivity"
-            android:launchMode="singleInstance" />
+            android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.FaqWebViewActivity"
-            android:launchMode="singleInstance" />
+            android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.PauseActivity"
             android:launchMode="singleInstance" />
         <activity
             android:name=".ui.DNSConfigureWebViewActivity"
-            android:launchMode="singleInstance" />
+            android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.DomainDetailActivity"
-            android:launchMode="singleInstance" />
+            android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.DNSListActivity"
-            android:launchMode="singleInstance" />
+            android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.NotificationHandlerDialog"
             android:excludeFromRecents="true"

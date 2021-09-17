@@ -251,8 +251,8 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
                                                            PendingIntent.FLAG_UPDATE_CURRENT)
         var builder: NotificationCompat.Builder
         if (isAtleastO()) {
-            val name: CharSequence = ORBOT_NOTIFICATION_ID
-            val description = context.resources.getString(R.string.settings_orbot_notification_desc)
+            val name: CharSequence = context.getString(R.string.notif_channel_orbot_failure)
+            val description = context.resources.getString(R.string.notif_channel_desc_orbot_failure)
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(ORBOT_NOTIFICATION_ID, name, importance)
             channel.description = description
@@ -321,7 +321,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
         return selectedProxyType == AppMode.ProxyType.HTTP_SOCKS5.name
     }
 
-    private fun handleOrbotSocks5Update(): Boolean {
+    private suspend fun handleOrbotSocks5Update(): Boolean {
         val proxyEndpoint = constructProxy()
         return if (proxyEndpoint != null) {
             appMode.insertOrbotProxy(proxyEndpoint)
@@ -379,7 +379,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
      * initiation.
      */
     private suspend fun waitForOrbot() {
-        uiCtx {
+        io {
             delay(TimeUnit.SECONDS.toMillis(25L))
             Log.i(LOG_TAG_VPN, "after timeout, isOrbotUp? $isResponseReceivedFromOrbot")
 
@@ -388,7 +388,9 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
             // then the executor will execute and will disable the Orbot settings.
             // Some cases where the Orbot won't be responding -eg., force stop of application,
             // user disabled auto-start of the application.
-            if (!isResponseReceivedFromOrbot) {
+            if (isResponseReceivedFromOrbot) return@io
+
+            withContext(Dispatchers.Main) {
                 stopOrbot(isInteractive = false)
             }
         }

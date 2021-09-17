@@ -36,5 +36,9 @@ class RethinkDnsApplicationPlay:Application() {
                     single<AppUpdater> { StoreAppUpdater(androidContext())}
             }))
         }
+
+        if (DEBUG) Log.d(LOG_TAG_SCHEDULER, "Schedule job")
+        get<WorkScheduler>().scheduleAppExitInfoCollectionJob()
+        get<WorkScheduler>().scheduleDatabaseRefreshJob()
     }
 }

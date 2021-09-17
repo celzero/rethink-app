@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Utilities
 
 class NotificationHandlerDialog : AppCompatActivity() {
     enum class TrampolineType {
@@ -49,28 +50,61 @@ class NotificationHandlerDialog : AppCompatActivity() {
     // In two-cases (accessibility failure/new app install action), the app directly launches
     // firewall activity from notification action. Need to handle the pause state for those cases
     private fun handleNotificationIntent(intent: Intent) {
+        val trampolineType: TrampolineType
+        // app not started launch home screen
+        if (!VpnController.isOn()) {
+            trampolineType = TrampolineType.NONE
+            trampoline(trampolineType)
+            return
+        }
 
-        when (determineTrampoline(intent)) {
+        if (VpnController.isAppPaused()) {
+            trampolineType = TrampolineType.PAUSE_ACTIVITY
+            trampoline(trampolineType)
+            return
+        }
+
+        trampolineType = if (isAccessibilityIntent(intent)) {
+            TrampolineType.ACCESSIBILITY_SERVICE_FAILURE_DIALOG
+        } else if (isNewAppInstalledIntent(intent)) {
+            TrampolineType.NEW_APP_INSTAL_DIALOG
+        } else {
+            TrampolineType.NONE
+        }
+        trampoline(trampolineType)
+    }
+
+    private fun trampoline(trampolineType: TrampolineType) {
+        when (trampolineType) {
             TrampolineType.ACCESSIBILITY_SERVICE_FAILURE_DIALOG -> {
                 handleAccessibilitySettings()
             }
             TrampolineType.NEW_APP_INSTAL_DIALOG -> {
                 // navigate to all apps screen
-                launchFirewallActivity()
+                launchFirewallActivityAndFinish()
             }
             TrampolineType.HOMESCREEN_ACTIVITY -> {
-                launchHomeScreen()
+                launchHomeScreenAndFinish()
             }
             TrampolineType.PAUSE_ACTIVITY -> {
-                showAppPauseDialog(receivedIntentType(intent))
+                showAppPauseDialog(trampolineType)
             }
             TrampolineType.NONE -> {
-                // no-op
+                launchHomeScreenAndFinish()
             }
         }
     }
 
-    private fun receivedIntentType(intent: Intent): TrampolineType {
+    private fun determineTrampoline(intent: Intent): TrampolineType {
+        // app not started launch home screen
+        if (!VpnController.isOn()) {
+            return TrampolineType.NONE
+        }
+
+        if (VpnController.isAppPaused()) {
+            return TrampolineType.PAUSE_ACTIVITY
+        }
+
         return if (isAccessibilityIntent(intent)) {
             TrampolineType.ACCESSIBILITY_SERVICE_FAILURE_DIALOG
         } else if (isNewAppInstalledIntent(intent)) {
@@ -80,28 +114,15 @@ class NotificationHandlerDialog : AppCompatActivity() {
         }
     }
 
-    private fun determineTrampoline(intent: Intent): TrampolineType {
-        // app not started launch home screen
-        if (!VpnController.isOn()) {
-            return TrampolineType.HOMESCREEN_ACTIVITY
-        }
-
-        if (VpnController.isAppPaused()) {
-            return TrampolineType.PAUSE_ACTIVITY
-        }
-
-        return receivedIntentType(intent)
-    }
-
-    private fun launchHomeScreen() {
+    private fun launchHomeScreenAndFinish() {
         startActivity(Intent(this, HomeScreenActivity::class.java))
         finish()
     }
 
-    private fun launchFirewallActivity() {
+    private fun launchFirewallActivityAndFinish() {
         val intent = Intent(this, FirewallActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-        intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, FirewallActivity.FirewallTabs.ALL_APPS.screen)
+        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+        intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, FirewallActivity.Tabs.ALL_APPS.screen)
         startActivity(intent)
         finish()
     }
@@ -139,55 +160,35 @@ class NotificationHandlerDialog : AppCompatActivity() {
         builder.setCancelable(false)
         builder.setPositiveButton(R.string.notif_dialog_pause_dialog_positive) { _, _ ->
             VpnController.getBraveVpnService()?.resumeApp()
-            when (trampolineType) {
-                TrampolineType.ACCESSIBILITY_SERVICE_FAILURE_DIALOG -> {
-                    handleAccessibilitySettings()
-                }
-                TrampolineType.NEW_APP_INSTAL_DIALOG -> {
-                    launchFirewallActivity()
-                }
-                else -> {
-                    // no-op
-                }
-            }
+
+            trampoline(trampolineType)
         }
 
         builder.setNegativeButton(R.string.notif_dialog_pause_dialog_negative) { _, _ ->
-            openAppPausedActivity()
+            finish()
+        }
+
+        builder.setNeutralButton(R.string.notif_dialog_pause_dialog_neutral) { _, _ ->
+            Utilities.openPauseActivityAndFinish(this)
         }
 
         builder.create().show()
     }
 
-    private fun openAppPausedActivity() {
-        val intent = Intent()
-        intent.setClass(this, PauseActivity::class.java)
-        startActivity(intent)
-        finish()
-    }
-
+    /* checks if its accessibility failure intent sent from notification */
     private fun isAccessibilityIntent(intent: Intent): Boolean {
-        // Created as part of accessibility failure notification.
-        val extras = intent.extras
-        if (extras != null) {
-            val value = extras.getString(Constants.NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME)
-            if (!value.isNullOrEmpty() && value == Constants.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE) {
-                return true
-            }
-        }
-        return false
+        if (intent.extras == null) return false
+
+        val what = intent.extras?.getString(Constants.NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME)
+        return Constants.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE == what
     }
 
+    /* checks if its a new-app-installed intent sent from notification */
     private fun isNewAppInstalledIntent(intent: Intent): Boolean {
-        // check whether the intent is from new app installed notification
-        val extras = intent.extras
-        if (extras != null) {
-            val value = extras.getString(Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME)
-            if (!value.isNullOrEmpty() && value == Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE) {
-                return true
-            }
-        }
-        return false
+        if (intent.extras == null) return false
+
+        val what = intent.extras?.getString(Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME)
+        return Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE == what
     }
 
 }

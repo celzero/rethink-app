@@ -16,9 +16,9 @@ limitations under the License.
 
 package com.celzero.bravedns.database
 
+import android.content.Context
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.celzero.bravedns.util.Constants
 
 @Entity(tableName = "CategoryInfo")
 class CategoryInfo {
@@ -30,8 +30,8 @@ class CategoryInfo {
     var numOfAppsExcluded: Int = 0
     var isInternetBlocked: Boolean = false
 
-    fun isAnySystemCategory(): Boolean {
-        return Constants.APP_CAT_SYSTEM_COMPONENTS == categoryName || Constants.APP_NON_APP == categoryName || Constants.APP_CAT_SYSTEM_APPS == categoryName
+    fun isAnySystemCategory(context: Context): Boolean {
+        return CategoryInfoRepository.CategoryConstants.isAnySystemCategory(context, categoryName)
     }
 
 

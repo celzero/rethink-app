@@ -198,7 +198,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
                 }
             }
 
-            (adapterList as FirewallAppListAdapter).updateData(filteredCategories, listData)
+            adapterList?.updateData(filteredCategories, listData)
             hideProgressBar()
             showExpandableList()
         }

@@ -36,9 +36,7 @@ import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
 import com.google.android.material.chip.Chip
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -54,7 +52,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
 
     private var filterQuery: String? = ""
     private var filterCategories: MutableSet<String> = mutableSetOf()
-    private var filterType: ConnectionTrackerViewModel.FilterType = ConnectionTrackerViewModel.FilterType.ALL
+    private var filterType: TopLevelFilter = TopLevelFilter.ALL
     private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
     private val persistentState by inject<PersistentState>()
     private val dnsLogTracker by inject<DNSLogTracker>()
@@ -95,6 +93,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         includeView.connectionSearch.setOnQueryTextListener(this)
         includeView.connectionSearch.setOnClickListener {
             showParentChipsUi()
+            showChildChipsIfNeeded()
             includeView.connectionSearch.requestFocus()
             includeView.connectionSearch.onActionViewExpanded()
         }
@@ -116,10 +115,25 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
 
         if (includeView.filterChipParentGroup.isVisible) {
             hideParentChipsUi()
+            hideChildChipsUi()
         } else {
             showParentChipsUi()
+            showChildChipsIfNeeded()
         }
-        hideChildChipsUi()
+    }
+
+    private fun showChildChipsIfNeeded() {
+        when (filterType) {
+            TopLevelFilter.ALL -> {
+                hideChildChipsUi()
+            }
+            TopLevelFilter.ALLOWED -> {
+                showChildChipsUi()
+            }
+            TopLevelFilter.BLOCKED -> {
+                showChildChipsUi()
+            }
+        }
     }
 
     private fun remakeParentFilterChipsUi() {
@@ -173,19 +187,19 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         when (tag) {
             TopLevelFilter.ALL.id -> {
                 filterCategories.clear()
-                filterType = ConnectionTrackerViewModel.FilterType.ALL
+                filterType = TopLevelFilter.ALL
                 viewModel.setFilter(filterQuery, filterCategories, filterType)
                 hideChildChipsUi()
             }
             TopLevelFilter.ALLOWED.id -> {
                 filterCategories.clear()
-                filterType = ConnectionTrackerViewModel.FilterType.ALLOWED
+                filterType = TopLevelFilter.ALLOWED
                 viewModel.setFilter(filterQuery, filterCategories, filterType)
                 remakeChildFilterChipsUi(FirewallRuleset.getAllowedRules())
-                showParentChipsUi()
+                showChildChipsUi()
             }
             TopLevelFilter.BLOCKED.id -> {
-                filterType = ConnectionTrackerViewModel.FilterType.BLOCKED
+                filterType = TopLevelFilter.BLOCKED
                 viewModel.setFilter(filterQuery, filterCategories, filterType)
                 remakeChildFilterChipsUi(FirewallRuleset.getBlockedRules())
                 showChildChipsUi()
@@ -226,12 +240,11 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     }
 
     private fun remakeChildFilterChipsUi(categories: List<FirewallRuleset>) {
-        val includeView = b.connectionListScrollList
+        val v = b.connectionListScrollList
 
-        includeView.filterChipGroup.removeAllViews()
-        for (category in categories) {
-            val chip = makeChildChip(category.id, category.title)
-            includeView.filterChipGroup.addView(chip)
+        v.filterChipGroup.removeAllViews()
+        for (c in categories) {
+            v.filterChipGroup.addView(makeChildChip(c.id, c.title))
         }
     }
 

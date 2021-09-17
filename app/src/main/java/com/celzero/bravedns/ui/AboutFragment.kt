@@ -43,12 +43,9 @@ import com.celzero.bravedns.databinding.DialogViewLogsBinding
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentAboutBinding
 import com.celzero.bravedns.scheduler.WorkScheduler
+import com.celzero.bravedns.scheduler.ZipUtil.Companion.FILE_PROVIDER_NAME
 import com.celzero.bravedns.scheduler.ZipUtil.Companion.getZipFilePath
 import com.celzero.bravedns.service.AppUpdater
-import com.celzero.bravedns.util.Constants.Companion.FILE_PROVIDER_NAME
-import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
-import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
-import com.celzero.bravedns.util.Constants.Companion.FLAVOR_WEBSITE
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
@@ -121,11 +118,11 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     private fun getDownloadSource(): String {
-        if (isFdroidFlavour()) return FLAVOR_FDROID
+        if (isFdroidFlavour()) return getString(R.string.build__flavor_fdroid)
 
-        if (isPlayStoreFlavour()) return FLAVOR_PLAY
+        if (isPlayStoreFlavour()) return getString(R.string.build__flavor_play_store)
 
-        return FLAVOR_WEBSITE
+        return getString(R.string.build__flavor_website)
     }
 
     override fun onClick(view: View?) {
@@ -331,6 +328,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             } finally {
                 fin?.close()
                 zin?.close()
+                zipFile.close()
             }
 
             uiCtx {
@@ -419,7 +417,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         }
     }
 
-    private suspend fun uiCtx(f: () -> Unit) {
+    private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) {
             f()
         }

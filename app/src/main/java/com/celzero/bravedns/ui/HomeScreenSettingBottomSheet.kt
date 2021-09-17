@@ -17,7 +17,6 @@ package com.celzero.bravedns.ui
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.os.SystemClock
 import android.text.format.DateUtils
 import android.util.Log
 import android.view.LayoutInflater
@@ -198,17 +197,16 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun updateUptime() {
+        // returns a string describing 'time' as a time relative to 'now'
         val upTime = DateUtils.getRelativeTimeSpanString(
-            HomeScreenActivity.GlobalVariable.appStartTime, SystemClock.elapsedRealtime(),
+            HomeScreenActivity.GlobalVariable.appStartTime, System.currentTimeMillis(),
             DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE)
         b.bsHomeScreenAppUptime.text = getString(R.string.hsf_uptime, upTime)
     }
 
     private fun modifyBraveMode(braveMode: Int) {
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                appMode.changeBraveMode(braveMode)
-            }
+        io {
+            appMode.changeBraveMode(braveMode)
         }
     }
 
@@ -222,6 +220,14 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
             }
             else -> {
                 getString(R.string.dns_explanation_connected)
+            }
+        }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                f()
             }
         }
     }

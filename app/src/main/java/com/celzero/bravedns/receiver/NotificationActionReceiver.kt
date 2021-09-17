@@ -70,7 +70,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
             }
             Constants.NOTIF_ACTION_NEW_APP_ALLOW -> {
                 val uid = intent.getIntExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, 0)
-                manager.cancel(RefreshDatabase.NOTIF_ID_NEW_APP.toString(), uid)
+                manager.cancel(RefreshDatabase.NOTIF_NEW_APP, uid)
 
                 if (uid <= 0) return
 
@@ -78,7 +78,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
             }
             Constants.NOTIF_ACTION_NEW_APP_DENY -> {
                 val uid = intent.getIntExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, 0)
-                manager.cancel(RefreshDatabase.NOTIF_ID_NEW_APP.toString(), uid)
+                manager.cancel(RefreshDatabase.NOTIF_NEW_APP, uid)
 
                 if (uid <= 0) return
 

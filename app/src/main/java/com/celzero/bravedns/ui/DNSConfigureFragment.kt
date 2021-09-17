@@ -20,10 +20,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.FragmentDnsConfigureBinding
-import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Utilities
 
 class DNSConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
     private val b by viewBinding(FragmentDnsConfigureBinding::bind)
@@ -60,7 +59,7 @@ class DNSConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
 
         b.customBlocklistCard.setOnClickListener {
             val intent = Intent(requireContext(), DomainDetailActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+            intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
             startActivity(intent)
         }
 
@@ -76,14 +75,14 @@ class DNSConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
 
         b.otherDnsCard.setOnClickListener {
             val intent = Intent(requireContext(), DNSListActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+            intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
             startActivity(intent)
         }
     }
 
     private fun initView() {
         // Show the on-device blocklist card only on non-play store builds
-        if (BuildConfig.FLAVOR != Constants.FLAVOR_PLAY) {
+        if (!Utilities.isPlayStoreFlavour()) {
             b.onDeviceBlockConfigureTitle.visibility = View.VISIBLE
         } else {
             b.onDeviceBlockConfigureTitle.visibility = View.GONE

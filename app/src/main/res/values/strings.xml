@@ -82,16 +82,6 @@
     Tap to change protection setting
   </string>
 
-    <string name="warning_channel_name" description="This is the name of the class of notifications that show warnings.  It's only
-  visible in the system's advanced notifications settings page.">
-    Warning
-  </string>
-
-    <string name="warning_channel_description" description="This is the explanatory text describing the 'Warning' notification class.  It's
-  only visible in the system's advanced notifications settings page.">
-    Shown when RethinkDNS has encountered a problem.
-  </string>
-
     <string name="notification_title" description="Status indicator text shown in a persistent notification.">
     Protected! Connected to Fast and Secure DNS.
   </string>
@@ -1061,6 +1051,7 @@
     <string name="network_log_app_name_unnamed">Unnamed (%1$s)</string>
 
     <string name="dns_crypt_connection_failure">Error connecting to DNSCrypt server.</string>
+    <string name="dns_proxy_connection_failure">Error connecting to DNS Proxy server.</string>
     <string name="dns_proxy_connection_failure_lockdown">Excluding %1$s for %2$s in lockdown mode can cause Internet connectivity issues.</string>
     <string name="dns_proxy_toast_parameter">DNS Proxy</string>
     <string name="socks5_proxy_toast_parameter">SOCKS5 Proxy</string>
@@ -1160,5 +1151,36 @@
     <string name="notif_dialog_pause_dialog_message">Application in pause state, resume to continue</string>
     <string name="notif_dialog_pause_dialog_positive">Resume</string>
     <string name="notif_dialog_pause_dialog_negative">Discard</string>
+    <string name="notif_dialog_pause_dialog_neutral">Show</string>
+
+    <!-- Notification label names -->
+    <string name="notif_channel_vpn_notification">RethinkDNS VPN</string>
+    <string name="notif_channel_vpn_failure">Warning</string>
+    <string name="notif_channel_accessibility_failure">App not in use failure</string>
+    <string name="notif_channel_new_app_batch">New apps batch install</string>
+    <string name="notif_channel_new_app">New app install</string>
+    <string name="notif_channel_orbot_failure">Orbot failure</string>
+    <string name="nofif_channel_firewall_load_failure">Firewall rules load failure</string>
+
+
+    <string name="notif_channel_desc_vpn_notification">Tap to change protection settings</string>
+    <string name="notif_channel_desc_vpn_failure">Shown when RethinkDNS has encountered a problem.</string>
+    <string name="notif_channel_desc_accessibility_failure">Shown when the app not in use firewall settings stopped working</string>
+    <string name="notif_channel_desc_new_app_batch">Shown when RethinkDNS detected batch of new apps installed</string>
+    <string name="notif_channel_desc_new_app">Shown when RethinkDNS detected a new app installed</string>
+    <string name="notif_channel_desc_orbot_failure">Shown when RethinkDNS failed to setup Orbot proxy</string>
+    <string name="nofif_channel_desc_firewall_load_failure">Shown when firewall rules are failed to load</string>
+
+    <!-- Category constants -->
+    <string name="category_name_sys_components">System Components</string>
+    <string name="category_name_sys_apps">System Apps</string>
+    <string name="category_name_others">Other</string>
+    <string name="category_name_non_app_sys">Non-App System</string>
+    <string name="category_name_installed">Installed Apps</string>
+
+    <!-- Build flavor constants -->
+    <string name="build__flavor_website">website</string>
+    <string name="build__flavor_play_store">play</string>
+    <string name="build__flavor_fdroid">fdroid</string>
 
 </resources>

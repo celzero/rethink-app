@@ -36,14 +36,14 @@ import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
-import com.celzero.bravedns.database.DNSLogs
+import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.databinding.DialogIpDetailsLayoutBinding
+import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
@@ -58,7 +58,7 @@ import java.util.*
 
 
 class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
-                                      private var transaction: DNSLogs) :
+                                      private var transaction: DnsLog) :
         BottomSheetDialogFragment() {
     private var _binding: BottomSheetDnsLogBinding? = null
 
@@ -119,10 +119,10 @@ class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
 
         b.dnsBlockBlocklistChip.visibility = View.GONE
         b.dnsBlockIpsChip.visibility = View.VISIBLE
-        handleIpsChip()
+        handleResponseIpsChip()
     }
 
-    private fun handleIpsChip() {
+    private fun handleResponseIpsChip() {
         if (transaction.response.isEmpty()) {
             b.dnsBlockIpsChip.visibility = View.GONE
             return
@@ -259,12 +259,12 @@ class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
     }
 
     private fun displayFavIcon() {
-        if (!persistentState.fetchFavIcon || transaction.failure()) return
+        if (!persistentState.fetchFavIcon || transaction.groundedQuery()) return
 
         val trim = transaction.queryStr.dropLast(1)
-        val url = "${Constants.FAV_ICON_URL}$trim.ico"
+        val url = "${FavIconDownloader.FAV_ICON_URL}$trim.ico"
         val domainURL = getETldPlus1(trim)
-        val glideURL = "${Constants.FAV_ICON_URL}$domainURL.ico"
+        val glideURL = "${FavIconDownloader.FAV_ICON_URL}$domainURL.ico"
         updateImage(url, glideURL)
     }
 

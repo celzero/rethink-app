@@ -50,6 +50,7 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_2
+import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
@@ -117,6 +118,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityPreventDnsLeaksSwitch.isChecked = persistentState.preventDnsLeaks
 
         observeCustomProxy()
+        observeBraveMode()
+
         displayAppThemeUi()
         displayNotificationActionUi()
         displaySocks5Ui()
@@ -180,7 +183,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     private fun displayNotificationActionUi() {
         b.settingsActivityNotificationRl.isEnabled = true
-        when (NotificationActionType.getNotificationActionType(persistentState.notificationActionType)) {
+        when (NotificationActionType.getNotificationActionType(
+            persistentState.notificationActionType)) {
             NotificationActionType.PAUSE_STOP -> {
                 b.genSettingsNotificationDesc.text = getString(R.string.settings_notification_desc,
                                                                getString(
@@ -388,30 +392,33 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivityOnDeviceBlockSwitch.setOnCheckedChangeListener(null)
         b.settingsActivityOnDeviceBlockSwitch.setOnClickListener {
             lifecycleScope.launch {
-                enableAfterDelayCo(TimeUnit.SECONDS.toMillis(1L),
-                                   b.settingsActivityOnDeviceBlockSwitch)
+                uiCtx {
+                    enableAfterDelayCo(TimeUnit.SECONDS.toMillis(1L),
+                                       b.settingsActivityOnDeviceBlockSwitch)
 
-                b.settingsActivityOnDeviceBlockProgress.visibility = View.VISIBLE
-                if (!b.settingsActivityOnDeviceBlockSwitch.isChecked) {
-                    removeBraveDNSLocal()
-                    return@launch
-                }
+                    b.settingsActivityOnDeviceBlockProgress.visibility = View.VISIBLE
+                    if (!b.settingsActivityOnDeviceBlockSwitch.isChecked) {
+                        removeBraveDNSLocal()
+                        return@uiCtx
+                    }
 
-                b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
-                val blocklistsExist = withContext(Dispatchers.Default) {
-                    hasLocalBlocklists(requireContext(), persistentState.localBlocklistTimestamp)
-                }
-                if (blocklistsExist) {
-                    setBraveDNSLocal() // TODO: Move this to vpnService observer
-                    b.settingsActivityOnDeviceBlockDesc.text = getString(
-                        R.string.settings_local_blocklist_in_use,
-                        persistentState.numberOfLocalBlocklists.toString())
-                } else {
-                    b.settingsActivityOnDeviceBlockSwitch.isChecked = false
-                    if (VpnController.isVpnLockdown()) {
-                        showVpnLockdownDownloadDialog()
+                    b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
+                    val blocklistsExist = withContext(Dispatchers.Default) {
+                        hasLocalBlocklists(requireContext(),
+                                           persistentState.localBlocklistTimestamp)
+                    }
+                    if (blocklistsExist) {
+                        setBraveDNSLocal() // TODO: Move this to vpnService observer
+                        b.settingsActivityOnDeviceBlockDesc.text = getString(
+                            R.string.settings_local_blocklist_in_use,
+                            persistentState.numberOfLocalBlocklists.toString())
                     } else {
-                        showDownloadDialog()
+                        b.settingsActivityOnDeviceBlockSwitch.isChecked = false
+                        if (VpnController.isVpnLockdown()) {
+                            showVpnLockdownDownloadDialog()
+                        } else {
+                            showDownloadDialog()
+                        }
                     }
                 }
             }
@@ -421,6 +428,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             val intent = Intent(requireContext(), DNSConfigureWebViewActivity::class.java)
             val stamp = persistentState.localBlocklistStamp
             if (DEBUG) Log.d(LOG_TAG_VPN, "Stamp value in settings screen: $stamp")
+            intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
             intent.putExtra(Constants.BLOCKLIST_LOCATION_INTENT_EXTRA,
                             DNSConfigureWebViewActivity.LOCAL)
             intent.putExtra(Constants.BLOCKLIST_STAMP_INTENT_EXTRA, stamp)
@@ -824,8 +832,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     override fun onResume() {
         super.onResume()
-        observeBraveMode()
-        refreshOnDeviceBlocklistStatus()
+        refreshOnDeviceBlocklistUi()
         refreshOrbotUi()
         handleLockdownModeIfNeeded()
         handleProxyUi()
@@ -876,7 +883,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     // Should be in disabled state when the brave mode is in DNS only / Vpn in lockdown mode.
     private fun handleProxyUi() {
-        val canEnableProxy = appMode.canEnableProxy()
+        val canEnableProxy = appMode.isDnsOnlyMode()
 
         if (canEnableProxy) {
             b.settingsActivitySocks5Rl.alpha = 1f
@@ -935,7 +942,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             hostAddressEditText.setText(hostName, TextView.BufferType.EDITABLE)
         }
         // TODO portAddress check for 0 is needed only for version v053f. Remove.
-        if (portAddr != INVALID_PORT || portAddr == 0) {
+        if (portAddr != INVALID_PORT || portAddr == UNSPECIFIED_PORT) {
             portEditText.setText(portAddr.toString(), TextView.BufferType.EDITABLE)
         } else {
             portEditText.setText(Constants.HTTP_PROXY_PORT, TextView.BufferType.EDITABLE)
@@ -965,8 +972,10 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
             if (isValid && isHostValid) {
                 errorTxt.visibility = View.INVISIBLE
-                appMode.addProxy(AppMode.ProxyType.HTTP, AppMode.ProxyProvider.CUSTOM)
-                appMode.insertCustomHttpProxy(host, port)
+                io {
+                    appMode.addProxy(AppMode.ProxyType.HTTP, AppMode.ProxyProvider.CUSTOM)
+                    appMode.insertCustomHttpProxy(host, port)
+                }
                 dialog.dismiss()
                 Toast.makeText(requireContext(),
                                getString(R.string.settings_http_proxy_toast_success),
@@ -1183,21 +1192,19 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 b.settingsActivitySocks5Switch.visibility = View.VISIBLE
             }
         }
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                var proxyName = name
-                if (proxyName.isBlank()) {
-                    proxyName = if (mode == getString(R.string.cd_dns_proxy_mode_internal)) {
-                        appName
-                    } else ip
-                }
-                val proxyEndpoint = ProxyEndpoint(id = 0, proxyName, proxyMode = 1, mode, appName,
-                                                  ip, port, userName, password, isSelected = true,
-                                                  isCustom = true, isUDP = isUDPBlock,
-                                                  modifiedDataTime = 0L, latency = 0)
-
-                appMode.insertCustomSocks5Proxy(proxyEndpoint)
+        io {
+            var proxyName = name
+            if (proxyName.isBlank()) {
+                proxyName = if (mode == getString(R.string.cd_dns_proxy_mode_internal)) {
+                    appName
+                } else ip
             }
+            val proxyEndpoint = ProxyEndpoint(id = 0, proxyName, proxyMode = 1, mode, appName, ip,
+                                              port, userName, password, isSelected = true,
+                                              isCustom = true, isUDP = isUDPBlock,
+                                              modifiedDataTime = 0L, latency = 0)
+
+            appMode.insertCustomSocks5Proxy(proxyEndpoint)
         }
     }
 
@@ -1213,12 +1220,12 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     // TODO: move mixed workloads to coroutines
     private suspend fun enableAfterDelayCo(ms: Long, vararg views: View) {
-        withContext(Dispatchers.Main) {
+        uiCtx {
             for (v in views) v.isEnabled = false
 
             delay(ms)
 
-            if (!isAdded) return@withContext
+            if (!isAdded) return@uiCtx
 
             for (v in views) v.isEnabled = true
         }
@@ -1228,6 +1235,20 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         a?.runOnUiThread {
             if (!isAdded) return@runOnUiThread
             f()
+        }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) {
+            f()
+        }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                f()
+            }
         }
     }
 }

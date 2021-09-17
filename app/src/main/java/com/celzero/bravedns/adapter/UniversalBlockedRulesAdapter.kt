@@ -84,7 +84,7 @@ class UniversalBlockedRulesAdapter(private val context: Context, val lifecycleOw
                 io {
                     FirewallRules.removeFirewallRules(UID_EVERYBODY, blockedConnections.ipAddress,
                                                       blockedConnectionsRepository)
-                    withContext(Dispatchers.Main) {
+                    uiCtx {
                         Toast.makeText(context,
                                        context.getString(R.string.univ_ip_delete_individual_toast,
                                                          blockedConnections.ipAddress),
@@ -106,6 +106,12 @@ class UniversalBlockedRulesAdapter(private val context: Context, val lifecycleOw
             withContext(Dispatchers.IO) {
                 f()
             }
+        }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) {
+            f()
         }
     }
 

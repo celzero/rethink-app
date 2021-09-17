@@ -23,7 +23,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [AppInfo::class, CategoryInfo::class, ConnectionTracker::class, BlockedConnections::class, DoHEndpoint::class, DNSCryptEndpoint::class, DNSProxyEndpoint::class, DNSCryptRelayEndpoint::class, ProxyEndpoint::class, DNSLogs::class],
+    entities = [AppInfo::class, CategoryInfo::class, ConnectionTracker::class, BlockedConnections::class, DoHEndpoint::class, DNSCryptEndpoint::class, DNSProxyEndpoint::class, DNSCryptRelayEndpoint::class, ProxyEndpoint::class, DnsLog::class],
     views = [AppInfoView::class], version = 10, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 

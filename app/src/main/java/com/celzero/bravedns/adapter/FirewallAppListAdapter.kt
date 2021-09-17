@@ -34,11 +34,11 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.CategoryInfo
+import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.databinding.ApkListItemBinding
 import com.celzero.bravedns.databinding.ExpandableFirewallHeaderBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Constants.Companion.APP_CAT_SYSTEM_COMPONENTS
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.Companion.getIcon
@@ -114,6 +114,7 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
 
             if (appUidList.size > 1) {
                 childViewBinding.firewallToggleWifi.isChecked = !appInfo.isInternetAllowed
+                // update the ui immediately after firewallToggleWifi's isChecked is modified
                 notifyDataSetChanged()
                 showDialog(appUidList, appInfo)
                 return@setOnClickListener
@@ -134,12 +135,10 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
 
     private fun killApps(uid: Int) {
         if (!persistentState.killAppOnFirewall) return
-        lifecycleOwner.lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                val apps = FirewallManager.getPackageNamesByUid(uid)
-                apps.forEach {
-                    Utilities.killBg(activityManager, it)
-                }
+        io {
+            val apps = FirewallManager.getPackageNamesByUid(uid)
+            apps.forEach {
+                Utilities.killBg(activityManager, it)
             }
         }
     }
@@ -229,7 +228,7 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
         groupViewBinding.expandCheckbox.setOnClickListener {
             // flip categoryInfo's isInternetBlocked
             val isInternetBlocked = !categoryInfo.isInternetBlocked
-            if (categoryInfo.isAnySystemCategory()) {
+            if (categoryInfo.isAnySystemCategory(context)) {
                 if (isInternetBlocked && categoryInfo.numOfAppWhitelisted != categoryInfo.numberOFApps) {
                     showSystemAppBlockDialog(categoryInfo)
                     return@setOnClickListener
@@ -283,7 +282,7 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
     private fun displaySystemWarning(categoryInfo: CategoryInfo, sysAppWarning: TextView,
                                      placeHolder: TextView, isExpanded: Boolean) {
 
-        if (categoryInfo.isAnySystemCategory()) {
+        if (categoryInfo.isAnySystemCategory(context)) {
             showAppWarningText(sysAppWarning, categoryInfo.categoryName)
         } else {
             hideAppWarningText(sysAppWarning)
@@ -291,7 +290,8 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
 
         hidePlaceHolder(placeHolder)
 
-        if (categoryInfo.categoryName == APP_CAT_SYSTEM_COMPONENTS && !isExpanded) {
+        if (CategoryInfoRepository.CategoryConstants.isSystemComponent(context,
+                                                                       categoryInfo.categoryName) && !isExpanded) {
             showPlaceHolder(placeHolder)
         }
     }
@@ -409,6 +409,14 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
 
         Utilities.delay(delay) {
             for (v in views) v.isEnabled = true
+        }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleOwner.lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                f()
+            }
         }
     }
 }

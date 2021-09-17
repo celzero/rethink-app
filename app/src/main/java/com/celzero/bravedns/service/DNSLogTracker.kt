@@ -22,7 +22,7 @@ import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.database.DNSLogRepository
-import com.celzero.bravedns.database.DNSLogs
+import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.dns.DnsPacket
 import com.celzero.bravedns.net.doh.Transaction
@@ -88,23 +88,23 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
 
     private fun insertToDB(transaction: Transaction) {
         CoroutineScope(Dispatchers.IO).launch {
-            val dnsLogs = DNSLogs()
+            val dnsLog = DnsLog()
 
-            dnsLogs.blockLists = transaction.blocklist
+            dnsLog.blockLists = transaction.blocklist
             if (transaction.isDNSCrypt) {
-                dnsLogs.dnsType = AppMode.DnsType.DNSCRYPT.type
-                dnsLogs.relayIP = transaction.relayIp
+                dnsLog.dnsType = AppMode.DnsType.DNSCRYPT.type
+                dnsLog.relayIP = transaction.relayIp
             } else {
-                dnsLogs.dnsType = AppMode.DnsType.DOH.type
-                dnsLogs.relayIP = ""
+                dnsLog.dnsType = AppMode.DnsType.DOH.type
+                dnsLog.relayIP = ""
             }
-            dnsLogs.latency = transaction.responseTime
-            dnsLogs.queryStr = transaction.name
-            dnsLogs.responseTime = transaction.responseTime
-            dnsLogs.serverIP = transaction.serverIp
-            dnsLogs.status = transaction.status.name
-            dnsLogs.time = transaction.responseCalendar.timeInMillis
-            dnsLogs.typeName = Utilities.getTypeName(transaction.type.toInt())
+            dnsLog.latency = transaction.responseTime
+            dnsLog.queryStr = transaction.name
+            dnsLog.responseTime = transaction.responseTime
+            dnsLog.serverIP = transaction.serverIp
+            dnsLog.status = transaction.status.name
+            dnsLog.time = transaction.responseCalendar.timeInMillis
+            dnsLog.typeName = Utilities.getTypeName(transaction.type.toInt())
             val serverAddress = try {
                 if (!transaction.serverIp.isNullOrEmpty()) {
                     // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
@@ -121,9 +121,9 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
             if (serverAddress != null) {
                 val countryCode: String = getCountryCode(serverAddress,
                                                          context) //TODO: Country code things
-                dnsLogs.resolver = makeAddressPair(countryCode, serverAddress.hostAddress)
+                dnsLog.resolver = makeAddressPair(countryCode, serverAddress.hostAddress)
             } else {
-                dnsLogs.resolver = transaction.serverIp
+                dnsLog.resolver = transaction.serverIp
             }
 
             if (transaction.status === Transaction.Status.COMPLETE) {
@@ -155,43 +155,43 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                         addresses.forEach {
                             ips += makeAddressPair(getCountryCode(it, context), it.hostAddress)
                         }
-                        dnsLogs.response = TextUtils.join(",", ips)
+                        dnsLog.response = TextUtils.join(",", ips)
 
                         if (destination.hostAddress.contains(UNSPECIFIED_IP)) {
-                            dnsLogs.isBlocked = true
+                            dnsLog.isBlocked = true
                         }
                         if (destination.isLoopbackAddress) {
-                            dnsLogs.isBlocked = true
+                            dnsLog.isBlocked = true
                         } else if (destination.hostAddress == UNSPECIFIED_IPV6 || destination.hostAddress == LOOPBACK_IPV6) {
-                            dnsLogs.isBlocked = true
+                            dnsLog.isBlocked = true
                         }
-                        dnsLogs.flag = getFlag(countryCode)
+                        dnsLog.flag = getFlag(countryCode)
                     } else {
-                        dnsLogs.response = NXDOMAIN
-                        dnsLogs.flag = context.getString(
+                        dnsLog.response = NXDOMAIN
+                        dnsLog.flag = context.getString(
                             R.string.unicode_question_sign) // White question mark
                     }
                 } else {
-                    dnsLogs.response = err
-                    dnsLogs.flag = context.getString(R.string.unicode_warning_sign) // Warning sign
+                    dnsLog.response = err
+                    dnsLog.flag = context.getString(R.string.unicode_warning_sign) // Warning sign
                 }
             } else {
-                dnsLogs.response = transaction.status.name
-                dnsLogs.flag = if (transaction.status === Transaction.Status.CANCELED) {
+                dnsLog.response = transaction.status.name
+                dnsLog.flag = if (transaction.status === Transaction.Status.CANCELED) {
                     context.getString(R.string.unicode_x_sign)// "X" mark
                 } else {
                     context.getString(R.string.unicode_warning_sign) // Warning sign
                 }
             }
 
-            fetchFavIcon(dnsLogs)
+            fetchFavIcon(dnsLog)
 
             // Post number of requests and blocked count to livedata.
             persistentState.dnsRequestsCountLiveData.postValue(++numRequests)
-            if (dnsLogs.isBlocked) persistentState.dnsBlockedCountLiveData.postValue(
+            if (dnsLog.isBlocked) persistentState.dnsBlockedCountLiveData.postValue(
                 ++numBlockedRequests)
 
-            dnsLogRepository.insert(dnsLogs)
+            dnsLogRepository.insert(dnsLog)
 
             // avoid excessive disk I/O from syncing the counter to disk after every request
             if (numRequests % PERSISTENCE_STATE_INSERT_SIZE == 0L) {
@@ -221,14 +221,13 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
         return now + TimeUnit.SECONDS.toMillis((ttl + DNS_TTL_GRACE_SEC))
     }
 
-    private fun fetchFavIcon(dnsLogs: DNSLogs) {
-        if (!persistentState.fetchFavIcon || dnsLogs.failure()) return
+    private fun fetchFavIcon(dnsLog: DnsLog) {
+        if (!persistentState.fetchFavIcon || dnsLog.groundedQuery()) return
 
-        if (isDgaDomain(dnsLogs.queryStr)) return
+        if (isDgaDomain(dnsLog.queryStr)) return
 
-        if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - fetchFavIcon() -${dnsLogs.queryStr}")
-        val favIconFetcher = FavIconDownloader(context, dnsLogs.queryStr)
-        favIconFetcher.run()
+        if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - fetchFavIcon() -${dnsLog.queryStr}")
+        FavIconDownloader(context, dnsLog.queryStr).run()
     }
 
     // TODO: Check if the domain is generated by a DGA (Domain Generation Algorithm)

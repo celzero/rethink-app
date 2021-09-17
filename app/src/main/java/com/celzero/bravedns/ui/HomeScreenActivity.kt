@@ -39,8 +39,6 @@ import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
 import com.celzero.bravedns.service.*
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.*
-import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
-import com.celzero.bravedns.util.Constants.Companion.FLAVOR_WEBSITE
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
@@ -49,6 +47,7 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.Companion.getPackageMetadata
 import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
+import com.celzero.bravedns.util.Utilities.Companion.isWebsiteFlavour
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
 import okhttp3.*
@@ -78,7 +77,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     object GlobalVariable {
         var appStartTime: Long = INIT_TIME_MS
-        var DEBUG = true
+        var DEBUG = BuildConfig.DEBUG
     }
 
     // TODO - #324 - Usage of isDarkTheme() in all activities.
@@ -94,10 +93,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         if (persistentState.firstTimeLaunch) {
             launchOnboardActivity()
-        }
-
-        if (VpnController.isAppPaused()) {
-            openAppPausedActivity()
         }
 
         updateNewVersion()
@@ -119,11 +114,24 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         initUpdateCheck()
 
+        observeAppState()
+
+    }
+
+    private fun observeAppState() {
+        VpnController.connectionStatus.observe(this, {
+            if (it == BraveVPNService.State.PAUSED) {
+                Utilities.openPauseActivityAndFinish(this)
+            }
+        })
     }
 
     private fun removeThisMethod() {
         persistentState.numberOfRequests = persistentState.oldNumberRequests.toLong()
         persistentState.numberOfBlockedRequests = persistentState.oldBlockedRequests.toLong()
+        io {
+            refreshDatabase.refreshAppInfoDatabase()
+        }
     }
 
     private fun insertDefaultData() {
@@ -143,13 +151,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun launchOnboardActivity() {
-        startActivity(Intent(this, WelcomeActivity::class.java))
-        finish()
-    }
-
-    private fun openAppPausedActivity() {
-        val intent = Intent()
-        intent.setClass(this, PauseActivity::class.java)
+        val intent = Intent(this, WelcomeActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         startActivity(intent)
         finish()
     }
@@ -161,12 +164,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         persistentState.appVersion = version
         persistentState.showWhatsNewChip = true
 
-        // Refresh the app info cache on new update
-        io {
-            refreshDatabase.refreshAppInfoDatabase()
-        }
-        // FIXME:  Remove this after the version v053g
-        // this is to fix the persistance state which was saved as Int instead of Long.
+        // FIXME: remove this post v053g
+        // this is to fix the persistence state which was saved as Int instead of Long.
         // Modification of persistence state
         removeThisMethod()
     }
@@ -205,7 +204,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             isInteractive: AppUpdater.UserPresent = AppUpdater.UserPresent.NONINTERACTIVE) {
 
         // Check updates only for play store / website version. Not fDroid.
-        if (BuildConfig.FLAVOR != FLAVOR_PLAY && BuildConfig.FLAVOR != FLAVOR_WEBSITE) {
+        if (!isPlayStoreFlavour() && !isWebsiteFlavour()) {
             if (DEBUG) Log.d(LOG_TAG_APP_UPDATE,
                              "Check for update: Not play or website- ${BuildConfig.FLAVOR}")
             return
@@ -353,17 +352,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             appUpdateManager.unregisterListener(installStateUpdatedListener)
         } catch (e: IllegalArgumentException) {
             Log.w(LOG_TAG_DOWNLOAD, "Unregister receiver exception")
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        checkAppState()
-    }
-
-    private fun checkAppState() {
-        if (VpnController.isAppPaused()) {
-            openAppPausedActivity()
         }
     }
 

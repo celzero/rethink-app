@@ -59,7 +59,7 @@ class BlocklistDownloadHelper {
             val dir = File(context.getExternalFilesDir(
                 null).toString() + Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH + timestamp)
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                             "deleteOldFiles -- File : ${dir.path}, ${dir.isDirectory}")
+                             "deleteOldFiles, File : ${dir.path}, ${dir.isDirectory}")
             deleteRecursive(dir)
         }
 

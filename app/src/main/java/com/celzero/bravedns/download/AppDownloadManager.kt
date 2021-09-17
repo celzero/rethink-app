@@ -25,10 +25,8 @@ import androidx.work.*
 import com.celzero.bravedns.download.DownloadConstants.Companion.DOWNLOAD_TAG
 import com.celzero.bravedns.download.DownloadConstants.Companion.FILE_TAG
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLISTS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
-import java.io.File
 import java.util.concurrent.TimeUnit
 
 /**
@@ -40,7 +38,7 @@ import java.util.concurrent.TimeUnit
 class AppDownloadManager(private val context: Context) {
 
     private lateinit var downloadManager: DownloadManager
-    private lateinit var downloadReference: LongArray
+    private lateinit var downloadIds: LongArray
 
     /**
      * Responsible for downloading the local blocklist files.
@@ -51,11 +49,11 @@ class AppDownloadManager(private val context: Context) {
     fun downloadLocalBlocklist(timestamp: Long) {
         purge(context, timestamp)
 
-        downloadReference = LongArray(Constants.ONDEVICE_BLOCKLISTS.size)
+        downloadIds = LongArray(ONDEVICE_BLOCKLISTS.size)
         ONDEVICE_BLOCKLISTS.forEachIndexed { i, it ->
             val fileName = it.filename
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "v: ($timestamp), f: $fileName, u: $it.url")
-            downloadReference[i] = enqueueDownload(it.url, fileName, timestamp.toString())
+            downloadIds[i] = enqueueDownload(it.url, fileName, timestamp.toString())
         }
         initiateDownloadStatusCheck(timestamp)
     }
@@ -65,7 +63,7 @@ class AppDownloadManager(private val context: Context) {
 
         val data = Data.Builder()
         data.putLong("workerStartTime", SystemClock.elapsedRealtime())
-        data.putLongArray("downloadIds", downloadReference)
+        data.putLongArray("downloadIds", downloadIds)
 
         val downloadWatcher = OneTimeWorkRequestBuilder<DownloadWatcher>().setInputData(
             data.build()).setBackoffCriteria(BackoffPolicy.LINEAR,
@@ -108,7 +106,7 @@ class AppDownloadManager(private val context: Context) {
      * Handles are the preliminary check before initiating the download.
      */
     private fun purge(context: Context, timestamp: Long) {
-        downloadReference = LongArray(ONDEVICE_BLOCKLISTS.size)
+        downloadIds = LongArray(ONDEVICE_BLOCKLISTS.size)
         BlocklistDownloadHelper.deleteOldFiles(context, timestamp)
     }
 
@@ -122,9 +120,9 @@ class AppDownloadManager(private val context: Context) {
             request.setDestinationInExternalFilesDir(context,
                                                      BlocklistDownloadHelper.getExternalFilePath(
                                                          timestamp), fileName)
-            val downloadID = downloadManager.enqueue(this)
-            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "filename - $fileName, downloadID - $downloadID")
-            return downloadID
+            val downloadId = downloadManager.enqueue(this)
+            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "filename - $fileName, downloadID - $downloadId")
+            return downloadId
         }
     }
 

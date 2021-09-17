@@ -16,9 +16,7 @@
 package com.celzero.bravedns.util
 
 enum class NotificationActionType(val action: Int) {
-    PAUSE_STOP (0),
-    DNS_FIREWALL (1),
-    NONE (2);
+    PAUSE_STOP(0), DNS_FIREWALL(1), NONE(2);
 
     companion object {
         fun getNotificationActionType(type: Int): NotificationActionType {

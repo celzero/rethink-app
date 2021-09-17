@@ -19,6 +19,7 @@ package com.celzero.bravedns.adapter
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -133,6 +134,7 @@ class DoHEndpointAdapter(private val context: Context, private val lifecycleOwne
 
         private fun startConfigureBlocklistActivity(stamp: String) {
             val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
+            intent.flags = FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
             intent.putExtra(BLOCKLIST_LOCATION_INTENT_EXTRA, DNSConfigureWebViewActivity.REMOTE)
             intent.putExtra(BLOCKLIST_STAMP_INTENT_EXTRA, stamp)
             context.startActivity(intent)
@@ -244,7 +246,7 @@ class DoHEndpointAdapter(private val context: Context, private val lifecycleOwne
             builder.create().show()
         }
 
-        private suspend fun uiCtx(f: () -> Unit) {
+        private suspend fun uiCtx(f: suspend () -> Unit) {
             withContext(Dispatchers.Main) {
                 f()
             }

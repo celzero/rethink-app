@@ -34,7 +34,7 @@ import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
-import com.celzero.bravedns.database.DNSLogs
+import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.TransactionRowBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.ui.DNSBlocklistBottomSheetFragment
@@ -44,22 +44,22 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 
 
 class DNSQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
-        PagedListAdapter<DNSLogs, DNSQueryAdapter.TransactionViewHolder>(DIFF_CALLBACK) {
+        PagedListAdapter<DnsLog, DNSQueryAdapter.TransactionViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         const val TYPE_TRANSACTION: Int = 1
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DNSLogs>() {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DnsLog>() {
 
-            override fun areItemsTheSame(oldConnection: DNSLogs,
-                                         newConnection: DNSLogs) = oldConnection.id == newConnection.id
+            override fun areItemsTheSame(oldConnection: DnsLog,
+                                         newConnection: DnsLog) = oldConnection.id == newConnection.id
 
-            override fun areContentsTheSame(oldConnection: DNSLogs,
-                                            newConnection: DNSLogs) = oldConnection == newConnection
+            override fun areContentsTheSame(oldConnection: DnsLog,
+                                            newConnection: DnsLog) = oldConnection == newConnection
         }
     }
 
     override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
-        val dnsLog: DNSLogs = getItem(position) ?: return
+        val dnsLog: DnsLog = getItem(position) ?: return
         holder.update(dnsLog)
     }
 
@@ -81,7 +81,7 @@ class DNSQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
 
     inner class TransactionViewHolder(private val b: TransactionRowBinding) :
             RecyclerView.ViewHolder(b.root) {
-        fun update(dnsLog: DNSLogs?) {
+        fun update(dnsLog: DnsLog?) {
             if (dnsLog == null) return
 
             displayDetails(dnsLog)
@@ -93,7 +93,7 @@ class DNSQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
             }
         }
 
-        private fun displayLogEntryHint(dnsLog: DNSLogs) {
+        private fun displayLogEntryHint(dnsLog: DnsLog) {
             if (dnsLog.isBlocked) {
                 b.queryLogIndicator.visibility = View.VISIBLE
             } else {
@@ -101,11 +101,11 @@ class DNSQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
             }
         }
 
-        private fun displayIcon(dnsLog: DNSLogs) {
+        private fun displayIcon(dnsLog: DnsLog) {
             b.flag.text = dnsLog.flag
             b.flag.visibility = View.VISIBLE
             b.favIcon.visibility = View.GONE
-            if (!loadFavIcon || dnsLog.failure()) {
+            if (!loadFavIcon || dnsLog.groundedQuery()) {
                 clearFavIcon()
                 return
             }
@@ -119,14 +119,14 @@ class DNSQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
             GlideApp.with(context.applicationContext).clear(b.favIcon)
         }
 
-        private fun displayDetails(dnsLog: DNSLogs) {
+        private fun displayDetails(dnsLog: DnsLog) {
             b.responseTime.text = dnsLog.wallTime()
             b.fqdn.text = dnsLog.queryStr
             b.latencyVal.text = context.getString(R.string.dns_query_latency,
                                                   dnsLog.latency.toString())
         }
 
-        private fun openBottomSheet(dnsLog: DNSLogs) {
+        private fun openBottomSheet(dnsLog: DnsLog) {
             if (context !is FragmentActivity) {
                 Log.wtf(LoggerConstants.LOG_TAG_UI,
                         "Can not open bottom sheet. Context is not attached to activity")

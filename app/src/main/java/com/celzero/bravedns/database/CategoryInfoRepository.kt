@@ -16,12 +16,38 @@ limitations under the License.
 
 package com.celzero.bravedns.database
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
+import com.celzero.bravedns.R
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
 
 class CategoryInfoRepository(private val categoryInfoDAO: CategoryInfoDAO) {
+
+    // Firewall app category constants
+    enum class CategoryConstants(val nameResId: Int) {
+        SYSTEM_COMPONENT(R.string.category_name_sys_components),
+        SYSTEM_APP(R.string.category_name_sys_apps),
+        OTHER(R.string.category_name_others),
+        NON_APP(R.string.category_name_non_app_sys),
+        INSTALLED(R.string.category_name_installed);
+
+        companion object {
+            fun isSystemComponent(context: Context, name: String): Boolean {
+                return context.getString(SYSTEM_COMPONENT.nameResId) == name
+            }
+
+            fun isAnySystemCategory(context: Context, name: String): Boolean {
+                return context.getString(SYSTEM_COMPONENT.nameResId) == name || context.getString(
+                    SYSTEM_APP.nameResId) == name || context.getString(NON_APP.nameResId) == name
+            }
+
+            fun isNonApp(context: Context, name: String): Boolean {
+                return context.getString(NON_APP.nameResId) == name
+            }
+        }
+    }
 
     fun update(categoryInfo: CategoryInfo) {
         categoryInfoDAO.update(categoryInfo)

@@ -30,7 +30,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppMode
-import com.celzero.bravedns.data.AppMode.Companion.cryptRelayToRemove
+import com.celzero.bravedns.data.AppMode.Companion.dnscryptRelaysToRemove
 import com.celzero.bravedns.database.DNSCryptRelayEndpoint
 import com.celzero.bravedns.databinding.DnsCryptEndpointListItemBinding
 import com.celzero.bravedns.util.Utilities
@@ -168,7 +168,7 @@ class DNSCryptRelayEndpointAdapter(private val context: Context, val lifecycleOw
 
                 endpoint.isSelected = isSelected
                 if (!isSelected) {
-                    cryptRelayToRemove = endpoint.dnsCryptRelayURL
+                    dnscryptRelaysToRemove = endpoint.dnsCryptRelayURL
                 }
                 appMode.handleDnsrelayChanges(endpoint)
 
@@ -193,7 +193,7 @@ class DNSCryptRelayEndpointAdapter(private val context: Context, val lifecycleOw
             }
         }
 
-        private suspend fun uiCtx(f: () -> Unit) {
+        private suspend fun uiCtx(f: suspend () -> Unit) {
             withContext(Dispatchers.Main) {
                 f()
             }

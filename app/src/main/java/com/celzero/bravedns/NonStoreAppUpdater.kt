@@ -41,9 +41,12 @@ class NonStoreAppUpdater(private val baseUrl: String,
         val url = baseUrl + BuildConfig.VERSION_CODE
 
         val bootstrapClient = OkHttpClient()
+        // FIXME: Use user set doh provider
+        // using quad9 doh provider
         val dns = DnsOverHttps.Builder().client(bootstrapClient).url(
-            "https://1.1.1.1/dns-query".toHttpUrl()).bootstrapDnsHosts(
-            InetAddress.getByName("1.1.1.1"), InetAddress.getByName("1.0.0.1")).build()
+            "https://dns.quad9.net/dns-query".toHttpUrl()).bootstrapDnsHosts(
+            InetAddress.getByName("9.9.9.9"), InetAddress.getByName("149.112.112.112"),
+            InetAddress.getByName("2620:fe::9"), InetAddress.getByName("2620:fe::fe")).build()
 
         val client = bootstrapClient.newBuilder().dns(dns).build()
         val request = Request.Builder().url(url).build()

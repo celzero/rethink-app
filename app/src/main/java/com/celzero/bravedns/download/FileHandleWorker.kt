@@ -54,7 +54,10 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "blocklistDownloadInitiatedTime - $timestamp")
 
             // invalid download initiated time
-            if (timestamp <= INIT_TIME_MS) return Result.failure()
+            if (timestamp <= INIT_TIME_MS) {
+                Log.w(LOG_TAG_DOWNLOAD, "timestamp version invalid $timestamp")
+                return Result.failure()
+            }
 
             // A file move from external file path to app data dir is preferred because it is an
             // atomic operation: but Android doesn't support move/rename across mount points.
@@ -103,7 +106,8 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
                     return false
                 }
             }
-            val destinationDir = File("${context.filesDir.canonicalPath}${File.separator}$timestamp${File.separator}")
+            val destinationDir = File(
+                "${context.filesDir.canonicalPath}${File.separator}$timestamp${File.separator}")
 
             Log.i(LOG_TAG_DOWNLOAD,
                   "After copy, dest dir: $destinationDir, ${destinationDir.isDirectory}, ${destinationDir.list()?.size}")
@@ -137,8 +141,8 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
     private fun isDownloadValid(timestamp: Long): Boolean {
         try {
             val path: String = context.filesDir.canonicalPath + File.separator + timestamp
-            val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.ONDEVICE_BLOCKLIST_FILE_TD_FILE,
-                                                 path + Constants.ONDEVICE_BLOCKLIST_FILE_RD_FILE,
+            val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.ONDEVICE_BLOCKLIST_FILE_TD,
+                                                 path + Constants.ONDEVICE_BLOCKLIST_FILE_RD,
                                                  path + Constants.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,
                                                  path + Constants.ONDEVICE_BLOCKLIST_FILE_TAG_NAME)
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,

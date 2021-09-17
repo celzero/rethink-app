@@ -57,7 +57,7 @@ class IPTracker internal constructor(
         if (!persistentState.logsEnabled) return
 
         //Modified the call of the insert to database inside the coroutine scope.
-        CoroutineScope(Dispatchers.IO).launch {
+        io {
             insertToDB(ipDetails)
         }
     }
@@ -99,7 +99,7 @@ class IPTracker internal constructor(
 
         if (packageNameList != null) {
             val packageName = packageNameList[0]
-            appName = getValidAppName(packageName, uid)
+            appName = getValidAppName(uid, packageName)
         } else { // For UNKNOWN or Non-App.
             val fileSystemUID = AndroidUidConfig.fromFileSystemUid(uid)
             Log.i(LOG_TAG_FIREWALL_LOG,
@@ -114,12 +114,8 @@ class IPTracker internal constructor(
         return appName
     }
 
-    private fun getValidAppName(packageName: String, uid: Int): String {
+    private fun getValidAppName(uid: Int, packageName: String): String {
         var appName: String? = null
-        val appDetails = FirewallManager.getAppInfoByPackage(packageName)
-        if (appDetails != null) {
-            appName = appDetails.appName
-        }
 
         if (appName.isNullOrEmpty()) {
             appName = FirewallManager.getAppNameByUid(uid)
@@ -132,6 +128,12 @@ class IPTracker internal constructor(
             appName = context.packageManager.getApplicationLabel(appInfo).toString()
         }
         return appName
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            f()
+        }
     }
 
 }
