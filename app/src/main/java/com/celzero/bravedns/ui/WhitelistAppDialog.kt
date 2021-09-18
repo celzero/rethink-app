@@ -132,14 +132,14 @@ class WhitelistAppDialog(val activity: Activity, val adapter: RecyclerView.Adapt
         }
     }
 
-    override fun onQueryTextSubmit(query: String?): Boolean {
-        categoryListByAppNameFromDB(query!!)
+    override fun onQueryTextSubmit(query: String): Boolean {
+        categoryListByAppNameFromDB(query)
         viewModel.setFilter(query)
         return true
     }
 
-    override fun onQueryTextChange(query: String?): Boolean {
-        categoryListByAppNameFromDB(query!!)
+    override fun onQueryTextChange(query: String): Boolean {
+        categoryListByAppNameFromDB(query)
         viewModel.setFilter(query)
         return true
     }

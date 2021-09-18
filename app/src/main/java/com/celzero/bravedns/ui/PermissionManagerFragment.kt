@@ -68,7 +68,7 @@ class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener {
         mRecyclerView.adapter = mAdapter
 
         editsearch = includeView.findViewById(R.id.search) as SearchView
-        editsearch!!.setOnQueryTextListener(this)
+        editsearch?.setOnQueryTextListener(this)
 
         updateAppList()
 

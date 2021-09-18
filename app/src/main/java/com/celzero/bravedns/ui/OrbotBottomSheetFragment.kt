@@ -45,7 +45,9 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 
@@ -342,8 +344,10 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         if (VpnController.hasTunnel()) {
-            lifecycleScope.launch {
-                orbotHelper.startOrbot(type)
+            go {
+                uiCtx {
+                    orbotHelper.startOrbot(type)
+                }
             }
         } else {
             Utilities.showToastUiCentered(requireContext(),
@@ -391,6 +395,18 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         }
         dialog.show()
 
+    }
+
+    private fun go(f: suspend () -> Unit) {
+        lifecycleScope.launch {
+            f()
+        }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) {
+            f()
+        }
     }
 
 }

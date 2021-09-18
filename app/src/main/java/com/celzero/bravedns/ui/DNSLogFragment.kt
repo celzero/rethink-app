@@ -207,7 +207,7 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         builder.setMessage(R.string.dns_query_clear_logs_message)
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
-            coroutineLaunch {
+            go {
                 withContext(Dispatchers.IO) {
                     GlideApp.get(requireActivity()).clearDiskCache()
                 }
@@ -228,7 +228,7 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         return true
     }
 
-    private fun coroutineLaunch(f: suspend () -> Unit) {
+    private fun go(f: suspend () -> Unit) {
         lifecycleScope.launch {
             f()
         }

@@ -201,7 +201,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     private fun updateDoHEndPoint(stamp: String, count: Int) {
         Log.i(LOG_TAG_DNS, "rethinkdns+ stamp updated to: $stamp")
 
-        lifecycleScope.launch {
+        go {
             ioCtx {
                 appMode.updateRethinkDnsPlusStamp(stamp, count)
             }
@@ -452,7 +452,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
         if (!dir.exists()) {
             dir.mkdirs()
         }
-        val filePath = File(dir.absolutePath + Constants.ONDEVICE_BLOCKLIST_FILE_TAG_NAME)
+        val filePath = File(dir.absolutePath + Constants.ONDEVICE_BLOCKLIST_FILE_TAG)
         if (!filePath.exists()) {
             filePath.createNewFile()
         }
@@ -461,6 +461,12 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
 
     private suspend fun ioCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.IO) {
+            f()
+        }
+    }
+
+    private fun go(f: suspend () -> Unit) {
+        lifecycleScope.launch {
             f()
         }
     }

@@ -391,7 +391,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
         b.settingsActivityOnDeviceBlockSwitch.setOnCheckedChangeListener(null)
         b.settingsActivityOnDeviceBlockSwitch.setOnClickListener {
-            lifecycleScope.launch {
+            go {
                 uiCtx {
                     enableAfterDelayCo(TimeUnit.SECONDS.toMillis(1L),
                                        b.settingsActivityOnDeviceBlockSwitch)
@@ -1249,6 +1249,12 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             withContext(Dispatchers.IO) {
                 f()
             }
+        }
+    }
+
+    private fun go(f: suspend () -> Unit) {
+        lifecycleScope.launch {
+            f()
         }
     }
 }

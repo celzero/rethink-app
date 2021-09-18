@@ -54,7 +54,6 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
 
 
     companion object {
-        const val ORBOT_NOTIFICATION_ID = "Orbot"
         const val ORBOT_SERVICE_ID = 1111
 
         const val ORBOT_PACKAGE_NAME = "org.torproject.android"
@@ -91,6 +90,8 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
         private const val ORBOT_REQUEST_CODE = 200
 
         var selectedProxyType: String = AppMode.ProxyType.NONE.name
+
+        const val PROXY_ALERTS = "PROXY_ALERTS"
 
     }
 
@@ -231,8 +232,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
         if (!isInteractive && selectedProxyType != AppMode.ProxyType.NONE.name) {
             val notificationManager = context.getSystemService(
                 VpnService.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.cancelAll()
-            notificationManager.notify(ORBOT_SERVICE_ID, createNotification().build())
+            notificationManager.notify(PROXY_ALERTS, ORBOT_SERVICE_ID, createNotification().build())
         }
         selectedProxyType = AppMode.ProxyType.NONE.name
         appMode.removeAllProxies()
@@ -251,16 +251,16 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
                                                            PendingIntent.FLAG_UPDATE_CURRENT)
         var builder: NotificationCompat.Builder
         if (isAtleastO()) {
-            val name: CharSequence = context.getString(R.string.notif_channel_orbot_failure)
-            val description = context.resources.getString(R.string.notif_channel_desc_orbot_failure)
+            val name: CharSequence = context.getString(R.string.notif_channel_proxy_failure)
+            val description = context.resources.getString(R.string.notif_channel_desc_proxy_failure)
             val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(ORBOT_NOTIFICATION_ID, name, importance)
+            val channel = NotificationChannel(PROXY_ALERTS, name, importance)
             channel.description = description
             val notificationManager = context.getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
-            builder = NotificationCompat.Builder(context, ORBOT_NOTIFICATION_ID)
+            builder = NotificationCompat.Builder(context, PROXY_ALERTS)
         } else {
-            builder = NotificationCompat.Builder(context, ORBOT_NOTIFICATION_ID)
+            builder = NotificationCompat.Builder(context, PROXY_ALERTS)
         }
 
         val contentTitle = context.resources.getString(R.string.settings_orbot_notification_heading)
@@ -275,6 +275,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
                                                                                           R.string.settings_orbot_notification_action),
                                                                                       openIntent)
         builder.addAction(notificationAction)
+        builder.setAutoCancel(true)
 
         // Secret notifications are not shown on the lock screen.  No need for this app to show there.
         // Only available in API >= 21

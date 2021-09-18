@@ -58,6 +58,13 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
         initClickListeners()
         observeAppState()
         observeTimer()
+        openHomeScreenAndFinishIfNeeded()
+    }
+
+    private fun openHomeScreenAndFinishIfNeeded() {
+        if (!VpnController.isAppPaused()) {
+            openHomeScreenAndFinish()
+        }
     }
 
     private fun initView() {
@@ -70,7 +77,7 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
     private fun observeAppState() {
         VpnController.connectionStatus.observe(this, {
             if (it != BraveVPNService.State.PAUSED) {
-                stopPauseActivity()
+                openHomeScreenAndFinish()
             }
         })
     }
@@ -89,7 +96,7 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
 
         b.pacStopIv.setOnClickListener {
             VpnController.getBraveVpnService()?.resumeApp()
-            stopPauseActivity()
+            openHomeScreenAndFinish()
         }
 
         b.pacMinusIv.setOnClickListener {
@@ -131,7 +138,7 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
         VpnController.getBraveVpnService()?.increasePauseDuration(PAUSE_VPN_EXTRA_MILLIS)
     }
 
-    private fun stopPauseActivity() {
+    private fun openHomeScreenAndFinish() {
         // refrain from calling start activity multiple times
         if (SystemClock.elapsedRealtime() - lastStopActivityInvokeTime < TimeUnit.SECONDS.toMillis(
                 1L)) {

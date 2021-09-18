@@ -17,6 +17,7 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import android.content.Intent
+import android.os.SystemClock
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
@@ -40,6 +41,8 @@ object VpnController : KoinComponent {
     private var states: Channel<BraveVPNService.State?>? = null
     private var controllerScope: CoroutineScope? = null
 
+    private var vpnStartElapsedTime: Long = SystemClock.elapsedRealtime()
+
     val mutex: Mutex = Mutex()
 
     var connectionStatus: MutableLiveData<BraveVPNService.State> = MutableLiveData()
@@ -52,7 +55,10 @@ object VpnController : KoinComponent {
     fun onVpnCreated(b: BraveVPNService) {
         braveVpnService = b
         controllerScope = CoroutineScope(Dispatchers.IO)
-        states = Channel(Channel.UNLIMITED)
+        states = Channel(Channel.CONFLATED) // drop unconsumed states
+
+        // store app start time, used in HomeScreenBottomSheet
+        vpnStartElapsedTime = SystemClock.elapsedRealtime()
 
         controllerScope!!.launch {
             states!!.consumeEach { state ->
@@ -79,6 +85,17 @@ object VpnController : KoinComponent {
         braveVpnService = null
         controllerScope?.cancel("stop")
         states?.cancel()
+        vpnStartElapsedTime = SystemClock.elapsedRealtime()
+    }
+
+    fun uptimeMs(): Long {
+        val t = SystemClock.elapsedRealtime() - vpnStartElapsedTime
+
+        return if (isOn()) {
+            t
+        } else {
+            -1 * t
+        }
     }
 
     fun getBraveVpnService(): BraveVPNService? {

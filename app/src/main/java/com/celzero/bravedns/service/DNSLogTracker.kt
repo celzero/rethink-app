@@ -119,8 +119,8 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
             }
 
             if (serverAddress != null) {
-                val countryCode: String = getCountryCode(serverAddress,
-                                                         context) //TODO: Country code things
+                val countryCode: String? = getCountryCode(serverAddress,
+                                                          context) //TODO: Country code things
                 dnsLog.resolver = makeAddressPair(countryCode, serverAddress.hostAddress)
             } else {
                 dnsLog.resolver = transaction.serverIp
@@ -150,7 +150,7 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                         val destination = addresses[0]
                         if (DEBUG) Log.d(LOG_TAG_DNS_LOG,
                                          "Address - ${destination.address}, HostAddress - ${destination.hostAddress}")
-                        val countryCode: String = getCountryCode(destination, context)
+                        val countryCode: String? = getCountryCode(destination, context)
 
                         addresses.forEach {
                             ips += makeAddressPair(getCountryCode(it, context), it.hostAddress)

@@ -34,6 +34,7 @@ import com.celzero.bravedns.adapter.UniversalBlockedRulesAdapter
 import com.celzero.bravedns.adapter.WhitelistedAppsAdapter
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.automaton.FirewallRules
+import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.database.BlockedConnectionsRepository
 import com.celzero.bravedns.databinding.FragmentFirewallBinding
 import com.celzero.bravedns.databinding.UniversalFragementContainerBinding
@@ -68,6 +69,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
 
     private val blockedConnectionsRepository by inject<BlockedConnectionsRepository>()
     private val persistentState by inject<PersistentState>()
+    private val appMode by inject<AppMode>()
 
     private var blockedRulesCount: Int = 0
 
@@ -78,6 +80,29 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
+        observeBraveMode()
+    }
+
+    private fun observeBraveMode() {
+        appMode.braveModeObserver.observe(viewLifecycleOwner, {
+            when (it) {
+                AppMode.BraveMode.DNS.mode -> handleDnsModeUi()
+                AppMode.BraveMode.FIREWALL.mode -> handleFirewallModeUi()
+                AppMode.BraveMode.DNS_FIREWALL.mode -> handleDnsFirewallModeUi()
+            }
+        })
+    }
+
+    private fun handleDnsModeUi() {
+        b.appScrollingInclFirewall.firewallDisallowDnsBypassLl.visibility = View.GONE
+    }
+
+    private fun handleFirewallModeUi() {
+        b.appScrollingInclFirewall.firewallDisallowDnsBypassLl.visibility = View.GONE
+    }
+
+    private fun handleDnsFirewallModeUi() {
+        b.appScrollingInclFirewall.firewallDisallowDnsBypassLl.visibility = View.VISIBLE
     }
 
     private fun initView() {

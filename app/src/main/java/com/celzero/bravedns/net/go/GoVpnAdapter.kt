@@ -31,14 +31,13 @@ import com.celzero.bravedns.data.AppMode.TunnelOptions
 import com.celzero.bravedns.database.DNSProxyEndpoint
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.DNSConfigureWebViewActivity.Companion.BLOCKLIST_REMOTE_FOLDER_NAME
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.DEFAULT_DOH_URL
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_RD
-import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG_NAME
+import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities.Companion.getNonLiveDnscryptServers
@@ -52,6 +51,7 @@ import intra.Tunnel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import protect.Protector
@@ -64,7 +64,8 @@ import java.io.IOException
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
  * custom logic for Intra.
  * */
-class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?, val context: Context) : KoinComponent {
+class GoVpnAdapter(private val context: Context, private val externalScope: CoroutineScope,
+                   private var tunFd: ParcelFileDescriptor?) : KoinComponent {
 
     private val persistentState by inject<PersistentState>()
     private val appMode by inject<AppMode>()
@@ -124,7 +125,7 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?, val context: Contex
                                tunnelOptions.proxyMode.mode)
         }
         stopDnscryptIfNeeded()
-        setDNSProxyIfNeeded(tunnelOptions.dnsMode)
+        setDnsProxyIfNeeded(tunnelOptions.dnsMode)
         setSocks5TunnelModeIfNeeded(tunnelOptions.proxyMode)
     }
 
@@ -133,6 +134,7 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?, val context: Contex
         tunnel?.braveDNS = null
 
         if (!dnsMode.isDoh() && !dnsMode.isDnscrypt()) return
+
         // No need to set the brave mode for DNS Proxy (implementation pending in underlying Go library).
         // TODO: remove the check once the implementation completed in underlying Go library
         io {
@@ -153,7 +155,7 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?, val context: Contex
             val remoteDir = remoteBlocklistDir(context, BLOCKLIST_REMOTE_FOLDER_NAME,
                                                persistentState.remoteBlocklistTimestamp) ?: return
             val remoteFile = remoteBlocklistFile(remoteDir.absolutePath,
-                                                 ONDEVICE_BLOCKLIST_FILE_TAG_NAME) ?: return
+                                                 ONDEVICE_BLOCKLIST_FILE_TAG) ?: return
             if (remoteFile.exists()) {
                 tunnel?.braveDNS = Dnsx.newBraveDNSRemote(remoteFile.absolutePath)
                 Log.i(LOG_TAG_VPN, "remote-bravedns enabled")
@@ -216,7 +218,7 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?, val context: Contex
         }
     }
 
-    private suspend fun setDNSProxyIfNeeded(dnsMode: AppMode.DnsMode) {
+    private suspend fun setDnsProxyIfNeeded(dnsMode: AppMode.DnsMode) {
         if (!dnsMode.isDnsProxy()) return
 
         try {
@@ -250,12 +252,12 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?, val context: Contex
             return
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
+        io {
             try {
                 val liveServers: String? = tunnel?.dnsCryptProxy?.refresh()
                 appMode.updateDnscryptLiveServers(liveServers)
                 Log.i(LOG_TAG_VPN,
-                      "Refresh LiveServers: $liveServers, tunnelOptions: ${tunnelOptions.dnsMode}, ${tunnelOptions.firewallMode}, ${tunnelOptions.proxyMode}")
+                      "Refresh LiveServers: $liveServers, tunnelOptions: $tunnelOptions")
                 if (liveServers.isNullOrEmpty()) {
                     tunnel?.stopDNSCryptProxy()
                     handleDnscryptFailure()
@@ -273,16 +275,12 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?, val context: Contex
     }
 
     private suspend fun handleDnscryptFailure() {
-        if (persistentState.dnsType != AppMode.DnsType.DNSCRYPT.type) return
-
         appMode.setDefaultConnection()
         showDnscryptConnectionFailureToast()
         Log.i(LOG_TAG_VPN, "connect-tunnel: falling back to doh since dnscrypt failed")
     }
 
     private suspend fun handleDnsProxyFailure() {
-        if (persistentState.dnsType != AppMode.DnsType.DNS_PROXY.type) return
-
         appMode.setDefaultConnection()
         showDnsProxyConnectionFailureToast()
         Log.i(LOG_TAG_VPN, "connect-tunnel: falling back to doh since dns proxy failed")
@@ -325,11 +323,10 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?, val context: Contex
     // We don't need socket protection in these versions because the call to
     // "addDisallowedApplication" effectively protects all sockets in this app.
     private fun getProtector(): Protector? {
-        // Android 6 and below not supported
         if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
             return null
         }
-        return null
+        return null // Android 6 and below not supported
     }
 
     fun close() {
@@ -387,8 +384,7 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?, val context: Contex
             // I/GoLog: Failed to read packet from TUN: read : bad file descriptor
             val dohTransport: Transport = makeDohTransport(dohURL, tunnelOptions.listener)
             tunnel?.dns = dohTransport
-            Log.i(LOG_TAG_VPN,
-                  "Connect tunnel with url " + dohURL + ", dnsMode: " + tunnelOptions.dnsMode + ", blockMode:" + tunnelOptions.firewallMode + ", proxyMode:" + tunnelOptions.proxyMode)
+            Log.i(LOG_TAG_VPN, "connect tunnel with doh: $dohURL, opts: $tunnelOptions")
 
             // Set brave dns to tunnel - Local/Remote
             setBraveDnsBlocklistMode(tunnelOptions.dnsMode, dohURL)
@@ -448,7 +444,7 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?, val context: Contex
             Dnsx.newBraveDNSLocal(path + ONDEVICE_BLOCKLIST_FILE_TD,
                                   path + ONDEVICE_BLOCKLIST_FILE_RD,
                                   path + ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,
-                                  path + ONDEVICE_BLOCKLIST_FILE_TAG_NAME)
+                                  path + ONDEVICE_BLOCKLIST_FILE_TAG)
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "Local brave dns set exception :${e.message}", e)
             // Set local blocklist enabled to false if there is a failure creating bravedns
@@ -459,9 +455,10 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?, val context: Contex
 
     companion object {
 
-        suspend fun establish(tunFd: ParcelFileDescriptor?, context: Context): GoVpnAdapter? {
+        suspend fun establish(context: Context, scope: CoroutineScope,
+                              tunFd: ParcelFileDescriptor?): GoVpnAdapter? {
             if (tunFd == null) return null
-            return GoVpnAdapter(tunFd, context)
+            return GoVpnAdapter(context, scope, tunFd)
         }
 
         fun getIpString(context: Context?, url: String?): String {
@@ -486,14 +483,18 @@ class GoVpnAdapter(private var tunFd: ParcelFileDescriptor?, val context: Contex
     }
 
     private fun io(f: suspend () -> Unit) {
-        VpnController.getBraveVpnService()?.vpnScope?.launch {
-            f()
+        externalScope.launch {
+            withContext(Dispatchers.IO) {
+                f()
+            }
         }
     }
 
     private fun ui(f: suspend () -> Unit) {
-        VpnController.getBraveVpnService()?.vpnScope?.launch {
-            f()
+        externalScope.launch {
+            withContext(Dispatchers.Main) {
+                f()
+            }
         }
     }
 }

@@ -52,6 +52,7 @@ import com.celzero.bravedns.service.FirewallRuleset.Companion.getFirewallRule
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.*
+import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Utilities.Companion.getIcon
 import com.celzero.bravedns.util.Utilities.Companion.getPackageInfoForUid
@@ -144,7 +145,8 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
             handleNonApp()
         }
 
-        val connRules = ConnectionRules(ipDetails.ipAddress!!, ipDetails.port, protocol)
+        val connRules = ConnectionRules(ipDetails.ipAddress ?: UNSPECIFIED_IP, ipDetails.port,
+                                        protocol)
         b.bsConnBlockConnAllSwitch.isChecked = FirewallRules.hasRule(UID_EVERYBODY, connRules)
 
         ipDetails.ipAddress?.let {
@@ -223,7 +225,8 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
 
     private fun setupClickListeners() {
         val protocol = Protocol.getProtocolName(ipDetails.protocol).name
-        val connRules = ConnectionRules(ipDetails.ipAddress!!, ipDetails.port, protocol)
+        val connRules = ConnectionRules(ipDetails.ipAddress ?: UNSPECIFIED_IP, ipDetails.port,
+                                        protocol)
 
         b.bsConnBlockAppCheck.setOnCheckedChangeListener(null)
         b.bsConnBlockAppCheck.setOnClickListener {

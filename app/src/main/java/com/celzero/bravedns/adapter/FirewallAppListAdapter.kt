@@ -114,7 +114,7 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
 
             if (appUidList.size > 1) {
                 childViewBinding.firewallToggleWifi.isChecked = !appInfo.isInternetAllowed
-                // update the ui immediately after firewallToggleWifi's isChecked is modified
+                // since isChecked is toggled above, notify the renderer
                 notifyDataSetChanged()
                 showDialog(appUidList, appInfo)
                 return@setOnClickListener
@@ -180,7 +180,7 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
     }
 
     override fun getChildrenCount(listPosition: Int): Int {
-        return this.dataList[this.titleList[listPosition]]!!.size
+        return this.dataList[this.titleList[listPosition]]?.count() ?: 0
     }
 
     override fun getGroup(listPosition: Int): CategoryInfo {

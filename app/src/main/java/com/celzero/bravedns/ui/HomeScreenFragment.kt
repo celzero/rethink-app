@@ -30,7 +30,6 @@ import android.net.VpnService
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
-import android.os.SystemClock
 import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -52,7 +51,6 @@ import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.appStartTime
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
@@ -411,6 +409,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             updateMainButtonUi()
             updateCardsUi()
             handleQuickSettingsChips()
+            syncDnsStatus()
         })
 
         VpnController.connectionStatus.observe(viewLifecycleOwner, {
@@ -518,9 +517,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         appMode.getConnectedDnsObservable().observe(viewLifecycleOwner, {
             b.fhsCardDnsConnectedDns.text = it
-            if (appMode.isRethinkDnsPlusUrl(it)) {
-                updateConfigureDnsChip(appMode.getRemoteBlocklistCount())
-            }
+            updateConfigureDnsChip(appMode.getRemoteBlocklistCount())
         })
     }
 
@@ -573,8 +570,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 b.fhsDnsOnOffBtn.isEnabled = true
             }
         }
-
-        appStartTime = SystemClock.elapsedRealtime()
 
         if (isVpnActivated) {
             stopVpnService()

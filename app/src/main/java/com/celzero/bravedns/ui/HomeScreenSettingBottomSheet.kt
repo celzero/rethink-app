@@ -31,6 +31,7 @@ import com.celzero.bravedns.databinding.BottomSheetHomeScreenBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.Utilities
@@ -197,11 +198,19 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun updateUptime() {
+        val uptimeMs = VpnController.uptimeMs()
+        val now = System.currentTimeMillis()
         // returns a string describing 'time' as a time relative to 'now'
-        val upTime = DateUtils.getRelativeTimeSpanString(
-            HomeScreenActivity.GlobalVariable.appStartTime, System.currentTimeMillis(),
-            DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE)
-        b.bsHomeScreenAppUptime.text = getString(R.string.hsf_uptime, upTime)
+        val t = DateUtils.getRelativeTimeSpanString(now - uptimeMs, now, DateUtils.MINUTE_IN_MILLIS,
+                                                    DateUtils.FORMAT_ABBREV_RELATIVE)
+
+        b.bsHomeScreenAppUptime.text = if (uptimeMs < INIT_TIME_MS) {
+            b.bsHomeScreenAppUptime.visibility = View.GONE
+            getString(R.string.hsf_downtime, t)
+        } else {
+            b.bsHomeScreenAppUptime.visibility = View.VISIBLE
+            getString(R.string.hsf_uptime, t)
+        }
     }
 
     private fun modifyBraveMode(braveMode: Int) {

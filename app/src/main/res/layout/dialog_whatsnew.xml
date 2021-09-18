@@ -17,7 +17,7 @@
             android:lineSpacingExtra="4sp"
             android:textColor="?attr/primaryTextColor"
             android:textStyle="italic"
-            android:text="@string/whats_new_version_text_v53f"
+            android:text=""
             android:visibility="gone"
             />
 

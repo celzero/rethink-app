@@ -26,7 +26,7 @@ class Constants {
         val ONDEVICE_BLOCKLIST_DOWNLOAD_PATH = File.separator + "downloads" + File.separator
 
         // file names which are downloaded as part of on-device blocklists
-        val ONDEVICE_BLOCKLIST_FILE_TAG_NAME = File.separator + "filetag.json"
+        val ONDEVICE_BLOCKLIST_FILE_TAG = File.separator + "filetag.json"
         val ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG = File.separator + "basicconfig.json"
         val ONDEVICE_BLOCKLIST_FILE_RD = File.separator + "rd.txt"
         val ONDEVICE_BLOCKLIST_FILE_TD = File.separator + "td.txt"
@@ -55,7 +55,7 @@ class Constants {
 
         val ONDEVICE_BLOCKLISTS = listOf(
             OnDeviceBlocklistsMetadata("https://download.rethinkdns.com/blocklists",
-                                       ONDEVICE_BLOCKLIST_FILE_TAG_NAME),
+                                       ONDEVICE_BLOCKLIST_FILE_TAG),
             OnDeviceBlocklistsMetadata("https://download.rethinkdns.com/basicconfig",
                                        ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG),
             OnDeviceBlocklistsMetadata("https://download.rethinkdns.com/rank",

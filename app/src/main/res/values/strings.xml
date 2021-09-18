@@ -529,16 +529,20 @@
     <string name="firewall_app_info_not_available">Cannot block the app</string>
 
     <string name="whats_dialog_title">What\'s new in v053g</string>
-    <string name="whats_new_version_name">🌎🌲 International Day of Peace (21 September) 🌲🌎</string>
-    <string name="whats_new_version_text_v53f"></string>
-    <string name="whats_new_version_update">Fixes and improvements:\n\n
-        1. Quick action buttons on Home Screen.\n\n
-        2. A brand new Pause mode which suspends DNS and Firewall for unblocked apps.\n\n
-        3. Major bug fixes around internet connectivity issues.\n\n
-        4. Share automatically generated bug reports from the About page.\n\n
-        5. UI refresh of the Settings page.\n\n
-        6. Improvements to \"Block any app not in use feature\"; no longer experimental.\n\n
-        7. Other minor performance improvements throughout the app.
+    <string name="whats_new_version_name">🌎&#128330; International day of non-violence (02 October) &#128330;🌎</string>
+    <string name="whats_new_version_update">🚀 M.E.G.A Release 🚀\n\n
+        1. <i>Network Log</i> UI now shows domain names corresponding to IP addresses.\n\n
+        2. New firewall rule: Block connections not resolved by user-configured DNS endpoint.\n\n
+        3. New firewall rule: Block newly installed apps by default.\n\n
+        4. Forward all traffic to <i>port 53</i> to user-configured DNS endpoint.\n\n
+        5. Improved search filters for <i>network logs</i>.\n\n
+        6. Quick action buttons on Home Screen.\n\n
+        7. A brand new Pause mode which suspends DNS and Firewall for unblocked apps.\n\n
+        8. Major bug fixes around internet connectivity issues.\n\n
+        9. Share automatically generated bug reports from the About page.\n\n
+        10. UI refresh of the Settings page.\n\n
+        11. Improvements to \"Block any app not in use feature\"; no longer experimental.\n\n
+        12. 50 other performance improvements throughout the app. 🙈 🙈
     </string>
 
     <!-- Settings Fragment strings -->
@@ -724,7 +728,8 @@
     <string name="hsf_start_btn_state">start</string>
     <string name="hsf_stop_btn_state">stop</string>
 
-    <string name="hsf_uptime">(%1$s)</string>
+    <string name="hsf_uptime">(active since %1$s)</string>
+    <string name="hsf_downtime">(inactive since %1$s)</string>
 
     <string name="hsf_vpn_dialog_header">Attention!</string>
     <string name="hsf_vpn_dialog_message">RethinkDNS needs permission to set up a local VPN to encrypt the device\'s DNS requests, implement a network monitor, and enforce firewall rules. \n\nRethinkDNS does not collect any information or spy on you in any way.</string>
@@ -1154,22 +1159,15 @@
     <string name="notif_dialog_pause_dialog_neutral">Show</string>
 
     <!-- Notification label names -->
-    <string name="notif_channel_vpn_notification">RethinkDNS VPN</string>
-    <string name="notif_channel_vpn_failure">Warning</string>
-    <string name="notif_channel_accessibility_failure">App not in use failure</string>
-    <string name="notif_channel_new_app_batch">New apps batch install</string>
-    <string name="notif_channel_new_app">New app install</string>
-    <string name="notif_channel_orbot_failure">Orbot failure</string>
-    <string name="nofif_channel_firewall_load_failure">Firewall rules load failure</string>
-
+    <string name="notif_channel_vpn_notification">VPN Active Notification</string>
+    <string name="notif_channel_vpn_failure">VPN Inactive Notification</string>
+    <string name="notif_channel_firewall_alerts">Firewall Alerts</string>
+    <string name="notif_channel_proxy_failure">Proxy Failure Alerts</string>
 
     <string name="notif_channel_desc_vpn_notification">Tap to change protection settings</string>
     <string name="notif_channel_desc_vpn_failure">Shown when RethinkDNS has encountered a problem.</string>
-    <string name="notif_channel_desc_accessibility_failure">Shown when the app not in use firewall settings stopped working</string>
-    <string name="notif_channel_desc_new_app_batch">Shown when RethinkDNS detected batch of new apps installed</string>
-    <string name="notif_channel_desc_new_app">Shown when RethinkDNS detected a new app installed</string>
-    <string name="notif_channel_desc_orbot_failure">Shown when RethinkDNS failed to setup Orbot proxy</string>
-    <string name="nofif_channel_desc_firewall_load_failure">Shown when firewall rules are failed to load</string>
+    <string name="notif_channel_desc_firewall_alerts">Shown when the app not in use firewall settings stopped working</string>
+    <string name="notif_channel_desc_proxy_failure">Shown when RethinkDNS detected batch of new apps installed</string>
 
     <!-- Category constants -->
     <string name="category_name_sys_components">System Components</string>

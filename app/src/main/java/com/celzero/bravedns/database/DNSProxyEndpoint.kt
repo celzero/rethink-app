@@ -79,4 +79,8 @@ class DNSProxyEndpoint {
     fun getPackageName(): String? {
         return proxyAppName
     }
+
+    fun isInternal(context: Context): Boolean {
+        return this.proxyType == context.getString(R.string.cd_dns_proxy_mode_internal)
+    }
 }

@@ -65,7 +65,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         fun onNetworkConnected(networks: LinkedHashSet<Network>?)
     }
 
-    fun removeCallBack() {
+    fun onVpnStop() {
         connectivityManager.unregisterNetworkCallback(this)
         destroy()
     }
@@ -109,7 +109,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
      * Force updates the VPN's underlying network based on the preference.
      * Will be initiated when the VPN start is completed.
      */
-    fun onVpnStarted() {
+    fun onVpnStart() {
         Log.i(LOG_TAG_CONNECTION, "new vpn is created force update the network")
         handleNetworkChange(isForceUpdate = true)
     }

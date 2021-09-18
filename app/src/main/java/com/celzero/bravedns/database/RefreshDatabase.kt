@@ -33,6 +33,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
+import com.celzero.bravedns.automaton.FirewallManager.FIREWALL_NOTIF_CHANNEL_ID
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -65,11 +66,6 @@ class RefreshDatabase internal constructor(private var context: Context,
         private const val APP_NAME_NO_APP = "Nobody"
 
         private const val NOTIF_BATCH_NEW_APPS_THRESHOLD = 5
-
-        private const val NOTIF_NEW_APPS_BATCH = "NewAppBulkInstall"
-
-        // some per-app unique notification id
-        const val NOTIF_NEW_APP = "NewAppInstall"
 
         const val PENDING_INTENT_REQUEST_CODE_ALLOW = 107
         const val PENDING_INTENT_REQUEST_CODE_DENY = 108
@@ -344,15 +340,16 @@ class RefreshDatabase internal constructor(private var context: Context,
 
         var builder: NotificationCompat.Builder
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name: CharSequence = context.getString(R.string.notif_channel_new_app_batch)
-            val description = context.resources.getString(R.string.notif_channel_desc_new_app_batch)
+            val name: CharSequence = context.getString(R.string.notif_channel_firewall_alerts)
+            val description = context.resources.getString(
+                R.string.notif_channel_desc_firewall_alerts)
             val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(NOTIF_NEW_APPS_BATCH, name, importance)
+            val channel = NotificationChannel(FIREWALL_NOTIF_CHANNEL_ID, name, importance)
             channel.description = description
             notificationManager.createNotificationChannel(channel)
-            builder = NotificationCompat.Builder(context, NOTIF_NEW_APPS_BATCH)
+            builder = NotificationCompat.Builder(context, FIREWALL_NOTIF_CHANNEL_ID)
         } else {
-            builder = NotificationCompat.Builder(context, NOTIF_NEW_APPS_BATCH)
+            builder = NotificationCompat.Builder(context, FIREWALL_NOTIF_CHANNEL_ID)
         }
 
         val contentTitle: String = context.resources.getString(
@@ -374,7 +371,8 @@ class RefreshDatabase internal constructor(private var context: Context,
         builder.setAutoCancel(true)
 
         val notificationId = Random()
-        notificationManager.notify(notificationId.nextInt(100), builder.build())
+        notificationManager.notify(FIREWALL_NOTIF_CHANNEL_ID, notificationId.nextInt(100),
+                                   builder.build())
     }
 
     private fun showNewAppNotificationIfNeeded(app: FirewallManager.AppInfoTuple) {
@@ -405,15 +403,16 @@ class RefreshDatabase internal constructor(private var context: Context,
                                                       PendingIntent.FLAG_UPDATE_CURRENT)
         val nbuilder: NotificationCompat.Builder
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name: CharSequence = context.getString(R.string.notif_channel_new_app)
-            val description = context.resources.getString(R.string.notif_channel_desc_new_app)
+            val name: CharSequence = context.getString(R.string.notif_channel_firewall_alerts)
+            val description = context.resources.getString(
+                R.string.notif_channel_desc_firewall_alerts)
             val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(NOTIF_NEW_APP, name, importance)
+            val channel = NotificationChannel(FIREWALL_NOTIF_CHANNEL_ID, name, importance)
             channel.description = description
             notificationManager.createNotificationChannel(channel)
-            nbuilder = NotificationCompat.Builder(context, NOTIF_NEW_APP)
+            nbuilder = NotificationCompat.Builder(context, FIREWALL_NOTIF_CHANNEL_ID)
         } else {
-            nbuilder = NotificationCompat.Builder(context, NOTIF_NEW_APP)
+            nbuilder = NotificationCompat.Builder(context, FIREWALL_NOTIF_CHANNEL_ID)
         }
 
         val contentTitle: String = context.resources.getString(R.string.new_app_notification_title)
@@ -449,7 +448,7 @@ class RefreshDatabase internal constructor(private var context: Context,
         // Cancel the notification after clicking.
         nbuilder.setAutoCancel(true)
 
-        notificationManager.notify(NOTIF_NEW_APP, app.uid, nbuilder.build())
+        notificationManager.notify(FIREWALL_NOTIF_CHANNEL_ID, app.uid, nbuilder.build())
     }
 
     private fun makeNewAppVpnIntent(context: Context, intentExtra: String, uid: Int,

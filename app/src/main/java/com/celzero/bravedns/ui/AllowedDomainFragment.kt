@@ -59,13 +59,13 @@ class AllowedDomainFragment : Fragment(R.layout.fragment_allowed_domain),
         b.allowedSearchView.setOnQueryTextListener(this)
     }
 
-    override fun onQueryTextSubmit(query: String?): Boolean {
-        viewModel.setFilter(query!!)
+    override fun onQueryTextSubmit(query: String): Boolean {
+        viewModel.setFilter(query)
         return true
     }
 
-    override fun onQueryTextChange(query: String?): Boolean {
-        viewModel.setFilter(query!!)
+    override fun onQueryTextChange(query: String): Boolean {
+        viewModel.setFilter(query)
         return true
     }
 }

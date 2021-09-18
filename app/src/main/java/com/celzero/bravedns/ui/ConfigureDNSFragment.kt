@@ -221,13 +221,13 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
         dialog.setContentView(dialogBinding.root)
 
         val lp = WindowManager.LayoutParams()
-        lp.copyFrom(dialog.window!!.attributes)
+        lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
         dialog.show()
         dialog.setCancelable(false)
         dialog.setCanceledOnTouchOutside(false)
-        dialog.window!!.attributes = lp
+        dialog.window?.attributes = lp
 
         val applyURLBtn = dialogBinding.dialogCustomUrlOkBtn
         val cancelURLBtn = dialogBinding.dialogCustomUrlCancelBtn
@@ -280,14 +280,15 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
         dialog.setContentView(dialogBinding.root)
 
         val lp = WindowManager.LayoutParams()
-        lp.copyFrom(dialog.window!!.attributes)
+        lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
         dialog.show()
         dialog.setCancelable(false)
         dialog.setCanceledOnTouchOutside(false)
 
-        dialog.window!!.attributes = lp
+        // TODO: figure out why window maybe null
+        dialog.window?.attributes = lp
 
         val applyURLBtn = dialogBinding.dialogDnsProxyApplyBtn
         val cancelURLBtn = dialogBinding.dialogDnsProxyCancelBtn

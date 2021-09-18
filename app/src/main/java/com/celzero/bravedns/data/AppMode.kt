@@ -216,12 +216,12 @@ class AppMode internal constructor(private val context: Context,
         }
     }
 
-    private suspend fun getDnsMode(): DnsMode {
+    private fun getDnsMode(): DnsMode {
         setDnsMode()
         return appDnsMode
     }
 
-    private suspend fun setDnsMode() {
+    private fun setDnsMode() {
         // Case: app mode - firewall, DNS mode should be none.
         when (persistentState.braveMode) {
             BraveMode.FIREWALL.mode -> appDnsMode = DnsMode.NONE
@@ -231,7 +231,7 @@ class AppMode internal constructor(private val context: Context,
         }
     }
 
-    private suspend fun determineDnsMode(): DnsMode {
+    private fun determineDnsMode(): DnsMode {
         // app mode - DNS & DNS+Firewall mode
         return when (persistentState.dnsType) {
             DnsType.DOH.type -> {
@@ -360,8 +360,8 @@ class AppMode internal constructor(private val context: Context,
         }
     }
 
-    suspend fun newTunnelMode(blocker: Blocker, listener: GoIntraListener,
-                              fakeDns: String): TunnelOptions {
+    fun newTunnelOptions(blocker: Blocker, listener: GoIntraListener,
+                         fakeDns: String): TunnelOptions {
         return TunnelOptions(getDnsMode(), getFirewallMode(), getProxyMode(), blocker, listener,
                              fakeDns)
     }
@@ -639,8 +639,7 @@ class AppMode internal constructor(private val context: Context,
                 return ProxyMode.SOCKS5
             }
             ProxyType.HTTP_SOCKS5.name -> {
-                // FIXME there's no corresponding tunnel mode when both http and socks5 are enabled,
-                // since the tunnel does not implement a http proxy.
+                // FIXME: tunnel does not support both http and socks5 at once.
                 return ProxyMode.SOCKS5
             }
         }

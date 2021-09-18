@@ -60,8 +60,13 @@ class NonStoreAppUpdater(private val baseUrl: String,
 
             override fun onResponse(call: Call, response: Response) {
                 try {
-                    val stringResponse = response.body!!.string()
-                    val json = JSONObject(stringResponse)
+                    val res = response.body?.string()
+                    if (res.isNullOrBlank()) {
+                        listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER, isInteractive)
+                        return
+                    }
+
+                    val json = JSONObject(res)
                     val version = json.optInt(JSON_VERSION, 0)
                     val shouldUpdate = json.optBoolean(JSON_UPDATE, false)
                     val latest = json.optLong(JSON_LATEST, INIT_TIME_MS)

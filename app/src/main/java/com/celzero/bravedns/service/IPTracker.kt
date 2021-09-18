@@ -82,7 +82,7 @@ class IPTracker internal constructor(
             Log.e(LOG_TAG_FIREWALL_LOG, "Failure converting string to InetAddresses: ${e.message}",
                   e)
         }
-        val countryCode: String = getCountryCode(serverAddress, context)
+        val countryCode: String? = getCountryCode(serverAddress, context)
         connTracker.flag = getFlag(countryCode)
 
         connTracker.appName = fetchApplicationName(connTracker.uid)

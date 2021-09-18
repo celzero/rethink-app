@@ -23,21 +23,20 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 
-class RethinkDnsApplicationPlay:Application() {
+class RethinkDnsApplicationPlay : Application() {
     override fun onCreate() {
         super.onCreate()
         startKoin {
-            if(BuildConfig.DEBUG) androidLogger()
+            if (BuildConfig.DEBUG) androidLogger()
             androidContext(this@RethinkDnsApplicationPlay)
             koin.loadModules(AppModules)
             koin.loadModules(listOf(module {
-                    // New Koin override strategy allow to override any definition by default.
-                    // don't need to specify override = true anymore in module.
-                    single<AppUpdater> { StoreAppUpdater(androidContext())}
+                // New Koin override strategy allow to override any definition by default.
+                // don't need to specify override = true anymore in module.
+                single<AppUpdater> { StoreAppUpdater(androidContext()) }
             }))
         }
 
-        if (DEBUG) Log.d(LOG_TAG_SCHEDULER, "Schedule job")
         get<WorkScheduler>().scheduleAppExitInfoCollectionJob()
         get<WorkScheduler>().scheduleDatabaseRefreshJob()
     }

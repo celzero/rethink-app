@@ -225,7 +225,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         builder.setMessage(R.string.conn_track_clear_logs_message)
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.ct_delete_logs_positive_btn)) { _, _ ->
-            io {
+            go {
                 connectionTrackerRepository.clearAllData()
             }
         }
@@ -284,7 +284,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         b.connectionListScrollList.filterChipParentGroup.visibility = View.GONE
     }
 
-    private fun io(f: suspend () -> Unit) {
+    private fun go(f: suspend () -> Unit) {
         lifecycleScope.launch {
             f()
         }

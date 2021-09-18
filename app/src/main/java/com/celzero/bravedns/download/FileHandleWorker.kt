@@ -144,7 +144,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.ONDEVICE_BLOCKLIST_FILE_TD,
                                                  path + Constants.ONDEVICE_BLOCKLIST_FILE_RD,
                                                  path + Constants.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,
-                                                 path + Constants.ONDEVICE_BLOCKLIST_FILE_TAG_NAME)
+                                                 path + Constants.ONDEVICE_BLOCKLIST_FILE_TAG)
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
                              "AppDownloadManager isDownloadValid? ${braveDNS != null}")
             return braveDNS != null

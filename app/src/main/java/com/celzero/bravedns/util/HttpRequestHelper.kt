@@ -78,9 +78,9 @@ class HttpRequestHelper {
             val request = DownloadManager.Request(uri)
             request.setDestinationInExternalFilesDir(context,
                                                      Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH,
-                                                     Constants.ONDEVICE_BLOCKLIST_FILE_TAG_NAME)
+                                                     Constants.ONDEVICE_BLOCKLIST_FILE_TAG)
             Log.i(LOG_TAG_DOWNLOAD,
-                  "Path - ${context.filesDir.canonicalPath}${Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH}${Constants.ONDEVICE_BLOCKLIST_FILE_TAG_NAME}")
+                  "Path - ${context.filesDir.canonicalPath}${Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH}${Constants.ONDEVICE_BLOCKLIST_FILE_TAG}")
             downloadManager.enqueue(request)
             return downloadManager
         }

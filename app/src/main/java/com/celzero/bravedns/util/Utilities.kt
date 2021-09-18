@@ -157,21 +157,22 @@ class Utilities {
         private var countryMap: CountryMap? = null
 
         // Return a two-letter ISO country code, or null if that fails.
-        fun getCountryCode(address: InetAddress?, context: Context): String {
-            activateCountryMap(context)
+        fun getCountryCode(address: InetAddress?, context: Context): String? {
+            initCountryMapIfNeeded(context)
             return (if (countryMap == null) {
                 null
             } else {
                 countryMap?.getCountryCode(address)
-            })!!
+            })
         }
 
-        private fun activateCountryMap(context: Context) {
+        private fun initCountryMapIfNeeded(context: Context) {
             if (countryMap != null) {
                 return
             }
+
             try {
-                countryMap = CountryMap(context.getAssets())
+                countryMap = CountryMap(context.assets)
             } catch (e: IOException) {
                 Log.e(LOG_TAG_VPN, "Failure fetching country map ${e.message}", e)
             }
@@ -548,11 +549,11 @@ class Utilities {
             }
         }
 
-        fun openPauseActivityAndFinish(context: Activity) {
+        fun openPauseActivityAndFinish(act: Activity) {
             val intent = Intent()
-            intent.setClass(context, PauseActivity::class.java)
-            context.startActivity(intent)
-            context.finish()
+            intent.setClass(act, PauseActivity::class.java)
+            act.startActivity(intent)
+            act.finish()
         }
 
         fun isNonApp(p: String): Boolean {

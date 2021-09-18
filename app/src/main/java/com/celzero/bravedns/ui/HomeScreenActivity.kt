@@ -39,7 +39,6 @@ import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
 import com.celzero.bravedns.service.*
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.*
-import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
@@ -76,7 +75,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
              Call the coroutine scope to insert/update/delete the values */
 
     object GlobalVariable {
-        var appStartTime: Long = INIT_TIME_MS
         var DEBUG = BuildConfig.DEBUG
     }
 
@@ -137,7 +135,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun insertDefaultData() {
         if (persistentState.isDefaultDataInsertComplete) return
 
-        lifecycleScope.launch {
+        go {
             //  FIXME: better ways of doing non-cancellable work in Android
             //  see: https://medium.com/androiddevelopers/coroutines-patterns-for-work-that-shouldnt-be-cancelled-e26c40f142ad
             withContext(NonCancellable + Dispatchers.IO) {
@@ -391,6 +389,12 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             withContext(Dispatchers.IO) {
                 f()
             }
+        }
+    }
+
+    private fun go(f: suspend () -> Unit) {
+        lifecycleScope.launch {
+            f()
         }
     }
 

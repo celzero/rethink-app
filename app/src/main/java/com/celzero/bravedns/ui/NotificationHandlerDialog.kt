@@ -50,28 +50,25 @@ class NotificationHandlerDialog : AppCompatActivity() {
     // In two-cases (accessibility failure/new app install action), the app directly launches
     // firewall activity from notification action. Need to handle the pause state for those cases
     private fun handleNotificationIntent(intent: Intent) {
-        val trampolineType: TrampolineType
         // app not started launch home screen
         if (!VpnController.isOn()) {
-            trampolineType = TrampolineType.NONE
-            trampoline(trampolineType)
+            trampoline(TrampolineType.NONE)
             return
         }
 
         if (VpnController.isAppPaused()) {
-            trampolineType = TrampolineType.PAUSE_ACTIVITY
-            trampoline(trampolineType)
+            trampoline(TrampolineType.PAUSE_ACTIVITY)
             return
         }
 
-        trampolineType = if (isAccessibilityIntent(intent)) {
+        val t = if (isAccessibilityIntent(intent)) {
             TrampolineType.ACCESSIBILITY_SERVICE_FAILURE_DIALOG
         } else if (isNewAppInstalledIntent(intent)) {
             TrampolineType.NEW_APP_INSTAL_DIALOG
         } else {
             TrampolineType.NONE
         }
-        trampoline(trampolineType)
+        trampoline(t)
     }
 
     private fun trampoline(trampolineType: TrampolineType) {
@@ -92,25 +89,6 @@ class NotificationHandlerDialog : AppCompatActivity() {
             TrampolineType.NONE -> {
                 launchHomeScreenAndFinish()
             }
-        }
-    }
-
-    private fun determineTrampoline(intent: Intent): TrampolineType {
-        // app not started launch home screen
-        if (!VpnController.isOn()) {
-            return TrampolineType.NONE
-        }
-
-        if (VpnController.isAppPaused()) {
-            return TrampolineType.PAUSE_ACTIVITY
-        }
-
-        return if (isAccessibilityIntent(intent)) {
-            TrampolineType.ACCESSIBILITY_SERVICE_FAILURE_DIALOG
-        } else if (isNewAppInstalledIntent(intent)) {
-            TrampolineType.NEW_APP_INSTAL_DIALOG
-        } else {
-            TrampolineType.NONE
         }
     }
 
