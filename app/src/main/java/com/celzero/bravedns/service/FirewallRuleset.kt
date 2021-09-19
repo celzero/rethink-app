@@ -19,27 +19,44 @@ package com.celzero.bravedns.service
 import com.celzero.bravedns.R
 
 // TODO: Add label and description from strings.xml
-enum class FirewallRuleset(val id: String, val title: Int, val desc: Int) {
-    RULE1("Rule #1", R.string.firewall_rule_block_app, R.string.firewall_rule_block_app_desc),
-    RULE2("Rule #2", R.string.firewall_rule_block_ip, R.string.firewall_rule_block_ip_desc),
-    RULE3("Rule #3", R.string.firewall_rule_device_lock, R.string.firewall_rule_device_lock_desc),
-    RULE4("Rule #4", R.string.firewall_rule_foreground, R.string.firewall_rule_foreground_desc),
-    RULE5("Rule #5", R.string.firewall_rule_unknown, R.string.firewall_rule_unknown_desc),
+enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val act: Int) {
+    // RULE0("Allowed", R.string.firewall_rule_exempt_dns_proxied,
+    //      R.string.firewall_rule_exempt_dns_proxied_desc, allow),
+    RULE1("Rule #1", R.string.firewall_rule_block_app,
+            R.string.firewall_rule_block_app_desc, stall),
+    RULE1B("Rule #1B", R.string.firewall_rule_block_app,
+            R.string.firewall_rule_block_app_desc, block),
+    RULE1C("Rule #1C", R.string.firewall_rule_block_app,
+            R.string.firewall_rule_block_app_desc, stall),
+    RULE2("Rule #2", R.string.firewall_rule_block_ip,
+            R.string.firewall_rule_block_ip_desc, stall),
+    RULE3("Rule #3", R.string.firewall_rule_device_lock,
+            R.string.firewall_rule_device_lock_desc, stall),
+    RULE4("Rule #4", R.string.firewall_rule_foreground,
+            R.string.firewall_rule_foreground_desc, block),
+    RULE5("Rule #5", R.string.firewall_rule_unknown,
+            R.string.firewall_rule_unknown_desc, stall),
     RULE6("Rule #6", R.string.firewall_rule_block_udp_ntp,
-          R.string.firewall_rule_block_udp_ntp_desc),
+          R.string.firewall_rule_block_udp_ntp_desc, stall),
     RULE7("Rule #7", R.string.firewall_rule_block_dns_bypass,
-          R.string.firewall_rule_block_dns_bypass_desc),
-
-    // FIXME: #298 - Fix the rule8,9 - find a way out for the whitelist and proxy.
+          R.string.firewall_rule_block_dns_bypass_desc, block),
     RULE8("Whitelist", R.string.firewall_rule_exempt_app_whitelist,
-          R.string.firewall_rule_exempt_app_whitelist_desc),
+          R.string.firewall_rule_exempt_app_whitelist_desc, allow),
     RULE9("Proxied", R.string.firewall_rule_exempt_dns_proxied,
-          R.string.firewall_rule_exempt_dns_proxied_desc);
+          R.string.firewall_rule_exempt_dns_proxied_desc, allow);
 
     companion object {
+
+        private val allow = 0
+        private val block = 1
+        private val stall = 2
+
         fun getFirewallRule(ruleId: String): FirewallRuleset? {
             return when (ruleId) {
+                // FIXME: account for RULE0
                 RULE1.id -> RULE1
+                RULE1B.id -> RULE1B
+                RULE1C.id -> RULE1C
                 RULE2.id -> RULE2
                 RULE3.id -> RULE3
                 RULE4.id -> RULE4
@@ -52,9 +69,13 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int) {
             }
         }
 
+        // TODO: Move ico to enum var like for label and desc
         fun getRulesIcon(ruleId: String?): Int {
             return when (ruleId) {
+                // FIXME: account for RULE0
                 RULE1.id -> R.drawable.ic_app_info
+                RULE1A.id -> R.drawable.ic_app_info
+                RULE1B.id -> R.drawable.ic_app_info
                 RULE2.id -> R.drawable.spinner_firewall
                 RULE3.id -> R.drawable.ic_device_lock
                 RULE4.id -> R.drawable.ic_foreground
@@ -67,20 +88,25 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int) {
             }
         }
 
+        // TODO: return a Set
         fun getAllRules(): List<FirewallRuleset> {
             return values().toList()
         }
 
         fun getAllowedRules(): List<FirewallRuleset> {
-            return values().toList().filter {
-                it == RULE9 || it == RULE8
-            }
+            return values().toList().filter{ it.act == allow }
         }
 
         fun getBlockedRules(): List<FirewallRuleset> {
-            return values().toList().filter {
-                it != RULE9 && it != RULE8
-            }
+            return values().toList().filter{ it.act != allow }
+        }
+
+        fun stall(rule: FirewallRuleset): Boolean {
+            return rule.act == stall
+        }
+
+        fun ground(rule: FirewallRuleset): Boolean {
+            return rule.act != allow
         }
     }
 }

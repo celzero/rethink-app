@@ -152,215 +152,151 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         NEW, WORKING, FAILING, PAUSED
     }
 
-    override fun block(protocol: Int, uid: Long, sourceAddress: String,
+    override fun block(protocol: Int, _uid: Long, sourceAddress: String,
                        destAddress: String): Boolean {
-        val isBlocked: Boolean
-        val first = sourceAddress.split(":")
-        val second = destAddress.split(":")
-        isBlocked = checkConnectionBlocked(uid.toInt(), protocol, first[0],
-                                           first[first.size - 1].toInt(), second[0],
-                                           second[second.size - 1].toInt())
 
         io("lockdownSync") {
             handleVpnLockdownState()
         }
-        return isBlocked
+
+        val isBlocked: Boolean
+        val first = sourceAddress.split(":")
+        val second = destAddress.split(":")
+
+        val uid = if (VERSION.SDK_INT >= VERSION_CODES.Q) {
+            connTracer.getUidQ(protocol, sourceIp, sourcePort, destIp, destPort)
+        } else {
+            _uid // uid must have been retrieved from procfs by the caller
+        }
+
+        val srcIp = first[0]
+        val srcPort = first[first.size - 1].toInt()
+        val dstIp = second[0]
+        val dstPort = second[second.size - 1].toInt()
+
+        // skip the block-ceremony for dns conns
+        if (isDns(destPort) && isVpnDns(destIp)) return false
+
+        // FIXME: replace currentTimeMillis with elapsed-time
+        val connInfo = IPDetails(uid, srcIp, srcPort, dstIp, dstPort,
+                System.currentTimeMillis(), /*blocked?*/ false, /*rule*/ "", protocol)
+
+        val rule = firewall(connInfo)
+        val blocked = FirewallRuleset.ground(rule)
+
+        connInfo.blockedByRule = rule.id
+        connInfo.isBlocked = blocked
+
+        if (DEBUG) Log.i(LOG_TAG_VPN, "firewall-rule $rule on conn $connInfo")
+
+        connTrack(connInfo)
+
+        if (FirewallRuleset.stall(rule)) {
+            stallResponse()
+        }
+
+        return blocked
     }
 
     /**
      * Checks if incoming connection is blocked by any user-set firewall rule
      */
-    private fun checkConnectionBlocked(_uid: Int, protocol: Int, sourceIp: String, sourcePort: Int,
-                                       destIp: String, destPort: Int): Boolean {
-
-        var ipDetails: IPDetails? = null
-        var isBlocked = false
-        var uid = _uid
-
+    private fun firewall(connInfo: IPDetails): FirewallRuleset {
         try {
-            // skip the block-ceremony for dns conns
-            if (isDns(destPort) && isVpnDns(destIp)) return false
 
-            if (VERSION.SDK_INT >= VERSION_CODES.Q) {
-                uid = connTracer.getUidQ(protocol, sourceIp, sourcePort, destIp, destPort)
-            } else {
-                // uid must have been retrieved from procfs by the caller
-            }
-
+            val uid = connInfo.uid
             val appStatus = FirewallManager.appStatus(uid)
-
-            // FIXME: replace currentTimeMillis with elapsed-time
-            ipDetails = IPDetails(uid, sourceIp, sourcePort, destIp, destPort,
-                                  System.currentTimeMillis(), false, "", protocol)
 
             // if the app is new (ie unknown), refresh the db
             if (FirewallManager.AppStatus.UNKNOWN == appStatus) {
                 io("dbRefresh") {
                     refreshDatabase.handleNewlyConnectedApp(uid)
                 }
-                // check whether to block newly installed app
-                if (persistentState.blockNewlyInstalledApp
-                        && isConnectionAllowedForNewlyInstalledApp(uid)) {
-                    ipDetails.isBlocked = true
-                    ipDetails.blockedByRule = FirewallRuleset.RULE1.id
-                    connTrack(ipDetails)
-                    delayBlockResponse()
-                    return true
+                if (newAppBlocked(uid)) {
+                    return FirewallRuleset.RULE1B
                 }
             }
 
             if (FirewallManager.AppStatus.WHITELISTED == appStatus) {
-                if (dnsProxied(ipDetails, destPort)) return false
-
-                ipDetails.isBlocked = false
-                ipDetails.blockedByRule = FirewallRuleset.RULE8.id
-                connTrack(ipDetails)
-                Log.i(LOG_TAG_VPN, "whitelisted app, uid: $uid")
-                return false
+                return (dnsProxied(connInfo, destPort)) {
+                    FirewallRuleset.RULE9
+                } else {
+                    FirewallRuleset.RULE8
+                }
             }
 
-            if (ipBlocked(destIp, destPort, protocol)) {
-                ipDetails.isBlocked = true
-                ipDetails.blockedByRule = FirewallRuleset.RULE2.id
-                connTrack(ipDetails)
-                delayBlockResponse()
-                return true
+            if (ipBlocked(connInfo.destIP, connInfo.destPort, connInfo.protocol)) {
+                return FirewallRuleset.RULE2
             }
 
-            if (persistentState.blockUnknownConnections && isMissingOrInvalidUid(uid)) {
-                ipDetails.isBlocked = true
-                ipDetails.blockedByRule = FirewallRuleset.RULE5.id
-                connTrack(ipDetails)
-                delayBlockResponse()
-                return true
+            if (unknownAppBlocked(uid)) {
+                return FirewallRuleset.RULE5.id
             }
 
             if (FirewallManager.AppStatus.BLOCKED == appStatus) {
-                ipDetails.isBlocked = true
-                ipDetails.blockedByRule = FirewallRuleset.RULE1.id
-                connTrack(ipDetails)
                 if (persistentState.killAppOnFirewall) {
                     killFirewalledApplication(uid)
                 }
-                delayBlockResponse()
-                return true
+                return FirewallRuleset.RULE1
             }
 
             if (deviceLocked()) {
-                ipDetails.isBlocked = true
-                ipDetails.blockedByRule = FirewallRuleset.RULE3.id
-                connTrack(ipDetails)
-                if (DEBUG) Log.d(LOG_TAG_VPN, "$uid blocked on device-lock to $destPort")
-                delayBlockResponse()
-                return true
+                return FirewallRuleset.RULE3
             }
 
-            if (udpBlocked(uid, protocol, destPort)) {
-                ipDetails.isBlocked = true
-                ipDetails.blockedByRule = FirewallRuleset.RULE6.id
-                connTrack(ipDetails)
-                delayBlockResponse()
-                if (DEBUG) Log.d(LOG_TAG_VPN, "$uid blocked, udp to $destPort")
-                return true
+            if (udpBlocked(uid, connInfo.protocol, connInfo.destPort)) {
+                return FirewallRuleset.RULE6
             }
 
-            // Check whether the background is enabled and act based on it
             if (blockBackgroundData()) {
-                // FIXME: 04-12-2020 Removed the app range check for testing.
-                var isBgBlock = true
-
-                // check if an app happens to come to the foreground and so is unblocked
-                // by exponentially backing-off over a period of remainingTimeMs
-                val bgBlockWaitMs = TimeUnit.SECONDS.toMillis(20)
-                var remainingWaitMs = TimeUnit.SECONDS.toMillis(10)
-                var attempt = 0
-
-                while (remainingWaitMs > 0) {
-                    if (FirewallManager.isAppForeground(uid, keyguardManager)) {
-                        isBgBlock = false
-                        break
-                    }
-                    remainingWaitMs = exponentialBackoff(remainingWaitMs, attempt)
-                    attempt += 1
-                }
-
-                // When the app is not in foreground.
-                if (isBgBlock) {
-                    if (DEBUG) Log.d(LOG_TAG_VPN,
-                                     "Background blocked uid: $uid, send response after sleep of ${bgBlockWaitMs + remainingWaitMs}")
-                    Thread.sleep(bgBlockWaitMs + remainingWaitMs)
-                    ipDetails.isBlocked = true
-                    ipDetails.blockedByRule = FirewallRuleset.RULE4.id
-                    connTrack(ipDetails)
-                    Log.i(LOG_TAG_VPN, "$uid blocked, bg-data")
-                    return isBgBlock
-                } else {
-                    if (DEBUG) Log.d(LOG_TAG_VPN, "$uid bg-allowed to $destIp, rem: ${10_000 - remainingWaitMs} ")
-                }
+                return FirewallRuleset.RULE4
             }
 
             // if all packets on port 53 needs to be trapped
-            if (dnsProxied(ipDetails, destPort)) {
-                return false
+            if (dnsProxied(connInfo.destPort)) {
+                return FirewallRuleset.RULE9
             }
 
             // whether the destination ip was resolved by the dns set by the user
-            if (persistentState.disallowDnsBypass && appMode.getBraveMode().isDnsFirewallMode()) {
-                if (unresolvedIp(destIp)) {
-                    ipDetails.isBlocked = true
-                    ipDetails.blockedByRule = FirewallRuleset.RULE7.id
-                    connTrack(ipDetails)
-                    return true
-                }
+            if (dnsBypassed(connInfo.destIp)) {
+                return FirewallRuleset.RULE7
             }
 
         } catch (iex: Exception) {
             // TODO: show alerts to user on such exceptions, in a separate ui?
-            isBlocked = true // block conn on any exception whatsoever
             Log.e(LOG_TAG_VPN, "err blocking conn, block anyway", iex)
         }
 
-        ipDetails?.isBlocked = isBlocked
-        connTrack(ipDetails)
-
-        if (isBlocked) {
-            delayBlockResponse()
-        }
-
-        if (DEBUG) Log.d(LOG_TAG_VPN, "dst: $destIp, uid: $uid, blocked? $isBlocked, src: $sourceIp")
-
-        return isBlocked
+        return FirewallRuleset.RULE1C
     }
 
-    private fun dnsProxied(ipDetails: IPDetails, port: Int): Boolean {
-        if (appMode.getBraveMode().isDnsFirewallMode() && persistentState.preventDnsLeaks && isDns(
-                port)) {
-            ipDetails.isBlocked = false
-            ipDetails.blockedByRule = FirewallRuleset.RULE9.id
-            connTrack(ipDetails)
-            return true
-        }
-
-        return false
+    private fun dnsProxied(port: Int): Boolean {
+        return (appMode.getBraveMode().isDnsFirewallMode() &&
+                persistentState.preventDnsLeaks && isDns(port))
     }
 
-    private fun isConnectionAllowedForNewlyInstalledApp(uid: Int): Boolean {
-        val bgBlockWaitMs = TimeUnit.SECONDS.toMillis(20)
-        var remainingWaitMs = TimeUnit.SECONDS.toMillis(10)
-        var attempt = 0
-
-        while (remainingWaitMs > 0) {
-            if (FirewallManager.hasUid(uid) && !FirewallManager.isUidFirewalled(uid)) {
-                return false
-            }
-
-            remainingWaitMs = exponentialBackoff(remainingWaitMs, attempt)
-            attempt += 1
+    private fun dnsBypassed(): Boolean {
+        return if (!persistentState.disallowDnsBypass ||
+                !appMode.getBraveMode().isDnsFirewallMode()) {
+            false
+        } else {
+            unresolvedIp(destIp)
         }
+    }
 
-        Thread.sleep(bgBlockWaitMs + remainingWaitMs)
+    private fun waitAndCheckIfNewAppAllowed(uid: Int): Boolean {
+        val allowed = testWithBackoff {
+            return FirewallManager.hasUid(uid) && !FirewallManager.isUidFirewalled(uid)
+        }
+        return !allowed
+    }
 
-        return true
+    private fun newAppBlocked(uid: Int): Boolean {
+        return if (!persistentState.blockNewlyInstalledApp) {
+            false
+        } else {
+            waitAndCheckIfNewAppAllowed(uid)
+        }
     }
 
     private fun ipBlocked(destIp: String, destPort: Int, protocol: Int): Boolean {
@@ -369,27 +305,40 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         return FirewallRules.hasRule(UID_EVERYBODY, connectionRules)
     }
 
-    private fun unresolvedIp(ip: String): Boolean {
-        val bgBlockWaitMs = TimeUnit.SECONDS.toMillis(20)
-        var remainingWaitMs = TimeUnit.SECONDS.toMillis(10)
-        var attempt = 0
-        val now = System.currentTimeMillis()
-        while (remainingWaitMs > 0) {
-            val ipLife = dnsLogTracker.ipDomainLookup.getIfPresent(ip)
+    private fun unknownAppBlocked(uid: Int): Boolean {
+        return if (!persistentState.blockUnknownConnections) {
+            false
+        } else {
+            isMissingOrInvalidUid(uid)
+        }
+    }
 
-            ipLife?.let {
-                Log.i(LOG_TAG_VPN, "ipLife: $ipLife, destIp: $ip, now: $now, attempt: $attempt")
-                if (it.ttl >= now) return false
-                // else wait
-            }
+    private fun testWithBackoff(stallSec: Long = 20, waitSec: Long = 10, test: () -> Boolean): Boolean {
+        val minWaitMs = TimeUnit.SECONDS.toMillis(stallSec)
+        var remainingWaitMs = TimeUnit.SECONDS.toMillis(waitSec)
+        var attempt = 0
+        while (remainingWaitMs > 0) {
+            if (test()) return true
 
             remainingWaitMs = exponentialBackoff(remainingWaitMs, attempt)
             attempt += 1
         }
 
-        Thread.sleep(bgBlockWaitMs + remainingWaitMs)
+        Thread.sleep(minWaitMs + remainingWaitMs)
 
-        return true
+        return false
+    }
+
+    private fun unresolvedIp(ip: String): Boolean {
+        val resolvedIp = testWithBackoff {
+            val now = System.currentTimeMillis()
+            dnsLogTracker.ipDomainLookup.getIfPresent(ip)?.let {
+                return it.ttl >= now
+            }
+            return false
+        }
+
+        return !resolvedIp
     }
 
     private fun udpBlocked(uid: Int, protocol: Int, port: Int): Boolean {
@@ -434,7 +383,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             handleAccessibilityFailure()
             return false
         }
-        return true
+
+        val allowed = testWithBackoff {
+            return FirewallManager.isAppForeground(uid, keyguardManager)
+        }
+
+        return !allowed
     }
 
     private fun handleAccessibilityFailure() {
@@ -542,7 +496,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                                    builder.build())
     }
 
-    private fun delayBlockResponse() {
+    private fun stallResponse() {
         Thread.sleep(DELAY_FIREWALL_RESPONSE_MS)
     }
 
@@ -554,8 +508,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         val exponent = exp(attempt)
         val randomValue = rand.nextLong(exponent - baseWaitMs + 1) + baseWaitMs
         val waitTimeMs = min(randomValue, remainingWaitMs)
+
         tempRemainingWaitMs -= waitTimeMs
+
         Thread.sleep(waitTimeMs)
+
         return tempRemainingWaitMs
     }
 
@@ -583,8 +540,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
      * Records the network transaction in local database
      * The logs will be shown in network monitor screen
      */
-    private fun connTrack(ipDetails: IPDetails?) {
-        ipTracker.recordTransaction(ipDetails)
+    private fun connTrack(info: IPDetails?) {
+        ipTracker.recordTransaction(info)
     }
 
     override fun getResolvers(): String {
