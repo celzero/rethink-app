@@ -45,9 +45,10 @@ class WhitelistedAppsAdapter(private val context: Context) :
     companion object {
 
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<AppInfo>() {
-            // fix: earlier the check was only for packageInfo, so whenever there is change in
-            // appInfo.whitelistUniv1 the checked state(whitelist dialog screen) did not toggled
-            // correctly, additional check for whiteListUniv1 fixed the issue
+            // account for both package-info and whitelist-flags when
+            // determining if items-are-same. previously, whitelist-flag was
+            // not part of the equation causing bugs where the ui wouldn't
+            // reflect the toggles adding/removing apps to/from the whitelist
             override fun areItemsTheSame(oldConnection: AppInfo, newConnection: AppInfo): Boolean {
                 return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.whiteListUniv1 == newConnection.whiteListUniv1)
             }

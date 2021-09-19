@@ -52,6 +52,7 @@ object VpnController : KoinComponent {
         throw CloneNotSupportedException()
     }
 
+    // TODO: make clients listen on create, start, stop, destory from vpn-service
     fun onVpnCreated(b: BraveVPNService) {
         braveVpnService = b
         controllerScope = CoroutineScope(Dispatchers.IO)
@@ -94,7 +95,7 @@ object VpnController : KoinComponent {
         return if (isOn()) {
             t
         } else {
-            -1 * t
+            -1L * t
         }
     }
 

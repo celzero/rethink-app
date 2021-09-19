@@ -161,20 +161,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                                            first[first.size - 1].toInt(), second[0],
                                            second[second.size - 1].toInt())
 
-        io("handleVpnLockdownState") {
+        io("lockdownSync") {
             handleVpnLockdownState()
         }
         return isBlocked
     }
 
     /**
-     * Check if the connection is blocked by any of the rules
-     * RULE1 - Firewall App
-     * RULE2 - IP blocked from connecting to Internet
-     * RULE3 - Universal firewall - Block connections when screen is off
-     * RULE4 - Universal firewall - Block connections when apps are in background
-     * RULE5 - Universal firewall - Block when source app is unknown
-     * RULE6 - Universal firewall - Block all UDP connections
+     * Checks if incoming connection is blocked by any user-set firewall rule
      */
     private fun checkConnectionBlocked(_uid: Int, protocol: Int, sourceIp: String, sourcePort: Int,
                                        destIp: String, destPort: Int): Boolean {
@@ -184,30 +178,29 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         var uid = _uid
 
         try {
+            // skip the block-ceremony for dns conns
+            if (isDns(destPort) && isVpnDns(destIp)) return false
 
             if (VERSION.SDK_INT >= VERSION_CODES.Q) {
                 uid = connTracer.getUidQ(protocol, sourceIp, sourcePort, destIp, destPort)
             } else {
-                // no-op
+                // uid must have been retrieved from procfs by the caller
             }
 
             val appStatus = FirewallManager.appStatus(uid)
 
+            // FIXME: replace currentTimeMillis with elapsed-time
             ipDetails = IPDetails(uid, sourceIp, sourcePort, destIp, destPort,
                                   System.currentTimeMillis(), false, "", protocol)
 
-
-
-            if (isDns(destPort) && isVpnDns(destIp)) return false
-
-            // Check if the app is available in cache, else refresh  apps database & cache
+            // if the app is new (ie unknown), refresh the db
             if (FirewallManager.AppStatus.UNKNOWN == appStatus) {
-                io("refresh_database") {
+                io("dbRefresh") {
                     refreshDatabase.handleNewlyConnectedApp(uid)
                 }
                 // check whether to block newly installed app
-                if (persistentState.blockNewlyInstalledApp && isConnectionAllowedForNewlyInstalledApp(
-                        uid)) {
+                if (persistentState.blockNewlyInstalledApp
+                        && isConnectionAllowedForNewlyInstalledApp(uid)) {
                     ipDetails.isBlocked = true
                     ipDetails.blockedByRule = FirewallRuleset.RULE1.id
                     connTrack(ipDetails)
@@ -226,26 +219,22 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 return false
             }
 
-            // Check whether IP rules are set
-            if (isIpBlocked(destIp, destPort, protocol)) {
+            if (ipBlocked(destIp, destPort, protocol)) {
                 ipDetails.isBlocked = true
                 ipDetails.blockedByRule = FirewallRuleset.RULE2.id
                 connTrack(ipDetails)
                 delayBlockResponse()
                 return true
-            } // fall-through
-
-            if (persistentState.blockUnknownConnections) {
-                if (isMissingOrInvalidUid(uid)) {
-                    ipDetails.isBlocked = true
-                    ipDetails.blockedByRule = FirewallRuleset.RULE5.id
-                    connTrack(ipDetails)
-                    delayBlockResponse()
-                    return true
-                }
             }
 
-            // Check whether any rules are set block the App.
+            if (persistentState.blockUnknownConnections && isMissingOrInvalidUid(uid)) {
+                ipDetails.isBlocked = true
+                ipDetails.blockedByRule = FirewallRuleset.RULE5.id
+                connTrack(ipDetails)
+                delayBlockResponse()
+                return true
+            }
+
             if (FirewallManager.AppStatus.BLOCKED == appStatus) {
                 ipDetails.isBlocked = true
                 ipDetails.blockedByRule = FirewallRuleset.RULE1.id
@@ -257,23 +246,21 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 return true
             }
 
-            //Check whether the screen lock is enabled and act based on it
-            if (isDeviceLocked()) {
+            if (deviceLocked()) {
                 ipDetails.isBlocked = true
                 ipDetails.blockedByRule = FirewallRuleset.RULE3.id
                 connTrack(ipDetails)
-                if (DEBUG) Log.d(LOG_TAG_VPN,
-                                 "Block connection with delay for screen lock: $uid, $destPort")
+                if (DEBUG) Log.d(LOG_TAG_VPN, "$uid blocked on device-lock to $destPort")
                 delayBlockResponse()
                 return true
             }
 
-            if (isUdpBlocked(uid, protocol, destPort)) {
+            if (udpBlocked(uid, protocol, destPort)) {
                 ipDetails.isBlocked = true
                 ipDetails.blockedByRule = FirewallRuleset.RULE6.id
                 connTrack(ipDetails)
                 delayBlockResponse()
-                if (DEBUG) Log.d(LOG_TAG_VPN, "blockUDPTraffic: $uid, $destPort")
+                if (DEBUG) Log.d(LOG_TAG_VPN, "$uid blocked, udp to $destPort")
                 return true
             }
 
@@ -305,22 +292,21 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                     ipDetails.isBlocked = true
                     ipDetails.blockedByRule = FirewallRuleset.RULE4.id
                     connTrack(ipDetails)
-                    Log.i(LOG_TAG_VPN, "Background blocked $uid after sleep of: 30 secs")
+                    Log.i(LOG_TAG_VPN, "$uid blocked, bg-data")
                     return isBgBlock
                 } else {
-                    if (DEBUG) Log.d(LOG_TAG_VPN,
-                                     "Background allowed for $uid, $destIp, Remaining time: ${10_000 - remainingWaitMs} ")
+                    if (DEBUG) Log.d(LOG_TAG_VPN, "$uid bg-allowed to $destIp, rem: ${10_000 - remainingWaitMs} ")
                 }
             }
 
-            // check if all packets on port 53 needs to be trapped
+            // if all packets on port 53 needs to be trapped
             if (dnsProxied(ipDetails, destPort)) {
                 return false
             }
 
-            // Check whether the destination ip was resolved by the dns set by the user
+            // whether the destination ip was resolved by the dns set by the user
             if (persistentState.disallowDnsBypass && appMode.getBraveMode().isDnsFirewallMode()) {
-                if (isUnresolvedIp(destIp)) {
+                if (unresolvedIp(destIp)) {
                     ipDetails.isBlocked = true
                     ipDetails.blockedByRule = FirewallRuleset.RULE7.id
                     connTrack(ipDetails)
@@ -329,23 +315,19 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             }
 
         } catch (iex: Exception) {
-            //Returning the blocked as true for all the block call from GO with exceptions.
-            //So the apps which are hit in exceptions will have the response sent as blocked(true)
-            //after a delayed amount of time.
-            /*
-             * TODO: Check for the possibility of adding the exceptions on alerts(either in-memory
-             * or as persistent alert)
-             */
-            isBlocked = true
+            // TODO: show alerts to user on such exceptions, in a separate ui?
+            isBlocked = true // block conn on any exception whatsoever
             Log.e(LOG_TAG_VPN, "err blocking conn, block anyway", iex)
         }
+
+        ipDetails?.isBlocked = isBlocked
+        connTrack(ipDetails)
+
         if (isBlocked) {
             delayBlockResponse()
         }
-        if (DEBUG) Log.d(LOG_TAG_VPN,
-                         "Response for the block: $destIp, $uid, $isBlocked, $sourceIp, $sourcePort, $destIp, $destPort")
-        ipDetails?.isBlocked = false
-        connTrack(ipDetails)
+
+        if (DEBUG) Log.d(LOG_TAG_VPN, "dst: $destIp, uid: $uid, blocked? $isBlocked, src: $sourceIp")
 
         return isBlocked
     }
@@ -381,13 +363,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         return true
     }
 
-    private fun isIpBlocked(destIp: String, destPort: Int, protocol: Int): Boolean {
+    private fun ipBlocked(destIp: String, destPort: Int, protocol: Int): Boolean {
         val connectionRules = ConnectionRules(destIp, destPort,
                                               Protocol.getProtocolName(protocol).name)
         return FirewallRules.hasRule(UID_EVERYBODY, connectionRules)
     }
 
-    private fun isUnresolvedIp(ip: String): Boolean {
+    private fun unresolvedIp(ip: String): Boolean {
         val bgBlockWaitMs = TimeUnit.SECONDS.toMillis(20)
         var remainingWaitMs = TimeUnit.SECONDS.toMillis(10)
         var attempt = 0
@@ -410,7 +392,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         return true
     }
 
-    private fun isUdpBlocked(uid: Int, protocol: Int, port: Int): Boolean {
+    private fun udpBlocked(uid: Int, protocol: Int, port: Int): Boolean {
         val hasUserBlockedUdp = persistentState.udpBlockedSettings
         if (!hasUserBlockedUdp) return false
 
@@ -435,7 +417,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     // Earlier the screen lock is detected with receiver received for Action user_present/screen_off.
     // Now the code only checks whether the KeyguardManager#isKeyguardLocked() is true/false.
     // if isKeyguardLocked() is true, the connections will be blocked.
-    private fun isDeviceLocked(): Boolean {
+    private fun deviceLocked(): Boolean {
         if (!persistentState.blockWhenDeviceLocked) return false
 
         if (keyguardManager == null) {
@@ -730,11 +712,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             registerAccessibilityServiceState()
         }
 
-        observerChanges()
+        observeChanges()
 
     }
 
-    private fun observerChanges() {
+    private fun observeChanges() {
         appInfoObserver = makeAppInfoObserver()
         FirewallManager.getApplistObserver().observeForever(appInfoObserver)
         persistentState.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
@@ -876,10 +858,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             startOrbotAsyncIfNeeded()
 
             VpnController.mutex.withLock {
-                // In case if the service already running(connectionMonitor will not be null)
-                // and onStartCommand is called then no need to process the below initializations
-                // instead call spawnTunUpdate()
-                // spawnTunUpdate() - Will overwrite the tunnel values with new values.
+                // if service is up (aka connectionMonitor not null)
+                // then simply update the existing tunnel
                 if (connectionMonitor == null) {
                     connectionMonitor = ConnectionMonitor(this, this)
                 } else {
@@ -905,10 +885,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
 
                     restartVpn(opts)
                 }
-                // Mark this as a foreground service.  This is normally done to ensure that the service
-                // survives under memory pressure.  Since this is a VPN service, it is presumably protected
-                // anyway, but the foreground service mechanism allows us to set a persistent notification,
-                // which helps users understand what's going on, and return to the app if they want.
+
                 startForeground(SERVICE_ID, updateNotificationBuilder().build())
 
                 persistentState.setVpnEnabled(true)
@@ -923,7 +900,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     private fun startOrbotAsyncIfNeeded() {
         if (!appMode.isOrbotProxyEnabled()) return
 
-        io("orbot_enabled") {
+        io("startOrbot") {
             orbotHelper.startOrbot(appMode.getProxyType())
         }
     }
@@ -951,7 +928,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             // Connection monitor can be null if onDestroy() of service
             // is called, in that case no need to call updateServerConnection()
             if (connectionMonitor == null) {
-                Log.w(LOG_TAG_VPN, "cannot spawn sever update, no connection monitor")
+                Log.w(LOG_TAG_VPN, "skip update-tun, connection-monitor missing")
                 return@withLock
             }
             vpnAdapter?.updateTun(tunnelOptions)
@@ -981,7 +958,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 notificationManager.notify(SERVICE_ID, updateNotificationBuilder().build())
             }
             PersistentState.LOCAL_BLOCK_LIST -> {
-                io("updateLocalBlocklist") {
+                io("localBlocklist") {
                     updateTun(opts)
                 }
             }
@@ -996,7 +973,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 spawnLocalBlocklistStampUpdate()
             }
             PersistentState.REMOTE_BLOCK_LIST_STAMP -> { // update tunnel on remote blocklist stamp change.
-                io("updateBlocklist") {
+                io("remoteBlocklist") {
                     updateTun(opts)
                 }
             }
@@ -1055,7 +1032,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     }
 
     private fun spawnLocalBlocklistStampUpdate() {
-        io("update_braveDnsStamp") {
+        io("dnsStampUpdate") {
             VpnController.mutex.withLock {
                 if (connectionMonitor == null) return@withLock
 
@@ -1249,11 +1226,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     }
 
     private fun handleVpnServiceOnAppStateChange() {
-        io("restartVpn_appState") {
+        io("appStateChange") {
             restartVpn(appMode.newTunnelOptions(this, GoIntraListener, fakeDns))
         }
-        val builder = updateNotificationBuilder()
-        notificationManager.notify(SERVICE_ID, builder.build())
+        notificationManager.notify(SERVICE_ID, updateNotificationBuilder().build())
     }
 
     // The VPN service and tun2socks must agree on the layout of the network.  By convention, we

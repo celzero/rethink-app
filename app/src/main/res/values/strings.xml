@@ -1159,13 +1159,13 @@
     <string name="notif_dialog_pause_dialog_neutral">Show</string>
 
     <!-- Notification label names -->
-    <string name="notif_channel_vpn_notification">VPN Active Notification</string>
-    <string name="notif_channel_vpn_failure">VPN Inactive Notification</string>
+    <string name="notif_channel_vpn_notification">Active VPN </string>
+    <string name="notif_channel_vpn_failure">Inactive VPN</string>
     <string name="notif_channel_firewall_alerts">Firewall Alerts</string>
-    <string name="notif_channel_proxy_failure">Proxy Failure Alerts</string>
+    <string name="notif_channel_proxy_failure">Proxy Alerts</string>
 
     <string name="notif_channel_desc_vpn_notification">Tap to change protection settings</string>
-    <string name="notif_channel_desc_vpn_failure">Shown when RethinkDNS has encountered a problem.</string>
+    <string name="notif_channel_desc_vpn_failure">Shown when RethinkDNS has encountered a problem</string>
     <string name="notif_channel_desc_firewall_alerts">Shown when the app not in use firewall settings stopped working</string>
     <string name="notif_channel_desc_proxy_failure">Shown when RethinkDNS detected batch of new apps installed</string>
 
