@@ -16,6 +16,11 @@ limitations under the License.
 
 package com.celzero.bravedns.net.manager;
 
+import static android.content.Context.CONNECTIVITY_SERVICE;
+import static com.celzero.bravedns.util.Constants.INVALID_UID;
+import static com.celzero.bravedns.util.Constants.MISSING_UID;
+import static com.celzero.bravedns.util.LoggerConstants.LOG_TAG_VPN;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -23,28 +28,24 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.celzero.bravedns.util.AndroidUidConfig;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
-import static android.content.Context.CONNECTIVITY_SERVICE;
-import static com.celzero.bravedns.util.Constants.INVALID_UID;
-import static com.celzero.bravedns.util.Constants.MISSING_UID;
-import static com.celzero.bravedns.util.LoggerConstants.LOG_TAG_VPN;
-
 public class ConnectionTracer {
     private static final boolean DEBUG = false;
-    private static final int CACHE_BUILDER_MAX_SIZE = 1000;
-    private static final int CACHE_BUILDER_WRITE_EXPIRE_SEC = 30;
+    private static final long CACHE_BUILDER_MAX_SIZE = 1000;
+    private static final long CACHE_BUILDER_WRITE_EXPIRE_SEC = 300;
     private final ConnectivityManager cm;
     private final Cache<String, Integer> uidCache;
 
     public ConnectionTracer(Context ctx) {
         this.cm = (ConnectivityManager) ctx.getSystemService(CONNECTIVITY_SERVICE);
-        // Cache the UID for the next 30 seconds.
-        // the UID will expire after 30 seconds of the write.
+        // Cache the UID for the next 60 seconds.
+        // the UID will expire after 60 seconds of the write.
         // Key for the cache is protocol, local, remote
         this.uidCache = CacheBuilder.newBuilder()
                 .maximumSize(CACHE_BUILDER_MAX_SIZE)
@@ -81,7 +82,7 @@ public class ConnectionTracer {
             remote = new InetSocketAddress(destIp, destPort);
         }
         int uid = INVALID_UID;
-        String key = protocol + local.getAddress().getHostAddress() + remote.getAddress().getHostAddress();
+        String key = makeCacheKey(protocol, local, sourcePort, remote, destPort);
         try {
             return uidCache.getIfPresent(key);
         } catch (Exception ignored) {
@@ -89,7 +90,12 @@ public class ConnectionTracer {
 
         try {
             uid = cm.getConnectionOwnerUid(protocol, local, remote);
-            uidCache.put(key, uid);
+            // Cache only uid's in app range
+            if (AndroidUidConfig.Companion.isUidAppRange(uid)) {
+                uidCache.put(key, uid);
+            } else {
+                // no-op
+            }
         } catch (SecurityException secEx) {
             Log.e(LOG_TAG_VPN, "NETWORK_STACK permission - " + secEx.getMessage(), secEx);
         }
@@ -97,5 +103,9 @@ public class ConnectionTracer {
         if (DEBUG) Log.d(LOG_TAG_VPN, "GetUidQ(" + local + "," + remote + "): " + uid);
 
         return uid;
+    }
+
+    private String makeCacheKey(int protocol, InetSocketAddress local, int sourcePort, InetSocketAddress remote, int destPort) {
+        return protocol + local.getAddress().getHostAddress() + sourcePort + remote.getAddress().getHostAddress() + destPort;
     }
 }

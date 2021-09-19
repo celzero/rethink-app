@@ -36,19 +36,27 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Utilities.Companion.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.Companion.getIcon
 
-class WhitelistedApplistAdapter(private val context: Context) :
-        PagedListAdapter<AppInfo, WhitelistedApplistAdapter.WhitelistAppInfoViewHolder>(
+// TODO: This class shares common functionality with ExcludeApplistAdapter.
+// Consider creating an appropriate abstraction between the two classes.
+class WhitelistedAppsAdapter(private val context: Context) :
+        PagedListAdapter<AppInfo, WhitelistedAppsAdapter.WhitelistAppInfoViewHolder>(
             DIFF_CALLBACK) {
 
     companion object {
 
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<AppInfo>() {
-
-            override fun areItemsTheSame(oldConnection: AppInfo,
-                                         newConnection: AppInfo) = oldConnection.packageInfo == newConnection.packageInfo
+            // account for both package-info and whitelist-flags when
+            // determining if items-are-same. previously, whitelist-flag was
+            // not part of the equation causing bugs where the ui wouldn't
+            // reflect the toggles adding/removing apps to/from the whitelist
+            override fun areItemsTheSame(oldConnection: AppInfo, newConnection: AppInfo): Boolean {
+                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.whiteListUniv1 == newConnection.whiteListUniv1)
+            }
 
             override fun areContentsTheSame(oldConnection: AppInfo,
-                                            newConnection: AppInfo) = oldConnection == newConnection
+                                            newConnection: AppInfo): Boolean {
+                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.whiteListUniv1 != newConnection.whiteListUniv1)
+            }
         }
     }
 
@@ -106,14 +114,10 @@ class WhitelistedApplistAdapter(private val context: Context) :
             } else {
                 FirewallManager.updateWhitelistedApps(appInfo, isWhitelist)
             }
-
         }
 
-
         private fun showDialog(packageList: List<String>, appInfo: AppInfo, isWhitelist: Boolean) {
-
             val positiveTxt: String
-
             val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
 
             builderSingle.setIcon(R.drawable.ic_whitelist)
@@ -148,7 +152,5 @@ class WhitelistedApplistAdapter(private val context: Context) :
             alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
             alertDialog.setCancelable(false)
         }
-
     }
-
 }

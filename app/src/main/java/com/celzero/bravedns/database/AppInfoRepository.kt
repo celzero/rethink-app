@@ -17,15 +17,14 @@ package com.celzero.bravedns.database
 
 import androidx.lifecycle.LiveData
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
 
-    fun updateAsync(appInfo: AppInfo, coroutineScope: CoroutineScope = GlobalScope) {
-        coroutineScope.launch {
-            appInfoDAO.update(appInfo)
-        }
+    companion object {
+        // No package applications
+        const val NO_PACKAGE = "no_package"
     }
 
     fun delete(appInfo: AppInfo) {
@@ -60,9 +59,8 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.getAppListForUID(uid)
     }
 
-    fun setInternetAllowedForCategory(categoryName: String, isInternetAllowed: Boolean): Int {
+    fun setInternetAllowedForCategory(categoryName: String, isInternetAllowed: Boolean) {
         appInfoDAO.updateInternetPermissionForCategory(categoryName, isInternetAllowed)
-        return appInfoDAO.getBlockedCountForCategory(categoryName)
     }
 
     fun getAllAppDetailsForLiveData(): LiveData<List<AppInfo>> {
@@ -116,22 +114,21 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         appInfoDAO.updateWhitelist(uid, isEnabled)
     }
 
-    fun updateWhitelistForAllApp(isEnabled: Boolean): Int {
-        return appInfoDAO.updateWhitelistForAllApp(isEnabled)
+    fun updateWhitelistForAllApps(isEnabled: Boolean): Int {
+        return appInfoDAO.updateWhitelistForAllApps(isEnabled)
     }
 
     fun updateWhitelistForCategories(category: String, isEnabled: Boolean): Int {
         return appInfoDAO.updateWhitelistForCategories(category, isEnabled)
     }
 
-    fun updateExcludedForAllApp(isExcluded: Boolean, coroutineScope: CoroutineScope = GlobalScope) {
-        coroutineScope.launch {
-            appInfoDAO.updateExcludedForAllApp(isExcluded)
-        }
+    fun updateExcludedForAllApps(isExcluded: Boolean) {
+        appInfoDAO.updateExcludedForAllApp(isExcluded)
     }
 
     fun updateExcludedForCategories(category: String, isExcluded: Boolean,
-                                    coroutineScope: CoroutineScope = GlobalScope) {
+                                    coroutineScope: CoroutineScope = CoroutineScope(
+                                        Dispatchers.IO)) {
         coroutineScope.launch {
             appInfoDAO.updateExcludedForCategories(category, isExcluded)
         }

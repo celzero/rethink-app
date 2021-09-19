@@ -13,55 +13,82 @@
         android:layout_height="wrap_content"
         android:padding="5dp"
         android:text="@string/whitelist_heading"
-        android:textSize="@dimen/large_font_text_view"
-        android:textColor="?attr/accentGood" />
+        android:textColor="?attr/accentGood"
+        android:textSize="@dimen/large_font_text_view" />
 
-    <LinearLayout
+    <androidx.cardview.widget.CardView
         android:id="@+id/custom_dialog_search_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:weightSum="1"
         android:layout_below="@id/custom_dialog_heading"
-        android:orientation="horizontal">
+        android:elevation="5dp">
 
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/custom_dialog_whitelist_search_view"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0.85"
-            android:layout_gravity="start"
-            android:fontFamily="sans-serif"
-            android:isScrollContainer="true"
-            app:queryHint="@string/search_hint">
-            <requestFocus />
-        </androidx.appcompat.widget.SearchView>
-        <ImageView
-            android:id="@+id/custom_dialog_whitelist_search_filter"
-            android:layout_width="0dp"
-            android:layout_weight="0.15"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_filter_large"/>
+            android:orientation="vertical">
 
-    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/custom_dialog_search_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="1">
 
+                <androidx.appcompat.widget.SearchView
+                    android:id="@+id/custom_dialog_whitelist_search_view"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_weight="0.85"
+                    android:fontFamily="sans-serif"
+                    android:isScrollContainer="true"
+                    app:queryHint="@string/search_hint">
 
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/custom_dialog_chip_group"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/custom_dialog_search_layout"
-        android:visibility="gone"
-        android:layout_margin="2dp"
-        android:padding="2dp"
-        app:singleSelection="false" />
-    <!--  android:layout_above="@id/recycler_view_dialog"
-              android:layout_below="@id/custom_dialog_whitelist_search_view"-->
+                    <requestFocus />
+                </androidx.appcompat.widget.SearchView>
+
+                <ImageView
+                    android:id="@+id/custom_dialog_whitelist_search_filter"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.15"
+                    android:src="@drawable/ic_filter_large" />
+
+            </LinearLayout>
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
+                android:clipToPadding="false"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:scrollbars="none">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/custom_dialog_chip_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:padding="2dp"
+                    android:visibility="gone"
+                    app:singleLine="true"
+                    app:singleSelection="false" />
+            </HorizontalScrollView>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
     <RelativeLayout
         android:id="@+id/custom_select_all_option"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/custom_dialog_chip_group"
+        android:layout_below="@id/custom_dialog_search_layout"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp">
 
@@ -92,10 +119,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="10dp"
             android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             android:buttonTint="?attr/accentGood"
-                android:foregroundTint="?attr/accentGood" />
+            android:foregroundTint="?attr/accentGood" />
     </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -113,8 +140,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:text="@string/whitelist_button"
-        android:textSize="@dimen/large_font_text_view"
-        android:textColor="?attr/accentGood" />
-
+        android:textColor="?attr/accentGood"
+        android:textSize="@dimen/large_font_text_view" />
 
 </RelativeLayout>

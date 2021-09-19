@@ -16,6 +16,8 @@
 package com.celzero.bravedns.util
 
 import java.util.*
+import kotlin.math.floor
+import kotlin.math.roundToInt
 import kotlin.math.sign
 
 /**
@@ -33,7 +35,7 @@ class P2QuantileEstimation(probability: Double) {
     // lower percentiles (p50) at the expense of computational cost;
     // for higher percentiles (p90+), even u as low as 5 works fine.
     private val u = 31
-    private val mid = Math.floor(u/2.0).roundToInt()
+    private val mid = floor(u / 2.0).roundToInt()
 
     private val n = IntArray(u) // marker positions
     private val ns = DoubleArray(u) // desired marker positions
@@ -41,7 +43,7 @@ class P2QuantileEstimation(probability: Double) {
     private val q = DoubleArray(u) // marker heights
 
     private var count = 0 // total sampled so far
-    
+
     init {
         p = probability
     }
@@ -60,7 +62,7 @@ class P2QuantileEstimation(probability: Double) {
                 for (i in 0..t) {
                     n[i] = i
                 }
-                
+
                 // divide p into mid no of equal segments
                 // p => 0.5, u = 11, t = 10, mid = 5; pmid => 0.1
                 val pmid = p / mid
@@ -74,7 +76,7 @@ class P2QuantileEstimation(probability: Double) {
                     // [3] => 3, [4] => 4, [5] => 5
                     ns[i] = dns[i] * t
                 }
-                
+
                 val rem = t - mid // the rest
                 val s = 1 - p // left-over probability
                 // divide q into rem no of equal segments
@@ -135,27 +137,23 @@ class P2QuantileEstimation(probability: Double) {
     }
 
     private fun parabolic(i: Int, d: Double): Double {
-        return q[i] +
-            (d / (n[i + 1] - n[i - 1])) *
-                (((n[i] - n[i - 1] + d) * (q[i + 1] - q[i]) / (n[i + 1] - n[i])) +
-                ((n[i + 1] - n[i] - d) * (q[i] - q[i - 1]) / (n[i] - n[i - 1])))
+        return q[i] + (d / (n[i + 1] - n[i - 1])) * (((n[i] - n[i - 1] + d) * (q[i + 1] - q[i]) / (n[i + 1] - n[i])) + ((n[i + 1] - n[i] - d) * (q[i] - q[i - 1]) / (n[i] - n[i - 1])))
     }
 
     private fun linear(i: Int, d: Int): Double {
-        return q[i] +
-            (d * (q[i + d] - q[i]) / (n[i + d] - n[i]))
+        return q[i] + (d * (q[i + d] - q[i]) / (n[i + d] - n[i]))
     }
 
-    fun getQuantile(): Double {
+    fun getQuantile(): Long {
         val c = count
 
         if (c > u) {
-            return q[mid]
+            return q[mid].toLong()
         }
 
         Arrays.sort(q, 0, c)
-        val index = ((c - 1) * p)).roundToInt()
-        return q[index]
+        val index = ((c - 1) * p).roundToInt()
+        return q[index].toLong()
     }
 
 }

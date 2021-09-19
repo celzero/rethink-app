@@ -39,7 +39,7 @@ class BraveTileService : TileService() {
             qsTile
         }
 
-        if (vpnState.on) {
+        if (vpnState.activationRequested) {
             tile.state = Tile.STATE_ACTIVE
         } else {
             tile.state = Tile.STATE_INACTIVE
@@ -51,7 +51,7 @@ class BraveTileService : TileService() {
     override fun onClick() {
         val vpnState: VpnState = VpnController.state()
 
-        if (vpnState.on) {
+        if (vpnState.activationRequested) {
             VpnController.stop(this)
         } else {
             if (VpnService.prepare(this) == null) {

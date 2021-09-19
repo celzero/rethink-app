@@ -25,6 +25,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
@@ -32,10 +33,7 @@ import com.celzero.bravedns.adapter.Apk
 import com.celzero.bravedns.adapter.ApkListAdapter
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.util.LoggerConstants
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.koin.android.ext.android.inject
 
 class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener {
@@ -70,7 +68,7 @@ class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener {
         mRecyclerView.adapter = mAdapter
 
         editsearch = includeView.findViewById(R.id.search) as SearchView
-        editsearch!!.setOnQueryTextListener(this)
+        editsearch?.setOnQueryTextListener(this)
 
         updateAppList()
 
@@ -85,22 +83,24 @@ class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener {
                 return@setOnClickListener
             }
             val bottomFilterSheetFragment = FilterAndSortBottomFragment()
-            bottomFilterSheetFragment.show(activity!!.supportFragmentManager,
+            bottomFilterSheetFragment.show(requireActivity().supportFragmentManager,
                                            bottomFilterSheetFragment.tag)
         }
 
         return view
     }
 
-    private fun updateAppList() = GlobalScope.launch(Dispatchers.Default) {
-        val appList = appInfoRepository.getAppInfo()
-        appList.forEach {
-            val userApk = Apk(it.appName, it.appName, it.packageInfo, it.uid.toString())
-            apkList.add(userApk)
-        }
-        withContext(Dispatchers.Main.immediate) {
-            progressBar.visibility = View.GONE
-            mAdapter.notifyDataSetChanged()
+    private fun updateAppList() = lifecycleScope.launch {
+        withContext(Dispatchers.Default) {
+            val appList = appInfoRepository.getAppInfo()
+            appList.forEach {
+                val userApk = Apk(it.appName, it.appName, it.packageInfo, it.uid.toString())
+                apkList.add(userApk)
+            }
+            withContext(Dispatchers.Main.immediate) {
+                progressBar.visibility = View.GONE
+                mAdapter.notifyDataSetChanged()
+            }
         }
     }
 

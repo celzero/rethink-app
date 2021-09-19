@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/background">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:animateLayoutChanges="true"
+            android:nestedScrollingEnabled="true"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/on_device_block_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardElevation="16dp">
+
+                <RelativeLayout
+                    android:id="@+id/on_device_block_rl"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingStart="10dp"
+                    android:paddingTop="20dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="20dp">
+
+                    <TextView
+                        android:id="@+id/on_device_block_heading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_gravity="center"
+                        android:drawablePadding="15dp"
+                        android:gravity="center"
+                        android:padding="15dp"
+                        android:text="On-device blocklist"
+                        android:textColor="?attr/colorAccent"
+                        app:drawableStartCompat="@drawable/ic_app_info" />
+
+                    <Button
+                        android:id="@+id/on_device_block_enable_btn"
+                        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:text="ENABLED"
+                        android:textColor="?attr/colorAccent" />
+
+                    <TextView
+                        android:id="@+id/on_device_block_desc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/on_device_block_heading"
+                        android:paddingStart="15dp"
+                        android:paddingEnd="15dp"
+                        android:text="@string/settings_local_blocklist_desc_1"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/default_font_text_view" />
+
+                    <RelativeLayout
+                        android:id="@+id/on_device_block_bottom_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/on_device_block_desc"
+                        android:visibility="gone">
+
+                        <Button
+                            android:id="@+id/on_device_block_update_btn"
+                            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:text="@string/settings_local_blocklist_update"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textSize="@dimen/default_font_text_view"
+                            android:visibility="visible" />
+
+                        <TextView
+                            android:id="@+id/on_device_block_last_updated_time_txt"
+                            style="@style/Widget.AppCompat.TextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:gravity="center"
+                            android:padding="15dp"
+                            android:text="@string/settings_local_blocklist_version"
+                            android:textSize="@dimen/default_font_text_view" />
+
+                    </RelativeLayout>
+
+                    <TextView
+                        android:id="@+id/on_device_block_configure_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/on_device_block_bottom_layout"
+                        android:padding="15dp"
+                        android:text="Configure"
+                        app:drawableEndCompat="@drawable/ic_right_arrow_secondary" />
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/on_device_block_chip_group"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/on_device_block_configure_title"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="-2dp"
+                        android:layout_marginEnd="0dp"
+                        android:visibility="gone">
+
+                        <com.google.android.material.chip.Chip
+                            style="@style/ThinnerChip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:singleLine="true"
+                            android:text="Adult basic" />
+
+                        <com.google.android.material.chip.Chip
+                            style="@style/ThinnerChip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:singleLine="true"
+                            android:text="Security basic" />
+
+                        <com.google.android.material.chip.Chip
+                            style="@style/ThinnerChip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:singleLine="true"
+                            android:text="Privacy basic" />
+
+                        <com.google.android.material.chip.Chip
+                            style="@style/ThinnerChip_entry"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:singleLine="true"
+                            android:text="Advanced"
+                            app:closeIcon="@drawable/ic_right_arrow_small" />
+
+
+                    </com.google.android.material.chip.ChipGroup>
+
+                </RelativeLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/custom_blocklist_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardElevation="16dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingStart="10dp"
+                    android:paddingTop="20dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="20dp">
+
+                    <TextView
+                        android:id="@+id/custom_blocklist_heading"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:drawablePadding="15dp"
+                        android:gravity="center_vertical"
+                        android:padding="15dp"
+                        android:text="My Custom blocklist"
+                        android:textColor="?attr/colorAccent"
+                        app:drawableEndCompat="@drawable/ic_right_arrow_secondary"
+                        app:drawableStartCompat="@drawable/ic_app_info" />
+
+                </RelativeLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardElevation="16dp">
+
+                <RelativeLayout
+                    android:id="@+id/rethink_rl"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingStart="10dp"
+                    android:paddingTop="20dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="20dp">
+
+                    <TextView
+                        android:id="@+id/rethink_heading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_gravity="center"
+                        android:drawablePadding="15dp"
+                        android:gravity="center"
+                        android:padding="15dp"
+                        android:text="DNS - Rethink Configurable"
+                        android:textColor="?attr/colorAccent"
+                        app:drawableStartCompat="@drawable/ic_app_info" />
+
+                    <Button
+                        android:id="@+id/rethink__button"
+                        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:text="ACTIVE"
+                        android:textColor="?attr/accentGood" />
+
+                    <TextView
+                        android:id="@+id/rethink_desc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/rethink_heading"
+                        android:paddingStart="15dp"
+                        android:paddingEnd="15dp"
+                        android:text="@string/settings_local_blocklist_desc_1"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/default_font_text_view" />
+
+
+                    <RelativeLayout
+                        android:id="@+id/rethink_bottom_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/rethink_desc"
+                        android:visibility="gone">
+
+                        <Button
+                            android:id="@+id/rethink_refresh_btn"
+                            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:text="@string/settings_local_blocklist_update"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textSize="@dimen/default_font_text_view"
+                            android:visibility="visible" />
+
+                        <TextView
+                            android:id="@+id/rethink_last_updated_time_txt"
+                            style="@style/Widget.AppCompat.TextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:gravity="center"
+                            android:padding="15dp"
+                            android:text="@string/settings_local_blocklist_version"
+                            android:textSize="@dimen/default_font_text_view" />
+
+                    </RelativeLayout>
+
+                    <View
+                        android:id="@+id/rethink_border"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@id/rethink_bottom_layout"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:background="?attr/divider"
+                        android:visibility="gone" />
+
+
+                    <TextView
+                        android:id="@+id/rethink_subtitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/rethink_border"
+                        android:padding="15dp"
+                        android:text="Configure"
+                        app:drawableEndCompat="@drawable/ic_right_arrow_secondary" />
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/rethink_chip_group"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/rethink_subtitle"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="-2dp"
+                        android:layout_marginEnd="0dp"
+                        android:visibility="gone">
+
+                        <com.google.android.material.chip.Chip
+                            style="@style/ThinnerChip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:singleLine="true"
+                            android:text="Adult basic" />
+
+                        <com.google.android.material.chip.Chip
+                            style="@style/ThinnerChip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:singleLine="true"
+                            android:text="Security basic" />
+
+                        <com.google.android.material.chip.Chip
+                            style="@style/ThinnerChip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:singleLine="true"
+                            android:text="Privacy basic" />
+
+                        <com.google.android.material.chip.Chip
+                            style="@style/ThinnerChip_entry"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:singleLine="true"
+                            android:text="Advanced"
+                            app:closeIcon="@drawable/ic_right_arrow_small" />
+
+
+                    </com.google.android.material.chip.ChipGroup>
+
+                </RelativeLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/other_dns_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardElevation="16dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingStart="10dp"
+                    android:paddingTop="20dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="20dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:drawablePadding="15dp"
+                        android:gravity="center_vertical"
+                        android:padding="15dp"
+                        android:text="More DNS options"
+                        android:textColor="?attr/colorAccent"
+                        app:drawableEndCompat="@drawable/ic_right_arrow_secondary"
+                        app:drawableStartCompat="@drawable/ic_app_info" />
+
+                </RelativeLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

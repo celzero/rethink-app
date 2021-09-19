@@ -22,24 +22,22 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DNSQueryAdapter
 import com.celzero.bravedns.data.AppMode
-import com.celzero.bravedns.database.DNSLogDAO
-import com.celzero.bravedns.database.DoHEndpoint
+import com.celzero.bravedns.database.DNSLogRepository
 import com.celzero.bravedns.databinding.ActivityQueryDetailBinding
 import com.celzero.bravedns.databinding.QueryListScrollListBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DNSCRYPT
-import com.celzero.bravedns.util.Constants.Companion.PREF_DNS_MODE_DOH
 import com.celzero.bravedns.viewmodel.DNSLogViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
@@ -53,7 +51,7 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     private var checkedItem = 1
     private var filterValue: String = ""
 
-    private val dnsLogDAO by inject<DNSLogDAO>()
+    private val dnsLogRepository by inject<DNSLogRepository>()
     private val persistentState by inject<PersistentState>()
     private val appMode by inject<AppMode>()
 
@@ -77,6 +75,8 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
 
         displayPerDnsUi(includeView)
         setupClickListeners(includeView)
+        observeDnsStats()
+        observeDnscryptStatus()
     }
 
     private fun setupClickListeners(includeView: QueryListScrollListBinding) {
@@ -134,51 +134,51 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     override fun onResume() {
         super.onResume()
         updateConnectedStatus()
-        observeDnsStats()
     }
 
     private fun updateConnectedStatus() {
-        val dnsType = appMode.getDNSType()
-        if (dnsType == PREF_DNS_MODE_DOH) {
-            val dohDetail: DoHEndpoint? = appMode.getDOHDetails()
-            b.connectedStatusTitleUrl.text = resources.getString(
-                R.string.configure_dns_connected_doh_status)
-            b.connectedStatusTitle.text = resources.getString(
-                R.string.configure_dns_connection_name, dohDetail?.dohName)
-            b.queryListScrollList.recyclerQuery.visibility = View.VISIBLE
-            b.queryListScrollList.dnsLogNoLogText.visibility = View.GONE
-        } else if (dnsType == PREF_DNS_MODE_DNSCRYPT) {
-            val cryptDetails = appMode.getDNSCryptServerCount()
-            val cryptName = resources.getString(R.string.configure_dns_crypt_name,
-                                                cryptDetails.toString())
-            b.connectedStatusTitle.text = resources.getString(
-                R.string.configure_dns_connection_name, cryptName)
-            b.connectedStatusTitleUrl.text = resources.getString(
-                R.string.configure_dns_connected_dns_crypt_status)
-            // Edge case, the dnscrypt count can change during the refresh
-            // operation(dnscrypt proxy refresh from Go) so during onResume()
-            // the value is fetched from database and force updated in persistent state.
-            val connectedCrypt = getString(R.string.configure_dns_crypt, cryptDetails.toString())
-            persistentState.setConnectedDns(connectedCrypt)
-            b.queryListScrollList.recyclerQuery.visibility = View.VISIBLE
-            b.queryListScrollList.dnsLogNoLogText.visibility = View.GONE
-        } else {
-            val proxyDetails = appMode.getDNSProxyServerDetails()
-            b.connectedStatusTitleUrl.text = resources.getString(
-                R.string.configure_dns_connected_dns_proxy_status)
-            b.connectedStatusTitle.text = resources.getString(
-                R.string.configure_dns_connection_name, proxyDetails.proxyName)
-            b.queryListScrollList.recyclerQuery.visibility = View.GONE
-            if (persistentState.logsEnabled) {
-                b.queryListScrollList.dnsLogNoLogText.visibility = View.VISIBLE
-            } else {
-                /* No op */
-                // As of now, the logs are not shown when the DNS mode is in DNSProxy.
-                // So when pxoxy mode is changed, only onResume() will be called as it
-                // is sharing the same activity. (The proxy mode changes done in the
-                // ConfigureDNSFragment). Other logs enabled states are handled in onViewCreated().
+        when (appMode.getDnsType()) {
+            AppMode.DnsType.DOH -> {
+                b.connectedStatusTitleUrl.text = resources.getString(
+                    R.string.configure_dns_connected_doh_status)
+                b.connectedStatusTitle.text = resources.getString(
+                    R.string.configure_dns_connection_name, appMode.getConnectedDNS())
+                b.queryListScrollList.recyclerQuery.visibility = View.VISIBLE
+                b.queryListScrollList.dnsLogNoLogText.visibility = View.GONE
+            }
+            AppMode.DnsType.DNSCRYPT -> {
+                b.connectedStatusTitleUrl.text = resources.getString(
+                    R.string.configure_dns_connected_dns_crypt_status)
+                b.queryListScrollList.recyclerQuery.visibility = View.VISIBLE
+                b.queryListScrollList.dnsLogNoLogText.visibility = View.GONE
+            }
+            AppMode.DnsType.DNS_PROXY -> {
+                b.connectedStatusTitleUrl.text = resources.getString(
+                    R.string.configure_dns_connected_dns_proxy_status)
+                b.connectedStatusTitle.text = resources.getString(
+                    R.string.configure_dns_connection_name, appMode.getConnectedDNS())
+                b.queryListScrollList.recyclerQuery.visibility = View.GONE
+                if (persistentState.logsEnabled) {
+                    b.queryListScrollList.dnsLogNoLogText.visibility = View.VISIBLE
+                } else {
+                    /* No op */
+                    // As of now, the logs are not shown when the DNS mode is in DNSProxy.
+                    // So when pxoxy mode is changed, only onResume() will be called as it
+                    // is sharing the same activity. (The proxy mode changes done in the
+                    // ConfigureDNSFragment). Other logs enabled states are handled in onViewCreated().
+                }
             }
         }
+    }
+
+    // FIXME: Create common observer for dns instead of separate observers
+    private fun observeDnscryptStatus() {
+        appMode.getDnscryptCountObserver().observe(viewLifecycleOwner, {
+            if (appMode.getDnsType() != AppMode.DnsType.DNSCRYPT) return@observe
+
+            val connectedCrypt = getString(R.string.configure_dns_crypt, it.toString())
+            b.connectedStatusTitle.text = connectedCrypt
+        })
     }
 
     private fun showDnsLogsFilterDialog() {
@@ -191,7 +191,7 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         // Single-choice items (initialized with checked item)
         builder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
             // Respond to item chosen
-            // FIXME - Remove the isFilter constants with introduction of new filter options.
+            // FIXME: Remove the isFilter constants with introduction of new filter options.
             filterValue = if (which == 0) ":isFilter"
             else ""
             checkedItem = which
@@ -201,16 +201,17 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         builder.show()
     }
 
-
     private fun showDnsLogsDeleteDialog() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle(R.string.dns_query_clear_logs_title)
         builder.setMessage(R.string.dns_query_clear_logs_message)
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
-            GlobalScope.launch(Dispatchers.IO) {
-                GlideApp.get(requireActivity()).clearDiskCache()
-                dnsLogDAO.clearAllData()
+            go {
+                withContext(Dispatchers.IO) {
+                    GlideApp.get(requireActivity()).clearDiskCache()
+                }
+                dnsLogRepository.clearAllData()
             }
         }
         builder.setNegativeButton(getString(R.string.dns_log_dialog_negative)) { _, _ -> }
@@ -227,4 +228,9 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         return true
     }
 
+    private fun go(f: suspend () -> Unit) {
+        lifecycleScope.launch {
+            f()
+        }
+    }
 }

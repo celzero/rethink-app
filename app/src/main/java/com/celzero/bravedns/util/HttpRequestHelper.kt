@@ -26,7 +26,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.JSON_UPDATE
 import com.celzero.bravedns.util.Constants.Companion.JSON_VERSION
-import com.celzero.bravedns.util.Constants.Companion.RESPONSE_VERSION
+import com.celzero.bravedns.util.Constants.Companion.UPDATE_CHECK_RESPONSE_VERSION
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import okhttp3.*
 import org.json.JSONObject
@@ -58,7 +58,7 @@ class HttpRequestHelper {
                     persistentState.lastAppUpdateCheck = System.currentTimeMillis()
                     Log.i(LOG_TAG_DOWNLOAD,
                           "Server response for the new version download is true, version number-  $shouldUpdate")
-                    if (version == RESPONSE_VERSION) {
+                    if (version == UPDATE_CHECK_RESPONSE_VERSION) {
                         if (shouldUpdate) {
                             // TODO handle - #319
                         } else {
@@ -74,12 +74,13 @@ class HttpRequestHelper {
         fun downloadBlockListFiles(context: Context): DownloadManager {
             val downloadManager = context.getSystemService(
                 AppCompatActivity.DOWNLOAD_SERVICE) as DownloadManager
-            val uri: Uri = Uri.parse(Constants.JSON_DOWNLOAD_BLOCKLIST_LINK)
+            val uri: Uri = Uri.parse("")
             val request = DownloadManager.Request(uri)
-            request.setDestinationInExternalFilesDir(context, Constants.DOWNLOAD_PATH,
-                                                     Constants.FILE_TAG_NAME)
+            request.setDestinationInExternalFilesDir(context,
+                                                     Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH,
+                                                     Constants.ONDEVICE_BLOCKLIST_FILE_TAG)
             Log.i(LOG_TAG_DOWNLOAD,
-                  "Path - ${context.filesDir.canonicalPath}${Constants.DOWNLOAD_PATH}${Constants.FILE_TAG_NAME}")
+                  "Path - ${context.filesDir.canonicalPath}${Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH}${Constants.ONDEVICE_BLOCKLIST_FILE_TAG}")
             downloadManager.enqueue(request)
             return downloadManager
         }

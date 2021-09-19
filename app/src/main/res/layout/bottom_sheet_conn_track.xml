@@ -17,23 +17,46 @@
         android:layout_marginBottom="20dp"
         android:background="@color/recycler_selected" />
 
-    <com.google.android.material.chip.Chip
-        android:id="@+id/bs_conn_track_app_kill"
-        style="@style/ThinnerChip_action"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginEnd="25dp"
-        android:padding="5dp"
-        android:text="@string/bsct_app_info"
-        android:textColor="?attr/accentGood"
-        android:textSize="@dimen/large_font_text_view"
-        android:visibility="visible" />
+        android:layout_marginBottom="10dp">
+
+        <TextView
+            android:id="@+id/bs_conn_track_port_detail_chip"
+            style="@style/ThinnerChip_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="15dp"
+            android:padding="5dp"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/small_font_text_view"
+            android:visibility="visible" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/bs_conn_track_app_kill"
+            style="@style/ThinnerChip_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="15dp"
+            android:padding="5dp"
+            android:text="@string/bsct_app_info"
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/large_font_text_view"
+            android:visibility="visible"
+            app:chipEndPadding="5dp"
+            app:chipStartPadding="5dp"
+            app:shapeAppearance="@style/ShapeAppearance.MyApp.LargeComponent" />
+
+    </RelativeLayout>
 
 
     <RelativeLayout
         android:id="@+id/bs_conn_track_app_name_header"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
@@ -43,8 +66,8 @@
 
         <ImageView
             android:id="@+id/bs_conn_track_app_icon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_centerVertical="true"
             android:layout_gravity="center"
             android:layout_marginEnd="10dp"
@@ -56,8 +79,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_margin="2dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginBottom="2dp"
             android:layout_toEndOf="@id/bs_conn_track_app_icon"
             android:gravity="center"
             android:text="@string/action_automatic"
@@ -77,9 +102,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:ellipsize="none"
+            android:fontFamily="sans-serif-condensed-medium"
             android:gravity="center"
             android:minWidth="35dp"
-            android:fontFamily="sans-serif-condensed-medium"
             android:singleLine="true"
             android:textAppearance="@android:style/TextAppearance.Material.Subhead"
             android:textSize="26sp" />
@@ -91,13 +116,12 @@
             android:layout_centerVertical="true"
             android:layout_marginTop="2dp"
             android:layout_toEndOf="@id/bs_conn_connection_flag"
+            android:typeface="monospace"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:textColor="?attr/primaryTextColor"
             android:textIsSelectable="true"
             android:textSize="@dimen/heading_font_text_view" />
-
-
     </RelativeLayout>
 
     <LinearLayout
@@ -116,43 +140,18 @@
             android:gravity="center">
 
             <TextView
-                android:id="@+id/bs_conn_blocked_desc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="fill_horizontal"
-                android:ellipsize="end"
-                android:gravity="end"
-                android:text="@string/bsct_conn_block_desc"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/default_font_text_view"
-                android:visibility="gone" />
-
-            <TextView
                 android:id="@+id/bs_conn_connection_details"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:text="@string/bsct_conn_conn_desc_allowed"
                 android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/default_font_text_view" />
+                android:textIsSelectable="true"
+                android:textSize="@dimen/default_font_text_view"
+                android:visibility="gone" />
         </LinearLayout>
 
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/bs_conn_connection_details1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:gravity="center"
-        android:padding="5dp"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:text="@string/bsct_conn_conn_desc_allowed"
-        android:textColor="?attr/primaryLightColorText"
-        android:textSize="@dimen/default_font_text_view"
-        android:visibility="gone" />
-
 
     <LinearLayout
         android:id="@+id/bs_conn_blocked_rule1_header_ll"
@@ -262,33 +261,11 @@
     </LinearLayout>
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        android:background="@color/childListColor"
-        android:textSize="@dimen/large_font_text_view"
-        android:visibility="gone" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/bs_conn_blocked_time"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:weightSum="1">
-
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/bs_conn_track_app_clear_rules"
-            style="@style/Widget.MaterialComponents.Chip.Action"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:layout_weight="0.5"
-            android:text="@string/bsct_clear"
-            android:textAlignment="center"
-            android:textColor="?attr/secondaryTextColor"
-            android:visibility="gone"
-            app:chipBackgroundColor="@color/colorPrimaryDark" />
-    </LinearLayout>
-
-
+        android:layout_gravity="center|bottom"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:textSize="@dimen/default_font_text_view" />
 </LinearLayout>

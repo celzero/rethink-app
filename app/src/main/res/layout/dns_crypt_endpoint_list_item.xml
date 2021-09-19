@@ -7,7 +7,6 @@
     android:background="?android:attr/selectableItemBackground"
     android:elevation="@dimen/activity_horizontal_margin">
 
-
     <RelativeLayout
         android:id="@+id/dns_crypt_endpoint_list_container"
         android:layout_width="match_parent"
@@ -61,18 +60,17 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_alignParentEnd="true"
-            android:gravity="center"
             android:buttonTint="?attr/accentGood"
-                        android:foregroundTint="?attr/accentGood"
-            android:text="@null"
-            android:padding="10dp" />
+            android:foregroundTint="?attr/accentGood"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@null" />
 
     </RelativeLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
-        android:layout_below="@id/dns_crypt_endpoint_list_container"
-        />
+        android:layout_below="@id/dns_crypt_endpoint_list_container" />
 
 </RelativeLayout>

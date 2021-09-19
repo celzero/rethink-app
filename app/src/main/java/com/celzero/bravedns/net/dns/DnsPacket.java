@@ -16,9 +16,9 @@ limitations under the License.
 
 package com.celzero.bravedns.net.dns;
 
-import android.util.Log;
+import static com.celzero.bravedns.util.LoggerConstants.LOG_TAG_DNS_LOG;
 
-import com.google.common.net.InetAddresses;
+import android.util.Log;
 
 import java.net.InetAddress;
 import java.net.ProtocolException;
@@ -27,8 +27,6 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.celzero.bravedns.util.LoggerConstants.LOG_TAG_DNS_LOG;
 
 
 /**
@@ -50,13 +48,32 @@ public class DnsPacket {
         short qclass;
     }
 
-    private static class DnsRecord {
+    public static class DnsRecord {
 
         String name;
         short rtype;
         short rclass;
         int ttl;
         byte[] data;
+
+        private boolean isAorAAAA() {
+            return this.rtype == TYPE_A || this.rtype == TYPE_AAAA;
+        }
+
+        public InetAddress getIp() {
+            if (!isAorAAAA()) return null;
+
+            try {
+                return InetAddress.getByAddress(this.data);
+            } catch (IllegalArgumentException | UnknownHostException e) {
+                Log.e(LOG_TAG_DNS_LOG, "Failure converting string to InetAddresses: ${e.message}", e);
+            }
+            return null;
+        }
+
+        public int getTtl() {
+            return this.ttl;
+        }
     }
 
     private final short id;
@@ -189,6 +206,10 @@ public class DnsPacket {
         }
     }
 
+    public DnsRecord[] getAnswer() {
+        return this.answer;
+    }
+
     public short getId() {
         return id;
     }
@@ -219,16 +240,10 @@ public class DnsPacket {
         List<InetAddress> addresses = new ArrayList<>();
         for (DnsRecord[] src : new DnsRecord[][]{answer, authority}) {
             for (DnsRecord r : src) {
-                if (r.rtype == TYPE_A || r.rtype == TYPE_AAAA) {
-                    try {
-                        // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
-                        // Unlike InetAddress.getByAddress(), the methods of this class never cause DNS services
-                        // to be accessed.
-                        addresses.add(InetAddresses.fromLittleEndianByteArray(r.data));
-                    } catch (IllegalArgumentException | UnknownHostException e) {
-                        Log.e(LOG_TAG_DNS_LOG, "Failure converting string to InetAddresses: ${e.message}", e);
-                    }
-                }
+                InetAddress ip = r.getIp();
+                if (ip == null) continue;
+
+                addresses.add(ip);
             }
         }
         return addresses;

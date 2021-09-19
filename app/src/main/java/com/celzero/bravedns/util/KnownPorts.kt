@@ -1,39 +1,49 @@
 /*
-Copyright 2021 RethinkDNS and its authors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2021 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.celzero.bravedns.util
 
 class KnownPorts {
-    //get protocol desc based on port number
+
     companion object {
-        private var portMap: HashMap<Int, String> = HashMap()
-        fun resolvePort(port: Int): String? {
-            if (portMap.size == 0) {
-                initPortMap()
-            }
-            return if (portMap.containsKey(port)) {
-                portMap[port]
-            } else {
-                Constants.PORT_VAL_UNKNOWN
-            }
+        const val DNS_PORT: Int = 53
+        const val NTP_PORT: Int = 123
+
+        // represents the unknown port in the port map. see class KnownPorts
+        const val PORT_VAL_UNKNOWN = "unknown"
+
+        //get protocol desc based on port number
+        private var portMap: HashMap<Int, String> = initPortMap()
+
+        fun resolvePort(port: Int): String {
+            return portMap[port] ?: PORT_VAL_UNKNOWN
+        }
+
+        fun isNtp(port: Int): Boolean {
+            return portMap[port] == portMap[NTP_PORT]
+        }
+
+        fun isDns(port: Int): Boolean {
+            return portMap[port] == portMap[DNS_PORT]
         }
 
         // init hash map with reserved ports (1-1024) and protocol identifiers
         // based on: http://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml
-        private fun initPortMap() {
+        private fun initPortMap(): HashMap<Int, String> {
+            portMap = HashMap()
             portMap[1] = "tcpmux"
             portMap[2] = "compressnet"
             portMap[3] = "compressnet"
@@ -723,6 +733,8 @@ class KnownPorts {
             portMap[1010] = "surf"
             portMap[1021] = "exp1"
             portMap[1022] = "exp2"
+
+            return portMap
         }
     }
 }

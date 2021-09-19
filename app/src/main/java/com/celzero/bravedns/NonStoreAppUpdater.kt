@@ -23,11 +23,14 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.JSON_LATEST
 import com.celzero.bravedns.util.Constants.Companion.JSON_UPDATE
 import com.celzero.bravedns.util.Constants.Companion.JSON_VERSION
-import com.celzero.bravedns.util.Constants.Companion.RESPONSE_VERSION
+import com.celzero.bravedns.util.Constants.Companion.UPDATE_CHECK_RESPONSE_VERSION
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
 import okhttp3.*
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.dnsoverhttps.DnsOverHttps
 import org.json.JSONObject
 import java.io.IOException
+import java.net.InetAddress
 
 class NonStoreAppUpdater(private val baseUrl: String,
                          private val persistentState: PersistentState) : AppUpdater {
@@ -37,7 +40,15 @@ class NonStoreAppUpdater(private val baseUrl: String,
         Log.i(LOG_TAG_APP_UPDATE, "Beginning update check")
         val url = baseUrl + BuildConfig.VERSION_CODE
 
-        val client = OkHttpClient()
+        val bootstrapClient = OkHttpClient()
+        // FIXME: Use user set doh provider
+        // using quad9 doh provider
+        val dns = DnsOverHttps.Builder().client(bootstrapClient).url(
+            "https://dns.quad9.net/dns-query".toHttpUrl()).bootstrapDnsHosts(
+            InetAddress.getByName("9.9.9.9"), InetAddress.getByName("149.112.112.112"),
+            InetAddress.getByName("2620:fe::9"), InetAddress.getByName("2620:fe::fe")).build()
+
+        val client = bootstrapClient.newBuilder().dns(dns).build()
         val request = Request.Builder().url(url).build()
 
         client.newCall(request).enqueue(object : Callback {
@@ -49,8 +60,13 @@ class NonStoreAppUpdater(private val baseUrl: String,
 
             override fun onResponse(call: Call, response: Response) {
                 try {
-                    val stringResponse = response.body!!.string()
-                    val json = JSONObject(stringResponse)
+                    val res = response.body?.string()
+                    if (res.isNullOrBlank()) {
+                        listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER, isInteractive)
+                        return
+                    }
+
+                    val json = JSONObject(res)
                     val version = json.optInt(JSON_VERSION, 0)
                     val shouldUpdate = json.optBoolean(JSON_UPDATE, false)
                     val latest = json.optLong(JSON_LATEST, INIT_TIME_MS)
@@ -61,7 +77,7 @@ class NonStoreAppUpdater(private val baseUrl: String,
                     Log.i(LOG_TAG_APP_UPDATE,
                           "Server response for the new version download is $shouldUpdate (json version: $version), version number:  $latest")
 
-                    if (version != RESPONSE_VERSION) {
+                    if (version != UPDATE_CHECK_RESPONSE_VERSION) {
                         listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER, isInteractive)
                         return
                     } else {

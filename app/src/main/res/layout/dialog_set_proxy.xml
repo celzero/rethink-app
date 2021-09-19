@@ -13,8 +13,17 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:padding="10dp"
-        android:textSize="@dimen/large_font_text_view"
-        android:text="@string/settings_dns_proxy_dialog_header" />
+        android:text="@string/settings_dns_proxy_dialog_header"
+        android:textSize="@dimen/large_font_text_view" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:text="@string/settings_dns_proxy_dialog_app_desc"
+        android:textSize="@dimen/default_font_text_view" />
 
     <LinearLayout
         android:id="@+id/dialog_proxy_spinner_header"
@@ -29,16 +38,16 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="0.3"
-            android:textSize="@dimen/large_font_text_view"
-            android:text="@string/settings_dns_proxy_dialog_app" />
+            android:text="@string/settings_dns_proxy_dialog_app"
+            android:textSize="@dimen/large_font_text_view" />
 
         <androidx.appcompat.widget.AppCompatSpinner
             android:id="@+id/dialog_proxy_spinner_appname"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/large_font_text_view"
             android:layout_gravity="center"
-            android:layout_weight="0.7" />
+            android:layout_weight="0.7"
+            android:textSize="@dimen/large_font_text_view" />
 
     </LinearLayout>
 
@@ -54,19 +63,20 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="@dimen/large_font_text_view"
             android:layout_weight="0.3"
-            android:text="@string/settings_dns_proxy_dialog_hostname" />
+            android:text="@string/settings_dns_proxy_dialog_hostname"
+            android:textSize="@dimen/large_font_text_view" />
 
         <EditText
             android:id="@+id/dialog_proxy_edit_ip"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="@dimen/large_font_text_view"
-            android:maxLines="1"
             android:layout_weight="0.7"
-            android:hint="@string/settings_socks5_dialog_hint_ip" />
+            android:hint="@string/settings_socks5_dialog_hint_ip"
+            android:maxLines="1"
+            android:textSize="@dimen/large_font_text_view"
+            android:typeface="monospace" />
 
     </LinearLayout>
 
@@ -81,9 +91,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="@dimen/large_font_text_view"
             android:layout_weight="0.3"
-            android:text="@string/settings_dns_proxy_dialog_port_number" />
+            android:text="@string/settings_dns_proxy_dialog_port_number"
+            android:textSize="@dimen/large_font_text_view" />
 
         <EditText
             android:id="@+id/dialog_proxy_edit_port"
@@ -91,10 +101,11 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="0.7"
-            android:maxLines="1"
             android:hint="@string/settings_socks5_dialog_hint_port"
+            android:inputType="number"
+            android:maxLines="1"
             android:textSize="@dimen/large_font_text_view"
-            android:inputType="number" />
+            android:typeface="monospace" />
 
     </LinearLayout>
 
@@ -110,8 +121,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="0.3"
-            android:textSize="@dimen/large_font_text_view"
-            android:text="@string/settings_dns_proxy_dialog_username" />
+            android:text="@string/settings_dns_proxy_dialog_username"
+            android:textSize="@dimen/large_font_text_view" />
 
         <EditText
             android:id="@+id/dialog_proxy_edit_username"
@@ -119,9 +130,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="0.7"
+            android:hint="@string/settings_socks5_dialog_hint_username"
             android:maxLines="1"
             android:textSize="@dimen/large_font_text_view"
-            android:hint="@string/settings_socks5_dialog_hint_username" />
+            android:typeface="monospace" />
 
     </LinearLayout>
 
@@ -137,8 +149,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="0.3"
-            android:textSize="@dimen/large_font_text_view"
-            android:text="@string/settings_dns_proxy_dialog_password" />
+            android:text="@string/settings_dns_proxy_dialog_password"
+            android:textSize="@dimen/large_font_text_view" />
 
         <EditText
             android:id="@+id/dialog_proxy_edit_password"
@@ -146,10 +158,11 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="0.7"
-            android:textSize="@dimen/large_font_text_view"
             android:hint="@string/settings_socks5_dialog_hint_password"
+            android:inputType="textPassword"
             android:maxLines="1"
-            android:inputType="textPassword" />
+            android:textSize="@dimen/large_font_text_view"
+            android:typeface="monospace" />
 
     </LinearLayout>
 
@@ -165,17 +178,17 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="0.9"
-            android:textSize="@dimen/large_font_text_view"
-            android:text="@string/univ_firewall_rule_4" />
+            android:text="@string/univ_firewall_rule_4"
+            android:textSize="@dimen/large_font_text_view" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
-            android:buttonTint="?attr/accentGood"
-            android:foregroundTint="?attr/accentGood"
             android:id="@+id/dialog_proxy_udp_check"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_weight="0.1" />
+            android:layout_weight="0.1"
+            android:buttonTint="?attr/accentGood"
+            android:foregroundTint="?attr/accentGood" />
 
     </LinearLayout>
 
@@ -185,8 +198,8 @@
         android:layout_height="wrap_content"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
-        android:textSize="@dimen/default_font_text_view"
-        android:textColor="@color/colorRed_A400" />
+        android:textColor="@color/colorRed_A400"
+        android:textSize="@dimen/default_font_text_view" />
 
 
     <LinearLayout
@@ -203,18 +216,18 @@
             android:layout_margin="5dp"
             android:gravity="center"
             android:text="@string/settings_dns_proxy_dialog_negative_btn"
-            android:textSize="@dimen/large_font_text_view"
-            android:textColor="?attr/accentGood" />
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/large_font_text_view" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/dialog_proxy_apply_btn"
             style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/large_font_text_view"
             android:layout_margin="5dp"
             android:gravity="center"
             android:text="@string/settings_dns_proxy_dialog_positive_btn"
-            android:textColor="?attr/accentGood" />
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/large_font_text_view" />
     </LinearLayout>
 </LinearLayout>

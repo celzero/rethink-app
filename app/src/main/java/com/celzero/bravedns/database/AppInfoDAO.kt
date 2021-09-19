@@ -78,7 +78,7 @@ interface AppInfoDAO {
     fun getPackageNameForUid(uid: Int): String
 
     @Query(
-        "select * from AppInfo where isExcluded = 0  order by whiteListUniv1 desc,lower(appName) ")
+        "select * from AppInfo where isExcluded = 0 order by whiteListUniv1 desc,lower(appName) ")
     fun getUnivAppDetailsLiveData(): DataSource.Factory<Int, AppInfo>
 
     @Query(
@@ -106,25 +106,27 @@ interface AppInfoDAO {
     fun updateWhitelist(uid: Int, isEnabled: Boolean)
 
     @Query("update AppInfo set whiteListUniv1 = :isEnabled, isInternetAllowed = 1")
-    fun updateWhitelistForAllApp(isEnabled: Boolean): Int
+    fun updateWhitelistForAllApps(isEnabled: Boolean): Int
 
     @Query(
         "update AppInfo set whiteListUniv1 = :isEnabled, isInternetAllowed = 1  where appCategory = :category")
     fun updateWhitelistForCategories(category: String, isEnabled: Boolean): Int
 
-    @Query("select * from AppInfo  order by isExcluded desc,lower(appName)")
+    @Query(
+        "select * from AppInfo where appCategory != 'Non-App System' order by isExcluded desc,lower(appName)")
     fun getExcludedAppDetailsLiveData(): DataSource.Factory<Int, AppInfo>
 
-    @Query("select * from AppInfo where isSystemApp = 1 order by isExcluded desc,lower(appName)")
+    @Query(
+        "select * from AppInfo where isSystemApp = 1 and appCategory != 'Non-App System' order by isExcluded desc,lower(appName)")
     fun getExcludedAAppSystemAppsLiveData(): DataSource.Factory<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where appCategory in (:filter) order by isExcluded desc,lower(appName)")
+        "select * from AppInfo where appCategory in (:filter) and appCategory != 'Non-App System' order by isExcluded desc,lower(appName)")
     fun getExcludedAppDetailsFilterForCategoryLiveData(
             filter: List<String>): DataSource.Factory<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where appName like :filter order by isExcluded desc,lower(appName)")
+        "select * from AppInfo where appName like :filter and appCategory != 'Non-App System' order by isExcluded desc,lower(appName)")
     fun getExcludedAppDetailsFilterLiveData(filter: String): DataSource.Factory<Int, AppInfo>
 
     @Query(

@@ -23,6 +23,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -33,7 +35,8 @@ import com.celzero.bravedns.databinding.DnsCryptEndpointListItemBinding
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.*
 
-class DNSCryptEndpointAdapter(private val context: Context, private val appMode: AppMode) :
+class DNSCryptEndpointAdapter(private val context: Context, val lifecycleOwner: LifecycleOwner,
+                              private val appMode: AppMode) :
         PagedListAdapter<DNSCryptEndpoint, DNSCryptEndpointAdapter.DNSCryptEndpointViewHolder>(
             DIFF_CALLBACK) {
 
@@ -154,16 +157,16 @@ class DNSCryptEndpointAdapter(private val context: Context, private val appMode:
         }
 
         private fun updateDNSCryptDetails(endpoint: DNSCryptEndpoint, isSelected: Boolean) {
-            CoroutineScope(Dispatchers.IO).launch {
-                if (!isSelected && !appMode.isRemoveDnscryptAllowed(endpoint)) {
+            io {
+                if (!isSelected && !appMode.canRemoveDnscrypt(endpoint)) {
                     // Do not unselect the only user-selected dnscrypt endpoint, that is
                     // when the getConnectedDnsCrypt returns a list of size 1
-                    withContext(Dispatchers.Main) {
+                    uiCtx {
                         Toast.makeText(context, context.getString(R.string.dns_select_toast),
                                        Toast.LENGTH_SHORT).show()
                         b.dnsCryptEndpointListActionImage.isChecked = true
                     }
-                    return@launch
+                    return@io
                 }
 
                 endpoint.isSelected = isSelected
@@ -172,11 +175,25 @@ class DNSCryptEndpointAdapter(private val context: Context, private val appMode:
         }
 
         private fun deleteEndpoint(id: Int) {
-            CoroutineScope(Dispatchers.IO).launch {
+            io {
                 appMode.deleteDnscryptEndpoint(id)
-                withContext(Dispatchers.Main) {
+                uiCtx {
                     Toast.makeText(context, R.string.dns_crypt_url_remove_success,
                                    Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        private suspend fun uiCtx(f: suspend () -> Unit) {
+            withContext(Dispatchers.Main) {
+                f()
+            }
+        }
+
+        private fun io(f: suspend () -> Unit) {
+            lifecycleOwner.lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    f()
                 }
             }
         }

@@ -27,5 +27,4 @@
         android:textSize="@dimen/large_font_text_view"
         android:textColor="@color/accent_bad" />
 
-
 </LinearLayout>

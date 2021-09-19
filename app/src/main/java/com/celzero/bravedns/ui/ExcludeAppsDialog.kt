@@ -15,8 +15,8 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui
 
+import android.app.Activity
 import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -25,18 +25,19 @@ import android.view.WindowManager
 import android.widget.CompoundButton
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
+import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.databinding.ExcludeAppDialogLayoutBinding
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
-import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ExcludedAppViewModel
 import com.google.android.material.chip.Chip
 
-class ExcludeAppsDialog(private var activity: Context,
+class ExcludeAppsDialog(private var activity: Activity,
                         internal var adapter: RecyclerView.Adapter<*>,
                         var viewModel: ExcludedAppViewModel, themeID: Int) :
         Dialog(activity, themeID), View.OnClickListener, SearchView.OnQueryTextListener {
@@ -45,8 +46,10 @@ class ExcludeAppsDialog(private var activity: Context,
 
     private var mLayoutManager: RecyclerView.LayoutManager? = null
 
-    private var filterCategories: MutableList<String> = ArrayList()
+    private var filterCategories: MutableSet<String> = mutableSetOf()
     private var category: List<String> = ArrayList()
+
+    private var isVpnRestartRequired: Boolean = false
 
     private val CATEGORY_FILTER_CONST = "category:"
 
@@ -58,6 +61,13 @@ class ExcludeAppsDialog(private var activity: Context,
         setContentView(b.root)
         setCancelable(false)
 
+        initializeValues()
+        initializeClickListeners()
+    }
+
+    private fun initializeValues() {
+        isVpnRestartRequired = false
+
         window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT,
                           WindowManager.LayoutParams.MATCH_PARENT)
 
@@ -66,6 +76,17 @@ class ExcludeAppsDialog(private var activity: Context,
         b.excludeAppRecyclerViewDialog.layoutManager = mLayoutManager
         b.excludeAppRecyclerViewDialog.adapter = adapter
 
+        FirewallManager.getApplistObserver().observe(activity as LifecycleOwner, {
+            val excludedCount = it.filter { a -> a.isExcluded }.count()
+            b.excludeAppSelectCountText.text = activity.getString(R.string.ex_dialog_count,
+                                                                  excludedCount.toString())
+        })
+
+        // By default, show all the categories.
+        showAllCategories()
+    }
+
+    private fun initializeClickListeners() {
         b.excludeAppDialogOkButton.setOnClickListener(this)
 
         b.excludeAppDialogWhitelistSearchView.setOnQueryTextListener(this)
@@ -76,27 +97,11 @@ class ExcludeAppsDialog(private var activity: Context,
             false
         }
 
-        val act: HomeScreenActivity = activity as HomeScreenActivity
-
-        FirewallManager.getApplistObserver().observe(act, {
-            val excludedCount = it.filter { a -> a.isExcluded }.size
-            b.excludeAppSelectCountText.text = act.getString(R.string.ex_dialog_count,
-                                                             excludedCount.toString(),
-                                                             FirewallManager.getTotalApps().toString())
-        })
-
-
         b.excludeAppSelectAllOptionCheckbox.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             FirewallManager.updateExcludedAppsByCategories(filterCategories, b)
-            Utilities.delay(1000) {
-                adapter.notifyDataSetChanged()
-            }
         }
 
         b.excludeAppDialogWhitelistSearchFilter.setOnClickListener(this)
-
-        // By default, show all the categories.
-        showAllCategories()
     }
 
     private fun showAllCategories() {
@@ -149,13 +154,15 @@ class ExcludeAppsDialog(private var activity: Context,
 
     private fun setupCategoryChips(name: String) {
         val categories = FirewallManager.getCategoryListByAppName(name)
-        if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category - ${category.size}")
+        if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category: ${category.size}")
 
         b.excludeAppDialogChipGroup.removeAllViews()
 
         for (category in categories) {
-            val chip = this.layoutInflater.inflate(R.layout.item_chip_category, null, false) as Chip
-            chip.text = category
+            // Ignore non-app system category in excluded list
+            if (CategoryInfoRepository.CategoryConstants.isNonApp(context, category)) continue
+
+            val chip = makeChip(category)
             b.excludeAppDialogChipGroup.addView(chip)
 
             chip.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
@@ -180,4 +187,11 @@ class ExcludeAppsDialog(private var activity: Context,
             }
         }
     }
+
+    private fun makeChip(category: String): Chip {
+        val chip = this.layoutInflater.inflate(R.layout.item_chip_category, null, false) as Chip
+        chip.text = category
+        return chip
+    }
+
 }

@@ -19,6 +19,7 @@ package com.celzero.bravedns.adapter
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +27,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -33,18 +36,17 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.databinding.DohEndpointListItemBinding
-import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.DNSConfigureWebViewActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.LOCATION_INTENT_EXTRA
-import com.celzero.bravedns.util.Constants.Companion.STAMP_INTENT_EXTRA
+import com.celzero.bravedns.util.Constants.Companion.BLOCKLIST_LOCATION_INTENT_EXTRA
+import com.celzero.bravedns.util.Constants.Companion.BLOCKLIST_STAMP_INTENT_EXTRA
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.*
 import xdns.Xdns.getBlocklistStampFromURL
 
 
-class DoHEndpointAdapter(private val context: Context, private val persistentState: PersistentState,
+class DoHEndpointAdapter(private val context: Context, private val lifecycleOwner: LifecycleOwner,
                          private val appMode: AppMode) :
         PagedListAdapter<DoHEndpoint, DoHEndpointAdapter.DoHEndpointViewHolder>(DIFF_CALLBACK) {
 
@@ -103,9 +105,9 @@ class DoHEndpointAdapter(private val context: Context, private val persistentSta
             b.dohEndpointListUrlExplanation.text = ""
             b.dohEndpointListCheckImage.isChecked = endpoint.isSelected
             Log.i(LOG_TAG_DNS,
-                  "connected to doh - ${endpoint.dohName} isSelected? - ${endpoint.isSelected}")
+                  "connected to doh: ${endpoint.dohName} isSelected? ${endpoint.isSelected}")
             if (endpoint.isSelected) {
-                val count = persistentState.numberOfRemoteBlocklists
+                val count = appMode.getRemoteBlocklistCount()
                 b.dohEndpointListUrlExplanation.text = if (endpoint.isRethinkDnsPlus() && count > 0) {
                     context.getString(R.string.dns_connected_rethink_plus, count.toString())
                 } else {
@@ -126,14 +128,15 @@ class DoHEndpointAdapter(private val context: Context, private val persistentSta
         private fun configureRethinkEndpoint(endpoint: DoHEndpoint) {
             val stamp = getRemoteBlocklistStamp(endpoint.dohURL)
             if (DEBUG) Log.d(LOG_TAG_DNS,
-                             "calling configure webview activity with doh url: ${endpoint.dohURL},and stamp: $stamp")
+                             "calling configure webview activity with doh url: ${endpoint.dohURL} and stamp: $stamp")
             startConfigureBlocklistActivity(stamp)
         }
 
         private fun startConfigureBlocklistActivity(stamp: String) {
             val intent = Intent(context, DNSConfigureWebViewActivity::class.java)
-            intent.putExtra(LOCATION_INTENT_EXTRA, DNSConfigureWebViewActivity.REMOTE)
-            intent.putExtra(STAMP_INTENT_EXTRA, stamp)
+            intent.flags = FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+            intent.putExtra(BLOCKLIST_LOCATION_INTENT_EXTRA, DNSConfigureWebViewActivity.REMOTE)
+            intent.putExtra(BLOCKLIST_STAMP_INTENT_EXTRA, stamp)
             context.startActivity(intent)
         }
 
@@ -161,15 +164,15 @@ class DoHEndpointAdapter(private val context: Context, private val persistentSta
             if (DEBUG) Log.d(LOG_TAG_DNS,
                              "on doh change - ${endpoint.dohName}, ${endpoint.dohURL}, ${endpoint.isSelected}")
 
-            CoroutineScope(Dispatchers.IO).launch {
+            io {
                 val stamp = getRemoteBlocklistStamp(endpoint.dohURL)
 
                 if (endpoint.isRethinkDnsPlus() && stamp.isNullOrEmpty()) {
-                    withContext(Dispatchers.Main) {
+                    uiCtx {
                         showDohConfigureDialog()
                         b.dohEndpointListCheckImage.isChecked = false
                     }
-                    return@launch
+                    return@io
                 }
 
                 endpoint.isSelected = true
@@ -178,9 +181,9 @@ class DoHEndpointAdapter(private val context: Context, private val persistentSta
         }
 
         private fun deleteEndpoint(id: Int) {
-            CoroutineScope(Dispatchers.IO).launch {
+            io {
                 appMode.deleteDohEndpoint(id)
-                withContext(Dispatchers.Main) {
+                uiCtx {
                     Toast.makeText(context, R.string.doh_custom_url_remove_success,
                                    Toast.LENGTH_SHORT).show()
                 }
@@ -209,9 +212,7 @@ class DoHEndpointAdapter(private val context: Context, private val persistentSta
                 Utilities.showToastUiCentered(context, context.getString(
                     R.string.info_dialog_url_copy_toast_msg), Toast.LENGTH_SHORT)
             }
-            val alertDialog: AlertDialog = builder.create()
-            alertDialog.setCancelable(true)
-            alertDialog.show()
+            builder.create().show()
         }
 
         private fun showDeleteDnsDialog(id: Int) {
@@ -224,11 +225,9 @@ class DoHEndpointAdapter(private val context: Context, private val persistentSta
             }
 
             builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
-
+                // no-op
             }
-            val alertDialog: AlertDialog = builder.create()
-            alertDialog.setCancelable(true)
-            alertDialog.show()
+            builder.create().show()
         }
 
         private fun showDohConfigureDialog() {
@@ -244,9 +243,21 @@ class DoHEndpointAdapter(private val context: Context, private val persistentSta
             builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
                 b.dohEndpointListCheckImage.isChecked = false
             }
-            val alertDialog: AlertDialog = builder.create()
-            alertDialog.setCancelable(true)
-            alertDialog.show()
+            builder.create().show()
+        }
+
+        private suspend fun uiCtx(f: suspend () -> Unit) {
+            withContext(Dispatchers.Main) {
+                f()
+            }
+        }
+
+        private fun io(f: suspend () -> Unit) {
+            lifecycleOwner.lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    f()
+                }
+            }
         }
 
     }

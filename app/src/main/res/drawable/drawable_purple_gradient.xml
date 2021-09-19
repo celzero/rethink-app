@@ -1,9 +1,6 @@
 <?xml version ="1.0" encoding ="utf-8"?><!--  Learn More about how to use App Actions: https://developer.android.com/guide/actions/index.html -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" >
-   <stroke
-          android:width="0.75dp"
-          android:color="@color/recycler_selected" />
-
+   <solid android:color="?attr/border" />
    <padding
            android:left="1dp"
            android:right="1dp"

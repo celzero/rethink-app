@@ -42,11 +42,16 @@ class ExcludedAppListAdapter(private val context: Context) :
 
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<AppInfo>() {
 
-            override fun areItemsTheSame(oldConnection: AppInfo,
-                                         newConnection: AppInfo) = oldConnection.packageInfo == newConnection.packageInfo
+            // based on the apps package info and excluded status
+            override fun areItemsTheSame(oldConnection: AppInfo, newConnection: AppInfo): Boolean {
+                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.isExcluded == newConnection.isExcluded)
+            }
 
+            // return false, when there is difference in excluded status
             override fun areContentsTheSame(oldConnection: AppInfo,
-                                            newConnection: AppInfo) = oldConnection == newConnection
+                                            newConnection: AppInfo): Boolean {
+                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.isExcluded != newConnection.isExcluded)
+            }
         }
     }
 
@@ -60,7 +65,6 @@ class ExcludedAppListAdapter(private val context: Context) :
         val appInfo: AppInfo = getItem(position) ?: return
         holder.update(appInfo)
     }
-
 
     inner class ExcludedAppInfoViewHolder(private val b: ExcludedAppListItemBinding) :
             RecyclerView.ViewHolder(b.root) {
@@ -130,7 +134,6 @@ class ExcludedAppListAdapter(private val context: Context) :
             builderSingle.setCancelable(false)
 
             builderSingle.setItems(packageList.toTypedArray(), null)
-
 
             builderSingle.setPositiveButton(positiveTxt) { _: DialogInterface, _: Int ->
                 FirewallManager.updateExcludedApps(appInfo, appInfo.isExcluded)

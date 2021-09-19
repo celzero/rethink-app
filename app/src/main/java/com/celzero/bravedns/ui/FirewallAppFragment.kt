@@ -23,6 +23,7 @@ import android.view.animation.RotateAnimation
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallAppListAdapter
@@ -36,6 +37,9 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.FirewallAppViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.collections.set
@@ -77,8 +81,8 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
         b.firewallUpdateProgress.visibility = View.VISIBLE
         b.firewallAppRefreshList.isEnabled = true
 
-        adapterList = FirewallAppListAdapter(requireContext(), persistentState, filteredCategories,
-                                             listData)
+        adapterList = FirewallAppListAdapter(requireContext(), viewLifecycleOwner, persistentState,
+                                             filteredCategories, listData)
         b.firewallExpandableList.setAdapter(adapterList)
 
         b.firewallExpandableList.setOnGroupClickListener { _, _, _, _ ->
@@ -117,6 +121,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
                     Utilities.showToastUiCentered(requireContext(),
                                                   getString(R.string.refresh_complete),
                                                   Toast.LENGTH_SHORT)
+                    adapterList?.notifyDataSetChanged()
                 }
             }
         }
@@ -130,7 +135,9 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
     }
 
     private fun refreshDatabase() {
-        refreshDatabase.refreshAppInfoDatabase(isForceRefresh = true)
+        io {
+            refreshDatabase.refreshAppInfoDatabase()
+        }
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
@@ -170,7 +177,6 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
         adapterList?.notifyDataSetChanged()
     }
 
-
     private fun setupLivedataObservers() {
 
         categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, {
@@ -192,7 +198,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
                 }
             }
 
-            (adapterList as FirewallAppListAdapter).updateData(filteredCategories, listData)
+            adapterList?.updateData(filteredCategories, listData)
             hideProgressBar()
             showExpandableList()
         }
@@ -204,6 +210,14 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
 
     private fun showExpandableList() {
         b.firewallExpandableList.visibility = View.VISIBLE
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                f()
+            }
+        }
     }
 
 }

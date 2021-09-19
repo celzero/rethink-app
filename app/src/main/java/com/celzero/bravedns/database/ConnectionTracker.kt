@@ -44,6 +44,10 @@ class ConnectionTracker {
     }
 
     fun isWhitelisted(): Boolean {
-        return this.blockedByRule == FirewallRuleset.RULE7.ruleName
+        return this.blockedByRule == FirewallRuleset.RULE8.id
+    }
+
+    fun isProxied(): Boolean {
+        return this.blockedByRule == FirewallRuleset.RULE9.id
     }
 }

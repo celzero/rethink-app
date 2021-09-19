@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/pm_apk_parent"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/pm_apk_parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -19,12 +19,12 @@
                 android:id="@+id/pm_status_indicator"
                 android:layout_width="10dp"
                 android:layout_height="match_parent"
-                android:background="@color/colorGreen_A400"/>
+                android:background="@color/colorGreen_A400" />
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
@@ -38,10 +38,10 @@
 
                         <ImageView
                             android:id="@+id/pm_apk_icon_iv"
-                            android:layout_margin="10dp"
                             android:layout_width="48dp"
                             android:layout_height="48dp"
                             android:layout_centerVertical="true"
+                            android:layout_margin="10dp"
                             android:layout_marginStart="10dp"
                             android:layout_marginTop="12dp"
                             android:maxWidth="48dp"
@@ -52,14 +52,14 @@
                             android:id="@+id/pm_apk_label_tv"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:paddingTop="10dp"
                             android:layout_centerHorizontal="true"
                             android:layout_marginStart="10dp"
                             android:layout_toEndOf="@id/pm_apk_icon_iv"
                             android:ellipsize="end"
                             android:fontFamily="sans-serif-light"
+                            android:gravity="center"
                             android:maxLines="1"
+                            android:paddingTop="10dp"
                             android:text="Dummy Label"
                             android:textColor="@android:color/white"
                             android:textSize="16sp" />
@@ -67,72 +67,70 @@
                         <TextView
                             android:id="@+id/pm_apk_package_tv"
                             android:layout_width="wrap_content"
-                            android:paddingTop="5dp"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/pm_apk_label_tv"
-                            android:layout_toEndOf="@id/pm_apk_icon_iv"
                             android:layout_marginStart="10dp"
+                            android:layout_toEndOf="@id/pm_apk_icon_iv"
                             android:ellipsize="end"
                             android:fontFamily="sans-serif-thin"
                             android:maxLines="1"
+                            android:paddingTop="5dp"
                             android:text="4 Trackers and 24 Permissions"
                             android:textColor="@android:color/white"
                             android:textSize="14sp" />
-
-
-
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/toggle_mobile_data"
                             android:layout_width="65dp"
                             android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:layout_margin="5dp"
-                            android:gravity="end"
-                            android:src="@android:drawable/ic_menu_view"
                             android:layout_marginStart="15dp"
-                            android:layout_alignParentEnd="true"/>
+                            android:gravity="end"
+                            android:src="@android:drawable/ic_menu_view" />
 
                     </RelativeLayout>
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:weightSum="0.99"
-                android:layout_margin="2dp"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal">
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="2dp"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal"
+                    android:weightSum="0.99">
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.33"
-                    android:layout_margin="1dp"
-                    android:background="@color/secondaryText"
-                    android:gravity="center"
-                    android:text="Auto\nRevoke"/>
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="1dp"
+                        android:layout_weight="0.33"
+                        android:background="@color/secondaryText"
+                        android:gravity="center"
+                        android:text="Auto\nRevoke" />
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:layout_margin="1dp"
-                    android:layout_weight="0.33"
-                    android:background="@color/secondaryText"
-                    android:text="Revoke on\nbackground"/>
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:layout_weight="0.33"
-                    android:layout_margin="1dp"
-                    android:background="@color/secondaryText"
-                    android:text="Do Nothing"/>
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="1dp"
+                        android:layout_weight="0.33"
+                        android:background="@color/secondaryText"
+                        android:gravity="center"
+                        android:text="Revoke on\nbackground" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="1dp"
+                        android:layout_weight="0.33"
+                        android:background="@color/secondaryText"
+                        android:gravity="center"
+                        android:text="Do Nothing" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
             </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.appcompat.widget.LinearLayoutCompat>
-            </androidx.appcompat.widget.LinearLayoutCompat>
 
     </androidx.cardview.widget.CardView>
 </RelativeLayout>

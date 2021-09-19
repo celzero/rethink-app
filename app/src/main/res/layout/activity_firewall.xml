@@ -17,12 +17,11 @@
         app:tabIndicatorColor="?attr/tabIndicator"
         android:layout_height="wrap_content" />
 
-    <androidx.viewpager.widget.ViewPager
+    <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/firewall_act_viewpager"
         android:orientation="horizontal"
         android:layout_width="match_parent"
+        android:nestedScrollingEnabled="true"
         android:layout_height="match_parent" />
-
-    <!--android:background="?android:attr/windowBackground"-->
 
 </LinearLayout>

@@ -37,7 +37,7 @@ class DNSCryptRelayEndpointViewModel(
                 pageSize = LIVEDATA_PAGE_SIZE)
         } else {
             dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveDataByName("%$input%").toLiveData(
-                pageSize = 50)
+                pageSize = LIVEDATA_PAGE_SIZE)
         }
     }
 

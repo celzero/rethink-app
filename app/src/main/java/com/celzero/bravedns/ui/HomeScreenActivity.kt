@@ -15,57 +15,45 @@
  */
 package com.celzero.bravedns.ui
 
-import android.app.ActivityManager
-import android.app.ApplicationExitInfo
 import android.content.*
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager.NameNotFoundException
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
 import androidx.annotation.Nullable
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallRules
-import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.BlockedConnectionsRepository
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
-import com.celzero.bravedns.service.AppUpdater
-import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.*
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.*
-import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
-import com.celzero.bravedns.util.Constants.Companion.FLAVOR_WEBSITE
+import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.Companion.getPackageMetadata
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastR
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GoogleApiAvailability
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
+import com.celzero.bravedns.util.Utilities.Companion.isWebsiteFlavour
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import okhttp3.*
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
-import kotlin.collections.HashSet
 
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
@@ -87,11 +75,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
              Call the coroutine scope to insert/update/delete the values */
 
     object GlobalVariable {
-
-        var braveModeToggler: MutableLiveData<Int> = MutableLiveData()
-
-        var appStartTime: Long = System.currentTimeMillis()
-        var DEBUG = true
+        var DEBUG = BuildConfig.DEBUG
     }
 
     // TODO - #324 - Usage of isDarkTheme() in all activities.
@@ -99,20 +83,14 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == UI_MODE_NIGHT_YES
     }
 
-    companion object {
-        var enqueue: Long = 0
-    }
-
     //TODO : Remove the unwanted data and the assignments happening
     //TODO : Create methods and segregate the data.
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Utilities.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
 
         if (persistentState.firstTimeLaunch) {
             launchOnboardActivity()
-        } else {
-            showNewFeaturesDialog()
         }
 
         updateNewVersion()
@@ -123,7 +101,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                                                               homeScreenFragment,
                                                               homeScreenFragment.javaClass.simpleName).commit()
         }
-        b.navView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
+
+        setupNavigationItemSelectedListener()
 
         FirewallRules.loadFirewallRules(blockedConnectionsRepository)
 
@@ -132,64 +111,61 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         insertDefaultData()
 
         initUpdateCheck()
+
+        observeAppState()
+
+    }
+
+    private fun observeAppState() {
+        VpnController.connectionStatus.observe(this, {
+            if (it == BraveVPNService.State.PAUSED) {
+                Utilities.openPauseActivityAndFinish(this)
+            }
+        })
     }
 
     private fun removeThisMethod() {
         persistentState.numberOfRequests = persistentState.oldNumberRequests.toLong()
         persistentState.numberOfBlockedRequests = persistentState.oldBlockedRequests.toLong()
+        io {
+            refreshDatabase.refreshAppInfoDatabase()
+        }
     }
 
     private fun insertDefaultData() {
-        if (persistentState.insertionCompleted) return
+        if (persistentState.isDefaultDataInsertComplete) return
 
-        CoroutineScope(Dispatchers.IO).launch {
-            refreshDatabase.insertDefaultDNSList()
-            refreshDatabase.insertDefaultDNSCryptList()
-            refreshDatabase.insertDefaultDNSCryptRelayList()
-            refreshDatabase.insertDefaultDNSProxy()
-            refreshDatabase.updateCategoryInDB()
-            persistentState.insertionCompleted = true
+        go {
+            //  FIXME: better ways of doing non-cancellable work in Android
+            //  see: https://medium.com/androiddevelopers/coroutines-patterns-for-work-that-shouldnt-be-cancelled-e26c40f142ad
+            withContext(NonCancellable + Dispatchers.IO) {
+                refreshDatabase.insertDefaultDNSList()
+                refreshDatabase.insertDefaultDNSCryptList()
+                refreshDatabase.insertDefaultDNSCryptRelayList()
+                refreshDatabase.insertDefaultDNSProxy()
+                persistentState.isDefaultDataInsertComplete = true
+            }
         }
     }
 
     private fun launchOnboardActivity() {
-        startActivity(Intent(this, WelcomeActivity::class.java))
+        val intent = Intent(this, WelcomeActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+        startActivity(intent)
         finish()
     }
 
-    private fun showNewFeaturesDialog() {
+    private fun updateNewVersion() {
         if (!isNewVersion()) return
 
-        val inflater: LayoutInflater = LayoutInflater.from(this)
-        val view: View = inflater.inflate(R.layout.dialog_whatsnew, null)
-        val builder = AlertDialog.Builder(this)
-        builder.setView(view).setTitle(getString(R.string.whats_dialog_title))
+        val version = getLatestVersion()
+        persistentState.appVersion = version
+        persistentState.showWhatsNewChip = true
 
-        builder.setPositiveButton(
-            getString(R.string.about_dialog_positive_button)) { dialogInterface, _ ->
-            dialogInterface.dismiss()
-        }
-
-        builder.setNeutralButton(getString(R.string.about_dialog_neutral_button)) { _, _ ->
-            val intent = Intent(Intent.ACTION_VIEW, (getString(R.string.about_mail_to)).toUri())
-            intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_subject))
-            startActivity(intent)
-        }
-
-        builder.setCancelable(false)
-        builder.create().show()
-
-        // FIXME - Remove this after the version v053f
-        // this is to fix the persistance state which was saved as Int instead of Long.
+        // FIXME: remove this post v053g
+        // this is to fix the persistence state which was saved as Int instead of Long.
         // Modification of persistence state
         removeThisMethod()
-    }
-
-    private fun updateNewVersion() {
-        if (isNewVersion()) {
-            val version = getLatestVersion()
-            persistentState.appVersion = version
-        }
     }
 
     private fun isNewVersion(): Boolean {
@@ -205,16 +181,15 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     //FIXME - Move it to Android's built-in WorkManager
     private fun initUpdateCheck() {
-        val currentTime = System.currentTimeMillis()
-        val diff = currentTime - persistentState.lastAppUpdateCheck
+        if (!isUpdateRequired()) return
 
-        if (isUpdateRequired()) {
-            val numOfDays = TimeUnit.MILLISECONDS.toDays(diff)
-            Log.i(LOG_TAG_UI, "App update check initiated, number of days: $numOfDays")
-            if (numOfDays <= 1L) return
+        val diff = System.currentTimeMillis() - persistentState.lastAppUpdateCheck
 
-            checkForUpdate()
-        }
+        val daysElapsed = TimeUnit.MILLISECONDS.toDays(diff)
+        Log.i(LOG_TAG_UI, "App update check initiated, number of days: $daysElapsed")
+        if (daysElapsed <= 1L) return
+
+        checkForUpdate()
     }
 
     private fun isUpdateRequired(): Boolean {
@@ -227,13 +202,13 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             isInteractive: AppUpdater.UserPresent = AppUpdater.UserPresent.NONINTERACTIVE) {
 
         // Check updates only for play store / website version. Not fDroid.
-        if (BuildConfig.FLAVOR != FLAVOR_PLAY && BuildConfig.FLAVOR != FLAVOR_WEBSITE) {
+        if (!isPlayStoreFlavour() && !isWebsiteFlavour()) {
             if (DEBUG) Log.d(LOG_TAG_APP_UPDATE,
                              "Check for update: Not play or website- ${BuildConfig.FLAVOR}")
             return
         }
 
-        if (isGooglePlayServicesAvailable()) {
+        if (isGooglePlayServicesAvailable() && isPlayStoreFlavour()) {
             appUpdateManager.checkForAppUpdate(isInteractive, this,
                                                installStateUpdatedListener) // Might be play updater or web updater
         } else {
@@ -243,12 +218,15 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun isGooglePlayServicesAvailable(): Boolean {
-        val googleApiAvailability: GoogleApiAvailability = GoogleApiAvailability.getInstance()
-        val status: Int = googleApiAvailability.isGooglePlayServicesAvailable(this)
-        if (status != ConnectionResult.SUCCESS) {
-            return false
+        return try {
+            // applicationInfo.enabled - When false, indicates that all components within
+            // this application are considered disabled, regardless of their individually set enabled status.
+            // TODO: prompt dialog to user that Playservice is disabled, so switch to update
+            // check for website
+            packageManager.getApplicationInfo(PKG_NAME_PLAY_STORE, 0).enabled
+        } catch (e: NameNotFoundException) {
+            false
         }
-        return true
     }
 
     private val installStateUpdatedListener = object : AppUpdater.InstallStateListener {
@@ -350,7 +328,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
 
     private fun initiateDownload() {
-        val url = Constants.APP_DOWNLOAD_LINK
+        val url = Constants.RETHINK_APP_DOWNLOAD_LINK
         val uri = Uri.parse(url)
         val intent = Intent(Intent.ACTION_VIEW)
         intent.data = uri
@@ -373,43 +351,51 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         } catch (e: IllegalArgumentException) {
             Log.w(LOG_TAG_DOWNLOAD, "Unregister receiver exception")
         }
-
     }
 
+    private fun setupNavigationItemSelectedListener() {
+        b.navView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_internet_manager -> {
+                    homeScreenFragment = HomeScreenFragment()
+                    supportFragmentManager.beginTransaction().replace(R.id.fragment_container,
+                                                                      homeScreenFragment,
+                                                                      homeScreenFragment.javaClass.simpleName).commit()
+                    return@setOnItemSelectedListener true
+                }
 
-    override fun onResume() {
-        super.onResume()
-        refreshDatabase.refreshAppInfoDatabase(isForceRefresh = false)
+                R.id.navigation_settings -> {
+                    settingsFragment = SettingsFragment()
+                    supportFragmentManager.beginTransaction().replace(R.id.fragment_container,
+                                                                      settingsFragment,
+                                                                      settingsFragment.javaClass.simpleName).commit()
+                    return@setOnItemSelectedListener true
+                }
+
+                R.id.navigation_about -> {
+                    aboutFragment = AboutFragment()
+                    supportFragmentManager.beginTransaction().replace(R.id.fragment_container,
+                                                                      aboutFragment,
+                                                                      aboutFragment.javaClass.simpleName).commit()
+                    return@setOnItemSelectedListener true
+                }
+            }
+            false
+        }
     }
 
-
-    private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-        when (item.itemId) {
-            R.id.navigation_internet_manager -> {
-                homeScreenFragment = HomeScreenFragment()
-                supportFragmentManager.beginTransaction().replace(R.id.fragment_container,
-                                                                  homeScreenFragment,
-                                                                  homeScreenFragment.javaClass.simpleName).commit()
-                return@OnNavigationItemSelectedListener true
-            }
-
-            R.id.navigation_settings -> {
-                settingsFragment = SettingsFragment()
-                supportFragmentManager.beginTransaction().replace(R.id.fragment_container,
-                                                                  settingsFragment,
-                                                                  settingsFragment.javaClass.simpleName).commit()
-                return@OnNavigationItemSelectedListener true
-            }
-
-            R.id.navigation_about -> {
-                aboutFragment = AboutFragment()
-                supportFragmentManager.beginTransaction().replace(R.id.fragment_container,
-                                                                  aboutFragment,
-                                                                  aboutFragment.javaClass.simpleName).commit()
-                return@OnNavigationItemSelectedListener true
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                f()
             }
         }
-        false
+    }
+
+    private fun go(f: suspend () -> Unit) {
+        lifecycleScope.launch {
+            f()
+        }
     }
 
 }

@@ -23,6 +23,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.SystemClock
 import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.util.Log
@@ -30,23 +31,48 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
+import com.celzero.bravedns.databinding.DialogViewLogsBinding
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentAboutBinding
+import com.celzero.bravedns.scheduler.WorkScheduler
+import com.celzero.bravedns.scheduler.ZipUtil.Companion.FILE_PROVIDER_NAME
+import com.celzero.bravedns.scheduler.ZipUtil.Companion.getZipFilePath
 import com.celzero.bravedns.service.AppUpdater
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.DOWNLOAD_SOURCE_PLAY_STORE
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.Companion.isAtleastR
+import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
+import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
+import com.celzero.bravedns.util.Utilities.Companion.sendEmailIntent
+import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
+import org.koin.core.component.KoinComponent
+import java.io.File
+import java.io.FileInputStream
+import java.util.concurrent.TimeUnit
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+import java.util.zip.ZipInputStream
 
-
-class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
+class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, KoinComponent {
     private val b by viewBinding(FragmentAboutBinding::bind)
+
+    private var lastAppExitInfoDialogInvokeTime = INIT_TIME_MS
+    private val workScheduler by inject<WorkScheduler>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -55,7 +81,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
 
     private fun initView() {
 
-        if (BuildConfig.FLAVOR == Constants.FLAVOR_FDROID) {
+        if (isFdroidFlavour()) {
             b.aboutAppUpdate.visibility = View.GONE
         }
 
@@ -72,11 +98,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         b.aboutAppInfo.setOnClickListener(this)
         b.aboutAppNotification.setOnClickListener(this)
         b.aboutVpnProfile.setOnClickListener(this)
+        b.aboutCrashLog.setOnClickListener(this)
 
         try {
             val version = getVersionName()
             b.aboutAppVersion.text = getString(R.string.about_version_install_source, version,
-                                               getDownloadSource().toString())
+                                               getDownloadSource())
             b.aboutWhatsNew.text = getString(R.string.about_whats_new,
                                              getString(R.string.about_version, version))
         } catch (e: PackageManager.NameNotFoundException) {
@@ -90,18 +117,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         return pInfo?.versionName ?: ""
     }
 
-    private fun getDownloadSource(): Int {
-        return when (BuildConfig.FLAVOR) {
-            Constants.FLAVOR_PLAY -> {
-                DOWNLOAD_SOURCE_PLAY_STORE
-            }
-            Constants.FLAVOR_FDROID -> {
-                Constants.DOWNLOAD_SOURCE_FDROID
-            }
-            else -> {
-                Constants.DOWNLOAD_SOURCE_WEBSITE
-            }
-        }
+    private fun getDownloadSource(): String {
+        if (isFdroidFlavour()) return getString(R.string.build__flavor_fdroid)
+
+        if (isPlayStoreFlavour()) return getString(R.string.build__flavor_play_store)
+
+        return getString(R.string.build__flavor_website)
     }
 
     override fun onClick(view: View?) {
@@ -124,10 +145,15 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
                                     getString(R.string.about_github_link).toUri())
                 startActivity(intent)
             }
+            b.aboutCrashLog -> {
+                if (isAtleastR()) {
+                    handleShowAppExitInfo()
+                } else {
+                    showNoLogDialog()
+                }
+            }
             b.aboutMail -> {
-                val intent = Intent(Intent.ACTION_VIEW, (getString(R.string.about_mail_to)).toUri())
-                intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_subject))
-                startActivity(intent)
+                sendEmailIntent(requireContext())
             }
             b.aboutTwitter -> {
                 val intent = Intent(Intent.ACTION_VIEW,
@@ -163,6 +189,22 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
         }
     }
 
+    private fun showNoLogDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle(R.string.about_bug_no_log_dialog_title)
+        builder.setMessage(R.string.about_bug_no_log_dialog_message)
+        builder.setPositiveButton(
+            getString(R.string.about_bug_no_log_dialog_positive_btn)) { _, _ ->
+            sendEmailIntent(requireContext())
+        }
+        builder.setNegativeButton(
+            getString(R.string.about_bug_no_log_dialog_negative_btn)) { dialog, _ ->
+            dialog.dismiss()
+        }
+        builder.create().show()
+
+    }
+
     private fun openAppInfo() {
         val packageName = requireContext().packageName
         try {
@@ -171,8 +213,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            Utilities.showToastUiCentered(requireContext(), getString(R.string.app_info_error),
-                                          Toast.LENGTH_SHORT)
+            showToastUiCentered(requireContext(), getString(R.string.app_info_error),
+                                Toast.LENGTH_SHORT)
             Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
@@ -191,8 +233,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             }
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            Utilities.showToastUiCentered(requireContext(), getString(R.string.vpn_profile_error),
-                                          Toast.LENGTH_SHORT)
+            showToastUiCentered(requireContext(), getString(R.string.vpn_profile_error),
+                                Toast.LENGTH_SHORT)
             Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
@@ -206,10 +248,178 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             dialogInterface.dismiss()
         }.setNeutralButton(
             getString(R.string.about_dialog_neutral_button)) { _: DialogInterface, _: Int ->
-            val intent = Intent(Intent.ACTION_VIEW, (getString(R.string.about_mail_to)).toUri())
-            intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_subject))
-            startActivity(intent)
+            sendEmailIntent(requireContext())
         }.setCancelable(true).create().show()
     }
 
+    // ref: https://developer.android.com/guide/components/intents-filters
+    private fun emailBugReport() {
+        val emailIntent = Intent(Intent.ACTION_SEND)
+        emailIntent.type = "text/plain"
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.about_mail_to)))
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_bugreport_subject))
+        emailIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.about_mail_bugreport_text))
+        // Get the bug_report.zip file
+        val file = File(getZipFilePath(requireContext()))
+        val uri = getFileUri(file)
+        emailIntent.putExtra(Intent.EXTRA_STREAM, uri)
+
+        emailIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        emailIntent.flags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+        startActivity(
+            Intent.createChooser(emailIntent, getString(R.string.about_mail_bugreport_share_title)))
+    }
+
+    private fun getFileUri(file: File): Uri? {
+        if (isFileAvailable(file)) {
+            return FileProvider.getUriForFile(requireContext().applicationContext,
+                                              FILE_PROVIDER_NAME, file)
+        }
+        return null
+    }
+
+    private fun isFileAvailable(file: File): Boolean {
+        return file.isFile && file.exists()
+    }
+
+    private fun promptCrashLogAction() {
+        val binding = DialogViewLogsBinding.inflate(LayoutInflater.from(requireContext()), null,
+                                                    false)
+        val builder: AlertDialog.Builder = AlertDialog.Builder(requireContext()).setView(
+            binding.root)
+        builder.setTitle(getString(R.string.about_bug_report))
+
+        val zipPath = getZipFilePath(requireContext())
+        val zipFile = try {
+            ZipFile(zipPath)
+        } catch (ignored: Exception) {  // FileNotFound, ZipException
+            null
+        }
+
+        if (zipFile == null || zipFile.size() <= 0) {
+            showToastUiCentered(requireContext(), getString(R.string.log_file_not_available),
+                                Toast.LENGTH_SHORT)
+            return
+        }
+
+        io {
+            var fin: FileInputStream? = null
+            var zin: ZipInputStream? = null
+            try {
+                fin = FileInputStream(zipPath)
+                zin = ZipInputStream(fin)
+                var ze: ZipEntry?
+
+                while (zin.nextEntry.also { ze = it } != null) {
+                    val inStream = zipFile.getInputStream(ze)
+                    val inputString = inStream?.bufferedReader().use { it?.readText() }
+                    uiCtx {
+                        if (!isAdded) return@uiCtx
+                        binding.logs.append(inputString)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.w(LOG_TAG_UI, "Error loading log files to textview: ${e.message}", e)
+                uiCtx {
+                    if (!isAdded) return@uiCtx
+
+                    binding.logs.text = getString(R.string.error_loading_log_file)
+                }
+            } finally {
+                fin?.close()
+                zin?.close()
+                zipFile.close()
+            }
+
+            uiCtx {
+                if (!isAdded) return@uiCtx
+
+                binding.progressLayout.visibility = View.GONE
+            }
+        }
+
+        val width = (resources.displayMetrics.widthPixels * 0.75).toInt()
+        val height = (resources.displayMetrics.heightPixels * 0.75).toInt()
+
+        builder.setPositiveButton(
+            getString(R.string.about_bug_report_dialog_positive_btn)) { _, _ ->
+            emailBugReport()
+        }
+        builder.setNegativeButton(
+            getString(R.string.about_bug_report_dialog_negative_btn)) { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        val alert: AlertDialog = builder.create()
+        alert.window?.setLayout(width, height)
+        alert.show()
+    }
+
+    private fun handleShowAppExitInfo() {
+        if (WorkScheduler.isWorkRunning(requireContext(),
+                                        WorkScheduler.APP_EXIT_INFO_JOB_TAG)) return
+
+        workScheduler.scheduleOneTimeWorkForAppExitInfo()
+        showBugReportProgressUi()
+
+        val workManager = WorkManager.getInstance(requireContext().applicationContext)
+        workManager.getWorkInfosByTagLiveData(WorkScheduler.APP_EXIT_INFO_ONE_TIME_JOB_TAG).observe(
+            viewLifecycleOwner, { workInfoList ->
+                val workInfo = workInfoList?.getOrNull(0) ?: return@observe
+                Log.i(LoggerConstants.LOG_TAG_SCHEDULER,
+                      "WorkManager state: ${workInfo.state} for ${WorkScheduler.APP_EXIT_INFO_ONE_TIME_JOB_TAG}")
+                if (WorkInfo.State.SUCCEEDED == workInfo.state) {
+                    onAppExitInfoSuccess()
+                    workManager.pruneWork()
+                } else if (WorkInfo.State.CANCELLED == workInfo.state || WorkInfo.State.FAILED == workInfo.state) {
+                    onAppExitInfoFailure()
+                    workManager.pruneWork()
+                    workManager.cancelAllWorkByTag(WorkScheduler.APP_EXIT_INFO_ONE_TIME_JOB_TAG)
+                } else { // state == blocked, queued, or running
+                    // no-op
+                }
+            })
+    }
+
+    private fun onAppExitInfoFailure() {
+        showToastUiCentered(requireContext(), getString(R.string.log_file_not_available),
+                            Toast.LENGTH_SHORT)
+        hideBugReportProgressUi()
+    }
+
+    private fun showBugReportProgressUi() {
+        b.progressLayout.visibility = View.VISIBLE
+        b.aboutCrashLog.visibility = View.GONE
+    }
+
+    private fun hideBugReportProgressUi() {
+        b.progressLayout.visibility = View.GONE
+        b.aboutCrashLog.visibility = View.VISIBLE
+    }
+
+    private fun onAppExitInfoSuccess() {
+        // refrain from calling promptCrashLogAction multiple times
+        if (SystemClock.elapsedRealtime() - lastAppExitInfoDialogInvokeTime < TimeUnit.SECONDS.toMillis(
+                1L)) {
+            return
+        }
+
+        lastAppExitInfoDialogInvokeTime = SystemClock.elapsedRealtime()
+        hideBugReportProgressUi()
+        promptCrashLogAction()
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                f()
+            }
+        }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) {
+            f()
+        }
+    }
 }

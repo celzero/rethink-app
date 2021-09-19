@@ -5,7 +5,6 @@
     <attr name="primaryColorAccent" format="reference" />
     <attr name="primaryTextColor" format="reference" />
     <attr name="secondaryTextColor" format="reference" />
-    <attr name="dividerColor" format="reference" />
     <attr name="roundedCornersButton"  format="reference"/>
     <attr name="homeScreenBtnBackground" format="reference"/>
     <attr name="svgStrokeColor" format="reference"/>
@@ -21,4 +20,10 @@
     <attr name="navBarBackground" format="reference"/>
     <attr name="buttonBackground" format="reference"/>
     <attr name="tabIndicator" format="reference"/>
+    <attr name="chipBgColorPositive" format="reference" />
+    <attr name="chipTextPositive" format="reference" />
+    <attr name="chipBgColorNegative" format="reference" />
+    <attr name="chipTextNegative" format="reference" />
+    <attr name="chipColorBgNormal" format="reference" />
+    <attr name="chipColorBgHighlight" format="reference" />
 </resources>

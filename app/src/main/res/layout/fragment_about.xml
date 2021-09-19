@@ -6,6 +6,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     app:layout_scrollFlags="scroll|enterAlways">
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -107,44 +108,121 @@
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:orientation="vertical"
-            android:padding="5dp">
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="20dp"
+            android:baselineAligned="true"
+            android:elevation="10dp"
+            android:orientation="horizontal"
+            android:weightSum="1">
 
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/about_telegram"
-                style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="5dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginEnd="5dp"
-                android:background="@drawable/rounded_corners_button_accent"
-                android:drawableStart="@drawable/ic_telegram"
-                android:drawablePadding="10dp"
-                android:gravity="center"
-                android:lineSpacingExtra="5dp"
-                android:padding="10dp"
-                android:text="@string/about_join_telegram"
-                android:textColor="?attr/accentGood"
-                android:textSize="@dimen/large_font_text_view" />
+                android:layout_weight="0.5"
+                android:orientation="vertical">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="match_parent"
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/about_telegram"
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/rounded_corners_button_accent"
+                    android:clickable="true"
+                    android:drawableStart="@drawable/ic_telegram"
+                    android:drawablePadding="-20dp"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="@string/about_join_telegram"
+                    android:textColor="?attr/accentGood"
+                    android:textSize="@dimen/large_font_text_view" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="10dp"
+                    android:text="@string/about_bravedns_toreport_text"
+                    android:textSize="@dimen/large_font_text_view" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:paddingTop="3dp"
-                android:paddingBottom="10dp"
-                android:text="@string/about_bravedns_toreport_text"
-                android:textSize="@dimen/large_font_text_view" />
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="20dp"
+                android:layout_weight="0.5"
+                android:orientation="vertical">
 
 
+                <RelativeLayout
+                    android:id="@+id/progress_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:visibility="gone">
+
+                    <ProgressBar
+                        android:id="@+id/progressBar"
+                        style="@android:style/Widget.DeviceDefault.ProgressBar.Small"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:padding="2dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/progressBar"
+                        android:padding="2dp"
+                        android:text="@string/collecting_logs_progress_text"
+                        android:textColor="?attr/colorSecondary" />
+                </RelativeLayout>
+
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/about_crash_log"
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/rounded_corners_button_accent"
+                    android:clickable="true"
+                    android:drawableStart="@drawable/report_bug_icon"
+                    android:drawablePadding="-20dp"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="@string/about_bug_report"
+                    android:textColor="?attr/accentGood"
+                    android:textSize="@dimen/large_font_text_view"
+                    android:visibility="visible" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="10dp"
+                    android:text="@string/about_bug_report_desc"
+                    android:textSize="@dimen/large_font_text_view" />
+
+
+            </LinearLayout>
         </LinearLayout>
 
         <androidx.appcompat.widget.LinearLayoutCompat
@@ -189,7 +267,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:drawableStart="@drawable/ic_app_update"
+                android:drawableStart="@drawable/ic_update"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
@@ -363,7 +441,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:drawableStart="@drawable/ic_about_settings"
+                android:drawableStart="@drawable/ic_app_info"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
@@ -391,7 +469,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:drawableStart="@drawable/ic_about_notifications"
+                android:drawableStart="@drawable/ic_notification"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
@@ -422,15 +500,15 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/about_app_version"
-            style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="50dp"
             android:gravity="center"
             android:paddingTop="20dp"
             android:paddingBottom="40dp"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/large_font_text_view" />
+            android:textIsSelectable="true"
+            android:textSize="@dimen/default_font_text_view"
+            android:typeface="monospace" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

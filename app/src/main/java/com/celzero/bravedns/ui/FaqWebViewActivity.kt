@@ -27,7 +27,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityFaqWebviewLayoutBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Utilities.Companion.getCurrentTheme
+import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import org.koin.android.ext.android.inject
 
 
@@ -51,7 +51,7 @@ class FaqWebViewActivity : AppCompatActivity(R.layout.activity_faq_webview_layou
         b.configureWebview.isClickable = true
         b.configureWebview.webChromeClient = WebChromeClient()
 
-        val url = intent.getStringExtra(Constants.URL_INTENT_EXTRA)
+        val url = intent.getStringExtra(Constants.BLOCKLIST_URL_INTENT_EXTRA)
         if (url == null) {
             b.configureWebview.loadUrl(this.resources.getString(R.string.faq_web_link))
         } else {

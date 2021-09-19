@@ -47,8 +47,17 @@ interface ConnectionTrackerDAO {
 
     @Query(
         "select * from ConnectionTracker where (appName like :searchString or ipAddress like :searchString) and isBlocked = 1 order by timeStamp desc")
-    fun getConnectionBlockedConnectionsByName(
-            searchString: String): DataSource.Factory<Int, ConnectionTracker>
+    fun getBlockedConnections(searchString: String): DataSource.Factory<Int, ConnectionTracker>
+
+    @Query(
+        "select * from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 and (appName like :searchString or ipAddress like :searchString) order by timeStamp desc")
+    fun getBlockedConnectionsFiltered(searchString: String,
+                                      filter: Set<String>): DataSource.Factory<Int, ConnectionTracker>
+
+    @Query(
+        "select * from ConnectionTracker where  (appName like :searchString or ipAddress like :searchString) and blockedByRule in (:filter) order by timeStamp desc")
+    fun getConnectionsFiltered(searchString: String,
+                               filter: List<String>): DataSource.Factory<Int, ConnectionTracker>
 
     @Query("delete from ConnectionTracker where timeStamp < :date")
     fun deleteOlderData(date: Long)
@@ -65,5 +74,14 @@ interface ConnectionTrackerDAO {
     @Query(
         "delete from ConnectionTracker where id < ((select max(id) from ConnectionTracker) - :count)")
     fun deleteOlderDataCount(count: Int)
+
+    @Query(
+        "select * from ConnectionTracker where isBlocked = 0 and (appName like :query or ipAddress like :query)  order by timeStamp desc")
+    fun getAllowedConnections(query: String): DataSource.Factory<Int, ConnectionTracker>
+
+    @Query(
+        "select * from ConnectionTracker where isBlocked = 0 and (appName like :query or ipAddress like :query) and blockedByRule in (:filter) order by timeStamp desc")
+    fun getAllowedConnectionsFiltered(query: String,
+                                      filter: Set<String>): DataSource.Factory<Int, ConnectionTracker>
 
 }

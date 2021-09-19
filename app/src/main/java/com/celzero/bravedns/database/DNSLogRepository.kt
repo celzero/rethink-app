@@ -13,24 +13,42 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
 package com.celzero.bravedns.database
 
 import com.celzero.bravedns.util.Constants
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class DNSLogRepository(private val dnsLogDAO: DNSLogDAO) {
 
-
-    fun insert(dnsLogs: DNSLogs) {
-        dnsLogDAO.insert(dnsLogs)
+    suspend fun insert(dnsLog: DnsLog) {
+        ioCtx {
+            dnsLogDAO.insert(dnsLog)
+        }
     }
 
-    fun deleteOlderData(date: Long) {
-        dnsLogDAO.deleteOlderData(date)
+    suspend fun deleteOlderData(date: Long) {
+        ioCtx {
+            dnsLogDAO.deleteOlderData(date)
+        }
     }
 
-    fun deleteConnectionTrackerCount() {
-        dnsLogDAO.deleteOlderDataCount(Constants.TOTAL_NETWORK_LOG_ENTRIES_THRESHOLD)
+    suspend fun deleteConnectionTrackerCount() {
+        ioCtx {
+            dnsLogDAO.deleteOlderDataCount(Constants.TOTAL_LOG_ENTRIES_THRESHOLD)
+        }
+    }
+
+    suspend fun clearAllData() {
+        ioCtx {
+            dnsLogDAO.clearAllData()
+        }
+    }
+
+    private suspend fun ioCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.IO) {
+            f()
+        }
     }
 
 }

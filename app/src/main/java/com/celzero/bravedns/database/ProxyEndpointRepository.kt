@@ -21,28 +21,14 @@ import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
 class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
 
-    fun updateAsync(proxyEndpoint: ProxyEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
-        coroutineScope.launch {
-            proxyEndpointDAO.update(proxyEndpoint)
-        }
-    }
-
-    fun deleteAsync(proxyEndpoint: ProxyEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
-        coroutineScope.launch {
-            proxyEndpointDAO.delete(proxyEndpoint)
-        }
-    }
-
-    fun insertAsync(proxyEndpoint: ProxyEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
-        coroutineScope.launch {
-            proxyEndpointDAO.insert(proxyEndpoint)
-        }
+    fun insert(proxyEndpoint: ProxyEndpoint) {
+        proxyEndpointDAO.insert(proxyEndpoint)
     }
 
     fun getDNSProxyEndpointLiveData(): LiveData<PagedList<ProxyEndpoint>> {
@@ -50,7 +36,8 @@ class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
             pageSize = LIVEDATA_PAGE_SIZE)
     }
 
-    fun deleteOlderData(date: Long, coroutineScope: CoroutineScope = GlobalScope) {
+    fun deleteOlderData(date: Long,
+                        coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
         coroutineScope.launch {
             proxyEndpointDAO.deleteOlderData(date)
         }

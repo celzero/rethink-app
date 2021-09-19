@@ -8,7 +8,6 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     app:layout_scrollFlags="scroll|enterAlways">
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -22,33 +21,45 @@
             android:layout_gravity="end"
             android:src="@android:drawable/ic_menu_close_clear_cancel" />
 
-        <TextView
-            android:id="@+id/info_rules_dialog_rules_title"
-            style="@style/Widget.AppCompat.TextView.SpinnerItem"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawablePadding="20dp"
-            android:padding="5dp"
-            android:textColor="?attr/primaryTextColor"
-            android:text="@string/firewall_rules"
-            android:textSize="@dimen/heading_font_text_view"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            app:drawableStartCompat="@drawable/spinner_firewall" />
+            android:layout_gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/info_rules_dialog_rules_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_margin="5dp"
+                android:layout_gravity="center_vertical"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/info_rules_dialog_rules_title"
+                style="@style/Widget.AppCompat.TextView.SpinnerItem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/firewall_rules"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/heading_font_text_view" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/info_rules_dialog_rules_desc"
             style="@style/Widget.AppCompat.TextView.SpinnerItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:lineSpacingExtra="5dp"
             android:padding="5dp"
-            android:layout_marginTop="10dp"
-            android:textSize="@dimen/large_font_text_view"
-            android:textColor="?attr/primaryTextColor"
             android:text="@string/bsct_conn_rule_explanation"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
-
-
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/large_font_text_view" />
 
         <TextView
             style="@style/Widget.AppCompat.TextView.SpinnerItem"

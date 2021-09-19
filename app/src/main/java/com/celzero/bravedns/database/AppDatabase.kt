@@ -23,7 +23,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [AppInfo::class, CategoryInfo::class, ConnectionTracker::class, BlockedConnections::class, DoHEndpoint::class, DNSCryptEndpoint::class, DNSProxyEndpoint::class, DNSCryptRelayEndpoint::class, ProxyEndpoint::class, DNSLogs::class],
+    entities = [AppInfo::class, CategoryInfo::class, ConnectionTracker::class, BlockedConnections::class, DoHEndpoint::class, DNSCryptEndpoint::class, DNSProxyEndpoint::class, DNSCryptRelayEndpoint::class, ProxyEndpoint::class, DnsLog::class],
     views = [AppInfoView::class], version = 10, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
@@ -33,7 +33,7 @@ abstract class AppDatabase : RoomDatabase() {
         // setJournalMode() is added as part of issue #344
         fun buildDatabase(context: Context) = Room.databaseBuilder(context.applicationContext,
                                                                    AppDatabase::class.java,
-                                                                   DATABASE_NAME).allowMainThreadQueries().setJournalMode(
+                                                                   DATABASE_NAME).setJournalMode(
             JournalMode.TRUNCATE).addMigrations(MIGRATION_1_2).addMigrations(
             MIGRATION_2_3).addMigrations(MIGRATION_3_4).addMigrations(MIGRATION_4_5).addMigrations(
             MIGRATION_5_6).addMigrations(MIGRATION_6_7).addMigrations(MIGRATION_7_8).addMigrations(

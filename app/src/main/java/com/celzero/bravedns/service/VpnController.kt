@@ -17,17 +17,33 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import android.content.Intent
+import android.os.SystemClock
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-object VpnController {
+object VpnController : KoinComponent {
 
     private var braveVpnService: BraveVPNService? = null
     private var connectionState: BraveVPNService.State? = null
+    private val persistentState by inject<PersistentState>()
+    private var states: Channel<BraveVPNService.State?>? = null
+    private var controllerScope: CoroutineScope? = null
+
+    private var vpnStartElapsedTime: Long = SystemClock.elapsedRealtime()
+
+    val mutex: Mutex = Mutex()
 
     var connectionStatus: MutableLiveData<BraveVPNService.State> = MutableLiveData()
 
@@ -36,32 +52,75 @@ object VpnController {
         throw CloneNotSupportedException()
     }
 
-    fun setBraveVpnService(braveVpnService: BraveVPNService?) {
-        VpnController.braveVpnService = braveVpnService
+    // TODO: make clients listen on create, start, stop, destory from vpn-service
+    fun onVpnCreated(b: BraveVPNService) {
+        braveVpnService = b
+        controllerScope = CoroutineScope(Dispatchers.IO)
+        states = Channel(Channel.CONFLATED) // drop unconsumed states
+
+        // store app start time, used in HomeScreenBottomSheet
+        vpnStartElapsedTime = SystemClock.elapsedRealtime()
+
+        controllerScope!!.launch {
+            states!!.consumeEach { state ->
+                // transition from paused connection state only on NEW/NULL
+                when (state) {
+                    null -> {
+                        updateState(null)
+                    }
+                    BraveVPNService.State.NEW -> {
+                        updateState(state)
+                    }
+                    else -> {
+                        // do not update if in paused-state unless state is new / null
+                        if (!isAppPaused()) {
+                            updateState(state)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun onVpnDestroyed() {
+        braveVpnService = null
+        controllerScope?.cancel("stop")
+        states?.cancel()
+        vpnStartElapsedTime = SystemClock.elapsedRealtime()
+    }
+
+    fun uptimeMs(): Long {
+        val t = SystemClock.elapsedRealtime() - vpnStartElapsedTime
+
+        return if (isOn()) {
+            t
+        } else {
+            -1L * t
+        }
     }
 
     fun getBraveVpnService(): BraveVPNService? {
         return braveVpnService
     }
 
-    @Synchronized
     fun onConnectionStateChanged(state: BraveVPNService.State?) {
-        connectionState = if (braveVpnService == null) {
-            // User clicked disable while the connection state was changing.
-            null
-        } else {
-            state
+        controllerScope?.launch {
+            states?.send(state)
         }
+    }
+
+    private fun updateState(state: BraveVPNService.State?) {
+        connectionState = state
         connectionStatus.postValue(state)
     }
 
-    @Synchronized
     fun start(context: Context) {
         //TODO : Code modified to remove the check of null reference - MODIFIED check??
         if (braveVpnService != null) {
             Log.i(LOG_TAG_VPN, "braveVPNService is not null")
             return
         }
+
         val startServiceIntent = Intent(context, BraveVPNService::class.java)
         if (isAtleastO()) {
             context.startForegroundService(startServiceIntent)
@@ -84,7 +143,6 @@ object VpnController {
         Log.i(LOG_TAG_VPN, "onStartComplete - VpnController")
     }
 
-    @Synchronized
     fun stop(context: Context) {
         Log.i(LOG_TAG_VPN, "VPN Controller stop with context: $context")
         connectionState = null
@@ -94,13 +152,29 @@ object VpnController {
     }
 
     fun state(): VpnState {
-        val requested: Boolean = VpnControllerHelper.persistentState.getVpnEnabled()
-        val on = braveVpnService?.isOn() == true
+        val requested: Boolean = persistentState.getVpnEnabled()
+        val on = isOn()
         return VpnState(requested, on, connectionState)
     }
 
-}
+    fun isOn(): Boolean {
+        return braveVpnService?.isOn() == true
+    }
 
-internal object VpnControllerHelper : KoinComponent {
-    val persistentState by inject<PersistentState>()
+    fun hasTunnel(): Boolean {
+        return braveVpnService?.hasTunnel() == true
+    }
+
+    fun hasStarted(): Boolean {
+        return connectionState == BraveVPNService.State.WORKING || connectionState == BraveVPNService.State.FAILING
+    }
+
+    fun isAppPaused(): Boolean {
+        return connectionState == BraveVPNService.State.PAUSED
+    }
+
+    fun isVpnLockdown(): Boolean {
+        return Utilities.isVpnLockdownEnabled(braveVpnService)
+    }
+
 }

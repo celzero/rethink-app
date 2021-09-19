@@ -7,6 +7,9 @@
     android:textAlignment="center"
     android:layout_margin="3dp"
     android:padding="2dp"
+    app:chipIconEnabled="true"
+    app:chipIconSize="15dp"
     android:textSize="@dimen/default_font_text_view"
-    android:textColor="@color/primaryText"
-    app:chipBackgroundColor="?attr/mainButtonBackground" />
+    android:textColor="?attr/primaryTextColor"
+    app:checkedIconTint="?attr/primaryTextColor"
+    app:chipBackgroundColor="@drawable/bg_chip_state_list" />

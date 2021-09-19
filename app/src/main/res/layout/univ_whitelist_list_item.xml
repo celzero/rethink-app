@@ -38,7 +38,6 @@
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
 
-
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/univ_whitelist_checkbox"
                 android:layout_width="wrap_content"

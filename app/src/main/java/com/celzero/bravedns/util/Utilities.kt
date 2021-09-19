@@ -18,13 +18,16 @@ package com.celzero.bravedns.util
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
+import android.app.Activity
 import android.app.ActivityManager
 import android.content.*
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Build
 import android.os.CountDownTimer
 import android.provider.Settings
@@ -40,14 +43,20 @@ import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.getSystemService
 import androidx.core.text.HtmlCompat
+import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.service.VpnControllerHelper.persistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.ui.PauseActivity
 import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
+import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
+import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
+import com.celzero.bravedns.util.Constants.Companion.FLAVOR_WEBSITE
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
+import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
@@ -60,6 +69,7 @@ import java.io.IOException
 import java.net.InetAddress
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.Locale
 
 
 class Utilities {
@@ -147,21 +157,22 @@ class Utilities {
         private var countryMap: CountryMap? = null
 
         // Return a two-letter ISO country code, or null if that fails.
-        fun getCountryCode(address: InetAddress?, context: Context): String {
-            activateCountryMap(context)
+        fun getCountryCode(address: InetAddress?, context: Context): String? {
+            initCountryMapIfNeeded(context)
             return (if (countryMap == null) {
                 null
             } else {
                 countryMap?.getCountryCode(address)
-            })!!
+            })
         }
 
-        private fun activateCountryMap(context: Context) {
+        private fun initCountryMapIfNeeded(context: Context) {
             if (countryMap != null) {
                 return
             }
+
             try {
-                countryMap = CountryMap(context.getAssets())
+                countryMap = CountryMap(context.assets)
             } catch (e: IOException) {
                 Log.e(LOG_TAG_VPN, "Failure fetching country map ${e.message}", e)
             }
@@ -176,7 +187,7 @@ class Utilities {
             // order.  Therefore, to convert from a country code to a flag, we simply need to apply an
             // offset to each character, shifting it from the normal A-Z range into the region indicator
             // symbol letter range.
-            val alphaBase = 'A'.toInt() // Start of alphabetic country code characters.
+            val alphaBase = 'A'.code // Start of alphabetic country code characters.
             val flagBase = 0x1F1E6 // Start of regional indicator symbol letters.
             val offset = flagBase - alphaBase
             val firstHalf = Character.codePointAt(countryCode, 0) + offset
@@ -190,30 +201,29 @@ class Utilities {
             } else String.format("%s (%s)", countryCode, ipAddress)
         }
 
-        fun convertLongToTime(time: Long): String {
+        fun convertLongToTime(time: Long, template: String): String {
             val date = Date(time)
-            val format = SimpleDateFormat("HH:mm:ss", Locale.US)
-            return format.format(date)
+            return SimpleDateFormat(template, Locale.ENGLISH).format(date)
         }
 
-        fun convertLongToDate(timestamp: Long): String {
-            val date = Date(timestamp)
-            val format = SimpleDateFormat("yy.MM (dd)", Locale.US)
-            return format.format(date)
+        fun humanReadableTime(timestamp: Long): String {
+            val offSet = TimeZone.getDefault().rawOffset + TimeZone.getDefault().dstSavings
+            val now = timestamp - offSet
+            return convertLongToTime(now, TIME_FORMAT_1)
         }
 
-        fun prepareServersToRemove(servers: String, liveServers: String): String {
+        fun getNonLiveDnscryptServers(servers: String, liveServers: String): String {
             val serverList = servers.split(",")
             val liveServerList = liveServers.split(",")
             var serversToSend = ""
+
             serverList.forEach {
                 if (!liveServerList.contains(it)) {
-                    serversToSend += "$it,"
+                    serversToSend += "${it.trim()},"
                 }
             }
             if (DEBUG) Log.d(LOG_TAG_VPN, "In: $serverList / Out: $serversToSend")
-            serversToSend = serversToSend.dropLast(1)
-            return serversToSend
+            return serversToSend.dropLast(1)
         }
 
         fun showToastUiCentered(context: Context, message: String, toastLength: Int) {
@@ -290,10 +300,6 @@ class Utilities {
             }
         }
 
-        fun isUnknownUid(uid: Int): Boolean {
-            return AndroidUidConfig.isUnknownUid(uid)
-        }
-
         fun isMissingOrInvalidUid(uid: Int): Boolean {
             return when (uid) {
                 MISSING_UID -> true
@@ -317,38 +323,6 @@ class Utilities {
             }
         }
 
-        fun getCurrentTheme(isDarkThemeOn: Boolean, theme: Int): Int {
-            return if (theme == Constants.THEME_SYSTEM_DEFAULT) {
-                if (isDarkThemeOn) {
-                    R.style.AppThemeTrueBlack
-                } else {
-                    R.style.AppThemeWhite
-                }
-            } else if (theme == Constants.THEME_LIGHT) {
-                R.style.AppThemeWhite
-            } else if (theme == Constants.THEME_DARK) {
-                R.style.AppTheme
-            } else {
-                R.style.AppThemeTrueBlack
-            }
-        }
-
-        fun getBottomsheetCurrentTheme(isDarkThemeOn: Boolean): Int {
-            return if (persistentState.theme == Constants.THEME_SYSTEM_DEFAULT) {
-                if (isDarkThemeOn) {
-                    R.style.BottomSheetDialogThemeTrueBlack
-                } else {
-                    R.style.BottomSheetDialogThemeWhite
-                }
-            } else if (persistentState.theme == Constants.THEME_LIGHT) {
-                R.style.BottomSheetDialogThemeWhite
-            } else if (persistentState.theme == Constants.THEME_DARK) {
-                R.style.BottomSheetDialogTheme
-            } else {
-                R.style.BottomSheetDialogThemeTrueBlack
-            }
-        }
-
         fun getPackageMetadata(pm: PackageManager, pi: String): PackageInfo? {
             var metadata: PackageInfo? = null
 
@@ -368,10 +342,7 @@ class Utilities {
                 if (!src.isFile) return false
 
                 src.copyTo(dest, true)
-            } catch (e: NoSuchFileException) { // Throws NoSuchFileException, IOException
-                Log.e(LOG_TAG_DOWNLOAD, "Error copying file ${e.message}", e)
-                return false
-            } catch (e: IOException) {
+            } catch (e: Exception) { // Throws NoSuchFileException, IOException
                 Log.e(LOG_TAG_DOWNLOAD, "Error copying file ${e.message}", e)
                 return false
             }
@@ -426,7 +397,7 @@ class Utilities {
         }
 
         private fun isValidAppName(appName: String?, packageName: String): Boolean {
-            return !packageName.contains(Constants.NO_PACKAGE) && Constants.UNKNOWN_APP != appName
+            return !isNonApp(packageName) && Constants.UNKNOWN_APP != appName
         }
 
         fun isValidAppName(appName: String?): Boolean {
@@ -462,11 +433,6 @@ class Utilities {
         }
 
         fun getPackageInfoForUid(context: Context, uid: Int): Array<out String>? {
-            if (!isUnknownUid(uid)) {
-                Log.i(LOG_TAG_FIREWALL, "Invalid uid, not fetching value from package manager")
-                return null
-            }
-
             try {
                 return context.packageManager.getPackagesForUid(uid)
             } catch (e: PackageManager.NameNotFoundException) {
@@ -482,5 +448,117 @@ class Utilities {
         fun isAtleastR(): Boolean {
             return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
         }
+
+        fun isAtleastQ(): Boolean {
+            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+        }
+
+        fun isFdroidFlavour(): Boolean {
+            return BuildConfig.FLAVOR == FLAVOR_FDROID
+        }
+
+        fun isWebsiteFlavour(): Boolean {
+            return BuildConfig.FLAVOR == FLAVOR_WEBSITE
+        }
+
+        fun isPlayStoreFlavour(): Boolean {
+            return BuildConfig.FLAVOR == FLAVOR_PLAY
+        }
+
+        fun getApplicationInfo(context: Context, packageName: String): ApplicationInfo? {
+            return try {
+                context.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+            } catch (e: PackageManager.NameNotFoundException) {
+                Log.w(LOG_TAG_FIREWALL,
+                      "ApplicationInfo is not available for package name: $packageName")
+                null
+            }
+        }
+
+        fun sendEmailIntent(context: Context) {
+            val intent = Intent(Intent.ACTION_SENDTO).apply {
+                data = Uri.parse(context.getString(R.string.about_mail_to_string))
+                putExtra(Intent.EXTRA_EMAIL, arrayOf(context.getString(R.string.about_mail_to)))
+                putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.about_mail_subject))
+            }
+            context.startActivity(Intent.createChooser(intent, context.getString(
+                R.string.about_mail_bugreport_share_title)))
+        }
+
+        fun deleteRecursive(fileOrDirectory: File) {
+            try {
+                if (fileOrDirectory.isDirectory) {
+                    fileOrDirectory.listFiles()?.forEach { child ->
+                        deleteRecursive(child)
+                    }
+                }
+                val isDeleted: Boolean = if (isAtleastO()) {
+                    fileOrDirectory.deleteRecursively()
+                } else {
+                    fileOrDirectory.delete()
+                }
+                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
+                                 "deleteRecursive -- File : ${fileOrDirectory.path}, $isDeleted")
+            } catch (e: Exception) {
+                Log.w(LOG_TAG_DOWNLOAD, "File delete exception: ${e.message}", e)
+            }
+        }
+
+        fun localBlocklistDownloadPath(ctx: Context, which: String, timestamp: Long): String {
+            return ctx.filesDir.canonicalPath + File.separator + timestamp + File.separator + which
+        }
+
+        fun hasLocalBlocklists(ctx: Context, timestamp: Long): Boolean {
+            val a = Constants.ONDEVICE_BLOCKLISTS.all {
+                localBlocklistFile(ctx, it.filename, timestamp)?.exists() == true
+            }
+            return a
+        }
+
+        private fun localBlocklistFile(ctx: Context, which: String, timestamp: Long): File? {
+            return try {
+                return File(localBlocklistDownloadPath(ctx, which, timestamp))
+            } catch (e: IOException) {
+                Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
+                null
+            }
+        }
+
+        fun remoteBlocklistDir(ctx: Context?, which: String, timestamp: Long): File? {
+            if (ctx == null) return null
+
+            return try {
+                File(remoteBlocklistDownloadBasePath(ctx, which, timestamp))
+            } catch (e: IOException) {
+                Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
+                null
+            }
+        }
+
+        private fun remoteBlocklistDownloadBasePath(ctx: Context, which: String,
+                                                    timestamp: Long): String {
+            return ctx.filesDir.canonicalPath + File.separator + which + File.separator + timestamp
+        }
+
+        fun remoteBlocklistFile(dirPath: String, fileName: String): File? {
+            return try {
+                return File(dirPath + fileName)
+            } catch (e: IOException) {
+                Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
+                null
+            }
+        }
+
+        fun openPauseActivityAndFinish(act: Activity) {
+            val intent = Intent()
+            intent.setClass(act, PauseActivity::class.java)
+            act.startActivity(intent)
+            act.finish()
+        }
+
+        fun isNonApp(p: String): Boolean {
+            return p.contains(NO_PACKAGE)
+        }
     }
+
 }

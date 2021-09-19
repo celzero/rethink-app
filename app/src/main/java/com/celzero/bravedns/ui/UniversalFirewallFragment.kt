@@ -31,23 +31,22 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.UniversalBlockedRulesAdapter
-import com.celzero.bravedns.adapter.WhitelistedApplistAdapter
+import com.celzero.bravedns.adapter.WhitelistedAppsAdapter
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.automaton.FirewallRules
-import com.celzero.bravedns.database.AppInfoRepository
-import com.celzero.bravedns.database.AppInfoViewRepository
+import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.database.BlockedConnectionsRepository
 import com.celzero.bravedns.databinding.FragmentFirewallBinding
 import com.celzero.bravedns.databinding.UniversalFragementContainerBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.BackgroundAccessibilityService
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.delay
-import com.celzero.bravedns.util.Utilities.Companion.getCurrentTheme
 import com.celzero.bravedns.viewmodel.AppListViewModel
 import com.celzero.bravedns.viewmodel.BlockedConnectionsViewModel
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -56,15 +55,11 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.reflect.KMutableProperty0
 
 
-/**
- * UniversalFirewallFragment - Universal Firewall.
- */
-
 class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_container),
                                   SearchView.OnQueryTextListener {
     private val b by viewBinding(UniversalFragementContainerBinding::bind)
 
-    private lateinit var recyclerAdapter: WhitelistedApplistAdapter
+    private lateinit var recyclerAdapter: WhitelistedAppsAdapter
     private lateinit var recyclerRulesAdapter: UniversalBlockedRulesAdapter
     private var layoutManager: RecyclerView.LayoutManager? = null
     private val viewModel: BlockedConnectionsViewModel by viewModel()
@@ -72,10 +67,11 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
 
     private var ipListState: Boolean = false
 
-    private val appInfoRepository by inject<AppInfoRepository>()
-    private val appInfoViewRepository by inject<AppInfoViewRepository>()
     private val blockedConnectionsRepository by inject<BlockedConnectionsRepository>()
     private val persistentState by inject<PersistentState>()
+    private val appMode by inject<AppMode>()
+
+    private var blockedRulesCount: Int = 0
 
     companion object {
         fun newInstance() = UniversalFirewallFragment()
@@ -84,6 +80,29 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
+        observeBraveMode()
+    }
+
+    private fun observeBraveMode() {
+        appMode.braveModeObserver.observe(viewLifecycleOwner, {
+            when (it) {
+                AppMode.BraveMode.DNS.mode -> handleDnsModeUi()
+                AppMode.BraveMode.FIREWALL.mode -> handleFirewallModeUi()
+                AppMode.BraveMode.DNS_FIREWALL.mode -> handleDnsFirewallModeUi()
+            }
+        })
+    }
+
+    private fun handleDnsModeUi() {
+        b.appScrollingInclFirewall.firewallDisallowDnsBypassLl.visibility = View.GONE
+    }
+
+    private fun handleFirewallModeUi() {
+        b.appScrollingInclFirewall.firewallDisallowDnsBypassLl.visibility = View.GONE
+    }
+
+    private fun handleDnsFirewallModeUi() {
+        b.appScrollingInclFirewall.firewallDisallowDnsBypassLl.visibility = View.VISIBLE
     }
 
     private fun initView() {
@@ -98,32 +117,34 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
 
         includeView.firewallScrollConnectCheck.visibility = View.VISIBLE
 
-        handleIpRulesState(state = false)
+        toggleIpRulesState(state = false)
 
         includeView.firewallUniversalRecycler.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(requireContext())
         includeView.firewallUniversalRecycler.layoutManager = layoutManager
-        recyclerRulesAdapter = UniversalBlockedRulesAdapter(requireContext(),
+        recyclerRulesAdapter = UniversalBlockedRulesAdapter(requireContext(), viewLifecycleOwner,
                                                             blockedConnectionsRepository)
-        recyclerAdapter = WhitelistedApplistAdapter(requireContext())
+        recyclerAdapter = WhitelistedAppsAdapter(requireContext())
         includeView.firewallUniversalRecycler.adapter = recyclerRulesAdapter
 
-        includeView.firewallAllAppsCheck.isChecked = persistentState.screenState
-        includeView.firewallBackgroundModeCheck.isChecked = persistentState.backgroundEnabled
+        includeView.firewallAllAppsCheck.isChecked = persistentState.blockWhenDeviceLocked
+        includeView.firewallBackgroundModeCheck.isChecked = persistentState.blockAppWhenBackground
         includeView.firewallUdpConnectionModeCheck.isChecked = persistentState.udpBlockedSettings
         includeView.firewallUnknownConnectionModeCheck.isChecked = persistentState.blockUnknownConnections
+        includeView.firewallDisallowDnsBypassModeCheck.isChecked = persistentState.disallowDnsBypass
+        includeView.firewallBlockNewAppCheck.isChecked = persistentState.blockNewlyInstalledApp
 
         setupClickListeners(includeView)
 
         FirewallManager.getApplistObserver().observe(viewLifecycleOwner, {
-            val whiteListApps = it.filter { a -> a.whiteListUniv1 }.size
+            val whiteListApps = it.filter { a -> a.whiteListUniv1 }.count()
             includeView.firewallUnivWhitelistCount.text = getString(
-                R.string.whitelist_dialog_apps_in_use, whiteListApps.toString(),
-                FirewallManager.getTotalApps().toString())
+                R.string.whitelist_dialog_apps_in_use, whiteListApps.toString())
         })
 
         blockedConnectionsRepository.getBlockedConnectionCountLiveData().observe(viewLifecycleOwner,
                                                                                  {
+                                                                                     blockedRulesCount = it
                                                                                      includeView.firewallUnivIpCount.text = getString(
                                                                                          R.string.univ_blocked_ip_count,
                                                                                          it.toString())
@@ -138,11 +159,11 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
 
     private fun setupClickListeners(includeView: FragmentFirewallBinding) {
         includeView.firewallAllAppsCheck.setOnCheckedChangeListener { _, b ->
-            persistentState.screenState = b
+            persistentState.blockWhenDeviceLocked = b
         }
 
         includeView.firewallAllAppsTxt.setOnClickListener {
-            toggle(includeView.firewallAllAppsCheck, persistentState::screenState)
+            toggle(includeView.firewallAllAppsCheck, persistentState::blockWhenDeviceLocked)
         }
 
         includeView.firewallUnknownConnectionModeCheck.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
@@ -169,7 +190,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
 
         includeView.firewallBackgroundModeCheck.setOnCheckedChangeListener(null)
         includeView.firewallBackgroundModeCheck.setOnClickListener {
-            // In this case, the isChecked value of the swtich would have already flipped.
+            // In this case, the isChecked property of the switch would have already flipped.
             recheckFirewallBackgroundMode(includeView.firewallBackgroundModeCheck.isChecked)
         }
 
@@ -180,20 +201,34 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             val customDialog = WhitelistAppDialog(requireActivity() as FirewallActivity,
                                                   recyclerAdapter, appInfoViewModel, themeID)
             customDialog.setCanceledOnTouchOutside(false)
-            //if we know that the particular variable not null any time ,we can assign !!
-            // (not null operator ), then  it won't check for null, if it becomes null,
-            // it will throw exception
             customDialog.show()
 
             delay(500) { if (isAdded) includeView.firewallAppsShowTxt.isEnabled = true }
         }
 
+        includeView.firewallDisallowDnsBypassModeCheck.setOnCheckedChangeListener { _, b ->
+            persistentState.disallowDnsBypass = b
+        }
+
+        includeView.firewallDisallowDnsBypassModeTxt.setOnClickListener {
+            toggle(includeView.firewallDisallowDnsBypassModeCheck,
+                   persistentState::disallowDnsBypass)
+        }
+
+        includeView.firewallBlockNewAppCheck.setOnCheckedChangeListener { _, b ->
+            persistentState.blockNewlyInstalledApp = b
+        }
+
+        includeView.firewallBlockNewAppTxt.setOnClickListener {
+            toggle(includeView.firewallBlockNewAppCheck, persistentState::blockNewlyInstalledApp)
+        }
+
         includeView.firewallUnivIpHeader.setOnClickListener {
-            handleIpRulesState(ipListState)
+            toggleIpRulesState(ipListState)
         }
 
         includeView.firewallUnivIpImg.setOnClickListener {
-            handleIpRulesState(ipListState)
+            toggleIpRulesState(ipListState)
         }
 
         includeView.firewallSearchDeleteIcon.setOnClickListener {
@@ -207,7 +242,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         }
     }
 
-    private fun handleIpRulesState(state: Boolean) {
+    private fun toggleIpRulesState(state: Boolean) {
         if (state) {
             b.appScrollingInclFirewall.firewallSearchViewTop.visibility = View.VISIBLE
             b.appScrollingInclFirewall.firewallUniversalRecycler.visibility = View.VISIBLE
@@ -234,7 +269,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         val includeView = b.appScrollingInclFirewall
         if (!isChecked) {
             includeView.firewallBackgroundModeCheck.isChecked = false
-            persistentState.backgroundEnabled = false
+            persistentState.blockAppWhenBackground = false
             return
         }
 
@@ -245,18 +280,23 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         val isAccessibilityServiceFunctional = isAccessibilityServiceRunning && isAccessibilityServiceEnabled
 
         if (isAccessibilityServiceFunctional) {
-            persistentState.backgroundEnabled = true
+            persistentState.blockAppWhenBackground = true
             includeView.firewallBackgroundModeCheck.isChecked = true
+            // Reset the heart beat time for the accessibility check.
+            // On accessibility failure the value will be stored for next 5 mins.
+            // If user, re-enable the settings reset the timestamp so that vpn service
+            // will check for the accessibility service availability.
+            VpnController.getBraveVpnService()?.accessibilityHearbeatTimestamp = INIT_TIME_MS
             return
         }
 
         showPermissionAlert()
         includeView.firewallBackgroundModeCheck.isChecked = false
-        persistentState.backgroundEnabled = false
+        persistentState.blockAppWhenBackground = false
     }
 
     private fun showIpRulesDeleteDialog() {
-        if (blockedConnectionsRepository.getBlockedConnectionsCount() <= 0) {
+        if (blockedRulesCount <= 0) {
             Utilities.showToastUiCentered(requireContext(),
                                           getString(R.string.univ_ip_no_rules_set),
                                           Toast.LENGTH_SHORT)
@@ -283,13 +323,20 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
 
     override fun onResume() {
         super.onResume()
+        updateUniversalFirewallPreferences()
+    }
+
+    private fun updateUniversalFirewallPreferences() {
+        b.appScrollingInclFirewall.firewallAllAppsCheck.isChecked = persistentState.blockWhenDeviceLocked
+        b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = persistentState.blockAppWhenBackground
+        b.appScrollingInclFirewall.firewallUdpConnectionModeCheck.isChecked = persistentState.udpBlockedSettings
         b.appScrollingInclFirewall.firewallUnknownConnectionModeCheck.isChecked = persistentState.blockUnknownConnections
-        checkAppNotInUse()
+        checkAppNotInUseRule()
     }
 
 
-    private fun checkAppNotInUse() {
-        if (!persistentState.backgroundEnabled) return
+    private fun checkAppNotInUseRule() {
+        if (!persistentState.blockAppWhenBackground) return
 
         val isAccessibilityServiceRunning = Utilities.isAccessibilityServiceEnabled(
             requireContext(), BackgroundAccessibilityService::class.java)
@@ -297,11 +344,11 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             requireContext(), BackgroundAccessibilityService::class.java)
 
         if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                         "backgroundEnabled? ${persistentState.backgroundEnabled}, isServiceEnabled? $isAccessibilityServiceEnabled, isServiceRunning? $isAccessibilityServiceRunning")
+                         "backgroundEnabled? ${persistentState.blockAppWhenBackground}, isServiceEnabled? $isAccessibilityServiceEnabled, isServiceRunning? $isAccessibilityServiceRunning")
         val isAccessibilityServiceFunctional = isAccessibilityServiceRunning && isAccessibilityServiceEnabled
 
         if (!isAccessibilityServiceFunctional) {
-            persistentState.backgroundEnabled = false
+            persistentState.blockAppWhenBackground = false
             b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = false
             Utilities.showToastUiCentered(requireContext(),
                                           getString(R.string.accessibility_failure_toast),
@@ -310,7 +357,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         }
 
         if (isAccessibilityServiceRunning) {
-            b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = persistentState.backgroundEnabled
+            b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = persistentState.blockAppWhenBackground
             return
         }
     }

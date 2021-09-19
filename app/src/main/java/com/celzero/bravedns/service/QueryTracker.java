@@ -45,7 +45,7 @@ public class QueryTracker {
         numRequests = 1;
     }
 
-    void recordTransaction(Transaction transaction) {
+    public void recordTransaction(Transaction transaction) {
         ++numRequests;
         if (numRequests % HISTORY_SIZE == 0) {
             reinitializeQuantileEstimator();
@@ -59,7 +59,6 @@ public class QueryTracker {
         }
         // Restore number of requests from storage, or 0 if it isn't defined yet.
         quantileEstimator.addValue((double) transaction.responseTime);
-        long latency = (long) quantileEstimator.getQuantile();
-        persistentState.setMedianLatency(latency);
+        persistentState.setMedianLatency(quantileEstimator.getQuantile());
     }
 }

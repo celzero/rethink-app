@@ -18,7 +18,7 @@ package com.celzero.bravedns.database
 
 import androidx.lifecycle.LiveData
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
@@ -40,10 +40,6 @@ class BlockedConnectionsRepository(private val blockedConnectionsDAO: BlockedCon
         return blockedConnectionsDAO.getBlockedConnections()
     }
 
-    fun getAllBlockedConnectionsForUID(uid: Int): List<BlockedConnections> {
-        return blockedConnectionsDAO.getAllBlockedConnectionsForUID(uid)
-    }
-
     fun deleteIPRulesUniversal(ipAddress: String) {
         blockedConnectionsDAO.deleteIPRulesUniversal(ipAddress)
     }
@@ -52,7 +48,7 @@ class BlockedConnectionsRepository(private val blockedConnectionsDAO: BlockedCon
         blockedConnectionsDAO.deleteIPRulesForUID(uid, ipAddress)
     }
 
-    fun deleteAllIPRulesUniversal(coroutineScope: CoroutineScope = GlobalScope) {
+    fun deleteAllIPRulesUniversal(coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
         coroutineScope.launch {
             blockedConnectionsDAO.deleteAllIPRulesUniversal()
         }

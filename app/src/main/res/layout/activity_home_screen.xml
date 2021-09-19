@@ -29,6 +29,5 @@
         app:layout_constraintRight_toRightOf="parent"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_menu" />
-    <!--android:background="?android:attr/windowBackground"-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

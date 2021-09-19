@@ -16,24 +16,26 @@ limitations under the License.
 package com.celzero.bravedns.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
+import android.widget.CompoundButton
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ConnectionTrackerAdapter
-import com.celzero.bravedns.database.ConnectionTrackerDAO
+import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.databinding.ActivityConnectionTrackerBinding
+import com.celzero.bravedns.service.DNSLogTracker
+import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import com.google.android.material.chip.Chip
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -47,16 +49,20 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
 
     private var layoutManager: RecyclerView.LayoutManager? = null
     private val viewModel: ConnectionTrackerViewModel by viewModel()
-    private var filterValue: String = ""
 
-    // By default, all connections are shown, Filter dialog will be selected with position 1.
-    private var checkedItem = 1
-
-    private val connectionTrackerDAO by inject<ConnectionTrackerDAO>()
+    private var filterQuery: String? = ""
+    private var filterCategories: MutableSet<String> = mutableSetOf()
+    private var filterType: TopLevelFilter = TopLevelFilter.ALL
+    private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
     private val persistentState by inject<PersistentState>()
+    private val dnsLogTracker by inject<DNSLogTracker>()
 
     companion object {
         fun newInstance() = ConnectionTrackerFragment()
+    }
+
+    enum class TopLevelFilter(val id: Int) {
+        ALL(0), ALLOWED(1), BLOCKED(2)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -79,56 +85,138 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         includeView.recyclerConnection.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(requireContext())
         includeView.recyclerConnection.layoutManager = layoutManager
-        val recyclerAdapter = ConnectionTrackerAdapter(requireContext())
+        val recyclerAdapter = ConnectionTrackerAdapter(this)
         viewModel.connectionTrackerList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
             recyclerAdapter::submitList))
         includeView.recyclerConnection.adapter = recyclerAdapter
 
         includeView.connectionSearch.setOnQueryTextListener(this)
         includeView.connectionSearch.setOnClickListener {
+            showParentChipsUi()
+            showChildChipsIfNeeded()
             includeView.connectionSearch.requestFocus()
             includeView.connectionSearch.onActionViewExpanded()
         }
 
         includeView.connectionFilterIcon.setOnClickListener {
-            showFilterDialog()
+            toggleParentChipsUi()
         }
 
         includeView.connectionDeleteIcon.setOnClickListener {
             showDeleteDialog()
         }
+
+        remakeParentFilterChipsUi()
+        remakeChildFilterChipsUi(FirewallRuleset.getBlockedRules())
+    }
+
+    private fun toggleParentChipsUi() {
+        val includeView = b.connectionListScrollList
+
+        if (includeView.filterChipParentGroup.isVisible) {
+            hideParentChipsUi()
+            hideChildChipsUi()
+        } else {
+            showParentChipsUi()
+            showChildChipsIfNeeded()
+        }
+    }
+
+    private fun showChildChipsIfNeeded() {
+        when (filterType) {
+            TopLevelFilter.ALL -> {
+                hideChildChipsUi()
+            }
+            TopLevelFilter.ALLOWED -> {
+                showChildChipsUi()
+            }
+            TopLevelFilter.BLOCKED -> {
+                showChildChipsUi()
+            }
+        }
+    }
+
+    private fun remakeParentFilterChipsUi() {
+        val includeView = b.connectionListScrollList
+        includeView.filterChipParentGroup.removeAllViews()
+
+        val all = makeParentChip(TopLevelFilter.ALL.id, getString(R.string.ct_filter_parent_all),
+                                 true)
+        val allowed = makeParentChip(TopLevelFilter.ALLOWED.id,
+                                     getString(R.string.ct_filter_parent_allowed), false)
+        val blocked = makeParentChip(TopLevelFilter.BLOCKED.id,
+                                     getString(R.string.ct_filter_parent_blocked), false)
+
+        includeView.filterChipParentGroup.addView(all)
+        includeView.filterChipParentGroup.addView(allowed)
+        includeView.filterChipParentGroup.addView(blocked)
+    }
+
+    private fun makeParentChip(id: Int, label: String, checked: Boolean): Chip {
+        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, null, false) as Chip
+        chip.tag = id
+        chip.text = label
+        chip.isChecked = checked
+
+        chip.setOnCheckedChangeListener { button: CompoundButton, isSelected: Boolean ->
+            if (isSelected) { // apply filter only when the CompoundButton is selected
+                applyParentFilter(button.tag)
+            } else { // actions need to be taken when the button is unselected
+                unselectParentsChipsUi(button.tag)
+            }
+        }
+
+        return chip
+    }
+
+    private fun makeChildChip(id: String, titleResId: Int): Chip {
+        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, null, false) as Chip
+        chip.text = getString(titleResId)
+        chip.chipIcon = ContextCompat.getDrawable(requireContext(),
+                                                  FirewallRuleset.getRulesIcon(id))
+        chip.isCheckedIconVisible = false
+        chip.tag = id
+
+        chip.setOnCheckedChangeListener { compoundButton: CompoundButton, isSelected: Boolean ->
+            applyChildFilter(compoundButton.tag, isSelected)
+        }
+        return chip
+    }
+
+    private fun applyParentFilter(tag: Any) {
+        when (tag) {
+            TopLevelFilter.ALL.id -> {
+                filterCategories.clear()
+                filterType = TopLevelFilter.ALL
+                viewModel.setFilter(filterQuery, filterCategories, filterType)
+                hideChildChipsUi()
+            }
+            TopLevelFilter.ALLOWED.id -> {
+                filterCategories.clear()
+                filterType = TopLevelFilter.ALLOWED
+                viewModel.setFilter(filterQuery, filterCategories, filterType)
+                remakeChildFilterChipsUi(FirewallRuleset.getAllowedRules())
+                showChildChipsUi()
+            }
+            TopLevelFilter.BLOCKED.id -> {
+                filterType = TopLevelFilter.BLOCKED
+                viewModel.setFilter(filterQuery, filterCategories, filterType)
+                remakeChildFilterChipsUi(FirewallRuleset.getBlockedRules())
+                showChildChipsUi()
+            }
+        }
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        viewModel.setFilter(query, filterValue)
+        this.filterQuery = query
+        viewModel.setFilter(query, filterCategories, filterType)
         return true
     }
 
     override fun onQueryTextChange(query: String?): Boolean {
-        viewModel.setFilter(query, filterValue)
+        this.filterQuery = query
+        viewModel.setFilter(query, filterCategories, filterType)
         return true
-    }
-
-    private fun showFilterDialog() {
-
-        val items = arrayOf(getString(R.string.filter_network_blocked_connections),
-                            getString(R.string.filter_network_all_connections))
-
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle(getString(R.string.ct_filter_dialog_title))
-
-        // Single-choice items (initialized with checked item)
-        builder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
-            // Respond to item chosen, position 0 - blocked filter.
-            filterValue = if (which == 0) {
-                ":isFilter"
-            } else ""
-            checkedItem = which
-            if (DEBUG) Log.d(LOG_TAG_UI, "Filter Option selected: $filterValue")
-            viewModel.setFilterBlocked(filterValue)
-            dialog.dismiss()
-        }
-        builder.show()
     }
 
     private fun showDeleteDialog() {
@@ -137,15 +225,68 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         builder.setMessage(R.string.conn_track_clear_logs_message)
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.ct_delete_logs_positive_btn)) { _, _ ->
-            GlobalScope.launch(Dispatchers.IO) {
-                connectionTrackerDAO.clearAllData()
+            go {
+                connectionTrackerRepository.clearAllData()
             }
         }
 
         builder.setNegativeButton(getString(R.string.ct_delete_logs_negative_btn)) { _, _ ->
         }
-        val alertDialog: AlertDialog = builder.create()
-        alertDialog.setCancelable(true)
-        alertDialog.show()
+        builder.create().show()
+    }
+
+    fun ipToDomain(ip: String): DNSLogTracker.DnsCacheRecord? {
+        return dnsLogTracker.ipDomainLookup.getIfPresent(ip)
+    }
+
+    private fun remakeChildFilterChipsUi(categories: List<FirewallRuleset>) {
+        val v = b.connectionListScrollList
+
+        v.filterChipGroup.removeAllViews()
+        for (c in categories) {
+            v.filterChipGroup.addView(makeChildChip(c.id, c.title))
+        }
+    }
+
+    private fun applyChildFilter(tag: Any, show: Boolean) {
+        if (show) {
+            filterCategories.add(tag.toString())
+        } else {
+            filterCategories.remove(tag.toString())
+        }
+        viewModel.setFilter(filterQuery, filterCategories, filterType)
+    }
+
+    // chips: all, allowed, blocked
+    // when any chip other than "all" is selected, show the child chips.
+    // ignore unselect events from allowed and blocked chip
+    private fun unselectParentsChipsUi(tag: Any) {
+        when (tag) {
+            TopLevelFilter.ALL.id -> {
+                showChildChipsUi()
+            }
+        }
+    }
+
+    private fun showChildChipsUi() {
+        b.connectionListScrollList.filterChipGroup.visibility = View.VISIBLE
+    }
+
+    private fun hideChildChipsUi() {
+        b.connectionListScrollList.filterChipGroup.visibility = View.GONE
+    }
+
+    private fun showParentChipsUi() {
+        b.connectionListScrollList.filterChipParentGroup.visibility = View.VISIBLE
+    }
+
+    private fun hideParentChipsUi() {
+        b.connectionListScrollList.filterChipParentGroup.visibility = View.GONE
+    }
+
+    private fun go(f: suspend () -> Unit) {
+        lifecycleScope.launch {
+            f()
+        }
     }
 }

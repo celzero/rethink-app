@@ -23,18 +23,21 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppMode
-import com.celzero.bravedns.data.AppMode.Companion.cryptRelayToRemove
+import com.celzero.bravedns.data.AppMode.Companion.dnscryptRelaysToRemove
 import com.celzero.bravedns.database.DNSCryptRelayEndpoint
 import com.celzero.bravedns.databinding.DnsCryptEndpointListItemBinding
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.*
 
-class DNSCryptRelayEndpointAdapter(private val context: Context, private val appMode: AppMode) :
+class DNSCryptRelayEndpointAdapter(private val context: Context, val lifecycleOwner: LifecycleOwner,
+                                   private val appMode: AppMode) :
         PagedListAdapter<DNSCryptRelayEndpoint, DNSCryptRelayEndpointAdapter.DNSCryptRelayEndpointViewHolder>(
             DIFF_CALLBACK) {
 
@@ -63,7 +66,6 @@ class DNSCryptRelayEndpointAdapter(private val context: Context, private val app
         val dnsCryptRelayEndpoint: DNSCryptRelayEndpoint = getItem(position) ?: return
         holder.update(dnsCryptRelayEndpoint)
     }
-
 
     inner class DNSCryptRelayEndpointViewHolder(private val b: DnsCryptEndpointListItemBinding) :
             RecyclerView.ViewHolder(b.root) {
@@ -153,20 +155,20 @@ class DNSCryptRelayEndpointAdapter(private val context: Context, private val app
         private fun updateDNSCryptRelayDetails(endpoint: DNSCryptRelayEndpoint,
                                                isSelected: Boolean) {
 
-            CoroutineScope(Dispatchers.IO).launch {
-                if (isSelected && !appMode.isRelaySelectable()) {
-                    withContext(Dispatchers.Main) {
+            io {
+                if (isSelected && !appMode.isDnscryptRelaySelectable()) {
+                    uiCtx {
                         Toast.makeText(context,
                                        context.getString(R.string.dns_crypt_relay_error_toast),
                                        Toast.LENGTH_LONG).show()
                         b.dnsCryptEndpointListActionImage.isChecked = false
                     }
-                    return@launch
+                    return@io
                 }
 
                 endpoint.isSelected = isSelected
                 if (!isSelected) {
-                    cryptRelayToRemove = endpoint.dnsCryptRelayURL
+                    dnscryptRelaysToRemove = endpoint.dnsCryptRelayURL
                 }
                 appMode.handleDnsrelayChanges(endpoint)
 
@@ -174,12 +176,26 @@ class DNSCryptRelayEndpointAdapter(private val context: Context, private val app
         }
 
         private fun deleteEndpoint(id: Int) {
-            CoroutineScope(Dispatchers.IO).launch {
-                appMode.deleteDnscryptEndpoint(id)
-                withContext(Dispatchers.Main) {
+            io {
+                appMode.deleteDnscryptRelayEndpoint(id)
+                uiCtx {
                     Toast.makeText(context, R.string.dns_crypt_relay_remove_success,
                                    Toast.LENGTH_SHORT).show()
                 }
+            }
+        }
+
+        private fun io(f: suspend () -> Unit) {
+            lifecycleOwner.lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    f()
+                }
+            }
+        }
+
+        private suspend fun uiCtx(f: suspend () -> Unit) {
+            withContext(Dispatchers.Main) {
+                f()
             }
         }
     }

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/background"
     android:fillViewport="true"
     android:orientation="vertical"
-    android:background="?attr/background"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     app:layout_scrollFlags="scroll|enterAlways">
 
@@ -14,7 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -31,7 +29,6 @@
                 android:gravity="center"
                 android:orientation="vertical" />
 
-
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -39,7 +36,6 @@
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="10dp">
-
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -79,6 +75,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:baselineAligned="true"
             android:orientation="horizontal"
             android:visibility="visible"
             android:weightSum="1">
@@ -87,9 +84,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:background="?attr/roundedCornersButton"
                 android:layout_marginEnd="5dp"
-                android:layout_weight="0.5">
+                android:layout_weight="0.5"
+                android:background="?attr/roundedCornersButton">
 
                 <LinearLayout
                     android:id="@+id/fhs_card_dns_ll"
@@ -101,25 +98,25 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:drawablePadding="10dp"
                         android:background="@android:color/transparent"
+                        android:drawablePadding="10dp"
                         android:padding="10dp"
+                        android:alpha="0.8"
                         android:text="@string/dns_mode_info_title"
-                        android:textSize="@dimen/extra_large_font_text_view"
                         android:textColor="?attr/primaryDarkColorText"
+                        android:textSize="@dimen/extra_large_font_text_view"
                         app:drawableEndCompat="@drawable/dns_home_screen" />
-
 
                     <TextView
                         android:id="@+id/fhs_card_dns_connected_dns"
                         android:layout_width="wrap_content"
-                        android:background="@android:color/transparent"
                         android:layout_height="wrap_content"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="10dp"
+                        android:background="@android:color/transparent"
+                        android:ellipsize="end"
                         android:gravity="center_vertical"
                         android:maxLines="1"
-                        android:ellipsize="end"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
                         android:textColor="?attr/primaryDarkColorText"
                         android:textSize="@dimen/extra_large_font_text_view" />
 
@@ -127,16 +124,17 @@
                         android:id="@+id/fhs_card_dns_latency"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingStart="10dp"
-                        android:background="@android:color/transparent"
-                        android:paddingEnd="10dp"
                         android:layout_marginBottom="10dp"
-                        android:paddingBottom="5dp"
-                        android:gravity="center_vertical"
-                        android:textColor="?attr/primaryDarkColorText"
+                        android:background="@android:color/transparent"
                         android:ellipsize="end"
+                        android:gravity="center_vertical"
                         android:maxLines="1"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:paddingBottom="5dp"
+                        android:textColor="?attr/primaryDarkColorText"
                         android:textSize="@dimen/default_font_text_view" />
+
                     <LinearLayout
                         android:id="@+id/fhs_card_dns_configure_ll"
                         android:layout_width="match_parent"
@@ -173,47 +171,49 @@
                 <LinearLayout
                     android:id="@+id/fhs_card_firewall_ll"
                     android:layout_width="match_parent"
-                    android:background="@android:color/transparent"
                     android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
                     android:orientation="vertical">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
                         android:drawablePadding="10dp"
+                        android:alpha="0.8"
                         android:padding="10dp"
                         android:text="@string/firewall_mode_info_title"
-                        android:background="@android:color/transparent"
-                        android:textSize="@dimen/extra_large_font_text_view"
                         android:textColor="?attr/primaryDarkColorText"
+                        android:textSize="@dimen/extra_large_font_text_view"
                         app:drawableEndCompat="@drawable/firewall_home_screen" />
 
                     <TextView
                         android:id="@+id/fhs_card_firewall_status"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:paddingStart="10dp"
                         android:background="@android:color/transparent"
-                        android:paddingEnd="10dp"
-                        android:maxLines="1"
                         android:ellipsize="end"
-                        android:textSize="@dimen/extra_large_font_text_view"
-                        android:textColor="?attr/primaryDarkColorText" />
+                        android:gravity="center_vertical"
+                        android:maxLines="1"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:textColor="?attr/primaryDarkColorText"
+                        android:textSize="@dimen/extra_large_font_text_view" />
+
                     <TextView
                         android:id="@+id/fhs_card_firewall_apps"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:textSize="@dimen/default_font_text_view"
+                        android:layout_marginBottom="10dp"
                         android:background="@android:color/transparent"
                         android:ellipsize="end"
+                        android:gravity="center_vertical"
                         android:maxLines="1"
-                        android:textColor="?attr/primaryDarkColorText"
-                        android:layout_marginBottom="10dp"
-                        android:paddingBottom="5dp"
                         android:paddingStart="10dp"
-                        android:paddingEnd="10dp" />
+                        android:paddingEnd="10dp"
+                        android:paddingBottom="5dp"
+                        android:textColor="?attr/primaryDarkColorText"
+                        android:textSize="@dimen/default_font_text_view" />
 
 
                     <LinearLayout
@@ -229,9 +229,9 @@
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
                             android:drawableEnd="@drawable/ic_right_arrow_white"
-                            android:text="@string/firewall_card_configure_btn"
                             android:drawablePadding="10dp"
                             android:padding="10dp"
+                            android:text="@string/firewall_card_configure_btn"
                             android:textAlignment="viewStart"
                             android:textColor="?attr/invertedPrimaryTextColor"
                             android:textSize="@dimen/default_font_text_view" />
@@ -241,6 +241,118 @@
             </LinearLayout>
 
         </LinearLayout>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
+            android:scrollbars="none">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipsPrograms"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                app:chipSpacing="8dp"
+                app:singleSelection="false">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/fhs_whats_new_chip"
+                    style="@style/Widget.MaterialComponents.Chip.Entry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.9"
+                    android:padding="10dp"
+                    android:text="@string/hsf_whats_new_chip_text"
+                    android:textColor="?attr/primaryDarkColorText"
+                    app:checkedIconVisible="false"
+                    app:chipBackgroundColor="?attr/homeScreenBtnBackground"
+                    app:chipIcon="@drawable/ic_whats_new"
+                    app:chipIconSize="16dp"
+                    app:iconStartPadding="5dp"
+                    app:shapeAppearance="@style/ShapeAppearance.MyApp.LargeComponent" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/fhs_proxy_chip"
+                    style="@style/Widget.MaterialComponents.Chip.Entry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.9"
+                    android:padding="10dp"
+                    android:text="@string/hsf_proxy_chip_text"
+                    android:textColor="?attr/primaryDarkColorText"
+                    app:checkedIconVisible="false"
+                    app:chipBackgroundColor="?attr/homeScreenBtnBackground"
+                    app:chipIcon="@drawable/ic_socks5"
+                    app:chipIconSize="16dp"
+                    app:iconStartPadding="5dp"
+                    app:shapeAppearance="@style/ShapeAppearance.MyApp.LargeComponent" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/fhs_dns_configure_chip"
+                    style="@style/Widget.MaterialComponents.Chip.Action"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.9"
+                    android:padding="10dp"
+                    android:text="@string/hsf_blocklist_chip_text"
+                    android:textColor="?attr/primaryDarkColorText"
+                    app:chipBackgroundColor="?attr/homeScreenBtnBackground"
+                    app:chipIcon="@drawable/ic_local_blocklist"
+                    app:chipIconSize="16dp"
+                    app:iconStartPadding="5dp"
+                    app:shapeAppearance="@style/ShapeAppearance.MyApp.LargeComponent" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/fhs_whitelist_chip"
+                    style="@style/Widget.MaterialComponents.Chip.Action"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.9"
+                    android:padding="10dp"
+                    android:text="@string/hsf_whitelist_chip_text"
+                    android:textColor="?attr/primaryDarkColorText"
+                    app:chipBackgroundColor="?attr/homeScreenBtnBackground"
+                    app:chipIcon="@drawable/ic_whitelist"
+                    app:chipIconSize="16dp"
+                    app:iconStartPadding="5dp"
+                    app:shapeAppearance="@style/ShapeAppearance.MyApp.LargeComponent" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/fhs_exclude_chip"
+                    style="@style/Widget.MaterialComponents.Chip.Action"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.9"
+                    android:padding="10dp"
+                    android:text="@string/hsf_exclude_chip_text"
+                    android:textColor="?attr/primaryDarkColorText"
+                    app:chipBackgroundColor="?attr/homeScreenBtnBackground"
+                    app:chipIcon="@drawable/ic_exclude"
+                    app:chipIconSize="16dp"
+                    app:iconStartPadding="5dp"
+                    app:shapeAppearance="@style/ShapeAppearance.MyApp.LargeComponent" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/fhs_theme_chip"
+                    style="@style/Widget.MaterialComponents.Chip.Action"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.9"
+                    android:padding="10dp"
+                    android:text="@string/hsf_chip_appearance"
+                    android:textColor="?attr/primaryDarkColorText"
+                    app:chipBackgroundColor="?attr/homeScreenBtnBackground"
+                    app:chipIcon="@drawable/ic_appearance"
+                    app:chipIconSize="16dp"
+                    app:iconStartPadding="5dp"
+                    app:shapeAppearance="@style/ShapeAppearance.MyApp.LargeComponent" />
+
+            </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -261,35 +373,45 @@
                 android:textColor="@color/accent_bad"
                 android:textSize="@dimen/large_font_text_view" />
 
-
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/shimmer_view_container1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:shimmer_auto_start="false"
                 app:shimmer_base_alpha="0.85"
                 app:shimmer_dropoff="1"
                 app:shimmer_duration="1000"
-                app:shimmer_auto_start="false"
                 app:shimmer_highlight_alpha="0.35">
 
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
+                    <Button
+                        android:id="@+id/home_fragment_pause_icon"
+                        android:layout_width="50dp"
+                        android:layout_height="49dp"
+                        android:layout_gravity="start"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:padding="10dp"
+                        android:text=" " />
+
                     <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/fhs_dns_on_off_btn"
                         style="@style/Widget.AppCompat.Button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center"
                         android:background="@drawable/rounded_corners_button_primary"
+                        android:drawableStart="@drawable/ic_pause"
                         android:drawableEnd="@drawable/ic_arrow_down"
                         android:fontFamily="sans-serif-condensed-medium"
                         android:gravity="center"
-                        android:paddingStart="39dp"
+                        android:paddingStart="10dp"
                         android:paddingEnd="10dp"
                         android:stateListAnimator="@null"
-                        android:textColor="?attr/primaryTextColor"
                         android:text="@string/hsf_start_btn_state"
+                        android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/home_screen_stat_text" />
 
                     <Button
@@ -315,6 +437,3 @@
         </LinearLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
-
-
-    <!--android:drawableLeft="@drawable/ic_permission_manager_small"-->

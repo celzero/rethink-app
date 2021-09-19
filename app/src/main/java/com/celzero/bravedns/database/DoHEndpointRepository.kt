@@ -22,7 +22,7 @@ import androidx.paging.toLiveData
 import androidx.room.Transaction
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
@@ -34,21 +34,15 @@ class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
         doHEndpointDAO.update(doHEndpoint)
     }
 
-    fun deleteAsync(doHEndpoint: DoHEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
-        coroutineScope.launch {
-            doHEndpointDAO.delete(doHEndpoint)
-        }
-    }
-
-
-    fun insertAsync(doHEndpoint: DoHEndpoint, coroutineScope: CoroutineScope = GlobalScope) {
+    fun insertAsync(doHEndpoint: DoHEndpoint,
+                    coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
         coroutineScope.launch {
             doHEndpointDAO.insert(doHEndpoint)
         }
     }
 
     fun insertWithReplaceAsync(doHEndpoint: DoHEndpoint,
-                               coroutineScope: CoroutineScope = GlobalScope) {
+                               coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
         coroutineScope.launch {
             doHEndpointDAO.insertReplace(doHEndpoint)
         }
@@ -58,7 +52,8 @@ class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
         return doHEndpointDAO.getDoHEndpointLiveData().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
     }
 
-    fun deleteOlderData(date: Long, coroutineScope: CoroutineScope = GlobalScope) {
+    fun deleteOlderData(date: Long,
+                        coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
         coroutineScope.launch {
             doHEndpointDAO.deleteOlderData(date)
         }
@@ -96,6 +91,10 @@ class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
     fun updateConnectionDefault(): DoHEndpoint? {
         doHEndpointDAO.updateConnectionDefault()
         return doHEndpointDAO.getConnectedDoH()
+    }
+
+    fun getRethinkDnsEndpoint(): DoHEndpoint {
+        return doHEndpointDAO.getRethinkDnsEndpoint()
     }
 
 }

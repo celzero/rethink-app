@@ -20,6 +20,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -29,11 +31,11 @@ import com.celzero.bravedns.automaton.FirewallRules.UID_EVERYBODY
 import com.celzero.bravedns.database.BlockedConnections
 import com.celzero.bravedns.database.BlockedConnectionsRepository
 import com.celzero.bravedns.databinding.UnivWhitelistRulesItemBinding
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class UniversalBlockedRulesAdapter(private val context: Context,
+class UniversalBlockedRulesAdapter(private val context: Context, val lifecycleOwner: LifecycleOwner,
                                    private val blockedConnectionsRepository: BlockedConnectionsRepository) :
         PagedListAdapter<BlockedConnections, UniversalBlockedRulesAdapter.UniversalBlockedConnViewHolder>(
             DIFF_CALLBACK) {
@@ -79,24 +81,38 @@ class UniversalBlockedRulesAdapter(private val context: Context,
             builder.setCancelable(true)
             builder.setPositiveButton(
                 context.getString(R.string.univ_ip_delete_individual_positive)) { _, _ ->
-
-                CoroutineScope(Dispatchers.IO).launch {
+                io {
                     FirewallRules.removeFirewallRules(UID_EVERYBODY, blockedConnections.ipAddress,
                                                       blockedConnectionsRepository)
+                    uiCtx {
+                        Toast.makeText(context,
+                                       context.getString(R.string.univ_ip_delete_individual_toast,
+                                                         blockedConnections.ipAddress),
+                                       Toast.LENGTH_SHORT).show()
+                    }
                 }
-                Toast.makeText(context, context.getString(R.string.univ_ip_delete_individual_toast,
-                                                          blockedConnections.ipAddress),
-                               Toast.LENGTH_SHORT).show()
             }
 
             builder.setNegativeButton(
                 context.getString(R.string.univ_ip_delete_individual_negative)) { _, _ -> }
 
-            val alertDialog: AlertDialog = builder.create()
-            alertDialog.setCancelable(true)
-            alertDialog.show()
+            builder.create().show()
         }
 
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleOwner.lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                f()
+            }
+        }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) {
+            f()
+        }
     }
 
 }

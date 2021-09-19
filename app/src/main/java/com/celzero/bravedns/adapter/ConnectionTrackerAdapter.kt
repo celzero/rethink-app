@@ -17,10 +17,8 @@ limitations under the License.
 package com.celzero.bravedns.adapter
 
 import android.content.Context
-import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
 import android.util.Log
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,7 +33,8 @@ import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
-import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.ui.ConnectionTrackerFragment
+import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
 import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Protocol
@@ -44,10 +43,11 @@ import com.celzero.bravedns.util.Utilities.Companion.getIcon
 import com.celzero.bravedns.util.Utilities.Companion.getPackageInfoForUid
 import java.util.*
 
-class ConnectionTrackerAdapter(val context: Context) :
+class ConnectionTrackerAdapter(private val connectionTrackerFragment: ConnectionTrackerFragment) :
         PagedListAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(
             DIFF_CALLBACK) {
 
+    val context: Context = connectionTrackerFragment.requireContext()
 
     companion object {
         private val DIFF_CALLBACK = object :
@@ -91,19 +91,28 @@ class ConnectionTrackerAdapter(val context: Context) :
 
         private fun openBottomSheet(ct: ConnectionTracker) {
             if (context !is FragmentActivity) {
-                Log.wtf(LOG_TAG_UI,
-                        "Can not open bottom sheet. Context is not attached to activity")
+                Log.wtf(LOG_TAG_UI, context.getString(R.string.ct_btm_sheet_error))
                 return
             }
+
             val bottomSheetFragment = ConnTrackerBottomSheetFragment(ct)
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
 
         private fun displayTransactionDetails(connTracker: ConnectionTracker) {
-            val time = Utilities.convertLongToTime(connTracker.timeStamp)
+            val time = Utilities.convertLongToTime(connTracker.timeStamp, TIME_FORMAT_1)
             b.connectionResponseTime.text = time
             b.connectionFlag.text = connTracker.flag
             b.connectionIpAddress.text = connTracker.ipAddress
+
+            connTracker.ipAddress?.let {
+                val dnsCache = connectionTrackerFragment.ipToDomain(it)
+                dnsCache?.let {
+                    b.connectionIpAddress.text = context.getString(R.string.ct_ip_details,
+                                                                   b.connectionIpAddress.text.toString(),
+                                                                   dnsCache.fqdn)
+                }
+            }
         }
 
         private fun displayAppDetails(ct: ConnectionTracker) {
@@ -131,15 +140,14 @@ class ConnectionTrackerAdapter(val context: Context) :
             // known ports(reserved port and protocol identifiers).
             // https://github.com/celzero/rethink-app/issues/42 - #3 - transport + protocol.
             val resolvedPort = KnownPorts.resolvePort(port)
-            b.connLatencyTxt.text = if (resolvedPort != Constants.PORT_VAL_UNKNOWN) {
-                resolvedPort?.toUpperCase(Locale.ROOT)
+            b.connLatencyTxt.text = if (resolvedPort != KnownPorts.PORT_VAL_UNKNOWN) {
+                resolvedPort.uppercase(Locale.ROOT)
             } else {
                 Protocol.getProtocolName(proto).name
             }
         }
 
         private fun displayFirewallRulesetHint(isBlocked: Boolean, ruleName: String?) {
-            Log.d(LOG_TAG_UI, "ConnTrack UI issue: $isBlocked, $ruleName")
             when {
                 // hint red when blocked
                 isBlocked -> {
@@ -148,7 +156,7 @@ class ConnectionTrackerAdapter(val context: Context) :
                         ContextCompat.getColor(context, R.color.colorRed_A400))
                 }
                 // hint white when whitelisted
-                FirewallRuleset.RULE7.ruleName == ruleName -> {
+                (FirewallRuleset.RULE8.id == ruleName || FirewallRuleset.RULE9.id == ruleName) -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
                     b.connectionStatusIndicator.setBackgroundColor(
                         ContextCompat.getColor(context, R.color.textColorMain))

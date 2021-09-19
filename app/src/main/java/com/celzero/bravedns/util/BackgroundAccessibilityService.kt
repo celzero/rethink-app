@@ -22,11 +22,16 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import com.celzero.bravedns.automaton.FirewallManager
-import com.celzero.bravedns.service.VpnControllerHelper
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
+import org.koin.android.ext.android.inject
+import org.koin.core.component.KoinComponent
 
-class BackgroundAccessibilityService : AccessibilityService() {
+class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
+
+    private val persistentState by inject<PersistentState>()
 
     override fun onInterrupt() {
         Log.w(LOG_TAG_FIREWALL, "BackgroundAccessibilityService Interrupted")
@@ -102,9 +107,14 @@ class BackgroundAccessibilityService : AccessibilityService() {
     // Handle the received event.
     // Earlier the event handling is taken care in FirewallManager.
     // Now, the firewall manager usage is modified, so moving this part here. 
-    fun handleAccessibilityEvent(event: AccessibilityEvent) {
+    private fun handleAccessibilityEvent(event: AccessibilityEvent) {
 
-        if (!VpnControllerHelper.persistentState.backgroundEnabled) return
+        // ref: https://developer.android.com/reference/android/accessibilityservice/AccessibilityService.html#lifecycle
+        // see: https://stackoverflow.com/questions/40433449/how-can-i-programmatically-start-and-stop-an-accessibilityservice
+        // no need ot handle the events when the vpn is not running
+        if (!VpnController.isOn()) return
+
+        if (!persistentState.blockAppWhenBackground) return
 
         val latestTrackedPackage = getEventPackageName(event)
 
@@ -130,7 +140,8 @@ class BackgroundAccessibilityService : AccessibilityService() {
         if (isPackageLauncher(latestTrackedPackage)) {
             FirewallManager.untrackForegroundApps()
         } else {
-            FirewallManager.trackForegroundApp(latestTrackedPackage)
+            val uid = getEventUid(latestTrackedPackage) ?: return
+            FirewallManager.trackForegroundApp(uid)
         }
 
     }
@@ -146,6 +157,12 @@ class BackgroundAccessibilityService : AccessibilityService() {
         } else {
             event.packageName.toString()
         }
+    }
+
+    private fun getEventUid(pkgName: String): Int? {
+        if (pkgName.isBlank()) return null
+
+        return this.packageManager.getApplicationInfo(pkgName, PackageManager.GET_META_DATA).uid
     }
 
     private fun isPackageLauncher(packageName: String?): Boolean {

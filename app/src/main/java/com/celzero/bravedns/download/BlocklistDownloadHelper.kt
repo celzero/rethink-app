@@ -20,7 +20,7 @@ import android.util.Log
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
+import com.celzero.bravedns.util.Utilities.Companion.deleteRecursive
 import java.io.File
 
 class BlocklistDownloadHelper {
@@ -38,9 +38,9 @@ class BlocklistDownloadHelper {
                 } else {
                     0
                 }
-                result = Constants.LOCAL_BLOCKLIST_FILE_COUNT == total
+                result = Constants.ONDEVICE_BLOCKLISTS.size == total
             } catch (e: Exception) {
-                Log.w(LOG_TAG_DOWNLOAD, "Local block list validation failed - ${e.message}", e)
+                Log.w(LOG_TAG_DOWNLOAD, "Local block list validation failed: ${e.message}", e)
             }
 
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
@@ -55,44 +55,26 @@ class BlocklistDownloadHelper {
          * Now in v053 we are moving the files from external dir to canonical path.
          * So deleting the old files in the external directory.
          */
-        fun deleteOldFiles(context: Context) {
-            val dir = File(context.getExternalFilesDir(null).toString() + Constants.DOWNLOAD_PATH)
+        fun deleteOldFiles(context: Context, timestamp: Long) {
+            val dir = File(context.getExternalFilesDir(
+                null).toString() + Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH + timestamp)
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                             "deleteOldFiles -- File : ${dir.path}, ${dir.isDirectory}")
+                             "deleteOldFiles, File : ${dir.path}, ${dir.isDirectory}")
             deleteRecursive(dir)
         }
 
-        private fun deleteRecursive(fileOrDirectory: File) {
-            try {
-                if (fileOrDirectory.isDirectory) {
-                    fileOrDirectory.listFiles()?.forEach { child ->
-                        deleteRecursive(child)
-                    }
-                }
-                val isDeleted: Boolean = if (isAtleastO()) {
-                    fileOrDirectory.deleteRecursively()
-                } else {
-                    fileOrDirectory.delete()
-                }
-                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                                 "deleteRecursive -- File : ${fileOrDirectory.path}, $isDeleted")
-            } catch (e: Exception) {
-                Log.w(LOG_TAG_DOWNLOAD, "File delete exception: ${e.message}", e)
-            }
-        }
-
-        fun deleteFromCanonicalPath(context: Context) {
-            val canonicalPath = File("${context.filesDir.canonicalPath}${File.separator}")
+        fun deleteFromCanonicalPath(context: Context, timestamp: Long) {
+            val canonicalPath = File("${context.filesDir.canonicalPath}${File.separator}$timestamp")
             deleteRecursive(canonicalPath)
         }
 
         fun getExternalFilePath(context: Context, timestamp: String): String {
             return context.getExternalFilesDir(
-                null).toString() + Constants.DOWNLOAD_PATH + File.separator + timestamp + File.separator
+                null).toString() + Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH + File.separator + timestamp + File.separator
         }
 
         fun getExternalFilePath(timestamp: String): String {
-            return Constants.DOWNLOAD_PATH + File.separator + timestamp + File.separator
+            return Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH + File.separator + timestamp + File.separator
         }
     }
 

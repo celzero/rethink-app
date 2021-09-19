@@ -20,31 +20,42 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.widget.Toast
+import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
+import com.celzero.bravedns.automaton.FirewallManager.FIREWALL_NOTIF_CHANNEL_ID
 import com.celzero.bravedns.data.AppMode
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS
-import com.celzero.bravedns.util.Constants.Companion.APP_MODE_DNS_FIREWALL
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
+import com.celzero.bravedns.util.OrbotHelper.Companion.PROXY_ALERTS
+import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.koin.core.component.inject
 
 class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
     private val appMode by inject<AppMode>()
+    private val orbotHelper by inject<OrbotHelper>()
 
     override fun onReceive(context: Context, intent: Intent) {
+        // TODO - Move the NOTIFICATION_ACTIONs value to enum
         val action: String? = intent.getStringExtra(Constants.NOTIFICATION_ACTION)
         Log.i(LOG_TAG_VPN, "NotificationActionReceiver: onReceive - $action")
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         when (action) {
             OrbotHelper.ORBOT_NOTIFICATION_ACTION_TEXT -> {
-                get<OrbotHelper>().openOrbotApp()
+                orbotHelper.openOrbotApp()
+                manager.cancel(PROXY_ALERTS, OrbotHelper.ORBOT_SERVICE_ID)
+            }
+            Constants.NOTIF_ACTION_PAUSE_VPN -> {
+                pauseApp(context)
+            }
+            Constants.NOTIF_ACTION_RESUME_VPN -> {
+                resumeApp()
             }
             Constants.NOTIF_ACTION_STOP_VPN -> {
                 stopVpn(context)
@@ -58,12 +69,27 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
             Constants.NOTIF_ACTION_RULES_FAILURE -> {
                 reloadRules()
             }
+            Constants.NOTIF_ACTION_NEW_APP_ALLOW -> {
+                val uid = intent.getIntExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, 0)
+                manager.cancel(FIREWALL_NOTIF_CHANNEL_ID, uid)
+
+                if (uid <= 0) return
+
+                modifyAppFirewallSettings(context, uid, isInternetAllowed = true)
+            }
+            Constants.NOTIF_ACTION_NEW_APP_DENY -> {
+                val uid = intent.getIntExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, 0)
+                manager.cancel(FIREWALL_NOTIF_CHANNEL_ID, uid)
+
+                if (uid <= 0) return
+
+                modifyAppFirewallSettings(context, uid, isInternetAllowed = false)
+            }
         }
-        manager.cancel(OrbotHelper.ORBOT_SERVICE_ID)
     }
 
     private fun reloadRules() {
-        CoroutineScope(Dispatchers.IO).launch {
+        io {
             FirewallManager.loadAppFirewallRules()
         }
     }
@@ -72,11 +98,53 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
         VpnController.stop(context)
     }
 
+    private fun pauseApp(context: Context) {
+        if (!VpnController.hasTunnel()) {
+            Utilities.showToastUiCentered(context,
+                                          context.getString(R.string.hsf_pause_vpn_failure),
+                                          Toast.LENGTH_SHORT)
+            return
+        }
+
+        if (VpnController.isVpnLockdown()) {
+            Utilities.showToastUiCentered(context,
+                                          context.getString(R.string.hsf_pause_lockdown_failure),
+                                          Toast.LENGTH_SHORT)
+            return
+        }
+
+        VpnController.getBraveVpnService()?.pauseApp()
+    }
+
+    private fun resumeApp() {
+        VpnController.getBraveVpnService()?.resumeApp()
+    }
+
     private fun dnsMode() {
-        appMode.changeBraveMode(APP_MODE_DNS)
+        io {
+            appMode.changeBraveMode(AppMode.BraveMode.DNS.mode)
+        }
     }
 
     private fun dnsFirewallMode() {
-        appMode.changeBraveMode(APP_MODE_DNS_FIREWALL)
+        io {
+            appMode.changeBraveMode(AppMode.BraveMode.DNS_FIREWALL.mode)
+        }
+    }
+
+    private fun modifyAppFirewallSettings(context: Context, uid: Int, isInternetAllowed: Boolean) {
+        val text = if (isInternetAllowed) {
+            context.getString(R.string.new_app_notification_action_toast_allow)
+        } else {
+            context.getString(R.string.new_app_notification_action_toast_deny)
+        }
+        Utilities.showToastUiCentered(context, text, Toast.LENGTH_SHORT)
+        FirewallManager.updateFirewalledApps(uid, isInternetAllowed)
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            f()
+        }
     }
 }

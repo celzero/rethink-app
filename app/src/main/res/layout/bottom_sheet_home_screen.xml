@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/bs_conn_top_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -15,7 +16,6 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:background="@color/recycler_selected" />
-
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -36,6 +36,22 @@
             android:textSize="@dimen/extra_large_font_text_view"
             android:textStyle="bold" />
     </RelativeLayout>
+
+    <TextView
+        android:id="@+id/bs_home_screen_vpn_lockdown_desc"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        app:drawableStartCompat="@drawable/dis_allowed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawablePadding="10dp"
+        android:paddingStart="10dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="10dp"
+        android:textColor="?attr/primaryTextColor"
+        android:text="@string/hs_btm_sheet_lock_down"
+        android:textSize="@dimen/default_font_text_view"
+        android:visibility="visible" />
 
     <RadioGroup
         android:id="@+id/bs_home_screen_radio_group"
@@ -60,8 +76,11 @@
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_gravity="center"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
                 android:alpha="0.5"
-                android:layout_margin="5dp"
                 android:contentDescription="@string/apps_icon_content_desc"
                 android:padding="5dp"
                 android:src="@drawable/bs_dns_home_screen" />
@@ -121,7 +140,10 @@
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_gravity="center"
-                android:layout_margin="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
                 android:alpha="0.5"
                 android:contentDescription="@string/apps_icon_content_desc"
                 android:padding="5dp"
@@ -184,8 +206,11 @@
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_gravity="center"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
                 android:alpha="0.5"
-                android:layout_margin="5dp"
                 android:contentDescription="@string/apps_icon_content_desc"
                 android:padding="5dp"
                 android:src="@drawable/ic_dns_firewall" />
@@ -234,6 +259,75 @@
                 android:padding="5dp"
                 android:text="" />
         </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/bs_hs_wireguard_rl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp">
+
+            <ImageView
+                android:id="@+id/wireguard_icon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:layout_margin="5dp"
+                android:alpha="0.5"
+                android:clickable="false"
+                android:contentDescription="@string/apps_icon_content_desc"
+                android:padding="5dp"
+                android:src="@drawable/ic_about_key" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/bs_home_screen_radio_wireguard"
+                android:layout_toEndOf="@id/wireguard_icon"
+                android:alpha="0.5"
+                android:clickable="false"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/wireguard_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="@string/app_mode_wireguard"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="@dimen/large_font_text_view" />
+
+                <TextView
+                    android:id="@+id/wireguard_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="@string/wireguard_mode_info_explanation_new"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/default_font_text_view" />
+            </LinearLayout>
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/bs_home_screen_radio_wireguard"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_margin="5dp"
+                android:layoutDirection="rtl"
+                android:clickable="false"
+                android:padding="5dp"
+                android:text="" />
+        </RelativeLayout>
     </RadioGroup>
 
     <View
@@ -264,8 +358,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/bs_home_screen_connected_status"
-            android:layout_margin="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
             android:gravity="center"
+            android:alpha="0.75"
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/default_font_text_view" />
 

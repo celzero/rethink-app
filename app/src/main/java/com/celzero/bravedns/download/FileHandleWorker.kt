@@ -24,9 +24,10 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_FILE_COUNT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.Companion.hasLocalBlocklists
+import com.celzero.bravedns.util.Utilities.Companion.localBlocklistDownloadPath
 import dnsx.Dnsx
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -49,7 +50,18 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
 
     override fun doWork(): Result {
         try {
-            val response = copyFiles(context)
+            val timestamp = inputData.getLong("blocklistDownloadInitiatedTime", Long.MIN_VALUE)
+            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "blocklistDownloadInitiatedTime - $timestamp")
+
+            // invalid download initiated time
+            if (timestamp <= INIT_TIME_MS) {
+                Log.w(LOG_TAG_DOWNLOAD, "timestamp version invalid $timestamp")
+                return Result.failure()
+            }
+
+            // A file move from external file path to app data dir is preferred because it is an
+            // atomic operation: but Android doesn't support move/rename across mount points.
+            val response = copyFiles(context, timestamp)
 
             val outputData = workDataOf(DownloadConstants.OUTPUT_FILES to response)
 
@@ -63,18 +75,13 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
         return Result.failure()
     }
 
-    // Preferred approach is to move the file from external file path to canonical path.
-    // As move is a atomic operation.
-    // Android doesn't support move/rename if the both paths are not having same mount points.
-    // So files are copied from
-    private fun copyFiles(context: Context): Boolean {
+    private fun copyFiles(context: Context, timestamp: Long): Boolean {
         try {
-            val timestamp = persistentState.tempBlocklistDownloadTime
             if (!BlocklistDownloadHelper.isDownloadComplete(context, timestamp.toString())) {
                 return false
             }
 
-            BlocklistDownloadHelper.deleteFromCanonicalPath(context)
+            BlocklistDownloadHelper.deleteFromCanonicalPath(context, timestamp)
             val dir = File(
                 BlocklistDownloadHelper.getExternalFilePath(context, timestamp.toString()))
             if (!dir.isDirectory) {
@@ -91,7 +98,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
 
             for (i in children.indices) {
                 val from = dir.absolutePath + File.separator + children[i]
-                val to = context.filesDir.canonicalPath + File.separator + timestamp + File.separator + children[i]
+                val to = localBlocklistDownloadPath(context, children[i], timestamp)
                 val result = Utilities.copy(from, to)
 
                 if (!result) {
@@ -99,17 +106,17 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
                     return false
                 }
             }
-            val destinationDir = File("${context.filesDir.canonicalPath}/$timestamp")
+            val destinationDir = File(
+                "${context.filesDir.canonicalPath}${File.separator}$timestamp${File.separator}")
 
             Log.i(LOG_TAG_DOWNLOAD,
-                  "After copy, dest dir: $destinationDir, ${destinationDir.isDirectory}, ${destinationDir.list()?.size}, ${!isDownloadValid()}")
+                  "After copy, dest dir: $destinationDir, ${destinationDir.isDirectory}, ${destinationDir.list()?.size}")
 
-            if (!destinationDir.isDirectory || destinationDir.list()?.size != LOCAL_BLOCKLIST_FILE_COUNT || !isDownloadValid()) {
+            if (!hasLocalBlocklists(context, timestamp) || !isDownloadValid(timestamp)) {
                 return false
             }
 
             updatePersistenceOnCopySuccess(timestamp)
-            BlocklistDownloadHelper.deleteOldFiles(context)
             return true
 
         } catch (e: Exception) {
@@ -119,10 +126,8 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
     }
 
     private fun updatePersistenceOnCopySuccess(timestamp: Long) {
-        persistentState.blocklistDownloadTime = timestamp
+        persistentState.localBlocklistTimestamp = timestamp
         persistentState.blocklistEnabled = true
-        persistentState.blocklistFilesDownloaded = true
-        persistentState.tempBlocklistDownloadTime = INIT_TIME_MS
     }
 
     /**
@@ -133,14 +138,13 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
      * create localBraveDNS object. If the object returned by the
      * Dnsx is not null then valid. Null/exception will be invalid.
      */
-    private fun isDownloadValid(): Boolean {
+    private fun isDownloadValid(timestamp: Long): Boolean {
         try {
-            val timestamp = persistentState.tempBlocklistDownloadTime
             val path: String = context.filesDir.canonicalPath + File.separator + timestamp
-            val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.FILE_TD_FILE,
-                                                 path + Constants.FILE_RD_FILE,
-                                                 path + Constants.FILE_BASIC_CONFIG,
-                                                 path + Constants.FILE_TAG_NAME)
+            val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.ONDEVICE_BLOCKLIST_FILE_TD,
+                                                 path + Constants.ONDEVICE_BLOCKLIST_FILE_RD,
+                                                 path + Constants.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,
+                                                 path + Constants.ONDEVICE_BLOCKLIST_FILE_TAG)
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
                              "AppDownloadManager isDownloadValid? ${braveDNS != null}")
             return braveDNS != null
