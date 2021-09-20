@@ -593,6 +593,14 @@ class AppConfig internal constructor(private val context: Context,
     }
 
     fun removeProxy(proxyType: ProxyType, provider: ProxyProvider) {
+        if (provider.isProxyProviderNone() || provider.isProxyProviderOrbot()) {
+            removeAllProxies()
+            return
+        }
+
+        // handles only for custom proxy setup
+        // change and set proxy on HTTP_SOCKS5 proxy mode
+        // remove proxy for all the other cases
         when (proxyType) {
             ProxyType.HTTP -> {
                 if (proxyType.isProxyTypeHttpSocks5()) {
@@ -603,12 +611,6 @@ class AppConfig internal constructor(private val context: Context,
             ProxyType.SOCKS5 -> {
                 if (proxyType.isProxyTypeHttpSocks5()) {
                     setProxy(ProxyType.HTTP, provider)
-                    return
-                }
-            }
-            ProxyType.HTTP_SOCKS5 -> {
-                if (ProxyProvider.CUSTOM == provider) {
-                    removeAllProxies()
                     return
                 }
             }
@@ -633,7 +635,7 @@ class AppConfig internal constructor(private val context: Context,
     // Settings.ProxyModeNone
     // Settings.ProxyModeSOCKS5
     // Settings.ProxyModeHTTPS
-    fun getTunProxyMode(): TunProxyMode {
+    private fun getTunProxyMode(): TunProxyMode {
         val type = persistentState.proxyType
         val provider = persistentState.proxyProvider
         if (DEBUG) Log.d(LOG_TAG_VPN, "selected proxy type: $type, with provider as $provider")
