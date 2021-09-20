@@ -223,7 +223,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         val packageName = requireContext().packageName
         try {
             val intent = Intent()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (Utilities.isAtleastO()) {
                 intent.action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
                 intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
             } else {

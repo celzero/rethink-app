@@ -37,7 +37,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ExcludedAppListAdapter
 import com.celzero.bravedns.automaton.FirewallManager
-import com.celzero.bravedns.data.AppMode
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.*
 import com.celzero.bravedns.databinding.ActivitySettingsScreenBinding
 import com.celzero.bravedns.databinding.DialogSetHttpProxyBinding
@@ -82,7 +82,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     private var proxyEndpoint: ProxyEndpoint? = null
 
     private val persistentState by inject<PersistentState>()
-    private val appMode by inject<AppMode>()
+    private val appConfig by inject<AppConfig>()
     private val orbotHelper by inject<OrbotHelper>()
     private val appDownloadManager by inject<AppDownloadManager>()
 
@@ -139,7 +139,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     }
 
     private fun observeCustomProxy() {
-        appMode.connectedProxy.observe(viewLifecycleOwner, {
+        appConfig.connectedProxy.observe(viewLifecycleOwner, {
             proxyEndpoint = it
             displaySocks5Ui()
         })
@@ -152,7 +152,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
 
         b.settingsActivityHttpProxyContainer.visibility = View.VISIBLE
-        b.settingsActivityHttpProxySwitch.isChecked = appMode.isCustomHttpProxyEnabled()
+        b.settingsActivityHttpProxySwitch.isChecked = appConfig.isCustomHttpProxyEnabled()
         if (b.settingsActivityHttpProxySwitch.isChecked) {
             b.settingsActivityHttpProxyDesc.text = getString(R.string.settings_http_proxy_desc,
                                                              persistentState.httpProxyHostAddress,
@@ -161,7 +161,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     }
 
     private fun displaySocks5Ui() {
-        val isCustomSocks5Enabled = appMode.isCustomSocks5Enabled()
+        val isCustomSocks5Enabled = appConfig.isCustomSocks5Enabled()
 
         b.settingsActivitySocks5Progress.visibility = View.GONE
         b.settingsActivitySocks5Switch.isChecked = isCustomSocks5Enabled
@@ -251,19 +251,19 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             return
         }
 
-        if (!appMode.isOrbotProxyEnabled()) {
+        if (!appConfig.isOrbotProxyEnabled()) {
             b.settingsActivityHttpOrbotDesc.text = getString(R.string.orbot_bs_status_4)
             return
         }
 
-        when (appMode.getProxyType()) {
-            AppMode.ProxyType.HTTP.name -> {
+        when (appConfig.getProxyType()) {
+            AppConfig.ProxyType.HTTP.name -> {
                 b.settingsActivityHttpOrbotDesc.text = getString(R.string.orbot_bs_status_2)
             }
-            AppMode.ProxyType.SOCKS5.name -> {
+            AppConfig.ProxyType.SOCKS5.name -> {
                 b.settingsActivityHttpOrbotDesc.text = getString(R.string.orbot_bs_status_1)
             }
-            AppMode.ProxyType.HTTP_SOCKS5.name -> {
+            AppConfig.ProxyType.HTTP_SOCKS5.name -> {
                 b.settingsActivityHttpOrbotDesc.text = getString(R.string.orbot_bs_status_3)
             }
             else -> {
@@ -322,13 +322,13 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
         b.settingsActivitySocks5Switch.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean ->
             if (!checked) {
-                appMode.removeProxy(AppMode.ProxyType.SOCKS5, AppMode.ProxyProvider.CUSTOM)
+                appConfig.removeProxy(AppConfig.ProxyType.SOCKS5, AppConfig.ProxyProvider.CUSTOM)
                 b.settingsActivitySocks5Desc.text = getString(
                     R.string.settings_socks_forwarding_default_desc)
                 return@setOnCheckedChangeListener
             }
 
-            if (!appMode.canEnableSocks5Proxy()) {
+            if (!appConfig.canEnableSocks5Proxy()) {
                 Utilities.showToastUiCentered(requireContext(),
                                               getString(R.string.settings_socks5_disabled_error),
                                               Toast.LENGTH_SHORT)
@@ -349,12 +349,12 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
         b.settingsActivityHttpProxySwitch.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean ->
             if (!checked) {
-                appMode.removeProxy(AppMode.ProxyType.HTTP, AppMode.ProxyProvider.CUSTOM)
+                appConfig.removeProxy(AppConfig.ProxyType.HTTP, AppConfig.ProxyProvider.CUSTOM)
                 b.settingsActivityHttpProxyDesc.text = getString(R.string.settings_https_desc)
                 return@setOnCheckedChangeListener
             }
 
-            if (!appMode.canEnableHttpProxy()) {
+            if (!appConfig.canEnableHttpProxy()) {
                 Utilities.showToastUiCentered(requireContext(),
                                               getString(R.string.settings_https_disabled_error),
                                               Toast.LENGTH_SHORT)
@@ -724,7 +724,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             return
         }
 
-        if (!appMode.canEnableOrbotProxy()) {
+        if (!appConfig.canEnableOrbotProxy()) {
             Utilities.showToastUiCentered(requireContext(),
                                           getString(R.string.settings_orbot_disabled_error),
                                           Toast.LENGTH_SHORT)
@@ -735,7 +735,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     }
 
     private fun openOrbotBottomSheet() {
-        // FIXME #200 - Inject VpnController via Koin
         if (!VpnController.hasTunnel()) {
             Utilities.showToastUiCentered(requireContext(),
                                           getString(R.string.settings_socks5_vpn_disabled_error),
@@ -839,11 +838,11 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     }
 
     private fun observeBraveMode() {
-        appMode.braveModeObserver.observe(viewLifecycleOwner, {
+        appConfig.braveModeObserver.observe(viewLifecycleOwner, {
             when (it) {
-                AppMode.BraveMode.DNS.mode -> handleDnsModeUi()
-                AppMode.BraveMode.FIREWALL.mode -> handleFirewallModeUi()
-                AppMode.BraveMode.DNS_FIREWALL.mode -> handleDnsFirewallModeUi()
+                AppConfig.BraveMode.DNS.mode -> handleDnsModeUi()
+                AppConfig.BraveMode.FIREWALL.mode -> handleFirewallModeUi()
+                AppConfig.BraveMode.DNS_FIREWALL.mode -> handleDnsFirewallModeUi()
             }
         })
     }
@@ -883,7 +882,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     // Should be in disabled state when the brave mode is in DNS only / Vpn in lockdown mode.
     private fun handleProxyUi() {
-        val canEnableProxy = appMode.isDnsOnlyMode()
+        val canEnableProxy = appConfig.isDnsOnlyMode()
 
         if (canEnableProxy) {
             b.settingsActivitySocks5Rl.alpha = 1f
@@ -905,7 +904,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     private fun showHttpProxyDialog(isEnabled: Boolean) {
         if (!isEnabled) {
-            appMode.removeProxy(AppMode.ProxyType.HTTP, AppMode.ProxyProvider.CUSTOM)
+            appConfig.removeProxy(AppConfig.ProxyType.HTTP, AppConfig.ProxyProvider.CUSTOM)
             b.settingsActivityHttpProxySwitch.isChecked = false
             b.settingsActivityHttpProxyDesc.text = getString(R.string.settings_https_desc)
             return
@@ -973,8 +972,8 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             if (isValid && isHostValid) {
                 errorTxt.visibility = View.INVISIBLE
                 io {
-                    appMode.addProxy(AppMode.ProxyType.HTTP, AppMode.ProxyProvider.CUSTOM)
-                    appMode.insertCustomHttpProxy(host, port)
+                    appConfig.addProxy(AppConfig.ProxyType.HTTP, AppConfig.ProxyProvider.CUSTOM)
+                    appConfig.insertCustomHttpProxy(host, port)
                 }
                 dialog.dismiss()
                 Toast.makeText(requireContext(),
@@ -988,7 +987,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
         cancelURLBtn.setOnClickListener {
             dialog.dismiss()
-            appMode.removeProxy(AppMode.ProxyType.HTTP, AppMode.ProxyProvider.CUSTOM)
+            appConfig.removeProxy(AppConfig.ProxyType.HTTP, AppConfig.ProxyProvider.CUSTOM)
             b.settingsActivityHttpProxyDesc.text = getString(R.string.settings_https_desc)
             b.settingsActivityHttpProxySwitch.isChecked = false
         }
@@ -1168,7 +1167,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
         cancelURLBtn.setOnClickListener {
             b.settingsActivitySocks5Switch.isChecked = false
-            appMode.removeProxy(AppMode.ProxyType.SOCKS5, AppMode.ProxyProvider.CUSTOM)
+            appConfig.removeProxy(AppConfig.ProxyType.SOCKS5, AppConfig.ProxyProvider.CUSTOM)
             b.settingsActivitySocks5Desc.text = getString(
                 R.string.settings_socks_forwarding_default_desc)
             dialog.dismiss()
@@ -1204,7 +1203,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                                               isCustom = true, isUDP = isUDPBlock,
                                               modifiedDataTime = 0L, latency = 0)
 
-            appMode.insertCustomSocks5Proxy(proxyEndpoint)
+            appConfig.insertCustomSocks5Proxy(proxyEndpoint)
         }
     }
 

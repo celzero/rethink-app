@@ -34,7 +34,7 @@ import com.celzero.bravedns.adapter.UniversalBlockedRulesAdapter
 import com.celzero.bravedns.adapter.WhitelistedAppsAdapter
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.automaton.FirewallRules
-import com.celzero.bravedns.data.AppMode
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.BlockedConnectionsRepository
 import com.celzero.bravedns.databinding.FragmentFirewallBinding
 import com.celzero.bravedns.databinding.UniversalFragementContainerBinding
@@ -42,7 +42,6 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.BackgroundAccessibilityService
-import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities
@@ -69,7 +68,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
 
     private val blockedConnectionsRepository by inject<BlockedConnectionsRepository>()
     private val persistentState by inject<PersistentState>()
-    private val appMode by inject<AppMode>()
+    private val appConfig by inject<AppConfig>()
 
     private var blockedRulesCount: Int = 0
 
@@ -84,11 +83,11 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
     }
 
     private fun observeBraveMode() {
-        appMode.braveModeObserver.observe(viewLifecycleOwner, {
+        appConfig.braveModeObserver.observe(viewLifecycleOwner, {
             when (it) {
-                AppMode.BraveMode.DNS.mode -> handleDnsModeUi()
-                AppMode.BraveMode.FIREWALL.mode -> handleFirewallModeUi()
-                AppMode.BraveMode.DNS_FIREWALL.mode -> handleDnsFirewallModeUi()
+                AppConfig.BraveMode.DNS.mode -> handleDnsModeUi()
+                AppConfig.BraveMode.FIREWALL.mode -> handleFirewallModeUi()
+                AppConfig.BraveMode.DNS_FIREWALL.mode -> handleDnsFirewallModeUi()
             }
         })
     }
@@ -286,7 +285,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             // On accessibility failure the value will be stored for next 5 mins.
             // If user, re-enable the settings reset the timestamp so that vpn service
             // will check for the accessibility service availability.
-            VpnController.getBraveVpnService()?.accessibilityHearbeatTimestamp = INIT_TIME_MS
+            VpnController.resetAccessibilityHearbeatTimestamp()
             return
         }
 

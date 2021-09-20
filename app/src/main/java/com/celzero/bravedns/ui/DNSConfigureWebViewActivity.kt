@@ -35,7 +35,7 @@ import androidx.webkit.WebSettingsCompat.DARK_STRATEGY_PREFER_WEB_THEME_OVER_USE
 import androidx.webkit.WebViewFeature
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppMode
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityFaqWebviewLayoutBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
@@ -67,7 +67,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     private var receivedIntentFrom: Int = 0
     private var receivedStamp: String = ""
     private val persistentState by inject<PersistentState>()
-    private val appMode by inject<AppMode>()
+    private val appConfig by inject<AppConfig>()
 
     companion object {
         const val LOCAL = 1
@@ -203,7 +203,7 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
 
         go {
             ioCtx {
-                appMode.updateRethinkDnsPlusStamp(stamp, count)
+                appConfig.updateRethinkDnsPlusStamp(stamp, count)
             }
         }
 

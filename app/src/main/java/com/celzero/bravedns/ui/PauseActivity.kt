@@ -83,7 +83,7 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
     }
 
     private fun observeTimer() {
-        VpnController.getBraveVpnService()?.getPauseCountDownObserver()?.observe(this, {
+        VpnController.getPauseCountDownObserver()?.observe(this, {
             b.pacTimer.text = humanReadableTime(it)
         })
     }
@@ -95,7 +95,7 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
         }
 
         b.pacStopIv.setOnClickListener {
-            VpnController.getBraveVpnService()?.resumeApp()
+            VpnController.resumeApp()
             openHomeScreenAndFinish()
         }
 
@@ -131,11 +131,11 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
     }
 
     private fun decreaseTimer() {
-        VpnController.getBraveVpnService()?.decreasePauseDuration(PAUSE_VPN_EXTRA_MILLIS)
+        VpnController.decreasePauseDuration(PAUSE_VPN_EXTRA_MILLIS)
     }
 
     private fun increaseTimer() {
-        VpnController.getBraveVpnService()?.increasePauseDuration(PAUSE_VPN_EXTRA_MILLIS)
+        VpnController.increasePauseDuration(PAUSE_VPN_EXTRA_MILLIS)
     }
 
     private fun openHomeScreenAndFinish() {

@@ -361,7 +361,7 @@ class Utilities {
             // For versions prior to 29 the check is made with Settings.Secure.
             // In our case, the always-on check is for all the vpn profiles. So using
             // vpnService?.isAlwaysOn will not be much helpful
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (isAtleastQ()) {
                 return vpnService?.isAlwaysOn == true
             }
 

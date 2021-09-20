@@ -25,9 +25,7 @@ import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.DNSLogTracker
 import com.celzero.bravedns.service.QueryTracker
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import dnscrypt.Dnscrypt
 import dnscrypt.Summary
 import doh.Doh
@@ -159,8 +157,6 @@ object GoIntraListener : Listener, KoinComponent {
             dnsLatencyTracker.recordTransaction(transaction)
         }
         dnsLogTracker.recordTransaction(transaction)
-        if (DEBUG) Log.d(LOG_TAG_VPN,
-                         "Record Transaction: status as ${transaction.status} with blocklist ${transaction.blocklist}")
         updateVpnConnectionState(transaction)
     }
 

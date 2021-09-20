@@ -33,7 +33,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
-import com.celzero.bravedns.automaton.FirewallManager.FIREWALL_NOTIF_CHANNEL_ID
+import com.celzero.bravedns.automaton.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -49,6 +49,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
+import kotlin.random.Random
 
 class RefreshDatabase internal constructor(private var context: Context,
                                            private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
@@ -67,11 +68,12 @@ class RefreshDatabase internal constructor(private var context: Context,
 
         private const val NOTIF_BATCH_NEW_APPS_THRESHOLD = 5
 
-        const val PENDING_INTENT_REQUEST_CODE_ALLOW = 107
-        const val PENDING_INTENT_REQUEST_CODE_DENY = 108
+        const val PENDING_INTENT_REQUEST_CODE_ALLOW = 0x10000000
+        const val PENDING_INTENT_REQUEST_CODE_DENY = 0x20000000
     }
 
     private val refreshMutex = ReentrantReadWriteLock()
+    private val randomNotifId: Random = Random
 
     @GuardedBy("refreshMutex") @Volatile private var isRefreshInProgress: Boolean = false
 
@@ -339,17 +341,17 @@ class RefreshDatabase internal constructor(private var context: Context,
                                                       PendingIntent.FLAG_ONE_SHOT)
 
         var builder: NotificationCompat.Builder
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (isAtleastO()) {
             val name: CharSequence = context.getString(R.string.notif_channel_firewall_alerts)
             val description = context.resources.getString(
                 R.string.notif_channel_desc_firewall_alerts)
             val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(FIREWALL_NOTIF_CHANNEL_ID, name, importance)
+            val channel = NotificationChannel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, name, importance)
             channel.description = description
             notificationManager.createNotificationChannel(channel)
-            builder = NotificationCompat.Builder(context, FIREWALL_NOTIF_CHANNEL_ID)
+            builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
         } else {
-            builder = NotificationCompat.Builder(context, FIREWALL_NOTIF_CHANNEL_ID)
+            builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
         }
 
         val contentTitle: String = context.resources.getString(
@@ -370,8 +372,7 @@ class RefreshDatabase internal constructor(private var context: Context,
         // Cancel the notification after clicking.
         builder.setAutoCancel(true)
 
-        val notificationId = Random()
-        notificationManager.notify(FIREWALL_NOTIF_CHANNEL_ID, notificationId.nextInt(100),
+        notificationManager.notify(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, randomNotifId.nextInt(100),
                                    builder.build())
     }
 
@@ -402,17 +403,17 @@ class RefreshDatabase internal constructor(private var context: Context,
         val pendingIntent = PendingIntent.getActivity(context, 0, intent,
                                                       PendingIntent.FLAG_UPDATE_CURRENT)
         val nbuilder: NotificationCompat.Builder
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (isAtleastO()) {
             val name: CharSequence = context.getString(R.string.notif_channel_firewall_alerts)
             val description = context.resources.getString(
                 R.string.notif_channel_desc_firewall_alerts)
             val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(FIREWALL_NOTIF_CHANNEL_ID, name, importance)
+            val channel = NotificationChannel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, name, importance)
             channel.description = description
             notificationManager.createNotificationChannel(channel)
-            nbuilder = NotificationCompat.Builder(context, FIREWALL_NOTIF_CHANNEL_ID)
+            nbuilder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
         } else {
-            nbuilder = NotificationCompat.Builder(context, FIREWALL_NOTIF_CHANNEL_ID)
+            nbuilder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
         }
 
         val contentTitle: String = context.resources.getString(R.string.new_app_notification_title)
@@ -448,7 +449,7 @@ class RefreshDatabase internal constructor(private var context: Context,
         // Cancel the notification after clicking.
         nbuilder.setAutoCancel(true)
 
-        notificationManager.notify(FIREWALL_NOTIF_CHANNEL_ID, app.uid, nbuilder.build())
+        notificationManager.notify(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, app.uid, nbuilder.build())
     }
 
     private fun makeNewAppVpnIntent(context: Context, intentExtra: String, uid: Int,
@@ -456,7 +457,7 @@ class RefreshDatabase internal constructor(private var context: Context,
         val intentAction = Intent(context, NotificationActionReceiver::class.java)
         intentAction.putExtra(Constants.NOTIFICATION_ACTION, intentExtra)
         intentAction.putExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, uid)
-        return PendingIntent.getBroadcast(context, requestCode, intentAction,
+        return PendingIntent.getBroadcast(context, (uid or requestCode), intentAction,
                                           PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
@@ -620,7 +621,7 @@ class RefreshDatabase internal constructor(private var context: Context,
         } else appCategoryType
     }
 
-    fun insertDefaultDNSList() {
+    suspend fun insertDefaultDNSList() {
         val isAlreadyConnectionAvailable = doHEndpointRepository.getConnectedDoH()
         val urlName = context.resources.getStringArray(R.array.doh_endpoint_names)
         val urlValues = context.resources.getStringArray(R.array.doh_endpoint_urls)
@@ -639,7 +640,7 @@ class RefreshDatabase internal constructor(private var context: Context,
 
     }
 
-    private fun insertDefaultDOHList() {
+    private suspend fun insertDefaultDOHList() {
         val urlName = context.resources.getStringArray(R.array.doh_endpoint_names)
         val urlValues = context.resources.getStringArray(R.array.doh_endpoint_urls)
         val doHEndpoint1 = DoHEndpoint(id = 1, urlName[0], urlValues[0],
@@ -659,17 +660,18 @@ class RefreshDatabase internal constructor(private var context: Context,
                                        isCustom = false,
                                        modifiedDataTime = System.currentTimeMillis(), latency = 0)
         // Note: rethinkdns+ must always be at index 5; if not impl such as
-        // AppMode#getDnsRethinkEndpoint will break
+        // AppConfig#getDnsRethinkEndpoint will break
         val doHEndpoint5 = DoHEndpoint(id = 5, urlName[5], urlValues[5],
                                        context.getString(R.string.dns_mode_5_explanation),
                                        isSelected = false, isCustom = false,
                                        modifiedDataTime = System.currentTimeMillis(), latency = 0)
-
-        doHEndpointRepository.insertWithReplaceAsync(doHEndpoint1)
-        doHEndpointRepository.insertWithReplaceAsync(doHEndpoint2)
-        doHEndpointRepository.insertWithReplaceAsync(doHEndpoint3)
-        doHEndpointRepository.insertWithReplaceAsync(doHEndpoint4)
-        doHEndpointRepository.insertWithReplaceAsync(doHEndpoint5)
+        ioCtx {
+            doHEndpointRepository.insertWithReplaceAsync(doHEndpoint1)
+            doHEndpointRepository.insertWithReplaceAsync(doHEndpoint2)
+            doHEndpointRepository.insertWithReplaceAsync(doHEndpoint3)
+            doHEndpointRepository.insertWithReplaceAsync(doHEndpoint4)
+            doHEndpointRepository.insertWithReplaceAsync(doHEndpoint5)
+        }
     }
 
 

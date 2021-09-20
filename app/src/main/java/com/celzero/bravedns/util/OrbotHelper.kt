@@ -28,7 +28,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppMode
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.PersistentState
@@ -50,7 +50,7 @@ import java.util.concurrent.TimeUnit
  * adopted from: github.com/guardianproject/NetCipher/blob/fee8571/libnetcipher/src/info/guardianproject/netcipher/proxy/OrbotHelper.java
  */
 class OrbotHelper(private val context: Context, private val persistentState: PersistentState,
-                  private val appMode: AppMode) {
+                  private val appConfig: AppConfig) {
 
 
     companion object {
@@ -89,9 +89,9 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
         // Orbot requestCode for PendingIntent.getBroadcast() for the notification action.
         private const val ORBOT_REQUEST_CODE = 200
 
-        var selectedProxyType: String = AppMode.ProxyType.NONE.name
+        var selectedProxyType: String = AppConfig.ProxyType.NONE.name
 
-        const val PROXY_ALERTS = "PROXY_ALERTS"
+        const val NOTIF_CHANNEL_ID_PROXY_ALERTS = "PROXY_ALERTS"
 
     }
 
@@ -106,7 +106,6 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
      * Returns the intent which will initiate the Orbot in non-vpn mode.
      */
     private fun getOrbotStartIntent(): Intent {
-        if (DEBUG) Log.d(LOG_TAG_VPN, "Settings - Orbot - getOrbotStartIntent")
         val intent = Intent(ACTION_START)
         intent.setPackage(ORBOT_PACKAGE_NAME)
         intent.putExtra(EXTRA_PACKAGE_NAME, context.packageName)
@@ -118,7 +117,6 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
      * The below intent is not stopping the Orbot.
      */
     private fun getOrbotStopIntent(): Intent {
-        if (DEBUG) Log.d(LOG_TAG_VPN, "Settings - Orbot - getOrbotStopIntent")
         val intent = Intent(ACTION_STOP_VPN)
         intent.setPackage(ORBOT_PACKAGE_NAME)
         intent.putExtra(EXTRA_PACKAGE_NAME, context.packageName)
@@ -164,7 +162,6 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
      * Not used as of now.
      */
     private fun getOrbotStatusIntent(): Intent? {
-        if (DEBUG) Log.d(LOG_TAG_VPN, "Settings - Orbot - getOrbotStatusIntent")
         val intent = Intent(ACTION_STATUS)
         intent.setPackage(ORBOT_PACKAGE_NAME)
         intent.putExtra(EXTRA_PACKAGE_NAME, context.packageName)
@@ -182,7 +179,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
         context.registerReceiver(orbotStatusReceiver, IntentFilter(ACTION_STATUS))
         context.sendBroadcast(intent)
         waitForOrbot()
-        if (DEBUG) Log.d(LOG_TAG_VPN, "Settings - Orbot - requestOrbotStatus")
+        if (DEBUG) Log.d(LOG_TAG_VPN, "request orbot start by broadcast")
     }
 
     /**
@@ -198,7 +195,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
 
             val status = intent.getStringExtra(EXTRA_STATUS)
             if (DEBUG) Log.d(LOG_TAG_VPN,
-                             "OrbotHelper - Orbot - OnStatusReceiver ${intent.action}, status- $status")
+                             "received status from orbot, action: ${intent.action}, status: $status")
 
             when (status) {
                 STATUS_ON -> {
@@ -229,16 +226,17 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
      * The notification will be sent if the user not initiated the stop.
      */
     fun stopOrbot(isInteractive: Boolean) {
-        if (!isInteractive && selectedProxyType != AppMode.ProxyType.NONE.name) {
+        if (!isInteractive && selectedProxyType != AppConfig.ProxyType.NONE.name) {
             val notificationManager = context.getSystemService(
                 VpnService.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.notify(PROXY_ALERTS, ORBOT_SERVICE_ID, createNotification().build())
+            notificationManager.notify(NOTIF_CHANNEL_ID_PROXY_ALERTS, ORBOT_SERVICE_ID,
+                                       createNotification().build())
         }
-        selectedProxyType = AppMode.ProxyType.NONE.name
-        appMode.removeAllProxies()
+        selectedProxyType = AppConfig.ProxyType.NONE.name
+        appConfig.removeAllProxies()
         persistentState.orbotConnectionStatus.postValue(false)
         context.sendBroadcast(getOrbotStopIntent())
-        if (DEBUG) Log.d(LOG_TAG_VPN, "OrbotHelper - Orbot - stopOrbot")
+        if (DEBUG) Log.d(LOG_TAG_VPN, "stop orbot, remove from proxy")
     }
 
     /**
@@ -254,13 +252,13 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
             val name: CharSequence = context.getString(R.string.notif_channel_proxy_failure)
             val description = context.resources.getString(R.string.notif_channel_desc_proxy_failure)
             val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(PROXY_ALERTS, name, importance)
+            val channel = NotificationChannel(NOTIF_CHANNEL_ID_PROXY_ALERTS, name, importance)
             channel.description = description
             val notificationManager = context.getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
-            builder = NotificationCompat.Builder(context, PROXY_ALERTS)
+            builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_PROXY_ALERTS)
         } else {
-            builder = NotificationCompat.Builder(context, PROXY_ALERTS)
+            builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_PROXY_ALERTS)
         }
 
         val contentTitle = context.resources.getString(R.string.settings_orbot_notification_heading)
@@ -296,11 +294,11 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
             Log.i(LOG_TAG_VPN, "Initiate orbot start with type: $selectedProxyType")
 
             if (isTypeSocks5() && handleOrbotSocks5Update()) {
-                appMode.addProxy(AppMode.ProxyType.SOCKS5, AppMode.ProxyProvider.ORBOT)
+                appConfig.addProxy(AppConfig.ProxyType.SOCKS5, AppConfig.ProxyProvider.ORBOT)
             } else if (isTypeHttp() && handleOrbotHttpUpdate()) {
-                appMode.addProxy(AppMode.ProxyType.HTTP, AppMode.ProxyProvider.ORBOT)
+                appConfig.addProxy(AppConfig.ProxyType.HTTP, AppConfig.ProxyProvider.ORBOT)
             } else if (isTypeHttpSocks5() && handleOrbotSocks5Update() && handleOrbotHttpUpdate()) {
-                appMode.addProxy(AppMode.ProxyType.HTTP_SOCKS5, AppMode.ProxyProvider.ORBOT)
+                appConfig.addProxy(AppConfig.ProxyType.HTTP_SOCKS5, AppConfig.ProxyProvider.ORBOT)
             } else {
                 uiCtx {
                     stopOrbot(isInteractive = true)
@@ -311,21 +309,21 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
     }
 
     private fun isTypeSocks5(): Boolean {
-        return selectedProxyType == AppMode.ProxyType.SOCKS5.name
+        return selectedProxyType == AppConfig.ProxyType.SOCKS5.name
     }
 
     private fun isTypeHttp(): Boolean {
-        return selectedProxyType == AppMode.ProxyType.HTTP.name
+        return selectedProxyType == AppConfig.ProxyType.HTTP.name
     }
 
     private fun isTypeHttpSocks5(): Boolean {
-        return selectedProxyType == AppMode.ProxyType.HTTP_SOCKS5.name
+        return selectedProxyType == AppConfig.ProxyType.HTTP_SOCKS5.name
     }
 
     private suspend fun handleOrbotSocks5Update(): Boolean {
         val proxyEndpoint = constructProxy()
         return if (proxyEndpoint != null) {
-            appMode.insertOrbotProxy(proxyEndpoint)
+            appConfig.insertOrbotProxy(proxyEndpoint)
             true
         } else {
             Log.w(LOG_TAG_VPN, "Error inserting value in proxy database")

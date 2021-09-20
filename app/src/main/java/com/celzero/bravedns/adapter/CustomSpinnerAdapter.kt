@@ -22,7 +22,7 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import com.celzero.bravedns.data.AppMode
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.SpinnerListItemBinding
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -33,7 +33,7 @@ class CustomSpinnerAdapter(val context: Context, var dataSource: List<String>) :
     private val inflater: LayoutInflater = context.getSystemService(
         Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
-    private val appMode by inject<AppMode>()
+    private val appConfig by inject<AppConfig>()
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
 
@@ -51,7 +51,7 @@ class CustomSpinnerAdapter(val context: Context, var dataSource: List<String>) :
         vh.label.text = dataSource[position]
 
         // ref ConfigureDns#initView():dnsValue
-        if (position == (appMode.getDnsType().type.minus(1))) {
+        if (position == (appConfig.getDnsType().type.minus(1))) {
             vh.img.visibility = View.VISIBLE
         } else {
             vh.img.visibility = View.INVISIBLE

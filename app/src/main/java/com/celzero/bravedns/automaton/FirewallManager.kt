@@ -54,7 +54,7 @@ object FirewallManager : KoinComponent {
     private val categoryInfoRepository by inject<CategoryInfoRepository>()
     private val lock = ReentrantReadWriteLock()
 
-    const val FIREWALL_NOTIF_CHANNEL_ID = "Firewall_Alerts"
+    const val NOTIF_CHANNEL_ID_FIREWALL_ALERTS = "Firewall_Alerts"
 
     enum class AppStatus {
         ALLOWED, BLOCKED, WHITELISTED, EXCLUDED, UNKNOWN

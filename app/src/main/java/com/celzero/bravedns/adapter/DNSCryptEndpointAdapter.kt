@@ -29,14 +29,14 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppMode
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DNSCryptEndpoint
 import com.celzero.bravedns.databinding.DnsCryptEndpointListItemBinding
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.*
 
 class DNSCryptEndpointAdapter(private val context: Context, val lifecycleOwner: LifecycleOwner,
-                              private val appMode: AppMode) :
+                              private val appConfig: AppConfig) :
         PagedListAdapter<DNSCryptEndpoint, DNSCryptEndpointAdapter.DNSCryptEndpointViewHolder>(
             DIFF_CALLBACK) {
 
@@ -158,7 +158,7 @@ class DNSCryptEndpointAdapter(private val context: Context, val lifecycleOwner: 
 
         private fun updateDNSCryptDetails(endpoint: DNSCryptEndpoint, isSelected: Boolean) {
             io {
-                if (!isSelected && !appMode.canRemoveDnscrypt(endpoint)) {
+                if (!isSelected && !appConfig.canRemoveDnscrypt(endpoint)) {
                     // Do not unselect the only user-selected dnscrypt endpoint, that is
                     // when the getConnectedDnsCrypt returns a list of size 1
                     uiCtx {
@@ -170,13 +170,13 @@ class DNSCryptEndpointAdapter(private val context: Context, val lifecycleOwner: 
                 }
 
                 endpoint.isSelected = isSelected
-                appMode.handleDnscryptChanges(endpoint)
+                appConfig.handleDnscryptChanges(endpoint)
             }
         }
 
         private fun deleteEndpoint(id: Int) {
             io {
-                appMode.deleteDnscryptEndpoint(id)
+                appConfig.deleteDnscryptEndpoint(id)
                 uiCtx {
                     Toast.makeText(context, R.string.dns_crypt_url_remove_success,
                                    Toast.LENGTH_SHORT).show()

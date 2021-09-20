@@ -20,7 +20,7 @@ import android.content.Context
 import android.text.TextUtils
 import android.util.Log
 import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppMode
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DNSLogRepository
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.glide.FavIconDownloader
@@ -92,10 +92,10 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
 
             dnsLog.blockLists = transaction.blocklist
             if (transaction.isDNSCrypt) {
-                dnsLog.dnsType = AppMode.DnsType.DNSCRYPT.type
+                dnsLog.dnsType = AppConfig.DnsType.DNSCRYPT.type
                 dnsLog.relayIP = transaction.relayIp
             } else {
-                dnsLog.dnsType = AppMode.DnsType.DOH.type
+                dnsLog.dnsType = AppConfig.DnsType.DOH.type
                 dnsLog.relayIP = ""
             }
             dnsLog.latency = transaction.responseTime

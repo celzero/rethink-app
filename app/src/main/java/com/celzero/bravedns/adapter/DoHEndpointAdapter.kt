@@ -33,7 +33,7 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppMode
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.databinding.DohEndpointListItemBinding
 import com.celzero.bravedns.ui.DNSConfigureWebViewActivity
@@ -47,7 +47,7 @@ import xdns.Xdns.getBlocklistStampFromURL
 
 
 class DoHEndpointAdapter(private val context: Context, private val lifecycleOwner: LifecycleOwner,
-                         private val appMode: AppMode) :
+                         private val appConfig: AppConfig) :
         PagedListAdapter<DoHEndpoint, DoHEndpointAdapter.DoHEndpointViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -107,7 +107,7 @@ class DoHEndpointAdapter(private val context: Context, private val lifecycleOwne
             Log.i(LOG_TAG_DNS,
                   "connected to doh: ${endpoint.dohName} isSelected? ${endpoint.isSelected}")
             if (endpoint.isSelected) {
-                val count = appMode.getRemoteBlocklistCount()
+                val count = appConfig.getRemoteBlocklistCount()
                 b.dohEndpointListUrlExplanation.text = if (endpoint.isRethinkDnsPlus() && count > 0) {
                     context.getString(R.string.dns_connected_rethink_plus, count.toString())
                 } else {
@@ -176,13 +176,13 @@ class DoHEndpointAdapter(private val context: Context, private val lifecycleOwne
                 }
 
                 endpoint.isSelected = true
-                appMode.handleDoHChanges(endpoint)
+                appConfig.handleDoHChanges(endpoint)
             }
         }
 
         private fun deleteEndpoint(id: Int) {
             io {
-                appMode.deleteDohEndpoint(id)
+                appConfig.deleteDohEndpoint(id)
                 uiCtx {
                     Toast.makeText(context, R.string.doh_custom_url_remove_success,
                                    Toast.LENGTH_SHORT).show()

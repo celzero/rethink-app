@@ -28,7 +28,7 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DNSQueryAdapter
-import com.celzero.bravedns.data.AppMode
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DNSLogRepository
 import com.celzero.bravedns.databinding.ActivityQueryDetailBinding
 import com.celzero.bravedns.databinding.QueryListScrollListBinding
@@ -53,7 +53,7 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
 
     private val dnsLogRepository by inject<DNSLogRepository>()
     private val persistentState by inject<PersistentState>()
-    private val appMode by inject<AppMode>()
+    private val appConfig by inject<AppConfig>()
 
     companion object {
         fun newInstance() = DNSLogFragment()
@@ -137,26 +137,26 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     }
 
     private fun updateConnectedStatus() {
-        when (appMode.getDnsType()) {
-            AppMode.DnsType.DOH -> {
+        when (appConfig.getDnsType()) {
+            AppConfig.DnsType.DOH -> {
                 b.connectedStatusTitleUrl.text = resources.getString(
                     R.string.configure_dns_connected_doh_status)
                 b.connectedStatusTitle.text = resources.getString(
-                    R.string.configure_dns_connection_name, appMode.getConnectedDNS())
+                    R.string.configure_dns_connection_name, appConfig.getConnectedDNS())
                 b.queryListScrollList.recyclerQuery.visibility = View.VISIBLE
                 b.queryListScrollList.dnsLogNoLogText.visibility = View.GONE
             }
-            AppMode.DnsType.DNSCRYPT -> {
+            AppConfig.DnsType.DNSCRYPT -> {
                 b.connectedStatusTitleUrl.text = resources.getString(
                     R.string.configure_dns_connected_dns_crypt_status)
                 b.queryListScrollList.recyclerQuery.visibility = View.VISIBLE
                 b.queryListScrollList.dnsLogNoLogText.visibility = View.GONE
             }
-            AppMode.DnsType.DNS_PROXY -> {
+            AppConfig.DnsType.DNS_PROXY -> {
                 b.connectedStatusTitleUrl.text = resources.getString(
                     R.string.configure_dns_connected_dns_proxy_status)
                 b.connectedStatusTitle.text = resources.getString(
-                    R.string.configure_dns_connection_name, appMode.getConnectedDNS())
+                    R.string.configure_dns_connection_name, appConfig.getConnectedDNS())
                 b.queryListScrollList.recyclerQuery.visibility = View.GONE
                 if (persistentState.logsEnabled) {
                     b.queryListScrollList.dnsLogNoLogText.visibility = View.VISIBLE
@@ -173,8 +173,8 @@ class DNSLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
 
     // FIXME: Create common observer for dns instead of separate observers
     private fun observeDnscryptStatus() {
-        appMode.getDnscryptCountObserver().observe(viewLifecycleOwner, {
-            if (appMode.getDnsType() != AppMode.DnsType.DNSCRYPT) return@observe
+        appConfig.getDnscryptCountObserver().observe(viewLifecycleOwner, {
+            if (appConfig.getDnsType() != AppConfig.DnsType.DNSCRYPT) return@observe
 
             val connectedCrypt = getString(R.string.configure_dns_crypt, it.toString())
             b.connectedStatusTitle.text = connectedCrypt

@@ -33,7 +33,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.*
 import com.celzero.bravedns.automaton.FirewallManager
-import com.celzero.bravedns.data.AppMode
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DNSCryptEndpoint
 import com.celzero.bravedns.database.DNSCryptRelayEndpoint
 import com.celzero.bravedns.database.DNSProxyEndpoint
@@ -42,7 +42,6 @@ import com.celzero.bravedns.databinding.DialogSetCustomUrlBinding
 import com.celzero.bravedns.databinding.DialogSetDnsCryptBinding
 import com.celzero.bravedns.databinding.DialogSetDnsProxyBinding
 import com.celzero.bravedns.databinding.FragmentConfigureDnsBinding
-import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Utilities
@@ -85,8 +84,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
 
     private lateinit var spinnerAdapter: CustomSpinnerAdapter
 
-    private val persistentState by inject<PersistentState>()
-    private val appMode by inject<AppMode>()
+    private val appConfig by inject<AppConfig>()
 
     companion object {
         fun newInstance() = ConfigureDNSFragment()
@@ -124,33 +122,33 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
         b.recyclerDnsProxyConnections.layoutManager = dnsProxyLayoutManager
 
         dnsCryptRecyclerAdapter = DNSCryptEndpointAdapter(requireContext(), viewLifecycleOwner,
-                                                          appMode)
+                                                          appConfig)
         dnsCryptViewModel.dnsCryptEndpointList.observe(viewLifecycleOwner,
                                                        androidx.lifecycle.Observer(
                                                            dnsCryptRecyclerAdapter::submitList))
         b.recyclerDnsCryptConnections.adapter = dnsCryptRecyclerAdapter
 
         dnsCryptRelayRecyclerAdapter = DNSCryptRelayEndpointAdapter(requireContext(),
-                                                                    viewLifecycleOwner, appMode)
+                                                                    viewLifecycleOwner, appConfig)
         dnsCryptRelayViewModel.dnsCryptRelayEndpointList.observe(viewLifecycleOwner,
                                                                  androidx.lifecycle.Observer(
                                                                      dnsCryptRelayRecyclerAdapter::submitList))
         b.recyclerDnsCryptRelays.adapter = dnsCryptRelayRecyclerAdapter
 
-        dohRecyclerAdapter = DoHEndpointAdapter(requireContext(), viewLifecycleOwner, appMode)
+        dohRecyclerAdapter = DoHEndpointAdapter(requireContext(), viewLifecycleOwner, appConfig)
         viewModel.dohEndpointList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
             dohRecyclerAdapter::submitList))
         b.recyclerDohConnections.adapter = dohRecyclerAdapter
 
         dnsProxyRecyclerAdapter = DNSProxyEndpointAdapter(requireContext(), viewLifecycleOwner,
-                                                          appMode)
+                                                          appConfig)
         dnsProxyViewModel.dnsProxyEndpointList.observe(viewLifecycleOwner,
                                                        androidx.lifecycle.Observer(
                                                            dnsProxyRecyclerAdapter::submitList))
         b.recyclerDnsProxyConnections.adapter = dnsProxyRecyclerAdapter
 
         b.configureDnsProgressBar.visibility = View.GONE
-        val dnsValue = appMode.getDnsType().type
+        val dnsValue = appConfig.getDnsType().type
         // To select the spinner position
         b.configureScreenSpinner.setSelection(dnsValue - 1)
         showRecycler(dnsValue)
@@ -190,17 +188,17 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
 
     private fun showRecycler(position: Int) {
         when (position) {
-            AppMode.DnsType.DOH.type -> {
+            AppConfig.DnsType.DOH.type -> {
                 b.recyclerDohConnectionsHeader.visibility = View.VISIBLE
                 b.recyclerDnsCryptConnectionsHeader.visibility = View.GONE
                 b.recyclerDnsProxyConnectionsHeader.visibility = View.GONE
             }
-            AppMode.DnsType.DNSCRYPT.type -> {
+            AppConfig.DnsType.DNSCRYPT.type -> {
                 b.recyclerDohConnectionsHeader.visibility = View.GONE
                 b.recyclerDnsCryptConnectionsHeader.visibility = View.VISIBLE
                 b.recyclerDnsProxyConnectionsHeader.visibility = View.GONE
             }
-            AppMode.DnsType.DNS_PROXY.type -> {
+            AppConfig.DnsType.DNS_PROXY.type -> {
                 b.recyclerDohConnectionsHeader.visibility = View.GONE
                 b.recyclerDnsCryptConnectionsHeader.visibility = View.GONE
                 b.recyclerDnsProxyConnectionsHeader.visibility = View.VISIBLE
@@ -239,7 +237,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
         // Fetch the count from repository and increment by 1 to show the
         // next doh name in the dialog
         io {
-            val nextIndex = appMode.getDohCount().plus(1)
+            val nextIndex = appConfig.getDohCount().plus(1)
             uiCtx {
                 if (!isAdded) return@uiCtx
                 customName.setText(getString(R.string.cd_custom_doh_url_name, nextIndex.toString()),
@@ -303,7 +301,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
         // Fetch the count from repository and increment by 1 to show the
         // next doh name in the dialog
         io {
-            val nextIndex = appMode.getDnsProxyCount().plus(1)
+            val nextIndex = appConfig.getDnsProxyCount().plus(1)
             uiCtx {
                 proxyNameEditText.setText(
                     getString(R.string.cd_custom_dns_proxy_name, nextIndex.toString()),
@@ -416,8 +414,8 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
         // Fetch the count from repository and increment by 1 to show the
         // next doh name in the dialog
         io {
-            dnscryptNextIndex = appMode.getDnscryptCount().plus(1)
-            relayNextIndex = appMode.getDnscryptRelayCount().plus(1)
+            dnscryptNextIndex = appConfig.getDnscryptCount().plus(1)
+            relayNextIndex = appConfig.getDnscryptRelayCount().plus(1)
             uiCtx {
                 cryptNameEditText.setText(
                     getString(R.string.cd_custom_dns_proxy_name, dnscryptNextIndex.toString()),
@@ -482,7 +480,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
             val dnsCryptRelayEndpoint = DNSCryptRelayEndpoint(id = 0, serverName, urlStamp, desc,
                                                               isSelected = false, isCustom = true,
                                                               modifiedDataTime = 0L, latency = 0)
-            appMode.insertDnscryptRelayEndpoint(dnsCryptRelayEndpoint)
+            appConfig.insertDnscryptRelayEndpoint(dnsCryptRelayEndpoint)
         }
     }
 
@@ -496,7 +494,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
             val dnsCryptEndpoint = DNSCryptEndpoint(id = 0, serverName, urlStamp, desc,
                                                     isSelected = false, isCustom = true,
                                                     modifiedDataTime = 0L, latency = 0)
-            appMode.insertDnscryptEndpoint(dnsCryptEndpoint)
+            appConfig.insertDnscryptEndpoint(dnsCryptEndpoint)
         }
     }
 
@@ -509,7 +507,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
             val doHEndpoint = DoHEndpoint(id = 0, dohName, url, dohExplanation = "",
                                           isSelected = false, isCustom = true, modifiedDataTime = 0,
                                           latency = 0)
-            appMode.insertDohEndpoint(doHEndpoint)
+            appConfig.insertDohEndpoint(doHEndpoint)
         }
     }
 
@@ -527,7 +525,7 @@ class ConfigureDNSFragment : Fragment(R.layout.fragment_configure_dns) {
             val dnsProxyEndpoint = DNSProxyEndpoint(id = 0, proxyName, mode, appName, ip, port,
                                                     isSelected = false, isCustom = true,
                                                     modifiedDataTime = 0L, latency = 0)
-            appMode.insertDnsproxyEndpoint(dnsProxyEndpoint)
+            appConfig.insertDnsproxyEndpoint(dnsProxyEndpoint)
             if (DEBUG) Log.d(LOG_TAG_UI, "Insert into DNSProxy database- $appName, $port")
         }
     }
