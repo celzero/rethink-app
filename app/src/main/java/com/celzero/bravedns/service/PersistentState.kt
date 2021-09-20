@@ -18,7 +18,7 @@ package com.celzero.bravedns.service
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppMode
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.Utilities
@@ -56,8 +56,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // launches the app for the very first time (after install or post clear-data)
     var firstTimeLaunch by booleanPref("is_first_time_launch", true)
 
-    // One among AppMode.BraveMode enum; 2's default, which is BraveMode.DNS_FIREWAL
-    var braveMode by intPref("brave_mode", AppMode.BraveMode.DNS_FIREWALL.mode)
+    // One among AppConfig.BraveMode enum; 2's default, which is BraveMode.DNS_FIREWAL
+    var braveMode by intPref("brave_mode", AppConfig.BraveMode.DNS_FIREWALL.mode)
 
     // enable / disable logging dns and tcp/udp connections to db
     var logsEnabled by booleanPref("local_logs", true)
@@ -109,7 +109,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // whether apps subject to the RethinkDNS VPN tunnel can bypass the tunnel on-demand
     var allowBypass by booleanPref("allow_bypass", true)
 
-    // user set among AppMode.DnsType enum; 1's the default which is DoH
+    // user set among AppConfig.DnsType enum; 1's the default which is DoH
     var dnsType by intPref("dns_type", 1)
 
     // whether the app must attempt to startup on reboot if it was running before shutdown
@@ -146,10 +146,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var useMultipleNetworks by booleanPref("add_all_networks_to_vpn", false)
 
     // user selected proxy type (e.g., http, socks5)
-    var proxyType by stringPref("proxy_proxytype", AppMode.ProxyType.NONE.name)
+    var proxyType by stringPref("proxy_proxytype", AppConfig.ProxyType.NONE.name)
 
     // user selected proxy provider, as of now two providers (custom, orbot)
-    var proxyProvider by stringPref("proxy_proxyprovider", AppMode.ProxyProvider.NONE.name)
+    var proxyProvider by stringPref("proxy_proxyprovider", AppConfig.ProxyProvider.NONE.name)
 
     // total dnscrypt server currently connected to
     private var _dnsCryptRelayCount by intPref("dnscrypt_relay", 0)
@@ -179,8 +179,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var dnsRequestsCountLiveData: MutableLiveData<Long> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
 
-    // requires livedata as the app state can be changed from more than one place
-    //var appStateObserver: MutableLiveData<AppMode.AppState> = MutableLiveData()
     var remoteBlocklistCount: MutableLiveData<Int> = MutableLiveData()
 
     fun setMedianLatency(median: Long) {

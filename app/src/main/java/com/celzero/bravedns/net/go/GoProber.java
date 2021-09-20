@@ -18,14 +18,10 @@ limitations under the License.
 package com.celzero.bravedns.net.go;
 
 import android.content.Context;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 
 import com.celzero.bravedns.net.doh.Prober;
-import com.celzero.bravedns.service.VpnController;
 
 import doh.Transport;
-import protect.Protector;
 import tun2socks.Tun2socks;
 
 /**
@@ -44,10 +40,7 @@ public class GoProber extends Prober {
         new Thread(() -> {
             String dohIPs = GoVpnAdapter.Companion.getIpString(context, url);
             try {
-                // Protection isn't needed for Lollipop+, or if the VPN is not active.
-                Protector protector = VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP ? null :
-                        VpnController.INSTANCE.getBraveVpnService();
-                Transport transport = Tun2socks.newDoHTransport(url, dohIPs, protector, null, null);
+                Transport transport = Tun2socks.newDoHTransport(url, dohIPs, /* protector */null, /* clientAuth */null, /* listener */null);
                 if (transport == null) {
                     callback.onCompleted(false);
                     return;

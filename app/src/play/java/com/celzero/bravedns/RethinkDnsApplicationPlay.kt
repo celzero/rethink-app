@@ -16,12 +16,13 @@
 package com.celzero.bravedns
 
 import android.app.Application
+import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.AppUpdater
-import com.celzero.bravedns.util.Constants
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
+import org.koin.android.ext.android.get
 
 class RethinkDnsApplicationPlay : Application() {
     override fun onCreate() {

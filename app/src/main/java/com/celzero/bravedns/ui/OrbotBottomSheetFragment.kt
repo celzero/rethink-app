@@ -35,7 +35,7 @@ import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.animation.Rotate3dAnimation
 import com.celzero.bravedns.automaton.FirewallManager
-import com.celzero.bravedns.data.AppMode
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.BottomSheetOrbotBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.service.PersistentState
@@ -65,7 +65,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
 
 
     private val persistentState by inject<PersistentState>()
-    private val appMode by inject<AppMode>()
+    private val appConfig by inject<AppConfig>()
     private val orbotHelper by inject<OrbotHelper>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -200,22 +200,22 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
 
     private fun updateUi() {
         when (OrbotHelper.selectedProxyType) {
-            AppMode.ProxyType.SOCKS5.name -> {
+            AppConfig.ProxyType.SOCKS5.name -> {
                 b.bsOrbotRadioSocks5.isChecked = true
                 b.orbotIcon.setImageResource(R.drawable.orbot_enabled)
                 b.orbotStatus.text = getString(R.string.orbot_bs_status_1)
             }
-            AppMode.ProxyType.HTTP.name -> {
+            AppConfig.ProxyType.HTTP.name -> {
                 b.bsOrbotRadioHttp.isChecked = true
                 b.orbotIcon.setImageResource(R.drawable.orbot_enabled)
                 b.orbotStatus.text = getString(R.string.orbot_bs_status_2)
             }
-            AppMode.ProxyType.HTTP_SOCKS5.name -> {
+            AppConfig.ProxyType.HTTP_SOCKS5.name -> {
                 b.bsOrbotRadioBoth.isChecked = true
                 b.orbotIcon.setImageResource(R.drawable.orbot_enabled)
                 b.orbotStatus.text = getString(R.string.orbot_bs_status_3)
             }
-            AppMode.ProxyType.NONE.name -> {
+            AppConfig.ProxyType.NONE.name -> {
                 updateOrbotNone()
             }
             else -> {
@@ -296,7 +296,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
      * Stop the Orbot - Calls the Orbot helper to initiate the stop orbot call.
      */
     private fun stopOrbot() {
-        appMode.removeAllProxies()
+        appConfig.removeAllProxies()
         b.bsOrbotRadioSocks5.isChecked = false
         b.bsOrbotRadioHttp.isChecked = false
         b.bsOrbotRadioBoth.isChecked = false
@@ -312,7 +312,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         b.bsOrbotRadioNone.isChecked = false
         b.bsOrbotRadioHttp.isChecked = false
         b.bsOrbotRadioBoth.isChecked = false
-        startOrbot(AppMode.ProxyType.SOCKS5.name)
+        startOrbot(AppConfig.ProxyType.SOCKS5.name)
     }
 
     /**
@@ -322,7 +322,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         b.bsOrbotRadioNone.isChecked = false
         b.bsOrbotRadioSocks5.isChecked = false
         b.bsOrbotRadioBoth.isChecked = false
-        startOrbot(AppMode.ProxyType.HTTP.name)
+        startOrbot(AppConfig.ProxyType.HTTP.name)
     }
 
     /**
@@ -332,7 +332,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         b.bsOrbotRadioNone.isChecked = false
         b.bsOrbotRadioSocks5.isChecked = false
         b.bsOrbotRadioHttp.isChecked = false
-        startOrbot(AppMode.ProxyType.HTTP_SOCKS5.name)
+        startOrbot(AppConfig.ProxyType.HTTP_SOCKS5.name)
     }
 
     /**
@@ -399,6 +399,12 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
 
     private fun go(f: suspend () -> Unit) {
         lifecycleScope.launch {
+            f()
+        }
+    }
+
+    private suspend fun ioCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.IO) {
             f()
         }
     }

@@ -30,7 +30,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
-import com.celzero.bravedns.data.AppMode
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DNSProxyEndpoint
 import com.celzero.bravedns.databinding.DnsProxyListItemBinding
 import com.celzero.bravedns.util.Utilities
@@ -39,7 +39,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class DNSProxyEndpointAdapter(private val context: Context, val lifecycleOwner: LifecycleOwner,
-                              private val appMode: AppMode) :
+                              private val appConfig: AppConfig) :
         PagedListAdapter<DNSProxyEndpoint, DNSProxyEndpointAdapter.DNSProxyEndpointViewHolder>(
             DIFF_CALLBACK) {
 
@@ -179,13 +179,13 @@ class DNSProxyEndpointAdapter(private val context: Context, val lifecycleOwner: 
     private fun updateDNSProxyDetails(endpoint: DNSProxyEndpoint) {
         io {
             endpoint.isSelected = true
-            appMode.handleDnsProxyChanges(endpoint)
+            appConfig.handleDnsProxyChanges(endpoint)
         }
     }
 
     private fun deleteProxyEndpoint(id: Int) {
         io {
-            appMode.deleteDnsProxyEndpoint(id)
+            appConfig.deleteDnsProxyEndpoint(id)
             uiCtx {
                 Toast.makeText(context, R.string.dns_proxy_remove_success,
                                Toast.LENGTH_SHORT).show()

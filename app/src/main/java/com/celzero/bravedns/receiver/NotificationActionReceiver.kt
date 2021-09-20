@@ -23,13 +23,13 @@ import android.util.Log
 import android.widget.Toast
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
-import com.celzero.bravedns.automaton.FirewallManager.FIREWALL_NOTIF_CHANNEL_ID
-import com.celzero.bravedns.data.AppMode
+import com.celzero.bravedns.automaton.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
-import com.celzero.bravedns.util.OrbotHelper.Companion.PROXY_ALERTS
+import com.celzero.bravedns.util.OrbotHelper.Companion.NOTIF_CHANNEL_ID_PROXY_ALERTS
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,7 +38,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
-    private val appMode by inject<AppMode>()
+    private val appConfig by inject<AppConfig>()
     private val orbotHelper by inject<OrbotHelper>()
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -49,7 +49,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
         when (action) {
             OrbotHelper.ORBOT_NOTIFICATION_ACTION_TEXT -> {
                 orbotHelper.openOrbotApp()
-                manager.cancel(PROXY_ALERTS, OrbotHelper.ORBOT_SERVICE_ID)
+                manager.cancel(NOTIF_CHANNEL_ID_PROXY_ALERTS, OrbotHelper.ORBOT_SERVICE_ID)
             }
             Constants.NOTIF_ACTION_PAUSE_VPN -> {
                 pauseApp(context)
@@ -70,18 +70,18 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
                 reloadRules()
             }
             Constants.NOTIF_ACTION_NEW_APP_ALLOW -> {
-                val uid = intent.getIntExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, 0)
-                manager.cancel(FIREWALL_NOTIF_CHANNEL_ID, uid)
+                val uid = intent.getIntExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, Int.MIN_VALUE)
+                if (uid < 0) return
 
-                if (uid <= 0) return
+                manager.cancel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, uid)
 
                 modifyAppFirewallSettings(context, uid, isInternetAllowed = true)
             }
             Constants.NOTIF_ACTION_NEW_APP_DENY -> {
-                val uid = intent.getIntExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, 0)
-                manager.cancel(FIREWALL_NOTIF_CHANNEL_ID, uid)
+                val uid = intent.getIntExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, Int.MIN_VALUE)
+                if (uid < 0) return
 
-                if (uid <= 0) return
+                manager.cancel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, uid)
 
                 modifyAppFirewallSettings(context, uid, isInternetAllowed = false)
             }
@@ -113,22 +113,22 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
             return
         }
 
-        VpnController.getBraveVpnService()?.pauseApp()
+        VpnController.pauseApp()
     }
 
     private fun resumeApp() {
-        VpnController.getBraveVpnService()?.resumeApp()
+        VpnController.resumeApp()
     }
 
     private fun dnsMode() {
         io {
-            appMode.changeBraveMode(AppMode.BraveMode.DNS.mode)
+            appConfig.changeBraveMode(AppConfig.BraveMode.DNS.mode)
         }
     }
 
     private fun dnsFirewallMode() {
         io {
-            appMode.changeBraveMode(AppMode.BraveMode.DNS_FIREWALL.mode)
+            appConfig.changeBraveMode(AppConfig.BraveMode.DNS_FIREWALL.mode)
         }
     }
 

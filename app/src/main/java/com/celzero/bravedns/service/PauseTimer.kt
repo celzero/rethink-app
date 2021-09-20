@@ -58,7 +58,7 @@ object PauseTimer {
                 }
             } finally {
                 if (DEBUG) Log.d(LOG_TAG_VPN, "pause timer complete")
-                VpnController.getBraveVpnService()?.resumeApp()
+                VpnController.resumeApp()
                 setCountdown(INIT_TIME_MS)
             }
         }
@@ -69,7 +69,7 @@ object PauseTimer {
         // lockdown mode is detected, set the app state as ACTIVE regardless of the current state
         if (!VpnController.isVpnLockdown()) return
 
-        VpnController.getBraveVpnService()?.resumeApp()
+        VpnController.resumeApp()
 
     }
 

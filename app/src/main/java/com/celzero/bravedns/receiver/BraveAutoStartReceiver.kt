@@ -25,7 +25,6 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.celzero.bravedns.util.Utilities
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -40,15 +39,12 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
             return
         }
 
-        val vpnService = VpnController.getBraveVpnService()
-        val isAlwaysOnEnabled = Utilities.isAlwaysOnEnabled(context, vpnService)
-
         if (Intent.ACTION_REBOOT != intent.action && Intent.ACTION_BOOT_COMPLETED != intent.action) {
             Log.w(LOG_TAG_VPN, "unhandled broadcast ${intent.action}")
             return
         }
 
-        if (VpnController.state().activationRequested && !isAlwaysOnEnabled) {
+        if (VpnController.state().activationRequested && !VpnController.isAlwaysOn(context)) {
             val prepareVpnIntent: Intent? = try {
                 VpnService.prepare(context)
             } catch (e: NullPointerException) {

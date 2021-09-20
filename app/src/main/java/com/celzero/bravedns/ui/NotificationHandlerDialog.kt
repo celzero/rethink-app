@@ -20,12 +20,14 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities
 
 class NotificationHandlerDialog : AppCompatActivity() {
@@ -72,6 +74,8 @@ class NotificationHandlerDialog : AppCompatActivity() {
     }
 
     private fun trampoline(trampolineType: TrampolineType) {
+        Log.i(LoggerConstants.LOG_TAG_VPN,
+              "act on notification, notification type: $trampolineType")
         when (trampolineType) {
             TrampolineType.ACCESSIBILITY_SERVICE_FAILURE_DIALOG -> {
                 handleAccessibilitySettings()
@@ -137,7 +141,7 @@ class NotificationHandlerDialog : AppCompatActivity() {
 
         builder.setCancelable(false)
         builder.setPositiveButton(R.string.notif_dialog_pause_dialog_positive) { _, _ ->
-            VpnController.getBraveVpnService()?.resumeApp()
+            VpnController.resumeApp()
 
             trampoline(trampolineType)
         }

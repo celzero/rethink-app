@@ -29,15 +29,15 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppMode
-import com.celzero.bravedns.data.AppMode.Companion.dnscryptRelaysToRemove
+import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.data.AppConfig.Companion.dnscryptRelaysToRemove
 import com.celzero.bravedns.database.DNSCryptRelayEndpoint
 import com.celzero.bravedns.databinding.DnsCryptEndpointListItemBinding
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.*
 
 class DNSCryptRelayEndpointAdapter(private val context: Context, val lifecycleOwner: LifecycleOwner,
-                                   private val appMode: AppMode) :
+                                   private val appConfig: AppConfig) :
         PagedListAdapter<DNSCryptRelayEndpoint, DNSCryptRelayEndpointAdapter.DNSCryptRelayEndpointViewHolder>(
             DIFF_CALLBACK) {
 
@@ -156,7 +156,7 @@ class DNSCryptRelayEndpointAdapter(private val context: Context, val lifecycleOw
                                                isSelected: Boolean) {
 
             io {
-                if (isSelected && !appMode.isDnscryptRelaySelectable()) {
+                if (isSelected && !appConfig.isDnscryptRelaySelectable()) {
                     uiCtx {
                         Toast.makeText(context,
                                        context.getString(R.string.dns_crypt_relay_error_toast),
@@ -170,14 +170,14 @@ class DNSCryptRelayEndpointAdapter(private val context: Context, val lifecycleOw
                 if (!isSelected) {
                     dnscryptRelaysToRemove = endpoint.dnsCryptRelayURL
                 }
-                appMode.handleDnsrelayChanges(endpoint)
+                appConfig.handleDnsrelayChanges(endpoint)
 
             }
         }
 
         private fun deleteEndpoint(id: Int) {
             io {
-                appMode.deleteDnscryptRelayEndpoint(id)
+                appConfig.deleteDnscryptRelayEndpoint(id)
                 uiCtx {
                     Toast.makeText(context, R.string.dns_crypt_relay_remove_success,
                                    Toast.LENGTH_SHORT).show()

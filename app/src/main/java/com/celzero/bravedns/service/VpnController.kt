@@ -20,6 +20,7 @@ import android.content.Intent
 import android.os.SystemClock
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
@@ -99,10 +100,6 @@ object VpnController : KoinComponent {
         }
     }
 
-    fun getBraveVpnService(): BraveVPNService? {
-        return braveVpnService
-    }
-
     fun onConnectionStateChanged(state: BraveVPNService.State?) {
         controllerScope?.launch {
             states?.send(state)
@@ -175,6 +172,40 @@ object VpnController : KoinComponent {
 
     fun isVpnLockdown(): Boolean {
         return Utilities.isVpnLockdownEnabled(braveVpnService)
+    }
+
+    fun isAlwaysOn(context: Context): Boolean {
+        return Utilities.isAlwaysOnEnabled(context, braveVpnService)
+    }
+
+    fun pauseApp() {
+        braveVpnService?.let {
+            onConnectionStateChanged(BraveVPNService.State.PAUSED)
+            it.pauseApp()
+        }
+    }
+
+    fun resumeApp() {
+        braveVpnService?.let {
+            onConnectionStateChanged(BraveVPNService.State.NEW)
+            it.resumeApp()
+        }
+    }
+
+    fun getPauseCountDownObserver(): MutableLiveData<Long>? {
+        return braveVpnService?.getPauseCountDownObserver()
+    }
+
+    fun increasePauseDuration(durationMs: Long) {
+        braveVpnService?.increasePauseDuration(durationMs)
+    }
+
+    fun decreasePauseDuration(durationMs: Long) {
+        braveVpnService?.decreasePauseDuration(durationMs)
+    }
+
+    fun resetAccessibilityHearbeatTimestamp() {
+        braveVpnService?.accessibilityHearbeatTimestamp = INIT_TIME_MS
     }
 
 }

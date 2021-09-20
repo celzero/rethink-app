@@ -21,80 +21,91 @@ import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import androidx.room.Transaction
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
 
     @Transaction
-    fun update(doHEndpoint: DoHEndpoint) {
-        doHEndpointDAO.removeConnectionStatus()
-        doHEndpointDAO.update(doHEndpoint)
+    suspend fun update(doHEndpoint: DoHEndpoint) {
+        ioCtx {
+            doHEndpointDAO.removeConnectionStatus()
+            doHEndpointDAO.update(doHEndpoint)
+        }
     }
 
-    fun insertAsync(doHEndpoint: DoHEndpoint,
-                    coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
-        coroutineScope.launch {
+    suspend fun insertAsync(doHEndpoint: DoHEndpoint) {
+        ioCtx {
             doHEndpointDAO.insert(doHEndpoint)
         }
     }
 
-    fun insertWithReplaceAsync(doHEndpoint: DoHEndpoint,
-                               coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
-        coroutineScope.launch {
+    suspend fun insertWithReplaceAsync(doHEndpoint: DoHEndpoint) {
+        ioCtx {
             doHEndpointDAO.insertReplace(doHEndpoint)
         }
     }
 
-    fun getDoHEndpointLiveData(): LiveData<PagedList<DoHEndpoint>> {
+    suspend fun getDoHEndpointLiveData(): LiveData<PagedList<DoHEndpoint>> {
         return doHEndpointDAO.getDoHEndpointLiveData().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
     }
 
-    fun deleteOlderData(date: Long,
-                        coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
-        coroutineScope.launch {
+    suspend fun deleteOlderData(date: Long) {
+        ioCtx {
             doHEndpointDAO.deleteOlderData(date)
         }
     }
 
-    fun getDoHEndpointLiveDataByName(query: String): LiveData<PagedList<DoHEndpoint>> {
+    suspend fun getDoHEndpointLiveDataByName(query: String): LiveData<PagedList<DoHEndpoint>> {
         return doHEndpointDAO.getDoHEndpointLiveDataByName(query).toLiveData(
             pageSize = LIVEDATA_PAGE_SIZE)
     }
 
-    fun deleteDoHEndpoint(id: Int) {
-        doHEndpointDAO.deleteDoHEndpoint(id)
+    suspend fun deleteDoHEndpoint(id: Int) {
+        ioCtx {
+            doHEndpointDAO.deleteDoHEndpoint(id)
+        }
     }
 
-    fun removeConnectionStatus() {
-        doHEndpointDAO.removeConnectionStatus()
+    suspend fun removeConnectionStatus() {
+        ioCtx {
+            doHEndpointDAO.removeConnectionStatus()
+        }
     }
 
-    fun getConnectedDoH(): DoHEndpoint? {
+    suspend fun getConnectedDoH(): DoHEndpoint? {
         return doHEndpointDAO.getConnectedDoH()
     }
 
-    fun updateConnectionURL(url: String) {
-        doHEndpointDAO.updateConnectionURL(url)
+    suspend fun updateConnectionURL(url: String) {
+        ioCtx {
+            doHEndpointDAO.updateConnectionURL(url)
+        }
     }
 
-    fun getConnectionURL(id: Int): String {
+    suspend fun getConnectionURL(id: Int): String {
         return doHEndpointDAO.getConnectionURL(id)
     }
 
-    fun getCount(): Int {
+    suspend fun getCount(): Int {
         return doHEndpointDAO.getCount()
     }
 
-    fun updateConnectionDefault(): DoHEndpoint? {
-        doHEndpointDAO.updateConnectionDefault()
-        return doHEndpointDAO.getConnectedDoH()
+    suspend fun updateConnectionDefault() {
+        ioCtx {
+            doHEndpointDAO.updateConnectionDefault()
+        }
     }
 
-    fun getRethinkDnsEndpoint(): DoHEndpoint {
+    suspend fun getRethinkDnsEndpoint(): DoHEndpoint {
         return doHEndpointDAO.getRethinkDnsEndpoint()
+    }
+
+    private suspend fun ioCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.IO) {
+            f()
+        }
     }
 
 }
