@@ -218,6 +218,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 }
             }
 
+            if (allowOrbot(uid)) {
+                return FirewallRuleset.RULE9B
+            }
+
             // if the app is new (ie unknown), refresh the db
             if (FirewallManager.AppStatus.UNKNOWN == appStatus) {
                 io("dbRefresh") {
@@ -280,6 +284,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         }
 
         return FirewallRuleset.RULE0
+    }
+
+    private fun allowOrbot(uid: Int): Boolean {
+        return settingUpOrbot.get() && OrbotHelper.ORBOT_PACKAGE_NAME == FirewallManager.getPackageNameByUid(uid)
     }
 
     private fun dnsProxied(port: Int): Boolean {
@@ -407,7 +415,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     }
 
     private fun showAccessibilityStoppedNotification() {
-        if (DEBUG) Log.d(LOG_TAG_VPN, "app not in use failure, show notification")
+        Log.i(LOG_TAG_VPN, "app not in use failure, show notification")
 
         val intent = Intent(this, NotificationHandlerDialog::class.java)
         intent.putExtra(NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME,
@@ -573,16 +581,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
 
         // Fix - Cloud Backups were failing thinking that the VPN connection is metered.
         // The below code will fix that.
-        if (VERSION.SDK_INT >= VERSION_CODES.Q) {
+        if (isAtleastQ()) {
             builder.setMetered(false)
         }
 
         // re-hydrate exclude-apps incase it has changed in the interim
         excludedApps = FirewallManager.getExcludedApps()
 
-        if (VERSION.SDK_INT >= VERSION_CODES.Q) {
-            if (!VpnController.isVpnLockdown() && AppConfig.ProxyType.isHttpProxyTypeEnabled(
-                    appConfig.getProxyType())) {
+        if (isAtleastQ()) {
+            if (appConfig.canEnableProxy() && appConfig.isCustomHttpProxyEnabled()) {
                 getHttpProxyInfo()?.let { builder.setHttpProxy(it) }
             }
         }
@@ -616,7 +623,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 }
                 builder = builder.addDisallowedApplication(this.packageName)
             }
-            if (appConfig.getProxyMode().isCustomSocks5Proxy()) {
+            if (appConfig.isCustomSocks5Enabled()) {
                 // For Socks5 if there is a app selected, add that app in excluded list
                 val socks5ProxyEndpoint = appConfig.getConnectedSocks5Proxy()
                 val appName = socks5ProxyEndpoint?.proxyAppName
@@ -629,7 +636,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 }
             }
 
-            if (appConfig.getProxyMode().isOrbotProxy() && isExcludePossible(
+            if (appConfig.isOrbotProxyEnabled() && isExcludePossible(
                     getString(R.string.orbot), getString(R.string.orbot_toast_parameter))) {
                 builder = builder.addDisallowedApplication(OrbotHelper.ORBOT_PACKAGE_NAME)
             }
@@ -759,7 +766,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         // 1. Pause / Resume, Stop action button.
         // 2. RethinkDNS modes (dns & dns+firewall mode)
         // 3. No action button.
-        if (DEBUG) Log.d(LOG_TAG_VPN, "Notification - ${persistentState.notificationActionType}")
+        if (DEBUG) Log.d(LOG_TAG_VPN, "notification action type:  ${persistentState.notificationActionType}")
         builder.color = ContextCompat.getColor(this, getThemeAccent(this))
         when (NotificationActionType.getNotificationActionType(
             persistentState.notificationActionType)) {

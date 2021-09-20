@@ -40,10 +40,6 @@ public class GoProber extends Prober {
         new Thread(() -> {
             String dohIPs = GoVpnAdapter.Companion.getIpString(context, url);
             try {
-                // commented out the below code, as the app supports 23+
-                /* // Protection isn't needed for Lollipop+, or if the VPN is not active.
-                Protector protector = VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP ? null :
-                        VpnController.INSTANCE.getBraveVpnService(); */
                 Transport transport = Tun2socks.newDoHTransport(url, dohIPs, /* protector */null, /* clientAuth */null, /* listener */null);
                 if (transport == null) {
                     callback.onCompleted(false);

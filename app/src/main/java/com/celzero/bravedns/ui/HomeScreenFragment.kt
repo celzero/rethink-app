@@ -125,8 +125,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             View.GONE
         }
 
-        b.fhsProxyChip.visibility = if (AppConfig.ProxyType.isProxyEnabled(
-                appConfig.getProxyType())) {
+        b.fhsProxyChip.visibility = if (appConfig.isProxyEnabled()) {
             View.VISIBLE
         } else {
             View.GONE

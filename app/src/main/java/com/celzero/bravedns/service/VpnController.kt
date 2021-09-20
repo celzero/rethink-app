@@ -179,13 +179,17 @@ object VpnController : KoinComponent {
     }
 
     fun pauseApp() {
-        onConnectionStateChanged(BraveVPNService.State.PAUSED)
-        braveVpnService?.pauseApp()
+        braveVpnService?.let {
+            onConnectionStateChanged(BraveVPNService.State.PAUSED)
+            it.pauseApp()
+        }
     }
 
     fun resumeApp() {
-        onConnectionStateChanged(BraveVPNService.State.NEW)
-        braveVpnService?.resumeApp()
+        braveVpnService?.let {
+            onConnectionStateChanged(BraveVPNService.State.NEW)
+            it.resumeApp()
+        }
     }
 
     fun getPauseCountDownObserver(): MutableLiveData<Long>? {

@@ -882,7 +882,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     // Should be in disabled state when the brave mode is in DNS only / Vpn in lockdown mode.
     private fun handleProxyUi() {
-        val canEnableProxy = appConfig.isDnsOnlyMode()
+        val canEnableProxy = appConfig.canEnableProxy()
 
         if (canEnableProxy) {
             b.settingsActivitySocks5Rl.alpha = 1f
