@@ -130,8 +130,8 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
 
         if (packageInfos != null) {
             b.bsConnBlockAppCheck.isChecked = FirewallManager.isUidFirewalled(ipDetails.uid)
-            val appCount = (packageInfos.size).minus(1)
-            b.bsConnTrackAppName.text = if (packageInfos.size >= 2) {
+            val appCount = (packageInfos.count()).minus(1)
+            b.bsConnTrackAppName.text = if (packageInfos.count() >= 2) {
                 getString(R.string.ctbs_app_other_apps, ipDetails.appName, appCount.toString())
             } else if (AndroidUidConfig.isUidAppRange(ipDetails.uid)) {
                 canNav = true
@@ -314,21 +314,21 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
 
         val appUIDList = FirewallManager.getAppNamesByUid(ipDetails.uid)
 
-        if (appUIDList.size <= 1) {
+        if (appUIDList.count() <= 1) {
             updateDetails(ipDetails.uid, isBlocked)
             return
         }
 
-        if (appUIDList.size > 1) {
+        if (appUIDList.count() > 1) {
             var title = getString(R.string.ctbs_block_other_apps, ipDetails.appName,
-                                  appUIDList.size.toString())
+                                  appUIDList.count().toString())
             var positiveText = getString(R.string.ctbs_block_other_apps_positive_text,
-                                         appUIDList.size.toString())
+                                         appUIDList.count().toString())
             if (isBlocked) {
                 title = getString(R.string.ctbs_unblock_other_apps, ipDetails.appName,
-                                  appUIDList.size.toString())
+                                  appUIDList.count().toString())
                 positiveText = getString(R.string.ctbs_unblock_other_apps_positive_text,
-                                         appUIDList.size.toString())
+                                         appUIDList.count().toString())
             }
             showFirewallDialog(appUIDList, title, positiveText, isBlocked)
             b.bsConnBlockAppCheck.isChecked = isBlocked
@@ -346,13 +346,13 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
 
     private fun clearAppRules() {
         val appUIDList = FirewallManager.getAppNamesByUid(ipDetails.uid)
-        if (appUIDList.size <= 1) {
+        if (appUIDList.count() <= 1) {
             promptClearRulesConfirmation()
             return
         }
 
         val title = getString(R.string.ctbs_clear_rules_desc, ipDetails.appName,
-                              appUIDList.size.toString())
+                              appUIDList.count().toString())
         val positiveText = getString(R.string.ctbs_clear_rules_positive_text)
 
         showClearRulesDialog(appUIDList, title, positiveText)

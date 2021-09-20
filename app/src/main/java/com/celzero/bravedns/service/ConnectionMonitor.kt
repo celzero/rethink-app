@@ -197,7 +197,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         private fun informListener(requireAllNetworks: Boolean = false) {
             Log.i(LOG_TAG_CONNECTION,
                   "inform listener on network change - ${currentNetworks.size}, is all network - $requireAllNetworks")
-            if (currentNetworks.size > 0) {
+            if (currentNetworks.count() > 0) {
                 val networks = when (requireAllNetworks) {
                     true -> currentNetworks
                     false -> null
@@ -210,7 +210,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
         private fun hasDifference(currentNetworks: LinkedHashSet<Network>,
                                   newNetworks: LinkedHashSet<Network>): Boolean {
-            return Sets.symmetricDifference(currentNetworks, newNetworks).size != 0
+            return Sets.symmetricDifference(currentNetworks, newNetworks).count() != 0
         }
 
         /**

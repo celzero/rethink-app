@@ -156,7 +156,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
 
     private fun searchAndExpandCategories(query: String) {
         firewallAppInfoViewModel.setFilter(query)
-        if (filteredCategories.size <= 0) return
+        if (filteredCategories.count() <= 0) return
 
         if (query.isEmpty()) {
             filteredCategories.forEachIndexed { i, _ ->
@@ -164,11 +164,11 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
             }
         } else {
             for (i in filteredCategories.indices) {
-                if (listData[filteredCategories[i]]?.size!! > 0) {
+                if (listData[filteredCategories[i]]?.count()!! > 0) {
                     b.firewallExpandableList.expandGroup(i)
                 }
             }
-            if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category block ${filteredCategories.size}")
+            if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category block ${filteredCategories.count()}")
         }
     }
 

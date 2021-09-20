@@ -327,7 +327,7 @@ class AppConfig internal constructor(private val context: Context,
                 val text = context.getString(R.string.configure_dns_crypt, count.toString())
                 connectedDNS.postValue(text)
                 persistentState.connectedDnsName = text
-                persistentState.setDnsCryptRelayCount(relayCount.size)
+                persistentState.setDnsCryptRelayCount(relayCount.count())
             }
             DnsType.DNS_PROXY -> {
                 val endpoint = getDNSProxyServerDetails()
@@ -456,7 +456,7 @@ class AppConfig internal constructor(private val context: Context,
 
     suspend fun canRemoveDnscrypt(dnsCryptEndpoint: DNSCryptEndpoint): Boolean {
         val list = dnsCryptEndpointRepository.getConnectedDNSCrypt()
-        if (list.size == 1 && list[0].dnsCryptURL == dnsCryptEndpoint.dnsCryptURL) {
+        if (list.count() == 1 && list[0].dnsCryptURL == dnsCryptEndpoint.dnsCryptURL) {
             return false
         }
         return true

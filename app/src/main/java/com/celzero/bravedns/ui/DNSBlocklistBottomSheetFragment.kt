@@ -130,8 +130,8 @@ class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
 
         val ips = transaction.response.split(",")
 
-        if (ips.size > 1) b.dnsBlockIpsChip.text = getString(R.string.dns_btm_sheet_chip,
-                                                             (ips.size - 1).toString())
+        if (ips.count() > 1) b.dnsBlockIpsChip.text = getString(R.string.dns_btm_sheet_chip,
+                                                             (ips.count() - 1).toString())
         else b.dnsBlockIpsChip.visibility = View.GONE
 
         b.dnsBlockIpsChip.setOnClickListener {
@@ -145,7 +145,7 @@ class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
 
         transaction.getBlocklists().forEach {
             val items = it.split(":")
-            if (items.size <= 1) return@forEach
+            if (items.count() <= 1) return@forEach
 
             group.put(items[0], items[1])
         }
@@ -217,7 +217,7 @@ class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
             val heading = it.replaceFirstChar { a ->
                 if (a.isLowerCase()) a.titlecase(Locale.getDefault()) else a.toString()
             }
-            val size = groupNames.get(it).size
+            val size = groupNames.get(it).count()
             text += getString(R.string.dns_btm_sheet_dialog_message, heading, size.toString(),
                               TextUtils.join(", ", groupNames.get(it)))
         }

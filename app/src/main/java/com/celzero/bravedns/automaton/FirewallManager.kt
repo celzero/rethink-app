@@ -87,7 +87,7 @@ object FirewallManager : KoinComponent {
     }
 
     fun getTotalApps(): Int {
-        return getAppInfosLocked().size
+        return getAppInfosLocked().count()
     }
 
     fun getPackageNames(): Set<AppInfoTuple> {
@@ -193,19 +193,19 @@ object FirewallManager : KoinComponent {
     private fun getBlockedCountForCategory(categoryName: String): Int {
         return getAppInfosLocked().filter {
             it.appCategory == categoryName && !it.isInternetAllowed
-        }.size
+        }.count()
     }
 
     private fun getWhitelistCountForCategory(categoryName: String): Int {
         return getAppInfosLocked().filter {
             it.appCategory == categoryName && it.whiteListUniv1
-        }.size
+        }.count()
     }
 
     private fun getExcludedCountForCategory(categoryName: String): Int {
         return getAppInfosLocked().filter {
             it.appCategory == categoryName && it.isExcluded
-        }.size
+        }.count()
     }
 
     fun getWhitelistAppData(): List<AppInfo> {

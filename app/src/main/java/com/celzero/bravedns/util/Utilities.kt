@@ -91,7 +91,7 @@ class Utilities {
                     // The name doesn't end in a recognized TLD.  This can happen for randomly generated
                     // names, or when new TLDs are introduced.
                     val parts: List<String> = name.parts()
-                    val size = parts.size
+                    val size = parts.count()
                     if (size >= 2) {
                         parts[size - 2] + "." + parts[size - 1]
                     } else if (size == 1) {
@@ -123,7 +123,7 @@ class Utilities {
                 }
             }
             if (DEBUG) Log.e(LOG_TAG_VPN,
-                             "Accessibility failure, ${context.packageName},  ${service.name}, return size: ${enabledServices.size}")
+                             "Accessibility failure, ${context.packageName},  ${service.name}, return size: ${enabledServices.count()}")
             return false
         }
 

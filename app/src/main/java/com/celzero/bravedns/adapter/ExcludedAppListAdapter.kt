@@ -100,7 +100,7 @@ class ExcludedAppListAdapter(private val context: Context) :
         private fun excludeAppsFromVpn(appInfo: AppInfo) {
             val appUidList = FirewallManager.getAppNamesByUid(appInfo.uid)
 
-            if (appUidList.size > 1) {
+            if (appUidList.count() > 1) {
                 showDialog(appUidList, appInfo)
             } else {
                 b.excludedAppListCheckbox.isChecked = appInfo.isExcluded
@@ -119,14 +119,14 @@ class ExcludedAppListAdapter(private val context: Context) :
             builderSingle.setIcon(R.drawable.ic_exclude_app)
             positiveTxt = if (appInfo.isExcluded) {
                 builderSingle.setTitle(context.getString(R.string.exclude_app_desc, appInfo.appName,
-                                                         packageList.size.toString()))
-                context.getString(R.string.exclude_app_dialog_positive, packageList.size.toString())
+                                                         packageList.count().toString()))
+                context.getString(R.string.exclude_app_dialog_positive, packageList.count().toString())
             } else {
                 builderSingle.setTitle(
                     context.getString(R.string.unexclude_app_desc, appInfo.appName,
-                                      packageList.size.toString()))
+                                      packageList.count().toString()))
                 context.getString(R.string.unexclude_app_dialog_positive,
-                                  packageList.size.toString())
+                                  packageList.count().toString())
             }
             val arrayAdapter = ArrayAdapter<String>(context,
                                                     android.R.layout.simple_list_item_activated_1)

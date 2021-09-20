@@ -109,7 +109,7 @@ class WhitelistedAppsAdapter(private val context: Context) :
             val appUidList = FirewallManager.getAppNamesByUid(appInfo.uid)
             Log.i(LOG_TAG_FIREWALL, "App ${appInfo.appName} whitelisted from vpn? $isWhitelist")
 
-            if (appUidList.size > 1) {
+            if (appUidList.count() > 1) {
                 showDialog(appUidList, appInfo, isWhitelist)
             } else {
                 FirewallManager.updateWhitelistedApps(appInfo, isWhitelist)
@@ -130,13 +130,13 @@ class WhitelistedAppsAdapter(private val context: Context) :
             positiveTxt = if (isWhitelist) {
                 builderSingle.setTitle(
                     context.getString(R.string.whitelist_add_app, appNameEllipsis,
-                                      packageList.size.toString()))
-                context.getString(R.string.whitelist_add_positive, packageList.size.toString())
+                                      packageList.count().toString()))
+                context.getString(R.string.whitelist_add_positive, packageList.count().toString())
             } else {
                 builderSingle.setTitle(
                     context.getString(R.string.whitelist_remove_app, appNameEllipsis,
-                                      packageList.size.toString()))
-                context.getString(R.string.whitelist_add_negative, packageList.size.toString())
+                                      packageList.count().toString()))
+                context.getString(R.string.whitelist_add_negative, packageList.count().toString())
             }
             builderSingle.setCancelable(false)
             builderSingle.setItems(packageList.toTypedArray(), null)

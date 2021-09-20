@@ -124,9 +124,9 @@ class ConnectionTrackerAdapter(private val connectionTrackerFragment: Connection
                 return
             }
 
-            val appName = if (apps.size > 1) {
+            val appName = if (apps.count() > 1) {
                 context.getString(R.string.ctbs_app_other_apps, ct.appName,
-                                  (apps.size).minus(1).toString())
+                                  (apps.count()).minus(1).toString())
             } else {
                 ct.appName
             }

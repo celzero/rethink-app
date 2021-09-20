@@ -158,7 +158,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var lastAppExitInfoTimestamp by longPref("prev_trace_timestamp", INIT_TIME_MS)
 
     // fetch fav icons for domains in dns request
-    var fetchFavIcon by booleanPref("fav_icon_enabled", Utilities.isFdroidFlavour())
+    var fetchFavIcon by booleanPref("fav_icon_enabled", !Utilities.isFdroidFlavour())
 
     // whether to show "what's new" chip on the homescreen, usually
     // shown after a update and until the user dismisses it

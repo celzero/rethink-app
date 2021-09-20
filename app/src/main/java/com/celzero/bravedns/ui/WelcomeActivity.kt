@@ -60,7 +60,10 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
 
         b.btnNext.setOnClickListener {
             val currentItem = getItem()
-            if (currentItem + 1 >= layout.size) {
+            // size and count() are almost always equivalent. However some lazy Seq cannot know
+            // their size until being fulfilled so size will be undefined for those cases and
+            // calling count() will fulfill the lazy Seq to determine its size.
+            if (currentItem + 1 >= layout.count()) {
                 launchHomeScreen()
             } else {
                 b.viewPager.currentItem = currentItem + 1
@@ -77,7 +80,7 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
 
             override fun onPageSelected(position: Int) {
                 addBottomDots(position)
-                if (position >= layout.size - 1) {
+                if (position >= layout.count() - 1) {
                     b.btnNext.text = getString(R.string.finish)
                     b.btnNext.visibility = View.VISIBLE
                     b.btnSkip.visibility = View.INVISIBLE
@@ -104,7 +107,7 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
     }
 
     private fun addBottomDots(currentPage: Int) {
-        dots = arrayOfNulls(layout.size)
+        dots = arrayOfNulls(layout.count())
 
         val colorActive = resources.getIntArray(R.array.array_dot_active)
         val colorInActive = resources.getIntArray(R.array.array_dot_inactive)
@@ -143,7 +146,7 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
         }
 
         override fun getCount(): Int {
-            return layout.size
+            return layout.count()
         }
 
         override fun instantiateItem(container: ViewGroup, position: Int): Any {

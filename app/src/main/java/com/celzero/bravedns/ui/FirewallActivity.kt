@@ -45,7 +45,7 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
 
         companion object {
             fun getCount(): Int {
-                return values().size
+                return values().count()
             }
         }
     }

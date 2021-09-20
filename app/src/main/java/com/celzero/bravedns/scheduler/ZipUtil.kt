@@ -58,7 +58,7 @@ class ZipUtil {
 
             val zipFile = getZipFile(context) ?: return constructFileName(filePath, null)
             zipFile.use { zf ->
-                val nextFileNumber = zf.entries().toList().size
+                val nextFileNumber = zf.entries().toList().count()
 
                 if (nextFileNumber >= BUG_REPORT_MAX_FILES_ALLOWED) {
                     val f = File(getOlderFile(zf))

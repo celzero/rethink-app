@@ -110,7 +110,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
                 "${context.filesDir.canonicalPath}${File.separator}$timestamp${File.separator}")
 
             Log.i(LOG_TAG_DOWNLOAD,
-                  "After copy, dest dir: $destinationDir, ${destinationDir.isDirectory}, ${destinationDir.list()?.size}")
+                  "After copy, dest dir: $destinationDir, ${destinationDir.isDirectory}, ${destinationDir.list()?.count()}")
 
             if (!hasLocalBlocklists(context, timestamp) || !isDownloadValid(timestamp)) {
                 return false

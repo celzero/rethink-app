@@ -112,7 +112,7 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
 
             val appUidList = FirewallManager.getAppNamesByUid(appInfo.uid)
 
-            if (appUidList.size > 1) {
+            if (appUidList.count() > 1) {
                 childViewBinding.firewallToggleWifi.isChecked = !appInfo.isInternetAllowed
                 // since isChecked is toggled above, notify the renderer
                 notifyDataSetChanged()
@@ -188,7 +188,7 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
     }
 
     override fun getGroupCount(): Int {
-        return this.titleList.size
+        return this.titleList.count()
     }
 
     override fun getGroupId(listPosition: Int): Long {
@@ -252,12 +252,12 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
         }
 
         when {
-            list.size == 1 -> {
+            list.count() == 1 -> {
                 show(app1Icon)
                 hide(app2Icon)
                 loadIcon(list[0].packageInfo, app1Icon)
             }
-            list.size > 1 -> {
+            list.count() > 1 -> {
                 show(app1Icon)
                 show(app2Icon)
                 loadIcon(list[0].packageInfo, app1Icon)
@@ -348,15 +348,15 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
         positiveTxt = if (appInfo.isInternetAllowed) {
             builderSingle.setTitle(
                 context.getString(R.string.ctbs_block_other_apps, appInfo.appName,
-                                  packageList.size.toString()))
+                                  packageList.count().toString()))
             context.getString(R.string.ctbs_block_other_apps_positive_text,
-                              packageList.size.toString())
+                              packageList.count().toString())
         } else {
             builderSingle.setTitle(
                 context.getString(R.string.ctbs_unblock_other_apps, appInfo.appName,
-                                  packageList.size.toString()))
+                                  packageList.count().toString()))
             context.getString(R.string.ctbs_unblock_other_apps_positive_text,
-                              packageList.size.toString())
+                              packageList.count().toString())
         }
         val arrayAdapter = ArrayAdapter<String>(context,
                                                 android.R.layout.simple_list_item_activated_1)
