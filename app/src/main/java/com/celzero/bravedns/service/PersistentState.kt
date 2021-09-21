@@ -107,7 +107,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var killAppOnFirewall by booleanPref("kill_app_on_firewall", true)
 
     // whether apps subject to the RethinkDNS VPN tunnel can bypass the tunnel on-demand
-    var allowBypass by booleanPref("allow_bypass", true)
+    // default: false for fdroid flavour
+    var allowBypass by booleanPref("allow_bypass", !Utilities.isFdroidFlavour())
 
     // user set among AppConfig.DnsType enum; 1's the default which is DoH
     var dnsType by intPref("dns_type", 1)
