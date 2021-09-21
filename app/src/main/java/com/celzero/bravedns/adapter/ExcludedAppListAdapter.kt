@@ -117,16 +117,18 @@ class ExcludedAppListAdapter(private val context: Context) :
             val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
 
             builderSingle.setIcon(R.drawable.ic_exclude_app)
+
+            val count = packageList.count()
             positiveTxt = if (appInfo.isExcluded) {
                 builderSingle.setTitle(context.getString(R.string.exclude_app_desc, appInfo.appName,
-                                                         packageList.count().toString()))
-                context.getString(R.string.exclude_app_dialog_positive, packageList.count().toString())
+                                                         count.toString()))
+                context.getString(R.string.exclude_app_dialog_positive, count.toString())
             } else {
                 builderSingle.setTitle(
                     context.getString(R.string.unexclude_app_desc, appInfo.appName,
-                                      packageList.count().toString()))
+                                      count.toString()))
                 context.getString(R.string.unexclude_app_dialog_positive,
-                                  packageList.count().toString())
+                                  count.toString())
             }
             val arrayAdapter = ArrayAdapter<String>(context,
                                                     android.R.layout.simple_list_item_activated_1)

@@ -136,7 +136,7 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
     private fun killApps(uid: Int) {
         if (!persistentState.killAppOnFirewall) return
         io {
-            val apps = FirewallManager.getPackageNamesByUid(uid)
+            val apps = FirewallManager.getNonSystemAppsPackageNameByUid(uid)
             apps.forEach {
                 Utilities.killBg(activityManager, it)
             }
@@ -251,13 +251,14 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
             return
         }
 
+        val count = list.count()
         when {
-            list.count() == 1 -> {
+            count == 1 -> {
                 show(app1Icon)
                 hide(app2Icon)
                 loadIcon(list[0].packageInfo, app1Icon)
             }
-            list.count() > 1 -> {
+            count > 1 -> {
                 show(app1Icon)
                 show(app2Icon)
                 loadIcon(list[0].packageInfo, app1Icon)
@@ -345,18 +346,19 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
         val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
 
         builderSingle.setIcon(R.drawable.spinner_firewall)
+        val count = packageList.count()
         positiveTxt = if (appInfo.isInternetAllowed) {
             builderSingle.setTitle(
                 context.getString(R.string.ctbs_block_other_apps, appInfo.appName,
-                                  packageList.count().toString()))
+                                  count.toString()))
             context.getString(R.string.ctbs_block_other_apps_positive_text,
-                              packageList.count().toString())
+                              count.toString())
         } else {
             builderSingle.setTitle(
                 context.getString(R.string.ctbs_unblock_other_apps, appInfo.appName,
-                                  packageList.count().toString()))
+                                  count.toString()))
             context.getString(R.string.ctbs_unblock_other_apps_positive_text,
-                              packageList.count().toString())
+                              count.toString())
         }
         val arrayAdapter = ArrayAdapter<String>(context,
                                                 android.R.layout.simple_list_item_activated_1)

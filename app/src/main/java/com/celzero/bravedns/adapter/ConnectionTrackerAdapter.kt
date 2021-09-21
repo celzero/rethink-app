@@ -28,6 +28,7 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
+import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
 import com.celzero.bravedns.glide.GlideApp
@@ -118,15 +119,17 @@ class ConnectionTrackerAdapter(private val connectionTrackerFragment: Connection
         private fun displayAppDetails(ct: ConnectionTracker) {
             b.connectionAppName.text = ct.appName
 
-            val apps = getPackageInfoForUid(context, ct.uid)
+            val apps = FirewallManager.getPackageNamesByUid(ct.uid)
+
             if (apps.isNullOrEmpty()) {
                 loadAppIcon(Utilities.getDefaultIcon(context))
                 return
             }
 
-            val appName = if (apps.count() > 1) {
+            val appsCount = apps.count()
+            val appName = if (appsCount > 1) {
                 context.getString(R.string.ctbs_app_other_apps, ct.appName,
-                                  (apps.count()).minus(1).toString())
+                                  (appsCount).minus(1).toString())
             } else {
                 ct.appName
             }

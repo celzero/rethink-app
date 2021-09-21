@@ -563,9 +563,9 @@ class AppConfig internal constructor(private val context: Context,
 
         // If add proxy request is custom proxy (either http/socks5), check if the other
         // proxy is already set. if yes, then make the proxy type as HTTP_SOCKS5.
-        val setProxyType = ProxyType.getProxyType(getProxyType())
+        val currentProxyType = ProxyType.getProxyType(getProxyType())
         if (proxyType.isProxyTypeHttp()) {
-            if (setProxyType.isProxyTypeSocks5()) {
+            if (currentProxyType.isProxyTypeSocks5()) {
                 setProxy(ProxyType.HTTP_SOCKS5, provider)
                 return
             }
@@ -574,7 +574,7 @@ class AppConfig internal constructor(private val context: Context,
         }
 
         if (proxyType.isProxyTypeSocks5()) {
-            if (setProxyType.isProxyTypeHttp()) {
+            if (currentProxyType.isProxyTypeHttp()) {
                 setProxy(ProxyType.HTTP_SOCKS5, provider)
                 return
             }
@@ -602,16 +602,16 @@ class AppConfig internal constructor(private val context: Context,
         // handles only for custom proxy setup
         // change and set proxy on HTTP_SOCKS5 proxy mode
         // remove proxy for all the other cases
-        val setProxyType = ProxyType.getProxyType(getProxyType())
+        val currentProxyType = ProxyType.getProxyType(getProxyType())
         when (proxyType) {
             ProxyType.HTTP -> {
-                if (setProxyType.isProxyTypeHttpSocks5()) {
+                if (currentProxyType.isProxyTypeHttpSocks5()) {
                     setProxy(ProxyType.SOCKS5, provider)
                     return
                 }
             }
             ProxyType.SOCKS5 -> {
-                if (setProxyType.isProxyTypeHttpSocks5()) {
+                if (currentProxyType.isProxyTypeHttpSocks5()) {
                     setProxy(ProxyType.HTTP, provider)
                     return
                 }

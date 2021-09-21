@@ -312,9 +312,10 @@ class RefreshDatabase internal constructor(private var context: Context,
         // if there is no apps in the cache, don't show the notification
         if (FirewallManager.getTotalApps() == 0) return
 
+        val appCount = apps.count()
         // Show bulk notification when the app size is greater than NEW_APP_BULK_CHECK_COUNT(5)
-        if (apps.count() > NOTIF_BATCH_NEW_APPS_THRESHOLD) {
-            showNewAppsBulkNotificationIfNeeded(apps.count())
+        if (appCount > NOTIF_BATCH_NEW_APPS_THRESHOLD) {
+            showNewAppsBulkNotificationIfNeeded(appCount)
             return
         }
 

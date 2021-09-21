@@ -127,16 +127,17 @@ class WhitelistedAppsAdapter(private val context: Context) :
                 appNameEllipsis = "$appNameEllipsis..."
             }
 
+            val count = packageList.count()
             positiveTxt = if (isWhitelist) {
                 builderSingle.setTitle(
                     context.getString(R.string.whitelist_add_app, appNameEllipsis,
-                                      packageList.count().toString()))
-                context.getString(R.string.whitelist_add_positive, packageList.count().toString())
+                                      count.toString()))
+                context.getString(R.string.whitelist_add_positive, count.toString())
             } else {
                 builderSingle.setTitle(
                     context.getString(R.string.whitelist_remove_app, appNameEllipsis,
-                                      packageList.count().toString()))
-                context.getString(R.string.whitelist_add_negative, packageList.count().toString())
+                                      count.toString()))
+                context.getString(R.string.whitelist_add_negative, count.toString())
             }
             builderSingle.setCancelable(false)
             builderSingle.setItems(packageList.toTypedArray(), null)

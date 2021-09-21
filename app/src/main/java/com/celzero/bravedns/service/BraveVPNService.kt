@@ -545,7 +545,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         if (DEBUG) Log.i(LOG_TAG_VPN,
                          "Firewalled application trying to connect - Kill app is enabled - uid - $uid")
         io("killBgApps") {
-            val appUIDList = FirewallManager.getPackageNamesByUid(uid)
+            val appUIDList = FirewallManager.getNonSystemAppsPackageNameByUid(uid)
             appUIDList.forEach {
                 if (DEBUG) Log.d(LOG_TAG_VPN, "app $uid / $it killed")
                 Utilities.killBg(activityManager, it)
