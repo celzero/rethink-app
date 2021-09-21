@@ -70,7 +70,7 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
     }
 
     private fun getBlockedNetworkLogs(input: String): LiveData<PagedList<ConnectionTracker>> {
-        return if (filterRules.size > 0) {
+        return if (filterRules.count() > 0) {
             connectionTrackerDAO.getBlockedConnectionsFiltered("%$input%", filterRules).toLiveData(
                 pageSize = DNS_LIVEDATA_PAGE_SIZE)
         } else {
@@ -80,7 +80,7 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
     }
 
     private fun getAllowedNetworkLogs(input: String): LiveData<PagedList<ConnectionTracker>> {
-        return if (filterRules.size > 0) {
+        return if (filterRules.count() > 0) {
             connectionTrackerDAO.getAllowedConnectionsFiltered("%$input%", filterRules).toLiveData(
                 pageSize = DNS_LIVEDATA_PAGE_SIZE)
         } else {

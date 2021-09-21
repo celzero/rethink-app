@@ -65,7 +65,7 @@ class CustomSpinnerAdapter(val context: Context, var dataSource: List<String>) :
     }
 
     override fun getCount(): Int {
-        return dataSource.size
+        return dataSource.count()
     }
 
     override fun getItemId(position: Int): Long {

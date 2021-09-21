@@ -34,11 +34,11 @@ class BlocklistDownloadHelper {
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Local block list validation: $timestamp")
                 dir = File(getExternalFilePath(context, timestamp))
                 total = if (dir.isDirectory) {
-                    dir.list()?.size
+                    dir.list()?.count()
                 } else {
                     0
                 }
-                result = Constants.ONDEVICE_BLOCKLISTS.size == total
+                result = Constants.ONDEVICE_BLOCKLISTS.count() == total
             } catch (e: Exception) {
                 Log.w(LOG_TAG_DOWNLOAD, "Local block list validation failed: ${e.message}", e)
             }

@@ -9,6 +9,7 @@
     android:padding="2dp"
     app:chipIconEnabled="true"
     app:chipIconSize="15dp"
+    app:iconStartPadding="3dp"
     android:textSize="@dimen/default_font_text_view"
     android:textColor="?attr/primaryTextColor"
     app:checkedIconTint="?attr/primaryTextColor"

@@ -57,7 +57,7 @@ object FirewallManager : KoinComponent {
     const val NOTIF_CHANNEL_ID_FIREWALL_ALERTS = "Firewall_Alerts"
 
     enum class AppStatus {
-        ALLOWED, BLOCKED, WHITELISTED, EXCLUDED, UNKNOWN
+        ALLOWED, BLOCKED, WHITELISTED, EXCLUDED, UNTRACKED
     }
 
     object GlobalVariable {
@@ -87,7 +87,7 @@ object FirewallManager : KoinComponent {
     }
 
     fun getTotalApps(): Int {
-        return getAppInfosLocked().size
+        return getAppInfosLocked().count()
     }
 
     fun getPackageNames(): Set<AppInfoTuple> {
@@ -127,7 +127,7 @@ object FirewallManager : KoinComponent {
     }
 
     fun appStatus(uid: Int): AppStatus {
-        val appInfo = getAppInfoByUid(uid) ?: return AppStatus.UNKNOWN
+        val appInfo = getAppInfoByUid(uid) ?: return AppStatus.UNTRACKED
 
         if (appInfo.whiteListUniv1) {
             return AppStatus.WHITELISTED
@@ -158,8 +158,12 @@ object FirewallManager : KoinComponent {
         return getAppInfosByUidLocked(uid).map { it.appName }
     }
 
-    fun getPackageNamesByUid(uid: Int): List<String> {
+    fun getNonSystemAppsPackageNameByUid(uid: Int): List<String> {
         return getAppInfosByUidLocked(uid).filter { !it.isSystemApp }.map { it.packageInfo }
+    }
+
+    fun getPackageNamesByUid(uid: Int): List<String> {
+        return getAppInfosByUidLocked(uid).map { it.packageInfo }
     }
 
     fun getAllAppNames(): List<String> {
@@ -176,7 +180,7 @@ object FirewallManager : KoinComponent {
         return getAppInfosLocked().firstOrNull { it.packageInfo == packageName }
     }
 
-    fun getAppInfoByUid(uid: Int): AppInfo? {
+    private fun getAppInfoByUid(uid: Int): AppInfo? {
         return getAppInfosByUidLocked(uid).firstOrNull()
     }
 
@@ -193,19 +197,19 @@ object FirewallManager : KoinComponent {
     private fun getBlockedCountForCategory(categoryName: String): Int {
         return getAppInfosLocked().filter {
             it.appCategory == categoryName && !it.isInternetAllowed
-        }.size
+        }.count()
     }
 
     private fun getWhitelistCountForCategory(categoryName: String): Int {
         return getAppInfosLocked().filter {
             it.appCategory == categoryName && it.whiteListUniv1
-        }.size
+        }.count()
     }
 
     private fun getExcludedCountForCategory(categoryName: String): Int {
         return getAppInfosLocked().filter {
             it.appCategory == categoryName && it.isExcluded
-        }.size
+        }.count()
     }
 
     fun getWhitelistAppData(): List<AppInfo> {
@@ -375,6 +379,8 @@ object FirewallManager : KoinComponent {
         }
     }
 
+    // TODO: invalidate cache through live-data updates to avoid scenarios where
+    // db writes have failed but the cache is invalidated anyway
     private fun invalidateCachedAppStatuses(categories: Set<String>, state: AppStatus,
                                             checked: Boolean) {
         lock.write {

@@ -165,7 +165,7 @@ class RefreshDatabase internal constructor(private var context: Context,
 
     // TODO: Ideally this should be in FirewallManager
     private suspend fun addMissingPackages(apps: HashSet<FirewallManager.AppInfoTuple>) {
-        if (apps.size <= 0) return
+        if (apps.count() <= 0) return
 
         handleNewAppNotification(apps)
 
@@ -312,9 +312,10 @@ class RefreshDatabase internal constructor(private var context: Context,
         // if there is no apps in the cache, don't show the notification
         if (FirewallManager.getTotalApps() == 0) return
 
+        val appCount = apps.count()
         // Show bulk notification when the app size is greater than NEW_APP_BULK_CHECK_COUNT(5)
-        if (apps.size > NOTIF_BATCH_NEW_APPS_THRESHOLD) {
-            showNewAppsBulkNotificationIfNeeded(apps.size)
+        if (appCount > NOTIF_BATCH_NEW_APPS_THRESHOLD) {
+            showNewAppsBulkNotificationIfNeeded(appCount)
             return
         }
 

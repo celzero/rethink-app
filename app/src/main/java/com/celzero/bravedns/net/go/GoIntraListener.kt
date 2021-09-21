@@ -54,7 +54,7 @@ object GoIntraListener : Listener, KoinComponent {
     private val dnscryptStatusMap = LongSparseArray<Transaction.Status>()
 
     private fun len(a: ByteArray?): Int {
-        return a?.size ?: 0
+        return a?.count() ?: 0
     }
 
     init {

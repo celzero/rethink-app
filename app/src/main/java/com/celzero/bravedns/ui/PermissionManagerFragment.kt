@@ -115,7 +115,7 @@ class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener {
     }
 
     override fun onQueryTextChange(newText: String): Boolean {
-        if (mAdapter.apkListFiltered.size == 0) mAdapter.apkListFiltered.addAll(apkList)
+        if (mAdapter.apkListFiltered.count() == 0) mAdapter.apkListFiltered.addAll(apkList)
 
         mAdapter.filter(newText)
         return false

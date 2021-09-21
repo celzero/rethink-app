@@ -49,7 +49,7 @@ class AppDownloadManager(private val context: Context) {
     fun downloadLocalBlocklist(timestamp: Long) {
         purge(context, timestamp)
 
-        downloadIds = LongArray(ONDEVICE_BLOCKLISTS.size)
+        downloadIds = LongArray(ONDEVICE_BLOCKLISTS.count())
         ONDEVICE_BLOCKLISTS.forEachIndexed { i, it ->
             val fileName = it.filename
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "v: ($timestamp), f: $fileName, u: $it.url")
@@ -106,7 +106,7 @@ class AppDownloadManager(private val context: Context) {
      * Handles are the preliminary check before initiating the download.
      */
     private fun purge(context: Context, timestamp: Long) {
-        downloadIds = LongArray(ONDEVICE_BLOCKLISTS.size)
+        downloadIds = LongArray(ONDEVICE_BLOCKLISTS.count())
         BlocklistDownloadHelper.deleteOldFiles(context, timestamp)
     }
 

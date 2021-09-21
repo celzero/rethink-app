@@ -107,7 +107,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var killAppOnFirewall by booleanPref("kill_app_on_firewall", true)
 
     // whether apps subject to the RethinkDNS VPN tunnel can bypass the tunnel on-demand
-    var allowBypass by booleanPref("allow_bypass", true)
+    // default: false for fdroid flavour
+    var allowBypass by booleanPref("allow_bypass", !Utilities.isFdroidFlavour())
 
     // user set among AppConfig.DnsType enum; 1's the default which is DoH
     var dnsType by intPref("dns_type", 1)
@@ -158,7 +159,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var lastAppExitInfoTimestamp by longPref("prev_trace_timestamp", INIT_TIME_MS)
 
     // fetch fav icons for domains in dns request
-    var fetchFavIcon by booleanPref("fav_icon_enabled", Utilities.isFdroidFlavour())
+    var fetchFavIcon by booleanPref("fav_icon_enabled", !Utilities.isFdroidFlavour())
 
     // whether to show "what's new" chip on the homescreen, usually
     // shown after a update and until the user dismisses it

@@ -621,8 +621,10 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             b.settingsActivityOnDeviceBlockDesc.text = getString(
                 R.string.settings_local_blocklist_desc2)
             b.settingsActivityOnDeviceBlockSwitch.visibility = View.GONE
+            b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.GONE
             b.settingsActivityOnDeviceBlockProgress.visibility = View.VISIBLE
             b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.GONE
+            b.settingsActivityOnDeviceBlockConfigureBtn.visibility = View.GONE
         }
     }
 

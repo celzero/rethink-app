@@ -166,9 +166,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         val second = destAddress.split(":")
 
         val srcIp = first[0]
-        val srcPort = first[first.size - 1].toInt()
+        val srcPort = first[first.count() - 1].toInt()
         val dstIp = second[0]
-        val dstPort = second[second.size - 1].toInt()
+        val dstPort = second[second.count() - 1].toInt()
 
         val uid = if (VERSION.SDK_INT >= VERSION_CODES.Q) {
             connTracer.getUidQ(protocol, srcIp, srcPort, dstIp, dstPort)
@@ -222,8 +222,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 return FirewallRuleset.RULE9B
             }
 
+            if (unknownAppBlocked(uid)) {
+                return FirewallRuleset.RULE5
+            }
+
             // if the app is new (ie unknown), refresh the db
-            if (FirewallManager.AppStatus.UNKNOWN == appStatus) {
+            if (FirewallManager.AppStatus.UNTRACKED == appStatus) {
                 io("dbRefresh") {
                     refreshDatabase.handleNewlyConnectedApp(uid)
                 }
@@ -242,10 +246,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
 
             if (ipBlocked(connInfo.destIP, connInfo.destPort, connInfo.protocol)) {
                 return FirewallRuleset.RULE2
-            }
-
-            if (unknownAppBlocked(uid)) {
-                return FirewallRuleset.RULE5
             }
 
             if (FirewallManager.AppStatus.BLOCKED == appStatus) {
@@ -296,7 +296,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     }
 
     private fun dnsBypassed(destIp: String): Boolean {
-        return if (!persistentState.disallowDnsBypass || !appConfig.getBraveMode().isDnsFirewallMode()) {
+        return if (!persistentState.disallowDnsBypass || !appConfig.canEnableDnsBypassFirewallSetting() ) {
             false
         } else {
             unresolvedIp(destIp)
@@ -545,7 +545,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         if (DEBUG) Log.i(LOG_TAG_VPN,
                          "Firewalled application trying to connect - Kill app is enabled - uid - $uid")
         io("killBgApps") {
-            val appUIDList = FirewallManager.getPackageNamesByUid(uid)
+            val appUIDList = FirewallManager.getNonSystemAppsPackageNameByUid(uid)
             appUIDList.forEach {
                 if (DEBUG) Log.d(LOG_TAG_VPN, "app $uid / $it killed")
                 Utilities.killBg(activityManager, it)
@@ -598,7 +598,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             if (!VpnController.isVpnLockdown() && isAppPaused()) {
                 val nonFirewalledApps = FirewallManager.getNonFirewalledAppsPackageNames()
                 Log.i(LOG_TAG_VPN,
-                      "app is in pause state, exclude all the non firewalled apps, size: ${nonFirewalledApps.size}")
+                      "app is in pause state, exclude all the non firewalled apps, size: ${nonFirewalledApps.count()}")
                 nonFirewalledApps.forEach {
                     builder.addDisallowedApplication(it.packageInfo)
                 }
@@ -702,7 +702,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         return Observer<Collection<AppInfo>> { t ->
             val latestExcludedApps = t.filter(AppInfo::isExcluded).map(AppInfo::packageInfo).toSet()
             if (Sets.symmetricDifference(excludedApps,
-                                         latestExcludedApps).size == 0) return@Observer
+                                         latestExcludedApps).count() == 0) return@Observer
 
             Log.i(LOG_TAG_VPN, "excluded-apps list changed, restart vpn")
 

@@ -80,27 +80,34 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         super.onViewCreated(view, savedInstanceState)
         initView()
         observeBraveMode()
+        observeConnectedDns()
     }
 
     private fun observeBraveMode() {
         appConfig.braveModeObserver.observe(viewLifecycleOwner, {
-            when (it) {
-                AppConfig.BraveMode.DNS.mode -> handleDnsModeUi()
-                AppConfig.BraveMode.FIREWALL.mode -> handleFirewallModeUi()
-                AppConfig.BraveMode.DNS_FIREWALL.mode -> handleDnsFirewallModeUi()
-            }
+            handleDisallowDnsBypassUi()
         })
     }
 
-    private fun handleDnsModeUi() {
+    private fun observeConnectedDns() {
+        appConfig.getConnectedDnsObservable().observe(viewLifecycleOwner, {
+            handleDisallowDnsBypassUi()
+        })
+    }
+
+    private fun handleDisallowDnsBypassUi() {
+        if (appConfig.canEnableDnsBypassFirewallSetting()) {
+            showDisallowDnsBypassUi()
+        } else {
+            hideDisallowDnsBypassUi()
+        }
+    }
+
+    private fun hideDisallowDnsBypassUi() {
         b.appScrollingInclFirewall.firewallDisallowDnsBypassLl.visibility = View.GONE
     }
 
-    private fun handleFirewallModeUi() {
-        b.appScrollingInclFirewall.firewallDisallowDnsBypassLl.visibility = View.GONE
-    }
-
-    private fun handleDnsFirewallModeUi() {
+    private fun showDisallowDnsBypassUi() {
         b.appScrollingInclFirewall.firewallDisallowDnsBypassLl.visibility = View.VISIBLE
     }
 

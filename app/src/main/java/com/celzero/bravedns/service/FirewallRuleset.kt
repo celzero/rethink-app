@@ -20,7 +20,7 @@ import com.celzero.bravedns.R
 
 // TODO: Add label and description from strings.xml
 enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val act: Int) {
-    RULE0("Allowed", R.string.firewall_rule_no_rule, R.string.firewall_rule_no_rule_desc,
+    RULE0("No Rule", R.string.firewall_rule_no_rule, R.string.firewall_rule_no_rule_desc,
           FirewallRuleset.allow),
     RULE1("Rule #1", R.string.firewall_rule_block_app, R.string.firewall_rule_block_app_desc,
           FirewallRuleset.stall),
@@ -75,10 +75,10 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
         // TODO: Move ico to enum var like for label and desc
         fun getRulesIcon(ruleId: String?): Int {
             return when (ruleId) {
-                RULE0.id -> R.drawable.bs_dns_home_screen
+                RULE0.id -> R.drawable.ic_whats_new
                 RULE1.id -> R.drawable.ic_app_info
-                RULE1B.id -> R.drawable.ic_app_info
-                RULE1C.id -> R.drawable.ic_app_info
+                RULE1B.id -> R.drawable.ic_auto_start
+                RULE1C.id -> R.drawable.ic_filter_error
                 RULE2.id -> R.drawable.spinner_firewall
                 RULE3.id -> R.drawable.ic_device_lock
                 RULE4.id -> R.drawable.ic_foreground
@@ -87,7 +87,7 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE7.id -> R.drawable.ic_prevent_dns_leaks
                 RULE8.id -> R.drawable.bs_firewall_home_screen
                 RULE9.id -> R.drawable.bs_dns_home_screen
-                RULE9B.id -> R.drawable.bs_dns_home_screen
+                RULE9B.id -> R.drawable.ic_orbot
                 else -> R.drawable.bs_dns_home_screen
             }
         }

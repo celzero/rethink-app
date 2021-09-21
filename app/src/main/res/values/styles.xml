@@ -38,7 +38,7 @@
         <item name="svgStrokeColor">@color/stroke_color</item>
         <item name="svgFillColor">@color/fill_color</item>
         <item name="mainButtonBackground">@color/button_background_tint</item>
-        <item name="border">@color/borderBlack</item>
+        <item name="border">@color/borderColor</item>
         <item name="invertedPrimaryTextColor">@color/accent_good</item>
         <item name="android:navigationBarColor">@color/black</item>
         <item name="navBarBackground">@color/navBarBackground</item>

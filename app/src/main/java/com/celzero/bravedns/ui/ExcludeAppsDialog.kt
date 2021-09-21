@@ -154,7 +154,7 @@ class ExcludeAppsDialog(private var activity: Activity,
 
     private fun setupCategoryChips(name: String) {
         val categories = FirewallManager.getCategoryListByAppName(name)
-        if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category: ${category.size}")
+        if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category: ${category.count()}")
 
         b.excludeAppDialogChipGroup.removeAllViews()
 

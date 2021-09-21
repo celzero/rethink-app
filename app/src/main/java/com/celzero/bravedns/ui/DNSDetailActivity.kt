@@ -43,7 +43,7 @@ class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
 
         companion object {
             fun getCount(): Int {
-                return values().size
+                return values().count()
             }
         }
     }

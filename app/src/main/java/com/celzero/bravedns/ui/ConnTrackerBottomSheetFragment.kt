@@ -18,7 +18,6 @@ package com.celzero.bravedns.ui
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.content.res.TypedArray
@@ -55,7 +54,6 @@ import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Utilities.Companion.getIcon
-import com.celzero.bravedns.util.Utilities.Companion.getPackageInfoForUid
 import com.celzero.bravedns.util.Utilities.Companion.isValidAppName
 import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -121,18 +119,13 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
         b.bsConnBlockAppTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block))
         b.bsConnBlockConnAllTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block_all))
 
-        val packageInfos = try {
-            getPackageInfoForUid(requireContext(), ipDetails.uid)
-        } catch (e: PackageManager.NameNotFoundException) {
-            Log.e(LOG_TAG_FIREWALL, "Package Not Found: " + e.message, e)
-            null
-        }
+        val packageInfos = FirewallManager.getPackageNamesByUid(ipDetails.uid)
 
-        if (packageInfos != null) {
+        val packageCount = packageInfos.count()
+        if (packageCount >= 1) {
             b.bsConnBlockAppCheck.isChecked = FirewallManager.isUidFirewalled(ipDetails.uid)
-            val appCount = (packageInfos.size).minus(1)
-            b.bsConnTrackAppName.text = if (packageInfos.size >= 2) {
-                getString(R.string.ctbs_app_other_apps, ipDetails.appName, appCount.toString())
+            b.bsConnTrackAppName.text = if (packageCount >= 2) {
+                getString(R.string.ctbs_app_other_apps, ipDetails.appName, packageCount.minus(1).toString())
             } else if (AndroidUidConfig.isUidAppRange(ipDetails.uid)) {
                 canNav = true
                 ipDetails.appName + "      ❯"
@@ -141,7 +134,9 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
             }
             b.bsConnTrackAppIcon.setImageDrawable(
                 getIcon(requireContext(), packageInfos[0], ipDetails.appName))
-        } else { // No info on the uid, Check if its in non-app category else treat as unknown.
+        } else {
+            // apps which are not available in cache are treated as non app.
+            // TODO: check packageManager#getApplicationInfo() for appInfo
             handleNonApp()
         }
 
@@ -210,17 +205,11 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
     }
 
     private fun handleNonApp() {
-        val app = FirewallManager.getAppInfoByUid(ipDetails.uid)
-        if (app == null) {
-            b.bsConnBlockAppCheck.isChecked = persistentState.blockUnknownConnections
-            b.bsConnTrackAppName.text = getString(R.string.ctbs_unknown_app)
-            b.bsConnBlockedRule1Txt.text = getString(R.string.ctbs_rule_5)
-            b.bsConnBlockAppTxt.text = requireContext().resources.getString(
-                R.string.univ_block_unknown_connections)
-        } else {
-            b.bsConnBlockAppCheck.isChecked = !app.isInternetAllowed
-            b.bsConnTrackAppName.text = app.appName
-        }
+        b.bsConnBlockAppCheck.isChecked = persistentState.blockUnknownConnections
+        b.bsConnTrackAppName.text = ipDetails.appName
+        b.bsConnBlockedRule1Txt.text = getString(R.string.ctbs_rule_5)
+        b.bsConnBlockAppTxt.text = requireContext().resources.getString(
+            R.string.univ_block_unknown_connections)
     }
 
     private fun setupClickListeners() {
@@ -299,7 +288,7 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
                 b.bsConnBlockAppCheck.isChecked = false
                 return
             }
-            FirewallManager.AppStatus.UNKNOWN -> {
+            FirewallManager.AppStatus.UNTRACKED -> {
                 showToast(getString(R.string.firewall_app_info_not_available))
                 b.bsConnBlockAppCheck.isChecked = false
                 return
@@ -314,21 +303,22 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
 
         val appUIDList = FirewallManager.getAppNamesByUid(ipDetails.uid)
 
-        if (appUIDList.size <= 1) {
+        val appUidCount = appUIDList.count()
+        if (appUidCount <= 1) {
             updateDetails(ipDetails.uid, isBlocked)
             return
         }
 
-        if (appUIDList.size > 1) {
+        if (appUidCount > 1) {
             var title = getString(R.string.ctbs_block_other_apps, ipDetails.appName,
-                                  appUIDList.size.toString())
+                                  appUidCount.toString())
             var positiveText = getString(R.string.ctbs_block_other_apps_positive_text,
-                                         appUIDList.size.toString())
+                                         appUidCount.toString())
             if (isBlocked) {
                 title = getString(R.string.ctbs_unblock_other_apps, ipDetails.appName,
-                                  appUIDList.size.toString())
+                                  appUidCount.toString())
                 positiveText = getString(R.string.ctbs_unblock_other_apps_positive_text,
-                                         appUIDList.size.toString())
+                                         appUidCount.toString())
             }
             showFirewallDialog(appUIDList, title, positiveText, isBlocked)
             b.bsConnBlockAppCheck.isChecked = isBlocked
@@ -346,13 +336,14 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
 
     private fun clearAppRules() {
         val appUIDList = FirewallManager.getAppNamesByUid(ipDetails.uid)
-        if (appUIDList.size <= 1) {
+        val appUidCount = appUIDList.count()
+        if (appUidCount <= 1) {
             promptClearRulesConfirmation()
             return
         }
 
         val title = getString(R.string.ctbs_clear_rules_desc, ipDetails.appName,
-                              appUIDList.size.toString())
+                              appUidCount.toString())
         val positiveText = getString(R.string.ctbs_clear_rules_positive_text)
 
         showClearRulesDialog(appUIDList, title, positiveText)
