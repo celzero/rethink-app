@@ -287,7 +287,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     }
 
     private fun allowOrbot(uid: Int): Boolean {
-        return settingUpOrbot.get() && OrbotHelper.ORBOT_PACKAGE_NAME == FirewallManager.getPackageNameByUid(uid)
+        return settingUpOrbot.get() && OrbotHelper.ORBOT_PACKAGE_NAME == FirewallManager.getPackageNameByUid(
+            uid)
     }
 
     private fun dnsProxied(port: Int): Boolean {
@@ -296,7 +297,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     }
 
     private fun dnsBypassed(destIp: String): Boolean {
-        return if (!persistentState.disallowDnsBypass || !appConfig.canEnableDnsBypassFirewallSetting() ) {
+        return if (!persistentState.disallowDnsBypass || !appConfig.canEnableDnsBypassFirewallSetting()) {
             false
         } else {
             unresolvedIp(destIp)
@@ -636,8 +637,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 }
             }
 
-            if (appConfig.isOrbotProxyEnabled() && isExcludePossible(
-                    getString(R.string.orbot), getString(R.string.orbot_toast_parameter))) {
+            if (appConfig.isOrbotProxyEnabled() && isExcludePossible(getString(R.string.orbot),
+                                                                     getString(
+                                                                         R.string.orbot_toast_parameter))) {
                 builder = builder.addDisallowedApplication(OrbotHelper.ORBOT_PACKAGE_NAME)
             }
 
@@ -766,7 +768,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         // 1. Pause / Resume, Stop action button.
         // 2. RethinkDNS modes (dns & dns+firewall mode)
         // 3. No action button.
-        if (DEBUG) Log.d(LOG_TAG_VPN, "notification action type:  ${persistentState.notificationActionType}")
+        if (DEBUG) Log.d(LOG_TAG_VPN,
+                         "notification action type:  ${persistentState.notificationActionType}")
         builder.color = ContextCompat.getColor(this, getThemeAccent(this))
         when (NotificationActionType.getNotificationActionType(
             persistentState.notificationActionType)) {

@@ -157,7 +157,7 @@ class AppConfig internal constructor(private val context: Context,
     enum class ProxyProvider {
         NONE, CUSTOM, ORBOT;
 
-        fun isProxyProviderCustom():Boolean {
+        fun isProxyProviderCustom(): Boolean {
             return CUSTOM.name == name
         }
 

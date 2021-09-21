@@ -262,7 +262,8 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
                     tunnel?.stopDNSCryptProxy()
                     handleDnscryptFailure()
                 } else {
-                    tunnel?.setTunMode(Settings.DNSModeCryptPort, tunnelOptions.tunFirewallMode.mode,
+                    tunnel?.setTunMode(Settings.DNSModeCryptPort,
+                                       tunnelOptions.tunFirewallMode.mode,
                                        tunnelOptions.tunProxyMode.mode)
                     setSocks5TunnelModeIfNeeded(tunnelOptions.tunProxyMode)
                 }
