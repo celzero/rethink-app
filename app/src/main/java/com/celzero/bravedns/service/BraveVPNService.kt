@@ -222,6 +222,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 return FirewallRuleset.RULE9B
             }
 
+            if (unknownAppBlocked(uid)) {
+                return FirewallRuleset.RULE5
+            }
+
             // if the app is new (ie unknown), refresh the db
             if (FirewallManager.AppStatus.UNKNOWN == appStatus) {
                 io("dbRefresh") {
@@ -242,10 +246,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
 
             if (ipBlocked(connInfo.destIP, connInfo.destPort, connInfo.protocol)) {
                 return FirewallRuleset.RULE2
-            }
-
-            if (unknownAppBlocked(uid)) {
-                return FirewallRuleset.RULE5
             }
 
             if (FirewallManager.AppStatus.BLOCKED == appStatus) {

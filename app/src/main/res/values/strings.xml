@@ -145,9 +145,9 @@
 
     <string name="status_protected_with_http_private_dns">protected with http proxy &amp; private dns</string>
 
-    <string name="status_protected_with_socks5">protected with socks5</string>
+    <string name="status_protected_with_socks5">protected with socks5 proxy</string>
 
-    <string name="status_protected_with_http">protected with http</string>
+    <string name="status_protected_with_http">protected with http proxy</string>
 
     <string name="status_protected_with_proxy">protected with proxy</string>
 

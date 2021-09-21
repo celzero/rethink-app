@@ -684,7 +684,7 @@ class AppConfig internal constructor(private val context: Context,
 
     fun isProxyEnabled(): Boolean {
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        if (!proxyProvider.isProxyProviderNone()) return false
+        if (proxyProvider.isProxyProviderNone()) return false
 
         val proxyType = ProxyType.getProxyType(persistentState.proxyType)
         return !proxyType.isProxyTypeNone()
