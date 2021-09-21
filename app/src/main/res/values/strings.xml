@@ -1118,7 +1118,7 @@
     <string name="hs_btm_sheet_lock_down">Cannot change modes when VPN is <i>lockdown</i>. Tap to <u>edit VPN settings</u>.</string>
 
     <!-- Firewall rules -->
-    <string name="firewall_rule_no_rule">Allowed</string>
+    <string name="firewall_rule_no_rule">No Rule</string>
     <string name="firewall_rule_block_app">App Blocked</string>
     <string name="firewall_rule_block_app_new_install">New App</string>
     <string name="firewall_rule_block_app_exception">Error</string>
@@ -1144,7 +1144,7 @@
     <string name="firewall_rule_block_dns_bypass_desc"><![CDATA[This connection was blocked because the <i>source app</i> bypassed user-preferred DNS.<br/><br/> To change this behaviour go to <i>Universal</i> tab.]]></string>
     <string name="firewall_rule_exempt_app_whitelist_desc"><![CDATA[This <i>app</i> was allowed to connect in accordance with a user-set <i>whitelist</i>.<br/><br/> To change go to <i>Universal</i> tab.]]></string>
     <string name="firewall_rule_exempt_dns_proxied_desc"><![CDATA[This DNS connection was proxied and forwarded to user-preferred DNS endpoint.<br/><br/> To change go to <i>Settings</i> page.]]></string>
-    <string name="firewall_rule_exempt_orbot_setup_desc"><![CDATA[This connection was allowed because <i>One click Tor-as-a-proxy</i> setup via Orbot was in progress.]]></string>
+    <string name="firewall_rule_exempt_orbot_setup_desc"><![CDATA[This connection was allowed because <i>one-click Tor-as-a-proxy</i> setup via Orbot was in progress.]]></string>
 
     <!-- New app install Notification -->
     <string name="new_app_bulk_notification_title">Attention</string>
