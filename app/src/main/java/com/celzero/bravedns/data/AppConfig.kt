@@ -584,8 +584,8 @@ class AppConfig internal constructor(private val context: Context,
 
     fun removeAllProxies() {
         removeOrbot()
-        persistentState.proxyType = ProxyType.NONE.name
         persistentState.proxyProvider = ProxyProvider.NONE.name
+        persistentState.proxyType = ProxyType.NONE.name
     }
 
     private fun removeOrbot() {
