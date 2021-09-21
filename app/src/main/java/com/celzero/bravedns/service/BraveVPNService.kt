@@ -296,7 +296,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     }
 
     private fun dnsBypassed(destIp: String): Boolean {
-        return if (!persistentState.disallowDnsBypass || !appConfig.getBraveMode().isDnsFirewallMode()) {
+        return if (!persistentState.disallowDnsBypass || !appConfig.canEnableDnsBypassFirewallSetting() ) {
             false
         } else {
             unresolvedIp(destIp)

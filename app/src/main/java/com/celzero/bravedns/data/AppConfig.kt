@@ -201,7 +201,7 @@ class AppConfig internal constructor(private val context: Context,
         }
 
         companion object {
-            fun getProxyType(name: String): ProxyType {
+            fun of(name: String): ProxyType {
                 return when (name) {
                     HTTP.name -> HTTP
                     SOCKS5.name -> SOCKS5
@@ -546,6 +546,10 @@ class AppConfig internal constructor(private val context: Context,
         dnsCryptRelayEndpointRepository.deleteDNSCryptRelayEndpoint(id)
     }
 
+    fun canEnableDnsBypassFirewallSetting(): Boolean {
+        return getBraveMode().isDnsFirewallMode() && !isDnsProxyActive()
+    }
+
     // -- Proxy Manager --
 
     fun addProxy(proxyType: ProxyType, provider: ProxyProvider) {
@@ -563,7 +567,7 @@ class AppConfig internal constructor(private val context: Context,
 
         // If add proxy request is custom proxy (either http/socks5), check if the other
         // proxy is already set. if yes, then make the proxy type as HTTP_SOCKS5.
-        val currentProxyType = ProxyType.getProxyType(getProxyType())
+        val currentProxyType = ProxyType.of(getProxyType())
         if (proxyType.isProxyTypeHttp()) {
             if (currentProxyType.isProxyTypeSocks5()) {
                 setProxy(ProxyType.HTTP_SOCKS5, provider)
@@ -593,35 +597,23 @@ class AppConfig internal constructor(private val context: Context,
         OrbotHelper.selectedProxyType = ProxyType.NONE.name
     }
 
-    fun removeProxy(proxyType: ProxyType, provider: ProxyProvider) {
-        if (provider.isProxyProviderNone() || provider.isProxyProviderOrbot()) {
-            removeAllProxies()
-            return
-        }
+    fun removeProxy(removeType: ProxyType, removeProvider: ProxyProvider) {
+        val currentProxyType = ProxyType.of(getProxyType())
 
-        // handles only for custom proxy setup
-        // change and set proxy on HTTP_SOCKS5 proxy mode
-        // remove proxy for all the other cases
-        val currentProxyType = ProxyType.getProxyType(getProxyType())
-        when (proxyType) {
-            ProxyType.HTTP -> {
-                if (currentProxyType.isProxyTypeHttpSocks5()) {
-                    setProxy(ProxyType.SOCKS5, provider)
-                    return
-                }
-            }
-            ProxyType.SOCKS5 -> {
-                if (currentProxyType.isProxyTypeHttpSocks5()) {
-                    setProxy(ProxyType.HTTP, provider)
-                    return
-                }
-            }
-            else -> {
-                removeAllProxies()
+        if (currentProxyType.isProxyTypeHttpSocks5()) {
+            if (removeType.isProxyTypeHttp()) {
+                setProxy(ProxyType.SOCKS5, removeProvider)
                 return
+            } else if (removeType.isProxyTypeSocks5()) {
+                setProxy(ProxyType.HTTP, removeProvider)
+                return
+            } else {
+                Log.w(LOG_TAG_VPN,
+                      "invalid remove proxy call, type: ${removeType.name}, provider: ${removeProvider.name}")
             }
+        } else {
+            removeAllProxies()
         }
-        removeAllProxies()
     }
 
     fun getProxyType(): String {
@@ -666,7 +658,7 @@ class AppConfig internal constructor(private val context: Context,
         // return false if the proxy provider is not custom
         if (!proxyProvider.isProxyProviderCustom()) return false
 
-        val proxyType = ProxyType.getProxyType(persistentState.proxyType)
+        val proxyType = ProxyType.of(persistentState.proxyType)
         return proxyType.isProxyTypeHttp() || proxyType.isProxyTypeHttpSocks5()
     }
 
@@ -675,7 +667,7 @@ class AppConfig internal constructor(private val context: Context,
         // return false if the proxy provider is not custom
         if (!proxyProvider.isProxyProviderCustom()) return false
 
-        val proxyType = ProxyType.getProxyType(persistentState.proxyType)
+        val proxyType = ProxyType.of(persistentState.proxyType)
         return proxyType.isProxyTypeSocks5() || proxyType.isProxyTypeHttpSocks5()
     }
 
@@ -688,7 +680,7 @@ class AppConfig internal constructor(private val context: Context,
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
         if (proxyProvider.isProxyProviderNone()) return false
 
-        val proxyType = ProxyType.getProxyType(persistentState.proxyType)
+        val proxyType = ProxyType.of(persistentState.proxyType)
         return !proxyType.isProxyTypeNone()
     }
 

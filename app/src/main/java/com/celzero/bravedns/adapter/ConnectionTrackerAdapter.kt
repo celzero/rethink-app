@@ -41,7 +41,6 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getIcon
-import com.celzero.bravedns.util.Utilities.Companion.getPackageInfoForUid
 import java.util.*
 
 class ConnectionTrackerAdapter(private val connectionTrackerFragment: ConnectionTrackerFragment) :
@@ -126,10 +125,10 @@ class ConnectionTrackerAdapter(private val connectionTrackerFragment: Connection
                 return
             }
 
-            val appsCount = apps.count()
-            val appName = if (appsCount > 1) {
+            val count = apps.count()
+            val appName = if (count > 1) {
                 context.getString(R.string.ctbs_app_other_apps, ct.appName,
-                                  (appsCount).minus(1).toString())
+                                  (count).minus(1).toString())
             } else {
                 ct.appName
             }

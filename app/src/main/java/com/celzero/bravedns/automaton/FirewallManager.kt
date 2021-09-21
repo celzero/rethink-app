@@ -379,6 +379,8 @@ object FirewallManager : KoinComponent {
         }
     }
 
+    // TODO: invalidate cache through live-data updates to avoid scenarios where
+    // db writes have failed but the cache is invalidated anyway
     private fun invalidateCachedAppStatuses(categories: Set<String>, state: AppStatus,
                                             checked: Boolean) {
         lock.write {
