@@ -164,11 +164,13 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
             }
         } else {
             for (i in filteredCategories.indices) {
-                if (listData[filteredCategories[i]]?.count()!! > 0) {
-                    b.firewallExpandableList.expandGroup(i)
+                listData[filteredCategories[i]]?.let {
+                    if (it.count() > 0) {
+                        b.firewallExpandableList.expandGroup(i)
+                    }
                 }
             }
-            if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Category block ${filteredCategories.count()}")
+            Log.i(LOG_TAG_FIREWALL, "Category block ${filteredCategories.count()}")
         }
     }
 

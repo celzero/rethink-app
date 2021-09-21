@@ -57,7 +57,7 @@ object FirewallManager : KoinComponent {
     const val NOTIF_CHANNEL_ID_FIREWALL_ALERTS = "Firewall_Alerts"
 
     enum class AppStatus {
-        ALLOWED, BLOCKED, WHITELISTED, EXCLUDED, UNKNOWN
+        ALLOWED, BLOCKED, WHITELISTED, EXCLUDED, UNTRACKED
     }
 
     object GlobalVariable {
@@ -127,7 +127,7 @@ object FirewallManager : KoinComponent {
     }
 
     fun appStatus(uid: Int): AppStatus {
-        val appInfo = getAppInfoByUid(uid) ?: return AppStatus.UNKNOWN
+        val appInfo = getAppInfoByUid(uid) ?: return AppStatus.UNTRACKED
 
         if (appInfo.whiteListUniv1) {
             return AppStatus.WHITELISTED
@@ -180,7 +180,7 @@ object FirewallManager : KoinComponent {
         return getAppInfosLocked().firstOrNull { it.packageInfo == packageName }
     }
 
-    fun getAppInfoByUid(uid: Int): AppInfo? {
+    private fun getAppInfoByUid(uid: Int): AppInfo? {
         return getAppInfosByUidLocked(uid).firstOrNull()
     }
 

@@ -288,7 +288,7 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
                 b.bsConnBlockAppCheck.isChecked = false
                 return
             }
-            FirewallManager.AppStatus.UNKNOWN -> {
+            FirewallManager.AppStatus.UNTRACKED -> {
                 showToast(getString(R.string.firewall_app_info_not_available))
                 b.bsConnBlockAppCheck.isChecked = false
                 return

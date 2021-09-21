@@ -227,7 +227,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             }
 
             // if the app is new (ie unknown), refresh the db
-            if (FirewallManager.AppStatus.UNKNOWN == appStatus) {
+            if (FirewallManager.AppStatus.UNTRACKED == appStatus) {
                 io("dbRefresh") {
                     refreshDatabase.handleNewlyConnectedApp(uid)
                 }
