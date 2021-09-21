@@ -120,15 +120,14 @@ class ExcludedAppListAdapter(private val context: Context) :
 
             val count = packageList.count()
             positiveTxt = if (appInfo.isExcluded) {
-                builderSingle.setTitle(context.getString(R.string.exclude_app_desc, appInfo.appName,
-                                                         count.toString()))
+                builderSingle.setTitle(
+                    context.getString(R.string.exclude_app_desc, appInfo.appName, count.toString()))
                 context.getString(R.string.exclude_app_dialog_positive, count.toString())
             } else {
                 builderSingle.setTitle(
                     context.getString(R.string.unexclude_app_desc, appInfo.appName,
                                       count.toString()))
-                context.getString(R.string.unexclude_app_dialog_positive,
-                                  count.toString())
+                context.getString(R.string.unexclude_app_dialog_positive, count.toString())
             }
             val arrayAdapter = ArrayAdapter<String>(context,
                                                     android.R.layout.simple_list_item_activated_1)

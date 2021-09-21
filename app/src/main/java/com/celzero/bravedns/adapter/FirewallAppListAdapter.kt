@@ -351,14 +351,12 @@ class FirewallAppListAdapter internal constructor(private val context: Context,
             builderSingle.setTitle(
                 context.getString(R.string.ctbs_block_other_apps, appInfo.appName,
                                   count.toString()))
-            context.getString(R.string.ctbs_block_other_apps_positive_text,
-                              count.toString())
+            context.getString(R.string.ctbs_block_other_apps_positive_text, count.toString())
         } else {
             builderSingle.setTitle(
                 context.getString(R.string.ctbs_unblock_other_apps, appInfo.appName,
                                   count.toString()))
-            context.getString(R.string.ctbs_unblock_other_apps_positive_text,
-                              count.toString())
+            context.getString(R.string.ctbs_unblock_other_apps_positive_text, count.toString())
         }
         val arrayAdapter = ArrayAdapter<String>(context,
                                                 android.R.layout.simple_list_item_activated_1)

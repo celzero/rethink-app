@@ -125,7 +125,8 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
         if (packageCount >= 1) {
             b.bsConnBlockAppCheck.isChecked = FirewallManager.isUidFirewalled(ipDetails.uid)
             b.bsConnTrackAppName.text = if (packageCount >= 2) {
-                getString(R.string.ctbs_app_other_apps, ipDetails.appName, packageCount.minus(1).toString())
+                getString(R.string.ctbs_app_other_apps, ipDetails.appName,
+                          packageCount.minus(1).toString())
             } else if (AndroidUidConfig.isUidAppRange(ipDetails.uid)) {
                 canNav = true
                 ipDetails.appName + "      ❯"

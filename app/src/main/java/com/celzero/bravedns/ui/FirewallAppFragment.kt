@@ -16,7 +16,6 @@
 package com.celzero.bravedns.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
@@ -33,8 +32,6 @@ import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.FragmentFirewallAllAppsBinding
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.FirewallAppViewModel
 import kotlinx.coroutines.Dispatchers
