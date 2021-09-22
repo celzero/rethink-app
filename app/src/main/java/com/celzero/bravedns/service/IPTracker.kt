@@ -95,20 +95,18 @@ class IPTracker internal constructor(
         }
 
         val packageNameList = getPackageInfoForUid(context, uid)
-        val appName: String?
 
-        if (packageNameList != null) {
+        val appName: String = if (packageNameList != null && packageNameList.isNotEmpty()) {
             val packageName = packageNameList[0]
-            appName = getValidAppName(uid, packageName)
+            getValidAppName(uid, packageName)
         } else { // For UNKNOWN or Non-App.
             val fileSystemUID = AndroidUidConfig.fromFileSystemUid(uid)
-            Log.i(LOG_TAG_FIREWALL_LOG,
-                  "App name for the uid: ${uid}, AndroidUid: ${fileSystemUID.uid}, fileName: ${fileSystemUID.name}")
+            Log.i(LOG_TAG_FIREWALL_LOG, "App name for the uid: ${uid}, AndroidUid: ${fileSystemUID.uid}, fileName: ${fileSystemUID.name}")
 
             if (fileSystemUID.uid == INVALID_UID) {
-                appName = context.getString(R.string.network_log_app_name_unnamed, uid.toString())
+                context.getString(R.string.network_log_app_name_unnamed, uid.toString())
             } else {
-                appName = fileSystemUID.name
+                fileSystemUID.name
             }
         }
         return appName

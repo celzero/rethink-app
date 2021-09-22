@@ -188,6 +188,22 @@ object FirewallManager : KoinComponent {
         return getAppInfosByUidLocked(uid).firstOrNull()?.packageInfo
     }
 
+    fun getCategoriesForSystemApps(): List<String> {
+        return getAppInfosLocked().filter {
+            it.isSystemApp
+        }.map { it.appCategory }.distinct().sorted()
+    }
+
+    fun getCategoriesForInstalledApps(): List<String> {
+        return getAppInfosLocked().filter {
+            !it.isSystemApp
+        }.map { it.appCategory }.distinct().sorted()
+    }
+
+    fun getAllCategories(): List<String> {
+        return getAppInfosLocked().map { it.appCategory }.distinct().sorted()
+    }
+
     fun getCategoryListByAppName(appName: String): List<String> {
         return getAppInfosLocked().filter {
             it.appName.contains(appName)

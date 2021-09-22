@@ -162,4 +162,22 @@ interface AppInfoDAO {
     @Query("select count(*) from AppInfo where packageInfo like 'no_package%'")
     fun getNonAppCount(): Int
 
+    @Query("select * from AppInfo where isSystemApp = 1 and appName like :name order by isInternetAllowed,lower(appName)")
+    fun getSystemAppInfoLiveData(name: String): DataSource.Factory<Int, AppInfo>
+
+    @Query("select * from AppInfo where isSystemApp = 1 and appName like :name and appCategory in (:filter) order by isInternetAllowed,lower(appName)")
+    fun getSystemAppInfoLiveData(name: String, filter: Set<String>): DataSource.Factory<Int, AppInfo>
+
+    @Query("select * from AppInfo where isSystemApp = 0 and appName like :name order by isInternetAllowed,lower(appName)")
+    fun getInstalledAppInfoLiveData(name: String): DataSource.Factory<Int, AppInfo>
+
+    @Query("select * from AppInfo where isSystemApp = 0 and appName like :name and appCategory in (:filter) order by isInternetAllowed,lower(appName)")
+    fun getInstalledAppInfoLiveData(name: String, filter: Set<String>): DataSource.Factory<Int, AppInfo>
+
+    @Query("select * from AppInfo where appName like :name order by isInternetAllowed,lower(appName)")
+    fun getAppInfosLiveData(name: String): DataSource.Factory<Int, AppInfo>
+
+    @Query("select * from AppInfo where appName like :name and appCategory in (:filter) order by isInternetAllowed,lower(appName)")
+    fun getAppInfosLiveData(name: String, filter: Set<String>): DataSource.Factory<Int, AppInfo>
+
 }

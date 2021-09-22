@@ -25,7 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.FirewallAppListAdapter
+import com.celzero.bravedns.adapter.FirewallExpandableAppListAdapter
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.CategoryInfo
 import com.celzero.bravedns.database.CategoryInfoRepository
@@ -45,7 +45,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
                             SearchView.OnQueryTextListener {
 
     private val b by viewBinding(FragmentFirewallAllAppsBinding::bind)
-    private var adapterList: FirewallAppListAdapter? = null
+    private var adapterListExpandable: FirewallExpandableAppListAdapter? = null
 
     private var appCategories: MutableList<CategoryInfo> = ArrayList()
     private var filteredCategories: MutableList<CategoryInfo> = ArrayList()
@@ -78,9 +78,9 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
         b.firewallUpdateProgress.visibility = View.VISIBLE
         b.firewallAppRefreshList.isEnabled = true
 
-        adapterList = FirewallAppListAdapter(requireContext(), viewLifecycleOwner, persistentState,
-                                             filteredCategories, listData)
-        b.firewallExpandableList.setAdapter(adapterList)
+        adapterListExpandable = FirewallExpandableAppListAdapter(requireContext(), viewLifecycleOwner, persistentState,
+                                                                 filteredCategories, listData)
+        b.firewallExpandableList.setAdapter(adapterListExpandable)
 
         b.firewallExpandableList.setOnGroupClickListener { _, _, _, _ ->
             false
@@ -118,7 +118,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
                     Utilities.showToastUiCentered(requireContext(),
                                                   getString(R.string.refresh_complete),
                                                   Toast.LENGTH_SHORT)
-                    adapterList?.notifyDataSetChanged()
+                    adapterListExpandable?.notifyDataSetChanged()
                 }
             }
         }
@@ -169,7 +169,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
 
     override fun onResume() {
         super.onResume()
-        adapterList?.notifyDataSetChanged()
+        adapterListExpandable?.notifyDataSetChanged()
     }
 
     private fun setupLivedataObservers() {
@@ -193,7 +193,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
                 }
             }
 
-            adapterList?.updateData(filteredCategories, listData)
+            adapterListExpandable?.updateData(filteredCategories, listData)
             hideProgressBar()
             showExpandableList()
         }

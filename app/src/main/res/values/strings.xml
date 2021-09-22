@@ -1037,10 +1037,14 @@
     <string name="dns_proxy_port">Port Number</string>
     <string name="dns_proxy_negative_btn">Cancel</string>
     <string name="dns_proxy_positive_btn">add</string>
+
     <!-- Firewall -->
     <string name="firewall_toggle_unblocked">Unblocked</string>
     <string name="firewall_toggle_blocked">Blocked</string>
 
+    <string name="fapps_filter_parent_all">All</string>
+    <string name="fapps_filter_parent_installed">Installed Apps</string>
+    <string name="fapps_filter_parent_system">System Apps</string>
 
     <!-- Unicode -->
     <string name="unicode_warning_sign">\u26a0</string>

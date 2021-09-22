@@ -50,6 +50,9 @@ object ViewModelModule {
         viewModel {
             FirewallAppViewModel(get())
         }
+        viewModel {
+            AppInfoViewModel(get())
+        }
     }
 
     val modules = listOf(viewModelModule)
