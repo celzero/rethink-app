@@ -111,7 +111,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
             b.firewallAppRefreshList.animation = animation
             b.firewallAppRefreshList.startAnimation(animation)
             refreshDatabase()
-            Utilities.delay(REFRESH_TIMEOUT) {
+            Utilities.delay(REFRESH_TIMEOUT, lifecycleScope) {
                 if (isAdded) {
                     b.firewallAppRefreshList.isEnabled = true
                     b.firewallAppRefreshList.clearAnimation()
@@ -143,7 +143,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        Utilities.delay(QUERY_TEXT_TIMEOUT) {
+        Utilities.delay(QUERY_TEXT_TIMEOUT, lifecycleScope) {
             if (isAdded) {
                 searchAndExpandCategories(query)
             }

@@ -43,6 +43,8 @@ import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.getSystemService
 import androidx.core.text.HtmlCompat
+import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE
@@ -64,6 +66,7 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.google.common.net.InetAddresses
 import com.google.common.net.InternetDomainName
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import java.net.InetAddress
@@ -422,14 +425,11 @@ class Utilities {
             }
         }
 
-        fun delay(ms: Long, updateUi: () -> Unit) {
-            object : CountDownTimer(ms, ms) {
-                override fun onTick(millisUntilFinished: Long) {}
-
-                override fun onFinish() {
-                    updateUi()
-                }
-            }.start()
+        fun delay(ms: Long, lifecycleScope: LifecycleCoroutineScope, updateUi: () -> Unit) {
+            lifecycleScope.launch {
+                kotlinx.coroutines.delay(ms)
+                updateUi()
+            }
         }
 
         fun getPackageInfoForUid(context: Context, uid: Int): Array<out String>? {

@@ -60,8 +60,8 @@ class DNSDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
                     Tabs.LOGS.screen -> DNSLogFragment.newInstance()
-                    Tabs.CONFIGURE.screen -> ConfigureDNSFragment.newInstance()
-                    else -> ConfigureDNSFragment.newInstance()
+                    Tabs.CONFIGURE.screen -> DNSConfigureFragment.newInstance()
+                    else -> DNSConfigureFragment.newInstance()
                 }
             }
 

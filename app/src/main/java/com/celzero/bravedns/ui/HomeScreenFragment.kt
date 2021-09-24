@@ -197,7 +197,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.homeFragmentBottomSheetIcon.setOnClickListener {
             b.homeFragmentBottomSheetIcon.isEnabled = false
             openBottomSheet()
-            delay(500) {
+            delay(TimeUnit.MILLISECONDS.toMillis(500), lifecycleScope) {
                 b.homeFragmentBottomSheetIcon.isEnabled = true
             }
         }
@@ -208,7 +208,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         b.fhsDnsOnOffBtn.setOnClickListener {
             handleMainScreenBtnClickEvent()
-            delay(500) {
+            delay(TimeUnit.MILLISECONDS.toMillis(500), lifecycleScope) {
                 if (isAdded) {
                     b.homeFragmentBottomSheetIcon.isEnabled = true
                 }
@@ -248,7 +248,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             appConfig.removeAllProxies()
             b.fhsProxyChip.text = getString(R.string.hsf_proxy_chip_remove_text)
             syncDnsStatus()
-            delay(2000) {
+            delay(TimeUnit.MINUTES.toMillis(2), lifecycleScope) {
                 b.fhsProxyChip.visibility = View.GONE
                 b.fhsProxyChip.isEnabled = true
                 showToastUiCentered(requireContext(),
@@ -268,7 +268,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsWhatsNewChip.setOnCloseIconClickListener {
             persistentState.showWhatsNewChip = false
             b.fhsWhatsNewChip.text = getString(R.string.hsf_whats_new_remove_text)
-            delay(2000) {
+            delay(TimeUnit.MINUTES.toMillis(2), lifecycleScope) {
                 b.fhsWhatsNewChip.visibility = View.GONE
             }
         }
@@ -563,7 +563,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         b.fhsDnsOnOffBtn.isEnabled = false
-        delay(500) {
+        delay(TimeUnit.MILLISECONDS.toMillis(500), lifecycleScope) {
             if (isAdded) {
                 b.fhsDnsOnOffBtn.isEnabled = true
             }
@@ -747,7 +747,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setCancelable(false)
         builder.setPositiveButton(R.string.hsf_start_dialog_positive) { _, _ ->
             handleMainScreenBtnClickEvent()
-            delay(TimeUnit.SECONDS.toMillis(1L)) {
+            delay(TimeUnit.SECONDS.toMillis(1L), lifecycleScope) {
                 if (isVpnActivated) {
                     openBottomSheet()
                     showToastUiCentered(requireContext(), resources.getText(

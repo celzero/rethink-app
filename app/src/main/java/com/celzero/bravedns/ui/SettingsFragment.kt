@@ -84,7 +84,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
     private val orbotHelper by inject<OrbotHelper>()
-    private val appDownloadManager by inject<AppDownloadManager>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -102,8 +101,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
         // allow apps part of the vpn to request networks outside of it, effectively letting it bypass the vpn itself
         b.settingsActivityAllowBypassSwitch.isChecked = persistentState.allowBypass
-        // display fav icon in dns logs
-        b.settingsActivityFavIconSwitch.isChecked = persistentState.fetchFavIcon
         // use all internet-capable networks, not just the active network, as underlying transports for the vpn tunnel
         b.settingsActivityAllNetworkSwitch.isChecked = persistentState.useMultipleNetworks
         // enable logs
@@ -115,16 +112,12 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         // check for app updates
         b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
 
-        b.settingsActivityPreventDnsLeaksSwitch.isChecked = persistentState.preventDnsLeaks
-
         observeCustomProxy()
-        observeBraveMode()
 
         displayAppThemeUi()
         displayNotificationActionUi()
         displaySocks5Ui()
         displayHttpProxyUi()
-        refreshOnDeviceBlocklistUi()
 
         //For exclude apps
         excludeAppAdapter = ExcludedAppListAdapter(requireContext())
@@ -236,7 +229,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             b.settingsActivityExcludeAppsRl.alpha = 1f
             b.settingsActivityAllowBypassRl.alpha = 1f
         }
-        b.settingsActivityOnDeviceBlockRl.isEnabled = !isLockdown
         b.settingsActivityExcludeAppsRl.isEnabled = !isLockdown
         b.settingsActivityAllowBypassSwitch.isEnabled = !isLockdown
         b.settingsActivityExcludeAppsImg.isEnabled = !isLockdown
@@ -277,14 +269,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             persistentState.logsEnabled = b
         }
 
-        b.settingsActivityFavIconSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
-            persistentState.fetchFavIcon = b
-        }
-
-        b.settingsActivityPreventDnsLeaksSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
-            persistentState.preventDnsLeaks = b
-        }
-
         b.settingsActivityAutoStartSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             persistentState.prefAutoStartBootUp = b
         }
@@ -307,7 +291,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             b.settingsActivityAllowBypassSwitch.isEnabled = false
             b.settingsActivityAllowBypassSwitch.visibility = View.INVISIBLE
             b.settingsActivityAllowBypassProgress.visibility = View.VISIBLE
-            delay(TimeUnit.SECONDS.toMillis(1L)) {
+            delay(TimeUnit.SECONDS.toMillis(1L), lifecycleScope) {
                 if (isAdded) {
                     b.settingsActivityAllowBypassSwitch.isEnabled = true
                     b.settingsActivityAllowBypassProgress.visibility = View.GONE
@@ -388,336 +372,6 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.settingsActivityNotificationRl)
             showNotificationActionDialog()
         }
-
-        b.settingsActivityOnDeviceBlockSwitch.setOnCheckedChangeListener(null)
-        b.settingsActivityOnDeviceBlockSwitch.setOnClickListener {
-            go {
-                uiCtx {
-                    enableAfterDelayCo(TimeUnit.SECONDS.toMillis(1L),
-                                       b.settingsActivityOnDeviceBlockSwitch)
-
-                    b.settingsActivityOnDeviceBlockProgress.visibility = View.VISIBLE
-                    if (!b.settingsActivityOnDeviceBlockSwitch.isChecked) {
-                        removeBraveDNSLocal()
-                        return@uiCtx
-                    }
-
-                    b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
-                    val blocklistsExist = withContext(Dispatchers.Default) {
-                        hasLocalBlocklists(requireContext(),
-                                           persistentState.localBlocklistTimestamp)
-                    }
-                    if (blocklistsExist) {
-                        setBraveDNSLocal() // TODO: Move this to vpnService observer
-                        b.settingsActivityOnDeviceBlockDesc.text = getString(
-                            R.string.settings_local_blocklist_in_use,
-                            persistentState.numberOfLocalBlocklists.toString())
-                    } else {
-                        b.settingsActivityOnDeviceBlockSwitch.isChecked = false
-                        if (VpnController.isVpnLockdown()) {
-                            showVpnLockdownDownloadDialog()
-                        } else {
-                            showDownloadDialog()
-                        }
-                    }
-                }
-            }
-        }
-
-        b.settingsActivityOnDeviceBlockConfigureBtn.setOnClickListener {
-            val intent = Intent(requireContext(), DNSConfigureWebViewActivity::class.java)
-            val stamp = persistentState.localBlocklistStamp
-            if (DEBUG) Log.d(LOG_TAG_VPN, "Stamp value in settings screen: $stamp")
-            intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-            intent.putExtra(Constants.BLOCKLIST_LOCATION_INTENT_EXTRA,
-                            DNSConfigureWebViewActivity.LOCAL)
-            intent.putExtra(Constants.BLOCKLIST_STAMP_INTENT_EXTRA, stamp)
-            requireContext().startActivity(intent)
-        }
-
-        b.settingsActivityOnDeviceBlockRefreshBtn.setOnClickListener {
-            updateBlocklistIfNeeded(isRefresh = true)
-        }
-
-        val workManager = WorkManager.getInstance(requireContext().applicationContext)
-
-        workManager.getWorkInfosByTagLiveData(DownloadConstants.DOWNLOAD_TAG).observe(
-            viewLifecycleOwner, { workInfoList ->
-                val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-                Log.i(LOG_TAG_DOWNLOAD,
-                      "WorkManager state: ${workInfo.state} for ${DownloadConstants.DOWNLOAD_TAG}")
-                if (WorkInfo.State.ENQUEUED == workInfo.state || WorkInfo.State.RUNNING == workInfo.state) {
-                    onDownloadStart()
-                } else if (WorkInfo.State.CANCELLED == workInfo.state || WorkInfo.State.FAILED == workInfo.state) {
-                    onDownloadAbort()
-                    workManager.pruneWork()
-                    workManager.cancelAllWorkByTag(DownloadConstants.DOWNLOAD_TAG)
-                    workManager.cancelAllWorkByTag(DownloadConstants.FILE_TAG)
-                }
-            })
-
-        workManager.getWorkInfosByTagLiveData(DownloadConstants.FILE_TAG).observe(
-            viewLifecycleOwner, { workInfoList ->
-                val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-                Log.i(LOG_TAG_DOWNLOAD,
-                      "WorkManager state: ${workInfo.state} for ${DownloadConstants.FILE_TAG}")
-                if (WorkInfo.State.SUCCEEDED == workInfo.state) {
-                    onDownloadSuccess()
-                    workManager.pruneWork()
-                } else if (WorkInfo.State.CANCELLED == workInfo.state || WorkInfo.State.FAILED == workInfo.state) {
-                    onDownloadAbort()
-                    workManager.pruneWork()
-                    workManager.cancelAllWorkByTag(DownloadConstants.FILE_TAG)
-                } else { // state == blocked, queued, or running
-                    // no-op
-                }
-            })
-    }
-
-    private fun refreshOnDeviceBlocklistUi() {
-        if (isPlayStoreFlavour()) { // hide the parent view
-            b.settingsActivityOnDeviceBlockRl.visibility = View.GONE
-            return
-        }
-
-        b.settingsActivityOnDeviceBlockRl.visibility = View.VISIBLE
-        // this switch is hidden to show the download-progress bar,
-        // enable it whenever the download is complete
-        b.settingsActivityOnDeviceBlockSwitch.visibility = View.VISIBLE
-        if (persistentState.blocklistEnabled) {
-            b.settingsActivityOnDeviceBlockConfigureBtn.visibility = View.VISIBLE
-            b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.VISIBLE
-            b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.VISIBLE
-            b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
-            b.settingsActivityOnDeviceBlockSwitch.isChecked = true
-        } else {
-            b.settingsActivityOnDeviceBlockConfigureBtn.visibility = View.GONE
-            b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.GONE
-            b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.GONE
-            b.settingsActivityOnDeviceBlockProgress.visibility = View.GONE
-            b.settingsActivityOnDeviceBlockSwitch.isChecked = false
-        }
-
-        refreshOnDeviceBlocklistStatus()
-    }
-
-    private fun refreshOnDeviceBlocklistStatus() {
-        if (!persistentState.blocklistEnabled) {
-            b.settingsActivityOnDeviceBlockDesc.text = getString(
-                R.string.settings_local_blocklist_desc_1)
-            return
-        }
-
-        b.settingsActivityOnDeviceBlockDesc.text = getString(
-            R.string.settings_local_blocklist_in_use,
-            persistentState.numberOfLocalBlocklists.toString())
-
-        b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.VISIBLE
-        b.settingsActivityOnDeviceLastUpdatedTimeTxt.text = getString(
-            R.string.settings_local_blocklist_version,
-            Utilities.convertLongToTime(persistentState.localBlocklistTimestamp, TIME_FORMAT_2))
-    }
-
-    private fun updateBlocklistIfNeeded(isRefresh: Boolean) {
-        val timestamp = persistentState.localBlocklistTimestamp
-        val appVersionCode = persistentState.appVersion
-        val url = "${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_URL}$timestamp&${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_PARAMETER_VCODE}$appVersionCode"
-        if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Check for local download, url: $url")
-        downloadBlocklistIfNeeded(url, isRefresh)
-    }
-
-    private fun downloadBlocklistIfNeeded(url: String, isRefresh: Boolean) {
-
-        val bootstrapClient = OkHttpClient()
-        // FIXME: Use user set doh provider
-        // using quad9 doh provider
-        val dns = DnsOverHttps.Builder().client(bootstrapClient).url(
-            "https://dns.quad9.net/dns-query".toHttpUrl()).bootstrapDnsHosts(
-            InetAddress.getByName("9.9.9.9"), InetAddress.getByName("149.112.112.112"),
-            InetAddress.getByName("2620:fe::9"), InetAddress.getByName("2620:fe::fe")).build()
-
-        val client = bootstrapClient.newBuilder().dns(
-            dns).build() // FIXME: Move it to the http-request-helper class
-        val request = Request.Builder().url(url).build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.i(LOG_TAG_DOWNLOAD,
-                      "onFailure, cancelled? ${call.isCanceled()}, exec? ${call.isExecuted()}")
-                handleFailedDownload(isRefresh)
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                val stringResponse = response.body?.string() ?: return
-                response.body?.close()
-
-                val json = JSONObject(stringResponse)
-                val version = json.optInt(Constants.JSON_VERSION, 0)
-                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                                 "client onResponse for refresh blocklist files-  $version")
-                if (version != Constants.UPDATE_CHECK_RESPONSE_VERSION) {
-                    return
-                }
-
-                val shouldUpdate = json.optBoolean(Constants.JSON_UPDATE, false)
-                val timestamp = json.optLong(Constants.JSON_LATEST, Constants.INIT_TIME_MS)
-                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "onResponse:  update? $shouldUpdate")
-                if (shouldUpdate) {
-                    appDownloadManager.downloadLocalBlocklist(timestamp)
-                    return
-                }
-
-                handleRedownload(isRefresh, timestamp)
-            }
-        })
-    }
-
-    private fun handleFailedDownload(isRefresh: Boolean) {
-        uithread(activity) {
-            if (isRefresh) {
-                Utilities.showToastUiCentered(requireContext(), getString(
-                    R.string.local_blocklist_update_check_failure), Toast.LENGTH_SHORT)
-            } else {
-                onDownloadAbort()
-            }
-        }
-    }
-
-    private fun handleRedownload(isRefresh: Boolean, timestamp: Long) {
-        if (!isRefresh) {
-            onDownloadAbort()
-            return
-        }
-
-        if (VpnController.isVpnLockdown()) {
-            showRedownloadDialogLockdown(timestamp)
-        } else {
-            showRedownloadDialog(timestamp)
-        }
-    }
-
-    private fun onDownloadAbort() {
-        uithread(activity) {
-            refreshOnDeviceBlocklistUi()
-            b.settingsActivityOnDeviceBlockDesc.text = getString(
-                R.string.settings_local_blocklist_desc4)
-            Utilities.showToastUiCentered(activity as Context,
-                                          getString(R.string.settings_local_blocklist_desc4),
-                                          Toast.LENGTH_SHORT)
-        }
-    }
-
-    private fun onDownloadSuccess() {
-        refreshOnDeviceBlocklistUi()
-        b.settingsActivityOnDeviceBlockDesc.text = getString(
-            R.string.settings_local_blocklist_desc3)
-        b.settingsActivityOnDeviceLastUpdatedTimeTxt.text = getString(
-            R.string.settings_local_blocklist_version,
-            Utilities.convertLongToTime(persistentState.localBlocklistTimestamp, TIME_FORMAT_2))
-    }
-
-    private fun onDownloadStart() {
-        uithread(activity) {
-            b.settingsActivityOnDeviceBlockDesc.text = getString(
-                R.string.settings_local_blocklist_desc2)
-            b.settingsActivityOnDeviceBlockSwitch.visibility = View.GONE
-            b.settingsActivityOnDeviceLastUpdatedTimeTxt.visibility = View.GONE
-            b.settingsActivityOnDeviceBlockProgress.visibility = View.VISIBLE
-            b.settingsActivityOnDeviceBlockRefreshBtn.visibility = View.GONE
-            b.settingsActivityOnDeviceBlockConfigureBtn.visibility = View.GONE
-        }
-    }
-
-    // FIXME: Verification of BraveDns object should be added in future.
-    private fun setBraveDNSLocal() {
-        persistentState.blocklistEnabled = true
-        refreshOnDeviceBlocklistUi()
-    }
-
-    private fun removeBraveDNSLocal() {
-        persistentState.blocklistEnabled = false
-        refreshOnDeviceBlocklistUi()
-    }
-
-    private fun showVpnLockdownDownloadDialog() {
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle(R.string.download_lockdown_dialog_heading)
-        builder.setMessage(R.string.download_lockdown_dialog_desc)
-        builder.setCancelable(false)
-        builder.setPositiveButton(getString(R.string.download_lockdown_dialog_positive)) { _, _ ->
-            openVpnProfile(requireContext())
-        }
-        builder.setNegativeButton(
-            getString(R.string.download_lockdown_dialog_negative)) { dialog, _ ->
-            dialog.dismiss()
-        }
-        builder.create().show()
-    }
-
-    private fun showDownloadDialog() {
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle(R.string.local_blocklist_download)
-        builder.setMessage(R.string.local_blocklist_download_desc)
-        builder.setCancelable(false)
-        builder.setPositiveButton(
-            getString(R.string.settings_local_blocklist_dialog_positive)) { _, _ ->
-            updateBlocklistIfNeeded(isRefresh = false)
-        }
-        builder.setNegativeButton(
-            getString(R.string.settings_local_blocklist_dialog_negative)) { dialog, _ ->
-            dialog.dismiss()
-        }
-        builder.create().show()
-    }
-
-    private fun showRedownloadDialogLockdown(timestamp: Long) {
-        uithread(activity) {
-            val builder = AlertDialog.Builder(requireContext())
-            builder.setTitle(R.string.local_blocklist_lockdown_redownload)
-            builder.setMessage(getString(R.string.local_blocklist_lockdown_redownload_desc,
-                                         Utilities.convertLongToTime(timestamp, TIME_FORMAT_2)))
-            builder.setCancelable(false)
-            builder.setPositiveButton(
-                getString(R.string.local_blocklist_lockdown_positive)) { dialogInterface, _ ->
-                dialogInterface.dismiss()
-            }
-            builder.create().show()
-        }
-    }
-
-    private fun showRedownloadDialog(timestamp: Long) {
-        uithread(activity) {
-            val builder = AlertDialog.Builder(requireContext())
-            builder.setTitle(R.string.local_blocklist_redownload)
-            builder.setMessage(getString(R.string.local_blocklist_redownload_desc,
-                                         Utilities.convertLongToTime(timestamp, TIME_FORMAT_2)))
-            builder.setCancelable(false)
-            builder.setPositiveButton(
-                getString(R.string.local_blocklist_positive)) { dialogInterface, _ ->
-                dialogInterface.dismiss()
-            }
-            builder.setNeutralButton(getString(R.string.local_blocklist_neutral)) { _, _ ->
-                onDownloadStart()
-                appDownloadManager.downloadLocalBlocklist(timestamp)
-            }
-            builder.create().show()
-        }
-    }
-
-    private fun showFileCorruptionDialog(timestamp: Long) {
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle(R.string.local_blocklist_corrupt)
-        builder.setMessage(R.string.local_blocklist_corrupt_desc)
-        builder.setCancelable(false)
-        builder.setNegativeButton(
-            getString(R.string.local_blocklist_corrupt_negative)) { dialogInterface, _ ->
-            handleFailedDownload(isRefresh = false)
-            dialogInterface.dismiss()
-        }
-        builder.setPositiveButton(getString(R.string.local_blocklist_corrupt_positive)) { _, _ ->
-            appDownloadManager.downloadLocalBlocklist(timestamp)
-        }
-        builder.create().show()
     }
 
     private fun handleOrbotUiEvent() {
@@ -833,53 +487,9 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
 
     override fun onResume() {
         super.onResume()
-        refreshOnDeviceBlocklistUi()
         refreshOrbotUi()
         handleLockdownModeIfNeeded()
         handleProxyUi()
-    }
-
-    private fun observeBraveMode() {
-        appConfig.braveModeObserver.observe(viewLifecycleOwner, {
-            when (it) {
-                AppConfig.BraveMode.DNS.mode -> handleDnsModeUi()
-                AppConfig.BraveMode.FIREWALL.mode -> handleFirewallModeUi()
-                AppConfig.BraveMode.DNS_FIREWALL.mode -> handleDnsFirewallModeUi()
-            }
-        })
-    }
-
-    private fun handleDnsModeUi() {
-        b.settingsActivityPreventDnsLeaksRl.alpha = 0.5f
-        b.settingsActivityOnDeviceBlockRl.alpha = 1f
-        b.settingsActivityFavIconRl.alpha = 1f
-        b.settingsActivityPreventDnsLeaksSwitch.isClickable = false
-        b.settingsActivityOnDeviceBlockConfigureBtn.isClickable = true
-        b.settingsActivityOnDeviceBlockRefreshBtn.isClickable = true
-        b.settingsActivityOnDeviceBlockSwitch.isClickable = true
-        b.settingsActivityFavIconSwitch.isClickable = true
-    }
-
-    private fun handleFirewallModeUi() {
-        b.settingsActivityPreventDnsLeaksRl.alpha = 0.5f
-        b.settingsActivityOnDeviceBlockRl.alpha = 0.5f
-        b.settingsActivityFavIconRl.alpha = 0.5f
-        b.settingsActivityPreventDnsLeaksSwitch.isClickable = false
-        b.settingsActivityOnDeviceBlockConfigureBtn.isClickable = false
-        b.settingsActivityOnDeviceBlockRefreshBtn.isClickable = false
-        b.settingsActivityOnDeviceBlockSwitch.isClickable = false
-        b.settingsActivityFavIconSwitch.isClickable = false
-    }
-
-    private fun handleDnsFirewallModeUi() {
-        b.settingsActivityPreventDnsLeaksRl.alpha = 1f
-        b.settingsActivityOnDeviceBlockRl.alpha = 1f
-        b.settingsActivityFavIconRl.alpha = 1f
-        b.settingsActivityPreventDnsLeaksSwitch.isClickable = true
-        b.settingsActivityOnDeviceBlockConfigureBtn.isClickable = true
-        b.settingsActivityOnDeviceBlockRefreshBtn.isClickable = true
-        b.settingsActivityOnDeviceBlockSwitch.isClickable = true
-        b.settingsActivityFavIconSwitch.isClickable = true
     }
 
     // Should be in disabled state when the brave mode is in DNS only / Vpn in lockdown mode.
@@ -1186,7 +796,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         b.settingsActivitySocks5Switch.isEnabled = false
         b.settingsActivitySocks5Switch.visibility = View.GONE
         b.settingsActivitySocks5Progress.visibility = View.VISIBLE
-        delay(TimeUnit.SECONDS.toMillis(1L)) {
+        delay(TimeUnit.SECONDS.toMillis(1L), lifecycleScope) {
             if (isAdded) {
                 b.settingsActivitySocks5Switch.isEnabled = true
                 b.settingsActivitySocks5Progress.visibility = View.GONE
@@ -1212,30 +822,10 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     private fun enableAfterDelay(ms: Long, vararg views: View) {
         for (v in views) v.isEnabled = false
 
-        delay(ms) {
+        delay(ms, lifecycleScope) {
             if (!isAdded) return@delay
 
             for (v in views) v.isEnabled = true
-        }
-    }
-
-    // TODO: move mixed workloads to coroutines
-    private suspend fun enableAfterDelayCo(ms: Long, vararg views: View) {
-        uiCtx {
-            for (v in views) v.isEnabled = false
-
-            delay(ms)
-
-            if (!isAdded) return@uiCtx
-
-            for (v in views) v.isEnabled = true
-        }
-    }
-
-    private fun uithread(a: FragmentActivity?, f: () -> Unit) {
-        a?.runOnUiThread {
-            if (!isAdded) return@runOnUiThread
-            f()
         }
     }
 

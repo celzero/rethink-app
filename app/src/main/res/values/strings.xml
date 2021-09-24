@@ -772,6 +772,18 @@
     <string name="dns_logs_lifetime_queries">Lifetime queries: %1$s</string>
     <string name="dns_logs_blocked_queries">Blocked queries: %1$s</string>
 
+    <!-- DNS configure screen -->
+
+    <string name="dc_on_device_block_btn_active">active</string>
+    <string name="dc_on_device_block_btn_inactive">inactive</string>
+
+    <string name="settings_dns_header">dns</string>
+    <string name="settings_local_blocklist_heading">Enable on-device blocklists</string>
+    <string name="settings_local_blocklist_desc_1">Choose from 185+ blocklists.</string>
+    <string name="settings_local_blocklist_configure">configure</string>
+    <string name="settings_local_blocklist_update">Update</string>
+
+
     <!-- About fragment -->
     <string name="about_bravedns_explantion">RethinkDNS is the easiest way to monitor app activity, circumvent Internet censorship, and firewall apps on your Android device. </string>
     <string name="about_bravedns_whoarewe">RethinkDNS is a free and open-source project, led by ex-engineers from Amazon, IBM, and Scientific Games.</string>
@@ -1090,12 +1102,6 @@
 
     <string name="settings_prevent_dns_leaks_heading">Prevent DNS leaks</string>
     <string name="settings_prevent_dns_leaks_desc">When enabled, RethinkDNS captures all packets on port 53 and forwards it to a user-set DNS endpoint.</string>
-
-    <string name="settings_dns_header">dns</string>
-    <string name="settings_local_blocklist_heading">Enable on-device blocklists</string>
-    <string name="settings_local_blocklist_desc_1">Choose from 185+ blocklists.</string>
-    <string name="settings_local_blocklist_configure">configure</string>
-    <string name="settings_local_blocklist_update">Update</string>
 
     <string name="accessibility_notification_title">Action Required</string>
     <string name="accessibility_notification_content">RethinkDNS accessibility service has stopped or crashed. No longer blocking backgrounded apps. Tap to re-enable.</string>

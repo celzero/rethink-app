@@ -15,12 +15,19 @@
  */
 package com.celzero.bravedns.database
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
 class CustomDomainsRepository(private val customDomainsDAO: CustomDomainsDAO) {
-    fun update(customDomains: CustomDomains) {
-        customDomainsDAO.update(customDomains)
+    suspend fun update(customDomains: CustomDomains) {
+        withContext(Dispatchers.IO) {
+            customDomainsDAO.update(customDomains)
+        }
     }
 
-    fun insert(customDomains: CustomDomains) {
-        customDomainsDAO.insert(customDomains)
+    suspend fun insert(customDomains: CustomDomains) {
+        withContext(Dispatchers.IO) {
+            customDomainsDAO.insert(customDomains)
+        }
     }
 }

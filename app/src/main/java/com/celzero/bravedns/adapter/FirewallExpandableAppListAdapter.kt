@@ -407,7 +407,7 @@ class FirewallExpandableAppListAdapter internal constructor(private val context:
     private fun enableAfterDelay(delay: Long, vararg views: View) {
         for (v in views) v.isEnabled = false
 
-        Utilities.delay(delay) {
+        Utilities.delay(delay, lifecycleOwner.lifecycleScope) {
             for (v in views) v.isEnabled = true
         }
     }

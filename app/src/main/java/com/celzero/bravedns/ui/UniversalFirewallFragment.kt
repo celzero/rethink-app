@@ -26,6 +26,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -51,6 +52,7 @@ import com.celzero.bravedns.viewmodel.BlockedConnectionsViewModel
 import com.google.android.material.switchmaterial.SwitchMaterial
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.concurrent.TimeUnit
 import kotlin.reflect.KMutableProperty0
 
 
@@ -209,7 +211,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             customDialog.setCanceledOnTouchOutside(false)
             customDialog.show()
 
-            delay(500) { if (isAdded) includeView.firewallAppsShowTxt.isEnabled = true }
+            delay(TimeUnit.MILLISECONDS.toMillis(500), viewLifecycleOwner.lifecycleScope) { if (isAdded) includeView.firewallAppsShowTxt.isEnabled = true }
         }
 
         includeView.firewallDisallowDnsBypassModeCheck.setOnCheckedChangeListener { _, b ->
