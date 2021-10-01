@@ -53,6 +53,9 @@ object ViewModelModule {
         viewModel {
             AppInfoViewModel(get())
         }
+        viewModel {
+            CustomDomainViewModel(get())
+        }
     }
 
     val modules = listOf(viewModelModule)

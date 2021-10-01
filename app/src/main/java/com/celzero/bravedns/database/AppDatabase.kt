@@ -19,12 +19,14 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [AppInfo::class, CategoryInfo::class, ConnectionTracker::class, BlockedConnections::class, DoHEndpoint::class, DNSCryptEndpoint::class, DNSProxyEndpoint::class, DNSCryptRelayEndpoint::class, ProxyEndpoint::class, DnsLog::class],
-    views = [AppInfoView::class], version = 10, exportSchema = false)
+    entities = [AppInfo::class, CategoryInfo::class, ConnectionTracker::class, BlockedConnections::class, DoHEndpoint::class, DNSCryptEndpoint::class, DNSProxyEndpoint::class, DNSCryptRelayEndpoint::class, ProxyEndpoint::class, DnsLog::class, CustomDomain::class],
+    views = [AppInfoView::class], version = 11, exportSchema = true)
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
     companion object {
@@ -37,7 +39,7 @@ abstract class AppDatabase : RoomDatabase() {
             JournalMode.TRUNCATE).addMigrations(MIGRATION_1_2).addMigrations(
             MIGRATION_2_3).addMigrations(MIGRATION_3_4).addMigrations(MIGRATION_4_5).addMigrations(
             MIGRATION_5_6).addMigrations(MIGRATION_6_7).addMigrations(MIGRATION_7_8).addMigrations(
-            MIGRATION_8_9).addMigrations(MIGRATION_9_10).build()
+            MIGRATION_8_9).addMigrations(MIGRATION_9_10).addMigrations(MIGRATION_10_11).build()
 
         private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
@@ -204,6 +206,15 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_10_11: Migration = object : Migration(10, 11) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                       "ALTER TABLE DNSLogs add column responseIps TEXT DEFAULT '' NOT NULL")
+                database.execSQL(
+                    "CREATE TABLE 'CustomDomain' ( 'domain' TEXT NOT NULL, 'ips' TEXT NOT NULL, 'status' INTEGER NOT NULL, 'createdTs' DATE NOT NULL, 'deletedTs' DATE NOT NULL, 'version' INTEGER NOT NULL, PRIMARY KEY (domain)) ")
+            }
+        }
+
     }
 
     abstract fun appInfoDAO(): AppInfoDAO
@@ -217,6 +228,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun proxyEndpointDAO(): ProxyEndpointDAO
     abstract fun dnsLogDAO(): DNSLogDAO
     abstract fun appInfoViewDAO(): AppInfoViewDAO
+    abstract fun customEndpointDAO(): CustomDomainDAO
 
     fun appInfoRepository() = AppInfoRepository(appInfoDAO())
     fun categoryInfoRepository() = CategoryInfoRepository(categoryInfoDAO())
@@ -226,10 +238,9 @@ abstract class AppDatabase : RoomDatabase() {
     fun dnsCryptEndpointsRepository() = DNSCryptEndpointRepository(dnsCryptEndpointDAO())
     fun dnsCryptRelayEndpointsRepository() = DNSCryptRelayEndpointRepository(
         dnsCryptRelayEndpointDAO())
-
     fun dnsProxyEndpointRepository() = DNSProxyEndpointRepository(dnsProxyEndpointDAO())
     fun proxyEndpointRepository() = ProxyEndpointRepository(proxyEndpointDAO())
     fun dnsLogRepository() = DNSLogRepository(dnsLogDAO())
     fun appInfoViewRepository() = AppInfoViewRepository(appInfoViewDAO())
-
+    fun customDomainsRepository() = CustomDomainRepository(customEndpointDAO())
 }

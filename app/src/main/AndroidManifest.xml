@@ -64,7 +64,7 @@
             android:name=".ui.DNSConfigureWebViewActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.DomainDetailActivity"
+            android:name=".ui.CustomDomainActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.DNSListActivity"

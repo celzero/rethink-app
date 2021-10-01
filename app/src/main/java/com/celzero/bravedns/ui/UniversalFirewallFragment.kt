@@ -290,11 +290,6 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         if (isAccessibilityServiceFunctional) {
             persistentState.blockAppWhenBackground = true
             includeView.firewallBackgroundModeCheck.isChecked = true
-            // Reset the heart beat time for the accessibility check.
-            // On accessibility failure the value will be stored for next 5 mins.
-            // If user, re-enable the settings reset the timestamp so that vpn service
-            // will check for the accessibility service availability.
-            VpnController.resetAccessibilityHearbeatTimestamp()
             return
         }
 

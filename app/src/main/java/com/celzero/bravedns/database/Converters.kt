@@ -15,19 +15,17 @@
  */
 package com.celzero.bravedns.database
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import androidx.room.TypeConverter
+import java.sql.Date
 
-class CustomDomainsRepository(private val customDomainsDAO: CustomDomainsDAO) {
-    suspend fun update(customDomains: CustomDomains) {
-        withContext(Dispatchers.IO) {
-            customDomainsDAO.update(customDomains)
+class Converters {
+    @TypeConverter
+        fun fromTimestamp(value: Long?): Date? {
+            return value?.let { Date(it) }
         }
-    }
 
-    suspend fun insert(customDomains: CustomDomains) {
-        withContext(Dispatchers.IO) {
-            customDomainsDAO.insert(customDomains)
+        @TypeConverter
+        fun dateToTimestamp(date: Date?): Long? {
+            return date?.time
         }
-    }
 }

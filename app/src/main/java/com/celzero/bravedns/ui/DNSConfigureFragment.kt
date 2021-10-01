@@ -47,7 +47,6 @@ import com.celzero.bravedns.util.Utilities.Companion.hasLocalBlocklists
 import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.*
@@ -136,15 +135,15 @@ class DNSConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
 
     private fun initClickListeners() {
 
-        b.dcCustomBlocklist.setOnClickListener {
+        b.dcCustomBlocklistCard.setOnClickListener {
             enableAfterDelay(TimeUnit.MINUTES.toMillis(1), b.dcCustomBlocklist)
 
-            val intent = Intent(requireContext(), DomainDetailActivity::class.java)
+            val intent = Intent(requireContext(), CustomDomainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
             startActivity(intent)
         }
 
-        b.dcMoreDns.setOnClickListener {
+        b.dcMoreDnsCard.setOnClickListener {
             enableAfterDelay(TimeUnit.MINUTES.toMillis(1), b.dcMoreDns)
 
             val intent = Intent(requireContext(), DNSListActivity::class.java)

@@ -38,6 +38,7 @@ object DatabaseModule {
         single<DNSProxyEndpointDAO> { get<AppDatabase>().dnsProxyEndpointDAO() }
         single<DoHEndpointDAO> { get<AppDatabase>().dohEndpointsDAO() }
         single<ProxyEndpointDAO> { get<AppDatabase>().proxyEndpointDAO() }
+        single<CustomDomainDAO> { get<AppDatabase>().customEndpointDAO() }
     }
     private val repositoryModule = module {
         single { AppInfoRepository(get()) }
@@ -51,6 +52,7 @@ object DatabaseModule {
         single { DNSProxyEndpointRepository(get()) }
         single { DoHEndpointRepository(get()) }
         single { ProxyEndpointRepository(get()) }
+        single { CustomDomainRepository(get()) }
     }
 
     val modules = listOf(databaseModule, daoModule, repositoryModule)

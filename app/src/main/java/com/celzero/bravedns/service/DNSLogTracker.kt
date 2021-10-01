@@ -152,10 +152,8 @@ class DNSLogTracker internal constructor(private val dnsLogRepository: DNSLogRep
                                          "Address - ${destination.address}, HostAddress - ${destination.hostAddress}")
                         val countryCode: String? = getCountryCode(destination, context)
 
-                        addresses.forEach {
-                            ips += makeAddressPair(getCountryCode(it, context), it.hostAddress)
-                        }
-                        dnsLog.response = TextUtils.join(",", ips)
+                        dnsLog.response = addresses.joinToString(separator = ",") { makeAddressPair(getCountryCode(it, context), it.hostAddress) }
+                        dnsLog.responseIps = addresses.joinToString(separator = ",") { it.hostAddress }
 
                         if (destination.hostAddress.contains(UNSPECIFIED_IP)) {
                             dnsLog.isBlocked = true

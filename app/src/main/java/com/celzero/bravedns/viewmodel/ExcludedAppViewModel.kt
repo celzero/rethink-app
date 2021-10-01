@@ -32,7 +32,7 @@ class ExcludedAppViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         filteredList.value = ""
     }
 
-    var excludedAppList = Transformations.switchMap(filteredList, ({ input: String ->
+    val excludedAppList = Transformations.switchMap(filteredList, ({ input: String ->
         if (input.isBlank()) {
             appInfoDAO.getExcludedAppDetailsLiveData().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
         } else if (input == FILTER_IS_SYSTEM) {

@@ -28,7 +28,7 @@ class FirewallAppViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         filteredList.value = ""
     }
 
-    var firewallAppDetailsList = Transformations.switchMap(filteredList, ({ input: String ->
+    val firewallAppDetailsList = Transformations.switchMap(filteredList, ({ input: String ->
         val inputTxt = "%$input%"
         if (inputTxt.isEmpty()) {
             appInfoDAO.getAllAppDetailsForLiveData()

@@ -204,8 +204,4 @@ object VpnController : KoinComponent {
         braveVpnService?.decreasePauseDuration(durationMs)
     }
 
-    fun resetAccessibilityHearbeatTimestamp() {
-        braveVpnService?.accessibilityHearbeatTimestamp = INIT_TIME_MS
-    }
-
 }

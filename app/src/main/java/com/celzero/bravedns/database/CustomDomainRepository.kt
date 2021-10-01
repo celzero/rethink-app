@@ -15,18 +15,20 @@
  */
 package com.celzero.bravedns.database
 
-import androidx.room.*
+class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
+    suspend fun update(customDomain: CustomDomain) {
+        customDomainDAO.update(customDomain)
+    }
 
-@Dao
-interface CustomDomainsDAO {
+    suspend fun insert(customDomain: CustomDomain) {
+        customDomainDAO.insert(customDomain)
+    }
 
-    @Update
-    fun update(customDomains: CustomDomains)
+    suspend fun delete(customDomain: CustomDomain) {
+        customDomainDAO.delete(customDomain)
+    }
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(customDomains: CustomDomains)
-
-    @Delete
-    fun delete(customDomains: CustomDomains)
-
+    fun getAllCustomDomains(): List<CustomDomain> {
+        return customDomainDAO.getAllDomains()
+    }
 }

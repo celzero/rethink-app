@@ -31,7 +31,7 @@ class DNSLogViewModel(private val dnsLogDAO: DNSLogDAO) : ViewModel() {
         filteredList.value = ""
     }
 
-    var dnsLogsList = Transformations.switchMap(filteredList) { input ->
+    val dnsLogsList = Transformations.switchMap(filteredList) { input ->
         if (input.isBlank()) {
             dnsLogDAO.getDNSLogsLiveData().toLiveData(pageSize = DNS_LIVEDATA_PAGE_SIZE)
         } else if (input.contains(FILTER_IS_FILTER)) {

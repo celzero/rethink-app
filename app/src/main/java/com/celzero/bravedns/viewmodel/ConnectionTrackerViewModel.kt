@@ -39,7 +39,7 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
         filterString.value = ""
     }
 
-    var connectionTrackerList = Transformations.switchMap(filterString,
+    val connectionTrackerList = Transformations.switchMap(filterString,
                                                           (Function<String, LiveData<PagedList<ConnectionTracker>>> { input ->
                                                               fetchNetworkLogs(input)
                                                           }))

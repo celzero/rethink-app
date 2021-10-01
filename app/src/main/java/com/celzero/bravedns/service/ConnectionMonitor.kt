@@ -168,7 +168,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
 
             currentNetworks = newNetworks
-            Log.i(LOG_TAG_CONNECTION, "Connected network- ${
+            Log.i(LOG_TAG_CONNECTION, "Connected network: ${
                 connectivityManager.getNetworkInfo(newActiveNetwork)?.typeName.toString()
             }, Is new network? $isNewNetwork, is force update? $isForceUpdate")
 
@@ -186,7 +186,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
 
             Log.i(LOG_TAG_CONNECTION,
-                  "process message MESSAGE_AVAILABLE_NETWORK, ${currentNetworks.size},${newNetworks.size}. isNewNetwork - $isNewNetwork, force update is $isForceUpdate")
+                  "process message MESSAGE_AVAILABLE_NETWORK, ${currentNetworks.size},${newNetworks.size}. isNewNetwork: $isNewNetwork, force update is $isForceUpdate")
             currentNetworks = newNetworks
 
             if (!isNewNetwork && !isForceUpdate) return
@@ -196,7 +196,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
         private fun informListener(requireAllNetworks: Boolean = false) {
             Log.i(LOG_TAG_CONNECTION,
-                  "inform listener on network change - ${currentNetworks.size}, is all network - $requireAllNetworks")
+                  "inform listener on network change: ${currentNetworks.size}, is all network: $requireAllNetworks")
             if (currentNetworks.count() > 0) {
                 val networks = when (requireAllNetworks) {
                     true -> currentNetworks

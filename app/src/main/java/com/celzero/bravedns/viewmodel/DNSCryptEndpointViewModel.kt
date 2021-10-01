@@ -31,7 +31,7 @@ class DNSCryptEndpointViewModel(private val dnsCryptEndpointDAO: DNSCryptEndpoin
         filteredList.value = ""
     }
 
-    var dnsCryptEndpointList = Transformations.switchMap(filteredList) { input ->
+    val dnsCryptEndpointList = Transformations.switchMap(filteredList) { input ->
         if (input.isBlank()) {
             dnsCryptEndpointDAO.getDNSCryptEndpointLiveData().toLiveData(
                 pageSize = LIVEDATA_PAGE_SIZE)

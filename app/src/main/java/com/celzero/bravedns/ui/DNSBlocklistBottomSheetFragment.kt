@@ -29,6 +29,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.target.CustomViewTarget
@@ -36,6 +37,7 @@ import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
+import com.celzero.bravedns.automaton.CustomDomainManager
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
@@ -53,6 +55,9 @@ import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import java.util.*
 
@@ -93,13 +98,54 @@ class DNSBlocklistBottomSheetFragment(private var contextVal: Context,
         b.dnsBlockIpLatency.text = getString(R.string.dns_btm_latency_ms,
                                              transaction.latency.toString())
 
-        b.dnsBlockRuleHeaderLl.setOnClickListener {
-            showToastUiCentered(requireContext(), getString(R.string.coming_soon_toast),
-                                Toast.LENGTH_SHORT)
-        }
-
+        handleCustomDomainViews()
         displayFavIcon()
         displayDnsTransactionDetails()
+    }
+
+    private fun handleCustomDomainViews() {
+        if (CustomDomainManager.isDomainWhitelisted(transaction.queryStr)) {
+            b.dnsBlockCheck.isChecked = false
+            b.dnsWhitelistCheck.isChecked = true
+        } else if (CustomDomainManager.isDomainBlocked(transaction.queryStr)) {
+            b.dnsBlockCheck.isChecked = true
+            b.dnsWhitelistCheck.isChecked = false
+        } else {
+            b.dnsBlockCheck.isChecked = false
+            b.dnsWhitelistCheck.isChecked = false
+        }
+
+        b.dnsBlockCheck.setOnCheckedChangeListener(null)
+        b.dnsBlockCheck.setOnClickListener {
+            handleBlockSwitch(b.dnsBlockCheck.isChecked)
+        }
+
+        b.dnsWhitelistCheck.setOnCheckedChangeListener(null)
+        b.dnsWhitelistCheck.setOnClickListener {
+            handleWhitelistSwitch(b.dnsWhitelistCheck.isChecked)
+        }
+    }
+
+    private fun handleBlockSwitch(enabled: Boolean) {
+        if (enabled) {
+            // add to custom blocklist domains
+            b.dnsWhitelistCheck.isChecked = false
+            CustomDomainManager.blocklist(transaction.queryStr, transaction.responseIps)
+        } else {
+            // sets the status to none
+            CustomDomainManager.removeStatus(transaction.queryStr, transaction.responseIps)
+        }
+    }
+
+    private fun handleWhitelistSwitch(enabled: Boolean) {
+        if (enabled) {
+            // add to custom blocklist domains
+            b.dnsBlockCheck.isChecked = false
+            CustomDomainManager.whitelist(transaction.queryStr, transaction.responseIps)
+        } else {
+            // sets the status to none
+            CustomDomainManager.removeStatus(transaction.queryStr, transaction.responseIps)
+        }
     }
 
     private fun getResponseIp(): String {

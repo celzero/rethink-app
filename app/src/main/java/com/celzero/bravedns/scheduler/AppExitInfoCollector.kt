@@ -17,7 +17,6 @@
 package com.celzero.bravedns.scheduler
 
 import android.app.ActivityManager
-import android.app.ApplicationExitInfo
 import android.content.Context
 import android.os.Build
 import android.util.Log
@@ -27,10 +26,8 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_3
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_SCHEDULER
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.convertLongToTime
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
@@ -54,37 +51,31 @@ class AppExitInfoCollector(val context: Context, workerParameters: WorkerParamet
 
         val am = context.getSystemService(AppCompatActivity.ACTIVITY_SERVICE) as ActivityManager
 
-        val path = ZipUtil.getBugReport(this.applicationContext)
+        val path = BugReportZipper.prepare(this.applicationContext)
         // gets all the historical process exit reasons.
         val appExitInfo = am.getHistoricalProcessExitReasons(null, 0, 0)
 
         if (appExitInfo.isEmpty()) return
 
-        val timestamp = appExitInfo[0].timestamp
+        var maxTimestamp = appExitInfo[0].timestamp
 
         val file = File(path)
         run returnTag@{
             appExitInfo.forEach {
 
-                // Write only the latest exit reason
+                maxTimestamp = maxTimestamp.coerceAtLeast(it.timestamp)
+
+                // Write exit infos past the previously recorded checkpoint
                 if (persistentState.lastAppExitInfoTimestamp >= it.timestamp) return@returnTag
 
-                val reportDetails = "${it.packageUid},${it.reason},${it.description},${it.importance},${it.pss},${it.rss},${
-                    convertLongToTime(it.timestamp, TIME_FORMAT_3)
-                }\n"
-                file.appendText(reportDetails)
-                // capture traces for ANR exit-infos
-                if (it.reason == ApplicationExitInfo.REASON_ANR) {
-                    ZipUtil.writeTrace(file, it.traceInputStream)
-                }
+                BugReportZipper.write(it, file)
+
             }
         }
 
-        if (timestamp <= persistentState.lastAppExitInfoTimestamp) return
-
         // Store the last exit reason time stamp
-        persistentState.lastAppExitInfoTimestamp = timestamp
+        persistentState.lastAppExitInfoTimestamp = persistentState.lastAppExitInfoTimestamp.coerceAtLeast(maxTimestamp)
 
-        if (file.exists() && file.length() > 0) ZipUtil.zip(applicationContext, file)
+        BugReportZipper.build(applicationContext, file)
     }
 }

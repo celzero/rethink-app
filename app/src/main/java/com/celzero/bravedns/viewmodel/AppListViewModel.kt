@@ -32,7 +32,7 @@ class AppListViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         filteredList.value = ""
     }
 
-    var appDetailsList = Transformations.switchMap(filteredList) { input: String ->
+    val appDetailsList = Transformations.switchMap(filteredList) { input: String ->
         if (input.isBlank()) {
             appInfoDAO.getUnivAppDetailsLiveData().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
         } else if (input == FILTER_IS_SYSTEM) {

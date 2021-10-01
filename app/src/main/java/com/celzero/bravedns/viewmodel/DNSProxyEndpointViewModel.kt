@@ -31,7 +31,7 @@ class DNSProxyEndpointViewModel(private val dnsProxyEndpointDAO: DNSProxyEndpoin
         filteredList.value = ""
     }
 
-    var dnsProxyEndpointList = Transformations.switchMap(filteredList) { input ->
+    val dnsProxyEndpointList = Transformations.switchMap(filteredList) { input ->
         if (input.isBlank()) {
             dnsProxyEndpointDAO.getDNSProxyEndpointLiveData().toLiveData(
                 pageSize = LIVEDATA_PAGE_SIZE)

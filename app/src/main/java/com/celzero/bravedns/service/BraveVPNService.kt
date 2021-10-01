@@ -40,6 +40,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.celzero.bravedns.R
+import com.celzero.bravedns.automaton.CustomDomainManager
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.automaton.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.automaton.FirewallRules
@@ -862,6 +863,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             } else {
                 io("startVpn") {
                     FirewallManager.loadAppFirewallRules()
+                    CustomDomainManager.load()
 
                     if (FirewallManager.getTotalApps() <= 0) {
                         notifyEmptyFirewallRules()
@@ -903,6 +905,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 handleAccessibilityFailure()
             }
         }
+
+        // Reset the heart beat time for the accessibility check.
+        // On accessibility failure the value will be stored for next 5 mins.
+        // If user, re-enable the settings reset the timestamp so that vpn service
+        // will check for the accessibility service availability.
+        accessibilityHearbeatTimestamp = INIT_TIME_MS
     }
 
     private fun unregisterAccessibilityServiceState() {

@@ -31,7 +31,7 @@ class DNSCryptRelayEndpointViewModel(
         filteredList.value = ""
     }
 
-    var dnsCryptRelayEndpointList = Transformations.switchMap(filteredList) { input ->
+    val dnsCryptRelayEndpointList = Transformations.switchMap(filteredList) { input ->
         if (input.isBlank()) {
             dnsCryptRelayEndpointDAO.getDNSCryptRelayEndpointLiveData().toLiveData(
                 pageSize = LIVEDATA_PAGE_SIZE)

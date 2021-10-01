@@ -32,7 +32,7 @@ class BlockedConnectionsViewModel(private val blockedConnectionsDAO: BlockedConn
         filteredList.value = ""
     }
 
-    var blockedUnivRulesList = Transformations.switchMap(filteredList) { input ->
+    val blockedUnivRulesList = Transformations.switchMap(filteredList) { input ->
         if (input.isNullOrBlank()) {
             blockedConnectionsDAO.getUnivBlockedConnectionsLiveData().toLiveData(
                 pageSize = LIVEDATA_PAGE_SIZE)

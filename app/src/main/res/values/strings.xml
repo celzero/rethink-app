@@ -502,6 +502,7 @@
     <string name="search_firewall_all_apps"><font size="12">Search apps</font></string>
     <string name="search_dns_logs"><font size="12">Search domain names or IPs</font></string>
     <string name="search_universal_ips"><font size="12">Search IPs</font></string>
+    <string name="search_custom_domains"><font size="12">Search domain names</font></string>
 
     <string name="app_mode_dns_low_battery">DNS (battery saver)</string>
     <string name="app_mode_dns">DNS</string>
@@ -896,7 +897,6 @@
     <string name="ct_filter_parent_allowed">Allowed</string>
     <string name="ct_filter_parent_blocked">Blocked</string>
 
-
     <!-- Connection tracker bottom sheet fragment string -->
     <string name="ctbs_app_info_not_available_toast">App settings page not found</string>
     <string name="ctbs_unknown_app">Unknown</string>
@@ -945,6 +945,7 @@
     <string name="dns_btm_latency_ms">%1$sms</string>
 
     <string name="dns_block_rule_text">Block this domain for all apps</string>
+    <string name="dns_whitelist_rule_text">Whitelist this domain for all apps</string>
 
     <!-- Excluded app dialog -->
     <string name="ex_dialog_count">%1$s excluded app(s) will not be monitored or blocked.</string>
@@ -1116,8 +1117,13 @@
     <string name="pause_desc">Note: %1$s blocked apps will continue to be firewalled.</string>
 
     <!-- Custom Blocklist -->
-    <string name="blocklist_tab1">blocked</string>
-    <string name="blocklist_tab2">allowed</string>
+    <string name="cb_blocked">blocked</string>
+    <string name="cb_allowed">allowed</string>
+
+    <string name="cb_filter_all">All</string>
+    <string name="cb_filter_none">None</string>
+    <string name="cb_filter_allowed">Allowed</string>
+    <string name="cb_filter_blocked">Blocked</string>
 
     <!-- Other DNS list -->
     <string name="other_dns_list_tab1">DOH</string>

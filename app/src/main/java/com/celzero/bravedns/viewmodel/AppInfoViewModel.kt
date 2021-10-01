@@ -22,7 +22,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         filter.value = ""
     }
 
-    var appInfos = Transformations.switchMap(filter) { input: String ->
+    val appInfos = Transformations.switchMap(filter) { input: String ->
         fetchAppInfos(input)
     }
 
