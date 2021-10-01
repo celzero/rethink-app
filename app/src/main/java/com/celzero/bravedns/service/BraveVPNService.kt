@@ -211,14 +211,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             val uid = connInfo.uid
             val appStatus = FirewallManager.appStatus(uid)
 
-            if (settingUpOrbot.get()) {
-                if (OrbotHelper.ORBOT_PACKAGE_NAME == FirewallManager.getPackageNameByUid(uid)) {
-                    return FirewallRuleset.RULE9B
-                } else {
-                    // fall-through
-                }
-            }
-
             if (allowOrbot(uid)) {
                 return FirewallRuleset.RULE9B
             }
@@ -305,7 +297,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         }
     }
 
-    private fun waitAndCheckIfNewAppAllowed(uid: Int): Boolean {
+    private fun waitAndCheckIfUidBlocked(uid: Int): Boolean {
         val allowed = testWithBackoff {
             FirewallManager.hasUid(uid) && !FirewallManager.isUidFirewalled(uid)
         }
@@ -313,10 +305,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     }
 
     private fun newAppBlocked(uid: Int): Boolean {
-        return if (!persistentState.blockNewlyInstalledApp) {
+        return if (!persistentState.blockNewlyInstalledApp || isMissingOrInvalidUid(uid)) {
             false
         } else {
-            waitAndCheckIfNewAppAllowed(uid)
+            waitAndCheckIfUidBlocked(uid)
         }
     }
 
@@ -334,10 +326,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         }
     }
 
-    private fun testWithBackoff(stallSec: Long = 20, waitSec: Long = 10,
+    private fun testWithBackoff(stallSec: Long = 20, durationSec: Long = 10,
                                 test: () -> Boolean): Boolean {
         val minWaitMs = TimeUnit.SECONDS.toMillis(stallSec)
-        var remainingWaitMs = TimeUnit.SECONDS.toMillis(waitSec)
+        var remainingWaitMs = TimeUnit.SECONDS.toMillis(durationSec)
         var attempt = 0
         while (remainingWaitMs > 0) {
             if (test()) return true
