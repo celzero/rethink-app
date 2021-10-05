@@ -182,15 +182,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             startDnsActivity(DNSDetailActivity.Tabs.CONFIGURE.screen)
         }
 
-        b.fhsCardDnsConfigureLl.setOnClickListener {
-            startDnsActivity(DNSDetailActivity.Tabs.LOGS.screen)
-        }
-
         b.fhsCardFirewallConfigure.setOnClickListener {
-            startFirewallActivity(FirewallActivity.Tabs.ALL_APPS.screen)
-        }
-
-        b.fhsCardFirewallConfigureLl.setOnClickListener {
             startFirewallActivity(FirewallActivity.Tabs.ALL_APPS.screen)
         }
 
@@ -422,10 +414,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun updateMainButtonUi() {
         if (isVpnActivated) {
-            b.fhsDnsOnOffBtn.setBackgroundResource(R.drawable.rounded_corners_button_accent)
+            b.fhsDnsOnOffBtn.setBackgroundResource(R.drawable.home_screen_button_stop_bg)
             b.fhsDnsOnOffBtn.text = getString(R.string.hsf_stop_btn_state)
         } else {
-            b.fhsDnsOnOffBtn.setBackgroundResource(R.drawable.rounded_corners_button_primary)
+            b.fhsDnsOnOffBtn.setBackgroundResource(R.drawable.home_screen_button_start_bg)
             b.fhsDnsOnOffBtn.text = getString(R.string.hsf_start_btn_state)
         }
     }
@@ -484,7 +476,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsCardFirewallApps.text = getString(R.string.firewall_card_text_inactive)
         b.fhsCardFirewallStatus.text = getString(R.string.firewall_card_status_inactive)
         b.fhsCardFirewallConfigure.alpha = 0.5F
-        b.fhsCardFirewallConfigure.setTextColor(fetchTextColor(R.color.textColorMain))
+        b.fhsCardFirewallConfigure.setTextColor(fetchTextColor(R.color.primaryLightColorText))
     }
 
     private fun showActiveFirewallCard() {
@@ -500,7 +492,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun disabledDnsCard() {
         b.fhsCardDnsLatency.text = getString(R.string.dns_card_latency_inactive)
         b.fhsCardDnsConnectedDns.text = getString(R.string.dns_card_connected_status_failure)
-        b.fhsCardDnsConfigure.setTextColor(fetchTextColor(R.color.textColorMain))
+        b.fhsCardDnsConfigure.setTextColor(fetchTextColor(R.color.primaryLightColorText))
         b.fhsCardDnsConfigure.alpha = 0.5F
     }
 
@@ -868,7 +860,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         if (status.on) {
-            colorId = fetchTextColor(R.color.positive)
+            colorId = fetchTextColor(R.color.accentGood)
             statusId = when {
                 status.connectionState == null -> {
                     R.string.status_waiting
@@ -880,18 +872,18 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     R.string.status_protected
                 }
                 else -> {
-                    colorId = fetchTextColor(R.color.accent_bad)
+                    colorId = fetchTextColor(R.color.accentBad)
                     R.string.status_failing
                 }
             }
         } else if (isVpnActivated) {
-            colorId = fetchTextColor(R.color.accent_bad)
+            colorId = fetchTextColor(R.color.accentBad)
             statusId = R.string.status_waiting
         } else if (isAnotherVpnActive()) {
-            colorId = fetchTextColor(R.color.accent_bad)
+            colorId = fetchTextColor(R.color.accentBad)
             statusId = R.string.status_exposed
         } else {
-            colorId = fetchTextColor(R.color.accent_bad)
+            colorId = fetchTextColor(R.color.accentBad)
             statusId = when (privateDnsMode) {
                 PrivateDnsMode.STRICT -> R.string.status_strict
                 else -> R.string.status_exposed
@@ -901,32 +893,32 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         if (statusId == R.string.status_protected) {
             if (appConfig.getBraveMode().isDnsMode() && isPrivateDnsActive()) {
                 statusId = R.string.status_protected_with_private_dns
-                colorId = fetchTextColor(R.color.indicator)
+                colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.getBraveMode().isDnsMode()) {
                 statusId = R.string.status_protected
             } else if (appConfig.isOrbotProxyEnabled() && isPrivateDnsActive()) {
                 statusId = R.string.status_protected_with_tor_private_dns
-                colorId = fetchTextColor(R.color.indicator)
+                colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.isOrbotProxyEnabled()) {
                 statusId = R.string.status_protected_with_tor
             } else if ((appConfig.isCustomSocks5Enabled() && appConfig.isCustomHttpProxyEnabled()) && isPrivateDnsActive()) { // SOCKS5 + Http + PrivateDns
                 statusId = R.string.status_protected_with_proxy_private_dns
-                colorId = fetchTextColor(R.color.indicator)
+                colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.isCustomSocks5Enabled() && appConfig.isCustomHttpProxyEnabled()) {
                 statusId = R.string.status_protected_with_proxy
             } else if (appConfig.isCustomSocks5Enabled() && isPrivateDnsActive()) {
                 statusId = R.string.status_protected_with_socks5_private_dns
-                colorId = fetchTextColor(R.color.indicator)
+                colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.isCustomHttpProxyEnabled() && isPrivateDnsActive()) {
                 statusId = R.string.status_protected_with_http_private_dns
-                colorId = fetchTextColor(R.color.indicator)
+                colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.isCustomHttpProxyEnabled()) {
                 statusId = R.string.status_protected_with_http
             } else if (appConfig.isCustomSocks5Enabled()) {
                 statusId = R.string.status_protected_with_socks5
             } else if (isPrivateDnsActive()) {
                 statusId = R.string.status_protected_with_private_dns
-                colorId = fetchTextColor(R.color.indicator)
+                colorId = fetchTextColor(R.color.primaryLightColorText)
             }
         }
 
@@ -978,19 +970,21 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun fetchTextColor(attr: Int): Int {
-        val attributeFetch = if (attr == R.color.positive) {
+        val attributeFetch = if (attr == R.color.accentGood) {
             R.attr.accentGood
-        } else if (attr == R.color.accent_bad) {
+        } else if (attr == R.color.accentBad) {
             R.attr.accentBad
-        } else if (attr == R.color.textColorMain) {
+        } else if (attr == R.color.primaryLightColorText) {
             R.attr.primaryLightColorText
         } else if (attr == R.color.secondaryText) {
             R.attr.invertedPrimaryTextColor
         } else if (attr == R.color.primaryText) {
-            R.attr.primaryDarkColorText
-        } else if (attr == R.color.black_white) {
             R.attr.primaryTextColor
-        } else {
+        } else if (attr == R.color.primaryTextLight) {
+            R.attr.primaryTextColor
+        } else if (attr == R.color.primaryLightColorText) {
+            R.attr.primaryLightColorText
+        }else {
             R.attr.accentGood
         }
         val typedValue = TypedValue()

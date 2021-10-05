@@ -21,13 +21,13 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ActivityCustomDomainsBinding
+import com.celzero.bravedns.databinding.ActivityCustomDomainBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import org.koin.android.ext.android.inject
 
-class CustomDomainActivity : AppCompatActivity(R.layout.activity_custom_domains) {
-    private val b by viewBinding(ActivityCustomDomainsBinding::bind)
+class CustomDomainActivity : AppCompatActivity(R.layout.activity_custom_domain) {
+    private val b by viewBinding(ActivityCustomDomainBinding::bind)
     private val persistentState by inject<PersistentState>()
 
     override fun onCreate(savedInstanceState: Bundle?) {

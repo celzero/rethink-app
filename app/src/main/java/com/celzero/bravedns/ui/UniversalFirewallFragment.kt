@@ -37,7 +37,7 @@ import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.automaton.FirewallRules
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.BlockedConnectionsRepository
-import com.celzero.bravedns.databinding.FragmentFirewallBinding
+import com.celzero.bravedns.databinding.FragmentUniversalFirewallBinding
 import com.celzero.bravedns.databinding.UniversalFragementContainerBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
@@ -162,10 +162,9 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             recyclerRulesAdapter::submitList))
         appInfoViewModel.appDetailsList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
             recyclerAdapter::submitList))
-
     }
 
-    private fun setupClickListeners(includeView: FragmentFirewallBinding) {
+    private fun setupClickListeners(includeView: FragmentUniversalFirewallBinding) {
         includeView.firewallAllAppsCheck.setOnCheckedChangeListener { _, b ->
             persistentState.blockWhenDeviceLocked = b
         }

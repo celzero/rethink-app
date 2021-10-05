@@ -35,7 +35,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.databinding.ApkListItemBinding
+import com.celzero.bravedns.databinding.ListItemFirewallAppBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Utilities
@@ -67,7 +67,7 @@ class FirewallAppListAdapter(private val context: Context,
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppListViewHolder {
-        val itemBinding = ApkListItemBinding.inflate(LayoutInflater.from(parent.context), parent,
+        val itemBinding = ListItemFirewallAppBinding.inflate(LayoutInflater.from(parent.context), parent,
                                                      false)
         return AppListViewHolder(itemBinding)
     }
@@ -77,7 +77,7 @@ class FirewallAppListAdapter(private val context: Context,
         holder.update(appInfo)
     }
 
-    inner class AppListViewHolder(private val b: ApkListItemBinding) :
+    inner class AppListViewHolder(private val b: ListItemFirewallAppBinding) :
             RecyclerView.ViewHolder(b.root) {
 
         fun update(appInfo: AppInfo) {

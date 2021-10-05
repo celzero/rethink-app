@@ -17,7 +17,7 @@
         android:focusableInTouchMode="true"
         android:padding="10dp"
         android:text="@string/settings_explanation_text"
-        android:textColor="@color/neutral"
+        android:textColor="?attr/primaryLightColorText"
         android:textSize="@dimen/default_font_text_view" />
 
     <LinearLayout

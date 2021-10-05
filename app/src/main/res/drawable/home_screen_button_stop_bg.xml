@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="@color/dimColor" />
     <stroke
         android:width="0.75dp"
-        android:color="@color/recycler_selected" />
+        android:color="?attr/border" />
     <corners android:radius="5dp" />
 </shape>

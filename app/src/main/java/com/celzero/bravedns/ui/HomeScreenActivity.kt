@@ -286,7 +286,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                                   Snackbar.LENGTH_INDEFINITE)
         snack.setAction(
             getString(R.string.update_complete_action_snack)) { appUpdateManager.completeUpdate() }
-        snack.setActionTextColor(ContextCompat.getColor(this, R.color.textColorMain))
+        snack.setActionTextColor(ContextCompat.getColor(this, R.color.primaryLightColorText))
         snack.show()
     }
 

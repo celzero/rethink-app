@@ -84,7 +84,7 @@
         android:drawablePadding="5dp"
         android:padding="10dp"
         android:text="@string/dns_connected_rethink_configure"
-        android:textColor="@color/white"
+        android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/large_font_text_view" />
 
     <TextView

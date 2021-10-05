@@ -54,7 +54,7 @@
                         android:letterSpacing="0.25"
                         android:text="@string/app_name_small_case"
                         android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/text_size_heading"
+                        android:textSize="@dimen/rethink_header_text"
                         android:visibility="visible" />
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -65,7 +65,7 @@
                         android:gravity="center"
                         android:text="@string/pause_title_desc"
                         android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/sub_heading_small"
+                        android:textSize="@dimen/small_font_subheading_text"
                         android:visibility="visible" />
                 </LinearLayout>
             </LinearLayout>
@@ -141,7 +141,7 @@
             android:layout_alignParentBottom="true"
             android:layout_margin="20dp"
             android:paddingBottom="40dp"
-            android:textSize="@dimen/sub_heading_small"
+            android:textSize="@dimen/small_font_subheading_text"
             android:text="@string/pause_desc" />
     </RelativeLayout>
 

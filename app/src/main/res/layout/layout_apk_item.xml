@@ -22,7 +22,7 @@
                     android:layout_marginTop="12dp"
                     android:maxHeight="48dp"
                     android:maxWidth="48dp"
-                    tools:src="@color/colorPrimary" />
+                    tools:src="?attr/colorPrimary" />
 
             <TextView
                     android:id="@+id/apk_label_tv"

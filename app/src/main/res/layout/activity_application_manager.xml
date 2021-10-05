@@ -4,14 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
     tools:context=".ui.ApplicationManagerActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar_application_manager"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:background="@color/colorPrimary"
+        android:background="?attr/colorPrimary"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -43,7 +42,7 @@
     <androidx.appcompat.widget.SearchView
         android:id="@+id/am_search"
         android:layout_width="match_parent"
-        android:background="@color/colorPrimary"
+        android:background="?attr/colorPrimary"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         tools:layout_editor_absoluteX="8dp"
@@ -64,10 +63,7 @@
         android:layout_centerInParent="true"
         android:layout_margin="60dp"
         android:src="@drawable/ic_fab_without_border"
-        android:tint="@color/accent_bad"
-        app:backgroundTint="@color/primaryText"
         app:fabSize="normal"
-        app:rippleColor="@color/indicator"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -83,13 +79,10 @@
         android:layout_marginEnd="68dp"
         android:layout_marginBottom="120dp"
         android:src="@drawable/ic_fab_uninstall"
-        android:tint="@color/accent_bad"
-        app:backgroundTint="@color/primaryText"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:fabSize="mini"
-        app:rippleColor="@color/indicator" />
+        app:fabSize="mini" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/am_fab_appinfo_icon"
@@ -98,12 +91,9 @@
         android:layout_marginEnd="68dp"
         android:layout_marginBottom="170dp"
         android:src="@drawable/ic_fab_appinfo"
-        android:tint="@color/accent_bad"
-        app:backgroundTint="@color/primaryText"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:fabSize="mini"
-        app:rippleColor="@color/indicator" />
+        app:fabSize="mini" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

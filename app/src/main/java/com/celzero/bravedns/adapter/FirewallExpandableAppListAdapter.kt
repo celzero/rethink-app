@@ -35,7 +35,7 @@ import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.CategoryInfo
 import com.celzero.bravedns.database.CategoryInfoRepository
-import com.celzero.bravedns.databinding.ApkListItemBinding
+import com.celzero.bravedns.databinding.ListItemFirewallAppBinding
 import com.celzero.bravedns.databinding.ExpandableFirewallHeaderBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.PersistentState
@@ -56,7 +56,7 @@ class FirewallExpandableAppListAdapter internal constructor(private val context:
         BaseExpandableListAdapter() {
 
     private lateinit var groupViewBinding: ExpandableFirewallHeaderBinding
-    private lateinit var childViewBinding: ApkListItemBinding
+    private lateinit var childViewBinding: ListItemFirewallAppBinding
 
     private var activityManager: ActivityManager = context.getSystemService(
         VpnService.ACTIVITY_SERVICE) as ActivityManager
@@ -80,7 +80,7 @@ class FirewallExpandableAppListAdapter internal constructor(private val context:
                               view: View?, parent: ViewGroup): View {
 
         val appInfo = getChild(listPosition, expandedListPosition)
-        childViewBinding = ApkListItemBinding.inflate(LayoutInflater.from(parent.context), parent,
+        childViewBinding = ListItemFirewallAppBinding.inflate(LayoutInflater.from(parent.context), parent,
                                                       false)
 
         displayChildDetails(appInfo)

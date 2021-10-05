@@ -64,7 +64,7 @@
                 android:textOff="@string/firewall_toggle_unblocked"
                 android:textOn="@string/firewall_toggle_blocked"
                 android:textSize="@dimen/default_font_text_view"
-                android:theme="@style/CustomCompoundButton_Switch_bad" />
+                android:theme="@style/CustomWidget.MaterialComponents.CompoundButton.Switch.Bad" />
 
             <ProgressBar
                 android:id="@+id/expand_header_progress"

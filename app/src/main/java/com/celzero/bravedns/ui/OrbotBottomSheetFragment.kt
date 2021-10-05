@@ -63,7 +63,6 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
     // onDestroyView.
     private val b get() = _binding!!
 
-
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
     private val orbotHelper by inject<OrbotHelper>()
@@ -79,11 +78,9 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         _binding = null
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
-
 
     override fun getTheme(): Int = Themes.getBottomsheetCurrentTheme(isDarkThemeOn(),
                                                                      persistentState.theme)

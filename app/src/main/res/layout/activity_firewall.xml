@@ -13,7 +13,7 @@
         android:id="@+id/firewall_act_tabLayout"
         android:layout_width="match_parent"
         android:background="?attr/colorPrimaryDark"
-        app:tabTextColor="?attr/primaryDarkColorText"
+        app:tabTextColor="?attr/invertedPrimaryTextColor"
         app:tabIndicatorColor="?attr/tabIndicator"
         android:layout_height="wrap_content" />
 

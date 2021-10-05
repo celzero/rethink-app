@@ -15,7 +15,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="20dp"
-        android:background="@color/recycler_selected" />
+        android:background="?attr/border" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -24,7 +24,7 @@
 
         <TextView
             android:id="@+id/bs_conn_track_port_detail_chip"
-            style="@style/ThinnerChip_action"
+            style="@style/ThinnerChip.Action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
@@ -37,7 +37,7 @@
 
         <com.google.android.material.chip.Chip
             android:id="@+id/bs_conn_track_app_kill"
-            style="@style/ThinnerChip_action"
+            style="@style/ThinnerChip.Action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -49,7 +49,7 @@
             android:visibility="visible"
             app:chipEndPadding="5dp"
             app:chipStartPadding="5dp"
-            app:shapeAppearance="@style/ShapeAppearance.MyApp.LargeComponent" />
+            app:shapeAppearance="@style/ShapeAppearance.LargeComponent" />
 
     </RelativeLayout>
 
@@ -116,12 +116,12 @@
             android:layout_centerVertical="true"
             android:layout_marginTop="2dp"
             android:layout_toEndOf="@id/bs_conn_connection_flag"
-            android:typeface="monospace"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:textColor="?attr/primaryTextColor"
             android:textIsSelectable="true"
-            android:textSize="@dimen/heading_font_text_view" />
+            android:textSize="@dimen/heading_font_text_view"
+            android:typeface="monospace" />
     </RelativeLayout>
 
     <LinearLayout
@@ -176,14 +176,13 @@
                 android:gravity="start"
                 android:padding="7dp"
                 android:text="@string/ct_bs_rule_1"
-                android:textColor="?attr/primaryLightColorText"
+                android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/default_font_text_view" />
 
             <TextView
                 android:id="@+id/bs_conn_block_app_txt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
                 android:padding="5dp"
                 android:text="@string/bsct_block"
                 android:textColor="?attr/primaryTextColor"
@@ -192,25 +191,13 @@
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/bs_conn_block_app_check"
-            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch.Bad"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="bottom"
-            android:padding="5dp" />
+            android:padding="10dp" />
 
     </LinearLayout>
-
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:background="@color/childListColor"
-        android:textSize="@dimen/default_font_text_view"
-        android:visibility="gone" />
-
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -235,7 +222,7 @@
                 android:gravity="start"
                 android:padding="7dp"
                 android:text="@string/ct_bs_rule_2"
-                android:textColor="?attr/primaryLightColorText"
+                android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/default_font_text_view" />
 
             <TextView
@@ -252,11 +239,10 @@
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/bs_conn_block_conn_all_switch"
-            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch.Bad"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:padding="5dp" />
+            android:padding="10dp" />
 
     </LinearLayout>
 

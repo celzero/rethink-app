@@ -279,7 +279,7 @@ class Utilities {
             return if (isDarkSystemTheme(context)) {
                 R.color.accentGoodBlack
             } else {
-                R.color.negative_white
+                R.color.accentBadLight
             }
         }
 

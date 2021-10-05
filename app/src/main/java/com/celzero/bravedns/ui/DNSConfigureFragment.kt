@@ -136,7 +136,7 @@ class DNSConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
     private fun initClickListeners() {
 
         b.dcCustomBlocklistCard.setOnClickListener {
-            enableAfterDelay(TimeUnit.MINUTES.toMillis(1), b.dcCustomBlocklist)
+            enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcCustomBlocklist)
 
             val intent = Intent(requireContext(), CustomDomainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
@@ -144,7 +144,7 @@ class DNSConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
         }
 
         b.dcMoreDnsCard.setOnClickListener {
-            enableAfterDelay(TimeUnit.MINUTES.toMillis(1), b.dcMoreDns)
+            enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcMoreDns)
 
             val intent = Intent(requireContext(), DNSListActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
@@ -152,7 +152,7 @@ class DNSConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
         }
 
         b.dcOnDeviceBlockDownloadBtn.setOnClickListener {
-            enableAfterDelay(TimeUnit.MINUTES.toMillis(1), b.dcOnDeviceBlockUpdateBtn)
+            enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcOnDeviceBlockUpdateBtn)
 
             go {
                 uiCtx {
@@ -178,7 +178,7 @@ class DNSConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
         }
 
         b.dcOnDeviceBlockEnableBtn.setOnClickListener {
-            enableAfterDelay(TimeUnit.MINUTES.toMillis(1), b.dcOnDeviceBlockEnableBtn)
+            enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcOnDeviceBlockEnableBtn)
 
             if (persistentState.blocklistEnabled) {
                 removeBraveDNSLocal()
@@ -201,7 +201,7 @@ class DNSConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
         }
 
         b.dcOnDeviceBlockConfigureBtn.setOnClickListener {
-            enableAfterDelay(TimeUnit.MINUTES.toMillis(1), b.dcOnDeviceBlockConfigureBtn)
+            enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcOnDeviceBlockConfigureBtn)
 
             val intent = Intent(requireContext(), DNSConfigureWebViewActivity::class.java)
             val stamp = persistentState.localBlocklistStamp
@@ -214,18 +214,18 @@ class DNSConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
         }
 
         b.dcOnDeviceBlockUpdateBtn.setOnClickListener {
-            enableAfterDelay(TimeUnit.MINUTES.toMillis(1), b.dcOnDeviceBlockUpdateBtn)
+            enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcOnDeviceBlockUpdateBtn)
 
             updateBlocklistIfNeeded(isRefresh = true)
         }
 
         b.dcFavIconSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
-            enableAfterDelay(TimeUnit.MINUTES.toMillis(1), b.dcFavIconSwitch)
+            enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcFavIconSwitch)
             persistentState.fetchFavIcon = enabled
         }
 
         b.dcPreventDnsLeaksSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
-            enableAfterDelay(TimeUnit.MINUTES.toMillis(1), b.dcPreventDnsLeaksSwitch)
+            enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcPreventDnsLeaksSwitch)
             persistentState.preventDnsLeaks = enabled
         }
     }

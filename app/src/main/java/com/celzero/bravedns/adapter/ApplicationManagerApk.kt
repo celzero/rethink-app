@@ -22,7 +22,7 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.celzero.bravedns.databinding.AppScrollListBinding
+import com.celzero.bravedns.databinding.ListItemAppMgrBinding
 
 
 class ApplicationManagerApk(packageInfo: PackageInfo, var category: String, context: Context) :
@@ -58,12 +58,12 @@ class ApplicationManagerApk(packageInfo: PackageInfo, var category: String, cont
     }
 
 
-    inner class ViewHolder(private val b: AppScrollListBinding) : RecyclerView.ViewHolder(b.root) {
+    inner class ViewHolder(b: ListItemAppMgrBinding) : RecyclerView.ViewHolder(b.root) {
 
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val itemBinding = AppScrollListBinding.inflate(LayoutInflater.from(parent.context), parent,
+        val itemBinding = ListItemAppMgrBinding.inflate(LayoutInflater.from(parent.context), parent,
                                                        false)
         return ViewHolder(itemBinding)
     }

@@ -160,10 +160,9 @@
         android:drawablePadding="10dp"
         android:text="@string/cd_fab_add_button"
         android:textAllCaps="false"
-        android:textColor="@color/white"
+        android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/default_font_text_view"
         app:fabSize="mini"
         app:icon="@drawable/ic_fab_without_border"
-        app:iconTint="@color/white"
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

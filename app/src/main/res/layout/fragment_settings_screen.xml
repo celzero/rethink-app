@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
+    android:background="?attr/background"
     android:orientation="vertical">
 
     <LinearLayout
@@ -45,27 +46,17 @@
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/fhs_title_rethink"
+                        style="@style/TextAppearance.Heading.HomeScreen"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:fontFamily="sans-serif-smallcaps"
-                        android:gravity="center"
-                        android:letterSpacing="0.25"
-                        android:text="@string/app_name_small_case"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/text_size_heading"
-                        android:visibility="visible" />
+                        android:text="@string/app_name_small_case" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/fhs_title_rethink_desc"
+                        style="@style/TextAppearance.SubHeading.HomeScreen"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:text="@string/settings_title_desc"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/sub_heading_small"
-                        android:visibility="visible" />
+                        android:text="@string/settings_title_desc" />
                 </LinearLayout>
             </LinearLayout>
 

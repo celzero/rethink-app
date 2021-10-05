@@ -161,7 +161,7 @@ class ConnectionTrackerAdapter(private val connectionTrackerFragment: Connection
                 (FirewallRuleset.RULE8.id == ruleName || FirewallRuleset.RULE9.id == ruleName) -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
                     b.connectionStatusIndicator.setBackgroundColor(
-                        ContextCompat.getColor(context, R.color.textColorMain))
+                        ContextCompat.getColor(context, R.color.primaryLightColorText))
                 }
                 // no hints, otherwise
                 else -> {

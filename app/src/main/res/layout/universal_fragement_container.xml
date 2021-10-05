@@ -9,5 +9,5 @@
 
   <include
       android:id="@+id/app_scrolling_incl_firewall"
-      layout="@layout/fragment_firewall" />
+      layout="@layout/fragment_universal_firewall" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

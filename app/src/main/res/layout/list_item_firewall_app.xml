@@ -92,7 +92,6 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:layout_margin="5dp"
-                        android:layout_marginStart="15dp"
                         android:gravity="center" />
 
                     <ProgressBar

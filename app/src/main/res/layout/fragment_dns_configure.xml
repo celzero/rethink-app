@@ -88,7 +88,7 @@
                                 android:layout_alignParentEnd="true"
                                 android:layout_centerVertical="true"
                                 android:text="download"
-                                android:textColor="?attr/colorAccent"
+                                android:textColor="?attr/secondaryTextColor"
                                 android:visibility="visible" />
 
                             <Button
@@ -99,7 +99,7 @@
                                 android:layout_alignParentEnd="true"
                                 android:layout_centerVertical="true"
                                 android:text="ACTIVE"
-                                android:textColor="?attr/colorAccent"
+                                android:textColor="?attr/secondaryTextColor"
                                 android:visibility="gone" />
 
                             <ProgressBar
@@ -109,7 +109,6 @@
                                 android:layout_alignParentEnd="true"
                                 android:layout_centerVertical="true"
                                 android:layout_marginEnd="20dp"
-                                android:textColor="?attr/colorAccent"
                                 android:visibility="gone" />
 
                         </RelativeLayout>
@@ -138,7 +137,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentEnd="true"
                                 android:text="configure"
-                                android:textColor="?attr/colorAccent" />
+                                android:textColor="?attr/secondaryTextColor" />
 
                             <Button
                                 android:id="@+id/dc_on_device_block_update_btn"
@@ -147,7 +146,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_toStartOf="@id/dc_on_device_block_configure_btn"
                                 android:text="update"
-                                android:textColor="?attr/colorAccent" />
+                                android:textColor="?attr/secondaryTextColor" />
                         </RelativeLayout>
                     </RelativeLayout>
 
@@ -183,7 +182,7 @@
                         android:padding="15dp"
                         android:text="My Custom blocklist"
                         android:textColor="?attr/primaryTextColor"
-                        app:drawableEndCompat="@drawable/ic_right_arrow_white"
+                        app:drawableEndCompat="@drawable/ic_right_arrow_small"
                         app:drawableStartCompat="@drawable/ic_app_info" />
 
                 </RelativeLayout>
@@ -228,7 +227,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:text="ACTIVE"
-                        android:textColor="?attr/accentGood" />
+                        android:textColor="?attr/secondaryTextColor" />
 
                 </RelativeLayout>
 
@@ -262,7 +261,7 @@
                         android:padding="15dp"
                         android:text="More DNS options"
                         android:textColor="?attr/primaryTextColor"
-                        app:drawableEndCompat="@drawable/ic_right_arrow_white"
+                        app:drawableEndCompat="@drawable/ic_right_arrow_small"
                         app:drawableStartCompat="@drawable/ic_app_info" />
 
                 </RelativeLayout>
@@ -347,7 +346,7 @@
 
                         <com.google.android.material.switchmaterial.SwitchMaterial
                             android:id="@+id/dc_fav_icon_switch"
-                            style="@style/SwitchCompat_theme"
+                            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"

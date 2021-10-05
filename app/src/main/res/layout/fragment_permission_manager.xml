@@ -28,7 +28,7 @@
             android:id="@+id/expandedImage"
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:background="@color/colorPrimary"
+            android:background="?attr/colorPrimary"
             android:scaleType="fitCenter"
             android:src="@drawable/lock_red"
             app:layout_collapseMode="parallax"
@@ -44,5 +44,5 @@
 
     </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
-    <include layout="@layout/app_scroll_list" android:id="@+id/app_scrolling_incl"/>
+    <include layout="@layout/list_item_app_mgr" android:id="@+id/app_scrolling_incl"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

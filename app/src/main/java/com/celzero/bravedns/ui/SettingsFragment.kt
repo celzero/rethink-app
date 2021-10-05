@@ -29,51 +29,36 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ExcludedAppListAdapter
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.*
-import com.celzero.bravedns.databinding.ActivitySettingsScreenBinding
 import com.celzero.bravedns.databinding.DialogSetHttpProxyBinding
 import com.celzero.bravedns.databinding.DialogSetProxyBinding
-import com.celzero.bravedns.download.AppDownloadManager
-import com.celzero.bravedns.download.DownloadConstants
+import com.celzero.bravedns.databinding.FragmentSettingsScreenBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
-import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_2
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.Companion.delay
-import com.celzero.bravedns.util.Utilities.Companion.hasLocalBlocklists
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
 import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
-import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 import com.celzero.bravedns.viewmodel.ExcludedAppViewModel
 import kotlinx.coroutines.*
 import okhttp3.*
-import okhttp3.HttpUrl.Companion.toHttpUrl
-import okhttp3.dnsoverhttps.DnsOverHttps
-import org.json.JSONObject
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.io.IOException
-import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 
-class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
-    private val b by viewBinding(ActivitySettingsScreenBinding::bind)
+class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
+    private val b by viewBinding(FragmentSettingsScreenBinding::bind)
 
     //For exclude apps dialog
     private lateinit var excludeAppAdapter: ExcludedAppListAdapter

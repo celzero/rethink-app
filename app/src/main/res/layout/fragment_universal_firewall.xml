@@ -27,8 +27,8 @@
                 android:layout_marginRight="2dp"
                 android:padding="10dp"
                 android:text="@string/universal_firewall_explanation"
-                android:textColor="@color/neutral"
                 android:textSize="@dimen/default_font_text_view"
+                android:textColor="?attr/primaryLightColorText"
                 android:visibility="visible" />
 
             <LinearLayout
@@ -275,7 +275,7 @@
                         android:layout_height="wrap_content"
                         android:paddingTop="2dp"
                         android:paddingBottom="2dp"
-                        android:textColor="@color/neutral"
+                        android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/default_font_text_view" />
 
                 </LinearLayout>
@@ -338,7 +338,7 @@
                     android:layout_height="wrap_content"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:textColor="@color/neutral"
+                    android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view" />
 
             </LinearLayout>
