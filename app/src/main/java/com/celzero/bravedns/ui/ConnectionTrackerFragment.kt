@@ -21,6 +21,7 @@ import android.widget.CompoundButton
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -70,38 +71,37 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     }
 
     private fun initView() {
-        val includeView = b.connectionListScrollList
 
         if (!persistentState.logsEnabled) {
-            includeView.connectionListLogsDisabledTv.visibility = View.VISIBLE
-            includeView.connectionCardViewTop.visibility = View.GONE
+            b.connectionListLogsDisabledTv.visibility = View.VISIBLE
+            b.connectionCardViewTop.visibility = View.GONE
             return
         }
 
-        includeView.connectionListLogsDisabledTv.visibility = View.GONE
-        includeView.connectionCardViewTop.visibility = View.VISIBLE
+        b.connectionListLogsDisabledTv.visibility = View.GONE
+        b.connectionCardViewTop.visibility = View.VISIBLE
 
-        includeView.recyclerConnection.setHasFixedSize(true)
+        b.recyclerConnection.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(requireContext())
-        includeView.recyclerConnection.layoutManager = layoutManager
+        b.recyclerConnection.layoutManager = layoutManager
         val recyclerAdapter = ConnectionTrackerAdapter(this)
         viewModel.connectionTrackerList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
             recyclerAdapter::submitList))
-        includeView.recyclerConnection.adapter = recyclerAdapter
+        b.recyclerConnection.adapter = recyclerAdapter
 
-        includeView.connectionSearch.setOnQueryTextListener(this)
-        includeView.connectionSearch.setOnClickListener {
+        b.connectionSearch.setOnQueryTextListener(this)
+        b.connectionSearch.setOnClickListener {
             showParentChipsUi()
             showChildChipsIfNeeded()
-            includeView.connectionSearch.requestFocus()
-            includeView.connectionSearch.onActionViewExpanded()
+            b.connectionSearch.requestFocus()
+            b.connectionSearch.onActionViewExpanded()
         }
 
-        includeView.connectionFilterIcon.setOnClickListener {
+        b.connectionFilterIcon.setOnClickListener {
             toggleParentChipsUi()
         }
 
-        includeView.connectionDeleteIcon.setOnClickListener {
+        b.connectionDeleteIcon.setOnClickListener {
             showDeleteDialog()
         }
 
@@ -110,9 +110,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     }
 
     private fun toggleParentChipsUi() {
-        val includeView = b.connectionListScrollList
-
-        if (includeView.filterChipParentGroup.isVisible) {
+        if (b.filterChipParentGroup.isVisible) {
             hideParentChipsUi()
             hideChildChipsUi()
         } else {
@@ -136,8 +134,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     }
 
     private fun remakeParentFilterChipsUi() {
-        val includeView = b.connectionListScrollList
-        includeView.filterChipParentGroup.removeAllViews()
+        b.filterChipParentGroup.removeAllViews()
 
         val all = makeParentChip(TopLevelFilter.ALL.id, getString(R.string.ct_filter_parent_all),
                                  true)
@@ -146,9 +143,9 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         val blocked = makeParentChip(TopLevelFilter.BLOCKED.id,
                                      getString(R.string.ct_filter_parent_blocked), false)
 
-        includeView.filterChipParentGroup.addView(all)
-        includeView.filterChipParentGroup.addView(allowed)
-        includeView.filterChipParentGroup.addView(blocked)
+        b.filterChipParentGroup.addView(all)
+        b.filterChipParentGroup.addView(allowed)
+        b.filterChipParentGroup.addView(blocked)
     }
 
     private fun makeParentChip(id: Int, label: String, checked: Boolean): Chip {
@@ -239,11 +236,9 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     }
 
     private fun remakeChildFilterChipsUi(categories: List<FirewallRuleset>) {
-        val v = b.connectionListScrollList
-
-        v.filterChipGroup.removeAllViews()
+        b.filterChipGroup.removeAllViews()
         for (c in categories) {
-            v.filterChipGroup.addView(makeChildChip(c.id, c.title))
+            b.filterChipGroup.addView(makeChildChip(c.id, c.title))
         }
     }
 
@@ -268,19 +263,19 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     }
 
     private fun showChildChipsUi() {
-        b.connectionListScrollList.filterChipGroup.visibility = View.VISIBLE
+        b.filterChipGroup.visibility = View.VISIBLE
     }
 
     private fun hideChildChipsUi() {
-        b.connectionListScrollList.filterChipGroup.visibility = View.GONE
+        b.filterChipGroup.visibility = View.GONE
     }
 
     private fun showParentChipsUi() {
-        b.connectionListScrollList.filterChipParentGroup.visibility = View.VISIBLE
+        b.filterChipParentGroup.visibility = View.VISIBLE
     }
 
     private fun hideParentChipsUi() {
-        b.connectionListScrollList.filterChipParentGroup.visibility = View.GONE
+        b.filterChipParentGroup.visibility = View.GONE
     }
 
     private fun go(f: suspend () -> Unit) {
