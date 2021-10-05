@@ -67,8 +67,8 @@ class FirewallAppListAdapter(private val context: Context,
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppListViewHolder {
-        val itemBinding = ListItemFirewallAppBinding.inflate(LayoutInflater.from(parent.context), parent,
-                                                     false)
+        val itemBinding = ListItemFirewallAppBinding.inflate(LayoutInflater.from(parent.context),
+                                                             parent, false)
         return AppListViewHolder(itemBinding)
     }
 

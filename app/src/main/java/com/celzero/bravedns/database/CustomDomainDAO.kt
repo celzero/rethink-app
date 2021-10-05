@@ -39,11 +39,13 @@ interface CustomDomainDAO {
     fun getAllDomainsLiveData(query: String): DataSource.Factory<Int, CustomDomain>
 
     @Transaction
-    @Query("select * from CustomDomain where domain like :query and status == :stat  order by createdTs desc")
+    @Query(
+        "select * from CustomDomain where domain like :query and status == :stat  order by createdTs desc")
     fun getWhitelistedDomains(query: String, stat: Int): DataSource.Factory<Int, CustomDomain>
 
     @Transaction
-    @Query("select * from CustomDomain where domain like :query and  status == :stat  order by createdTs desc")
+    @Query(
+        "select * from CustomDomain where domain like :query and  status == :stat  order by createdTs desc")
     fun getBlockedDomains(query: String, stat: Int): DataSource.Factory<Int, CustomDomain>
 
 }

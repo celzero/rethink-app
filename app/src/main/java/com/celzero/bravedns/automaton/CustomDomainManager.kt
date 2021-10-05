@@ -112,7 +112,7 @@ object CustomDomainManager : KoinComponent {
     fun toggleStatus(cd: CustomDomain, state: CustomDomainStatus) {
         if (cd.isWhitelisted() && state == CustomDomainStatus.WHITELIST) {
             cd.status = CustomDomainStatus.NONE.statusId
-        } else if(cd.isBlocked() && state == CustomDomainStatus.BLOCKLIST) {
+        } else if (cd.isBlocked() && state == CustomDomainStatus.BLOCKLIST) {
             cd.status = CustomDomainStatus.NONE.statusId
         } else {
             cd.status = state.statusId
@@ -159,9 +159,8 @@ object CustomDomainManager : KoinComponent {
     }
 
     private fun constructObject(domain: String, ips: String, status: Int): CustomDomain {
-        return CustomDomain(domain, ips, status,
-                            Date(Calendar.getInstance().timeInMillis), Date(Constants.INIT_TIME_MS),
-                            CustomDomain.getCurrentVersion())
+        return CustomDomain(domain, ips, status, Date(Calendar.getInstance().timeInMillis),
+                            Date(Constants.INIT_TIME_MS), CustomDomain.getCurrentVersion())
     }
 
     private fun io(f: suspend () -> Unit) {

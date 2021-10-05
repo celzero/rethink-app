@@ -256,6 +256,7 @@
         <item name="chipMinHeight">24dp</item>
         <item name="android:textSize">11sp</item>
         <item name="chipMinTouchTargetSize">30dp</item>
+        <item name="chipBackgroundColor">?attr/homeScreenBtnBackground</item>
     </style>
 
     <style name="ThinnerChip.Large" parent="Widget.MaterialComponents.Chip.Filter">
@@ -271,6 +272,7 @@
         <item name="android:textSize">11sp</item>
         <item name="chipMinTouchTargetSize">30dp</item>
         <item name="chipIconSize">15dp</item>
+        <item name="chipBackgroundColor">?attr/homeScreenBtnBackground</item>
     </style>
 
     <style name="ThinnerChip.Entry" parent="Widget.MaterialComponents.Chip.Entry">

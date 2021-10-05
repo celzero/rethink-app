@@ -78,7 +78,9 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
         b.firewallUpdateProgress.visibility = View.VISIBLE
         b.firewallAppRefreshList.isEnabled = true
 
-        adapterListExpandable = FirewallExpandableAppListAdapter(requireContext(), viewLifecycleOwner, persistentState,
+        adapterListExpandable = FirewallExpandableAppListAdapter(requireContext(),
+                                                                 viewLifecycleOwner,
+                                                                 persistentState,
                                                                  filteredCategories, listData)
         b.firewallExpandableList.setAdapter(adapterListExpandable)
 

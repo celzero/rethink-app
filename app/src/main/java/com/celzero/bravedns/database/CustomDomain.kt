@@ -40,7 +40,8 @@ class CustomDomain {
         return this.domain.hashCode()
     }
 
-    constructor(domain: String, ips: String, status: Int, createdTs: Date, deletedTs: Date, version: Long) {
+    constructor(domain: String, ips: String, status: Int, createdTs: Date, deletedTs: Date,
+                version: Long) {
         this.domain = domain
         this.ips = ips
         this.status = status

@@ -102,7 +102,7 @@ class CustomDomainFragment : Fragment(R.layout.fragment_custom_domain),
         b.cdfFilterChipGroup.removeAllViews()
 
         val all = makeParentChip(CustomDomainManager.CustomDomainStatus.NONE.statusId,
-                                         getString(R.string.cb_filter_all), true)
+                                 getString(R.string.cb_filter_all), true)
         val allowed = makeParentChip(CustomDomainManager.CustomDomainStatus.WHITELIST.statusId,
                                      getString(R.string.cb_filter_allowed), false)
         val blocked = makeParentChip(CustomDomainManager.CustomDomainStatus.BLOCKLIST.statusId,
@@ -140,7 +140,7 @@ class CustomDomainFragment : Fragment(R.layout.fragment_custom_domain),
             }
             CustomDomainManager.CustomDomainStatus.BLOCKLIST.statusId -> {
                 filterType = CustomDomainManager.CustomDomainStatus.BLOCKLIST
-                viewModel.setFilter(filterQuery,  filterType)
+                viewModel.setFilter(filterQuery, filterType)
             }
         }
     }

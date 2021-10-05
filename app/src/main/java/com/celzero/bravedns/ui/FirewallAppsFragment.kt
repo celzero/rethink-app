@@ -45,7 +45,7 @@ class FirewallAppsFragment : Fragment(R.layout.fragment_firewall_app_list),
 
     private var searchString: String = ""
     private var categoryFilters: MutableSet<String> = mutableSetOf()
-    private var topLevelFilter =  TopLevelFilter.INSTALLED
+    private var topLevelFilter = TopLevelFilter.INSTALLED
 
     enum class TopLevelFilter(val id: Int) {
         ALL(0), INSTALLED(1), SYSTEM(2)
@@ -76,9 +76,10 @@ class FirewallAppsFragment : Fragment(R.layout.fragment_firewall_app_list),
         b.ffaAppList.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(requireContext())
         b.ffaAppList.layoutManager = layoutManager
-        val recyclerAdapter = FirewallAppListAdapter(requireContext(), viewLifecycleOwner, persistentState)
-        appInfoViewModel.appInfos.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
-            recyclerAdapter::submitList))
+        val recyclerAdapter = FirewallAppListAdapter(requireContext(), viewLifecycleOwner,
+                                                     persistentState)
+        appInfoViewModel.appInfos.observe(viewLifecycleOwner,
+                                          androidx.lifecycle.Observer(recyclerAdapter::submitList))
         b.ffaAppList.adapter = recyclerAdapter
 
         b.ffaSearch.setOnQueryTextListener(this)
@@ -123,8 +124,8 @@ class FirewallAppsFragment : Fragment(R.layout.fragment_firewall_app_list),
     private fun remakeParentFilterChipsUi() {
         b.ffaParentChipGroup.removeAllViews()
 
-        val all = makeParentChip(TopLevelFilter.ALL.id,
-                                 getString(R.string.fapps_filter_parent_all), false)
+        val all = makeParentChip(TopLevelFilter.ALL.id, getString(R.string.fapps_filter_parent_all),
+                                 false)
         val allowed = makeParentChip(TopLevelFilter.INSTALLED.id,
                                      getString(R.string.fapps_filter_parent_installed), true)
         val blocked = makeParentChip(TopLevelFilter.SYSTEM.id,

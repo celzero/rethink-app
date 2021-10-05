@@ -210,7 +210,8 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             customDialog.setCanceledOnTouchOutside(false)
             customDialog.show()
 
-            delay(TimeUnit.MILLISECONDS.toMillis(500), viewLifecycleOwner.lifecycleScope) { if (isAdded) includeView.firewallAppsShowTxt.isEnabled = true }
+            delay(TimeUnit.MILLISECONDS.toMillis(500),
+                  viewLifecycleOwner.lifecycleScope) { if (isAdded) includeView.firewallAppsShowTxt.isEnabled = true }
         }
 
         includeView.firewallDisallowDnsBypassModeCheck.setOnCheckedChangeListener { _, b ->

@@ -8,7 +8,6 @@ import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoDAO
-import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.ui.FirewallAppsFragment
 import com.celzero.bravedns.util.Constants
 
@@ -26,7 +25,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         fetchAppInfos(input)
     }
 
-    fun setFilter(searchString: String?, category: Set<String>, topLevelFilter: FirewallAppsFragment.TopLevelFilter) {
+    fun setFilter(searchString: String?, category: Set<String>,
+                  topLevelFilter: FirewallAppsFragment.TopLevelFilter) {
         this.category.clear()
         this.category.addAll(category)
 
@@ -50,7 +50,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         }
     }
 
-    private fun allApps(searchString: String): LiveData<PagedList<AppInfo>>  {
+    private fun allApps(searchString: String): LiveData<PagedList<AppInfo>> {
         return if (category.isEmpty()) {
             appInfoDAO.getAppInfosLiveData("%$searchString%").toLiveData(
                 pageSize = Constants.LIVEDATA_PAGE_SIZE)
@@ -66,11 +66,11 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                 pageSize = Constants.LIVEDATA_PAGE_SIZE)
         } else {
             appInfoDAO.getInstalledAppInfoLiveData("%$searchString%", category).toLiveData(
-                            pageSize = Constants.LIVEDATA_PAGE_SIZE)
+                pageSize = Constants.LIVEDATA_PAGE_SIZE)
         }
     }
 
-    private fun systemApps(searchString: String): LiveData<PagedList<AppInfo>>  {
+    private fun systemApps(searchString: String): LiveData<PagedList<AppInfo>> {
         return if (category.isEmpty()) {
             appInfoDAO.getSystemAppInfoLiveData("%$searchString%").toLiveData(
                 pageSize = Constants.LIVEDATA_PAGE_SIZE)

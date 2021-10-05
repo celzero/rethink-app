@@ -984,7 +984,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             R.attr.primaryTextColor
         } else if (attr == R.color.primaryLightColorText) {
             R.attr.primaryLightColorText
-        }else {
+        } else {
             R.attr.accentGood
         }
         val typedValue = TypedValue()

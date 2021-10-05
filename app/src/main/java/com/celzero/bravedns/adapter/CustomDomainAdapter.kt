@@ -26,10 +26,8 @@ import com.celzero.bravedns.automaton.CustomDomainManager
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.databinding.ListItemCustomDomainsBinding
 
-class CustomDomainAdapter(private val context: Context,
-                          val lifecycleOwner: LifecycleOwner) :
-        PagedListAdapter<CustomDomain, CustomDomainAdapter.CustomDomainViewHolder>(
-            DIFF_CALLBACK) {
+class CustomDomainAdapter(private val context: Context, val lifecycleOwner: LifecycleOwner) :
+        PagedListAdapter<CustomDomain, CustomDomainAdapter.CustomDomainViewHolder>(DIFF_CALLBACK) {
 
     companion object {
 
@@ -78,11 +76,13 @@ class CustomDomainAdapter(private val context: Context,
             }
 
             b.whitelistIcon.setOnClickListener {
-                CustomDomainManager.toggleStatus(customDomain, CustomDomainManager.CustomDomainStatus.WHITELIST)
+                CustomDomainManager.toggleStatus(customDomain,
+                                                 CustomDomainManager.CustomDomainStatus.WHITELIST)
             }
 
             b.blocklistIcon.setOnClickListener {
-                CustomDomainManager.toggleStatus(customDomain, CustomDomainManager.CustomDomainStatus.BLOCKLIST)
+                CustomDomainManager.toggleStatus(customDomain,
+                                                 CustomDomainManager.CustomDomainStatus.BLOCKLIST)
             }
 
             b.deleteIcon.setOnClickListener {

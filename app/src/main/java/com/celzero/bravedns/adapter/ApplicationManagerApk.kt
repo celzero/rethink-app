@@ -64,7 +64,7 @@ class ApplicationManagerApk(packageInfo: PackageInfo, var category: String, cont
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemBinding = ListItemAppMgrBinding.inflate(LayoutInflater.from(parent.context), parent,
-                                                       false)
+                                                        false)
         return ViewHolder(itemBinding)
     }
 

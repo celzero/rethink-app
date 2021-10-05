@@ -209,7 +209,7 @@ abstract class AppDatabase : RoomDatabase() {
         private val MIGRATION_10_11: Migration = object : Migration(10, 11) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
-                       "ALTER TABLE DNSLogs add column responseIps TEXT DEFAULT '' NOT NULL")
+                    "ALTER TABLE DNSLogs add column responseIps TEXT DEFAULT '' NOT NULL")
                 database.execSQL(
                     "CREATE TABLE 'CustomDomain' ( 'domain' TEXT NOT NULL, 'ips' TEXT NOT NULL, 'status' INTEGER NOT NULL, 'createdTs' DATE NOT NULL, 'deletedTs' DATE NOT NULL, 'version' INTEGER NOT NULL, PRIMARY KEY (domain)) ")
             }
@@ -238,6 +238,7 @@ abstract class AppDatabase : RoomDatabase() {
     fun dnsCryptEndpointsRepository() = DNSCryptEndpointRepository(dnsCryptEndpointDAO())
     fun dnsCryptRelayEndpointsRepository() = DNSCryptRelayEndpointRepository(
         dnsCryptRelayEndpointDAO())
+
     fun dnsProxyEndpointRepository() = DNSProxyEndpointRepository(dnsProxyEndpointDAO())
     fun proxyEndpointRepository() = ProxyEndpointRepository(proxyEndpointDAO())
     fun dnsLogRepository() = DNSLogRepository(dnsLogDAO())

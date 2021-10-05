@@ -101,7 +101,8 @@ class IPTracker internal constructor(
             getValidAppName(uid, packageName)
         } else { // For UNKNOWN or Non-App.
             val fileSystemUID = AndroidUidConfig.fromFileSystemUid(uid)
-            Log.i(LOG_TAG_FIREWALL_LOG, "App name for the uid: ${uid}, AndroidUid: ${fileSystemUID.uid}, fileName: ${fileSystemUID.name}")
+            Log.i(LOG_TAG_FIREWALL_LOG,
+                  "App name for the uid: ${uid}, AndroidUid: ${fileSystemUID.uid}, fileName: ${fileSystemUID.name}")
 
             if (fileSystemUID.uid == INVALID_UID) {
                 context.getString(R.string.network_log_app_name_unnamed, uid.toString())

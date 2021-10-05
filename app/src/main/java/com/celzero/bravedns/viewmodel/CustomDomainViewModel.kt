@@ -36,18 +36,15 @@ class CustomDomainViewModel(private val customDomainDAO: CustomDomainDAO) : View
     val blockedUnivRulesList = Transformations.switchMap(filteredList) { input ->
         when (status) {
             CustomDomainManager.CustomDomainStatus.NONE -> {
-                Log.d("TEST", "TEST: queried: getCustomDomains, ${status.statusId}")
                 customDomainDAO.getAllDomainsLiveData("%$input%").toLiveData(
                     pageSize = LIVEDATA_PAGE_SIZE)
             }
             CustomDomainManager.CustomDomainStatus.WHITELIST -> {
-                Log.d("TEST", "TEST: queried: getWhitelistedDomains, ${status.statusId}")
                 customDomainDAO.getWhitelistedDomains("%$input%", status.statusId).toLiveData(
                     pageSize = LIVEDATA_PAGE_SIZE)
             }
             CustomDomainManager.CustomDomainStatus.BLOCKLIST -> {
-                Log.d("TEST", "TEST: queried: getBlockedDomains, ${status.statusId}")
-                    customDomainDAO.getBlockedDomains("%$input%", status.statusId).toLiveData(
+                customDomainDAO.getBlockedDomains("%$input%", status.statusId).toLiveData(
                     LIVEDATA_PAGE_SIZE)
             }
         }

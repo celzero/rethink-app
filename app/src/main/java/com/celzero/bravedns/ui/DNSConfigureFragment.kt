@@ -373,19 +373,18 @@ class DNSConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
 
     private fun refreshOnDeviceBlocklistStatus() {
         if (!persistentState.blocklistEnabled) {
-            b.dcOnDeviceBlockDesc.text = getString(
-                R.string.settings_local_blocklist_desc_1)
+            b.dcOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc_1)
             return
         }
 
-        b.dcOnDeviceBlockDesc.text = getString(
-            R.string.settings_local_blocklist_in_use,
-            persistentState.numberOfLocalBlocklists.toString())
+        b.dcOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_in_use,
+                                               persistentState.numberOfLocalBlocklists.toString())
 
         b.dcOnDeviceBlockVersion.visibility = View.VISIBLE
-        b.dcOnDeviceBlockVersion.text = getString(
-            R.string.settings_local_blocklist_version,
-            Utilities.convertLongToTime(persistentState.localBlocklistTimestamp, TIME_FORMAT_2))
+        b.dcOnDeviceBlockVersion.text = getString(R.string.settings_local_blocklist_version,
+                                                  Utilities.convertLongToTime(
+                                                      persistentState.localBlocklistTimestamp,
+                                                      TIME_FORMAT_2))
     }
 
     private fun updateBlocklistIfNeeded(isRefresh: Boolean) {
@@ -470,8 +469,7 @@ class DNSConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
     private fun onDownloadAbort() {
         uithread(activity) {
             refreshOnDeviceBlocklistUi()
-            b.dcOnDeviceBlockDesc.text = getString(
-                R.string.settings_local_blocklist_desc4)
+            b.dcOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc4)
             Utilities.showToastUiCentered(activity as Context,
                                           getString(R.string.settings_local_blocklist_desc4),
                                           Toast.LENGTH_SHORT)
@@ -480,18 +478,16 @@ class DNSConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
 
     private fun onDownloadSuccess() {
         refreshOnDeviceBlocklistUi()
-        b.dcOnDeviceBlockDesc.text = getString(
-            R.string.settings_local_blocklist_desc3)
-        b.dcOnDeviceBlockVersion.text = getString(
-            R.string.settings_local_blocklist_version,
-            Utilities.convertLongToTime(persistentState.localBlocklistTimestamp,
-                                        TIME_FORMAT_2))
+        b.dcOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc3)
+        b.dcOnDeviceBlockVersion.text = getString(R.string.settings_local_blocklist_version,
+                                                  Utilities.convertLongToTime(
+                                                      persistentState.localBlocklistTimestamp,
+                                                      TIME_FORMAT_2))
     }
 
     private fun onDownloadStart() {
         uithread(activity) {
-            b.dcOnDeviceBlockDesc.text = getString(
-                R.string.settings_local_blocklist_desc2)
+            b.dcOnDeviceBlockDesc.text = getString(R.string.settings_local_blocklist_desc2)
 
             b.dcOnDeviceConfigureRl.visibility = View.GONE
             b.dcOnDeviceBlockEnableBtn.visibility = View.GONE

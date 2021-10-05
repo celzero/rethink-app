@@ -41,9 +41,9 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.DialogViewLogsBinding
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentAboutBinding
-import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.scheduler.BugReportZipper.FILE_PROVIDER_NAME
 import com.celzero.bravedns.scheduler.BugReportZipper.getZipFilePath
+import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.LoggerConstants

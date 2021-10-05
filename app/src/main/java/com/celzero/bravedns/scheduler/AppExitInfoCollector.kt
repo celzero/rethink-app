@@ -74,7 +74,8 @@ class AppExitInfoCollector(val context: Context, workerParameters: WorkerParamet
         }
 
         // Store the last exit reason time stamp
-        persistentState.lastAppExitInfoTimestamp = persistentState.lastAppExitInfoTimestamp.coerceAtLeast(maxTimestamp)
+        persistentState.lastAppExitInfoTimestamp = persistentState.lastAppExitInfoTimestamp.coerceAtLeast(
+            maxTimestamp)
 
         BugReportZipper.build(applicationContext, file)
     }
