@@ -44,6 +44,7 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
+import com.celzero.bravedns.util.Utilities.Companion.deleteUnwantedLocalBlocklistFolders
 import com.celzero.bravedns.util.Utilities.Companion.getPackageMetadata
 import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.Companion.isWebsiteFlavour
@@ -52,6 +53,7 @@ import kotlinx.coroutines.*
 import okhttp3.*
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
+import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -128,7 +130,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         persistentState.numberOfRequests = persistentState.oldNumberRequests.toLong()
         persistentState.numberOfBlockedRequests = persistentState.oldBlockedRequests.toLong()
         io {
-            refreshDatabase.refreshAppInfoDatabase()
+            val localBlocklistFolder = File(this.filesDir.canonicalPath + File.separator)
+            deleteUnwantedLocalBlocklistFolders(localBlocklistFolder, persistentState.localBlocklistTimestamp.toString())
         }
     }
 
@@ -162,9 +165,10 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         persistentState.appVersion = version
         persistentState.showWhatsNewChip = true
 
-        // FIXME: remove this post v053g
-        // this is to fix the persistence state which was saved as Int instead of Long.
-        // Modification of persistence state
+        // FIXME: remove this post v054
+        // this is to fix the pile up of local blocklist folders in app's canonical path
+        // deletes all the folder names starting with "16" other than current local blocklist
+        // timestamp
         removeThisMethod()
     }
 

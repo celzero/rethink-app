@@ -508,6 +508,23 @@ class Utilities {
             return ctx.filesDir.canonicalPath + File.separator + timestamp + File.separator + which
         }
 
+        fun deleteUnwantedLocalBlocklistFolders(fileOrDirectory: File,
+                                                currentActiveFolder: String) {
+            // folders with timestamp other than current local blocklist timestamp
+            // will be deleted (path: ../files/<timestamp>)
+            if (fileOrDirectory.isDirectory) {
+                fileOrDirectory.listFiles()?.forEach { child ->
+                    deleteUnwantedLocalBlocklistFolders(child, currentActiveFolder)
+                }
+            }
+
+            if (fileOrDirectory.name.startsWith("16") && !fileOrDirectory.name.equals(
+                    currentActiveFolder)) {
+                deleteRecursive(fileOrDirectory)
+            }
+
+        }
+
         fun hasLocalBlocklists(ctx: Context, timestamp: Long): Boolean {
             val a = Constants.ONDEVICE_BLOCKLISTS.all {
                 localBlocklistFile(ctx, it.filename, timestamp)?.exists() == true
