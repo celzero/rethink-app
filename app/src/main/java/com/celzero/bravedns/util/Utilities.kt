@@ -48,6 +48,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.ui.DNSConfigureWebViewActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.PauseActivity
 import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
@@ -504,41 +505,62 @@ class Utilities {
             }
         }
 
-        fun localBlocklistDownloadPath(ctx: Context, which: String, timestamp: Long): String {
+        fun localBlocklistDownloadPath(ctx: Context?, which: String, timestamp: Long): String? {
+            ctx ?: return null
+
             return ctx.filesDir.canonicalPath + File.separator + timestamp + File.separator + which
         }
 
-        fun deleteUnwantedLocalBlocklistFolders(fileOrDirectory: File,
-                                                currentActiveFolder: String) {
+        fun cleanupOldLocalBlocklistFolders(fileOrDirectory: File,
+                                            currentActiveFolder: String) {
+            if (fileOrDirectory.name.equals(currentActiveFolder)) return
+
+            if (fileOrDirectory.name.startsWith("16")) {
+                deleteRecursive(fileOrDirectory)
+            }
             // folders with timestamp other than current local blocklist timestamp
             // will be deleted (path: ../files/<timestamp>)
             if (fileOrDirectory.isDirectory) {
                 fileOrDirectory.listFiles()?.forEach { child ->
-                    deleteUnwantedLocalBlocklistFolders(child, currentActiveFolder)
+                    cleanupOldLocalBlocklistFolders(child, currentActiveFolder)
                 }
             }
-
-            if (fileOrDirectory.name.startsWith("16") && !fileOrDirectory.name.equals(
-                    currentActiveFolder)) {
-                deleteRecursive(fileOrDirectory)
-            }
-
         }
 
-        fun hasLocalBlocklists(ctx: Context, timestamp: Long): Boolean {
+        fun hasLocalBlocklists(ctx: Context?, timestamp: Long): Boolean {
             val a = Constants.ONDEVICE_BLOCKLISTS.all {
                 localBlocklistFile(ctx, it.filename, timestamp)?.exists() == true
             }
             return a
         }
 
-        private fun localBlocklistFile(ctx: Context, which: String, timestamp: Long): File? {
+        private fun localBlocklistFile(ctx: Context?, which: String, timestamp: Long): File? {
             return try {
-                return File(localBlocklistDownloadPath(ctx, which, timestamp))
+                val localBlocklist = localBlocklistDownloadPath(ctx, which, timestamp) ?: return null
+
+                return File(localBlocklist)
             } catch (e: IOException) {
                 Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
                 null
             }
+        }
+
+        fun hasRemoteBlocklistDir(ctx: Context?, which: String, timestamp: Long): Boolean {
+            val remoteDir = remoteBlocklistDir(ctx, which, timestamp) ?: return false
+            val remoteFile = remoteBlocklistFile(remoteDir.absolutePath,
+                                                 Constants.ONDEVICE_BLOCKLIST_FILE_TAG) ?: return false
+            if (remoteFile.exists()) {
+                return true
+            }
+
+            return false
+        }
+
+        fun cleanupOldRemoteBlocklistFiles(ctx: Context?, which: String) {
+            ctx ?: return
+
+            val dir = File(ctx.filesDir.canonicalPath + File.separator + which)
+            deleteRecursive(dir)
         }
 
         fun remoteBlocklistDir(ctx: Context?, which: String, timestamp: Long): File? {

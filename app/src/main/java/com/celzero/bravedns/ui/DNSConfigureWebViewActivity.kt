@@ -50,6 +50,9 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.Companion.cleanupOldRemoteBlocklistFiles
+import com.celzero.bravedns.util.Utilities.Companion.deleteRecursive
+import com.celzero.bravedns.util.Utilities.Companion.hasRemoteBlocklistDir
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import com.celzero.bravedns.util.Utilities.Companion.remoteBlocklistDir
 import kotlinx.coroutines.Dispatchers
@@ -425,9 +428,10 @@ class DNSConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
 
             val t = parseLong(timestamp)
 
-            if (persistentState.remoteBlocklistTimestamp >= t) return
+            if (persistentState.remoteBlocklistTimestamp >= t && hasRemoteBlocklistDir(applicationContext, BLOCKLIST_REMOTE_FOLDER_NAME, t)) return
 
             try {
+                cleanupOldRemoteBlocklistFiles(applicationContext, BLOCKLIST_REMOTE_FOLDER_NAME)
                 val filetag = makeFile(t) ?: return
 
                 filetag.writeText(fileContent)

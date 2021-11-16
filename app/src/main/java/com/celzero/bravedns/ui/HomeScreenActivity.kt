@@ -44,7 +44,7 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.Utilities.Companion.deleteUnwantedLocalBlocklistFolders
+import com.celzero.bravedns.util.Utilities.Companion.cleanupOldLocalBlocklistFolders
 import com.celzero.bravedns.util.Utilities.Companion.getPackageMetadata
 import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.Companion.isWebsiteFlavour
@@ -131,7 +131,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         persistentState.numberOfBlockedRequests = persistentState.oldBlockedRequests.toLong()
         io {
             val localBlocklistFolder = File(this.filesDir.canonicalPath + File.separator)
-            deleteUnwantedLocalBlocklistFolders(localBlocklistFolder, persistentState.localBlocklistTimestamp.toString())
+            cleanupOldLocalBlocklistFolders(localBlocklistFolder, persistentState.localBlocklistTimestamp.toString())
         }
     }
 

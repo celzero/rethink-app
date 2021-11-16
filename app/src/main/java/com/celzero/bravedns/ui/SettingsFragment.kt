@@ -554,7 +554,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 val json = JSONObject(stringResponse)
                 val version = json.optInt(Constants.JSON_VERSION, 0)
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                                 "client onResponse for refresh blocklist files-  $version")
+                                 "client onResponse for refresh blocklist files:  $version")
                 if (version != Constants.UPDATE_CHECK_RESPONSE_VERSION) {
                     return
                 }
@@ -562,7 +562,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 val shouldUpdate = json.optBoolean(Constants.JSON_UPDATE, false)
                 val timestamp = json.optLong(Constants.JSON_LATEST, Constants.INIT_TIME_MS)
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "onResponse:  update? $shouldUpdate")
-                if (shouldUpdate) {
+                if (shouldUpdate || !hasLocalBlocklists(activity?.applicationContext, timestamp)) {
                     appDownloadManager.downloadLocalBlocklist(timestamp)
                     return
                 }

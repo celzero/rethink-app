@@ -98,7 +98,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
 
             for (i in children.indices) {
                 val from = dir.absolutePath + File.separator + children[i]
-                val to = localBlocklistDownloadPath(context, children[i], timestamp)
+                val to = localBlocklistDownloadPath(context, children[i], timestamp) ?: return false
                 val result = Utilities.copy(from, to)
 
                 if (!result) {
