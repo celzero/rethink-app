@@ -48,7 +48,6 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.ui.DNSConfigureWebViewActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.PauseActivity
 import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
@@ -511,18 +510,19 @@ class Utilities {
             return ctx.filesDir.canonicalPath + File.separator + timestamp + File.separator + which
         }
 
-        fun cleanupOldLocalBlocklistFolders(fileOrDirectory: File,
-                                            currentActiveFolder: String) {
-            if (fileOrDirectory.name.equals(currentActiveFolder)) return
+        fun cleanupOldLocalBlocklistFiles(fileOrDir: File, activeDir: String) {
+            if (fileOrDir.name.equals(activeDir)) return
 
-            if (fileOrDirectory.name.startsWith("16")) {
-                deleteRecursive(fileOrDirectory)
+            // local blocklist dirs are created with timestamp value.
+            // below check for file name starts with "16" will delete only those files.
+            if (fileOrDir.name.startsWith("16")) {
+                deleteRecursive(fileOrDir)
             }
             // folders with timestamp other than current local blocklist timestamp
             // will be deleted (path: ../files/<timestamp>)
-            if (fileOrDirectory.isDirectory) {
-                fileOrDirectory.listFiles()?.forEach { child ->
-                    cleanupOldLocalBlocklistFolders(child, currentActiveFolder)
+            if (fileOrDir.isDirectory) {
+                fileOrDir.listFiles()?.forEach { child ->
+                    cleanupOldLocalBlocklistFiles(child, activeDir)
                 }
             }
         }
@@ -545,18 +545,14 @@ class Utilities {
             }
         }
 
-        fun hasRemoteBlocklistDir(ctx: Context?, which: String, timestamp: Long): Boolean {
+        fun hasRemoteBlocklistFile(ctx: Context?, which: String, timestamp: Long): Boolean {
             val remoteDir = remoteBlocklistDir(ctx, which, timestamp) ?: return false
             val remoteFile = remoteBlocklistFile(remoteDir.absolutePath,
                                                  Constants.ONDEVICE_BLOCKLIST_FILE_TAG) ?: return false
-            if (remoteFile.exists()) {
-                return true
-            }
-
-            return false
+            return remoteFile.exists()
         }
 
-        fun cleanupOldRemoteBlocklistFiles(ctx: Context?, which: String) {
+        fun cleanupRemoteBlocklistDir(ctx: Context?, which: String) {
             ctx ?: return
 
             val dir = File(ctx.filesDir.canonicalPath + File.separator + which)

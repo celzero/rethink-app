@@ -107,7 +107,7 @@ class AppDownloadManager(private val context: Context) {
      */
     private fun purge(context: Context, timestamp: Long) {
         downloadIds = LongArray(ONDEVICE_BLOCKLISTS.count())
-        BlocklistDownloadHelper.deleteOldFiles(context, timestamp)
+        BlocklistDownloadHelper.deleteFromExternalDir(context, timestamp)
     }
 
     private fun enqueueDownload(url: String, fileName: String, timestamp: String): Long {

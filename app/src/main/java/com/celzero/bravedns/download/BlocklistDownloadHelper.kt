@@ -20,7 +20,7 @@ import android.util.Log
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
-import com.celzero.bravedns.util.Utilities.Companion.cleanupOldLocalBlocklistFolders
+import com.celzero.bravedns.util.Utilities.Companion.cleanupOldLocalBlocklistFiles
 import com.celzero.bravedns.util.Utilities.Companion.deleteRecursive
 import java.io.File
 
@@ -56,7 +56,7 @@ class BlocklistDownloadHelper {
          * Now in v053 we are moving the files from external dir to canonical path.
          * So deleting the old files in the external directory.
          */
-        fun deleteOldFiles(context: Context, timestamp: Long) {
+        fun deleteFromExternalDir(context: Context, timestamp: Long) {
             val dir = File(context.getExternalFilesDir(
                 null).toString() + Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH + timestamp)
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
@@ -66,7 +66,7 @@ class BlocklistDownloadHelper {
 
         fun deleteFromCanonicalPath(context: Context, timestamp: Long) {
             val canonicalPath = File(context.filesDir.canonicalPath + File.separator)
-            cleanupOldLocalBlocklistFolders(canonicalPath, timestamp.toString())
+            cleanupOldLocalBlocklistFiles(canonicalPath, timestamp.toString())
         }
 
         fun getExternalFilePath(context: Context, timestamp: String): String {
