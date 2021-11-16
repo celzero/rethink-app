@@ -436,7 +436,12 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
 
         b.settingsActivityOnDeviceBlockRefreshBtn.setOnClickListener {
-            updateBlocklistIfNeeded(isRefresh = true)
+            // Update check should not be carried when vpn in lockdown mode
+            if (VpnController.isVpnLockdown()) {
+                showVpnLockdownDownloadDialog()
+            } else {
+                updateBlocklistIfNeeded(isRefresh = true)
+            }
         }
 
         val workManager = WorkManager.getInstance(requireContext().applicationContext)
