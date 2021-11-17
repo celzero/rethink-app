@@ -446,8 +446,13 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
                                   path + ONDEVICE_BLOCKLIST_FILE_TAG)
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "Local brave dns set exception :${e.message}", e)
-            // Set local blocklist enabled to false if there is a failure creating bravedns
+            // Set local blocklist enabled to false and reset the timestamp
+            // if there is a failure creating bravedns
             persistentState.blocklistEnabled = false
+            // this exception may occur when the local blocklist files are either missing
+            // or corrupted. Reset local blocklist timestamp to make sure
+            // user is prompted to download blocklists again on the next try
+            persistentState.localBlocklistTimestamp = 0
             null
         }
     }

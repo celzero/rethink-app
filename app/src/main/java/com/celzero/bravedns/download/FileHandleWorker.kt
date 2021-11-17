@@ -20,6 +20,7 @@ import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.celzero.bravedns.download.BlocklistDownloadHelper.Companion.deleteFromExternalDir
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
@@ -96,9 +97,17 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
                 return false
             }
 
+            // In case of failure, all files in
+            // 1. "from" dir will be deleted by deleteFromExternalDir
+            // 2. "to" dir will be delete by deleteFromCanonicalPath
+            // during the next download downloadLocalBlocklist
             for (i in children.indices) {
                 val from = dir.absolutePath + File.separator + children[i]
                 val to = localBlocklistDownloadPath(context, children[i], timestamp)
+                if (to == null) {
+                    Log.w(LOG_TAG_DOWNLOAD, "Copy failed from $from, to: $to")
+                    return false
+                }
                 val result = Utilities.copy(from, to)
 
                 if (!result) {
@@ -117,6 +126,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             }
 
             updatePersistenceOnCopySuccess(timestamp)
+            deleteFromExternalDir(context, timestamp)
             return true
 
         } catch (e: Exception) {

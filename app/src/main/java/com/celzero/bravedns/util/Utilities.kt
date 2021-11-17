@@ -504,40 +504,76 @@ class Utilities {
             }
         }
 
-        fun localBlocklistDownloadPath(ctx: Context, which: String, timestamp: Long): String {
+        fun localBlocklistDownloadPath(ctx: Context?, which: String, timestamp: Long): String? {
+            ctx ?: return null
+
             return ctx.filesDir.canonicalPath + File.separator + timestamp + File.separator + which
         }
 
-        fun hasLocalBlocklists(ctx: Context, timestamp: Long): Boolean {
+        fun cleanupOldLocalBlocklistFiles(fileOrDir: File, activeDir: String) {
+            if (fileOrDir.name.equals(activeDir)) return
+
+            // local blocklist dirs are named with timestamps, ex: 1635754946983
+            // Dirs other than activeDir (current timestamp)
+            // should be deleted (path: ../files/<timestamp>).
+            // delete both files and dirs starting with "16".
+            if (fileOrDir.name.startsWith("16")) {
+                deleteRecursive(fileOrDir)
+                return
+            }
+
+            if (fileOrDir.isDirectory) {
+                fileOrDir.listFiles()?.forEach { child ->
+                    cleanupOldLocalBlocklistFiles(child, activeDir)
+                }
+            } // ignore files that don't start with "16"
+        }
+
+        fun hasLocalBlocklists(ctx: Context?, timestamp: Long): Boolean {
             val a = Constants.ONDEVICE_BLOCKLISTS.all {
                 localBlocklistFile(ctx, it.filename, timestamp)?.exists() == true
             }
             return a
         }
 
-        private fun localBlocklistFile(ctx: Context, which: String, timestamp: Long): File? {
+        private fun localBlocklistFile(ctx: Context?, which: String, timestamp: Long): File? {
             return try {
-                return File(localBlocklistDownloadPath(ctx, which, timestamp))
+                val localBlocklist = localBlocklistDownloadPath(ctx, which, timestamp) ?: return null
+
+                return File(localBlocklist)
             } catch (e: IOException) {
                 Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
                 null
             }
+        }
+
+        fun hasRemoteBlocklistFile(ctx: Context?, which: String, timestamp: Long): Boolean {
+            val remoteDir = remoteBlocklistDir(ctx, which, timestamp) ?: return false
+            val remoteFile = remoteBlocklistFile(remoteDir.absolutePath,
+                                                 Constants.ONDEVICE_BLOCKLIST_FILE_TAG) ?: return false
+            return remoteFile.exists()
+        }
+
+        fun cleanupRemoteBlocklistDir(ctx: Context?, which: String) {
+            ctx ?: return
+
+            val dir = File(remoteBlocklistDownloadBasePath(ctx, which))
+            deleteRecursive(dir)
         }
 
         fun remoteBlocklistDir(ctx: Context?, which: String, timestamp: Long): File? {
             if (ctx == null) return null
 
             return try {
-                File(remoteBlocklistDownloadBasePath(ctx, which, timestamp))
+                File(remoteBlocklistDownloadBasePath(ctx, which) + File.separator + timestamp)
             } catch (e: IOException) {
                 Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
                 null
             }
         }
 
-        private fun remoteBlocklistDownloadBasePath(ctx: Context, which: String,
-                                                    timestamp: Long): String {
-            return ctx.filesDir.canonicalPath + File.separator + which + File.separator + timestamp
+        private fun remoteBlocklistDownloadBasePath(ctx: Context, which: String): String {
+            return ctx.filesDir.canonicalPath + File.separator + which
         }
 
         fun remoteBlocklistFile(dirPath: String, fileName: String): File? {

@@ -414,11 +414,9 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                             persistentState.numberOfLocalBlocklists.toString())
                     } else {
                         b.settingsActivityOnDeviceBlockSwitch.isChecked = false
-                        if (VpnController.isVpnLockdown()) {
-                            showVpnLockdownDownloadDialog()
-                        } else {
+                        maybeDownloadLocalBlocklist(yes = {
                             showDownloadDialog()
-                        }
+                        })
                     }
                 }
             }
@@ -436,7 +434,9 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
 
         b.settingsActivityOnDeviceBlockRefreshBtn.setOnClickListener {
-            updateBlocklistIfNeeded(isRefresh = true)
+            maybeDownloadLocalBlocklist(yes = {
+                updateBlocklistIfNeeded(isRefresh = true)
+            })
         }
 
         val workManager = WorkManager.getInstance(requireContext().applicationContext)
@@ -472,6 +472,20 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                     // no-op
                 }
             })
+    }
+
+    // As of now, the android download manager is used to download blocklist files.
+    // When VPN is in lockdown mode, downloads are not succeeding. As an interim fix,
+    // prompt dialog to the user about lockdown mode. No need for the below case if
+    // local blocklists download is carried away by the in-built download manager.
+    private fun maybeDownloadLocalBlocklist(yes: () -> Unit): Boolean {
+        return if (VpnController.isVpnLockdown()) {
+            showVpnLockdownDownloadDialog()
+            false
+        } else {
+            yes()
+            true
+        }
     }
 
     private fun refreshOnDeviceBlocklistUi() {
@@ -554,7 +568,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 val json = JSONObject(stringResponse)
                 val version = json.optInt(Constants.JSON_VERSION, 0)
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                                 "client onResponse for refresh blocklist files-  $version")
+                                 "client onResponse for refresh blocklist files:  $version")
                 if (version != Constants.UPDATE_CHECK_RESPONSE_VERSION) {
                     return
                 }

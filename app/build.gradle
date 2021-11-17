@@ -31,8 +31,8 @@ android {
         applicationId "com.celzero.bravedns"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 18 // For version name 053g
-        versionName "053g"
+        versionCode 19 // For version name 053h
+        versionName "053h"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
