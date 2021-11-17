@@ -449,8 +449,8 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
             // Set local blocklist enabled to false and reset the timestamp
             // if there is a failure creating bravedns
             persistentState.blocklistEnabled = false
-            // Case: when the local blocklist is either deleted by an external source or
-            // corrupted, in this case, reset the persistent state (this will disable
+            // when the local blocklist is either deleted by an external source or
+            // corrupted, in that case, reset the persistent state (this will disable
             // local blocklist), next time enabling will prompt the user to download the blocklist
             persistentState.localBlocklistTimestamp = 0
             null

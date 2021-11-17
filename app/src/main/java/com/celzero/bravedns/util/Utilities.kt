@@ -514,12 +514,13 @@ class Utilities {
             if (fileOrDir.name.equals(activeDir)) return
 
             // local blocklist dirs are created with timestamp value.
+            // folders with timestamp other than current local blocklist timestamp
+            // will be deleted (path: ../files/<timestamp>).
             // below check for file name starts with "16" will delete only those files.
             if (fileOrDir.name.startsWith("16")) {
                 deleteRecursive(fileOrDir)
             }
-            // folders with timestamp other than current local blocklist timestamp
-            // will be deleted (path: ../files/<timestamp>)
+
             if (fileOrDir.isDirectory) {
                 fileOrDir.listFiles()?.forEach { child ->
                     cleanupOldLocalBlocklistFiles(child, activeDir)
