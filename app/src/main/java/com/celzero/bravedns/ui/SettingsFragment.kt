@@ -414,9 +414,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                             persistentState.numberOfLocalBlocklists.toString())
                     } else {
                         b.settingsActivityOnDeviceBlockSwitch.isChecked = false
-                        if (VpnController.isVpnLockdown()) {
-                            showVpnLockdownDownloadDialog()
-                        } else {
+                        initiateLocalBlocklistDownload {
                             showDownloadDialog()
                         }
                     }
@@ -436,10 +434,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
 
         b.settingsActivityOnDeviceBlockRefreshBtn.setOnClickListener {
-            // Update check should not be carried when vpn in lockdown mode
-            if (VpnController.isVpnLockdown()) {
-                showVpnLockdownDownloadDialog()
-            } else {
+            initiateLocalBlocklistDownload {
                 updateBlocklistIfNeeded(isRefresh = true)
             }
         }
@@ -477,6 +472,18 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                     // no-op
                 }
             })
+    }
+
+    // As of now, the android download manager is used to download blocklist files.
+    // When VPN is in lockdown mode, downloads are not succeeding. As an interim fix,
+    // prompt dialog to the user about lockdown mode. No need for the below case if
+    // local blocklists download is carried away by the in-built download manager.
+    private fun initiateLocalBlocklistDownload(f: () -> Unit) {
+        if (VpnController.isVpnLockdown()) {
+            showVpnLockdownDownloadDialog()
+        } else {
+            f()
+        }
     }
 
     private fun refreshOnDeviceBlocklistUi() {
