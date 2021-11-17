@@ -414,9 +414,9 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                             persistentState.numberOfLocalBlocklists.toString())
                     } else {
                         b.settingsActivityOnDeviceBlockSwitch.isChecked = false
-                        initiateLocalBlocklistDownload {
+                        maybeDownloadLocalBlocklist(yes = {
                             showDownloadDialog()
-                        }
+                        })
                     }
                 }
             }
@@ -434,9 +434,9 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
         }
 
         b.settingsActivityOnDeviceBlockRefreshBtn.setOnClickListener {
-            initiateLocalBlocklistDownload {
+            maybeDownloadLocalBlocklist(yes = {
                 updateBlocklistIfNeeded(isRefresh = true)
-            }
+            })
         }
 
         val workManager = WorkManager.getInstance(requireContext().applicationContext)
@@ -478,11 +478,13 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
     // When VPN is in lockdown mode, downloads are not succeeding. As an interim fix,
     // prompt dialog to the user about lockdown mode. No need for the below case if
     // local blocklists download is carried away by the in-built download manager.
-    private fun initiateLocalBlocklistDownload(f: () -> Unit) {
-        if (VpnController.isVpnLockdown()) {
+    private fun maybeDownloadLocalBlocklist(yes: () -> Unit): Boolean {
+        return if (VpnController.isVpnLockdown()) {
             showVpnLockdownDownloadDialog()
+            false
         } else {
-            f()
+            yes()
+            true
         }
     }
 
@@ -574,7 +576,7 @@ class SettingsFragment : Fragment(R.layout.activity_settings_screen) {
                 val shouldUpdate = json.optBoolean(Constants.JSON_UPDATE, false)
                 val timestamp = json.optLong(Constants.JSON_LATEST, Constants.INIT_TIME_MS)
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "onResponse:  update? $shouldUpdate")
-                if (shouldUpdate || !hasLocalBlocklists(activity?.applicationContext, timestamp)) {
+                if (shouldUpdate) {
                     appDownloadManager.downloadLocalBlocklist(timestamp)
                     return
                 }

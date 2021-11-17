@@ -519,6 +519,7 @@ class Utilities {
             // below check for file name starts with "16" will delete only those files.
             if (fileOrDir.name.startsWith("16")) {
                 deleteRecursive(fileOrDir)
+                return
             }
 
             if (fileOrDir.isDirectory) {
@@ -556,7 +557,7 @@ class Utilities {
         fun cleanupRemoteBlocklistDir(ctx: Context?, which: String) {
             ctx ?: return
 
-            val dir = File(ctx.filesDir.canonicalPath + File.separator + which)
+            val dir = File(remoteBlocklistDownloadBasePath(ctx, which))
             deleteRecursive(dir)
         }
 
@@ -564,16 +565,15 @@ class Utilities {
             if (ctx == null) return null
 
             return try {
-                File(remoteBlocklistDownloadBasePath(ctx, which, timestamp))
+                File(remoteBlocklistDownloadBasePath(ctx, which) + File.separator + timestamp)
             } catch (e: IOException) {
                 Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
                 null
             }
         }
 
-        private fun remoteBlocklistDownloadBasePath(ctx: Context, which: String,
-                                                    timestamp: Long): String {
-            return ctx.filesDir.canonicalPath + File.separator + which + File.separator + timestamp
+        private fun remoteBlocklistDownloadBasePath(ctx: Context, which: String): String {
+            return ctx.filesDir.canonicalPath + File.separator + which
         }
 
         fun remoteBlocklistFile(dirPath: String, fileName: String): File? {
