@@ -513,10 +513,10 @@ class Utilities {
         fun cleanupOldLocalBlocklistFiles(fileOrDir: File, activeDir: String) {
             if (fileOrDir.name.equals(activeDir)) return
 
-            // local blocklist dirs are created with timestamp value.
-            // folders with timestamp other than current local blocklist timestamp
-            // will be deleted (path: ../files/<timestamp>).
-            // below check for file name starts with "16" will delete only those files.
+            // local blocklist dirs are named with timestamps, ex: 1635754946983
+            // Dirs other than activeDir (current timestamp)
+            // should be deleted (path: ../files/<timestamp>).
+            // delete both files and dirs starting with "16".
             if (fileOrDir.name.startsWith("16")) {
                 deleteRecursive(fileOrDir)
                 return
@@ -526,7 +526,7 @@ class Utilities {
                 fileOrDir.listFiles()?.forEach { child ->
                     cleanupOldLocalBlocklistFiles(child, activeDir)
                 }
-            }
+            } // ignore files that don't start with "16"
         }
 
         fun hasLocalBlocklists(ctx: Context?, timestamp: Long): Boolean {

@@ -97,9 +97,17 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
                 return false
             }
 
+            // In case of failure, all files in
+            // 1. "from" dir will be deleted by deleteFromExternalDir
+            // 2. "to" dir will be delete by deleteFromCanonicalPath
+            // during the next download downloadLocalBlocklist
             for (i in children.indices) {
                 val from = dir.absolutePath + File.separator + children[i]
-                val to = localBlocklistDownloadPath(context, children[i], timestamp) ?: return false
+                val to = localBlocklistDownloadPath(context, children[i], timestamp)
+                if (to == null) {
+                    Log.w(LOG_TAG_DOWNLOAD, "Copy failed from $from, to: $to")
+                    return false
+                }
                 val result = Utilities.copy(from, to)
 
                 if (!result) {
