@@ -24,22 +24,19 @@ object ViewModelModule {
             AppListViewModel(get())
         }
         viewModel {
-            BlockedConnectionsViewModel(get())
-        }
-        viewModel {
             ConnectionTrackerViewModel(get())
         }
         viewModel {
-            DNSCryptEndpointViewModel(get())
+            DnsCryptEndpointViewModel(get())
         }
         viewModel {
-            DNSCryptRelayEndpointViewModel(get())
+            DnsCryptRelayEndpointViewModel(get())
         }
         viewModel {
-            DNSLogViewModel(get())
+            DnsLogViewModel(get())
         }
         viewModel {
-            DNSProxyEndpointViewModel(get())
+            DnsProxyEndpointViewModel(get())
         }
         viewModel {
             DoHEndpointViewModel(get())
@@ -55,6 +52,12 @@ object ViewModelModule {
         }
         viewModel {
             CustomDomainViewModel(get())
+        }
+        viewModel {
+            CustomIpViewModel(get())
+        }
+        viewModel {
+            AppConnectionDetailsViewModel(get())
         }
     }
 

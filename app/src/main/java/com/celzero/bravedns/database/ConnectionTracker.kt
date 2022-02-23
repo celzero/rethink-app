@@ -23,14 +23,14 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 @Entity(tableName = "ConnectionTracker")
 class ConnectionTracker {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
-    var appName: String? = null
+    var appName: String = ""
     var uid: Int = 0
-    var ipAddress: String? = null
+    var ipAddress: String = ""
     var port: Int = 0
     var protocol: Int = 0
     var isBlocked: Boolean = false
-    var blockedByRule: String? = null
-    var flag: String? = null
+    var blockedByRule: String = ""
+    var flag: String = ""
     var timeStamp: Long = INIT_TIME_MS
 
     override fun equals(other: Any?): Boolean {

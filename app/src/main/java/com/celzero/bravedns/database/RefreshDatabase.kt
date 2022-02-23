@@ -52,20 +52,12 @@ import kotlin.concurrent.write
 import kotlin.random.Random
 
 class RefreshDatabase internal constructor(private var context: Context,
-                                           private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
-                                           private val categoryInfoRepository: CategoryInfoRepository,
-                                           private val doHEndpointRepository: DoHEndpointRepository,
                                            private val connTrackerRepository: ConnectionTrackerRepository,
-                                           private val dnsLogRepository: DNSLogRepository,
-                                           private val dnsCryptEndpointRepository: DNSCryptEndpointRepository,
-                                           private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
+                                           private val dnsLogRepository: DnsLogRepository,
                                            private val persistentState: PersistentState) {
 
 
     companion object {
-        private const val PROXY_EXTERNAL = "External"
-        private const val APP_NAME_NO_APP = "Nobody"
-
         private const val NOTIF_BATCH_NEW_APPS_THRESHOLD = 5
 
         const val PENDING_INTENT_REQUEST_CODE_ALLOW = 0x10000000
@@ -129,8 +121,6 @@ class RefreshDatabase internal constructor(private var context: Context,
                 addMissingPackages(packagesToAdd)
 
                 refreshNonApps(trackedApps, installedApps)
-
-                updateCategoryRepo()
             } catch (e: RuntimeException) {
                 Log.e(LOG_TAG_APP_DB, e.message, e)
                 throw e
@@ -227,7 +217,6 @@ class RefreshDatabase internal constructor(private var context: Context,
             insertUnknownApp(uid)
         }
 
-        updateCategoryRepo()
         showNewAppNotificationIfNeeded(FirewallManager.AppInfoTuple(uid, ai?.packageName ?: ""))
     }
 
@@ -267,12 +256,11 @@ class RefreshDatabase internal constructor(private var context: Context,
 
         appInfo.appName = appName
         appInfo.packageInfo = "no_package_$uid"
-        appInfo.appCategory = context.getString(
-            CategoryInfoRepository.CategoryConstants.NON_APP.nameResId)
+        appInfo.appCategory = context.getString(FirewallManager.CategoryConstants.NON_APP.nameResId)
 
         appInfo.uid = uid
         if (persistentState.blockNewlyInstalledApp) {
-            appInfo.isInternetAllowed = false
+            appInfo.firewallStatus = FirewallManager.AppStatus.BLOCK.id
         }
 
         FirewallManager.persistAppInfo(appInfo)
@@ -283,21 +271,18 @@ class RefreshDatabase internal constructor(private var context: Context,
         Log.i(LOG_TAG_APP_DB, "insert app: $appName")
 
         val isSystemApp = isSystemApp(appInfo)
-        val isSystemComponent = isSystemComponent(appInfo)
         val entry = AppInfo()
 
         entry.appName = appName
 
         entry.packageInfo = appInfo.packageName
         entry.uid = appInfo.uid
-
-        entry.whiteListUniv1 = isSystemComponent
         entry.isSystemApp = isSystemApp
 
         // default value of apps internet permission is true, when the universal firewall
         // parameter (blockNewlyInstalledApp is true) firewall the app
         if (persistentState.blockNewlyInstalledApp) {
-            entry.isInternetAllowed = false
+            entry.firewallStatus = FirewallManager.AppStatus.BLOCK.id
         }
 
         entry.appCategory = determineAppCategory(appInfo)
@@ -403,7 +388,7 @@ class RefreshDatabase internal constructor(private var context: Context,
 
         val pendingIntent = PendingIntent.getActivity(context, 0, intent,
                                                       PendingIntent.FLAG_UPDATE_CURRENT)
-        val nbuilder: NotificationCompat.Builder
+        val builder: NotificationCompat.Builder
         if (isAtleastO()) {
             val name: CharSequence = context.getString(R.string.notif_channel_firewall_alerts)
             val description = context.resources.getString(
@@ -412,20 +397,20 @@ class RefreshDatabase internal constructor(private var context: Context,
             val channel = NotificationChannel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, name, importance)
             channel.description = description
             notificationManager.createNotificationChannel(channel)
-            nbuilder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
+            builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
         } else {
-            nbuilder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
+            builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
         }
 
         val contentTitle: String = context.resources.getString(R.string.new_app_notification_title)
         val contentText: String = context.resources.getString(R.string.new_app_notification_content,
                                                               appName)
 
-        nbuilder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(
+        builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(
             pendingIntent).setContentText(contentText)
 
-        nbuilder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-        nbuilder.color = ContextCompat.getColor(context, Utilities.getThemeAccent(context))
+        builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
+        builder.color = ContextCompat.getColor(context, Utilities.getThemeAccent(context))
 
         val openIntent1 = makeNewAppVpnIntent(context, Constants.NOTIF_ACTION_NEW_APP_ALLOW,
                                               app.uid, PENDING_INTENT_REQUEST_CODE_ALLOW)
@@ -440,17 +425,17 @@ class RefreshDatabase internal constructor(private var context: Context,
                                                                                        context.resources.getString(
                                                                                            R.string.new_app_notification_action_deny),
                                                                                        openIntent2)
-        nbuilder.addAction(notificationAction)
-        nbuilder.addAction(notificationAction2)
+        builder.addAction(notificationAction)
+        builder.addAction(notificationAction2)
 
         // Secret notifications are not shown on the lock screen.  No need for this app to show there.
         // Only available in API >= 21
-        nbuilder.setVisibility(NotificationCompat.VISIBILITY_SECRET)
+        builder.setVisibility(NotificationCompat.VISIBILITY_SECRET)
 
         // Cancel the notification after clicking.
-        nbuilder.setAutoCancel(true)
+        builder.setAutoCancel(true)
 
-        notificationManager.notify(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, app.uid, nbuilder.build())
+        notificationManager.notify(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, app.uid, builder.build())
     }
 
     private fun makeNewAppVpnIntent(context: Context, intentExtra: String, uid: Int,
@@ -481,19 +466,18 @@ class RefreshDatabase internal constructor(private var context: Context,
         }
 
         if (isSystemComponent(ai)) {
-            return context.getString(
-                CategoryInfoRepository.CategoryConstants.SYSTEM_COMPONENT.nameResId)
+            return context.getString(FirewallManager.CategoryConstants.SYSTEM_COMPONENT.nameResId)
         }
 
         if (isSystemApp(ai)) {
-            return context.getString(CategoryInfoRepository.CategoryConstants.SYSTEM_APP.nameResId)
+            return context.getString(FirewallManager.CategoryConstants.SYSTEM_APP.nameResId)
         }
 
         if (isAtleastO()) {
             return replaceUnderscore(appInfoCategory(ai))
         }
 
-        return context.getString(CategoryInfoRepository.CategoryConstants.INSTALLED.nameResId)
+        return context.getString(FirewallManager.CategoryConstants.INSTALLED.nameResId)
 
     }
 
@@ -501,32 +485,12 @@ class RefreshDatabase internal constructor(private var context: Context,
     private fun appInfoCategory(ai: ApplicationInfo): String {
         val cat = ApplicationInfo.getCategoryTitle(context, ai.category)
         return cat?.toString() ?: context.getString(
-            CategoryInfoRepository.CategoryConstants.OTHER.nameResId)
+            FirewallManager.CategoryConstants.OTHER.nameResId)
     }
 
     private fun replaceUnderscore(s: String): String {
         return s.replace("_", " ")
     }
-
-    fun insertDefaultDNSProxy() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val proxyURL = context.resources.getStringArray(R.array.dns_proxy_names)
-            val proxyIP = context.resources.getStringArray(R.array.dns_proxy_ips)
-            val dnsProxyEndPoint1 = DNSProxyEndpoint(1, proxyURL[0], PROXY_EXTERNAL,
-                                                     APP_NAME_NO_APP, proxyIP[0], 53, false, false,
-                                                     0, 0)
-            val dnsProxyEndPoint2 = DNSProxyEndpoint(2, proxyURL[1], PROXY_EXTERNAL,
-                                                     APP_NAME_NO_APP, proxyIP[1], 53, false, false,
-                                                     0, 0)
-            val dnsProxyEndPoint3 = DNSProxyEndpoint(3, proxyURL[2], PROXY_EXTERNAL,
-                                                     APP_NAME_NO_APP, proxyIP[2], 53, false, false,
-                                                     0, 0)
-            dnsProxyEndpointRepository.insertWithReplace(dnsProxyEndPoint1)
-            dnsProxyEndpointRepository.insertWithReplace(dnsProxyEndPoint2)
-            dnsProxyEndpointRepository.insertWithReplace(dnsProxyEndPoint3)
-        }
-    }
-
 
     fun deleteOlderDataFromNetworkLogs() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -538,37 +502,6 @@ class RefreshDatabase internal constructor(private var context: Context,
              */
             dnsLogRepository.deleteConnectionTrackerCount()
             connTrackerRepository.deleteConnectionTrackerCount()
-        }
-    }
-
-    private val CAT_SIZE = 9
-    private val CATEGORY_STRING = "category/"
-    private val CATEGORY_GAME_STRING = "GAME_" // All games start with this prefix
-
-    private suspend fun updateCategoryRepo() {
-        if (DEBUG) Log.d(LOG_TAG_APP_DB, "RefreshDatabase - Call for updateCategoryDB")
-
-        //Changes to remove the count queries.
-        val categoryFromAppList = FirewallManager.getAppInfos()
-        val applications = categoryFromAppList.distinctBy { a -> a.appCategory }
-
-        applications.forEach {
-            val categoryInfo = CategoryInfo()
-            categoryInfo.categoryName = it.appCategory
-
-            val excludedList = categoryFromAppList.filter { a -> a.isExcluded && a.appCategory == it.appCategory }
-            val appsBlocked = categoryFromAppList.filter { a -> !a.isInternetAllowed && a.appCategory == it.appCategory }
-            val whiteListedApps = categoryFromAppList.filter { a -> a.whiteListUniv1 && a.appCategory == it.appCategory }
-
-            categoryInfo.numberOFApps = categoryFromAppList.filter { a -> a.appCategory == it.appCategory }.count()
-            categoryInfo.numOfAppsExcluded = excludedList.count()
-            categoryInfo.numOfAppWhitelisted = whiteListedApps.count()
-            categoryInfo.numOfAppsBlocked = appsBlocked.count()
-            categoryInfo.isInternetBlocked = (categoryInfo.numberOFApps == categoryInfo.numOfAppsBlocked)
-
-            Log.i(LOG_TAG_APP_DB,
-                  "categoryListFromAppList - ${categoryInfo.categoryName}, ${categoryInfo.numberOFApps}, ${categoryInfo.numOfAppsBlocked}, ${categoryInfo.isInternetBlocked}")
-            categoryInfoRepository.insert(categoryInfo)
         }
     }
 
@@ -598,7 +531,12 @@ class RefreshDatabase internal constructor(private var context: Context,
 
     }
 
-    /*private fun parseAndExtractCategory(url: String): String? {
+    /*
+    private val CAT_SIZE = 9
+    private val CATEGORY_STRING = "category/"
+    private val CATEGORY_GAME_STRING = "GAME_" // All games start with this prefix
+
+    private fun parseAndExtractCategory(url: String): String? {
         return try {
             val text = Jsoup.connect(url).get()?.select("a[itemprop=genre]") ?: return null
             val href = text.attr("abs:href")
@@ -613,119 +551,14 @@ class RefreshDatabase internal constructor(private var context: Context,
             //TODO handle error
             PlayStoreCategory.OTHER.name
         }
-    }*/
+    }
 
     private fun getCategoryTypeByHref(href: String): String? {
         val appCategoryType = href.substring(href.indexOf(CATEGORY_STRING) + CAT_SIZE, href.length)
         return if (appCategoryType.contains(CATEGORY_GAME_STRING)) {
             PlayStoreCategory.GENERAL_GAMES_CATEGORY_NAME
         } else appCategoryType
-    }
-
-    suspend fun insertDefaultDNSList() {
-        val isAlreadyConnectionAvailable = doHEndpointRepository.getConnectedDoH()
-        val urlName = context.resources.getStringArray(R.array.doh_endpoint_names)
-        val urlValues = context.resources.getStringArray(R.array.doh_endpoint_urls)
-        if (isAlreadyConnectionAvailable == null) {
-            insertDefaultDOHList()
-        } else {
-            Log.w(LOG_TAG_APP_DB,
-                  "Refresh Database, Already insertion done. Correct values for Cloudflare alone.")
-            val doHEndpoint = DoHEndpoint(id = 3, urlName[2], urlValues[2],
-                                          context.getString(R.string.dns_mode_2_explanation),
-                                          isSelected = false, isCustom = false,
-                                          modifiedDataTime = System.currentTimeMillis(),
-                                          latency = 0)
-            doHEndpointRepository.insertWithReplaceAsync(doHEndpoint)
-        }
-
-    }
-
-    private suspend fun insertDefaultDOHList() {
-        val urlName = context.resources.getStringArray(R.array.doh_endpoint_names)
-        val urlValues = context.resources.getStringArray(R.array.doh_endpoint_urls)
-        val doHEndpoint1 = DoHEndpoint(id = 1, urlName[0], urlValues[0],
-                                       context.getString(R.string.dns_mode_0_explanation),
-                                       isSelected = false, isCustom = false,
-                                       modifiedDataTime = System.currentTimeMillis(), latency = 0)
-        val doHEndpoint2 = DoHEndpoint(id = 2, urlName[1], urlValues[1],
-                                       context.getString(R.string.dns_mode_1_explanation),
-                                       isSelected = false, isCustom = false,
-                                       modifiedDataTime = System.currentTimeMillis(), latency = 0)
-        val doHEndpoint3 = DoHEndpoint(id = 3, urlName[2], urlValues[2],
-                                       context.getString(R.string.dns_mode_2_explanation),
-                                       isSelected = false, isCustom = false,
-                                       modifiedDataTime = System.currentTimeMillis(), latency = 0)
-        val doHEndpoint4 = DoHEndpoint(id = 4, urlName[3], urlValues[3],
-                                       context.getString(R.string.dns_mode_3_explanation), true,
-                                       isCustom = false,
-                                       modifiedDataTime = System.currentTimeMillis(), latency = 0)
-        // Note: rethinkdns+ must always be at index 5; if not impl such as
-        // AppConfig#getDnsRethinkEndpoint will break
-        val doHEndpoint5 = DoHEndpoint(id = 5, urlName[5], urlValues[5],
-                                       context.getString(R.string.dns_mode_5_explanation),
-                                       isSelected = false, isCustom = false,
-                                       modifiedDataTime = System.currentTimeMillis(), latency = 0)
-        ioCtx {
-            doHEndpointRepository.insertWithReplaceAsync(doHEndpoint1)
-            doHEndpointRepository.insertWithReplaceAsync(doHEndpoint2)
-            doHEndpointRepository.insertWithReplaceAsync(doHEndpoint3)
-            doHEndpointRepository.insertWithReplaceAsync(doHEndpoint4)
-            doHEndpointRepository.insertWithReplaceAsync(doHEndpoint5)
-        }
-    }
-
-
-    fun insertDefaultDNSCryptList() {
-        val urlName = context.resources.getStringArray(R.array.dns_crypt_endpoint_names)
-        val urlValues = context.resources.getStringArray(R.array.dns_crypt_endpoint_urls)
-        val urlDesc = context.resources.getStringArray(R.array.dns_crypt_endpoint_desc)
-
-        val dnsCryptEndpoint1 = DNSCryptEndpoint(1, urlName[0], urlValues[0], urlDesc[0], false,
-                                                 false, System.currentTimeMillis(), 0)
-        val dnsCryptEndpoint2 = DNSCryptEndpoint(2, urlName[1], urlValues[1], urlDesc[1], false,
-                                                 false, System.currentTimeMillis(), 0)
-        val dnsCryptEndpoint3 = DNSCryptEndpoint(3, urlName[2], urlValues[2], urlDesc[2], false,
-                                                 false, System.currentTimeMillis(), 0)
-        val dnsCryptEndpoint4 = DNSCryptEndpoint(4, urlName[3], urlValues[3], urlDesc[3], false,
-                                                 false, System.currentTimeMillis(), 0)
-        val dnsCryptEndpoint5 = DNSCryptEndpoint(5, urlName[4], urlValues[4], urlDesc[4], false,
-                                                 false, System.currentTimeMillis(), 0)
-        dnsCryptEndpointRepository.insertAsync(dnsCryptEndpoint1)
-        dnsCryptEndpointRepository.insertAsync(dnsCryptEndpoint2)
-        dnsCryptEndpointRepository.insertAsync(dnsCryptEndpoint3)
-        dnsCryptEndpointRepository.insertAsync(dnsCryptEndpoint4)
-        dnsCryptEndpointRepository.insertAsync(dnsCryptEndpoint5)
-
-    }
-
-    fun insertDefaultDNSCryptRelayList() {
-        val urlName = context.resources.getStringArray(R.array.dns_crypt_relay_endpoint_names)
-        val urlValues = context.resources.getStringArray(R.array.dns_crypt_relay_endpoint_urls)
-        val urlDesc = context.resources.getStringArray(R.array.dns_crypt_relay_endpoint_desc)
-
-        val dnsCryptRelayEndpoint1 = DNSCryptRelayEndpoint(1, urlName[0], urlValues[0], urlDesc[0],
-                                                           false, false, System.currentTimeMillis(),
-                                                           0)
-        val dnsCryptRelayEndpoint2 = DNSCryptRelayEndpoint(2, urlName[1], urlValues[1], urlDesc[1],
-                                                           false, false, System.currentTimeMillis(),
-                                                           0)
-        val dnsCryptRelayEndpoint3 = DNSCryptRelayEndpoint(3, urlName[2], urlValues[2], urlDesc[2],
-                                                           false, false, System.currentTimeMillis(),
-                                                           0)
-        val dnsCryptRelayEndpoint4 = DNSCryptRelayEndpoint(4, urlName[3], urlValues[3], urlDesc[3],
-                                                           false, false, System.currentTimeMillis(),
-                                                           0)
-        val dnsCryptRelayEndpoint5 = DNSCryptRelayEndpoint(5, urlName[4], urlValues[4], urlDesc[4],
-                                                           false, false, System.currentTimeMillis(),
-                                                           0)
-
-        dnsCryptRelayEndpointRepository.insertAsync(dnsCryptRelayEndpoint1)
-        dnsCryptRelayEndpointRepository.insertAsync(dnsCryptRelayEndpoint2)
-        dnsCryptRelayEndpointRepository.insertAsync(dnsCryptRelayEndpoint3)
-        dnsCryptRelayEndpointRepository.insertAsync(dnsCryptRelayEndpoint4)
-        dnsCryptRelayEndpointRepository.insertAsync(dnsCryptRelayEndpoint5)
-    }
+    }*/
 
     private suspend fun ioCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.IO) {

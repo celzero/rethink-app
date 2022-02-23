@@ -24,22 +24,24 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [AppInfo::class, CategoryInfo::class, ConnectionTracker::class, BlockedConnections::class, DoHEndpoint::class, DNSCryptEndpoint::class, DNSProxyEndpoint::class, DNSCryptRelayEndpoint::class, ProxyEndpoint::class, DnsLog::class, CustomDomain::class],
-    views = [AppInfoView::class], version = 11, exportSchema = true)
+    entities = [AppInfo::class, ConnectionTracker::class, CustomIp::class, DoHEndpoint::class, DnsCryptEndpoint::class, DnsProxyEndpoint::class, DnsCryptRelayEndpoint::class, ProxyEndpoint::class, DnsLog::class, CustomDomain::class],
+    version = 12, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         private const val DATABASE_NAME = "bravedns.db"
+        private const val DATABASE_PATH = "database/rethink_v12.db"
 
         // setJournalMode() is added as part of issue #344
         fun buildDatabase(context: Context) = Room.databaseBuilder(context.applicationContext,
                                                                    AppDatabase::class.java,
-                                                                   DATABASE_NAME).setJournalMode(
-            JournalMode.TRUNCATE).addMigrations(MIGRATION_1_2).addMigrations(
-            MIGRATION_2_3).addMigrations(MIGRATION_3_4).addMigrations(MIGRATION_4_5).addMigrations(
-            MIGRATION_5_6).addMigrations(MIGRATION_6_7).addMigrations(MIGRATION_7_8).addMigrations(
-            MIGRATION_8_9).addMigrations(MIGRATION_9_10).addMigrations(MIGRATION_10_11).build()
+                                                                   DATABASE_NAME).createFromAsset(
+            DATABASE_PATH).setJournalMode(JournalMode.TRUNCATE).addMigrations(
+            MIGRATION_1_2).addMigrations(MIGRATION_2_3).addMigrations(MIGRATION_3_4).addMigrations(
+            MIGRATION_4_5).addMigrations(MIGRATION_5_6).addMigrations(MIGRATION_6_7).addMigrations(
+            MIGRATION_7_8).addMigrations(MIGRATION_8_9).addMigrations(MIGRATION_9_10).addMigrations(
+            MIGRATION_10_11).addMigrations(MIGRATION_11_12).build()
 
         private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
@@ -215,33 +217,92 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_11_12: Migration = object : Migration(11, 12) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                modifyAppInfoTableSchema(database)
+                database.execSQL("DROP VIEW AppInfoView")
+                database.execSQL("DROP TABLE if exists CategoryInfo")
+                database.execSQL(
+                    "UPDATE DoHEndpoint set dohURL = `replace`(dohURL,'bravedns','rethinkdns')")
+                database.execSQL("UPDATE DNSProxyEndpoint set id = 4 where id = 3")
+                database.execSQL("UPDATE DNSProxyEndpoint set id = 3 where id = 2")
+                database.execSQL("UPDATE DNSProxyEndpoint set id = 2 where id = 1")
+                database.execSQL(
+                    "INSERT INTO DNSProxyEndpoint values (1,'Network DNS','External','Nobody','',53,0,0,0,0)")
+                database.execSQL(
+                    "ALTER TABLE CustomDomain add column wildcard INTEGER DEFAULT 0 NOT NULL")
+                modifyBlockedConnectionsTable(database)
+                modifyConnectionTrackerTable(database)
+            }
+
+            private fun modifyConnectionTrackerTable(database: SupportSQLiteDatabase) {
+                with(database) {
+                    execSQL(
+                        "CREATE TABLE 'ConnectionTracker_backup' ('id' INTEGER NOT NULL,'appName' TEXT DEFAULT '' NOT NULL, 'uid' INTEGER NOT NULL, 'ipAddress' TEXT DEFAULT ''  NOT NULL, 'port' INTEGER NOT NULL, 'protocol' INTEGER NOT NULL,'isBlocked' INTEGER NOT NULL, 'blockedByRule' TEXT DEFAULT '' NOT NULL, 'flag' TEXT  DEFAULT '' NOT NULL, 'timeStamp' INTEGER NOT NULL,PRIMARY KEY (id)  )")
+                    execSQL(
+                        "INSERT INTO ConnectionTracker_backup SELECT id, appName, uid, ipAddress, port, protocol, isBlocked, blockedByRule, flag, timeStamp from ConnectionTracker")
+                    execSQL("DROP TABLE if exists ConnectionTracker")
+                    execSQL(
+                        "CREATE TABLE 'ConnectionTracker' ('id' INTEGER NOT NULL,'appName' TEXT DEFAULT '' NOT NULL, 'uid' INTEGER NOT NULL, 'ipAddress' TEXT DEFAULT ''  NOT NULL, 'port' INTEGER NOT NULL, 'protocol' INTEGER NOT NULL,'isBlocked' INTEGER NOT NULL, 'blockedByRule' TEXT DEFAULT '' NOT NULL, 'flag' TEXT  DEFAULT '' NOT NULL, 'timeStamp' INTEGER NOT NULL,PRIMARY KEY (id)  )")
+                    execSQL(
+                        "INSERT INTO ConnectionTracker SELECT id, appName, uid, ipAddress, port, protocol, isBlocked, blockedByRule, flag, timeStamp from ConnectionTracker_backup")
+                    execSQL("DROP TABLE if exists ConnectionTracker_backup")
+                }
+            }
+
+            private fun modifyBlockedConnectionsTable(database: SupportSQLiteDatabase) {
+                with(database) {
+                    execSQL(
+                        "CREATE TABLE 'CustomIp' ('uid' INTEGER NOT NULL, 'ipAddress' TEXT DEFAULT '' NOT NULL, 'port' INTEGER DEFAULT '' NOT NULL, 'protocol' TEXT DEFAULT '' NOT NULL, 'isActive' INTEGER DEFAULT 1 NOT NULL, 'status' INTEGER DEFAULT 1 NOT NULL,'ruleType' INTEGER DEFAULT 0 NOT NULL, 'wildcard' INTEGER DEFAULT 0 NOT NULL, 'modifiedDateTime' INTEGER DEFAULT 0 NOT NULL, PRIMARY KEY(uid, ipAddress, port, protocol))")
+                    execSQL(
+                        "INSERT INTO 'CustomIp' SELECT uid, ipAddress, port, protocol, isActive, 1, 0, 0, modifiedDateTime from BlockedConnections")
+                    execSQL("DROP TABLE if exists BlockedConnections")
+                }
+            }
+
+            private fun modifyAppInfoTableSchema(database: SupportSQLiteDatabase) {
+                with(database) {
+                    execSQL(
+                        "CREATE TABLE 'AppInfo_backup' ('packageInfo' TEXT PRIMARY KEY NOT NULL, 'appName' TEXT NOT NULL, 'uid' INTEGER NOT NULL, 'isSystemApp' INTEGER NOT NULL, 'firewallStatus' INTEGER NOT NULL DEFAULT 0, 'appCategory' TEXT NOT NULL, 'wifiDataUsed' INTEGER NOT NULL, 'mobileDataUsed' INTEGER NOT NULL, 'metered' INTEGER NOT NULL DEFAULT 0, 'screenOffAllowed' INTEGER NOT NULL DEFAULT 0, 'backgroundAllowed' INTEGER NOT NULL DEFAULT 0,  'isInternetAllowed' INTEGER NOT NULL, 'whiteListUniv1' INTEGER NOT NULL, 'isExcluded' INTEGER NOT NULL)")
+                    execSQL(
+                        "INSERT INTO AppInfo_backup SELECT packageInfo, appName, uid, isSystemApp, 0, appCategory, wifiDataUsed, mobileDataUsed, 0, isScreenOff, isBackgroundEnabled, isInternetAllowed, whiteListUniv1, isExcluded FROM AppInfo")
+                    execSQL(
+                        "UPDATE AppInfo_backup set firewallStatus = 2 where isInternetAllowed = 1")
+                    execSQL("UPDATE AppInfo_backup set firewallStatus = 3 where whiteListUniv1 = 1")
+                    execSQL("UPDATE AppInfo_backup set firewallStatus = 4 where isExcluded = 1")
+                    execSQL("DROP TABLE if exists AppInfo")
+                    execSQL(
+                        "CREATE TABLE 'AppInfo' ('packageInfo' TEXT PRIMARY KEY NOT NULL, 'appName' TEXT NOT NULL, 'uid' INTEGER NOT NULL, 'isSystemApp' INTEGER NOT NULL, 'firewallStatus' INTEGER NOT NULL DEFAULT 0, 'appCategory' TEXT NOT NULL, 'wifiDataUsed' INTEGER NOT NULL, 'mobileDataUsed' INTEGER NOT NULL, 'metered' INTEGER NOT NULL DEFAULT 0, 'screenOffAllowed' INTEGER NOT NULL DEFAULT 0, 'backgroundAllowed' INTEGER NOT NULL DEFAULT 0)")
+                    execSQL(
+                        "INSERT INTO AppInfo SELECT packageInfo, appName, uid, isSystemApp, firewallStatus, appCategory, wifiDataUsed, mobileDataUsed, metered, screenOffAllowed, backgroundAllowed FROM AppInfo_backup")
+
+                    execSQL("DROP TABLE AppInfo_backup")
+                }
+            }
+        }
     }
 
     abstract fun appInfoDAO(): AppInfoDAO
-    abstract fun categoryInfoDAO(): CategoryInfoDAO
     abstract fun connectionTrackerDAO(): ConnectionTrackerDAO
-    abstract fun blockedConnectionsDAO(): BlockedConnectionsDAO
     abstract fun dohEndpointsDAO(): DoHEndpointDAO
-    abstract fun dnsCryptEndpointDAO(): DNSCryptEndpointDAO
-    abstract fun dnsCryptRelayEndpointDAO(): DNSCryptRelayEndpointDAO
-    abstract fun dnsProxyEndpointDAO(): DNSProxyEndpointDAO
+    abstract fun dnsCryptEndpointDAO(): DnsCryptEndpointDAO
+    abstract fun dnsCryptRelayEndpointDAO(): DnsCryptRelayEndpointDAO
+    abstract fun dnsProxyEndpointDAO(): DnsProxyEndpointDAO
     abstract fun proxyEndpointDAO(): ProxyEndpointDAO
-    abstract fun dnsLogDAO(): DNSLogDAO
-    abstract fun appInfoViewDAO(): AppInfoViewDAO
-    abstract fun customEndpointDAO(): CustomDomainDAO
+    abstract fun dnsLogDAO(): DnsLogDAO
+    abstract fun customDomainEndpointDAO(): CustomDomainDAO
+    abstract fun customIpEndpointDao(): CustomIpDao
 
     fun appInfoRepository() = AppInfoRepository(appInfoDAO())
-    fun categoryInfoRepository() = CategoryInfoRepository(categoryInfoDAO())
     fun connectionTrackerRepository() = ConnectionTrackerRepository(connectionTrackerDAO())
-    fun blockedConnectionRepository() = BlockedConnectionsRepository(blockedConnectionsDAO())
-    fun doHEndpointsRepository() = DoHEndpointRepository(dohEndpointsDAO())
-    fun dnsCryptEndpointsRepository() = DNSCryptEndpointRepository(dnsCryptEndpointDAO())
-    fun dnsCryptRelayEndpointsRepository() = DNSCryptRelayEndpointRepository(
+    fun dohEndpointRepository() = DoHEndpointRepository(dohEndpointsDAO())
+    fun dnsCryptEndpointRepository() = DnsCryptEndpointRepository(dnsCryptEndpointDAO())
+    fun dnsCryptRelayEndpointRepository() = DnsCryptRelayEndpointRepository(
         dnsCryptRelayEndpointDAO())
 
-    fun dnsProxyEndpointRepository() = DNSProxyEndpointRepository(dnsProxyEndpointDAO())
+    fun dnsProxyEndpointRepository() = DnsProxyEndpointRepository(dnsProxyEndpointDAO())
     fun proxyEndpointRepository() = ProxyEndpointRepository(proxyEndpointDAO())
-    fun dnsLogRepository() = DNSLogRepository(dnsLogDAO())
-    fun appInfoViewRepository() = AppInfoViewRepository(appInfoViewDAO())
-    fun customDomainsRepository() = CustomDomainRepository(customEndpointDAO())
+    fun dnsLogRepository() = DnsLogRepository(dnsLogDAO())
+    fun customDomainRepository() = CustomDomainRepository(customDomainEndpointDAO())
+    fun customIpRepository() = CustomIpRepository(customIpEndpointDao())
 }

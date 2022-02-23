@@ -30,6 +30,8 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
            R.string.firewall_rule_block_app_desc, FirewallRuleset.stall),
     RULE2("Rule #2", R.string.firewall_rule_block_ip, R.string.firewall_rule_block_ip_desc,
           FirewallRuleset.stall),
+    RULE2B("IP Whitelist", R.string.firewall_rule_whitelist_ip,
+           R.string.firewall_rule_whitelist_ip_desc, FirewallRuleset.allow),
     RULE3("Rule #3", R.string.firewall_rule_device_lock, R.string.firewall_rule_device_lock_desc,
           FirewallRuleset.stall),
     RULE4("Rule #4", R.string.firewall_rule_foreground, R.string.firewall_rule_foreground_desc,
@@ -60,6 +62,7 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE1B.id -> RULE1B
                 RULE1C.id -> RULE1C
                 RULE2.id -> RULE2
+                RULE2B.id -> RULE2B
                 RULE3.id -> RULE3
                 RULE4.id -> RULE4
                 RULE5.id -> RULE5
@@ -80,6 +83,7 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE1B.id -> R.drawable.ic_auto_start
                 RULE1C.id -> R.drawable.ic_filter_error
                 RULE2.id -> R.drawable.spinner_firewall
+                RULE2B.id -> R.drawable.bs_firewall_home_screen
                 RULE3.id -> R.drawable.ic_device_lock
                 RULE4.id -> R.drawable.ic_foreground
                 RULE5.id -> R.drawable.ic_unknown_app

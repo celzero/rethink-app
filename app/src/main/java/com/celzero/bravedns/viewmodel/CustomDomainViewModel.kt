@@ -15,42 +15,41 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.toLiveData
-import com.celzero.bravedns.automaton.CustomDomainManager
+import com.celzero.bravedns.automaton.DomainRulesManager
 import com.celzero.bravedns.database.CustomDomainDAO
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class CustomDomainViewModel(private val customDomainDAO: CustomDomainDAO) : ViewModel() {
 
     private var filteredList: MutableLiveData<String> = MutableLiveData()
-    private var status: CustomDomainManager.CustomDomainStatus = CustomDomainManager.CustomDomainStatus.NONE
+    private var status: DomainRulesManager.DomainStatus = DomainRulesManager.DomainStatus.NONE
 
     init {
         filteredList.value = ""
     }
 
-    val blockedUnivRulesList = Transformations.switchMap(filteredList) { input ->
+    val customDomainList = Transformations.switchMap(filteredList) { input ->
         when (status) {
-            CustomDomainManager.CustomDomainStatus.NONE -> {
+            DomainRulesManager.DomainStatus.NONE -> {
                 customDomainDAO.getAllDomainsLiveData("%$input%").toLiveData(
                     pageSize = LIVEDATA_PAGE_SIZE)
             }
-            CustomDomainManager.CustomDomainStatus.WHITELIST -> {
+            DomainRulesManager.DomainStatus.WHITELISTED -> {
                 customDomainDAO.getWhitelistedDomains("%$input%", status.statusId).toLiveData(
                     pageSize = LIVEDATA_PAGE_SIZE)
             }
-            CustomDomainManager.CustomDomainStatus.BLOCKLIST -> {
+            DomainRulesManager.DomainStatus.BLOCKED -> {
                 customDomainDAO.getBlockedDomains("%$input%", status.statusId).toLiveData(
                     LIVEDATA_PAGE_SIZE)
             }
         }
     }
 
-    fun setFilter(filter: String, status: CustomDomainManager.CustomDomainStatus) {
+    fun setFilter(filter: String, status: DomainRulesManager.DomainStatus) {
         this.status = status
         filteredList.value = filter
     }

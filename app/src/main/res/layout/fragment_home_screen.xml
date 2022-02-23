@@ -17,47 +17,22 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="15dp"
-            android:visibility="visible"
-            android:weightSum="1">
+            android:orientation="vertical"
+            android:padding="15dp">
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0"
-                android:gravity="center"
-                android:orientation="vertical" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fhs_title_rethink"
+                style="@style/TextAppearance.Heading.HomeScreen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name_small_case" />
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:orientation="vertical">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fhs_title_rethink"
-                        style="@style/TextAppearance.Heading.HomeScreen"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/app_name_small_case" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fhs_title_rethink_desc"
-                        style="@style/TextAppearance.SubHeading.HomeScreen"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/backed_by_mozilla" />
-                </LinearLayout>
-            </LinearLayout>
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fhs_title_rethink_desc"
+                style="@style/TextAppearance.SubHeading.HomeScreen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/backed_by_mozilla" />
 
         </LinearLayout>
 
@@ -76,7 +51,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="5dp"
                 android:layout_weight="0.5"
-                android:background="@drawable/rounded_corners_button_accent">
+                android:background="@drawable/rectangle_border_background">
 
                 <LinearLayout
                     android:id="@+id/fhs_card_dns_ll"
@@ -111,8 +86,10 @@
                         android:id="@+id/fhs_card_dns_configure"
                         style="@style/Button.HomeScreen.Borderless"
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
+                        android:layout_height="48dp"
                         android:layout_margin="1dp"
+                        android:minHeight="48dp"
+                        android:textSize="@dimen/large_font_text_view"
                         android:background="@drawable/rounded_corner_button_bg"
                         android:text="@string/dns_card_configure_btn" />
 
@@ -126,7 +103,7 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="10dp"
                 android:layout_weight="0.5"
-                android:background="@drawable/rounded_corners_button_accent">
+                android:background="@drawable/rectangle_border_background">
 
                 <LinearLayout
                     android:id="@+id/fhs_card_firewall_ll"
@@ -162,8 +139,10 @@
                         android:id="@+id/fhs_card_firewall_configure"
                         style="@style/Button.HomeScreen.Borderless"
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
+                        android:layout_height="48dp"
+                        android:minHeight="48dp"
                         android:layout_margin="1dp"
+                        android:textSize="@dimen/large_font_text_view"
                         android:background="@drawable/rounded_corner_button_bg"
                         android:text="@string/firewall_card_configure_btn" />
                 </LinearLayout>
@@ -267,11 +246,10 @@
                     <Button
                         android:id="@+id/home_fragment_pause_icon"
                         android:layout_width="50dp"
-                        android:layout_height="49dp"
+                        android:layout_height="48dp"
                         android:layout_gravity="start"
                         android:background="?android:attr/selectableItemBackground"
-                        android:padding="10dp"
-                        android:text=" " />
+                        android:padding="10dp" />
 
                     <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/fhs_dns_on_off_btn"
@@ -285,11 +263,10 @@
                     <Button
                         android:id="@+id/home_fragment_bottom_sheet_icon"
                         android:layout_width="50dp"
-                        android:layout_height="49dp"
+                        android:layout_height="48dp"
                         android:layout_gravity="end"
                         android:background="?android:attr/selectableItemBackground"
-                        android:padding="10dp"
-                        android:text=" " />
+                        android:padding="10dp" />
                 </FrameLayout>
             </com.facebook.shimmer.ShimmerFrameLayout>
 

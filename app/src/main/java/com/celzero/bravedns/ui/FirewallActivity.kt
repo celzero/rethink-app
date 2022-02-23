@@ -68,7 +68,7 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
                 return when (position) {
                     Tabs.UNIVERSAL.screen -> UniversalFirewallFragment.newInstance()
                     Tabs.LOGS.screen -> ConnectionTrackerFragment.newInstance()
-                    Tabs.ALL_APPS.screen -> FirewallAppsFragment.newInstance()
+                    Tabs.ALL_APPS.screen -> FirewallAppFragment.newInstance()
                     else -> UniversalFirewallFragment.newInstance()
                 }
             }

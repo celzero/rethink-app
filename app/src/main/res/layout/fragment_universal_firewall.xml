@@ -242,7 +242,7 @@
                 android:layout_marginBottom="10dp">
 
                 <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/firewall_univ_whitelist_icon"
+                    android:id="@+id/firewall_univ_ip_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
@@ -254,7 +254,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_toStartOf="@id/firewall_univ_whitelist_img"
-                    android:layout_toEndOf="@id/firewall_univ_whitelist_icon"
+                    android:layout_toEndOf="@id/firewall_univ_ip_icon"
                     android:orientation="vertical">
 
                     <TextView
@@ -265,17 +265,18 @@
                         android:gravity="center_vertical"
                         android:paddingTop="5dp"
                         android:paddingBottom="5dp"
-                        android:text="@string/univ_whitelist_heading"
+                        android:text="@string/univ_view_blocked_ip"
                         android:textSize="@dimen/large_font_text_view"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/firewall_univ_whitelist_count"
+                        android:id="@+id/firewall_univ_ip_desc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingTop="2dp"
                         android:paddingBottom="2dp"
                         android:textColor="?attr/primaryLightColorText"
+                        android:text="@string/univ_view_blocked_ip_desc"
                         android:textSize="@dimen/default_font_text_view" />
 
                 </LinearLayout>
@@ -289,153 +290,6 @@
                     android:src="@drawable/ic_right_arrow_small" />
             </RelativeLayout>
         </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="?attr/border" />
-
-        <RelativeLayout
-            android:id="@+id/firewall_ip_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="2dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="2dp">
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/firewall_univ_ip_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:padding="10dp"
-                android:src="@drawable/ic_local_blocklist" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toStartOf="@id/firewall_univ_ip_img"
-                android:layout_toEndOf="@id/firewall_univ_ip_icon"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/firewall_univ_ip_header"
-                    style="@style/TextAppearance.AppCompat.Subhead"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:gravity="center_vertical"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"
-                    android:text="@string/univ_view_blocked_ip"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/firewall_univ_ip_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:textSize="@dimen/default_font_text_view" />
-
-            </LinearLayout>
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/firewall_univ_ip_img"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:src="@drawable/ic_keyboard_arrow_down_gray_24dp" />
-        </RelativeLayout>
-
-        <LinearLayout
-            android:id="@+id/firewall_search_view_top"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="visible">
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/firewall_search_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="3dp"
-                android:elevation="10dp"
-                android:visibility="visible">
-
-                <LinearLayout
-                    android:id="@+id/firewall_search_ll"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="start"
-                    android:orientation="horizontal"
-                    android:weightSum="1">
-
-                    <androidx.appcompat.widget.SearchView
-                        android:id="@+id/firewall_search_view"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="start"
-                        android:layout_weight="0.9"
-                        android:fontFamily="sans-serif"
-                        android:isScrollContainer="true"
-                        app:iconifiedByDefault="false"
-                        app:queryHint="@string/search_universal_ips" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/firewall_search_add_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:layout_weight="0.05"
-                        android:padding="5dp"
-                        android:src="@drawable/ic_add"
-                        android:visibility="gone" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/firewall_search_delete_icon"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:layout_weight="0.10"
-                        android:padding="7dp"
-                        android:src="@drawable/ic_delete" />
-
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-        </LinearLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/firewall_no_rules_set_txt"
-                style="@style/TextAppearance.AppCompat.Body1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:gravity="center"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
-                android:text="@string/univ_firewall_no_ip_message"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/default_font_text_view"
-                android:visibility="invisible" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/firewall_universal_recycler"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:scrollIndicators="right"
-                android:scrollbarStyle="outsideOverlay"
-                android:visibility="invisible"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-        </RelativeLayout>
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

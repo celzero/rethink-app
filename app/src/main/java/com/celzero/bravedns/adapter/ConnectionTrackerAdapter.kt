@@ -72,8 +72,8 @@ class ConnectionTrackerAdapter(private val connectionTrackerFragment: Connection
         val connTracker: ConnectionTracker = getItem(position) ?: return
 
         holder.update(connTracker)
+        holder.setTag(connTracker)
     }
-
 
     inner class ConnectionTrackerViewHolder(private val b: ConnectionTransactionRowBinding) :
             RecyclerView.ViewHolder(b.root) {
@@ -87,6 +87,11 @@ class ConnectionTrackerAdapter(private val connectionTrackerFragment: Connection
             b.connectionParentLayout.setOnClickListener {
                 openBottomSheet(connTracker)
             }
+        }
+
+        fun setTag(connTracker: ConnectionTracker) {
+            b.connectionResponseTime.tag = connTracker.timeStamp
+            b.root.tag = connTracker.timeStamp
         }
 
         private fun openBottomSheet(ct: ConnectionTracker) {
@@ -105,7 +110,7 @@ class ConnectionTrackerAdapter(private val connectionTrackerFragment: Connection
             b.connectionFlag.text = connTracker.flag
             b.connectionIpAddress.text = connTracker.ipAddress
 
-            connTracker.ipAddress?.let {
+            connTracker.ipAddress.let {
                 val dnsCache = connectionTrackerFragment.ipToDomain(it)
                 dnsCache?.let {
                     b.connectionIpAddress.text = context.getString(R.string.ct_ip_details,
@@ -177,5 +182,3 @@ class ConnectionTrackerAdapter(private val connectionTrackerFragment: Connection
     }
 
 }
-
-

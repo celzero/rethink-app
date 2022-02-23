@@ -7,21 +7,22 @@
     android:layout_height="match_parent"
     android:background="?attr/background"
     android:orientation="vertical"
-    tools:context=".ui.FirewallActivity">
+    tools:context=".ui.DnsDetailActivity">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/dns_detail_act_tabLayout"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:background="?attr/colorPrimaryDark"
-        app:tabTextColor="?attr/invertedPrimaryTextColor"
         app:tabIndicatorColor="?attr/tabIndicator"
-        android:layout_height="wrap_content" />
+        app:tabTextColor="?attr/invertedPrimaryTextColor"
+        tools:ignore="SpeakableTextPresentCheck" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/dns_detail_act_viewpager"
         android:layout_width="match_parent"
-        android:orientation="horizontal"
+        android:layout_height="match_parent"
         android:nestedScrollingEnabled="true"
-        android:layout_height="match_parent" />
+        android:orientation="horizontal" />
 
 </LinearLayout>

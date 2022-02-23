@@ -98,6 +98,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutAppNotification.setOnClickListener(this)
         b.aboutVpnProfile.setOnClickListener(this)
         b.aboutCrashLog.setOnClickListener(this)
+        b.aboutAppVersion.setOnClickListener(this)
 
         try {
             val version = getVersionName()
@@ -363,21 +364,21 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
         val workManager = WorkManager.getInstance(requireContext().applicationContext)
         workManager.getWorkInfosByTagLiveData(WorkScheduler.APP_EXIT_INFO_ONE_TIME_JOB_TAG).observe(
-            viewLifecycleOwner, { workInfoList ->
-                val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-                Log.i(LoggerConstants.LOG_TAG_SCHEDULER,
-                      "WorkManager state: ${workInfo.state} for ${WorkScheduler.APP_EXIT_INFO_ONE_TIME_JOB_TAG}")
-                if (WorkInfo.State.SUCCEEDED == workInfo.state) {
-                    onAppExitInfoSuccess()
-                    workManager.pruneWork()
-                } else if (WorkInfo.State.CANCELLED == workInfo.state || WorkInfo.State.FAILED == workInfo.state) {
-                    onAppExitInfoFailure()
-                    workManager.pruneWork()
-                    workManager.cancelAllWorkByTag(WorkScheduler.APP_EXIT_INFO_ONE_TIME_JOB_TAG)
-                } else { // state == blocked, queued, or running
-                    // no-op
-                }
-            })
+            viewLifecycleOwner) { workInfoList ->
+            val workInfo = workInfoList?.getOrNull(0) ?: return@observe
+            Log.i(LoggerConstants.LOG_TAG_SCHEDULER,
+                  "WorkManager state: ${workInfo.state} for ${WorkScheduler.APP_EXIT_INFO_ONE_TIME_JOB_TAG}")
+            if (WorkInfo.State.SUCCEEDED == workInfo.state) {
+                onAppExitInfoSuccess()
+                workManager.pruneWork()
+            } else if (WorkInfo.State.CANCELLED == workInfo.state || WorkInfo.State.FAILED == workInfo.state) {
+                onAppExitInfoFailure()
+                workManager.pruneWork()
+                workManager.cancelAllWorkByTag(WorkScheduler.APP_EXIT_INFO_ONE_TIME_JOB_TAG)
+            } else { // state == blocked, queued, or running
+                // no-op
+            }
+        }
     }
 
     private fun onAppExitInfoFailure() {

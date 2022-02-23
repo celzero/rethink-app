@@ -62,6 +62,8 @@
         <item name="chipTextNegative">@color/chipTextNegative</item>
         <item name="chipColorBgNormal">@color/chipColorBgNormal</item>
         <item name="chipColorBgHighlight">@color/chipColorBgHighlight</item>
+
+        <item name="fabBackgroundColor">@color/fabBackground</item>
     </style>
 
     <style name="AppThemeWhite" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
@@ -112,6 +114,8 @@
         <item name="chipTextNegative">@color/chipTextNegativeLight</item>
         <item name="chipColorBgNormal">@color/chipColorBgNormalLight</item>
         <item name="chipColorBgHighlight">@color/chipColorBgHighlightLight</item>
+
+        <item name="fabBackgroundColor">@color/fabBackgroundLight</item>
     </style>
 
     <style name="AppThemeTrueBlack" parent="Theme.MaterialComponents.NoActionBar.Bridge">
@@ -163,6 +167,8 @@
         <item name="chipTextNegative">@color/chipTextNegativeBlack</item>
         <item name="chipColorBgNormal">@color/chipColorBgNormalBlack</item>
         <item name="chipColorBgHighlight">@color/chipColorBgHighlightBlack</item>
+
+        <item name="fabBackgroundColor">@color/fabBackgroundBlack</item>
     </style>
 
     <style name="CustomWidget.MaterialComponents.CompoundButton.Switch" parent="Widget.MaterialComponents.CompoundButton.Switch">
@@ -264,6 +270,7 @@
         <item name="chipMinHeight">32dp</item>
         <item name="android:textSize">14sp</item>
         <item name="chipMinTouchTargetSize">40dp</item>
+        <item name="android:textColor">@drawable/chip_text_color</item>
     </style>
 
     <style name="ThinnerChip.Action" parent="Widget.MaterialComponents.Chip.Action">
@@ -347,5 +354,12 @@
         <item name="android:stateListAnimator">@null</item>
         <item name="android:textColor">?attr/primaryTextColor</item>
         <item name="android:textSize">@dimen/home_screen_stat_text</item>
+    </style>
+
+    <style name="toggleButtonStyle" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:paddingLeft">@dimen/mtrl_btn_padding_left</item>
+        <item name="android:paddingRight">@dimen/mtrl_btn_padding_right</item>
+        <item name="strokeColor">?attr/border</item>
+        <item name="strokeWidth">@dimen/mtrl_btn_stroke_size</item>
     </style>
 </resources>

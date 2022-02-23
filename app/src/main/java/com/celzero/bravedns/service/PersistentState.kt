@@ -79,9 +79,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // whether all udp connection except dns must be dropped
     var udpBlockedSettings by booleanPref("block_udp_traffic_other_than_dns", false)
 
-    // whether the initial database inserts on first-run completed successfully, see: HomeScreenActivity#insertDefaultData
-    var isDefaultDataInsertComplete by booleanPref("initial_insert_servers_complete", false)
-
     // user chosen blocklists stored custom dictionary indexed in base64
     var localBlocklistStamp by stringPref("local_block_list_stamp", "")
 
@@ -141,7 +138,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var theme by intPref("app_theme", 0)
 
     // user selected notification action type, ref: Constants#NOTIFICATION_ACTION_STOP
-    var notificationActionType by intPref("notification_action", 1)
+    var notificationActionType by intPref("notification_action", 0)
 
     // add all networks (say, both wifi / mobile) with internet capability to the vpn tunnel
     var useMultipleNetworks by booleanPref("add_all_networks_to_vpn", false)
@@ -173,6 +170,12 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // block all newly installed apps
     var blockNewlyInstalledApp by booleanPref("block_new_app", false)
+
+    // user setting to use custom download manager or android's default download manager
+    var useCustomDownloadManager by booleanPref("use_custom_download_managet", true)
+
+    // custom download manager's last generated id
+    var customDownloaderLastGeneratedId by longPref("custom_downloader_last_generated_id", 0)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()

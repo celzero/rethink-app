@@ -47,20 +47,17 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
         const val DOWNLOAD_RETRY = 0
     }
 
-
     private var downloadIds: MutableList<Long>? = mutableListOf()
 
     override fun doWork(): Result {
 
         val startTime = inputData.getLong("workerStartTime", 0)
         downloadIds = inputData.getLongArray("downloadIds")?.toMutableList()
-        if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "AppDownloadManager - $startTime, $downloadIds")
+        if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "AppDownloadManager: $startTime, $downloadIds")
 
         if (downloadIds == null || downloadIds?.isEmpty() == true) return Result.failure()
 
-        val currentTime = SystemClock.elapsedRealtime()
-        if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "AppDownloadManager - $startTime, $currentTime")
-        if (currentTime - startTime > ONDEVICE_BLOCKLIST_DOWNLOAD_TIMEOUT_MS) {
+        if (SystemClock.elapsedRealtime() - startTime > ONDEVICE_BLOCKLIST_DOWNLOAD_TIMEOUT_MS) {
             return Result.failure()
         }
 
@@ -80,7 +77,7 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
     }
 
     private fun checkForDownload(context: Context, downloadIds: MutableList<Long>?): Int {
-        //Check for the download success from the receiver
+        // check for the download success from the receiver
         val downloadIdsIterator = downloadIds?.iterator()
 
         while (downloadIdsIterator?.hasNext() == true) {
@@ -121,7 +118,7 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
             }
         }
 
-        // Send the status as success when the download ids are cleared
+        // send the status as success when the download ids are cleared
         if (downloadIds?.isEmpty() == true) {
             Log.i(LOG_TAG_DOWNLOAD, "files downloaded successfully")
             return DOWNLOAD_SUCCESS

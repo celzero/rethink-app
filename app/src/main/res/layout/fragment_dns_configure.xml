@@ -23,17 +23,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="4dp"
-                android:clickable="true"
-                android:focusable="true"
-                app:cardElevation="4dp">
+                android:clickable="false"
+                android:focusable="false"
+                app:cardElevation="8dp">
 
                 <RelativeLayout
                     android:id="@+id/dc_on_device_block_rl"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingStart="15dp"
+                    android:paddingStart="10dp"
                     android:paddingTop="10dp"
-                    android:paddingEnd="5dp"
+                    android:paddingEnd="10dp"
                     android:paddingBottom="10dp">
 
                     <RelativeLayout
@@ -51,11 +51,12 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_centerVertical="true"
-                                android:layout_margin="5dp"
-                                android:src="@drawable/ic_app_info" />
+                                android:src="@drawable/ic_app_info"
+                                android:padding="10dp"
+                                />
 
                             <LinearLayout
-
+                                android:padding="5dp"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_centerVertical="true"
@@ -68,8 +69,7 @@
                                     android:layout_height="wrap_content"
                                     android:padding="3dp"
                                     android:text="On-device blocklist"
-                                    android:textColor="?attr/primaryTextColor"
-                                    android:textSize="@dimen/default_font_text_view" />
+                                    android:textColor="?attr/primaryTextColor" />
 
                                 <TextView
                                     android:id="@+id/dc_on_device_block_desc"
@@ -125,9 +125,8 @@
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentStart="true"
                                 android:layout_centerVertical="true"
-                                android:padding="5dp"
                                 android:layout_marginStart="5dp"
-                                android:text="On-device blocklist"
+                                android:padding="5dp"
                                 android:textColor="?attr/primaryTextColor" />
 
                             <Button
@@ -162,15 +161,15 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:visibility="visible"
-                app:cardElevation="4dp">
+                app:cardElevation="8dp">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:paddingStart="5dp"
-                    android:paddingTop="10dp"
+                    android:paddingTop="5dp"
                     android:paddingEnd="5dp"
-                    android:paddingBottom="10dp">
+                    android:paddingBottom="5dp">
 
                     <TextView
                         android:id="@+id/dc_custom_blocklist"
@@ -180,7 +179,7 @@
                         android:drawablePadding="15dp"
                         android:gravity="center_vertical"
                         android:padding="15dp"
-                        android:text="My Custom blocklist"
+                        android:text="Allow/Deny domains list"
                         android:textColor="?attr/primaryTextColor"
                         app:drawableEndCompat="@drawable/ic_right_arrow_small"
                         app:drawableStartCompat="@drawable/ic_app_info" />
@@ -193,39 +192,64 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="4dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:visibility="visible"
-                app:cardElevation="4dp">
+                android:clickable="false"
+                android:focusable="false"
+                app:cardElevation="8dp">
 
                 <RelativeLayout
                     android:id="@+id/dc_rethink_rl"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingStart="5dp"
+                    android:paddingStart="10dp"
                     android:paddingTop="10dp"
-                    android:paddingEnd="5dp"
+                    android:paddingEnd="10dp"
                     android:paddingBottom="10dp">
 
-                    <TextView
-                        android:id="@+id/dc_rethink_heading"
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/dc_rethink_plus_icon_iv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
-                        android:layout_gravity="center"
-                        android:drawablePadding="15dp"
-                        android:gravity="center"
-                        android:padding="15dp"
-                        android:text="DNS - Rethink Configurable"
-                        android:textColor="?attr/primaryTextColor"
-                        app:drawableStartCompat="@drawable/ic_app_info" />
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:src="@drawable/ic_app_info" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/dc_rethink_plus_icon_iv"
+                        android:layout_toStartOf="@id/dc_rethink_button"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/dc_rethink_heading"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:padding="5dp"
+                            android:text="Rethink DNS Plus"
+                            android:textColor="?attr/primaryTextColor" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:padding="5dp"
+                            android:text="Customizable Rethink DNS endpoint"
+                            android:textSize="@dimen/small_font_text_view" />
+                    </LinearLayout>
 
                     <Button
-                        android:id="@+id/dc_rethink__button"
+                        android:id="@+id/dc_rethink_button"
                         style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
                         android:text="ACTIVE"
                         android:textColor="?attr/secondaryTextColor" />
 
@@ -241,15 +265,15 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:visibility="visible"
-                app:cardElevation="4dp">
+                app:cardElevation="8dp">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:paddingStart="5dp"
-                    android:paddingTop="10dp"
+                    android:paddingTop="5dp"
                     android:paddingEnd="5dp"
-                    android:paddingBottom="10dp">
+                    android:paddingBottom="5dp">
 
                     <TextView
                         android:id="@+id/dc_more_dns"
@@ -272,18 +296,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="4dp"
-                android:clickable="true"
-                android:focusable="true"
-                app:cardElevation="4dp">
+                android:clickable="false"
+                android:focusable="false"
+                app:cardElevation="8dp">
 
                 <RelativeLayout
                     android:id="@+id/settings_activity_fav_icon_rl"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="5dp"
-                    android:paddingTop="10dp"
-                    android:paddingEnd="5dp"
-                    android:paddingBottom="10dp">
+                    android:layout_height="wrap_content">
 
 
                     <TextView
@@ -296,7 +316,6 @@
                         android:padding="15dp"
                         android:text="Other DNS settings"
                         android:textColor="?attr/primaryTextColor" />
-
 
                     <RelativeLayout
                         android:id="@+id/dc_show_fav_icon_rl"

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="3dp"
+    android:layout_marginEnd="3dp"
+    android:layout_marginBottom="1dp">
+
+    <RelativeLayout
+        android:id="@+id/custom_ips_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:layout_marginStart="5dp">
+
+        <TextView
+            android:id="@+id/custom_ips_label_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_toStartOf="@id/custom_ips_allow_icon"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/large_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/custom_ips_allow_icon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="10dp"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/custom_ips_block_icon"
+            android:src="@drawable/allowed" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/custom_ips_block_icon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerVertical="true"
+            android:padding="10dp"
+            android:layout_toStartOf="@id/custom_ips_delete_icon"
+            android:src="@drawable/dis_allowed" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/custom_ips_delete_icon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="10dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_delete" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

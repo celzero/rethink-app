@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 RethinkDNS and its authors
+ * Copyright 2021 RethinkDNS and its authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,48 +16,45 @@
 package com.celzero.bravedns.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.FirewallExpandableAppListAdapter
-import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.database.CategoryInfo
-import com.celzero.bravedns.database.CategoryInfoRepository
+import com.celzero.bravedns.adapter.FirewallAppListAdapter
 import com.celzero.bravedns.database.RefreshDatabase
-import com.celzero.bravedns.databinding.FragmentFirewallAllAppsBinding
+import com.celzero.bravedns.databinding.FragmentFirewallAppListBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.viewmodel.FirewallAppViewModel
+import com.celzero.bravedns.viewmodel.AppInfoViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import kotlin.collections.set
 
-class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
+class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
                             SearchView.OnQueryTextListener {
+    private val b by viewBinding(FragmentFirewallAppListBinding::bind)
 
-    private val b by viewBinding(FragmentFirewallAllAppsBinding::bind)
-    private var adapterListExpandable: FirewallExpandableAppListAdapter? = null
+    private val appInfoViewModel: AppInfoViewModel by viewModel()
+    private val persistentState by inject<PersistentState>()
+    private val refreshDatabase by inject<RefreshDatabase>()
 
-    private var appCategories: MutableList<CategoryInfo> = ArrayList()
-    private var filteredCategories: MutableList<CategoryInfo> = ArrayList()
-    private var listData: HashMap<CategoryInfo, List<AppInfo>> = HashMap()
+    private var layoutManager: RecyclerView.LayoutManager? = null
 
     private lateinit var animation: Animation
 
-    private val firewallAppInfoViewModel: FirewallAppViewModel by viewModel()
-
-    private val categoryInfoRepository by inject<CategoryInfoRepository>()
-    private val refreshDatabase by inject<RefreshDatabase>()
-    private val persistentState by inject<PersistentState>()
+    private val filters = MutableLiveData<Filters>()
 
     companion object {
         fun newInstance() = FirewallAppFragment()
@@ -69,28 +66,191 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
         private const val ANIMATION_END_DEGREE = 360.0f
 
         private const val REFRESH_TIMEOUT: Long = 4000
-        private const val QUERY_TEXT_TIMEOUT: Long = 1000
+        private const val QUERY_TEXT_TIMEOUT: Long = 600
+
+        // TODO: Find a solution to replace the below query usage
+        // ref: https://stackoverflow.com/questions/61055772/android-room-dao-order-by-case-not-working
+        private const val ORDERBY_DEFAULT = " lower(appName)"
+        private const val ORDERBY_BLOCKED = " CASE firewallStatus WHEN 1 THEN 0 WHEN 0 THEN 1 WHEN 2 THEN 2 WHEN 3 THEN 3 WHEN 4 THEN 4 END, lower(appName)"
+        private const val ORDERBY_WHITELISTED = " CASE firewallStatus WHEN 2 THEN 0 WHEN 0 THEN 1 WHEN 1 THEN 2 WHEN 3 THEN 3 WHEN 4 THEN 4 END, lower(appName)"
+        private const val ORDERBY_EXCLUDED = " CASE firewallStatus WHEN 3 THEN 0 WHEN 0 THEN 1 WHEN 1 THEN 2 WHEN 2 THEN 3 WHEN 4 THEN 4 END, lower(appName)"
+
+        /*
+        private const val ORDERBY_ALLOWED = " CASE firewallStatus WHEN 0 THEN 0 WHEN 1 THEN 1 WHEN 2 THEN 2 WHEN 3 THEN 3 WHEN 4 THEN 4 END, lower(appName)"
+        private const val ORDERBY_RESTRICTED = " CASE firewallStatus WHEN 1 THEN 0 WHEN 0 THEN 1 WHEN 2 THEN 2 WHEN 3 THEN 3 WHEN 4 THEN 4 END, lower(appName)"
+        private const val ORDERBY_BLOCKED = " CASE firewallStatus WHEN 2 THEN 0 WHEN 0 THEN 1 WHEN 1 THEN 2 WHEN 3 THEN 3 WHEN 4 THEN 4 END, lower(appName)"
+        private const val ORDERBY_WHITELISTED = " CASE firewallStatus WHEN 3 THEN 0 WHEN 0 THEN 1 WHEN 1 THEN 2 WHEN 2 THEN 3 WHEN 4 THEN 4 END, lower(appName)"
+        private const val ORDERBY_EXCLUDED = " CASE firewallStatus WHEN 4 THEN 0 WHEN 0 THEN 1 WHEN 1 THEN 2 WHEN 2 THEN 3 WHEN 3 THEN 4 END, lower(appName)"
+         */
     }
 
+    enum class TopLevelFilter(val id: Int) {
+        ALL(0), INSTALLED(1), SYSTEM(2)
+    }
+
+    enum class SortFilter(val id: Int) {
+        NONE(0), BLOCKED(2), WHITELISTED(3), EXCLUDED(4); //RESTRICTED(1),
+
+        companion object {
+            fun getSortFilter(id: Int): SortFilter {
+                return when (id) {
+                    NONE.id -> NONE
+                    BLOCKED.id -> BLOCKED
+                    WHITELISTED.id -> WHITELISTED
+                    EXCLUDED.id -> EXCLUDED
+                    else -> NONE
+                }
+            }
+        }
+    }
+
+    class Filters {
+        var categoryFilters: MutableSet<String> = mutableSetOf()
+        var topLevelFilter = TopLevelFilter.ALL
+        var sortType = SortFilter.NONE
+        var searchString: String = ""
+
+        fun getSortByQuery(): String {
+            return when (sortType) {
+                SortFilter.NONE -> ORDERBY_DEFAULT
+                SortFilter.BLOCKED -> ORDERBY_BLOCKED
+                SortFilter.WHITELISTED -> ORDERBY_WHITELISTED
+                SortFilter.EXCLUDED -> ORDERBY_EXCLUDED
+            }
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initView()
+        initObserver()
+        setupClickListener()
+    }
+
+    private fun initObserver() {
+        filters.observe(this.viewLifecycleOwner) {
+            appInfoViewModel.setFilter(it)
+            resetFirewallIcons()
+        }
+    }
+
+    override fun onQueryTextSubmit(query: String): Boolean {
+        addQueryToFilters(query)
+        return true
+    }
+
+    override fun onQueryTextChange(query: String): Boolean {
+        Utilities.delay(QUERY_TEXT_TIMEOUT, lifecycleScope) {
+            if (isAdded) {
+                addQueryToFilters(query)
+            }
+        }
+        return true
+    }
+
+    private fun addQueryToFilters(query: String) {
+        val a = filterObserver()
+        a.value?.searchString = query
+        filters.postValue(a.value)
+    }
+
+    private fun setupClickListener() {
+        b.ffaFilterIcon.setOnClickListener {
+            openFilterBottomSheet()
+        }
+
+        b.ffaRefreshList.setOnClickListener {
+            b.ffaRefreshList.isEnabled = false
+            b.ffaRefreshList.animation = animation
+            b.ffaRefreshList.startAnimation(animation)
+            refreshDatabase()
+            Utilities.delay(REFRESH_TIMEOUT, lifecycleScope) {
+                if (isAdded) {
+                    b.ffaRefreshList.isEnabled = true
+                    b.ffaRefreshList.clearAnimation()
+                    Utilities.showToastUiCentered(requireContext(),
+                                                  getString(R.string.refresh_complete),
+                                                  Toast.LENGTH_SHORT)
+                }
+            }
+        }
+        
+        b.ffaToggleAllWifi.setOnClickListener {
+            updateWifi()
+        }
+
+        b.ffaToggleAllMobileData.setOnClickListener {
+            updateMobileData()
+        }
+    }
+
+    private fun resetFirewallIcons() {
+        b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_on_grey)
+        b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_on_grey)
+    }
+
+    private fun updateMobileData() {
+        if (b.ffaToggleAllMobileData.tag == 0) {
+            b.ffaToggleAllMobileData.tag = 1
+            b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_off)
+            io {
+                appInfoViewModel.updateMobileDataStatus(true)
+            }
+            return
+        }
+
+        b.ffaToggleAllMobileData.tag = 0
+        b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_on)
+        io {
+            appInfoViewModel.updateMobileDataStatus(false)
+        }
+    }
+
+    private fun updateWifi() {
+        if (b.ffaToggleAllWifi.tag == 0) {
+            b.ffaToggleAllWifi.tag = 1
+            b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_off)
+            io {
+                appInfoViewModel.updateWifiStatus(true)
+            }
+            return
+        }
+
+        b.ffaToggleAllWifi.tag = 0
+        b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_on)
+        io {
+            appInfoViewModel.updateWifiStatus(false)
+        }
+    }
+
+    fun filterObserver(): MutableLiveData<Filters> {
+        return filters
+    }
 
     private fun initView() {
-        b.firewallExpandableList.visibility = View.VISIBLE
-        b.firewallUpdateProgress.visibility = View.VISIBLE
-        b.firewallAppRefreshList.isEnabled = true
-
-        adapterListExpandable = FirewallExpandableAppListAdapter(requireContext(),
-                                                                 viewLifecycleOwner,
-                                                                 persistentState,
-                                                                 filteredCategories, listData)
-        b.firewallExpandableList.setAdapter(adapterListExpandable)
-
-        b.firewallExpandableList.setOnGroupClickListener { _, _, _, _ ->
-            false
-        }
-        b.firewallExpandableList.setOnGroupExpandListener {}
-        b.firewallCategorySearch.setOnQueryTextListener(this)
-
+        initListAdapter()
+        b.ffaSearch.setOnQueryTextListener(this)
         addAnimation()
+    }
+
+    private fun initListAdapter() {
+        b.ffaAppList.setHasFixedSize(true)
+        layoutManager = LinearLayoutManager(requireContext())
+        b.ffaAppList.layoutManager = layoutManager
+        val recyclerAdapter = FirewallAppListAdapter(requireContext(), viewLifecycleOwner,
+                                                     persistentState)
+        appInfoViewModel.appInfos.observe(viewLifecycleOwner,
+                                          androidx.lifecycle.Observer(recyclerAdapter::submitList))
+        b.ffaAppList.adapter = recyclerAdapter
+        val dividerItemDecoration = DividerItemDecoration(b.ffaAppList.context,
+                                                          (layoutManager as LinearLayoutManager).orientation)
+        b.ffaAppList.addItemDecoration(dividerItemDecoration)
+
+    }
+
+    private fun openFilterBottomSheet() {
+        val bottomSheetFragment = FirewallAppFilterBottomSheet(this)
+        bottomSheetFragment.show(requireActivity().supportFragmentManager, bottomSheetFragment.tag)
     }
 
     private fun addAnimation() {
@@ -101,112 +261,10 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
         animation.duration = ANIMATION_DURATION
     }
 
-    private fun setupClickListeners() {
-
-        b.firewallCategorySearch.setOnClickListener {
-            b.firewallCategorySearch.requestFocus()
-            b.firewallCategorySearch.onActionViewExpanded()
-        }
-
-        b.firewallAppRefreshList.setOnClickListener {
-            b.firewallAppRefreshList.isEnabled = false
-            b.firewallAppRefreshList.animation = animation
-            b.firewallAppRefreshList.startAnimation(animation)
-            refreshDatabase()
-            Utilities.delay(REFRESH_TIMEOUT, lifecycleScope) {
-                if (isAdded) {
-                    b.firewallAppRefreshList.isEnabled = true
-                    b.firewallAppRefreshList.clearAnimation()
-                    Utilities.showToastUiCentered(requireContext(),
-                                                  getString(R.string.refresh_complete),
-                                                  Toast.LENGTH_SHORT)
-                    adapterListExpandable?.notifyDataSetChanged()
-                }
-            }
-        }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setupLivedataObservers()
-        initView()
-        setupClickListeners()
-    }
-
     private fun refreshDatabase() {
         io {
             refreshDatabase.refreshAppInfoDatabase()
         }
-    }
-
-    override fun onQueryTextSubmit(query: String): Boolean {
-        searchAndExpandCategories(query)
-        return false
-    }
-
-    override fun onQueryTextChange(query: String): Boolean {
-        Utilities.delay(QUERY_TEXT_TIMEOUT, lifecycleScope) {
-            if (isAdded) {
-                searchAndExpandCategories(query)
-            }
-        }
-        return true
-    }
-
-    private fun searchAndExpandCategories(query: String) {
-        firewallAppInfoViewModel.setFilter(query)
-
-        filteredCategories.forEachIndexed { i, c ->
-            if (query.isEmpty()) {
-                b.firewallExpandableList.collapseGroup(i)
-            } else {
-                listData[c]?.let {
-                    if (it.count() > 0) {
-                        b.firewallExpandableList.expandGroup(i)
-                    }
-                }
-            }
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        adapterListExpandable?.notifyDataSetChanged()
-    }
-
-    private fun setupLivedataObservers() {
-
-        categoryInfoRepository.getAppCategoryForLiveData().observe(viewLifecycleOwner, {
-            appCategories = it.toMutableList()
-        })
-
-        firewallAppInfoViewModel.firewallAppDetailsList.observe(viewLifecycleOwner) { itAppInfo ->
-            listData.clear()
-            filteredCategories = appCategories.toMutableList()
-            val iterator = filteredCategories.iterator()
-            while (iterator.hasNext()) {
-                val item = iterator.next()
-                val appList = itAppInfo.filter { a -> a.appCategory == item.categoryName }
-                listData[item] = appList
-                if (appList.isNotEmpty()) {
-                    listData[item] = appList
-                } else {
-                    iterator.remove()
-                }
-            }
-
-            adapterListExpandable?.updateData(filteredCategories, listData)
-            hideProgressBar()
-            showExpandableList()
-        }
-    }
-
-    private fun hideProgressBar() {
-        b.firewallUpdateProgress.visibility = View.GONE
-    }
-
-    private fun showExpandableList() {
-        b.firewallExpandableList.visibility = View.VISIBLE
     }
 
     private fun io(f: suspend () -> Unit) {
@@ -216,5 +274,4 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_all_apps),
             }
         }
     }
-
 }

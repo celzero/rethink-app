@@ -48,14 +48,8 @@ class RethinkDnsApplication : Application() {
         if (!BuildConfig.DEBUG) return
         // Uncomment the code below to enable the StrictModes.
         // To test the apps disk read/writes, network usages.
-        /*StrictMode.setThreadPolicy(
-            StrictMode.ThreadPolicy.Builder()
-            .detectAll()
-            .penaltyLog()
-            .permitDiskReads()
-            .permitDiskWrites()
-            .permitNetwork()
-            .build())*/
+        StrictMode.setThreadPolicy(
+            StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().permitDiskReads().permitDiskWrites().permitNetwork().build())
         StrictMode.setVmPolicy(
             StrictMode.VmPolicy.Builder().detectAll().detectLeakedSqlLiteObjects().penaltyLog().build())
     }

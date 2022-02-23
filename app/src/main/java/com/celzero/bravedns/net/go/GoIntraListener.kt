@@ -22,7 +22,7 @@ import androidx.collection.LongSparseArray
 import com.celzero.bravedns.net.dns.DnsPacket
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.service.DNSLogTracker
+import com.celzero.bravedns.service.DnsLogTracker
 import com.celzero.bravedns.service.QueryTracker
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
@@ -33,6 +33,9 @@ import doh.Token
 import intra.Listener
 import intra.TCPSocketSummary
 import intra.UDPSocketSummary
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.*
@@ -43,7 +46,7 @@ object GoIntraListener : Listener, KoinComponent {
     override fun onTCPSocketClosed(summary: TCPSocketSummary?) {}
     override fun onUDPSocketClosed(summary: UDPSocketSummary?) {}
     private val dnsLatencyTracker by inject<QueryTracker>()
-    private val dnsLogTracker by inject<DNSLogTracker>()
+    private val dnsLogTracker by inject<DnsLogTracker>()
 
     // UDP is often used for one-off messages and pings.  The relative overhead of reporting metrics
     // on these short messages would be large, so we only report metrics on sockets that transfer at
@@ -141,6 +144,12 @@ object GoIntraListener : Listener, KoinComponent {
         transaction.blocklist = summary.blocklists
         transaction.isDNSCrypt = false
         recordTransaction(transaction)
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            f()
+        }
     }
 
     private fun recordTransaction(transaction: Transaction?) {

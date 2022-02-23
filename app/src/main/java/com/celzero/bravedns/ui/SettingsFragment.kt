@@ -96,6 +96,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         b.settingsActivityKillAppSwitch.isChecked = persistentState.killAppOnFirewall
         // check for app updates
         b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
+        // use custom download manager
+        b.settingsActivityDownloaderSwitch.isChecked = persistentState.useCustomDownloadManager
 
         observeCustomProxy()
 
@@ -110,7 +112,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             excludeAppAdapter::submitList))
 
         FirewallManager.getApplistObserver().observe(viewLifecycleOwner, {
-            val excludedCount = it.filter { a -> a.isExcluded }.count()
+            val excludedCount = it.filter { a -> a.firewallStatus == FirewallManager.AppStatus.EXCLUDE.id }.count()
             b.settingsActivityExcludeAppsCountText.text = getString(R.string.ex_dialog_count,
                                                                     excludedCount.toString())
         })
@@ -356,6 +358,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         b.settingsActivityNotificationRl.setOnClickListener {
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.settingsActivityNotificationRl)
             showNotificationActionDialog()
+        }
+
+        b.settingsActivityDownloaderSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
+            persistentState.useCustomDownloadManager = b
         }
     }
 

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bsac_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="vertical"
+    android:paddingBottom="60dp">
+
+    <TextView
+        android:layout_width="60dp"
+        android:layout_height="3dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="?attr/border" />
+
+    <TextView
+        android:id="@+id/bsac_heading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:padding="5dp"
+        android:textColor="?attr/primaryLightColorText"
+        android:textIsSelectable="true"
+        android:textSize="@dimen/extra_large_font_text_view"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/bsac_desc"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:text="@string/hs_btm_sheet_lock_down"
+        android:textColor="?attr/primaryTextColor"
+        android:textSize="@dimen/default_font_text_view" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="10dp"
+        android:background="?attr/border" />
+
+    <TextView
+        android:id="@+id/bsac_unblock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:fontFamily="sans-serif-medium"
+        android:padding="10dp"
+        android:text="Unblock"
+        android:textColor="?attr/primaryTextColor"
+        android:textSize="@dimen/extra_large_font_text_view"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/bsac_block"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:fontFamily="sans-serif-medium"
+        android:padding="10dp"
+        android:text="Block"
+        android:textColor="?attr/primaryTextColor"
+        android:textSize="@dimen/extra_large_font_text_view"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/bsac_block_all"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:fontFamily="sans-serif-medium"
+        android:padding="10dp"
+        android:text="Block for all apps ⭐"
+        android:textColor="?attr/primaryTextColor"
+        android:textSize="@dimen/extra_large_font_text_view"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/bsac_whitelist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:fontFamily="sans-serif-medium"
+        android:padding="10dp"
+        android:text="Whitelist"
+        android:textColor="?attr/primaryTextColor"
+        android:textSize="@dimen/extra_large_font_text_view"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/bsac_whitelist_all"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:fontFamily="sans-serif-medium"
+        android:padding="10dp"
+        android:text="Whitelist for all apps  ⭐"
+        android:textColor="?attr/primaryTextColor"
+        android:textSize="@dimen/extra_large_font_text_view"
+        android:visibility="gone" />
+
+
+    <TextView
+        android:id="@+id/bsac_whitelist_remove"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:fontFamily="sans-serif-medium"
+        android:padding="10dp"
+        android:text="Remove from whitelist"
+        android:textColor="?attr/primaryTextColor"
+        android:textSize="@dimen/extra_large_font_text_view"
+        android:visibility="gone" />
+
+
+</LinearLayout>

@@ -82,9 +82,6 @@ class PermissionManagerFragment : Fragment(), SearchView.OnQueryTextListener {
                       "Cannot open orbot-bottom-sheet, activity does not exist")
                 return@setOnClickListener
             }
-            val bottomFilterSheetFragment = FilterAndSortBottomFragment()
-            bottomFilterSheetFragment.show(requireActivity().supportFragmentManager,
-                                           bottomFilterSheetFragment.tag)
         }
 
         return view

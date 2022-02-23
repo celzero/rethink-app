@@ -22,37 +22,32 @@ object DatabaseModule {
     private val databaseModule = module {
         single { AppDatabase.buildDatabase(androidContext()) }
         single {
-            RefreshDatabase(androidContext(), get(), get(), get(), get(), get(), get(), get(),
-                            get())
+            RefreshDatabase(androidContext(), get(), get(), get())
         }
     }
     private val daoModule = module {
-        single<AppInfoDAO> { get<AppDatabase>().appInfoDAO() }
-        single<AppInfoViewDAO> { get<AppDatabase>().appInfoViewDAO() }
-        single<BlockedConnectionsDAO> { get<AppDatabase>().blockedConnectionsDAO() }
-        single<CategoryInfoDAO> { get<AppDatabase>().categoryInfoDAO() }
-        single<ConnectionTrackerDAO> { get<AppDatabase>().connectionTrackerDAO() }
-        single<DNSCryptEndpointDAO> { get<AppDatabase>().dnsCryptEndpointDAO() }
-        single<DNSCryptRelayEndpointDAO> { get<AppDatabase>().dnsCryptRelayEndpointDAO() }
-        single<DNSLogDAO> { get<AppDatabase>().dnsLogDAO() }
-        single<DNSProxyEndpointDAO> { get<AppDatabase>().dnsProxyEndpointDAO() }
-        single<DoHEndpointDAO> { get<AppDatabase>().dohEndpointsDAO() }
-        single<ProxyEndpointDAO> { get<AppDatabase>().proxyEndpointDAO() }
-        single<CustomDomainDAO> { get<AppDatabase>().customEndpointDAO() }
+        single { get<AppDatabase>().appInfoDAO() }
+        single { get<AppDatabase>().connectionTrackerDAO() }
+        single { get<AppDatabase>().dnsCryptEndpointDAO() }
+        single { get<AppDatabase>().dnsCryptRelayEndpointDAO() }
+        single { get<AppDatabase>().dnsLogDAO() }
+        single { get<AppDatabase>().dnsProxyEndpointDAO() }
+        single { get<AppDatabase>().dohEndpointsDAO() }
+        single { get<AppDatabase>().proxyEndpointDAO() }
+        single { get<AppDatabase>().customDomainEndpointDAO() }
+        single { get<AppDatabase>().customIpEndpointDao() }
     }
     private val repositoryModule = module {
-        single { AppInfoRepository(get()) }
-        single { AppInfoViewRepository(get()) }
-        single { BlockedConnectionsRepository(get()) }
-        single { CategoryInfoRepository(get()) }
-        single { ConnectionTrackerRepository(get()) }
-        single { DNSCryptEndpointRepository(get()) }
-        single { DNSCryptRelayEndpointRepository(get()) }
-        single { DNSLogRepository(get()) }
-        single { DNSProxyEndpointRepository(get()) }
-        single { DoHEndpointRepository(get()) }
-        single { ProxyEndpointRepository(get()) }
-        single { CustomDomainRepository(get()) }
+        single { get<AppDatabase>().appInfoRepository() }
+        single { get<AppDatabase>().connectionTrackerRepository() }
+        single { get<AppDatabase>().dnsCryptEndpointRepository() }
+        single { get<AppDatabase>().dnsCryptRelayEndpointRepository() }
+        single { get<AppDatabase>().dnsLogRepository() }
+        single { get<AppDatabase>().dnsProxyEndpointRepository() }
+        single { get<AppDatabase>().dohEndpointRepository() }
+        single { get<AppDatabase>().proxyEndpointRepository() }
+        single { get<AppDatabase>().customDomainRepository() }
+        single { get<AppDatabase>().customIpRepository() }
     }
 
     val modules = listOf(databaseModule, daoModule, repositoryModule)

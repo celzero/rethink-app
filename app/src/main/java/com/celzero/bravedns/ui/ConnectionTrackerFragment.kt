@@ -24,16 +24,17 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ConnectionTrackerAdapter
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.databinding.ActivityConnectionTrackerBinding
-import com.celzero.bravedns.service.DNSLogTracker
+import com.celzero.bravedns.service.DnsLogTracker
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.CustomLinearLayoutManager
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.launch
@@ -55,7 +56,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     private var filterType: TopLevelFilter = TopLevelFilter.ALL
     private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
     private val persistentState by inject<PersistentState>()
-    private val dnsLogTracker by inject<DNSLogTracker>()
+    private val dnsLogTracker by inject<DnsLogTracker>()
 
     companion object {
         fun newInstance() = ConnectionTrackerFragment()
@@ -82,12 +83,14 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         b.connectionCardViewTop.visibility = View.VISIBLE
 
         b.recyclerConnection.setHasFixedSize(true)
-        layoutManager = LinearLayoutManager(requireContext())
+        layoutManager = CustomLinearLayoutManager(requireContext())
         b.recyclerConnection.layoutManager = layoutManager
         val recyclerAdapter = ConnectionTrackerAdapter(this)
         viewModel.connectionTrackerList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
             recyclerAdapter::submitList))
         b.recyclerConnection.adapter = recyclerAdapter
+
+        setupRecyclerScrollListener()
 
         b.connectionSearch.setOnQueryTextListener(this)
         b.connectionSearch.setOnClickListener {
@@ -107,6 +110,34 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
 
         remakeParentFilterChipsUi()
         remakeChildFilterChipsUi(FirewallRuleset.getBlockedRules())
+    }
+
+    private fun setupRecyclerScrollListener() {
+        val scrollListener = object : RecyclerView.OnScrollListener() {
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                if (recyclerView.getChildAt(0).tag == null) return
+
+                val tag: Long = recyclerView.getChildAt(0).tag as Long
+
+                if (dy > 0) {
+                    b.connectionListScrollHeader.text = Utilities.formatToRelativeTime(tag)
+                    b.connectionListScrollHeader.visibility = View.VISIBLE
+                } else {
+                    b.connectionListScrollHeader.visibility = View.GONE
+                }
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    b.connectionListScrollHeader.visibility = View.GONE
+                }
+            }
+        }
+        b.recyclerConnection.addOnScrollListener(scrollListener)
     }
 
     private fun toggleParentChipsUi() {
@@ -149,7 +180,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     }
 
     private fun makeParentChip(id: Int, label: String, checked: Boolean): Chip {
-        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, null, false) as Chip
+        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
         chip.tag = id
         chip.text = label
         chip.isChecked = checked
@@ -166,7 +197,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     }
 
     private fun makeChildChip(id: String, titleResId: Int): Chip {
-        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, null, false) as Chip
+        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
         chip.text = getString(titleResId)
         chip.chipIcon = ContextCompat.getDrawable(requireContext(),
                                                   FirewallRuleset.getRulesIcon(id))
@@ -231,7 +262,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         builder.create().show()
     }
 
-    fun ipToDomain(ip: String): DNSLogTracker.DnsCacheRecord? {
+    fun ipToDomain(ip: String): DnsLogTracker.DnsCacheRecord? {
         return dnsLogTracker.ipDomainLookup.getIfPresent(ip)
     }
 

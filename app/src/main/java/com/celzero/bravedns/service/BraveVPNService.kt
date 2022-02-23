@@ -23,9 +23,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.pm.PackageManager
-import android.net.Network
-import android.net.ProxyInfo
-import android.net.VpnService
+import android.net.*
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.ParcelFileDescriptor
@@ -40,13 +38,11 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.celzero.bravedns.R
-import com.celzero.bravedns.automaton.CustomDomainManager
+import com.celzero.bravedns.automaton.DomainRulesManager
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.automaton.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
-import com.celzero.bravedns.automaton.FirewallRules
-import com.celzero.bravedns.automaton.FirewallRules.UID_EVERYBODY
+import com.celzero.bravedns.automaton.IpRulesManager
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.data.ConnectionRules
 import com.celzero.bravedns.data.IPDetails
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.RefreshDatabase
@@ -87,6 +83,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
 
     @GuardedBy("vpnController") private var connectionMonitor: ConnectionMonitor? = null
     @GuardedBy("vpnController") private var vpnAdapter: GoVpnAdapter? = null
+    private var connectionType: ConnectionMonitor.ConnectionType = ConnectionMonitor.ConnectionType.NONE
 
     companion object {
         const val SERVICE_ID = 1 // Only has to be unique within this app.
@@ -132,7 +129,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     private val appConfig by inject<AppConfig>()
     private val orbotHelper by inject<OrbotHelper>()
     private val ipTracker by inject<IPTracker>()
-    private val dnsLogTracker by inject<DNSLogTracker>()
+    private val dnsLogTracker by inject<DnsLogTracker>()
     private val persistentState by inject<PersistentState>()
     private val refreshDatabase by inject<RefreshDatabase>()
 
@@ -160,7 +157,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
 
     override fun block(protocol: Int, _uid: Long, sourceAddress: String,
                        destAddress: String): Boolean {
-
         handleVpnLockdownStateAsync()
 
         val first = sourceAddress.split(":")
@@ -178,7 +174,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         }
 
         // skip the block-ceremony for dns conns
-        if (isDns(dstPort) && isVpnDns(dstIp)) return false
+        if (isDns(dstPort) && isVpnDns(dstIp)) {
+            return false
+        }
 
         // FIXME: replace currentTimeMillis with elapsed-time
         val connInfo = IPDetails(uid, srcIp, srcPort, dstIp, dstPort,
@@ -210,6 +208,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
 
             val uid = connInfo.uid
             val appStatus = FirewallManager.appStatus(uid)
+            val connectionStatus = FirewallManager.connectionStatus(uid)
 
             if (allowOrbot(uid)) {
                 return FirewallRuleset.RULE9B
@@ -229,7 +228,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 }
             }
 
-            if (FirewallManager.AppStatus.WHITELISTED == appStatus) {
+            if (FirewallManager.AppStatus.WHITELIST == appStatus) {
                 return if (dnsProxied(connInfo.destPort)) {
                     FirewallRuleset.RULE9
                 } else {
@@ -237,15 +236,27 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 }
             }
 
-            if (ipBlocked(connInfo.destIP, connInfo.destPort, connInfo.protocol)) {
-                return FirewallRuleset.RULE2
-            }
-
-            if (FirewallManager.AppStatus.BLOCKED == appStatus) {
+            if (appBlocked(appStatus, connectionStatus)) {
                 if (persistentState.killAppOnFirewall) {
                     killFirewalledApplication(uid)
                 }
                 return FirewallRuleset.RULE1
+            }
+
+            // ip status should be considered only if the app is not blocked.
+            // earlier the ip rules had only block so checking ips before app is valid
+            // case: when the ip is whitelisted and the app is blocked, the
+            // connections are going through.
+            when (ipStatus(uid, connInfo.destIP)) {
+                IpRulesManager.IpRuleStatus.BLOCK -> {
+                    return FirewallRuleset.RULE2
+                }
+                IpRulesManager.IpRuleStatus.WHITELIST -> {
+                    return FirewallRuleset.RULE2B
+                }
+                IpRulesManager.IpRuleStatus.NONE -> {
+                    // no-op; pass-through
+                }
             }
 
             if (deviceLocked()) {
@@ -312,10 +323,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         }
     }
 
-    private fun ipBlocked(destIp: String, destPort: Int, protocol: Int): Boolean {
-        val connectionRules = ConnectionRules(destIp, destPort,
-                                              Protocol.getProtocolName(protocol).name)
-        return FirewallRules.hasRule(UID_EVERYBODY, connectionRules)
+    private fun ipStatus(uid: Int, destIp: String): IpRulesManager.IpRuleStatus {
+        return IpRulesManager.hasRule(uid, destIp)
     }
 
     private fun unknownAppBlocked(uid: Int): Boolean {
@@ -385,6 +394,36 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         }
         return (keyguardManager?.isKeyguardLocked == true)
+    }
+
+    // Check if the app has firewall rules set
+    // refer: FirewallManager.kt line-no#58
+    private fun appBlocked(appStatus: FirewallManager.AppStatus,
+                           connectionStatus: FirewallManager.ConnectionStatus): Boolean {
+        if (isAppBlocked(appStatus, connectionStatus)) {
+            return true
+        }
+
+        return if (connectionType.typeMobileData()) {
+            isMobileDataBlockedForUid(appStatus, connectionStatus)
+        } else {
+            isWifiBlockedForUid(appStatus, connectionStatus)
+        }
+    }
+
+    private fun isAppBlocked(appStatus: FirewallManager.AppStatus,
+                             connectionStatus: FirewallManager.ConnectionStatus): Boolean {
+        return appStatus.blocked() && connectionStatus.both()
+    }
+
+    private fun isMobileDataBlockedForUid(appStatus: FirewallManager.AppStatus,
+                                          connectionStatus: FirewallManager.ConnectionStatus): Boolean {
+        return appStatus.blocked() && connectionStatus.mobileData()
+    }
+
+    private fun isWifiBlockedForUid(appStatus: FirewallManager.AppStatus,
+                                    connectionStatus: FirewallManager.ConnectionStatus): Boolean {
+        return appStatus.blocked() && connectionStatus.wifi()
     }
 
     private fun blockBackgroundData(uid: Int): Boolean {
@@ -476,13 +515,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             val name: CharSequence = getString(R.string.notif_channel_firewall_alerts)
             val description = resources.getString(R.string.notif_channel_desc_firewall_alerts)
             val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS,
+            val channel = NotificationChannel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS,
                                               name, importance)
             channel.description = description
             notificationManager.createNotificationChannel(channel)
         }
         var builder: NotificationCompat.Builder = NotificationCompat.Builder(this,
-                                                                             FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
+                                                                             NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
 
         val contentTitle = resources.getString(R.string.rules_load_failure_heading)
         val contentText = resources.getString(R.string.rules_load_failure_desc)
@@ -695,7 +734,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
 
     private fun makeAppInfoObserver(): Observer<Collection<AppInfo>> {
         return Observer<Collection<AppInfo>> { t ->
-            val latestExcludedApps = t.filter(AppInfo::isExcluded).map(AppInfo::packageInfo).toSet()
+            val copy : Collection<AppInfo>
+            // adding synchronized block, found a case of concurrent modification
+            // exception that happened once when trying to filter the received object (t).
+            // creating a copy of the received value in a synchronized block.
+            synchronized(t) {
+                copy = t
+            }
+            val latestExcludedApps = copy.filter { it.firewallStatus == FirewallManager.AppStatus.EXCLUDE.id }.map(
+                AppInfo::packageInfo).toSet()
             if (Sets.symmetricDifference(excludedApps,
                                          latestExcludedApps).count() == 0) return@Observer
 
@@ -855,7 +902,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             } else {
                 io("startVpn") {
                     FirewallManager.loadAppFirewallRules()
-                    CustomDomainManager.load()
+                    DomainRulesManager.load()
 
                     if (FirewallManager.getTotalApps() <= 0) {
                         notifyEmptyFirewallRules()
@@ -1103,9 +1150,27 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         VpnController.onConnectionStateChanged(null)
     }
 
-    override fun onNetworkConnected(networks: LinkedHashSet<Network>?) {
+    override fun onNetworkConnected(networks: LinkedHashSet<Network>?,
+                                    connectionType: ConnectionMonitor.ConnectionType) {
         Log.i(LOG_TAG_VPN, "connecting to networks: $networks")
         setUnderlyingNetworks(networks?.toTypedArray())
+        this.connectionType = connectionType
+    }
+
+    override fun onLinkPropertiesChange(linkProperties: LinkProperties,
+                                        connectionType: ConnectionMonitor.ConnectionType) {
+        // get the dns endpoint object from database and update the ip
+        io("insert_network_dns") {
+            val endpoint = appConfig.getNetworkDnsEndpoint()
+            if (linkProperties.dnsServers.isEmpty()) return@io
+
+            // dns servers returns list of InetAddress, update the host address of the
+            // first element as endpoint's proxyIp
+            // fixme: as of now, database accepts only one ip as input.
+            // need to do the changes in the dns proxy endpoint to accept multiple ip addresses
+            endpoint.proxyIP = linkProperties.dnsServers[0]?.hostAddress
+            appConfig.updateNetworkDnsEndpoint(endpoint)
+        }
     }
 
     private fun handleVpnLockdownStateAsync() {
@@ -1194,7 +1259,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         PauseTimer.subtractDuration(durationMs)
     }
 
-    fun getPauseCountDownObserver(): MutableLiveData<Long>? {
+    fun getPauseCountDownObserver(): MutableLiveData<Long> {
         return PauseTimer.getPauseCountDownObserver()
     }
 

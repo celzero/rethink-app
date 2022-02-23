@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:nestedScrollingEnabled="false"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:showIn="@layout/activity_connection_tracker">
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <RelativeLayout
         android:id="@+id/connection_list_rl"
@@ -43,7 +42,7 @@
                         android:fontFamily="sans-serif"
                         android:isScrollContainer="true"
                         app:iconifiedByDefault="false"
-                        app:queryHint="@string/search_firewall_network_log"/>
+                        app:queryHint="@string/search_firewall_network_log" />
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/connection_filter_icon"
@@ -90,10 +89,10 @@
                         android:id="@+id/filter_chip_group"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingBottom="5dp"
-                        app:singleLine="true"
                         android:elevation="5dp"
+                        android:paddingBottom="5dp"
                         android:visibility="gone"
+                        app:singleLine="true"
                         app:singleSelection="false" />
                 </HorizontalScrollView>
 
@@ -101,22 +100,37 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <com.celzero.bravedns.util.NestedScrollableHost
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_connection"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/connection_card_view_top"
-            android:layout_margin="2dp"
-            android:layout_marginBottom="?attr/actionBarSize">
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginBottom="2dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="vertical"
+            app:fastScrollEnabled="true"
+            app:fastScrollHorizontalThumbDrawable="@drawable/fast_scroll_thumb_drawable"
+            app:fastScrollHorizontalTrackDrawable="@drawable/fast_scroll_line_drawable"
+            app:fastScrollVerticalThumbDrawable="@drawable/fast_scroll_thumb_drawable"
+            app:fastScrollVerticalTrackDrawable="@drawable/fast_scroll_line_drawable" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_connection"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clickable="true"
-                android:focusable="true"
-                android:nestedScrollingEnabled="false"
-                android:orientation="vertical" />
-        </com.celzero.bravedns.util.NestedScrollableHost>
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/connection_list_scroll_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/connection_card_view_top"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/recycler_view_header_bg"
+            android:paddingStart="10dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="5dp"
+            android:textColor="?attr/primaryTextColor"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/connection_list_logs_disabled_tv"

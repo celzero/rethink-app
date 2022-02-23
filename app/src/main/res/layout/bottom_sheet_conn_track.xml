@@ -124,34 +124,19 @@
             android:typeface="monospace" />
     </RelativeLayout>
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/bs_conn_dns_cache_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="5dp"
         android:layout_marginBottom="20dp"
+        android:ellipsize="end"
         android:gravity="center"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:weightSum="1">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.75"
-            android:gravity="center">
-
-            <TextView
-                android:id="@+id/bs_conn_connection_details"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:text="@string/bsct_conn_conn_desc_allowed"
-                android:textColor="?attr/primaryLightColorText"
-                android:textIsSelectable="true"
-                android:textSize="@dimen/default_font_text_view"
-                android:visibility="gone" />
-        </LinearLayout>
-
-    </LinearLayout>
+        android:padding="5dp"
+        android:textColor="?attr/primaryLightColorText"
+        android:textIsSelectable="true"
+        android:textSize="@dimen/default_font_text_view"
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/bs_conn_blocked_rule1_header_ll"
@@ -159,43 +144,131 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp">
+        android:orientation="vertical"
+        android:padding="10dp">
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.9"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/bs_conn_blocked_rule1_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/drawable_purple_gradient"
-                android:gravity="start"
-                android:padding="7dp"
-                android:text="@string/ct_bs_rule_1"
-                android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/default_font_text_view" />
-
-            <TextView
-                android:id="@+id/bs_conn_block_app_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:text="@string/bsct_block"
-                android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/large_font_text_view" />
-        </LinearLayout>
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/bs_conn_block_app_check"
+        <TextView
+            android:id="@+id/bs_conn_blocked_rule1_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/drawable_purple_gradient"
+            android:gravity="start"
+            android:padding="7dp"
+            android:text="@string/ct_bs_heading_1"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/default_font_text_view" />
+
+        <TextView
+            android:id="@+id/bs_conn_block_app_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:gravity="bottom"
-            android:padding="10dp" />
+            android:padding="5dp"
+            android:text="@string/bsct_block"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/large_font_text_view" />
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/bs_conn_block_app_toggle_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:singleSelection="true"
+            app:selectionRequired="true"
+            app:checkedButton="@id/bs_conn_tg_no_rule"
+            android:gravity="center">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/bs_conn_tg_no_rule"
+                style="@style/toggleButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="no rule"
+                android:tag="0"
+                android:minWidth="5dp"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/small_font_subheading_text" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/bs_conn_tg_block"
+                style="@style/toggleButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="block"
+                android:tag="1"
+                android:minWidth="5dp"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/small_font_subheading_text" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/bs_conn_tg_whitelist"
+                style="@style/toggleButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="whitelist"
+                android:tag="2"
+                android:minWidth="5dp"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/small_font_subheading_text" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/bs_conn_tg_exclude"
+                style="@style/toggleButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="exclude"
+                android:tag="3"
+                android:minWidth="5dp"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/small_font_subheading_text" />
+
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bs_conn_blocked_rule2_header_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/bs_conn_blocked_rule2_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/drawable_purple_gradient"
+            android:gravity="start"
+            android:padding="7dp"
+            android:text="@string/ct_bs_heading_3"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/default_font_text_view" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/bs_conn_unknown_app_txt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.75"
+                android:padding="5dp"
+                android:text="@string/univ_block_unknown_connections"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/bs_conn_unknown_app_check"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.25"
+                android:gravity="center" />
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -203,46 +276,73 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="2dp"
-        android:layout_marginTop="20dp"
         android:layout_marginRight="2dp"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:paddingBottom="5dp">
+        android:orientation="vertical"
+        android:padding="10dp">
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.9"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/drawable_purple_gradient"
-                android:gravity="start"
-                android:padding="7dp"
-                android:text="@string/ct_bs_rule_2"
-                android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/default_font_text_view" />
-
-            <TextView
-                android:id="@+id/bs_conn_block_conn_all_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.9"
-                android:padding="5dp"
-                android:text="@string/bsct_block_all"
-                android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/large_font_text_view" />
-
-        </LinearLayout>
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/bs_conn_block_conn_all_switch"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:padding="10dp" />
+            android:background="@drawable/drawable_purple_gradient"
+            android:gravity="start"
+            android:padding="7dp"
+            android:text="@string/ct_bs_heading_2"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/default_font_text_view" />
+
+        <TextView
+            android:id="@+id/bs_conn_block_conn_all_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="5dp"
+            android:text="@string/bsct_block_all"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/large_font_text_view" />
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/bs_conn_block_ip_toggle_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:singleSelection="true"
+            app:selectionRequired="true"
+            app:checkedButton="@id/bs_conn_ip_tg_no_rule"
+            android:gravity="center">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/bs_conn_ip_tg_no_rule"
+                style="@style/toggleButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="no rule"
+                android:tag="2"
+                android:minWidth="5dp"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/small_font_subheading_text" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/bs_conn_ip_tg_block"
+                style="@style/toggleButtonStyle"
+                android:minWidth="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="block"
+                android:tag="0"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/small_font_subheading_text" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/bs_conn_ip_tg_whitelist"
+                style="@style/toggleButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="whitelist"
+                android:tag="1"
+                android:minWidth="5dp"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/small_font_subheading_text" />
+
+        </com.google.android.material.button.MaterialButtonToggleGroup>
 
     </LinearLayout>
 

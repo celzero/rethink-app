@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.celzero.bravedns.database
 
+import com.celzero.bravedns.data.AppConnections
 import com.celzero.bravedns.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -26,6 +27,10 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
         ioCtx {
             connectionTrackerDAO.insert(connectionTracker)
         }
+    }
+
+    suspend fun getLogsForApp(uid: Int): List<AppConnections> {
+        return connectionTrackerDAO.getLogsForApp(uid)
     }
 
     suspend fun deleteConnectionTrackerCount() {

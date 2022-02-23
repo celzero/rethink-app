@@ -36,7 +36,7 @@ import org.koin.dsl.module
 object ServiceModule {
     private val serviceModules = module {
         single { IPTracker(get(), androidContext()) }
-        single { DNSLogTracker(get(), get(), androidContext()) }
+        single { DnsLogTracker(get(), get(), androidContext()) }
         single { PersistentState(androidContext()) }
         single { QueryTracker(get()) }
     }

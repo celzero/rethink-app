@@ -11,6 +11,5 @@
     app:chipIconSize="15dp"
     app:iconStartPadding="3dp"
     android:textSize="@dimen/default_font_text_view"
-    android:textColor="?attr/primaryTextColor"
     app:checkedIconTint="?attr/primaryTextColor"
     app:chipBackgroundColor="@drawable/bg_chip_state_list" />

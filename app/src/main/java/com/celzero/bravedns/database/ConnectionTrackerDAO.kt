@@ -18,6 +18,7 @@ package com.celzero.bravedns.database
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.room.*
+import com.celzero.bravedns.data.AppConnections
 
 
 @Dao
@@ -48,6 +49,10 @@ interface ConnectionTrackerDAO {
     @Query(
         "select * from ConnectionTracker where (appName like :searchString or ipAddress like :searchString) and isBlocked = 1 order by timeStamp desc")
     fun getBlockedConnections(searchString: String): DataSource.Factory<Int, ConnectionTracker>
+
+    @Query(
+        "select ipAddress as ipAddress, count(ipAddress) as count, flag from ConnectionTracker where uid = :uid group by ipAddress, flag order by count desc")
+    fun getLogsForApp(uid: Int): List<AppConnections>
 
     @Query(
         "select * from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 and (appName like :searchString or ipAddress like :searchString) order by timeStamp desc")

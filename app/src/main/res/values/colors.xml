@@ -54,7 +54,7 @@
     <color name="divider">#444444</color>
     <color name="border">#77959595</color>
     <color name="homeScreenBtnBackground">#2d2c2c</color>
-    <color name="textViewBackground">#444444</color>
+    <color name="textViewBackground">#77959595</color>
     <color name="buttonBackground">#006f67</color>
 
     <color name="tabIndicator">#18ffff</color>
@@ -78,7 +78,9 @@
     <color name="primaryDarkColorText">#FDFDFD</color>
     <color name="chipTextColor">#FDFDFD</color>
     <color name="invertedPrimaryText">#18ffff</color>
-    <color name="secondaryText">#05dfd7</color>
+    <color name="secondaryText">#18ffff</color>
+
+    <color name="fabBackground">#77959595</color>
 
     <!-- theme light -->
     <color name="colorPrimaryLight">#ececec</color>
@@ -91,10 +93,10 @@
     <color name="accentGoodLight">#005cb2</color>
     <color name="accentBadLight">#ff1744</color>
 
-    <color name="backgroundLight">#FFFFFF</color>
+    <color name="backgroundLight">#fafafa</color>
     <color name="dividerLight">#eeeeee</color>
     <color name="borderLight">#77757575</color>
-    <color name="textViewBackgroundLight">#efefef</color>
+    <color name="textViewBackgroundLight">#77757575</color>
     <color name="homeScreenBtnBackgroundLight">#005cb2</color>
     <color name="buttonBackgroundLight">#1e88e5</color>
     <color name="tabIndicatorLight">#ff4081</color>
@@ -120,7 +122,9 @@
     <color name="primaryDarkColorTextLight">#FFFFFF</color>
     <color name="chipTextColorLight">#FFFFFF</color>
     <color name="invertedPrimaryTextLight">#FFFFFF</color>
-    <color name="secondaryTextLight">#1e88e5</color>
+    <color name="secondaryTextLight">#005cb2</color>
+
+    <color name="fabBackgroundLight">#FFFFFF</color>
 
     <!-- theme dark -->
     <color name="colorPrimaryBlack">#383838</color>
@@ -138,7 +142,7 @@
     <color name="borderBlack">#77959595</color>
     <color name="homeScreenBtnBackgroundBlack">#2d2c2c</color>
     <color name="buttonBackgroundBlack">#4fc3f7</color>
-    <color name="textViewBackgroundBlack">#2d2c2c</color>
+    <color name="textViewBackgroundBlack">#77959595</color>
     <color name="tabIndicatorBlack">#4fc3f7</color>
 
     <color name="colorControlActivatedBlack">#4fc3f7</color>
@@ -162,5 +166,7 @@
     <color name="chipTextNegativeBlack">#CCFF5252</color>
     <color name="chipColorBgNormalBlack">#444444</color>
     <color name="chipColorBgHighlightBlack">#904fc3f7</color>
+
+    <color name="fabBackgroundBlack">#77959595</color>
 
 </resources>

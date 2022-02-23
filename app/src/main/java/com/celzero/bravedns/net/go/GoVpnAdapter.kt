@@ -28,18 +28,20 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConfig.Companion.dnscryptRelaysToRemove
 import com.celzero.bravedns.data.AppConfig.TunnelOptions
-import com.celzero.bravedns.database.DNSProxyEndpoint
+import com.celzero.bravedns.database.DnsProxyEndpoint
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.DNSConfigureWebViewActivity.Companion.BLOCKLIST_REMOTE_FOLDER_NAME
+import com.celzero.bravedns.ui.DnsConfigureWebViewActivity.Companion.BLOCKLIST_REMOTE_FOLDER_NAME
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.DEFAULT_DOH_URL
+import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_RD
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getNonLiveDnscryptServers
 import com.celzero.bravedns.util.Utilities.Companion.remoteBlocklistDir
 import com.celzero.bravedns.util.Utilities.Companion.remoteBlocklistFile
@@ -57,7 +59,6 @@ import org.koin.core.component.inject
 import protect.Protector
 import settings.Settings
 import tun2socks.Tun2socks
-import java.io.File
 import java.io.IOException
 
 /**
@@ -222,7 +223,7 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
         if (!tunDnsMode.isDnsProxy()) return
 
         try {
-            val dnsProxy: DNSProxyEndpoint = appConfig.getConnectedProxyDetails()
+            val dnsProxy: DnsProxyEndpoint = appConfig.getConnectedProxyDetails()
             if (DEBUG) Log.d(LOG_TAG_VPN,
                              "setDNSProxy mode set: " + dnsProxy.proxyIP + ", " + dnsProxy.proxyPort)
             tunnel?.startDNSProxy(dnsProxy.proxyIP, dnsProxy.proxyPort.toString())
@@ -439,7 +440,9 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
     private fun makeLocalBraveDns(): BraveDNS? {
         return try {
             // FIXME: canonical path may go missing but is unhandled
-            val path: String = context.filesDir.canonicalPath + File.separator + persistentState.localBlocklistTimestamp
+            val path: String = Utilities.localBlocklistDownloadBasePath(context,
+                                                                        LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                                                        persistentState.localBlocklistTimestamp)
             Dnsx.newBraveDNSLocal(path + ONDEVICE_BLOCKLIST_FILE_TD,
                                   path + ONDEVICE_BLOCKLIST_FILE_RD,
                                   path + ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,

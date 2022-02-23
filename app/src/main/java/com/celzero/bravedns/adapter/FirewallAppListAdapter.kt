@@ -18,6 +18,7 @@ package com.celzero.bravedns.adapter
 import android.app.ActivityManager
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.VpnService
 import android.view.LayoutInflater
@@ -27,6 +28,7 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagedListAdapter
@@ -34,10 +36,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
+import com.celzero.bravedns.automaton.FirewallManager.updateFirewallStatus
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.databinding.ListItemFirewallAppBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.AppInfoActivity
+import com.celzero.bravedns.ui.AppInfoActivity.Companion.UID_INTENT_NAME
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getIcon
 import kotlinx.coroutines.Dispatchers
@@ -56,12 +61,12 @@ class FirewallAppListAdapter(private val context: Context,
     companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<AppInfo>() {
             override fun areItemsTheSame(oldConnection: AppInfo, newConnection: AppInfo): Boolean {
-                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.isInternetAllowed == newConnection.isInternetAllowed)
+                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.firewallStatus == newConnection.firewallStatus)
             }
 
             override fun areContentsTheSame(oldConnection: AppInfo,
                                             newConnection: AppInfo): Boolean {
-                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.isInternetAllowed != newConnection.isInternetAllowed)
+                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.firewallStatus != newConnection.firewallStatus)
             }
         }
     }
@@ -81,53 +86,126 @@ class FirewallAppListAdapter(private val context: Context,
             RecyclerView.ViewHolder(b.root) {
 
         fun update(appInfo: AppInfo) {
-            displayChildDetails(appInfo)
-            setupChildClickListeners(appInfo)
+            displayDetails(appInfo)
+            setupClickListeners(appInfo)
         }
 
-        private fun displayChildDetails(appInfo: AppInfo) {
-            b.firewallApkLabelTv.text = appInfo.appName
-            b.firewallApkProgressBar.visibility = View.GONE
+        private fun displayDetails(appInfo: AppInfo) {
+            val appStatus = FirewallManager.appStatus(appInfo.uid)
+            val connStatus = FirewallManager.connectionStatus(appInfo.uid)
 
-            // To disable the app from selecting into firewall
-            b.firewallToggleWifi.isClickable = appInfo.canFirewall()
-            b.firewallToggleWifi.isEnabled = appInfo.canFirewall()
-            b.firewallToggleWifi.isChecked = !appInfo.isInternetAllowed
+            b.firewallAppLabelTv.text = appInfo.appName
+            b.firewallAppToggleOther.text = getFirewallText(appStatus, connStatus)
 
-            displayIcon(getIcon(context, appInfo.packageInfo, appInfo.appName), b.firewallApkIconIv)
-            showAppHint(b.firewallStatusIndicator, appInfo)
+            displayIcon(getIcon(context, appInfo.packageInfo, appInfo.appName), b.firewallAppIconIv)
+            displayConnectionStatus(appStatus, connStatus)
+            showAppHint(b.firewallAppStatusIndicator, appInfo)
+        }
 
+        private fun getFirewallText(aStat: FirewallManager.AppStatus,
+                                    cStat: FirewallManager.ConnectionStatus): CharSequence {
+            return when (aStat) {
+                FirewallManager.AppStatus.ALLOW -> "Allowed"
+                FirewallManager.AppStatus.EXCLUDE -> "Excluded"
+                FirewallManager.AppStatus.WHITELIST -> "Whitelisted"
+                FirewallManager.AppStatus.BLOCK -> {
+                    when {
+                        cStat.mobileData() -> "Allowed on WiFi"
+                        cStat.wifi() -> "Allowed on mobile data"
+                        else -> "Blocked"
+                    }
+                }
+                FirewallManager.AppStatus.UNTRACKED -> "Unknown"
+            }
+        }
+
+        private fun displayConnectionStatus(appStatus: FirewallManager.AppStatus,
+                                            connStatus: FirewallManager.ConnectionStatus) {
+            when (appStatus) {
+                FirewallManager.AppStatus.ALLOW -> {
+                    showWifiEnabled()
+                    showMobileDataEnabled()
+                }
+                FirewallManager.AppStatus.BLOCK -> {
+                    when {
+                        connStatus.both() -> {
+                            showWifiDisabled()
+                            showMobileDataDisabled()
+                        }
+                        connStatus.mobileData() -> {
+                            showWifiEnabled()
+                            showMobileDataDisabled()
+                        }
+                        else -> {
+                            showWifiDisabled()
+                            showMobileDataEnabled()
+                        }
+                    }
+                }
+                FirewallManager.AppStatus.EXCLUDE -> {
+                    showMobileDataUnused()
+                    showWifiUnused()
+                }
+                FirewallManager.AppStatus.WHITELIST -> {
+                    showMobileDataUnused()
+                    showWifiUnused()
+                }
+                else -> {
+                    showWifiDisabled()
+                    showMobileDataDisabled()
+                }
+            }
+        }
+
+        private fun showMobileDataDisabled() {
+            b.firewallAppToggleMobileData.setImageDrawable(
+                ContextCompat.getDrawable(context, R.drawable.ic_firewall_data_off))
+        }
+
+        private fun showMobileDataEnabled() {
+            b.firewallAppToggleMobileData.setImageDrawable(
+                ContextCompat.getDrawable(context, R.drawable.ic_firewall_data_on))
+        }
+
+        private fun showWifiDisabled() {
+            b.firewallAppToggleWifi.setImageDrawable(
+                ContextCompat.getDrawable(context, R.drawable.ic_firewall_wifi_off))
+        }
+
+        private fun showWifiEnabled() {
+            b.firewallAppToggleWifi.setImageDrawable(
+                ContextCompat.getDrawable(context, R.drawable.ic_firewall_wifi_on))
+        }
+
+        private fun showMobileDataUnused() {
+            b.firewallAppToggleMobileData.setImageDrawable(
+                ContextCompat.getDrawable(context, R.drawable.ic_firewall_data_on_grey))
+        }
+
+        private fun showWifiUnused() {
+            b.firewallAppToggleWifi.setImageDrawable(
+                ContextCompat.getDrawable(context, R.drawable.ic_firewall_data_on_grey))
         }
 
         private fun showAppHint(mIconIndicator: TextView, appInfo: AppInfo) {
-            if (appInfo.isInternetAllowed) {
-                mIconIndicator.setBackgroundColor(context.getColor(R.color.colorGreen_900))
-            } else {
-                mIconIndicator.setBackgroundColor(context.getColor(R.color.colorAmber_900))
+            when (FirewallManager.appStatus(appInfo.uid)) {
+                FirewallManager.AppStatus.ALLOW -> {
+                    mIconIndicator.setBackgroundColor(context.getColor(R.color.colorGreen_900))
+                }
+                FirewallManager.AppStatus.EXCLUDE -> {
+                    mIconIndicator.setBackgroundColor(
+                        context.getColor(R.color.primaryLightColorText))
+                }
+                FirewallManager.AppStatus.WHITELIST -> {
+                    mIconIndicator.setBackgroundColor(
+                        context.getColor(R.color.primaryLightColorText))
+                }
+                FirewallManager.AppStatus.BLOCK -> {
+                    mIconIndicator.setBackgroundColor(context.getColor(R.color.colorAmber_900))
+                }
+                FirewallManager.AppStatus.UNTRACKED -> { /* no-op */
+                }
             }
-
-            when {
-                appInfo.whiteListUniv1 -> {
-                    showAppTextualHint(b.firewallApkPackageTv,
-                                       context.getString(R.string.firewall_app_added_in_whitelist))
-                }
-                appInfo.isExcluded -> {
-                    showAppTextualHint(b.firewallApkPackageTv, context.getString(
-                        R.string.firewall_app_added_in_excluded_list))
-                }
-                else -> {
-                    hideAppTextualHint(b.firewallApkPackageTv)
-                }
-            }
-        }
-
-        private fun hideAppTextualHint(mPackageTextView: TextView) {
-            mPackageTextView.visibility = View.GONE
-        }
-
-        private fun showAppTextualHint(mPackageTextView: TextView, message: String) {
-            mPackageTextView.visibility = View.VISIBLE
-            mPackageTextView.text = message
         }
 
         private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
@@ -135,43 +213,112 @@ class FirewallAppListAdapter(private val context: Context,
                 mIconImageView)
         }
 
-        private fun setupChildClickListeners(appInfo: AppInfo) {
+        private fun setupClickListeners(appInfo: AppInfo) {
 
-            b.firewallToggleWifi.setOnCheckedChangeListener(null)
-            b.firewallToggleWifi.setOnClickListener {
-                enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.firewallToggleWifi)
+            b.firewallAppTextLl.setOnClickListener {
+                enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.firewallAppTextLl)
+                openAppDetailActivity(appInfo.uid)
+            }
 
-                val appUidList = FirewallManager.getAppNamesByUid(appInfo.uid)
+            b.firewallAppIconIv.setOnClickListener {
+                enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.firewallAppIconIv)
+                openAppDetailActivity(appInfo.uid)
+            }
 
-                if (appUidList.count() > 1) {
-                    b.firewallToggleWifi.isChecked = !appInfo.isInternetAllowed
-                    // since isChecked is toggled above, notify the renderer
-                    notifyDataSetChanged()
-                    showDialog(appUidList, appInfo)
+            b.indicator.setOnClickListener {
+                enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.firewallAppIconIv)
+                openAppDetailActivity(appInfo.uid)
+            }
+
+            b.firewallAppToggleWifi.setOnClickListener {
+                enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.firewallAppToggleWifi)
+
+                val appNames = FirewallManager.getAppNamesByUid(appInfo.uid)
+                if (appNames.count() > 1) {
+                    showDialog(appNames, appInfo, isWifi = true)
                     return@setOnClickListener
                 }
-                updateBlockApp(appInfo)
+                toggleWifi(appInfo)
+            }
+
+            b.firewallAppToggleMobileData.setOnClickListener {
+                enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.firewallAppToggleMobileData)
+                val appNames = FirewallManager.getAppNamesByUid(appInfo.uid)
+                if (appNames.count() > 1) {
+                    showDialog(appNames, appInfo, isWifi = false)
+                    return@setOnClickListener
+                }
+
+                toggleMobileData(appInfo)
             }
         }
 
-        private fun showDialog(packageList: List<String>, appInfo: AppInfo) {
-            val positiveTxt: String
+        private fun toggleMobileData(appInfo: AppInfo) {
+            val appStatus = FirewallManager.appStatus(appInfo.uid)
+
+            when (FirewallManager.connectionStatus(appInfo.uid)) {
+                FirewallManager.ConnectionStatus.MOBILE_DATA -> {
+                    updateFirewallStatus(appInfo.uid, FirewallManager.AppStatus.ALLOW,
+                                         FirewallManager.ConnectionStatus.BOTH)
+                }
+                FirewallManager.ConnectionStatus.WIFI -> {
+                    updateFirewallStatus(appInfo.uid, FirewallManager.AppStatus.BLOCK,
+                                         FirewallManager.ConnectionStatus.BOTH)
+                    killApps(appInfo.uid)
+                }
+                FirewallManager.ConnectionStatus.BOTH -> {
+                    if (appStatus.blocked()) {
+                        updateFirewallStatus(appInfo.uid, FirewallManager.AppStatus.BLOCK,
+                                             FirewallManager.ConnectionStatus.WIFI)
+                        return
+                    }
+                    updateFirewallStatus(appInfo.uid, FirewallManager.AppStatus.BLOCK,
+                                         FirewallManager.ConnectionStatus.MOBILE_DATA)
+                }
+            }
+        }
+
+        private fun toggleWifi(appInfo: AppInfo) {
+            val appStatus = FirewallManager.appStatus(appInfo.uid)
+
+            when (FirewallManager.connectionStatus(appInfo.uid)) {
+                FirewallManager.ConnectionStatus.MOBILE_DATA -> {
+                    updateFirewallStatus(appInfo.uid, FirewallManager.AppStatus.BLOCK,
+                                         FirewallManager.ConnectionStatus.BOTH)
+                    killApps(appInfo.uid)
+                }
+                FirewallManager.ConnectionStatus.WIFI -> {
+                    updateFirewallStatus(appInfo.uid, FirewallManager.AppStatus.ALLOW,
+                                         FirewallManager.ConnectionStatus.BOTH)
+                }
+                FirewallManager.ConnectionStatus.BOTH -> {
+                    if (appStatus.blocked()) {
+                        updateFirewallStatus(appInfo.uid, FirewallManager.AppStatus.BLOCK,
+                                             FirewallManager.ConnectionStatus.MOBILE_DATA)
+                        return
+                    }
+                    updateFirewallStatus(appInfo.uid, FirewallManager.AppStatus.BLOCK,
+                                         FirewallManager.ConnectionStatus.WIFI)
+                }
+            }
+        }
+
+        private fun openAppDetailActivity(uid: Int) {
+            val intent = Intent(context, AppInfoActivity::class.java)
+            intent.putExtra(UID_INTENT_NAME, uid)
+            context.startActivity(intent)
+        }
+
+        private fun showDialog(packageList: List<String>, appInfo: AppInfo, isWifi: Boolean) {
 
             val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
 
             builderSingle.setIcon(R.drawable.spinner_firewall)
             val count = packageList.count()
-            positiveTxt = if (appInfo.isInternetAllowed) {
-                builderSingle.setTitle(
-                    context.getString(R.string.ctbs_block_other_apps, appInfo.appName,
-                                      count.toString()))
-                context.getString(R.string.ctbs_block_other_apps_positive_text, count.toString())
-            } else {
-                builderSingle.setTitle(
-                    context.getString(R.string.ctbs_unblock_other_apps, appInfo.appName,
-                                      count.toString()))
-                context.getString(R.string.ctbs_unblock_other_apps_positive_text, count.toString())
-            }
+            builderSingle.setTitle(
+                context.getString(R.string.ctbs_block_other_apps, appInfo.appName,
+                                  count.toString()))
+
             val arrayAdapter = ArrayAdapter<String>(context,
                                                     android.R.layout.simple_list_item_activated_1)
             arrayAdapter.addAll(packageList)
@@ -179,11 +326,16 @@ class FirewallAppListAdapter(private val context: Context,
 
             builderSingle.setItems(packageList.toTypedArray(), null)
 
-            builderSingle.setPositiveButton(positiveTxt) { _: DialogInterface, _: Int ->
-                updateBlockApp(appInfo)
+            builderSingle.setPositiveButton(context.getString(
+                R.string.ctbs_proceed_positive_text)) { _: DialogInterface, _: Int ->
+                if (isWifi) {
+                    toggleWifi(appInfo)
+                    return@setPositiveButton
+                }
+
+                toggleMobileData(appInfo)
             }.setNeutralButton(context.getString(
                 R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int ->
-
             }
 
             val alertDialog: AlertDialog = builderSingle.create()
@@ -191,18 +343,9 @@ class FirewallAppListAdapter(private val context: Context,
             alertDialog.show()
         }
 
-        private fun updateBlockApp(appInfo: AppInfo) {
-            val isInternetAllowed = appInfo.isInternetAllowed
-            FirewallManager.updateFirewalledApps(appInfo.uid, !isInternetAllowed)
-            if (!isInternetAllowed) b.firewallStatusIndicator.setBackgroundColor(
-                context.getColor(R.color.colorGreen_900))
-            else b.firewallStatusIndicator.setBackgroundColor(
-                context.getColor(R.color.colorAmber_900))
-            killApps(appInfo.uid)
-        }
-
         private fun killApps(uid: Int) {
             if (!persistentState.killAppOnFirewall) return
+
             io {
                 val apps = FirewallManager.getNonSystemAppsPackageNameByUid(uid)
                 apps.forEach {
@@ -210,7 +353,6 @@ class FirewallAppListAdapter(private val context: Context,
                 }
             }
         }
-
     }
 
     private fun enableAfterDelay(delay: Long, vararg views: View) {

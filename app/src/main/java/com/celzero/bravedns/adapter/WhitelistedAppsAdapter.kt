@@ -31,7 +31,6 @@ import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.databinding.UnivWhitelistListItemBinding
 import com.celzero.bravedns.glide.GlideApp
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Utilities.Companion.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.Companion.getIcon
@@ -45,17 +44,17 @@ class WhitelistedAppsAdapter(private val context: Context) :
     companion object {
 
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<AppInfo>() {
-            // account for both package-info and whitelist-flags when
-            // determining if items-are-same. previously, whitelist-flag was
+            // account for both package-info and firewall-status when
+            // determining if items-are-same. previously, firewall-status was
             // not part of the equation causing bugs where the ui wouldn't
             // reflect the toggles adding/removing apps to/from the whitelist
             override fun areItemsTheSame(oldConnection: AppInfo, newConnection: AppInfo): Boolean {
-                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.whiteListUniv1 == newConnection.whiteListUniv1)
+                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.firewallStatus == newConnection.firewallStatus)
             }
 
             override fun areContentsTheSame(oldConnection: AppInfo,
                                             newConnection: AppInfo): Boolean {
-                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.whiteListUniv1 != newConnection.whiteListUniv1)
+                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.firewallStatus != newConnection.firewallStatus)
             }
         }
     }
@@ -77,9 +76,8 @@ class WhitelistedAppsAdapter(private val context: Context) :
 
         fun update(appInfo: AppInfo) {
             b.univWhitelistApkLabelTv.text = appInfo.appName
-            b.univWhitelistCheckbox.isChecked = appInfo.whiteListUniv1
-
-            displayIcon(getIcon(context, appInfo.packageInfo, appInfo.appName))
+            b.univWhitelistCheckbox.isChecked = FirewallManager.isUidWhitelisted(appInfo.uid)
+            displayIcon(getIcon(context, appInfo.packageInfo, /*No app name */""))
             setupClickListeners(appInfo)
         }
 
@@ -90,33 +88,28 @@ class WhitelistedAppsAdapter(private val context: Context) :
 
         private fun setupClickListeners(appInfo: AppInfo) {
             b.univWhitelistContainer.setOnClickListener {
-                if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                                 "is app - ${appInfo.appName} whitelisted? ${appInfo.whiteListUniv1}")
-                b.univWhitelistCheckbox.isChecked = !appInfo.whiteListUniv1
-                modifyWhitelistApps(appInfo)
+                b.univWhitelistCheckbox.isChecked = !b.univWhitelistCheckbox.isChecked
+                modifyWhitelistApps(appInfo, b.univWhitelistCheckbox.isChecked)
             }
 
             b.univWhitelistCheckbox.setOnCheckedChangeListener(null)
             b.univWhitelistCheckbox.setOnClickListener {
-                if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                                 "is app ${appInfo.appName} whitelisted? ${appInfo.whiteListUniv1}")
-                modifyWhitelistApps(appInfo)
+                modifyWhitelistApps(appInfo, b.univWhitelistCheckbox.isChecked)
             }
         }
 
-        private fun modifyWhitelistApps(appInfo: AppInfo) {
-            val isWhitelist = !appInfo.whiteListUniv1
+        private fun modifyWhitelistApps(appInfo: AppInfo, whitelisted: Boolean) {
             val appUidList = FirewallManager.getAppNamesByUid(appInfo.uid)
-            Log.i(LOG_TAG_FIREWALL, "App ${appInfo.appName} whitelisted from vpn? $isWhitelist")
+            Log.i(LOG_TAG_FIREWALL, "App ${appInfo.appName} whitelisted from vpn? $whitelisted")
 
             if (appUidList.count() > 1) {
-                showDialog(appUidList, appInfo, isWhitelist)
+                showDialog(appUidList, appInfo, whitelisted)
             } else {
-                FirewallManager.updateWhitelistedApps(appInfo, isWhitelist)
+                FirewallManager.updateWhitelistedApps(appInfo, whitelisted)
             }
         }
 
-        private fun showDialog(packageList: List<String>, appInfo: AppInfo, isWhitelist: Boolean) {
+        private fun showDialog(packageList: List<String>, appInfo: AppInfo, whitelisted: Boolean) {
             val positiveTxt: String
             val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
 
@@ -128,7 +121,7 @@ class WhitelistedAppsAdapter(private val context: Context) :
             }
 
             val count = packageList.count()
-            positiveTxt = if (isWhitelist) {
+            positiveTxt = if (whitelisted) {
                 builderSingle.setTitle(
                     context.getString(R.string.whitelist_add_app, appNameEllipsis,
                                       count.toString()))
@@ -143,7 +136,7 @@ class WhitelistedAppsAdapter(private val context: Context) :
             builderSingle.setItems(packageList.toTypedArray(), null)
 
             builderSingle.setPositiveButton(positiveTxt) { _: DialogInterface, _: Int ->
-                FirewallManager.updateWhitelistedApps(appInfo, isWhitelist)
+                FirewallManager.updateWhitelistedApps(appInfo, whitelisted)
             }.setNeutralButton(context.getString(
                 R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int ->
                 /* no-op */

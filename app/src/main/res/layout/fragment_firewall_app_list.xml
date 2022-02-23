@@ -7,34 +7,50 @@
     android:focusable="true"
     android:focusableInTouchMode="true">
 
-    <TextView
-        android:id="@+id/ffa_explain_txt"
+    <LinearLayout
+        android:id="@+id/top_header_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
+        android:orientation="horizontal"
         android:padding="10dp"
-        android:text="@string/settings_explanation_text"
-        android:textColor="?attr/primaryLightColorText"
-        android:textSize="@dimen/default_font_text_view" />
+        android:weightSum="1">
+
+        <TextView
+            android:id="@+id/ffa_explain_txt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.9"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:text="@string/settings_explanation_text"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/default_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ffa_refresh_list"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="0.1"
+            android:padding="5dp"
+            android:src="@drawable/ic_refresh_white" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/ffa_search_view_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/ffa_explain_txt"
-        android:layout_margin="2dp"
-        android:orientation="vertical"
-        android:visibility="visible">
+        android:layout_below="@id/top_header_ll"
+        android:orientation="vertical">
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="3dp"
-            android:elevation="10dp"
-            android:visibility="visible">
+            android:layout_margin="4dp"
+            android:elevation="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -53,7 +69,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="start"
-                        android:layout_weight="0.85"
+                        android:layout_weight="0.9"
                         android:fontFamily="sans-serif"
                         android:isScrollContainer="true"
                         app:iconifiedByDefault="false"
@@ -64,19 +80,44 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
-                        android:layout_weight="0.10"
-                        android:padding="7dp"
+                        android:layout_weight="0.1"
+                        android:layout_margin="5dp"
+                        android:padding="5dp"
                         android:src="@drawable/ic_filter"
                         android:visibility="visible" />
+                </LinearLayout>
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/ffa_refresh_list"
+                <LinearLayout
+                    android:id="@+id/ffa_sort_chip_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:orientation="horizontal"
+                    android:padding="5dp"
+                    android:visibility="gone">
+
+                    <TextView
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:padding="5dp"
+                        android:text="Sort by:"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/default_font_text_view" />
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/ffa_sort_chip_group"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_weight="0.05"
-                        android:padding="8dp"
-                        android:src="@drawable/ic_refresh_white" />
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="2dp"
+                        android:visibility="visible"
+                        app:selectionRequired="true"
+                        app:singleSelection="true" />
 
                 </LinearLayout>
 
@@ -119,15 +160,76 @@
         </androidx.cardview.widget.CardView>
     </LinearLayout>
 
+    <RelativeLayout
+        android:id="@+id/ffa_toggle_all_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_below="@id/ffa_search_view_top">
+
+        <TextView
+            android:id="@+id/firewall_app_label_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_toStartOf="@id/ffa_toggle_all_wifi"
+            android:fontFamily="sans-serif"
+            android:gravity="right"
+            android:padding="5dp"
+            android:text="Click to disable/enable all filtered apps"
+            android:textSize="@dimen/default_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ffa_toggle_all_wifi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:tag="0"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_toStartOf="@id/ffa_toggle_all_mobile_data"
+            android:maxWidth="24dp"
+            android:maxHeight="24dp"
+            android:padding="5dp"
+            android:src="@drawable/ic_firewall_wifi_on_grey" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ffa_toggle_all_mobile_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="5dp"
+            android:maxWidth="24dp"
+            android:maxHeight="24dp"
+            android:padding="5dp"
+            android:src="@drawable/ic_firewall_data_on_grey"
+            android:tag="0" />
+
+    </RelativeLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ffa_app_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/ffa_search_view_top"
+        android:layout_below="@id/ffa_toggle_all_container"
         android:layout_marginStart="2dp"
         android:layout_marginEnd="2dp"
         android:divider="?attr/border"
         android:dividerHeight="1dp"
-        android:scrollbars="none" />
+        android:scrollbars="none"
+        app:fastScrollEnabled="true"
+        app:fastScrollHorizontalThumbDrawable="@drawable/fast_scroll_thumb_drawable"
+        app:fastScrollHorizontalTrackDrawable="@drawable/fast_scroll_line_drawable"
+        app:fastScrollVerticalThumbDrawable="@drawable/fast_scroll_thumb_drawable"
+        app:fastScrollVerticalTrackDrawable="@drawable/fast_scroll_line_drawable" />
 
 </RelativeLayout>

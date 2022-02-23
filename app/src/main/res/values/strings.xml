@@ -63,12 +63,14 @@
     </string-array>
 
     <string-array name="dns_proxy_names">
+        <item>Network DNS</item>
         <item>Google</item>
         <item>Cloudflare</item>
         <item>Quad9</item>
     </string-array>
 
     <string-array name="dns_proxy_ips">
+        <item></item>
         <item>8.8.8.8</item>
         <item>1.1.1.1</item>
         <item>9.9.9.9</item>
@@ -236,34 +238,28 @@
 
     <string name="firewall_rules">Network Rules</string>
 
-    <string name="dns_mode_info_explanation">\u0009 Circumvent Internet censorship.\n\u0009 Prevent DNS manipulation attacks with encrypted DNS.\n\u0009 First line of defence against malware and other security threats.\n\u0009 Monitor DNS traffic.</string>
-
     <string name="firewall_mode_info_title">Firewall</string>
-
     <string name="firewall_mode_info_explanation">\u0009 Firewall select apps from connecting to the Internet.\n\u0009 Monitor network activity of all apps.\n\u0009 Note: This feature may consume extra battery.</string>
+    <string name="firewall_mode_info_explanation_new">Monitor network activity and firewall any app or IP address.</string>
 
     <string name="hybrid_mode_info_title">DNS + Firewall</string>
 
+    <string name="dns_mode_info_explanation">\u0009 Circumvent Internet censorship.\n\u0009 Prevent DNS manipulation attacks with encrypted DNS.\n\u0009 First line of defence against malware and other security threats.\n\u0009 Monitor DNS traffic.</string>
     <string name="dns_mode_info_explanation_new">Monitor, block, and encrypt DNS requests.</string>
-    <string name="firewall_mode_info_explanation_new">Monitor network activity and firewall any app or IP address.</string>
+
     <string name="dns_firewall_mode_info_explanation_new">All of the above + bypass Internet censorship.</string>
     <string name="wireguard_mode_info_explanation_new">Coming soon.</string>
 
     <string name="alert_permission_accessibility">Permission - Accessibility</string>
-
     <string name="alert_permission_accessibility_regrant">Action Required</string>
-
     <string name="alert_firewall_accessibility_explanation">RethinkDNS uses accessibility service to track which apps are in-use (foreground) versus those that are not in-use (background).\n\nRethinkDNS does not collect any information or spy on you in any way.</string>
-
     <string name="alert_firewall_accessibility_regrant_explanation">RethinkDNS accessibility service has stopped or crashed. <i><b>Goto Settings and Force Stop</b></i> RethinkDNS and start it again to use <i>Block any app not in use</i> feature.\n\nRethinkDNS uses accessibility service to track which apps are in-use (foreground) versus those that are not in-use (background).</string>
+    <string name="alert_firewall_accessibility_exception">Failure opening Accessibility Settings. Try again later!</string>
 
     <string name="brave_dns_connect_prompt_firewall">Start Firewall / DNS+Firewall to configure apps.</string>
     <string name="brave_dns_connect_prompt_query">Start DNS / DNS+Firewall to view logs</string>
-
     <string name="brave_dns_connect_mode_change_firewall">Choose Mode.</string>
-
     <string name="brave_dns_connect_mode_change_dns">Choose Mode.</string>
-
     <string name="brave_dns_connect_mode_change_connection">Start Firewall / DNS+Firewall to view network logs.</string>
 
     <string name="faq_web_link">https://www.bravedns.com/faq</string>
@@ -503,6 +499,7 @@
     <string name="search_dns_logs"><font size="12">Search domain names or IPs</font></string>
     <string name="search_universal_ips"><font size="12">Search IPs</font></string>
     <string name="search_custom_domains"><font size="12">Search domain names</font></string>
+    <string name="search_rethinkplus_file_tag"><font size="12">Search blocklists</font></string>
 
     <string name="app_mode_dns_low_battery">DNS (battery saver)</string>
     <string name="app_mode_dns">DNS</string>
@@ -636,8 +633,10 @@
     <string name="settings_orbot_notification_action">Open Orbot</string>
 
     <string name="settings_general_header">general</string>
+
     <string name="settings_refresh_heading">Refresh Data</string>
     <string name="settings_refresh_desc">Re-sync application list.</string>
+
     <string name="settings_autostart_bootup_heading">Auto-start on power-up (experimental)</string>
     <string name="settings_autostart_bootup_desc">On device power-up, start RethinkDNS if it was running before shut down.</string>
 
@@ -649,6 +648,9 @@
 
     <string name="settings_check_update_heading">Check for app updates</string>
     <string name="settings_check_update_desc">Automatically check for app updates once a week.</string>
+
+    <string name="settings_custom_downloader_heading">Use Custom download manager</string>
+    <string name="settings_custom_downloader_desc">Use Custom download manager</string>
 
     <string name="settings_theme_heading">Appearance</string>
     <string name="settings_theme_desc">Dark/light theme</string>
@@ -711,6 +713,9 @@
     <!--Connection tracker bottom sheet -->
     <string name="ct_bs_rule_1">Rule #1</string>
     <string name="ct_bs_rule_2">Rule #2</string>
+    <string name="ct_bs_heading_1">App firewall</string>
+    <string name="ct_bs_heading_2">IP firewall</string>
+    <string name="ct_bs_heading_3">Universal Setting</string>
 
     <!-- Home screen -->
     <string name="firewall_card_status_inactive">Disabled</string>
@@ -737,6 +742,8 @@
     <string name="hsf_vpn_dialog_message">RethinkDNS needs permission to set up a local VPN to encrypt the device\'s DNS requests, implement a network monitor, and enforce firewall rules. \n\nRethinkDNS does not collect any information or spy on you in any way.</string>
     <string name="hsf_vpn_dialog_positive">Proceed</string>
     <string name="hsf_vpn_dialog_negative">Cancel</string>
+
+    <string name="hsf_vpn_prepare_failure">VPN connection cancelled. Did you configure another VPN to be an always-on VPN?</string>
 
     <string name="hsf_start_dialog_header">Start %1$s</string>
     <string name="hsf_start_dialog_message">You are one step away from safe and secure Android: Instantly see network activity, block websites, IPs, and badly behaving apps.</string>
@@ -907,8 +914,9 @@
     <string name="ctbs_proxied">Proxied</string>
     <string name="ctbs_unblocked_app">Unblocked %1$s</string>
     <string name="ctbs_block_connections">Blocking all connections to %1$s</string>
-    <string name="ctbs_block_other_apps">Blocking %1$s will also block these %2$s other apps</string>
+    <string name="ctbs_block_other_apps">Rules applied for %1$s will also be applicable for %2$s other apps</string>
     <string name="ctbs_block_other_apps_positive_text">Block %1$s apps</string>
+    <string name="ctbs_proceed_positive_text">Proceed</string>
     <string name="ctbs_unblock_other_apps">Unblocking %1$s will also unblock these %2$s other apps</string>
     <string name="ctbs_unblock_other_apps_positive_text">Unblock %1$s apps</string>
     <string name="ctbs_clear_rules_desc">Clearing rules for %1$s will also clear rules for these %2$s other apps"</string>
@@ -934,6 +942,10 @@
         <Data><![CDATA[ %1$s %2$s <br/>]]></Data>
     </string>
     <string name="dns_btm_sheet_chip">+%1$s Other IPs</string>
+
+    <string name="dns_filter_parent_all">All</string>
+    <string name="dns_filter_parent_allowed">Allowed</string>
+    <string name="dns_filter_parent_blocked">Blocked</string>
 
     <!-- DNS log bottom sheet -->
     <string name="dns_btm_blocked_by">blocked %1$s by %2$s</string>
@@ -982,9 +994,8 @@
 
     <string name="univ_block_unknown_connections">Block connections when source app is unknown</string>
 
-    <string name="univ_whitelist_heading">Whitelist Apps</string>
-
-    <string name="univ_view_blocked_ip">View Blocked IPs</string>
+    <string name="univ_view_blocked_ip">View Connections</string>
+    <string name="univ_view_blocked_ip_desc">Custom list of all allowed or blocked IPs that will be part of firewall rules.</string>
 
     <string name="univ_ip_delete_individual_positive">Delete</string>
     <string name="univ_ip_delete_individual_negative">Cancel</string>
@@ -996,7 +1007,6 @@
     <string name="univ_delete_firewall_dialog_title">Delete all IP Rules?</string>
     <string name="univ_delete_firewall_dialog_message">Deleting these rules would allow any application to connect to the currently blocked IPs.</string>
     <string name="univ_ip_delete_btn">delete</string>
-
 
     <string name="univ_accessibility_crash_dialog_positive">Goto Settings</string>
     <string name="univ_accessibility_crash_dialog_negative">Cancel</string>
@@ -1059,6 +1069,13 @@
     <string name="fapps_filter_parent_installed">Installed Apps</string>
     <string name="fapps_filter_parent_system">System Apps</string>
 
+    <string name="fapps_sort_filter_none">A-Z</string>
+    <string name="fapps_sort_filter_allowed">Allowed</string>
+    <string name="fapps_sort_filter_restricted">Restricted</string>
+    <string name="fapps_sort_filter_blocked">Blocked</string>
+    <string name="fapps_sort_filter_whitelisted">Whitelisted</string>
+    <string name="fapps_sort_filter_excluded">Excluded</string>
+
     <!-- Unicode -->
     <string name="unicode_warning_sign">\u26a0</string>
     <string name="unicode_x_sign">\u274c</string>
@@ -1116,15 +1133,6 @@
     <string name="pause_text">paused</string>
     <string name="pause_desc">Note: %1$s blocked apps will continue to be firewalled.</string>
 
-    <!-- Custom Blocklist -->
-    <string name="cb_blocked">blocked</string>
-    <string name="cb_allowed">allowed</string>
-
-    <string name="cb_filter_all">All</string>
-    <string name="cb_filter_none">None</string>
-    <string name="cb_filter_allowed">Allowed</string>
-    <string name="cb_filter_blocked">Blocked</string>
-
     <!-- Other DNS list -->
     <string name="other_dns_list_tab1">DOH</string>
     <string name="other_dns_list_tab2">DNSCrypt</string>
@@ -1139,6 +1147,7 @@
     <string name="firewall_rule_block_app_new_install">New App</string>
     <string name="firewall_rule_block_app_exception">Error</string>
     <string name="firewall_rule_block_ip">IP Blocked</string>
+    <string name="firewall_rule_whitelist_ip">IP Whitelisted</string>
     <string name="firewall_rule_device_lock">Device Locked</string>
     <string name="firewall_rule_foreground">App Not-in-Use</string>
     <string name="firewall_rule_unknown">Source Unknown</string>
@@ -1153,6 +1162,7 @@
     <string name="firewall_rule_block_app_new_install_desc"><![CDATA[This connection was firewalled because RethinkDNS is <i>seeing</i> this app for the first time.<br/><br/> To change this behaviour go to <i>Universal</i> tab.]]></string>
     <string name="firewall_rule_block_app_exception_desc"><![CDATA[RethinkDNS encountered error while trying to apply firewall rules. This connection was blocked as a result.]]></string>
     <string name="firewall_rule_block_ip_desc"><![CDATA[A user-set firewall rule blocked this <i>IP</i>.<br/><br/> To change go to <i>Universal</i> tab.]]></string>
+    <string name="firewall_rule_whitelist_ip_desc"><![CDATA[A user-set firewall rule whitelisted this <i>IP</i>.<br/><br/> To change go to <i>Universal</i> tab.]]></string>
     <string name="firewall_rule_device_lock_desc"><![CDATA[This connection was firewalled because <i>device was locked</i> at the time.<br/><br/> To change this behaviour go to <i>Universal</i> tab.]]></string>
     <string name="firewall_rule_foreground_desc"><![CDATA[This connection was firewalled because the source app was <i>not in the foreground</i>.<br/><br/> To change this behaviour go to <i>Universal</i> tab.]]></string>
     <string name="firewall_rule_unknown_desc"><![CDATA[This connection was firewalled because the <i>source app</i> could not be determined.<br/><br/> To change this behaviour go to <i>Universal</i> tab.]]></string>
@@ -1203,5 +1213,98 @@
     <string name="build__flavor_website">website</string>
     <string name="build__flavor_play_store">play</string>
     <string name="build__flavor_fdroid">fdroid</string>
+
+    <!-- Firewall apps bottom sheet -->
+    <string name="fa_btm_sheet_title">Firewall Status</string>
+    <string name="fa_btm_sheet_desc">Select below to change the application\'s firewall status.</string>
+    <string name="fa_btm_sheet_allowed">Allowed</string>
+    <string name="fa_btm_sheet_allowed_desc">Allowed</string>
+    <string name="fa_btm_sheet_blocked">Blocked</string>
+    <string name="fa_btm_sheet_blocked_desc">Blocked</string>
+    <string name="fa_btm_sheet_whitelist">Whitelist</string>
+    <string name="fa_btm_sheet_whitelist_desc">Whitelist</string>
+    <string name="fa_btm_sheet_exclude">Exclude</string>
+    <string name="fa_btm_sheet_exclude_desc">Exclude</string>
+
+    <!-- Configure rethink plus -->
+    <string name="crp_empty_name">Others</string>
+    <string name="crp_group_names">%1$s: %2$s</string>
+
+    <!-- custom domain -->
+    <string name="cd_tab_header_domain">Domain</string>
+    <string name="cd_tab_header_ip">IP</string>
+
+    <string name="cd_toast_whitelist">Domain added to whitelist</string>
+    <string name="cd_toast_blocklist">Domain added to blocklist</string>
+    <string name="cd_toast_deleted">Domain removed from custom list</string>
+    <string name="cd_toast_added">Domain added successfully</string>
+    <string name="cd_remove_dialog_title">Delete domain?</string>
+    <string name="cd_remove_dialog_message">Delete the domain from saved configuration.</string>
+    <string name="cd_remove_dialog_positive">Delete</string>
+    <string name="cd_remove_dialog_negative">Cancel</string>
+    <string name="cd_remove_dialog_success_toast">domain deleted.</string>
+
+    <string name="cd_add_dialog_positive_btn">add</string>
+    <string name="cd_add_dialog_show_btn">show</string>
+    <string name="cd_add_dialog_negative_btn">cancel</string>
+
+    <string name="cd_sample_unicode_valid">✅</string>
+    <string name="cd_sample_unicode_invalid">❌</string>
+
+    <string name="cd_add_dialog_sample_1">%1$s https://%2$s.%3$s \n</string>
+    <string name="cd_add_dialog_sample_2">%1$s https://%2$s.%3$s \n</string>
+    <string name="cd_add_dialog_sample_3">%1$s https://%2$s \n</string>
+    <string name="cd_add_dialog_sample_4">%1$s https://%2$s</string>
+
+    <string name="cd_blocked">blocked</string>
+    <string name="cd_allowed">allowed</string>
+
+    <string name="cd_filter_all">All</string>
+    <string name="cd_filter_none">None</string>
+    <string name="cd_filter_allowed">Allowed</string>
+    <string name="cd_filter_blocked">Blocked</string>
+
+    <string name="cd_add_fab">Add</string>
+
+    <string name="cd_dialog_title">Add domain</string>
+    <string name="cd_dialog_desc">Custom URL(domain) or wild card to either allow or block. eg, *.test.com, test.com/test</string>
+    <string name="cd_dialog_edittext_hint">Enter %1$s</string>
+    <string name="cd_dialog_error_invalid_domain">Invalid URL(domain).</string>
+    <string name="cd_dialog_error_invalid_tld">Invalid Top level domain.</string>
+    <string name="cd_dialog_error_invalid_wildcard">Invalid wildcard.</string>
+
+    <!-- custom IP -->
+    <string name="ci_dialog_title">Add IP address</string>
+    <string name="ci_dialog_desc">Custom IP address or range to either allow or block the connections. eg., 10.10.10.10, 10.10.10.*</string>
+    <string name="ci_dialog_edittext_hint">Enter IP address</string>
+    <string name="ci_dialog_error_invalid_ip">Invalid IP address.</string>
+    <string name="ci_dialog_error_invalid_ip_wildcard">Invalid wildcard.</string>
+
+    <string name="ipv6_coming_soon_toast">Coming soon!</string>
+    <string name="ci_dialog_added_success">IP added to the list</string>
+
+    <!-- app info -->
+    <string name="ada_noapp_dialog_title">App Info not found</string>
+    <string name="ada_noapp_dialog_message">App information for the specified application is not found.</string>
+    <string name="ada_noapp_dialog_positive">Okay</string>
+
+    <string name="ada_ip_rules_status_block">Block</string>
+    <string name="ada_ip_rules_status_whitelist">Whitelist</string>
+    <string name="ada_ip_rules_status_blocked">Blocked</string>
+
+    <string name="ada_firewall_status"><![CDATA[Network connections for this app is <b><i>%1$s</i></b>.]]></string>
+    <string name="ada_uid"><![CDATA[Uid: <b><i>%1$s</i></b><br/>Application Category: <b><i>%2$s</i></b><br/>Install time: <b><i>%3$s</i></b><br/>Last update time: <b><i>%4$s</i></b>.]]></string>
+
+    <string name="ada_ip_connection_count">%1$s individual ip address(es) attempted connection.</string>
+    <string name="ada_ip_connection_count_zero">0 connections made.</string>
+    <string name="ada_ip_no_connection">No details of connections available for the app in the available logs\nNote: Not more than two days logs stored in the application</string>
+
+    <!-- DNS logs bottom sheet -->
+    <string name="bsdl_domain_heading">Domain rule</string>
+    <string name="bsdl_domain_desc">Click below to allow or block dns query</string>
+    <string name="bsdl_blocked_desc">blocked %1$s by %2$s</string>
+    <string name="bsdl_domain_rule_norule">no rule</string>
+    <string name="bsdl_domain_rule_allow">allow</string>
+    <string name="bsdl_domain_rule_block">block</string>
 
 </resources>

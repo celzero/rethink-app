@@ -53,6 +53,9 @@ class Constants {
         // meta data for on-device blocklist
         data class OnDeviceBlocklistsMetadata(val url: String, val filename: String)
 
+        // folder name to store the local blocklist download files (eg../files/local_blocklist/<timestamp>)
+        const val LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME = "local_blocklist"
+
         val ONDEVICE_BLOCKLISTS = listOf(
             OnDeviceBlocklistsMetadata("https://download.rethinkdns.com/blocklists",
                                        ONDEVICE_BLOCKLIST_FILE_TAG),
@@ -62,6 +65,16 @@ class Constants {
                                        ONDEVICE_BLOCKLIST_FILE_RD),
             OnDeviceBlocklistsMetadata("https://download.rethinkdns.com/trie",
                                        ONDEVICE_BLOCKLIST_FILE_TD))
+
+        val ONDEVICE_BLOCKLISTS_TEMP = listOf(
+            OnDeviceBlocklistsMetadata("blocklists", ONDEVICE_BLOCKLIST_FILE_TAG),
+            OnDeviceBlocklistsMetadata("basicconfig", ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG),
+            OnDeviceBlocklistsMetadata("rank", ONDEVICE_BLOCKLIST_FILE_RD),
+            OnDeviceBlocklistsMetadata("trie", ONDEVICE_BLOCKLIST_FILE_TD))
+
+        const val FILETAG_TEMP_DOWNLOAD_URL = "blocklists"
+
+        const val BLOCKLISTS_BASE_URL = "https://download.rethinkdns.com"
 
         // url to download the rethinkdns apk file
         const val RETHINK_APP_DOWNLOAD_LINK = "https://rethinkdns.com/download"

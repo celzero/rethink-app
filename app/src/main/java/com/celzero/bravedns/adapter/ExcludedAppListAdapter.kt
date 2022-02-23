@@ -18,7 +18,6 @@ package com.celzero.bravedns.adapter
 import android.content.Context
 import android.content.DialogInterface
 import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
@@ -31,9 +30,12 @@ import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.databinding.ExcludedAppListItemBinding
 import com.celzero.bravedns.glide.GlideApp
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Utilities.Companion.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.Companion.getIcon
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ExcludedAppListAdapter(private val context: Context) :
         PagedListAdapter<AppInfo, ExcludedAppListAdapter.ExcludedAppInfoViewHolder>(DIFF_CALLBACK) {
@@ -44,13 +46,13 @@ class ExcludedAppListAdapter(private val context: Context) :
 
             // based on the apps package info and excluded status
             override fun areItemsTheSame(oldConnection: AppInfo, newConnection: AppInfo): Boolean {
-                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.isExcluded == newConnection.isExcluded)
+                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.firewallStatus == newConnection.firewallStatus)
             }
 
             // return false, when there is difference in excluded status
             override fun areContentsTheSame(oldConnection: AppInfo,
                                             newConnection: AppInfo): Boolean {
-                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.isExcluded != newConnection.isExcluded)
+                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.firewallStatus != newConnection.firewallStatus)
             }
         }
     }
@@ -71,24 +73,20 @@ class ExcludedAppListAdapter(private val context: Context) :
 
         fun update(appInfo: AppInfo) {
             b.excludedAppListApkLabelTv.text = appInfo.appName
-            b.excludedAppListCheckbox.isChecked = appInfo.isExcluded
-            displayIcon(getIcon(context, appInfo.packageInfo, appInfo.appName))
+            b.excludedAppListCheckbox.isChecked = FirewallManager.isUidExcluded(appInfo.uid)
+            displayIcon(getIcon(context, appInfo.packageInfo, /*No app name */""))
             setupClickListeners(appInfo)
         }
 
         private fun setupClickListeners(appInfo: AppInfo) {
             b.excludedAppListContainer.setOnClickListener {
-                appInfo.isExcluded = !appInfo.isExcluded
-                Log.i(LOG_TAG_FIREWALL, "is app excluded- ${appInfo.appName},${appInfo.isExcluded}")
-                excludeAppsFromVpn(appInfo)
+                b.excludedAppListCheckbox.isChecked = !b.excludedAppListCheckbox.isChecked
+                handleExcludeApp(appInfo, b.excludedAppListCheckbox.isChecked)
             }
 
             b.excludedAppListCheckbox.setOnCheckedChangeListener(null)
             b.excludedAppListCheckbox.setOnClickListener {
-                appInfo.isExcluded = !appInfo.isExcluded
-                Log.i(LOG_TAG_FIREWALL,
-                      "is app excluded - ${appInfo.appName},${appInfo.isExcluded}")
-                excludeAppsFromVpn(appInfo)
+                handleExcludeApp(appInfo, b.excludedAppListCheckbox.isChecked)
             }
         }
 
@@ -97,21 +95,17 @@ class ExcludedAppListAdapter(private val context: Context) :
                 b.excludedAppListApkIconIv)
         }
 
-        private fun excludeAppsFromVpn(appInfo: AppInfo) {
+        private fun handleExcludeApp(appInfo: AppInfo, isExcluded: Boolean) {
             val appUidList = FirewallManager.getAppNamesByUid(appInfo.uid)
 
             if (appUidList.count() > 1) {
-                showDialog(appUidList, appInfo)
+                showDialog(appUidList, appInfo, isExcluded)
             } else {
-                b.excludedAppListCheckbox.isChecked = appInfo.isExcluded
-                FirewallManager.updateExcludedApps(appInfo, appInfo.isExcluded)
+                FirewallManager.updateExcludedApps(appInfo, isExcluded)
             }
-
-            Log.i(LOG_TAG_FIREWALL,
-                  "App ${appInfo.appName} excluded from vpn? - ${appInfo.isExcluded}")
         }
 
-        private fun showDialog(packageList: List<String>, appInfo: AppInfo) {
+        private fun showDialog(packageList: List<String>, appInfo: AppInfo, isExcluded: Boolean) {
             val positiveTxt: String
 
             val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
@@ -119,7 +113,7 @@ class ExcludedAppListAdapter(private val context: Context) :
             builderSingle.setIcon(R.drawable.ic_exclude_app)
 
             val count = packageList.count()
-            positiveTxt = if (appInfo.isExcluded) {
+            positiveTxt = if (isExcluded) {
                 builderSingle.setTitle(
                     context.getString(R.string.exclude_app_desc, appInfo.appName, count.toString()))
                 context.getString(R.string.exclude_app_dialog_positive, count.toString())
@@ -137,7 +131,7 @@ class ExcludedAppListAdapter(private val context: Context) :
             builderSingle.setItems(packageList.toTypedArray(), null)
 
             builderSingle.setPositiveButton(positiveTxt) { _: DialogInterface, _: Int ->
-                FirewallManager.updateExcludedApps(appInfo, appInfo.isExcluded)
+                FirewallManager.updateExcludedApps(appInfo, isExcluded)
             }.setNeutralButton(context.getString(
                 R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int -> }
 

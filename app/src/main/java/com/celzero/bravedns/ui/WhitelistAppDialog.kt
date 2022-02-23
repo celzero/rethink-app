@@ -30,7 +30,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
-import com.celzero.bravedns.databinding.CustomDialogLayoutBinding
+import com.celzero.bravedns.databinding.DialogWhitelistAppsBinding
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.AppListViewModel
 import com.google.android.material.chip.Chip
@@ -40,7 +40,7 @@ class WhitelistAppDialog(val activity: Activity, val adapter: RecyclerView.Adapt
                                                                           View.OnClickListener,
                                                                           SearchView.OnQueryTextListener {
 
-    private lateinit var b: CustomDialogLayoutBinding
+    private lateinit var b: DialogWhitelistAppsBinding
 
     private var mLayoutManager: RecyclerView.LayoutManager? = null
     private var filterCategories: MutableSet<String> = mutableSetOf()
@@ -51,7 +51,7 @@ class WhitelistAppDialog(val activity: Activity, val adapter: RecyclerView.Adapt
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
-        b = CustomDialogLayoutBinding.inflate(layoutInflater)
+        b = DialogWhitelistAppsBinding.inflate(layoutInflater)
         setContentView(b.root)
         setCancelable(false)
 
@@ -73,14 +73,14 @@ class WhitelistAppDialog(val activity: Activity, val adapter: RecyclerView.Adapt
             false
         }
 
-        FirewallManager.getApplistObserver().observe(activity as LifecycleOwner, {
-            val blockedCount = it.filter { a -> a.whiteListUniv1 }.count()
+        FirewallManager.getApplistObserver().observe(activity as LifecycleOwner) {
+            val blockedCount = it.filter { a -> a.firewallStatus == FirewallManager.AppStatus.WHITELIST.id }.count()
             b.customSelectAllOptionCount.text = context.getString(
                 R.string.whitelist_dialog_apps_in_use, blockedCount.toString())
-        })
+        }
 
         b.customSelectAllOptionCheckbox.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
-            FirewallManager.updateWhitelistedAppsByCategories(filterCategories, b)
+            //  FirewallManager.updateWhitelistedAppsByCategories(filterCategories, b)
             if (b) {
                 Utilities.showToastUiCentered(context,
                                               context.getString(R.string.whitelist_toast_positive),

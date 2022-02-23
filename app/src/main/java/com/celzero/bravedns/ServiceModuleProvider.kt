@@ -42,7 +42,7 @@ private val orbotHelperModule = module {
 }
 
 private val appDownloadManagerModule = module {
-    single { AppDownloadManager(androidContext()) }
+    single { AppDownloadManager(androidContext(), get()) }
     single { WorkScheduler(androidContext()) }
 }
 

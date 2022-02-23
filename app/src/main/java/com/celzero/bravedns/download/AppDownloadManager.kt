@@ -22,11 +22,22 @@ import android.net.Uri
 import android.os.SystemClock
 import android.util.Log
 import androidx.work.*
+import com.celzero.bravedns.customdownloader.ConnectionCheckHelper
+import com.celzero.bravedns.customdownloader.CustomDownloadManager
+import com.celzero.bravedns.customdownloader.LocalBlocklistDownloader
 import com.celzero.bravedns.download.DownloadConstants.Companion.DOWNLOAD_TAG
 import com.celzero.bravedns.download.DownloadConstants.Companion.FILE_TAG
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLISTS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Utilities.Companion.localBlocklistDownloadBasePath
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 /**
@@ -35,7 +46,8 @@ import java.util.concurrent.TimeUnit
  * to listen for the download complete and for copying the files from external to canonical path.
  * TODO remote blocklist - implementation pending.
  */
-class AppDownloadManager(private val context: Context) {
+class AppDownloadManager(private val context: Context,
+                         private val persistentState: PersistentState) {
 
     private lateinit var downloadManager: DownloadManager
     private lateinit var downloadIds: LongArray
@@ -47,6 +59,15 @@ class AppDownloadManager(private val context: Context) {
      * Calls the copy method.
      */
     fun downloadLocalBlocklist(timestamp: Long) {
+        if (persistentState.useCustomDownloadManager) {
+            initiateCustomDownloadManager(timestamp)
+            return
+        }
+
+        initiateAndroidDownloadManager(timestamp)
+    }
+
+    private fun initiateAndroidDownloadManager(timestamp: Long) {
         purge(context, timestamp)
 
         downloadIds = LongArray(ONDEVICE_BLOCKLISTS.count())
@@ -56,6 +77,44 @@ class AppDownloadManager(private val context: Context) {
             downloadIds[i] = enqueueDownload(it.url, fileName, timestamp.toString())
         }
         initiateDownloadStatusCheck(timestamp)
+    }
+
+    private fun initiateCustomDownloadManager(timestamp: Long) {
+        io {
+            val customDownloadManager = CustomDownloadManager()
+            ConnectionCheckHelper.downloadIds.clear()
+            Constants.ONDEVICE_BLOCKLISTS_TEMP.forEachIndexed { _, onDeviceBlocklistsMetadata ->
+                val id = generateDownloadId()
+                val outputFile1 = File(
+                    localBlocklistDownloadBasePath(context, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                                   timestamp))
+                outputFile1.mkdirs()
+                val filename = outputFile1.absolutePath + onDeviceBlocklistsMetadata.filename
+                customDownloadManager.download(id, filename, onDeviceBlocklistsMetadata.url)
+            }
+
+            startWorker(timestamp)
+        }
+    }
+
+    private fun startWorker(timestamp: Long) {
+        WorkManager.getInstance(context).pruneWork()
+        val data = Data.Builder()
+        data.putLong("workerStartTime", SystemClock.elapsedRealtime())
+        data.putLong("blocklistTimestamp", timestamp)
+        val downloadWatcher = OneTimeWorkRequestBuilder<LocalBlocklistDownloader>().setInputData(
+            data.build()).setBackoffCriteria(BackoffPolicy.LINEAR,
+                                             OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+                                             TimeUnit.MILLISECONDS).addTag(
+            LocalBlocklistDownloader.CUSTOM_DOWNLOAD).build()
+
+        WorkManager.getInstance(context).beginWith(downloadWatcher).enqueue()
+    }
+
+    private fun generateDownloadId(): Long {
+        val id = persistentState.customDownloaderLastGeneratedId + 1
+        persistentState.customDownloaderLastGeneratedId = id
+        return id
     }
 
     private fun initiateDownloadStatusCheck(timestamp: Long) {
@@ -123,6 +182,12 @@ class AppDownloadManager(private val context: Context) {
             val downloadId = downloadManager.enqueue(this)
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "filename - $fileName, downloadID - $downloadId")
             return downloadId
+        }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            f()
         }
     }
 

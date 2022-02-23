@@ -18,7 +18,7 @@ package com.celzero.bravedns.database
 import android.os.SystemClock
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.celzero.bravedns.automaton.CustomDomainManager
+import com.celzero.bravedns.automaton.DomainRulesManager
 import java.sql.Date
 
 @Entity(tableName = "CustomDomain")
@@ -26,6 +26,7 @@ class CustomDomain {
     @PrimaryKey var domain: String = ""
     var ips: String = ""
     var status: Int = 0
+    var type: Int = 0
     var createdTs: Date = Date(SystemClock.elapsedRealtime())
     var deletedTs: Date = Date(SystemClock.elapsedRealtime())
     var version: Long = getCurrentVersion()
@@ -40,11 +41,12 @@ class CustomDomain {
         return this.domain.hashCode()
     }
 
-    constructor(domain: String, ips: String, status: Int, createdTs: Date, deletedTs: Date,
-                version: Long) {
-        this.domain = domain
+    constructor(domain: String, ips: String, type: Int, status: Int, createdTs: Date,
+                deletedTs: Date, version: Long) {
+        this.domain = domain.dropLastWhile { it == '.' }
         this.ips = ips
         this.status = status
+        this.type = type
         this.createdTs = createdTs
         this.deletedTs = deletedTs
         this.version = version
@@ -59,10 +61,10 @@ class CustomDomain {
     }
 
     fun isBlocked(): Boolean {
-        return this.status == CustomDomainManager.CustomDomainStatus.BLOCKLIST.statusId
+        return this.status == DomainRulesManager.DomainStatus.BLOCKED.statusId
     }
 
     fun isWhitelisted(): Boolean {
-        return this.status == CustomDomainManager.CustomDomainStatus.WHITELIST.statusId
+        return this.status == DomainRulesManager.DomainStatus.WHITELISTED.statusId
     }
 }

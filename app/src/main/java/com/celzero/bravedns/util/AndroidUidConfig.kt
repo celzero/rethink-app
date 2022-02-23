@@ -175,8 +175,7 @@ enum class AndroidUidConfig(val uid: Int) {
         private val map = values().associateBy(AndroidUidConfig::uid)
 
         fun fromFileSystemUid(uid: Int): AndroidUidConfig {
-            if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                             "UID: $uid, hashed val: ${uid.hashCode()}, map Vale: ${map[uid.hashCode()]}")
+            if (DEBUG) Log.d(LOG_TAG_FIREWALL, "uid: $uid, uid name: ${map[uid.hashCode()]}")
             return map[uid.hashCode()] ?: OTHER
         }
 
