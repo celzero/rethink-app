@@ -92,6 +92,7 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
         })
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         return
     }
