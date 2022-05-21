@@ -32,7 +32,6 @@ import java.sql.Date
 import java.util.*
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import java.util.regex.Pattern
-import kotlin.collections.HashMap
 import kotlin.concurrent.write
 
 object DomainRulesManager : KoinComponent {

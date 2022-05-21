@@ -27,6 +27,7 @@ import com.celzero.bravedns.adapter.AppConnectionAdapter
 import com.celzero.bravedns.automaton.IpRulesManager
 import com.celzero.bravedns.databinding.BottomSheetAppConnectionsBinding
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -41,8 +42,7 @@ class AppConnectionBottomSheet(private val adapter: AppConnectionAdapter, val ui
                                val position: Int) : BottomSheetDialogFragment() {
     private var _binding: BottomSheetAppConnectionsBinding? = null
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
+    // This property is only valid between onCreateView and onDestroyView.
     private val b get() = _binding!!
 
     private val persistentState by inject<PersistentState>()
@@ -94,61 +94,63 @@ class AppConnectionBottomSheet(private val adapter: AppConnectionAdapter, val ui
 
     private fun showButtonForStatusBlock() {
         b.bsacUnblock.visibility = View.VISIBLE
-        b.bsacBlockAll.visibility = View.VISIBLE
         b.bsacWhitelist.visibility = View.VISIBLE
+        b.bsacBlockAll.visibility = View.VISIBLE
         b.bsacWhitelistAll.visibility = View.VISIBLE
     }
 
     private fun showButtonsForStatusWhitelist() {
         b.bsacBlock.visibility = View.VISIBLE
+        b.bsacWhitelistRemove.visibility = View.VISIBLE
         b.bsacBlockAll.visibility = View.VISIBLE
         b.bsacWhitelistAll.visibility = View.VISIBLE
-        b.bsacWhitelistRemove.visibility = View.VISIBLE
     }
 
     private fun showButtonsForStatusNone() {
         b.bsacBlock.visibility = View.VISIBLE
-        b.bsacBlockAll.visibility = View.VISIBLE
         b.bsacWhitelist.visibility = View.VISIBLE
+        b.bsacBlockAll.visibility = View.VISIBLE
         b.bsacWhitelistAll.visibility = View.VISIBLE
     }
 
     private fun initializeClickListeners() {
         b.bsacBlock.setOnClickListener {
-            applyRule(ipAddress, IpRulesManager.IpRuleStatus.BLOCK, IpRulesManager.IPRuleType.IPV4,
+            applyRule(uid, ipAddress, IpRulesManager.IpRuleStatus.BLOCK, IpRulesManager.IPRuleType.IPV4,
                       "Blocking $ipAddress for this app")
         }
 
+        // introduce this when IP firewall becomes uid-wise
         b.bsacBlockAll.setOnClickListener {
-            applyRule(ipAddress, IpRulesManager.IpRuleStatus.BLOCK, IpRulesManager.IPRuleType.IPV4,
+            applyRule(Constants.INVALID_UID, ipAddress, IpRulesManager.IpRuleStatus.BLOCK, IpRulesManager.IPRuleType.IPV4,
                       "Blocking $ipAddress for all apps")
         }
 
         b.bsacUnblock.setOnClickListener {
-            applyRule(ipAddress, IpRulesManager.IpRuleStatus.NONE, IpRulesManager.IPRuleType.IPV4,
+            applyRule(uid, ipAddress, IpRulesManager.IpRuleStatus.NONE, IpRulesManager.IPRuleType.IPV4,
                       "Removed $ipAddress from the rules")
         }
 
         b.bsacWhitelist.setOnClickListener {
-            applyRule(ipAddress, IpRulesManager.IpRuleStatus.WHITELIST,
+            applyRule(uid, ipAddress, IpRulesManager.IpRuleStatus.WHITELIST,
                       IpRulesManager.IPRuleType.IPV4, "Whitelisted $ipAddress for this app")
         }
 
+        // introduce this when IP firewall becomes uid-wise
         b.bsacWhitelistAll.setOnClickListener {
-            applyRule(ipAddress, IpRulesManager.IpRuleStatus.WHITELIST,
+            applyRule(Constants.INVALID_UID, ipAddress, IpRulesManager.IpRuleStatus.WHITELIST,
                       IpRulesManager.IPRuleType.IPV4, "Whitelisted $ipAddress for all apps")
         }
 
         b.bsacWhitelistRemove.setOnClickListener {
-            applyRule(ipAddress, IpRulesManager.IpRuleStatus.NONE, IpRulesManager.IPRuleType.IPV4,
+            applyRule(Constants.INVALID_UID, ipAddress, IpRulesManager.IpRuleStatus.NONE, IpRulesManager.IPRuleType.IPV4,
                       "Removed $ipAddress from whitelist")
         }
     }
 
-    private fun applyRule(ipAddress: String, ruleStatus: IpRulesManager.IpRuleStatus,
-                          ruleType: IpRulesManager.IPRuleType, toastMsg: String) {
+    private fun applyRule(uid: Int, ipAddress: String, status: IpRulesManager.IpRuleStatus,
+                          type: IpRulesManager.IPRuleType, toastMsg: String) {
         io {
-            IpRulesManager.addIpRule(uid, ipAddress, ruleStatus, ruleType)
+            IpRulesManager.addIpRule(uid, ipAddress, status, type)
         }
         Utilities.showToastUiCentered(requireContext(), toastMsg, Toast.LENGTH_SHORT)
         this.dismiss()

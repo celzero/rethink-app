@@ -51,7 +51,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     private var layoutManager: RecyclerView.LayoutManager? = null
     private val viewModel: ConnectionTrackerViewModel by viewModel()
 
-    private var filterQuery: String? = ""
+    private var filterQuery: String = ""
     private var filterCategories: MutableSet<String> = mutableSetOf()
     private var filterType: TopLevelFilter = TopLevelFilter.ALL
     private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
@@ -85,7 +85,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         b.recyclerConnection.setHasFixedSize(true)
         layoutManager = CustomLinearLayoutManager(requireContext())
         b.recyclerConnection.layoutManager = layoutManager
-        val recyclerAdapter = ConnectionTrackerAdapter(this)
+        val recyclerAdapter = ConnectionTrackerAdapter(requireContext())
         viewModel.connectionTrackerList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
             recyclerAdapter::submitList))
         b.recyclerConnection.adapter = recyclerAdapter
@@ -234,13 +234,13 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         }
     }
 
-    override fun onQueryTextSubmit(query: String?): Boolean {
+    override fun onQueryTextSubmit(query: String): Boolean {
         this.filterQuery = query
         viewModel.setFilter(query, filterCategories, filterType)
         return true
     }
 
-    override fun onQueryTextChange(query: String?): Boolean {
+    override fun onQueryTextChange(query: String): Boolean {
         this.filterQuery = query
         viewModel.setFilter(query, filterCategories, filterType)
         return true
@@ -260,10 +260,6 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         builder.setNegativeButton(getString(R.string.ct_delete_logs_negative_btn)) { _, _ ->
         }
         builder.create().show()
-    }
-
-    fun ipToDomain(ip: String): DnsLogTracker.DnsCacheRecord? {
-        return dnsLogTracker.ipDomainLookup.getIfPresent(ip)
     }
 
     private fun remakeChildFilterChipsUi(categories: List<FirewallRuleset>) {

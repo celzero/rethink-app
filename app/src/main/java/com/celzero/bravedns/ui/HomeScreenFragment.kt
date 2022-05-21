@@ -23,7 +23,10 @@ import android.content.res.Configuration
 import android.content.res.TypedArray
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
-import android.net.*
+import android.net.ConnectivityManager
+import android.net.LinkProperties
+import android.net.NetworkCapabilities
+import android.net.VpnService
 import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
@@ -44,7 +47,7 @@ import com.celzero.bravedns.adapter.WhitelistedAppsAdapter
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.database.DoHEndpoint
+import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.databinding.FragmentHomeScreenBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
@@ -111,7 +114,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                              getString(R.string.settings_theme_dialog_themes_3),
                              getString(R.string.settings_theme_dialog_themes_4))
 
-        appConfig.braveModeObserver.postValue(appConfig.getBraveMode().mode)
+        appConfig.getBraveModeObservable().postValue(appConfig.getBraveMode().mode)
 
     }
 
@@ -161,8 +164,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun updateConfigureDnsChip(count: Int) {
-        b.fhsDnsConfigureChip.text = if (appConfig.isRethinkDnsPlusUrl(
-                appConfig.getConnectedDns()) && count != 0) {
+        b.fhsDnsConfigureChip.text = if (appConfig.isRethinkDnsConnected() && count != 0) {
             getString(R.string.hsf_blocklist_chip_text, count.toString())
         } else {
             getString(R.string.hsf_blocklist_chip_text_no_data)
@@ -212,16 +214,22 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         }
 
-        appConfig.braveModeObserver.observe(viewLifecycleOwner) {
+        appConfig.getBraveModeObservable().observe(viewLifecycleOwner) {
             updateCardsUi()
             handleQuickSettingsChips()
             syncDnsStatus()
         }
 
         b.fhsDnsConfigureChip.setOnClickListener {
+            b.fhsDnsConfigureChip.text = getString(R.string.hsf_blocklist_updating_text)
+            b.fhsDnsConfigureChip.text = getString(R.string.hsf_blocklist_updating_text)
             io {
+                kotlinx.coroutines.delay(1500)
+                appConfig.setDefaultConnection()
+            }
+            /*io {
                 val endpoint = appConfig.getDnsRethinkEndpoint()
-                val stamp = getRemoteBlocklistStamp(endpoint.dohURL)
+                val stamp = getRemoteBlocklistStamp(endpoint!!.name)
                 if (appConfig.isRethinkDnsPlusUrl(appConfig.getConnectedDns()) || stamp.isEmpty()) {
                     uiCtx {
                         openRethinkPlusConfigureActivity(stamp)
@@ -229,7 +237,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 } else {
                     enableRethinkPlusEndpoint(endpoint)
                 }
-            }
+            }*/
         }
 
         b.fhsWhitelistChip.setOnClickListener {
@@ -272,7 +280,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun openRethinkPlusConfigureActivity(stamp: String) {
-        val intent = Intent(context, DnsConfigureWebViewActivity::class.java)
+        val intent = Intent(requireContext(), DnsConfigureWebViewActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         intent.putExtra(Constants.BLOCKLIST_LOCATION_INTENT_EXTRA,
                         DnsConfigureWebViewActivity.REMOTE)
@@ -280,15 +288,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         startActivity(intent)
     }
 
-    private suspend fun enableRethinkPlusEndpoint(endpoint: DoHEndpoint) {
+    private suspend fun enableRethinkPlusEndpoint(endpoint: RethinkDnsEndpoint) {
         uiCtx {
             b.fhsDnsConfigureChip.text = getString(R.string.hsf_blocklist_updating_text)
         }
 
         io {
             kotlinx.coroutines.delay(1500)
-            endpoint.isSelected = true
-            appConfig.handleDoHChanges(endpoint)
+            endpoint.isActive = true
+            appConfig.handleRethinkChanges(endpoint)
             uiCtx {
                 showToastUiCentered(requireContext(),
                                     getString(R.string.hsf_blocklist_selected_toast,
@@ -538,9 +546,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 synchronized(it) {
                     copy = it.toList()
                 }
-                val blockedList = copy.filter { a -> a.firewallStatus == FirewallManager.AppStatus.BLOCK.id }
-                val whiteListApps = copy.filter { a -> a.firewallStatus == FirewallManager.AppStatus.WHITELIST.id }
-                val excludedList = copy.filter { a -> a.firewallStatus == FirewallManager.AppStatus.EXCLUDE.id }
+                val blockedList = copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.BLOCK.id }
+                val whiteListApps = copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.WHITELIST.id }
+                val excludedList = copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.EXCLUDE.id }
                 b.fhsCardFirewallStatus.text = getString(R.string.firewall_card_status_active,
                                                          blockedList.count().toString())
                 b.fhsCardFirewallApps.text = getString(R.string.firewall_card_text_active,
@@ -800,14 +808,18 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     @Throws(ActivityNotFoundException::class)
     private fun prepareVpnService(): Boolean {
         val prepareVpnIntent: Intent? = try {
-            VpnService.prepare(context)
+            // In some cases, the intent used to register the VPN service does not open the
+            // application (from Android settings). This happens in some of the Android versions.
+            // VpnService.prepare() is now registered with requireContext() instead of context.
+            // Issue #469
+            VpnService.prepare(requireContext())
         } catch (e: NullPointerException) {
             // This exception is not mentioned in the documentation, but it has been encountered
             // users and also by other developers, e.g. https://stackoverflow.com/questions/45470113.
             Log.e(LOG_TAG_VPN, "Device does not support system-wide VPN mode.", e)
             return false
         }
-        //If the VPN.prepare is not null, then the first time VPN dialog is shown, Show info dialog
+        //If the VPN.prepare() is not null, then the first time VPN dialog is shown, Show info dialog
         //before that.
         if (prepareVpnIntent != null) {
             showFirstTimeVpnDialog(prepareVpnIntent)
@@ -884,10 +896,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             colorId = fetchTextColor(R.color.accentGood)
             statusId = when {
                 status.connectionState == null -> {
-                    R.string.status_waiting
+                    // app's waiting here, but such a status is a cause for confusion
+                    // R.string.status_waiting
+                    R.string.status_protected
                 }
                 status.connectionState === BraveVPNService.State.NEW -> {
-                    R.string.status_starting
+                    // app's starting here, but such a status confuses users
+                    // R.string.status_starting
+                    R.string.status_protected
                 }
                 status.connectionState === BraveVPNService.State.WORKING -> {
                     R.string.status_protected

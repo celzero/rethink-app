@@ -27,6 +27,10 @@ android {
         }
     }
 
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+
     defaultConfig {
         applicationId "com.celzero.bravedns"
         minSdkVersion 23
@@ -48,8 +52,8 @@ android {
             initWith buildTypes.debug
         }
         compileOptions {
-            sourceCompatibility JavaVersion.VERSION_1_8
-            targetCompatibility JavaVersion.VERSION_1_8
+            sourceCompatibility JavaVersion.VERSION_11
+            targetCompatibility JavaVersion.VERSION_11
         }
     }
     flavorDimensions "releaseChannel"
@@ -64,9 +68,6 @@ android {
             dimension "releaseChannel"
         }
     }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
 
     buildFeatures {
         viewBinding true
@@ -76,8 +77,8 @@ android {
 dependencies {
     androidTestImplementation 'androidx.test:rules:1.4.0'
     def koin_version = '3.1.2'
-    def room_version = "2.4.1"
-    def paging_version = "3.1.0"
+    def room_version = "2.4.2"
+    def paging_version = "2.1.2"
 
     implementation "com.google.guava:guava:31.0.1-android"
 
@@ -97,7 +98,7 @@ dependencies {
     // For liveData implementation
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.1'
 
-    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.google.code.gson:gson:2.8.9'
 
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
@@ -155,7 +156,7 @@ dependencies {
     implementation 'com.github.celzero:firestack:e3ae8df8cf'
 
     // Work manager
-    implementation 'android.arch.work:work-runtime-ktx:1.0.1'
+    implementation 'androidx.work:work-runtime-ktx:2.7.1'
 
     // Webkit
     implementation 'androidx.webkit:webkit:1.4.0'

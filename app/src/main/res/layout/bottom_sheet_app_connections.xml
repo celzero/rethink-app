@@ -34,7 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="20dp"
-        android:text="@string/hs_btm_sheet_lock_down"
+        android:text="Change connection settings of the IP. This rules will be applied to all the applications."
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/default_font_text_view" />
 

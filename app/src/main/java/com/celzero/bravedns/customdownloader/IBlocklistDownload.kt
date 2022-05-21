@@ -22,7 +22,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Streaming
 
-interface BlocklistDownloadInterface {
+interface IBlocklistDownload {
 
     @GET("/{fileName}")
     @Streaming

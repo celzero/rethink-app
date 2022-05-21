@@ -132,7 +132,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var checkForAppUpdate by booleanPref("check_for_app_update", true)
 
     // last connected dns label name
-    var connectedDnsName by stringPref("connected_dns_name", context.getString(R.string.dns_mode_3))
+    var connectedDnsName by stringPref("connected_dns_name", context.getString(R.string.default_dns_name))
 
     // the current light/dark theme; 0's the default which is "Set by System"
     var theme by intPref("app_theme", 0)
@@ -176,6 +176,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // custom download manager's last generated id
     var customDownloaderLastGeneratedId by longPref("custom_downloader_last_generated_id", 0)
+
+    var isLocalBlocklistUpdateAvailable by booleanPref("local_blocklist_update_check", false)
+
+    var isRemoteBlocklistUpdateAvailable by booleanPref("remote_blocklist_update_check", false)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()

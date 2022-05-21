@@ -27,10 +27,10 @@ class DownloadFile() : Parcelable {
         return 0
     }
 
-    private constructor(`in`: Parcel) : this() {
-        progress = `in`.readInt()
-        currentFileSize = `in`.readInt()
-        totalFileSize = `in`.readInt()
+    private constructor(parcel: Parcel) : this() {
+        progress = parcel.readInt()
+        currentFileSize = parcel.readInt()
+        totalFileSize = parcel.readInt()
     }
 
     override fun writeToParcel(dest: Parcel, flags: Int) {

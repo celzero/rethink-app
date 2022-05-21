@@ -11,7 +11,9 @@
     <dimen name="slide_title">30dp</dimen>
     <dimen name="slide_desc">18dp</dimen>
     <dimen name="desc_padding">30dp</dimen>
+    <dimen name="default_padding">16dp</dimen>
 
+    <dimen name="defaultStrokeWidth">1dp</dimen>
     <dimen name="rippleStrokeWidth">1dp</dimen>
     <dimen name="rippleRadius">16dp</dimen>
     <dimen name="maxSize">1000dp</dimen>

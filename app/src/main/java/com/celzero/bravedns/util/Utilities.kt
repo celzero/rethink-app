@@ -20,6 +20,7 @@ import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.Activity
 import android.app.ActivityManager
+import android.app.PendingIntent
 import android.content.*
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
@@ -51,7 +52,6 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.ui.DnsConfigureWebViewActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.PauseActivity
 import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
@@ -61,6 +61,7 @@ import com.celzero.bravedns.util.Constants.Companion.FLAVOR_WEBSITE
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
+import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
@@ -301,7 +302,8 @@ class Utilities {
                                 "CERT", "A6", "DNAME", "SINK", "OPT", "APL", "DS", "SSHFP",
                                 "IPSECKEY", "RRSIG", "NSEC", "DNSKEY", "DHCID", "NSEC3",
                                 "NSEC3PARAM", "TLSA", "SMIMEA")
-            return if (type < names.size) {
+            // fix: some cases the type(transaction.type) contains negative value
+            return if (type < names.size && type >= 0) {
                 names[type]
             } else String.format(Locale.ROOT, "%d", type)
         }
@@ -483,6 +485,10 @@ class Utilities {
             return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
         }
 
+        fun isAtleastS(): Boolean {
+            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+        }
+
         fun isFdroidFlavour(): Boolean {
             return BuildConfig.FLAVOR == FLAVOR_FDROID
         }
@@ -558,7 +564,7 @@ class Utilities {
             return ctx.filesDir.canonicalPath + File.separator + which
         }
 
-        private fun localBlocklistFile(ctx: Context, which: String, timestamp: Long): File? {
+        fun localBlocklistFile(ctx: Context, which: String, timestamp: Long): File? {
             return try {
                 return File(localBlocklistDownloadPath(ctx, which, timestamp))
             } catch (e: IOException) {
@@ -568,11 +574,10 @@ class Utilities {
         }
 
         fun hasRemoteBlocklists(ctx: Context, timestamp: Long): Boolean {
-            val remoteDir = remoteBlocklistDir(ctx,
-                                               DnsConfigureWebViewActivity.BLOCKLIST_REMOTE_FOLDER_NAME,
-                                               timestamp) ?: return false
-            val remoteFile = remoteBlocklistFile(remoteDir.absolutePath,
-                                                 Constants.ONDEVICE_BLOCKLIST_FILE_TAG) ?: return false
+            val remoteDir = remoteBlocklistFile(ctx, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                                timestamp) ?: return false
+            val remoteFile = blocklistFile(remoteDir.absolutePath,
+                                           Constants.ONDEVICE_BLOCKLIST_FILE_TAG) ?: return false
             if (remoteFile.exists()) {
                 return true
             }
@@ -580,22 +585,31 @@ class Utilities {
             return false
         }
 
-        fun remoteBlocklistDir(ctx: Context?, which: String, timestamp: Long): File? {
+        fun remoteBlocklistFile(ctx: Context?, which: String, timestamp: Long): File? {
             if (ctx == null) return null
 
             return try {
+                val a = remoteBlocklistDownloadBasePath(ctx, which, timestamp)
+                Log.d(LoggerConstants.LOG_TAG_DNS,"Path: $a")
                 File(remoteBlocklistDownloadBasePath(ctx, which, timestamp))
+
             } catch (e: IOException) {
                 Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
                 null
             }
         }
 
-        fun remoteBlocklistDownloadBasePath(ctx: Context, which: String, timestamp: Long): String {
+        fun remoteBlocklistDownloadPath(ctx: Context, which: String, timestamp: Long): String {
+            return remoteBlocklistDownloadBasePath(ctx, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                                  timestamp) + File.separator + which
+        }
+
+        fun remoteBlocklistDownloadBasePath(ctx: Context, which: String,
+                                                    timestamp: Long): String {
             return ctx.filesDir.canonicalPath + File.separator + which + File.separator + timestamp
         }
 
-        fun remoteBlocklistFile(dirPath: String, fileName: String): File? {
+        fun blocklistFile(dirPath: String, fileName: String): File? {
             return try {
                 return File(dirPath + fileName)
             } catch (e: IOException) {
@@ -643,6 +657,26 @@ class Utilities {
             val color = a.getColor(0, 0)
             a.recycle()
             return color
+        }
+
+        fun getActivityPendingIntent(context: Context, intent: Intent, flag: Int,
+                                     mutable: Boolean): PendingIntent {
+            return if (isAtleastS()) {
+                val sFlag = if (mutable) PendingIntent.FLAG_MUTABLE else PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.getActivity(context, 0, intent, sFlag)
+            } else {
+                PendingIntent.getActivity(context, 0, intent, flag)
+            }
+        }
+
+        fun getBroadcastPendingIntent(context: Context, requestCode: Int, intent: Intent, flag: Int,
+                                      mutable: Boolean): PendingIntent {
+            return if (isAtleastS()) {
+                val sFlag = if (mutable) PendingIntent.FLAG_MUTABLE else PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.getBroadcast(context, requestCode, intent, sFlag)
+            } else {
+                PendingIntent.getBroadcast(context, requestCode, intent, flag)
+            }
         }
     }
 }

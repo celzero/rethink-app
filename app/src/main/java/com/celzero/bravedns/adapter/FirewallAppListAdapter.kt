@@ -102,31 +102,31 @@ class FirewallAppListAdapter(private val context: Context,
             showAppHint(b.firewallAppStatusIndicator, appInfo)
         }
 
-        private fun getFirewallText(aStat: FirewallManager.AppStatus,
+        private fun getFirewallText(aStat: FirewallManager.FirewallStatus,
                                     cStat: FirewallManager.ConnectionStatus): CharSequence {
             return when (aStat) {
-                FirewallManager.AppStatus.ALLOW -> "Allowed"
-                FirewallManager.AppStatus.EXCLUDE -> "Excluded"
-                FirewallManager.AppStatus.WHITELIST -> "Whitelisted"
-                FirewallManager.AppStatus.BLOCK -> {
+                FirewallManager.FirewallStatus.ALLOW -> "Allowed"
+                FirewallManager.FirewallStatus.EXCLUDE -> "Excluded"
+                FirewallManager.FirewallStatus.WHITELIST -> "Whitelisted"
+                FirewallManager.FirewallStatus.BLOCK -> {
                     when {
                         cStat.mobileData() -> "Allowed on WiFi"
                         cStat.wifi() -> "Allowed on mobile data"
                         else -> "Blocked"
                     }
                 }
-                FirewallManager.AppStatus.UNTRACKED -> "Unknown"
+                FirewallManager.FirewallStatus.UNTRACKED -> "Unknown"
             }
         }
 
-        private fun displayConnectionStatus(appStatus: FirewallManager.AppStatus,
+        private fun displayConnectionStatus(firewallStatus: FirewallManager.FirewallStatus,
                                             connStatus: FirewallManager.ConnectionStatus) {
-            when (appStatus) {
-                FirewallManager.AppStatus.ALLOW -> {
+            when (firewallStatus) {
+                FirewallManager.FirewallStatus.ALLOW -> {
                     showWifiEnabled()
                     showMobileDataEnabled()
                 }
-                FirewallManager.AppStatus.BLOCK -> {
+                FirewallManager.FirewallStatus.BLOCK -> {
                     when {
                         connStatus.both() -> {
                             showWifiDisabled()
@@ -142,11 +142,11 @@ class FirewallAppListAdapter(private val context: Context,
                         }
                     }
                 }
-                FirewallManager.AppStatus.EXCLUDE -> {
+                FirewallManager.FirewallStatus.EXCLUDE -> {
                     showMobileDataUnused()
                     showWifiUnused()
                 }
-                FirewallManager.AppStatus.WHITELIST -> {
+                FirewallManager.FirewallStatus.WHITELIST -> {
                     showMobileDataUnused()
                     showWifiUnused()
                 }
@@ -189,21 +189,21 @@ class FirewallAppListAdapter(private val context: Context,
 
         private fun showAppHint(mIconIndicator: TextView, appInfo: AppInfo) {
             when (FirewallManager.appStatus(appInfo.uid)) {
-                FirewallManager.AppStatus.ALLOW -> {
+                FirewallManager.FirewallStatus.ALLOW -> {
                     mIconIndicator.setBackgroundColor(context.getColor(R.color.colorGreen_900))
                 }
-                FirewallManager.AppStatus.EXCLUDE -> {
+                FirewallManager.FirewallStatus.EXCLUDE -> {
                     mIconIndicator.setBackgroundColor(
                         context.getColor(R.color.primaryLightColorText))
                 }
-                FirewallManager.AppStatus.WHITELIST -> {
+                FirewallManager.FirewallStatus.WHITELIST -> {
                     mIconIndicator.setBackgroundColor(
                         context.getColor(R.color.primaryLightColorText))
                 }
-                FirewallManager.AppStatus.BLOCK -> {
+                FirewallManager.FirewallStatus.BLOCK -> {
                     mIconIndicator.setBackgroundColor(context.getColor(R.color.colorAmber_900))
                 }
-                FirewallManager.AppStatus.UNTRACKED -> { /* no-op */
+                FirewallManager.FirewallStatus.UNTRACKED -> { /* no-op */
                 }
             }
         }
@@ -258,21 +258,21 @@ class FirewallAppListAdapter(private val context: Context,
 
             when (FirewallManager.connectionStatus(appInfo.uid)) {
                 FirewallManager.ConnectionStatus.MOBILE_DATA -> {
-                    updateFirewallStatus(appInfo.uid, FirewallManager.AppStatus.ALLOW,
+                    updateFirewallStatus(appInfo.uid, FirewallManager.FirewallStatus.ALLOW,
                                          FirewallManager.ConnectionStatus.BOTH)
                 }
                 FirewallManager.ConnectionStatus.WIFI -> {
-                    updateFirewallStatus(appInfo.uid, FirewallManager.AppStatus.BLOCK,
+                    updateFirewallStatus(appInfo.uid, FirewallManager.FirewallStatus.BLOCK,
                                          FirewallManager.ConnectionStatus.BOTH)
                     killApps(appInfo.uid)
                 }
                 FirewallManager.ConnectionStatus.BOTH -> {
                     if (appStatus.blocked()) {
-                        updateFirewallStatus(appInfo.uid, FirewallManager.AppStatus.BLOCK,
+                        updateFirewallStatus(appInfo.uid, FirewallManager.FirewallStatus.BLOCK,
                                              FirewallManager.ConnectionStatus.WIFI)
                         return
                     }
-                    updateFirewallStatus(appInfo.uid, FirewallManager.AppStatus.BLOCK,
+                    updateFirewallStatus(appInfo.uid, FirewallManager.FirewallStatus.BLOCK,
                                          FirewallManager.ConnectionStatus.MOBILE_DATA)
                 }
             }
@@ -283,21 +283,21 @@ class FirewallAppListAdapter(private val context: Context,
 
             when (FirewallManager.connectionStatus(appInfo.uid)) {
                 FirewallManager.ConnectionStatus.MOBILE_DATA -> {
-                    updateFirewallStatus(appInfo.uid, FirewallManager.AppStatus.BLOCK,
+                    updateFirewallStatus(appInfo.uid, FirewallManager.FirewallStatus.BLOCK,
                                          FirewallManager.ConnectionStatus.BOTH)
                     killApps(appInfo.uid)
                 }
                 FirewallManager.ConnectionStatus.WIFI -> {
-                    updateFirewallStatus(appInfo.uid, FirewallManager.AppStatus.ALLOW,
+                    updateFirewallStatus(appInfo.uid, FirewallManager.FirewallStatus.ALLOW,
                                          FirewallManager.ConnectionStatus.BOTH)
                 }
                 FirewallManager.ConnectionStatus.BOTH -> {
                     if (appStatus.blocked()) {
-                        updateFirewallStatus(appInfo.uid, FirewallManager.AppStatus.BLOCK,
+                        updateFirewallStatus(appInfo.uid, FirewallManager.FirewallStatus.BLOCK,
                                              FirewallManager.ConnectionStatus.MOBILE_DATA)
                         return
                     }
-                    updateFirewallStatus(appInfo.uid, FirewallManager.AppStatus.BLOCK,
+                    updateFirewallStatus(appInfo.uid, FirewallManager.FirewallStatus.BLOCK,
                                          FirewallManager.ConnectionStatus.WIFI)
                 }
             }

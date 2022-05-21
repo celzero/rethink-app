@@ -39,7 +39,7 @@ class DnsDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
     private val persistentState by inject<PersistentState>()
 
     enum class Tabs(val screen: Int) {
-        LOGS(0), CONFIGURE(1);
+        LOGS(0), CONFIGURE(1), CONFIGURE_NEW(2);
 
         companion object {
             fun getCount(): Int {
@@ -61,6 +61,7 @@ class DnsDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
                 return when (position) {
                     Tabs.LOGS.screen -> DnsLogFragment.newInstance()
                     Tabs.CONFIGURE.screen -> DnsConfigureFragment.newInstance()
+                    Tabs.CONFIGURE_NEW.screen -> DnsConfigureFragmentNew.newInstance()
                     else -> DnsConfigureFragment.newInstance()
                 }
             }
@@ -75,6 +76,7 @@ class DnsDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
             tab.text = when (position) {
                 Tabs.LOGS.screen -> getString(R.string.dns_act_log)
                 Tabs.CONFIGURE.screen -> getString(R.string.dns_act_configure_tab)
+                Tabs.CONFIGURE_NEW.screen -> getString(R.string.dns_act_configure_tab)
                 else -> getString(R.string.dns_act_configure_tab)
             }
         }.attach()

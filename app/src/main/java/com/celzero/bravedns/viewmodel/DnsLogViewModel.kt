@@ -21,8 +21,8 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.PagedList
 import androidx.paging.toLiveData
-import com.celzero.bravedns.database.DnsLogDAO
 import com.celzero.bravedns.database.DnsLog
+import com.celzero.bravedns.database.DnsLogDAO
 import com.celzero.bravedns.ui.DnsLogFragment
 import com.celzero.bravedns.util.Constants.Companion.DNS_LIVEDATA_PAGE_SIZE
 

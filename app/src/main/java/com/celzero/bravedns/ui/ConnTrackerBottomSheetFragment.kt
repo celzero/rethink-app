@@ -20,15 +20,22 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
+import android.content.res.TypedArray
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.util.Log
-import android.view.*
+import android.util.TypedValue
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.Window
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
+import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.automaton.IpRulesManager
 import com.celzero.bravedns.automaton.IpRulesManager.UID_EVERYBODY
@@ -41,8 +48,9 @@ import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.FirewallRuleset.Companion.getFirewallRule
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.Protocol
+import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
 import com.celzero.bravedns.util.Utilities.Companion.getIcon
 import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
@@ -51,6 +59,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
+
 
 /**
  * Renders network logs from where user can also set firewall rules.
@@ -63,7 +72,7 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
     // This property is only valid between onCreateView and onDestroyView.
     private val b get() = _binding!!
 
-    private val dnsLogTracker by inject<DnsLogTracker>()
+    data class ToggleBtnUi(val txtColor: Int, val bgColor: Int)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -90,7 +99,6 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
 
         applyFirewallRule(findSelectedFirewallRule(getTag(btn.tag)))
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -130,11 +138,13 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
     }
 
     private fun updateDnsIfAvailable() {
-        val ipToDomain = dnsLogTracker.ipDomainLookup.getIfPresent(ipDetails.ipAddress)
-        ipToDomain?.let {
-            b.bsConnDnsCacheText.visibility = View.VISIBLE
-            b.bsConnDnsCacheText.text = ipToDomain.fqdn
+        if (ipDetails.dnsQuery.isNullOrEmpty()) {
+            b.bsConnDnsCacheText.visibility = View.GONE
+            return
         }
+
+        b.bsConnDnsCacheText.visibility = View.VISIBLE
+        b.bsConnDnsCacheText.text = ipDetails.dnsQuery
     }
 
     private fun updateConnDetailsChip() {
@@ -194,15 +204,15 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
                                                                       ipDetails.blockedByRule))
         if (ipDetails.isBlocked) {
             b.bsConnTrackAppKill.setTextColor(fetchColor(requireContext(), R.attr.chipTextNegative))
-            val colorFilter = PorterDuffColorFilter(fetchColor(requireContext(), R.attr.chipTextNegative),
-                                                    PorterDuff.Mode.SRC_IN)
+            val colorFilter = PorterDuffColorFilter(
+                fetchColor(requireContext(), R.attr.chipTextNegative), PorterDuff.Mode.SRC_IN)
             b.bsConnTrackAppKill.chipBackgroundColor = ColorStateList.valueOf(
                 fetchColor(requireContext(), R.attr.chipBgColorNegative))
             b.bsConnTrackAppKill.chipIcon?.colorFilter = colorFilter
         } else {
             b.bsConnTrackAppKill.setTextColor(fetchColor(requireContext(), R.attr.chipTextPositive))
-            val colorFilter = PorterDuffColorFilter(fetchColor(requireContext(), R.attr.chipTextPositive),
-                                                    PorterDuff.Mode.SRC_IN)
+            val colorFilter = PorterDuffColorFilter(
+                fetchColor(requireContext(), R.attr.chipTextPositive), PorterDuff.Mode.SRC_IN)
             b.bsConnTrackAppKill.chipBackgroundColor = ColorStateList.valueOf(
                 fetchColor(requireContext(), R.attr.chipBgColorPositive))
             b.bsConnTrackAppKill.chipIcon?.colorFilter = colorFilter
@@ -231,6 +241,7 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
         }
 
         b.bsConnBlockAppToggleGroup.addOnButtonCheckedListener(appToggleGroupListener)
+        b.bsConnBlockAppToggleGroup1.addOnButtonCheckedListener(tempGroupListener)
         b.bsConnBlockIpToggleGroup.addOnButtonCheckedListener { group, checkedId, isChecked ->
             val btn: MaterialButton = b.bsConnBlockIpToggleGroup.findViewById(checkedId)
             if (!isChecked) {
@@ -246,7 +257,99 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
         b.bsConnTrackAppNameHeader.setOnClickListener {
             openAppDetailActivity(ipDetails.uid)
         }
+
+        b.bsConnFirewallSpinner.adapter = FirewallStatusSpinnerAdapter(requireContext())
+        b.bsConnFirewallSpinner.onItemSelectedListener = object :
+                AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View, position: Int,
+                                        id: Long) {
+
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
     }
+
+    private val tempGroupListener = MaterialButtonToggleGroup.OnButtonCheckedListener { group, checkedId, isChecked ->
+        val b: MaterialButton = b.bsConnBlockAppToggleGroup1.findViewById(checkedId)
+        if (isChecked) {
+            val fid = findSelectedFirewallRule(getTag(b.tag))
+            val t = toggleBtnUi(fid)
+            selectToggleBtnUi(b, t)
+            return@OnButtonCheckedListener
+        }
+
+        unselectToggleBtnUi(b)
+    }
+
+    private fun toggleBtnUi(id: FirewallManager.FirewallStatus): ToggleBtnUi {
+        return when (id) {
+            FirewallManager.FirewallStatus.ALLOW -> {
+                ToggleBtnUi(fetchTextColor(R.color.firewallNoRuleToggleBtnTxt),
+                            fetchTextColor(R.color.firewallNoRuleToggleBtnBg))
+            }
+            FirewallManager.FirewallStatus.BLOCK -> {
+                ToggleBtnUi(fetchTextColor(R.color.firewallBlockToggleBtnTxt),
+                            fetchTextColor(R.color.firewallBlockToggleBtnBg))
+            }
+            FirewallManager.FirewallStatus.WHITELIST -> {
+                ToggleBtnUi(fetchTextColor(R.color.firewallWhiteListToggleBtnTxt),
+                            fetchTextColor(R.color.firewallWhiteListToggleBtnBg))
+            }
+            FirewallManager.FirewallStatus.EXCLUDE -> {
+                ToggleBtnUi(fetchTextColor(R.color.firewallExcludeToggleBtnTxt),
+                            fetchTextColor(R.color.firewallExcludeToggleBtnBg))
+            }
+            else -> {
+                ToggleBtnUi(fetchTextColor(R.color.firewallNoRuleToggleBtnTxt),
+                            fetchTextColor(R.color.firewallNoRuleToggleBtnBg))
+            }
+        }
+    }
+
+    private fun selectToggleBtnUi(b: MaterialButton, toggleBtnUi: ToggleBtnUi) {
+        b.setTextColor(toggleBtnUi.txtColor)
+        b.backgroundTintList = ColorStateList.valueOf(toggleBtnUi.bgColor)
+    }
+
+    private fun unselectToggleBtnUi(b: MaterialButton) {
+        b.setTextColor(fetchTextColor(R.color.defaultToggleBtnTxt))
+        b.backgroundTintList = ColorStateList.valueOf(fetchTextColor(R.color.defaultToggleBtnBg))
+    }
+
+    private fun fetchTextColor(attr: Int): Int {
+        val attributeFetch = if (attr == R.color.firewallNoRuleToggleBtnTxt) {
+            R.attr.firewallNoRuleToggleBtnTxt
+        } else if (attr == R.color.firewallNoRuleToggleBtnBg) {
+            R.attr.firewallNoRuleToggleBtnBg
+        } else if (attr == R.color.firewallBlockToggleBtnTxt) {
+            R.attr.firewallBlockToggleBtnTxt
+        } else if (attr == R.color.firewallBlockToggleBtnBg) {
+            R.attr.firewallBlockToggleBtnBg
+        } else if (attr == R.color.firewallWhiteListToggleBtnTxt) {
+            R.attr.firewallWhiteListToggleBtnTxt
+        } else if (attr == R.color.firewallWhiteListToggleBtnBg) {
+            R.attr.firewallWhiteListToggleBtnBg
+        } else if (attr == R.color.firewallExcludeToggleBtnBg) {
+            R.attr.firewallExcludeToggleBtnBg
+        } else if (attr == R.color.firewallExcludeToggleBtnTxt) {
+            R.attr.firewallExcludeToggleBtnTxt
+        } else if (attr == R.color.defaultToggleBtnBg) {
+            R.attr.defaultToggleBtnBg
+        } else if (attr == R.color.defaultToggleBtnTxt) {
+            R.attr.defaultToggleBtnTxt
+        } else {
+            R.attr.chipBgColorPositive
+        }
+        val typedValue = TypedValue()
+        val a: TypedArray = requireContext().obtainStyledAttributes(typedValue.data,
+                                                                    intArrayOf(attributeFetch))
+        val color = a.getColor(0, 0)
+        a.recycle()
+        return color
+    }
+
 
     // each button in the toggle group is associated with tag value.
     // tag values are ids of the FirewallManager.AppStatus and IpRulesManager.IpRuleStatus
@@ -255,22 +358,22 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
     }
 
     // returns the firewall app status based on the button tag
-    private fun findSelectedFirewallRule(ruleId: Int): FirewallManager.AppStatus {
+    private fun findSelectedFirewallRule(ruleId: Int): FirewallManager.FirewallStatus {
         return when (ruleId) {
-            FirewallManager.AppStatus.ALLOW.id -> {
-                FirewallManager.AppStatus.ALLOW
+            FirewallManager.FirewallStatus.ALLOW.id -> {
+                FirewallManager.FirewallStatus.ALLOW
             }
-            FirewallManager.AppStatus.BLOCK.id -> {
-                FirewallManager.AppStatus.BLOCK
+            FirewallManager.FirewallStatus.BLOCK.id -> {
+                FirewallManager.FirewallStatus.BLOCK
             }
-            FirewallManager.AppStatus.WHITELIST.id -> {
-                FirewallManager.AppStatus.WHITELIST
+            FirewallManager.FirewallStatus.WHITELIST.id -> {
+                FirewallManager.FirewallStatus.WHITELIST
             }
-            FirewallManager.AppStatus.EXCLUDE.id -> {
-                FirewallManager.AppStatus.EXCLUDE
+            FirewallManager.FirewallStatus.EXCLUDE.id -> {
+                FirewallManager.FirewallStatus.EXCLUDE
             }
             else -> {
-                FirewallManager.AppStatus.ALLOW
+                FirewallManager.FirewallStatus.ALLOW
             }
         }
     }
@@ -299,25 +402,25 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
         requireContext().startActivity(intent)
     }
 
-    private fun updateFirewallRulesUi(appStatus: FirewallManager.AppStatus) {
-        when (appStatus) {
-            FirewallManager.AppStatus.ALLOW -> {
+    private fun updateFirewallRulesUi(firewallStatus: FirewallManager.FirewallStatus) {
+        when (firewallStatus) {
+            FirewallManager.FirewallStatus.ALLOW -> {
                 b.bsConnBlockAppToggleGroup.check(b.bsConnTgNoRule.id)
                 enableToggleButton(b.bsConnTgNoRule)
             }
-            FirewallManager.AppStatus.BLOCK -> {
+            FirewallManager.FirewallStatus.BLOCK -> {
                 b.bsConnBlockAppToggleGroup.check(b.bsConnTgBlock.id)
                 enableToggleButton(b.bsConnTgBlock)
             }
-            FirewallManager.AppStatus.WHITELIST -> {
+            FirewallManager.FirewallStatus.WHITELIST -> {
                 b.bsConnBlockAppToggleGroup.check(b.bsConnTgWhitelist.id)
                 enableToggleButton(b.bsConnTgWhitelist)
             }
-            FirewallManager.AppStatus.EXCLUDE -> {
+            FirewallManager.FirewallStatus.EXCLUDE -> {
                 b.bsConnBlockAppToggleGroup.check(b.bsConnTgExclude.id)
                 enableToggleButton(b.bsConnTgExclude)
             }
-            FirewallManager.AppStatus.UNTRACKED -> {
+            FirewallManager.FirewallStatus.UNTRACKED -> {
                 b.bsConnBlockAppToggleGroup.check(b.bsConnTgNoRule.id)
                 enableToggleButton(b.bsConnTgNoRule)
             }
@@ -379,7 +482,7 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
         dialog.show()
     }
 
-    private fun applyFirewallRule(status: FirewallManager.AppStatus) {
+    private fun applyFirewallRule(status: FirewallManager.FirewallStatus) {
         val appNames = FirewallManager.getAppNamesByUid(ipDetails.uid)
         if (appNames.count() > 1) {
             val prevStatus = FirewallManager.appStatus(ipDetails.uid)
@@ -413,8 +516,8 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
         }
     }
 
-    private fun showFirewallDialog(packageList: List<String>, status: FirewallManager.AppStatus,
-                                   prevStatus: FirewallManager.AppStatus) {
+    private fun showFirewallDialog(packageList: List<String>, status: FirewallManager.FirewallStatus,
+                                   prevStatus: FirewallManager.FirewallStatus) {
 
         val builderSingle: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(
             requireContext())

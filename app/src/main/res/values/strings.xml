@@ -264,12 +264,7 @@
 
     <string name="faq_web_link">https://www.bravedns.com/faq</string>
 
-    <string name="dns_mode_0">No Filter</string>
-    <string name="dns_mode_1">Family</string>
-    <string name="dns_mode_2">Security</string>
-    <string name="dns_mode_3">RethinkDNS Basic</string>
-    <string name="dns_mode_4">Custom</string>
-    <string name="dns_mode_5">RethinkDNS Plus</string>
+    <string name="default_dns_name">RethinkDNS Default</string>
 
     <string name="dns_mode_0_explanation">Does not block any DNS requests. Uses Cloudflare\'s 1.1.1.1 DNS endpoint.</string>
     <string name="dns_mode_1_explanation">Blocks malware and adult content. Uses Cloudflare\'s 1.1.1.3 DNS endpoint.</string>
@@ -352,12 +347,11 @@
     <string name="system_apps_dialog_negative">Cancel</string>
 
     <string name="firewall_act_universal_tab">Universal</string>
-    <string name="firewall_act_apps_tab">All apps</string>
-    <string name="firewall_act_network_monitor_tab">Network log</string>
+    <string name="firewall_act_apps_tab">All Apps</string>
+    <string name="firewall_act_network_monitor_tab">Network Logs</string>
 
     <string name="dns_act_configure_tab">Configure</string>
     <string name="dns_act_log">Logs</string>
-    <string name="dns_act_home">Home</string>
 
     <string name="univ_firewall_dialog_title">Delete IP Rule?</string>
     <string name="univ_firewall_dialog_message">Deleting this rule would allow any app to connect to this IP. Do you want to proceed?</string>
@@ -404,7 +398,7 @@
     <string name="local_blocklist_corrupt_positive">Re-download</string>
     <string name="local_blocklist_corrupt_negative">Cancel</string>
 
-    <string name="local_blocklist_update_check_failure">Something went wrong. Try again later!</string>
+    <string name="blocklist_update_check_failure">Something went wrong. Try again later!</string>
 
     <string name="webview_no_stamp_change_title">Quit?</string>
     <string name="webview_no_stamp_change_desc">Currently, %1$s blocklist(s) in-use. No additional blocklists have been set. Do you want to quit anyway?</string>
@@ -791,6 +785,54 @@
     <string name="settings_local_blocklist_configure">configure</string>
     <string name="settings_local_blocklist_update">Update</string>
 
+    <string name="dc_block_heading">allow / deny domains</string>
+    <string name="dc_other_dns_heading">configure dns</string>
+    <string name="dc_other_settings_heading">other dns settings</string>
+
+    <string name="dc_local_block_heading">Local</string>
+    <string name="dc_local_block_desc_1">Choose from 185+ blocklists. Click here to download or configure blocklists.</string>
+
+    <string name="dc_remote_block_heading">RethinkDNS</string>
+    <string name="dc_remote_block_desc">Configure doh with blocklist from 185+ blocklists.</string>
+
+    <string name="dc_custom_block_heading">Custom Allow/Deny domains</string>
+    <string name="dc_custom_block_desc">Click here to configure custom allow or deny domains.</string>
+
+    <string name="dc_dns_options_heading">More DNS options</string>
+    <string name="dc_dns_options_desc">Select or add more options from doh, dnscrypt, dns proxy.</string>
+
+    <string name="dc_dns_website_heading">Show website icon in DNS logs (experimental)</string>
+    <string name="dc_dns_website_desc">Fetches website icons from duckduckgo.com</string>
+
+    <string name="dc_dns_leaks_heading">Prevent DNS leaks</string>
+    <string name="dc_dns_leaks_desc">When enabled, RethinkDNS captures all packets on port 53 and forwards it to a user-set DNS endpoint</string>
+
+    <string name="dc_check_update_heading">Check updates for blocklists</string>
+    <string name="dc_check_update_desc">Check for blocklists update once every three days</string>
+
+    <!-- Local blocklist bottom sheet -->
+
+    <string name="bslb_heading">Local Blocklist</string>
+    <string name="bslb_desc">Local Blocklist</string>
+    <string name="bslb_default_desc">A configurable DNS resolver that lets users add or remove blocklists. Download blocklists (around 60MB) to use this feature?</string>
+    <string name="bslb_download_desc">Download blocklists (around 60MB) to use this feature?</string>
+    <string name="bslb_download_btn">Download</string>
+    <string name="bslb_downloading_btn">Downloading..</string>
+    <string name="bslb_configure_btn">Configure</string>
+    <string name="bslb_cancel_btn">Dismiss</string>
+    <string name="bslb_check_update">Check for update</string>
+    <string name="bslb_open_vpn_profile"><u>Open Vpn profile</u></string>
+
+    <!-- Remote blocklist bottom sheet -->
+
+    <string name="bsrb_heading">Remote Blocklist</string>
+    <string name="bsrb_desc">Remote Blocklist</string>
+    <string name="bsrb_default_desc">A configurable DNS resolver that lets users add or remove blocklists</string>
+    <string name="bsrb_download_desc">Download blocklist (around 2KB) to use this feature?</string>
+    <string name="bsrb_download_btn">Download</string>
+    <string name="bsrb_configure_btn">Configure</string>
+    <string name="bsrb_cancel_btn">Dismiss</string>
+    <string name="bsrb_check_update"><u>Check for update?</u></string>
 
     <!-- About fragment -->
     <string name="about_bravedns_explantion">RethinkDNS is the easiest way to monitor app activity, circumvent Internet censorship, and firewall apps on your Android device. </string>
@@ -1134,9 +1176,9 @@
     <string name="pause_desc">Note: %1$s blocked apps will continue to be firewalled.</string>
 
     <!-- Other DNS list -->
-    <string name="other_dns_list_tab1">DOH</string>
-    <string name="other_dns_list_tab2">DNSCrypt</string>
-    <string name="other_dns_list_tab3">DNS Proxy</string>
+    <string name="other_dns_list_tab1">DoH</string>
+    <string name="other_dns_list_tab2">Dnscrypt</string>
+    <string name="other_dns_list_tab3">Dns Proxy</string>
 
     <!-- Home screen bottom sheet -->
     <string name="hs_btm_sheet_lock_down">Cannot change modes when VPN is <i>lockdown</i>. Tap to <u>edit VPN settings</u>.</string>
@@ -1295,9 +1337,17 @@
     <string name="ada_firewall_status"><![CDATA[Network connections for this app is <b><i>%1$s</i></b>.]]></string>
     <string name="ada_uid"><![CDATA[Uid: <b><i>%1$s</i></b><br/>Application Category: <b><i>%2$s</i></b><br/>Install time: <b><i>%3$s</i></b><br/>Last update time: <b><i>%4$s</i></b>.]]></string>
 
-    <string name="ada_ip_connection_count">%1$s individual ip address(es) attempted connection.</string>
-    <string name="ada_ip_connection_count_zero">0 connections made.</string>
-    <string name="ada_ip_no_connection">No details of connections available for the app in the available logs\nNote: Not more than two days logs stored in the application</string>
+    <string name="ada_ip_connection_count">%1$s individual IP address(es) attempted connection.</string>
+    <string name="ada_ip_connection_count_zero">0 IP address</string>
+    <string name="ada_ip_no_connection">No details of connections are available for the app in the available logs. Note: The application stores no more than two days\' worth of logs.</string>
+
+    <string name="ada_app_status_allow">Allowed</string>
+    <string name="ada_app_status_block">Blocked</string>
+    <string name="ada_app_status_block_wifi">Allowed on Mobile data</string>
+    <string name="ada_app_status_block_md">Allowed on WiFi</string>
+    <string name="ada_app_status_whitelist">Whitelisted</string>
+    <string name="ada_app_status_exclude">Excluded</string>
+    <string name="ada_app_status_unknown">Unknown</string>
 
     <!-- DNS logs bottom sheet -->
     <string name="bsdl_domain_heading">Domain rule</string>

@@ -53,7 +53,7 @@
             android:layout_marginEnd="10dp"
             android:layout_toStartOf="@id/dns_crypt_endpoint_list_action_image"
             android:padding="10dp"
-            android:src="@drawable/ic_fab_appinfo" />
+            android:src="@drawable/ic_info" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/dns_crypt_endpoint_list_action_image"

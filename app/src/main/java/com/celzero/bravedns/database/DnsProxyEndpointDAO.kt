@@ -63,4 +63,7 @@ interface DnsProxyEndpointDAO {
     // instead of using id
     @Query("select * from DNSProxyEndpoint where id = 1")
     fun getNetworkDnsEndpoint(): DnsProxyEndpoint
+
+    @Query("update DNSProxyEndpoint set isSelected = 1 where id = 1")
+    fun setNetworkDns()
 }

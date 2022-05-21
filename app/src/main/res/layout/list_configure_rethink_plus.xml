@@ -2,8 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="?attr/background">
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/crp_heading_tv"
@@ -23,7 +22,11 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/crp_heading_tv"
         android:layout_margin="4dp"
-        app:cardElevation="8dp">
+        android:layout_marginTop="5dp"
+        app:cardBackgroundColor="?attr/background"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        app:cardUseCompatPadding="true">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -65,10 +68,10 @@
                     android:id="@+id/crp_desc_group_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
                     android:background="@drawable/rectangle_border_background"
                     android:ellipsize="end"
                     android:padding="5dp"
-                    android:layout_marginEnd="5dp"
                     android:text="Dummy Package"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />

@@ -28,8 +28,7 @@
                 android:padding="10dp"
                 android:text="@string/universal_firewall_explanation"
                 android:textSize="@dimen/default_font_text_view"
-                android:textColor="?attr/primaryLightColorText"
-                android:visibility="visible" />
+                android:textColor="?attr/primaryLightColorText" />
 
             <LinearLayout
                 android:id="@+id/firewall_screen_ll"
@@ -265,8 +264,9 @@
                         android:gravity="center_vertical"
                         android:paddingTop="5dp"
                         android:paddingBottom="5dp"
+                        android:textColor="?attr/secondaryTextColor"
                         android:text="@string/univ_view_blocked_ip"
-                        android:textSize="@dimen/large_font_text_view"
+                        android:textSize="@dimen/extra_large_font_text_view"
                         android:textStyle="bold" />
 
                     <TextView
@@ -286,6 +286,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
+                    android:padding="25dp"
                     android:layout_centerVertical="true"
                     android:src="@drawable/ic_right_arrow_small" />
             </RelativeLayout>

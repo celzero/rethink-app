@@ -40,11 +40,11 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
+import com.celzero.bravedns.util.Utilities.Companion.getActivityPendingIntent
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import com.celzero.bravedns.util.Utilities.Companion.isNonApp
 import com.google.common.collect.Sets
 import kotlinx.coroutines.*
-import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
@@ -260,7 +260,7 @@ class RefreshDatabase internal constructor(private var context: Context,
 
         appInfo.uid = uid
         if (persistentState.blockNewlyInstalledApp) {
-            appInfo.firewallStatus = FirewallManager.AppStatus.BLOCK.id
+            appInfo.firewallStatus = FirewallManager.FirewallStatus.BLOCK.id
         }
 
         FirewallManager.persistAppInfo(appInfo)
@@ -282,7 +282,7 @@ class RefreshDatabase internal constructor(private var context: Context,
         // default value of apps internet permission is true, when the universal firewall
         // parameter (blockNewlyInstalledApp is true) firewall the app
         if (persistentState.blockNewlyInstalledApp) {
-            entry.firewallStatus = FirewallManager.AppStatus.BLOCK.id
+            entry.firewallStatus = FirewallManager.FirewallStatus.BLOCK.id
         }
 
         entry.appCategory = determineAppCategory(appInfo)
@@ -323,8 +323,8 @@ class RefreshDatabase internal constructor(private var context: Context,
         intent.putExtra(Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME,
                         Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE)
 
-        val pendingIntent = PendingIntent.getActivity(context, 0, intent,
-                                                      PendingIntent.FLAG_ONE_SHOT)
+        val pendingIntent = getActivityPendingIntent(context, intent, PendingIntent.FLAG_ONE_SHOT,
+                                                     mutable = false)
 
         var builder: NotificationCompat.Builder
         if (isAtleastO()) {
@@ -386,8 +386,10 @@ class RefreshDatabase internal constructor(private var context: Context,
         intent.putExtra(Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME,
                         Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE)
 
-        val pendingIntent = PendingIntent.getActivity(context, 0, intent,
-                                                      PendingIntent.FLAG_UPDATE_CURRENT)
+        val pendingIntent = getActivityPendingIntent(context, intent,
+                                                     PendingIntent.FLAG_UPDATE_CURRENT,
+                                                     mutable = true)
+
         val builder: NotificationCompat.Builder
         if (isAtleastO()) {
             val name: CharSequence = context.getString(R.string.notif_channel_firewall_alerts)
@@ -440,11 +442,13 @@ class RefreshDatabase internal constructor(private var context: Context,
 
     private fun makeNewAppVpnIntent(context: Context, intentExtra: String, uid: Int,
                                     requestCode: Int): PendingIntent? {
-        val intentAction = Intent(context, NotificationActionReceiver::class.java)
-        intentAction.putExtra(Constants.NOTIFICATION_ACTION, intentExtra)
-        intentAction.putExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, uid)
-        return PendingIntent.getBroadcast(context, (uid or requestCode), intentAction,
-                                          PendingIntent.FLAG_UPDATE_CURRENT)
+        val intent = Intent(context, NotificationActionReceiver::class.java)
+        intent.putExtra(Constants.NOTIFICATION_ACTION, intentExtra)
+        intent.putExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, uid)
+
+        return Utilities.getBroadcastPendingIntent(context, (uid or requestCode), intent,
+                                                   PendingIntent.FLAG_UPDATE_CURRENT,
+                                                   mutable = true)
     }
 
     private fun isSystemApp(ai: ApplicationInfo): Boolean {

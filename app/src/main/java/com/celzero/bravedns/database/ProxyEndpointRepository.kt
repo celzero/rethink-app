@@ -27,52 +27,39 @@ import kotlinx.coroutines.launch
 
 class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
 
-    fun insert(proxyEndpoint: ProxyEndpoint) {
+    suspend fun insert(proxyEndpoint: ProxyEndpoint) {
         proxyEndpointDAO.insert(proxyEndpoint)
     }
 
-    fun getDNSProxyEndpointLiveData(): LiveData<PagedList<ProxyEndpoint>> {
-        return proxyEndpointDAO.getDNSProxyEndpointLiveData().toLiveData(
-            pageSize = LIVEDATA_PAGE_SIZE)
+    suspend fun deleteOlderData(date: Long) {
+        proxyEndpointDAO.deleteOlderData(date)
     }
 
-    fun deleteOlderData(date: Long,
-                        coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
-        coroutineScope.launch {
-            proxyEndpointDAO.deleteOlderData(date)
-        }
-    }
-
-    fun getDNSProxyEndpointLiveDataByType(query: String): LiveData<PagedList<ProxyEndpoint>> {
-        return proxyEndpointDAO.getDNSProxyEndpointLiveDataByType(query).toLiveData(
-            pageSize = LIVEDATA_PAGE_SIZE)
-    }
-
-    fun deleteDNSProxyEndpoint(proxyIP: String, port: Int) {
+    suspend fun deleteDNSProxyEndpoint(proxyIP: String, port: Int) {
         proxyEndpointDAO.deleteDNSProxyEndpoint(proxyIP, port)
     }
 
-    fun removeConnectionStatus() {
+    suspend fun removeConnectionStatus() {
         proxyEndpointDAO.removeConnectionStatus()
     }
 
-    fun getCount(): Int {
+    suspend fun getCount(): Int {
         return proxyEndpointDAO.getCount()
     }
 
-    fun getConnectedProxy(): ProxyEndpoint? {
+    suspend fun getConnectedProxy(): ProxyEndpoint? {
         return proxyEndpointDAO.getConnectedProxy()
     }
 
-    fun getConnectedOrbotProxy(): ProxyEndpoint {
+    suspend fun getConnectedOrbotProxy(): ProxyEndpoint {
         return proxyEndpointDAO.getConnectedOrbotProxy()
     }
 
-    fun clearAllData() {
+    suspend fun clearAllData() {
         proxyEndpointDAO.clearAllData()
     }
 
-    fun clearOrbotData() {
+    suspend fun clearOrbotData() {
         proxyEndpointDAO.clearOrbotData()
     }
 

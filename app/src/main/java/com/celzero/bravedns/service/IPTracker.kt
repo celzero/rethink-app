@@ -43,14 +43,8 @@ class IPTracker internal constructor(
         private val connectionTrackerRepository: ConnectionTrackerRepository,
         private val context: Context) : KoinComponent {
 
-
-    private val recentTrackers: Queue<IPDetails> = LinkedList()
-
     private val persistentState by inject<PersistentState>()
-
-    fun getRecentIPTransactions(): Queue<IPDetails?>? {
-        return LinkedList(recentTrackers)
-    }
+    private val dnsLogTracker by inject<DnsLogTracker>()
 
     fun recordTransaction(ipDetails: IPDetails?) {
         if (ipDetails == null) return
@@ -82,6 +76,10 @@ class IPTracker internal constructor(
             Log.e(LOG_TAG_FIREWALL_LOG, "Failure converting string to InetAddresses: ${e.message}",
                   e)
         }
+
+        connTracker.dnsQuery = dnsLogTracker.ipDomainLookup.getIfPresent(
+            connTracker.ipAddress)?.fqdn
+
         val countryCode: String? = getCountryCode(serverAddress, context)
         connTracker.flag = getFlag(countryCode)
 

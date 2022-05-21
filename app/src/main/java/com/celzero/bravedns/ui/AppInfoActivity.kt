@@ -24,6 +24,7 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
+import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -32,17 +33,19 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppConnectionAdapter
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.automaton.FirewallManager.updateFirewallStatus
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ConnectionTrackerRepository
+import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.databinding.ActivityAppDetailsBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_3
 import com.celzero.bravedns.util.Themes
@@ -55,14 +58,18 @@ import org.koin.android.ext.android.inject
 
 class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private val b by viewBinding(ActivityAppDetailsBinding::bind)
+
     private val persistentState by inject<PersistentState>()
+    private val appConfig by inject<AppConfig>()
+    private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
+
     private var uid: Int = 0
     private lateinit var appInfo: AppInfo
-    private var layoutManager: RecyclerView.LayoutManager? = null
-    private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
-    private var ipListState: Boolean = true
 
-    private var appStatus = FirewallManager.AppStatus.ALLOW
+    private var ipListState: Boolean = true
+    private var appDetailsState: Boolean = false
+
+    private var appStatus = FirewallManager.FirewallStatus.ALLOW
     private var connStatus = FirewallManager.ConnectionStatus.BOTH
 
     companion object {
@@ -85,7 +92,6 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             return
         }
 
-        // asserting app info as the null-check for appInfo is done above
         appInfo = ai
 
         val packages = FirewallManager.getPackageNamesByUid(appInfo.uid)
@@ -96,11 +102,12 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
         b.aadAppDetailName.text = appName(packages.count())
         b.aadAppDetailDesc.text = appInfo.packageInfo
-        updateBasicAppInfo()
         appStatus = FirewallManager.appStatus(appInfo.uid)
         connStatus = FirewallManager.connectionStatus(appInfo.uid)
         updateFirewallStatusUi(appStatus, connStatus)
         toggleIpRulesState(ipListState)
+        updateBasicAppInfo()
+        updateDnsDetails()
 
         displayIcon(Utilities.getIcon(this, appInfo.packageInfo, appInfo.appName),
                     b.aadAppDetailIcon)
@@ -108,27 +115,43 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         displayNetworkLogsIfAny(appInfo.uid)
     }
 
-    private fun updateFirewallStatusUi(appStatus: FirewallManager.AppStatus,
+    private fun updateDnsDetails() {
+        io {
+            val isDnsEnabled = appConfig.isAppDnsEnabled(uid)
+
+            uiCtx {
+                if(isDnsEnabled) {
+                    enableDnsStatusUi()
+                    return@uiCtx
+                }
+
+                disableDnsStatusUi()
+            }
+        }
+
+    }
+
+    private fun updateFirewallStatusUi(firewallStatus: FirewallManager.FirewallStatus,
                                        connectionStatus: FirewallManager.ConnectionStatus) {
         b.aadFirewallStatus.text = updateHtmlEncodedText(
-            getString(R.string.ada_firewall_status, getFirewallText(appStatus, connectionStatus)))
+            getString(R.string.ada_firewall_status, getFirewallText(firewallStatus, connectionStatus)))
 
-        when (appStatus) {
-            FirewallManager.AppStatus.ALLOW -> {
+        when (firewallStatus) {
+            FirewallManager.FirewallStatus.ALLOW -> {
                 disableWhitelistExcludeUi()
                 enableAllow()
             }
-            FirewallManager.AppStatus.BLOCK -> {
+            FirewallManager.FirewallStatus.BLOCK -> {
                 disableWhitelistExcludeUi()
                 enableBlock(connectionStatus)
             }
-            FirewallManager.AppStatus.EXCLUDE -> {
+            FirewallManager.FirewallStatus.EXCLUDE -> {
                 enableAppExcludedUi()
             }
-            FirewallManager.AppStatus.WHITELIST -> {
+            FirewallManager.FirewallStatus.WHITELIST -> {
                 enableAppWhitelistedUi()
             }
-            FirewallManager.AppStatus.UNTRACKED -> {
+            FirewallManager.FirewallStatus.UNTRACKED -> {
                 // no-op
             }
         }
@@ -150,11 +173,13 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         }
 
         b.aadAppSettingsWhitelist.setOnClickListener {
-            updateFirewallStatus(FirewallManager.AppStatus.WHITELIST, FirewallManager.ConnectionStatus.BOTH)
+            updateFirewallStatus(FirewallManager.FirewallStatus.WHITELIST,
+                                 FirewallManager.ConnectionStatus.BOTH)
         }
 
         b.aadAppSettingsExclude.setOnClickListener {
-            updateFirewallStatus(FirewallManager.AppStatus.EXCLUDE, FirewallManager.ConnectionStatus.BOTH)
+            updateFirewallStatus(FirewallManager.FirewallStatus.EXCLUDE,
+                                 FirewallManager.ConnectionStatus.BOTH)
         }
 
         b.aadConnDetailIndicator.setOnClickListener {
@@ -164,16 +189,78 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         b.aadConnDetailRl.setOnClickListener {
             toggleIpRulesState(ipListState)
         }
+
+        b.aadDownArrowIcon.setOnClickListener {
+            toggleAppDetailsState(appDetailsState)
+        }
+
+        b.aadAppDetailIcon.setOnClickListener {
+            toggleAppDetailsState(appDetailsState)
+        }
+
+        b.aadAppDetailLl.setOnClickListener {
+            toggleAppDetailsState(appDetailsState)
+        }
+
+        b.aadDnsHeading.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
+            if (isSelected) {
+                enableDnsStatusUi()
+                setAppDns("https://basic.rethinkdns.com/1:IAAQAA==")
+                return@setOnCheckedChangeListener
+            }
+
+            removeAppDns(uid)
+        }
+
+        b.aadAppDnsRethinkConfigure.setOnClickListener {
+            rethinkListBottomSheet()
+        }
+    }
+
+    private fun setAppDns(url: String) {
+        io {
+            val endpoint = RethinkDnsEndpoint("app_${appInfo.appName}", url, uid,
+                                              desc = "", isActive = false, isCustom = true,
+                                              latency = 0, modifiedDataTime = Constants.INIT_TIME_MS)
+            appConfig.insertReplaceEndpoint(endpoint)
+        }
+    }
+
+    private fun rethinkListBottomSheet() {
+        val bottomSheetFragment = RethinkListBottomSheet()
+        bottomSheetFragment.show(this.supportFragmentManager, bottomSheetFragment.tag)
+    }
+
+    private fun removeAppDns(uid: Int) {
+        io {
+            appConfig.removeAppDns(uid)
+        }
+
+        disableDnsStatusUi()
+    }
+
+    private fun disableDnsStatusUi() {
+        b.aadDnsRethinkRl.visibility = View.GONE
+        b.aadDnsHeading.isChecked = false
+    }
+
+    private fun enableDnsStatusUi() {
+        b.aadDnsRethinkRl.visibility = View.VISIBLE
+        b.aadDnsHeading.isChecked = true
     }
 
     private fun toggleMobileData(appInfo: AppInfo) {
         val status = FirewallManager.appStatus(appInfo.uid)
-        var aStat : FirewallManager.AppStatus = FirewallManager.AppStatus.BLOCK
-        var cStat : FirewallManager.ConnectionStatus = FirewallManager.ConnectionStatus.BOTH
+        var aStat: FirewallManager.FirewallStatus = FirewallManager.FirewallStatus.BLOCK
+        var cStat: FirewallManager.ConnectionStatus = FirewallManager.ConnectionStatus.BOTH
 
+        // toggle mobile data: change the app status and connection status based on the current status.
+        // if Mobile Data -> allow(app status) + Mobile Data(connection status)
+        // if BOTH -> no need to change the app status, toggle connection status
+        // based on the current status
         when (FirewallManager.connectionStatus(appInfo.uid)) {
             FirewallManager.ConnectionStatus.MOBILE_DATA -> {
-                aStat = FirewallManager.AppStatus.ALLOW
+                aStat = FirewallManager.FirewallStatus.ALLOW
             }
             FirewallManager.ConnectionStatus.BOTH -> {
                 cStat = if (status.blocked()) {
@@ -193,12 +280,16 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private fun toggleWifi(appInfo: AppInfo) {
         val currentStatus = FirewallManager.appStatus(appInfo.uid)
 
-        var aStat : FirewallManager.AppStatus = FirewallManager.AppStatus.BLOCK
-        var cStat : FirewallManager.ConnectionStatus = FirewallManager.ConnectionStatus.BOTH
+        var aStat: FirewallManager.FirewallStatus = FirewallManager.FirewallStatus.BLOCK
+        var cStat: FirewallManager.ConnectionStatus = FirewallManager.ConnectionStatus.BOTH
 
+        // toggle wifi: change the app status and connection status based on the current status.
+        // if Wifi -> allow(app status) + wifi(connection status)
+        // if BOTH -> no need to change the app status, toggle connection status
+        // based on the current status
         when (FirewallManager.connectionStatus(appInfo.uid)) {
             FirewallManager.ConnectionStatus.WIFI -> {
-                aStat = FirewallManager.AppStatus.ALLOW
+                aStat = FirewallManager.FirewallStatus.ALLOW
             }
             FirewallManager.ConnectionStatus.BOTH -> {
                 cStat = if (currentStatus.blocked()) {
@@ -215,7 +306,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         updateFirewallStatus(aStat, cStat)
     }
 
-    private fun updateFirewallStatus(aStat: FirewallManager.AppStatus,
+    private fun updateFirewallStatus(aStat: FirewallManager.FirewallStatus,
                                      cStat: FirewallManager.ConnectionStatus) {
         val appNames = FirewallManager.getAppNamesByUid(appInfo.uid)
         if (appNames.count() > 1) {
@@ -226,7 +317,8 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         completeFirewallChanges(aStat, cStat)
     }
 
-    private fun completeFirewallChanges(aStat: FirewallManager.AppStatus, cStat: FirewallManager.ConnectionStatus) {
+    private fun completeFirewallChanges(aStat: FirewallManager.FirewallStatus,
+                                        cStat: FirewallManager.ConnectionStatus) {
         appStatus = aStat
         connStatus = cStat
         updateFirewallStatus(appInfo.uid, aStat, cStat)
@@ -238,8 +330,9 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             val list = connectionTrackerRepository.getLogsForApp(uid)
 
             uiCtx {
-                if (list.isEmpty()) {
+                if (list.isNullOrEmpty()) {
                     b.aadConnDetailDesc.text = getString(R.string.ada_ip_connection_count_zero)
+                    b.aadConnDetailSearchContainer.visibility = View.GONE
                     b.aadConnDetailEmptyTxt.visibility = View.VISIBLE
                     b.aadConnDetailRecycler.visibility = View.GONE
                     return@uiCtx
@@ -247,31 +340,44 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
                 b.aadConnDetailDesc.text = getString(R.string.ada_ip_connection_count,
                                                      list.size.toString())
+                // set listview adapter
                 b.aadConnDetailRecycler.setHasFixedSize(true)
-                layoutManager = LinearLayoutManager(this)
+                val layoutManager = LinearLayoutManager(this)
                 b.aadConnDetailRecycler.layoutManager = layoutManager
                 val recyclerAdapter = AppConnectionAdapter(this, list, uid)
                 b.aadConnDetailRecycler.adapter = recyclerAdapter
                 val dividerItemDecoration = DividerItemDecoration(b.aadConnDetailRecycler.context,
-                                                                  (layoutManager as LinearLayoutManager).orientation)
+                                                                  layoutManager.orientation)
                 b.aadConnDetailRecycler.addItemDecoration(dividerItemDecoration)
             }
         }
     }
 
     private fun toggleIpRulesState(state: Boolean) {
+        ipListState = !state
         if (state) {
             b.aadConnDetailTopLl.visibility = View.VISIBLE
             b.aadConnDetailSearchLl.visibility = View.VISIBLE
             b.aadConnDetailIndicator.setImageResource(R.drawable.ic_keyboard_arrow_up_gray_24dp)
-        } else {
-            b.aadConnDetailSearchLl.visibility = View.GONE
-            b.aadConnDetailTopLl.visibility = View.GONE
-            b.aadConnDetailIndicator.setImageResource(R.drawable.ic_keyboard_arrow_down_gray_24dp)
+            return
         }
-        ipListState = !state
+
+        b.aadConnDetailSearchLl.visibility = View.GONE
+        b.aadConnDetailTopLl.visibility = View.GONE
+        b.aadConnDetailIndicator.setImageResource(R.drawable.ic_keyboard_arrow_down_gray_24dp)
     }
 
+    private fun toggleAppDetailsState(state: Boolean) {
+        appDetailsState = !state
+        if (state) {
+            b.aadAppStatsCard.visibility = View.VISIBLE
+            b.aadDownArrowIcon.setImageResource(R.drawable.ic_arrow_up)
+            return
+        }
+
+        b.aadAppStatsCard.visibility = View.GONE
+        b.aadDownArrowIcon.setImageResource(R.drawable.ic_arrow_down)
+    }
 
     private fun enableAppWhitelistedUi() {
         setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlock)
@@ -299,6 +405,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
     }
 
+    // update the BLOCK status based on connection status (mobile data + wifi + both)
     private fun enableBlock(cStat: FirewallManager.ConnectionStatus) {
         when (cStat) {
             FirewallManager.ConnectionStatus.MOBILE_DATA -> {
@@ -323,20 +430,20 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         txt.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null)
     }
 
-    private fun getFirewallText(aStat: FirewallManager.AppStatus,
+    private fun getFirewallText(aStat: FirewallManager.FirewallStatus,
                                 cStat: FirewallManager.ConnectionStatus): CharSequence {
         return when (aStat) {
-            FirewallManager.AppStatus.ALLOW -> "Allowed"
-            FirewallManager.AppStatus.EXCLUDE -> "Excluded"
-            FirewallManager.AppStatus.WHITELIST -> "Whitelisted"
-            FirewallManager.AppStatus.BLOCK -> {
+            FirewallManager.FirewallStatus.ALLOW -> getString(R.string.ada_app_status_allow)
+            FirewallManager.FirewallStatus.EXCLUDE -> getString(R.string.ada_app_status_exclude)
+            FirewallManager.FirewallStatus.WHITELIST -> getString(R.string.ada_app_status_whitelist)
+            FirewallManager.FirewallStatus.BLOCK -> {
                 when {
-                    cStat.mobileData() -> "Allowed on WiFi"
-                    cStat.wifi() -> "Allowed on Mobile data"
-                    else -> "Blocked"
+                    cStat.mobileData() -> getString(R.string.ada_app_status_block_md)
+                    cStat.wifi() -> getString(R.string.ada_app_status_block_wifi)
+                    else -> getString(R.string.ada_app_status_block)
                 }
             }
-            FirewallManager.AppStatus.UNTRACKED -> "Unknown"
+            FirewallManager.FirewallStatus.UNTRACKED -> getString(R.string.ada_app_status_unknown)
         }
     }
 
@@ -363,7 +470,8 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     }
 
     private fun showDialog(packageList: List<String>, appInfo: AppInfo,
-                           aStat: FirewallManager.AppStatus, cStat: FirewallManager.ConnectionStatus) {
+                           aStat: FirewallManager.FirewallStatus,
+                           cStat: FirewallManager.ConnectionStatus) {
 
         val builderSingle: AlertDialog.Builder = AlertDialog.Builder(this)
 
@@ -403,9 +511,32 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             b.aadDetails.text = updateHtmlEncodedText(
                 getString(R.string.ada_uid, appInfo.uid.toString(), appInfo.appCategory,
                           installTime, updateTime))
-        } catch (e: PackageManager.NameNotFoundException) {
-            e.printStackTrace()
+            toggleAppDetailsState(appDetailsState)
+            enableAppInfoIndicators()
+        } catch (ignored: PackageManager.NameNotFoundException) {
+            // pass the app state to false; so that the toggle will
+            // hide the app's basic info for non-apps
+            toggleAppDetailsState(state = false)
+            disableAppInfoIndicators()
         }
+    }
+
+    private fun enableAppInfoIndicators() {
+        b.aadAppInfoIcon.visibility = View.VISIBLE
+        b.aadDownArrowIcon.visibility = View.VISIBLE
+        b.aadAppDetailIcon.isEnabled = true
+        b.aadAppDetailLl.isEnabled = true
+        b.aadAppDetailLl.isClickable = true
+        b.aadAppDetailIcon.isClickable = true
+    }
+
+    private fun disableAppInfoIndicators() {
+        b.aadAppInfoIcon.visibility = View.GONE
+        b.aadDownArrowIcon.visibility = View.GONE
+        b.aadAppDetailIcon.isEnabled = false
+        b.aadAppDetailLl.isEnabled = false
+        b.aadAppDetailLl.isClickable = false
+        b.aadAppDetailIcon.isClickable = false
     }
 
     private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
@@ -430,5 +561,4 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             f()
         }
     }
-
 }

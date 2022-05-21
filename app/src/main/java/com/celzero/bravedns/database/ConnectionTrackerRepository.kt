@@ -24,9 +24,7 @@ import kotlinx.coroutines.withContext
 class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTrackerDAO) {
 
     suspend fun insert(connectionTracker: ConnectionTracker) {
-        ioCtx {
-            connectionTrackerDAO.insert(connectionTracker)
-        }
+        connectionTrackerDAO.insert(connectionTracker)
     }
 
     suspend fun getLogsForApp(uid: Int): List<AppConnections> {
@@ -34,27 +32,15 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
     }
 
     suspend fun deleteConnectionTrackerCount() {
-        ioCtx {
-            connectionTrackerDAO.deleteOlderDataCount(Constants.TOTAL_LOG_ENTRIES_THRESHOLD)
-        }
+        connectionTrackerDAO.deleteOlderDataCount(Constants.TOTAL_LOG_ENTRIES_THRESHOLD)
     }
 
     suspend fun deleteOlderData(date: Long) {
-        ioCtx {
-            connectionTrackerDAO.deleteOlderData(date)
-        }
+        connectionTrackerDAO.deleteOlderData(date)
     }
 
     suspend fun clearAllData() {
-        ioCtx {
-            connectionTrackerDAO.clearAllData()
-        }
-    }
-
-    private suspend fun ioCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.IO) {
-            f()
-        }
+        connectionTrackerDAO.clearAllData()
     }
 
 }

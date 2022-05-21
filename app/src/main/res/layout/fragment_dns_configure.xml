@@ -13,320 +13,44 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:animateLayoutChanges="true"
-            android:nestedScrollingEnabled="true"
-            android:orientation="vertical"
-            android:padding="8dp">
+            android:orientation="vertical">
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/dc_on_device_block_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:clickable="false"
-                android:focusable="false"
-                app:cardElevation="8dp">
+                android:layout_marginTop="5dp"
+                app:cardBackgroundColor="?attr/background"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="true">
 
-                <RelativeLayout
-                    android:id="@+id/dc_on_device_block_rl"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingStart="10dp"
-                    android:paddingTop="10dp"
-                    android:paddingEnd="10dp"
-                    android:paddingBottom="10dp">
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/dc_dns_heading"
+                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="40dp"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:padding="15dp"
+                        android:text="@string/dc_other_dns_heading"
+                        android:textColor="?attr/accentGood"
+                        android:textSize="@dimen/extra_large_font_text_view"
+                        android:textStyle="bold" />
 
                     <RelativeLayout
-                        android:id="@+id/dc_on_device_heading_rl"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <RelativeLayout
-                            android:id="@+id/dc_on_device_heading_internal_rl"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:id="@+id/dc_on_device_icon_iv"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerVertical="true"
-                                android:src="@drawable/ic_app_info"
-                                android:padding="10dp"
-                                />
-
-                            <LinearLayout
-                                android:padding="5dp"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerVertical="true"
-                                android:layout_toEndOf="@+id/dc_on_device_icon_iv"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:id="@+id/dc_on_device_block_heading"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:padding="3dp"
-                                    android:text="On-device blocklist"
-                                    android:textColor="?attr/primaryTextColor" />
-
-                                <TextView
-                                    android:id="@+id/dc_on_device_block_desc"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:padding="3dp"
-                                    android:text="On-device blocklist"
-                                    android:textSize="@dimen/small_font_text_view" />
-                            </LinearLayout>
-
-                            <Button
-                                android:id="@+id/dc_on_device_block_download_btn"
-                                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentEnd="true"
-                                android:layout_centerVertical="true"
-                                android:text="download"
-                                android:textColor="?attr/secondaryTextColor"
-                                android:visibility="visible" />
-
-                            <Button
-                                android:id="@+id/dc_on_device_block_enable_btn"
-                                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentEnd="true"
-                                android:layout_centerVertical="true"
-                                android:text="ACTIVE"
-                                android:textColor="?attr/secondaryTextColor"
-                                android:visibility="gone" />
-
-                            <ProgressBar
-                                android:id="@+id/dc_on_device_block_progress"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentEnd="true"
-                                android:layout_centerVertical="true"
-                                android:layout_marginEnd="20dp"
-                                android:visibility="gone" />
-
-                        </RelativeLayout>
-
-                        <RelativeLayout
-                            android:id="@+id/dc_on_device_configure_rl"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@id/dc_on_device_heading_internal_rl">
-
-                            <TextView
-                                android:id="@+id/dc_on_device_block_version"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentStart="true"
-                                android:layout_centerVertical="true"
-                                android:layout_marginStart="5dp"
-                                android:padding="5dp"
-                                android:textColor="?attr/primaryTextColor" />
-
-                            <Button
-                                android:id="@+id/dc_on_device_block_configure_btn"
-                                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentEnd="true"
-                                android:text="configure"
-                                android:textColor="?attr/secondaryTextColor" />
-
-                            <Button
-                                android:id="@+id/dc_on_device_block_update_btn"
-                                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_toStartOf="@id/dc_on_device_block_configure_btn"
-                                android:text="update"
-                                android:textColor="?attr/secondaryTextColor" />
-                        </RelativeLayout>
-                    </RelativeLayout>
-
-                </RelativeLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/dc_custom_blocklist_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:visibility="visible"
-                app:cardElevation="8dp">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingStart="5dp"
-                    android:paddingTop="5dp"
-                    android:paddingEnd="5dp"
-                    android:paddingBottom="5dp">
-
-                    <TextView
-                        android:id="@+id/dc_custom_blocklist"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:drawablePadding="15dp"
-                        android:gravity="center_vertical"
-                        android:padding="15dp"
-                        android:text="Allow/Deny domains list"
-                        android:textColor="?attr/primaryTextColor"
-                        app:drawableEndCompat="@drawable/ic_right_arrow_small"
-                        app:drawableStartCompat="@drawable/ic_app_info" />
-
-                </RelativeLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:clickable="false"
-                android:focusable="false"
-                app:cardElevation="8dp">
-
-                <RelativeLayout
-                    android:id="@+id/dc_rethink_rl"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingStart="10dp"
-                    android:paddingTop="10dp"
-                    android:paddingEnd="10dp"
-                    android:paddingBottom="10dp">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/dc_rethink_plus_icon_iv"
+                        android:id="@+id/dc_remote_blocklist_rl"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:layout_marginBottom="10dp"
-                        android:src="@drawable/ic_app_info" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_toEndOf="@id/dc_rethink_plus_icon_iv"
-                        android:layout_toStartOf="@id/dc_rethink_button"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/dc_rethink_heading"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:padding="5dp"
-                            android:text="Rethink DNS Plus"
-                            android:textColor="?attr/primaryTextColor" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:padding="5dp"
-                            android:text="Customizable Rethink DNS endpoint"
-                            android:textSize="@dimen/small_font_text_view" />
-                    </LinearLayout>
-
-                    <Button
-                        android:id="@+id/dc_rethink_button"
-                        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:text="ACTIVE"
-                        android:textColor="?attr/secondaryTextColor" />
-
-                </RelativeLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/dc_more_dns_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:visibility="visible"
-                app:cardElevation="8dp">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingStart="5dp"
-                    android:paddingTop="5dp"
-                    android:paddingEnd="5dp"
-                    android:paddingBottom="5dp">
-
-                    <TextView
-                        android:id="@+id/dc_more_dns"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:drawablePadding="15dp"
-                        android:gravity="center_vertical"
-                        android:padding="15dp"
-                        android:text="More DNS options"
-                        android:textColor="?attr/primaryTextColor"
-                        app:drawableEndCompat="@drawable/ic_right_arrow_small"
-                        app:drawableStartCompat="@drawable/ic_app_info" />
-
-                </RelativeLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:clickable="false"
-                android:focusable="false"
-                app:cardElevation="8dp">
-
-                <RelativeLayout
-                    android:id="@+id/settings_activity_fav_icon_rl"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-
-                    <TextView
-                        android:id="@+id/dc_other_dns_card"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:drawablePadding="15dp"
-                        android:gravity="center_vertical"
-                        android:padding="15dp"
-                        android:text="Other DNS settings"
-                        android:textColor="?attr/primaryTextColor" />
-
-                    <RelativeLayout
-                        android:id="@+id/dc_show_fav_icon_rl"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/dc_other_dns_card"
                         android:paddingTop="15dp"
                         android:paddingBottom="15dp">
 
                         <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/dc_fav_icon_icon"
+                            android:id="@+id/dc_remote_blocklist_icon"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
@@ -336,35 +60,62 @@
                             android:layout_marginBottom="5dp"
                             android:alpha="0.5"
                             android:padding="10dp"
-                            android:src="@drawable/ic_fav_icon" />
+                            android:src="@drawable/ic_network" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
-                            android:layout_toStartOf="@id/dc_fav_icon_switch"
-                            android:layout_toEndOf="@id/dc_fav_icon_icon"
+                            android:layout_toStartOf="@id/dc_remote_blocklist_switch"
+                            android:layout_toEndOf="@id/dc_remote_blocklist_icon"
                             android:orientation="vertical">
 
-                            <TextView
-                                android:id="@+id/dc_fav_icon_txt"
-                                style="@style/TextAppearance.AppCompat.Subhead"
+                            <androidx.appcompat.widget.LinearLayoutCompat
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/settings_fav_icon_heading"
-                                android:textSize="@dimen/large_font_text_view" />
+                                android:gravity="center"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/dc_remote_blocklist_heading"
+                                    style="@style/TextAppearance.AppCompat.Subhead"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="5dp"
+                                    android:drawablePadding="10dp"
+                                    android:text="@string/dc_remote_block_heading"
+                                    android:textSize="@dimen/large_font_text_view"
+                                    app:drawableEndCompat="@drawable/ic_keyboard_arrow_down_small" />
+
+                                <TextView
+                                    android:id="@+id/dc_remote_blocklist_update"
+                                    style="@style/TextAppearance.AppCompat.Subhead"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:background="@drawable/badge_background"
+                                    android:gravity="center"
+                                    android:paddingStart="5dp"
+                                    android:paddingTop="2dp"
+                                    android:paddingEnd="5dp"
+                                    android:paddingBottom="2dp"
+                                    android:text="update available"
+                                    android:textColor="?attr/chipTextColor"
+                                    android:textSize="@dimen/small_font_subheading_text"
+                                    android:visibility="gone" />
+
+                            </androidx.appcompat.widget.LinearLayoutCompat>
 
                             <TextView
-                                android:id="@+id/dc_fav_icon_desc"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:paddingTop="5dp"
-                                android:text="@string/settings_fav_icon_desc"
+                                android:text="@string/dc_remote_block_desc"
                                 android:textSize="@dimen/default_font_text_view" />
                         </LinearLayout>
 
                         <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/dc_fav_icon_switch"
+                            android:id="@+id/dc_remote_blocklist_switch"
                             style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -375,16 +126,313 @@
                     </RelativeLayout>
 
                     <RelativeLayout
-                        android:id="@+id/dc_prevent_dns_rl"
+                        android:id="@+id/dc_dns_options_rl"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/dc_show_fav_icon_rl"
-                        android:layout_margin="5dp"
                         android:paddingTop="15dp"
                         android:paddingBottom="15dp">
 
                         <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/dc_prevent_dns_leaks_icon"
+                            android:id="@+id/dc_dns_options_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_margin="5dp"
+                            android:alpha="0.5"
+                            android:padding="10dp"
+                            android:src="@drawable/ic_network" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_toStartOf="@id/dc_dns_options_img"
+                            android:layout_toEndOf="@id/dc_dns_options_icon"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/dc_dns_options_heading"
+                                style="@style/TextAppearance.AppCompat.Subhead"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:drawablePadding="10dp"
+                                android:text="@string/dc_dns_options_heading"
+                                android:textSize="@dimen/large_font_text_view" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="5dp"
+                                android:text="@string/dc_dns_options_desc"
+                                android:textSize="@dimen/default_font_text_view" />
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/dc_dns_options_img"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:paddingStart="25dp"
+                            android:paddingEnd="25dp"
+                            android:src="@drawable/ic_right_arrow_small" />
+
+                    </RelativeLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="?attr/background"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/dc_blocklist_heading"
+                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="40dp"
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:padding="15dp"
+                        android:text="@string/dc_block_heading"
+                        android:textColor="?attr/accentGood"
+                        android:textSize="@dimen/extra_large_font_text_view"
+                        android:textStyle="bold" />
+
+                    <RelativeLayout
+                        android:id="@+id/dc_local_blocklist_rl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="15dp"
+                        android:paddingBottom="15dp">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/dc_local_blocklist_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_margin="5dp"
+                            android:alpha="0.5"
+                            android:padding="10dp"
+                            android:src="@drawable/ic_network" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_toStartOf="@id/dc_local_blocklist_switch"
+                            android:layout_toEndOf="@id/dc_local_blocklist_icon"
+                            android:orientation="vertical">
+
+                            <androidx.appcompat.widget.LinearLayoutCompat
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/dc_local_blocklist_heading"
+                                    style="@style/TextAppearance.AppCompat.Subhead"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="5dp"
+                                    android:drawablePadding="10dp"
+                                    android:text="@string/dc_local_block_heading"
+                                    android:textSize="@dimen/large_font_text_view"
+                                    app:drawableEndCompat="@drawable/ic_keyboard_arrow_down_small" />
+
+                                <TextView
+                                    android:id="@+id/dc_local_blocklist_update"
+                                    style="@style/TextAppearance.AppCompat.Subhead"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:background="@drawable/badge_background"
+                                    android:gravity="center"
+                                    android:paddingStart="5dp"
+                                    android:paddingTop="2dp"
+                                    android:paddingEnd="5dp"
+                                    android:paddingBottom="2dp"
+                                    android:text="update available"
+                                    android:textColor="?attr/chipTextColor"
+                                    android:textSize="@dimen/small_font_subheading_text"
+                                    android:visibility="visible" />
+                            </androidx.appcompat.widget.LinearLayoutCompat>
+
+                            <TextView
+                                android:id="@+id/dc_local_blocklist_desc"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="5dp"
+                                android:text="@string/dc_local_block_desc_1"
+                                android:textSize="@dimen/default_font_text_view" />
+                        </LinearLayout>
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/dc_local_blocklist_switch"
+                            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:padding="10dp" />
+
+                    </RelativeLayout>
+
+
+                    <RelativeLayout
+                        android:id="@+id/dc_custom_domain_rl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="15dp"
+                        android:paddingBottom="15dp">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/dc_custom_domain_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_margin="5dp"
+                            android:alpha="0.5"
+                            android:padding="10dp"
+                            android:src="@drawable/ic_network" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_toStartOf="@id/dc_custom_domain_img"
+                            android:layout_toEndOf="@id/dc_custom_domain_icon"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/dc_custom_domain_heading"
+                                style="@style/TextAppearance.AppCompat.Subhead"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:drawablePadding="10dp"
+                                android:text="@string/dc_custom_block_heading"
+                                android:textSize="@dimen/large_font_text_view" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="5dp"
+                                android:text="@string/dc_custom_block_desc"
+                                android:textSize="@dimen/default_font_text_view" />
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/dc_custom_domain_img"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:paddingStart="25dp"
+                            android:paddingEnd="25dp"
+                            android:src="@drawable/ic_right_arrow_small" />
+
+                    </RelativeLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="?attr/background"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/dc_other_settings_heading"
+                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="40dp"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:padding="15dp"
+                        android:text="@string/dc_other_settings_heading"
+                        android:textColor="?attr/accentGood"
+                        android:textSize="@dimen/extra_large_font_text_view"
+                        android:textStyle="bold" />
+
+                    <RelativeLayout
+                        android:id="@+id/dc_favicon_rl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="15dp"
+                        android:paddingBottom="15dp">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/dc_favicon_img"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_margin="5dp"
+                            android:alpha="0.5"
+                            android:padding="10dp"
+                            android:src="@drawable/ic_network" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_toStartOf="@id/dc_favicon_switch"
+                            android:layout_toEndOf="@id/dc_favicon_img"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/dc_favicon_heading"
+                                style="@style/TextAppearance.AppCompat.Subhead"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:drawablePadding="10dp"
+                                android:text="@string/dc_dns_website_heading"
+                                android:textSize="@dimen/large_font_text_view" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="5dp"
+                                android:text="@string/dc_dns_website_desc"
+                                android:textSize="@dimen/default_font_text_view" />
+                        </LinearLayout>
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/dc_favicon_switch"
+                            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:padding="10dp" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/dc_prevent_dns_leaks_rl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="15dp"
+                        android:paddingBottom="15dp">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/dc_prevent_dns_leaks_img"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
@@ -392,31 +440,32 @@
                             android:layout_marginTop="5dp"
                             android:layout_marginEnd="5dp"
                             android:layout_marginBottom="5dp"
+                            android:alpha="0.5"
                             android:padding="10dp"
-                            android:src="@drawable/ic_prevent_dns_leaks" />
+                            android:src="@drawable/ic_network" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:layout_toStartOf="@id/dc_prevent_dns_leaks_switch"
-                            android:layout_toEndOf="@id/dc_prevent_dns_leaks_icon"
+                            android:layout_toEndOf="@id/dc_prevent_dns_leaks_img"
                             android:orientation="vertical">
 
                             <TextView
-                                android:id="@+id/dc_prevent_dns_leaks_txt"
+                                android:id="@+id/dc_prevent_dns_leaks_heading"
                                 style="@style/TextAppearance.AppCompat.Subhead"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/settings_prevent_dns_leaks_heading"
+                                android:drawablePadding="10dp"
+                                android:text="@string/dc_dns_leaks_heading"
                                 android:textSize="@dimen/large_font_text_view" />
 
                             <TextView
-                                android:id="@+id/dc_prevent_dns_leaks_desc"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:paddingTop="5dp"
-                                android:text="@string/settings_prevent_dns_leaks_desc"
+                                android:text="@string/dc_dns_leaks_desc"
                                 android:textSize="@dimen/default_font_text_view" />
                         </LinearLayout>
 
@@ -431,10 +480,67 @@
 
                     </RelativeLayout>
 
-                </RelativeLayout>
+                    <RelativeLayout
+                        android:id="@+id/dc_check_update_rl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="15dp"
+                        android:paddingBottom="15dp">
 
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/dc_check_update_img"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginEnd="5dp"
+                            android:layout_marginBottom="5dp"
+                            android:alpha="0.5"
+                            android:padding="10dp"
+                            android:src="@drawable/ic_network" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_toStartOf="@id/dc_check_update_switch"
+                            android:layout_toEndOf="@id/dc_check_update_img"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/dc_check_update_heading"
+                                style="@style/TextAppearance.AppCompat.Subhead"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:drawablePadding="10dp"
+                                android:text="@string/dc_check_update_heading"
+                                android:textSize="@dimen/large_font_text_view" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="5dp"
+                                android:text="@string/dc_check_update_desc"
+                                android:textSize="@dimen/default_font_text_view" />
+                        </LinearLayout>
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/dc_check_update_switch"
+                            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:padding="10dp" />
+
+                    </RelativeLayout>
+                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-        </LinearLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="40dp" />
+        </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bs_conn_top_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -30,6 +31,7 @@
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:layout_marginStart="15dp"
+            android:layout_toStartOf="@id/bs_conn_track_app_kill"
             android:padding="5dp"
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/small_font_text_view"
@@ -121,7 +123,8 @@
             android:textColor="?attr/primaryTextColor"
             android:textIsSelectable="true"
             android:textSize="@dimen/heading_font_text_view"
-            android:typeface="monospace" />
+            android:typeface="monospace"
+            tools:ignore="SpeakableTextPresentCheck,SpeakableTextPresentCheck" />
     </RelativeLayout>
 
     <TextView
@@ -147,16 +150,35 @@
         android:orientation="vertical"
         android:padding="10dp">
 
-        <TextView
-            android:id="@+id/bs_conn_blocked_rule1_txt"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/drawable_purple_gradient"
-            android:gravity="start"
-            android:padding="7dp"
-            android:text="@string/ct_bs_heading_1"
-            android:textColor="?attr/primaryTextColor"
-            android:textSize="@dimen/default_font_text_view" />
+            android:weightSum="1">
+
+            <TextView
+                android:id="@+id/bs_conn_blocked_rule1_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/drawable_purple_gradient"
+                android:gravity="start"
+                android:padding="7dp"
+                android:layout_marginEnd="150dp"
+                android:text="@string/ct_bs_heading_1"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/default_font_text_view" />
+
+            <Spinner
+                android:id="@+id/bs_conn_firewall_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/spinner_outline"
+                android:popupBackground="@drawable/spinner_outline_with_bg"
+                android:spinnerMode="dropdown"
+                android:layout_gravity="center"
+                tools:listitem="@layout/spinner_item_firewall_status"
+                />
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/bs_conn_block_app_txt"
@@ -172,19 +194,19 @@
             android:id="@+id/bs_conn_block_app_toggle_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:singleSelection="true"
-            app:selectionRequired="true"
+            android:gravity="center"
             app:checkedButton="@id/bs_conn_tg_no_rule"
-            android:gravity="center">
+            app:selectionRequired="true"
+            app:singleSelection="true">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/bs_conn_tg_no_rule"
                 style="@style/toggleButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="no rule"
-                android:tag="0"
                 android:minWidth="5dp"
+                android:tag="0"
+                android:text="no rule"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/small_font_subheading_text" />
 
@@ -193,9 +215,9 @@
                 style="@style/toggleButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="block"
-                android:tag="1"
                 android:minWidth="5dp"
+                android:tag="1"
+                android:text="block"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/small_font_subheading_text" />
 
@@ -204,9 +226,9 @@
                 style="@style/toggleButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="whitelist"
-                android:tag="2"
                 android:minWidth="5dp"
+                android:tag="2"
+                android:text="whitelist"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/small_font_subheading_text" />
 
@@ -215,9 +237,64 @@
                 style="@style/toggleButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="exclude"
-                android:tag="3"
                 android:minWidth="5dp"
+                android:tag="3"
+                android:text="exclude"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/small_font_subheading_text" />
+
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/bs_conn_block_app_toggle_group_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            app:checkedButton="@id/bs_conn_tg_no_rule"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/bs_conn_tg_no_rule_1"
+                style="@style/toggleButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="5dp"
+                android:tag="0"
+                android:text="no rule"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/small_font_subheading_text" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/bs_conn_tg_block_1"
+                style="@style/toggleButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="5dp"
+                android:tag="1"
+                android:text="block"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/small_font_subheading_text" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/bs_conn_tg_whitelist_1"
+                style="@style/toggleButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="5dp"
+                android:tag="2"
+                android:text="whitelist"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/small_font_subheading_text" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/bs_conn_tg_exclude_1"
+                style="@style/toggleButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="5dp"
+                android:tag="3"
+                android:text="exclude"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/small_font_subheading_text" />
 
@@ -304,30 +381,30 @@
             android:id="@+id/bs_conn_block_ip_toggle_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:singleSelection="true"
-            app:selectionRequired="true"
+            android:gravity="center"
             app:checkedButton="@id/bs_conn_ip_tg_no_rule"
-            android:gravity="center">
+            app:selectionRequired="true"
+            app:singleSelection="true">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/bs_conn_ip_tg_no_rule"
                 style="@style/toggleButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="no rule"
-                android:tag="2"
                 android:minWidth="5dp"
+                android:tag="2"
+                android:text="no rule"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/small_font_subheading_text" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/bs_conn_ip_tg_block"
                 style="@style/toggleButtonStyle"
-                android:minWidth="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="block"
+                android:minWidth="5dp"
                 android:tag="0"
+                android:text="block"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/small_font_subheading_text" />
 
@@ -336,9 +413,9 @@
                 style="@style/toggleButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="whitelist"
-                android:tag="1"
                 android:minWidth="5dp"
+                android:tag="1"
+                android:text="whitelist"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/small_font_subheading_text" />
 

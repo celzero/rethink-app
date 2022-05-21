@@ -8,34 +8,34 @@
       android:strokeLineJoin="round"
       android:strokeWidth="2"
       android:fillColor="?attr/svgFillColor"
-      android:strokeColor="?attr/svgStrokeColor"
+      android:strokeColor="?attr/accentBad"
       android:strokeLineCap="round"/>
   <path
       android:pathData="M5.1716,11.7046C6.6317,10.86 8.2627,10.2779 10,10.0229M18.8284,11.7046C17.9699,11.2079 17.0522,10.8021 16.0886,10.5001"
       android:strokeLineJoin="round"
       android:strokeWidth="2"
       android:fillColor="?attr/svgFillColor"
-      android:strokeColor="?attr/svgStrokeColor"
+      android:strokeColor="?attr/accentBad"
       android:strokeLineCap="round"/>
   <path
       android:pathData="M9.0736,15.2544C9.9889,14.9309 10.9739,14.7549 12,14.7549C13.0261,14.7549 14.0111,14.9309 14.9265,15.2544"
       android:strokeLineJoin="round"
       android:strokeWidth="2"
       android:fillColor="?attr/svgFillColor"
-      android:strokeColor="?attr/svgStrokeColor"
+      android:strokeColor="?attr/accentBad"
       android:strokeLineCap="round"/>
   <path
       android:pathData="M11.9181,19.1465L11.902,19.1304"
       android:strokeLineJoin="round"
       android:strokeWidth="2"
       android:fillColor="?attr/svgFillColor"
-      android:strokeColor="?attr/svgStrokeColor"
+      android:strokeColor="?attr/accentBad"
       android:strokeLineCap="round"/>
   <path
       android:pathData="M2,2L22,22"
       android:strokeLineJoin="round"
       android:strokeWidth="2"
       android:fillColor="?attr/svgFillColor"
-      android:strokeColor="?attr/svgStrokeColor"
+      android:strokeColor="?attr/accentBad"
       android:strokeLineCap="round"/>
 </vector>

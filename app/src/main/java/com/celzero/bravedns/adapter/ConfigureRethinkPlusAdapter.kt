@@ -22,14 +22,13 @@ import android.widget.Filter
 import android.widget.Filterable
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.celzero.bravedns.R
 import com.celzero.bravedns.data.FileTag
 import com.celzero.bravedns.databinding.ListConfigureRethinkPlusBinding
 import com.celzero.bravedns.ui.ConfigureRethinkPlusActivity
 import java.util.*
-import kotlin.collections.ArrayList
 
-class ConfigureRethinkPlusAdapter(val context: ConfigureRethinkPlusActivity, var fileTags: List<FileTag>) :
+class ConfigureRethinkPlusAdapter(val context: ConfigureRethinkPlusActivity,
+                                  var fileTags: List<FileTag>) :
         RecyclerView.Adapter<ConfigureRethinkPlusAdapter.ConfigureRethinkPlusViewHolder>(),
         Filterable {
 
@@ -44,43 +43,39 @@ class ConfigureRethinkPlusAdapter(val context: ConfigureRethinkPlusActivity, var
 
     override fun getFilter(): Filter {
         return object : Filter() {
-            override fun performFiltering(constraint: CharSequence?): FilterResults {
-                val charSearch = constraint.toString()
-                filteredTags = if (charSearch.isEmpty()) {
-                    fileTags
-                } else {
-                    getFilteredFileTag(charSearch)
-                }
+            override fun performFiltering(constraint: CharSequence): FilterResults {
                 val filterResults = FilterResults()
-                filterResults.values = filteredTags
+                filterResults.values = getFilteredFileTag(constraint.toString())
                 return filterResults
             }
 
-            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-                val r = results?.values as? List<FileTag> ?: return
+            override fun publishResults(constraint: CharSequence, results: FilterResults?) {
+                val res = results?.values as? List<FileTag> ?: return
 
-                filteredTags = r
+                filteredTags = res
                 notifyDataSetChanged()
             }
 
-            private fun getFilteredFileTag(search: String): ArrayList<FileTag> {
-                val resultList = ArrayList<FileTag>()
+            private fun getFilteredFileTag(search: String): List<FileTag> {
+                var resultList: List<FileTag>
                 val filter = context.filterObserver()
 
-                var d : List<FileTag> = fileTags
-                if (filter.value?.groups?.isNotEmpty() == true) {
-                    d = fileTags.filter { filter.value!!.groups.contains(it.subg) }
-                }
-
-                var e : List<FileTag> = d
-                if (filter.value?.subGroups?.isNotEmpty() == true) {
-                    e = d.filter { filter.value!!.subGroups.contains(it.group) }
-                }
-
-                for (row in e) {
-                    if (row.vname.lowercase(Locale.ROOT).contains(search.lowercase(Locale.ROOT))) {
-                        resultList.add(row)
+                resultList = if (search.isEmpty()) {
+                    fileTags
+                } else {
+                    // search the term in vname, group, sub group
+                    fileTags.filter {
+                        it.vname.contains(search) || it.group.contains(search) || it.subg.contains(
+                            search)
                     }
+                }
+
+                if (filter.value?.groups?.isNotEmpty() == true) {
+                    resultList = resultList.filter { filter.value!!.groups.contains(it.group) }
+                }
+
+                if (filter.value?.subGroups?.isNotEmpty() == true) {
+                    resultList = resultList.filter { filter.value!!.subGroups.contains(it.subg) }
                 }
                 return resultList
             }
@@ -116,9 +111,9 @@ class ConfigureRethinkPlusAdapter(val context: ConfigureRethinkPlusActivity, var
 
                 override fun areContentsTheSame(oldItemPosition: Int,
                                                 newItemPosition: Int): Boolean {
-                    val newMovie: FileTag = f[oldItemPosition]
-                    val oldMovie = f[newItemPosition]
-                    return newMovie.uname === oldMovie.uname
+                    val newTag: FileTag = f[oldItemPosition]
+                    val oldTag = f[newItemPosition]
+                    return newTag.uname === oldTag.uname
                 }
             })
             fileTags = f
@@ -146,11 +141,6 @@ class ConfigureRethinkPlusAdapter(val context: ConfigureRethinkPlusActivity, var
 
         private fun displayMetaData(groupName: String, position: Int) {
             b.crpDescGroupTv.text = groupName
-            if (filteredTags[position].subg.isBlank()) {
-                b.crpDescSubgTv.text = context.getString(R.string.crp_empty_name)
-                return
-            }
-
             b.crpDescSubgTv.text = filteredTags[position].subg
         }
 
@@ -164,5 +154,4 @@ class ConfigureRethinkPlusAdapter(val context: ConfigureRethinkPlusActivity, var
             b.crpHeadingTv.visibility = View.GONE
         }
     }
-
 }

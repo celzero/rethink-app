@@ -41,12 +41,4 @@ class DnsCryptEndpointViewModel(private val dnsCryptEndpointDAO: DnsCryptEndpoin
         }
     }
 
-    fun setFilter(filter: String?) {
-        filteredList.value = filter
-    }
-
-    fun setFilterBlocked(filter: String) {
-        filteredList.value = filter
-    }
-
 }

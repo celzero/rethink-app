@@ -8,6 +8,6 @@
       android:strokeLineJoin="miter"
       android:strokeWidth="2"
       android:fillColor="?attr/svgFillColor"
-      android:strokeColor="?attr/invertedPrimaryTextColor"
+      android:strokeColor="?attr/svgStrokeColor"
       android:strokeLineCap="square"/>
 </vector>

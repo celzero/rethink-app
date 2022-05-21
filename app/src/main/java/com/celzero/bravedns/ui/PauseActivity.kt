@@ -69,7 +69,7 @@ class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
 
     private fun initView() {
         FirewallManager.getApplistObserver().observe(this, {
-            val blockedList = it.filter { a -> a.firewallStatus == FirewallManager.AppStatus.BLOCK.id }
+            val blockedList = it.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.BLOCK.id }
             b.pacTimerDesc.text = getString(R.string.pause_desc, blockedList.count().toString())
         })
     }

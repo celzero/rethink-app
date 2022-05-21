@@ -23,7 +23,10 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.pm.PackageManager
-import android.net.*
+import android.net.LinkProperties
+import android.net.Network
+import android.net.ProxyInfo
+import android.net.VpnService
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.ParcelFileDescriptor
@@ -219,7 +222,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
             }
 
             // if the app is new (ie unknown), refresh the db
-            if (FirewallManager.AppStatus.UNTRACKED == appStatus) {
+            if (FirewallManager.FirewallStatus.UNTRACKED == appStatus) {
                 io("dbRefresh") {
                     refreshDatabase.handleNewlyConnectedApp(uid)
                 }
@@ -228,7 +231,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 }
             }
 
-            if (FirewallManager.AppStatus.WHITELIST == appStatus) {
+            if (FirewallManager.FirewallStatus.WHITELIST == appStatus) {
                 return if (dnsProxied(connInfo.destPort)) {
                     FirewallRuleset.RULE9
                 } else {
@@ -398,32 +401,32 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
 
     // Check if the app has firewall rules set
     // refer: FirewallManager.kt line-no#58
-    private fun appBlocked(appStatus: FirewallManager.AppStatus,
+    private fun appBlocked(firewallStatus: FirewallManager.FirewallStatus,
                            connectionStatus: FirewallManager.ConnectionStatus): Boolean {
-        if (isAppBlocked(appStatus, connectionStatus)) {
+        if (isAppBlocked(firewallStatus, connectionStatus)) {
             return true
         }
 
         return if (connectionType.typeMobileData()) {
-            isMobileDataBlockedForUid(appStatus, connectionStatus)
+            isMobileDataBlockedForUid(firewallStatus, connectionStatus)
         } else {
-            isWifiBlockedForUid(appStatus, connectionStatus)
+            isWifiBlockedForUid(firewallStatus, connectionStatus)
         }
     }
 
-    private fun isAppBlocked(appStatus: FirewallManager.AppStatus,
+    private fun isAppBlocked(firewallStatus: FirewallManager.FirewallStatus,
                              connectionStatus: FirewallManager.ConnectionStatus): Boolean {
-        return appStatus.blocked() && connectionStatus.both()
+        return firewallStatus.blocked() && connectionStatus.both()
     }
 
-    private fun isMobileDataBlockedForUid(appStatus: FirewallManager.AppStatus,
+    private fun isMobileDataBlockedForUid(firewallStatus: FirewallManager.FirewallStatus,
                                           connectionStatus: FirewallManager.ConnectionStatus): Boolean {
-        return appStatus.blocked() && connectionStatus.mobileData()
+        return firewallStatus.blocked() && connectionStatus.mobileData()
     }
 
-    private fun isWifiBlockedForUid(appStatus: FirewallManager.AppStatus,
+    private fun isWifiBlockedForUid(firewallStatus: FirewallManager.FirewallStatus,
                                     connectionStatus: FirewallManager.ConnectionStatus): Boolean {
-        return appStatus.blocked() && connectionStatus.wifi()
+        return firewallStatus.blocked() && connectionStatus.wifi()
     }
 
     private fun blockBackgroundData(uid: Int): Boolean {
@@ -454,8 +457,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         intent.putExtra(NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME,
                         NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE)
 
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent,
-                                                      PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val pendingIntent = Utilities.getActivityPendingIntent(this, Intent(this,
+                                                                            HomeScreenActivity::class.java),
+                                                               PendingIntent.FLAG_UPDATE_CURRENT,
+                                                               mutable = true)
+
         var builder: NotificationCompat.Builder
         if (isAtleastO()) {
             val name: CharSequence = getString(R.string.notif_channel_firewall_alerts)
@@ -509,14 +516,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
 
     private fun notifyEmptyFirewallRules() {
         val intent = Intent(this, HomeScreenActivity::class.java)
-        val mainActivityIntent = PendingIntent.getActivity(this, 0, intent,
-                                                           PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val pendingIntent = Utilities.getActivityPendingIntent(this, intent,
+                                                               PendingIntent.FLAG_UPDATE_CURRENT,
+                                                               mutable = true)
         if (isAtleastO()) {
             val name: CharSequence = getString(R.string.notif_channel_firewall_alerts)
             val description = resources.getString(R.string.notif_channel_desc_firewall_alerts)
             val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS,
-                                              name, importance)
+            val channel = NotificationChannel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, name, importance)
             channel.description = description
             notificationManager.createNotificationChannel(channel)
         }
@@ -526,7 +534,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         val contentTitle = resources.getString(R.string.rules_load_failure_heading)
         val contentText = resources.getString(R.string.rules_load_failure_desc)
         builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(
-            mainActivityIntent).setContentText(contentText)
+            pendingIntent).setContentText(contentText)
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
         builder.color = ContextCompat.getColor(this, getThemeAccent(this))
         val openIntent = makeVpnIntent(NOTIF_ID_LOAD_RULES_FAIL,
@@ -734,14 +742,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
 
     private fun makeAppInfoObserver(): Observer<Collection<AppInfo>> {
         return Observer<Collection<AppInfo>> { t ->
-            val copy : Collection<AppInfo>
+            val copy: Collection<AppInfo>
             // adding synchronized block, found a case of concurrent modification
             // exception that happened once when trying to filter the received object (t).
             // creating a copy of the received value in a synchronized block.
             synchronized(t) {
                 copy = t
             }
-            val latestExcludedApps = copy.filter { it.firewallStatus == FirewallManager.AppStatus.EXCLUDE.id }.map(
+            val latestExcludedApps = copy.filter { it.firewallStatus == FirewallManager.FirewallStatus.EXCLUDE.id }.map(
                 AppInfo::packageInfo).toSet()
             if (Sets.symmetricDifference(excludedApps,
                                          latestExcludedApps).count() == 0) return@Observer
@@ -773,9 +781,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
     }
 
     private fun updateNotificationBuilder(): NotificationCompat.Builder {
-        val mainActivityIntent = PendingIntent.getActivity(this, 0, Intent(this,
-                                                                           HomeScreenActivity::class.java),
-                                                           PendingIntent.FLAG_UPDATE_CURRENT)
+        val pendingIntent = Utilities.getActivityPendingIntent(this, Intent(this,
+                                                                            HomeScreenActivity::class.java),
+                                                               PendingIntent.FLAG_UPDATE_CURRENT,
+                                                               mutable = true)
         var builder: NotificationCompat.Builder
         if (isAtleastO()) {
             val name: CharSequence = resources.getString(R.string.notif_channel_vpn_notification)
@@ -802,7 +811,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         }
 
         builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(
-            mainActivityIntent)
+            pendingIntent)
 
         // New action button options in the notification
         // 1. Pause / Resume, Stop action button.
@@ -863,11 +872,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
         return builder
     }
 
-    private fun makeVpnIntent(notificationID: Int, intentExtra: String): PendingIntent? {
-        val intentAction = Intent(this, NotificationActionReceiver::class.java)
-        intentAction.putExtra(Constants.NOTIFICATION_ACTION, intentExtra)
-        return PendingIntent.getBroadcast(this, notificationID, intentAction,
-                                          PendingIntent.FLAG_UPDATE_CURRENT)
+    private fun makeVpnIntent(notificationID: Int, intentExtra: String): PendingIntent {
+        val intent = Intent(this, NotificationActionReceiver::class.java)
+        intent.putExtra(Constants.NOTIFICATION_ACTION, intentExtra)
+        return Utilities.getBroadcastPendingIntent(this, notificationID, intent,
+                                                   PendingIntent.FLAG_UPDATE_CURRENT,
+                                                   mutable = true)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -1029,6 +1039,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                         }
                         AppConfig.DnsType.DNS_PROXY -> {
                             updateDnsProxy(opts)
+                        }
+                        AppConfig.DnsType.RETHINK_REMOTE -> {
+                            updateTun(opts)
                         }
                     }
                 }
@@ -1208,13 +1221,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Protect
                 builder = NotificationCompat.Builder(this, WARNING_CHANNEL_ID)
                 builder.setVibrate(vibrationPattern)
             }
-            val mainActivityIntent = PendingIntent.getActivity(this, 0, Intent(this,
-                                                                               HomeScreenActivity::class.java),
-                                                               PendingIntent.FLAG_UPDATE_CURRENT)
+
+            val pendingIntent = Utilities.getActivityPendingIntent(this, Intent(this,
+                                                                                HomeScreenActivity::class.java),
+                                                                   PendingIntent.FLAG_UPDATE_CURRENT,
+                                                                   mutable = true)
             builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(
                 resources.getText(R.string.warning_title)).setContentText(
-                resources.getText(R.string.notification_content)).setContentIntent(
-                mainActivityIntent)
+                resources.getText(R.string.notification_content)).setContentIntent(pendingIntent)
                 // Open the main UI if possible.
                 .setAutoCancel(true)
             notificationManager.notify(0, builder.build())

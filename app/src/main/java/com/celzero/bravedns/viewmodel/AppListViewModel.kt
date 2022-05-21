@@ -47,11 +47,7 @@ class AppListViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         }
     }
 
-    fun setFilter(filter: String?) {
-        filteredList.value = filter
-    }
-
-    fun setFilterBlocked(filter: String) {
+    fun setFilter(filter: String) {
         filteredList.value = filter
     }
 }

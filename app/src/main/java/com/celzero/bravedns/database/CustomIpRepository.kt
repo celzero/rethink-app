@@ -23,45 +23,43 @@ import kotlinx.coroutines.launch
 
 class CustomIpRepository(private val customIpDao: CustomIpDao) {
 
-    fun update(customIp: CustomIp) {
+    suspend fun update(customIp: CustomIp) {
         customIpDao.update(customIp)
     }
 
-    fun clearFirewallRules(uid: Int) {
+    suspend fun clearFirewallRules(uid: Int) {
         customIpDao.clearIpRuleByUid(uid)
     }
 
-    fun insert(customIp: CustomIp) {
+    suspend fun insert(customIp: CustomIp) {
         customIpDao.insert(customIp)
     }
 
-    fun getIpRules(): List<CustomIp> {
+    suspend fun getIpRules(): List<CustomIp> {
         return customIpDao.getFirewallRules()
     }
 
-    fun getCustomIpDetail(uid: Int, ipAddress: String): CustomIp? {
+    suspend fun getCustomIpDetail(uid: Int, ipAddress: String): CustomIp? {
         return customIpDao.getCustomIpDetail(uid, ipAddress)
     }
 
-    fun deleteIPRulesForUID(uid: Int, ipAddress: String) {
+    suspend fun deleteIPRulesForUID(uid: Int, ipAddress: String) {
         customIpDao.deleteIPRulesForUID(uid, ipAddress)
     }
 
-    fun deleteIpRule(customIp: CustomIp) {
+    suspend fun deleteIpRule(customIp: CustomIp) {
         customIpDao.delete(customIp)
     }
 
-    fun deleteAllIPRulesUniversal(coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
-        coroutineScope.launch {
-            customIpDao.deleteAllIPRulesUniversal()
-        }
+    suspend fun deleteAllIPRulesUniversal() {
+        customIpDao.deleteAllIPRulesUniversal()
     }
 
-    fun getBlockedConnectionsCount(): Int {
+    suspend fun getBlockedConnectionsCount(): Int {
         return customIpDao.getBlockedConnectionsCount()
     }
 
-    fun getBlockedConnectionCountLiveData(): LiveData<Int> {
+    suspend fun getBlockedConnectionCountLiveData(): LiveData<Int> {
         return customIpDao.getBlockedConnectionCountLiveData()
     }
 }

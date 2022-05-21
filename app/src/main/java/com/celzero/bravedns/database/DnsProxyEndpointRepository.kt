@@ -34,55 +34,37 @@ class DnsProxyEndpointRepository(private val dnsProxyEndpointDAO: DnsProxyEndpoi
         dnsProxyEndpointDAO.update(dnsProxyEndpoint)
     }
 
-    fun insertAsync(dnsCryptEndpoint: DnsProxyEndpoint,
-                    coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
-        coroutineScope.launch {
-            dnsProxyEndpointDAO.insert(dnsCryptEndpoint)
-        }
+    suspend fun insertAsync(dnsCryptEndpoint: DnsProxyEndpoint) {
+        dnsProxyEndpointDAO.insert(dnsCryptEndpoint)
     }
 
-    fun insertWithReplace(dnsProxyEndpoint: DnsProxyEndpoint,
-                          coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
-        coroutineScope.launch {
-            dnsProxyEndpointDAO.insertWithReplace(dnsProxyEndpoint)
-        }
+    suspend fun deleteOlderData(date: Long) {
+        dnsProxyEndpointDAO.deleteOlderData(date)
     }
 
-    fun getDnsProxyEndpointLiveData(): LiveData<PagedList<DnsProxyEndpoint>> {
-        return dnsProxyEndpointDAO.getDnsProxyEndpointLiveData().toLiveData(
-            pageSize = LIVEDATA_PAGE_SIZE)
-    }
-
-    fun deleteOlderData(date: Long,
-                        coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
-        coroutineScope.launch {
-            dnsProxyEndpointDAO.deleteOlderData(date)
-        }
-    }
-
-    fun getDnsProxyEndpointLiveDataByType(query: String): LiveData<PagedList<DnsProxyEndpoint>> {
-        return dnsProxyEndpointDAO.getDnsProxyEndpointLiveDataByType(query).toLiveData(
-            pageSize = LIVEDATA_PAGE_SIZE)
-    }
-
-    fun deleteDnsProxyEndpoint(id: Int) {
+    suspend fun deleteDnsProxyEndpoint(id: Int) {
         dnsProxyEndpointDAO.deleteDnsProxyEndpoint(id)
     }
 
-    fun removeConnectionStatus() {
+    suspend fun removeConnectionStatus() {
         dnsProxyEndpointDAO.removeConnectionStatus()
     }
 
-    fun getCount(): Int {
+    suspend fun getCount(): Int {
         return dnsProxyEndpointDAO.getCount()
     }
 
-    fun getConnectedProxy(): DnsProxyEndpoint {
+    suspend fun getConnectedProxy(): DnsProxyEndpoint {
         return dnsProxyEndpointDAO.getConnectedProxy()
     }
 
-    fun getNetworkDnsEndpoint(): DnsProxyEndpoint {
+    suspend fun getNetworkDnsEndpoint(): DnsProxyEndpoint {
         return dnsProxyEndpointDAO.getNetworkDnsEndpoint()
+    }
+
+    suspend fun setNetworkDns() {
+        dnsProxyEndpointDAO.removeConnectionStatus()
+        dnsProxyEndpointDAO.setNetworkDns()
     }
 
 }

@@ -36,6 +36,7 @@ object DatabaseModule {
         single { get<AppDatabase>().proxyEndpointDAO() }
         single { get<AppDatabase>().customDomainEndpointDAO() }
         single { get<AppDatabase>().customIpEndpointDao() }
+        single { get<AppDatabase>().rethinkEndpointDao()}
     }
     private val repositoryModule = module {
         single { get<AppDatabase>().appInfoRepository() }
@@ -48,6 +49,7 @@ object DatabaseModule {
         single { get<AppDatabase>().proxyEndpointRepository() }
         single { get<AppDatabase>().customDomainRepository() }
         single { get<AppDatabase>().customIpRepository() }
+        single { get<AppDatabase>().rethinkEndpointRepository()}
     }
 
     val modules = listOf(databaseModule, daoModule, repositoryModule)

@@ -31,7 +31,6 @@ import com.celzero.bravedns.data.AppConfig.TunnelOptions
 import com.celzero.bravedns.database.DnsProxyEndpoint
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.DnsConfigureWebViewActivity.Companion.BLOCKLIST_REMOTE_FOLDER_NAME
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.DEFAULT_DOH_URL
@@ -40,11 +39,12 @@ import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_BAS
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_RD
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TD
+import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getNonLiveDnscryptServers
-import com.celzero.bravedns.util.Utilities.Companion.remoteBlocklistDir
 import com.celzero.bravedns.util.Utilities.Companion.remoteBlocklistFile
+import com.celzero.bravedns.util.Utilities.Companion.blocklistFile
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import dnsx.BraveDNS
 import dnsx.Dnsx
@@ -153,10 +153,10 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
             return
         }
         try {
-            val remoteDir = remoteBlocklistDir(context, BLOCKLIST_REMOTE_FOLDER_NAME,
-                                               persistentState.remoteBlocklistTimestamp) ?: return
-            val remoteFile = remoteBlocklistFile(remoteDir.absolutePath,
-                                                 ONDEVICE_BLOCKLIST_FILE_TAG) ?: return
+            val remoteDir = remoteBlocklistFile(context, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                                persistentState.remoteBlocklistTimestamp) ?: return
+            val remoteFile = blocklistFile(remoteDir.absolutePath,
+                                           ONDEVICE_BLOCKLIST_FILE_TAG) ?: return
             if (remoteFile.exists()) {
                 tunnel?.braveDNS = Dnsx.newBraveDNSRemote(remoteFile.absolutePath)
                 Log.i(LOG_TAG_VPN, "remote-bravedns enabled")
@@ -399,7 +399,7 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
     private suspend fun getDohUrl(): String {
         var dohURL: String? = ""
         try {
-            dohURL = appConfig.getDOHDetails()?.dohURL
+            dohURL = appConfig.getRemoteRethinkEndpoint()?.url ?: appConfig.getDOHDetails()?.dohURL
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "error while fetching doh details", e)
         }

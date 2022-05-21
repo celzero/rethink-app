@@ -75,7 +75,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
 
                 manager.cancel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, uid)
 
-                modifyAppFirewallSettings(context, uid, FirewallManager.AppStatus.BLOCK)
+                modifyAppFirewallSettings(context, uid, FirewallManager.FirewallStatus.ALLOW)
             }
             Constants.NOTIF_ACTION_NEW_APP_DENY -> {
                 val uid = intent.getIntExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, Int.MIN_VALUE)
@@ -83,7 +83,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
 
                 manager.cancel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, uid)
 
-                modifyAppFirewallSettings(context, uid, FirewallManager.AppStatus.ALLOW)
+                modifyAppFirewallSettings(context, uid, FirewallManager.FirewallStatus.BLOCK)
             }
         }
     }
@@ -132,15 +132,16 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
         }
     }
 
-    private fun modifyAppFirewallSettings(context: Context, uid: Int, appStatus: FirewallManager.AppStatus) {
-        val text = if (appStatus == FirewallManager.AppStatus.BLOCK) {
+    private fun modifyAppFirewallSettings(context: Context, uid: Int,
+                                          firewallStatus: FirewallManager.FirewallStatus) {
+        val text = if (firewallStatus == FirewallManager.FirewallStatus.BLOCK) {
             context.getString(R.string.new_app_notification_action_toast_deny)
         } else {
             context.getString(R.string.new_app_notification_action_toast_allow)
         }
 
         Utilities.showToastUiCentered(context, text, Toast.LENGTH_SHORT)
-        FirewallManager.updateFirewalledApps(uid, appStatus)
+        FirewallManager.updateFirewalledApps(uid, firewallStatus)
     }
 
     private fun io(f: suspend () -> Unit) {

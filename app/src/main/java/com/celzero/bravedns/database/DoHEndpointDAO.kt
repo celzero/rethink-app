@@ -71,7 +71,4 @@ interface DoHEndpointDAO {
 
     @Query("update DoHEndpoint set isSelected = 1 where id = 4")
     fun updateConnectionDefault()
-
-    @Query("select * from DoHEndpoint where id = 5")
-    fun getRethinkDnsEndpoint(): DoHEndpoint
 }

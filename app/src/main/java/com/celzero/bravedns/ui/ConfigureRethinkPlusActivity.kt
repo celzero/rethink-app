@@ -18,6 +18,7 @@ package com.celzero.bravedns.ui
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.MutableLiveData
@@ -26,20 +27,21 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ConfigureRethinkPlusAdapter
-import com.celzero.bravedns.customdownloader.BlocklistDownloadInterface
-import com.celzero.bravedns.customdownloader.RetrofitManager
+import com.celzero.bravedns.automaton.RethinkBlocklistsManager
 import com.celzero.bravedns.data.FileTag
 import com.celzero.bravedns.databinding.ActivityConfigureRethinkplusBinding
+import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Constants.Companion.FILETAG_TEMP_DOWNLOAD_URL
+import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
+import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
+import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Utilities
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import org.koin.android.ext.android.inject
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
 
 class ConfigureRethinkPlusActivity : AppCompatActivity(R.layout.activity_configure_rethinkplus),
                                      SearchView.OnQueryTextListener {
@@ -51,6 +53,10 @@ class ConfigureRethinkPlusActivity : AppCompatActivity(R.layout.activity_configu
 
     private val fileTags: MutableList<FileTag> = ArrayList()
     private val filters = MutableLiveData<Filters>()
+
+    companion object {
+        private const val EMPTY_SUBGROUP = "others"
+    }
 
     class Filters {
         var query: String = ""
@@ -81,9 +87,11 @@ class ConfigureRethinkPlusActivity : AppCompatActivity(R.layout.activity_configu
     }
 
     private fun init() {
-        downloadFileTagIfNeeded()
+        val type = intent.getIntExtra(Constants.BLOCKLIST_LOCATION_INTENT_EXTRA, 0)
+        val stamp = intent.getStringExtra(Constants.BLOCKLIST_STAMP_INTENT_EXTRA)
+        Log.d(LoggerConstants.LOG_TAG_DNS, "Rethink Type: $type, with the stamp: $stamp")
+        readJson(type)
         b.rethinkPlusSearchView.setOnQueryTextListener(this)
-        recylcerAdapter = ConfigureRethinkPlusAdapter(this, fileTags)
     }
 
     private fun initClickListeners() {
@@ -97,38 +105,45 @@ class ConfigureRethinkPlusActivity : AppCompatActivity(R.layout.activity_configu
         bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
     }
 
-    private fun downloadFileTagIfNeeded() {
-        val retrofit = RetrofitManager.getBlocklistBaseBuilder().addConverterFactory(
-            GsonConverterFactory.create()).build()
-        val retrofitInterface = retrofit.create(BlocklistDownloadInterface::class.java)
-        val request = retrofitInterface.downloadRemoteBlocklistFile(FILETAG_TEMP_DOWNLOAD_URL)
+    private fun readJson(type: Int) {
+        try {
+            val dir = if (type == AppDownloadManager.DownloadType.REMOTE.id) {
+                Utilities.remoteBlocklistFile(this, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                              persistentState.remoteBlocklistTimestamp)
+            } else {
+                Utilities.localBlocklistFile(this, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                             persistentState.localBlocklistTimestamp)
+            } ?: return
 
-        request.enqueue(object : Callback<JsonObject?> {
-            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                if (response.isSuccessful) {
-                    parseJson(response.body())
-                } else {
-                    // no-op
+            val file = Utilities.blocklistFile(dir.absolutePath,
+                                               Constants.ONDEVICE_BLOCKLIST_FILE_TAG) ?: return
+            Log.d(LoggerConstants.LOG_TAG_DNS, "file directory path: ${dir.absolutePath}, ${file.absolutePath}")
+            val jsonString = file.bufferedReader().use { it.readText() }
+            val entries: JsonObject = Gson().fromJson(jsonString, JsonObject::class.java)
+
+            entries.entrySet().forEach {
+                val t = Gson().fromJson(it.value, FileTag::class.java)
+                // add subg tag as "others" if its empty
+                if (t.subg.isEmpty()) {
+                    t.subg = EMPTY_SUBGROUP
                 }
+                t.simpleViewTag = RethinkBlocklistsManager.getSimpleBlocklistDetails(t.uname, t.subg)
+                fileTags.add(t)
             }
 
-            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                // TODO: handle the failure cases
-            }
+            fileTags.sortBy { it.group }
 
-        })
+            setFileTagAdapter()
+        } catch (ioException: IOException) {
+            Log.e(LoggerConstants.LOG_TAG_DNS,
+                  "Failure reading json file for timestamp: ${persistentState.remoteBlocklistTimestamp}",
+                  ioException)
+            showFailureDialog()
+        }
     }
 
-    private fun parseJson(jsonObject: JsonObject?) {
-        jsonObject ?: return
-
-        jsonObject.entrySet().forEach {
-            val t = Gson().fromJson(it.value, FileTag::class.java)
-            fileTags.add(t)
-        }
-
-        fileTags.sortBy { it.group }
-
+    private fun setFileTagAdapter() {
+        recylcerAdapter = ConfigureRethinkPlusAdapter(this, fileTags)
         recylcerAdapter?.updateFileTag(fileTags)
 
         layoutManager = LinearLayoutManager(this)
@@ -148,7 +163,26 @@ class ConfigureRethinkPlusActivity : AppCompatActivity(R.layout.activity_configu
 
     private fun addQueryToFilters(query: String) {
         val a = filterObserver()
-        a.value?.query = query
+        if (a.value == null) {
+            val temp = Filters()
+            temp.query = query
+            filters.postValue(temp)
+            return
+        }
+
+        // asserting, as there is a null check
+        a.value!!.query = query
         filters.postValue(a.value)
+    }
+
+    private fun showFailureDialog() {
+        val builder = androidx.appcompat.app.AlertDialog.Builder(this)
+        builder.setTitle("Failure")
+        builder.setMessage("Issue loading configuration files")
+        builder.setCancelable(false)
+        builder.setPositiveButton("Quit") { _, _ ->
+            finish()
+        }
+        builder.create().show()
     }
 }

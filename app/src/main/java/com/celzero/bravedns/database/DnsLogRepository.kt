@@ -22,33 +22,19 @@ import kotlinx.coroutines.withContext
 class DnsLogRepository(private val dnsLogDAO: DnsLogDAO) {
 
     suspend fun insert(dnsLog: DnsLog) {
-        ioCtx {
-            dnsLogDAO.insert(dnsLog)
-        }
+        dnsLogDAO.insert(dnsLog)
     }
 
     suspend fun deleteOlderData(date: Long) {
-        ioCtx {
-            dnsLogDAO.deleteOlderData(date)
-        }
+        dnsLogDAO.deleteOlderData(date)
     }
 
     suspend fun deleteConnectionTrackerCount() {
-        ioCtx {
-            dnsLogDAO.deleteOlderDataCount(Constants.TOTAL_LOG_ENTRIES_THRESHOLD)
-        }
+        dnsLogDAO.deleteOlderDataCount(Constants.TOTAL_LOG_ENTRIES_THRESHOLD)
     }
 
     suspend fun clearAllData() {
-        ioCtx {
-            dnsLogDAO.clearAllData()
-        }
-    }
-
-    private suspend fun ioCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.IO) {
-            f()
-        }
+        dnsLogDAO.clearAllData()
     }
 
 }

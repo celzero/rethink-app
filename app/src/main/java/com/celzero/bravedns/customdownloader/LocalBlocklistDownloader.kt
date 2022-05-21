@@ -17,10 +17,10 @@ package com.celzero.bravedns.customdownloader
 
 import android.content.Context
 import android.os.SystemClock
-import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.customdownloader.ConnectionCheckHelper.downloadIds
+import com.celzero.bravedns.customdownloader.ConnectivityHelper.downloadIds
+import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.service.PersistentState
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -30,11 +30,6 @@ class LocalBlocklistDownloader(val context: Context, workerParams: WorkerParamet
         Worker(context, workerParams), KoinComponent {
 
     val persistentState by inject<PersistentState>()
-
-    // various download status used as part of Work manager.
-    enum class DownloadManagerStatus {
-        FAILURE, SUCCESS, IN_PROGRESS
-    }
 
     companion object {
         val BLOCKLIST_DOWNLOAD_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(40)
@@ -51,17 +46,17 @@ class LocalBlocklistDownloader(val context: Context, workerParams: WorkerParamet
         }
 
         return when (checkForDownload()) {
-            DownloadManagerStatus.IN_PROGRESS -> {
-                Result.retry()
-            }
-            DownloadManagerStatus.FAILURE -> {
+            AppDownloadManager.DownloadManagerStatus.FAILURE -> {
                 Result.failure()
             }
-            DownloadManagerStatus.SUCCESS -> {
+            AppDownloadManager.DownloadManagerStatus.SUCCESS -> {
                 // update the download related persistence status on download success
                 updatePersistenceOnCopySuccess(timestamp)
                 clearDownloadList()
                 Result.success()
+            }
+            else -> {
+                Result.retry()
             }
         }
     }
@@ -70,26 +65,26 @@ class LocalBlocklistDownloader(val context: Context, workerParams: WorkerParamet
         downloadIds.clear()
     }
 
-    private fun checkForDownload(): DownloadManagerStatus {
+    private fun checkForDownload(): AppDownloadManager.DownloadManagerStatus {
 
         downloadIds.forEach {
             when (it.value) {
-                ConnectionCheckHelper.DownloadStatus.PAUSED -> {
-                    return DownloadManagerStatus.IN_PROGRESS
+                ConnectivityHelper.DownloadStatus.PAUSED -> {
+                    return AppDownloadManager.DownloadManagerStatus.IN_PROGRESS
                 }
-                ConnectionCheckHelper.DownloadStatus.RUNNING -> {
-                    return DownloadManagerStatus.IN_PROGRESS
+                ConnectivityHelper.DownloadStatus.RUNNING -> {
+                    return AppDownloadManager.DownloadManagerStatus.IN_PROGRESS
                 }
-                ConnectionCheckHelper.DownloadStatus.FAILED -> {
-                    return DownloadManagerStatus.FAILURE
+                ConnectivityHelper.DownloadStatus.FAILED -> {
+                    return AppDownloadManager.DownloadManagerStatus.FAILURE
                 }
-                ConnectionCheckHelper.DownloadStatus.SUCCESSFUL -> {
+                ConnectivityHelper.DownloadStatus.SUCCESSFUL -> {
                     // no-op
                 }
             }
         }
 
-        return DownloadManagerStatus.SUCCESS
+        return AppDownloadManager.DownloadManagerStatus.SUCCESS
     }
 
     private fun updatePersistenceOnCopySuccess(timestamp: Long) {

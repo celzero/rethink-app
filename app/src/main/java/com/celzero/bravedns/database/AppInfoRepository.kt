@@ -22,23 +22,23 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         const val NO_PACKAGE = "no_package"
     }
 
-    fun delete(appInfo: AppInfo) {
+    suspend fun delete(appInfo: AppInfo) {
         appInfoDAO.delete(appInfo)
     }
 
-    fun insert(appInfo: AppInfo) {
+    suspend fun insert(appInfo: AppInfo) {
         appInfoDAO.insert(appInfo)
     }
 
-    fun deleteByPackageName(packageNames: List<String>) {
+    suspend fun deleteByPackageName(packageNames: List<String>) {
         appInfoDAO.deleteByPackageName(packageNames)
     }
 
-    fun getAppInfo(): List<AppInfo> {
+    suspend fun getAppInfo(): List<AppInfo> {
         return appInfoDAO.getAllAppDetails()
     }
 
-    fun updateFirewallStatusByUid(uid: Int, firewallStatus: Int, connectionStatus: Int) {
+    suspend fun updateFirewallStatusByUid(uid: Int, firewallStatus: Int, connectionStatus: Int) {
         appInfoDAO.updateFirewallStatusByUid(uid, firewallStatus, connectionStatus)
     }
 

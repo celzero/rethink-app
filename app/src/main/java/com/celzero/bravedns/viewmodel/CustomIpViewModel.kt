@@ -47,7 +47,4 @@ class CustomIpViewModel(private val customIpDao: CustomIpDao) : ViewModel() {
         filteredList.value = filter
     }
 
-    fun setFilterBlocked(filter: String) {
-        filteredList.value = filter
-    }
 }

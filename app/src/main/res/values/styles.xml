@@ -52,10 +52,12 @@
         <item name="secondaryTextColor">@color/secondaryText</item>
         <item name="chipTextColor">@color/chipTextColor</item>
         <item name="invertedPrimaryTextColor">@color/invertedPrimaryText</item>
+        <item name="textColorAccentBad">@color/textColorAccentBad</item>
 
         <item name="svgStrokeColor">@color/stroke</item>
         <item name="svgFillColor">@color/fill</item>
 
+        <item name="chipBackgroundColor">@color/chipBackgroundColor</item>
         <item name="chipBgColorPositive">@color/chipBgPositive</item>
         <item name="chipTextPositive">@color/chipTextPositive</item>
         <item name="chipBgColorNegative">@color/chipBgNegative</item>
@@ -64,6 +66,17 @@
         <item name="chipColorBgHighlight">@color/chipColorBgHighlight</item>
 
         <item name="fabBackgroundColor">@color/fabBackground</item>
+
+        <item name="firewallNoRuleToggleBtnTxt">@color/firewallNoRuleToggleBtnTxt</item>
+        <item name="firewallNoRuleToggleBtnBg">@color/firewallNoRuleToggleBtnBg</item>
+        <item name="firewallBlockToggleBtnTxt">@color/firewallBlockToggleBtnTxt</item>
+        <item name="firewallBlockToggleBtnBg">@color/firewallBlockToggleBtnBg</item>
+        <item name="firewallWhiteListToggleBtnTxt">@color/firewallWhiteListToggleBtnTxt</item>
+        <item name="firewallWhiteListToggleBtnBg">@color/firewallWhiteListToggleBtnBg</item>
+        <item name="firewallExcludeToggleBtnTxt">@color/firewallExcludeToggleBtnTxt</item>
+        <item name="firewallExcludeToggleBtnBg">@color/firewallExcludeToggleBtnBg</item>
+        <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxt</item>
+        <item name="defaultToggleBtnBg">@color/defaultToggleBtnBg</item>
     </style>
 
     <style name="AppThemeWhite" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
@@ -104,10 +117,12 @@
         <item name="invertedPrimaryTextColor">@color/invertedPrimaryTextLight</item>
         <item name="chipTextColor">@color/chipTextColorLight</item>
         <item name="secondaryTextColor">@color/secondaryTextLight</item>
+        <item name="textColorAccentBad">@color/textColorAccentBadLight</item>
 
         <item name="svgStrokeColor">@color/strokeLight</item>
         <item name="svgFillColor">@color/fillLight</item>
 
+        <item name="chipBackgroundColor">@color/chipBackgroundColorLight</item>
         <item name="chipBgColorPositive">@color/chipBgPositiveLight</item>
         <item name="chipTextPositive">@color/chipTextPositiveLight</item>
         <item name="chipBgColorNegative">@color/chipBgNegativeLight</item>
@@ -116,6 +131,17 @@
         <item name="chipColorBgHighlight">@color/chipColorBgHighlightLight</item>
 
         <item name="fabBackgroundColor">@color/fabBackgroundLight</item>
+
+        <item name="firewallNoRuleToggleBtnTxt">@color/firewallNoRuleToggleBtnTxtLight</item>
+        <item name="firewallNoRuleToggleBtnBg">@color/firewallNoRuleToggleBtnBgLight</item>
+        <item name="firewallBlockToggleBtnTxt">@color/firewallBlockToggleBtnTxtLight</item>
+        <item name="firewallBlockToggleBtnBg">@color/firewallBlockToggleBtnBgLight</item>
+        <item name="firewallWhiteListToggleBtnTxt">@color/firewallWhiteListToggleBtnTxtLight</item>
+        <item name="firewallWhiteListToggleBtnBg">@color/firewallWhiteListToggleBtnBgLight</item>
+        <item name="firewallExcludeToggleBtnTxt">@color/firewallExcludeToggleBtnTxtLight</item>
+        <item name="firewallExcludeToggleBtnBg">@color/firewallExcludeToggleBtnBgLight</item>
+        <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtLight</item>
+        <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgLight</item>
     </style>
 
     <style name="AppThemeTrueBlack" parent="Theme.MaterialComponents.NoActionBar.Bridge">
@@ -157,10 +183,12 @@
         <item name="chipTextColor">@color/chipTextColorBlack</item>
         <item name="invertedPrimaryTextColor">@color/invertedPrimaryTextBlack</item>
         <item name="secondaryTextColor">@color/secondaryTextBlack</item>
+        <item name="textColorAccentBad">@color/textColorAccentBadBlack</item>
 
         <item name="svgStrokeColor">@color/strokeBlack</item>
         <item name="svgFillColor">@color/fillBlack</item>
 
+        <item name="chipBackgroundColor">@color/chipBackgroundColorBlack</item>
         <item name="chipBgColorPositive">@color/chipBgPositiveBlack</item>
         <item name="chipTextPositive">@color/chipTextPositiveBlack</item>
         <item name="chipBgColorNegative">@color/chipBgNegativeBlack</item>
@@ -169,6 +197,17 @@
         <item name="chipColorBgHighlight">@color/chipColorBgHighlightBlack</item>
 
         <item name="fabBackgroundColor">@color/fabBackgroundBlack</item>
+
+        <item name="firewallNoRuleToggleBtnTxt">@color/firewallNoRuleToggleBtnTxtBlack</item>
+        <item name="firewallNoRuleToggleBtnBg">@color/firewallNoRuleToggleBtnBgBlack</item>
+        <item name="firewallBlockToggleBtnTxt">@color/firewallBlockToggleBtnTxtBlack</item>
+        <item name="firewallBlockToggleBtnBg">@color/firewallBlockToggleBtnBgBlack</item>
+        <item name="firewallWhiteListToggleBtnTxt">@color/firewallWhiteListToggleBtnTxtBlack</item>
+        <item name="firewallWhiteListToggleBtnBg">@color/firewallWhiteListToggleBtnBgBlack</item>
+        <item name="firewallExcludeToggleBtnTxt">@color/firewallExcludeToggleBtnTxtBlack</item>
+        <item name="firewallExcludeToggleBtnBg">@color/firewallExcludeToggleBtnBgBlack</item>
+        <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtBlack</item>
+        <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgBlack</item>
     </style>
 
     <style name="CustomWidget.MaterialComponents.CompoundButton.Switch" parent="Widget.MaterialComponents.CompoundButton.Switch">
@@ -193,9 +232,6 @@
 
     <style name="BottomSheet" parent="@style/Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/bg_bottom_sheet_dialog_fragment</item>
-        <!--<item name="android:switchStyle">
-            @style/CustomWidget.MaterialComponents.CompoundButton.Switch.Bad
-        </item>-->
     </style>
 
     <style name="BaseBottomSheetDialog" parent="@style/Theme.Design.BottomSheetDialog">
@@ -212,6 +248,17 @@
         <item name="android:colorForeground">@color/switchNormal</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:navigationBarColor">@color/navBarColor</item>
+
+        <item name="firewallNoRuleToggleBtnTxt">@color/firewallNoRuleToggleBtnTxt</item>
+        <item name="firewallNoRuleToggleBtnBg">@color/firewallNoRuleToggleBtnBg</item>
+        <item name="firewallBlockToggleBtnTxt">@color/firewallBlockToggleBtnTxt</item>
+        <item name="firewallBlockToggleBtnBg">@color/firewallBlockToggleBtnBg</item>
+        <item name="firewallWhiteListToggleBtnTxt">@color/firewallWhiteListToggleBtnTxt</item>
+        <item name="firewallWhiteListToggleBtnBg">@color/firewallWhiteListToggleBtnBg</item>
+        <item name="firewallExcludeToggleBtnTxt">@color/firewallExcludeToggleBtnTxt</item>
+        <item name="firewallExcludeToggleBtnBg">@color/firewallExcludeToggleBtnBg</item>
+        <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxt</item>
+        <item name="defaultToggleBtnBg">@color/defaultToggleBtnBg</item>
     </style>
 
     <style name="BottomSheetDialogThemeWhite" parent="BaseBottomSheetDialog">
@@ -222,6 +269,17 @@
         <item name="android:colorForeground">@color/switchNormalLight</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:navigationBarColor">@color/navBarColorLight</item>
+
+        <item name="firewallNoRuleToggleBtnTxt">@color/firewallNoRuleToggleBtnTxtLight</item>
+        <item name="firewallNoRuleToggleBtnBg">@color/firewallNoRuleToggleBtnBgLight</item>
+        <item name="firewallBlockToggleBtnTxt">@color/firewallBlockToggleBtnTxtLight</item>
+        <item name="firewallBlockToggleBtnBg">@color/firewallBlockToggleBtnBgLight</item>
+        <item name="firewallWhiteListToggleBtnTxt">@color/firewallWhiteListToggleBtnTxtLight</item>
+        <item name="firewallWhiteListToggleBtnBg">@color/firewallWhiteListToggleBtnBgLight</item>
+        <item name="firewallExcludeToggleBtnTxt">@color/firewallExcludeToggleBtnTxtLight</item>
+        <item name="firewallExcludeToggleBtnBg">@color/firewallExcludeToggleBtnBgLight</item>
+        <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtLight</item>
+        <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgLight</item>
     </style>
 
     <style name="BottomSheetDialogThemeTrueBlack" parent="BaseBottomSheetDialog">
@@ -232,6 +290,17 @@
         <item name="android:colorForeground">@color/switchNormalBlack</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:navigationBarColor">@color/navBarColorBlack</item>
+
+        <item name="firewallNoRuleToggleBtnTxt">@color/firewallNoRuleToggleBtnTxtBlack</item>
+        <item name="firewallNoRuleToggleBtnBg">@color/firewallNoRuleToggleBtnBgBlack</item>
+        <item name="firewallBlockToggleBtnTxt">@color/firewallBlockToggleBtnTxtBlack</item>
+        <item name="firewallBlockToggleBtnBg">@color/firewallBlockToggleBtnBgBlack</item>
+        <item name="firewallWhiteListToggleBtnTxt">@color/firewallWhiteListToggleBtnTxtBlack</item>
+        <item name="firewallWhiteListToggleBtnBg">@color/firewallWhiteListToggleBtnBgBlack</item>
+        <item name="firewallExcludeToggleBtnTxt">@color/firewallExcludeToggleBtnTxtBlack</item>
+        <item name="firewallExcludeToggleBtnBg">@color/firewallExcludeToggleBtnBgBlack</item>
+        <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtBlack</item>
+        <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgBlack</item>
     </style>
 
     <style name="SearchView.Custom" parent="Widget.AppCompat.SearchView">
@@ -357,9 +426,29 @@
     </style>
 
     <style name="toggleButtonStyle" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="android:paddingLeft">@dimen/mtrl_btn_padding_left</item>
-        <item name="android:paddingRight">@dimen/mtrl_btn_padding_right</item>
+        <item name="android:paddingLeft">@dimen/default_padding</item>
+        <item name="android:paddingRight">@dimen/default_padding</item>
         <item name="strokeColor">?attr/border</item>
-        <item name="strokeWidth">@dimen/mtrl_btn_stroke_size</item>
+        <item name="strokeWidth">@dimen/defaultStrokeWidth</item>
     </style>
+
+    <style name="TabTextDefault" parent="TextAppearance.Design.Tab">
+        <item name="textAllCaps">false</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="TabbedLayoutDefault" parent="Widget.Material3.TabLayout.OnSurface">
+        <item name="tabContentStart">30dp</item>
+        <item name="tabGravity">center</item>
+        <item name="tabMode">scrollable</item>
+        <item name="tabIndicatorFullWidth">true</item>
+        <item name="tabIndicatorColor">?attr/secondaryTextColor</item>
+        <item name="tabPaddingStart">25dp</item>
+        <item name="tabPaddingEnd">25dp</item>
+        <item name="tabSelectedTextColor">?attr/secondaryTextColor</item>
+        <item name="tabTextAppearance">@style/TabTextDefault</item>
+        <item name="tabTextColor">?attr/primaryLightColorText</item>
+    </style>
+
 </resources>

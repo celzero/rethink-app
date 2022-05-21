@@ -44,5 +44,4 @@
 
     </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
-    <include layout="@layout/list_item_app_mgr" android:id="@+id/app_scrolling_incl"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

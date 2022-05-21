@@ -35,11 +35,8 @@ class DnsCryptEndpointRepository(private val dnsCryptEndpointDAO: DnsCryptEndpoi
     }
 
 
-    fun insertAsync(dnsCryptEndpoint: DnsCryptEndpoint,
-                    coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
-        coroutineScope.launch {
-            dnsCryptEndpointDAO.insert(dnsCryptEndpoint)
-        }
+    suspend fun insertAsync(dnsCryptEndpoint: DnsCryptEndpoint) {
+        dnsCryptEndpointDAO.insert(dnsCryptEndpoint)
     }
 
     fun getDNSCryptEndpointLiveData(): LiveData<PagedList<DnsCryptEndpoint>> {
@@ -47,31 +44,23 @@ class DnsCryptEndpointRepository(private val dnsCryptEndpointDAO: DnsCryptEndpoi
             pageSize = LIVEDATA_PAGE_SIZE)
     }
 
-    fun deleteOlderData(date: Long,
-                        coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
-        coroutineScope.launch {
-            dnsCryptEndpointDAO.deleteOlderData(date)
-        }
+    suspend fun deleteOlderData(date: Long) {
+        dnsCryptEndpointDAO.deleteOlderData(date)
     }
 
-    fun getDNSCryptEndpointLiveDataByName(query: String): LiveData<PagedList<DnsCryptEndpoint>> {
-        return dnsCryptEndpointDAO.getDNSCryptEndpointLiveDataByName(query).toLiveData(
-            pageSize = LIVEDATA_PAGE_SIZE)
-    }
-
-    fun deleteDNSCryptEndpoint(id: Int) {
+    suspend fun deleteDNSCryptEndpoint(id: Int) {
         dnsCryptEndpointDAO.deleteDNSCryptEndpoint(id)
     }
 
-    fun removeConnectionStatus() {
+    suspend fun removeConnectionStatus() {
         dnsCryptEndpointDAO.removeConnectionStatus()
     }
 
-    fun getConnectedDNSCrypt(): List<DnsCryptEndpoint> {
+    suspend fun getConnectedDNSCrypt(): List<DnsCryptEndpoint> {
         return dnsCryptEndpointDAO.getConnectedDNSCrypt()
     }
 
-    fun getConnectedCount(): Int {
+    suspend fun getConnectedCount(): Int {
         return dnsCryptEndpointDAO.getConnectedCount()
     }
 
@@ -79,22 +68,22 @@ class DnsCryptEndpointRepository(private val dnsCryptEndpointDAO: DnsCryptEndpoi
         return dnsCryptEndpointDAO.getConnectedCountLiveData()
     }
 
-    fun getCount(): Int {
+    suspend fun getCount(): Int {
         return dnsCryptEndpointDAO.getCount()
     }
 
-    fun updateConnectionStatus(liveServersID: String?) {
+    suspend fun updateConnectionStatus(liveServersID: String?) {
         removeConnectionStatus()
         liveServersID?.split(",")?.forEach {
             dnsCryptEndpointDAO.updateConnectionStatus(it.trim().toInt())
         }
     }
 
-    fun updateFailingConnections() {
+    suspend fun updateFailingConnections() {
         dnsCryptEndpointDAO.updateFailingConnections()
     }
 
-    fun getServersToAdd(): String {
+    suspend fun getServersToAdd(): String {
         val servers = getConnectedDNSCrypt().joinToString(separator = ",") {
             "${it.id}#${it.dnsCryptURL}"
         }
@@ -102,7 +91,7 @@ class DnsCryptEndpointRepository(private val dnsCryptEndpointDAO: DnsCryptEndpoi
         return servers
     }
 
-    fun getServersToRemove(): String {
+    suspend fun getServersToRemove(): String {
         return getConnectedDNSCrypt().joinToString(separator = ",") { "${it.id}" }
     }
 }

@@ -56,6 +56,8 @@ class Constants {
         // folder name to store the local blocklist download files (eg../files/local_blocklist/<timestamp>)
         const val LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME = "local_blocklist"
 
+        const val REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME = "remote_blocklist"
+
         val ONDEVICE_BLOCKLISTS = listOf(
             OnDeviceBlocklistsMetadata("https://download.rethinkdns.com/blocklists",
                                        ONDEVICE_BLOCKLIST_FILE_TAG),
@@ -110,6 +112,7 @@ class Constants {
         const val INVALID_UID = -1
 
         // missing uid, used when the uid is undermined. see ConnectionTracer#getUidQ()
+        // changing this requires changes in RethinkDnsEndpointDao file
         const val MISSING_UID = -2000
 
         // label for rethinkdns plus doh endpoint

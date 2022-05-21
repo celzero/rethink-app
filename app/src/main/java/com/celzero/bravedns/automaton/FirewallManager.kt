@@ -41,11 +41,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
 
-/*TODO : Initial check is for firewall app completely
-           Later modification required for Data, WiFi, ScreenOn/Off, Background
-           Lot of redundant code - streamline the code.
-           */
-
 object FirewallManager : KoinComponent {
 
     private val appInfoRepository by inject<AppInfoRepository>()
@@ -53,13 +48,13 @@ object FirewallManager : KoinComponent {
 
     const val NOTIF_CHANNEL_ID_FIREWALL_ALERTS = "Firewall_Alerts"
 
-    // Below are the rule set
+    // Below are the firewall rule set
     // app-status | connection-status |  Rule
     // allowed    |    BOTH           |  allow
     // blocked    |    wifi           |  WiFi-data-block
     // blocked    |    mobile         |  mobile-data-block
     // blocked    |    both           |  block
-    enum class AppStatus(val id: Int) {
+    enum class FirewallStatus(val id: Int) {
         ALLOW(0), BLOCK(1), WHITELIST(2), EXCLUDE(3), UNTRACKED(4);
 
         fun whitelisted(): Boolean {
@@ -135,15 +130,15 @@ object FirewallManager : KoinComponent {
     @Volatile private var isFirewallRulesLoaded: Boolean = false
 
     fun isUidFirewalled(uid: Int): Boolean {
-        return appStatus(uid) == AppStatus.BLOCK
+        return appStatus(uid) == FirewallStatus.BLOCK
     }
 
     fun isUidWhitelisted(uid: Int): Boolean {
-        return appStatus(uid) == AppStatus.WHITELIST
+        return appStatus(uid) == FirewallStatus.WHITELIST
     }
 
     fun isUidExcluded(uid: Int): Boolean {
-        return appStatus(uid) == AppStatus.EXCLUDE
+        return appStatus(uid) == FirewallStatus.EXCLUDE
     }
 
     fun isUidSystemApp(uid: Int): Boolean {
@@ -166,13 +161,15 @@ object FirewallManager : KoinComponent {
                     appInfos.remove(tuple.uid, ai)
                 }
             }
+        }
+        io {
             // Delete the uninstalled apps from database
             appInfoRepository.deleteByPackageName(packagesToDelete.map { it.packageName })
         }
     }
 
     fun getNonFirewalledAppsPackageNames(): List<AppInfo> {
-        return getAppInfosLocked().filter { it.firewallStatus == AppStatus.ALLOW.id }
+        return getAppInfosLocked().filter { it.firewallStatus == FirewallStatus.ALLOW.id }
     }
 
     // TODO: Use the package-manager API instead
@@ -186,16 +183,16 @@ object FirewallManager : KoinComponent {
         }
     }
 
-    fun appStatus(uid: Int): AppStatus {
-        val appInfo = getAppInfoByUid(uid) ?: return AppStatus.UNTRACKED
+    fun appStatus(uid: Int): FirewallStatus {
+        val appInfo = getAppInfoByUid(uid) ?: return FirewallStatus.UNTRACKED
 
         return when (appInfo.firewallStatus) {
-            AppStatus.WHITELIST.id -> AppStatus.WHITELIST
-            AppStatus.BLOCK.id -> AppStatus.BLOCK
-            AppStatus.ALLOW.id -> AppStatus.ALLOW
-            AppStatus.EXCLUDE.id -> AppStatus.EXCLUDE
-            AppStatus.UNTRACKED.id -> AppStatus.UNTRACKED
-            else -> AppStatus.ALLOW
+            FirewallStatus.WHITELIST.id -> FirewallStatus.WHITELIST
+            FirewallStatus.BLOCK.id -> FirewallStatus.BLOCK
+            FirewallStatus.ALLOW.id -> FirewallStatus.ALLOW
+            FirewallStatus.EXCLUDE.id -> FirewallStatus.EXCLUDE
+            FirewallStatus.UNTRACKED.id -> FirewallStatus.UNTRACKED
+            else -> FirewallStatus.ALLOW
         }
     }
 
@@ -215,7 +212,7 @@ object FirewallManager : KoinComponent {
     }
 
     fun getExcludedApps(): MutableSet<String> {
-        return getAppInfosLocked().filter { it.firewallStatus == AppStatus.EXCLUDE.id }.map { it.packageInfo }.toMutableSet()
+        return getAppInfosLocked().filter { it.firewallStatus == FirewallStatus.EXCLUDE.id }.map { it.packageInfo }.toMutableSet()
     }
 
     fun getPackageNameByAppName(appName: String): String? {
@@ -286,7 +283,7 @@ object FirewallManager : KoinComponent {
         }
     }
 
-    private fun invalidateFirewallStatus(uid: Int, firewallStatus: AppStatus,
+    private fun invalidateFirewallStatus(uid: Int, firewallStatus: FirewallStatus,
                                          connectionStatus: ConnectionStatus) {
         lock.write {
             appInfos.get(uid).forEach {
@@ -333,7 +330,7 @@ object FirewallManager : KoinComponent {
     fun trackForegroundApp(uid: Int) {
         val appInfo = appInfos[uid]
 
-        if (appInfo == null) {
+        if (appInfo.isNullOrEmpty()) {
             Log.i(LOG_TAG_FIREWALL, "No such app $uid to update 'dis/allow' firewall rule")
             return
         }
@@ -361,42 +358,42 @@ object FirewallManager : KoinComponent {
 
     fun updateExcludedApps(appInfo: AppInfo, status: Boolean) {
         io {
-            val appStatus: AppStatus = if (status) {
-                AppStatus.EXCLUDE
+            val firewallStatus: FirewallStatus = if (status) {
+                FirewallStatus.EXCLUDE
             } else {
-                AppStatus.ALLOW
+                FirewallStatus.ALLOW
             }
 
-            invalidateFirewallStatus(appInfo.uid, appStatus, ConnectionStatus.BOTH)
-            appInfoRepository.updateFirewallStatusByUid(appInfo.uid, appStatus.id,
+            invalidateFirewallStatus(appInfo.uid, firewallStatus, ConnectionStatus.BOTH)
+            appInfoRepository.updateFirewallStatusByUid(appInfo.uid, firewallStatus.id,
                                                         ConnectionStatus.BOTH.id)
         }
     }
 
     fun updateWhitelistedApps(appInfo: AppInfo, isWhitelisted: Boolean) {
         io {
-            val appStatus: AppStatus = if (isWhitelisted) {
-                AppStatus.WHITELIST
+            val firewallStatus: FirewallStatus = if (isWhitelisted) {
+                FirewallStatus.WHITELIST
             } else {
-                AppStatus.ALLOW
+                FirewallStatus.ALLOW
             }
-            invalidateFirewallStatus(appInfo.uid, appStatus, ConnectionStatus.BOTH)
-            appInfoRepository.updateFirewallStatusByUid(appInfo.uid, appStatus.id,
+            invalidateFirewallStatus(appInfo.uid, firewallStatus, ConnectionStatus.BOTH)
+            appInfoRepository.updateFirewallStatusByUid(appInfo.uid, firewallStatus.id,
                                                         ConnectionStatus.BOTH.id)
         }
     }
 
-    fun updateFirewalledApps(uid: Int, appStatus: AppStatus) {
+    fun updateFirewalledApps(uid: Int, firewallStatus: FirewallStatus) {
         io {
-            invalidateFirewallStatus(uid, appStatus, ConnectionStatus.BOTH)
-            appInfoRepository.updateFirewallStatusByUid(uid, appStatus.id, ConnectionStatus.BOTH.id)
+            invalidateFirewallStatus(uid, firewallStatus, ConnectionStatus.BOTH)
+            appInfoRepository.updateFirewallStatusByUid(uid, firewallStatus.id, ConnectionStatus.BOTH.id)
         }
     }
 
-    fun updateFirewallStatus(uid: Int, appStatus: AppStatus, connectionStatus: ConnectionStatus) {
+    fun updateFirewallStatus(uid: Int, firewallStatus: FirewallStatus, connectionStatus: ConnectionStatus) {
         io {
-            invalidateFirewallStatus(uid, appStatus, connectionStatus)
-            appInfoRepository.updateFirewallStatusByUid(uid, appStatus.id, connectionStatus.id)
+            invalidateFirewallStatus(uid, firewallStatus, connectionStatus)
+            appInfoRepository.updateFirewallStatusByUid(uid, firewallStatus.id, connectionStatus.id)
         }
     }
 

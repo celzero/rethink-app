@@ -19,7 +19,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 
-object ConnectionCheckHelper {
+object ConnectivityHelper {
 
     // download request status
     enum class DownloadStatus {

@@ -42,6 +42,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_BLOCKLIST_CONFIGURE_URL
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_BLOCKLIST_CONFIGURE_URL_PARAMETER
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
@@ -52,7 +53,7 @@ import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.hasRemoteBlocklists
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
-import com.celzero.bravedns.util.Utilities.Companion.remoteBlocklistDir
+import com.celzero.bravedns.util.Utilities.Companion.remoteBlocklistFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -74,9 +75,7 @@ class DnsConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     companion object {
         const val LOCAL = 1
         const val REMOTE = 2
-        const val BLOCKLIST_REMOTE_FOLDER_NAME = "remote_blocklist"
     }
-
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -104,11 +103,11 @@ class DnsConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     }
 
     private fun observeAppState() {
-        VpnController.connectionStatus.observe(this, {
+        VpnController.connectionStatus.observe(this) {
             if (it == BraveVPNService.State.PAUSED) {
                 Utilities.openPauseActivityAndFinish(this)
             }
-        })
+        }
     }
 
     private fun constructUrl(stamp: String?): String {
@@ -456,7 +455,8 @@ class DnsConfigureWebViewActivity : AppCompatActivity(R.layout.activity_faq_webv
     }
 
     private fun makeFile(timestamp: Long): File? {
-        val dir = remoteBlocklistDir(this, BLOCKLIST_REMOTE_FOLDER_NAME, timestamp) ?: return null
+        val dir = remoteBlocklistFile(this, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                      timestamp) ?: return null
 
         if (!dir.exists()) {
             dir.mkdirs()

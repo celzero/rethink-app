@@ -9,14 +9,45 @@
     android:orientation="vertical"
     tools:context=".ui.DnsDetailActivity">
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/dns_detail_act_tabLayout"
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimaryDark"
-        app:tabIndicatorColor="?attr/tabIndicator"
-        app:tabTextColor="?attr/invertedPrimaryTextColor"
-        tools:ignore="SpeakableTextPresentCheck" />
+        android:visibility="gone">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_back_arrow_accent"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DNS"
+                android:layout_marginStart="30dp"
+                android:textColor="?attr/secondaryTextColor"
+                android:textSize="@dimen/extra_large_font_text_view"
+                android:textStyle="bold" />
+
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/dns_detail_act_tabLayout"
+        style="@style/TabbedLayoutDefault"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:visibility="gone"
+        android:background="?attr/border" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/dns_detail_act_viewpager"

@@ -206,6 +206,14 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
                     // ConfigureDNSFragment). Other logs enabled states are handled in onViewCreated().
                 }
             }
+            AppConfig.DnsType.RETHINK_REMOTE -> {
+                b.connectedStatusTitleUrl.text = resources.getString(
+                    R.string.configure_dns_connected_doh_status)
+                b.connectedStatusTitle.text = resources.getString(
+                    R.string.configure_dns_connection_name, "RethinkDNS "+appConfig.getConnectedDns())
+                b.queryListScrollView.recyclerQuery.visibility = View.VISIBLE
+                b.queryListScrollView.dnsLogNoLogText.visibility = View.GONE
+            }
         }
     }
 

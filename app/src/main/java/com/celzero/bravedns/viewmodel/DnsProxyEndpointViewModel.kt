@@ -40,13 +40,4 @@ class DnsProxyEndpointViewModel(private val dnsProxyEndpointDAO: DnsProxyEndpoin
                 pageSize = LIVEDATA_PAGE_SIZE)
         }
     }
-
-    fun setFilter(filter: String?) {
-        filteredList.value = filter
-    }
-
-    fun setFilterBlocked(filter: String) {
-        filteredList.value = filter
-    }
-
 }

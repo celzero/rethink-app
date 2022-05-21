@@ -45,9 +45,6 @@ object ViewModelModule {
             ExcludedAppViewModel(get())
         }
         viewModel {
-            FirewallAppViewModel(get())
-        }
-        viewModel {
             AppInfoViewModel(get())
         }
         viewModel {
@@ -57,7 +54,7 @@ object ViewModelModule {
             CustomIpViewModel(get())
         }
         viewModel {
-            AppConnectionDetailsViewModel(get())
+            RethinkEndpointViewModel(get())
         }
     }
 

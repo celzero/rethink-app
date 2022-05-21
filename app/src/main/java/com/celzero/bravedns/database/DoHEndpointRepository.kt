@@ -29,49 +29,24 @@ class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
 
     @Transaction
     suspend fun update(doHEndpoint: DoHEndpoint) {
-        ioCtx {
-            doHEndpointDAO.removeConnectionStatus()
-            doHEndpointDAO.update(doHEndpoint)
-        }
+        doHEndpointDAO.removeConnectionStatus()
+        doHEndpointDAO.update(doHEndpoint)
     }
 
     suspend fun insertAsync(doHEndpoint: DoHEndpoint) {
-        ioCtx {
-            doHEndpointDAO.insert(doHEndpoint)
-        }
-    }
-
-    suspend fun insertWithReplaceAsync(doHEndpoint: DoHEndpoint) {
-        ioCtx {
-            doHEndpointDAO.insertReplace(doHEndpoint)
-        }
-    }
-
-    suspend fun getDoHEndpointLiveData(): LiveData<PagedList<DoHEndpoint>> {
-        return doHEndpointDAO.getDoHEndpointLiveData().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+        doHEndpointDAO.insert(doHEndpoint)
     }
 
     suspend fun deleteOlderData(date: Long) {
-        ioCtx {
-            doHEndpointDAO.deleteOlderData(date)
-        }
-    }
-
-    suspend fun getDoHEndpointLiveDataByName(query: String): LiveData<PagedList<DoHEndpoint>> {
-        return doHEndpointDAO.getDoHEndpointLiveDataByName(query).toLiveData(
-            pageSize = LIVEDATA_PAGE_SIZE)
+        doHEndpointDAO.deleteOlderData(date)
     }
 
     suspend fun deleteDoHEndpoint(id: Int) {
-        ioCtx {
-            doHEndpointDAO.deleteDoHEndpoint(id)
-        }
+        doHEndpointDAO.deleteDoHEndpoint(id)
     }
 
     suspend fun removeConnectionStatus() {
-        ioCtx {
-            doHEndpointDAO.removeConnectionStatus()
-        }
+        doHEndpointDAO.removeConnectionStatus()
     }
 
     suspend fun getConnectedDoH(): DoHEndpoint? {
@@ -79,13 +54,7 @@ class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
     }
 
     suspend fun updateConnectionURL(url: String) {
-        ioCtx {
-            doHEndpointDAO.updateConnectionURL(url)
-        }
-    }
-
-    suspend fun getConnectionURL(id: Int): String {
-        return doHEndpointDAO.getConnectionURL(id)
+        doHEndpointDAO.updateConnectionURL(url)
     }
 
     suspend fun getCount(): Int {
@@ -93,19 +62,8 @@ class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
     }
 
     suspend fun updateConnectionDefault() {
-        ioCtx {
-            doHEndpointDAO.updateConnectionDefault()
-        }
-    }
-
-    suspend fun getRethinkDnsEndpoint(): DoHEndpoint {
-        return doHEndpointDAO.getRethinkDnsEndpoint()
-    }
-
-    private suspend fun ioCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.IO) {
-            f()
-        }
+        doHEndpointDAO.removeConnectionStatus()
+        doHEndpointDAO.updateConnectionDefault()
     }
 
 }

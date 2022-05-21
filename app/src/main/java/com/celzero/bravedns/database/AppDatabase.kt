@@ -24,7 +24,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [AppInfo::class, ConnectionTracker::class, CustomIp::class, DoHEndpoint::class, DnsCryptEndpoint::class, DnsProxyEndpoint::class, DnsCryptRelayEndpoint::class, ProxyEndpoint::class, DnsLog::class, CustomDomain::class],
+    entities = [AppInfo::class, ConnectionTracker::class, CustomIp::class, DoHEndpoint::class, DnsCryptEndpoint::class, DnsProxyEndpoint::class, DnsCryptRelayEndpoint::class, ProxyEndpoint::class, DnsLog::class, CustomDomain::class, RethinkDnsEndpoint::class],
     version = 12, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -36,12 +36,14 @@ abstract class AppDatabase : RoomDatabase() {
         // setJournalMode() is added as part of issue #344
         fun buildDatabase(context: Context) = Room.databaseBuilder(context.applicationContext,
                                                                    AppDatabase::class.java,
-                                                                   DATABASE_NAME).createFromAsset(
-            DATABASE_PATH).setJournalMode(JournalMode.TRUNCATE).addMigrations(
-            MIGRATION_1_2).addMigrations(MIGRATION_2_3).addMigrations(MIGRATION_3_4).addMigrations(
-            MIGRATION_4_5).addMigrations(MIGRATION_5_6).addMigrations(MIGRATION_6_7).addMigrations(
-            MIGRATION_7_8).addMigrations(MIGRATION_8_9).addMigrations(MIGRATION_9_10).addMigrations(
-            MIGRATION_10_11).addMigrations(MIGRATION_11_12).build()
+                                                                   DATABASE_NAME)
+            .createFromAsset(DATABASE_PATH)
+            .setJournalMode(JournalMode.TRUNCATE).addMigrations(MIGRATION_1_2).addMigrations(
+                MIGRATION_2_3).addMigrations(MIGRATION_3_4).addMigrations(
+                MIGRATION_4_5).addMigrations(MIGRATION_5_6).addMigrations(
+                MIGRATION_6_7).addMigrations(MIGRATION_7_8).addMigrations(
+                MIGRATION_8_9).addMigrations(MIGRATION_9_10).addMigrations(
+                MIGRATION_10_11).addMigrations(MIGRATION_11_12).build()
 
         private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
@@ -219,37 +221,50 @@ abstract class AppDatabase : RoomDatabase() {
 
         private val MIGRATION_11_12: Migration = object : Migration(11, 12) {
             override fun migrate(database: SupportSQLiteDatabase) {
+                removeRethinkFromDohList(database)
+                addMoreDohToList(database)
                 modifyAppInfoTableSchema(database)
+                modifyBlockedConnectionsTable(database)
+                addNetworkDns(database)
                 database.execSQL("DROP VIEW AppInfoView")
                 database.execSQL("DROP TABLE if exists CategoryInfo")
                 database.execSQL(
                     "UPDATE DoHEndpoint set dohURL = `replace`(dohURL,'bravedns','rethinkdns')")
-                database.execSQL("UPDATE DNSProxyEndpoint set id = 4 where id = 3")
-                database.execSQL("UPDATE DNSProxyEndpoint set id = 3 where id = 2")
-                database.execSQL("UPDATE DNSProxyEndpoint set id = 2 where id = 1")
-                database.execSQL(
-                    "INSERT INTO DNSProxyEndpoint values (1,'Network DNS','External','Nobody','',53,0,0,0,0)")
                 database.execSQL(
                     "ALTER TABLE CustomDomain add column wildcard INTEGER DEFAULT 0 NOT NULL")
-                modifyBlockedConnectionsTable(database)
                 modifyConnectionTrackerTable(database)
+                createRethinkDnsTable(database)
             }
 
-            private fun modifyConnectionTrackerTable(database: SupportSQLiteDatabase) {
+            // remove the rethink doh from the list
+            private fun removeRethinkFromDohList(database: SupportSQLiteDatabase) {
                 with(database) {
-                    execSQL(
-                        "CREATE TABLE 'ConnectionTracker_backup' ('id' INTEGER NOT NULL,'appName' TEXT DEFAULT '' NOT NULL, 'uid' INTEGER NOT NULL, 'ipAddress' TEXT DEFAULT ''  NOT NULL, 'port' INTEGER NOT NULL, 'protocol' INTEGER NOT NULL,'isBlocked' INTEGER NOT NULL, 'blockedByRule' TEXT DEFAULT '' NOT NULL, 'flag' TEXT  DEFAULT '' NOT NULL, 'timeStamp' INTEGER NOT NULL,PRIMARY KEY (id)  )")
-                    execSQL(
-                        "INSERT INTO ConnectionTracker_backup SELECT id, appName, uid, ipAddress, port, protocol, isBlocked, blockedByRule, flag, timeStamp from ConnectionTracker")
-                    execSQL("DROP TABLE if exists ConnectionTracker")
-                    execSQL(
-                        "CREATE TABLE 'ConnectionTracker' ('id' INTEGER NOT NULL,'appName' TEXT DEFAULT '' NOT NULL, 'uid' INTEGER NOT NULL, 'ipAddress' TEXT DEFAULT ''  NOT NULL, 'port' INTEGER NOT NULL, 'protocol' INTEGER NOT NULL,'isBlocked' INTEGER NOT NULL, 'blockedByRule' TEXT DEFAULT '' NOT NULL, 'flag' TEXT  DEFAULT '' NOT NULL, 'timeStamp' INTEGER NOT NULL,PRIMARY KEY (id)  )")
-                    execSQL(
-                        "INSERT INTO ConnectionTracker SELECT id, appName, uid, ipAddress, port, protocol, isBlocked, blockedByRule, flag, timeStamp from ConnectionTracker_backup")
-                    execSQL("DROP TABLE if exists ConnectionTracker_backup")
+                    execSQL("DELETE from DoHEndpoint where id in (4,5)")
                 }
             }
 
+            // add more doh options as default
+            private fun addMoreDohToList(database: SupportSQLiteDatabase) {
+                with(database) {
+                    execSQL("INSERT OR REPLACE INTO DoHEndpoint(id,dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values(4,'Google','https://dns.google/dns-query','Traditional DNS queries and replies are sent over UDP or TCP without encryption, making them subject to surveillance, spoofing, and DNS-based Internet filtering.',0,0,0,0)")
+                    execSQL("INSERT OR REPLACE INTO DoHEndpoint(id,dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values(5,'CleanBrowsing Family','https://doh.cleanbrowsing.org/doh/family-filter/','Family filter blocks access to all adult, pornographic and explicit sites. It also blocks proxy and VPN domains that could be used to bypass our filters. Mixed content sites (like Reddit) are also blocked. Google, Bing and Youtube are set to the Safe Mode.',0,0,0,0)")
+                    execSQL("INSERT OR REPLACE INTO DoHEndpoint(id,dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values(6,'CleanBrowsing Adult','https://doh.cleanbrowsing.org/doh/adult-filter/','Adult filter blocks access to all adult, pornographic and explicit sites. It does not block proxy or VPNs, nor mixed-content sites. Sites like Reddit are allowed. Google and Bing are set to the Safe Mode.',0,0,0,0)")
+                    execSQL("INSERT OR REPLACE INTO DoHEndpoint(id,dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values(7,'Quad9 Secure','https://dns.quad9.net/dns-query','Quad9 routes your DNS queries through a secure network of servers around the globe.',0,0,0,0)")
+                }
+            }
+
+            // add network dns option in dns proxy
+            private fun addNetworkDns(database: SupportSQLiteDatabase) {
+                with(database) {
+                    execSQL("UPDATE DNSProxyEndpoint set id = 4 where id = 3")
+                    execSQL("UPDATE DNSProxyEndpoint set id = 3 where id = 2")
+                    execSQL("UPDATE DNSProxyEndpoint set id = 2 where id = 1")
+                    execSQL(
+                        "INSERT INTO DNSProxyEndpoint values (1,'Network DNS','External','Nobody','',53,0,0,0,0)")
+                }
+            }
+
+            // rename blockedConnections table to CustomIp
             private fun modifyBlockedConnectionsTable(database: SupportSQLiteDatabase) {
                 with(database) {
                     execSQL(
@@ -270,7 +285,7 @@ abstract class AppDatabase : RoomDatabase() {
                         "UPDATE AppInfo_backup set firewallStatus = 2 where isInternetAllowed = 1")
                     execSQL("UPDATE AppInfo_backup set firewallStatus = 3 where whiteListUniv1 = 1")
                     execSQL("UPDATE AppInfo_backup set firewallStatus = 4 where isExcluded = 1")
-                    execSQL("DROP TABLE if exists AppInfo")
+                    execSQL(" DROP TABLE if exists AppInfo")
                     execSQL(
                         "CREATE TABLE 'AppInfo' ('packageInfo' TEXT PRIMARY KEY NOT NULL, 'appName' TEXT NOT NULL, 'uid' INTEGER NOT NULL, 'isSystemApp' INTEGER NOT NULL, 'firewallStatus' INTEGER NOT NULL DEFAULT 0, 'appCategory' TEXT NOT NULL, 'wifiDataUsed' INTEGER NOT NULL, 'mobileDataUsed' INTEGER NOT NULL, 'metered' INTEGER NOT NULL DEFAULT 0, 'screenOffAllowed' INTEGER NOT NULL DEFAULT 0, 'backgroundAllowed' INTEGER NOT NULL DEFAULT 0)")
                     execSQL(
@@ -279,7 +294,35 @@ abstract class AppDatabase : RoomDatabase() {
                     execSQL("DROP TABLE AppInfo_backup")
                 }
             }
+
+            // To introduce NOT NULL property for columns in the schema, alter table query cannot
+            // add the not-null to the schema, so creating a backup and recreating the table
+            // during migration.
+            private fun modifyConnectionTrackerTable(database: SupportSQLiteDatabase) {
+                with(database) {
+                    execSQL(
+                        "CREATE TABLE 'ConnectionTracker_backup' ('id' INTEGER NOT NULL,'appName' TEXT DEFAULT '' NOT NULL, 'uid' INTEGER NOT NULL, 'ipAddress' TEXT DEFAULT ''  NOT NULL, 'port' INTEGER NOT NULL, 'protocol' INTEGER NOT NULL,'isBlocked' INTEGER NOT NULL, 'blockedByRule' TEXT DEFAULT '' NOT NULL, 'flag' TEXT  DEFAULT '' NOT NULL, 'dnsQuery' TEXT DEFAULT '', 'timeStamp' INTEGER NOT NULL,PRIMARY KEY (id)  )")
+                    execSQL(
+                        "INSERT INTO ConnectionTracker_backup SELECT id, appName, uid, ipAddress, port, protocol, isBlocked, blockedByRule, flag, '', timeStamp from ConnectionTracker")
+                    execSQL("DROP TABLE if exists ConnectionTracker")
+                    execSQL(
+                        "CREATE TABLE 'ConnectionTracker' ('id' INTEGER NOT NULL,'appName' TEXT DEFAULT '' NOT NULL, 'uid' INTEGER NOT NULL, 'ipAddress' TEXT DEFAULT ''  NOT NULL, 'port' INTEGER NOT NULL, 'protocol' INTEGER NOT NULL,'isBlocked' INTEGER NOT NULL, 'blockedByRule' TEXT DEFAULT '' NOT NULL, 'flag' TEXT  DEFAULT '' NOT NULL, 'dnsQuery' TEXT DEFAULT '', 'timeStamp' INTEGER NOT NULL,PRIMARY KEY (id)  )")
+                    execSQL(
+                        "INSERT INTO ConnectionTracker SELECT id, appName, uid, ipAddress, port, protocol, isBlocked, blockedByRule, flag, '',  timeStamp from ConnectionTracker_backup")
+                    execSQL("DROP TABLE if exists ConnectionTracker_backup")
+                }
+            }
+
+            // create new table to store Rethink dns endpoint
+            // contains both the global and app specific dns endpoints
+            private fun createRethinkDnsTable(database: SupportSQLiteDatabase) {
+                with(database) {
+                    execSQL(
+                        "CREATE TABLE 'RethinkDnsEndpoint' ('name' TEXT NOT NULL, 'url' TEXT NOT NULL, 'uid' INTEGER NOT NULL, 'desc' TEXT NOT NULL, 'isActive' INTEGER NOT NULL, 'isCustom' INTEGER NOT NULL, 'latency' INTEGER NOT NULL, 'modifiedDataTime' INTEGER NOT NULL, PRIMARY KEY (name, uid))")
+                }
+            }
         }
+
     }
 
     abstract fun appInfoDAO(): AppInfoDAO
@@ -292,6 +335,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun dnsLogDAO(): DnsLogDAO
     abstract fun customDomainEndpointDAO(): CustomDomainDAO
     abstract fun customIpEndpointDao(): CustomIpDao
+    abstract fun rethinkEndpointDao(): RethinkDnsEndpointDao
 
     fun appInfoRepository() = AppInfoRepository(appInfoDAO())
     fun connectionTrackerRepository() = ConnectionTrackerRepository(connectionTrackerDAO())
@@ -305,4 +349,5 @@ abstract class AppDatabase : RoomDatabase() {
     fun dnsLogRepository() = DnsLogRepository(dnsLogDAO())
     fun customDomainRepository() = CustomDomainRepository(customDomainEndpointDAO())
     fun customIpRepository() = CustomIpRepository(customIpEndpointDao())
+    fun rethinkEndpointRepository() = RethinkDnsEndpointRepository(rethinkEndpointDao())
 }

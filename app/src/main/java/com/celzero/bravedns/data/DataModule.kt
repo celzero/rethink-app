@@ -20,7 +20,7 @@ import org.koin.dsl.module
 
 object DataModule {
     private val dataModule = module {
-        single { AppConfig(androidContext(), get(), get(), get(), get(), get(), get()) }
+        single { AppConfig(androidContext(), get(), get(), get(), get(), get(), get(), get()) }
     }
 
     val modules = listOf(dataModule)

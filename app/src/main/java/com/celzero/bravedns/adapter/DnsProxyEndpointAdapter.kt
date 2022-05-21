@@ -114,7 +114,7 @@ class DnsProxyEndpointAdapter(private val context: Context, val lifecycleOwner: 
                     AppCompatResources.getDrawable(context, R.drawable.ic_fab_uninstall))
             } else {
                 b.dnsProxyListActionImage.setImageDrawable(
-                    AppCompatResources.getDrawable(context, R.drawable.ic_fab_appinfo))
+                    AppCompatResources.getDrawable(context, R.drawable.ic_info))
             }
         }
     }

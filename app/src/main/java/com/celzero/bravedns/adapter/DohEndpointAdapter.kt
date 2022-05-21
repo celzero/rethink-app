@@ -18,11 +18,8 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.DialogInterface
-import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -36,14 +33,12 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.databinding.DohEndpointListItemBinding
-import com.celzero.bravedns.ui.DnsConfigureWebViewActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants.Companion.BLOCKLIST_LOCATION_INTENT_EXTRA
-import com.celzero.bravedns.util.Constants.Companion.BLOCKLIST_STAMP_INTENT_EXTRA
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.Utilities
-import kotlinx.coroutines.*
-import xdns.Xdns.getBlocklistStampFromURL
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DohEndpointAdapter(private val context: Context, private val lifecycleOwner: LifecycleOwner,
                          private val appConfig: AppConfig) :
@@ -92,9 +87,6 @@ class DohEndpointAdapter(private val context: Context, private val lifecycleOwne
             b.dohEndpointListCheckImage.setOnClickListener {
                 updateConnection(endpoint)
             }
-            b.dohEndpointListConfigure.setOnClickListener {
-                configureRethinkEndpoint(endpoint)
-            }
         }
 
         private fun displayDetails(endpoint: DoHEndpoint) {
@@ -115,36 +107,6 @@ class DohEndpointAdapter(private val context: Context, private val lifecycleOwne
             // Shows either the info/delete icon for the DoH entries.
             showIcon(endpoint)
 
-            if (endpoint.isRethinkDnsPlus()) {
-                b.dohEndpointListConfigure.visibility = View.VISIBLE
-            } else {
-                b.dohEndpointListConfigure.visibility = View.GONE
-            }
-        }
-
-        private fun configureRethinkEndpoint(endpoint: DoHEndpoint) {
-            val stamp = getRemoteBlocklistStamp(endpoint.dohURL)
-            if (DEBUG) Log.d(LOG_TAG_DNS,
-                             "calling configure webview activity with doh url: ${endpoint.dohURL} and stamp: $stamp")
-            startConfigureBlocklistActivity(stamp)
-        }
-
-        private fun startConfigureBlocklistActivity(stamp: String) {
-            val intent = Intent(context, DnsConfigureWebViewActivity::class.java)
-            intent.flags = FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-            intent.putExtra(BLOCKLIST_LOCATION_INTENT_EXTRA, DnsConfigureWebViewActivity.REMOTE)
-            intent.putExtra(BLOCKLIST_STAMP_INTENT_EXTRA, stamp)
-            context.startActivity(intent)
-        }
-
-        private fun getRemoteBlocklistStamp(url: String): String {
-            // Interacts with GO lib to fetch the stamp (Xdnx#getBlocklistStampFromURL)
-            return try {
-                getBlocklistStampFromURL(url)
-            } catch (e: Exception) {
-                Log.w(LOG_TAG_DNS, "failure fetching stamp from Go ${e.message}", e)
-                ""
-            }
         }
 
         private fun showIcon(endpoint: DoHEndpoint) {
@@ -153,7 +115,7 @@ class DohEndpointAdapter(private val context: Context, private val lifecycleOwne
                     ContextCompat.getDrawable(context, R.drawable.ic_fab_uninstall))
             } else {
                 b.dohEndpointListActionImage.setImageDrawable(
-                    ContextCompat.getDrawable(context, R.drawable.ic_fab_appinfo))
+                    ContextCompat.getDrawable(context, R.drawable.ic_info))
             }
         }
 
@@ -162,16 +124,6 @@ class DohEndpointAdapter(private val context: Context, private val lifecycleOwne
                              "on doh change - ${endpoint.dohName}, ${endpoint.dohURL}, ${endpoint.isSelected}")
 
             io {
-                val stamp = getRemoteBlocklistStamp(endpoint.dohURL)
-
-                if (endpoint.isRethinkDnsPlus() && stamp.isNullOrEmpty()) {
-                    uiCtx {
-                        showDohConfigureDialog()
-                        b.dohEndpointListCheckImage.isChecked = false
-                    }
-                    return@io
-                }
-
                 endpoint.isSelected = true
                 appConfig.handleDoHChanges(endpoint)
             }
@@ -223,22 +175,6 @@ class DohEndpointAdapter(private val context: Context, private val lifecycleOwne
 
             builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
                 // no-op
-            }
-            builder.create().show()
-        }
-
-        private fun showDohConfigureDialog() {
-            val builder = AlertDialog.Builder(context)
-            builder.setTitle(R.string.doh_brave_pro_configure)
-            builder.setMessage(R.string.doh_brave_pro_configure_desc)
-            builder.setCancelable(true)
-            builder.setPositiveButton(
-                context.getString(R.string.dns_connected_rethink_configure)) { _, _ ->
-                startConfigureBlocklistActivity(/*empty stamp*/"")
-            }
-
-            builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
-                b.dohEndpointListCheckImage.isChecked = false
             }
             builder.create().show()
         }

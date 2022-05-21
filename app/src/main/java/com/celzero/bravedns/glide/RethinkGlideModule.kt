@@ -43,7 +43,7 @@ class RethinkGlideModule : AppGlideModule() {
         builder.setDiskCache(InternalCacheDiskCacheFactory(context, diskCacheSizeBytes.toLong()))
 
         if (DEBUG) {
-            builder.setLogLevel(Log.ERROR)
+            builder.setLogLevel(Log.DEBUG)
         } else {
             builder.setLogLevel(Log.ERROR)
         }

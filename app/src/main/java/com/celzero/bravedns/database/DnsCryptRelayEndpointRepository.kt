@@ -27,69 +27,41 @@ import kotlinx.coroutines.launch
 class DnsCryptRelayEndpointRepository(
         private val dnsCryptRelayEndpointDAO: DnsCryptRelayEndpointDAO) {
 
-    fun update(dnsCryptRelayEndpoint: DnsCryptRelayEndpoint) {
+    suspend fun update(dnsCryptRelayEndpoint: DnsCryptRelayEndpoint) {
         dnsCryptRelayEndpointDAO.update(dnsCryptRelayEndpoint)
     }
 
-    fun deleteAsync(dnsCryptRelayEndpoint: DnsCryptRelayEndpoint,
-                    coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
-        coroutineScope.launch {
-            dnsCryptRelayEndpointDAO.delete(dnsCryptRelayEndpoint)
-        }
-    }
-
-    fun insertAsync(dnsCryptRelayEndpoint: DnsCryptRelayEndpoint,
+    suspend fun insertAsync(dnsCryptRelayEndpoint: DnsCryptRelayEndpoint,
                     coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
         coroutineScope.launch {
             dnsCryptRelayEndpointDAO.insert(dnsCryptRelayEndpoint)
         }
     }
 
-    fun getDnsCryptRelayEndpointLiveData(): LiveData<PagedList<DnsCryptRelayEndpoint>> {
-        return dnsCryptRelayEndpointDAO.getDnsCryptRelayEndpointLiveData().toLiveData(
-            pageSize = LIVEDATA_PAGE_SIZE)
+    suspend fun deleteOlderData(date: Long) {
+        dnsCryptRelayEndpointDAO.deleteOlderData(date)
     }
 
-    fun deleteOlderData(date: Long,
-                        coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
-        coroutineScope.launch {
-            dnsCryptRelayEndpointDAO.deleteOlderData(date)
-        }
-    }
-
-    fun getDnsCryptEndpointLiveDataByName(
-            query: String): LiveData<PagedList<DnsCryptRelayEndpoint>> {
-        return dnsCryptRelayEndpointDAO.getDnsCryptRelayEndpointLiveDataByName(query).toLiveData(
-            pageSize = LIVEDATA_PAGE_SIZE)
-    }
-
-    fun deleteDnsCryptRelayEndpoint(id: Int) {
+    suspend fun deleteDnsCryptRelayEndpoint(id: Int) {
         dnsCryptRelayEndpointDAO.deleteDnsCryptRelayEndpoint(id)
     }
 
-    fun removeConnectionStatus() {
+    suspend fun removeConnectionStatus() {
         dnsCryptRelayEndpointDAO.removeConnectionStatus()
     }
 
-    fun getConnectedRelays(): List<DnsCryptRelayEndpoint> {
+    suspend fun getConnectedRelays(): List<DnsCryptRelayEndpoint> {
         return dnsCryptRelayEndpointDAO.getConnectedRelays()
     }
 
-    fun getCount(): Int {
+    suspend fun getCount(): Int {
         return dnsCryptRelayEndpointDAO.getCount()
     }
 
-    fun getServersToAdd(): String {
+    suspend fun getServersToAdd(): String {
         val relays = getConnectedRelays()
         return relays.joinToString(separator = ",") {
             it.dnsCryptRelayURL
-        }
-    }
-
-    fun getServersToRemove(): String {
-        val relays = getConnectedRelays()
-        return relays.joinToString(separator = ",") {
-            "${it.id}"
         }
     }
 }

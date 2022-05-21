@@ -34,7 +34,9 @@ import com.celzero.bravedns.data.AppConfig.Companion.dnscryptRelaysToRemove
 import com.celzero.bravedns.database.DnsCryptRelayEndpoint
 import com.celzero.bravedns.databinding.DnsCryptEndpointListItemBinding
 import com.celzero.bravedns.util.Utilities
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DnsCryptRelayEndpointAdapter(private val context: Context, val lifecycleOwner: LifecycleOwner,
                                    private val appConfig: AppConfig) :
@@ -105,7 +107,7 @@ class DnsCryptRelayEndpointAdapter(private val context: Context, val lifecycleOw
                     ContextCompat.getDrawable(context, R.drawable.ic_fab_uninstall))
             } else {
                 b.dnsCryptEndpointListInfoImage.setImageDrawable(
-                    ContextCompat.getDrawable(context, R.drawable.ic_fab_appinfo))
+                    ContextCompat.getDrawable(context, R.drawable.ic_info))
             }
         }
 

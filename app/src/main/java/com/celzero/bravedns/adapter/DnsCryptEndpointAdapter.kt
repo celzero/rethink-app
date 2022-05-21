@@ -33,7 +33,9 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsCryptEndpoint
 import com.celzero.bravedns.databinding.DnsCryptEndpointListItemBinding
 import com.celzero.bravedns.util.Utilities
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DnsCryptEndpointAdapter(private val context: Context, val lifecycleOwner: LifecycleOwner,
                               private val appConfig: AppConfig) :
@@ -105,7 +107,7 @@ class DnsCryptEndpointAdapter(private val context: Context, val lifecycleOwner: 
                     ContextCompat.getDrawable(context, R.drawable.ic_fab_uninstall))
             } else {
                 b.dnsCryptEndpointListInfoImage.setImageDrawable(
-                    ContextCompat.getDrawable(context, R.drawable.ic_fab_appinfo))
+                    ContextCompat.getDrawable(context, R.drawable.ic_info))
             }
         }
 

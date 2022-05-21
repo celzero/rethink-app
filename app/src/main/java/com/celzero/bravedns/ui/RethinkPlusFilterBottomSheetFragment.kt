@@ -18,7 +18,6 @@ package com.celzero.bravedns.ui
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,7 +44,7 @@ class RethinkPlusFilterBottomSheetFragment(val activity: ConfigureRethinkPlusAct
 
     private val persistentState by inject<PersistentState>()
 
-    private var filters : ConfigureRethinkPlusActivity.Filters? = null
+    private var filters: ConfigureRethinkPlusActivity.Filters? = null
 
     override fun getTheme(): Int = Themes.getBottomsheetCurrentTheme(isDarkSystemTheme(activity),
                                                                      persistentState.theme)
@@ -66,7 +65,6 @@ class RethinkPlusFilterBottomSheetFragment(val activity: ConfigureRethinkPlusAct
         filters = activity.filterObserver().value
         makeChipGroup(fileTags)
         makeChipSubGroup(fileTags)
-        // checkFilterIfNeeded()
     }
 
     private fun makeChipGroup(ft: List<FileTag>) {
@@ -78,7 +76,6 @@ class RethinkPlusFilterBottomSheetFragment(val activity: ConfigureRethinkPlusAct
     }
 
     private fun makeChipSubGroup(ft: List<FileTag>) {
-        //val f = activity.filterObserver().value
         b.rpfFilterChipSubGroup.removeAllViews()
         ft.distinctBy { it.subg }.forEach {
             if (it.subg.isBlank()) return@forEach
@@ -86,11 +83,6 @@ class RethinkPlusFilterBottomSheetFragment(val activity: ConfigureRethinkPlusAct
             val checked = filters?.subGroups?.contains(it.subg) == true
             b.rpfFilterChipSubGroup.addView(remakeChipSubgroup(it.subg, checked))
         }
-
-        // add an extra chip as "others" only to handle all the empty sub-group in the list
-        val checked = filters?.subGroups?.contains("others") == true
-        b.rpfFilterChipSubGroup.addView(remakeChipSubgroup("others", checked))
-        // TODO: Remove the above code for others after the changes in server for filetag.json
     }
 
     private fun initClickListeners() {
@@ -156,16 +148,33 @@ class RethinkPlusFilterBottomSheetFragment(val activity: ConfigureRethinkPlusAct
         }
         // asserting the filters object with above check
         filters!!.groups.add(tag)
+
+        // filter sub group ui
+        val filteredTag: MutableList<FileTag> = ArrayList()
+        filters!!.groups.forEach { g ->
+            filteredTag.addAll(fileTags.filter { it.group == g })
+        }
+        makeChipSubGroup(filteredTag)
     }
 
     private fun removeGroupFilter(tag: String) {
         if (filters == null) return
 
+        // asserting the filters object with above check
         filters!!.groups.remove(tag)
+
+        // filter sub group ui
+        val filteredTag: MutableList<FileTag> = ArrayList()
+        if (filters!!.groups.isEmpty()) return
+
+        filters!!.groups.forEach { g ->
+            filteredTag.addAll(fileTags.filter { it.group == g })
+        }
+        makeChipSubGroup(filteredTag)
     }
 
     private fun applySubgroupFilter(tag: String) {
-        val ft = fileTags.first { it.subg == tag }
+        val ft = fileTags.first { tag == it.subg }
         if (filters == null) {
             filters = ConfigureRethinkPlusActivity.Filters()
         }
@@ -177,6 +186,7 @@ class RethinkPlusFilterBottomSheetFragment(val activity: ConfigureRethinkPlusAct
     private fun removeSubgroupFilter(tag: String) {
         if (filters == null) return
 
+        // asserting the filters object with above check
         filters!!.subGroups.remove(tag)
     }
 }

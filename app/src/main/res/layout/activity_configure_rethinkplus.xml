@@ -15,6 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
+            android:focusableInTouchMode="true"
             android:elevation="8dp">
 
             <LinearLayout
@@ -37,6 +38,7 @@
                         android:layout_weight="0.90"
                         android:fontFamily="sans-serif"
                         android:isScrollContainer="true"
+                        android:focusable="false"
                         app:iconifiedByDefault="false"
                         app:queryHint="@string/search_rethinkplus_file_tag" />
 

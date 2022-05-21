@@ -31,6 +31,7 @@ class ConnectionTracker {
     var isBlocked: Boolean = false
     var blockedByRule: String = ""
     var flag: String = ""
+    var dnsQuery: String? = null
     var timeStamp: Long = INIT_TIME_MS
 
     override fun equals(other: Any?): Boolean {

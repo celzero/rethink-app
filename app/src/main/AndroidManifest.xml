@@ -14,7 +14,7 @@
     <!-- Allows the app to perform actions across different users on the device. -->
     <uses-permission
         android:name="android.permission.INTERACT_ACROSS_USERS"
-        android:protectionLevel="signature"/>
+        android:protectionLevel="signature" />
 
     <application
         android:name=".RethinkDnsApplication"
@@ -31,9 +31,6 @@
 
         <activity
             android:name=".ui.FirewallActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.PermissionManagerActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.HomeScreenActivity"
@@ -68,6 +65,9 @@
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.ConfigureRethinkPlusActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.ConfigureRethinkBasicActivity"
             android:finishOnTaskLaunch="true" />
 
         <activity

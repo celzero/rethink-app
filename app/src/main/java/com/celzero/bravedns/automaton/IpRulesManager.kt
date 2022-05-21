@@ -102,6 +102,7 @@ object IpRulesManager : KoinComponent {
     // block for all the applications.
     const val UID_EVERYBODY = -1000
 
+    // returns CustomIp object based on uid and IP address
     private suspend fun getObj(uid: Int, ipAddress: String): CustomIp? {
         return customIpRepository.getCustomIpDetail(uid, ipAddress)
     }
@@ -154,6 +155,15 @@ object IpRulesManager : KoinComponent {
     fun whitelistIp(customIp: CustomIp) {
         io {
             customIp.status = IpRuleStatus.WHITELIST.id
+            customIpRepository.update(customIp)
+            updateLocalCache(customIp)
+            ipRulesLookupCache.invalidateAll()
+        }
+    }
+
+    fun noRuleIp(customIp: CustomIp) {
+        io {
+            customIp.status = IpRuleStatus.NONE.id
             customIpRepository.update(customIp)
             updateLocalCache(customIp)
             ipRulesLookupCache.invalidateAll()

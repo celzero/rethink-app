@@ -119,7 +119,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             }
 
             updatePersistenceOnCopySuccess(timestamp)
-            deleteOldFiles(context, timestamp)
+            deleteOldFiles(context, timestamp, AppDownloadManager.DownloadType.LOCAL)
             return true
 
         } catch (e: Exception) {

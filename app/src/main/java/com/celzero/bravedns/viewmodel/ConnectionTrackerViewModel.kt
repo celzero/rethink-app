@@ -44,7 +44,7 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
                                                               fetchNetworkLogs(input)
                                                           }))
 
-    fun setFilter(searchString: String?, filter: Set<String>,
+    fun setFilter(searchString: String, filter: Set<String>,
                   type: ConnectionTrackerFragment.TopLevelFilter) {
         filterRules.clear()
 

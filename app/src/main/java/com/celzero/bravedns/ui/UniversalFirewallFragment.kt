@@ -16,7 +16,6 @@ limitations under the License.
 package com.celzero.bravedns.ui
 
 import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -27,10 +26,8 @@ import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.CustomIpAdapter
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.FragmentUniversalFirewallBinding
 import com.celzero.bravedns.databinding.UniversalFragementContainerBinding
@@ -38,16 +35,13 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.BackgroundAccessibilityService
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.delay
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
 import com.google.android.material.switchmaterial.SwitchMaterial
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.concurrent.TimeUnit
 import kotlin.reflect.KMutableProperty0
 
 class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_container) {
@@ -70,7 +64,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
     }
 
     private fun observeBraveMode() {
-        appConfig.braveModeObserver.observe(viewLifecycleOwner) {
+        appConfig.getBraveModeObservable().observe(viewLifecycleOwner) {
             handleDisallowDnsBypassUi()
         }
     }

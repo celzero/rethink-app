@@ -76,7 +76,7 @@ class ExcludeAppsDialog(private var activity: Activity,
         b.excludeAppRecyclerViewDialog.adapter = adapter
 
         FirewallManager.getApplistObserver().observe(activity as LifecycleOwner, {
-            val excludedCount = it.filter { a -> a.firewallStatus == FirewallManager.AppStatus.EXCLUDE.id }.count()
+            val excludedCount = it.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.EXCLUDE.id }.count()
             b.excludeAppSelectCountText.text = activity.getString(R.string.ex_dialog_count,
                                                                   excludedCount.toString())
         })

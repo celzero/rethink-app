@@ -43,7 +43,8 @@ import com.google.android.material.chip.Chip
 import java.net.MalformedURLException
 import java.util.regex.Pattern
 
-class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainViewModel, themeId: Int): Dialog(activity, themeId), SearchView.OnQueryTextListener {
+class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainViewModel,
+                         themeId: Int) : Dialog(activity, themeId), SearchView.OnQueryTextListener {
 
     private lateinit var b: DialogCustomDomainBinding
     private var layoutManager: RecyclerView.LayoutManager? = null
@@ -71,8 +72,8 @@ class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainView
         b.cdfRecycler.layoutManager = layoutManager
         b.cdfRecycler.adapter = adapter
 
-        viewModel.customDomainList.observe(activity as LifecycleOwner, androidx.lifecycle.Observer(
-            adapter::submitList))
+        viewModel.customDomainList.observe(activity as LifecycleOwner,
+                                           androidx.lifecycle.Observer(adapter::submitList))
 
         b.cdfSearchView.setOnQueryTextListener(this)
     }
@@ -107,8 +108,8 @@ class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainView
         val types = DomainRulesManager.DomainType.getAllDomainTypes()
         var selectedType: DomainRulesManager.DomainType = DomainRulesManager.DomainType.DOMAIN
 
-        val aa: ArrayAdapter<*> = ArrayAdapter<Any?>(activity,
-                                                     android.R.layout.simple_spinner_item, types)
+        val aa: ArrayAdapter<*> = ArrayAdapter<Any?>(activity, android.R.layout.simple_spinner_item,
+                                                     types)
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         dBind.dacdSpinner.adapter = aa
 
@@ -122,10 +123,10 @@ class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainView
         dialog.window?.attributes = lp
 
         dBind.dacdUrlTitle.text = activity.getString(R.string.cd_dialog_title)
-        dBind.dacdDomainEditText.hint = activity.resources.getString(R.string.cd_dialog_edittext_hint,
-                                                            types[0])
-        dBind.dacdTextInputLayout.hint = activity.resources.getString(R.string.cd_dialog_edittext_hint,
-                                                             types[0])
+        dBind.dacdDomainEditText.hint = activity.resources.getString(
+            R.string.cd_dialog_edittext_hint, types[0])
+        dBind.dacdTextInputLayout.hint = activity.resources.getString(
+            R.string.cd_dialog_edittext_hint, types[0])
 
         dBind.dacdSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -210,24 +211,22 @@ class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainView
     private fun constructTldSamples(input: String): String {
         val validUnicode = activity.getString(R.string.cd_sample_unicode_valid)
         val invalidUnicode = activity.getString(R.string.cd_sample_unicode_invalid)
-        var sample = activity.getString(R.string.cd_add_dialog_sample_1, invalidUnicode,
-                                                "abc.xyz", input)
-        sample += activity.getString(R.string.cd_add_dialog_sample_2, validUnicode,
-                                             "abc.xyz", "pqr")
-        sample += activity.getString(R.string.cd_add_dialog_sample_3, invalidUnicode,
-                                             "xyz.$input")
-        sample += activity.getString(R.string.cd_add_dialog_sample_4, validUnicode,
-                                             "xyz.pqr")
+        var sample = activity.getString(R.string.cd_add_dialog_sample_1, invalidUnicode, "abc.xyz",
+                                        input)
+        sample += activity.getString(R.string.cd_add_dialog_sample_2, validUnicode, "abc.xyz",
+                                     "pqr")
+        sample += activity.getString(R.string.cd_add_dialog_sample_3, invalidUnicode, "xyz.$input")
+        sample += activity.getString(R.string.cd_add_dialog_sample_4, validUnicode, "xyz.pqr")
         return sample
     }
 
     private fun constructWildcardSamples(input: String): String {
         val validUnicode = activity.getString(R.string.cd_sample_unicode_valid)
         val invalidUnicode = activity.getString(R.string.cd_sample_unicode_invalid)
-        var sample = activity.getString(R.string.cd_add_dialog_sample_1, validUnicode,
-                                                "abc.", input)
+        var sample = activity.getString(R.string.cd_add_dialog_sample_1, validUnicode, "abc.",
+                                        input)
         sample += activity.getString(R.string.cd_add_dialog_sample_2, validUnicode, "abc.",
-                                             "$input.pqr")
+                                     "$input.pqr")
         sample += activity.getString(R.string.cd_add_dialog_sample_3, invalidUnicode, "xyz")
         sample += activity.getString(R.string.cd_add_dialog_sample_4, validUnicode, "xyz")
         return sample
@@ -236,10 +235,10 @@ class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainView
     private fun constructDomainSamples(input: String): String {
         val validUnicode = activity.getString(R.string.cd_sample_unicode_valid)
         val invalidUnicode = activity.getString(R.string.cd_sample_unicode_invalid)
-        var sample = activity.getString(R.string.cd_add_dialog_sample_1, invalidUnicode,
-                                                "abc.", input)
+        var sample = activity.getString(R.string.cd_add_dialog_sample_1, invalidUnicode, "abc.",
+                                        input)
         sample += activity.getString(R.string.cd_add_dialog_sample_2, validUnicode, "abc.",
-                                             "$input.pqr")
+                                     "$input.pqr")
         sample += activity.getString(R.string.cd_add_dialog_sample_3, invalidUnicode, "xyz")
         sample += activity.getString(R.string.cd_add_dialog_sample_4, validUnicode, "xyz")
         return sample

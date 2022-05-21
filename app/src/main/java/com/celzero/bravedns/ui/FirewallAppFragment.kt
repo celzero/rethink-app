@@ -16,7 +16,6 @@
 package com.celzero.bravedns.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
@@ -70,18 +69,11 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
 
         // TODO: Find a solution to replace the below query usage
         // ref: https://stackoverflow.com/questions/61055772/android-room-dao-order-by-case-not-working
-        private const val ORDERBY_DEFAULT = " lower(appName)"
-        private const val ORDERBY_BLOCKED = " CASE firewallStatus WHEN 1 THEN 0 WHEN 0 THEN 1 WHEN 2 THEN 2 WHEN 3 THEN 3 WHEN 4 THEN 4 END, lower(appName)"
-        private const val ORDERBY_WHITELISTED = " CASE firewallStatus WHEN 2 THEN 0 WHEN 0 THEN 1 WHEN 1 THEN 2 WHEN 3 THEN 3 WHEN 4 THEN 4 END, lower(appName)"
-        private const val ORDERBY_EXCLUDED = " CASE firewallStatus WHEN 3 THEN 0 WHEN 0 THEN 1 WHEN 1 THEN 2 WHEN 2 THEN 3 WHEN 4 THEN 4 END, lower(appName)"
+        private const val ORDER_BY_DEFAULT = " lower(appName)"
+        private const val ORDER_BY_BLOCKED = " CASE firewallStatus WHEN 1 THEN 0 WHEN 0 THEN 1 WHEN 2 THEN 2 WHEN 3 THEN 3 WHEN 4 THEN 4 END, lower(appName)"
+        private const val ORDER_BY_WHITELISTED = " CASE firewallStatus WHEN 2 THEN 0 WHEN 0 THEN 1 WHEN 1 THEN 2 WHEN 3 THEN 3 WHEN 4 THEN 4 END, lower(appName)"
+        private const val ORDER_BY_EXCLUDED = " CASE firewallStatus WHEN 3 THEN 0 WHEN 0 THEN 1 WHEN 1 THEN 2 WHEN 2 THEN 3 WHEN 4 THEN 4 END, lower(appName)"
 
-        /*
-        private const val ORDERBY_ALLOWED = " CASE firewallStatus WHEN 0 THEN 0 WHEN 1 THEN 1 WHEN 2 THEN 2 WHEN 3 THEN 3 WHEN 4 THEN 4 END, lower(appName)"
-        private const val ORDERBY_RESTRICTED = " CASE firewallStatus WHEN 1 THEN 0 WHEN 0 THEN 1 WHEN 2 THEN 2 WHEN 3 THEN 3 WHEN 4 THEN 4 END, lower(appName)"
-        private const val ORDERBY_BLOCKED = " CASE firewallStatus WHEN 2 THEN 0 WHEN 0 THEN 1 WHEN 1 THEN 2 WHEN 3 THEN 3 WHEN 4 THEN 4 END, lower(appName)"
-        private const val ORDERBY_WHITELISTED = " CASE firewallStatus WHEN 3 THEN 0 WHEN 0 THEN 1 WHEN 1 THEN 2 WHEN 2 THEN 3 WHEN 4 THEN 4 END, lower(appName)"
-        private const val ORDERBY_EXCLUDED = " CASE firewallStatus WHEN 4 THEN 0 WHEN 0 THEN 1 WHEN 1 THEN 2 WHEN 2 THEN 3 WHEN 3 THEN 4 END, lower(appName)"
-         */
     }
 
     enum class TopLevelFilter(val id: Int) {
@@ -112,10 +104,10 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
 
         fun getSortByQuery(): String {
             return when (sortType) {
-                SortFilter.NONE -> ORDERBY_DEFAULT
-                SortFilter.BLOCKED -> ORDERBY_BLOCKED
-                SortFilter.WHITELISTED -> ORDERBY_WHITELISTED
-                SortFilter.EXCLUDED -> ORDERBY_EXCLUDED
+                SortFilter.NONE -> ORDER_BY_DEFAULT
+                SortFilter.BLOCKED -> ORDER_BY_BLOCKED
+                SortFilter.WHITELISTED -> ORDER_BY_WHITELISTED
+                SortFilter.EXCLUDED -> ORDER_BY_EXCLUDED
             }
         }
     }
@@ -174,7 +166,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
                 }
             }
         }
-        
+
         b.ffaToggleAllWifi.setOnClickListener {
             updateWifi()
         }
@@ -239,8 +231,8 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
         b.ffaAppList.layoutManager = layoutManager
         val recyclerAdapter = FirewallAppListAdapter(requireContext(), viewLifecycleOwner,
                                                      persistentState)
-        appInfoViewModel.appInfos.observe(viewLifecycleOwner,
-                                          androidx.lifecycle.Observer(recyclerAdapter::submitList))
+        appInfoViewModel.appInfo.observe(viewLifecycleOwner,
+                                         androidx.lifecycle.Observer(recyclerAdapter::submitList))
         b.ffaAppList.adapter = recyclerAdapter
         val dividerItemDecoration = DividerItemDecoration(b.ffaAppList.context,
                                                           (layoutManager as LinearLayoutManager).orientation)

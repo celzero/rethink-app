@@ -35,7 +35,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ExcludedAppListAdapter
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.*
+import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.databinding.DialogSetHttpProxyBinding
 import com.celzero.bravedns.databinding.DialogSetProxyBinding
 import com.celzero.bravedns.databinding.FragmentSettingsScreenBinding
@@ -51,8 +51,9 @@ import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
 import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 import com.celzero.bravedns.viewmodel.ExcludedAppViewModel
-import kotlinx.coroutines.*
-import okhttp3.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.concurrent.TimeUnit
@@ -111,18 +112,18 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         excludeAppViewModel.excludedAppList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
             excludeAppAdapter::submitList))
 
-        FirewallManager.getApplistObserver().observe(viewLifecycleOwner, {
-            val excludedCount = it.filter { a -> a.firewallStatus == FirewallManager.AppStatus.EXCLUDE.id }.count()
+        FirewallManager.getApplistObserver().observe(viewLifecycleOwner) {
+            val excludedCount = it.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.EXCLUDE.id }.count()
             b.settingsActivityExcludeAppsCountText.text = getString(R.string.ex_dialog_count,
                                                                     excludedCount.toString())
-        })
+        }
     }
 
     private fun observeCustomProxy() {
-        appConfig.connectedProxy.observe(viewLifecycleOwner, {
+        appConfig.connectedProxy.observe(viewLifecycleOwner) {
             proxyEndpoint = it
             displaySocks5Ui()
-        })
+        }
     }
 
     private fun displayHttpProxyUi() {

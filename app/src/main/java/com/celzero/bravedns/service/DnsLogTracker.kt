@@ -20,8 +20,8 @@ import android.content.Context
 import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.database.DnsLog
+import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.dns.DnsPacket
 import com.celzero.bravedns.net.doh.Transaction
@@ -203,7 +203,7 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
                     numBlockedRequests = persistentState.numberOfBlockedRequests
                 }
 
-                // Number of request count.
+                // Number of request count
                 if (numRequests > persistentState.numberOfRequests) {
                     persistentState.numberOfRequests = numRequests
                 } else {

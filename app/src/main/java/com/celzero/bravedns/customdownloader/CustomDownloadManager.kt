@@ -16,9 +16,9 @@
 package com.celzero.bravedns.customdownloader
 
 import android.util.Log
-import com.celzero.bravedns.customdownloader.ConnectionCheckHelper.downloadIds
+import com.celzero.bravedns.customdownloader.ConnectivityHelper.downloadIds
 import com.celzero.bravedns.customdownloader.RetrofitManager.Companion.getBlocklistBaseBuilder
-import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants
 import kotlinx.coroutines.*
 import okhttp3.ResponseBody
@@ -51,29 +51,34 @@ class CustomDownloadManager : CoroutineScope {
 
     private fun downloadFiles(downloadId: Long, url: String, fileName: String) = launch {
         withContext(coroutineContext) {
-            OkHttpDebugLogging.enableHttp2()
-            OkHttpDebugLogging.enableTaskRunner()
-            val retrofit = getBlocklistBaseBuilder().build()
-            val retrofitInterface = retrofit.create(BlocklistDownloadInterface::class.java)
-            val request = retrofitInterface.downloadLocalBlocklistFile(url)
-            var status: ConnectionCheckHelper.DownloadStatus
+            // enable the OkHttp's logging only in debug mode for testing
+            if (DEBUG) OkHttpDebugLogging.enableHttp2()
+            if (DEBUG) OkHttpDebugLogging.enableTaskRunner()
+
+            // create okhttp client with base url as https://download.rethinkdns.com
+            val retrofit = getBlocklistBaseBuilder().build().create(
+                IBlocklistDownload::class.java)
+            val request = retrofit.downloadLocalBlocklistFile(url)
+
+            var status: ConnectivityHelper.DownloadStatus
 
             request?.enqueue(object : Callback<ResponseBody?> {
-                override fun onResponse(call: Call<ResponseBody?>?,
+                override fun onResponse(call: Call<ResponseBody?>,
                                         response: Response<ResponseBody?>) {
                     io {
                         if (response.isSuccessful) {
                             status = downloadFile(response.body(), fileName)
                             updateDownloadStatus(downloadId, status)
-                        } else {
-                            status = ConnectionCheckHelper.DownloadStatus.FAILED
-                            updateDownloadStatus(downloadId, status)
+                            return@io
                         }
+
+                        status = ConnectivityHelper.DownloadStatus.FAILED
+                        updateDownloadStatus(downloadId, status)
                     }
                 }
 
-                override fun onFailure(call: Call<ResponseBody?>?, t: Throwable) {
-                    status = ConnectionCheckHelper.DownloadStatus.FAILED
+                override fun onFailure(call: Call<ResponseBody?>, t: Throwable) {
+                    status = ConnectivityHelper.DownloadStatus.FAILED
                     updateDownloadStatus(downloadId, status)
                 }
             })
@@ -82,16 +87,22 @@ class CustomDownloadManager : CoroutineScope {
 
     private fun initDownload(downloadId: Long) {
         // initiate the download and show the dialog with progress bar
-        downloadIds[downloadId] = ConnectionCheckHelper.DownloadStatus.RUNNING
+        downloadIds[downloadId] = ConnectivityHelper.DownloadStatus.RUNNING
     }
 
-    private fun updateDownloadStatus(downloadId: Long, result: ConnectionCheckHelper.DownloadStatus) {
+    private fun updateDownloadStatus(downloadId: Long,
+                                     result: ConnectivityHelper.DownloadStatus) {
         // hide progress and show the download complete
         downloadIds[downloadId] = result
     }
 
     private fun downloadFile(body: ResponseBody?,
-                             fileName: String): ConnectionCheckHelper.DownloadStatus {
+                             fileName: String): ConnectivityHelper.DownloadStatus {
+
+        if (body == null) {
+            return ConnectivityHelper.DownloadStatus.FAILED
+        }
+
         var bis: InputStream? = null
         var output: OutputStream? = null
         try {
@@ -107,6 +118,7 @@ class CustomDownloadManager : CoroutineScope {
             var total: Long = 0
             val startTime = System.currentTimeMillis()
             var timeCount = 1
+            var prevProgress = 0
             while (bis.read(data).also { count = it } != -1) {
                 total += count.toLong()
                 totalFileSize = (fileSize / 1024.0.pow(2.0)).toInt()
@@ -115,6 +127,9 @@ class CustomDownloadManager : CoroutineScope {
                 val currentTime = System.currentTimeMillis() - startTime
                 val download = DownloadFile()
                 download.totalFileSize = totalFileSize
+                if (prevProgress - progress >= 5 || prevProgress - progress <= 5) {
+                    prevProgress = progress
+                }
                 if (currentTime > 1000 * timeCount) {
                     download.currentFileSize = current.toInt()
                     download.progress = progress
@@ -123,6 +138,7 @@ class CustomDownloadManager : CoroutineScope {
                 output.write(data, 0, count)
             }
 
+            // the code to download the file without the calculations (download percentage)
             /*var count: Int
             bis = BufferedInputStream(body?.byteStream(), 1024 * 8)
             val data = ByteArray(1024 * 4)
@@ -136,10 +152,10 @@ class CustomDownloadManager : CoroutineScope {
                 output.write(data, 0, count)
             }*/
             output.flush()
-            return ConnectionCheckHelper.DownloadStatus.SUCCESSFUL
+            return ConnectivityHelper.DownloadStatus.SUCCESSFUL
         } catch (e: Exception) {
             Log.e(LoggerConstants.LOG_TAG_DOWNLOAD, "failure error: ${e.message}", e)
-            return ConnectionCheckHelper.DownloadStatus.FAILED
+            return ConnectivityHelper.DownloadStatus.FAILED
         } finally {
             output?.close()
             bis?.close()
