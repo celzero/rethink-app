@@ -73,7 +73,7 @@ object IpRulesManager : KoinComponent {
     }
 
     enum class IpRuleStatus(val id: Int) {
-        BLOCK(0), WHITELIST(1), NONE(2);
+        NONE(0), BLOCK(1), WHITELIST(2);
 
         fun isBlocked(): Boolean {
             return this.id == BLOCK.id
