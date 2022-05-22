@@ -309,11 +309,11 @@ class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainView
     private fun remakeParentFilterChipsUi() {
         b.cdfFilterChipGroup.removeAllViews()
 
-        val all = makeParentChip(DomainRulesManager.DomainStatus.NONE.statusId,
+        val all = makeParentChip(DomainRulesManager.DomainStatus.NONE.id,
                                  activity.getString(R.string.cd_filter_all), true)
-        val allowed = makeParentChip(DomainRulesManager.DomainStatus.WHITELISTED.statusId,
+        val allowed = makeParentChip(DomainRulesManager.DomainStatus.WHITELIST.id,
                                      activity.getString(R.string.cd_filter_allowed), false)
-        val blocked = makeParentChip(DomainRulesManager.DomainStatus.BLOCKED.statusId,
+        val blocked = makeParentChip(DomainRulesManager.DomainStatus.BLOCK.id,
                                      activity.getString(R.string.cd_filter_blocked), false)
 
         b.cdfFilterChipGroup.addView(all)

@@ -17,8 +17,6 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.content.res.TypedArray
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,6 +30,7 @@ import com.celzero.bravedns.automaton.IpRulesManager
 import com.celzero.bravedns.automaton.IpRulesManager.UID_EVERYBODY
 import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.databinding.ListItemCustomIpBinding
+import com.celzero.bravedns.util.Utilities.Companion.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
 import com.celzero.bravedns.util.Utilities.Companion.getFlag
 import com.google.android.material.button.MaterialButton
@@ -71,22 +70,22 @@ class CustomIpAdapter(private val context: Context) :
         private lateinit var customIp: CustomIp
         fun update(ci: CustomIp) {
             customIp = ci
-            b.customIpsLabelTv.text = customIp.ipAddress
+            b.customIpLabelTv.text = customIp.ipAddress
             b.customIpToggleGroup.tag = 1
             val status = IpRulesManager.IpRuleStatus.getStatus(customIp.status)
 
             // whether to show the toggle group
             toggleActionsUi()
-            // update the toggle group button based on the status
-            updateToggleGroup(status.id)
+            // update toggle group button based on the status
+            updateToggleGroup(customIp.status)
             // update flag for the available ips
             updateFlagIfAvailable(customIp)
-            // update the status in desc and status flag (N/B/W)
+            // update status in desc and status flag (N/B/W)
             updateStatusUi(status)
 
             b.customIpToggleGroup.addOnButtonCheckedListener(ipRulesGroupListener)
 
-            b.customIpsExpandIcon.setOnClickListener {
+            b.customIpExpandIcon.setOnClickListener {
                 toggleActionsUi()
             }
 
@@ -132,14 +131,14 @@ class CustomIpAdapter(private val context: Context) :
                 // update the status in desc and status flag (N/B/W)
                 updateStatusUi(statusId)
 
-                updateIpStatus(statusId)
+                changeIpStatus(statusId)
                 return@OnButtonCheckedListener
             }
 
             unselectToggleBtnUi(b)
         }
 
-        private fun updateIpStatus(id: IpRulesManager.IpRuleStatus) {
+        private fun changeIpStatus(id: IpRulesManager.IpRuleStatus) {
             when (id) {
                 IpRulesManager.IpRuleStatus.NONE -> {
                     noRuleIp(customIp)
@@ -156,19 +155,17 @@ class CustomIpAdapter(private val context: Context) :
         private fun toggleBtnUi(id: IpRulesManager.IpRuleStatus): ToggleBtnUi {
             return when (id) {
                 IpRulesManager.IpRuleStatus.NONE -> {
-                    ToggleBtnUi(
-                        fetchTextColor(R.color.firewallNoRuleToggleBtnTxt),
-                        fetchTextColor(R.color.firewallNoRuleToggleBtnBg))
+                    ToggleBtnUi(fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnTxt),
+                                fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnBg))
                 }
                 IpRulesManager.IpRuleStatus.BLOCK -> {
-                    ToggleBtnUi(
-                        fetchTextColor(R.color.firewallBlockToggleBtnTxt),
-                        fetchTextColor(R.color.firewallBlockToggleBtnBg))
+                    ToggleBtnUi(fetchToggleBtnColors(context, R.color.firewallBlockToggleBtnTxt),
+                                fetchToggleBtnColors(context, R.color.firewallBlockToggleBtnBg))
                 }
                 IpRulesManager.IpRuleStatus.WHITELIST -> {
                     ToggleBtnUi(
-                        fetchTextColor(R.color.firewallWhiteListToggleBtnTxt),
-                        fetchTextColor(R.color.firewallWhiteListToggleBtnBg))
+                        fetchToggleBtnColors(context, R.color.firewallWhiteListToggleBtnTxt),
+                        fetchToggleBtnColors(context, R.color.firewallWhiteListToggleBtnBg))
                 }
             }
         }
@@ -179,41 +176,9 @@ class CustomIpAdapter(private val context: Context) :
         }
 
         private fun unselectToggleBtnUi(b: MaterialButton) {
-            b.setTextColor(fetchTextColor(R.color.defaultToggleBtnTxt))
+            b.setTextColor(fetchToggleBtnColors(context, R.color.defaultToggleBtnTxt))
             b.backgroundTintList = ColorStateList.valueOf(
-                fetchTextColor(R.color.defaultToggleBtnBg))
-        }
-
-        private fun fetchTextColor(attr: Int): Int {
-            val attributeFetch = if (attr == R.color.firewallNoRuleToggleBtnTxt) {
-                R.attr.firewallNoRuleToggleBtnTxt
-            } else if (attr == R.color.firewallNoRuleToggleBtnBg) {
-                R.attr.firewallNoRuleToggleBtnBg
-            } else if (attr == R.color.firewallBlockToggleBtnTxt) {
-                R.attr.firewallBlockToggleBtnTxt
-            } else if (attr == R.color.firewallBlockToggleBtnBg) {
-                R.attr.firewallBlockToggleBtnBg
-            } else if (attr == R.color.firewallWhiteListToggleBtnTxt) {
-                R.attr.firewallWhiteListToggleBtnTxt
-            } else if (attr == R.color.firewallWhiteListToggleBtnBg) {
-                R.attr.firewallWhiteListToggleBtnBg
-            } else if (attr == R.color.firewallExcludeToggleBtnBg) {
-                R.attr.firewallExcludeToggleBtnBg
-            } else if (attr == R.color.firewallExcludeToggleBtnTxt) {
-                R.attr.firewallExcludeToggleBtnTxt
-            } else if (attr == R.color.defaultToggleBtnBg) {
-                R.attr.defaultToggleBtnBg
-            } else if (attr == R.color.defaultToggleBtnTxt) {
-                R.attr.defaultToggleBtnTxt
-            } else {
-                R.attr.chipBgColorPositive
-            }
-            val typedValue = TypedValue()
-            val a: TypedArray = context.obtainStyledAttributes(typedValue.data,
-                                                                        intArrayOf(attributeFetch))
-            val color = a.getColor(0, 0)
-            a.recycle()
-            return color
+                fetchToggleBtnColors(context, R.color.defaultToggleBtnBg))
         }
 
         // each button in the toggle group is associated with tag value.
@@ -242,7 +207,8 @@ class CustomIpAdapter(private val context: Context) :
         private fun updateFlagIfAvailable(ip: CustomIp) {
             if (ip.wildcard) return
 
-            b.customIpsFlag.text = getFlag(getCountryCode(InetAddress.getByName(ip.ipAddress), context))
+            b.customIpFlag.text = getFlag(
+                getCountryCode(InetAddress.getByName(ip.ipAddress), context))
         }
 
         private fun toggleActionsUi() {
@@ -257,29 +223,28 @@ class CustomIpAdapter(private val context: Context) :
         }
 
         private fun updateStatusUi(status: IpRulesManager.IpRuleStatus) {
+            // fixme: move the string literals to strings.xml
             when (status) {
                 IpRulesManager.IpRuleStatus.WHITELIST -> {
-                    b.customIpsStatusIcon.text = "W"
-                    b.customIpsStatusTv.text = "Whitelisted"
+                    b.customIpStatusIcon.text = "W"
+                    b.customIpStatusTv.text = "Whitelisted"
                 }
                 IpRulesManager.IpRuleStatus.BLOCK -> {
-                    b.customIpsStatusIcon.text = "B"
-                    b.customIpsStatusTv.text = "Blocked"
+                    b.customIpStatusIcon.text = "B"
+                    b.customIpStatusTv.text = "Blocked"
                 }
                 IpRulesManager.IpRuleStatus.NONE -> {
-                    b.customIpsStatusIcon.text = "N"
-                    b.customIpsStatusTv.text = "No Rule"
+                    b.customIpStatusIcon.text = "N"
+                    b.customIpStatusTv.text = "No Rule"
                 }
             }
         }
 
         private fun whitelistIp(customIp: CustomIp) {
-            // TODO: Implement allow ip
             IpRulesManager.whitelistIp(customIp)
         }
 
         private fun blockIp(customIp: CustomIp) {
-            // TODO: Implement block ip
             IpRulesManager.blockIp(customIp)
         }
 

@@ -659,6 +659,38 @@ class Utilities {
             return color
         }
 
+        fun fetchToggleBtnColors(context: Context, attr: Int): Int {
+            val attributeFetch = if (attr == R.color.firewallNoRuleToggleBtnTxt) {
+                R.attr.firewallNoRuleToggleBtnTxt
+            } else if (attr == R.color.firewallNoRuleToggleBtnBg) {
+                R.attr.firewallNoRuleToggleBtnBg
+            } else if (attr == R.color.firewallBlockToggleBtnTxt) {
+                R.attr.firewallBlockToggleBtnTxt
+            } else if (attr == R.color.firewallBlockToggleBtnBg) {
+                R.attr.firewallBlockToggleBtnBg
+            } else if (attr == R.color.firewallWhiteListToggleBtnTxt) {
+                R.attr.firewallWhiteListToggleBtnTxt
+            } else if (attr == R.color.firewallWhiteListToggleBtnBg) {
+                R.attr.firewallWhiteListToggleBtnBg
+            } else if (attr == R.color.firewallExcludeToggleBtnBg) {
+                R.attr.firewallExcludeToggleBtnBg
+            } else if (attr == R.color.firewallExcludeToggleBtnTxt) {
+                R.attr.firewallExcludeToggleBtnTxt
+            } else if (attr == R.color.defaultToggleBtnBg) {
+                R.attr.defaultToggleBtnBg
+            } else if (attr == R.color.defaultToggleBtnTxt) {
+                R.attr.defaultToggleBtnTxt
+            } else {
+                R.attr.chipBgColorPositive
+            }
+            val typedValue = TypedValue()
+            val a: TypedArray = context.obtainStyledAttributes(typedValue.data,
+                                                               intArrayOf(attributeFetch))
+            val color = a.getColor(0, 0)
+            a.recycle()
+            return color
+        }
+
         fun getActivityPendingIntent(context: Context, intent: Intent, flag: Int,
                                      mutable: Boolean): PendingIntent {
             return if (isAtleastS()) {

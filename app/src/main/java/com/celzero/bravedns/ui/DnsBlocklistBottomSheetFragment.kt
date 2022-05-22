@@ -104,11 +104,11 @@ class DnsBlocklistBottomSheetFragment(private var contextVal: Context,
 
     private fun handleCustomDomainUi() {
         when (DomainRulesManager.matchesDomain(transaction.queryStr)) {
-            DomainRulesManager.DomainStatus.BLOCKED -> {
+            DomainRulesManager.DomainStatus.BLOCK -> {
                 b.dnsBlockToggleGroup.check(b.dnsBlockTgDeny.id)
                 enableToggleButton(b.dnsBlockTgDeny)
             }
-            DomainRulesManager.DomainStatus.WHITELISTED -> {
+            DomainRulesManager.DomainStatus.WHITELIST -> {
                 b.dnsBlockToggleGroup.check(b.dnsBlockTgAllow.id)
                 enableToggleButton(b.dnsBlockTgAllow)
             }
@@ -152,11 +152,11 @@ class DnsBlocklistBottomSheetFragment(private var contextVal: Context,
 
     private fun findSelectedDnsRule(ruleId: Int): DomainRulesManager.DomainStatus {
         return when (ruleId) {
-            DomainRulesManager.DomainStatus.WHITELISTED.statusId -> {
-                DomainRulesManager.DomainStatus.WHITELISTED
+            DomainRulesManager.DomainStatus.WHITELIST.id -> {
+                DomainRulesManager.DomainStatus.WHITELIST
             }
-            DomainRulesManager.DomainStatus.BLOCKED.statusId -> {
-                DomainRulesManager.DomainStatus.BLOCKED
+            DomainRulesManager.DomainStatus.BLOCK.id -> {
+                DomainRulesManager.DomainStatus.BLOCK
             }
             else -> {
                 DomainRulesManager.DomainStatus.NONE

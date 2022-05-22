@@ -50,15 +50,15 @@ object DomainRulesManager : KoinComponent {
     private val domainLookupCache: Cache<String, DomainStatus> = CacheBuilder.newBuilder().maximumSize(
         CACHE_MAX_SIZE).build()
 
-    enum class DomainStatus(val statusId: Int) {
-        NONE(0), WHITELISTED(1), BLOCKED(2);
+    enum class DomainStatus(val id: Int) {
+        NONE(0), BLOCK(1), WHITELIST(2) ;
 
         companion object {
             fun getStatus(statusId: Int): DomainStatus {
                 return when (statusId) {
-                    NONE.statusId -> NONE
-                    WHITELISTED.statusId -> WHITELISTED
-                    BLOCKED.statusId -> BLOCKED
+                    NONE.id -> NONE
+                    WHITELIST.id -> WHITELIST
+                    BLOCK.id -> BLOCK
                     else -> NONE
                 }
             }
@@ -124,18 +124,18 @@ object DomainRulesManager : KoinComponent {
     fun status(domain: String): Test {
         // return if the cache has the domain
         domainLookupCache.getIfPresent(domain)?.let {
-            return Test("Cache", DomainStatus.getStatus(it.statusId))
+            return Test("Cache", DomainStatus.getStatus(it.id))
         }
 
         // check if the domain is added in custom domain list
         when (matchesDomain(domain)) {
-            DomainStatus.WHITELISTED -> {
-                updateLookupCache(domain, DomainStatus.WHITELISTED)
-                return Test("Domain", DomainStatus.WHITELISTED)
+            DomainStatus.WHITELIST -> {
+                updateLookupCache(domain, DomainStatus.WHITELIST)
+                return Test("Domain", DomainStatus.WHITELIST)
             }
-            DomainStatus.BLOCKED -> {
-                updateLookupCache(domain, DomainStatus.BLOCKED)
-                return Test("Domain", DomainStatus.BLOCKED)
+            DomainStatus.BLOCK -> {
+                updateLookupCache(domain, DomainStatus.BLOCK)
+                return Test("Domain", DomainStatus.BLOCK)
             }
             DomainStatus.NONE -> {
                 // fall-through
@@ -144,13 +144,13 @@ object DomainRulesManager : KoinComponent {
 
         // extract the TLD of the received domain and check with the custom tld's list
         when (matchesTld(domain)) {
-            DomainStatus.BLOCKED -> {
-                updateLookupCache(domain, DomainStatus.BLOCKED)
-                return Test("TLD", DomainStatus.BLOCKED)
+            DomainStatus.BLOCK -> {
+                updateLookupCache(domain, DomainStatus.BLOCK)
+                return Test("TLD", DomainStatus.BLOCK)
             }
-            DomainStatus.WHITELISTED -> {
-                updateLookupCache(domain, DomainStatus.WHITELISTED)
-                return Test("TLD", DomainStatus.WHITELISTED)
+            DomainStatus.WHITELIST -> {
+                updateLookupCache(domain, DomainStatus.WHITELIST)
+                return Test("TLD", DomainStatus.WHITELIST)
             }
             DomainStatus.NONE -> {
                 // fall-through
@@ -207,9 +207,9 @@ object DomainRulesManager : KoinComponent {
         domainLookupCache.put(domain, status)
     }
 
-    fun whitelist(domain: String, ips: String, type: DomainType) {
+    fun whitelist(cd: CustomDomain) {
         io {
-            val cd = constructObject(domain, ips, type, DomainStatus.WHITELISTED.statusId)
+            cd.status = DomainStatus.WHITELIST.id
             dbInsertOrUpdate(cd)
             updateCache(cd)
         }
@@ -217,29 +217,7 @@ object DomainRulesManager : KoinComponent {
 
     fun applyStatus(domain: String, ips: String, type: DomainType, status: DomainStatus) {
         io {
-            val cd = constructObject(domain, ips, type, status.statusId)
-            dbInsertOrUpdate(cd)
-            updateCache(cd)
-        }
-    }
-
-    fun toggleStatus(cd: CustomDomain, state: DomainStatus) {
-        io {
-            if (cd.isWhitelisted() && state == DomainStatus.WHITELISTED) {
-                cd.status = DomainStatus.NONE.statusId
-            } else if (cd.isBlocked() && state == DomainStatus.BLOCKED) {
-                cd.status = DomainStatus.NONE.statusId
-            } else {
-                cd.status = state.statusId
-            }
-            dbInsertOrUpdate(cd)
-            updateCache(cd)
-        }
-    }
-
-    fun removeStatus(domain: String, ips: String, type: DomainType) {
-        io {
-            val cd = constructObject(domain, ips, type, DomainStatus.NONE.statusId)
+            val cd = constructObject(domain, ips, type, status.id)
             dbInsertOrUpdate(cd)
             updateCache(cd)
         }
@@ -247,7 +225,23 @@ object DomainRulesManager : KoinComponent {
 
     fun block(domain: String, ips: String = "", type: DomainType) {
         io {
-            val cd = constructObject(domain, ips, type, DomainStatus.BLOCKED.statusId)
+            val cd = constructObject(domain, ips, type, DomainStatus.BLOCK.id)
+            dbInsertOrUpdate(cd)
+            updateCache(cd)
+        }
+    }
+
+    fun block(cd: CustomDomain) {
+        io {
+            cd.status = DomainStatus.BLOCK.id
+            dbInsertOrUpdate(cd)
+            updateCache(cd)
+        }
+    }
+
+    fun noRule(cd: CustomDomain) {
+        io {
+            cd.status = DomainStatus.NONE.id
             dbInsertOrUpdate(cd)
             updateCache(cd)
         }

@@ -61,10 +61,10 @@ class CustomDomain {
     }
 
     fun isBlocked(): Boolean {
-        return this.status == DomainRulesManager.DomainStatus.BLOCKED.statusId
+        return this.status == DomainRulesManager.DomainStatus.BLOCK.id
     }
 
     fun isWhitelisted(): Boolean {
-        return this.status == DomainRulesManager.DomainStatus.WHITELISTED.statusId
+        return this.status == DomainRulesManager.DomainStatus.WHITELIST.id
     }
 }

@@ -6,13 +6,13 @@
     android:layout_marginBottom="1dp">
 
     <RelativeLayout
-        android:id="@+id/custom_ips_container"
+        android:id="@+id/custom_ip_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp">
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/custom_ips_flag"
+            android:id="@+id/custom_ip_flag"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_alignParentStart="true"
@@ -28,11 +28,11 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginStart="10dp"
-            android:layout_toEndOf="@id/custom_ips_flag"
+            android:layout_toEndOf="@id/custom_ip_flag"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/custom_ips_label_tv"
+                android:id="@+id/custom_ip_label_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
@@ -42,7 +42,7 @@
                 android:textSize="@dimen/large_font_text_view" />
 
             <TextView
-                android:id="@+id/custom_ips_status_tv"
+                android:id="@+id/custom_ip_status_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
@@ -53,7 +53,7 @@
         </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/custom_ips_status_icon"
+            android:id="@+id/custom_ip_status_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="25dp"
@@ -62,13 +62,13 @@
             android:layout_marginStart="5dp"
             android:textSize="@dimen/default_font_text_view"
             android:layout_marginEnd="10dp"
-            android:layout_toStartOf="@id/custom_ips_expand_icon"
+            android:layout_toStartOf="@id/custom_ip_expand_icon"
             android:background="@drawable/rectangle_border_background"
             android:padding="5dp"
             android:text="B" />
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/custom_ips_expand_icon"
+            android:id="@+id/custom_ip_expand_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -81,8 +81,7 @@
 
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/custom_ip_toggle_group"
-        android:layout_below="@id/custom_ips_container"
-        app:checkedButton="@id/bs_conn_tg_no_rule"
+        android:layout_below="@id/custom_ip_container"
         app:selectionRequired="true"
         app:singleSelection="true"
         android:visibility="gone"

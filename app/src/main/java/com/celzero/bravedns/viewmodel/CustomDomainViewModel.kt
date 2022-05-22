@@ -38,12 +38,12 @@ class CustomDomainViewModel(private val customDomainDAO: CustomDomainDAO) : View
                 customDomainDAO.getAllDomainsLiveData("%$input%").toLiveData(
                     pageSize = LIVEDATA_PAGE_SIZE)
             }
-            DomainRulesManager.DomainStatus.WHITELISTED -> {
-                customDomainDAO.getWhitelistedDomains("%$input%", status.statusId).toLiveData(
+            DomainRulesManager.DomainStatus.WHITELIST -> {
+                customDomainDAO.getWhitelistedDomains("%$input%", status.id).toLiveData(
                     pageSize = LIVEDATA_PAGE_SIZE)
             }
-            DomainRulesManager.DomainStatus.BLOCKED -> {
-                customDomainDAO.getBlockedDomains("%$input%", status.statusId).toLiveData(
+            DomainRulesManager.DomainStatus.BLOCK -> {
+                customDomainDAO.getBlockedDomains("%$input%", status.id).toLiveData(
                     LIVEDATA_PAGE_SIZE)
             }
         }
