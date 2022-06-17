@@ -53,6 +53,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import settings.Settings
 import tun2socks.Tun2socks
+import java.io.File
 import java.io.IOException
 
 /**

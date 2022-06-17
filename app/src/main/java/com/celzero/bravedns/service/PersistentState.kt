@@ -85,21 +85,25 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         false)
 
     // user chosen blocklists stored custom dictionary indexed in base64
-    var localBlocklistStamp by stringPref("local_block_list_stamp").withDefault<String>("")
+    var localBlocklistStamp by stringPref("local_block_list_stamp").withDefault<String>(
+        if (Utilities.isHeadlessFlavour()) "1:0B__A___-v-gHTaQgADkAgAo"
+            else "")
 
     // whether to drop packets when the source app originating the reqs couldn't be determined
     var blockUnknownConnections by booleanPref("block_unknown_connections").withDefault<Boolean>(
         false)
 
     // whether user has enable on-device blocklists
-    var blocklistEnabled by booleanPref("enable_local_list").withDefault<Boolean>(false)
+    var blocklistEnabled by booleanPref("enable_local_list").withDefault<Boolean>(
+        Utilities.isHeadlessFlavour())
 
     // the version (which is a unix timestamp) of the current rethinkdns+ remote blocklist files
     var remoteBlocklistTimestamp by longPref("remote_block_list_downloaded_time").withDefault<Long>(
         INIT_TIME_MS)
 
     // the version (which is a unix timestamp) of the current on-device blocklist files
-    var localBlocklistTimestamp by longPref("local_block_list_downloaded_time").withDefault<Long>(0)
+    var localBlocklistTimestamp by longPref("local_block_list_downloaded_time")
+        .withDefault<Long>(if (Utilities.isHeadlessFlavour()) 1655223903366 else 0)
 
     // user set http proxy port
     var httpProxyPort by intPref("http_proxy_port").withDefault<Int>(INVALID_PORT)
@@ -113,7 +117,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         !Utilities.isFdroidFlavour())
 
     // user set among AppConfig.DnsType enum; RETHINK_REMOTE is default which is Rethink-DoH
-    var dnsType by intPref("dns_type").withDefault<Int>(AppConfig.DnsType.RETHINK_REMOTE.type)
+    var dnsType by intPref("dns_type").withDefault<Int>(if (!Utilities.isHeadlessFlavour())
+        AppConfig.DnsType.RETHINK_REMOTE.type else AppConfig.DnsType.NETWORK_DNS.type)
 
     // whether the app must attempt to startup on reboot if it was running before shutdown
     var prefAutoStartBootUp by booleanPref("auto_start_on_boot").withDefault<Boolean>(true)
@@ -202,7 +207,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // user-preferred Internet Protocol type, default IPv4
     var internetProtocolType by intPref(INTERNET_PROTOCOL).withDefault<Int>(
-        InternetProtocol.IPv4.id)
+        if (Utilities.isHeadlessFlavour()) InternetProtocol.IPv46.id else InternetProtocol.IPv4.id)
 
     // user-preferred 6to4 protocol translation, on IPv6 mode (default: PTMODEAUTO)
     var protocolTranslationType by booleanPref(PROTOCOL_TRANSLATION).withDefault<Boolean>(false)

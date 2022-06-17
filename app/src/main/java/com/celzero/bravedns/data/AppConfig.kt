@@ -47,6 +47,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import protect.Blocker
 import settings.Settings
+import java.io.File
 import java.net.InetAddress
 
 class AppConfig internal constructor(private val context: Context,
@@ -84,6 +85,14 @@ class AppConfig internal constructor(private val context: Context,
             val path: String = Utilities.localBlocklistDownloadBasePath(context,
                                                                         LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
                                                                         persistentState.localBlocklistTimestamp)
+            File(path).mkdirs()
+            for (asset in arrayOf(ONDEVICE_BLOCKLIST_FILE_TD, ONDEVICE_BLOCKLIST_FILE_RD,
+                ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG, ONDEVICE_BLOCKLIST_FILE_TAG)) {
+                val file = File(path + asset)
+                if (!file.exists()) {
+                    context.assets.open(asset).copyTo(file.outputStream())
+                }
+            }
             braveDns = Dnsx.newBraveDNSLocal(path + ONDEVICE_BLOCKLIST_FILE_TD,
                                              path + ONDEVICE_BLOCKLIST_FILE_RD,
                                              path + ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,

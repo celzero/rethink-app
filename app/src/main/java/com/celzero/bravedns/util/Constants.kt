@@ -30,10 +30,10 @@ class Constants {
         const val FILE_TAG = "filetag.json"
 
         // file names which are downloaded as part of on-device blocklists
-        val ONDEVICE_BLOCKLIST_FILE_TAG = File.separator + FILE_TAG
-        val ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG = File.separator + "basicconfig.json"
-        val ONDEVICE_BLOCKLIST_FILE_RD = File.separator + "rd.txt"
-        val ONDEVICE_BLOCKLIST_FILE_TD = File.separator + "td.txt"
+        val ONDEVICE_BLOCKLIST_FILE_TAG = "filetag.json"
+        val ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG = "basicconfig.json"
+        val ONDEVICE_BLOCKLIST_FILE_RD = "rd.txt"
+        val ONDEVICE_BLOCKLIST_FILE_TD = "td.txt"
 
         val ONDEVICE_GEOIP_IPV4 = File.separator + "dbip.v4"
         val ONDEVICE_GEOIP_IPV6 = File.separator + "dbip.v6"
@@ -173,10 +173,11 @@ class Constants {
         // data-time format used as part of network log adapter
         const val DATE_FORMAT_PATTERN = "HH:mm:ss"
 
-        // constants generated as part of BuildConfig.FLAVORS (playstore/fdroid/website)
+        // constants generated as part of BuildConfig.FLAVORS
         const val FLAVOR_PLAY = "play"
         const val FLAVOR_FDROID = "fdroid"
         const val FLAVOR_WEBSITE = "website"
+        const val FLAVOR_HEADLESS = "headless"
 
         // Various notification action constants used part of NotificationCompat.Action
         const val NOTIFICATION_ACTION = "NOTIFICATION_VALUE"
