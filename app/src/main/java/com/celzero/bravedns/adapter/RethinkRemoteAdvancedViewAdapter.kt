@@ -54,7 +54,6 @@ class RethinkRemoteAdvancedViewAdapter(val context: Context) :
 
     override fun onCreateViewHolder(parent: ViewGroup,
                                     viewType: Int): RethinkRemoteFileTagViewHolder {
-        Log.d("TEST", "TEST onCreateViewHolder")
         val itemBinding = ListItemRethinkBlocklistAdvBinding.inflate(
             LayoutInflater.from(parent.context), parent, false)
         return RethinkRemoteFileTagViewHolder(itemBinding)

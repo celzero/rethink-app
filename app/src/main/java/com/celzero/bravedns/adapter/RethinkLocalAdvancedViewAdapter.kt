@@ -42,15 +42,11 @@ class RethinkLocalAdvancedViewAdapter(val context: Context) :
 
             override fun areItemsTheSame(oldConnection: RethinkLocalFileTag,
                                          newConnection: RethinkLocalFileTag): Boolean {
-                Log.d("TEST",
-                      "TEST areItemsTheSame: ${oldConnection.value}, ${newConnection.value}")
                 return oldConnection == newConnection
             }
 
             override fun areContentsTheSame(oldConnection: RethinkLocalFileTag,
                                             newConnection: RethinkLocalFileTag): Boolean {
-                Log.d("TEST",
-                      "TEST areContentsTheSame: ${oldConnection.value}, ${newConnection.value} || ${oldConnection.isSelected}, ${newConnection.isSelected}")
                 return (oldConnection.value == newConnection.value && oldConnection.isSelected == newConnection.isSelected)
             }
         }
@@ -58,7 +54,6 @@ class RethinkLocalAdvancedViewAdapter(val context: Context) :
 
     override fun onCreateViewHolder(parent: ViewGroup,
                                     viewType: Int): RethinkLocalFileTagViewHolder {
-        Log.d("TEST", "TEST onCreateViewHolder")
         val itemBinding = ListItemRethinkBlocklistAdvBinding.inflate(
             LayoutInflater.from(parent.context), parent, false)
         return RethinkLocalFileTagViewHolder(itemBinding)

@@ -150,10 +150,8 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         }
 
         selectedFileTags.observe(viewLifecycleOwner) {
-            Log.d("TEST", "TEST: Selected file tag1, $it")
             if (it.isNullOrEmpty()) return@observe
 
-            Log.d("TEST", "TEST: Selected file tag2, $it")
             modifiedStamp = RethinkBlocklistManager.getStamp(requireContext(),
                                                              getDownloadTimeStamp(), it, type)
         }
@@ -447,8 +445,6 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
     }
 
     private fun updateSelectedFileTags(selectedTags: MutableSet<Int>) {
-        Log.d("TEST",
-              "TEST time stamp1: ${System.currentTimeMillis()}, ${selectedTags.joinToString(",")}")
         if (selectedTags.isEmpty()) return
 
         io {
@@ -459,9 +455,7 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
                 RethinkBlocklistManager.updateSelectedFiletagsRemote(selectedTags,
                                                                      1 /* isSelected: true */)
             }
-            Log.d("TEST", "TEST time stamp3: ${System.currentTimeMillis()}")
         }
-        Log.d("TEST", "TEST time stamp2: ${System.currentTimeMillis()}")
     }
 
     private fun getStamp(): String {
@@ -554,7 +548,6 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
     private fun setLocalAdapter() {
         if (advanceLocalListAdapter != null) return
 
-        Log.d("TEST", "TEST set local adapter 1")
         advanceLocalListAdapter = RethinkLocalAdvancedViewAdapter(requireContext())
         val layoutManager = CustomLinearLayoutManager(requireContext())
         b.lbAdvancedRecycler.layoutManager = layoutManager

@@ -37,12 +37,10 @@ class CustomLinearLayoutManager(context: Context) : LinearLayoutManager(context)
      }
 
      override fun computeVerticalScrollOffset(state: RecyclerView.State): Int {
-         Log.d("TEST", "TEST : computeVerticalScrollOffset: ${super.computeVerticalScrollOffset(state)}, ${super.computeVerticalScrollOffset(state)/4}...${state.remainingScrollVertical}, ${state.isMeasuring}, ${state.itemCount}, ${state.targetScrollPosition}")
           return super.computeVerticalScrollRange(state) / 2
       }
 
       override fun computeVerticalScrollRange(state: RecyclerView.State): Int {
-          Log.d("TEST", "TEST : computeVerticalScrollRange: ${state.remainingScrollVertical}, ${state.isMeasuring}, ${state.itemCount}, ${state.targetScrollPosition}")
           //return 15000 //+ state.remainingScrollVertical
           return super.computeVerticalScrollOffset(state) / 2
       }*/
