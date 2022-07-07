@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.celzero.bravedns.database
 
+import android.util.Log
 import androidx.room.Transaction
 
 
@@ -77,7 +78,7 @@ class RethinkDnsEndpointRepository(private val rethinkDnsEndpointDao: RethinkDns
         rethinkDnsEndpointDao.updateEndpoint(name, url, count)
     }
 
-    suspend fun getRethinkPlusStamp(): String {
-        return rethinkDnsEndpointDao.getRethinkPlusStamp()
+    suspend fun getRethinkPlusEndpoint(): RethinkDnsEndpoint {
+        return rethinkDnsEndpointDao.getRethinkPlusEndpoint()
     }
 }

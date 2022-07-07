@@ -202,6 +202,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     private fun updateRethinkEndpoint(name: String, url: String, count: Int) {
         io {
             appConfig.updateRethinkEndpoint(name, url, count)
+            appConfig.enableRethinkDnsPlus()
             emptyTempStampInfo()
         }
     }

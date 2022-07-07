@@ -141,13 +141,19 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
             if (it.name.isNotEmpty()) {
                 io {
-                    appConfig.updateRethinkEndpoint(it.name, it.stamp, it.count)
+                    val url = getUrlForStamp(it.stamp)
+                    appConfig.updateRethinkEndpoint(it.name, url, it.count)
+                    kotlinx.coroutines.delay(1000)
                     appConfig.enableRethinkDnsPlus()
                 }
                 RethinkListFragment.modifiedStamp.postValue(null)
                 return@observe
             }
         }
+    }
+
+    private fun getUrlForStamp(stamp: String): String {
+        return Constants.RETHINK_BASE_URL + stamp
     }
 
     // Icons used in chips are re-used in other screens as well.
@@ -171,7 +177,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun updateConfigureDnsChip(count: Int) {
-        b.fhsDnsConfigureChip.text = if (appConfig.isRethinkDnsConnected() && count != 0) {
+        b.fhsDnsConfigureChip.text = if (appConfig.isRethinkDnsConnected()) {
             getString(R.string.hsf_blocklist_chip_text, count.toString())
         } else {
             getString(R.string.hsf_blocklist_chip_text_no_data)
@@ -230,12 +236,20 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             b.fhsDnsConfigureChip.text = getString(R.string.hsf_blocklist_updating_text)
             io {
                 kotlinx.coroutines.delay(1500)
-                val url = appConfig.getRethinkPlusUrl()
-                val stamp = getRemoteBlocklistStamp(url)
+                val plusEndpoint = appConfig.getRethinkPlusEndpoint()
+                val stamp = getRemoteBlocklistStamp(plusEndpoint.url)
 
+                // open configuration screen if rethinkplus is already connected.
+                if (plusEndpoint.isActive) {
+                    openEditConfiguration(stamp)
+                    return@io
+                }
+
+                // Enable rethinkplus if configured
                 if (stamp.isNotEmpty()) {
                     appConfig.enableRethinkDnsPlus()
                 } else {
+                    // for new configuration/empty configuration
                     openEditConfiguration(stamp)
                 }
             }
@@ -993,12 +1007,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             withContext(Dispatchers.IO) {
                 f()
             }
-        }
-    }
-
-    private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) {
-            f()
         }
     }
 }

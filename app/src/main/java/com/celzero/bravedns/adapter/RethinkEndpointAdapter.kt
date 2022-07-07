@@ -149,13 +149,13 @@ class RethinkEndpointAdapter(private val context: Context,
 
         private fun showExplanationOnImageClick(endpoint: RethinkDnsEndpoint) {
             if (endpoint.isEditable()) showEditDnsDialog(endpoint)
-            else showDohMetadataDialog(endpoint.name, endpoint.url, endpoint.desc)
+            else showDohMetadataDialog(endpoint)
         }
 
-        private fun showDohMetadataDialog(title: String, url: String, message: String?) {
+        private fun showDohMetadataDialog(endpoint: RethinkDnsEndpoint) {
             val builder = AlertDialog.Builder(context)
-            builder.setTitle(title)
-            builder.setMessage(url + "\n\n" + message)
+            builder.setTitle(endpoint.name)
+            builder.setMessage(endpoint.url + "\n\n" + endpoint.desc)
             builder.setCancelable(true)
             builder.setPositiveButton(
                 context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
@@ -164,10 +164,16 @@ class RethinkEndpointAdapter(private val context: Context,
             builder.setNeutralButton(
                 context.getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
 
-                Utilities.clipboardCopy(context, url,
+                Utilities.clipboardCopy(context, endpoint.url,
                                         context.getString(R.string.copy_clipboard_label))
                 Utilities.showToastUiCentered(context, context.getString(
                     R.string.info_dialog_url_copy_toast_msg), Toast.LENGTH_SHORT)
+            }
+            if (endpoint.isRethinkPlus(context)) {
+                builder.setNegativeButton(
+                    context.getString(R.string.rt_edit_dialog_positive)) { _, _ ->
+                    openEditConfiguration(endpoint)
+                }
             }
             builder.create().show()
         }

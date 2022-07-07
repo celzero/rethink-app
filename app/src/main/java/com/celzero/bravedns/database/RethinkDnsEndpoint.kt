@@ -49,8 +49,8 @@ class RethinkDnsEndpoint {
     }
 
     companion object {
-        const val RETHINK_DEFAULT = "'RDNS Default'"
-        const val RETHINK_PLUS = "'RDNS Plus'"
+        const val RETHINK_DEFAULT: String = "RDNS Default"
+        const val RETHINK_PLUS: String = "RDNS Plus"
     }
 
     constructor(name: String, url: String, uid: Int, desc: String, isActive: Boolean,
@@ -75,6 +75,10 @@ class RethinkDnsEndpoint {
 
     fun isEditable(): Boolean {
         return isCustom && !isActive
+    }
+
+    fun isRethinkPlus(context: Context): Boolean {
+        return this.name == context.getString(R.string.rdns_plus)
     }
 
     fun isAppSpecificEndpoint(): Boolean {

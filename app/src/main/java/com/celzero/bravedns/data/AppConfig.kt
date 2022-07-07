@@ -425,6 +425,7 @@ class AppConfig internal constructor(private val context: Context,
                 val endpoint = getRemoteRethinkEndpoint() ?: return
 
                 connectedDns.postValue(endpoint.name)
+                Log.d("TEST","TEST endpoint connected?: ${endpoint.name}, ${endpoint.blocklistCount}")
                 persistentState.setRemoteBlocklistCount(endpoint.blocklistCount)
                 persistentState.connectedDnsName = endpoint.name
             }
@@ -597,8 +598,8 @@ class AppConfig internal constructor(private val context: Context,
         return persistentState.getRemoteBlocklistCount()
     }
 
-    suspend fun getRethinkPlusUrl(): String {
-        return rethinkDnsEndpointRepository.getRethinkPlusStamp()
+    suspend fun getRethinkPlusEndpoint(): RethinkDnsEndpoint {
+        return rethinkDnsEndpointRepository.getRethinkPlusEndpoint()
     }
 
     suspend fun enableRethinkDnsPlus() {
@@ -727,6 +728,7 @@ class AppConfig internal constructor(private val context: Context,
     }
 
     suspend fun updateRethinkEndpoint(name: String, url: String, count: Int) {
+        Log.d("TEST", "TEST in repository: ${name}, ${url}, $count")
         rethinkDnsEndpointRepository.updateEndpoint(name, url, count)
     }
 

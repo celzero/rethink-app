@@ -70,23 +70,21 @@ interface RethinkDnsEndpointDao {
     @Query("select * from RethinkDnsEndpoint where isActive = 1 and uid = $MISSING_UID LIMIT 1")
     fun getConnectedEndpoint(): RethinkDnsEndpoint?
 
-    @Query(
-        "update RethinkDnsEndpoint set isActive = 1 where uid = $MISSING_UID and name = $RETHINK_DEFAULT")
-    fun updateConnectionDefault()
+    @Query("update RethinkDnsEndpoint set isActive = 1 where uid = $MISSING_UID and name = :conn")
+    fun updateConnectionDefault(conn: String = RETHINK_DEFAULT)
 
     @Query("select count(*) from RethinkDnsEndpoint")
     fun getCount(): Int
 
-    @Query("select url from RethinkDnsEndpoint where name = $RETHINK_PLUS")
-    fun getRethinkPlusStamp(): String
+    @Query("select * from RethinkDnsEndpoint where name = :plus and uid = $MISSING_UID")
+    fun getRethinkPlusEndpoint(plus: String = RETHINK_PLUS): RethinkDnsEndpoint
 
-    @Query(
-        "update RethinkDnsEndpoint set isActive = 1 where uid = $MISSING_UID and name = $RETHINK_PLUS")
-    fun setRethinkPlus()
+    @Query("update RethinkDnsEndpoint set isActive = 1 where uid = $MISSING_UID and name = :plus")
+    fun setRethinkPlus(plus: String = RETHINK_PLUS)
 
     // TODO: remove this method post v054 versions
     @Query(
-        "update RethinkDnsEndpoint set blocklistCount = :count where uid = $MISSING_UID and name = $RETHINK_PLUS")
-    fun updatePlusBlocklistCount(count: Int)
+        "update RethinkDnsEndpoint set blocklistCount = :count where uid = $MISSING_UID and name = :plus")
+    fun updatePlusBlocklistCount(count: Int, plus: String = RETHINK_PLUS)
 
 }

@@ -150,7 +150,7 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         }
 
         selectedFileTags.observe(viewLifecycleOwner) {
-            if (it.isNullOrEmpty()) return@observe
+            if (it == null) return@observe
 
             modifiedStamp = RethinkBlocklistManager.getStamp(requireContext(),
                                                              getDownloadTimeStamp(), it, type)
@@ -440,7 +440,6 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
             selectedFileTags.value?.addAll(list)
         }
 
-        //selectedFileTags.postValue(selectedFileTags.value)
         updateSelectedFileTags(list.toMutableSet())
     }
 
