@@ -27,7 +27,6 @@ import com.celzero.bravedns.adapter.AppConnectionAdapter
 import com.celzero.bravedns.automaton.IpRulesManager
 import com.celzero.bravedns.databinding.BottomSheetAppConnectionsBinding
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -36,7 +35,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class AppConnectionBottomSheet(private val adapter: AppConnectionAdapter, val uid: Int,
+class AppConnectionBottomSheet(private val adapter: AppConnectionAdapter?, val uid: Int,
                                val ipAddress: String,
                                private val ipRuleStatus: IpRulesManager.IpRuleStatus,
                                val position: Int) : BottomSheetDialogFragment() {
@@ -46,7 +45,7 @@ class AppConnectionBottomSheet(private val adapter: AppConnectionAdapter, val ui
     private val b get() = _binding!!
 
     private val persistentState by inject<PersistentState>()
-    private lateinit var dismissListener: OnBottomSheetDialogFragmentDismiss
+    private var dismissListener: OnBottomSheetDialogFragmentDismiss? = null
 
     override fun getTheme(): Int = getBottomsheetCurrentTheme(isDarkThemeOn(),
                                                               persistentState.theme)
@@ -73,7 +72,7 @@ class AppConnectionBottomSheet(private val adapter: AppConnectionAdapter, val ui
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        dismissListener.notifyDataset(position)
+        dismissListener?.notifyDataset(position)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -95,62 +94,62 @@ class AppConnectionBottomSheet(private val adapter: AppConnectionAdapter, val ui
     private fun showButtonForStatusBlock() {
         b.bsacUnblock.visibility = View.VISIBLE
         b.bsacWhitelist.visibility = View.VISIBLE
-        b.bsacBlockAll.visibility = View.VISIBLE
-        b.bsacWhitelistAll.visibility = View.VISIBLE
+        //b.bsacBlockAll.visibility = View.VISIBLE
+        //b.bsacWhitelistAll.visibility = View.VISIBLE
     }
 
     private fun showButtonsForStatusWhitelist() {
         b.bsacBlock.visibility = View.VISIBLE
         b.bsacWhitelistRemove.visibility = View.VISIBLE
-        b.bsacBlockAll.visibility = View.VISIBLE
-        b.bsacWhitelistAll.visibility = View.VISIBLE
+        //b.bsacBlockAll.visibility = View.VISIBLE
+        //b.bsacWhitelistAll.visibility = View.VISIBLE
     }
 
     private fun showButtonsForStatusNone() {
         b.bsacBlock.visibility = View.VISIBLE
         b.bsacWhitelist.visibility = View.VISIBLE
-        b.bsacBlockAll.visibility = View.VISIBLE
-        b.bsacWhitelistAll.visibility = View.VISIBLE
+        //b.bsacBlockAll.visibility = View.VISIBLE
+        //b.bsacWhitelistAll.visibility = View.VISIBLE
     }
 
     private fun initializeClickListeners() {
         b.bsacBlock.setOnClickListener {
-            applyRule(uid, ipAddress, IpRulesManager.IpRuleStatus.BLOCK, IpRulesManager.IPRuleType.IPV4,
-                      "Blocking $ipAddress for this app")
+            applyRule(uid, ipAddress, IpRulesManager.IpRuleStatus.BLOCK,
+                      "Blocking $ipAddress for this apps")
         }
 
         // introduce this when IP firewall becomes uid-wise
-        b.bsacBlockAll.setOnClickListener {
-            applyRule(Constants.INVALID_UID, ipAddress, IpRulesManager.IpRuleStatus.BLOCK, IpRulesManager.IPRuleType.IPV4,
+        /*b.bsacBlockAll.setOnClickListener {
+            applyRule(IpRulesManager.UID_EVERYBODY, ipAddress, IpRulesManager.IpRuleStatus.BLOCK,
                       "Blocking $ipAddress for all apps")
-        }
+        }*/
 
         b.bsacUnblock.setOnClickListener {
-            applyRule(uid, ipAddress, IpRulesManager.IpRuleStatus.NONE, IpRulesManager.IPRuleType.IPV4,
-                      "Removed $ipAddress from the rules")
+            applyRule(uid, ipAddress, IpRulesManager.IpRuleStatus.NONE,
+                      "Unblocked $ipAddress for this app")
         }
 
         b.bsacWhitelist.setOnClickListener {
             applyRule(uid, ipAddress, IpRulesManager.IpRuleStatus.WHITELIST,
-                      IpRulesManager.IPRuleType.IPV4, "Whitelisted $ipAddress for this app")
+                      "Whitelisted $ipAddress for this apps")
         }
 
         // introduce this when IP firewall becomes uid-wise
-        b.bsacWhitelistAll.setOnClickListener {
-            applyRule(Constants.INVALID_UID, ipAddress, IpRulesManager.IpRuleStatus.WHITELIST,
-                      IpRulesManager.IPRuleType.IPV4, "Whitelisted $ipAddress for all apps")
-        }
+        /* b.bsacWhitelistAll.setOnClickListener {
+             applyRule(IpRulesManager.UID_EVERYBODY, ipAddress, IpRulesManager.IpRuleStatus.WHITELIST,
+                       "Whitelisted $ipAddress for all apps")
+         }*/
 
         b.bsacWhitelistRemove.setOnClickListener {
-            applyRule(Constants.INVALID_UID, ipAddress, IpRulesManager.IpRuleStatus.NONE, IpRulesManager.IPRuleType.IPV4,
+            applyRule(uid, ipAddress, IpRulesManager.IpRuleStatus.NONE,
                       "Removed $ipAddress from whitelist")
         }
     }
 
     private fun applyRule(uid: Int, ipAddress: String, status: IpRulesManager.IpRuleStatus,
-                          type: IpRulesManager.IPRuleType, toastMsg: String) {
+                          toastMsg: String) {
         io {
-            IpRulesManager.addIpRule(uid, ipAddress, status, type)
+            IpRulesManager.addIpRule(uid, ipAddress, status)
         }
         Utilities.showToastUiCentered(requireContext(), toastMsg, Toast.LENGTH_SHORT)
         this.dismiss()

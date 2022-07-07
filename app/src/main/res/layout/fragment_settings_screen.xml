@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/background"
@@ -17,20 +18,27 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="15dp">
+            android:layout_marginStart="45dp"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/fhs_title_rethink"
                 style="@style/TextAppearance.Heading.HomeScreen"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:alpha="0.5"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
                 android:text="@string/app_name_small_case" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/fhs_title_rethink_desc"
                 style="@style/TextAppearance.SubHeading.HomeScreen"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:alpha="0.5"
+                android:layout_marginStart="9dp"
                 android:text="@string/settings_title_desc" />
 
         </LinearLayout>
@@ -63,59 +71,6 @@
             android:textSize="@dimen/default_font_text_view"
             android:visibility="visible"
             app:drawableStartCompat="@drawable/dis_allowed" />
-
-        <RelativeLayout
-            android:id="@+id/settings_activity_exclude_apps_rl"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="15dp"
-            android:paddingBottom="15dp"
-            android:visibility="gone">
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/settings_activity_exclude_apps_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_margin="5dp"
-                android:padding="10dp"
-                android:src="@drawable/ic_exclude" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toStartOf="@id/settings_activity_exclude_apps_img"
-                android:layout_toEndOf="@id/settings_activity_exclude_apps_icon"
-                android:orientation="vertical">
-
-                <TextView
-                    style="@style/TextAppearance.AppCompat.Subhead"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/settings_exclude_app_heading"
-                    android:textSize="@dimen/large_font_text_view" />
-
-                <TextView
-                    android:id="@+id/settings_activity_exclude_apps_count_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="2dp"
-                    android:text=""
-                    android:textSize="@dimen/default_font_text_view" />
-
-            </LinearLayout>
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/settings_activity_exclude_apps_img"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:padding="10dp"
-                android:src="@drawable/ic_right_arrow_small" />
-        </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/settings_activity_allow_bypass_rl"
@@ -190,7 +145,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_margin="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
                 android:alpha="0.5"
                 android:padding="10dp"
                 android:src="@drawable/ic_network" />
@@ -227,6 +185,119 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:padding="10dp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/settings_activity_ip_rl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/settings_activity_ip_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:alpha="0.5"
+                android:padding="10dp"
+                android:src="@drawable/ic_ip_network" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/settings_activity_ip_img"
+                android:layout_toEndOf="@id/settings_activity_ip_icon"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/gen_settings_ip_txt"
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_ip_network_heading"
+                    android:textSize="@dimen/large_font_text_view" />
+
+                <TextView
+                    android:id="@+id/gen_settings_ip_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:text="@string/settings_ip_network_desc"
+                    android:textSize="@dimen/default_font_text_view" />
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/settings_activity_ip_img"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:padding="10dp"
+                android:src="@drawable/ic_right_arrow_small" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/settings_activity_ptrans_rl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/settings_activity_ptrans_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:alpha="0.5"
+                android:padding="10dp"
+                android:src="@drawable/ic_ip_network" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/settings_activity_ptrans_switch"
+                android:layout_toEndOf="@id/settings_activity_ptrans_icon"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/gen_settings_ptrans_txt"
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_ptrans_heading"
+                    android:textSize="@dimen/large_font_text_view" />
+
+                <TextView
+                    android:id="@+id/gen_settings_ptrans_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:text="@string/settings_ptrans_desc"
+                    android:textSize="@dimen/default_font_text_view" />
+            </LinearLayout>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/settings_activity_ptrans_switch"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:padding="10dp"
+                android:src="@drawable/ic_right_arrow_small" />
 
         </RelativeLayout>
 

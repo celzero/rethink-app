@@ -30,14 +30,15 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ConnectionTrackerAdapter
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.databinding.ActivityConnectionTrackerBinding
-import com.celzero.bravedns.service.DnsLogTracker
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
 import com.google.android.material.chip.Chip
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -56,7 +57,6 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     private var filterType: TopLevelFilter = TopLevelFilter.ALL
     private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
     private val persistentState by inject<PersistentState>()
-    private val dnsLogTracker by inject<DnsLogTracker>()
 
     companion object {
         fun newInstance() = ConnectionTrackerFragment()
@@ -252,7 +252,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         builder.setMessage(R.string.conn_track_clear_logs_message)
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.ct_delete_logs_positive_btn)) { _, _ ->
-            go {
+            io {
                 connectionTrackerRepository.clearAllData()
             }
         }
@@ -305,9 +305,11 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         b.filterChipParentGroup.visibility = View.GONE
     }
 
-    private fun go(f: suspend () -> Unit) {
+    private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch {
-            f()
+            withContext(Dispatchers.IO) {
+                f()
+            }
         }
     }
 }

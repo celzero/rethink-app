@@ -23,10 +23,7 @@ import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.LoggerConstants
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_SCHEDULER
-import com.celzero.bravedns.util.Utilities
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Request
@@ -34,10 +31,7 @@ import okhttp3.Response
 import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.io.File
-import java.io.FileWriter
 import java.io.IOException
-import java.util.*
 
 class BlocklistUpdateCheckJob(val context: Context, workerParameters: WorkerParameters) :
         CoroutineWorker(context, workerParameters), KoinComponent {
@@ -47,21 +41,18 @@ class BlocklistUpdateCheckJob(val context: Context, workerParameters: WorkerPara
     override suspend fun doWork(): Result {
         Log.i(LOG_TAG_SCHEDULER, "starting blocklist update check job")
 
-        testWrite("Time:${Calendar.getInstance().time}, starting blocklist update check job")
         isDownloadRequired(AppDownloadManager.DownloadType.LOCAL)
         isDownloadRequired(AppDownloadManager.DownloadType.REMOTE)
         return Result.success()
     }
 
     private fun isDownloadRequired(type: AppDownloadManager.DownloadType) {
-        testWrite("Time:${Calendar.getInstance().time}, isDownloadRequired: ${type.name}")
         val url = constructDownloadCheckUrl(type)
         val request = Request.Builder().url(url).build()
         val client = RetrofitManager.okHttpClient()
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                testWrite("Time:${Calendar.getInstance().time}, onFailure, cancelled? ${call.isCanceled()}, exec? ${call.isExecuted()}")
                 Log.i(LOG_TAG_SCHEDULER,
                       "onFailure, cancelled? ${call.isCanceled()}, exec? ${call.isExecuted()}")
 
@@ -75,7 +66,6 @@ class BlocklistUpdateCheckJob(val context: Context, workerParameters: WorkerPara
                 val json = JSONObject(stringResponse)
                 val version = json.optInt(Constants.JSON_VERSION, 0)
                 Log.i(LOG_TAG_SCHEDULER, "Response for update check for blocklist:  $version")
-                testWrite("Time:${Calendar.getInstance().time}, Response for update check for blocklist:  $version")
                 if (version != Constants.UPDATE_CHECK_RESPONSE_VERSION) {
                     return
                 }
@@ -83,7 +73,6 @@ class BlocklistUpdateCheckJob(val context: Context, workerParameters: WorkerPara
                 val shouldUpdate = json.optBoolean(Constants.JSON_UPDATE, false)
                 Log.i(LOG_TAG_SCHEDULER,
                       "Response for update check for blocklist: version? $version, update? $shouldUpdate")
-                testWrite("Time:${Calendar.getInstance().time}, Response for update check for blocklist: version? $version, update? $shouldUpdate")
                 if (type == AppDownloadManager.DownloadType.LOCAL) {
                     persistentState.isLocalBlocklistUpdateAvailable = shouldUpdate
                 } else {
@@ -102,15 +91,7 @@ class BlocklistUpdateCheckJob(val context: Context, workerParameters: WorkerPara
         val appVersionCode = persistentState.appVersion
         val url = "${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_URL}$timestamp&${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_PARAMETER_VCODE}$appVersionCode"
         Log.d(LOG_TAG_SCHEDULER, "Check for download, download type ${type.name} url: $url")
-        testWrite("Time:${Calendar.getInstance().time}, Check for download, download type ${type.name} url: $url")
         return url
     }
 
-    // TODO: Remove this code after testing
-    private fun testWrite(data: String) {
-        val file = File(context.filesDir.canonicalPath + File.separator + "test.txt")
-        val fr = FileWriter(file, true)
-        fr.write(data)
-        fr.close()
-    }
 }

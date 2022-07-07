@@ -16,14 +16,7 @@ limitations under the License.
 
 package com.celzero.bravedns.database
 
-import androidx.lifecycle.LiveData
-import androidx.paging.PagedList
-import androidx.paging.toLiveData
 import androidx.room.Transaction
-import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 class DnsProxyEndpointRepository(private val dnsProxyEndpointDAO: DnsProxyEndpointDAO) {
@@ -54,17 +47,8 @@ class DnsProxyEndpointRepository(private val dnsProxyEndpointDAO: DnsProxyEndpoi
         return dnsProxyEndpointDAO.getCount()
     }
 
-    suspend fun getConnectedProxy(): DnsProxyEndpoint {
+    suspend fun getConnectedProxy(): DnsProxyEndpoint? {
         return dnsProxyEndpointDAO.getConnectedProxy()
-    }
-
-    suspend fun getNetworkDnsEndpoint(): DnsProxyEndpoint {
-        return dnsProxyEndpointDAO.getNetworkDnsEndpoint()
-    }
-
-    suspend fun setNetworkDns() {
-        dnsProxyEndpointDAO.removeConnectionStatus()
-        dnsProxyEndpointDAO.setNetworkDns()
     }
 
 }

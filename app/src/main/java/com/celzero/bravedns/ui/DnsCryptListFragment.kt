@@ -227,17 +227,17 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
     }
 
     private fun io(f: suspend () -> Unit) {
-           lifecycleScope.launch {
-               withContext(Dispatchers.IO) {
-                   f()
-               }
-           }
-       }
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                f()
+            }
+        }
+    }
 
-       private suspend fun uiCtx(f: suspend () -> Unit) {
-           withContext(Dispatchers.Main) {
-               f()
-           }
-       }
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) {
+            f()
+        }
+    }
 
 }

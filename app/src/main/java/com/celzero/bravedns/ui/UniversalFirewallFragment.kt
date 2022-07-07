@@ -109,6 +109,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         includeView.firewallUnknownConnectionModeCheck.isChecked = persistentState.blockUnknownConnections
         includeView.firewallDisallowDnsBypassModeCheck.isChecked = persistentState.disallowDnsBypass
         includeView.firewallBlockNewAppCheck.isChecked = persistentState.blockNewlyInstalledApp
+        includeView.firewallCheckIpv4Check.isChecked = persistentState.filterIpv4inIpv6
 
         setupClickListeners(includeView)
     }
@@ -171,12 +172,18 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             toggle(includeView.firewallBlockNewAppCheck, persistentState::blockNewlyInstalledApp)
         }
 
+        includeView.firewallCheckIpv4Check.setOnCheckedChangeListener { _, b ->
+            persistentState.filterIpv4inIpv6 = b
+        }
+
+        includeView.firewallCheckIpv4Txt.setOnClickListener {
+            toggle(includeView.firewallCheckIpv4Check, persistentState::filterIpv4inIpv6)
+        }
     }
 
     private fun openCustomIpDialog() {
         val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         val customDialog = CustomIpDialog(requireActivity(), customIpViewModel, themeId)
-        customDialog.setCanceledOnTouchOutside(false)
         customDialog.show()
     }
 

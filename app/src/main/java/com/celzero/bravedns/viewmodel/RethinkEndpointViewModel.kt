@@ -23,7 +23,8 @@ import com.celzero.bravedns.database.RethinkDnsEndpointDao
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
-class RethinkEndpointViewModel(private val rethinkDnsEndpointDao: RethinkDnsEndpointDao) : ViewModel() {
+class RethinkEndpointViewModel(private val rethinkDnsEndpointDao: RethinkDnsEndpointDao) :
+        ViewModel() {
 
     private var list: MutableLiveData<String> = MutableLiveData()
     private var uid: Int = Constants.MISSING_UID
@@ -35,7 +36,8 @@ class RethinkEndpointViewModel(private val rethinkDnsEndpointDao: RethinkDnsEndp
     val rethinkEndpointList = Transformations.switchMap(list, ({ input: String ->
         if (uid == Constants.MISSING_UID) {
             if (input.isBlank()) {
-                rethinkDnsEndpointDao.getRethinkEndpoints().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+                rethinkDnsEndpointDao.getRethinkEndpoints().toLiveData(
+                    pageSize = LIVEDATA_PAGE_SIZE)
             } else {
                 rethinkDnsEndpointDao.getRethinkEndpointsByName("%$input%").toLiveData(
                     pageSize = LIVEDATA_PAGE_SIZE)

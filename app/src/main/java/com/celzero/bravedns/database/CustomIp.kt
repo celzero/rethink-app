@@ -17,6 +17,8 @@ package com.celzero.bravedns.database
 
 import androidx.room.Entity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+import inet.ipaddr.IPAddress
+import inet.ipaddr.IPAddressString
 
 /**
  * The CustomIp table will contain the firewall rules
@@ -39,6 +41,7 @@ class CustomIp {
     var status: Int = 0
     var wildcard: Boolean = false
 
+    // fixme: Is this needed in database as column?
     // IPV4(0), IPV4_WILDCARD(1), IPV6(2), IPV6_WILDCARD(3)
     var ruleType: Int = 0
     var modifiedDateTime: Long = INIT_TIME_MS
@@ -53,5 +56,13 @@ class CustomIp {
         result += result * 31 + this.uid.hashCode()
         result += result * 31 + this.ipAddress.hashCode()
         return result
+    }
+
+    fun getCustomIpAddress(): IPAddress {
+        return IPAddressString(ipAddress).address
+    }
+
+    fun setCustomIpAddress(ipAddress: String) {
+        this.ipAddress = IPAddressString(ipAddress).address.toNormalizedString()
     }
 }

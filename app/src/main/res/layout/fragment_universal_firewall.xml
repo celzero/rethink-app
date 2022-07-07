@@ -8,289 +8,316 @@
     android:fillViewport="true"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/firewall_scroll_connect_check"
+    <LinearLayout
+        android:id="@+id/firewall_scroll_connect_check"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="5dp">
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="5dp">
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:padding="10dp"
+            android:text="@string/universal_firewall_explanation"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/default_font_text_view" />
+
+        <LinearLayout
+            android:id="@+id/firewall_screen_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginRight="2dp">
 
             <TextView
-                android:layout_width="match_parent"
+                android:id="@+id/firewall_all_apps_txt"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="2dp"
-                android:layout_marginRight="2dp"
+                android:layout_weight="0.9"
+                android:drawablePadding="10dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="start|center"
                 android:padding="10dp"
-                android:text="@string/universal_firewall_explanation"
-                android:textSize="@dimen/default_font_text_view"
-                android:textColor="?attr/primaryLightColorText" />
+                android:text="@string/univ_firewall_rule_1"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view"
+                app:drawableStartCompat="@drawable/ic_device_lock" />
 
-            <LinearLayout
-                android:id="@+id/firewall_screen_ll"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="2dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginRight="2dp">
-
-                <TextView
-                    android:id="@+id/firewall_all_apps_txt"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.9"
-                    android:drawablePadding="10dp"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:gravity="start|center"
-                    android:padding="10dp"
-                    android:text="@string/univ_firewall_rule_1"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/large_font_text_view"
-                    app:drawableStartCompat="@drawable/ic_device_lock" />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/firewall_all_apps_check"
-                    style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:padding="15dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/firewall_background_ll"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="2dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginRight="2dp">
-
-                <TextView
-                    android:id="@+id/firewall_background_mode_txt"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.9"
-                    android:drawablePadding="10dp"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:gravity="start|center"
-                    android:padding="10dp"
-                    android:text="@string/univ_firewall_rule_2"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/large_font_text_view"
-                    app:drawableStartCompat="@drawable/ic_foreground" />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/firewall_background_mode_check"
-                    style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:padding="15dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/firewall_unknown_connection_ll"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="2dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginRight="2dp">
-
-                <TextView
-                    android:id="@+id/firewall_unknown_connection_mode_txt"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.9"
-                    android:drawablePadding="10dp"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:gravity="start|center"
-                    android:padding="10dp"
-                    android:text="@string/univ_block_unknown_connections"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/large_font_text_view"
-                    app:drawableStartCompat="@drawable/ic_unknown_app" />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/firewall_unknown_connection_mode_check"
-                    style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:padding="15dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/firewall_udp_connection_ll"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="2dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginRight="2dp">
-
-                <TextView
-                    android:id="@+id/firewall_udp_connection_mode_txt"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.9"
-                    android:drawablePadding="10dp"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:gravity="start|center"
-                    android:padding="10dp"
-                    android:text="@string/univ_firewall_rule_4"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/large_font_text_view"
-                    app:drawableStartCompat="@drawable/ic_udp" />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/firewall_udp_connection_mode_check"
-                    style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:padding="15dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/firewall_disallow_dns_bypass_ll"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="2dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginRight="2dp">
-
-                <TextView
-                    android:id="@+id/firewall_disallow_dns_bypass_mode_txt"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.9"
-                    android:drawablePadding="10dp"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:gravity="start|center"
-                    android:padding="10dp"
-                    android:text="@string/univ_firewall_rule_5"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/large_font_text_view"
-                    app:drawableStartCompat="@drawable/ic_prevent_dns_leaks" />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/firewall_disallow_dns_bypass_mode_check"
-                    style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:padding="15dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/firewall_block_new_app_ll"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="2dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginRight="2dp"
-                android:layout_marginBottom="10dp">
-
-                <TextView
-                    android:id="@+id/firewall_block_new_app_txt"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.9"
-                    android:drawablePadding="10dp"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:gravity="start|center"
-                    android:padding="10dp"
-                    android:text="@string/univ_firewall_rule_6"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/large_font_text_view"
-                    app:drawableStartCompat="@drawable/ic_app_info" />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/firewall_block_new_app_check"
-                    style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:padding="15dp" />
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="?attr/border" />
-
-            <RelativeLayout
-                android:id="@+id/firewall_apps_show_txt"
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/firewall_all_apps_check"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="2dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="2dp"
-                android:layout_marginBottom="10dp">
+                android:layout_gravity="center"
+                android:padding="15dp" />
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/firewall_univ_ip_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:padding="10dp"
-                    android:src="@drawable/ic_whitelist" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toStartOf="@id/firewall_univ_whitelist_img"
-                    android:layout_toEndOf="@id/firewall_univ_ip_icon"
-                    android:orientation="vertical">
-
-                    <TextView
-                        style="@style/TextAppearance.AppCompat.Subhead"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-smallcaps"
-                        android:gravity="center_vertical"
-                        android:paddingTop="5dp"
-                        android:paddingBottom="5dp"
-                        android:textColor="?attr/secondaryTextColor"
-                        android:text="@string/univ_view_blocked_ip"
-                        android:textSize="@dimen/extra_large_font_text_view"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/firewall_univ_ip_desc"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="2dp"
-                        android:paddingBottom="2dp"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:text="@string/univ_view_blocked_ip_desc"
-                        android:textSize="@dimen/default_font_text_view" />
-
-                </LinearLayout>
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/firewall_univ_whitelist_img"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:padding="25dp"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/ic_right_arrow_small" />
-            </RelativeLayout>
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/firewall_background_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginRight="2dp">
+
+            <TextView
+                android:id="@+id/firewall_background_mode_txt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.9"
+                android:drawablePadding="10dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="start|center"
+                android:padding="10dp"
+                android:text="@string/univ_firewall_rule_2"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view"
+                app:drawableStartCompat="@drawable/ic_foreground" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/firewall_background_mode_check"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="15dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/firewall_unknown_connection_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginRight="2dp">
+
+            <TextView
+                android:id="@+id/firewall_unknown_connection_mode_txt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.9"
+                android:drawablePadding="10dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="start|center"
+                android:padding="10dp"
+                android:text="@string/univ_block_unknown_connections"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view"
+                app:drawableStartCompat="@drawable/ic_unknown_app" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/firewall_unknown_connection_mode_check"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="15dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/firewall_udp_connection_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginRight="2dp">
+
+            <TextView
+                android:id="@+id/firewall_udp_connection_mode_txt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.9"
+                android:drawablePadding="10dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="start|center"
+                android:padding="10dp"
+                android:text="@string/univ_firewall_rule_4"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view"
+                app:drawableStartCompat="@drawable/ic_udp" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/firewall_udp_connection_mode_check"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="15dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/firewall_disallow_dns_bypass_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginRight="2dp">
+
+            <TextView
+                android:id="@+id/firewall_disallow_dns_bypass_mode_txt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.9"
+                android:drawablePadding="10dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="start|center"
+                android:padding="10dp"
+                android:text="@string/univ_firewall_rule_5"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view"
+                app:drawableStartCompat="@drawable/ic_prevent_dns_leaks" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/firewall_disallow_dns_bypass_mode_check"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="15dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/firewall_block_new_app_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:id="@+id/firewall_block_new_app_txt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.9"
+                android:drawablePadding="10dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="start|center"
+                android:padding="10dp"
+                android:text="@string/univ_firewall_rule_6"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view"
+                app:drawableStartCompat="@drawable/ic_app_info" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/firewall_block_new_app_check"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="15dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/firewall_check_ipv4_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:id="@+id/firewall_check_ipv4_txt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.9"
+                android:drawablePadding="10dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="start|center"
+                android:padding="10dp"
+                android:text="Block IPv4 in IPv6 (experimental)"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view"
+                app:drawableStartCompat="@drawable/ic_app_info" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/firewall_check_ipv4_check"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="15dp" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?attr/border" />
+
+        <RelativeLayout
+            android:id="@+id/firewall_apps_show_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginBottom="10dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/firewall_univ_ip_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:padding="10dp"
+                android:src="@drawable/ic_whitelist" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/firewall_univ_whitelist_img"
+                android:layout_toEndOf="@id/firewall_univ_ip_icon"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:gravity="center_vertical"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:text="@string/univ_view_blocked_ip"
+                    android:textColor="?attr/secondaryTextColor"
+                    android:textSize="@dimen/extra_large_font_text_view"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/firewall_univ_ip_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="@string/univ_view_blocked_ip_desc"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/default_font_text_view" />
+
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/firewall_univ_whitelist_img"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:padding="25dp"
+                android:src="@drawable/ic_right_arrow_small" />
+        </RelativeLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

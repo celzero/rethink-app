@@ -28,16 +28,18 @@ import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOOPBACK_IPV6
 import com.celzero.bravedns.util.Constants.Companion.NXDOMAIN
-import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP
-import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IPV6
+import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
+import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
+import com.celzero.bravedns.util.IpManager
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
-import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.ResourceRecordTypes
 import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
 import com.celzero.bravedns.util.Utilities.Companion.getFlag
 import com.celzero.bravedns.util.Utilities.Companion.makeAddressPair
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
-import com.google.common.net.InetAddresses.forString
+import inet.ipaddr.HostName
+import inet.ipaddr.IPAddress
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -54,6 +56,7 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
     companion object {
         private const val PERSISTENCE_STATE_INSERT_SIZE = 100L
         private const val DNS_LEAK_TEST = "dnsleaktest"
+        private const val INVALID_COUNTRY_CODE = "ZZ"
 
         private const val CACHE_BUILDER_MAX_SIZE = 20000L
         private val CACHE_BUILDER_WRITE_EXPIRE_HRS = TimeUnit.DAYS.toHours(3L)
@@ -92,11 +95,12 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
             val dnsLog = DnsLog()
 
             dnsLog.blockLists = transaction.blocklist
-            if (transaction.isDNSCrypt) {
+            if (transaction.queryType.isDnsCrypt) {
                 dnsLog.dnsType = AppConfig.DnsType.DNSCRYPT.type
                 dnsLog.relayIP = transaction.relayIp
             } else {
-                dnsLog.dnsType = AppConfig.DnsType.DOH.type
+                // fixme: handle for DoH and Dns proxy
+                dnsLog.dnsType = transaction.queryType.ordinal
                 dnsLog.relayIP = ""
             }
             dnsLog.latency = transaction.responseTime
@@ -105,28 +109,16 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
             dnsLog.serverIP = transaction.serverIp
             dnsLog.status = transaction.status.name
             dnsLog.time = transaction.responseCalendar.timeInMillis
-            dnsLog.typeName = Utilities.getTypeName(transaction.type.toInt())
-            val serverAddress = try {
-                if (!transaction.serverIp.isNullOrEmpty()) {
-                    // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
-                    forString(transaction.serverIp)
-                } else {
-                    null
-                }
-            } catch (e: IllegalArgumentException) {
-                Log.e(LOG_TAG_DNS_LOG, "Failure converting string to InetAddresses: ${e.message}",
-                      e)
-                null
-            }
+            dnsLog.typeName = ResourceRecordTypes.getTypeName(transaction.type.toInt()).desc
+            val serverAddress = IpManager.getIpAddress(transaction.serverIp)
 
-            if (serverAddress != null) {
-                val countryCode: String? = getCountryCode(serverAddress,
+            if (serverAddress?.toInetAddress()?.hostAddress != null) {
+                val countryCode: String? = getCountryCode(serverAddress.toInetAddress(),
                                                           context) //TODO: Country code things
-                dnsLog.resolver = makeAddressPair(countryCode, serverAddress.hostAddress)
+                dnsLog.resolver = makeAddressPair(countryCode, transaction.serverIp)
             } else {
                 dnsLog.resolver = transaction.serverIp
             }
-
             if (transaction.status === Transaction.Status.COMPLETE) {
                 var packet: DnsPacket? = null
                 var err = ""
@@ -146,28 +138,32 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
                         ipDomainLookup.put(ip.hostAddress, dnsCacheRecord)
                     }
 
+
                     if (addresses.isNotEmpty()) {
-                        val destination = addresses[0]
-                        if (DEBUG) Log.d(LOG_TAG_DNS_LOG,
-                                         "Address: ${destination.address[0]}, HostAddress: ${destination.hostAddress}")
+                        val destination = convertIpV6ToIpv4IfNeeded(addresses[0])
                         val countryCode: String? = getCountryCode(destination, context)
 
-                        dnsLog.response = addresses.joinToString(separator = ",") {
-                            makeAddressPair(getCountryCode(it, context), it.hostAddress)
-                        }
-                        dnsLog.responseIps = addresses.joinToString(
-                            separator = ",") { it.hostAddress }
+                        val inetAddress = convertIpV6ToIpv4IfNeeded(addresses[0])
+                        dnsLog.response = makeAddressPair(getCountryCode(inetAddress, context),
+                                                          addresses[0].hostAddress)
 
-                        if (destination.hostAddress.contains(UNSPECIFIED_IP)) {
+                        dnsLog.responseIps = addresses.joinToString(separator = ",") {
+                            val inetAddress = convertIpV6ToIpv4IfNeeded(it)
+                            makeAddressPair(getCountryCode(inetAddress, context), it.hostAddress)
+                        }
+
+                        if (destination.hostAddress.contains(UNSPECIFIED_IP_IPV4)) {
                             dnsLog.isBlocked = true
                         }
                         if (destination.isLoopbackAddress) {
                             dnsLog.isBlocked = true
-                        } else if (destination.hostAddress == UNSPECIFIED_IPV6 || destination.hostAddress == LOOPBACK_IPV6) {
+                        } else if (destination.hostAddress == UNSPECIFIED_IP_IPV6 || destination.hostAddress == LOOPBACK_IPV6) {
                             dnsLog.isBlocked = true
                         }
                         dnsLog.flag = getFlag(countryCode)
                     } else {
+                        // fixme: for queries with empty AAAA records, we are setting as NXDOMAIN
+                        //  which needs a fix. need to check for the response's status
                         dnsLog.response = NXDOMAIN
                         dnsLog.flag = context.getString(
                             R.string.unicode_question_sign) // White question mark
@@ -213,6 +209,21 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
         }
     }
 
+    private fun convertIpV6ToIpv4IfNeeded(ip: InetAddress): InetAddress {
+        val ipAddress: IPAddress = HostName(ip).address ?: return ip
+
+        // no need to check if IP is not of type IPv6
+        if (!IpManager.isIpV6(ipAddress)) return ip
+
+        val ipv4 = IpManager.toIpV4(ipAddress)
+
+        return if (ipv4 != null) {
+            ipv4.toInetAddress()
+        } else {
+            ip
+        }
+    }
+
     private fun calculateTtl(ttl: Int): Long {
         val now = System.currentTimeMillis()
 
@@ -231,7 +242,7 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
         FavIconDownloader(context, dnsLog.queryStr).run()
     }
 
-    // TODO: Check if the domain is generated by a DGA (Domain Generation Algorithm)
+    // check if the domain is generated by a DGA (Domain Generation Algorithm)
     private fun isDgaDomain(fqdn: String): Boolean {
         // dnsleaktest.com fqdn's are auto-generated
         if (fqdn.contains(DNS_LEAK_TEST)) return true

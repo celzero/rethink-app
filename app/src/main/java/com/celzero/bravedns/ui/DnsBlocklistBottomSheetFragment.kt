@@ -99,7 +99,23 @@ class DnsBlocklistBottomSheetFragment(private var contextVal: Context,
         handleCustomDomainUi()
         displayFavIcon()
         displayDnsTransactionDetails()
+        displayRecordTypeChip()
         setupClickListeners()
+    }
+
+    private fun getResponseIp(): String {
+        val ips = transaction.response.split(",")
+        return ips[0]
+    }
+
+    private fun displayRecordTypeChip() {
+        if (transaction.typeName.isEmpty()) {
+            b.dnsRecordTypeChip.visibility = View.GONE
+            return
+        }
+
+        b.dnsRecordTypeChip.visibility = View.VISIBLE
+        b.dnsRecordTypeChip.text = getString(R.string.dns_btm_record_type, transaction.typeName)
     }
 
     private fun handleCustomDomainUi() {
@@ -164,32 +180,33 @@ class DnsBlocklistBottomSheetFragment(private var contextVal: Context,
         }
     }
 
-    private fun getResponseIp(): String {
-        val ips = transaction.response.split(",")
-        return ips[0]
-    }
-
     private fun displayDnsTransactionDetails() {
         displayDescription()
 
         if (transaction.hasBlocklists()) {
             handleBlocklistChip()
+            return
         }
 
         handleResponseIpsChip()
     }
 
     private fun handleResponseIpsChip() {
-        if (transaction.response.isEmpty()) {
+        if (transaction.responseIps.isEmpty()) {
             b.dnsBlockIpsChip.visibility = View.GONE
             return
         }
 
-        val ips = transaction.response.split(",")
+        val ips = transaction.responseIps.split(",")
         val ipCount = ips.count()
-        if (ipCount > 1) b.dnsBlockIpsChip.text = getString(R.string.dns_btm_sheet_chip,
-                                                            (ipCount - 1).toString())
-        else b.dnsBlockIpsChip.visibility = View.GONE
+
+        if (ipCount > 1) {
+            b.dnsBlockIpsChip.visibility = View.VISIBLE
+            b.dnsBlockIpsChip.text = getString(R.string.dns_btm_sheet_chip,
+                                               (ipCount - 1).toString())
+        } else {
+            b.dnsBlockIpsChip.visibility = View.GONE
+        }
 
         b.dnsBlockIpsChip.setOnClickListener {
             showIpsDialog()
@@ -249,7 +266,7 @@ class DnsBlocklistBottomSheetFragment(private var contextVal: Context,
         else dialogBinding.ipDetailsFavIcon.visibility = View.GONE
 
         dialogBinding.ipDetailsFqdnTxt.text = transaction.queryStr
-        dialogBinding.ipDetailsIpDetailsTxt.text = formatIps(transaction.response)
+        dialogBinding.ipDetailsIpDetailsTxt.text = formatIps(transaction.responseIps)
 
         dialogBinding.infoRulesDialogCancelImg.setOnClickListener {
             dialog.dismiss()

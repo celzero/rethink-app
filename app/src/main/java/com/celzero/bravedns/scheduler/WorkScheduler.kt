@@ -36,7 +36,7 @@ class WorkScheduler(val context: Context) {
 
         const val APP_EXIT_INFO_JOB_TIME_INTERVAL_DAYS: Long = 7
         const val REFRESH_TIME_INTERVAL_HOURS: Long = 3
-        const val BLOCKLIST_UPDATE_CHECK_INTERVAL_DAYS: Long = 1
+        const val BLOCKLIST_UPDATE_CHECK_INTERVAL_DAYS: Long = 3
 
         fun isWorkRunning(context: Context, tag: String): Boolean {
             val instance = WorkManager.getInstance(context)
@@ -115,7 +115,7 @@ class WorkScheduler(val context: Context) {
         Log.i(LOG_TAG_SCHEDULER, "Scheduled blocklist update check")
         val blocklistUpdateCheck = PeriodicWorkRequest.Builder(BlocklistUpdateCheckJob::class.java,
                                                                BLOCKLIST_UPDATE_CHECK_INTERVAL_DAYS,
-                                                               TimeUnit.HOURS).addTag(
+                                                               TimeUnit.DAYS).addTag(
             BLOCKLIST_UPDATE_CHECK_JOB_TAG).build()
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(BLOCKLIST_UPDATE_CHECK_JOB_TAG,
                                                                    ExistingPeriodicWorkPolicy.REPLACE,

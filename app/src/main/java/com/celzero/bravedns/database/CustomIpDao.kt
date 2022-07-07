@@ -35,7 +35,7 @@ interface CustomIpDao {
 
     @Transaction
     @Query("select * from CustomIp order by uid")
-    fun getFirewallRules(): List<CustomIp>
+    fun getCustomIpRules(): List<CustomIp>
 
     @Query("select * from CustomIp where ipAddress = :ipAddress and uid = :uid")
     fun getCustomIpDetail(uid: Int, ipAddress: String): CustomIp?
@@ -67,9 +67,20 @@ interface CustomIpDao {
     @Query("delete from CustomIp where uid = $UID_EVERYBODY")
     fun deleteAllIPRulesUniversal()
 
-    @Query("select count(*) from CustomIp where uid = $UID_EVERYBODY")
+    @Query("select count(*) from CustomIp where uid = $UID_EVERYBODY LIMIT 10000")
     fun getBlockedConnectionsCount(): Int
 
-    @Query("select count(*) from CustomIp where uid = $UID_EVERYBODY")
+    @Query("select count(*) from CustomIp where uid = $UID_EVERYBODY LIMIT 10000")
     fun getBlockedConnectionCountLiveData(): LiveData<Int>
+
+    @Query("select count(*) from CustomIp where uid = :uid")
+    fun getBlockedConnectionCountForUid(uid: Int): LiveData<Int>
+
+    @Query(
+        "select * from CustomIp where uid = :uid and isActive = 1 order by modifiedDateTime desc")
+    fun getAppWiseCustomIp(uid: Int): DataSource.Factory<Int, CustomIp>
+
+    @Query(
+        "select * from CustomIp where ipAddress like :query and uid = :uid and  isActive = 1 order by modifiedDateTime desc")
+    fun getAppWiseCustomIp(query: String, uid: Int): DataSource.Factory<Int, CustomIp>
 }

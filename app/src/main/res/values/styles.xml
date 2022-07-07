@@ -371,15 +371,12 @@
     <style name="TextAppearance.Heading.HomeScreen" parent="">
         <item name="android:layout_gravity">center</item>
         <item name="android:fontFamily">sans-serif-smallcaps</item>
-        <item name="android:gravity">center</item>
         <item name="android:letterSpacing">0.25</item>
         <item name="android:textColor">?attr/primaryTextColor</item>
         <item name="android:textSize">@dimen/rethink_header_text</item>
     </style>
 
     <style name="TextAppearance.SubHeading.HomeScreen" parent="">
-        <item name="android:layout_gravity">center</item>
-        <item name="android:gravity">center</item>
         <item name="android:textColor">?attr/primaryTextColor</item>
         <item name="android:textSize">@dimen/small_font_subheading_text</item>
     </style>
@@ -388,8 +385,9 @@
         <item name="android:background">@android:color/transparent</item>
         <item name="android:drawablePadding">10dp</item>
         <item name="android:padding">10dp</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:alpha">0.8</item>
-        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textColor">?attr/invertedPrimaryTextColor</item>
         <item name="android:textSize">@dimen/extra_large_font_text_view</item>
     </style>
 
@@ -401,7 +399,7 @@
         <item name="android:alpha">0.8</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
-        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textColor">?attr/chipTextColor</item>
         <item name="android:textSize">@dimen/extra_large_font_text_view</item>
     </style>
 
@@ -428,7 +426,7 @@
     <style name="toggleButtonStyle" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="android:paddingLeft">@dimen/default_padding</item>
         <item name="android:paddingRight">@dimen/default_padding</item>
-        <item name="strokeColor">?attr/border</item>
+        <item name="strokeColor">?attr/accentGood</item>
         <item name="strokeWidth">@dimen/defaultStrokeWidth</item>
     </style>
 
@@ -443,6 +441,8 @@
         <item name="tabGravity">center</item>
         <item name="tabMode">scrollable</item>
         <item name="tabIndicatorFullWidth">true</item>
+        <item name="tabIconTint">?attr/svgFillColor</item>
+        <item name="tabRippleColor">?attr/svgFillColor</item>
         <item name="tabIndicatorColor">?attr/secondaryTextColor</item>
         <item name="tabPaddingStart">25dp</item>
         <item name="tabPaddingEnd">25dp</item>

@@ -136,10 +136,8 @@ class DnsProxyEndpointAdapter(private val context: Context, val lifecycleOwner: 
         if (!app.isNullOrEmpty()) {
             builder.setMessage(context.getString(R.string.dns_proxy_dialog_message, app, ip, port))
         } else {
-            builder.setMessage(context.getString(R.string.dns_proxy_dialog_message,
-                                                 context.getString(
-                                                     R.string.cd_custom_dns_proxy_default_app), ip,
-                                                 port))
+            builder.setMessage(
+                context.getString(R.string.dns_proxy_dialog_message_no_app, ip, port))
         }
         builder.setCancelable(true)
         builder.setPositiveButton(

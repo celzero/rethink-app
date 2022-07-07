@@ -43,7 +43,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="5dp"
-                    android:text="App Name"
                     android:textColor="?primaryTextColor"
                     android:textSize="@dimen/extra_large_font_text_view" />
 
@@ -52,7 +51,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="5dp"
-                    android:text="App Name"
                     android:textColor="?primaryTextColor"
                     android:textSize="@dimen/default_font_text_view" />
             </LinearLayout>
@@ -135,7 +133,7 @@
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/card1"
+            android:id="@+id/aad_aap_firewall_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/aad_app_stats_card"
@@ -159,7 +157,7 @@
                     android:paddingTop="5dp"
                     android:paddingEnd="20dp"
                     android:paddingBottom="5dp"
-                    android:text="Firewall Settings"
+                    android:text="@string/ada_app_firewall_settings"
                     android:textColor="?attr/secondaryTextColor"
                     android:textSize="@dimen/large_font_text_view"
                     android:textStyle="bold" />
@@ -183,7 +181,7 @@
                         android:fontFamily="sans-serif-medium"
                         android:gravity="center"
                         android:padding="5dp"
-                        android:text="WiFi"
+                        android:text="@string/ada_app_unmetered"
                         android:textColor="?primaryTextColor"
                         android:textSize="@dimen/default_font_text_view"
                         app:drawableTopCompat="@drawable/ic_firewall_wifi_on_grey" />
@@ -198,7 +196,7 @@
                         android:fontFamily="sans-serif-medium"
                         android:gravity="center"
                         android:padding="5dp"
-                        android:text="Mobile data"
+                        android:text="@string/ada_app_metered"
                         android:textColor="?primaryTextColor"
                         android:textSize="@dimen/default_font_text_view"
                         app:drawableTopCompat="@drawable/ic_firewall_data_on_grey" />
@@ -213,7 +211,7 @@
                         android:fontFamily="sans-serif-medium"
                         android:gravity="center"
                         android:padding="5dp"
-                        android:text="Whitelist"
+                        android:text="@string/ada_app_whitelist"
                         android:textColor="?primaryTextColor"
                         android:textSize="@dimen/default_font_text_view"
                         app:drawableTopCompat="@drawable/ic_whitelist" />
@@ -228,12 +226,20 @@
                         android:fontFamily="sans-serif-medium"
                         android:gravity="center"
                         android:padding="5dp"
-                        android:text="Exclude"
+                        android:text="@string/ada_app_exclude"
                         android:textColor="?primaryTextColor"
                         android:textSize="@dimen/default_font_text_view"
                         app:drawableTopCompat="@drawable/ic_exclude" />
 
                 </LinearLayout>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/aad_app_settings_ll"
+                    android:textSize="@dimen/default_font_text_view"
+                    android:text=""
+                    />
             </RelativeLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -241,9 +247,10 @@
             android:id="@+id/aad_dns_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/card1"
+            android:layout_below="@id/aad_aap_firewall_card"
             android:layout_margin="8dp"
             app:cardCornerRadius="8dp"
+            android:visibility="gone"
             app:cardElevation="8dp">
 
             <RelativeLayout
@@ -313,10 +320,117 @@
             android:visibility="gone" />
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/aad_ip_block_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/aad_aap_firewall_card"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:id="@+id/aad_ip_block_rl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="2dp"
+                    android:padding="10dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/aad_ip_block_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_local_blocklist"
+                        android:visibility="gone" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="10dp"
+                        android:layout_toStartOf="@id/aad_ip_block_indicator"
+                        android:layout_toEndOf="@id/aad_ip_block_icon"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/aad_ip_block_header"
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-smallcaps"
+                            android:gravity="center_vertical"
+                            android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/ada_ip_block_title"
+                            android:textColor="?attr/secondaryTextColor"
+                            android:textSize="@dimen/large_font_text_view"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/aad_ip_block_desc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="2dp"
+                            android:paddingBottom="2dp"
+                            android:text="@string/ada_ip_block_count"
+                            android:textSize="@dimen/default_font_text_view" />
+
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/aad_ip_block_indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:src="@drawable/ic_keyboard_arrow_up_gray_24dp" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/aad_ip_block_top_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/aad_ip_block_empty_txt"
+                        style="@style/TextAppearance.AppCompat.Body1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="10dp"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
+                        android:text="@string/ada_ip_block_no_rules"
+                        android:textSize="@dimen/default_font_text_view"
+                        android:visibility="invisible" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/aad_ip_block_recycler"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="10dp"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:scrollIndicators="right"
+                        android:scrollbarStyle="outsideOverlay"
+                        android:visibility="visible"
+                        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+                </RelativeLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/aad_conn_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/aad_dns_card"
+            android:layout_below="@id/aad_ip_block_card"
             android:layout_margin="8dp"
             app:cardCornerRadius="8dp"
             app:cardElevation="8dp">
@@ -407,29 +521,19 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="start"
-                            android:orientation="horizontal"
-                            android:weightSum="1">
+                            android:orientation="horizontal">
 
                             <androidx.appcompat.widget.SearchView
                                 android:id="@+id/aad_conn_detail_search"
-                                android:layout_width="0dp"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="start"
-                                android:layout_weight="0.9"
                                 android:focusable="false"
                                 android:fontFamily="sans-serif"
                                 android:isScrollContainer="true"
                                 app:iconifiedByDefault="false"
                                 app:queryHint="@string/search_universal_ips" />
 
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:id="@+id/aad_conn_detail_delete_icon"
-                                android:layout_width="0dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center"
-                                android:layout_weight="0.10"
-                                android:padding="7dp"
-                                android:src="@drawable/ic_delete" />
 
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>

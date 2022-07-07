@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.*
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -31,7 +32,10 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.databinding.DialogSetRethinkBinding
 import com.celzero.bravedns.databinding.FragmentDohListBinding
+import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_TYPE
+import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.UID
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL
 import com.celzero.bravedns.viewmodel.RethinkEndpointViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -54,14 +58,17 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
 
     private var uid: Int = Constants.MISSING_UID
 
+    data class ModifiedStamp(val name: String, val stamp: String, val count: Int)
+
     companion object {
         fun newInstance() = RethinkListFragment()
+        var modifiedStamp: MutableLiveData<ModifiedStamp> = MutableLiveData()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val bundle = this.arguments
-        uid = bundle?.getInt("UID", Constants.MISSING_UID) ?: Constants.MISSING_UID
+        uid = bundle?.getInt(UID, Constants.MISSING_UID) ?: Constants.MISSING_UID
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
@@ -69,6 +76,20 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
         super.onViewCreated(view, savedInstanceState)
         initView()
         initClickListeners()
+        observeModifiedStamp()
+    }
+
+    private fun observeModifiedStamp() {
+        modifiedStamp.observe(viewLifecycleOwner) {
+            if (it == null) return@observe
+
+            if (it.name.isNotEmpty()) {
+                updateRethinkEndpoint(it.name, getUrlForStamp(it.stamp), it.count)
+                return@observe
+            }
+
+            showAddCustomDohDialog(it.stamp, it.count)
+        }
     }
 
     private fun initView() {
@@ -84,11 +105,17 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
 
     private fun initClickListeners() {
         b.dohFabAddServerIcon.setOnClickListener {
-            // decide whether to show the dialog or open rethink configure screen
-            // showAddCustomDohDialog()
+            emptyTempStampInfo()
+
             val intent = Intent(requireContext(), ConfigureRethinkBasicActivity::class.java)
+            intent.putExtra(RETHINK_BLOCKLIST_TYPE,
+                            RethinkBlocklistFragment.RethinkBlocklistType.REMOTE)
             requireContext().startActivity(intent)
         }
+    }
+
+    private fun getUrlForStamp(stamp: String): String {
+        return RETHINK_BASE_URL + stamp
     }
 
     /**
@@ -96,7 +123,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
      * If entered DNS end point is valid, then the DNS queries are forwarded to that end point
      * else, it will revert back to default end point
      */
-    private fun showAddCustomDohDialog() {
+    private fun showAddCustomDohDialog(stamp: String, count: Int) {
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setTitle(getString(R.string.cd_custom_doh_dialog_title))
@@ -112,23 +139,29 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
         dialog.setCanceledOnTouchOutside(false)
         dialog.window?.attributes = lp
 
+        dialogBinding.dialogCustomUrlConfigureBtn.visibility = View.GONE
+        dialogBinding.dialogCustomUrlEditText.append(RETHINK_BASE_URL + stamp)
+
+        dialogBinding.dialogCustomNameEditText.setText(getString(R.string.rt_rethink_dns),
+                                                       TextView.BufferType.EDITABLE)
+
         // fetch the count from repository and increment by 1 to show the
         // next doh name in the dialog
         io {
-            val nextIndex = appConfig.getDohCount().plus(1)
+            val nextIndex = appConfig.getRethinkCount().plus(1)
             uiCtx {
-                dialogBinding.dialogCustomNameEditText.setText("RethinkDNS " + nextIndex,
-                                                               TextView.BufferType.EDITABLE)
+                val name = getString(R.string.rethink_dns_txt, nextIndex)
+                dialogBinding.dialogCustomNameEditText.setText(name, TextView.BufferType.EDITABLE)
             }
         }
 
-        dialogBinding.dialogCustomNameEditText.setText("RethinkDNS", TextView.BufferType.EDITABLE)
+
         dialogBinding.dialogCustomUrlOkBtn.setOnClickListener {
             val url = dialogBinding.dialogCustomUrlEditText.text.toString()
             val name = dialogBinding.dialogCustomNameEditText.text.toString()
 
             if (checkUrl(url)) {
-                insertRethinkEndpoint(name, url)
+                insertRethinkEndpoint(name, url, count)
                 dialog.dismiss()
             } else {
                 dialogBinding.dialogCustomUrlFailureText.text = resources.getString(
@@ -140,26 +173,36 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             }
         }
 
-        dialogBinding.dialogCustomUrlConfigureBtn.setOnClickListener {
-            val intent = Intent(requireContext(), ConfigureRethinkBasicActivity::class.java)
-            requireContext().startActivity(intent)
-        }
-
         dialogBinding.dialogCustomUrlCancelBtn.setOnClickListener {
+            emptyTempStampInfo()
             dialog.dismiss()
         }
         dialog.show()
     }
 
-    private fun insertRethinkEndpoint(name: String, url: String) {
+    private fun emptyTempStampInfo() {
+        modifiedStamp.postValue(null)
+        RethinkBlocklistFragment.selectedFileTags.postValue(mutableSetOf())
+    }
+
+    private fun insertRethinkEndpoint(name: String, url: String, count: Int) {
         io {
             var dohName: String = name
             if (name.isBlank()) {
                 dohName = url
             }
-            val endpoint = RethinkDnsEndpoint(dohName, url, uid = Constants.MISSING_UID, desc = "", isActive = false,
-                                              isCustom = true, latency = 0, modifiedDataTime = Constants.INIT_TIME_MS)
+            val endpoint = RethinkDnsEndpoint(dohName, url, uid = Constants.MISSING_UID, desc = "",
+                                              isActive = false, isCustom = true, latency = 0, count,
+                                              modifiedDataTime = Constants.INIT_TIME_MS)
             appConfig.insertReplaceEndpoint(endpoint)
+            emptyTempStampInfo()
+        }
+    }
+
+    private fun updateRethinkEndpoint(name: String, url: String, count: Int) {
+        io {
+            appConfig.updateRethinkEndpoint(name, url, count)
+            emptyTempStampInfo()
         }
     }
 

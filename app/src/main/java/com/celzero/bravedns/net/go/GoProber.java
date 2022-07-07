@@ -40,7 +40,7 @@ public class GoProber extends Prober {
         new Thread(() -> {
             String dohIPs = GoVpnAdapter.Companion.getIpString(context, url);
             try {
-                Transport transport = Tun2socks.newDoHTransport(url, dohIPs, /* protector */null, /* clientAuth */null, /* listener */null);
+                Transport transport = Tun2socks.newDoHTransport(url, dohIPs, /* clientAuth */null, /* listener */null);
                 if (transport == null) {
                     callback.onCompleted(false);
                     return;

@@ -8,9 +8,10 @@
 # If your project uses WebView with JS, uncomment the following
 # and specify the fully qualified class name to the JavaScript interface
 # class:
--keepclassmembers class com.celzero.bravedns.ui.DnsConfigureWebViewActivity$JSInterface {
-   public *;
-}
+# commenting below, webview removed from version v053i
+#-keepclassmembers class com.celzero.bravedns.ui.DnsConfigureWebViewActivity$JSInterface {
+#   public *;
+#}
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.

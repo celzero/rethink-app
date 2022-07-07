@@ -17,8 +17,6 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.content.res.TypedArray
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -154,16 +152,17 @@ class CustomDomainAdapter(val context: Context) :
         private fun toggleBtnUi(id: DomainRulesManager.DomainStatus): ToggleBtnUi {
             return when (id) {
                 DomainRulesManager.DomainStatus.NONE -> {
-                    ToggleBtnUi(fetchToggleBtnColors(context,R.color.firewallNoRuleToggleBtnTxt),
-                                fetchToggleBtnColors(context,R.color.firewallNoRuleToggleBtnBg))
+                    ToggleBtnUi(fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnTxt),
+                                fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnBg))
                 }
                 DomainRulesManager.DomainStatus.BLOCK -> {
-                    ToggleBtnUi(fetchToggleBtnColors(context,R.color.firewallBlockToggleBtnTxt),
-                                fetchToggleBtnColors(context,R.color.firewallBlockToggleBtnBg))
+                    ToggleBtnUi(fetchToggleBtnColors(context, R.color.firewallBlockToggleBtnTxt),
+                                fetchToggleBtnColors(context, R.color.firewallBlockToggleBtnBg))
                 }
                 DomainRulesManager.DomainStatus.WHITELIST -> {
-                    ToggleBtnUi(fetchToggleBtnColors(context,R.color.firewallWhiteListToggleBtnTxt),
-                                fetchToggleBtnColors(context,R.color.firewallWhiteListToggleBtnBg))
+                    ToggleBtnUi(
+                        fetchToggleBtnColors(context, R.color.firewallWhiteListToggleBtnTxt),
+                        fetchToggleBtnColors(context, R.color.firewallWhiteListToggleBtnBg))
                 }
             }
         }
@@ -174,9 +173,9 @@ class CustomDomainAdapter(val context: Context) :
         }
 
         private fun unselectToggleBtnUi(b: MaterialButton) {
-            b.setTextColor(fetchToggleBtnColors(context,R.color.defaultToggleBtnTxt))
+            b.setTextColor(fetchToggleBtnColors(context, R.color.defaultToggleBtnTxt))
             b.backgroundTintList = ColorStateList.valueOf(
-                fetchToggleBtnColors(context,R.color.defaultToggleBtnBg))
+                fetchToggleBtnColors(context, R.color.defaultToggleBtnBg))
         }
 
         // each button in the toggle group is associated with tag value.
@@ -214,19 +213,18 @@ class CustomDomainAdapter(val context: Context) :
         }
 
         private fun updateStatusUi(status: DomainRulesManager.DomainStatus) {
-            // fixme: move the string literals to strings.xml
             when (status) {
                 DomainRulesManager.DomainStatus.WHITELIST -> {
-                    b.customDomainStatusIcon.text = "W"
-                    b.customDomainStatusTv.text = "Whitelisted"
+                    b.customDomainStatusIcon.text = context.getString(R.string.cd_whitelist_initial)
+                    b.customDomainStatusTv.text = context.getString(R.string.cd_whitelist_txt)
                 }
                 DomainRulesManager.DomainStatus.BLOCK -> {
-                    b.customDomainStatusIcon.text = "B"
-                    b.customDomainStatusTv.text = "Blocked"
+                    b.customDomainStatusIcon.text = context.getString(R.string.cd_blocked_initial)
+                    b.customDomainStatusTv.text = context.getString(R.string.cd_blocked_txt)
                 }
                 DomainRulesManager.DomainStatus.NONE -> {
-                    b.customDomainStatusIcon.text = "N"
-                    b.customDomainStatusTv.text = "No Rule"
+                    b.customDomainStatusIcon.text = context.getString(R.string.cd_no_rule_initial)
+                    b.customDomainStatusTv.text = context.getString(R.string.cd_no_rule_txt)
                 }
             }
         }

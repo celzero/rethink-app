@@ -27,52 +27,32 @@
         android:textSize="@dimen/small_font_subheading_text"
         app:layout_constraintTop_toBottomOf="@id/daci_ip_title" />
 
-    <LinearLayout
-        android:id="@+id/daci_input_layout"
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/daci_text_input_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="10dp"
+        android:hint="@string/ci_dialog_edittext_hint"
+        app:hintTextColor="?attr/accentGood"
         app:layout_constraintTop_toBottomOf="@id/daci_ip_desc">
 
-        <androidx.appcompat.widget.AppCompatSpinner
-            android:id="@+id/daci_spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="10dp"
-            android:drawSelectorOnTop="true"
-            android:textAlignment="center"
-            android:gravity="center"
-            android:dropDownWidth="wrap_content"
-            android:minHeight="48dp"
-            android:spinnerMode="dropdown" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/daci_text_input_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="10dp"
+        <EditText
+            android:id="@+id/daci_ip_edit_text"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
             android:hint="@string/ci_dialog_edittext_hint"
-            app:hintTextColor="?attr/accentGood">
-
-            <EditText
-                android:id="@+id/daci_ip_edit_text"
-                android:layout_width="fill_parent"
-                android:layout_height="match_parent"
-                android:hint="@string/ci_dialog_edittext_hint"
-                android:importantForAutofill="no"
-                android:inputType="textUri"
-                android:maxLines="2"
-                android:minHeight="48dp"
-                android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/large_font_text_view"
-                app:layout_constraintRight_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/text_input_layout_name" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-    </LinearLayout>
+            android:importantForAutofill="no"
+            android:inputType="textUri"
+            android:maxLines="2"
+            android:minHeight="48dp"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/large_font_text_view"
+            app:layout_constraintRight_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_input_layout_name" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
         android:id="@+id/daci_failure_text_view"
@@ -85,7 +65,7 @@
         android:textColor="@color/colorRed_A400"
         android:textSize="@dimen/default_font_text_view"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/daci_input_layout" />
+        app:layout_constraintTop_toBottomOf="@id/daci_text_input_layout" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/daci_add_btn"

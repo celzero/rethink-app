@@ -15,10 +15,6 @@
  */
 package com.celzero.bravedns.util
 
-import android.util.Log
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
-
 // https://android.googlesource.com/platform/system/core/+/4489ee0a190ad488df8ed9be545986a46c86148e/libcutils/include/private/android_filesystem_config.h
 enum class AndroidUidConfig(val uid: Int) {
     ANDROID(0),//Modified as ANDROID instead of ROOT
@@ -175,7 +171,6 @@ enum class AndroidUidConfig(val uid: Int) {
         private val map = values().associateBy(AndroidUidConfig::uid)
 
         fun fromFileSystemUid(uid: Int): AndroidUidConfig {
-            if (DEBUG) Log.d(LOG_TAG_FIREWALL, "uid: $uid, uid name: ${map[uid.hashCode()]}")
             return map[uid.hashCode()] ?: OTHER
         }
 

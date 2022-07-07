@@ -32,6 +32,7 @@ import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.IpRulesManager
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
 import com.celzero.bravedns.service.AppUpdater
@@ -72,6 +73,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private lateinit var aboutFragment: AboutFragment
 
     private val persistentState by inject<PersistentState>()
+    private val appConfig by inject<AppConfig>()
     private val appUpdateManager by inject<AppUpdater>()
 
     /* TODO : This task need to be completed.
@@ -88,8 +90,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == UI_MODE_NIGHT_YES
     }
 
-    //TODO : Remove the unwanted data and the assignments happening
-    //TODO : Create methods and segregate the data.
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
@@ -111,7 +111,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         setupNavigationItemSelectedListener()
 
         // TODO: Remove this from home screen and move it to vpn service
-        IpRulesManager.loadFirewallRules()
+        IpRulesManager.loadIpRules()
 
         refreshDatabase.deleteOlderDataFromNetworkLogs()
 
@@ -136,6 +136,18 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             val oldFolder = File(this.filesDir.canonicalPath)
             deleteUnwantedFolders(oldFolder)
         }
+
+        // for version v054
+        updateIfRethinkConnectedv053x()
+    }
+
+    private fun updateIfRethinkConnectedv053x() {
+        if (!appConfig.isRethinkDnsConnectedv053x()) return
+
+        io {
+            appConfig.updateRethinkPlusCountv053x(persistentState.getRemoteBlocklistCount())
+        }
+        persistentState.dnsType = AppConfig.DnsType.RETHINK_REMOTE.type
     }
 
     private fun moveLocalBlocklistFiles() {

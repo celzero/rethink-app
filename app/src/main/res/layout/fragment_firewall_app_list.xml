@@ -4,8 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/background"
-    android:focusable="true"
-    android:focusableInTouchMode="true">
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <LinearLayout
         android:id="@+id/top_header_ll"
@@ -13,6 +12,8 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:orientation="horizontal"
         android:padding="10dp"
         android:weightSum="1">
@@ -69,19 +70,30 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="start"
-                        android:layout_weight="0.9"
+                        android:layout_weight="0.8"
                         android:fontFamily="sans-serif"
                         android:isScrollContainer="true"
                         app:iconifiedByDefault="false"
                         app:queryHint="@string/search_firewall_all_apps" />
 
                     <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ffa_sort_icon"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:layout_margin="5dp"
+                        android:layout_weight="0.1"
+                        android:padding="5dp"
+                        android:src="@drawable/ic_sort"
+                        android:visibility="visible" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/ffa_filter_icon"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
-                        android:layout_weight="0.1"
                         android:layout_margin="5dp"
+                        android:layout_weight="0.1"
                         android:padding="5dp"
                         android:src="@drawable/ic_filter"
                         android:visibility="visible" />
@@ -102,7 +114,9 @@
                         android:focusable="true"
                         android:focusableInTouchMode="true"
                         android:padding="5dp"
-                        android:text="Sort by:"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:text="@string/fapps_sort_by"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/default_font_text_view" />
 
@@ -164,9 +178,16 @@
         android:id="@+id/ffa_toggle_all_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/ffa_search_view_top"
         android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        android:layout_below="@id/ffa_search_view_top">
+        android:layout_marginEnd="10dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ffa_app_info_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_info" />
 
         <TextView
             android:id="@+id/firewall_app_label_tv"
@@ -176,10 +197,11 @@
             android:layout_marginStart="5dp"
             android:layout_marginEnd="5dp"
             android:layout_toStartOf="@id/ffa_toggle_all_wifi"
+            android:layout_toEndOf="@id/ffa_app_info_icon"
             android:fontFamily="sans-serif"
-            android:gravity="right"
+            android:gravity="end"
             android:padding="5dp"
-            android:text="Click to disable/enable all filtered apps"
+            android:text="@string/fapps_firewall_filter_hint"
             android:textSize="@dimen/default_font_text_view" />
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -189,14 +211,14 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="5dp"
             android:layout_marginTop="5dp"
-            android:tag="0"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
             android:layout_toStartOf="@id/ffa_toggle_all_mobile_data"
             android:maxWidth="24dp"
             android:maxHeight="24dp"
             android:padding="5dp"
-            android:src="@drawable/ic_firewall_wifi_on_grey" />
+            android:src="@drawable/ic_firewall_wifi_on_grey"
+            android:tag="0" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ffa_toggle_all_mobile_data"
@@ -216,17 +238,33 @@
 
     </RelativeLayout>
 
+    <TextView
+        android:id="@+id/firewall_app_lockdown_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ffa_toggle_all_container"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:fontFamily="sans-serif"
+        android:padding="5dp"
+        android:visibility="gone"
+        android:text="@string/fapps_all_network_hint"
+        android:textColor="?attr/accentBad"
+        android:textSize="@dimen/default_font_text_view"
+        android:textStyle="italic" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ffa_app_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/ffa_toggle_all_container"
+        android:layout_below="@id/firewall_app_lockdown_hint"
         android:layout_marginStart="2dp"
+        android:layout_marginTop="2dp"
         android:layout_marginEnd="2dp"
-        android:divider="?attr/border"
-        android:dividerHeight="1dp"
-        android:scrollbars="none"
-        app:fastScrollEnabled="true"
+        android:layout_marginBottom="2dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:fastScrollEnabled="false"
         app:fastScrollHorizontalThumbDrawable="@drawable/fast_scroll_thumb_drawable"
         app:fastScrollHorizontalTrackDrawable="@drawable/fast_scroll_line_drawable"
         app:fastScrollVerticalThumbDrawable="@drawable/fast_scroll_thumb_drawable"

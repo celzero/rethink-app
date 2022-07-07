@@ -25,19 +25,20 @@ import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
+import com.celzero.bravedns.util.IpManager
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL_LOG
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
 import com.celzero.bravedns.util.Utilities.Companion.getFlag
 import com.celzero.bravedns.util.Utilities.Companion.getPackageInfoForUid
-import com.google.common.net.InetAddresses
+import inet.ipaddr.HostName
+import inet.ipaddr.IPAddressString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.net.InetAddress
-import java.util.*
 
 class IPTracker internal constructor(
         private val connectionTrackerRepository: ConnectionTrackerRepository,
@@ -66,16 +67,7 @@ class IPTracker internal constructor(
         connTracker.timeStamp = ipDetails.timestamp
         connTracker.blockedByRule = ipDetails.blockedByRule
 
-        // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
-        // Unlike InetAddress.getByName(), the methods of this class never cause DNS services
-        // to be accessed
-        var serverAddress: InetAddress? = null
-        try {
-            serverAddress = InetAddresses.forString(ipDetails.destIP)
-        } catch (e: IllegalArgumentException) {
-            Log.e(LOG_TAG_FIREWALL_LOG, "Failure converting string to InetAddresses: ${e.message}",
-                  e)
-        }
+        val serverAddress = convertIpV6ToIpv4IfNeeded(ipDetails.destIP) ?: return
 
         connTracker.dnsQuery = dnsLogTracker.ipDomainLookup.getIfPresent(
             connTracker.ipAddress)?.fqdn
@@ -85,6 +77,22 @@ class IPTracker internal constructor(
 
         connTracker.appName = fetchApplicationName(connTracker.uid)
         connectionTrackerRepository.insert(connTracker)
+    }
+
+    private fun convertIpV6ToIpv4IfNeeded(ip: String): InetAddress? {
+        val inetAddress = HostName(ip)?.toInetAddress()
+        val ipAddress = IPAddressString(ip)?.address ?: return inetAddress
+
+        // no need to check if IP is not of type IPv6
+        if (!IpManager.isIpV6(ipAddress)) return inetAddress
+
+        val ipv4 = IpManager.toIpV4(ipAddress)
+
+        return if (ipv4 != null) {
+            ipv4.toInetAddress()
+        } else {
+            inetAddress
+        }
     }
 
     private suspend fun fetchApplicationName(uid: Int): String {

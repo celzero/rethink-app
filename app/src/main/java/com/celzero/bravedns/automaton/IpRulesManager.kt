@@ -18,11 +18,15 @@ package com.celzero.bravedns.automaton
 import android.util.Log
 import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.database.CustomIpRepository
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
+import com.celzero.bravedns.util.IpManager
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import inet.ipaddr.HostName
+import inet.ipaddr.IPAddress
+import inet.ipaddr.IPAddressString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,18 +38,17 @@ import kotlin.concurrent.write
 object IpRulesManager : KoinComponent {
 
     private val customIpRepository by inject<CustomIpRepository>()
+    private val persistentState by inject<PersistentState>()
     private val lock = ReentrantReadWriteLock()
 
     // max size of ip request look-up cache
     private const val CACHE_MAX_SIZE = 10000L
 
-    // maintaining two different maps for the firewall rules
-    // wildcard match and the ip match
-    private var appIpRules: MutableMap<String, CustomIp> = hashMapOf()
-    private var wildcards: MutableMap<String, CustomIp> = hashMapOf()
+    private var appIpRules: MutableMap<IPAddress, CustomIp> = hashMapOf()
+    private var wildCards: MutableMap<IPAddress, CustomIp> = hashMapOf()
 
     // stores the response for the look-up request from the BraveVpnService
-    private val ipRulesLookupCache: Cache<String, IpCache> = CacheBuilder.newBuilder().maximumSize(
+    private val ipRulesLookupCache: Cache<IPAddress, IpCache> = CacheBuilder.newBuilder().maximumSize(
         CACHE_MAX_SIZE).build()
 
     // stores the data object in ip response look-up cache
@@ -53,23 +56,6 @@ object IpRulesManager : KoinComponent {
 
     enum class IPRuleType(val id: Int) {
         IPV4(0), IPV4_WILDCARD(1), IPV6(2), IPV6_WILDCARD(3);
-
-        companion object {
-            fun getInputTypes(): Array<String> {
-                return arrayOf("IPV4", "IPV4 Wildcard", "IPV6 (Coming soon)",
-                               "IPV6 Wildcard (Coming soon)")
-            }
-
-            fun getType(id: Int): IPRuleType {
-                return when (id) {
-                    IPV4.id -> IPV4
-                    IPV4_WILDCARD.id -> IPV4_WILDCARD
-                    IPV6.id -> IPV6
-                    IPV6_WILDCARD.id -> IPV6_WILDCARD
-                    else -> IPV4
-                }
-            }
-        }
     }
 
     enum class IpRuleStatus(val id: Int) {
@@ -88,6 +74,12 @@ object IpRulesManager : KoinComponent {
         }
 
         companion object {
+
+            // labels for spinner / toggle ui
+            fun getLabel(): Array<String> {
+                return arrayOf("Allow", "Block", "Whitelist")
+            }
+
             fun getStatus(id: Int): IpRuleStatus {
                 return when (id) {
                     BLOCK.id -> BLOCK
@@ -107,15 +99,8 @@ object IpRulesManager : KoinComponent {
         return customIpRepository.getCustomIpDetail(uid, ipAddress)
     }
 
-    fun clearFirewallRules(uid: Int) {
-        io {
-            customIpRepository.clearFirewallRules(uid)
-        }
-        appIpRules.clear()
-    }
-
     fun removeFirewallRules(uid: Int, ipAddress: String) {
-        if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Remove Firewall: $uid, $ipAddress")
+        Log.i(LOG_TAG_FIREWALL, "IP Rules, remove/delete rule for ip: $ipAddress for uid: $uid")
         if (ipAddress.isEmpty()) {
             return
         }
@@ -132,18 +117,9 @@ object IpRulesManager : KoinComponent {
         }
     }
 
-    fun addFirewallRules(uid: Int, ipAddress: String, wildcard: Boolean) {
-        if (DEBUG) Log.d(LOG_TAG_FIREWALL, "addFirewallRules: $uid, $ipAddress")
-        io {
-            val customIpObj = constructCustomIpObject(uid, ipAddress, IpRuleStatus.BLOCK,
-                                                      wildcard = wildcard)
-            customIpRepository.insert(customIpObj)
-            updateLocalCache(customIpObj)
-            ipRulesLookupCache.invalidateAll()
-        }
-    }
-
     fun updateRule(uid: Int, ipAddress: String, status: IpRuleStatus) {
+        Log.i(LOG_TAG_FIREWALL,
+              "IP Rules, update rule for ip: $ipAddress for uid: $uid with status: ${status.name}")
         io {
             val customIpObj = constructCustomIpObject(uid, ipAddress, status)
             customIpRepository.insert(customIpObj)
@@ -153,6 +129,8 @@ object IpRulesManager : KoinComponent {
     }
 
     fun whitelistIp(customIp: CustomIp) {
+        Log.i(LOG_TAG_FIREWALL,
+              "IP Rules, whitelist ip: ${customIp.ipAddress} for uid: ${customIp.uid} with previous status id: ${customIp.status}")
         io {
             customIp.status = IpRuleStatus.WHITELIST.id
             customIpRepository.update(customIp)
@@ -162,6 +140,8 @@ object IpRulesManager : KoinComponent {
     }
 
     fun noRuleIp(customIp: CustomIp) {
+        Log.i(LOG_TAG_FIREWALL,
+              "IP Rules, remove(soft delete) rule for ip: ${customIp.ipAddress} for uid: ${customIp.uid} with previous status id: ${customIp.status}")
         io {
             customIp.status = IpRuleStatus.NONE.id
             customIpRepository.update(customIp)
@@ -171,33 +151,28 @@ object IpRulesManager : KoinComponent {
     }
 
     private fun updateLocalCache(ip: CustomIp) {
-
-        if (ip.wildcard) {
-            lock.write {
-                wildcards[ip.ipAddress] = ip
-            }
-            return
-        }
-
         lock.write {
-            appIpRules[ip.ipAddress] = ip
+            if (ip.getCustomIpAddress().isMultiple) {
+                wildCards[ip.getCustomIpAddress()] = ip
+                return
+            }
+            appIpRules[ip.getCustomIpAddress()] = ip
         }
     }
 
     private fun removeLocalCache(ip: CustomIp) {
-        if (ip.wildcard) {
-            lock.write {
-                wildcards.remove(ip.ipAddress)
-            }
-            return
-        }
-
         lock.write {
-            appIpRules.remove(ip.ipAddress)
+            if (ip.getCustomIpAddress().isMultiple) {
+                wildCards.remove(ip.getCustomIpAddress())
+                return
+            }
+            appIpRules.remove(ip.getCustomIpAddress())
         }
     }
 
     fun blockIp(customIp: CustomIp) {
+        Log.i(LOG_TAG_FIREWALL,
+              "IP Rules, block rule for ip: ${customIp.ipAddress} for uid: ${customIp.uid} with previous status id: ${customIp.status}")
         io {
             customIp.status = IpRuleStatus.BLOCK.id
             customIpRepository.update(customIp)
@@ -206,33 +181,64 @@ object IpRulesManager : KoinComponent {
         }
     }
 
-    fun hasRule(uid: Int, ipAddress: String): IpRuleStatus {
+    fun hasRule(uid: Int, ipString: String): IpRuleStatus {
+        val ip = IPAddressString(ipString).address
         // check if the ip address is already available in the cache
-        ipRulesLookupCache.getIfPresent(ipAddress)?.let {
+        ipRulesLookupCache.getIfPresent(ip)?.let {
             // return only if both ip and app(uid) matches
             if (uid == UID_EVERYBODY || uid == it.uid) {
                 return it.status
+            } else {
+                // no-op, continue
             }
         }
 
-        if (appIpRules.contains(ipAddress)) {
-            val ip = appIpRules[ipAddress] ?: return IpRuleStatus.NONE
+        if (appIpRules.contains(ip)) {
+            val customIp = appIpRules[ip] ?: return IpRuleStatus.NONE
 
-            val status = IpRuleStatus.getStatus(ip.status)
-            ipRulesLookupCache.put(ipAddress, IpCache(ip.uid, status))
+            // only if the uid is either global or same uid
+            if (customIp.uid == UID_EVERYBODY || customIp.uid == uid) {
+                val status = IpRuleStatus.getStatus(customIp.status)
+                ipRulesLookupCache.put(ip, IpCache(customIp.uid, status))
+                return status
+            }
+        }
+
+        var status = subnetMatch(uid, ip)
+
+        // no need to carry out below checks if ip is not IPv6
+        if (!IpManager.isIpV6(ip) && !isIpv6ToV4FilterRequired()) {
+            ipRulesLookupCache.put(ip, IpCache(uid, status))
             return status
         }
 
-        val match = wildcardMatch(ipAddress)
+        // for IPv4 address in IPv6
+        if (status == IpRuleStatus.NONE) { // no match with previous rules
+            var ipv4: IPAddress? = null
+            if (IpManager.canMakeIpv4(ip)) {
+                ipv4 = IpManager.toIpV4(ip)
+            }
 
-        ipRulesLookupCache.put(ipAddress, IpCache(uid, match))
-        return match
+            if (ipv4 != null) {
+                status = hasRule(uid, ipv4.toNormalizedString())
+            } else {
+                // no-op
+            }
+        }
+
+        ipRulesLookupCache.put(ip, IpCache(uid, status))
+        return status
     }
 
-    fun getStatus(uid: Int, ipAddress: String): IpRuleStatus {
+    private fun isIpv6ToV4FilterRequired(): Boolean {
+        return persistentState.filterIpv4inIpv6
+    }
+
+    fun getStatus(uid: Int, ip: String): IpRuleStatus {
+        val ipAddress = IPAddressString(ip).address
         if (!appIpRules.contains(ipAddress)) return IpRuleStatus.NONE
 
-        // get the status of the ipAddress from local list if available
+        // get the status of the ipAddress from local list if available.
         // status will be retrieved for uid matching either UID_EVERYBODY or specific uid
         return appIpRules[ipAddress]?.status?.let {
             val ruleUid = appIpRules[ipAddress]?.uid
@@ -247,78 +253,73 @@ object IpRulesManager : KoinComponent {
     fun clearAllIpRules() {
         io {
             customIpRepository.deleteAllIPRulesUniversal()
-            loadFirewallRules()
+            appIpRules.clear()
+            wildCards.clear()
         }
     }
 
-    fun loadFirewallRules() {
+    fun loadIpRules() {
         io {
             val rules = customIpRepository.getIpRules()
             rules.forEach {
-                // wildcards are added in separate list
-                if (it.wildcard) {
-                    wildcards[it.ipAddress] = it
+                if (it.getCustomIpAddress().isMultiple) {
+                    wildCards[it.getCustomIpAddress()] = it
                     return@forEach
                 }
-
-                appIpRules[it.ipAddress] = it
+                appIpRules[it.getCustomIpAddress()] = it
             }
         }
     }
 
     private fun constructCustomIpObject(uid: Int, ipAddress: String, status: IpRuleStatus,
-                                        ruleType: IPRuleType = IPRuleType.IPV4,
                                         wildcard: Boolean = false): CustomIp {
         val customIp = CustomIp()
-        customIp.ipAddress = ipAddress
+        customIp.setCustomIpAddress(ipAddress)
         customIp.port = UNSPECIFIED_PORT
         customIp.protocol = ""
         customIp.isActive = true
         customIp.status = status.id
         customIp.wildcard = wildcard
         customIp.modifiedDateTime = System.currentTimeMillis()
-        customIp.ruleType = ruleType.id
+
+        // TODO: is this needed in database?
+        customIp.ruleType = if (HostName(ipAddress).address?.isIPv6 == true) {
+            IPRuleType.IPV6.id
+        } else {
+            IPRuleType.IPV4.id
+        }
         customIp.uid = uid
         return customIp
     }
 
-    fun addIpRule(uid: Int, ipAddress: String, status: IpRuleStatus, type: IPRuleType) {
+    fun addIpRule(uid: Int, ipAddress: String, status: IpRuleStatus) {
         io {
-            // fixme: as of now, ip rules are not validated against uid's so assigning
-            // UID_EVERYBODY to uid instead of actual uid
-            val _uid = UID_EVERYBODY
-            val customIpObj = constructCustomIpObject(_uid, ipAddress, status, type)
+            Log.i(LOG_TAG_FIREWALL,
+                  "IP Rules, add rule for ip: $ipAddress with status: ${status.name}")
+            val customIpObj = constructCustomIpObject(uid, ipAddress, status)
             customIpRepository.insert(customIpObj)
             updateLocalCache(customIpObj)
+            ipRulesLookupCache.invalidateAll()
         }
     }
 
-    private fun wildcardMatch(ipAddress: String): IpRuleStatus {
-        wildcards.keys.forEach { wildcard ->
-            if (isMatch(wildcard, ipAddress)) {
-                return wildcards[wildcard]?.status?.let {
-                    IpRuleStatus.getStatus(it)
-                } ?: IpRuleStatus.NONE
+    private fun subnetMatch(uid: Int, ipAddress: IPAddress): IpRuleStatus {
+        // TODO: subnet precedence should be taken care of.
+        // TODO: IP/16 and IP/24 is added to the rule.
+        wildCards.keys.forEach { wc ->
+            if (wc.contains(ipAddress)) {
+                val rule = wildCards[wc]
+                if (rule?.uid == UID_EVERYBODY || rule?.uid == uid) {
+                    return IpRuleStatus.getStatus(rule.status)
+                } else {
+                    // no-op
+                }
+            } else {
+                // no-op
             }
         }
 
         return IpRuleStatus.NONE
-    }
-
-    private fun isMatch(w: String, i: String): Boolean {
-        val wildcard = Array(4) { "*" }
-        val ipAddress = Array(4) { "*" }
-
-        w.split(".").toTypedArray().copyInto(wildcard, 0)
-        i.split(".").toTypedArray().copyInto(ipAddress, 0)
-
-        wildcard.forEachIndexed { index, s ->
-            if (s != "*" && ipAddress[index] != s) {
-                return false
-            }
-        }
-
-        return true
     }
 
     private fun io(f: suspend () -> Unit) {

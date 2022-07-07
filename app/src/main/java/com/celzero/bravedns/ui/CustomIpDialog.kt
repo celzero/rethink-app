@@ -21,11 +21,11 @@ import android.os.Bundle
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -36,6 +36,7 @@ import com.celzero.bravedns.databinding.DialogAddCustomIpBinding
 import com.celzero.bravedns.databinding.DialogCustomIpBinding
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
+import inet.ipaddr.IPAddressString
 
 class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, themeId: Int) :
         Dialog(activity, themeId), SearchView.OnQueryTextListener {
@@ -45,6 +46,7 @@ class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, t
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setCancelable(true)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         b = DialogCustomIpBinding.inflate(layoutInflater)
         setContentView(b.root)
@@ -52,8 +54,38 @@ class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, t
         window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT,
                           WindowManager.LayoutParams.MATCH_PARENT)
 
+        observeCustomRules()
         setupRecyclerView()
         setupClickListeners()
+    }
+
+    private fun observeCustomRules() {
+        viewModel.customIpSize.observe(activity as LifecycleOwner) {
+            if (it <= 0) {
+                showNoRulesUi()
+                hideRulesUi()
+                return@observe
+            }
+
+            hideNoRulesUi()
+            showRulesUi()
+        }
+    }
+
+    private fun hideRulesUi() {
+        b.customDialogShowRulesRl.visibility = View.GONE
+    }
+
+    private fun showRulesUi() {
+        b.customDialogShowRulesRl.visibility = View.VISIBLE
+    }
+
+    private fun hideNoRulesUi() {
+        b.customDialogNoRulesRl.visibility = View.GONE
+    }
+
+    private fun showNoRulesUi() {
+        b.customDialogNoRulesRl.visibility = View.VISIBLE
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
@@ -78,8 +110,12 @@ class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, t
     }
 
     private fun setupClickListeners() {
-        b.cipAddIp.setOnClickListener {
+        b.customDialogAddFab.setOnClickListener {
             showAddIpDialog()
+        }
+
+        b.cipSearchDeleteIcon.setOnClickListener {
+            showIpRulesDeleteDialog()
         }
     }
 
@@ -95,14 +131,6 @@ class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, t
         val dBind = DialogAddCustomIpBinding.inflate(layoutInflater)
         dialog.setContentView(dBind.root)
 
-        val types = IpRulesManager.IPRuleType.getInputTypes()
-        var selectedInputType: IpRulesManager.IPRuleType = IpRulesManager.IPRuleType.IPV4
-
-        val aa: ArrayAdapter<*> = ArrayAdapter<Any?>(activity, android.R.layout.simple_spinner_item,
-                                                     types)
-        aa.setDropDownViewResource(R.layout.custom_ip_spinner_item)
-        dBind.daciSpinner.adapter = aa
-
         val lp = WindowManager.LayoutParams()
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
@@ -112,70 +140,29 @@ class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, t
         dialog.setCanceledOnTouchOutside(false)
         dialog.window?.attributes = lp
 
-
         dBind.daciIpTitle.text = activity.getString(R.string.cd_dialog_title)
 
-        dBind.daciSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // no-op
-            }
-
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int,
-                                        id: Long) {
-                if (position == 2 || position == 3) {
-                    Utilities.showToastUiCentered(activity, activity.resources.getString(
-                        R.string.ipv6_coming_soon_toast), Toast.LENGTH_SHORT)
-                    dBind.daciSpinner.setSelection(0)
-                    return
-                }
-
-                selectedInputType = IpRulesManager.IPRuleType.getType(position)
-                dBind.daciIpEditText.hint = activity.resources.getString(
-                    R.string.cd_dialog_edittext_hint, types[position])
-                dBind.daciTextInputLayout.hint = activity.resources.getString(
-                    R.string.cd_dialog_edittext_hint, types[position])
-
+        dBind.daciIpEditText.addTextChangedListener {
+            if (dBind.daciFailureTextView.isVisible) {
+                dBind.daciFailureTextView.visibility = View.GONE
             }
         }
 
         dBind.daciAddBtn.setOnClickListener {
             val input = dBind.daciIpEditText.text.toString()
 
-            when (selectedInputType) {
-                IpRulesManager.IPRuleType.IPV4 -> {
-                    val ipv4 = Utilities.removeLeadingAndTrailingDots(input)
-                    if (!isValidIpv4(ipv4)) {
-                        dBind.daciFailureTextView.text = activity.resources.getString(
-                            R.string.ci_dialog_error_invalid_ip)
-                        dBind.daciFailureTextView.visibility = View.VISIBLE
-                        return@setOnClickListener
-                    }
-
-                    insertCustomIpv4(ipv4, false)
-                    dialog.dismiss()
-                }
-                IpRulesManager.IPRuleType.IPV4_WILDCARD -> {
-                    if (!isValidIpv4WildCard(input)) {
-                        dBind.daciFailureTextView.text = activity.resources.getString(
-                            R.string.ci_dialog_error_invalid_ip_wildcard)
-                        dBind.daciFailureTextView.visibility = View.VISIBLE
-                        return@setOnClickListener
-                    }
-
-                    insertCustomIpv4(input, true)
-                    dialog.dismiss()
-                }
-                IpRulesManager.IPRuleType.IPV6 -> {
-                    Utilities.showToastUiCentered(activity, activity.resources.getString(
-                        R.string.ipv6_coming_soon_toast), Toast.LENGTH_SHORT)
-                    dBind.daciSpinner.setSelection(0)
-                }
-                IpRulesManager.IPRuleType.IPV6_WILDCARD -> {
-                    Utilities.showToastUiCentered(activity, activity.resources.getString(
-                        R.string.ipv6_coming_soon_toast), Toast.LENGTH_SHORT)
-                    dBind.daciSpinner.setSelection(0)
-                }
+            val ipString = Utilities.removeLeadingAndTrailingDots(input)
+            val ip = IPAddressString(ipString).address
+            if (ip == null || ipString.isEmpty()) {
+                dBind.daciFailureTextView.text = activity.resources.getString(
+                    R.string.ci_dialog_error_invalid_ip)
+                dBind.daciFailureTextView.visibility = View.VISIBLE
+                return@setOnClickListener
             }
+
+            dBind.daciIpEditText.text.clear()
+            insertCustomIpv4(input)
+
         }
 
         dBind.daciCancelBtn.setOnClickListener {
@@ -184,20 +171,9 @@ class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, t
         dialog.show()
     }
 
-    private fun isValidIpv4(ipv4: String): Boolean {
-        // ref: https://mkyong.com/regular-expressions/how-to-validate-ip-address-with-regular-expression/
-        val ipv4Regex = "^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(\\.(?!$)|$)){4}$".toRegex()
-        return ipv4.matches(ipv4Regex)
-    }
-
-    private fun isValidIpv4WildCard(ipv4WildCard: String): Boolean {
-        // ref: https://stackoverflow.com/questions/11301670/regex-to-validate-ip-address-with-wildcard
-        val ipv4WildcardRegEx = "^((((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))|(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){1,3}\\*))\$".toRegex()
-        return ipv4WildCard.matches(ipv4WildcardRegEx)
-    }
-
-    private fun insertCustomIpv4(ipv4: String, isWildcard: Boolean) {
-        IpRulesManager.addFirewallRules(IpRulesManager.UID_EVERYBODY, ipv4, isWildcard)
+    private fun insertCustomIpv4(ipv4: String) {
+        IpRulesManager.addIpRule(IpRulesManager.UID_EVERYBODY, ipv4,
+                                 IpRulesManager.IpRuleStatus.BLOCK)
         Utilities.showToastUiCentered(activity,
                                       activity.getString(R.string.ci_dialog_added_success),
                                       Toast.LENGTH_SHORT)
@@ -207,7 +183,6 @@ class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, t
         val builder = AlertDialog.Builder(activity)
         builder.setTitle(R.string.univ_delete_firewall_dialog_title)
         builder.setMessage(R.string.univ_delete_firewall_dialog_message)
-        builder.setCancelable(true)
         builder.setPositiveButton(
             activity.getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->
             IpRulesManager.clearAllIpRules()

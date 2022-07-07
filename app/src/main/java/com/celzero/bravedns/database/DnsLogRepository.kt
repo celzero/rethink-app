@@ -16,8 +16,6 @@ limitations under the License.
 package com.celzero.bravedns.database
 
 import com.celzero.bravedns.util.Constants
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class DnsLogRepository(private val dnsLogDAO: DnsLogDAO) {
 

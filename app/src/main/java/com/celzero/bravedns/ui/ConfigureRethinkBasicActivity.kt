@@ -18,18 +18,14 @@ package com.celzero.bravedns.ui
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.FragmentRethinkBasicBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes
 import org.koin.android.ext.android.inject
 
 class ConfigureRethinkBasicActivity : AppCompatActivity(R.layout.fragment_rethink_basic) {
-    private val b by viewBinding(FragmentRethinkBasicBinding::bind)
     private val persistentState by inject<PersistentState>()
 
     enum class FragmentLoader {
@@ -38,6 +34,10 @@ class ConfigureRethinkBasicActivity : AppCompatActivity(R.layout.fragment_rethin
 
     companion object {
         const val INTENT = "RethinkDns_Intent"
+        const val RETHINK_BLOCKLIST_TYPE = "RethinkBlocklistType"
+        const val RETHINK_BLOCKLIST_NAME = "RethinkBlocklistName"
+        const val RETHINK_BLOCKLIST_STAMP = "RethinkBlocklistStamp"
+        const val UID = "UID"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,33 +47,51 @@ class ConfigureRethinkBasicActivity : AppCompatActivity(R.layout.fragment_rethin
     }
 
     private fun loadFragment() {
-        // add the fragment to the activity based on the received intent
-        val i = intent.getIntExtra(INTENT, FragmentLoader.REMOTE.ordinal)
-        when (i) {
+        // add fragments to the activity based on the received intent
+        when (intent.getIntExtra(INTENT, FragmentLoader.REMOTE.ordinal)) {
             FragmentLoader.REMOTE.ordinal -> {
+                val name = intent.getStringExtra(RETHINK_BLOCKLIST_NAME) ?: ""
+                val stamp = intent.getStringExtra(RETHINK_BLOCKLIST_STAMP) ?: ""
+
                 // load the Rethink remote dns configure screen (default)
-                val rethinkRemote = RethinkRemoteBlocklistFragment.newInstance()
-                supportFragmentManager.beginTransaction().replace(R.id.root_container,
-                                                                  rethinkRemote, rethinkRemote.javaClass.simpleName).commit()
+                val rr = RethinkBlocklistFragment.newInstance()
+                var bundle = createBundle(RETHINK_BLOCKLIST_TYPE,
+                                          RethinkBlocklistFragment.RethinkBlocklistType.REMOTE.ordinal)
+                bundle = updateBundle(bundle, RETHINK_BLOCKLIST_NAME, name)
+                rr.arguments = updateBundle(bundle, RETHINK_BLOCKLIST_STAMP, stamp)
+                supportFragmentManager.beginTransaction().replace(R.id.root_container, rr,
+                                                                  rr.javaClass.simpleName).commit()
                 return
             }
             FragmentLoader.LOCAL.ordinal -> {
                 // load the local blocklist configure screen
-                val rethinkLocal = RethinkLocalBlocklistFragment.newInstance()
-                supportFragmentManager.beginTransaction().replace(R.id.root_container,
-                                                                  rethinkLocal, rethinkLocal.javaClass.simpleName).commit()
+                val rl = RethinkBlocklistFragment.newInstance()
+                rl.arguments = createBundle(RETHINK_BLOCKLIST_TYPE,
+                                            RethinkBlocklistFragment.RethinkBlocklistType.LOCAL.ordinal)
+                supportFragmentManager.beginTransaction().replace(R.id.root_container, rl,
+                                                                  rl.javaClass.simpleName).commit()
                 return
             }
             FragmentLoader.DB_LIST.ordinal -> {
                 // load the list of already added rethink doh urls
                 val r = RethinkListFragment.newInstance()
-                val bundle = Bundle()
-                bundle.putInt("UID", Constants.MISSING_UID)
-                r.arguments = bundle
-                supportFragmentManager.beginTransaction().replace(R.id.root_container, r, r.javaClass.simpleName).commit()
+                r.arguments = createBundle(UID, Constants.MISSING_UID)
+                supportFragmentManager.beginTransaction().replace(R.id.root_container, r,
+                                                                  r.javaClass.simpleName).commit()
                 return
             }
         }
+    }
+
+    private fun createBundle(id: String, value: Int): Bundle {
+        val bundle = Bundle()
+        bundle.putInt(id, value)
+        return bundle
+    }
+
+    private fun updateBundle(bundle: Bundle, id: String, value: String): Bundle {
+        bundle.putString(id, value)
+        return bundle
     }
 
     private fun Context.isDarkThemeOn(): Boolean {

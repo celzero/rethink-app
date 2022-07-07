@@ -15,17 +15,21 @@
  */
 package com.celzero.bravedns.ui
 
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
+import android.widget.CompoundButton
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -33,8 +37,11 @@ import com.celzero.bravedns.adapter.FirewallAppListAdapter
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.FragmentFirewallAppListBinding
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.AppInfoViewModel
+import com.google.android.material.chip.Chip
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -53,10 +60,10 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
 
     private lateinit var animation: Animation
 
-    private val filters = MutableLiveData<Filters>()
-
     companion object {
         fun newInstance() = FirewallAppFragment()
+
+        val filters = MutableLiveData<Filters>()
 
         private const val ANIMATION_DURATION = 750L
         private const val ANIMATION_REPEAT_COUNT = -1
@@ -80,6 +87,33 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
         ALL(0), INSTALLED(1), SYSTEM(2)
     }
 
+    enum class FirewallFilter(val id: Int) {
+        NONE(0), ALLOWED(1), BLOCKED(2), WHITELISTED(3), EXCLUDED(4);
+
+        fun getFilterString(): String {
+            return when (this) {
+                NONE -> "0,1,2,3,4"
+                ALLOWED -> "0"
+                BLOCKED -> "1"
+                WHITELISTED -> "2"
+                EXCLUDED -> "3"
+            }
+        }
+
+        companion object {
+            fun filter(id: Int): FirewallFilter {
+                return when (id) {
+                    NONE.id -> NONE
+                    ALLOWED.id -> ALLOWED
+                    BLOCKED.id -> BLOCKED
+                    WHITELISTED.id -> WHITELISTED
+                    EXCLUDED.id -> EXCLUDED
+                    else -> NONE
+                }
+            }
+        }
+    }
+
     enum class SortFilter(val id: Int) {
         NONE(0), BLOCKED(2), WHITELISTED(3), EXCLUDED(4); //RESTRICTED(1),
 
@@ -94,22 +128,23 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
                 }
             }
         }
+
+        fun getSortByQuery(): String {
+            return when (this) {
+                NONE -> ORDER_BY_DEFAULT
+                BLOCKED -> ORDER_BY_BLOCKED
+                WHITELISTED -> ORDER_BY_WHITELISTED
+                EXCLUDED -> ORDER_BY_EXCLUDED
+            }
+        }
     }
 
     class Filters {
         var categoryFilters: MutableSet<String> = mutableSetOf()
         var topLevelFilter = TopLevelFilter.ALL
+        var firewallFilter = FirewallFilter.NONE
         var sortType = SortFilter.NONE
         var searchString: String = ""
-
-        fun getSortByQuery(): String {
-            return when (sortType) {
-                SortFilter.NONE -> ORDER_BY_DEFAULT
-                SortFilter.BLOCKED -> ORDER_BY_BLOCKED
-                SortFilter.WHITELISTED -> ORDER_BY_WHITELISTED
-                SortFilter.EXCLUDED -> ORDER_BY_EXCLUDED
-            }
-        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -119,11 +154,40 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
         setupClickListener()
     }
 
+    override fun onResume() {
+        super.onResume()
+        checkVpnLockdownAndAllNetworks()
+    }
+
+    private fun checkVpnLockdownAndAllNetworks() {
+        if (VpnController.isVpnLockdown()) {
+            b.firewallAppLockdownHint.text = getString(R.string.fapps_lockdown_hint)
+            b.firewallAppLockdownHint.visibility = View.VISIBLE
+            return
+        }
+
+        if (persistentState.useMultipleNetworks) {
+            b.firewallAppLockdownHint.text = getString(R.string.fapps_all_network_hint)
+            b.firewallAppLockdownHint.visibility = View.VISIBLE
+            return
+        }
+
+        b.firewallAppLockdownHint.visibility = View.GONE
+    }
+
     private fun initObserver() {
         filters.observe(this.viewLifecycleOwner) {
-            appInfoViewModel.setFilter(it)
             resetFirewallIcons()
+
+            if (it == null) return@observe
+
+            appInfoViewModel.setFilter(it)
         }
+    }
+
+    override fun onDetach() {
+        filters.postValue(Filters())
+        super.onDetach()
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
@@ -141,9 +205,8 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
     }
 
     private fun addQueryToFilters(query: String) {
-        val a = filterObserver()
-        a.value?.searchString = query
-        filters.postValue(a.value)
+        filters.value?.searchString = query
+        filters.postValue(filters.value)
     }
 
     private fun setupClickListener() {
@@ -174,6 +237,90 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
         b.ffaToggleAllMobileData.setOnClickListener {
             updateMobileData()
         }
+
+        b.ffaSortIcon.setOnClickListener {
+            toggleSortUi()
+        }
+
+        b.ffaAppInfoIcon.setOnClickListener {
+            showInfoDialog()
+        }
+    }
+
+    private fun showInfoDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle(getString(R.string.fapps_info_dialog_title))
+        builder.setMessage(getString(R.string.fapps_info_dialog_message))
+        builder.setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        builder.setCancelable(false)
+        builder.create().show()
+    }
+
+    private fun toggleSortUi() {
+        if (b.ffaSortChipLl.isVisible) {
+            b.ffaSortChipLl.visibility = View.GONE
+        } else {
+            b.ffaSortChipLl.visibility = View.VISIBLE
+        }
+    }
+
+    private fun remakeSortChips() {
+        b.ffaSortChipGroup.removeAllViews()
+
+        val none = makeSortChip(SortFilter.NONE.id, getString(R.string.fapps_sort_filter_none),
+                                true)
+        val blocked = makeSortChip(SortFilter.BLOCKED.id,
+                                   getString(R.string.fapps_sort_filter_blocked), false)
+        val whitelisted = makeSortChip(SortFilter.WHITELISTED.id,
+                                       getString(R.string.fapps_sort_filter_whitelisted), false)
+        val excluded = makeSortChip(SortFilter.EXCLUDED.id,
+                                    getString(R.string.fapps_sort_filter_excluded), false)
+
+        b.ffaSortChipGroup.addView(none)
+        b.ffaSortChipGroup.addView(blocked)
+        b.ffaSortChipGroup.addView(whitelisted)
+        b.ffaSortChipGroup.addView(excluded)
+    }
+
+    private fun makeSortChip(id: Int, label: String, checked: Boolean): Chip {
+        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
+        chip.tag = id
+        chip.text = label
+        chip.isChecked = checked
+
+        chip.setOnCheckedChangeListener { button: CompoundButton, isSelected: Boolean ->
+            if (isSelected) {
+                applySortFilter(button.tag)
+                colorUpChipIcon(chip)
+            } else {
+                // no-op
+                // no action needed for checkState: false
+            }
+        }
+
+        return chip
+    }
+
+    private fun colorUpChipIcon(chip: Chip) {
+        val colorFilter = PorterDuffColorFilter(
+            ContextCompat.getColor(requireContext(), R.color.primaryText), PorterDuff.Mode.SRC_IN)
+        chip.checkedIcon?.colorFilter = colorFilter
+        chip.chipIcon?.colorFilter = colorFilter
+    }
+
+    private fun applySortFilter(tag: Any) {
+        if (filters.value == null) {
+            val f = Filters()
+            f.sortType = SortFilter.getSortFilter(tag as Int)
+            filters.postValue(f)
+            return
+        }
+
+        filters.value?.sortType = SortFilter.getSortFilter(tag as Int)
+        filters.postValue(filters.value)
     }
 
     private fun resetFirewallIcons() {
@@ -215,33 +362,37 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
         }
     }
 
-    fun filterObserver(): MutableLiveData<Filters> {
-        return filters
-    }
-
     private fun initView() {
         initListAdapter()
+        addObserver()
         b.ffaSearch.setOnQueryTextListener(this)
         addAnimation()
+        remakeSortChips()
+    }
+
+    private fun addObserver() {
+        filters.observe(viewLifecycleOwner) {
+            if (it == null) return@observe
+
+            appInfoViewModel.setFilter(it)
+            b.ffaAppList.smoothScrollToPosition(0)
+        }
     }
 
     private fun initListAdapter() {
         b.ffaAppList.setHasFixedSize(true)
-        layoutManager = LinearLayoutManager(requireContext())
+        layoutManager = CustomLinearLayoutManager(requireContext())
         b.ffaAppList.layoutManager = layoutManager
         val recyclerAdapter = FirewallAppListAdapter(requireContext(), viewLifecycleOwner,
                                                      persistentState)
         appInfoViewModel.appInfo.observe(viewLifecycleOwner,
                                          androidx.lifecycle.Observer(recyclerAdapter::submitList))
         b.ffaAppList.adapter = recyclerAdapter
-        val dividerItemDecoration = DividerItemDecoration(b.ffaAppList.context,
-                                                          (layoutManager as LinearLayoutManager).orientation)
-        b.ffaAppList.addItemDecoration(dividerItemDecoration)
 
     }
 
     private fun openFilterBottomSheet() {
-        val bottomSheetFragment = FirewallAppFilterBottomSheet(this)
+        val bottomSheetFragment = FirewallAppFilterBottomSheet()
         bottomSheetFragment.show(requireActivity().supportFragmentManager, bottomSheetFragment.tag)
     }
 

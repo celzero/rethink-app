@@ -16,9 +16,6 @@
 package com.celzero.bravedns.database
 
 import androidx.lifecycle.LiveData
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 class CustomIpRepository(private val customIpDao: CustomIpDao) {
@@ -36,7 +33,7 @@ class CustomIpRepository(private val customIpDao: CustomIpDao) {
     }
 
     suspend fun getIpRules(): List<CustomIp> {
-        return customIpDao.getFirewallRules()
+        return customIpDao.getCustomIpRules()
     }
 
     suspend fun getCustomIpDetail(uid: Int, ipAddress: String): CustomIp? {

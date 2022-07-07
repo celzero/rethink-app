@@ -57,6 +57,60 @@ object FirewallManager : KoinComponent {
     enum class FirewallStatus(val id: Int) {
         ALLOW(0), BLOCK(1), WHITELIST(2), EXCLUDE(3), UNTRACKED(4);
 
+        companion object {
+
+            // labels for spinner / toggle ui
+            fun getLabel(context: Context): Array<String> {
+                return context.resources.getStringArray(R.array.firewall_rules)
+            }
+
+            fun getStatus(id: Int): FirewallStatus {
+                return when (id) {
+                    ALLOW.id -> {
+                        ALLOW
+                    }
+                    BLOCK.id -> {
+                        BLOCK
+                    }
+                    WHITELIST.id -> {
+                        WHITELIST
+                    }
+                    EXCLUDE.id -> {
+                        EXCLUDE
+                    }
+                    else -> {
+                        UNTRACKED
+                    }
+                }
+            }
+
+            fun getStatusByLabel(id: Int): FirewallStatus {
+                return when (id) {
+                    0 -> {
+                        ALLOW
+                    }
+                    1 -> {
+                        BLOCK
+                    }
+                    2 -> {
+                        BLOCK
+                    }
+                    3 -> {
+                        BLOCK
+                    }
+                    4 -> {
+                        WHITELIST
+                    }
+                    5 -> {
+                        EXCLUDE
+                    }
+                    else -> {
+                        ALLOW
+                    }
+                }
+            }
+        }
+
         fun whitelisted(): Boolean {
             return this == WHITELIST
         }
@@ -71,6 +125,10 @@ object FirewallManager : KoinComponent {
 
         fun blocked(): Boolean {
             return this == BLOCK
+        }
+
+        fun isUntracked(): Boolean {
+            return this == UNTRACKED
         }
     }
 
@@ -87,6 +145,34 @@ object FirewallManager : KoinComponent {
 
         fun both(): Boolean {
             return this == BOTH
+        }
+
+        companion object {
+            fun getStatusByLabel(id: Int): ConnectionStatus {
+                return when (id) {
+                    0 -> {
+                        BOTH
+                    }
+                    1 -> {
+                        BOTH
+                    }
+                    2 -> {
+                        WIFI
+                    }
+                    3 -> {
+                        MOBILE_DATA
+                    }
+                    4 -> {
+                        BOTH
+                    }
+                    5 -> {
+                        BOTH
+                    }
+                    else -> {
+                        BOTH
+                    }
+                }
+            }
         }
 
     }
@@ -192,7 +278,7 @@ object FirewallManager : KoinComponent {
             FirewallStatus.ALLOW.id -> FirewallStatus.ALLOW
             FirewallStatus.EXCLUDE.id -> FirewallStatus.EXCLUDE
             FirewallStatus.UNTRACKED.id -> FirewallStatus.UNTRACKED
-            else -> FirewallStatus.ALLOW
+            else -> FirewallStatus.UNTRACKED
         }
     }
 
@@ -386,11 +472,15 @@ object FirewallManager : KoinComponent {
     fun updateFirewalledApps(uid: Int, firewallStatus: FirewallStatus) {
         io {
             invalidateFirewallStatus(uid, firewallStatus, ConnectionStatus.BOTH)
-            appInfoRepository.updateFirewallStatusByUid(uid, firewallStatus.id, ConnectionStatus.BOTH.id)
+            appInfoRepository.updateFirewallStatusByUid(uid, firewallStatus.id,
+                                                        ConnectionStatus.BOTH.id)
         }
     }
 
-    fun updateFirewallStatus(uid: Int, firewallStatus: FirewallStatus, connectionStatus: ConnectionStatus) {
+    fun updateFirewallStatus(uid: Int, firewallStatus: FirewallStatus,
+                             connectionStatus: ConnectionStatus) {
+        Log.d(LOG_TAG_FIREWALL,
+              "Apply firewall rule for uid: ${uid}, ${firewallStatus.name}, ${connectionStatus.name}")
         io {
             invalidateFirewallStatus(uid, firewallStatus, connectionStatus)
             appInfoRepository.updateFirewallStatusByUid(uid, firewallStatus.id, connectionStatus.id)

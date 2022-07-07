@@ -400,12 +400,6 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private suspend fun ioCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.IO) {
-            f()
-        }
-    }
-
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) {
             f()

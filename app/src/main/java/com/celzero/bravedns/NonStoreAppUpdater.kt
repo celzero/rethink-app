@@ -26,7 +26,10 @@ import com.celzero.bravedns.util.Constants.Companion.JSON_UPDATE
 import com.celzero.bravedns.util.Constants.Companion.JSON_VERSION
 import com.celzero.bravedns.util.Constants.Companion.UPDATE_CHECK_RESPONSE_VERSION
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
-import okhttp3.*
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.Request
+import okhttp3.Response
 import org.json.JSONObject
 import java.io.IOException
 

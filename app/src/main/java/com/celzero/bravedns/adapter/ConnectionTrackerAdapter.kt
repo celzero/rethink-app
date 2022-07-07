@@ -109,7 +109,9 @@ class ConnectionTrackerAdapter(private val context: Context) :
             if (connTracker.dnsQuery.isNullOrEmpty()) {
                 b.connectionIpAddress.text = connTracker.ipAddress
             } else {
-                b.connectionIpAddress.text = context.getString(R.string.ct_ip_details, connTracker.ipAddress, connTracker.dnsQuery)
+                b.connectionIpAddress.text = context.getString(R.string.ct_ip_details,
+                                                               connTracker.ipAddress,
+                                                               connTracker.dnsQuery)
             }
         }
 

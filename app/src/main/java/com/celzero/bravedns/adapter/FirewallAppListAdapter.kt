@@ -61,12 +61,12 @@ class FirewallAppListAdapter(private val context: Context,
     companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<AppInfo>() {
             override fun areItemsTheSame(oldConnection: AppInfo, newConnection: AppInfo): Boolean {
-                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.firewallStatus == newConnection.firewallStatus)
+                return oldConnection == newConnection
             }
 
             override fun areContentsTheSame(oldConnection: AppInfo,
                                             newConnection: AppInfo): Boolean {
-                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.firewallStatus != newConnection.firewallStatus)
+                return (oldConnection.packageInfo == newConnection.packageInfo && oldConnection.firewallStatus == newConnection.firewallStatus && oldConnection.metered == newConnection.metered)
             }
         }
     }
@@ -105,17 +105,22 @@ class FirewallAppListAdapter(private val context: Context,
         private fun getFirewallText(aStat: FirewallManager.FirewallStatus,
                                     cStat: FirewallManager.ConnectionStatus): CharSequence {
             return when (aStat) {
-                FirewallManager.FirewallStatus.ALLOW -> "Allowed"
-                FirewallManager.FirewallStatus.EXCLUDE -> "Excluded"
-                FirewallManager.FirewallStatus.WHITELIST -> "Whitelisted"
+                FirewallManager.FirewallStatus.ALLOW -> context.getString(
+                    R.string.firewall_status_allow)
+                FirewallManager.FirewallStatus.EXCLUDE -> context.getString(
+                    R.string.firewall_status_excluded)
+                FirewallManager.FirewallStatus.WHITELIST -> context.getString(
+                    R.string.firewall_status_whitelisted)
                 FirewallManager.FirewallStatus.BLOCK -> {
                     when {
-                        cStat.mobileData() -> "Allowed on WiFi"
-                        cStat.wifi() -> "Allowed on mobile data"
-                        else -> "Blocked"
+                        cStat.mobileData() -> context.getString(
+                            R.string.firewall_status_allow_unmetered)
+                        cStat.wifi() -> context.getString(R.string.firewall_status_allow_metered)
+                        else -> context.getString(R.string.firewall_status_blocked)
                     }
                 }
-                FirewallManager.FirewallStatus.UNTRACKED -> "Unknown"
+                FirewallManager.FirewallStatus.UNTRACKED -> context.getString(
+                    R.string.firewall_status_unknown)
             }
         }
 
@@ -184,7 +189,7 @@ class FirewallAppListAdapter(private val context: Context,
 
         private fun showWifiUnused() {
             b.firewallAppToggleWifi.setImageDrawable(
-                ContextCompat.getDrawable(context, R.drawable.ic_firewall_data_on_grey))
+                ContextCompat.getDrawable(context, R.drawable.ic_firewall_wifi_on_grey))
         }
 
         private fun showAppHint(mIconIndicator: TextView, appInfo: AppInfo) {

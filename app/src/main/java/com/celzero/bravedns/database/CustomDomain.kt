@@ -19,7 +19,6 @@ import android.os.SystemClock
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.celzero.bravedns.automaton.DomainRulesManager
-import java.sql.Date
 
 @Entity(tableName = "CustomDomain")
 class CustomDomain {
@@ -27,8 +26,8 @@ class CustomDomain {
     var ips: String = ""
     var status: Int = 0
     var type: Int = 0
-    var createdTs: Date = Date(SystemClock.elapsedRealtime())
-    var deletedTs: Date = Date(SystemClock.elapsedRealtime())
+    var createdTs: Long = SystemClock.elapsedRealtime()
+    var deletedTs: Long = SystemClock.elapsedRealtime()
     var version: Long = getCurrentVersion()
 
     override fun equals(other: Any?): Boolean {
@@ -41,8 +40,8 @@ class CustomDomain {
         return this.domain.hashCode()
     }
 
-    constructor(domain: String, ips: String, type: Int, status: Int, createdTs: Date,
-                deletedTs: Date, version: Long) {
+    constructor(domain: String, ips: String, type: Int, status: Int, createdTs: Long,
+                deletedTs: Long, version: Long) {
         this.domain = domain.dropLastWhile { it == '.' }
         this.ips = ips
         this.status = status

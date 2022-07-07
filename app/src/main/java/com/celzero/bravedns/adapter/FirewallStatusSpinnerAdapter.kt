@@ -16,53 +16,54 @@
 package com.celzero.bravedns.adapter
 
 import android.content.Context
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
+import android.widget.BaseAdapter
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatImageView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.databinding.SpinnerItemFirewallStatusBinding
 
-class FirewallStatusSpinnerAdapter(context: Context) :
-        ArrayAdapter<FirewallManager.FirewallStatus>(context, 0, FirewallManager.FirewallStatus.values()) {
+class FirewallStatusSpinnerAdapter(val context: Context, private val spinnerLabels: Array<String>) :
+        BaseAdapter() {
+
+    override fun getCount(): Int {
+        return spinnerLabels.size
+    }
+
+    override fun getItem(position: Int): String {
+        return spinnerLabels[position]
+    }
+
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
+    }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-
         val itemBinding = convertView ?: SpinnerItemFirewallStatusBinding.inflate(
             LayoutInflater.from(parent.context), parent, false).root
 
-        getItem(position)?.let { status ->
-            setItem(itemBinding, status)
-        }
-
+        setItem(itemBinding, getItem(position))
         return itemBinding
     }
 
     override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val itemBinding = SpinnerItemFirewallStatusBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false)
-        if (position == 0) {
-            itemBinding.root.setOnClickListener {
-                itemBinding.root.dispatchKeyEvent(
-                    KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BACK))
-                itemBinding.root.dispatchKeyEvent(
-                    KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK))
-            }
-        }
+        val itemBinding = convertView ?: SpinnerItemFirewallStatusBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false).root
 
-        getItem(position)?.let { status ->
-            setItem(itemBinding.root, status)
-        }
-        return itemBinding.root
+        setItem(itemBinding, getItem(position))
+        return itemBinding
     }
 
-    override fun isEnabled(position: Int) = position != 0
+    private fun setItem(view: View, status: String?) {
+        if (status == null) return
 
-    private fun setItem(view: View, status: FirewallManager.FirewallStatus) {
         val tv = view.findViewById<TextView>(R.id.spinner_text)
-        tv.text = status.name
+        val iv = view.findViewById<AppCompatImageView>(R.id.spinner_icon)
+        tv.text = status
+        // do not show down arrow on drop down
+        iv.visibility = View.INVISIBLE
     }
+
 }

@@ -155,7 +155,7 @@ class RefreshDatabase internal constructor(private var context: Context,
 
     // TODO: Ideally this should be in FirewallManager
     private suspend fun addMissingPackages(apps: HashSet<FirewallManager.AppInfoTuple>) {
-        if (apps.count() <= 0) return
+        if (apps.isEmpty()) return
 
         handleNewAppNotification(apps)
 

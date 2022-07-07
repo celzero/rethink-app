@@ -19,9 +19,13 @@ import android.content.Context
 import android.os.SystemClock
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.celzero.bravedns.automaton.RethinkBlocklistManager
 import com.celzero.bravedns.customdownloader.ConnectivityHelper.downloadIds
 import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.service.PersistentState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.concurrent.TimeUnit
@@ -90,6 +94,17 @@ class LocalBlocklistDownloader(val context: Context, workerParams: WorkerParamet
     private fun updatePersistenceOnCopySuccess(timestamp: Long) {
         persistentState.localBlocklistTimestamp = timestamp
         persistentState.blocklistEnabled = true
+        // write the file tag json file into database
+        io {
+            RethinkBlocklistManager.readJson(context, AppDownloadManager.DownloadType.LOCAL,
+                                             timestamp)
+        }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            f()
+        }
     }
 
 }

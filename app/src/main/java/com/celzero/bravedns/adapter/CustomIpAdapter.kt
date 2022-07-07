@@ -35,7 +35,7 @@ import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
 import com.celzero.bravedns.util.Utilities.Companion.getFlag
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
-import java.net.InetAddress
+import inet.ipaddr.IPAddressString
 
 class CustomIpAdapter(private val context: Context) :
         PagedListAdapter<CustomIp, CustomIpAdapter.CustomIpsViewHolder>(DIFF_CALLBACK) {
@@ -51,6 +51,7 @@ class CustomIpAdapter(private val context: Context) :
         }
     }
 
+    // ui component to update/toggle the buttons
     data class ToggleBtnUi(val txtColor: Int, val bgColor: Int)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomIpsViewHolder {
@@ -86,6 +87,10 @@ class CustomIpAdapter(private val context: Context) :
             b.customIpToggleGroup.addOnButtonCheckedListener(ipRulesGroupListener)
 
             b.customIpExpandIcon.setOnClickListener {
+                toggleActionsUi()
+            }
+
+            b.customIpContainer.setOnClickListener {
                 toggleActionsUi()
             }
 
@@ -208,7 +213,7 @@ class CustomIpAdapter(private val context: Context) :
             if (ip.wildcard) return
 
             b.customIpFlag.text = getFlag(
-                getCountryCode(InetAddress.getByName(ip.ipAddress), context))
+                getCountryCode(IPAddressString(ip.ipAddress).hostAddress.toInetAddress(), context))
         }
 
         private fun toggleActionsUi() {
@@ -223,19 +228,18 @@ class CustomIpAdapter(private val context: Context) :
         }
 
         private fun updateStatusUi(status: IpRulesManager.IpRuleStatus) {
-            // fixme: move the string literals to strings.xml
             when (status) {
                 IpRulesManager.IpRuleStatus.WHITELIST -> {
-                    b.customIpStatusIcon.text = "W"
-                    b.customIpStatusTv.text = "Whitelisted"
+                    b.customIpStatusIcon.text = context.getString(R.string.ci_whitelist_initial)
+                    b.customIpStatusTv.text = context.getString(R.string.ci_whitelist_txt)
                 }
                 IpRulesManager.IpRuleStatus.BLOCK -> {
-                    b.customIpStatusIcon.text = "B"
-                    b.customIpStatusTv.text = "Blocked"
+                    b.customIpStatusIcon.text = context.getString(R.string.ci_blocked_initial)
+                    b.customIpStatusTv.text = context.getString(R.string.ci_blocked_txt)
                 }
                 IpRulesManager.IpRuleStatus.NONE -> {
-                    b.customIpStatusIcon.text = "N"
-                    b.customIpStatusTv.text = "No Rule"
+                    b.customIpStatusIcon.text = context.getString(R.string.ci_no_rule_initial)
+                    b.customIpStatusTv.text = context.getString(R.string.ci_no_rule_txt)
                 }
             }
         }

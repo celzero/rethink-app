@@ -1,120 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/firewall_app_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:attr/selectableItemBackground">
+    android:animateLayoutChanges="true"
+    android:focusable="true"
+    android:layout_marginBottom="1dp"
+    android:clickable="true"
+    android:background="?attr/background"
+    android:orientation="vertical">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <LinearLayout
+        android:id="@+id/firewall_app_list_top_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:orientation="horizontal">
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/firewall_app_list_top_layout"
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/firewall_app_status_indicator"
+            android:layout_width="1.5dp"
+            android:layout_height="match_parent"
+            android:background="@color/colorGreen_A400" />
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/firewall_app_status_indicator"
-                android:layout_width="2dp"
-                android:layout_height="match_parent"
-                android:background="@color/colorGreen_A400" />
-
-            <androidx.appcompat.widget.LinearLayoutCompat
+            <RelativeLayout
+                android:id="@+id/container"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp">
+                android:layout_height="match_parent">
 
-                <RelativeLayout
-                    android:id="@+id/container"
-                    android:layout_width="match_parent"
+                <ImageView
+                    android:id="@+id/firewall_app_icon_iv"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:contentDescription="@string/apps_icon_content_desc"
+                    android:maxWidth="60dp"
+                    android:maxHeight="60dp"
+                    android:src="@drawable/ic_launcher_foreground" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/firewall_app_text_ll"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp">
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_toStartOf="@id/firewall_app_toggle_wifi"
+                    android:layout_toEndOf="@id/firewall_app_icon_iv"
+                    android:orientation="vertical">
 
-                    <ImageView
-                        android:id="@+id/firewall_app_icon_iv"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:contentDescription="@string/apps_icon_content_desc"
-                        android:maxWidth="60dp"
-                        android:maxHeight="60dp"
-                        android:src="@drawable/ic_launcher_foreground" />
-
-                    <androidx.appcompat.widget.LinearLayoutCompat
-                        android:id="@+id/firewall_app_text_ll"
-                        android:layout_width="wrap_content"
+                    <TextView
+                        android:id="@+id/firewall_app_label_tv"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
+                        android:fontFamily="sans-serif"
+                        android:padding="5dp"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/extra_large_font_text_view" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/firewall_app_toggle_other"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="5dp"
-                        android:layout_toStartOf="@id/firewall_app_toggle_wifi"
-                        android:layout_toEndOf="@id/firewall_app_icon_iv"
-                        android:orientation="vertical">
+                        android:textSize="@dimen/default_font_text_view" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
 
-                        <TextView
-                            android:id="@+id/firewall_app_label_tv"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif"
-                            android:padding="5dp"
-                            android:textColor="?attr/primaryTextColor"
-                            android:textSize="@dimen/extra_large_font_text_view" />
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/firewall_app_toggle_wifi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_toStartOf="@id/firewall_app_toggle_mobile_data"
+                    android:maxWidth="24dp"
+                    android:maxHeight="24dp"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_firewall_wifi_on" />
 
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/firewall_app_toggle_other"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp"
-                            android:layout_marginEnd="5dp"
-                            android:textSize="@dimen/default_font_text_view" />
-                    </androidx.appcompat.widget.LinearLayoutCompat>
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/firewall_app_toggle_mobile_data"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_toStartOf="@id/indicator"
+                    android:maxWidth="24dp"
+                    android:maxHeight="24dp"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_firewall_data_on" />
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/firewall_app_toggle_wifi"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginEnd="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:layout_toStartOf="@id/firewall_app_toggle_mobile_data"
-                        android:maxWidth="24dp"
-                        android:maxHeight="24dp"
-                        android:padding="5dp"
-                        android:src="@drawable/ic_firewall_wifi_on" />
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/indicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_keyboard_arrow_down_small" />
+            </RelativeLayout>
+        </LinearLayout>
+    </LinearLayout>
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/firewall_app_toggle_mobile_data"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:layout_toStartOf="@id/indicator"
-                        android:maxWidth="24dp"
-                        android:maxHeight="24dp"
-                        android:padding="5dp"
-                        android:src="@drawable/ic_firewall_data_on" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/indicator"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_keyboard_arrow_down_small" />
-                </RelativeLayout>
-            </androidx.appcompat.widget.LinearLayoutCompat>
-        </androidx.appcompat.widget.LinearLayoutCompat>
-    </androidx.appcompat.widget.LinearLayoutCompat>
-</RelativeLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/divider" />
+</LinearLayout>

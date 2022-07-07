@@ -16,14 +16,6 @@ limitations under the License.
 
 package com.celzero.bravedns.database
 
-import androidx.lifecycle.LiveData
-import androidx.paging.PagedList
-import androidx.paging.toLiveData
-import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-
 
 class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
 

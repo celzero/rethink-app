@@ -22,9 +22,6 @@ import androidx.paging.toLiveData
 import androidx.room.Transaction
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 import com.celzero.bravedns.util.LoggerConstants
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 class DnsCryptEndpointRepository(private val dnsCryptEndpointDAO: DnsCryptEndpointDAO) {

@@ -17,8 +17,6 @@ package com.celzero.bravedns.database
 
 import com.celzero.bravedns.data.AppConnections
 import com.celzero.bravedns.util.Constants
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 
 class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTrackerDAO) {
@@ -27,7 +25,7 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
         connectionTrackerDAO.insert(connectionTracker)
     }
 
-    suspend fun getLogsForApp(uid: Int): List<AppConnections> {
+    suspend fun getLogsForApp(uid: Int): List<AppConnections>? {
         return connectionTrackerDAO.getLogsForApp(uid)
     }
 

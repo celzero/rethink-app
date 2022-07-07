@@ -28,7 +28,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.sql.Date
 import java.util.*
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import java.util.regex.Pattern
@@ -51,7 +50,7 @@ object DomainRulesManager : KoinComponent {
         CACHE_MAX_SIZE).build()
 
     enum class DomainStatus(val id: Int) {
-        NONE(0), BLOCK(1), WHITELIST(2) ;
+        NONE(0), BLOCK(1), WHITELIST(2);
 
         companion object {
             fun getStatus(statusId: Int): DomainStatus {
@@ -285,8 +284,8 @@ object DomainRulesManager : KoinComponent {
 
     private fun constructObject(domain: String, ips: String = "", type: DomainType,
                                 status: Int): CustomDomain {
-        return CustomDomain(domain, ips, type.id, status, Date(Calendar.getInstance().timeInMillis),
-                            Date(Constants.INIT_TIME_MS), CustomDomain.getCurrentVersion())
+        return CustomDomain(domain, ips, type.id, status, Calendar.getInstance().timeInMillis,
+                            Constants.INIT_TIME_MS, CustomDomain.getCurrentVersion())
     }
 
     private fun io(f: suspend () -> Unit) {

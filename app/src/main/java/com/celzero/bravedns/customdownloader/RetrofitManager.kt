@@ -28,7 +28,7 @@ class RetrofitManager {
 
     companion object {
         fun getBlocklistBaseBuilder(): Retrofit.Builder {
-            return Retrofit.Builder().baseUrl(Constants.BLOCKLISTS_BASE_URL).client(okHttpClient())
+            return Retrofit.Builder().baseUrl(Constants.DOWNLOAD_BASE_URL).client(okHttpClient())
         }
 
         fun okHttpClient(): OkHttpClient {

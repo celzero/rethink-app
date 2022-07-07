@@ -63,15 +63,17 @@ import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FO
 import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
-import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP
+import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.google.common.base.CharMatcher
-import com.google.common.net.InetAddresses
 import com.google.common.net.InternetDomainName
+import inet.ipaddr.IPAddressString
 import kotlinx.coroutines.launch
+import xdns.Xdns
 import java.io.File
 import java.io.IOException
 import java.net.InetAddress
@@ -273,39 +275,16 @@ class Utilities {
         }
 
         fun isLanIpv4(ipAddress: String): Boolean {
-            try {
-                // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
-                val ip = InetAddresses.forString(ipAddress)
-                return ip.isLoopbackAddress || ip.isSiteLocalAddress || ip.isAnyLocalAddress || UNSPECIFIED_IP.equals(
-                    ip)
-            } catch (e: IllegalArgumentException) {
-                Log.w(LOG_TAG_VPN, "Failed parsing IP from $ipAddress with ${e.message}", e)
-            }
-            return false
+            val ip = IPAddressString(ipAddress).address
+            return ip.isLoopback || ip.isLocal || ip.isAnyLocal || UNSPECIFIED_IP_IPV4.equals(ip)
         }
 
         fun isValidLocalPort(port: Int): Boolean {
-            return port in 65535 downTo 1024
+            return isValidPort(port)
         }
 
         fun isValidPort(port: Int): Boolean {
             return port in 65535 downTo 0
-        }
-
-        fun getTypeName(type: Int): String {
-            // From https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-4
-            // additional ref: https://www.netmeister.org/blog/dns-rrs.html
-            val names = arrayOf("0", "A", "NS", "MD", "MF", "CNAME", "SOA", "MB", "MG", "MR",
-                                "NULL", "WKS", "PTR", "HINFO", "MINFO", "MX", "TXT", "RP", "AFSDB",
-                                "X25", "ISDN", "RT", "NSAP", "NSAP+PTR", "SIG", "KEY", "PX", "GPOS",
-                                "AAAA", "LOC", "NXT", "EID", "NIMLOC", "SRV", "ATMA", "NAPTR", "KX",
-                                "CERT", "A6", "DNAME", "SINK", "OPT", "APL", "DS", "SSHFP",
-                                "IPSECKEY", "RRSIG", "NSEC", "DNSKEY", "DHCID", "NSEC3",
-                                "NSEC3PARAM", "TLSA", "SMIMEA")
-            // fix: some cases the type(transaction.type) contains negative value
-            return if (type < names.size && type >= 0) {
-                names[type]
-            } else String.format(Locale.ROOT, "%d", type)
         }
 
         fun getThemeAccent(context: Context): Int {
@@ -316,7 +295,7 @@ class Utilities {
             }
         }
 
-        fun isDarkSystemTheme(context: Context): Boolean {
+        private fun isDarkSystemTheme(context: Context): Boolean {
             return context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
         }
 
@@ -590,7 +569,7 @@ class Utilities {
 
             return try {
                 val a = remoteBlocklistDownloadBasePath(ctx, which, timestamp)
-                Log.d(LoggerConstants.LOG_TAG_DNS,"Path: $a")
+                Log.d(LoggerConstants.LOG_TAG_DNS, "Path: $a")
                 File(remoteBlocklistDownloadBasePath(ctx, which, timestamp))
 
             } catch (e: IOException) {
@@ -599,13 +578,7 @@ class Utilities {
             }
         }
 
-        fun remoteBlocklistDownloadPath(ctx: Context, which: String, timestamp: Long): String {
-            return remoteBlocklistDownloadBasePath(ctx, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                  timestamp) + File.separator + which
-        }
-
-        fun remoteBlocklistDownloadBasePath(ctx: Context, which: String,
-                                                    timestamp: Long): String {
+        fun remoteBlocklistDownloadBasePath(ctx: Context, which: String, timestamp: Long): String {
             return ctx.filesDir.canonicalPath + File.separator + which + File.separator + timestamp
         }
 
@@ -680,6 +653,8 @@ class Utilities {
                 R.attr.defaultToggleBtnBg
             } else if (attr == R.color.defaultToggleBtnTxt) {
                 R.attr.defaultToggleBtnTxt
+            } else if (attr == R.color.accentGood) {
+                R.attr.accentGood
             } else {
                 R.attr.chipBgColorPositive
             }
@@ -708,6 +683,16 @@ class Utilities {
                 PendingIntent.getBroadcast(context, requestCode, intent, sFlag)
             } else {
                 PendingIntent.getBroadcast(context, requestCode, intent, flag)
+            }
+        }
+
+        fun getRemoteBlocklistStamp(url: String): String {
+            // Interacts with GO lib to fetch the stamp (Xdnx#getBlocklistStampFromURL)
+            return try {
+                Xdns.getBlocklistStampFromURL(url)
+            } catch (e: Exception) {
+                Log.w(LOG_TAG_DNS, "failure fetching stamp from Go ${e.message}", e)
+                ""
             }
         }
     }

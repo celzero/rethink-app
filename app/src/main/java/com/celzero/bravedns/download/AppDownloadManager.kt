@@ -24,6 +24,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.work.*
+import com.celzero.bravedns.automaton.RethinkBlocklistManager
 import com.celzero.bravedns.customdownloader.*
 import com.celzero.bravedns.download.DownloadConstants.Companion.DOWNLOAD_TAG
 import com.celzero.bravedns.download.DownloadConstants.Companion.FILE_TAG
@@ -75,16 +76,35 @@ class AppDownloadManager(private val context: Context,
 
     enum class DownloadType(val id: Int) {
         LOCAL(0), REMOTE(1);
+
+        fun isLocal(): Boolean {
+            return this == LOCAL
+        }
+
+        fun isRemote(): Boolean {
+            return this == REMOTE
+        }
+
+        companion object {
+            fun getType(id: Int): DownloadType {
+                return when (id) {
+                    0 -> LOCAL
+                    1 -> REMOTE
+                    else -> REMOTE
+                }
+            }
+        }
     }
 
     fun isDownloadRequired(type: DownloadType): LiveData<Long> {
+        timeStampToDownload.postValue(DownloadManagerStatus.IN_PROGRESS.id)
         val url = constructDownloadCheckUrl(type)
         val request = Request.Builder().url(url).build()
 
         RetrofitManager.okHttpClient().newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.i(LOG_TAG_DOWNLOAD,
-                      "onFailure, cancelled? ${call.isCanceled()}, exec? ${call.isExecuted()}")
+                      "onFailure, cancelled? ${call.isCanceled()}, exec? ${call.isExecuted()} with exception: ${e.message}")
                 timeStampToDownload.postValue(DownloadManagerStatus.FAILURE.id)
             }
 
@@ -110,6 +130,11 @@ class AppDownloadManager(private val context: Context,
                     return
                 }
 
+                if (type.isLocal()) {
+                    persistentState.isLocalBlocklistUpdateAvailable = false
+                } else {
+                    persistentState.isRemoteBlocklistUpdateAvailable = false
+                }
                 timeStampToDownload.postValue(DownloadManagerStatus.NOT_REQUIRED.id)
             }
         })
@@ -124,7 +149,7 @@ class AppDownloadManager(private val context: Context,
         }
         val appVersionCode = persistentState.appVersion
         val url = "${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_URL}$timestamp&${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_PARAMETER_VCODE}$appVersionCode"
-        Log.d(LOG_TAG_DOWNLOAD, "Check for download, download type ${type.name} url: $url")
+        Log.d(LOG_TAG_DOWNLOAD, "Check for download 1, download type ${type.name} url: $url")
         return url
     }
 
@@ -151,21 +176,25 @@ class AppDownloadManager(private val context: Context,
         val request = retrofitInterface.downloadRemoteBlocklistFile(
             Constants.FILETAG_TEMP_DOWNLOAD_URL)
 
+        Log.i(LOG_TAG_DOWNLOAD,
+              "Remote blocklist download request with $request with url? ${request.request().url} ")
+
         request.enqueue(object : retrofit2.Callback<JsonObject?> {
             override fun onResponse(call: retrofit2.Call<JsonObject?>,
                                     response: retrofit2.Response<JsonObject?>) {
                 if (response.isSuccessful) {
-                    // TODO: pass the time stamp
-                    // before this we need to check if there is a download required with the
-                    // previously available time stamp
                     saveFileTag(response.body(), timestamp)
                     remoteDownloadStatus.postValue(timestamp)
                 } else {
+                    Log.i(LOG_TAG_DOWNLOAD,
+                          "Remote blocklist download failure, call? ${call.isExecuted}, response: $response ")
                     remoteDownloadStatus.postValue(DownloadManagerStatus.FAILURE.id)
                 }
             }
 
             override fun onFailure(call: retrofit2.Call<JsonObject?>, t: Throwable) {
+                Log.i(LOG_TAG_DOWNLOAD,
+                      "Remote blocklist download failure with error: ${t.message}")
                 remoteDownloadStatus.postValue(DownloadManagerStatus.FAILURE.id)
             }
         })
@@ -179,6 +208,10 @@ class AppDownloadManager(private val context: Context,
 
             filetag.writeText(jsonObject.toString())
             persistentState.remoteBlocklistTimestamp = timestamp
+            // write the file tag json file into database
+            io {
+                RethinkBlocklistManager.readJson(context, DownloadType.REMOTE, timestamp)
+            }
         } catch (e: IOException) {
             Log.w(LOG_TAG_DOWNLOAD, "could not create filetag.json at version $timestamp", e)
         }
@@ -213,7 +246,7 @@ class AppDownloadManager(private val context: Context,
 
     private fun initiateCustomDownloadManager(timestamp: Long) {
         io {
-            val customDownloadManager = CustomDownloadManager()
+            val customDownloadManager = CustomDownloadManager(context)
             ConnectivityHelper.downloadIds.clear()
             Constants.ONDEVICE_BLOCKLISTS_TEMP.forEachIndexed { _, onDeviceBlocklistsMetadata ->
                 val id = generateCustomDownloadId()

@@ -15,39 +15,64 @@
         android:layout_marginBottom="20dp"
         android:background="?attr/border" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="end">
+        android:orientation="horizontal">
 
-    <com.google.android.material.chip.Chip
-        android:id="@+id/dns_block_blocklist_chip"
-        style="@style/ThinnerChip.Action"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginEnd="25dp"
-        android:layout_marginBottom="20dp"
-        android:padding="5dp"
-        android:textColor="?attr/chipTextColor"
-        android:textSize="@dimen/large_font_text_view"
-        android:visibility="gone" />
+        <TextView
+            android:id="@+id/dns_record_type_chip"
+            style="@style/ThinnerChip.Action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_toStartOf="@id/dns_block_chip_group"
+            android:layout_marginStart="15dp"
+            android:padding="5dp"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/small_font_text_view"
+            android:visibility="visible" />
 
-    <com.google.android.material.chip.Chip
-        android:id="@+id/dns_block_ips_chip"
-        style="@style/ThinnerChip.Action"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginEnd="25dp"
-        android:layout_marginBottom="20dp"
-        android:padding="5dp"
-        android:textColor="?attr/chipTextColor"
-        android:textSize="@dimen/large_font_text_view"
-        android:visibility="visible" />
+        <LinearLayout
+            android:id="@+id/dns_block_chip_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:orientation="horizontal">
 
-    </LinearLayout>
+            <com.google.android.material.chip.Chip
+                android:id="@+id/dns_block_blocklist_chip"
+                style="@style/ThinnerChip.Action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:gravity="center_vertical"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="20dp"
+                android:padding="5dp"
+                android:textColor="?attr/chipTextColor"
+                android:textSize="@dimen/large_font_text_view"
+                android:visibility="gone" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/dns_block_ips_chip"
+                style="@style/ThinnerChip.Action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:gravity="center_vertical"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="20dp"
+                android:padding="5dp"
+                android:textColor="?attr/chipTextColor"
+                android:textSize="@dimen/large_font_text_view"
+                android:visibility="gone" />
+
+        </LinearLayout>
+    </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -168,7 +193,8 @@
             android:layout_marginLeft="2dp"
             android:layout_marginRight="2dp"
             android:orientation="vertical"
-            android:padding="10dp">
+            android:padding="10dp"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="wrap_content"

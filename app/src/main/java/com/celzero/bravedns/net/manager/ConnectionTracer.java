@@ -70,19 +70,25 @@ public class ConnectionTracer {
         if (DEBUG)
             Log.d(LOG_TAG_VPN, sourceIp + " [" + sourcePort + "] to " + destIp + " [" + destPort + "]");
 
-        if (TextUtils.isEmpty(sourceIp) || sourceIp.split("\\.").length < 4) {
-            local = new InetSocketAddress(sourcePort);
-        } else {
-            local = new InetSocketAddress(sourceIp, sourcePort);
+        try {
+            if (TextUtils.isEmpty(sourceIp)) {
+                local = new InetSocketAddress(sourcePort);
+            } else {
+                local = new InetSocketAddress(sourceIp, sourcePort);
+            }
+
+            if (TextUtils.isEmpty(destIp)) {
+                remote = new InetSocketAddress(destPort);
+            } else {
+                remote = new InetSocketAddress(destIp, destPort);
+            }
+        } catch (IllegalArgumentException | SecurityException ignored) {
+            // InetSocketAddress throws IllegalArgumentException or SecurityException
+            return MISSING_UID;
         }
 
-        if (TextUtils.isEmpty(destIp) || destIp.split("\\.").length < 4) {
-            remote = new InetSocketAddress(destPort);
-        } else {
-            remote = new InetSocketAddress(destIp, destPort);
-        }
         int uid = INVALID_UID;
-        String key = makeCacheKey(protocol, local, sourcePort, remote, destPort);
+        String key = makeCacheKey(protocol, local, remote, destPort);
         try {
             return uidCache.getIfPresent(key);
         } catch (Exception ignored) {
@@ -105,7 +111,7 @@ public class ConnectionTracer {
         return uid;
     }
 
-    private String makeCacheKey(int protocol, InetSocketAddress local, int sourcePort, InetSocketAddress remote, int destPort) {
-        return protocol + local.getAddress().getHostAddress() + sourcePort + remote.getAddress().getHostAddress() + destPort;
+    private String makeCacheKey(int protocol, InetSocketAddress local, InetSocketAddress remote, int destPort) {
+        return protocol + local.getAddress().getHostAddress() + remote.getAddress().getHostAddress() + destPort;
     }
 }

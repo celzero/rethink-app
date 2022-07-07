@@ -2,36 +2,43 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:background="@android:color/transparent"
     android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/crp_heading_tv"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/crp_title_ll"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="10dp"
-        android:ellipsize="end"
-        android:padding="10dp"
-        android:text="Dummy Label"
-        android:textColor="?attr/secondaryTextColor"
-        android:textSize="@dimen/large_font_text_view" />
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/crp_blocktype_heading_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp"
+            android:textColor="?attr/accentBad"
+            android:textSize="@dimen/heading_font_text_view"
+            android:textStyle="bold" />
+
+    </LinearLayout>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/crp_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/crp_heading_tv"
-        android:layout_margin="4dp"
-        android:layout_marginTop="5dp"
+        android:layout_below="@id/crp_title_ll"
         app:cardBackgroundColor="?attr/background"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="4dp"
+        app:cardCornerRadius="2dp"
+        app:cardElevation="2dp"
         app:cardUseCompatPadding="true">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="10dp">
+            android:padding="5dp"
+            android:background="@android:color/transparent">
 
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/crp_check_box"
@@ -40,6 +47,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layoutDirection="rtl"
+                android:padding="5dp"
                 android:minWidth="48dp"
                 android:minHeight="48dp" />
 
@@ -61,10 +69,12 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/crp_label_tv"
                 android:layout_alignParentStart="true"
+                android:background="@android:color/transparent"
                 android:layout_marginTop="5dp"
-                android:layout_toEndOf="@+id/crp_check_box">
+                android:layout_toEndOf="@+id/crp_check_box"
+                android:padding="5dp">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/crp_desc_group_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -76,7 +86,7 @@
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/crp_desc_subg_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

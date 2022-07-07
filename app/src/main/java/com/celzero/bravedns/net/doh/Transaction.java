@@ -20,6 +20,8 @@ import com.celzero.bravedns.net.dns.DnsPacket;
 import java.io.Serializable;
 import java.util.Calendar;
 
+import dnsx.Dnsx;
+
 /**
  * A representation of a complete DNS transaction, whether it succeeded or failed.
  */
@@ -28,10 +30,44 @@ public class Transaction implements Serializable {
     public enum Status {
         COMPLETE,
         SEND_FAIL,
-        HTTP_ERROR,
+        TRANSPORT_ERROR,
+        NO_RESPONSE,
         BAD_RESPONSE,
+        BAD_QUERY,
         INTERNAL_ERROR,
         CANCELED
+    }
+
+    public enum QueryType {
+        DOH(Dnsx.DOH), DNS_CRYPT(Dnsx.DNSCrypt), DNS_PROXY(Dnsx.DNS53);
+
+        QueryType(String type) {
+        }
+
+        public static QueryType getType(String type) {
+            switch (type) {
+                case Dnsx.DOH:
+                    return DOH;
+                case Dnsx.DNSCrypt:
+                    return DNS_CRYPT;
+                case Dnsx.DNS53:
+                    return DNS_PROXY;
+            }
+
+            return DOH;
+        }
+
+        public Boolean isDoH() {
+            return this == DOH;
+        }
+
+        public Boolean isDnsCrypt() {
+            return this == DNS_CRYPT;
+        }
+
+        public Boolean isDnsProxy() {
+            return this == DNS_PROXY;
+        }
     }
 
     public Transaction(DnsPacket query, long timestamp) {
@@ -50,5 +86,5 @@ public class Transaction implements Serializable {
     public String serverIp;
     public String blocklist;
     public String relayIp;
-    public boolean isDNSCrypt;
+    public QueryType queryType;
 }

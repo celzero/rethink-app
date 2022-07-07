@@ -24,7 +24,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -39,9 +38,9 @@ import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Utilities.Companion.formatToRelativeTime
 import com.celzero.bravedns.viewmodel.DnsLogViewModel
 import com.google.android.material.chip.Chip
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
@@ -79,14 +78,16 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         if (!persistentState.logsEnabled) {
             includeView.queryListLogsDisabledTv.visibility = View.VISIBLE
             includeView.queryListCardViewTop.visibility = View.GONE
+            b.latencyTxt.visibility = View.GONE
+            b.totalQueriesTxt.visibility = View.GONE
             return
         }
 
         displayPerDnsUi(includeView)
         setupClickListeners(includeView)
         remakeFilterChipsUi()
-        observeDnsStats()
         observeDnscryptStatus()
+        observeDnsStats()
     }
 
     private fun setupClickListeners(includeView: QueryListScrollListBinding) {
@@ -181,38 +182,29 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
                     R.string.configure_dns_connected_doh_status)
                 b.connectedStatusTitle.text = resources.getString(
                     R.string.configure_dns_connection_name, appConfig.getConnectedDns())
-                b.queryListScrollView.recyclerQuery.visibility = View.VISIBLE
-                b.queryListScrollView.dnsLogNoLogText.visibility = View.GONE
             }
             AppConfig.DnsType.DNSCRYPT -> {
                 b.connectedStatusTitleUrl.text = resources.getString(
                     R.string.configure_dns_connected_dns_crypt_status)
                 b.queryListScrollView.recyclerQuery.visibility = View.VISIBLE
-                b.queryListScrollView.dnsLogNoLogText.visibility = View.GONE
             }
             AppConfig.DnsType.DNS_PROXY -> {
                 b.connectedStatusTitleUrl.text = resources.getString(
                     R.string.configure_dns_connected_dns_proxy_status)
                 b.connectedStatusTitle.text = resources.getString(
                     R.string.configure_dns_connection_name, appConfig.getConnectedDns())
-                b.queryListScrollView.recyclerQuery.visibility = View.GONE
-                if (persistentState.logsEnabled) {
-                    b.queryListScrollView.dnsLogNoLogText.visibility = View.VISIBLE
-                } else {
-                    /* No op */
-                    // As of now, the logs are not shown when the DNS mode is in DNSProxy.
-                    // So when proxy mode is changed, only onResume() will be called as it
-                    // is sharing the same activity. (The proxy mode changes done in the
-                    // ConfigureDNSFragment). Other logs enabled states are handled in onViewCreated().
-                }
             }
             AppConfig.DnsType.RETHINK_REMOTE -> {
                 b.connectedStatusTitleUrl.text = resources.getString(
                     R.string.configure_dns_connected_doh_status)
                 b.connectedStatusTitle.text = resources.getString(
-                    R.string.configure_dns_connection_name, "RethinkDNS "+appConfig.getConnectedDns())
-                b.queryListScrollView.recyclerQuery.visibility = View.VISIBLE
-                b.queryListScrollView.dnsLogNoLogText.visibility = View.GONE
+                    R.string.configure_dns_connection_name, appConfig.getConnectedDns())
+            }
+            AppConfig.DnsType.NETWORK_DNS -> {
+                b.connectedStatusTitleUrl.text = resources.getString(
+                    R.string.configure_dns_connected_dns_proxy_status)
+                b.connectedStatusTitle.text = resources.getString(
+                    R.string.configure_dns_connection_name, appConfig.getConnectedDns())
             }
         }
     }
@@ -295,10 +287,8 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         builder.setMessage(R.string.dns_query_clear_logs_message)
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
-            go {
-                withContext(Dispatchers.IO) {
-                    GlideApp.get(requireActivity()).clearDiskCache()
-                }
+            io {
+                GlideApp.get(requireActivity()).clearDiskCache()
                 dnsLogRepository.clearAllData()
             }
         }
@@ -318,8 +308,8 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         return true
     }
 
-    private fun go(f: suspend () -> Unit) {
-        lifecycleScope.launch {
+    private fun io(f: suspend () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
             f()
         }
     }

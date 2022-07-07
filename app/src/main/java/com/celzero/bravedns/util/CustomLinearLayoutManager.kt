@@ -30,12 +30,20 @@ class CustomLinearLayoutManager(context: Context) : LinearLayoutManager(context)
         super.smoothScrollToPosition(recyclerView, state, position)
     }
 
-    override fun computeVerticalScrollOffset(state: RecyclerView.State): Int {
-        return (super.computeVerticalScrollOffset(state) / 25f).toInt()
-    }
+    // fixme: Revisit this file for fast scroll drawable changes
+    /* override fun scrollVerticallyBy(dy: Int, recycler: RecyclerView.Recycler?,
+                                     state: RecyclerView.State?): Int {
+         return super.scrollVerticallyBy(dy * 2, recycler, state)
+     }
 
-    override fun computeVerticalScrollRange(state: RecyclerView.State): Int {
-        return 50000
-    }
+     override fun computeVerticalScrollOffset(state: RecyclerView.State): Int {
+         Log.d("TEST", "TEST : computeVerticalScrollOffset: ${super.computeVerticalScrollOffset(state)}, ${super.computeVerticalScrollOffset(state)/4}...${state.remainingScrollVertical}, ${state.isMeasuring}, ${state.itemCount}, ${state.targetScrollPosition}")
+          return super.computeVerticalScrollRange(state) / 2
+      }
 
+      override fun computeVerticalScrollRange(state: RecyclerView.State): Int {
+          Log.d("TEST", "TEST : computeVerticalScrollRange: ${state.remainingScrollVertical}, ${state.isMeasuring}, ${state.itemCount}, ${state.targetScrollPosition}")
+          //return 15000 //+ state.remainingScrollVertical
+          return super.computeVerticalScrollOffset(state) / 2
+      }*/
 }

@@ -20,6 +20,7 @@ import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.celzero.bravedns.automaton.RethinkBlocklistManager
 import com.celzero.bravedns.download.BlocklistDownloadHelper.Companion.deleteOldFiles
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -31,6 +32,9 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.hasLocalBlocklists
 import com.celzero.bravedns.util.Utilities.Companion.localBlocklistDownloadPath
 import dnsx.Dnsx
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
@@ -131,6 +135,10 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
     private fun updatePersistenceOnCopySuccess(timestamp: Long) {
         persistentState.localBlocklistTimestamp = timestamp
         persistentState.blocklistEnabled = true
+        io {
+            RethinkBlocklistManager.readJson(context, AppDownloadManager.DownloadType.LOCAL,
+                                             timestamp)
+        }
     }
 
     /**
@@ -157,6 +165,12 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             Log.e(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid exception: ${e.message}", e)
         }
         return false
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            f()
+        }
     }
 
 }

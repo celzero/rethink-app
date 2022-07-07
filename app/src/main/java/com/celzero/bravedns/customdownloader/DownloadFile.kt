@@ -20,8 +20,8 @@ import android.os.Parcelable
 
 class DownloadFile() : Parcelable {
     var progress = 0
-    var currentFileSize = 0
-    var totalFileSize = 0
+    var currentFileSize = 0.0
+    var totalFileSize = 0.0
 
     override fun describeContents(): Int {
         return 0
@@ -29,14 +29,14 @@ class DownloadFile() : Parcelable {
 
     private constructor(parcel: Parcel) : this() {
         progress = parcel.readInt()
-        currentFileSize = parcel.readInt()
-        totalFileSize = parcel.readInt()
+        currentFileSize = parcel.readDouble()
+        totalFileSize = parcel.readDouble()
     }
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
         dest.writeInt(progress)
-        dest.writeInt(currentFileSize)
-        dest.writeInt(totalFileSize)
+        dest.writeDouble(currentFileSize)
+        dest.writeDouble(totalFileSize)
     }
 
     companion object CREATOR : Parcelable.Creator<DownloadFile> {

@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui
 
+import android.content.res.Configuration
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
@@ -28,12 +29,11 @@ import com.celzero.bravedns.data.FileTag
 import com.celzero.bravedns.databinding.BottomSheetRethinkPlusFilterBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.Utilities.Companion.isDarkSystemTheme
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import org.koin.android.ext.android.inject
 
-class RethinkPlusFilterBottomSheetFragment(val activity: ConfigureRethinkPlusActivity,
+class RethinkPlusFilterBottomSheetFragment(val activity: RethinkBlocklistFragment?,
                                            private val fileTags: List<FileTag>) :
         BottomSheetDialogFragment() {
 
@@ -44,9 +44,9 @@ class RethinkPlusFilterBottomSheetFragment(val activity: ConfigureRethinkPlusAct
 
     private val persistentState by inject<PersistentState>()
 
-    private var filters: ConfigureRethinkPlusActivity.Filters? = null
+    private var filters: RethinkBlocklistFragment.Filters? = null
 
-    override fun getTheme(): Int = Themes.getBottomsheetCurrentTheme(isDarkSystemTheme(activity),
+    override fun getTheme(): Int = Themes.getBottomsheetCurrentTheme(isDarkThemeOn(),
                                                                      persistentState.theme)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -55,6 +55,11 @@ class RethinkPlusFilterBottomSheetFragment(val activity: ConfigureRethinkPlusAct
         return b.root
     }
 
+    private fun isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+    }
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
@@ -62,7 +67,7 @@ class RethinkPlusFilterBottomSheetFragment(val activity: ConfigureRethinkPlusAct
     }
 
     private fun initView() {
-        filters = activity.filterObserver().value
+        filters = activity?.filterObserver()?.value
         makeChipGroup(fileTags)
         makeChipSubGroup(fileTags)
     }
@@ -90,11 +95,11 @@ class RethinkPlusFilterBottomSheetFragment(val activity: ConfigureRethinkPlusAct
             this.dismiss()
             if (filters == null) return@setOnClickListener
 
-            activity.filterObserver().postValue(filters)
+            activity?.filterObserver()?.postValue(filters)
         }
 
         b.rpfClear.setOnClickListener {
-            activity.filterObserver().postValue(ConfigureRethinkPlusActivity.Filters())
+            activity?.filterObserver()?.postValue(RethinkBlocklistFragment.Filters())
             this.dismiss()
         }
     }
@@ -144,7 +149,7 @@ class RethinkPlusFilterBottomSheetFragment(val activity: ConfigureRethinkPlusAct
 
     private fun applyGroupFilter(tag: String) {
         if (filters == null) {
-            filters = ConfigureRethinkPlusActivity.Filters()
+            filters = RethinkBlocklistFragment.Filters()
         }
         // asserting the filters object with above check
         filters!!.groups.add(tag)
@@ -176,7 +181,7 @@ class RethinkPlusFilterBottomSheetFragment(val activity: ConfigureRethinkPlusAct
     private fun applySubgroupFilter(tag: String) {
         val ft = fileTags.first { tag == it.subg }
         if (filters == null) {
-            filters = ConfigureRethinkPlusActivity.Filters()
+            filters = RethinkBlocklistFragment.Filters()
         }
         // asserting the filters object with above check
         filters!!.groups.add(ft.group)

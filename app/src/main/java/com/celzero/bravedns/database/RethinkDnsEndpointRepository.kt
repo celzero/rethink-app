@@ -17,8 +17,6 @@ limitations under the License.
 package com.celzero.bravedns.database
 
 import androidx.room.Transaction
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 
 class RethinkDnsEndpointRepository(private val rethinkDnsEndpointDao: RethinkDnsEndpointDao) {
@@ -41,16 +39,16 @@ class RethinkDnsEndpointRepository(private val rethinkDnsEndpointDao: RethinkDns
         rethinkDnsEndpointDao.removeConnectionStatus()
     }
 
-    suspend fun removeAppDns(uid: Int){
-        rethinkDnsEndpointDao.removeAppDns(uid)
+    suspend fun removeAppWiseDns(uid: Int) {
+        rethinkDnsEndpointDao.removeAppWiseDns(uid)
     }
 
     suspend fun deleteRethinkEndpoint(name: String, url: String, uid: Int) {
         rethinkDnsEndpointDao.deleteDoHEndpoint(name, url, uid)
     }
 
-    suspend fun isAppDnsEnabled(uid: Int): Boolean {
-        return rethinkDnsEndpointDao.isAppDnsEnabled(uid) ?: false
+    suspend fun isAppWiseDnsEnabled(uid: Int): Boolean {
+        return rethinkDnsEndpointDao.isAppWiseDnsEnabled(uid) ?: false
     }
 
     suspend fun getConnectedEndpoint(): RethinkDnsEndpoint? {
@@ -60,5 +58,26 @@ class RethinkDnsEndpointRepository(private val rethinkDnsEndpointDao: RethinkDns
     suspend fun updateConnectionDefault() {
         rethinkDnsEndpointDao.removeConnectionStatus()
         rethinkDnsEndpointDao.updateConnectionDefault()
+    }
+
+    suspend fun setRethinkPlus() {
+        rethinkDnsEndpointDao.removeConnectionStatus()
+        rethinkDnsEndpointDao.setRethinkPlus()
+    }
+
+    suspend fun getCount(): Int {
+        return rethinkDnsEndpointDao.getCount()
+    }
+
+    suspend fun updatePlusBlocklistCount(count: Int) {
+        rethinkDnsEndpointDao.updatePlusBlocklistCount(count)
+    }
+
+    suspend fun updateEndpoint(name: String, url: String, count: Int) {
+        rethinkDnsEndpointDao.updateEndpoint(name, url, count)
+    }
+
+    suspend fun getRethinkPlusStamp(): String {
+        return rethinkDnsEndpointDao.getRethinkPlusStamp()
     }
 }

@@ -15,7 +15,7 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="15dp">
@@ -24,6 +24,7 @@
                 android:id="@+id/fhs_title_rethink"
                 style="@style/TextAppearance.Heading.HomeScreen"
                 android:layout_width="wrap_content"
+                android:alpha="0.5"
                 android:layout_height="wrap_content"
                 android:text="@string/app_name_small_case" />
 
@@ -32,6 +33,7 @@
                 style="@style/TextAppearance.SubHeading.HomeScreen"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:text="@string/backed_by_mozilla" />
 
         </LinearLayout>
@@ -57,7 +59,7 @@
                     android:id="@+id/fhs_card_dns_ll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
+                    android:background="@drawable/rounded_corner_button_bg"
                     android:orientation="vertical">
 
                     <TextView
@@ -88,10 +90,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:layout_margin="1dp"
-                        android:minHeight="40dp"
-                        android:textSize="@dimen/large_font_text_view"
                         android:background="@drawable/rounded_corner_button_bg"
-                        android:text="@string/dns_card_configure_btn" />
+                        android:minHeight="40dp"
+                        android:text="@string/dns_card_configure_btn"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:visibility="gone" />
 
                 </LinearLayout>
 
@@ -109,7 +112,7 @@
                     android:id="@+id/fhs_card_firewall_ll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
+                    android:background="@drawable/rounded_corner_button_bg"
                     android:orientation="vertical">
 
                     <TextView
@@ -117,6 +120,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/firewall_mode_info_title"
+                        android:textColor="?attr/invertedPrimaryTextColor"
                         app:drawableEndCompat="@drawable/firewall_home_screen" />
 
                     <TextView
@@ -140,11 +144,12 @@
                         style="@style/Button.HomeScreen.Borderless"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
-                        android:minHeight="40dp"
                         android:layout_margin="1dp"
-                        android:textSize="@dimen/large_font_text_view"
                         android:background="@drawable/rounded_corner_button_bg"
-                        android:text="@string/firewall_card_configure_btn" />
+                        android:minHeight="40dp"
+                        android:text="@string/firewall_card_configure_btn"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:visibility="gone" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -193,19 +198,19 @@
                     app:chipIcon="@drawable/ic_local_blocklist" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/fhs_whitelist_chip"
+                    android:id="@+id/fhs_dns_logs_chip"
                     style="@style/Chip.HomeScreen.Action"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/hsf_whitelist_chip_text"
+                    android:text="@string/hsf_dns_logs_chip_text"
                     app:chipIcon="@drawable/ic_whitelist" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/fhs_exclude_chip"
+                    android:id="@+id/fhs_network_logs_chip"
                     style="@style/Chip.HomeScreen.Action"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/hsf_exclude_chip_text"
+                    android:text="@string/hsf_network_logs_chip_text"
                     app:chipIcon="@drawable/ic_exclude" />
 
                 <com.google.android.material.chip.Chip

@@ -175,6 +175,7 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
 
         val intent = Intent("android.intent.action.MAIN")
         intent.addCategory("android.intent.category.HOME")
+        // package manager returns null,
         val thisPackage = this.packageManager.resolveActivity(intent,
                                                               PackageManager.MATCH_DEFAULT_ONLY)?.activityInfo?.packageName
         return thisPackage == packageName

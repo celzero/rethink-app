@@ -22,12 +22,12 @@
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp"
         android:padding="10dp"
-        android:text="Group by"
+        android:text="@string/fapps_filter_firewall_status"
         android:textColor="?attr/secondaryTextColor"
         android:textSize="@dimen/large_font_text_view" />
 
     <com.google.android.material.chip.ChipGroup
-        android:id="@+id/ffa_sort_chip_group"
+        android:id="@+id/ffa_firewall_chip_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -51,7 +51,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp"
         android:padding="10dp"
-        android:text="Filter"
+        android:text="@string/fapps_filter_filter_heading"
         android:textColor="?attr/secondaryTextColor"
         android:textSize="@dimen/large_font_text_view" />
 
@@ -72,7 +72,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp"
         android:padding="10dp"
-        android:text="Categories"
+        android:text="@string/fapps_filter_categories_heading"
         android:textColor="?attr/secondaryTextColor"
         android:textSize="@dimen/large_font_text_view" />
 
@@ -107,7 +107,7 @@
             android:padding="5dp"
             android:maxHeight="40dp"
             android:minHeight="40dp"
-            android:text="Clear"
+            android:text="@string/fapps_filter_clear_btn"
             android:textColor="?attr/primaryTextColor" />
 
         <androidx.appcompat.widget.AppCompatButton
@@ -121,7 +121,7 @@
             android:minHeight="40dp"
             android:background="@drawable/rounded_corners_button_primary"
             android:padding="5dp"
-            android:text="Apply"
+            android:text="@string/fapps_filter_apply_btn"
             android:textColor="?attr/primaryTextColor" />
     </LinearLayout>
 

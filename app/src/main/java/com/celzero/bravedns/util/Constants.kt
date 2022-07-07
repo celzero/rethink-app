@@ -25,26 +25,34 @@ class Constants {
         // on-device blocklist download path
         val ONDEVICE_BLOCKLIST_DOWNLOAD_PATH = File.separator + "downloads" + File.separator
 
+        const val DOWNLOAD_BASE_URL = "https://dl.rethinkdns.com"
+
         // file names which are downloaded as part of on-device blocklists
         val ONDEVICE_BLOCKLIST_FILE_TAG = File.separator + "filetag.json"
         val ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG = File.separator + "basicconfig.json"
         val ONDEVICE_BLOCKLIST_FILE_RD = File.separator + "rd.txt"
         val ONDEVICE_BLOCKLIST_FILE_TD = File.separator + "td.txt"
 
+        val ONDEVICE_GEOIP_IPV4 = File.separator + "dbip.v4"
+        val ONDEVICE_GEOIP_IPV6 = File.separator + "dbip.v6"
+
+        // url parameter used in configure blocklist webview
+        const val RETHINK_BLOCKLIST_CONFIGURE_URL_PARAMETER = "tstamp="
+
         // url to check to check the if there is update available for on-device blocklist
-        const val ONDEVICE_BLOCKLIST_UPDATE_CHECK_URL = "https://download.rethinkdns.com/update/blocklists?tstamp="
+        const val ONDEVICE_BLOCKLIST_UPDATE_CHECK_URL = "$DOWNLOAD_BASE_URL/update/blocklists?$RETHINK_BLOCKLIST_CONFIGURE_URL_PARAMETER"
+
+        // url to check to check the if there is update available for on-device blocklist
+        const val ONDEVICE_IPDB_UPDATE_CHECK_URL = "$DOWNLOAD_BASE_URL/update/geoip?path="
 
         // url parameter, part of update check for on-device blocklist
         const val ONDEVICE_BLOCKLIST_UPDATE_CHECK_PARAMETER_VCODE = "vcode="
 
         // url to check if there is app-update is available (this is for website version only)
-        const val RETHINK_APP_UPDATE_CHECK = "https://download.rethinkdns.com/update/app?vcode="
+        const val RETHINK_APP_UPDATE_CHECK = "$DOWNLOAD_BASE_URL/update/app?$ONDEVICE_BLOCKLIST_UPDATE_CHECK_PARAMETER_VCODE"
 
         // url to launch the blocklist (remote/on-device) configure screen
         const val RETHINK_BLOCKLIST_CONFIGURE_URL = "https://rethinkdns.com/configure?v=app"
-
-        // url parameter used in configure blocklist webview
-        const val RETHINK_BLOCKLIST_CONFIGURE_URL_PARAMETER = "tstamp"
 
         // The version tag value(response) for the update check (both on-device and app update)
         // TODO: have two different response versions for blocklist update and app update
@@ -58,15 +66,19 @@ class Constants {
 
         const val REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME = "remote_blocklist"
 
-        val ONDEVICE_BLOCKLISTS = listOf(
-            OnDeviceBlocklistsMetadata("https://download.rethinkdns.com/blocklists",
-                                       ONDEVICE_BLOCKLIST_FILE_TAG),
-            OnDeviceBlocklistsMetadata("https://download.rethinkdns.com/basicconfig",
-                                       ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG),
-            OnDeviceBlocklistsMetadata("https://download.rethinkdns.com/rank",
-                                       ONDEVICE_BLOCKLIST_FILE_RD),
-            OnDeviceBlocklistsMetadata("https://download.rethinkdns.com/trie",
-                                       ONDEVICE_BLOCKLIST_FILE_TD))
+        val ONDEVICE_BLOCKLISTS = listOf(OnDeviceBlocklistsMetadata("$DOWNLOAD_BASE_URL/blocklists",
+                                                                    ONDEVICE_BLOCKLIST_FILE_TAG),
+                                         OnDeviceBlocklistsMetadata(
+                                             "$DOWNLOAD_BASE_URL/basicconfig",
+                                             ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG),
+                                         OnDeviceBlocklistsMetadata("$DOWNLOAD_BASE_URL/rank",
+                                                                    ONDEVICE_BLOCKLIST_FILE_RD),
+                                         OnDeviceBlocklistsMetadata("$DOWNLOAD_BASE_URL/trie",
+                                                                    ONDEVICE_BLOCKLIST_FILE_TD))
+
+        val ONDEVICE_IPDB = listOf(
+            OnDeviceBlocklistsMetadata("$DOWNLOAD_BASE_URL/geoip?v4", ONDEVICE_GEOIP_IPV4),
+            OnDeviceBlocklistsMetadata("$DOWNLOAD_BASE_URL/geoip?v6", ONDEVICE_GEOIP_IPV6))
 
         val ONDEVICE_BLOCKLISTS_TEMP = listOf(
             OnDeviceBlocklistsMetadata("blocklists", ONDEVICE_BLOCKLIST_FILE_TAG),
@@ -76,13 +88,11 @@ class Constants {
 
         const val FILETAG_TEMP_DOWNLOAD_URL = "blocklists"
 
-        const val BLOCKLISTS_BASE_URL = "https://download.rethinkdns.com"
-
         // url to download the rethinkdns apk file
         const val RETHINK_APP_DOWNLOAD_LINK = "https://rethinkdns.com/download"
 
-        // base-url for bravedns
-        const val BRAVE_BASE_URL = "https://basic.bravedns.com/"
+        // base-url for rethinkdns
+        const val RETHINK_BASE_URL = "https://basic.rethinkdns.com/"
 
         // base-url stamp for configure blocklist
         const val RETHINK_BLOCKLIST_CONFIGURE_BASE_URL = "rethinkdns.com/configure"
@@ -94,7 +104,7 @@ class Constants {
         const val RETHINKDNS_DOMAIN = "rethinkdns.com"
 
         // default doh url
-        const val DEFAULT_DOH_URL = "https://basic.bravedns.com/dns-query"
+        const val DEFAULT_DOH_URL = "https://basic.rethinkdns.com/dns-query"
 
         // json object constants received as part of update check
         // FIXME: Avoid usage of these parameters, map to POJO instead
@@ -180,19 +190,23 @@ class Constants {
         // {@link com.celzero.bravedns.util.Utilities#isAccessibilityServiceEnabledViaSettingsSecure}
         val ACCESSIBILITY_SERVICE_HEARTBEAT_THRESHOLD_MS = TimeUnit.MINUTES.toMillis(5)
 
+        // minimum interval before checking if there is a change in active network
+        // (metered/unmetered)
+        val ACTIVE_NETWORK_CHECK_THRESHOLD_MS = TimeUnit.SECONDS.toMillis(60)
+
         // View model - filter string
         const val FILTER_IS_SYSTEM = "isSystem"
         const val FILTER_IS_FILTER = "isFilter"
         const val FILTER_CATEGORY = "category:"
 
         // IPv4 uses 0.0.0.0 as an unspecified address
-        const val UNSPECIFIED_IP = "0.0.0.0"
+        const val UNSPECIFIED_IP_IPV4 = "0.0.0.0"
+
+        // IPv6 uses :: as an unspecified address
+        const val UNSPECIFIED_IP_IPV6 = "::"
 
         // special port number not assigned to any app
         const val UNSPECIFIED_PORT = 0
-
-        // IPv6 uses ::0 as an unspecified address
-        const val UNSPECIFIED_IPV6 = "::0"
 
         // IPv6 loopback address
         const val LOOPBACK_IPV6 = "::1"

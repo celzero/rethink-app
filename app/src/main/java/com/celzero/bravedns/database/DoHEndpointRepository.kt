@@ -16,13 +16,7 @@ limitations under the License.
 
 package com.celzero.bravedns.database
 
-import androidx.lifecycle.LiveData
-import androidx.paging.PagedList
-import androidx.paging.toLiveData
 import androidx.room.Transaction
-import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 
 class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
@@ -53,17 +47,7 @@ class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
         return doHEndpointDAO.getConnectedDoH()
     }
 
-    suspend fun updateConnectionURL(url: String) {
-        doHEndpointDAO.updateConnectionURL(url)
-    }
-
     suspend fun getCount(): Int {
         return doHEndpointDAO.getCount()
     }
-
-    suspend fun updateConnectionDefault() {
-        doHEndpointDAO.removeConnectionStatus()
-        doHEndpointDAO.updateConnectionDefault()
-    }
-
 }

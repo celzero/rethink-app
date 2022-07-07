@@ -5,10 +5,41 @@
     android:layout_height="wrap_content"
     android:background="?attr/background">
 
+    <LinearLayout
+        android:id="@+id/crp_title_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/crp_blocktype_heading_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp"
+            android:textColor="?attr/accentBad"
+            android:textSize="@dimen/heading_font_text_view"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/crp_blocktype_desc_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text=""
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/default_font_text_view"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/crp_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/crp_title_ll"
         android:layout_margin="4dp"
         app:cardElevation="4dp">
 

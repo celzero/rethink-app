@@ -18,6 +18,7 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -33,9 +34,12 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.databinding.RethinkEndpointListItemBinding
+import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.ui.RethinkBlocklistFragment
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.Companion.getRemoteBlocklistStamp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -96,22 +100,27 @@ class RethinkEndpointAdapter(private val context: Context,
             b.rethinkEndpointListUrlExplanation.text = ""
             b.rethinkEndpointListCheckImage.isChecked = endpoint.isActive
             Log.i(LOG_TAG_DNS,
-                  "connected to doh: ${endpoint.name} isSelected? ${endpoint.isActive}")
-            if (endpoint.isActive) {
-                val count = appConfig.getRemoteBlocklistCount()
-                b.rethinkEndpointListUrlExplanation.text = context.getString(
-                    R.string.dns_connected_rethink_plus, count.toString())
-            }
+                  "connected to rethink endpoint: ${endpoint.name} isSelected? ${endpoint.isActive}")
 
             // Shows either the info/delete icon for the DoH entries.
             showIcon(endpoint)
 
+            if (!endpoint.isActive) return
+
+            // show blocklist count and status as connected if endpoint is active
+            if (endpoint.blocklistCount > 0) {
+                b.rethinkEndpointListUrlExplanation.text = context.getString(
+                    R.string.dns_connected_rethink_plus, endpoint.blocklistCount.toString())
+            } else {
+                b.rethinkEndpointListUrlExplanation.text = context.getString(
+                    R.string.dns_connected_no_count)
+            }
         }
 
         private fun showIcon(endpoint: RethinkDnsEndpoint) {
-            if (endpoint.isDeletable()) {
+            if (endpoint.isEditable()) {
                 b.rethinkEndpointListActionImage.setImageDrawable(
-                    ContextCompat.getDrawable(context, R.drawable.ic_fab_uninstall))
+                    ContextCompat.getDrawable(context, R.drawable.ic_edit_icon))
             } else {
                 b.rethinkEndpointListActionImage.setImageDrawable(
                     ContextCompat.getDrawable(context, R.drawable.ic_info))
@@ -120,7 +129,7 @@ class RethinkEndpointAdapter(private val context: Context,
 
         private fun updateConnection(endpoint: RethinkDnsEndpoint) {
             if (DEBUG) Log.d(LOG_TAG_DNS,
-                             "on doh change - ${endpoint.name}, ${endpoint.url}, ${endpoint.isActive}")
+                             "on rethink dns change - ${endpoint.name}, ${endpoint.url}, ${endpoint.isActive}")
 
             io {
                 endpoint.isActive = true
@@ -139,7 +148,7 @@ class RethinkEndpointAdapter(private val context: Context,
         }
 
         private fun showExplanationOnImageClick(endpoint: RethinkDnsEndpoint) {
-            if (endpoint.isDeletable()) showDeleteDnsDialog(endpoint)
+            if (endpoint.isEditable()) showEditDnsDialog(endpoint)
             else showDohMetadataDialog(endpoint.name, endpoint.url, endpoint.desc)
         }
 
@@ -163,19 +172,39 @@ class RethinkEndpointAdapter(private val context: Context,
             builder.create().show()
         }
 
-        private fun showDeleteDnsDialog(endpoint: RethinkDnsEndpoint) {
+        private fun showEditDnsDialog(endpoint: RethinkDnsEndpoint) {
             val builder = AlertDialog.Builder(context)
-            builder.setTitle(R.string.doh_custom_url_remove_dialog_title)
-            builder.setMessage(R.string.doh_custom_url_remove_dialog_message)
+            builder.setTitle(R.string.rt_edit_dialog_title)
+            builder.setMessage(context.getString(R.string.rt_edit_dialog_message, endpoint.url))
             builder.setCancelable(true)
-            builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { _, _ ->
-                deleteEndpoint(endpoint.name, endpoint.url, endpoint.uid)
+            builder.setPositiveButton(context.getString(R.string.rt_edit_dialog_positive)) { _, _ ->
+                openEditConfiguration(endpoint)
             }
 
-            builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
-                // no-op
+            builder.setNegativeButton(context.getString(R.string.rt_edit_dialog_negative)) { _, _ ->
+                Utilities.clipboardCopy(context, endpoint.url,
+                                        context.getString(R.string.copy_clipboard_label))
+                Utilities.showToastUiCentered(context, context.getString(
+                    R.string.info_dialog_url_copy_toast_msg), Toast.LENGTH_SHORT)
+            }
+            if (endpoint.isDeletable(context)) {
+                builder.setNeutralButton(
+                    context.getString(R.string.rt_edit_dialog_neutral)) { _, _ ->
+                    deleteEndpoint(endpoint.name, endpoint.url, endpoint.uid)
+                }
             }
             builder.create().show()
+        }
+
+        private fun openEditConfiguration(endpoint: RethinkDnsEndpoint) {
+            val stamp = getRemoteBlocklistStamp(endpoint.url)
+
+            val intent = Intent(context, ConfigureRethinkBasicActivity::class.java)
+            intent.putExtra(ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_TYPE,
+                            RethinkBlocklistFragment.RethinkBlocklistType.REMOTE)
+            intent.putExtra(ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_NAME, endpoint.name)
+            intent.putExtra(ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_STAMP, stamp)
+            context.startActivity(intent)
         }
 
         private suspend fun uiCtx(f: suspend () -> Unit) {

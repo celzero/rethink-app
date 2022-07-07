@@ -17,7 +17,9 @@ package com.celzero.bravedns.ui
 
 import android.app.Dialog
 import android.os.Bundle
-import android.view.*
+import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -109,7 +111,8 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
         io {
             val nextIndex = appConfig.getDohCount().plus(1)
             uiCtx {
-                customName.setText(getString(R.string.cd_custom_doh_url_name, nextIndex.toString()), TextView.BufferType.EDITABLE)
+                customName.setText(getString(R.string.cd_custom_doh_url_name, nextIndex.toString()),
+                                   TextView.BufferType.EDITABLE)
             }
         }
 

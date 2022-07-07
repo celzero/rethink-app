@@ -57,13 +57,6 @@ interface DnsProxyEndpointDAO {
     fun getCount(): Int
 
     @Query("select * from DNSProxyEndpoint where isSelected = 1")
-    fun getConnectedProxy(): DnsProxyEndpoint
+    fun getConnectedProxy(): DnsProxyEndpoint?
 
-    // fixme: network dns is added as first element in the database, need to change the where clause
-    // instead of using id
-    @Query("select * from DNSProxyEndpoint where id = 1")
-    fun getNetworkDnsEndpoint(): DnsProxyEndpoint
-
-    @Query("update DNSProxyEndpoint set isSelected = 1 where id = 1")
-    fun setNetworkDns()
 }

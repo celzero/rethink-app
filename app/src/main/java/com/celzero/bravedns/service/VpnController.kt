@@ -45,7 +45,7 @@ object VpnController : KoinComponent {
 
     val mutex: Mutex = Mutex()
 
-    var connectionStatus: MutableLiveData<BraveVPNService.State> = MutableLiveData()
+    var connectionStatus: MutableLiveData<BraveVPNService.State?> = MutableLiveData()
 
     @Throws(CloneNotSupportedException::class)
     fun clone(): Any? {
@@ -111,7 +111,6 @@ object VpnController : KoinComponent {
     }
 
     fun start(context: Context) {
-        //TODO : Code modified to remove the check of null reference - MODIFIED check??
         if (braveVpnService != null) {
             Log.i(LOG_TAG_VPN, "braveVPNService is not null")
             return

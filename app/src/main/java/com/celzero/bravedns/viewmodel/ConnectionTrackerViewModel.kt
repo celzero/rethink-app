@@ -51,7 +51,7 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
         filterRules.addAll(filter)
         filterType = type
 
-        if (!searchString.isNullOrBlank()) filterString.value = searchString
+        if (!searchString.isBlank()) filterString.value = searchString
         else filterString.value = ""
     }
 
@@ -70,7 +70,7 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
     }
 
     private fun getBlockedNetworkLogs(input: String): LiveData<PagedList<ConnectionTracker>> {
-        return if (filterRules.count() > 0) {
+        return if (filterRules.isNotEmpty()) {
             connectionTrackerDAO.getBlockedConnectionsFiltered("%$input%", filterRules).toLiveData(
                 pageSize = DNS_LIVEDATA_PAGE_SIZE)
         } else {

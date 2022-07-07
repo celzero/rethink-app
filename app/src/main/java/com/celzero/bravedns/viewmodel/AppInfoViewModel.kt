@@ -18,6 +18,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     private var filter: MutableLiveData<String> = MutableLiveData()
     private var category: MutableSet<String> = mutableSetOf()
     private var topLevelFilter = FirewallAppFragment.TopLevelFilter.ALL
+    private var firewallFilter = FirewallAppFragment.FirewallFilter.NONE
     private var orderBy: String = " lower(appName)"
     private var search: String = ""
 
@@ -33,11 +34,13 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         this.category.clear()
         this.category.addAll(filters.categoryFilters)
 
+        this.firewallFilter = filters.firewallFilter
         this.topLevelFilter = filters.topLevelFilter
-        this.orderBy = filters.getSortByQuery()
+        this.orderBy = filters.sortType.getSortByQuery()
 
         this.search = filters.searchString
         this.filter.value = filters.searchString
+
     }
 
     private fun getAppInfo(searchString: String): LiveData<PagedList<AppInfo>> {
@@ -57,7 +60,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     private fun allApps(searchString: String): LiveData<PagedList<AppInfo>> {
         return if (category.isEmpty()) {
             val query = SimpleSQLiteQuery(
-                "select * from AppInfo where appName like '%$searchString%' or uid like '%$searchString%' order by $orderBy")
+                "select * from AppInfo where (appName like '%$searchString%' or uid like '%$searchString%') and firewallStatus in (${getFirewallStatusFilter()}) order by $orderBy")
             appInfoDAO.getQuery(query).toLiveData(pageSize = Constants.LIVEDATA_PAGE_SIZE)
             // using SimpleSQLiteQuery instead of @Dao query
             // issue: values passed for the order by parameter is not working as expected
@@ -67,7 +70,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         } else {
             val cat = category.joinToString { c -> "'$c'" }
             val query = SimpleSQLiteQuery(
-                "select * from AppInfo where appName like '%$searchString%' or uid like '%$searchString%' and appCategory in ($cat) order by $orderBy")
+                "select * from AppInfo where (appName like '%$searchString%' or uid like '%$searchString%')  and firewallStatus in (${getFirewallStatusFilter()}) and appCategory in ($cat) order by $orderBy")
             appInfoDAO.getQuery(query).toLiveData(pageSize = Constants.LIVEDATA_PAGE_SIZE)
             /*appInfoDAO.getAppInfo("%$searchString%", category, orderBy).toLiveData(
                 pageSize = Constants.LIVEDATA_PAGE_SIZE)*/
@@ -77,14 +80,14 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     private fun installedApps(search: String): LiveData<PagedList<AppInfo>> {
         return if (category.isEmpty()) {
             val query = SimpleSQLiteQuery(
-                "select * from AppInfo where isSystemApp = 0 and appName like '%$search%' or uid like '%$search%' order by $orderBy")
+                "select * from AppInfo where isSystemApp = 0 and (appName like '%$search%' or uid like '%$search%')  and firewallStatus in (${getFirewallStatusFilter()}) order by $orderBy")
             appInfoDAO.getQuery(query).toLiveData(pageSize = Constants.LIVEDATA_PAGE_SIZE)
             /*appInfoDAO.getInstalledApps("%$searchString%", orderBy).toLiveData(
                 pageSize = Constants.LIVEDATA_PAGE_SIZE)*/
         } else {
             val cat = category.joinToString { c -> "'$c'" }
             val query = SimpleSQLiteQuery(
-                "select * from AppInfo where isSystemApp = 0 and appName like '%$search%' or uid like '%$search%' and appCategory in ($cat) order by $orderBy")
+                "select * from AppInfo where isSystemApp = 0 and (appName like '%$search%' or uid like '%$search%') and appCategory in ($cat)  and firewallStatus in (${getFirewallStatusFilter()}) order by $orderBy")
             appInfoDAO.getQuery(query).toLiveData(pageSize = Constants.LIVEDATA_PAGE_SIZE)
             /*appInfoDAO.getInstalledApps("%$searchString%", category, orderBy).toLiveData(
                 pageSize = Constants.LIVEDATA_PAGE_SIZE)*/
@@ -94,18 +97,22 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     private fun systemApps(search: String): LiveData<PagedList<AppInfo>> {
         return if (category.isEmpty()) {
             val query = SimpleSQLiteQuery(
-                "select * from AppInfo where isSystemApp = 1 and appName like '%$search%' or uid like '%$search%' order by $orderBy")
+                "select * from AppInfo where isSystemApp = 1 and (appName like '%$search%' or uid like '%$search%')  and firewallStatus in (${getFirewallStatusFilter()}) order by $orderBy")
             appInfoDAO.getQuery(query).toLiveData(pageSize = Constants.LIVEDATA_PAGE_SIZE)
             /*appInfoDAO.getSystemApps("%$searchString%", orderBy).toLiveData(
                 pageSize = Constants.LIVEDATA_PAGE_SIZE)*/
         } else {
             val cat = category.joinToString { c -> "'$c'" }
             val query = SimpleSQLiteQuery(
-                "select * from AppInfo where isSystemApp = 1 and appName like '%$search%' or uid like '%$search%' and appCategory in ($cat) order by $orderBy")
+                "select * from AppInfo where isSystemApp = 1 and (appName like '%$search%' or uid like '%$search%') and appCategory in ($cat) and firewallStatus in (${getFirewallStatusFilter()}) order by $orderBy")
             appInfoDAO.getQuery(query).toLiveData(pageSize = Constants.LIVEDATA_PAGE_SIZE)
             /*appInfoDAO.getSystemApps("%$searchString%", category, orderBy).toLiveData(
                 pageSize = Constants.LIVEDATA_PAGE_SIZE)*/
         }
+    }
+
+    private fun getFirewallStatusFilter(): String {
+        return firewallFilter.getFilterString()
     }
 
     fun updateWifiStatus(blocked: Boolean) {

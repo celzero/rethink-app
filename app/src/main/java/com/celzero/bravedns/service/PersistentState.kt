@@ -21,6 +21,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
+import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.Utilities
 import hu.autsoft.krate.*
 import org.koin.core.component.KoinComponent
@@ -37,6 +38,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val NOTIFICATION_ACTION = "notification_action"
         const val DNS_CHANGE = "connected_dns_name"
         const val DNS_RELAYS = "dnscrypt_relay"
+        const val INTERNET_PROTOCOL = "internet_protocol"
+        const val PROTOCOL_TRANSLATION = "protocol_translation"
 
         // const val APP_STATE = "app_state"
         const val REMOTE_BLOCK_LIST_STAMP = "remote_block_list_count"
@@ -107,8 +110,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // default: false for fdroid flavour
     var allowBypass by booleanPref("allow_bypass", !Utilities.isFdroidFlavour())
 
-    // user set among AppConfig.DnsType enum; 1's the default which is DoH
-    var dnsType by intPref("dns_type", 1)
+    // user set among AppConfig.DnsType enum; RETHINK_REMOTE is default which is Rethink-DoH
+    var dnsType by intPref("dns_type", AppConfig.DnsType.RETHINK_REMOTE.type)
 
     // whether the app must attempt to startup on reboot if it was running before shutdown
     var prefAutoStartBootUp by booleanPref("auto_start_on_boot", true)
@@ -132,7 +135,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var checkForAppUpdate by booleanPref("check_for_app_update", true)
 
     // last connected dns label name
-    var connectedDnsName by stringPref("connected_dns_name", context.getString(R.string.default_dns_name))
+    var connectedDnsName by stringPref("connected_dns_name",
+                                       context.getString(R.string.default_dns_name))
 
     // the current light/dark theme; 0's the default which is "Set by System"
     var theme by intPref("app_theme", 0)
@@ -180,6 +184,18 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var isLocalBlocklistUpdateAvailable by booleanPref("local_blocklist_update_check", false)
 
     var isRemoteBlocklistUpdateAvailable by booleanPref("remote_blocklist_update_check", false)
+
+    // auto-check for blocklist update periodically (once in a day)
+    var periodicallyCheckBlocklistUpdate by booleanPref("check_blocklist_update", false)
+
+    // user-preferred Internet Protocol type, default IPv4
+    var internetProtocolType by intPref(INTERNET_PROTOCOL, InternetProtocol.IPv4.id)
+
+    // user-preferred Protocol translation, on IPv6 mode (default: PTMODEAUTO)
+    var protocolTranslationType by booleanPref(PROTOCOL_TRANSLATION, false)
+
+    // filter IPv6 compatible IPv4 address in custom ips
+    var filterIpv4inIpv6 by booleanPref("filter_ip4_ipv6", false)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()

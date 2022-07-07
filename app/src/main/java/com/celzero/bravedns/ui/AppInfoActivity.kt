@@ -23,10 +23,7 @@ import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.CompoundButton
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -36,6 +33,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppConnectionAdapter
+import com.celzero.bravedns.adapter.AppIpRulesAdapter
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.automaton.FirewallManager.updateFirewallStatus
 import com.celzero.bravedns.data.AppConfig
@@ -45,16 +43,20 @@ import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.databinding.ActivityAppDetailsBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_3
+import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
+import com.celzero.bravedns.viewmodel.AppCustomIpViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private val b by viewBinding(ActivityAppDetailsBinding::bind)
@@ -63,11 +65,14 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private val appConfig by inject<AppConfig>()
     private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
 
+    private val appCustomIpViewModel: AppCustomIpViewModel by viewModel()
+
     private var uid: Int = 0
     private lateinit var appInfo: AppInfo
 
-    private var ipListState: Boolean = true
-    private var appDetailsState: Boolean = false
+    private var ipListState: Boolean = false
+    private var ipRulesState: Boolean = false
+    private var appDetailsState: Boolean = true
 
     private var appStatus = FirewallManager.FirewallStatus.ALLOW
     private var connStatus = FirewallManager.ConnectionStatus.BOTH
@@ -81,7 +86,23 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         super.onCreate(savedInstanceState)
         uid = intent.getIntExtra(UID_INTENT_NAME, INVALID_UID)
         init()
+        appCustomIpViewModel.setUid(uid)
+        observeCustomIpSize()
         setupClickListeners()
+    }
+
+    private fun observeCustomIpSize() {
+        appCustomIpViewModel.appWiseIpRulesSize(uid).observe(this) {
+            b.aadIpBlockDesc.text = getString(R.string.ada_ip_block_count, it.toString())
+            if (it == 0) {
+                b.aadIpBlockEmptyTxt.visibility = View.VISIBLE
+                b.aadIpBlockRecycler.visibility = View.GONE
+                return@observe
+            }
+
+            b.aadIpBlockEmptyTxt.visibility = View.GONE
+            b.aadIpBlockRecycler.visibility = View.VISIBLE
+        }
     }
 
     private fun init() {
@@ -105,22 +126,25 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         appStatus = FirewallManager.appStatus(appInfo.uid)
         connStatus = FirewallManager.connectionStatus(appInfo.uid)
         updateFirewallStatusUi(appStatus, connStatus)
-        toggleIpRulesState(ipListState)
+        toggleIpConnectionsState(ipListState)
+        toggleIpRulesState(ipRulesState)
         updateBasicAppInfo()
         updateDnsDetails()
 
         displayIcon(Utilities.getIcon(this, appInfo.packageInfo, appInfo.appName),
                     b.aadAppDetailIcon)
 
+        appCustomIpViewModel.setUid(appInfo.uid)
+        displayIpRulesIfAny(appInfo.uid)
         displayNetworkLogsIfAny(appInfo.uid)
     }
 
     private fun updateDnsDetails() {
         io {
-            val isDnsEnabled = appConfig.isAppDnsEnabled(uid)
+            val isDnsEnabled = appConfig.isAppWiseDnsEnabled(uid)
 
             uiCtx {
-                if(isDnsEnabled) {
+                if (isDnsEnabled) {
                     enableDnsStatusUi()
                     return@uiCtx
                 }
@@ -133,8 +157,9 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
     private fun updateFirewallStatusUi(firewallStatus: FirewallManager.FirewallStatus,
                                        connectionStatus: FirewallManager.ConnectionStatus) {
-        b.aadFirewallStatus.text = updateHtmlEncodedText(
-            getString(R.string.ada_firewall_status, getFirewallText(firewallStatus, connectionStatus)))
+        b.aadFirewallStatus.text = updateHtmlEncodedText(getString(R.string.ada_firewall_status,
+                                                                   getFirewallText(firewallStatus,
+                                                                                   connectionStatus)))
 
         when (firewallStatus) {
             FirewallManager.FirewallStatus.ALLOW -> {
@@ -178,16 +203,30 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         }
 
         b.aadAppSettingsExclude.setOnClickListener {
+            if (VpnController.isVpnLockdown()) {
+                Utilities.showToastUiCentered(this, getString(R.string.hsf_exclude_error),
+                                              Toast.LENGTH_SHORT)
+                return@setOnClickListener
+            }
+
             updateFirewallStatus(FirewallManager.FirewallStatus.EXCLUDE,
                                  FirewallManager.ConnectionStatus.BOTH)
         }
 
         b.aadConnDetailIndicator.setOnClickListener {
-            toggleIpRulesState(ipListState)
+            toggleIpConnectionsState(ipListState)
         }
 
         b.aadConnDetailRl.setOnClickListener {
-            toggleIpRulesState(ipListState)
+            toggleIpConnectionsState(ipListState)
+        }
+
+        b.aadIpBlockIndicator.setOnClickListener {
+            toggleIpRulesState(ipRulesState)
+        }
+
+        b.aadIpBlockRl.setOnClickListener {
+            toggleIpRulesState(ipRulesState)
         }
 
         b.aadDownArrowIcon.setOnClickListener {
@@ -205,6 +244,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         b.aadDnsHeading.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
             if (isSelected) {
                 enableDnsStatusUi()
+                // fixme: remove the below code, added for testing
                 setAppDns("https://basic.rethinkdns.com/1:IAAQAA==")
                 return@setOnCheckedChangeListener
             }
@@ -219,9 +259,10 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
     private fun setAppDns(url: String) {
         io {
-            val endpoint = RethinkDnsEndpoint("app_${appInfo.appName}", url, uid,
-                                              desc = "", isActive = false, isCustom = true,
-                                              latency = 0, modifiedDataTime = Constants.INIT_TIME_MS)
+            val endpoint = RethinkDnsEndpoint("app_${appInfo.appName}", url, uid, desc = "",
+                                              isActive = false, isCustom = true, latency = 0,
+                                              blocklistCount = 0,
+                                              modifiedDataTime = Constants.INIT_TIME_MS)
             appConfig.insertReplaceEndpoint(endpoint)
         }
     }
@@ -233,7 +274,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
     private fun removeAppDns(uid: Int) {
         io {
-            appConfig.removeAppDns(uid)
+            appConfig.removeAppWiseDns(uid)
         }
 
         disableDnsStatusUi()
@@ -325,6 +366,18 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         updateFirewallStatusUi(aStat, cStat)
     }
 
+    private fun displayIpRulesIfAny(uid: Int) {
+        b.aadIpBlockEmptyTxt.visibility = View.GONE
+        appCustomIpViewModel.setUid(uid)
+        b.aadIpBlockRecycler.setHasFixedSize(false)
+        val layoutManager = CustomLinearLayoutManager(this)
+        b.aadIpBlockRecycler.layoutManager = layoutManager
+        val recyclerAdapter = AppIpRulesAdapter(this, uid)
+        appCustomIpViewModel.customIpDetails.observe(this, androidx.lifecycle.Observer(
+            recyclerAdapter::submitList))
+        b.aadIpBlockRecycler.adapter = recyclerAdapter
+    }
+
     private fun displayNetworkLogsIfAny(uid: Int) {
         io {
             val list = connectionTrackerRepository.getLogsForApp(uid)
@@ -353,7 +406,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         }
     }
 
-    private fun toggleIpRulesState(state: Boolean) {
+    private fun toggleIpConnectionsState(state: Boolean) {
         ipListState = !state
         if (state) {
             b.aadConnDetailTopLl.visibility = View.VISIBLE
@@ -365,6 +418,19 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         b.aadConnDetailSearchLl.visibility = View.GONE
         b.aadConnDetailTopLl.visibility = View.GONE
         b.aadConnDetailIndicator.setImageResource(R.drawable.ic_keyboard_arrow_down_gray_24dp)
+    }
+
+    private fun toggleIpRulesState(state: Boolean) {
+        ipRulesState = !state
+
+        if (state) {
+            b.aadIpBlockTopLl.visibility = View.VISIBLE
+            b.aadIpBlockIndicator.setImageResource(R.drawable.ic_keyboard_arrow_up_gray_24dp)
+            return
+        }
+
+        b.aadIpBlockTopLl.visibility = View.GONE
+        b.aadIpBlockIndicator.setImageResource(R.drawable.ic_keyboard_arrow_down_gray_24dp)
     }
 
     private fun toggleAppDetailsState(state: Boolean) {
