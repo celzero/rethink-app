@@ -162,7 +162,12 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
     private fun getEventUid(pkgName: String): Int? {
         if (pkgName.isBlank()) return null
 
-        return this.packageManager.getApplicationInfo(pkgName, PackageManager.GET_META_DATA).uid
+        // #428- Issue fix
+        // there is a case where the accessibility services received event from the package
+        // which is not part of Android's packageInfo. This method in utilities will handle the
+        // error in that case and will return null instead of exception
+        // return this.packageManager.getApplicationInfo(pkgName, PackageManager.GET_META_DATA).uid
+        return Utilities.getApplicationInfo(this, pkgName)?.uid
     }
 
     private fun isPackageLauncher(packageName: String?): Boolean {
@@ -170,6 +175,7 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
 
         val intent = Intent("android.intent.action.MAIN")
         intent.addCategory("android.intent.category.HOME")
+        // package manager returns null,
         val thisPackage = this.packageManager.resolveActivity(intent,
                                                               PackageManager.MATCH_DEFAULT_ONLY)?.activityInfo?.packageName
         return thisPackage == packageName

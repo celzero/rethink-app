@@ -27,7 +27,7 @@ import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
-import com.celzero.bravedns.databinding.PauseActivityBinding
+import com.celzero.bravedns.databinding.ActivityPauseBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PauseTimer.PAUSE_VPN_EXTRA_MILLIS
 import com.celzero.bravedns.service.PersistentState
@@ -39,8 +39,8 @@ import kotlinx.coroutines.*
 import org.koin.android.ext.android.inject
 import java.util.concurrent.TimeUnit
 
-class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
-    private val b by viewBinding(PauseActivityBinding::bind)
+class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
+    private val b by viewBinding(ActivityPauseBinding::bind)
     private val persistentState by inject<PersistentState>()
     @Volatile var j: CompletableJob? = null
 
@@ -69,7 +69,7 @@ class PauseActivity : AppCompatActivity(R.layout.pause_activity) {
 
     private fun initView() {
         FirewallManager.getApplistObserver().observe(this, {
-            val blockedList = it.filter { a -> !a.isInternetAllowed }
+            val blockedList = it.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.BLOCK.id }
             b.pacTimerDesc.text = getString(R.string.pause_desc, blockedList.count().toString())
         })
     }

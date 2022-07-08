@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    android:orientation="vertical"
+    android:paddingBottom="40dp">
+
+    <TextView
+        android:layout_width="60dp"
+        android:layout_height="3dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
+        android:background="?attr/border" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/border" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/rpf_filter_group_heading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:padding="10dp"
+        android:text="Group"
+        android:textColor="?attr/secondaryTextColor"
+        android:textSize="@dimen/large_font_text_view" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/rpf_filter_chip_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="2dp"
+        app:selectionRequired="false"
+        app:singleSelection="false" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/rpf_filter_subgroup_heading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:padding="10dp"
+        android:text="Sub Group"
+        android:textColor="?attr/secondaryTextColor"
+        android:textSize="@dimen/large_font_text_view" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/rpf_filter_chip_sub_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="2dp"
+        app:selectionRequired="false"
+        app:singleSelection="false" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="10dp"
+        android:weightSum="1">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/rpf_clear"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="0.5"
+            android:background="@drawable/rectangle_border_background"
+            android:maxHeight="40dp"
+            android:minHeight="40dp"
+            android:padding="5dp"
+            android:text="Clear"
+            android:textColor="?attr/primaryTextColor" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/rpf_apply"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="0.5"
+            android:background="@drawable/rounded_corners_button_primary"
+            android:maxHeight="40dp"
+            android:minHeight="40dp"
+            android:padding="5dp"
+            android:text="Apply"
+            android:textColor="?attr/primaryTextColor" />
+    </LinearLayout>
+
+</LinearLayout>

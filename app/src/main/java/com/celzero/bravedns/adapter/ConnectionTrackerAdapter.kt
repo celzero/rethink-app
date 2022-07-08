@@ -34,7 +34,6 @@ import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
-import com.celzero.bravedns.ui.ConnectionTrackerFragment
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
 import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
@@ -43,11 +42,9 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getIcon
 import java.util.*
 
-class ConnectionTrackerAdapter(private val connectionTrackerFragment: ConnectionTrackerFragment) :
+class ConnectionTrackerAdapter(private val context: Context) :
         PagedListAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(
             DIFF_CALLBACK) {
-
-    val context: Context = connectionTrackerFragment.requireContext()
 
     companion object {
         private val DIFF_CALLBACK = object :
@@ -72,8 +69,8 @@ class ConnectionTrackerAdapter(private val connectionTrackerFragment: Connection
         val connTracker: ConnectionTracker = getItem(position) ?: return
 
         holder.update(connTracker)
+        holder.setTag(connTracker)
     }
-
 
     inner class ConnectionTrackerViewHolder(private val b: ConnectionTransactionRowBinding) :
             RecyclerView.ViewHolder(b.root) {
@@ -87,6 +84,11 @@ class ConnectionTrackerAdapter(private val connectionTrackerFragment: Connection
             b.connectionParentLayout.setOnClickListener {
                 openBottomSheet(connTracker)
             }
+        }
+
+        fun setTag(connTracker: ConnectionTracker) {
+            b.connectionResponseTime.tag = connTracker.timeStamp
+            b.root.tag = connTracker.timeStamp
         }
 
         private fun openBottomSheet(ct: ConnectionTracker) {
@@ -103,15 +105,13 @@ class ConnectionTrackerAdapter(private val connectionTrackerFragment: Connection
             val time = Utilities.convertLongToTime(connTracker.timeStamp, TIME_FORMAT_1)
             b.connectionResponseTime.text = time
             b.connectionFlag.text = connTracker.flag
-            b.connectionIpAddress.text = connTracker.ipAddress
 
-            connTracker.ipAddress?.let {
-                val dnsCache = connectionTrackerFragment.ipToDomain(it)
-                dnsCache?.let {
-                    b.connectionIpAddress.text = context.getString(R.string.ct_ip_details,
-                                                                   b.connectionIpAddress.text.toString(),
-                                                                   dnsCache.fqdn)
-                }
+            if (connTracker.dnsQuery.isNullOrEmpty()) {
+                b.connectionIpAddress.text = connTracker.ipAddress
+            } else {
+                b.connectionIpAddress.text = context.getString(R.string.ct_ip_details,
+                                                               connTracker.ipAddress,
+                                                               connTracker.dnsQuery)
             }
         }
 
@@ -161,7 +161,7 @@ class ConnectionTrackerAdapter(private val connectionTrackerFragment: Connection
                 (FirewallRuleset.RULE8.id == ruleName || FirewallRuleset.RULE9.id == ruleName) -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
                     b.connectionStatusIndicator.setBackgroundColor(
-                        ContextCompat.getColor(context, R.color.textColorMain))
+                        ContextCompat.getColor(context, R.color.primaryLightColorText))
                 }
                 // no hints, otherwise
                 else -> {
@@ -177,5 +177,3 @@ class ConnectionTrackerAdapter(private val connectionTrackerFragment: Connection
     }
 
 }
-
-

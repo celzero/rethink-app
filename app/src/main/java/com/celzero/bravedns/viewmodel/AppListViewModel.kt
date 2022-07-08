@@ -32,27 +32,22 @@ class AppListViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         filteredList.value = ""
     }
 
-    var appDetailsList = Transformations.switchMap(filteredList) { input: String ->
+    val appDetailsList = Transformations.switchMap(filteredList) { input: String ->
         if (input.isBlank()) {
-            appInfoDAO.getUnivAppDetailsLiveData().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+            appInfoDAO.getWhitelistedApps("%$input%").toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
         } else if (input == FILTER_IS_SYSTEM) {
-            appInfoDAO.getUnivAppSystemAppsLiveData().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+            appInfoDAO.getWhitelistedSystemApps().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
         } else if (input.contains(FILTER_CATEGORY)) {
             val filterVal = input.split(":")[1]
             val result = filterVal.split(",").map { it.trim() }
-            appInfoDAO.getUnivAppDetailsFilterForCategoryLiveData(result).toLiveData(
+            appInfoDAO.getWhitelistedAppsByCategory(result).toLiveData(
                 pageSize = LIVEDATA_PAGE_SIZE)
         } else {
-            appInfoDAO.getUnivAppDetailsFilterLiveData("%$input%").toLiveData(
-                pageSize = LIVEDATA_PAGE_SIZE)
+            appInfoDAO.getWhitelistedApps("%$input%").toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
         }
     }
 
-    fun setFilter(filter: String?) {
-        filteredList.value = filter
-    }
-
-    fun setFilterBlocked(filter: String) {
+    fun setFilter(filter: String) {
         filteredList.value = filter
     }
 }

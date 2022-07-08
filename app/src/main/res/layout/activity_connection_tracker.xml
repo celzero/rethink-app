@@ -1,12 +1,151 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.ConnectionTrackerFragment">
+    android:nestedScrollingEnabled="false"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-  <include
-      android:id="@+id/connection_list_scroll_list"
-      layout="@layout/connection_list_scroll_list" />
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <RelativeLayout
+        android:id="@+id/connection_list_rl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/connection_card_view_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:elevation="5dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+
+                <LinearLayout
+                    android:id="@+id/connection_url_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:orientation="horizontal"
+                    android:weightSum="1">
+
+                    <androidx.appcompat.widget.SearchView
+                        android:id="@+id/connection_search"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start"
+                        android:layout_weight="0.80"
+                        android:fontFamily="sans-serif"
+                        android:isScrollContainer="true"
+                        app:iconifiedByDefault="false"
+                        app:queryHint="@string/search_firewall_network_log" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/connection_filter_icon"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:layout_weight="0.10"
+                        android:padding="7dp"
+                        android:src="@drawable/ic_filter"
+                        android:visibility="visible" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/connection_delete_icon"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:layout_weight="0.10"
+                        android:padding="7dp"
+                        android:src="@drawable/ic_delete"
+                        android:visibility="visible" />
+
+                </LinearLayout>
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/filter_chip_parent_group"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="2dp"
+                    android:visibility="gone"
+                    app:selectionRequired="true"
+                    app:singleSelection="true" />
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:scrollbars="none">
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/filter_chip_group"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:elevation="5dp"
+                        android:paddingBottom="5dp"
+                        android:visibility="gone"
+                        app:singleLine="true"
+                        app:singleSelection="false" />
+                </HorizontalScrollView>
+
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_connection"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/connection_card_view_top"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginBottom="2dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="vertical"
+            app:fastScrollEnabled="true"
+            app:fastScrollHorizontalThumbDrawable="@drawable/fast_scroll_thumb_drawable"
+            app:fastScrollHorizontalTrackDrawable="@drawable/fast_scroll_line_drawable"
+            app:fastScrollVerticalThumbDrawable="@drawable/fast_scroll_thumb_drawable"
+            app:fastScrollVerticalTrackDrawable="@drawable/fast_scroll_line_drawable" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/connection_list_scroll_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/connection_card_view_top"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/recycler_view_header_bg"
+            android:paddingStart="10dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="5dp"
+            android:textColor="?attr/primaryTextColor"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/connection_list_logs_disabled_tv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/connection_card_view_top"
+            android:layout_alignParentTop="true"
+            android:background="?attr/background"
+            android:gravity="top|center"
+            android:paddingStart="10dp"
+            android:paddingTop="20dp"
+            android:paddingEnd="10dp"
+            android:text="@string/show_logs_disabled_network_message"
+            android:textSize="@dimen/large_font_text_view"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+</LinearLayout>

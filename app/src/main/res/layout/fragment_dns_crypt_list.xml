@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -11,54 +12,60 @@
 
         <TextView
             android:id="@+id/recycler_dns_crypt_servers_title"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
+            android:layout_toStartOf="@id/add_relay_btn"
             android:fontFamily="sans-serif-smallcaps"
             android:padding="5dp"
             android:text="@string/cd_dns_crypt_title"
-            android:textColor="?attr/accentGood"
-            android:textSize="@dimen/heading_font_text_view"
+            android:textColor="?attr/secondaryTextColor"
+            android:textSize="@dimen/extra_large_font_text_view"
             android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/add_relay_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="15dp"
+            android:background="@drawable/rectangle_border_background"
+            android:drawablePadding="5dp"
+            android:fontFamily="sans-serif-smallcaps"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="relays"
+            android:textColor="?attr/secondaryTextColor"
+            android:textSize="@dimen/large_font_text_view"
+            app:drawableEndCompat="@drawable/ic_right_arrow_secondary" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_dns_crypt_connections"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/recycler_dns_crypt_servers_title"
-            android:clickable="true"
-            android:focusable="true"
-            android:nestedScrollingEnabled="true"
-            android:visibility="visible" />
-
-        <TextView
-            android:id="@+id/recycler_dns_crypt_relays_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/recycler_dns_crypt_connections"
-            android:layout_marginStart="15dp"
+            android:layout_below="@id/add_relay_btn"
             android:layout_marginTop="10dp"
-            android:fontFamily="sans-serif-smallcaps"
-            android:paddingStart="5dp"
-            android:paddingTop="15dp"
-            android:paddingEnd="5dp"
-            android:paddingBottom="10dp"
-            android:text="@string/cd_dns_crypt_relay_title"
-            android:textColor="?attr/accentGood"
-            android:textSize="@dimen/heading_font_text_view"
-            android:visibility="visible" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_dns_crypt_relays"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/recycler_dns_crypt_relays_title"
-            android:clickable="true"
-            android:focusable="true"
+            android:clipToPadding="false"
             android:nestedScrollingEnabled="true"
-            android:visibility="visible" />
+            android:paddingBottom="50dp" />
 
     </RelativeLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/doh_fab_add_server_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="30dp"
+        android:contentDescription="New"
+        android:padding="10dp"
+        android:src="@drawable/ic_fab_without_border"
+        app:fabSize="normal"
+        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

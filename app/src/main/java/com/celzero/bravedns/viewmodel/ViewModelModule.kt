@@ -24,22 +24,19 @@ object ViewModelModule {
             AppListViewModel(get())
         }
         viewModel {
-            BlockedConnectionsViewModel(get())
-        }
-        viewModel {
             ConnectionTrackerViewModel(get())
         }
         viewModel {
-            DNSCryptEndpointViewModel(get())
+            DnsCryptEndpointViewModel(get())
         }
         viewModel {
-            DNSCryptRelayEndpointViewModel(get())
+            DnsCryptRelayEndpointViewModel(get())
         }
         viewModel {
-            DNSLogViewModel(get())
+            DnsLogViewModel(get())
         }
         viewModel {
-            DNSProxyEndpointViewModel(get())
+            DnsProxyEndpointViewModel(get())
         }
         viewModel {
             DoHEndpointViewModel(get())
@@ -48,7 +45,25 @@ object ViewModelModule {
             ExcludedAppViewModel(get())
         }
         viewModel {
-            FirewallAppViewModel(get())
+            AppInfoViewModel(get())
+        }
+        viewModel {
+            CustomDomainViewModel(get())
+        }
+        viewModel {
+            CustomIpViewModel(get())
+        }
+        viewModel {
+            RethinkEndpointViewModel(get())
+        }
+        viewModel {
+            AppCustomIpViewModel(get())
+        }
+        viewModel {
+            RethinkRemoteFileTagViewModel(get())
+        }
+        viewModel {
+            RethinkLocalFileTagViewModel(get())
         }
     }
 

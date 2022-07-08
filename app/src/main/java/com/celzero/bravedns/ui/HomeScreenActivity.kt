@@ -15,15 +15,14 @@
  */
 package com.celzero.bravedns.ui
 
-import android.content.*
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageInfo
-import android.content.pm.PackageManager.NameNotFoundException
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import androidx.annotation.Nullable
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -32,32 +31,37 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
-import com.celzero.bravedns.automaton.FirewallRules
-import com.celzero.bravedns.database.BlockedConnectionsRepository
+import com.celzero.bravedns.automaton.IpRulesManager
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
-import com.celzero.bravedns.service.*
+import com.celzero.bravedns.service.AppUpdater
+import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.*
+import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.Utilities.Companion.cleanupOldLocalBlocklistFiles
-import com.celzero.bravedns.util.Utilities.Companion.deleteRecursive
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getPackageMetadata
 import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.Companion.isWebsiteFlavour
+import com.celzero.bravedns.util.Utilities.Companion.localBlocklistDownloadBasePath
+import com.celzero.bravedns.util.Utilities.Companion.oldLocalBlocklistDownloadDir
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.*
-import okhttp3.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
-
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
@@ -68,8 +72,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private lateinit var homeScreenFragment: HomeScreenFragment
     private lateinit var aboutFragment: AboutFragment
 
-    private val blockedConnectionsRepository by inject<BlockedConnectionsRepository>()
     private val persistentState by inject<PersistentState>()
+    private val appConfig by inject<AppConfig>()
     private val appUpdateManager by inject<AppUpdater>()
 
     /* TODO : This task need to be completed.
@@ -86,14 +90,13 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == UI_MODE_NIGHT_YES
     }
 
-    //TODO : Remove the unwanted data and the assignments happening
-    //TODO : Create methods and segregate the data.
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
 
         if (persistentState.firstTimeLaunch) {
             launchOnboardActivity()
+            return
         }
 
         updateNewVersion()
@@ -107,49 +110,81 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         setupNavigationItemSelectedListener()
 
-        FirewallRules.loadFirewallRules(blockedConnectionsRepository)
+        // TODO: Remove this from home screen and move it to vpn service
+        IpRulesManager.loadIpRules()
 
         refreshDatabase.deleteOlderDataFromNetworkLogs()
-
-        insertDefaultData()
 
         initUpdateCheck()
 
         observeAppState()
-
     }
 
     private fun observeAppState() {
-        VpnController.connectionStatus.observe(this, {
+        VpnController.connectionStatus.observe(this) {
             if (it == BraveVPNService.State.PAUSED) {
                 Utilities.openPauseActivityAndFinish(this)
             }
-        })
+        }
     }
 
     private fun removeThisMethod() {
         io {
-            val canonicalDir = File(this.filesDir.canonicalPath + File.separator)
-            cleanupOldLocalBlocklistFiles(canonicalDir, persistentState.localBlocklistTimestamp.toString())
-            // clean up files in external files dir
-            val externalDir = File(this.getExternalFilesDir(null).toString() + Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH)
-            deleteRecursive(externalDir)
+            moveLocalBlocklistFiles()
+
+            // path: /data/data/com.celzero.bravedns/files
+            val oldFolder = File(this.filesDir.canonicalPath)
+            deleteUnwantedFolders(oldFolder)
+        }
+
+        // for version v054
+        updateIfRethinkConnectedv053x()
+    }
+
+    private fun updateIfRethinkConnectedv053x() {
+        if (!appConfig.isRethinkDnsConnectedv053x()) return
+
+        io {
+            appConfig.updateRethinkPlusCountv053x(persistentState.getRemoteBlocklistCount())
+        }
+        persistentState.dnsType = AppConfig.DnsType.RETHINK_REMOTE.type
+    }
+
+    private fun moveLocalBlocklistFiles() {
+        val path = oldLocalBlocklistDownloadDir(this, persistentState.localBlocklistTimestamp)
+        val blocklistsExist = Constants.ONDEVICE_BLOCKLISTS.all {
+            File(path + File.separator + it.filename).exists()
+        }
+        if (!blocklistsExist) return
+
+        changeDefaultLocalBlocklistLocation()
+    }
+
+    // move the files of local blocklist to specific folder (../files/local_blocklist/<timestamp>)
+    private fun changeDefaultLocalBlocklistLocation() {
+        val baseDir = localBlocklistDownloadBasePath(this, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                                     persistentState.localBlocklistTimestamp)
+        File(baseDir).mkdirs()
+        Constants.ONDEVICE_BLOCKLISTS.forEach {
+            val currentFile = File(oldLocalBlocklistDownloadDir(this,
+                                                                persistentState.localBlocklistTimestamp) + it.filename)
+            val newFile = File(baseDir + File.separator + it.filename)
+            com.google.common.io.Files.move(currentFile, newFile)
         }
     }
 
-    private fun insertDefaultData() {
-        if (persistentState.isDefaultDataInsertComplete) return
+    private fun deleteUnwantedFolders(fileOrDirectory: File) {
+        // TODO: delete the old folders with timestamp in the files dir (../files/<timestamp>)
+        // this operation is performed after moving the local blocklist to
+        // specific folder
 
-        go {
-            //  FIXME: better ways of doing non-cancellable work in Android
-            //  see: https://medium.com/androiddevelopers/coroutines-patterns-for-work-that-shouldnt-be-cancelled-e26c40f142ad
-            withContext(NonCancellable + Dispatchers.IO) {
-                refreshDatabase.insertDefaultDNSList()
-                refreshDatabase.insertDefaultDNSCryptList()
-                refreshDatabase.insertDefaultDNSCryptRelayList()
-                refreshDatabase.insertDefaultDNSProxy()
-                persistentState.isDefaultDataInsertComplete = true
+        if (fileOrDirectory.name.startsWith("16")) {
+            if (fileOrDirectory.isDirectory) {
+                fileOrDirectory.listFiles()?.forEach { child ->
+                    deleteUnwantedFolders(child)
+                }
             }
+            fileOrDirectory.delete()
         }
     }
 
@@ -168,9 +203,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         persistentState.showWhatsNewChip = true
 
         // FIXME: remove this post v054
-        // this is to fix the pile up of local blocklist folders in app's canonical path
-        // deletes all the folder names starting with "16" other than current local blocklist
-        // timestamp
+        // this is to fix the local blocklist default download location
         removeThisMethod()
     }
 
@@ -224,15 +257,11 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun isGooglePlayServicesAvailable(): Boolean {
-        return try {
-            // applicationInfo.enabled - When false, indicates that all components within
-            // this application are considered disabled, regardless of their individually set enabled status.
-            // TODO: prompt dialog to user that Playservice is disabled, so switch to update
-            // check for website
-            packageManager.getApplicationInfo(PKG_NAME_PLAY_STORE, 0).enabled
-        } catch (e: NameNotFoundException) {
-            false
-        }
+        // applicationInfo.enabled - When false, indicates that all components within
+        // this application are considered disabled, regardless of their individually set enabled status.
+        // TODO: prompt dialog to user that Playservice is disabled, so switch to update
+        // check for website
+        return Utilities.getApplicationInfo(this, PKG_NAME_PLAY_STORE)?.enabled ?: false
     }
 
     private val installStateUpdatedListener = object : AppUpdater.InstallStateListener {
@@ -292,7 +321,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                                   Snackbar.LENGTH_INDEFINITE)
         snack.setAction(
             getString(R.string.update_complete_action_snack)) { appUpdateManager.completeUpdate() }
-        snack.setActionTextColor(ContextCompat.getColor(this, R.color.textColorMain))
+        snack.setActionTextColor(ContextCompat.getColor(this, R.color.primaryLightColorText))
         snack.show()
     }
 
@@ -341,13 +370,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         intent.addCategory(Intent.CATEGORY_BROWSABLE)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, @Nullable data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode != RESULT_OK) {
-            Log.e(LOG_TAG_DOWNLOAD, "onActivityResult: app download failed")
-        }
     }
 
     override fun onStop() {

@@ -15,41 +15,30 @@ limitations under the License.
 */
 package com.celzero.bravedns.database
 
+import com.celzero.bravedns.data.AppConnections
 import com.celzero.bravedns.util.Constants
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 
 class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTrackerDAO) {
 
     suspend fun insert(connectionTracker: ConnectionTracker) {
-        ioCtx {
-            connectionTrackerDAO.insert(connectionTracker)
-        }
+        connectionTrackerDAO.insert(connectionTracker)
+    }
+
+    suspend fun getLogsForApp(uid: Int): List<AppConnections>? {
+        return connectionTrackerDAO.getLogsForApp(uid)
     }
 
     suspend fun deleteConnectionTrackerCount() {
-        ioCtx {
-            connectionTrackerDAO.deleteOlderDataCount(Constants.TOTAL_LOG_ENTRIES_THRESHOLD)
-        }
+        connectionTrackerDAO.deleteOlderDataCount(Constants.TOTAL_LOG_ENTRIES_THRESHOLD)
     }
 
     suspend fun deleteOlderData(date: Long) {
-        ioCtx {
-            connectionTrackerDAO.deleteOlderData(date)
-        }
+        connectionTrackerDAO.deleteOlderData(date)
     }
 
     suspend fun clearAllData() {
-        ioCtx {
-            connectionTrackerDAO.clearAllData()
-        }
-    }
-
-    private suspend fun ioCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.IO) {
-            f()
-        }
+        connectionTrackerDAO.clearAllData()
     }
 
 }

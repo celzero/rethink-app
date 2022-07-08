@@ -1,6 +1,6 @@
 <?xml version ="1.0" encoding ="utf-8"?><!--  Learn More about how to use App Actions: https://developer.android.com/guide/actions/index.html -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" >
-   <solid android:color="?attr/border" />
+   <solid android:color="?attr/textViewBackground" />
    <padding
            android:left="1dp"
            android:right="1dp"

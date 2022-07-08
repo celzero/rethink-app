@@ -5,25 +5,38 @@
     <attr name="primaryColorAccent" format="reference" />
     <attr name="primaryTextColor" format="reference" />
     <attr name="secondaryTextColor" format="reference" />
-    <attr name="roundedCornersButton"  format="reference"/>
-    <attr name="homeScreenBtnBackground" format="reference"/>
-    <attr name="svgStrokeColor" format="reference"/>
-    <attr name="svgFillColor" format="reference"/>
-    <attr name="accentGood" format="reference"/>
-    <attr name="accentBad" format="reference"/>
-    <attr name="primaryDarkColorText" format="reference" />
-    <attr name="primaryLightColorText" format="reference"/>
-    <attr name="mainButtonBackground" format="reference" />
-    <attr name="border" format="reference"/>
-    <attr name="invertedPrimaryTextColor" format="reference"/>
-    <attr name="colorCheckSelected" format="reference"/>
-    <attr name="navBarBackground" format="reference"/>
-    <attr name="buttonBackground" format="reference"/>
-    <attr name="tabIndicator" format="reference"/>
+    <attr name="primaryLightColorText" format="reference" />
+    <attr name="chipTextColor" format="reference" />
+    <attr name="invertedPrimaryTextColor" format="reference" />
+    <attr name="textColorAccentBad" format="reference" />
+    <attr name="fabBackgroundColor" format="reference" />/
+    <attr name="homeScreenBtnBackground" format="reference" />
+    <attr name="svgStrokeColor" format="reference" />
+    <attr name="svgFillColor" format="reference" />
+    <attr name="accentGood" format="reference" />
+    <attr name="accentBad" format="reference" />
+    <attr name="border" format="reference" />
+    <attr name="navBarColor" format="reference" />
+    <attr name="buttonBackground" format="reference" />
+    <attr name="textViewBackground" format="reference" />
+    <attr name="tabIndicator" format="reference" />
     <attr name="chipBgColorPositive" format="reference" />
     <attr name="chipTextPositive" format="reference" />
     <attr name="chipBgColorNegative" format="reference" />
     <attr name="chipTextNegative" format="reference" />
     <attr name="chipColorBgNormal" format="reference" />
     <attr name="chipColorBgHighlight" format="reference" />
+    <attr name="controlActivated" format="reference" />
+    <attr name="controlActivatedBad" format="reference" />
+    <attr name="switchNormal" format="reference" />
+    <attr name="firewallNoRuleToggleBtnTxt" format="reference" />
+    <attr name="firewallNoRuleToggleBtnBg" format="reference" />
+    <attr name="firewallBlockToggleBtnTxt" format="reference" />
+    <attr name="firewallBlockToggleBtnBg" format="reference" />
+    <attr name="firewallWhiteListToggleBtnTxt" format="reference" />
+    <attr name="firewallWhiteListToggleBtnBg" format="reference" />
+    <attr name="firewallExcludeToggleBtnTxt" format="reference" />
+    <attr name="firewallExcludeToggleBtnBg" format="reference" />
+    <attr name="defaultToggleBtnTxt" format="reference" />
+    <attr name="defaultToggleBtnBg" format="reference" />
 </resources>

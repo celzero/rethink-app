@@ -32,15 +32,15 @@ class ExcludedAppViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         filteredList.value = ""
     }
 
-    var excludedAppList = Transformations.switchMap(filteredList, ({ input: String ->
+    val excludedAppList = Transformations.switchMap(filteredList, ({ input: String ->
         if (input.isBlank()) {
-            appInfoDAO.getExcludedAppDetailsLiveData().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+            appInfoDAO.getExcludedAppDetails().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
         } else if (input == FILTER_IS_SYSTEM) {
-            appInfoDAO.getExcludedAAppSystemAppsLiveData().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+            appInfoDAO.getExcludedAAppSystemApps().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
         } else if (input.contains(FILTER_CATEGORY)) {
             val filterVal = input.split(":")[1]
             val result = filterVal.split(",").map { it.trim() }
-            appInfoDAO.getExcludedAppDetailsFilterForCategoryLiveData(result).toLiveData(
+            appInfoDAO.getExcludedAppDetailsFilterForCategory(result).toLiveData(
                 pageSize = LIVEDATA_PAGE_SIZE)
         } else {
             appInfoDAO.getExcludedAppDetailsFilterLiveData("%$input%").toLiveData(
@@ -48,11 +48,7 @@ class ExcludedAppViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         }
     }))
 
-    fun setFilter(filter: String?) {
-        filteredList.value = filter
-    }
-
-    fun setFilterBlocked(filter: String) {
+    fun setFilter(filter: String) {
         filteredList.value = filter
     }
 }

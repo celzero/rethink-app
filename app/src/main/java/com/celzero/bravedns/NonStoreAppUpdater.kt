@@ -17,6 +17,7 @@ package com.celzero.bravedns
 
 import android.app.Activity
 import android.util.Log
+import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
@@ -25,12 +26,12 @@ import com.celzero.bravedns.util.Constants.Companion.JSON_UPDATE
 import com.celzero.bravedns.util.Constants.Companion.JSON_VERSION
 import com.celzero.bravedns.util.Constants.Companion.UPDATE_CHECK_RESPONSE_VERSION
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
-import okhttp3.*
-import okhttp3.HttpUrl.Companion.toHttpUrl
-import okhttp3.dnsoverhttps.DnsOverHttps
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.Request
+import okhttp3.Response
 import org.json.JSONObject
 import java.io.IOException
-import java.net.InetAddress
 
 class NonStoreAppUpdater(private val baseUrl: String,
                          private val persistentState: PersistentState) : AppUpdater {
@@ -40,18 +41,10 @@ class NonStoreAppUpdater(private val baseUrl: String,
         Log.i(LOG_TAG_APP_UPDATE, "Beginning update check")
         val url = baseUrl + BuildConfig.VERSION_CODE
 
-        val bootstrapClient = OkHttpClient()
-        // FIXME: Use user set doh provider
-        // using quad9 doh provider
-        val dns = DnsOverHttps.Builder().client(bootstrapClient).url(
-            "https://dns.quad9.net/dns-query".toHttpUrl()).bootstrapDnsHosts(
-            InetAddress.getByName("9.9.9.9"), InetAddress.getByName("149.112.112.112"),
-            InetAddress.getByName("2620:fe::9"), InetAddress.getByName("2620:fe::fe")).build()
-
-        val client = bootstrapClient.newBuilder().dns(dns).build()
+        val client = RetrofitManager.okHttpClient()
         val request = Request.Builder().url(url).build()
 
-        client.newCall(request).enqueue(object : Callback {
+        RetrofitManager.okHttpClient().newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.i(LOG_TAG_APP_UPDATE, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
                 listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER, isInteractive)

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/background"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/dacd_url_title"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="@string/cd_dialog_title"
+        android:textSize="@dimen/large_font_text_view"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/dacd_url_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:padding="5dp"
+        android:text="@string/cd_dialog_desc"
+        android:textColor="?attr/primaryLightColorText"
+        android:textSize="@dimen/small_font_subheading_text"
+        app:layout_constraintTop_toBottomOf="@id/dacd_url_title" />
+
+    <LinearLayout
+        android:id="@+id/dacd_input_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/dacd_url_desc">
+
+        <androidx.appcompat.widget.AppCompatSpinner
+            android:id="@+id/dacd_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:drawSelectorOnTop="true"
+            android:dropDownWidth="wrap_content"
+            android:padding="0dp"
+            android:spinnerMode="dropdown" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/dacd_text_input_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/cd_dialog_edittext_hint"
+            app:hintTextColor="?attr/accentGood">
+
+            <EditText
+                android:id="@+id/dacd_domain_edit_text"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:importantForAutofill="no"
+                android:inputType="textUri"
+                android:maxLines="2"
+                android:minHeight="48dp"
+                android:hint="@string/cd_dialog_edittext_hint"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view"
+                app:layout_constraintRight_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_input_layout_name" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/dacd_sample_text"
+        style="@style/TextAppearance.AppCompat.Body1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:padding="5dp"
+        android:textColor="?attr/secondaryTextColor"
+        android:textSize="@dimen/large_font_text_view"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/dacd_input_layout" />
+
+    <TextView
+        android:id="@+id/dacd_failure_text"
+        style="@style/TextAppearance.AppCompat.Body1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:padding="5dp"
+        android:text="@string/settings_http_proxy_error_text4"
+        android:textColor="@color/colorRed_A400"
+        android:textSize="@dimen/default_font_text_view"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/dacd_sample_text" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/dacd_add_btn"
+        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="@string/cd_dialog_positive_btn"
+        android:textColor="?attr/accentGood"
+        android:textSize="@dimen/large_font_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@id/dacd_failure_text" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/dacd_show_btn"
+        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="@string/cd_add_dialog_show_btn"
+        android:textColor="?attr/accentGood"
+        android:textSize="@dimen/large_font_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dacd_failure_text" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/dacd_cancel_btn"
+        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:text="@string/cd_dialog_negative_btn"
+        android:textColor="?attr/accentGood"
+        android:textSize="@dimen/large_font_text_view"
+        app:layout_constraintEnd_toStartOf="@id/dacd_add_btn"
+        app:layout_constraintTop_toBottomOf="@id/dacd_failure_text" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

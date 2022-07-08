@@ -30,7 +30,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager
-import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.databinding.ExcludeAppDialogLayoutBinding
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
@@ -77,7 +76,7 @@ class ExcludeAppsDialog(private var activity: Activity,
         b.excludeAppRecyclerViewDialog.adapter = adapter
 
         FirewallManager.getApplistObserver().observe(activity as LifecycleOwner, {
-            val excludedCount = it.filter { a -> a.isExcluded }.count()
+            val excludedCount = it.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.EXCLUDE.id }.count()
             b.excludeAppSelectCountText.text = activity.getString(R.string.ex_dialog_count,
                                                                   excludedCount.toString())
         })
@@ -95,10 +94,6 @@ class ExcludeAppsDialog(private var activity: Activity,
         b.excludeAppDialogWhitelistSearchView.setOnCloseListener {
             toggleCategoryChipsUi()
             false
-        }
-
-        b.excludeAppSelectAllOptionCheckbox.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
-            FirewallManager.updateExcludedAppsByCategories(filterCategories, b)
         }
 
         b.excludeAppDialogWhitelistSearchFilter.setOnClickListener(this)
@@ -160,7 +155,7 @@ class ExcludeAppsDialog(private var activity: Activity,
 
         for (category in categories) {
             // Ignore non-app system category in excluded list
-            if (CategoryInfoRepository.CategoryConstants.isNonApp(context, category)) continue
+            if (FirewallManager.CategoryConstants.isNonApp(context, category)) continue
 
             val chip = makeChip(category)
             b.excludeAppDialogChipGroup.addView(chip)
@@ -189,7 +184,7 @@ class ExcludeAppsDialog(private var activity: Activity,
     }
 
     private fun makeChip(category: String): Chip {
-        val chip = this.layoutInflater.inflate(R.layout.item_chip_category, null, false) as Chip
+        val chip = this.layoutInflater.inflate(R.layout.item_chip_category, b.root, false) as Chip
         chip.text = category
         return chip
     }

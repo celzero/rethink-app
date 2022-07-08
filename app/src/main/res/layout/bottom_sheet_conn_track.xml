@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bs_conn_top_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -15,7 +16,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="20dp"
-        android:background="@color/recycler_selected" />
+        android:background="?attr/border" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -24,12 +25,13 @@
 
         <TextView
             android:id="@+id/bs_conn_track_port_detail_chip"
-            style="@style/ThinnerChip_action"
+            style="@style/ThinnerChip.Action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:layout_marginStart="15dp"
+            android:layout_toStartOf="@id/bs_conn_track_app_kill"
             android:padding="5dp"
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/small_font_text_view"
@@ -37,7 +39,7 @@
 
         <com.google.android.material.chip.Chip
             android:id="@+id/bs_conn_track_app_kill"
-            style="@style/ThinnerChip_action"
+            style="@style/ThinnerChip.Action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -49,10 +51,9 @@
             android:visibility="visible"
             app:chipEndPadding="5dp"
             app:chipStartPadding="5dp"
-            app:shapeAppearance="@style/ShapeAppearance.MyApp.LargeComponent" />
+            app:shapeAppearance="@style/ShapeAppearance.LargeComponent" />
 
     </RelativeLayout>
-
 
     <RelativeLayout
         android:id="@+id/bs_conn_track_app_name_header"
@@ -116,42 +117,28 @@
             android:layout_centerVertical="true"
             android:layout_marginTop="2dp"
             android:layout_toEndOf="@id/bs_conn_connection_flag"
-            android:typeface="monospace"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:textColor="?attr/primaryTextColor"
             android:textIsSelectable="true"
-            android:textSize="@dimen/heading_font_text_view" />
+            android:textSize="@dimen/heading_font_text_view"
+            android:typeface="monospace"
+            tools:ignore="SpeakableTextPresentCheck,SpeakableTextPresentCheck" />
     </RelativeLayout>
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/bs_conn_dns_cache_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="5dp"
         android:layout_marginBottom="20dp"
+        android:ellipsize="end"
         android:gravity="center"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:weightSum="1">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.75"
-            android:gravity="center">
-
-            <TextView
-                android:id="@+id/bs_conn_connection_details"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:text="@string/bsct_conn_conn_desc_allowed"
-                android:textColor="?attr/primaryLightColorText"
-                android:textIsSelectable="true"
-                android:textSize="@dimen/default_font_text_view"
-                android:visibility="gone" />
-        </LinearLayout>
-
-    </LinearLayout>
+        android:padding="5dp"
+        android:textColor="?attr/primaryLightColorText"
+        android:textIsSelectable="true"
+        android:textSize="@dimen/default_font_text_view"
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/bs_conn_blocked_rule1_header_ll"
@@ -159,104 +146,151 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp">
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/bs_conn_blocked_rule1_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="150dp"
+            android:background="@drawable/drawable_purple_gradient"
+            android:gravity="start"
+            android:padding="7dp"
+            android:text="@string/ct_bs_heading_1"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/default_font_text_view" />
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0.9"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/bs_conn_blocked_rule1_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/drawable_purple_gradient"
-                android:gravity="start"
-                android:padding="7dp"
-                android:text="@string/ct_bs_rule_1"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/default_font_text_view" />
+            android:orientation="horizontal"
+            android:layout_marginBottom="5dp"
+            android:paddingBottom="5dp"
+            android:weightSum="1">
 
             <TextView
                 android:id="@+id/bs_conn_block_app_txt"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-
+                android:layout_weight="0.6"
                 android:padding="5dp"
                 android:text="@string/bsct_block"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
-        </LinearLayout>
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/bs_conn_block_app_check"
-            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch.Bad"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="bottom"
-            android:padding="5dp" />
+            <Spinner
+                android:id="@+id/bs_conn_firewall_spinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.4"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
+                android:background="@drawable/spinner_outline"
+                android:minWidth="100dp"
+                android:popupBackground="@drawable/spinner_outline_with_bg"
+                android:spinnerMode="dropdown"
+                tools:listitem="@layout/spinner_item_firewall_status" />
+        </LinearLayout>
 
     </LinearLayout>
 
-
-    <TextView
+    <LinearLayout
+        android:id="@+id/bs_conn_blocked_rule2_header_ll"
         android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:background="@color/childListColor"
-        android:textSize="@dimen/default_font_text_view"
-        android:visibility="gone" />
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:orientation="vertical"
+        android:padding="10dp">
 
+        <TextView
+            android:id="@+id/bs_conn_blocked_rule2_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/drawable_purple_gradient"
+            android:gravity="start"
+            android:padding="7dp"
+            android:text="@string/ct_bs_heading_3"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/default_font_text_view" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/bs_conn_unknown_app_txt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.75"
+                android:padding="5dp"
+                android:text="@string/univ_block_unknown_connections"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/bs_conn_unknown_app_check"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.25"
+                android:gravity="center" />
+        </LinearLayout>
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="2dp"
-        android:layout_marginTop="20dp"
         android:layout_marginRight="2dp"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:paddingBottom="5dp">
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="150dp"
+            android:background="@drawable/drawable_purple_gradient"
+            android:gravity="start"
+            android:padding="7dp"
+            android:text="@string/ct_bs_heading_2"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/default_font_text_view" />
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0.9"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/drawable_purple_gradient"
-                android:gravity="start"
-                android:padding="7dp"
-                android:text="@string/ct_bs_rule_2"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/default_font_text_view" />
+            android:orientation="horizontal"
+            android:layout_marginBottom="5dp"
+            android:paddingBottom="5dp"
+            android:weightSum="1">
 
             <TextView
                 android:id="@+id/bs_conn_block_conn_all_txt"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.9"
+                android:layout_gravity="center"
+                android:layout_weight="0.6"
                 android:padding="5dp"
                 android:text="@string/bsct_block_all"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
 
+            <Spinner
+                android:id="@+id/bs_conn_ip_rule_spinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.4"
+                android:background="@drawable/spinner_outline"
+                android:popupBackground="@drawable/spinner_outline_with_bg"
+                android:spinnerMode="dropdown"
+                tools:listitem="@layout/spinner_item_firewall_status" />
         </LinearLayout>
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/bs_conn_block_conn_all_switch"
-            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch.Bad"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:padding="5dp" />
 
     </LinearLayout>
 

@@ -27,39 +27,47 @@ import com.celzero.bravedns.net.go.GoIntraListener
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.InternetProtocol
+import com.celzero.bravedns.util.InternetProtocol.Companion.getInternetProtocol
+import com.celzero.bravedns.util.KnownPorts
+import com.celzero.bravedns.util.KnownPorts.Companion.DNS_PORT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
+import inet.ipaddr.IPAddressString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import protect.Blocker
 import settings.Settings
+import java.net.InetAddress
 
 class AppConfig internal constructor(private val context: Context,
-                                     private val dnsProxyEndpointRepository: DNSProxyEndpointRepository,
+                                     private val rethinkDnsEndpointRepository: RethinkDnsEndpointRepository,
+                                     private val dnsProxyEndpointRepository: DnsProxyEndpointRepository,
                                      private val doHEndpointRepository: DoHEndpointRepository,
-                                     private val dnsCryptEndpointRepository: DNSCryptEndpointRepository,
-                                     private val dnsCryptRelayEndpointRepository: DNSCryptRelayEndpointRepository,
+                                     private val dnsCryptEndpointRepository: DnsCryptEndpointRepository,
+                                     private val dnsCryptRelayEndpointRepository: DnsCryptRelayEndpointRepository,
                                      private val proxyEndpointRepository: ProxyEndpointRepository,
                                      private val persistentState: PersistentState) {
     private var appTunDnsMode: TunDnsMode = TunDnsMode.NONE
-    var braveModeObserver: MutableLiveData<Int> = MutableLiveData()
+    private var systemDns: SystemDns = SystemDns("", DNS_PORT)
+    private var braveModeObserver: MutableLiveData<Int> = MutableLiveData()
 
     companion object {
-        private var connectedDNS: MutableLiveData<String> = MutableLiveData()
+        private var connectedDns: MutableLiveData<String> = MutableLiveData()
         var dnscryptRelaysToRemove: String = ""
 
         private const val PROXY_MODE_ORBOT = 10L
     }
 
     init {
-        connectedDNS.postValue(persistentState.connectedDnsName)
+        connectedDns.postValue(persistentState.connectedDnsName)
         setDnsMode()
     }
 
     data class TunnelOptions(val tunDnsMode: TunDnsMode, val tunFirewallMode: TunFirewallMode,
-                             val tunProxyMode: TunProxyMode, val blocker: Blocker,
-                             val listener: GoIntraListener, val fakeDns: String)
+                             val tunProxyMode: TunProxyMode, val ptMode: ProtoTranslationMode,
+                             val blocker: Blocker, val listener: GoIntraListener,
+                             val fakeDns: String, val preferredEngine: InternetProtocol)
 
     enum class BraveMode(val mode: Int) {
         DNS(0), FIREWALL(1), DNS_FIREWALL(2);
@@ -84,6 +92,17 @@ class AppConfig internal constructor(private val context: Context,
             return mode == DNS_FIREWALL.mode
         }
 
+        companion object {
+            fun getMode(id: Int): BraveMode {
+                return when (id) {
+                    DNS.mode -> DNS
+                    FIREWALL.mode -> FIREWALL
+                    DNS_FIREWALL.mode -> DNS_FIREWALL
+                    else -> DNS_FIREWALL
+                }
+            }
+        }
+
     }
 
     enum class TunFirewallMode(val mode: Long) {
@@ -98,7 +117,16 @@ class AppConfig internal constructor(private val context: Context,
     }
 
     enum class DnsType(val type: Int) {
-        DOH(1), DNSCRYPT(2), DNS_PROXY(3)
+        // fixme: remove the type RETHINK_REMOTE and merge it with type DOH
+        DOH(1), DNSCRYPT(2), DNS_PROXY(3), RETHINK_REMOTE(4), NETWORK_DNS(5);
+
+        fun isDnsProxy(): Boolean {
+            return this == DNS_PROXY
+        }
+
+        fun isNetworkDns(): Boolean {
+            return this == NETWORK_DNS
+        }
     }
 
     enum class TunDnsMode(val mode: Long) {
@@ -119,6 +147,14 @@ class AppConfig internal constructor(private val context: Context,
         }
 
         fun isDnsProxy(): Boolean {
+            return mode == DNSPROXY_IP.mode || mode == DNSPROXY_PORT.mode
+        }
+
+        fun isRethinkRemote(): Boolean {
+            return mode == DOH_IP.mode || mode == DOH_PORT.mode
+        }
+
+        fun isSystemDns(): Boolean {
             return mode == DNSPROXY_IP.mode || mode == DNSPROXY_PORT.mode
         }
 
@@ -148,7 +184,6 @@ class AppConfig internal constructor(private val context: Context,
         fun isTunProxySocks5(): Boolean {
             return mode == SOCKS5.mode
         }
-
 
     }
 
@@ -212,6 +247,38 @@ class AppConfig internal constructor(private val context: Context,
         }
     }
 
+    enum class ProtoTranslationMode(val id: Long) {
+        PTMODEAUTO(Settings.PtModeAuto),
+        PTMODEFORCE64(Settings.PtModeForce64),
+        PTMODEMAYBE46(Settings.PtModeMaybe46);
+
+        companion object {
+            fun getProtoTranslationMode(id: Long): ProtoTranslationMode {
+                return when (id) {
+                    PTMODEAUTO.id -> PTMODEAUTO
+                    PTMODEFORCE64.id -> PTMODEFORCE64
+                    PTMODEMAYBE46.id -> PTMODEMAYBE46
+                    else -> PTMODEAUTO
+                }
+            }
+        }
+    }
+
+    fun getInternetProtocol(): InternetProtocol {
+        return getInternetProtocol(persistentState.internetProtocolType)
+    }
+
+    fun getProtocolTranslationMode(): ProtoTranslationMode {
+        if (persistentState.protocolTranslationType && getInternetProtocol().isIPv6()) {
+            return ProtoTranslationMode.PTMODEFORCE64
+        }
+
+        return ProtoTranslationMode.PTMODEAUTO
+    }
+
+
+    data class SystemDns(var ipAddress: String, var port: Int)
+
     fun getFirewallMode(): TunFirewallMode {
         return determineFirewallMode()
     }
@@ -225,6 +292,8 @@ class AppConfig internal constructor(private val context: Context,
             DnsType.DOH.type -> DnsType.DOH
             DnsType.DNSCRYPT.type -> DnsType.DNSCRYPT
             DnsType.DNS_PROXY.type -> DnsType.DNS_PROXY
+            DnsType.RETHINK_REMOTE.type -> DnsType.RETHINK_REMOTE
+            DnsType.NETWORK_DNS.type -> DnsType.NETWORK_DNS
             else -> {
                 Log.wtf(LOG_TAG_VPN, "Invalid dns type mode: ${persistentState.dnsType}")
                 DnsType.DOH
@@ -270,6 +339,20 @@ class AppConfig internal constructor(private val context: Context,
                     TunDnsMode.DNSPROXY_IP
                 }
             }
+            DnsType.RETHINK_REMOTE.type -> {
+                if (persistentState.preventDnsLeaks) {
+                    TunDnsMode.DOH_PORT
+                } else {
+                    TunDnsMode.DOH_IP
+                }
+            }
+            DnsType.NETWORK_DNS.type -> {
+                if (persistentState.preventDnsLeaks) {
+                    TunDnsMode.DNSPROXY_PORT
+                } else {
+                    TunDnsMode.DNSPROXY_IP
+                }
+            }
             else -> {
                 TunDnsMode.NONE
             }
@@ -281,7 +364,11 @@ class AppConfig internal constructor(private val context: Context,
     }
 
     fun getConnectedDnsObservable(): MutableLiveData<String> {
-        return connectedDNS
+        return connectedDns
+    }
+
+    fun getBraveModeObservable(): MutableLiveData<Int> {
+        return braveModeObserver
     }
 
     suspend fun getDOHDetails(): DoHEndpoint? {
@@ -300,7 +387,7 @@ class AppConfig internal constructor(private val context: Context,
         return proxyEndpointRepository.getConnectedOrbotProxy()
     }
 
-    private suspend fun getDNSProxyServerDetails(): DNSProxyEndpoint {
+    private suspend fun getDNSProxyServerDetails(): DnsProxyEndpoint? {
         return dnsProxyEndpointRepository.getConnectedProxy()
     }
 
@@ -315,33 +402,45 @@ class AppConfig internal constructor(private val context: Context,
         setDnsMode()
         when (dt) {
             DnsType.DOH -> {
-                val endpoint = getDOHDetails()
-                if (endpoint != null) {
-                    connectedDNS.postValue(endpoint.dohName)
-                    persistentState.connectedDnsName = endpoint.dohName
-                }
+                val endpoint = getDOHDetails() ?: return
+
+                connectedDns.postValue(endpoint.dohName)
+                persistentState.connectedDnsName = endpoint.dohName
             }
             DnsType.DNSCRYPT -> {
                 val count = getDNSCryptServerCount()
                 val relayCount = dnsCryptRelayEndpointRepository.getConnectedRelays()
                 val text = context.getString(R.string.configure_dns_crypt, count.toString())
-                connectedDNS.postValue(text)
+                connectedDns.postValue(text)
                 persistentState.connectedDnsName = text
                 persistentState.setDnsCryptRelayCount(relayCount.count())
             }
             DnsType.DNS_PROXY -> {
-                val endpoint = getDNSProxyServerDetails()
-                connectedDNS.postValue(endpoint.proxyName)
+                val endpoint = getDNSProxyServerDetails() ?: return
+
+                connectedDns.postValue(endpoint.proxyName)
                 persistentState.connectedDnsName = endpoint.proxyName
+            }
+            DnsType.RETHINK_REMOTE -> {
+                val endpoint = getRemoteRethinkEndpoint() ?: return
+
+                connectedDns.postValue(endpoint.name)
+                Log.d("TEST","TEST endpoint connected?: ${endpoint.name}, ${endpoint.blocklistCount}")
+                persistentState.setRemoteBlocklistCount(endpoint.blocklistCount)
+                persistentState.connectedDnsName = endpoint.name
+            }
+            DnsType.NETWORK_DNS -> {
+                connectedDns.postValue(context.getString(R.string.network_dns))
+                persistentState.connectedDnsName = context.getString(R.string.network_dns)
             }
         }
     }
 
     private fun isValidDnsType(dt: DnsType): Boolean {
-        return (dt == DnsType.DOH || dt == DnsType.DNSCRYPT || dt == DnsType.DNS_PROXY)
+        return (dt == DnsType.DOH || dt == DnsType.DNSCRYPT || dt == DnsType.DNS_PROXY || dt == DnsType.RETHINK_REMOTE || dt == DnsType.NETWORK_DNS)
     }
 
-    fun getConnectedDNS(): String {
+    fun getConnectedDns(): String {
         return persistentState.connectedDnsName
     }
 
@@ -375,14 +474,15 @@ class AppConfig internal constructor(private val context: Context,
         }
     }
 
-    fun newTunnelOptions(blocker: Blocker, listener: GoIntraListener,
-                         fakeDns: String): TunnelOptions {
-        return TunnelOptions(getDnsMode(), getFirewallMode(), getTunProxyMode(), blocker, listener,
-                             fakeDns)
+    fun newTunnelOptions(blocker: Blocker, listener: GoIntraListener, fakeDns: String,
+                         preferredEngine: InternetProtocol,
+                         ptMode: ProtoTranslationMode): TunnelOptions {
+        return TunnelOptions(getDnsMode(), getFirewallMode(), getTunProxyMode(), ptMode, blocker,
+                             listener, fakeDns, preferredEngine)
     }
 
     // -- DNS Manager --
-    suspend fun getConnectedProxyDetails(): DNSProxyEndpoint {
+    suspend fun getConnectedProxyDetails(): DnsProxyEndpoint? {
         return dnsProxyEndpointRepository.getConnectedProxy()
     }
 
@@ -400,6 +500,10 @@ class AppConfig internal constructor(private val context: Context,
 
     suspend fun getDohCount(): Int {
         return doHEndpointRepository.getCount()
+    }
+
+    suspend fun getRethinkCount(): Int {
+        return rethinkDnsEndpointRepository.getCount()
     }
 
     suspend fun getDnsProxyCount(): Int {
@@ -434,7 +538,17 @@ class AppConfig internal constructor(private val context: Context,
         onDnsChange(DnsType.DOH)
     }
 
-    suspend fun handleDnsProxyChanges(dnsProxyEndpoint: DNSProxyEndpoint) {
+    suspend fun handleRethinkChanges(rethinkDnsEndpoint: RethinkDnsEndpoint) {
+        // if previous connection was rethink, then remove the connection from database
+        if (getDnsType() != DnsType.RETHINK_REMOTE) {
+            removeConnectionStatus()
+        }
+
+        rethinkDnsEndpointRepository.update(rethinkDnsEndpoint)
+        onDnsChange(DnsType.RETHINK_REMOTE)
+    }
+
+    suspend fun handleDnsProxyChanges(dnsProxyEndpoint: DnsProxyEndpoint) {
         // if the prev connection was not dns proxy, then remove the connection status from database
         if (getDnsType() != DnsType.DNS_PROXY) {
             removeConnectionStatus()
@@ -444,7 +558,7 @@ class AppConfig internal constructor(private val context: Context,
         onDnsChange(DnsType.DNS_PROXY)
     }
 
-    suspend fun handleDnscryptChanges(dnsCryptEndpoint: DNSCryptEndpoint) {
+    suspend fun handleDnscryptChanges(dnsCryptEndpoint: DnsCryptEndpoint) {
         // if the prev connection was not dnscrypt, then remove the connection status from database
         if (getDnsType() != DnsType.DNSCRYPT) {
             removeConnectionStatus()
@@ -454,7 +568,7 @@ class AppConfig internal constructor(private val context: Context,
         onDnsChange(DnsType.DNSCRYPT)
     }
 
-    suspend fun canRemoveDnscrypt(dnsCryptEndpoint: DNSCryptEndpoint): Boolean {
+    suspend fun canRemoveDnscrypt(dnsCryptEndpoint: DnsCryptEndpoint): Boolean {
         val list = dnsCryptEndpointRepository.getConnectedDNSCrypt()
         if (list.count() == 1 && list[0].dnsCryptURL == dnsCryptEndpoint.dnsCryptURL) {
             return false
@@ -462,41 +576,113 @@ class AppConfig internal constructor(private val context: Context,
         return true
     }
 
-    suspend fun handleDnsrelayChanges(endpoint: DNSCryptRelayEndpoint) {
+    suspend fun handleDnsrelayChanges(endpoint: DnsCryptRelayEndpoint) {
         dnsCryptRelayEndpointRepository.update(endpoint)
         onDnsChange(DnsType.DNSCRYPT)
     }
 
     suspend fun setDefaultConnection() {
-        if (getDnsType() != DnsType.DOH) {
+        if (getDnsType() != DnsType.RETHINK_REMOTE) {
             removeConnectionStatus()
         }
 
-        doHEndpointRepository.updateConnectionDefault()
-        onDnsChange(DnsType.DOH)
+        rethinkDnsEndpointRepository.updateConnectionDefault()
+        onDnsChange(DnsType.RETHINK_REMOTE)
     }
 
-    suspend fun getDnsRethinkEndpoint(): DoHEndpoint {
-        return doHEndpointRepository.getRethinkDnsEndpoint()
+    suspend fun getRemoteRethinkEndpoint(): RethinkDnsEndpoint? {
+        return rethinkDnsEndpointRepository.getConnectedEndpoint()
     }
 
     fun getRemoteBlocklistCount(): Int {
         return persistentState.getRemoteBlocklistCount()
     }
 
-    fun isRethinkDnsPlusUrl(dohName: String): Boolean {
-        return Constants.RETHINK_DNS_PLUS == dohName
+    suspend fun getRethinkPlusEndpoint(): RethinkDnsEndpoint {
+        return rethinkDnsEndpointRepository.getRethinkPlusEndpoint()
     }
 
-    suspend fun updateRethinkDnsPlusStamp(stamp: String, count: Int) {
-        removeConnectionStatus()
-        doHEndpointRepository.updateConnectionURL(stamp)
-        persistentState.setRemoteBlocklistCount(count)
-        onDnsChange(DnsType.DOH)
+    suspend fun enableRethinkDnsPlus() {
+        if (getDnsType() != DnsType.RETHINK_REMOTE) {
+            removeConnectionStatus()
+        }
+
+        rethinkDnsEndpointRepository.setRethinkPlus()
+        onDnsChange(DnsType.RETHINK_REMOTE)
+    }
+
+    fun isRethinkDnsConnectedv053x(): Boolean {
+        return connectedDns.value == context.getString(R.string.rethink_plus)
+    }
+
+    suspend fun updateRethinkPlusCountv053x(count: Int) {
+        rethinkDnsEndpointRepository.updatePlusBlocklistCount(count)
+    }
+
+    fun isRethinkDnsConnected(): Boolean {
+        return getDnsType() == DnsType.RETHINK_REMOTE
+    }
+
+    suspend fun setSystemDns(ip: String, port: Int) {
+        if (getDnsType() != DnsType.NETWORK_DNS) {
+            removeConnectionStatus()
+        }
+
+        systemDns.ipAddress = ip
+        systemDns.port = port
+        onDnsChange(DnsType.NETWORK_DNS)
+    }
+
+    suspend fun setSystemDns(dnsServers: List<InetAddress>) {
+        var dnsIp: String? = null
+
+        when (getInternetProtocol()) {
+            InternetProtocol.IPv4 -> {
+                run loop@{
+                    dnsServers.forEach {
+                        if (IPAddressString(it.hostAddress).isIPv4) {
+                            dnsIp = it.hostAddress
+                            return@loop
+                        }
+                    }
+                }
+            }
+            InternetProtocol.IPv6 -> {
+                run loop@{
+                    dnsServers.forEach {
+                        if (IPAddressString(it.hostAddress).isIPv6) {
+                            dnsIp = it.hostAddress
+                            return@loop
+                        }
+                    }
+                }
+            }
+            InternetProtocol.IPv46 -> {
+                dnsIp = dnsServers[0].hostAddress
+            }
+        }
+
+        if (dnsIp.isNullOrEmpty()) {
+            dnsIp = dnsServers[0].hostAddress
+        }
+
+        dnsIp?.let { setSystemDns(it, KnownPorts.DNS_PORT) }
+    }
+
+    fun getSystemDns(): SystemDns {
+        return systemDns
+    }
+
+    fun isSystemDns(): Boolean {
+        return getDnsType().isNetworkDns()
     }
 
     suspend fun isDnscryptRelaySelectable(): Boolean {
         return dnsCryptEndpointRepository.getConnectedCount() >= 1
+    }
+
+    suspend fun isAppWiseDnsEnabled(uid: Int): Boolean {
+        return rethinkDnsEndpointRepository.isAppWiseDnsEnabled(uid)
     }
 
     private suspend fun removeConnectionStatus() {
@@ -511,14 +697,25 @@ class AppConfig internal constructor(private val context: Context,
             DnsType.DNS_PROXY -> {
                 dnsProxyEndpointRepository.removeConnectionStatus()
             }
+            DnsType.RETHINK_REMOTE -> {
+                rethinkDnsEndpointRepository.removeConnectionStatus()
+            }
+            DnsType.NETWORK_DNS -> {
+                // set the system dns object with empty ip address
+                setSystemDns("", DNS_PORT)
+            }
         }
     }
 
-    suspend fun insertDnscryptRelayEndpoint(endpoint: DNSCryptRelayEndpoint) {
+    suspend fun removeAppWiseDns(uid: Int) {
+        rethinkDnsEndpointRepository.removeAppWiseDns(uid)
+    }
+
+    suspend fun insertDnscryptRelayEndpoint(endpoint: DnsCryptRelayEndpoint) {
         dnsCryptRelayEndpointRepository.insertAsync(endpoint)
     }
 
-    suspend fun insertDnscryptEndpoint(endpoint: DNSCryptEndpoint) {
+    suspend fun insertDnscryptEndpoint(endpoint: DnsCryptEndpoint) {
         dnsCryptEndpointRepository.insertAsync(endpoint)
     }
 
@@ -526,7 +723,16 @@ class AppConfig internal constructor(private val context: Context,
         doHEndpointRepository.insertAsync(endpoint)
     }
 
-    suspend fun insertDnsproxyEndpoint(endpoint: DNSProxyEndpoint) {
+    suspend fun insertReplaceEndpoint(endpoint: RethinkDnsEndpoint) {
+        rethinkDnsEndpointRepository.insertWithReplace(endpoint)
+    }
+
+    suspend fun updateRethinkEndpoint(name: String, url: String, count: Int) {
+        Log.d("TEST", "TEST in repository: ${name}, ${url}, $count")
+        rethinkDnsEndpointRepository.updateEndpoint(name, url, count)
+    }
+
+    suspend fun insertDnsproxyEndpoint(endpoint: DnsProxyEndpoint) {
         dnsProxyEndpointRepository.insertAsync(endpoint)
     }
 
@@ -534,8 +740,12 @@ class AppConfig internal constructor(private val context: Context,
         doHEndpointRepository.deleteDoHEndpoint(id)
     }
 
+    suspend fun deleteRethinkEndpoint(name: String, url: String, uid: Int) {
+        rethinkDnsEndpointRepository.deleteRethinkEndpoint(name, url, uid)
+    }
+
     suspend fun deleteDnsProxyEndpoint(id: Int) {
-        dnsProxyEndpointRepository.deleteDNSProxyEndpoint(id)
+        dnsProxyEndpointRepository.deleteDnsProxyEndpoint(id)
     }
 
     suspend fun deleteDnscryptEndpoint(id: Int) {
@@ -543,11 +753,11 @@ class AppConfig internal constructor(private val context: Context,
     }
 
     suspend fun deleteDnscryptRelayEndpoint(id: Int) {
-        dnsCryptRelayEndpointRepository.deleteDNSCryptRelayEndpoint(id)
+        dnsCryptRelayEndpointRepository.deleteDnsCryptRelayEndpoint(id)
     }
 
     fun canEnableDnsBypassFirewallSetting(): Boolean {
-        return getBraveMode().isDnsFirewallMode() && !isDnsProxyActive()
+        return getBraveMode().isDnsFirewallMode()
     }
 
     // -- Proxy Manager --

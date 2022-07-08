@@ -25,20 +25,14 @@ class AppInfo {
     @PrimaryKey var packageInfo: String = ""
     var appName: String = ""
     var uid: Int = 0
-    var trackers: Int = 0
-    var isWifiEnabled: Boolean = true
-    var isDataEnabled: Boolean = true
     var isSystemApp: Boolean = false
-    var isScreenOff: Boolean = false
-    var isInternetAllowed: Boolean = true
-    var isBackgroundEnabled: Boolean = false
-    var whiteListUniv1: Boolean = false
-    var whiteListUniv2: Boolean = false
-    var isExcluded: Boolean = false
+    var firewallStatus: Int = 0
     var appCategory: String = ""
     var wifiDataUsed: Long = 0
     var mobileDataUsed: Long = 0
-
+    var metered: Int = 0
+    var screenOffAllowed: Boolean = false
+    var backgroundAllowed: Boolean = false
 
     override fun equals(other: Any?): Boolean {
         if (other !is AppInfo) return false
@@ -49,9 +43,4 @@ class AppInfo {
     override fun hashCode(): Int {
         return this.packageInfo.hashCode()
     }
-
-    fun canFirewall(): Boolean {
-        return !(this.whiteListUniv1 || this.isExcluded)
-    }
-
 }

@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/background"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     app:layout_scrollFlags="scroll|enterAlways">
-
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,63 +13,31 @@
         android:orientation="vertical"
         android:weightSum="1">
 
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="15dp"
-            android:visibility="visible"
-            android:weightSum="1">
+            android:orientation="vertical"
+            android:padding="15dp">
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0"
-                android:gravity="center"
-                android:orientation="vertical" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fhs_title_rethink"
+                style="@style/TextAppearance.Heading.HomeScreen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:alpha="0.5"
+                android:paddingStart="7dp"
+                android:paddingEnd="7dp"
+                android:text="@string/app_name_small_case" />
 
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:orientation="vertical">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fhs_title_rethink"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:fontFamily="sans-serif-smallcaps"
-                        android:gravity="center"
-                        android:letterSpacing="0.25"
-                        android:text="@string/app_name_small_case"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/text_size_heading"
-                        android:visibility="visible" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fhs_title_rethink_desc"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:text="@string/about_title_desc"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/sub_heading_small"
-                        android:visibility="visible" />
-                </LinearLayout>
-            </LinearLayout>
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fhs_title_rethink_desc"
+                style="@style/TextAppearance.SubHeading.HomeScreen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:alpha="0.5"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="@string/about_title_desc" />
 
         </LinearLayout>
 
@@ -132,16 +100,16 @@
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/rounded_corners_button_accent"
+                    android:background="@drawable/rectangle_border_background"
                     android:clickable="true"
                     android:drawableStart="@drawable/ic_telegram"
-                    android:drawablePadding="-20dp"
+                    android:drawablePadding="-15dp"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground"
                     android:gravity="center"
                     android:padding="10dp"
                     android:text="@string/about_join_telegram"
-                    android:textColor="?attr/accentGood"
+                    android:textColor="?attr/secondaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -199,18 +167,17 @@
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/rounded_corners_button_accent"
+                    android:background="@drawable/rectangle_border_background"
                     android:clickable="true"
                     android:drawableStart="@drawable/report_bug_icon"
-                    android:drawablePadding="-20dp"
+                    android:drawablePadding="-15dp"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground"
                     android:gravity="center"
                     android:padding="10dp"
                     android:text="@string/about_bug_report"
-                    android:textColor="?attr/accentGood"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:visibility="visible" />
+                    android:textColor="?attr/secondaryTextColor"
+                    android:textSize="@dimen/large_font_text_view" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="match_parent"
@@ -250,9 +217,10 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_whats_new"
                 style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:drawableStart="@drawable/ic_whats_new"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
@@ -264,9 +232,10 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_app_update"
                 style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:drawableStart="@drawable/ic_update"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
@@ -274,7 +243,6 @@
                 android:padding="5dp"
                 android:text="@string/about_app_update_check"
                 android:textSize="@dimen/large_font_text_view" />
-
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -304,9 +272,10 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_website"
                 style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:drawableStart="@drawable/ic_website"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
@@ -318,9 +287,10 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_github"
                 style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:drawableStart="@drawable/ic_github"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
@@ -332,9 +302,10 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_faq"
                 style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:drawableStart="@drawable/ic_faq"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
@@ -346,9 +317,10 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_blog"
                 style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:drawableStart="@drawable/ic_blog"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
@@ -384,9 +356,10 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_mail"
                 style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:drawableStart="@drawable/ic_mail"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
@@ -398,9 +371,10 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_twitter"
                 style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:layout_marginBottom="5dp"
                 android:drawableStart="@drawable/ic_twitter"
                 android:drawablePadding="20dp"
@@ -438,9 +412,10 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_app_info"
                 style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:drawableStart="@drawable/ic_app_info"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
@@ -452,9 +427,10 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_vpn_profile"
                 style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:drawableStart="@drawable/ic_about_key"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
@@ -466,9 +442,10 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_app_notification"
                 style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:drawableStart="@drawable/ic_notification"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"

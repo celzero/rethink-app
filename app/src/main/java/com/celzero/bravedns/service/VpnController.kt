@@ -20,7 +20,6 @@ import android.content.Intent
 import android.os.SystemClock
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
@@ -46,7 +45,7 @@ object VpnController : KoinComponent {
 
     val mutex: Mutex = Mutex()
 
-    var connectionStatus: MutableLiveData<BraveVPNService.State> = MutableLiveData()
+    var connectionStatus: MutableLiveData<BraveVPNService.State?> = MutableLiveData()
 
     @Throws(CloneNotSupportedException::class)
     fun clone(): Any? {
@@ -112,7 +111,6 @@ object VpnController : KoinComponent {
     }
 
     fun start(context: Context) {
-        //TODO : Code modified to remove the check of null reference - MODIFIED check??
         if (braveVpnService != null) {
             Log.i(LOG_TAG_VPN, "braveVPNService is not null")
             return
@@ -202,10 +200,6 @@ object VpnController : KoinComponent {
 
     fun decreasePauseDuration(durationMs: Long) {
         braveVpnService?.decreasePauseDuration(durationMs)
-    }
-
-    fun resetAccessibilityHearbeatTimestamp() {
-        braveVpnService?.accessibilityHearbeatTimestamp = INIT_TIME_MS
     }
 
 }

@@ -35,6 +35,8 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Utilities.Companion.getActivityPendingIntent
+import com.celzero.bravedns.util.Utilities.Companion.getBroadcastPendingIntent
 import com.celzero.bravedns.util.Utilities.Companion.getThemeAccent
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
@@ -134,7 +136,6 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
 
             var foundPackageName: String? = null
             for (r in resInfos) {
-                Log.i("OrbotHelper", "market: " + r.activityInfo.packageName)
                 if (TextUtils.equals(r.activityInfo.packageName, PLAY_PACKAGE_NAME)) {
                     foundPackageName = r.activityInfo.packageName
                     break
@@ -189,6 +190,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
      */
     private val orbotStatusReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
+            Log.d(LOG_TAG_VPN, "received status from orbot, action: ${intent.action}")
             if (ACTION_STATUS != intent.action) {
                 return
             }
@@ -244,9 +246,12 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
      * Creates a new notification channel for the Orbot failure update.
      */
     private fun createNotification(): NotificationCompat.Builder {
-        val mainActivityIntent = PendingIntent.getActivity(context, 0, Intent(context,
-                                                                              HomeScreenActivity::class.java),
-                                                           PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val pendingIntent = getActivityPendingIntent(context, Intent(context,
+                                                                     HomeScreenActivity::class.java),
+                                                     PendingIntent.FLAG_UPDATE_CURRENT,
+                                                     mutable = true)
+
         var builder: NotificationCompat.Builder
         if (isAtleastO()) {
             val name: CharSequence = context.getString(R.string.notif_channel_proxy_failure)
@@ -264,7 +269,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
         val contentTitle = context.resources.getString(R.string.settings_orbot_notification_heading)
         val contentText = context.resources.getString(R.string.settings_orbot_notification_content)
         builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(
-            mainActivityIntent).setContentText(contentText)
+            pendingIntent).setContentText(contentText)
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
         builder.color = ContextCompat.getColor(context, getThemeAccent(context))
         val openIntent = getOrbotOpenIntent()
@@ -282,11 +287,11 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
         return builder
     }
 
-    private fun getOrbotOpenIntent(): PendingIntent? {
-        val intentAction = Intent(context, NotificationActionReceiver::class.java)
-        intentAction.putExtra(Constants.NOTIFICATION_ACTION, ORBOT_NOTIFICATION_ACTION_TEXT)
-        return PendingIntent.getBroadcast(context, ORBOT_REQUEST_CODE, intentAction,
-                                          PendingIntent.FLAG_UPDATE_CURRENT)
+    private fun getOrbotOpenIntent(): PendingIntent {
+        val intent = Intent(context, NotificationActionReceiver::class.java)
+        intent.putExtra(Constants.NOTIFICATION_ACTION, ORBOT_NOTIFICATION_ACTION_TEXT)
+        return getBroadcastPendingIntent(context, ORBOT_REQUEST_CODE, intent,
+                                         PendingIntent.FLAG_UPDATE_CURRENT, mutable = true)
     }
 
     private fun setOrbotMode() {

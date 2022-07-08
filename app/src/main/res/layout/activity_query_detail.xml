@@ -99,6 +99,6 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <include
-        android:id="@+id/query_list_scroll_list"
+        android:id="@+id/query_list_scroll_view"
         layout="@layout/query_list_scroll_list" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

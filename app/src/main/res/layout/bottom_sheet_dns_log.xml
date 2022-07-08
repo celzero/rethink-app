@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true"
@@ -12,39 +13,71 @@
         android:layout_gravity="center"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="20dp"
-        android:background="@color/recycler_selected" />
-
-    <com.google.android.material.chip.Chip
-        android:id="@+id/dns_block_blocklist_chip"
-        style="@style/ThinnerChip_action"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginEnd="25dp"
-        android:layout_marginBottom="20dp"
-        android:padding="5dp"
-        android:text=""
-        android:textColor="?attr/accentGood"
-        android:textSize="@dimen/large_font_text_view"
-        android:visibility="invisible" />
-
-    <com.google.android.material.chip.Chip
-        android:id="@+id/dns_block_ips_chip"
-        style="@style/ThinnerChip_action"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginEnd="25dp"
-        android:layout_marginBottom="20dp"
-        android:padding="5dp"
-        android:text=""
-        android:textColor="?attr/accentGood"
-        android:textSize="@dimen/large_font_text_view"
-        android:visibility="invisible" />
+        android:background="?attr/border" />
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/dns_record_type_chip"
+            style="@style/ThinnerChip.Action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_toStartOf="@id/dns_block_chip_group"
+            android:layout_marginStart="15dp"
+            android:padding="5dp"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/small_font_text_view"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/dns_block_chip_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/dns_block_blocklist_chip"
+                style="@style/ThinnerChip.Action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:gravity="center_vertical"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="20dp"
+                android:padding="5dp"
+                android:textColor="?attr/chipTextColor"
+                android:textSize="@dimen/large_font_text_view"
+                android:visibility="gone" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/dns_block_ips_chip"
+                style="@style/ThinnerChip.Action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:gravity="center_vertical"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="20dp"
+                android:padding="5dp"
+                android:textColor="?attr/chipTextColor"
+                android:textSize="@dimen/large_font_text_view"
+                android:visibility="gone" />
+
+        </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="60dp">
 
         <LinearLayout
             android:id="@+id/dns_block_header_container"
@@ -59,8 +92,8 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_weight="0.8">
+                android:layout_weight="0.8"
+                android:gravity="center">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/dns_block_fav_icon"
@@ -78,7 +111,6 @@
                     android:gravity="center"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
-                    android:text="@string/action_automatic"
                     android:textColor="?attr/primaryTextColor"
                     android:textIsSelectable="true"
                     android:textSize="@dimen/heading_font_text_view" />
@@ -118,14 +150,13 @@
                 android:layout_marginTop="2dp"
                 android:layout_weight="0.65"
                 android:ellipsize="end"
-                android:typeface="monospace"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
-                android:text="asdasaasda"
                 android:textAlignment="viewStart"
                 android:textColor="?attr/primaryTextColor"
                 android:textIsSelectable="true"
-                android:textSize="@dimen/large_font_text_view" />
+                android:textSize="@dimen/large_font_text_view"
+                android:typeface="monospace" />
 
             <TextView
                 android:id="@+id/dns_block_ip_latency"
@@ -136,7 +167,6 @@
                 android:layout_weight="0.2"
                 android:background="@drawable/drawable_purple_gradient"
                 android:padding="7dp"
-                android:text="12323434 ms"
                 android:textAlignment="center"
                 android:textColor="?attr/primaryLightColorText"
                 android:textSize="@dimen/default_font_text_view" />
@@ -151,67 +181,81 @@
             android:layout_below="@id/dns_block_ip_header"
             android:layout_centerInParent="true"
             android:padding="5dp"
-            android:text="@string/bsct_conn_block_desc"
+            android:text="@string/bsdl_blocked_desc"
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/default_font_text_view"
             android:visibility="visible" />
 
-        <TextView
-            android:id="@+id/dns_block_place_holder"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/dns_block_rule_header_ll"
-            android:paddingBottom="60dp"
-            android:textSize="@dimen/default_font_text_view" />
-
         <LinearLayout
-            android:id="@+id/dns_block_rule_header_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/dns_block_blocked_desc"
             android:layout_marginLeft="2dp"
-            android:layout_marginTop="20sp"
             android:layout_marginRight="2dp"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp">
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:visibility="gone">
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.9"
-                android:clickable="false"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/dns_block_rule_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/drawable_purple_gradient"
-                    android:gravity="start"
-                    android:padding="7dp"
-                    android:text="@string/ct_bs_rule_1"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:textSize="@dimen/default_font_text_view" />
-
-                <TextView
-                    android:id="@+id/dns_block_app_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:text="@string/dns_block_rule_text"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/large_font_text_view" />
-            </LinearLayout>
-
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/dns_block_check"
-                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch.Bad"
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@drawable/drawable_purple_gradient"
+                android:gravity="start"
+                android:padding="7dp"
+                android:text="@string/bsdl_domain_heading"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/default_font_text_view" />
+
+            <TextView
+                android:id="@+id/bs_conn_block_conn_all_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:clickable="false"
-                android:gravity="bottom"
-                android:padding="5dp" />
+                android:padding="5dp"
+                android:text="@string/bsdl_domain_desc"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/dns_block_toggle_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                app:checkedButton="@id/dns_block_tg_no_rule"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/dns_block_tg_no_rule"
+                    style="@style/toggleButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:tag="0"
+                    android:text="@string/bsdl_domain_rule_norule"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="@dimen/small_font_subheading_text" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/dns_block_tg_allow"
+                    style="@style/toggleButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:tag="1"
+                    android:text="@string/bsdl_domain_rule_allow"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="@dimen/small_font_subheading_text" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/dns_block_tg_deny"
+                    style="@style/toggleButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:tag="2"
+                    android:text="@string/bsdl_domain_rule_block"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="@dimen/small_font_subheading_text" />
+
+            </com.google.android.material.button.MaterialButtonToggleGroup>
 
         </LinearLayout>
 

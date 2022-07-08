@@ -64,5 +64,4 @@ class Rotate3dAnimation
         t.matrix.preTranslate(-mCenterX, -mCenterY)
         t.matrix.postTranslate(mCenterX, mCenterY)
     }
-
 }

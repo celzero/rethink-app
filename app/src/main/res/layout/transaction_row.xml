@@ -23,7 +23,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="start"
             android:layout_weight="0"
-            android:background="@color/accent_bad"
+            android:background="?attr/accentBad"
             android:visibility="invisible"
             tools:text="" />
 

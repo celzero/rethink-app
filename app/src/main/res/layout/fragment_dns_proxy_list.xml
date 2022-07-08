@@ -8,11 +8,25 @@
         android:id="@+id/recycler_dns_proxy_connections"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
         android:nestedScrollingEnabled="true"
-        android:visibility="visible"
+        android:paddingBottom="50dp"
+        android:clipToPadding="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/doh_fab_add_server_icon"
+        android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|bottom"
+                android:layout_margin="30dp"
+                android:src="@drawable/ic_fab_without_border"
+                android:padding="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:fabSize="normal"
+                app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
+                android:contentDescription="New" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

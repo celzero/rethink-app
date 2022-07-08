@@ -31,7 +31,7 @@ class DoHEndpointViewModel(private val doHEndpointDAO: DoHEndpointDAO) : ViewMod
         filteredList.value = ""
     }
 
-    var dohEndpointList = Transformations.switchMap(filteredList, ({ input: String ->
+    val dohEndpointList = Transformations.switchMap(filteredList, ({ input: String ->
         if (input.isBlank()) {
             doHEndpointDAO.getDoHEndpointLiveData().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
         } else if (input == FILTER_IS_SYSTEM) {
@@ -42,11 +42,4 @@ class DoHEndpointViewModel(private val doHEndpointDAO: DoHEndpointDAO) : ViewMod
         }
     }))
 
-    fun setFilter(filter: String?) {
-        filteredList.value = filter
-    }
-
-    fun setFilterBlocked(filter: String) {
-        filteredList.value = filter
-    }
 }

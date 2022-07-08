@@ -22,14 +22,12 @@ import androidx.collection.LongSparseArray
 import com.celzero.bravedns.net.dns.DnsPacket
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.service.DNSLogTracker
+import com.celzero.bravedns.service.DnsLogTracker
 import com.celzero.bravedns.service.QueryTracker
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
-import dnscrypt.Dnscrypt
-import dnscrypt.Summary
-import doh.Doh
-import doh.Token
+import dnsx.Dnsx
+import dnsx.Summary
 import intra.Listener
 import intra.TCPSocketSummary
 import intra.UDPSocketSummary
@@ -43,51 +41,32 @@ object GoIntraListener : Listener, KoinComponent {
     override fun onTCPSocketClosed(summary: TCPSocketSummary?) {}
     override fun onUDPSocketClosed(summary: UDPSocketSummary?) {}
     private val dnsLatencyTracker by inject<QueryTracker>()
-    private val dnsLogTracker by inject<DNSLogTracker>()
+    private val dnsLogTracker by inject<DnsLogTracker>()
 
     // UDP is often used for one-off messages and pings.  The relative overhead of reporting metrics
     // on these short messages would be large, so we only report metrics on sockets that transfer at
     // least this many bytes.
     private const val UDP_THRESHOLD_BYTES = 10000
     private val goStatusMap = LongSparseArray<Transaction.Status>()
-    private val dohStatusMap = LongSparseArray<Transaction.Status>()
-    private val dnscryptStatusMap = LongSparseArray<Transaction.Status>()
-
-    private fun len(a: ByteArray?): Int {
-        return a?.count() ?: 0
-    }
 
     init {
-        goStatusMap.put(Doh.Complete, Transaction.Status.COMPLETE)
-        goStatusMap.put(Doh.SendFailed, Transaction.Status.SEND_FAIL)
-        goStatusMap.put(Doh.HTTPError, Transaction.Status.HTTP_ERROR)
-        goStatusMap.put(Doh.BadQuery,
-                        Transaction.Status.INTERNAL_ERROR) // TODO: Add a BAD_QUERY Status
-        goStatusMap.put(Doh.BadResponse, Transaction.Status.BAD_RESPONSE)
-        goStatusMap.put(Doh.InternalError, Transaction.Status.INTERNAL_ERROR)
-
-        // TODO: Add a BAD_QUERY Status
-        dohStatusMap.put(Doh.Complete, Transaction.Status.COMPLETE)
-        dohStatusMap.put(Doh.SendFailed, Transaction.Status.SEND_FAIL)
-        dohStatusMap.put(Doh.HTTPError, Transaction.Status.HTTP_ERROR)
-        dohStatusMap.put(Doh.BadQuery, Transaction.Status.INTERNAL_ERROR)
-        dohStatusMap.put(Doh.BadResponse, Transaction.Status.BAD_RESPONSE)
-        dohStatusMap.put(Doh.InternalError, Transaction.Status.INTERNAL_ERROR)
-        dnscryptStatusMap.put(Dnscrypt.Complete, Transaction.Status.COMPLETE)
-        dnscryptStatusMap.put(Dnscrypt.SendFailed, Transaction.Status.SEND_FAIL)
-        dnscryptStatusMap.put(Dnscrypt.Error, Transaction.Status.CANCELED)
-        dnscryptStatusMap.put(Dnscrypt.BadQuery, Transaction.Status.INTERNAL_ERROR)
-        dnscryptStatusMap.put(Dnscrypt.BadResponse, Transaction.Status.BAD_RESPONSE)
-        dnscryptStatusMap.put(Dnscrypt.InternalError, Transaction.Status.INTERNAL_ERROR)
+        goStatusMap.put(Dnsx.Complete, Transaction.Status.COMPLETE)
+        goStatusMap.put(Dnsx.SendFailed, Transaction.Status.SEND_FAIL)
+        goStatusMap.put(Dnsx.NoResponse, Transaction.Status.NO_RESPONSE)
+        goStatusMap.put(Dnsx.TransportError, Transaction.Status.TRANSPORT_ERROR)
+        goStatusMap.put(Dnsx.BadQuery, Transaction.Status.BAD_QUERY)
+        goStatusMap.put(Dnsx.BadResponse, Transaction.Status.BAD_RESPONSE)
+        goStatusMap.put(Dnsx.InternalError, Transaction.Status.INTERNAL_ERROR)
     }
 
-    override fun onDNSCryptQuery(s: String): Boolean {
-        return false
+    override fun onQuery(query: String?): String {
+        // return empty response for now
+        return ""
     }
 
-    override fun onDNSCryptResponse(summary: Summary?) {
+    override fun onResponse(summary: Summary?) {
         if (summary == null) {
-            Log.i(LOG_TAG_DNS_LOG, "received null dnscrypt summary")
+            Log.i(LOG_TAG_DNS_LOG, "received null summary")
             return
         }
 
@@ -100,52 +79,20 @@ object GoIntraListener : Listener, KoinComponent {
         val nowMs = SystemClock.elapsedRealtime()
         val queryTimeMs = nowMs - latencyMs
         val transaction = Transaction(query, queryTimeMs)
-        transaction.response = summary.response
-        transaction.responseTime = latencyMs
-        transaction.serverIp = summary.server
-        transaction.relayIp = summary.relayServer
-        transaction.blocklist = summary.blocklists
-        transaction.status = dnscryptStatusMap[summary.status]
-        transaction.responseCalendar = Calendar.getInstance()
-        transaction.isDNSCrypt = true
-        recordTransaction(transaction)
-    }
-
-    override fun onQuery(url: String): Token? {
-        return null
-    }
-
-    override fun onResponse(token: Token?, summary: doh.Summary?) {
-        if (token == null) {
-            // ignore tokens, not used
-        }
-        if (summary == null) {
-            Log.i(LOG_TAG_DNS_LOG, "received null doh summary")
-            return
-        }
-
-        val query: DnsPacket = try {
-            DnsPacket(summary.query)
-        } catch (e: Exception) {
-            return
-        }
-        val latencyMs = (TimeUnit.SECONDS.toMillis(1L) * summary.latency).toLong()
-        val nowMs = SystemClock.elapsedRealtime()
-        val queryTimeMs = nowMs - latencyMs
-        val transaction = Transaction(query, queryTimeMs)
+        transaction.queryType = Transaction.QueryType.getType(summary.type)
         transaction.response = summary.response
         transaction.responseTime = latencyMs
         transaction.serverIp = summary.server
         transaction.status = goStatusMap[summary.status]
         transaction.responseCalendar = Calendar.getInstance()
         transaction.blocklist = summary.blocklists
-        transaction.isDNSCrypt = false
+        transaction.queryType = Transaction.QueryType.DOH
         recordTransaction(transaction)
     }
 
     private fun recordTransaction(transaction: Transaction?) {
         if (transaction == null) {
-            Log.i(LOG_TAG_DNS_LOG, "doh transaction is null, no need to record")
+            Log.i(LOG_TAG_DNS_LOG, "Transaction is null, no need to record")
             return
         }
 
@@ -153,7 +100,7 @@ object GoIntraListener : Listener, KoinComponent {
         // All the transactions are recorded in the DNS logs.
         // Quantile estimation correction - Not adding the transactions with server IP
         // as null in the quantile estimator.
-        if (!transaction.serverIp.isNullOrEmpty()) {
+        if (!transaction.serverIp.isNullOrEmpty() || transaction.blocklist.isNullOrEmpty()) {
             dnsLatencyTracker.recordTransaction(transaction)
         }
         dnsLogTracker.recordTransaction(transaction)

@@ -20,29 +20,33 @@ import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.Activity
 import android.app.ActivityManager
+import android.app.PendingIntent
 import android.content.*
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.content.res.Configuration
+import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
-import android.os.CountDownTimer
 import android.provider.Settings
 import android.provider.Settings.ACTION_VPN_SETTINGS
 import android.text.Html
 import android.text.Spanned
 import android.text.TextUtils
 import android.text.TextUtils.SimpleStringSplitter
+import android.text.format.DateUtils
 import android.util.Log
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.getSystemService
 import androidx.core.text.HtmlCompat
+import androidx.lifecycle.LifecycleCoroutineScope
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE
@@ -55,21 +59,27 @@ import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_WEBSITE
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
+import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
+import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
-import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP
+import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.google.common.net.InetAddresses
+import com.google.common.base.CharMatcher
 import com.google.common.net.InternetDomainName
+import inet.ipaddr.IPAddressString
+import kotlinx.coroutines.launch
+import xdns.Xdns
 import java.io.File
 import java.io.IOException
 import java.net.InetAddress
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.Locale
+import java.util.Calendar.DAY_OF_YEAR
 
 
 class Utilities {
@@ -139,7 +149,7 @@ class Utilities {
                 while (colonSplitter.hasNext()) {
                     val componentNameString = colonSplitter.next()
                     val enabledService = ComponentName.unflattenFromString(componentNameString)
-                    if (expectedComponentName.equals(enabledService)) {
+                    if (expectedComponentName == enabledService) {
                         if (DEBUG) Log.i(LOG_TAG_VPN,
                                          "SettingsSecure accessibility enabled for: ${expectedComponentName.packageName}")
                         return true
@@ -212,6 +222,34 @@ class Utilities {
             return convertLongToTime(now, TIME_FORMAT_1)
         }
 
+        fun formatToRelativeTime(timestamp: Long): String {
+            val now = System.currentTimeMillis()
+            return if (DateUtils.isToday(timestamp)) {
+                "Today"
+            } else if (isYesterday(Date(timestamp))) {
+                "Yesterday"
+            } else {
+                val d = DateUtils.getRelativeTimeSpanString(timestamp, now,
+                                                            DateUtils.MINUTE_IN_MILLIS,
+                                                            DateUtils.FORMAT_ABBREV_RELATIVE)
+                d.toString()
+            }
+        }
+
+        // ref: https://stackoverflow.com/a/3006423
+        private fun isYesterday(day: Date): Boolean {
+            val c1 = Calendar.getInstance()
+            c1.add(DAY_OF_YEAR, -1)
+            val c2 = Calendar.getInstance()
+            c2.time = day
+            if (c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR) && c1.get(DAY_OF_YEAR) == c2.get(
+                    DAY_OF_YEAR)) {
+                return true
+            }
+
+            return false
+        }
+
         fun getNonLiveDnscryptServers(servers: String, liveServers: String): String {
             val serverList = servers.split(",")
             val liveServerList = liveServers.split(",")
@@ -237,46 +275,23 @@ class Utilities {
         }
 
         fun isLanIpv4(ipAddress: String): Boolean {
-            try {
-                // InetAddresses - 'com.google.common.net.InetAddresses' is marked unstable with @Beta
-                val ip = InetAddresses.forString(ipAddress)
-                return ip.isLoopbackAddress || ip.isSiteLocalAddress || ip.isAnyLocalAddress || UNSPECIFIED_IP.equals(
-                    ip)
-            } catch (e: IllegalArgumentException) {
-                Log.w(LOG_TAG_VPN, "Failed parsing IP from $ipAddress with ${e.message}", e)
-            }
-            return false
+            val ip = IPAddressString(ipAddress).address
+            return ip.isLoopback || ip.isLocal || ip.isAnyLocal || UNSPECIFIED_IP_IPV4.equals(ip)
         }
 
         fun isValidLocalPort(port: Int): Boolean {
-            return port in 65535 downTo 1024
+            return isValidPort(port)
         }
 
         fun isValidPort(port: Int): Boolean {
             return port in 65535 downTo 0
         }
 
-
-        fun getTypeName(type: Int): String {
-            // From https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-4
-            // additional ref: https://www.netmeister.org/blog/dns-rrs.html
-            val names = arrayOf("0", "A", "NS", "MD", "MF", "CNAME", "SOA", "MB", "MG", "MR",
-                                "NULL", "WKS", "PTR", "HINFO", "MINFO", "MX", "TXT", "RP", "AFSDB",
-                                "X25", "ISDN", "RT", "NSAP", "NSAP+PTR", "SIG", "KEY", "PX", "GPOS",
-                                "AAAA", "LOC", "NXT", "EID", "NIMLOC", "SRV", "ATMA", "NAPTR", "KX",
-                                "CERT", "A6", "DNAME", "SINK", "OPT", "APL", "DS", "SSHFP",
-                                "IPSECKEY", "RRSIG", "NSEC", "DNSKEY", "DHCID", "NSEC3",
-                                "NSEC3PARAM", "TLSA", "SMIMEA")
-            return if (type < names.size) {
-                names[type]
-            } else String.format(Locale.ROOT, "%d", type)
-        }
-
         fun getThemeAccent(context: Context): Int {
             return if (isDarkSystemTheme(context)) {
                 R.color.accentGoodBlack
             } else {
-                R.color.negative_white
+                R.color.accentBadLight
             }
         }
 
@@ -350,7 +365,6 @@ class Utilities {
             return true
         }
 
-
         fun isAlwaysOnEnabled(context: Context, vpnService: BraveVPNService?): Boolean {
             // Introduced as part of issue fix #325
             // From android version 12+(R) Settings keys annotated with @hide are restricted to
@@ -422,21 +436,18 @@ class Utilities {
             }
         }
 
-        fun delay(ms: Long, updateUi: () -> Unit) {
-            object : CountDownTimer(ms, ms) {
-                override fun onTick(millisUntilFinished: Long) {}
-
-                override fun onFinish() {
-                    updateUi()
-                }
-            }.start()
+        fun delay(ms: Long, lifecycleScope: LifecycleCoroutineScope, updateUi: () -> Unit) {
+            lifecycleScope.launch {
+                kotlinx.coroutines.delay(ms)
+                updateUi()
+            }
         }
 
         fun getPackageInfoForUid(context: Context, uid: Int): Array<out String>? {
             try {
                 return context.packageManager.getPackagesForUid(uid)
             } catch (e: PackageManager.NameNotFoundException) {
-                Log.w(LoggerConstants.LOG_TAG_FIREWALL_LOG, "Package Not Found - " + e.message)
+                Log.w(LoggerConstants.LOG_TAG_FIREWALL_LOG, "Package Not Found: " + e.message)
             }
             return null
         }
@@ -451,6 +462,10 @@ class Utilities {
 
         fun isAtleastQ(): Boolean {
             return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+        }
+
+        fun isAtleastS(): Boolean {
+            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
         }
 
         fun isFdroidFlavour(): Boolean {
@@ -498,16 +513,19 @@ class Utilities {
                     fileOrDirectory.delete()
                 }
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                                 "deleteRecursive -- File : ${fileOrDirectory.path}, $isDeleted")
+                                 "deleteRecursive File : ${fileOrDirectory.path}, $isDeleted")
             } catch (e: Exception) {
                 Log.w(LOG_TAG_DOWNLOAD, "File delete exception: ${e.message}", e)
             }
         }
 
-        fun localBlocklistDownloadPath(ctx: Context?, which: String, timestamp: Long): String? {
-            ctx ?: return null
+        fun localBlocklistDownloadPath(ctx: Context, which: String, timestamp: Long): String {
+            return localBlocklistDownloadBasePath(ctx, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                                  timestamp) + File.separator + which
+        }
 
-            return ctx.filesDir.canonicalPath + File.separator + timestamp + File.separator + which
+        fun oldLocalBlocklistDownloadDir(ctx: Context, timestamp: Long): String {
+            return ctx.filesDir.canonicalPath + File.separator + timestamp + File.separator
         }
 
         fun cleanupOldLocalBlocklistFiles(fileOrDir: File, activeDir: String) {
@@ -536,7 +554,15 @@ class Utilities {
             return a
         }
 
-        private fun localBlocklistFile(ctx: Context?, which: String, timestamp: Long): File? {
+        fun localBlocklistDownloadBasePath(ctx: Context, which: String, timestamp: Long): String {
+            return ctx.filesDir.canonicalPath + File.separator + which + File.separator + timestamp
+        }
+
+        fun localBlocklistCanonicalPath(ctx: Context, which: String): String {
+            return ctx.filesDir.canonicalPath + File.separator + which
+        }
+
+        fun localBlocklistFile(ctx: Context, which: String, timestamp: Long): File? {
             return try {
                 val localBlocklist = localBlocklistDownloadPath(ctx, which, timestamp) ?: return null
 
@@ -547,36 +573,37 @@ class Utilities {
             }
         }
 
-        fun hasRemoteBlocklistFile(ctx: Context?, which: String, timestamp: Long): Boolean {
-            val remoteDir = remoteBlocklistDir(ctx, which, timestamp) ?: return false
-            val remoteFile = remoteBlocklistFile(remoteDir.absolutePath,
-                                                 Constants.ONDEVICE_BLOCKLIST_FILE_TAG) ?: return false
-            return remoteFile.exists()
+        fun hasRemoteBlocklists(ctx: Context, timestamp: Long): Boolean {
+            val remoteDir = remoteBlocklistFile(ctx, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                                timestamp) ?: return false
+            val remoteFile = blocklistFile(remoteDir.absolutePath,
+                                           Constants.ONDEVICE_BLOCKLIST_FILE_TAG) ?: return false
+            if (remoteFile.exists()) {
+                return true
+            }
+
+            return false
         }
 
-        fun cleanupRemoteBlocklistDir(ctx: Context?, which: String) {
-            ctx ?: return
-
-            val dir = File(remoteBlocklistDownloadBasePath(ctx, which))
-            deleteRecursive(dir)
-        }
-
-        fun remoteBlocklistDir(ctx: Context?, which: String, timestamp: Long): File? {
+        fun remoteBlocklistFile(ctx: Context?, which: String, timestamp: Long): File? {
             if (ctx == null) return null
 
             return try {
-                File(remoteBlocklistDownloadBasePath(ctx, which) + File.separator + timestamp)
+                val a = remoteBlocklistDownloadBasePath(ctx, which, timestamp)
+                Log.d(LoggerConstants.LOG_TAG_DNS, "Path: $a")
+                File(remoteBlocklistDownloadBasePath(ctx, which, timestamp))
+
             } catch (e: IOException) {
                 Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
                 null
             }
         }
 
-        private fun remoteBlocklistDownloadBasePath(ctx: Context, which: String): String {
-            return ctx.filesDir.canonicalPath + File.separator + which
+        fun remoteBlocklistDownloadBasePath(ctx: Context, which: String, timestamp: Long): String {
+            return ctx.filesDir.canonicalPath + File.separator + which + File.separator + timestamp
         }
 
-        fun remoteBlocklistFile(dirPath: String, fileName: String): File? {
+        fun blocklistFile(dirPath: String, fileName: String): File? {
             return try {
                 return File(dirPath + fileName)
             } catch (e: IOException) {
@@ -595,6 +622,99 @@ class Utilities {
         fun isNonApp(p: String): Boolean {
             return p.contains(NO_PACKAGE)
         }
-    }
 
+        fun openAndroidAppInfo(context: Context, packageName: String?) {
+            try {
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                intent.data = Uri.fromParts("package", packageName, null)
+                context.startActivity(intent)
+            } catch (e: Exception) { // ActivityNotFoundException | NullPointerException
+                Log.w(LOG_TAG_FIREWALL, "Failure calling app info: ${e.message}", e)
+                showToastUiCentered(context,
+                                    context.getString(R.string.ctbs_app_info_not_available_toast),
+                                    Toast.LENGTH_SHORT)
+            }
+        }
+
+        fun removeLeadingAndTrailingDots(str: String?): String {
+            if (str.isNullOrBlank()) return ""
+
+            // remove leading and trailing dots(.) from the given string
+            // eg., (...adsd.asd.asa... will result in adsd.asd.asa)
+            val s = CharMatcher.`is`('.').trimLeadingFrom(str)
+            return CharMatcher.`is`('.').trimTrailingFrom(s)
+        }
+
+        fun fetchColor(context: Context, attr: Int): Int {
+            val typedValue = TypedValue()
+            val a: TypedArray = context.obtainStyledAttributes(typedValue.data, intArrayOf(attr))
+            val color = a.getColor(0, 0)
+            a.recycle()
+            return color
+        }
+
+        fun fetchToggleBtnColors(context: Context, attr: Int): Int {
+            val attributeFetch = if (attr == R.color.firewallNoRuleToggleBtnTxt) {
+                R.attr.firewallNoRuleToggleBtnTxt
+            } else if (attr == R.color.firewallNoRuleToggleBtnBg) {
+                R.attr.firewallNoRuleToggleBtnBg
+            } else if (attr == R.color.firewallBlockToggleBtnTxt) {
+                R.attr.firewallBlockToggleBtnTxt
+            } else if (attr == R.color.firewallBlockToggleBtnBg) {
+                R.attr.firewallBlockToggleBtnBg
+            } else if (attr == R.color.firewallWhiteListToggleBtnTxt) {
+                R.attr.firewallWhiteListToggleBtnTxt
+            } else if (attr == R.color.firewallWhiteListToggleBtnBg) {
+                R.attr.firewallWhiteListToggleBtnBg
+            } else if (attr == R.color.firewallExcludeToggleBtnBg) {
+                R.attr.firewallExcludeToggleBtnBg
+            } else if (attr == R.color.firewallExcludeToggleBtnTxt) {
+                R.attr.firewallExcludeToggleBtnTxt
+            } else if (attr == R.color.defaultToggleBtnBg) {
+                R.attr.defaultToggleBtnBg
+            } else if (attr == R.color.defaultToggleBtnTxt) {
+                R.attr.defaultToggleBtnTxt
+            } else if (attr == R.color.accentGood) {
+                R.attr.accentGood
+            } else {
+                R.attr.chipBgColorPositive
+            }
+            val typedValue = TypedValue()
+            val a: TypedArray = context.obtainStyledAttributes(typedValue.data,
+                                                               intArrayOf(attributeFetch))
+            val color = a.getColor(0, 0)
+            a.recycle()
+            return color
+        }
+
+        fun getActivityPendingIntent(context: Context, intent: Intent, flag: Int,
+                                     mutable: Boolean): PendingIntent {
+            return if (isAtleastS()) {
+                val sFlag = if (mutable) PendingIntent.FLAG_MUTABLE else PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.getActivity(context, 0, intent, sFlag)
+            } else {
+                PendingIntent.getActivity(context, 0, intent, flag)
+            }
+        }
+
+        fun getBroadcastPendingIntent(context: Context, requestCode: Int, intent: Intent, flag: Int,
+                                      mutable: Boolean): PendingIntent {
+            return if (isAtleastS()) {
+                val sFlag = if (mutable) PendingIntent.FLAG_MUTABLE else PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.getBroadcast(context, requestCode, intent, sFlag)
+            } else {
+                PendingIntent.getBroadcast(context, requestCode, intent, flag)
+            }
+        }
+
+        fun getRemoteBlocklistStamp(url: String): String {
+            // Interacts with GO lib to fetch the stamp (Xdnx#getBlocklistStampFromURL)
+            return try {
+                Xdns.getBlocklistStampFromURL(url)
+            } catch (e: Exception) {
+                Log.w(LOG_TAG_DNS, "failure fetching stamp from Go ${e.message}", e)
+                ""
+            }
+        }
+    }
 }

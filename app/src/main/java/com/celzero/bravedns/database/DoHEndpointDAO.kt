@@ -60,18 +60,7 @@ interface DoHEndpointDAO {
     @Query("select * from DoHEndpoint where isSelected = 1")
     fun getConnectedDoH(): DoHEndpoint?
 
-    @Query("update DoHEndpoint set dohURL = :url, isSelected = 1 where id = 5")
-    fun updateConnectionURL(url: String)
-
-    @Query("select dohURL from DoHEndpoint where id = :id")
-    fun getConnectionURL(id: Int): String
-
     @Query("select count(*) from DoHEndpoint")
     fun getCount(): Int
 
-    @Query("update DoHEndpoint set isSelected = 1 where id = 4")
-    fun updateConnectionDefault()
-
-    @Query("select * from DoHEndpoint where id = 5")
-    fun getRethinkDnsEndpoint(): DoHEndpoint
 }

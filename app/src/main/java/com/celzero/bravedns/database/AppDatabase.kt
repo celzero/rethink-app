@@ -19,25 +19,30 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.celzero.bravedns.util.Constants
 
 @Database(
-    entities = [AppInfo::class, CategoryInfo::class, ConnectionTracker::class, BlockedConnections::class, DoHEndpoint::class, DNSCryptEndpoint::class, DNSProxyEndpoint::class, DNSCryptRelayEndpoint::class, ProxyEndpoint::class, DnsLog::class],
-    views = [AppInfoView::class], version = 10, exportSchema = false)
+    entities = [AppInfo::class, ConnectionTracker::class, CustomIp::class, DoHEndpoint::class, DnsCryptEndpoint::class, DnsProxyEndpoint::class, DnsCryptRelayEndpoint::class, ProxyEndpoint::class, DnsLog::class, CustomDomain::class, RethinkDnsEndpoint::class, RethinkRemoteFileTag::class, RethinkLocalFileTag::class],
+    version = 12, exportSchema = false)
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         private const val DATABASE_NAME = "bravedns.db"
+        private const val DATABASE_PATH = "database/rethink_v12.db"
 
         // setJournalMode() is added as part of issue #344
         fun buildDatabase(context: Context) = Room.databaseBuilder(context.applicationContext,
                                                                    AppDatabase::class.java,
-                                                                   DATABASE_NAME).setJournalMode(
-            JournalMode.TRUNCATE).addMigrations(MIGRATION_1_2).addMigrations(
-            MIGRATION_2_3).addMigrations(MIGRATION_3_4).addMigrations(MIGRATION_4_5).addMigrations(
-            MIGRATION_5_6).addMigrations(MIGRATION_6_7).addMigrations(MIGRATION_7_8).addMigrations(
-            MIGRATION_8_9).addMigrations(MIGRATION_9_10).build()
+                                                                   DATABASE_NAME).createFromAsset(
+            DATABASE_PATH).setJournalMode(JournalMode.TRUNCATE).addMigrations(
+            MIGRATION_1_2).addMigrations(MIGRATION_2_3).addMigrations(MIGRATION_3_4).addMigrations(
+            MIGRATION_4_5).addMigrations(MIGRATION_5_6).addMigrations(MIGRATION_6_7).addMigrations(
+            MIGRATION_7_8).addMigrations(MIGRATION_8_9).addMigrations(MIGRATION_9_10).addMigrations(
+            MIGRATION_10_11).addMigrations(MIGRATION_11_12).build()
 
         private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
@@ -204,32 +209,175 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_10_11: Migration = object : Migration(10, 11) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "ALTER TABLE DNSLogs add column responseIps TEXT DEFAULT '' NOT NULL")
+                database.execSQL(
+                    "CREATE TABLE 'CustomDomain' ( 'domain' TEXT NOT NULL, 'ips' TEXT NOT NULL, 'status' INTEGER NOT NULL, 'type' INTEGER NOT NULL, 'createdTs' INTEGER NOT NULL, 'deletedTs' INTEGER NOT NULL, 'version' INTEGER NOT NULL, PRIMARY KEY (domain)) ")
+            }
+        }
+
+        private val MIGRATION_11_12: Migration = object : Migration(11, 12) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                addMoreDohToList(database)
+                modifyAppInfoTableSchema(database)
+                modifyBlockedConnectionsTable(database)
+                database.execSQL("DROP VIEW AppInfoView")
+                database.execSQL("DROP TABLE if exists CategoryInfo")
+                database.execSQL(
+                    "UPDATE DoHEndpoint set dohURL = `replace`(dohURL,'bravedns','rethinkdns')")
+                modifyConnectionTrackerTable(database)
+                createRethinkDnsTable(database)
+                removeRethinkFromDohList(database)
+                updateDnscryptStamps(database)
+                createRethinkFileTagTables(database)
+            }
+
+            private fun updateDnscryptStamps(database: SupportSQLiteDatabase) {
+                with(database) {
+                    execSQL(
+                        "UPDATE DNSCryptEndpoint set dnsCryptURL='sdns://AQMAAAAAAAAAEjE0OS4xMTIuMTEyLjk6ODQ0MyBnyEe4yHWM0SAkVUO-dWdG3zTfHYTAC4xHA2jfgh2GPhkyLmRuc2NyeXB0LWNlcnQucXVhZDkubmV0' where id=5")
+                    execSQL(
+                        "UPDATE DNSCryptEndpoint set dnsCryptURL='sdns://AQMAAAAAAAAAETk0LjE0MC4xNC4xNTo1NDQzILgxXdexS27jIKRw3C7Wsao5jMnlhvhdRUXWuMm1AFq6ITIuZG5zY3J5cHQuZmFtaWx5Lm5zMS5hZGd1YXJkLmNvbQ' where id=3")
+                }
+            }
+
+            // add more doh options as default
+            private fun addMoreDohToList(database: SupportSQLiteDatabase) {
+                with(database) {
+                    execSQL(
+                        "INSERT OR REPLACE INTO DoHEndpoint(dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values('Google','https://dns.google/dns-query','Traditional DNS queries and replies are sent over UDP or TCP without encryption, making them subject to surveillance, spoofing, and DNS-based Internet filtering.',0,0,0,0)")
+                    execSQL(
+                        "INSERT OR REPLACE INTO DoHEndpoint(dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values('CleanBrowsing Family','https://doh.cleanbrowsing.org/doh/family-filter/','Family filter blocks access to all adult, pornographic and explicit sites. It also blocks proxy and VPN domains that could be used to bypass our filters. Mixed content sites (like Reddit) are also blocked. Google, Bing and Youtube are set to the Safe Mode.',0,0,0,0)")
+                    execSQL(
+                        "INSERT OR REPLACE INTO DoHEndpoint(dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values('CleanBrowsing Adult','https://doh.cleanbrowsing.org/doh/adult-filter/','Adult filter blocks access to all adult, pornographic and explicit sites. It does not block proxy or VPNs, nor mixed-content sites. Sites like Reddit are allowed. Google and Bing are set to the Safe Mode.',0,0,0,0)")
+                    execSQL(
+                        "INSERT OR REPLACE INTO DoHEndpoint(dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values('Quad9 Secure','https://dns.quad9.net/dns-query','Quad9 routes your DNS queries through a secure network of servers around the globe.',0,0,0,0)")
+                }
+            }
+
+            // rename blockedConnections table to CustomIp
+            private fun modifyBlockedConnectionsTable(database: SupportSQLiteDatabase) {
+                with(database) {
+                    execSQL(
+                        "CREATE TABLE 'CustomIp' ('uid' INTEGER NOT NULL, 'ipAddress' TEXT DEFAULT '' NOT NULL, 'port' INTEGER DEFAULT '' NOT NULL, 'protocol' TEXT DEFAULT '' NOT NULL, 'isActive' INTEGER DEFAULT 1 NOT NULL, 'status' INTEGER DEFAULT 1 NOT NULL,'ruleType' INTEGER DEFAULT 0 NOT NULL, 'wildcard' INTEGER DEFAULT 0 NOT NULL, 'modifiedDateTime' INTEGER DEFAULT 0 NOT NULL, PRIMARY KEY(uid, ipAddress, port, protocol))")
+                    execSQL(
+                        "INSERT INTO 'CustomIp' SELECT uid, ipAddress, port, protocol, isActive, 1, 0, 0, modifiedDateTime from BlockedConnections")
+                    execSQL("DROP TABLE if exists BlockedConnections")
+                }
+            }
+
+            private fun modifyAppInfoTableSchema(database: SupportSQLiteDatabase) {
+                with(database) {
+                    execSQL(
+                        "CREATE TABLE 'AppInfo_backup' ('packageInfo' TEXT PRIMARY KEY NOT NULL, 'appName' TEXT NOT NULL, 'uid' INTEGER NOT NULL, 'isSystemApp' INTEGER NOT NULL, 'firewallStatus' INTEGER NOT NULL DEFAULT 0, 'appCategory' TEXT NOT NULL, 'wifiDataUsed' INTEGER NOT NULL, 'mobileDataUsed' INTEGER NOT NULL, 'metered' INTEGER NOT NULL DEFAULT 0, 'screenOffAllowed' INTEGER NOT NULL DEFAULT 0, 'backgroundAllowed' INTEGER NOT NULL DEFAULT 0,  'isInternetAllowed' INTEGER NOT NULL, 'whiteListUniv1' INTEGER NOT NULL, 'isExcluded' INTEGER NOT NULL)")
+                    execSQL(
+                        "INSERT INTO AppInfo_backup SELECT packageInfo, appName, uid, isSystemApp, 0, appCategory, wifiDataUsed, mobileDataUsed, 0, isScreenOff, isBackgroundEnabled, isInternetAllowed, whiteListUniv1, isExcluded FROM AppInfo")
+                    execSQL(
+                        "UPDATE AppInfo_backup set firewallStatus = 0 where isInternetAllowed = 1")
+                    execSQL(
+                        "UPDATE AppInfo_backup set firewallStatus = 1 where isInternetAllowed = 0")
+                    execSQL("UPDATE AppInfo_backup set firewallStatus = 2 where whiteListUniv1 = 1")
+                    execSQL("UPDATE AppInfo_backup set firewallStatus = 3 where isExcluded = 1")
+                    execSQL(" DROP TABLE if exists AppInfo")
+                    execSQL(
+                        "CREATE TABLE 'AppInfo' ('packageInfo' TEXT PRIMARY KEY NOT NULL, 'appName' TEXT NOT NULL, 'uid' INTEGER NOT NULL, 'isSystemApp' INTEGER NOT NULL, 'firewallStatus' INTEGER NOT NULL DEFAULT 0, 'appCategory' TEXT NOT NULL, 'wifiDataUsed' INTEGER NOT NULL, 'mobileDataUsed' INTEGER NOT NULL, 'metered' INTEGER NOT NULL DEFAULT 0, 'screenOffAllowed' INTEGER NOT NULL DEFAULT 0, 'backgroundAllowed' INTEGER NOT NULL DEFAULT 0)")
+                    execSQL(
+                        "INSERT INTO AppInfo SELECT packageInfo, appName, uid, isSystemApp, firewallStatus, appCategory, wifiDataUsed, mobileDataUsed, metered, screenOffAllowed, backgroundAllowed FROM AppInfo_backup")
+
+                    execSQL("DROP TABLE AppInfo_backup")
+                }
+            }
+
+            // introduce NOT NULL property for columns in the schema, alter table query cannot
+            // add the not-null to the schema, so creating a backup and recreating the table
+            // during migration.
+            private fun modifyConnectionTrackerTable(database: SupportSQLiteDatabase) {
+                with(database) {
+                    execSQL(
+                        "CREATE TABLE 'ConnectionTracker_backup' ('id' INTEGER NOT NULL,'appName' TEXT DEFAULT '' NOT NULL, 'uid' INTEGER NOT NULL, 'ipAddress' TEXT DEFAULT ''  NOT NULL, 'port' INTEGER NOT NULL, 'protocol' INTEGER NOT NULL,'isBlocked' INTEGER NOT NULL, 'blockedByRule' TEXT DEFAULT '' NOT NULL, 'flag' TEXT  DEFAULT '' NOT NULL, 'dnsQuery' TEXT DEFAULT '', 'timeStamp' INTEGER NOT NULL,PRIMARY KEY (id)  )")
+                    execSQL(
+                        "INSERT INTO ConnectionTracker_backup SELECT id, appName, uid, ipAddress, port, protocol, isBlocked, blockedByRule, flag, '', timeStamp from ConnectionTracker")
+                    execSQL("DROP TABLE if exists ConnectionTracker")
+                    execSQL(
+                        "CREATE TABLE 'ConnectionTracker' ('id' INTEGER NOT NULL,'appName' TEXT DEFAULT '' NOT NULL, 'uid' INTEGER NOT NULL, 'ipAddress' TEXT DEFAULT ''  NOT NULL, 'port' INTEGER NOT NULL, 'protocol' INTEGER NOT NULL,'isBlocked' INTEGER NOT NULL, 'blockedByRule' TEXT DEFAULT '' NOT NULL, 'flag' TEXT  DEFAULT '' NOT NULL, 'dnsQuery' TEXT DEFAULT '', 'timeStamp' INTEGER NOT NULL,PRIMARY KEY (id)  )")
+                    execSQL(
+                        "INSERT INTO ConnectionTracker SELECT id, appName, uid, ipAddress, port, protocol, isBlocked, blockedByRule, flag, '',  timeStamp from ConnectionTracker_backup")
+                    execSQL("DROP TABLE if exists ConnectionTracker_backup")
+                }
+            }
+
+            // create new table to store Rethink dns endpoint
+            // contains both the global and app specific dns endpoints
+            private fun createRethinkDnsTable(database: SupportSQLiteDatabase) {
+                with(database) {
+                    execSQL(
+                        "CREATE TABLE 'RethinkDnsEndpoint' ('name' TEXT NOT NULL, 'url' TEXT NOT NULL, 'uid' INTEGER NOT NULL, 'desc' TEXT NOT NULL, 'isActive' INTEGER NOT NULL, 'isCustom' INTEGER NOT NULL, 'latency' INTEGER NOT NULL, 'blocklistCount' INTEGER NOT NULL DEFAULT 0,'modifiedDataTime' INTEGER NOT NULL,  PRIMARY KEY (name, url, uid))")
+                    execSQL(
+                        "INSERT INTO 'RethinkDnsEndpoint' ( 'name', 'url', 'uid', 'desc', 'isActive', 'isCustom', 'latency', 'blocklistCount', 'modifiedDataTime' ) VALUES ( 'RDNS Default', 'https://basic.rethinkdns.com/1:IAAQAA==',  ${Constants.MISSING_UID}, 'Blocks over 100,000+ phishing, malvertising, malware, spyware, ransomware, cryptojacking and other threats.', '0', '0', '0', '1','1633624616715')")
+                    execSQL(
+                        "INSERT INTO 'RethinkDnsEndpoint' ( 'name', 'url', 'uid', 'desc', 'isActive', 'isCustom', 'latency', 'blocklistCount', 'modifiedDataTime' ) VALUES ( 'RDNS Adult', 'https://basic.rethinkdns.com/1:EMABAADgIAA=', ${Constants.MISSING_UID}, 'Blocks over 30,000 adult websites.', '0', '0', '0','5', '1633624616715')")
+                    execSQL(
+                        "INSERT INTO 'RethinkDnsEndpoint' ( 'name', 'url', 'uid', 'desc', 'isActive', 'isCustom', 'latency', 'blocklistCount', 'modifiedDataTime' ) VALUES ( 'RDNS Piracy', 'https://basic.rethinkdns.com/1:EID-BwCB', ${Constants.MISSING_UID}, 'Blocks torrent, dubious video streaming and file sharing websites.', '0', '0', '0','12', '1633624616715')")
+                    execSQL(
+                        "INSERT INTO 'RethinkDnsEndpoint' ( 'name', 'url', 'uid', 'desc', 'isActive', 'isCustom', 'latency', 'blocklistCount', 'modifiedDataTime' ) VALUES ( 'RDNS Social Media', 'https://basic.rethinkdns.com/1:AEAAEA==', ${Constants.MISSING_UID}, 'Blocks popular social media including Facebook, Instagram, and WhatsApp.', '0', '0', '0','1', '1633624616715')")
+                    execSQL(
+                        "INSERT INTO 'RethinkDnsEndpoint' ( 'name', 'url', 'uid', 'desc', 'isActive', 'isCustom', 'latency', 'blocklistCount', 'modifiedDataTime' ) VALUES ( 'RDNS Security', 'https://basic.rethinkdns.com/1:EBx_AP__-P8AIA==', ${Constants.MISSING_UID}, 'Blocks over 150,000 malware, ransomware, phishing and other threats.', '0', '0', '0','37', '1633624616715')")
+                    execSQL(
+                        "INSERT INTO 'RethinkDnsEndpoint' ( 'name', 'url', 'uid', 'desc', 'isActive', 'isCustom', 'latency', 'blocklistCount', 'modifiedDataTime' ) VALUES ( 'RDNS Privacy', 'https://basic.rethinkdns.com/1:QAcCAIAcAhCkAg==', ${Constants.MISSING_UID}, 'Blocks over 100,000+ adware, spyware, and trackers through some of the most extensive blocklists.', '0', '0', '0','11', '1633624616715')")
+                    execSQL(
+                        "INSERT INTO 'RethinkDnsEndpoint' ( 'name', 'url', 'uid', 'desc', 'isActive', 'isCustom', 'latency', 'blocklistCount', 'modifiedDataTime' ) VALUES ( 'RDNS Plus', (Select dohurl from DoHEndpoint where id = 5), ${Constants.MISSING_UID}, 'User Configured', (select isSelected from DoHEndpoint where id = 5), '0', '1', '0', '1633624616715')")
+                }
+            }
+
+            private fun createRethinkFileTagTables(database: SupportSQLiteDatabase) {
+                with(database) {
+                    execSQL(
+                        "CREATE TABLE RethinkRemoteFileTag ('value' INTEGER NOT NULL, 'uname' TEXT NOT NULL, 'vname' TEXT NOT NULL, 'group' TEXT NOT NULL, 'subg' TEXT NOT NULL, 'url' TEXT NOT NULL, 'show' INTEGER NOT NULL, 'entries' INTEGER NOT NULL, 'simpleTagId' INTEGER NOT NULL, 'isSelected' INTEGER NOT NULL,  PRIMARY KEY (value))")
+                    execSQL(
+                        "CREATE TABLE RethinkLocalFileTag ('value' INTEGER NOT NULL, 'uname' TEXT NOT NULL, 'vname' TEXT NOT NULL, 'group' TEXT NOT NULL, 'subg' TEXT NOT NULL, 'url' TEXT NOT NULL, 'show' INTEGER NOT NULL, 'entries' INTEGER NOT NULL,  'simpleTagId' INTEGER NOT NULL, 'isSelected' INTEGER NOT NULL, PRIMARY KEY (value))")
+                }
+            }
+
+            // remove the rethink doh from the list
+            private fun removeRethinkFromDohList(database: SupportSQLiteDatabase) {
+                with(database) {
+                    execSQL("DELETE from DoHEndpoint where id in (4,5)")
+                }
+            }
+        }
+
     }
 
     abstract fun appInfoDAO(): AppInfoDAO
-    abstract fun categoryInfoDAO(): CategoryInfoDAO
     abstract fun connectionTrackerDAO(): ConnectionTrackerDAO
-    abstract fun blockedConnectionsDAO(): BlockedConnectionsDAO
     abstract fun dohEndpointsDAO(): DoHEndpointDAO
-    abstract fun dnsCryptEndpointDAO(): DNSCryptEndpointDAO
-    abstract fun dnsCryptRelayEndpointDAO(): DNSCryptRelayEndpointDAO
-    abstract fun dnsProxyEndpointDAO(): DNSProxyEndpointDAO
+    abstract fun dnsCryptEndpointDAO(): DnsCryptEndpointDAO
+    abstract fun dnsCryptRelayEndpointDAO(): DnsCryptRelayEndpointDAO
+    abstract fun dnsProxyEndpointDAO(): DnsProxyEndpointDAO
     abstract fun proxyEndpointDAO(): ProxyEndpointDAO
-    abstract fun dnsLogDAO(): DNSLogDAO
-    abstract fun appInfoViewDAO(): AppInfoViewDAO
+    abstract fun dnsLogDAO(): DnsLogDAO
+    abstract fun customDomainEndpointDAO(): CustomDomainDAO
+    abstract fun customIpEndpointDao(): CustomIpDao
+    abstract fun rethinkEndpointDao(): RethinkDnsEndpointDao
+    abstract fun rethinkRemoteFileTagDao(): RethinkRemoteFileTagDao
+    abstract fun rethinkLocalFileTagDao(): RethinkLocalFileTagDao
 
     fun appInfoRepository() = AppInfoRepository(appInfoDAO())
-    fun categoryInfoRepository() = CategoryInfoRepository(categoryInfoDAO())
     fun connectionTrackerRepository() = ConnectionTrackerRepository(connectionTrackerDAO())
-    fun blockedConnectionRepository() = BlockedConnectionsRepository(blockedConnectionsDAO())
-    fun doHEndpointsRepository() = DoHEndpointRepository(dohEndpointsDAO())
-    fun dnsCryptEndpointsRepository() = DNSCryptEndpointRepository(dnsCryptEndpointDAO())
-    fun dnsCryptRelayEndpointsRepository() = DNSCryptRelayEndpointRepository(
+    fun dohEndpointRepository() = DoHEndpointRepository(dohEndpointsDAO())
+    fun dnsCryptEndpointRepository() = DnsCryptEndpointRepository(dnsCryptEndpointDAO())
+    fun dnsCryptRelayEndpointRepository() = DnsCryptRelayEndpointRepository(
         dnsCryptRelayEndpointDAO())
 
-    fun dnsProxyEndpointRepository() = DNSProxyEndpointRepository(dnsProxyEndpointDAO())
+    fun dnsProxyEndpointRepository() = DnsProxyEndpointRepository(dnsProxyEndpointDAO())
     fun proxyEndpointRepository() = ProxyEndpointRepository(proxyEndpointDAO())
-    fun dnsLogRepository() = DNSLogRepository(dnsLogDAO())
-    fun appInfoViewRepository() = AppInfoViewRepository(appInfoViewDAO())
+    fun dnsLogRepository() = DnsLogRepository(dnsLogDAO())
+    fun customDomainRepository() = CustomDomainRepository(customDomainEndpointDAO())
+    fun customIpRepository() = CustomIpRepository(customIpEndpointDao())
+    fun rethinkEndpointRepository() = RethinkDnsEndpointRepository(rethinkEndpointDao())
+    fun rethinkRemoteFileTagRepository() = RethinkRemoteFileTagRepository(rethinkRemoteFileTagDao())
+    fun rethinkLocalFileTagRepository() = RethinkLocalFileTagRepository(rethinkLocalFileTagDao())
 
 }

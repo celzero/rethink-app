@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/colorPrimaryDark"
+    android:background="?attr/colorPrimaryDark"
     android:gravity="center">
 
     <com.google.android.material.button.MaterialButton
@@ -14,7 +14,7 @@
         android:layout_marginEnd="30dp"
         android:text="cancel"
         android:textSize="@dimen/large_font_text_view"
-        android:textColor="@color/accent_bad" />
+        android:textColor="?attr/accentBad" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/dialog_bottom_apply_changes_ok_btn"
@@ -25,6 +25,6 @@
         android:layout_marginEnd="30dp"
         android:text="apply"
         android:textSize="@dimen/large_font_text_view"
-        android:textColor="@color/accent_bad" />
+        android:textColor="?attr/accentBad" />
 
 </LinearLayout>

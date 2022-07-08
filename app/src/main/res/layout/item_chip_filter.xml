@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.chip.Chip xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="@style/ThinnerChip_large"
+    style="@style/ThinnerChip.Large"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:textAlignment="center"
@@ -11,6 +11,5 @@
     app:chipIconSize="15dp"
     app:iconStartPadding="3dp"
     android:textSize="@dimen/default_font_text_view"
-    android:textColor="?attr/primaryTextColor"
     app:checkedIconTint="?attr/primaryTextColor"
     app:chipBackgroundColor="@drawable/bg_chip_state_list" />

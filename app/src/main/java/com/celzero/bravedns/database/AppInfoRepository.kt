@@ -15,11 +15,6 @@ limitations under the License.
 */
 package com.celzero.bravedns.database
 
-import androidx.lifecycle.LiveData
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-
 class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
 
     companion object {
@@ -27,131 +22,24 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         const val NO_PACKAGE = "no_package"
     }
 
-    fun delete(appInfo: AppInfo) {
+    suspend fun delete(appInfo: AppInfo) {
         appInfoDAO.delete(appInfo)
     }
 
-    fun insert(appInfo: AppInfo) {
+    suspend fun insert(appInfo: AppInfo) {
         appInfoDAO.insert(appInfo)
     }
 
-    fun deleteByPackageName(packageNames: List<String>) {
+    suspend fun deleteByPackageName(packageNames: List<String>) {
         appInfoDAO.deleteByPackageName(packageNames)
     }
 
-    fun isRootUserAvailable(): String? {
-        return appInfoDAO.isRootAvailable()
-    }
-
-    fun getAppInfo(): List<AppInfo> {
+    suspend fun getAppInfo(): List<AppInfo> {
         return appInfoDAO.getAllAppDetails()
     }
 
-    fun getNonAppCount(): Int {
-        return appInfoDAO.getNonAppCount()
+    suspend fun updateFirewallStatusByUid(uid: Int, firewallStatus: Int, connectionStatus: Int) {
+        appInfoDAO.updateFirewallStatusByUid(uid, firewallStatus, connectionStatus)
     }
 
-    fun updateInternetForUID(uid: Int, isInternetAllowed: Boolean) {
-        appInfoDAO.updateInternetPermissionForAlluid(uid, isInternetAllowed)
-    }
-
-    fun getAppListForUID(uid: Int): List<AppInfo> {
-        return appInfoDAO.getAppListForUID(uid)
-    }
-
-    fun setInternetAllowedForCategory(categoryName: String, isInternetAllowed: Boolean) {
-        appInfoDAO.updateInternetPermissionForCategory(categoryName, isInternetAllowed)
-    }
-
-    fun getAllAppDetailsForLiveData(): LiveData<List<AppInfo>> {
-        return appInfoDAO.getAllAppDetailsForLiveData()
-    }
-
-    fun getAppDetailsForLiveData(input: String): LiveData<List<AppInfo>> {
-        if (input.isEmpty()) {
-            return appInfoDAO.getAllAppDetailsForLiveData()
-        }
-        return appInfoDAO.getAppDetailsForLiveData(input)
-    }
-
-    fun getUIDForUnivWhiteList(): LiveData<List<Int>> {
-        return appInfoDAO.getUIDForUnivWhiteList()
-    }
-
-    fun getAppNameList(): MutableList<String> {
-        return appInfoDAO.getAppNameList().toMutableList()
-    }
-
-    fun removeUninstalledPackage(packageName: String) {
-        return appInfoDAO.removeUninstalledPackage(packageName)
-    }
-
-    fun getAppCategoryList(): List<String> {
-        return appInfoDAO.getAppCategoryList()
-    }
-
-    fun getAppCategoryForAppName(appName: String): List<String> {
-        return appInfoDAO.getAppCategoryForAppName(appName)
-    }
-
-    fun getAppCountForCategory(categoryName: String): Int {
-        return appInfoDAO.getAppCountForCategory(categoryName)
-    }
-
-    fun getBlockedCountForCategory(categoryName: String): Int {
-        return appInfoDAO.getBlockedCountForCategory(categoryName)
-    }
-
-    fun getPackageNameForAppName(appName: String): String {
-        return appInfoDAO.getPackageNameForAppName(appName)
-    }
-
-    fun getPackageNameForUid(uid: Int): String {
-        return appInfoDAO.getPackageNameForUid(uid)
-    }
-
-    fun updateWhitelist(uid: Int, isEnabled: Boolean) {
-        appInfoDAO.updateWhitelist(uid, isEnabled)
-    }
-
-    fun updateWhitelistForAllApps(isEnabled: Boolean): Int {
-        return appInfoDAO.updateWhitelistForAllApps(isEnabled)
-    }
-
-    fun updateWhitelistForCategories(category: String, isEnabled: Boolean): Int {
-        return appInfoDAO.updateWhitelistForCategories(category, isEnabled)
-    }
-
-    fun updateExcludedForAllApps(isExcluded: Boolean) {
-        appInfoDAO.updateExcludedForAllApp(isExcluded)
-    }
-
-    fun updateExcludedForCategories(category: String, isExcluded: Boolean,
-                                    coroutineScope: CoroutineScope = CoroutineScope(
-                                        Dispatchers.IO)) {
-        coroutineScope.launch {
-            appInfoDAO.updateExcludedForCategories(category, isExcluded)
-        }
-    }
-
-    fun updateExcludedList(uid: Int, isEnabled: Boolean) {
-        appInfoDAO.updateExcludedList(uid, isEnabled)
-    }
-
-    fun getExcludedAppList(): List<String> {
-        return appInfoDAO.getExcludedAppList()
-    }
-
-    fun getAppInfoForPackageName(packageName: String): AppInfo? {
-        return appInfoDAO.getAppInfoForPackageName(packageName)
-    }
-
-
-    fun getWhitelistCountForCategory(categoryName: String): Int {
-        return appInfoDAO.getWhitelistCount(categoryName)
-    }
-
-    fun getExcludedAppCountForCategory(categoryName: String): Int {
-        return appInfoDAO.getExcludedAppCountForCategory(categoryName)
-    }
 }

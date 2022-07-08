@@ -21,16 +21,19 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper
 import android.os.Message
+import android.system.OsConstants.RT_SCOPE_UNIVERSE
 import android.util.Log
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_CONNECTION
 import com.google.common.collect.Sets
+import inet.ipaddr.IPAddressString
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-
+import java.util.concurrent.TimeUnit
 
 class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         ConnectivityManager.NetworkCallback(), KoinComponent {
+
     private val networkRequest: NetworkRequest = NetworkRequest.Builder().addCapability(
         NetworkCapabilities.NET_CAPABILITY_INTERNET).build()
 
@@ -42,7 +45,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     private var serviceHandler: NetworkRequestHandler? = null
     private val persistentState by inject<PersistentState>()
 
-    var connectivityManager: ConnectivityManager = context.applicationContext.getSystemService(
+    private var connectivityManager: ConnectivityManager = context.applicationContext.getSystemService(
         Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
     companion object {
@@ -51,7 +54,12 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
         // add all available networks as underlying vpn networks
         const val MSG_ADD_ALL_NETWORKS = 2
+
+        // change in linked property
+        const val MSG_LINK_PROPERTY = 3
     }
+
+    data class NetworkProperties(val network: Network, val linkedProperties: LinkProperties)
 
     init {
         connectivityManager.registerNetworkCallback(networkRequest, this)
@@ -62,7 +70,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
     interface NetworkListener {
         fun onNetworkDisconnected()
-        fun onNetworkConnected(networks: LinkedHashSet<Network>?)
+        fun onNetworkConnected(networks: UnderlyingNetworks)
     }
 
     fun onVpnStop() {
@@ -94,6 +102,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
         if (DEBUG) Log.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged")
         handleNetworkChange(isForceUpdate = true)
+        handlePropertyChange(network, linkProperties)
     }
 
     /**
@@ -115,11 +124,17 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     }
 
     private fun handleNetworkChange(isForceUpdate: Boolean = false) {
-        val message = constructMessage(
+        val message = constructNetworkMessage(
             if (persistentState.useMultipleNetworks) MSG_ADD_ALL_NETWORKS else MSG_ADD_ACTIVE_NETWORK,
             isForceUpdate)
         serviceHandler?.removeMessages(MSG_ADD_ACTIVE_NETWORK, null)
         serviceHandler?.removeMessages(MSG_ADD_ALL_NETWORKS, null)
+        serviceHandler?.sendMessageDelayed(message, TimeUnit.SECONDS.toMillis(3))
+    }
+
+    private fun handlePropertyChange(network: Network, linkedProperties: LinkProperties) {
+        val message = constructLinkedPropertyMessage(MSG_LINK_PROPERTY, network, linkedProperties)
+        serviceHandler?.removeMessages(MSG_LINK_PROPERTY, null)
         serviceHandler?.sendMessage(message)
     }
 
@@ -128,12 +143,28 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
      * Add the active network to the message object
      * in case of setUnderlying network has only active networks.
      */
-    private fun constructMessage(what: Int, isForceUpdate: Boolean): Message {
+    private fun constructNetworkMessage(what: Int, isForceUpdate: Boolean): Message {
         val message = Message.obtain()
         message.what = what
         message.obj = isForceUpdate
         return message
     }
+
+    // constructs the message object for Network handler.
+    // adds the linked properties to the message
+    // dns server changes are part of linked properties
+    private fun constructLinkedPropertyMessage(what: Int, network: Network,
+                                               linkedProperties: LinkProperties): Message {
+        val networkProperties = NetworkProperties(network, linkedProperties)
+        val message = Message.obtain()
+        message.what = what
+        message.obj = networkProperties
+        return message
+    }
+
+    data class UnderlyingNetworks(val allNet: Set<Network>?, val ipv4Net: Set<Network>,
+                                  val ipv6Net: Set<Network>, val useActive: Boolean,
+                                  var isActiveNetworkMetered: Boolean)
 
     // Handles the network messages from the callback from the connectivity manager
     private class NetworkRequestHandler(context: Context, looper: Looper,
@@ -144,16 +175,30 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         // defines network priority depending on the iteration order, that is, the network
         // in the 0th index is preferred over the one at 1st index, and so on.
         var currentNetworks: LinkedHashSet<Network> = linkedSetOf()
+
+        var trackedIpv4Networks: MutableSet<Network> = mutableSetOf()
+        var trackedIpv6Networks: MutableSet<Network> = mutableSetOf()
+
         var connectivityManager: ConnectivityManager = context.applicationContext.getSystemService(
             Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
         override fun handleMessage(msg: Message) {
             // isForceUpdate - true if onUserPreferenceChanged is changes, the messages should be
             // processed forcefully regardless of the current and new networks.
-            val isForceUpdate: Boolean = msg.obj as Boolean
+            val isForceUpdate: Boolean
             when (msg.what) {
-                MSG_ADD_ACTIVE_NETWORK -> processActiveNetwork(isForceUpdate)
-                MSG_ADD_ALL_NETWORKS -> processAllNetworks(isForceUpdate)
+                MSG_ADD_ACTIVE_NETWORK -> {
+                    isForceUpdate = msg.obj as Boolean
+                    processActiveNetwork(isForceUpdate)
+                }
+                MSG_ADD_ALL_NETWORKS -> {
+                    isForceUpdate = msg.obj as Boolean
+                    processAllNetworks(isForceUpdate)
+                }
+                MSG_LINK_PROPERTY -> {
+                    val netProps = msg.obj as NetworkProperties
+                    processLinkPropertyChange(netProps)
+                }
             }
         }
 
@@ -164,17 +209,20 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
          */
         private fun processActiveNetwork(isForceUpdate: Boolean) {
             val newActiveNetwork = connectivityManager.activeNetwork
+            // set active network's connection status
+            val isActiveNetworkMetered = isConnectionMetered()
             val newNetworks = createNetworksSet(newActiveNetwork)
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
 
-            currentNetworks = newNetworks
-            Log.i(LOG_TAG_CONNECTION, "Connected network- ${
+            Log.i(LOG_TAG_CONNECTION, "Connected network: ${
                 connectivityManager.getNetworkInfo(newActiveNetwork)?.typeName.toString()
             }, Is new network? $isNewNetwork, is force update? $isForceUpdate")
 
-            if (!isNewNetwork && !isForceUpdate) return
-
-            informListener()
+            if (isNewNetwork || isForceUpdate) {
+                currentNetworks = newNetworks
+                repopulateTrackedNetworks(currentNetworks)
+                informListener(requireAllNetworks = false, isActiveNetworkMetered)
+            }
         }
 
         /**
@@ -182,35 +230,100 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
          */
         private fun processAllNetworks(isForceUpdate: Boolean) {
             val newActiveNetwork = connectivityManager.activeNetwork
+            // set active network's connection status
+            val isActiveNetworkMetered = isConnectionMetered()
             val newNetworks = createNetworksSet(newActiveNetwork, true)
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
 
             Log.i(LOG_TAG_CONNECTION,
-                  "process message MESSAGE_AVAILABLE_NETWORK, ${currentNetworks.size},${newNetworks.size}. isNewNetwork - $isNewNetwork, force update is $isForceUpdate")
-            currentNetworks = newNetworks
+                  "process message MESSAGE_AVAILABLE_NETWORK, ${currentNetworks},${newNetworks}. isNewNetwork: $isNewNetwork, force update is $isForceUpdate")
 
-            if (!isNewNetwork && !isForceUpdate) return
+            if (isNewNetwork || isForceUpdate) {
+                currentNetworks = newNetworks
+                repopulateTrackedNetworks(currentNetworks)
 
-            informListener(requireAllNetworks = true)
+                informListener(requireAllNetworks = true, isActiveNetworkMetered)
+            }
         }
 
-        private fun informListener(requireAllNetworks: Boolean = false) {
+        private fun informListener(requireAllNetworks: Boolean = false,
+                                   isActiveNetworkMetered: Boolean) {
             Log.i(LOG_TAG_CONNECTION,
-                  "inform listener on network change - ${currentNetworks.size}, is all network - $requireAllNetworks")
-            if (currentNetworks.count() > 0) {
-                val networks = when (requireAllNetworks) {
-                    true -> currentNetworks
-                    false -> null
-                }
-                networkListener.onNetworkConnected(networks)
+                  "inform listener on network change: ${currentNetworks.size}, is all network: $requireAllNetworks")
+            if (currentNetworks.isNotEmpty()) {
+                val underlyingNetworks = UnderlyingNetworks(currentNetworks, trackedIpv4Networks,
+                                                            trackedIpv6Networks,
+                                                            !requireAllNetworks,
+                                                            isActiveNetworkMetered)
+                networkListener.onNetworkConnected(underlyingNetworks)
             } else {
                 networkListener.onNetworkDisconnected()
             }
         }
 
+        private fun isConnectionMetered(): Boolean {
+            return connectivityManager.isActiveNetworkMetered
+
+            // below code will return if the connection is of type CELLULAR or not
+            /*
+            return connectivityManager.getNetworkCapabilities(
+                connectivityManager.activeNetwork)?.hasTransport(
+                NetworkCapabilities.TRANSPORT_CELLULAR) == true */
+        }
+
+        private fun processLinkPropertyChange(networkProperties: NetworkProperties) {
+            val linkedProperties = networkProperties.linkedProperties
+            val network = networkProperties.network
+
+            // do not add network if there is no internet/is VPN
+            if (hasInternet(network) == false || isVPN(network) == true) {
+                return
+            }
+
+            linkedProperties.linkAddresses.forEach {
+                if (it.scope != RT_SCOPE_UNIVERSE) return@forEach
+
+                val address = IPAddressString(it.address.hostAddress?.toString()) ?: return@forEach
+
+                if (address.isIPv6) {
+                    trackedIpv6Networks.add(network)
+                } else {
+                    trackedIpv4Networks.add(network)
+                }
+            }
+
+        }
+
+        private fun repopulateTrackedNetworks(networks: LinkedHashSet<Network>) {
+            val ipv6: MutableSet<Network> = mutableSetOf()
+            val ipv4: MutableSet<Network> = mutableSetOf()
+
+            networks.forEach { network ->
+                val linkedProperties = connectivityManager.getLinkProperties(
+                    network) ?: return@forEach
+
+                linkedProperties.linkAddresses.forEach inner@{ prop ->
+                    if (prop.scope != RT_SCOPE_UNIVERSE) return@inner
+
+                    val address = IPAddressString(prop.address.hostAddress?.toString())
+
+                    if (address.isIPv6) {
+                        ipv6.add(network)
+                    } else {
+                        ipv4.add(network)
+                    }
+                }
+            }
+
+            trackedIpv6Networks = ipv6
+            trackedIpv4Networks = ipv4
+            Log.d(LOG_TAG_CONNECTION,
+                  "repopulate tracked network for IPv6: $trackedIpv6Networks, Ipv4: $trackedIpv4Networks")
+        }
+
         private fun hasDifference(currentNetworks: LinkedHashSet<Network>,
                                   newNetworks: LinkedHashSet<Network>): Boolean {
-            return Sets.symmetricDifference(currentNetworks, newNetworks).count() != 0
+            return Sets.symmetricDifference(currentNetworks, newNetworks).isNotEmpty()
         }
 
         /**
@@ -225,13 +338,17 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             activeNetwork?.let {
                 if (hasInternet(it) == true && isVPN(it) == false) {
                     newNetworks.add(it)
+                } else {
+                    // no-op
                 }
             }
+
             if (!requireAllNetworks) {
                 return newNetworks
             }
 
             val tempAllNetwork = connectivityManager.allNetworks
+
             tempAllNetwork.forEach {
                 if (it.networkHandle == activeNetwork?.networkHandle) {
                     return@forEach
@@ -239,6 +356,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
                 if (hasInternet(it) == true && isVPN(it) == false) {
                     newNetworks.add(it)
+                } else {
+                    // no-op
                 }
             }
 
@@ -246,6 +365,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         }
 
         private fun hasInternet(network: Network): Boolean? {
+            // TODO: consider checking for NET_CAPABILITY_NOT_SUSPENDED, NET_CAPABILITY_VALIDATED?
             return connectivityManager.getNetworkCapabilities(network)?.hasCapability(
                 NetworkCapabilities.NET_CAPABILITY_INTERNET)
         }

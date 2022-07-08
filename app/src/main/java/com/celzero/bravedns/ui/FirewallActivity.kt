@@ -34,7 +34,6 @@ import com.celzero.bravedns.util.Utilities.Companion.openPauseActivityAndFinish
 import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.android.ext.android.inject
 
-
 class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
     private val b by viewBinding(ActivityFirewallBinding::bind)
     private var fragmentIndex = 0
@@ -94,11 +93,11 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
     }
 
     private fun observeAppState() {
-        VpnController.connectionStatus.observe(this, {
+        VpnController.connectionStatus.observe(this) {
             if (it == BraveVPNService.State.PAUSED) {
                 openPauseActivityAndFinish(this)
             }
-        })
+        }
     }
 
 }

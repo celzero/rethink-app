@@ -20,16 +20,21 @@ import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.celzero.bravedns.download.BlocklistDownloadHelper.Companion.deleteFromExternalDir
+import com.celzero.bravedns.automaton.RethinkBlocklistManager
+import com.celzero.bravedns.download.BlocklistDownloadHelper.Companion.deleteOldFiles
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.hasLocalBlocklists
 import com.celzero.bravedns.util.Utilities.Companion.localBlocklistDownloadPath
 import dnsx.Dnsx
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
@@ -82,7 +87,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
                 return false
             }
 
-            BlocklistDownloadHelper.deleteFromCanonicalPath(context, timestamp)
+            BlocklistDownloadHelper.deleteFromCanonicalPath(context)
             val dir = File(
                 BlocklistDownloadHelper.getExternalFilePath(context, timestamp.toString()))
             if (!dir.isDirectory) {
@@ -126,11 +131,11 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             }
 
             updatePersistenceOnCopySuccess(timestamp)
-            deleteFromExternalDir(context, timestamp)
+            deleteOldFiles(context, timestamp, AppDownloadManager.DownloadType.LOCAL)
             return true
 
         } catch (e: Exception) {
-            Log.e(LOG_TAG_DOWNLOAD, "AppDownloadManager Copy exception - ${e.message}", e)
+            Log.e(LOG_TAG_DOWNLOAD, "AppDownloadManager Copy exception: ${e.message}", e)
         }
         return false
     }
@@ -138,6 +143,10 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
     private fun updatePersistenceOnCopySuccess(timestamp: Long) {
         persistentState.localBlocklistTimestamp = timestamp
         persistentState.blocklistEnabled = true
+        io {
+            RethinkBlocklistManager.readJson(context, AppDownloadManager.DownloadType.LOCAL,
+                                             timestamp)
+        }
     }
 
     /**
@@ -150,7 +159,9 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
      */
     private fun isDownloadValid(timestamp: Long): Boolean {
         try {
-            val path: String = context.filesDir.canonicalPath + File.separator + timestamp
+            val path: String = Utilities.localBlocklistDownloadBasePath(context,
+                                                                        LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                                                        timestamp)
             val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.ONDEVICE_BLOCKLIST_FILE_TD,
                                                  path + Constants.ONDEVICE_BLOCKLIST_FILE_RD,
                                                  path + Constants.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,
@@ -159,10 +170,15 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
                              "AppDownloadManager isDownloadValid? ${braveDNS != null}")
             return braveDNS != null
         } catch (e: Exception) {
-            Log.e(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid exception - ${e.message}",
-                  e)
+            Log.e(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid exception: ${e.message}", e)
         }
         return false
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            f()
+        }
     }
 
 }

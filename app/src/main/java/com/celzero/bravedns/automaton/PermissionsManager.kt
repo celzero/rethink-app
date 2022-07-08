@@ -32,8 +32,6 @@ import androidx.core.text.HtmlCompat
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PERMISSION
 import com.celzero.bravedns.util.MyAccessibilityService
 import java.util.*
-import kotlin.collections.LinkedHashMap
-import kotlin.collections.LinkedHashSet
 
 
 class PermissionsManager(service: MyAccessibilityService) {

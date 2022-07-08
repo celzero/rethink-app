@@ -13,19 +13,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
 package com.celzero.bravedns.automaton
 
 import android.app.KeyguardManager
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.FirewallManager.GlobalVariable.appInfos
 import com.celzero.bravedns.automaton.FirewallManager.GlobalVariable.appInfosLiveData
 import com.celzero.bravedns.automaton.FirewallManager.GlobalVariable.foregroundUids
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoRepository
-import com.celzero.bravedns.database.CategoryInfo
-import com.celzero.bravedns.database.CategoryInfoRepository
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
@@ -42,22 +41,164 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
 
-
-/*TODO : Initial check is for firewall app completely
-           Later modification required for Data, WiFi, ScreenOn/Off, Background
-           Lot of redundant code - streamline the code.
-           */
-
 object FirewallManager : KoinComponent {
 
     private val appInfoRepository by inject<AppInfoRepository>()
-    private val categoryInfoRepository by inject<CategoryInfoRepository>()
     private val lock = ReentrantReadWriteLock()
 
     const val NOTIF_CHANNEL_ID_FIREWALL_ALERTS = "Firewall_Alerts"
 
-    enum class AppStatus {
-        ALLOWED, BLOCKED, WHITELISTED, EXCLUDED, UNTRACKED
+    // Below are the firewall rule set
+    // app-status | connection-status |  Rule
+    // allowed    |    BOTH           |  allow
+    // blocked    |    wifi           |  WiFi-data-block
+    // blocked    |    mobile         |  mobile-data-block
+    // blocked    |    both           |  block
+    enum class FirewallStatus(val id: Int) {
+        ALLOW(0), BLOCK(1), WHITELIST(2), EXCLUDE(3), UNTRACKED(4);
+
+        companion object {
+
+            // labels for spinner / toggle ui
+            fun getLabel(context: Context): Array<String> {
+                return context.resources.getStringArray(R.array.firewall_rules)
+            }
+
+            fun getStatus(id: Int): FirewallStatus {
+                return when (id) {
+                    ALLOW.id -> {
+                        ALLOW
+                    }
+                    BLOCK.id -> {
+                        BLOCK
+                    }
+                    WHITELIST.id -> {
+                        WHITELIST
+                    }
+                    EXCLUDE.id -> {
+                        EXCLUDE
+                    }
+                    else -> {
+                        UNTRACKED
+                    }
+                }
+            }
+
+            fun getStatusByLabel(id: Int): FirewallStatus {
+                return when (id) {
+                    0 -> {
+                        ALLOW
+                    }
+                    1 -> {
+                        BLOCK
+                    }
+                    2 -> {
+                        BLOCK
+                    }
+                    3 -> {
+                        BLOCK
+                    }
+                    4 -> {
+                        WHITELIST
+                    }
+                    5 -> {
+                        EXCLUDE
+                    }
+                    else -> {
+                        ALLOW
+                    }
+                }
+            }
+        }
+
+        fun whitelisted(): Boolean {
+            return this == WHITELIST
+        }
+
+        fun excluded(): Boolean {
+            return this == EXCLUDE
+        }
+
+        fun allowed(): Boolean {
+            return this == ALLOW
+        }
+
+        fun blocked(): Boolean {
+            return this == BLOCK
+        }
+
+        fun isUntracked(): Boolean {
+            return this == UNTRACKED
+        }
+    }
+
+    enum class ConnectionStatus(val id: Int) {
+        BOTH(0), WIFI(1), MOBILE_DATA(2);
+
+        fun mobileData(): Boolean {
+            return this == MOBILE_DATA
+        }
+
+        fun wifi(): Boolean {
+            return this == WIFI
+        }
+
+        fun both(): Boolean {
+            return this == BOTH
+        }
+
+        companion object {
+            fun getStatusByLabel(id: Int): ConnectionStatus {
+                return when (id) {
+                    0 -> {
+                        BOTH
+                    }
+                    1 -> {
+                        BOTH
+                    }
+                    2 -> {
+                        WIFI
+                    }
+                    3 -> {
+                        MOBILE_DATA
+                    }
+                    4 -> {
+                        BOTH
+                    }
+                    5 -> {
+                        BOTH
+                    }
+                    else -> {
+                        BOTH
+                    }
+                }
+            }
+        }
+
+    }
+
+    // Firewall app category constants
+    enum class CategoryConstants(val nameResId: Int) {
+        SYSTEM_COMPONENT(R.string.category_name_sys_components),
+        SYSTEM_APP(R.string.category_name_sys_apps),
+        OTHER(R.string.category_name_others),
+        NON_APP(R.string.category_name_non_app_sys),
+        INSTALLED(R.string.category_name_installed);
+
+        companion object {
+            fun isSystemComponent(context: Context, name: String): Boolean {
+                return context.getString(SYSTEM_COMPONENT.nameResId) == name
+            }
+
+            fun isAnySystemCategory(context: Context, name: String): Boolean {
+                return context.getString(SYSTEM_COMPONENT.nameResId) == name || context.getString(
+                    SYSTEM_APP.nameResId) == name || context.getString(NON_APP.nameResId) == name
+            }
+
+            fun isNonApp(context: Context, name: String): Boolean {
+                return context.getString(NON_APP.nameResId) == name
+            }
+        }
     }
 
     object GlobalVariable {
@@ -75,11 +216,15 @@ object FirewallManager : KoinComponent {
     @Volatile private var isFirewallRulesLoaded: Boolean = false
 
     fun isUidFirewalled(uid: Int): Boolean {
-        return appStatus(uid) == AppStatus.BLOCKED
+        return appStatus(uid) == FirewallStatus.BLOCK
     }
 
     fun isUidWhitelisted(uid: Int): Boolean {
-        return appStatus(uid) == AppStatus.WHITELISTED
+        return appStatus(uid) == FirewallStatus.WHITELIST
+    }
+
+    fun isUidExcluded(uid: Int): Boolean {
+        return appStatus(uid) == FirewallStatus.EXCLUDE
     }
 
     fun isUidSystemApp(uid: Int): Boolean {
@@ -94,10 +239,6 @@ object FirewallManager : KoinComponent {
         return getAppInfosLocked().map { AppInfoTuple(it.uid, it.packageInfo) }.toHashSet()
     }
 
-    fun getAppInfos(): Collection<AppInfo> {
-        return getAppInfosLocked()
-    }
-
     fun deletePackagesFromCache(packagesToDelete: Set<AppInfoTuple>) {
         lock.write {
             packagesToDelete.forEach { tuple ->
@@ -106,13 +247,15 @@ object FirewallManager : KoinComponent {
                     appInfos.remove(tuple.uid, ai)
                 }
             }
+        }
+        io {
             // Delete the uninstalled apps from database
             appInfoRepository.deleteByPackageName(packagesToDelete.map { it.packageName })
         }
     }
 
     fun getNonFirewalledAppsPackageNames(): List<AppInfo> {
-        return getAppInfosLocked().filter { it.isInternetAllowed }
+        return getAppInfosLocked().filter { it.firewallStatus == FirewallStatus.ALLOW.id }
     }
 
     // TODO: Use the package-manager API instead
@@ -126,20 +269,28 @@ object FirewallManager : KoinComponent {
         }
     }
 
-    fun appStatus(uid: Int): AppStatus {
-        val appInfo = getAppInfoByUid(uid) ?: return AppStatus.UNTRACKED
+    fun appStatus(uid: Int): FirewallStatus {
+        val appInfo = getAppInfoByUid(uid) ?: return FirewallStatus.UNTRACKED
 
-        if (appInfo.whiteListUniv1) {
-            return AppStatus.WHITELISTED
+        return when (appInfo.firewallStatus) {
+            FirewallStatus.WHITELIST.id -> FirewallStatus.WHITELIST
+            FirewallStatus.BLOCK.id -> FirewallStatus.BLOCK
+            FirewallStatus.ALLOW.id -> FirewallStatus.ALLOW
+            FirewallStatus.EXCLUDE.id -> FirewallStatus.EXCLUDE
+            FirewallStatus.UNTRACKED.id -> FirewallStatus.UNTRACKED
+            else -> FirewallStatus.UNTRACKED
         }
-        if (appInfo.isExcluded) {
-            return AppStatus.EXCLUDED
-        }
-        if (!appInfo.isInternetAllowed) {
-            return AppStatus.BLOCKED
-        }
+    }
 
-        return AppStatus.ALLOWED
+    fun connectionStatus(uid: Int): ConnectionStatus {
+        val appInfo = getAppInfoByUid(uid) ?: return ConnectionStatus.BOTH
+
+        return when (appInfo.metered) {
+            ConnectionStatus.MOBILE_DATA.id -> ConnectionStatus.MOBILE_DATA
+            ConnectionStatus.WIFI.id -> ConnectionStatus.WIFI
+            ConnectionStatus.BOTH.id -> ConnectionStatus.BOTH
+            else -> ConnectionStatus.BOTH
+        }
     }
 
     fun getApplistObserver(): MutableLiveData<Collection<AppInfo>> {
@@ -147,7 +298,7 @@ object FirewallManager : KoinComponent {
     }
 
     fun getExcludedApps(): MutableSet<String> {
-        return getAppInfosLocked().filter { it.isExcluded }.map { it.packageInfo }.toMutableSet()
+        return getAppInfosLocked().filter { it.firewallStatus == FirewallStatus.EXCLUDE.id }.map { it.packageInfo }.toMutableSet()
     }
 
     fun getPackageNameByAppName(appName: String): String? {
@@ -180,7 +331,7 @@ object FirewallManager : KoinComponent {
         return getAppInfosLocked().firstOrNull { it.packageInfo == packageName }
     }
 
-    private fun getAppInfoByUid(uid: Int): AppInfo? {
+    fun getAppInfoByUid(uid: Int): AppInfo? {
         return getAppInfosByUidLocked(uid).firstOrNull()
     }
 
@@ -188,32 +339,26 @@ object FirewallManager : KoinComponent {
         return getAppInfosByUidLocked(uid).firstOrNull()?.packageInfo
     }
 
+    fun getCategoriesForSystemApps(): List<String> {
+        return getAppInfosLocked().filter {
+            it.isSystemApp
+        }.map { it.appCategory }.distinct().sorted()
+    }
+
+    fun getCategoriesForInstalledApps(): List<String> {
+        return getAppInfosLocked().filter {
+            !it.isSystemApp
+        }.map { it.appCategory }.distinct().sorted()
+    }
+
+    fun getAllCategories(): List<String> {
+        return getAppInfosLocked().map { it.appCategory }.distinct().sorted()
+    }
+
     fun getCategoryListByAppName(appName: String): List<String> {
         return getAppInfosLocked().filter {
             it.appName.contains(appName)
         }.map { it.appCategory }.distinct().sorted()
-    }
-
-    private fun getBlockedCountForCategory(categoryName: String): Int {
-        return getAppInfosLocked().filter {
-            it.appCategory == categoryName && !it.isInternetAllowed
-        }.count()
-    }
-
-    private fun getWhitelistCountForCategory(categoryName: String): Int {
-        return getAppInfosLocked().filter {
-            it.appCategory == categoryName && it.whiteListUniv1
-        }.count()
-    }
-
-    private fun getExcludedCountForCategory(categoryName: String): Int {
-        return getAppInfosLocked().filter {
-            it.appCategory == categoryName && it.isExcluded
-        }.count()
-    }
-
-    fun getWhitelistAppData(): List<AppInfo> {
-        return getAppInfosLocked().filter { it.whiteListUniv1 }
     }
 
     suspend fun loadAppFirewallRules() {
@@ -224,29 +369,12 @@ object FirewallManager : KoinComponent {
         }
     }
 
-    private fun invalidateBlockedApps(uid: Int, isAllowed: Boolean) {
-        getAppInfosByUidLocked(uid).forEach {
-            it.isInternetAllowed = isAllowed
-        }
-        informObservers()
-    }
-
-    private fun invalidateExcludedApps(uid: Int, isExcluded: Boolean) {
+    private fun invalidateFirewallStatus(uid: Int, firewallStatus: FirewallStatus,
+                                         connectionStatus: ConnectionStatus) {
         lock.write {
             appInfos.get(uid).forEach {
-                it.isExcluded = isExcluded
-                it.whiteListUniv1 = it.whiteListUniv1 && !it.isExcluded
-                it.isInternetAllowed = it.isInternetAllowed || it.isExcluded
-            }
-        }
-        informObservers()
-    }
-
-    private fun invalidateWhitelistedApps(uid: Int, isWhitelisted: Boolean) {
-        lock.write {
-            appInfos.get(uid).forEach {
-                it.whiteListUniv1 = isWhitelisted
-                it.isInternetAllowed = it.isInternetAllowed || it.whiteListUniv1
+                it.firewallStatus = firewallStatus.id
+                it.metered = connectionStatus.id
             }
         }
         informObservers()
@@ -288,7 +416,7 @@ object FirewallManager : KoinComponent {
     fun trackForegroundApp(uid: Int) {
         val appInfo = appInfos[uid]
 
-        if (appInfo == null) {
+        if (appInfo.isNullOrEmpty()) {
             Log.i(LOG_TAG_FIREWALL, "No such app $uid to update 'dis/allow' firewall rule")
             return
         }
@@ -314,151 +442,48 @@ object FirewallManager : KoinComponent {
         return locked && isForeground
     }
 
-    fun updateFirewalledAppsByCategory(categoryInfo: CategoryInfo, isInternetBlocked: Boolean) {
-        io {
-            invalidateCachedAppStatuses(mutableSetOf(categoryInfo.categoryName), AppStatus.BLOCKED,
-                                        isInternetBlocked)
-
-            val count = getBlockedCountForCategory(categoryInfo.categoryName)
-            if (DEBUG) Log.d(LOG_TAG_FIREWALL, "Apps updated: $count, $isInternetBlocked")
-            // Update the category's internet blocked based on the app's count which is returned
-            // from the app info database.
-            categoryInfoRepository.updateCategoryDetails(categoryInfo.categoryName, count,
-                                                         isInternetBlocked)
-            // flip appInfoRepository's isInternetBlocked.
-            // AppInfo's(Database) column name is isInternet but for CategoryInfo(database) the
-            // column name is appInfoRepository.
-            appInfoRepository.setInternetAllowedForCategory(categoryInfo.categoryName,
-                                                            !isInternetBlocked)
-        }
-    }
-
-    fun updateExcludedAppsByCategories(categories: Set<String>, checked: Boolean) {
-        io {
-            if (categories.isNullOrEmpty()) {
-                appInfoRepository.updateExcludedForAllApps(checked)
-                categoryInfoRepository.updateExcludedCountForAllApp(checked)
-                if (checked) {
-                    categoryInfoRepository.updateWhitelistCountForAllCategories(!checked)
-                }
-            } else {
-                categories.forEach { category ->
-                    val update = appInfoRepository.updateExcludedForCategories(category, checked)
-                    categoryInfoRepository.updateExcludedCountForCategory(category, checked)
-                    if (checked) {
-                        categoryInfoRepository.updateWhitelistForCategory(category, !checked)
-                    }
-                    Log.i(LOG_TAG_FIREWALL, "Excluded apps count: $update")
-                }
-            }
-
-            invalidateCachedAppStatuses(categories, AppStatus.EXCLUDED, checked)
-        }
-    }
-
-    fun updateWhitelistedAppsByCategories(categories: Set<String>, checked: Boolean) {
-        io {
-            if (categories.isNullOrEmpty()) {
-                appInfoRepository.updateWhitelistForAllApps(checked)
-                appInfoRepository.getAppCategoryList().forEach {
-                    val countBlocked = appInfoRepository.getBlockedCountForCategory(it)
-                    categoryInfoRepository.updateBlockedCount(it, countBlocked)
-                }
-                categoryInfoRepository.updateWhitelistCountForAllCategories(checked)
-            } else {
-                categories.forEach { category ->
-                    val update = appInfoRepository.updateWhitelistForCategories(category, checked)
-                    categoryInfoRepository.updateWhitelistForCategory(category, checked)
-                    val countBlocked = appInfoRepository.getBlockedCountForCategory(category)
-                    categoryInfoRepository.updateBlockedCount(category, countBlocked)
-                    Log.i(LOG_TAG_FIREWALL, "Whitelisted apps count: $update")
-                }
-            }
-
-            invalidateCachedAppStatuses(categories, AppStatus.WHITELISTED, checked)
-        }
-    }
-
-    // TODO: invalidate cache through live-data updates to avoid scenarios where
-    // db writes have failed but the cache is invalidated anyway
-    private fun invalidateCachedAppStatuses(categories: Set<String>, state: AppStatus,
-                                            checked: Boolean) {
-        lock.write {
-            appInfos.values().forEach {
-                if (categories.isNotEmpty() && !categories.contains(it.appCategory)) return@forEach
-                // modify the appInfos based on the state.
-                if (checked) {
-                    when (state) {
-                        AppStatus.BLOCKED -> it.isInternetAllowed = false
-                        AppStatus.WHITELISTED -> {
-                            it.whiteListUniv1 = true
-                            it.isExcluded = false
-                        }
-                        AppStatus.EXCLUDED -> {
-                            it.isExcluded = true
-                            it.whiteListUniv1 = false
-                        }
-                        else -> { /* no-op */
-                        }
-                    }
-                } else {
-                    when (state) {
-                        AppStatus.BLOCKED -> it.isInternetAllowed = true
-                        AppStatus.WHITELISTED -> {
-                            it.whiteListUniv1 = false
-                            it.isInternetAllowed = true
-                        }
-                        AppStatus.EXCLUDED -> {
-                            it.isExcluded = false
-                            it.isInternetAllowed = true
-                        }
-                        else -> { /* no-op */
-                        }
-                    }
-                }
-            }
-        }
-        informObservers()
-    }
-
     fun updateExcludedApps(appInfo: AppInfo, status: Boolean) {
         io {
-            invalidateExcludedApps(appInfo.uid, status)
-            appInfoRepository.updateExcludedList(appInfo.uid, status)
-            val count = getBlockedCountForCategory(appInfo.appCategory)
-            val excludedCount = getExcludedCountForCategory(appInfo.appCategory)
-            val whitelistCount = getWhitelistCountForCategory(appInfo.appCategory)
-            categoryInfoRepository.updateBlockedCount(appInfo.appCategory, count)
-            categoryInfoRepository.updateExcludedCount(appInfo.appCategory, excludedCount)
-            categoryInfoRepository.updateWhitelistCount(appInfo.appCategory, whitelistCount)
+            val firewallStatus: FirewallStatus = if (status) {
+                FirewallStatus.EXCLUDE
+            } else {
+                FirewallStatus.ALLOW
+            }
+
+            invalidateFirewallStatus(appInfo.uid, firewallStatus, ConnectionStatus.BOTH)
+            appInfoRepository.updateFirewallStatusByUid(appInfo.uid, firewallStatus.id,
+                                                        ConnectionStatus.BOTH.id)
         }
     }
 
     fun updateWhitelistedApps(appInfo: AppInfo, isWhitelisted: Boolean) {
         io {
-            invalidateWhitelistedApps(appInfo.uid, isWhitelisted)
-            val countBlocked = getBlockedCountForCategory(appInfo.appCategory)
-            val countWhitelisted = getWhitelistCountForCategory(appInfo.appCategory)
-            categoryInfoRepository.updateBlockedCount(appInfo.appCategory, countBlocked)
-            categoryInfoRepository.updateWhitelistCount(appInfo.appCategory, countWhitelisted)
-            appInfoRepository.updateWhitelist(appInfo.uid, isWhitelisted)
-            if (isWhitelisted) {
-                appInfoRepository.updateInternetForUID(appInfo.uid, isWhitelisted)
+            val firewallStatus: FirewallStatus = if (isWhitelisted) {
+                FirewallStatus.WHITELIST
+            } else {
+                FirewallStatus.ALLOW
             }
+            invalidateFirewallStatus(appInfo.uid, firewallStatus, ConnectionStatus.BOTH)
+            appInfoRepository.updateFirewallStatusByUid(appInfo.uid, firewallStatus.id,
+                                                        ConnectionStatus.BOTH.id)
         }
     }
 
-    fun updateFirewalledApps(uid: Int, isBlocked: Boolean) {
+    fun updateFirewalledApps(uid: Int, firewallStatus: FirewallStatus) {
         io {
-            invalidateBlockedApps(uid, isBlocked)
-            val appInfo = getAppInfosByUidLocked(uid).distinctBy { it.appCategory }
-            appInfo.forEach {
-                val count = getBlockedCountForCategory(it.appCategory)
-                categoryInfoRepository.updateBlockedCount(it.appCategory, count)
-                if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                                 "Category (${it.appCategory}), isFirewalled? ${!isBlocked}")
-            }
-            appInfoRepository.updateInternetForUID(uid, isBlocked)
+            invalidateFirewallStatus(uid, firewallStatus, ConnectionStatus.BOTH)
+            appInfoRepository.updateFirewallStatusByUid(uid, firewallStatus.id,
+                                                        ConnectionStatus.BOTH.id)
+        }
+    }
+
+    fun updateFirewallStatus(uid: Int, firewallStatus: FirewallStatus,
+                             connectionStatus: ConnectionStatus) {
+        Log.d(LOG_TAG_FIREWALL,
+              "Apply firewall rule for uid: ${uid}, ${firewallStatus.name}, ${connectionStatus.name}")
+        io {
+            invalidateFirewallStatus(uid, firewallStatus, connectionStatus)
+            appInfoRepository.updateFirewallStatusByUid(uid, firewallStatus.id, connectionStatus.id)
         }
     }
 

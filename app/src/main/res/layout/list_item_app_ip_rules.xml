@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:padding="5dp"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <TextView
+            android:id="@+id/aip_ip_address"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="0.7"
+            android:ellipsize="start"
+            android:fontFamily="sans-serif-light"
+            android:padding="10dp"
+            android:textAppearance="@android:style/TextAppearance.Material.Body1"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/large_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/aip_status_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:padding="5dp"
+            android:layout_weight="0.3"
+            android:background="@drawable/rectangle_border_background"
+            android:drawableEnd="@drawable/ic_arrow_down_small"
+            android:drawablePadding="-5dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="Allow"
+            android:visibility="visible"
+            android:textAllCaps="false" />
+
+
+    </LinearLayout>
+</LinearLayout>

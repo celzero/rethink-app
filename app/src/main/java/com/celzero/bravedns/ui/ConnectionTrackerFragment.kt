@@ -24,19 +24,21 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ConnectionTrackerAdapter
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.databinding.ActivityConnectionTrackerBinding
-import com.celzero.bravedns.service.DNSLogTracker
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.CustomLinearLayoutManager
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
 import com.google.android.material.chip.Chip
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -50,12 +52,11 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     private var layoutManager: RecyclerView.LayoutManager? = null
     private val viewModel: ConnectionTrackerViewModel by viewModel()
 
-    private var filterQuery: String? = ""
+    private var filterQuery: String = ""
     private var filterCategories: MutableSet<String> = mutableSetOf()
     private var filterType: TopLevelFilter = TopLevelFilter.ALL
     private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
     private val persistentState by inject<PersistentState>()
-    private val dnsLogTracker by inject<DNSLogTracker>()
 
     companion object {
         fun newInstance() = ConnectionTrackerFragment()
@@ -71,38 +72,39 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     }
 
     private fun initView() {
-        val includeView = b.connectionListScrollList
 
         if (!persistentState.logsEnabled) {
-            includeView.connectionListLogsDisabledTv.visibility = View.VISIBLE
-            includeView.connectionCardViewTop.visibility = View.GONE
+            b.connectionListLogsDisabledTv.visibility = View.VISIBLE
+            b.connectionCardViewTop.visibility = View.GONE
             return
         }
 
-        includeView.connectionListLogsDisabledTv.visibility = View.GONE
-        includeView.connectionCardViewTop.visibility = View.VISIBLE
+        b.connectionListLogsDisabledTv.visibility = View.GONE
+        b.connectionCardViewTop.visibility = View.VISIBLE
 
-        includeView.recyclerConnection.setHasFixedSize(true)
-        layoutManager = LinearLayoutManager(requireContext())
-        includeView.recyclerConnection.layoutManager = layoutManager
-        val recyclerAdapter = ConnectionTrackerAdapter(this)
+        b.recyclerConnection.setHasFixedSize(true)
+        layoutManager = CustomLinearLayoutManager(requireContext())
+        b.recyclerConnection.layoutManager = layoutManager
+        val recyclerAdapter = ConnectionTrackerAdapter(requireContext())
         viewModel.connectionTrackerList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
             recyclerAdapter::submitList))
-        includeView.recyclerConnection.adapter = recyclerAdapter
+        b.recyclerConnection.adapter = recyclerAdapter
 
-        includeView.connectionSearch.setOnQueryTextListener(this)
-        includeView.connectionSearch.setOnClickListener {
+        setupRecyclerScrollListener()
+
+        b.connectionSearch.setOnQueryTextListener(this)
+        b.connectionSearch.setOnClickListener {
             showParentChipsUi()
             showChildChipsIfNeeded()
-            includeView.connectionSearch.requestFocus()
-            includeView.connectionSearch.onActionViewExpanded()
+            b.connectionSearch.requestFocus()
+            b.connectionSearch.onActionViewExpanded()
         }
 
-        includeView.connectionFilterIcon.setOnClickListener {
+        b.connectionFilterIcon.setOnClickListener {
             toggleParentChipsUi()
         }
 
-        includeView.connectionDeleteIcon.setOnClickListener {
+        b.connectionDeleteIcon.setOnClickListener {
             showDeleteDialog()
         }
 
@@ -110,10 +112,36 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         remakeChildFilterChipsUi(FirewallRuleset.getBlockedRules())
     }
 
-    private fun toggleParentChipsUi() {
-        val includeView = b.connectionListScrollList
+    private fun setupRecyclerScrollListener() {
+        val scrollListener = object : RecyclerView.OnScrollListener() {
 
-        if (includeView.filterChipParentGroup.isVisible) {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                if (recyclerView.getChildAt(0).tag == null) return
+
+                val tag: Long = recyclerView.getChildAt(0).tag as Long
+
+                if (dy > 0) {
+                    b.connectionListScrollHeader.text = Utilities.formatToRelativeTime(tag)
+                    b.connectionListScrollHeader.visibility = View.VISIBLE
+                } else {
+                    b.connectionListScrollHeader.visibility = View.GONE
+                }
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    b.connectionListScrollHeader.visibility = View.GONE
+                }
+            }
+        }
+        b.recyclerConnection.addOnScrollListener(scrollListener)
+    }
+
+    private fun toggleParentChipsUi() {
+        if (b.filterChipParentGroup.isVisible) {
             hideParentChipsUi()
             hideChildChipsUi()
         } else {
@@ -137,8 +165,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     }
 
     private fun remakeParentFilterChipsUi() {
-        val includeView = b.connectionListScrollList
-        includeView.filterChipParentGroup.removeAllViews()
+        b.filterChipParentGroup.removeAllViews()
 
         val all = makeParentChip(TopLevelFilter.ALL.id, getString(R.string.ct_filter_parent_all),
                                  true)
@@ -147,13 +174,13 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         val blocked = makeParentChip(TopLevelFilter.BLOCKED.id,
                                      getString(R.string.ct_filter_parent_blocked), false)
 
-        includeView.filterChipParentGroup.addView(all)
-        includeView.filterChipParentGroup.addView(allowed)
-        includeView.filterChipParentGroup.addView(blocked)
+        b.filterChipParentGroup.addView(all)
+        b.filterChipParentGroup.addView(allowed)
+        b.filterChipParentGroup.addView(blocked)
     }
 
     private fun makeParentChip(id: Int, label: String, checked: Boolean): Chip {
-        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, null, false) as Chip
+        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
         chip.tag = id
         chip.text = label
         chip.isChecked = checked
@@ -170,7 +197,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     }
 
     private fun makeChildChip(id: String, titleResId: Int): Chip {
-        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, null, false) as Chip
+        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
         chip.text = getString(titleResId)
         chip.chipIcon = ContextCompat.getDrawable(requireContext(),
                                                   FirewallRuleset.getRulesIcon(id))
@@ -207,13 +234,13 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         }
     }
 
-    override fun onQueryTextSubmit(query: String?): Boolean {
+    override fun onQueryTextSubmit(query: String): Boolean {
         this.filterQuery = query
         viewModel.setFilter(query, filterCategories, filterType)
         return true
     }
 
-    override fun onQueryTextChange(query: String?): Boolean {
+    override fun onQueryTextChange(query: String): Boolean {
         this.filterQuery = query
         viewModel.setFilter(query, filterCategories, filterType)
         return true
@@ -225,7 +252,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         builder.setMessage(R.string.conn_track_clear_logs_message)
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.ct_delete_logs_positive_btn)) { _, _ ->
-            go {
+            io {
                 connectionTrackerRepository.clearAllData()
             }
         }
@@ -235,16 +262,10 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         builder.create().show()
     }
 
-    fun ipToDomain(ip: String): DNSLogTracker.DnsCacheRecord? {
-        return dnsLogTracker.ipDomainLookup.getIfPresent(ip)
-    }
-
     private fun remakeChildFilterChipsUi(categories: List<FirewallRuleset>) {
-        val v = b.connectionListScrollList
-
-        v.filterChipGroup.removeAllViews()
+        b.filterChipGroup.removeAllViews()
         for (c in categories) {
-            v.filterChipGroup.addView(makeChildChip(c.id, c.title))
+            b.filterChipGroup.addView(makeChildChip(c.id, c.title))
         }
     }
 
@@ -269,24 +290,26 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     }
 
     private fun showChildChipsUi() {
-        b.connectionListScrollList.filterChipGroup.visibility = View.VISIBLE
+        b.filterChipGroup.visibility = View.VISIBLE
     }
 
     private fun hideChildChipsUi() {
-        b.connectionListScrollList.filterChipGroup.visibility = View.GONE
+        b.filterChipGroup.visibility = View.GONE
     }
 
     private fun showParentChipsUi() {
-        b.connectionListScrollList.filterChipParentGroup.visibility = View.VISIBLE
+        b.filterChipParentGroup.visibility = View.VISIBLE
     }
 
     private fun hideParentChipsUi() {
-        b.connectionListScrollList.filterChipParentGroup.visibility = View.GONE
+        b.filterChipParentGroup.visibility = View.GONE
     }
 
-    private fun go(f: suspend () -> Unit) {
+    private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch {
-            f()
+            withContext(Dispatchers.IO) {
+                f()
+            }
         }
     }
 }

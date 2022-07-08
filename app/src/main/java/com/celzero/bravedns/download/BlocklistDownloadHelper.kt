@@ -22,6 +22,7 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.Utilities.Companion.cleanupOldLocalBlocklistFiles
 import com.celzero.bravedns.util.Utilities.Companion.deleteRecursive
+import com.celzero.bravedns.util.Utilities.Companion.localBlocklistCanonicalPath
 import java.io.File
 
 class BlocklistDownloadHelper {
@@ -56,17 +57,23 @@ class BlocklistDownloadHelper {
          * Now in v053 we are moving the files from external dir to canonical path.
          * So deleting the old files in the external directory.
          */
-        fun deleteFromExternalDir(context: Context, timestamp: Long) {
-            val dir = File(context.getExternalFilesDir(
-                null).toString() + Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH + timestamp)
+        fun deleteOldFiles(context: Context, timestamp: Long,
+                           type: AppDownloadManager.DownloadType) {
+            val path = if (type == AppDownloadManager.DownloadType.LOCAL) {
+                Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH
+            } else {
+                Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH
+            }
+            val dir = File(context.getExternalFilesDir(null).toString() + path + timestamp)
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
                              "deleteOldFiles, File : ${dir.path}, ${dir.isDirectory}")
             deleteRecursive(dir)
         }
 
-        fun deleteFromCanonicalPath(context: Context, timestamp: Long) {
-            val canonicalPath = File(context.filesDir.canonicalPath + File.separator)
-            cleanupOldLocalBlocklistFiles(canonicalPath, timestamp.toString())
+        fun deleteFromCanonicalPath(context: Context) {
+            val canonicalPath = File(localBlocklistCanonicalPath(context,
+                                                                 Constants.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME))
+            deleteRecursive(canonicalPath)
         }
 
         fun getExternalFilePath(context: Context, timestamp: String): String {
@@ -74,6 +81,9 @@ class BlocklistDownloadHelper {
                 null).toString() + Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH + File.separator + timestamp + File.separator
         }
 
+        // getExternalFilePath is similar to the above function without use of default external files dir
+        // case: with usage of default android download manager, api requires path without
+        // external files dir (api: setDestinationInExternalFilesDir)
         fun getExternalFilePath(timestamp: String): String {
             return Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH + File.separator + timestamp + File.separator
         }

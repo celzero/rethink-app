@@ -110,7 +110,7 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
 
     private fun initializeClickListeners() {
         b.bsHomeScreenRadioDns.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
-            handleDNSMode(isSelected)
+            handleDnsMode(isSelected)
         }
 
         b.bsHomeScreenRadioFirewall.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
@@ -118,7 +118,7 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
         }
 
         b.bsHomeScreenRadioDnsFirewall.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
-            handleDNSFirewallMode(isSelected)
+            handleDnsFirewallMode(isSelected)
         }
 
         b.bsHsDnsRl.setOnClickListener {
@@ -126,7 +126,7 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
             if (!checked) {
                 b.bsHomeScreenRadioDns.isChecked = true
             }
-            handleDNSMode(checked)
+            handleDnsMode(checked)
         }
 
         b.bsHsFirewallRl.setOnClickListener {
@@ -142,7 +142,7 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
             if (!checked) {
                 b.bsHomeScreenRadioDnsFirewall.isChecked = true
             }
-            handleDNSFirewallMode(checked)
+            handleDnsFirewallMode(checked)
         }
 
         b.bsHsWireguardRl.setOnClickListener {
@@ -173,7 +173,7 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
         b.bsHomeScreenRadioDns.isEnabled = !isLockdown
     }
 
-    private fun handleDNSMode(isChecked: Boolean) {
+    private fun handleDnsMode(isChecked: Boolean) {
         if (!isChecked) return
 
         b.bsHomeScreenRadioFirewall.isChecked = false
@@ -189,7 +189,7 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
         modifyBraveMode(AppConfig.BraveMode.FIREWALL.mode)
     }
 
-    private fun handleDNSFirewallMode(isChecked: Boolean) {
+    private fun handleDnsFirewallMode(isChecked: Boolean) {
         if (!isChecked) return
 
         b.bsHomeScreenRadioDns.isChecked = false

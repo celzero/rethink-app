@@ -46,7 +46,7 @@
                             android:layout_marginTop="12dp"
                             android:maxWidth="48dp"
                             android:maxHeight="48dp"
-                            tools:src="@color/colorPrimary" />
+                            tools:src="?attr/colorPrimary" />
 
                         <TextView
                             android:id="@+id/pm_apk_label_tv"
@@ -107,7 +107,6 @@
                         android:layout_height="match_parent"
                         android:layout_margin="1dp"
                         android:layout_weight="0.33"
-                        android:background="@color/secondaryText"
                         android:gravity="center"
                         android:text="Auto\nRevoke" />
 
@@ -116,7 +115,6 @@
                         android:layout_height="match_parent"
                         android:layout_margin="1dp"
                         android:layout_weight="0.33"
-                        android:background="@color/secondaryText"
                         android:gravity="center"
                         android:text="Revoke on\nbackground" />
 
@@ -125,7 +123,6 @@
                         android:layout_height="match_parent"
                         android:layout_margin="1dp"
                         android:layout_weight="0.33"
-                        android:background="@color/secondaryText"
                         android:gravity="center"
                         android:text="Do Nothing" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
