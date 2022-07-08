@@ -528,26 +528,7 @@ class Utilities {
             return ctx.filesDir.canonicalPath + File.separator + timestamp + File.separator
         }
 
-        fun cleanupOldLocalBlocklistFiles(fileOrDir: File, activeDir: String) {
-            if (fileOrDir.name.equals(activeDir)) return
-
-            // local blocklist dirs are named with timestamps, ex: 1635754946983
-            // Dirs other than activeDir (current timestamp)
-            // should be deleted (path: ../files/<timestamp>).
-            // delete both files and dirs starting with "16".
-            if (fileOrDir.name.startsWith("16")) {
-                deleteRecursive(fileOrDir)
-                return
-            }
-
-            if (fileOrDir.isDirectory) {
-                fileOrDir.listFiles()?.forEach { child ->
-                    cleanupOldLocalBlocklistFiles(child, activeDir)
-                }
-            } // ignore files that don't start with "16"
-        }
-
-        fun hasLocalBlocklists(ctx: Context?, timestamp: Long): Boolean {
+        fun hasLocalBlocklists(ctx: Context, timestamp: Long): Boolean {
             val a = Constants.ONDEVICE_BLOCKLISTS.all {
                 localBlocklistFile(ctx, it.filename, timestamp)?.exists() == true
             }

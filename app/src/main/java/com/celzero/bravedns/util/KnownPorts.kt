@@ -21,6 +21,7 @@ class KnownPorts {
     companion object {
         const val DNS_PORT: Int = 53
         const val NTP_PORT: Int = 123
+        const val HTTP_PORT: Int = 80
 
         // represents the unknown port in the port map. see class KnownPorts
         const val PORT_VAL_UNKNOWN = "unknown"

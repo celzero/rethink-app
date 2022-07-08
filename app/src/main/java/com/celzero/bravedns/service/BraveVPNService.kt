@@ -333,6 +333,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
                 }
             }
 
+            if (httpBlocked(connInfo.destPort)) {
+                return FirewallRuleset.RULE10
+            }
+
             if (deviceLocked()) {
                 return FirewallRuleset.RULE3
             }
@@ -362,6 +366,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
         }
 
         return FirewallRuleset.RULE0
+    }
+
+    private fun httpBlocked(port: Int): Boolean {
+        // no need to check if the port is not HTTP port
+        if (port != KnownPorts.HTTP_PORT) {
+            return false
+        }
+
+        return persistentState.blockHttpConnections
     }
 
     private fun allowOrbot(uid: Int): Boolean {

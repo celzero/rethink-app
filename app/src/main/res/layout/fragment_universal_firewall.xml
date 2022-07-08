@@ -240,13 +240,46 @@
                 android:foreground="?attr/selectableItemBackground"
                 android:gravity="start|center"
                 android:padding="10dp"
-                android:text="Block IPv4 in IPv6 (experimental)"
+                android:text="@string/univ_firewall_rule_7"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view"
                 app:drawableStartCompat="@drawable/ic_app_info" />
 
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/firewall_check_ipv4_check"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="15dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/firewall_block_http_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:id="@+id/firewall_block_http_txt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.9"
+                android:drawablePadding="10dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="start|center"
+                android:padding="10dp"
+                android:text="@string/univ_firewall_rule_8"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view"
+                app:drawableStartCompat="@drawable/ic_app_info" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/firewall_block_http_check"
                 style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
