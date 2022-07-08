@@ -534,22 +534,11 @@
     <string name="features_disabled">(disabled)</string>
     <string name="firewall_app_info_not_available">Cannot block the app</string>
 
-    <string name="whats_dialog_title">What\'s new in v053g</string>
-    <string name="whats_new_version_name">🌎&#128330; International day of non-violence (02 October) &#128330;🌎</string>
-    <string name="whats_new_version_update">🚀 <b>M.E.G.A Release</b> 🚀\n\n
-        1. <i>New firewall rule</i>: Block connections not resolved by user-configured DNS endpoint.\n\n
-        2. <i>New firewall rule</i>: Block newly installed apps by default.\n\n
-        3. <i>Network Log</i> UI now shows domain names corresponding to IP addresses.\n\n
-        4. <i>DNS Log</i> UI now shows all IPs received as part of DNS response.\n\n
-        5. Forward all traffic to <i>port 53</i> to user-configured DNS endpoint.\n\n
-        6. Improved search filters for <i>network logs</i>.\n\n
-        7. Quick action buttons on Home Screen.\n\n
-        8. A brand new Pause mode which suspends DNS and Firewall for unblocked apps.\n\n
-        9. Major bug fixes around internet connectivity issues.\n\n
-        10. Share automatically generated bug reports from the About page.\n\n
-        11. UI refresh of the Settings page.\n\n
-        12. Improvements to \"Block any app not in use feature\"; no longer experimental.\n\n
-        14. 50 other performance improvements and bug fixes throughout the app. 🙈 🙈
+    <string name="whats_dialog_title">What\'s new in v053h</string>
+    <string name="whats_new_version_name">🌎&#128330; World Computer literacy day (02 December) &#128330;🌎</string>
+    <string name="whats_new_version_update"><b>Minor release fixing file bloat</b>\n\n
+    Leftover blocklist files were not deleted which resulted in ever-increasing app\'s storage space.\n\n
+    Now, on every new blocklist version download older files are deleted.\n\n
     </string>
 
     <!-- Settings Fragment strings -->

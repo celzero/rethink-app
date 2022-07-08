@@ -10,7 +10,7 @@ In other words, RethinkDNS has two primary modes, DNS and Firewall. The DNS mode
 [<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
      alt="Get it on Google Play"
      height="70">](https://play.google.com/store/apps/details?id=com.celzero.bravedns)
-
+     
 ### Firewall
 
 The firewall doesn't really care about the connections per se rather what's making those connections. This is different from the traditional firewalls but in-line with [Little Snitch](https://www.obdev.at/products/littlesnitch/index.html), [LuLu](https://objective-see.com/products/lulu.html), [Glasswire](https://glasswire.com/) and others.
@@ -23,15 +23,19 @@ A network monitor is a per-app report-card of sorts on when connections were mad
 
 ### DNS over HTTPS client
 
-Almost all of the network related code (`firestack`), including DNS over HTTPS split-tunnel, is a very minimal fork of the excellent [Jigsaw-Code/outline-go-tun2socks](https://github.com/Jigsaw-Code/outline-go-tun2socks) written in golang. A majority of work is on the UI with other parts remaining same as on [Jigsaw-Code/Intra](https://github.com/Jigsaw-Code/Intra/), and so the implementation underneath is pretty much the same. A split-tunnel traps requests sent to the VPN's DNS endpoint and relays it to a DNS over HTTPS endpoint of the user's choosing, logging the end-to-end latency, time of request, the dns request query itself and its answer.
+Almost all of the network related code (`firestack`), including DNS over HTTPS split-tunnel, is a very minimal fork of [Jigsaw-Code/outline-go-tun2socks](https://github.com/Jigsaw-Code/outline-go-tun2socks) written in golang. A majority of work is on the UI with other parts remaining same as on [Jigsaw-Code/Intra](https://github.com/Jigsaw-Code/Intra/). A split-tunnel traps requests sent to the VPN's DNS endpoint and relays it to a DNS over HTTPS endpoint of the user's choosing, logging the end-to-end latency, time of request, the dns request query itself and its answer.
 
 ### The RethinkDNS Resolver
 
-A malware and ad-blocking DNS over HTTPS resolver at `https://basic.rethinkdns.com/1:IAAgAA==` (deployed to 200+ locations world-wide) is the default DNS endpoint on the app, though the user is free to change that. A configurable DNS resolver that lets users add or remove blacklists and whitelists, add rewrites, analyse DNS requests is launching late 2021. Right now, a free-to-use DNS over HTTPS endpoint with custom blocklists can be setup here: [rethinkdns.com/configure](https://rethinkdns.com/configure).
+A malware and ad-blocking DNS over HTTPS resolver at `https://basic.rethinkdns.com/1:IAAgAA==` (deployed to 200+ locations world-wide via Cloudflare Workers) is the default DNS endpoint on the app, though the user is free to change that. A configurable DNS resolver that lets users add or remove denylists and allowlists, add rewrites, analyse DNS requests is launching late 2022. Right now, a free-to-use DNS over HTTPS endpoint with custom blocklists can be setup here: [rethinkdns.com/configure](https://rethinkdns.com/configure).
+
+The resolver is deployed to [Fly.io](https://fly.io/) at `max.rethinkdns.com` and [Deno Deploy](https://deno.com/deploy) at `rdns.deno.dev` too, apart from the default deployment on [Cloudflare Workers](https://workers.dev).
+
+The RethinkDNS resolver is open source software: [serverless-dns](https://github.com/serverless-dns/serverless-dns).
 
 ### Community
-- Join us on telegram: [t.me/rethinkdns](https://t.me/rethinkdns).
-- Email us: [hello@celzero.com](mailto:hello@celzero.com).
+- The telegram community is super active and full of crypto-bros. Kidding. We are generally a welcoming bunch. Feel free to get in touch: [t.me/rethinkdns](https://t.me/rethinkdns).
+- Or, email us: [hello@celzero.com](mailto:hello@celzero.com) (we read all emails immediately and reply once we fix the issues being reported).
 
 ### What RethinkDNS is not
 
@@ -53,7 +57,7 @@ To deliver the promise of open-internet for all: With the inevitable ESNI standa
   2. Write descriptive commit messages that explain concisely the changes made. 
   3. Each commit must reference an open issue on the project. This is to make sure there isn't duplicated effort more than anything else.
 2. If you plan to work on a feature, please create a github issue on the project first to kickstart the discussion before committing to doing any work. Again, this is to avoid duplicate work more than anything else. 
-3. Release cycles are undecided, but we're leaning towards bi-weekly once automated tests are up, whenever that may be.
+3. Release cycles are undecided, but we're leaning towards bi-monthly once automated tests are up, whenever that may be.
 
 ## Tenets (unless you know better ones)
 We aren't there yet, may never will be but these are some tenets for the project for the foreseeable future.
@@ -79,8 +83,4 @@ We aren't there yet, may never will be but these are some tenets for the project
 
 ## Backstory
 Internet censorship (sometimes ISP-enforced and often times government-enforced), unabated dragnet surveillance (by pretty much every company and app) stirred us upon this path. The three of us university classmates, [Mohammed](https://www.linkedin.com/in/hussain-mohammed-2525a626/), [Murtaza](https://www.linkedin.com/in/murtaza-aliakbar/), [Santhosh](https://www.linkedin.com/in/santhosh-ponnusamy-2b781244/) got together in late 2019 in the sleepy town of Coimbatore, India to do something about it. Our main gripe was there were all these wonderful tools that people could use but couldn't, either due to cost or due to inability to grok Computer-specific jargon. A lot has happened since we started and a lot has changed but our focus has always been on Android and its 2B+ unsuspecting users. The current idea has been in the works for since May 2020, with the pandemic derailing a bit of progress, and a bit of snafu with abandoning our previous version in favour of the current fork, which we aren't proud of yet, but it is a start. All's good now that we've won a grant from the [Mozilla Builders MVP program](https://builders.mozilla.community/) to go ahead and build this thing that we wanted to... do so faster... and not simply sleep our way through the execution. I hope you're excited but not as much as us that you quit your jobs for this like we did.
-
-## License
-
-[Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
