@@ -21,7 +21,7 @@ import android.util.Log
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.FutureTarget
 import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.Utilities
 import java.io.File

@@ -18,7 +18,7 @@ package com.celzero.bravedns.database
 import android.os.SystemClock
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.celzero.bravedns.automaton.DomainRulesManager
+import com.celzero.bravedns.service.DomainRulesManager
 
 @Entity(tableName = "CustomDomain")
 class CustomDomain {

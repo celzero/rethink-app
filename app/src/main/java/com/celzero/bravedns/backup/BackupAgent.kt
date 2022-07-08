@@ -22,6 +22,7 @@ import android.util.Log
 import androidx.preference.PreferenceManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_BACKUP_URI
 import com.celzero.bravedns.backup.BackupHelper.Companion.SHARED_PREFS_BACKUP_FILE_NAME
 import com.celzero.bravedns.backup.BackupHelper.Companion.TEMP_ZIP_FILE_NAME
@@ -30,7 +31,6 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.getFileNameFromPath
 import com.celzero.bravedns.backup.BackupHelper.Companion.getRethinkDatabase
 import com.celzero.bravedns.backup.BackupHelper.Companion.getTempDir
 import com.celzero.bravedns.backup.BackupHelper.Companion.startVpn
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.copyWithStream

@@ -50,12 +50,11 @@ import androidx.core.content.getSystemService
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.celzero.bravedns.BuildConfig
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.ui.PauseActivity
 import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
@@ -92,7 +91,7 @@ class Utilities {
 
         fun getPermissionDetails(context: Context, packageName: String): PackageInfo {
             return context.packageManager.getPackageInfo(packageName,
-                                                         PackageManager.GET_PERMISSIONS)
+                PackageManager.GET_PERMISSIONS)
         }
 
         // Convert an FQDN like "www.example.co.uk." to an eTLD + 1 like "example.co.uk".
@@ -131,13 +130,13 @@ class Utilities {
             for (enabledService in enabledServices) {
                 val enabledServiceInfo: ServiceInfo = enabledService.resolveInfo.serviceInfo
                 if (DEBUG) Log.i(LOG_TAG_VPN,
-                                 "Accessibility enabled check for: ${enabledServiceInfo.packageName}")
+                    "Accessibility enabled check for: ${enabledServiceInfo.packageName}")
                 if (enabledServiceInfo.packageName == context.packageName && enabledServiceInfo.name == service.name) {
                     return true
                 }
             }
             if (DEBUG) Log.e(LOG_TAG_VPN,
-                             "Accessibility failure, ${context.packageName},  ${service.name}, return size: ${enabledServices.count()}")
+                "Accessibility failure, ${context.packageName},  ${service.name}, return size: ${enabledServices.count()}")
             return false
         }
 
@@ -155,14 +154,14 @@ class Utilities {
                     val enabledService = ComponentName.unflattenFromString(componentNameString)
                     if (expectedComponentName == enabledService) {
                         if (DEBUG) Log.i(LOG_TAG_VPN,
-                                         "SettingsSecure accessibility enabled for: ${expectedComponentName.packageName}")
+                            "SettingsSecure accessibility enabled for: ${expectedComponentName.packageName}")
                         return true
                     }
                 }
             } catch (e: Settings.SettingNotFoundException) {
                 Log.e(LOG_TAG_VPN,
-                      "isAccessibilityServiceEnabled Exception on isAccessibilityServiceEnabledViaSettingsSecure() ${e.message}",
-                      e)
+                    "isAccessibilityServiceEnabled Exception on isAccessibilityServiceEnabledViaSettingsSecure() ${e.message}",
+                    e)
             }
             if (DEBUG) Log.d(LOG_TAG_VPN, "Accessibility enabled check failed")
             return isAccessibilityServiceEnabled(context, accessibilityService)
@@ -234,8 +233,8 @@ class Utilities {
                 "Yesterday"
             } else {
                 val d = DateUtils.getRelativeTimeSpanString(timestamp, now,
-                                                            DateUtils.MINUTE_IN_MILLIS,
-                                                            DateUtils.FORMAT_ABBREV_RELATIVE)
+                    DateUtils.MINUTE_IN_MILLIS,
+                    DateUtils.FORMAT_ABBREV_RELATIVE)
                 d.toString()
             }
         }
@@ -315,7 +314,7 @@ class Utilities {
                 context.startActivity(intent)
             } catch (e: ActivityNotFoundException) {
                 showToastUiCentered(context, context.getString(R.string.vpn_profile_error),
-                                    Toast.LENGTH_SHORT)
+                    Toast.LENGTH_SHORT)
                 Log.w(LOG_TAG_VPN, "Failure opening app info: ${e.message}", e)
             }
         }
@@ -404,7 +403,7 @@ class Utilities {
         fun isOtherVpnHasAlwaysOn(context: Context): Boolean {
             return try {
                 val alwaysOn = Settings.Secure.getString(context.contentResolver,
-                                                         "always_on_vpn_app")
+                    "always_on_vpn_app")
                 !TextUtils.isEmpty(alwaysOn) && context.packageName != alwaysOn
             } catch (e: Exception) {
                 Log.e(LOG_TAG_VPN, "Failure while retrieving Settings.Secure value ${e.message}", e)
@@ -422,7 +421,7 @@ class Utilities {
             } catch (e: PackageManager.NameNotFoundException) {
                 // Not adding exception details in logs.
                 Log.e(LOG_TAG_FIREWALL,
-                      "Application Icon not available for package: $packageName" + e.message)
+                    "Application Icon not available for package: $packageName" + e.message)
                 getDefaultIcon(context)
             }
         }
@@ -502,7 +501,7 @@ class Utilities {
                 context.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
             } catch (e: PackageManager.NameNotFoundException) {
                 Log.w(LOG_TAG_FIREWALL,
-                      "ApplicationInfo is not available for package name: $packageName")
+                    "ApplicationInfo is not available for package name: $packageName")
                 null
             }
         }
@@ -530,7 +529,7 @@ class Utilities {
                     fileOrDirectory.delete()
                 }
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                                 "deleteRecursive File : ${fileOrDirectory.path}, $isDeleted")
+                    "deleteRecursive File : ${fileOrDirectory.path}, $isDeleted")
             } catch (e: Exception) {
                 Log.w(LOG_TAG_DOWNLOAD, "File delete exception: ${e.message}", e)
             }
@@ -538,7 +537,7 @@ class Utilities {
 
         fun localBlocklistDownloadPath(ctx: Context, which: String, timestamp: Long): String {
             return localBlocklistDownloadBasePath(ctx, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                  timestamp) + File.separator + which
+                timestamp) + File.separator + which
         }
 
         fun oldLocalBlocklistDownloadDir(ctx: Context, timestamp: Long): String {
@@ -563,7 +562,7 @@ class Utilities {
         fun localBlocklistFile(ctx: Context, which: String, timestamp: Long): File? {
             return try {
                 val localBlocklist = localBlocklistDownloadPath(ctx, which,
-                                                                timestamp) ?: return null
+                    timestamp) ?: return null
 
                 return File(localBlocklist)
             } catch (e: IOException) {
@@ -574,9 +573,9 @@ class Utilities {
 
         fun hasRemoteBlocklists(ctx: Context, timestamp: Long): Boolean {
             val remoteDir = remoteBlocklistFile(ctx, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                timestamp) ?: return false
+                timestamp) ?: return false
             val remoteFile = blocklistFile(remoteDir.absolutePath,
-                                           Constants.ONDEVICE_BLOCKLIST_FILE_TAG) ?: return false
+                Constants.ONDEVICE_BLOCKLIST_FILE_TAG) ?: return false
             if (remoteFile.exists()) {
                 return true
             }
@@ -608,13 +607,6 @@ class Utilities {
             }
         }
 
-        fun openPauseActivityAndFinish(act: Activity) {
-            val intent = Intent()
-            intent.setClass(act, PauseActivity::class.java)
-            act.startActivity(intent)
-            act.finish()
-        }
-
         fun isNonApp(p: String): Boolean {
             return p.contains(NO_PACKAGE)
         }
@@ -627,8 +619,8 @@ class Utilities {
             } catch (e: Exception) { // ActivityNotFoundException | NullPointerException
                 Log.w(LOG_TAG_FIREWALL, "Failure calling app info: ${e.message}", e)
                 showToastUiCentered(context,
-                                    context.getString(R.string.ctbs_app_info_not_available_toast),
-                                    Toast.LENGTH_SHORT)
+                    context.getString(R.string.ctbs_app_info_not_available_toast),
+                    Toast.LENGTH_SHORT)
             }
         }
 
@@ -677,7 +669,7 @@ class Utilities {
             }
             val typedValue = TypedValue()
             val a: TypedArray = context.obtainStyledAttributes(typedValue.data,
-                                                               intArrayOf(attributeFetch))
+                intArrayOf(attributeFetch))
             val color = a.getColor(0, 0)
             a.recycle()
             return color

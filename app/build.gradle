@@ -56,7 +56,9 @@ android {
             targetCompatibility JavaVersion.VERSION_11
         }
     }
-    flavorDimensions "releaseChannel"
+
+    flavorDimensions "releaseChannel", "releaseType"
+
     productFlavors {
         play {
             dimension "releaseChannel"
@@ -67,6 +69,12 @@ android {
         website {
             dimension "releaseChannel"
         }
+        headless {
+            dimension "releaseType"
+        }
+        full {
+            dimension "releaseType"
+        }
     }
 
     buildFeatures {
@@ -74,6 +82,10 @@ android {
     }
 
     namespace 'com.celzero.bravedns'
+
+    kapt {
+        correctErrorTypes true
+    }
 }
 
 dependencies {
@@ -84,15 +96,15 @@ dependencies {
 
     implementation 'com.google.guava:guava:31.1-jre'
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation 'androidx.core:core-ktx:1.9.0'
+    fullImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    fullImplementation 'androidx.appcompat:appcompat:1.5.1'
+    fullImplementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.preference:preference-ktx:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    fullImplementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    fullImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+    fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
+    fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
 
     // For liveData implementation
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
@@ -105,21 +117,21 @@ dependencies {
     implementation "androidx.room:room-paging:$room_version"
     implementation "android.arch.persistence.room:runtime:1.1.1"
 
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
+    fullImplementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    fullImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+    fullImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
 
     // For paging - connection tracker
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-    implementation "androidx.fragment:fragment-ktx:1.5.3"
+    fullImplementation "androidx.fragment:fragment-ktx:1.5.3"
     implementation 'com.google.android.material:material:1.7.0'
-    implementation "androidx.viewpager2:viewpager2:1.0.0"
+    fullImplementation "androidx.viewpager2:viewpager2:1.0.0"
 
-    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.10'
-    implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:5.0.0-alpha.10'
+    fullImplementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.10'
+    fullImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:5.0.0-alpha.10'
 
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    fullImplementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    fullImplementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
     // Glide implementation
     implementation('com.github.bumptech.glide:glide:4.14.2') {
@@ -129,7 +141,7 @@ dependencies {
     kapt 'com.github.bumptech.glide:compiler:4.14.2'
 
     // Swipe button animation
-    implementation 'com.facebook.shimmer:shimmer:0.5.0'
+    fullImplementation 'com.facebook.shimmer:shimmer:0.5.0'
 
     // Koin core features
     implementation "io.insert-koin:koin-core:3.2.2"
@@ -139,8 +151,8 @@ dependencies {
     implementation 'hu.autsoft:krate:2.0.0'
 
     // To use only without reflection variants of viewBinding
-    implementation 'com.github.kirich1409:viewbindingpropertydelegate:1.5.6'
-    implementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.6'
+    fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate:1.5.6'
+    fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.6'
 
     // Tun2socks (https://jitpack.io/#celzero/firestack)
     implementation 'com.github.celzero:firestack:34ee72663a'

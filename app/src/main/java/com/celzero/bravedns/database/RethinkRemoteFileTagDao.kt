@@ -19,7 +19,6 @@ package com.celzero.bravedns.database
 import androidx.paging.PagingSource
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
-import com.celzero.bravedns.automaton.RethinkBlocklistManager
 import com.celzero.bravedns.data.FileTag
 
 @Dao
@@ -73,7 +72,7 @@ interface RethinkRemoteFileTagDao {
     fun updateSelectedTag(value: Int, isSelected: Int)
 
     @Query("select value, simpleTagId from RethinkRemoteFileTag order by simpleTagId")
-    fun getSimpleViewTags(): List<RethinkBlocklistManager.SimpleViewMapping>
+    fun getSimpleViewTags(): List<SimpleViewMapping>
 
     @Query("Update RethinkRemoteFileTag set isSelected = 0")
     fun clearSelectedTags()

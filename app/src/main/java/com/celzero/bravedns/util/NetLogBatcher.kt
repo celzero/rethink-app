@@ -17,7 +17,7 @@
 package com.celzero.bravedns.util
 
 import android.util.Log
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.BuildConfig.DEBUG
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel

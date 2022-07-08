@@ -22,6 +22,7 @@ import android.util.Log
 import androidx.preference.PreferenceManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_RESTORE_URI
 import com.celzero.bravedns.backup.BackupHelper.Companion.SHARED_PREFS_BACKUP_FILE_NAME
 import com.celzero.bravedns.backup.BackupHelper.Companion.deleteResidue
@@ -29,7 +30,6 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.getTempDir
 import com.celzero.bravedns.backup.BackupHelper.Companion.stopVpn
 import com.celzero.bravedns.backup.BackupHelper.Companion.unzip
 import com.celzero.bravedns.database.AppDatabase
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Utilities
 import org.koin.core.component.KoinComponent

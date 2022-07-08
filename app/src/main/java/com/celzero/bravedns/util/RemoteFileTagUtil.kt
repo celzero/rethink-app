@@ -17,8 +17,7 @@ package com.celzero.bravedns.util
 
 import android.content.Context
 import android.util.Log
-import com.celzero.bravedns.automaton.RethinkBlocklistManager
-import com.celzero.bravedns.download.AppDownloadManager
+import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.PersistentState
 import org.koin.core.component.KoinComponent
 import java.io.File
@@ -39,7 +38,7 @@ class RemoteFileTagUtil : KoinComponent {
                                   Constants.PACKAGED_REMOTE_FILETAG_TIMESTAMP) ?: throw IOException()
 
                 Utilities.copyWithStream(readStream, to.outputStream())
-                RethinkBlocklistManager.readJson(context, AppDownloadManager.DownloadType.REMOTE,
+                RethinkBlocklistManager.readJson(context, RethinkBlocklistManager.DownloadType.REMOTE,
                                                  Constants.PACKAGED_REMOTE_FILETAG_TIMESTAMP)
                 persistentState.remoteBlocklistTimestamp = Constants.PACKAGED_REMOTE_FILETAG_TIMESTAMP
             } catch (e: IOException) {
