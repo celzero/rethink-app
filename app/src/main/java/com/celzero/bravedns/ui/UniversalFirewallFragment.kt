@@ -110,6 +110,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         includeView.firewallDisallowDnsBypassModeCheck.isChecked = persistentState.disallowDnsBypass
         includeView.firewallBlockNewAppCheck.isChecked = persistentState.blockNewlyInstalledApp
         includeView.firewallCheckIpv4Check.isChecked = persistentState.filterIpv4inIpv6
+        includeView.firewallBlockHttpCheck.isChecked = persistentState.blockHttpConnections
 
         setupClickListeners(includeView)
     }
@@ -178,6 +179,14 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
 
         includeView.firewallCheckIpv4Txt.setOnClickListener {
             toggle(includeView.firewallCheckIpv4Check, persistentState::filterIpv4inIpv6)
+        }
+
+        includeView.firewallBlockHttpCheck.setOnCheckedChangeListener { _, b ->
+            persistentState.blockHttpConnections = b
+        }
+
+        includeView.firewallBlockHttpTxt.setOnClickListener {
+            toggle(includeView.firewallBlockHttpCheck, persistentState::blockHttpConnections)
         }
     }
 

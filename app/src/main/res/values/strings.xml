@@ -1071,6 +1071,8 @@
     <string name="univ_firewall_rule_4">Block all UDP traffic except DNS and NTP</string>
     <string name="univ_firewall_rule_5">Block connections when DNS is bypassed (experimental)</string>
     <string name="univ_firewall_rule_6">Block newly installed apps by default</string>
+    <string name="univ_firewall_rule_7">Block IPv4 in IPv6 (experimental)</string>
+    <string name="univ_firewall_rule_8">Block all HTTP (port 80) traffic</string>
 
     <string name="univ_block_unknown_connections">Block connections when source app is unknown</string>
 
@@ -1267,6 +1269,7 @@
     <string name="firewall_rule_exempt_app_whitelist">App Whitelisted</string>
     <string name="firewall_rule_exempt_dns_proxied">DNS Proxied</string>
     <string name="firewall_rule_exempt_orbot_setup">Orbot Setup</string>
+    <string name="firewall_rule_block_http">HTTP Connection</string>
 
     <string name="firewall_rule_no_rule_desc">No firewall rules matched this connection.</string>
     <string name="firewall_rule_block_app_desc"><![CDATA[A user-set firewall rule blocked this <i>app</i>.<br/><br/> To change go to <i>All Apps</i> tab.]]></string>
@@ -1284,6 +1287,7 @@
     <string name="firewall_rule_exempt_app_whitelist_desc"><![CDATA[This <i>app</i> was allowed to connect in accordance with a user-set <i>whitelist</i>.<br/><br/> To change go to <i>Universal</i> tab.]]></string>
     <string name="firewall_rule_exempt_dns_proxied_desc"><![CDATA[This DNS connection was proxied and forwarded to user-preferred DNS endpoint.<br/><br/> To change go to <i>Settings</i> page.]]></string>
     <string name="firewall_rule_exempt_orbot_setup_desc"><![CDATA[This connection was allowed because <i>one-click Tor-as-a-proxy</i> setup via Orbot was in progress.]]></string>
+    <string name="firewall_rule_block_http_desc"><![CDATA[This connection was blocked because <i>Block all HTTP (port 80) connections</i> is enabled. To change go to <i>Universal</i> tab.]]></string>
 
     <!-- New app install Notification -->
     <string name="new_app_bulk_notification_title">Attention</string>

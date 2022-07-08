@@ -197,6 +197,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // filter IPv6 compatible IPv4 address in custom ips
     var filterIpv4inIpv6 by booleanPref("filter_ip4_ipv6", false)
 
+    // universal firewall settings to block all http connections
+    var blockHttpConnections by booleanPref("block_http_connections", false)
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
     var dnsBlockedCountLiveData: MutableLiveData<Long> = MutableLiveData()
