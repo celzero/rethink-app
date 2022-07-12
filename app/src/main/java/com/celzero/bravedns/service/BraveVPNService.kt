@@ -48,7 +48,6 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.IPDetails
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.RefreshDatabase
-import com.celzero.bravedns.net.go.GoIntraListener
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.net.go.GoVpnAdapter.Companion.establish
 import com.celzero.bravedns.net.manager.ConnectionTracer
@@ -68,8 +67,12 @@ import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
 import com.celzero.bravedns.util.Utilities.Companion.isMissingOrInvalidUid
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import com.google.common.collect.Sets
+import dnsx.Summary
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
+import intra.Listener
+import intra.TCPSocketSummary
+import intra.UDPSocketSummary
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.withLock
 import org.koin.android.ext.android.inject
@@ -81,8 +84,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.random.Random
 
-
-class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker,
+class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker, Listener,
                         OnSharedPreferenceChangeListener {
 
     @GuardedBy("vpnController") private var connectionMonitor: ConnectionMonitor? = null
@@ -134,10 +136,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
 
     private val appConfig by inject<AppConfig>()
     private val orbotHelper by inject<OrbotHelper>()
-    private val ipTracker by inject<IPTracker>()
-    private val dnsLogTracker by inject<DnsLogTracker>()
     private val persistentState by inject<PersistentState>()
     private val refreshDatabase by inject<RefreshDatabase>()
+    private val netLogTracker by inject<NetLogTracker>()
 
     @Volatile private var isAccessibilityServiceFunctional: Boolean = false
     @Volatile var accessibilityHearbeatTimestamp: Long = INIT_TIME_MS
@@ -442,7 +443,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
     private fun unresolvedIp(ip: String): Boolean {
         val resolvedIp = testWithBackoff {
             val now = System.currentTimeMillis()
-            val ttl = dnsLogTracker.ipDomainLookup.getIfPresent(ip)?.ttl ?: Long.MIN_VALUE
+            val ttl = FirewallManager.ipDomainLookup.getIfPresent(ip)?.ttl ?: Long.MIN_VALUE
             ttl >= now
         }
 
@@ -732,7 +733,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
      * The logs will be shown in network monitor screen
      */
     private fun connTrack(info: IPDetails?) {
-        ipTracker.recordTransaction(info)
+        if (info == null) return
+
+        netLogTracker.writeIpLog(info)
     }
 
     private suspend fun newBuilder(): Builder {
@@ -847,6 +850,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
     override fun onCreate() {
         connTracer = ConnectionTracer(this)
         VpnController.onVpnCreated(this)
+        netLogTracker.startLogger()
 
         notificationManager = this.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         activityManager = this.getSystemService(ACTIVITY_SERVICE) as ActivityManager
@@ -889,7 +893,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
             Log.i(LOG_TAG_VPN, "excluded-apps list changed, restart vpn")
 
             io("excludeApps") {
-                restartVpn(appConfig.newTunnelOptions(this, GoIntraListener, getFakeDns(),
+                restartVpn(appConfig.newTunnelOptions(this, this, getFakeDns(),
                                                       appConfig.getInternetProtocol(),
                                                       appConfig.getProtocolTranslationMode()))
             }
@@ -1035,7 +1039,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
                 }
             }
 
-            val opts = appConfig.newTunnelOptions(this, GoIntraListener, getFakeDns(),
+            val opts = appConfig.newTunnelOptions(this, this, getFakeDns(),
                                                   appConfig.getInternetProtocol(),
                                                   appConfig.getProtocolTranslationMode())
 
@@ -1129,7 +1133,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
         /* TODO Check on the Persistent State variable
            Check on updating the values for Package change and for mode change.
            As of now handled manually */
-        val opts = appConfig.newTunnelOptions(this, GoIntraListener, getFakeDns(),
+        val opts = appConfig.newTunnelOptions(this, this, getFakeDns(),
                                               appConfig.getInternetProtocol(),
                                               appConfig.getProtocolTranslationMode())
         Log.i(LOG_TAG_VPN, "onPrefChange key: $key, opts: $opts")
@@ -1241,7 +1245,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
 
     private fun updateTunnelOnSystemDnsChange() {
         io("system_dns") {
-            val opts = appConfig.newTunnelOptions(this, GoIntraListener, getFakeDns(),
+            val opts = appConfig.newTunnelOptions(this, this, getFakeDns(),
                                                   appConfig.getInternetProtocol(),
                                                   appConfig.getProtocolTranslationMode())
             val previousTunnelProxyInfo = vpnAdapter?.getProxyTransport()
@@ -1423,7 +1427,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
         if (!syncLockdownState()) return
         io("lockdownSync") {
             Log.i(LOG_TAG_VPN, "vpn lockdown mode change, restarting")
-            restartVpn(appConfig.newTunnelOptions(this, GoIntraListener, getFakeDns(),
+            restartVpn(appConfig.newTunnelOptions(this, this, getFakeDns(),
                                                   appConfig.getInternetProtocol(),
                                                   appConfig.getProtocolTranslationMode()))
         }
@@ -1484,6 +1488,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
         unobserveAppInfos()
         persistentState.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
 
+        netLogTracker.stopLogger()
         connectionMonitor?.onVpnStop()
         VpnController.onVpnDestroyed()
         vpnScope.cancel("VpnService onDestroy")
@@ -1528,7 +1533,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
 
     private fun handleVpnServiceOnAppStateChange() {
         io("appStateChange") {
-            restartVpn(appConfig.newTunnelOptions(this, GoIntraListener, getFakeDns(),
+            restartVpn(appConfig.newTunnelOptions(this, this, getFakeDns(),
                                                   appConfig.getInternetProtocol(),
                                                   appConfig.getProtocolTranslationMode()))
         }
@@ -1668,20 +1673,38 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
         }
     }
 
-    private fun io(s: String, f: suspend () -> Unit) {
-        vpnScope.launch(CoroutineName(s)) {
-            withContext(Dispatchers.IO) {
-                f()
-            }
+    private fun io(s: String, f: suspend () -> Unit) = vpnScope.launch(CoroutineName(s)) {
+        withContext(Dispatchers.IO) {
+            f()
         }
     }
 
-    private fun ui(f: suspend () -> Unit) {
-        vpnScope.launch {
-            withContext(Dispatchers.Main) {
-                f()
-            }
+    private fun ui(f: suspend () -> Unit) = vpnScope.launch {
+        withContext(Dispatchers.Main) {
+            f()
         }
+    }
+
+    override fun onQuery(query: String?): String {
+        // return empty response for now
+        return ""
+    }
+
+    override fun onResponse(summary: Summary?) {
+        if (summary == null) {
+            Log.i(LoggerConstants.LOG_TAG_DNS_LOG, "received null summary")
+            return
+        }
+
+        netLogTracker.processDnsLog(summary)
+    }
+
+    override fun onTCPSocketClosed(summary: TCPSocketSummary?) {
+        // no-op
+    }
+
+    override fun onUDPSocketClosed(summary: UDPSocketSummary?) {
+        // no-op
     }
 
 }
