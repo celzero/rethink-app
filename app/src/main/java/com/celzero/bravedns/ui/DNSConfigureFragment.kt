@@ -34,6 +34,7 @@ import com.celzero.bravedns.databinding.FragmentDnsConfigureBinding
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.scheduler.WorkScheduler.Companion.BLOCKLIST_UPDATE_CHECK_JOB_TAG
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
@@ -71,7 +72,7 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
     override fun onResume() {
         super.onResume()
         // update selected dns values
-        updateSelectedDns(appConfig.getConnectedDns())
+        updateSelectedDns()
         // update local blocklist ui
         updateLocalBlocklistUi()
     }
@@ -120,9 +121,7 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
         return appConfig.isRethinkDnsConnected()
     }
 
-    private fun updateSelectedDns(name: String) {
-        b.connectedDnsDetailsTv.text = getString(R.string.dc_connected_dns_text, name,
-                                                 getConnectedDnsType())
+    private fun updateSelectedDns() {
 
         if (isSystemDns()) {
             b.networkDnsRb.isChecked = true
@@ -183,7 +182,7 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
         }
 
         appConfig.getConnectedDnsObservable().observe(viewLifecycleOwner) {
-            updateSelectedDns(it)
+            updateSelectedDns()
         }
     }
 
@@ -279,7 +278,7 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
 
         b.customDnsRb.setOnClickListener {
             // custom dns
-            setCustomDns()
+            showCustomDns()
         }
 
         b.networkDnsRb.setOnClickListener {
@@ -312,10 +311,31 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
         requireContext().startActivity(intent)
     }
 
-    private fun setCustomDns() {
+    private fun showCustomDns() {
         val intent = Intent(requireContext(), DnsListActivity::class.java)
+        intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, customDnsScreenToLoad())
         intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         startActivity(intent)
+    }
+
+    private fun customDnsScreenToLoad(): Int {
+        return when (appConfig.getDnsType()) {
+            AppConfig.DnsType.RETHINK_REMOTE -> {
+                DnsListActivity.Tabs.DOH.screen
+            }
+            AppConfig.DnsType.DOH -> {
+                DnsListActivity.Tabs.DOH.screen
+            }
+            AppConfig.DnsType.DNSCRYPT -> {
+                DnsListActivity.Tabs.DNSCRYPT.screen
+            }
+            AppConfig.DnsType.DNS_PROXY -> {
+                DnsListActivity.Tabs.DNSPROXY.screen
+            }
+            AppConfig.DnsType.NETWORK_DNS -> {
+                DnsListActivity.Tabs.DOH.screen
+            }
+        }
     }
 
     private fun setNetworkDns() {

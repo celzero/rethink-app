@@ -42,34 +42,13 @@
                         android:textSize="@dimen/extra_large_font_text_view"
                         android:textStyle="bold" />
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="45dp"
-                        android:layout_marginEnd="15dp"
-                        android:padding="5dp"
-                        android:text="Choose between already available DNS resolvers or add your DNS resolver."
-                        android:textSize="@dimen/default_font_text_view" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/connected_dns_details_tv"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="45dp"
-                        android:layout_marginEnd="45dp"
-                        android:fontFamily="sans-serif-condensed"
-                        android:padding="5dp"
-                        android:text="@string/dc_connected_dns_text"
-                        android:textColor="?attr/secondaryTextColor"
-                        android:textSize="@dimen/default_font_text_view" />
-
                     <RadioGroup
                         android:id="@+id/configure_dns_rg"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:checkedButton="@+id/default_dns"
-                        android:paddingTop="15dp"
-                        android:paddingBottom="15dp">
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp">
 
                         <RadioButton
                             android:id="@+id/rethink_plus_dns_rb"
@@ -77,14 +56,13 @@
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
                             android:layout_marginStart="10dp"
-                            android:layout_marginTop="15dp"
                             android:layout_marginEnd="10dp"
                             android:checked="false"
                             android:drawableEnd="@drawable/ic_right_arrow_white"
                             android:enabled="true"
                             android:minHeight="48dp"
                             android:padding="10dp"
-                            android:text="RethinkDNS Plus" />
+                            android:text="@string/dc_rethink_dns_radio" />
 
                         <RadioButton
                             android:id="@+id/custom_dns_rb"
@@ -100,7 +78,7 @@
                             android:enabled="true"
                             android:minHeight="48dp"
                             android:padding="10dp"
-                            android:text="Custom DNS (DOH/DNSCrypt/DNS Proxy)" />
+                            android:text="@string/dc_custom_dns_radio" />
 
 
                         <RadioButton
@@ -115,7 +93,7 @@
                             android:enabled="true"
                             android:minHeight="48dp"
                             android:padding="10dp"
-                            android:text="System DNS" />
+                            android:text="@string/network_dns" />
 
                     </RadioGroup>
                 </LinearLayout>
@@ -192,7 +170,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:paddingTop="5dp"
-                                android:text="Disabled"
                                 android:textColor="?attr/accentBad"
                                 android:textSize="@dimen/default_font_text_view" />
 
@@ -224,8 +201,8 @@
                         android:layout_marginStart="20dp"
                         android:layout_marginTop="10dp"
                         android:layout_marginEnd="20dp"
-                        android:paddingBottom="20dp"
                         android:gravity="end"
+                        android:paddingBottom="20dp"
                         android:visibility="gone">
 
                         <Button
@@ -233,8 +210,8 @@
                             style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="25dp"
                             android:layout_gravity="end"
+                            android:layout_marginEnd="25dp"
                             android:background="@drawable/rectangle_border_background"
                             android:drawablePadding="5dp"
                             android:gravity="center"
@@ -252,13 +229,69 @@
                             android:background="@drawable/rectangle_border_background"
                             android:minHeight="32dp"
                             android:padding="5dp"
-                            android:text="enable"
+                            android:text="@string/settings_local_blocklist_enable"
                             android:textSize="@dimen/large_font_text_view"
                             android:visibility="visible" />
 
 
                     </LinearLayout>
 
+                    <RelativeLayout
+                        android:id="@+id/dc_check_update_rl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="15dp"
+
+                        android:paddingBottom="15dp">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/dc_check_update_img"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginEnd="5dp"
+                            android:layout_marginBottom="5dp"
+                            android:alpha="0.5"
+                            android:padding="10dp"
+                            android:src="@drawable/ic_network" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_toStartOf="@id/dc_check_update_switch"
+                            android:layout_toEndOf="@id/dc_check_update_img"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/dc_check_update_heading"
+                                style="@style/TextAppearance.AppCompat.Subhead"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:drawablePadding="10dp"
+                                android:text="@string/dc_check_update_heading"
+                                android:textSize="@dimen/large_font_text_view" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="5dp"
+                                android:text="@string/dc_check_update_desc"
+                                android:textSize="@dimen/default_font_text_view" />
+                        </LinearLayout>
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/dc_check_update_switch"
+                            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:padding="10dp" />
+
+                    </RelativeLayout>
 
                     <RelativeLayout
                         android:id="@+id/dc_custom_domain_rl"
@@ -456,62 +489,7 @@
 
                     </RelativeLayout>
 
-                    <RelativeLayout
-                        android:id="@+id/dc_check_update_rl"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="15dp"
 
-                        android:paddingBottom="15dp">
-
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/dc_check_update_img"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginStart="5dp"
-                            android:layout_marginTop="5dp"
-                            android:layout_marginEnd="5dp"
-                            android:layout_marginBottom="5dp"
-                            android:alpha="0.5"
-                            android:padding="10dp"
-                            android:src="@drawable/ic_network" />
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_toStartOf="@id/dc_check_update_switch"
-                            android:layout_toEndOf="@id/dc_check_update_img"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/dc_check_update_heading"
-                                style="@style/TextAppearance.AppCompat.Subhead"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:drawablePadding="10dp"
-                                android:text="@string/dc_check_update_heading"
-                                android:textSize="@dimen/large_font_text_view" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:paddingTop="5dp"
-                                android:text="@string/dc_check_update_desc"
-                                android:textSize="@dimen/default_font_text_view" />
-                        </LinearLayout>
-
-                        <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/dc_check_update_switch"
-                            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:padding="10dp" />
-
-                    </RelativeLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

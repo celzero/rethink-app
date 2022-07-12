@@ -534,8 +534,8 @@
     <string name="features_disabled">(disabled)</string>
     <string name="firewall_app_info_not_available">Cannot block the app</string>
 
-    <string name="whats_dialog_title">What\'s new in v053h</string>
-    <string name="whats_new_version_name">🌎&#128330; World Computer literacy day (02 December) &#128330;🌎</string>
+    <string name="whats_dialog_title">What\'s new in v053i</string>
+    <string name="whats_new_version_name">🌎&#128330; World Youth Skills Day (15 July) &#128330;🌎</string>
     <string name="whats_new_version_update"><b>Minor release fixing file bloat</b>\n\n
     Leftover blocklist files were not deleted which resulted in ever-increasing app\'s storage space.\n\n
     Now, on every new blocklist version download older files are deleted.\n\n
@@ -781,6 +781,7 @@
     <string name="hsf_whats_new_chip_text">What\'s new</string>
     <string name="hsf_proxy_chip_text">Proxy active</string>
     <string name="hsf_blocklist_chip_text">%1$s blocklists in-use</string>
+    <string name="hsf_blocklist_chip_text_no_blocklist">RethinkDNS in-use</string>
     <string name="hsf_blocklist_chip_text_no_data">Enable RethinkDNS+</string>
     <string name="hsf_dns_logs_chip_text">DNS logs</string>
     <string name="hsf_network_logs_chip_text">Network logs</string>
@@ -820,10 +821,14 @@
     <string name="settings_local_blocklist_desc_1">Choose from 185+ blocklists.</string>
     <string name="settings_local_blocklist_configure">configure</string>
     <string name="settings_local_blocklist_update">Update</string>
+    <string name="settings_local_blocklist_enable">Enable</string>
 
     <string name="dc_block_heading">allow / deny domains</string>
     <string name="dc_other_dns_heading">configure dns</string>
     <string name="dc_other_settings_heading">other dns settings</string>
+
+    <string name="dc_custom_dns_radio">Custom DNS (DOH/DNSCrypt/DNS Proxy)</string>
+    <string name="dc_rethink_dns_radio">RethinkDNS</string>
 
     <string name="dc_local_block_heading">Local Blocklist</string>
     <string name="dc_local_block_desc_1">Choose from 185+ blocklists. Click here to download or configure blocklists.</string>
@@ -968,6 +973,9 @@
     <string name="cd_doh_dialog_resolver_name">Resolver Name</string>
     <string name="cd_doh_dialog_resolver_url">Resolver URL</string>
 
+    <string name="cd_dnscrypt_relay_heading">Relays</string>
+    <string name="cd_dnscrypt_relay_dismiss_btn">Dismiss</string>
+
     <!-- Connection Tracker fragment string -->
     <string name="ct_delete_logs_positive_btn">Delete logs</string>
     <string name="ct_delete_logs_negative_btn">Cancel</string>
@@ -1020,6 +1028,8 @@
         <Data><![CDATA[ %1$s %2$s <br/>]]></Data>
     </string>
     <string name="dns_btm_sheet_chip">+%1$s Other IPs</string>
+    <string name="dns_btm_sheet_chip_allowed">Allowed</string>
+    <string name="dns_btm_sheet_chip_blocked">Blocked</string>
 
     <string name="dns_filter_parent_all">All</string>
     <string name="dns_filter_parent_allowed">Allowed</string>
@@ -1350,8 +1360,9 @@
     <string name="crp_group_names">%1$s: %2$s</string>
 
 
-
     <!-- custom domain -->
+    <string name="cd_dialog_header">Custom domain(s)</string>
+
     <string name="cd_tab_header_domain">Domain</string>
     <string name="cd_tab_header_ip">IP</string>
 
@@ -1415,6 +1426,8 @@
 
     <string name="ci_header">Custom IP(s)</string>
 
+    <string name="ci_no_rules_text">No Rules found. Added IP rules will be shown here</string>
+
     <string name="ci_whitelist_initial">W</string>
     <string name="ci_whitelist_txt">Whitelist</string>
     <string name="ci_whitelist_desc">- Whitelisted</string>
@@ -1439,7 +1452,7 @@
     <string name="ada_ip_rules_delete">Delete</string>
 
     <string name="ada_firewall_status"><![CDATA[Network connections for this app is <b><i>%1$s</i></b>.]]></string>
-    <string name="ada_uid"><![CDATA[Uid: <b><i>%1$s</i></b><br/>Application Category: <b><i>%2$s</i></b><br/>Install time: <b><i>%3$s</i></b><br/>Last update time: <b><i>%4$s</i></b>.]]></string>
+    <string name="ada_uid"><![CDATA[Uid: <b><i>%1$s</i></b><br/>Category: <b><i>%2$s</i></b><br/>Installed at: <b><i>%3$s</i></b><br/>Updated at: <b><i>%4$s</i></b>.]]></string>
 
     <string name="ada_ip_connection_count">%1$s individual IP address(es) attempted connection.</string>
     <string name="ada_ip_connection_count_zero">0 IP address</string>
@@ -1462,6 +1475,17 @@
     <string name="ada_app_unmetered">Unmetered</string>
     <string name="ada_app_whitelist">Whitelist</string>
     <string name="ada_app_exclude">Whitelist</string>
+
+    <string name="ada_app_dns_settings">DNS Settings</string>
+
+    <!-- app info bottom sheet -->
+    <string name="bsac_title_desc">Change connection settings of the IP. This rules will be applied to all the applications.</string>
+    <string name="bsac_unblock">Unblock</string>
+    <string name="bsac_block">Block</string>
+    <string name="bsac_block_all">Block for all apps ⭐</string>
+    <string name="bsac_whitelist">Whitelist</string>
+    <string name="bsac_whitelist_all">Whitelist for all apps  ⭐</string>
+    <string name="bsac_whitelist_remove">Remove from whitelist</string>
 
     <!-- DNS logs bottom sheet -->
     <string name="bsdl_domain_heading">Domain rule</string>
@@ -1515,6 +1539,13 @@
 
     <string name="rethink_dns_txt">RethinkDNS %1$s</string>
 
+    <!-- rethink bottomsheet filter -->
+
+    <string name="bsrf_group_heading">Group</string>
+    <string name="bsrf_sub_group_heading">Sub Group</string>
+    <string name="bsrf_apply_filter">Apply</string>
+    <string name="bsrf_clear_filter">Clear</string>
+
     <!-- dns configure fragment -->
     <string name="dc_local_block_enable">Enable</string>
     <string name="dc_local_block_enabled">Enabled</string>
@@ -1528,11 +1559,7 @@
 
     <string name="dc_connected_dns_text">Connected DNS: %1$s \n%2$s</string>
     <string name="title_activity_test">TestActivity</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="previous">Previous</string>
 
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+
 </resources>

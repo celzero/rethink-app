@@ -37,13 +37,13 @@ class Constants {
         val ONDEVICE_GEOIP_IPV6 = File.separator + "dbip.v6"
 
         // url parameter used in configure blocklist webview
-        const val RETHINK_BLOCKLIST_CONFIGURE_URL_PARAMETER = "tstamp="
+        private const val RETHINK_BLOCKLIST_CONFIGURE_URL_PARAMETER = "tstamp="
 
         // url to check to check the if there is update available for on-device blocklist
         const val ONDEVICE_BLOCKLIST_UPDATE_CHECK_URL = "$DOWNLOAD_BASE_URL/update/blocklists?$RETHINK_BLOCKLIST_CONFIGURE_URL_PARAMETER"
 
         // url to check to check the if there is update available for on-device blocklist
-        const val ONDEVICE_IPDB_UPDATE_CHECK_URL = "$DOWNLOAD_BASE_URL/update/geoip?path="
+        const val ONDEVICE_IPDB_UPDATE_CHECK_URL = "$DOWNLOAD_BASE_URL/update/geoip?$RETHINK_BLOCKLIST_CONFIGURE_URL_PARAMETER"
 
         // url parameter, part of update check for on-device blocklist
         const val ONDEVICE_BLOCKLIST_UPDATE_CHECK_PARAMETER_VCODE = "vcode="

@@ -269,7 +269,7 @@
                     android:paddingTop="10dp"
                     android:paddingEnd="20dp"
                     android:paddingBottom="10dp"
-                    android:text="DNS Settings"
+                    android:text="@string/ada_app_dns_settings"
                     android:textColor="?attr/secondaryTextColor"
                     android:textSize="@dimen/large_font_text_view"
                     android:textStyle="bold" />
@@ -293,7 +293,6 @@
                         android:drawablePadding="20dp"
                         android:gravity="center"
                         android:padding="10dp"
-                        android:text="https://basic.rethinkdns.com/1:IAAQAA=="
                         android:textColor="?attr/primaryLightColorText"
                         android:visibility="visible" />
 

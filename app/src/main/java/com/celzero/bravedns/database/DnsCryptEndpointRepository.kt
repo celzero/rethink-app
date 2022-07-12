@@ -17,10 +17,7 @@ package com.celzero.bravedns.database
 
 import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.paging.PagedList
-import androidx.paging.toLiveData
 import androidx.room.Transaction
-import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 import com.celzero.bravedns.util.LoggerConstants
 
 
@@ -31,14 +28,8 @@ class DnsCryptEndpointRepository(private val dnsCryptEndpointDAO: DnsCryptEndpoi
         dnsCryptEndpointDAO.update(dnsCryptEndpoint)
     }
 
-
     suspend fun insertAsync(dnsCryptEndpoint: DnsCryptEndpoint) {
         dnsCryptEndpointDAO.insert(dnsCryptEndpoint)
-    }
-
-    fun getDNSCryptEndpointLiveData(): LiveData<PagedList<DnsCryptEndpoint>> {
-        return dnsCryptEndpointDAO.getDNSCryptEndpointLiveData().toLiveData(
-            pageSize = LIVEDATA_PAGE_SIZE)
     }
 
     suspend fun deleteOlderData(date: Long) {
@@ -74,10 +65,6 @@ class DnsCryptEndpointRepository(private val dnsCryptEndpointDAO: DnsCryptEndpoi
         liveServersID?.split(",")?.forEach {
             dnsCryptEndpointDAO.updateConnectionStatus(it.trim().toInt())
         }
-    }
-
-    suspend fun updateFailingConnections() {
-        dnsCryptEndpointDAO.updateFailingConnections()
     }
 
     suspend fun getServersToAdd(): String {

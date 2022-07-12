@@ -37,7 +37,7 @@
             android:fontFamily="sans-serif-smallcaps"
             android:gravity="center"
             android:padding="5dp"
-            android:text="relays"
+            android:text="@string/cd_dnscrypt_relay_heading"
             android:textColor="?attr/secondaryTextColor"
             android:textSize="@dimen/large_font_text_view"
             app:drawableEndCompat="@drawable/ic_right_arrow_secondary" />
@@ -60,7 +60,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="30dp"
-        android:contentDescription="New"
         android:padding="10dp"
         android:src="@drawable/ic_fab_without_border"
         app:fabSize="normal"

@@ -1,18 +1,18 @@
 /*
-Copyright 2020 RethinkDNS and its authors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2020 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.celzero.bravedns.adapter
 
@@ -88,7 +88,7 @@ class RethinkEndpointAdapter(private val context: Context,
                 updateConnection(endpoint)
             }
             b.rethinkEndpointListActionImage.setOnClickListener {
-                showExplanationOnImageClick(endpoint)
+                showDohMetadataDialog(endpoint)
             }
             b.rethinkEndpointListCheckImage.setOnClickListener {
                 updateConnection(endpoint)
@@ -118,7 +118,7 @@ class RethinkEndpointAdapter(private val context: Context,
         }
 
         private fun showIcon(endpoint: RethinkDnsEndpoint) {
-            if (endpoint.isEditable()) {
+            if (endpoint.isEditable(context)) {
                 b.rethinkEndpointListActionImage.setImageDrawable(
                     ContextCompat.getDrawable(context, R.drawable.ic_edit_icon))
             } else {
@@ -137,29 +137,21 @@ class RethinkEndpointAdapter(private val context: Context,
             }
         }
 
-        private fun deleteEndpoint(name: String, url: String, uid: Int) {
-            io {
-                appConfig.deleteRethinkEndpoint(name, url, uid)
-                uiCtx {
-                    Toast.makeText(context, R.string.doh_custom_url_remove_success,
-                                   Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-
-        private fun showExplanationOnImageClick(endpoint: RethinkDnsEndpoint) {
-            if (endpoint.isEditable()) showEditDnsDialog(endpoint)
-            else showDohMetadataDialog(endpoint)
-        }
-
         private fun showDohMetadataDialog(endpoint: RethinkDnsEndpoint) {
             val builder = AlertDialog.Builder(context)
             builder.setTitle(endpoint.name)
             builder.setMessage(endpoint.url + "\n\n" + endpoint.desc)
             builder.setCancelable(true)
-            builder.setPositiveButton(
-                context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
-                dialogInterface.dismiss()
+            if (endpoint.isEditable(context)) {
+                builder.setPositiveButton(
+                    context.getString(R.string.rt_edit_dialog_positive)) { _, _ ->
+                    openEditConfiguration(endpoint)
+                }
+            } else {
+                builder.setPositiveButton(
+                    context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
+                    dialogInterface.dismiss()
+                }
             }
             builder.setNeutralButton(
                 context.getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
@@ -168,36 +160,6 @@ class RethinkEndpointAdapter(private val context: Context,
                                         context.getString(R.string.copy_clipboard_label))
                 Utilities.showToastUiCentered(context, context.getString(
                     R.string.info_dialog_url_copy_toast_msg), Toast.LENGTH_SHORT)
-            }
-            if (endpoint.isRethinkPlus(context)) {
-                builder.setNegativeButton(
-                    context.getString(R.string.rt_edit_dialog_positive)) { _, _ ->
-                    openEditConfiguration(endpoint)
-                }
-            }
-            builder.create().show()
-        }
-
-        private fun showEditDnsDialog(endpoint: RethinkDnsEndpoint) {
-            val builder = AlertDialog.Builder(context)
-            builder.setTitle(R.string.rt_edit_dialog_title)
-            builder.setMessage(context.getString(R.string.rt_edit_dialog_message, endpoint.url))
-            builder.setCancelable(true)
-            builder.setPositiveButton(context.getString(R.string.rt_edit_dialog_positive)) { _, _ ->
-                openEditConfiguration(endpoint)
-            }
-
-            builder.setNegativeButton(context.getString(R.string.rt_edit_dialog_negative)) { _, _ ->
-                Utilities.clipboardCopy(context, endpoint.url,
-                                        context.getString(R.string.copy_clipboard_label))
-                Utilities.showToastUiCentered(context, context.getString(
-                    R.string.info_dialog_url_copy_toast_msg), Toast.LENGTH_SHORT)
-            }
-            if (endpoint.isDeletable(context)) {
-                builder.setNeutralButton(
-                    context.getString(R.string.rt_edit_dialog_neutral)) { _, _ ->
-                    deleteEndpoint(endpoint.name, endpoint.url, endpoint.uid)
-                }
             }
             builder.create().show()
         }
@@ -211,12 +173,6 @@ class RethinkEndpointAdapter(private val context: Context,
             intent.putExtra(ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_NAME, endpoint.name)
             intent.putExtra(ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_STAMP, stamp)
             context.startActivity(intent)
-        }
-
-        private suspend fun uiCtx(f: suspend () -> Unit) {
-            withContext(Dispatchers.Main) {
-                f()
-            }
         }
 
         private fun io(f: suspend () -> Unit) {

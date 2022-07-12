@@ -25,6 +25,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityOtherDnsListBinding
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes
 import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.android.ext.android.inject
@@ -32,12 +33,24 @@ import org.koin.android.ext.android.inject
 class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
     private val b by viewBinding(ActivityOtherDnsListBinding::bind)
 
+    private var fragmentIndex = 0
     private val dnsTabsCount = 3
     private val persistentState by inject<PersistentState>()
+
+    enum class Tabs(val screen: Int) {
+        DOH(0), DNSCRYPT(1), DNSPROXY(2);
+
+        companion object {
+            fun getCount(): Int {
+                return values().count()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+        fragmentIndex = intent.getIntExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, fragmentIndex)
         init()
     }
 
@@ -64,6 +77,8 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
                 else -> getString(R.string.other_dns_list_tab3)
             }
         }.attach()
+
+        b.otherDnsActViewpager.setCurrentItem(fragmentIndex, true)
     }
 
     private fun Context.isDarkThemeOn(): Boolean {

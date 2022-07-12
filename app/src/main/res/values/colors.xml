@@ -84,6 +84,8 @@
 
     <color name="fabBackground">#77959595</color>
 
+    <color name="selectedCardBg">#636363</color>
+
     <color name="firewallNoRuleToggleBtnTxt">#00796B</color>
     <color name="firewallNoRuleToggleBtnBg">#80CBC4</color>
     <color name="firewallBlockToggleBtnTxt">#C51162</color>
@@ -141,6 +143,8 @@
 
     <color name="fabBackgroundLight">#FFFFFF</color>
 
+    <color name="selectedCardBgLight">#c7c7c7</color>
+
     <color name="firewallNoRuleToggleBtnTxtLight">#C5E1A5</color>
     <color name="firewallNoRuleToggleBtnBgLight">#33691E</color>
     <color name="firewallBlockToggleBtnTxtLight">#F48FB1</color>
@@ -196,6 +200,8 @@
     <color name="chipColorBgHighlightBlack">#904fc3f7</color>
 
     <color name="fabBackgroundBlack">#77959595</color>
+
+    <color name="selectedCardBgBlack">#383838</color>
 
     <color name="firewallNoRuleToggleBtnTxtBlack">#33004D40</color>
     <color name="firewallNoRuleToggleBtnBgBlack">#4fc3f7</color>

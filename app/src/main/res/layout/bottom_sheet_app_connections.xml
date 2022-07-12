@@ -34,7 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="20dp"
-        android:text="Change connection settings of the IP. This rules will be applied to all the applications."
+        android:text="@string/bsac_title_desc"
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/default_font_text_view" />
 
@@ -51,7 +51,7 @@
         android:layout_margin="10dp"
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
-        android:text="Unblock"
+        android:text="@string/bsac_unblock"
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/extra_large_font_text_view"
         android:visibility="gone" />
@@ -63,7 +63,7 @@
         android:layout_margin="10dp"
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
-        android:text="Block"
+        android:text="@string/bsac_block"
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/extra_large_font_text_view"
         android:visibility="gone" />
@@ -75,7 +75,7 @@
         android:layout_margin="10dp"
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
-        android:text="Block for all apps ⭐"
+        android:text="@string/bsac_block_all"
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/extra_large_font_text_view"
         android:visibility="gone" />
@@ -87,7 +87,7 @@
         android:layout_margin="10dp"
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
-        android:text="Whitelist"
+        android:text="@string/bsac_whitelist"
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/extra_large_font_text_view"
         android:visibility="gone" />
@@ -99,7 +99,7 @@
         android:layout_margin="10dp"
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
-        android:text="Whitelist for all apps  ⭐"
+        android:text="@string/bsac_whitelist_all"
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/extra_large_font_text_view"
         android:visibility="gone" />
@@ -112,7 +112,7 @@
         android:layout_margin="10dp"
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
-        android:text="Remove from whitelist"
+        android:text="@string/bsac_whitelist_remove"
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/extra_large_font_text_view"
         android:visibility="gone" />

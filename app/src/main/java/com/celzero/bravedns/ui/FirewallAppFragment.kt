@@ -205,6 +205,13 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
     }
 
     private fun addQueryToFilters(query: String) {
+        if (filters.value == null) {
+            val f = Filters()
+            f.searchString = query
+            filters.postValue(f)
+            return
+        }
+
         filters.value?.searchString = query
         filters.postValue(filters.value)
     }

@@ -28,7 +28,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -399,9 +398,6 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 b.aadConnDetailRecycler.layoutManager = layoutManager
                 val recyclerAdapter = AppConnectionAdapter(this, list, uid)
                 b.aadConnDetailRecycler.adapter = recyclerAdapter
-                val dividerItemDecoration = DividerItemDecoration(b.aadConnDetailRecycler.context,
-                                                                  layoutManager.orientation)
-                b.aadConnDetailRecycler.addItemDecoration(dividerItemDecoration)
             }
         }
     }

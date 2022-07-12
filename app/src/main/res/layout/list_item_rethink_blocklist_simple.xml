@@ -40,8 +40,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/crp_title_ll"
-        android:layout_margin="4dp"
-        app:cardElevation="4dp">
+        app:cardBackgroundColor="?attr/background"
+        app:cardCornerRadius="2dp"
+        app:cardElevation="2dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -67,7 +68,6 @@
                 android:layout_toStartOf="@+id/crp_check_box"
                 android:ellipsize="end"
                 android:padding="5dp"
-                android:text="Dummy Label"
                 android:textColor="?attr/secondaryTextColor"
                 android:textSize="@dimen/extra_large_font_text_view" />
 
@@ -80,7 +80,6 @@
                 android:layout_toStartOf="@+id/crp_check_box"
                 android:ellipsize="end"
                 android:padding="5dp"
-                android:text="Dummy Package"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/small_font_subheading_text" />
 

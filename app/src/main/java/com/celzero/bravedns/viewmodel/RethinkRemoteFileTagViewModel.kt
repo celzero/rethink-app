@@ -61,7 +61,7 @@ class RethinkRemoteFileTagViewModel(private val rethinkRemoteDao: RethinkRemoteF
         }
     }))
 
-    fun allFileTags(): List<FileTag> {
+    suspend fun allFileTags(): List<FileTag> {
         return rethinkRemoteDao.getAllTags()
     }
 

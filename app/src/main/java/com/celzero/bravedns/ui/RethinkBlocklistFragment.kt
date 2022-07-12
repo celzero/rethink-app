@@ -504,7 +504,7 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
             val tags = RethinkBlocklistManager.getSimpleViewTags(type)
             uiCtx {
                 // set recycler for simple view adapter
-                simpleListAdapter = RethinkSimpleViewAdapter(tags, type)
+                simpleListAdapter = RethinkSimpleViewAdapter(requireContext(), tags, type)
                 //getSimpleViewFileTags
                 val layoutManager = LinearLayoutManager(requireContext())
                 b.lbSimpleRecycler.layoutManager = layoutManager
@@ -516,14 +516,14 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
 
     private fun openFilterBottomSheet() {
         io {
+            val bottomSheetFragment = RethinkPlusFilterBottomSheetFragment(this, getAllList())
             uiCtx {
-                val bottomSheetFragment = RethinkPlusFilterBottomSheetFragment(this, getAllList())
                 bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)
             }
         }
     }
 
-    private fun getAllList(): List<FileTag> {
+    private suspend fun getAllList(): List<FileTag> {
         return if (type.isLocal()) {
             localFileTagViewModel.allFileTags()
         } else {

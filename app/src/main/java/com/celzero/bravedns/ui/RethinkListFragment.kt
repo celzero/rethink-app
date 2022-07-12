@@ -195,6 +195,8 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
                                               isActive = false, isCustom = true, latency = 0, count,
                                               modifiedDataTime = Constants.INIT_TIME_MS)
             appConfig.insertReplaceEndpoint(endpoint)
+            endpoint.isActive = true
+            appConfig.handleRethinkChanges(endpoint)
             emptyTempStampInfo()
         }
     }

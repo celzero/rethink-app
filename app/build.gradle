@@ -35,7 +35,7 @@ android {
         applicationId "com.celzero.bravedns"
         minSdkVersion 23
         targetSdkVersion 32
-        versionCode 20 // for version name 054
+        versionCode 20 // for version name 053i
         versionName "053i"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -53,8 +53,8 @@ android {
             initWith buildTypes.debug
         }
         compileOptions {
-            sourceCompatibility JavaVersion.VERSION_11
-            targetCompatibility JavaVersion.VERSION_11
+            sourceCompatibility JavaVersion.VERSION_1_8
+            targetCompatibility JavaVersion.VERSION_1_8
         }
     }
     flavorDimensions "releaseChannel"
@@ -68,6 +68,9 @@ android {
         website {
             dimension "releaseChannel"
         }
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
     }
 
     buildFeatures {
@@ -118,7 +121,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
 
     // Glide implementation
-    implementation ('com.github.bumptech.glide:glide:4.11.0') {
+    implementation('com.github.bumptech.glide:glide:4.11.0') {
         exclude group: 'glide-parent'
     }
     // Ref - https://stackoverflow.com/questions/46638056/how-to-use-glidemodule-on-glide-4/46638213#46638213

@@ -68,7 +68,7 @@ class RethinkLocalFileTagViewModel(private val rethinkLocalDao: RethinkLocalFile
         }
     }))
 
-    fun allFileTags(): List<FileTag> {
+    suspend fun allFileTags(): List<FileTag> {
         return rethinkLocalDao.getAllTags()
     }
 

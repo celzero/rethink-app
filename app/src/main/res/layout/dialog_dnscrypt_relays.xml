@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="Relays"
+        android:text="@string/cd_dnscrypt_relay_heading"
         android:textColor="?attr/accentGood"
         android:textSize="@dimen/large_font_text_view" />
 
@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:text="Dismiss"
+        android:text="@string/cd_dnscrypt_relay_dismiss_btn"
         android:textColor="?attr/accentGood"
         android:textSize="@dimen/large_font_text_view" />
 

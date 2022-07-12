@@ -16,7 +16,6 @@
 package com.celzero.bravedns.adapter
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -87,12 +86,12 @@ class RethinkRemoteAdvancedViewAdapter(val context: Context) :
             b.crpDescGroupTv.text = filetag.group
             b.crpDescSubgTv.text = filetag.subg
             b.crpCheckBox.isChecked = filetag.isSelected
-            setChipBackground(filetag.isSelected)
+            setCardBackground(filetag.isSelected)
         }
 
-        private fun setChipBackground(isSelected: Boolean) {
+        private fun setCardBackground(isSelected: Boolean) {
             if (isSelected) {
-                b.crpCard.setCardBackgroundColor(fetchColor(context, R.attr.border))
+                b.crpCard.setCardBackgroundColor(fetchColor(context, R.attr.selectedCardBg))
             } else {
                 b.crpCard.setCardBackgroundColor(fetchColor(context, R.attr.background))
             }
@@ -100,7 +99,7 @@ class RethinkRemoteAdvancedViewAdapter(val context: Context) :
 
         private fun toggleCheckbox(isSelected: Boolean, filetag: RethinkRemoteFileTag) {
             b.crpCheckBox.isChecked = isSelected
-            setChipBackground(isSelected)
+            setCardBackground(isSelected)
 
             io {
                 if (isSelected) {

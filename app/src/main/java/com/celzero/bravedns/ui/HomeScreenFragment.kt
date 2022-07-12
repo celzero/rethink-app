@@ -177,10 +177,20 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun updateConfigureDnsChip(count: Int) {
-        b.fhsDnsConfigureChip.text = if (appConfig.isRethinkDnsConnected()) {
+        if (!isVpnActivated) {
+            b.fhsDnsConfigureChip.text = getString(R.string.hsf_blocklist_chip_text_no_data)
+            return
+        }
+
+        if (!appConfig.isRethinkDnsConnected()) {
+            b.fhsDnsConfigureChip.text = getString(R.string.hsf_blocklist_chip_text_no_data)
+            return
+        }
+
+        b.fhsDnsConfigureChip.text = if (count > 0) {
             getString(R.string.hsf_blocklist_chip_text, count.toString())
         } else {
-            getString(R.string.hsf_blocklist_chip_text_no_data)
+            getString(R.string.hsf_blocklist_chip_text_no_blocklist)
         }
     }
 
@@ -382,6 +392,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             updateCardsUi()
             handleQuickSettingsChips()
             syncDnsStatus()
+            updateConfigureDnsChip(0)
         }
 
         VpnController.connectionStatus.observe(viewLifecycleOwner) {

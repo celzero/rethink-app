@@ -17,7 +17,10 @@ package com.celzero.bravedns.ui
 
 import android.app.Dialog
 import android.content.Context
+import android.content.res.ColorStateList
 import android.content.res.Configuration
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.Spanned
@@ -55,6 +58,7 @@ import com.celzero.bravedns.util.Utilities.Companion.getETldPlus1
 import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.chip.Chip
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import org.koin.android.ext.android.inject
@@ -183,8 +187,9 @@ class DnsBlocklistBottomSheetFragment(private var contextVal: Context,
     private fun displayDnsTransactionDetails() {
         displayDescription()
 
-        if (transaction.hasBlocklists()) {
+        if (transaction.isBlocked) {
             handleBlocklistChip()
+            b.dnsBlockIpsChip.visibility = View.GONE
             return
         }
 
@@ -192,21 +197,23 @@ class DnsBlocklistBottomSheetFragment(private var contextVal: Context,
     }
 
     private fun handleResponseIpsChip() {
+        b.dnsBlockIpsChip.visibility = View.VISIBLE
+        lightenUpChip(b.dnsBlockIpsChip, true)
+
         if (transaction.responseIps.isEmpty()) {
-            b.dnsBlockIpsChip.visibility = View.GONE
+            b.dnsBlockIpsChip.text = getString(R.string.dns_btm_sheet_chip_allowed)
             return
         }
 
         val ips = transaction.responseIps.split(",")
         val ipCount = ips.count()
 
-        if (ipCount > 1) {
-            b.dnsBlockIpsChip.visibility = View.VISIBLE
-            b.dnsBlockIpsChip.text = getString(R.string.dns_btm_sheet_chip,
-                                               (ipCount - 1).toString())
-        } else {
-            b.dnsBlockIpsChip.visibility = View.GONE
+        if (ipCount == 1) {
+            b.dnsBlockIpsChip.text = getString(R.string.dns_btm_sheet_chip_allowed)
+            return
         }
+
+        b.dnsBlockIpsChip.text = getString(R.string.dns_btm_sheet_chip, (ipCount - 1).toString())
 
         b.dnsBlockIpsChip.setOnClickListener {
             showIpsDialog()
@@ -215,6 +222,13 @@ class DnsBlocklistBottomSheetFragment(private var contextVal: Context,
 
     private fun handleBlocklistChip() {
         b.dnsBlockBlocklistChip.visibility = View.VISIBLE
+        lightenUpChip(b.dnsBlockBlocklistChip, false)
+
+        if (!transaction.hasBlocklists()) {
+            b.dnsBlockBlocklistChip.text = getString(R.string.dns_btm_sheet_chip_blocked)
+            return
+        }
+
         val group: Multimap<String, String> = HashMultimap.create()
 
         transaction.getBlocklists().forEach {
@@ -233,6 +247,24 @@ class DnsBlocklistBottomSheetFragment(private var contextVal: Context,
 
         b.dnsBlockBlocklistChip.setOnClickListener {
             showBlocklistDialog(group)
+        }
+    }
+
+    private fun lightenUpChip(chip: Chip, isPositive: Boolean) {
+        if (isPositive) {
+            chip.setTextColor(fetchColor(requireContext(), R.attr.chipTextPositive))
+            val colorFilter = PorterDuffColorFilter(
+                fetchColor(requireContext(), R.attr.chipTextPositive), PorterDuff.Mode.SRC_IN)
+            chip.chipBackgroundColor = ColorStateList.valueOf(
+                fetchColor(requireContext(), R.attr.chipBgColorPositive))
+            chip.chipIcon?.colorFilter = colorFilter
+        } else {
+            chip.setTextColor(fetchColor(requireContext(), R.attr.chipTextNegative))
+            val colorFilter = PorterDuffColorFilter(
+                fetchColor(requireContext(), R.attr.chipTextNegative), PorterDuff.Mode.SRC_IN)
+            chip.chipBackgroundColor = ColorStateList.valueOf(
+                fetchColor(requireContext(), R.attr.chipBgColorNegative))
+            chip.chipIcon?.colorFilter = colorFilter
         }
     }
 

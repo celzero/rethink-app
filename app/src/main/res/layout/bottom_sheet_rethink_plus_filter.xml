@@ -27,7 +27,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp"
         android:padding="10dp"
-        android:text="Group"
+        android:text="@string/bsrf_group_heading"
         android:textColor="?attr/secondaryTextColor"
         android:textSize="@dimen/large_font_text_view" />
 
@@ -49,7 +49,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp"
         android:padding="10dp"
-        android:text="Sub Group"
+        android:text="@string/bsrf_sub_group_heading"
         android:textColor="?attr/secondaryTextColor"
         android:textSize="@dimen/large_font_text_view" />
 
@@ -82,7 +82,7 @@
             android:maxHeight="40dp"
             android:minHeight="40dp"
             android:padding="5dp"
-            android:text="Clear"
+            android:text="@string/bsrf_clear_filter"
             android:textColor="?attr/primaryTextColor" />
 
         <androidx.appcompat.widget.AppCompatButton
@@ -96,7 +96,7 @@
             android:maxHeight="40dp"
             android:minHeight="40dp"
             android:padding="5dp"
-            android:text="Apply"
+            android:text="@string/bsrf_apply_filter"
             android:textColor="?attr/primaryTextColor" />
     </LinearLayout>
 
