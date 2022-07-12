@@ -21,7 +21,6 @@ import android.content.res.Resources
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import android.widget.Toast
-import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConfig.Companion.dnscryptRelaysToRemove
@@ -49,6 +48,7 @@ import dnsx.Dnsx
 import doh.Transport
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
+import intra.Listener
 import intra.Tunnel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -84,7 +84,7 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
 
         try {
             if (DEBUG) {
-                //Tun2socks.enableDebugLog()
+                Tun2socks.enableDebugLog()
             }
 
             // TODO : #321 As of now the app fallback on an unmaintained url. Requires a rewrite as
@@ -140,7 +140,7 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
     }
 
     private fun setBraveDnsBlocklistMode(tunDnsMode: AppConfig.TunDnsMode, dohUrl: String) {
-        if (BuildConfig.DEBUG) Log.d(LOG_TAG_VPN, "init bravedns mode")
+        if (DEBUG) Log.d(LOG_TAG_VPN, "init bravedns mode")
         tunnel?.braveDNS = null
 
         // No need to set the brave mode for DNS Proxy (implementation pending in underlying Go library).
@@ -374,7 +374,7 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
     }
 
     @Throws(Exception::class)
-    private fun makeDohTransport(url: String?, listener: GoIntraListener): Transport {
+    private fun makeDohTransport(url: String?, listener: Listener): Transport {
         //TODO : Check the below code
         //@NonNull String realUrl = PersistentState.Companion.expandUrl(vpnService, url);
         val dohIPs: String = getIpString(context, url)

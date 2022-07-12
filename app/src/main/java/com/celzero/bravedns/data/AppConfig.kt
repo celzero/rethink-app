@@ -23,7 +23,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.*
-import com.celzero.bravedns.net.go.GoIntraListener
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -34,6 +33,7 @@ import com.celzero.bravedns.util.KnownPorts.Companion.DNS_PORT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
 import inet.ipaddr.IPAddressString
+import intra.Listener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import protect.Blocker
@@ -66,8 +66,8 @@ class AppConfig internal constructor(private val context: Context,
 
     data class TunnelOptions(val tunDnsMode: TunDnsMode, val tunFirewallMode: TunFirewallMode,
                              val tunProxyMode: TunProxyMode, val ptMode: ProtoTranslationMode,
-                             val blocker: Blocker, val listener: GoIntraListener,
-                             val fakeDns: String, val preferredEngine: InternetProtocol)
+                             val blocker: Blocker, val listener: Listener, val fakeDns: String,
+                             val preferredEngine: InternetProtocol)
 
     enum class BraveMode(val mode: Int) {
         DNS(0), FIREWALL(1), DNS_FIREWALL(2);
@@ -425,7 +425,6 @@ class AppConfig internal constructor(private val context: Context,
                 val endpoint = getRemoteRethinkEndpoint() ?: return
 
                 connectedDns.postValue(endpoint.name)
-                Log.d("TEST","TEST endpoint connected?: ${endpoint.name}, ${endpoint.blocklistCount}")
                 persistentState.setRemoteBlocklistCount(endpoint.blocklistCount)
                 persistentState.connectedDnsName = endpoint.name
             }
@@ -474,7 +473,7 @@ class AppConfig internal constructor(private val context: Context,
         }
     }
 
-    fun newTunnelOptions(blocker: Blocker, listener: GoIntraListener, fakeDns: String,
+    fun newTunnelOptions(blocker: Blocker, listener: Listener, fakeDns: String,
                          preferredEngine: InternetProtocol,
                          ptMode: ProtoTranslationMode): TunnelOptions {
         return TunnelOptions(getDnsMode(), getFirewallMode(), getTunProxyMode(), ptMode, blocker,
@@ -728,7 +727,6 @@ class AppConfig internal constructor(private val context: Context,
     }
 
     suspend fun updateRethinkEndpoint(name: String, url: String, count: Int) {
-        Log.d("TEST", "TEST in repository: ${name}, ${url}, $count")
         rethinkDnsEndpointRepository.updateEndpoint(name, url, count)
     }
 
