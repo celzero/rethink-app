@@ -18,7 +18,6 @@ package com.celzero.bravedns.database
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.room.*
-import androidx.sqlite.db.SupportSQLiteQuery
 
 @Dao
 interface AppInfoDAO {
@@ -87,37 +86,38 @@ interface AppInfoDAO {
         "select * from AppInfo where appName like :filter and appCategory != 'Non-App System' order by lower(appName)")
     fun getExcludedAppDetailsFilterLiveData(filter: String): DataSource.Factory<Int, AppInfo>
 
-    @Query("select * from AppInfo where isSystemApp = 1 and appName like :name order by :orderBy")
-    fun getSystemApps(name: String, orderBy: String): DataSource.Factory<Int, AppInfo>
+    @Query(
+        "select * from AppInfo where isSystemApp = 1 and appName like :name and firewallStatus in (:firewall) order by lower(appName)")
+    fun getSystemApps(name: String, firewall: Set<Int>): DataSource.Factory<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where isSystemApp = 1 and appName like :name and appCategory in (:filter) order by :orderBy")
+        "select * from AppInfo where isSystemApp = 1 and appName like :name and appCategory in (:filter) and firewallStatus in (:firewall)  order by lower(appName)")
     fun getSystemApps(name: String, filter: Set<String>,
-                      orderBy: String): DataSource.Factory<Int, AppInfo>
-
-    @Query("select * from AppInfo where isSystemApp = 0 and appName like :name order by :orderBy")
-    fun getInstalledApps(name: String, orderBy: String): DataSource.Factory<Int, AppInfo>
-
-    @RawQuery(observedEntities = [AppInfo::class])
-    fun getQuery(query: SupportSQLiteQuery): DataSource.Factory<Int, AppInfo>
+                      firewall: Set<Int>): DataSource.Factory<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where isSystemApp = 0 and appName like :name and appCategory in (:filter) order by :orderBy")
+        "select * from AppInfo where isSystemApp = 0 and appName like :name and firewallStatus in (:firewall) order by lower(appName)")
+    fun getInstalledApps(name: String, firewall: Set<Int>): DataSource.Factory<Int, AppInfo>
+
+    @Query(
+        "select * from AppInfo where isSystemApp = 0 and appName like :name and appCategory in (:filter) and firewallStatus in (:firewall) order by lower(appName)")
     fun getInstalledApps(name: String, filter: Set<String>,
-                         orderBy: String): DataSource.Factory<Int, AppInfo>
-
-    @Query("select * from AppInfo where appName like :name order by :orderBy")
-    fun getAppInfos(name: String, orderBy: String): DataSource.Factory<Int, AppInfo>
+                         firewall: Set<Int>): DataSource.Factory<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where appName like :name and appCategory in (:filter) order by :orderBy")
+        "select * from AppInfo where appName like :name and firewallStatus in (:firewall) order by lower(appName)")
+    fun getAppInfos(name: String, firewall: Set<Int>): DataSource.Factory<Int, AppInfo>
+
+    @Query(
+        "select * from AppInfo where appName like :name and appCategory in (:filter)  and firewallStatus in (:firewall)  order by lower(appName)")
     fun getAppInfos(name: String, filter: Set<String>,
-                    orderBy: String): DataSource.Factory<Int, AppInfo>
+                    firewall: Set<Int>): DataSource.Factory<Int, AppInfo>
 
-    @Query("select * from AppInfo where appName like :name and appCategory in (:cat)")
-    fun getFilteredApps(name: String, cat: Set<String>): List<AppInfo>
+    @Query(
+        "select * from AppInfo where appName like :name and appCategory in (:cat)  and firewallStatus in (:firewall) ")
+    fun getFilteredApps(name: String, cat: Set<String>, firewall: Set<Int>): List<AppInfo>
 
-    @Query("select * from AppInfo where appName like :name")
-    fun getFilteredApps(name: String): List<AppInfo>
+    @Query("select * from AppInfo where appName like :name  and firewallStatus in (:firewall) ")
+    fun getFilteredApps(name: String, firewall: Set<Int>): List<AppInfo>
 
 }

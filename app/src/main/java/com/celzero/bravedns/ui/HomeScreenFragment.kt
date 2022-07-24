@@ -38,6 +38,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -52,6 +53,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.Themes
@@ -278,7 +280,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             appConfig.removeAllProxies()
             b.fhsProxyChip.text = getString(R.string.hsf_proxy_chip_remove_text)
             syncDnsStatus()
-            delay(TimeUnit.MINUTES.toMillis(2), lifecycleScope) {
+            delay(TimeUnit.SECONDS.toMillis(2), lifecycleScope) {
                 b.fhsProxyChip.visibility = View.GONE
                 b.fhsProxyChip.isEnabled = true
                 showToastUiCentered(requireContext(),
@@ -298,9 +300,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsWhatsNewChip.setOnCloseIconClickListener {
             persistentState.showWhatsNewChip = false
             b.fhsWhatsNewChip.text = getString(R.string.hsf_whats_new_remove_text)
-            delay(TimeUnit.MINUTES.toMillis(2), lifecycleScope) {
+            delay(TimeUnit.SECONDS.toMillis(2), lifecycleScope) {
                 b.fhsWhatsNewChip.visibility = View.GONE
             }
+        }
+
+        b.fhsSponsor.setOnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW, RETHINKDNS_SPONSOR_LINK.toUri())
+            startActivity(intent)
         }
     }
 
@@ -523,10 +530,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 // exception that happened once when trying to filter the received object (t).
                 // creating a copy of the received value in a synchronized block.
                 synchronized(it) {
-                    copy = it.toList()
+                    copy = mutableListOf<AppInfo>().apply { addAll(it) }.toList()
                 }
                 val blockedList = copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.BLOCK.id }
-                val whiteListApps = copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.WHITELIST.id }
+                val whiteListApps = copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL.id }
                 val excludedList = copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.EXCLUDE.id }
                 b.fhsCardFirewallStatus.text = getString(R.string.firewall_card_status_active,
                                                          blockedList.count().toString())

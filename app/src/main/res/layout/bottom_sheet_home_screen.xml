@@ -365,8 +365,8 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
-            android:gravity="center"
             android:alpha="0.75"
+            android:gravity="center"
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/default_font_text_view" />
 

@@ -324,7 +324,7 @@ abstract class AppDatabase : RoomDatabase() {
                     execSQL(
                         "INSERT INTO 'RethinkDnsEndpoint' ( 'name', 'url', 'uid', 'desc', 'isActive', 'isCustom', 'latency', 'blocklistCount', 'modifiedDataTime' ) VALUES ( 'RDNS Social Media', 'https://basic.rethinkdns.com/1:AEAAEA==', ${Constants.MISSING_UID}, 'Blocks popular social media including Facebook, Instagram, and WhatsApp.', '0', '0', '0','1', '1633624616715')")
                     execSQL(
-                        "INSERT INTO 'RethinkDnsEndpoint' ( 'name', 'url', 'uid', 'desc', 'isActive', 'isCustom', 'latency', 'blocklistCount', 'modifiedDataTime' ) VALUES ( 'RDNS Security', 'https://basic.rethinkdns.com/1:EBx_AP__-P8AIA==', ${Constants.MISSING_UID}, 'Blocks over 150,000 malware, ransomware, phishing and other threats.', '0', '0', '0','37', '1633624616715')")
+                        "INSERT INTO 'RethinkDnsEndpoint' ( 'name', 'url', 'uid', 'desc', 'isActive', 'isCustom', 'latency', 'blocklistCount', 'modifiedDataTime' ) VALUES ( 'RDNS Security', 'https://basic.rethinkdns.com/1:4AIAgAABAHAgAA==', ${Constants.MISSING_UID}, 'Blocks over 150,000 malware, ransomware, phishing and other threats.', '0', '0', '0','37', '1633624616715')")
                     execSQL(
                         "INSERT INTO 'RethinkDnsEndpoint' ( 'name', 'url', 'uid', 'desc', 'isActive', 'isCustom', 'latency', 'blocklistCount', 'modifiedDataTime' ) VALUES ( 'RDNS Privacy', 'https://basic.rethinkdns.com/1:QAcCAIAcAhCkAg==', ${Constants.MISSING_UID}, 'Blocks over 100,000+ adware, spyware, and trackers through some of the most extensive blocklists.', '0', '0', '0','11', '1633624616715')")
                     execSQL(

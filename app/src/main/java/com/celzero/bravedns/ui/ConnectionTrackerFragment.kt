@@ -305,6 +305,8 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         b.filterChipParentGroup.visibility = View.GONE
     }
 
+
+    // fixme: move this to viewmodel scope
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {

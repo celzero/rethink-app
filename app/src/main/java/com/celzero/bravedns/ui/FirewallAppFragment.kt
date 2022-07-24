@@ -26,7 +26,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
@@ -73,14 +72,6 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
 
         private const val REFRESH_TIMEOUT: Long = 4000
         private const val QUERY_TEXT_TIMEOUT: Long = 600
-
-        // TODO: Find a solution to replace the below query usage
-        // ref: https://stackoverflow.com/questions/61055772/android-room-dao-order-by-case-not-working
-        private const val ORDER_BY_DEFAULT = " lower(appName)"
-        private const val ORDER_BY_BLOCKED = " CASE firewallStatus WHEN 1 THEN 0 WHEN 0 THEN 1 WHEN 2 THEN 2 WHEN 3 THEN 3 WHEN 4 THEN 4 END, lower(appName)"
-        private const val ORDER_BY_WHITELISTED = " CASE firewallStatus WHEN 2 THEN 0 WHEN 0 THEN 1 WHEN 1 THEN 2 WHEN 3 THEN 3 WHEN 4 THEN 4 END, lower(appName)"
-        private const val ORDER_BY_EXCLUDED = " CASE firewallStatus WHEN 3 THEN 0 WHEN 0 THEN 1 WHEN 1 THEN 2 WHEN 2 THEN 3 WHEN 4 THEN 4 END, lower(appName)"
-
     }
 
     enum class TopLevelFilter(val id: Int) {
@@ -88,53 +79,26 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
     }
 
     enum class FirewallFilter(val id: Int) {
-        NONE(0), ALLOWED(1), BLOCKED(2), WHITELISTED(3), EXCLUDED(4);
+        ALL(0), BLOCKED(2), WHITELISTED(3), EXCLUDED(4);
 
-        fun getFilterString(): String {
+        fun getFilter(): Set<Int> {
             return when (this) {
-                NONE -> "0,1,2,3,4"
-                ALLOWED -> "0"
-                BLOCKED -> "1"
-                WHITELISTED -> "2"
-                EXCLUDED -> "3"
+                ALL -> setOf(0, 1, 2, 3, 4)
+                BLOCKED -> setOf(1)
+                WHITELISTED -> setOf(2)
+                EXCLUDED -> setOf(3)
             }
         }
 
         companion object {
             fun filter(id: Int): FirewallFilter {
                 return when (id) {
-                    NONE.id -> NONE
-                    ALLOWED.id -> ALLOWED
+                    ALL.id -> ALL
                     BLOCKED.id -> BLOCKED
                     WHITELISTED.id -> WHITELISTED
                     EXCLUDED.id -> EXCLUDED
-                    else -> NONE
+                    else -> ALL
                 }
-            }
-        }
-    }
-
-    enum class SortFilter(val id: Int) {
-        NONE(0), BLOCKED(2), WHITELISTED(3), EXCLUDED(4); //RESTRICTED(1),
-
-        companion object {
-            fun getSortFilter(id: Int): SortFilter {
-                return when (id) {
-                    NONE.id -> NONE
-                    BLOCKED.id -> BLOCKED
-                    WHITELISTED.id -> WHITELISTED
-                    EXCLUDED.id -> EXCLUDED
-                    else -> NONE
-                }
-            }
-        }
-
-        fun getSortByQuery(): String {
-            return when (this) {
-                NONE -> ORDER_BY_DEFAULT
-                BLOCKED -> ORDER_BY_BLOCKED
-                WHITELISTED -> ORDER_BY_WHITELISTED
-                EXCLUDED -> ORDER_BY_EXCLUDED
             }
         }
     }
@@ -142,8 +106,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
     class Filters {
         var categoryFilters: MutableSet<String> = mutableSetOf()
         var topLevelFilter = TopLevelFilter.ALL
-        var firewallFilter = FirewallFilter.NONE
-        var sortType = SortFilter.NONE
+        var firewallFilter = FirewallFilter.ALL
         var searchString: String = ""
     }
 
@@ -157,6 +120,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
     override fun onResume() {
         super.onResume()
         checkVpnLockdownAndAllNetworks()
+        setFirewallFilter(filters.value?.firewallFilter)
     }
 
     private fun checkVpnLockdownAndAllNetworks() {
@@ -181,7 +145,10 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
 
             if (it == null) return@observe
 
-            appInfoViewModel.setFilter(it)
+            ui {
+                appInfoViewModel.setFilter(it)
+                b.ffaAppList.smoothScrollToPosition(0)
+            }
         }
     }
 
@@ -245,10 +212,6 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
             updateMobileData()
         }
 
-        b.ffaSortIcon.setOnClickListener {
-            toggleSortUi()
-        }
-
         b.ffaAppInfoIcon.setOnClickListener {
             showInfoDialog()
         }
@@ -266,33 +229,34 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
         builder.create().show()
     }
 
-    private fun toggleSortUi() {
-        if (b.ffaSortChipLl.isVisible) {
-            b.ffaSortChipLl.visibility = View.GONE
-        } else {
-            b.ffaSortChipLl.visibility = View.VISIBLE
-        }
+    private fun setFirewallFilter(firewallFilter: FirewallFilter?) {
+        if (firewallFilter == null) return
+
+        val view: Chip = b.ffaFirewallChipGroup.findViewWithTag(firewallFilter.id)
+        b.ffaFirewallChipGroup.check(view.id)
+        colorUpChipIcon(view)
     }
 
-    private fun remakeSortChips() {
-        b.ffaSortChipGroup.removeAllViews()
+    private fun remakeFirewallChipsUi() {
+        b.ffaFirewallChipGroup.removeAllViews()
 
-        val none = makeSortChip(SortFilter.NONE.id, getString(R.string.fapps_sort_filter_none),
-                                true)
-        val blocked = makeSortChip(SortFilter.BLOCKED.id,
-                                   getString(R.string.fapps_sort_filter_blocked), false)
-        val whitelisted = makeSortChip(SortFilter.WHITELISTED.id,
-                                       getString(R.string.fapps_sort_filter_whitelisted), false)
-        val excluded = makeSortChip(SortFilter.EXCLUDED.id,
-                                    getString(R.string.fapps_sort_filter_excluded), false)
+        val none = makeFirewallChip(FirewallFilter.ALL.id,
+                                    getString(R.string.fapps_firewall_filter_all), true)
+        val blocked = makeFirewallChip(FirewallFilter.BLOCKED.id,
+                                       getString(R.string.fapps_firewall_filter_blocked), false)
+        val whitelisted = makeFirewallChip(FirewallFilter.WHITELISTED.id,
+                                           getString(R.string.fapps_firewall_filter_whitelisted),
+                                           false)
+        val excluded = makeFirewallChip(FirewallFilter.EXCLUDED.id,
+                                        getString(R.string.fapps_firewall_filter_excluded), false)
 
-        b.ffaSortChipGroup.addView(none)
-        b.ffaSortChipGroup.addView(blocked)
-        b.ffaSortChipGroup.addView(whitelisted)
-        b.ffaSortChipGroup.addView(excluded)
+        b.ffaFirewallChipGroup.addView(none)
+        b.ffaFirewallChipGroup.addView(blocked)
+        b.ffaFirewallChipGroup.addView(whitelisted)
+        b.ffaFirewallChipGroup.addView(excluded)
     }
 
-    private fun makeSortChip(id: Int, label: String, checked: Boolean): Chip {
+    private fun makeFirewallChip(id: Int, label: String, checked: Boolean): Chip {
         val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
         chip.tag = id
         chip.text = label
@@ -300,7 +264,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
 
         chip.setOnCheckedChangeListener { button: CompoundButton, isSelected: Boolean ->
             if (isSelected) {
-                applySortFilter(button.tag)
+                applyFirewallFilter(button.tag)
                 colorUpChipIcon(chip)
             } else {
                 // no-op
@@ -311,23 +275,24 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
         return chip
     }
 
+    private fun applyFirewallFilter(tag: Any) {
+        val firewallFilter = FirewallFilter.filter(tag as Int)
+        if (filters.value == null) {
+            val f = Filters()
+            f.firewallFilter = firewallFilter
+            filters.postValue(f)
+            return
+        }
+
+        filters.value?.firewallFilter = firewallFilter
+        filters.postValue(filters.value)
+    }
+
     private fun colorUpChipIcon(chip: Chip) {
         val colorFilter = PorterDuffColorFilter(
             ContextCompat.getColor(requireContext(), R.color.primaryText), PorterDuff.Mode.SRC_IN)
         chip.checkedIcon?.colorFilter = colorFilter
         chip.chipIcon?.colorFilter = colorFilter
-    }
-
-    private fun applySortFilter(tag: Any) {
-        if (filters.value == null) {
-            val f = Filters()
-            f.sortType = SortFilter.getSortFilter(tag as Int)
-            filters.postValue(f)
-            return
-        }
-
-        filters.value?.sortType = SortFilter.getSortFilter(tag as Int)
-        filters.postValue(filters.value)
     }
 
     private fun resetFirewallIcons() {
@@ -371,19 +336,9 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
 
     private fun initView() {
         initListAdapter()
-        addObserver()
         b.ffaSearch.setOnQueryTextListener(this)
         addAnimation()
-        remakeSortChips()
-    }
-
-    private fun addObserver() {
-        filters.observe(viewLifecycleOwner) {
-            if (it == null) return@observe
-
-            appInfoViewModel.setFilter(it)
-            b.ffaAppList.smoothScrollToPosition(0)
-        }
+        remakeFirewallChipsUi()
     }
 
     private fun initListAdapter() {
@@ -422,6 +377,12 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
             withContext(Dispatchers.IO) {
                 f()
             }
+        }
+    }
+
+    private fun ui(f: () -> Unit) {
+        lifecycleScope.launch(Dispatchers.Main) {
+            f()
         }
     }
 }

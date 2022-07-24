@@ -84,7 +84,7 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
 
         try {
             if (DEBUG) {
-                Tun2socks.enableDebugLog()
+                // Tun2socks.enableDebugLog()
             }
 
             // TODO : #321 As of now the app fallback on an unmaintained url. Requires a rewrite as

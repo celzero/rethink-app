@@ -25,10 +25,12 @@ class Constants {
         // on-device blocklist download path
         val ONDEVICE_BLOCKLIST_DOWNLOAD_PATH = File.separator + "downloads" + File.separator
 
-        const val DOWNLOAD_BASE_URL = "https://dl.rethinkdns.com"
+        const val DOWNLOAD_BASE_URL = "https://download.rethinkdns.com"
+
+        const val FILE_TAG = "filetag.json"
 
         // file names which are downloaded as part of on-device blocklists
-        val ONDEVICE_BLOCKLIST_FILE_TAG = File.separator + "filetag.json"
+        val ONDEVICE_BLOCKLIST_FILE_TAG = File.separator + FILE_TAG
         val ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG = File.separator + "basicconfig.json"
         val ONDEVICE_BLOCKLIST_FILE_RD = File.separator + "rd.txt"
         val ONDEVICE_BLOCKLIST_FILE_TD = File.separator + "td.txt"
@@ -94,8 +96,16 @@ class Constants {
         // base-url for rethinkdns
         const val RETHINK_BASE_URL = "https://basic.rethinkdns.com/"
 
+        const val RETHINK_SEARCH_URL = "https://rethinkdns.com/search?s="
+
         // base-url stamp for configure blocklist
         const val RETHINK_BLOCKLIST_CONFIGURE_BASE_URL = "rethinkdns.com/configure"
+
+        // default filetag.json for remote blocklist (stored in assets folder) (v053i)
+        const val PACKAGED_REMOTE_FILETAG_TIMESTAMP: Long = 1657632597183
+
+        // rethinkdns sponsor link
+        const val RETHINKDNS_SPONSOR_LINK = "https://svc.rethinkdns.com/r/sponsor"
 
         // base-url for bravedns
         const val BRAVEDNS_DOMAIN = "bravedns.com"
@@ -196,7 +206,6 @@ class Constants {
 
         // View model - filter string
         const val FILTER_IS_SYSTEM = "isSystem"
-        const val FILTER_IS_FILTER = "isFilter"
         const val FILTER_CATEGORY = "category:"
 
         // IPv4 uses 0.0.0.0 as an unspecified address

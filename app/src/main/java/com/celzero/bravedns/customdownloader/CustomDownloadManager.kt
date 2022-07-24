@@ -210,7 +210,7 @@ class CustomDownloadManager(private val context: Context) : CoroutineScope {
         val pendingIntent = Utilities.getActivityPendingIntent(context, Intent(context,
                                                                                HomeScreenActivity::class.java),
                                                                PendingIntent.FLAG_UPDATE_CURRENT,
-                                                               mutable = true)
+                                                               mutable = false)
 
         if (Utilities.isAtleastO()) {
             val name: CharSequence = context.getString(R.string.notif_channel_download)

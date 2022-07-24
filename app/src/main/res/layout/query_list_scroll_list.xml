@@ -88,11 +88,59 @@
             </androidx.cardview.widget.CardView>
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/query_details_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/query_list_card_view_top"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
+            android:orientation="horizontal"
+            android:padding="5dp"
+            android:weightSum="1">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/latency_txt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center"
+                android:layout_weight="0.45"
+                android:fontFamily="sans-serif"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
+                android:alpha="0.5"
+                android:text="@string/dns_logs_blocked_queries"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/default_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/total_queries_txt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.55"
+                android:fontFamily="sans-serif"
+                android:gravity="end"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
+                android:alpha="0.5"
+                android:text="@string/dns_logs_lifetime_queries"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/default_font_text_view" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/query_details_ll"
+            android:background="?attr/border" />
+
         <TextView
             android:id="@+id/query_list_logs_disabled_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/query_list_card_view_top"
+            android:layout_below="@id/query_details_ll"
             android:layout_margin="10dp"
             android:gravity="center"
             android:padding="10dp"
@@ -103,6 +151,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_query"
             android:layout_width="match_parent"
+            android:layout_marginTop="5dp"
             android:layout_height="match_parent"
             android:layout_below="@id/query_list_logs_disabled_tv"
             android:nestedScrollingEnabled="true"

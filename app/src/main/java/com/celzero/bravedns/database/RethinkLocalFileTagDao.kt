@@ -54,17 +54,17 @@ interface RethinkLocalFileTagDao {
     @Query(
         "select * from RethinkLocalFileTag where `group` in (:group) and subg in (:subg) and (vname like :query or `group` like :query or subg like :query) order by `group`")
     fun getLocalFileTags(query: String, group: Set<String>,
-                         subg: Set<String>): DataSource.Factory<Int, RethinkRemoteFileTag>
+                         subg: Set<String>): DataSource.Factory<Int, RethinkLocalFileTag>
 
     @Query(
         "select * from RethinkLocalFileTag where `group` in (:group) and (vname like :query or `group` like :query or subg like :query) order by `group`")
     fun getLocalFileTagsGroup(query: String,
-                              group: Set<String>): DataSource.Factory<Int, RethinkRemoteFileTag>
+                              group: Set<String>): DataSource.Factory<Int, RethinkLocalFileTag>
 
     @Query(
         "select * from RethinkLocalFileTag where subg in (:subg) and (vname like :query or `group` like :query or subg like :query) order by `group`")
     fun getLocalFileTagsSubg(query: String,
-                             subg: Set<String>): DataSource.Factory<Int, RethinkRemoteFileTag>
+                             subg: Set<String>): DataSource.Factory<Int, RethinkLocalFileTag>
 
     @Query(
         "select * from RethinkLocalFileTag where (vname like :input or `group` like :input or subg like :input) order by `group`")

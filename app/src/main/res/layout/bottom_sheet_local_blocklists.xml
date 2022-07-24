@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/lbbs_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="vertical"
+    android:paddingBottom="60dp"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/indicator"
+        android:layout_width="60dp"
+        android:layout_height="3dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="?attr/border"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/hint"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/indicator" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/lbbs_heading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:drawableStart="@drawable/ic_local_blocklist"
+        android:drawablePadding="5dp"
+        android:gravity="center"
+        android:padding="5dp"
+        android:text="@string/lbbs_heading"
+        android:textColor="?attr/primaryLightColorText"
+        android:textIsSelectable="true"
+        android:textSize="@dimen/extra_large_font_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/hint" />
+
+    <View
+        android:id="@+id/hint1"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lbbs_heading" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/lbbs_enable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:fontFamily="sans-serif-medium"
+        android:padding="10dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:text="@string/lbbs_enable"
+        android:textColor="?attr/primaryTextColor"
+        android:textSize="@dimen/extra_large_font_text_view"
+        app:drawableEndCompat="@drawable/ic_cross"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/hint1" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/lbbs_configure"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:fontFamily="sans-serif-medium"
+        android:padding="10dp"
+        android:text="@string/lbbs_configure"
+        android:textColor="?attr/primaryTextColor"
+        android:background="?android:attr/selectableItemBackground"
+        android:textSize="@dimen/extra_large_font_text_view"
+        app:drawableEndCompat="@drawable/ic_right_arrow_white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lbbs_enable" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/lbbs_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:fontFamily="sans-serif-medium"
+        android:padding="10dp"
+        android:text="@string/lbbs_search"
+        android:background="?android:attr/selectableItemBackground"
+        android:textColor="?attr/primaryTextColor"
+        android:textSize="@dimen/extra_large_font_text_view"
+        app:drawableEndCompat="@drawable/ic_search"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lbbs_configure" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/lbbs_copy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:fontFamily="sans-serif-medium"
+        android:padding="10dp"
+        android:text="@string/lbbs_copy"
+        android:textColor="?attr/primaryTextColor"
+        android:textSize="@dimen/extra_large_font_text_view"
+        android:background="?android:attr/selectableItemBackground"
+        app:drawableEndCompat="@drawable/ic_copy"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lbbs_search" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

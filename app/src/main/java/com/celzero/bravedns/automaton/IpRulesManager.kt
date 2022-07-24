@@ -59,14 +59,18 @@ object IpRulesManager : KoinComponent {
     }
 
     enum class IpRuleStatus(val id: Int) {
-        NONE(0), BLOCK(1), WHITELIST(2);
+        NONE(0), BLOCK(1), BYPASS_APP_RULES(2), BYPASS_UNIVERSAL(3);
 
         fun isBlocked(): Boolean {
             return this.id == BLOCK.id
         }
 
-        fun isWhitelist(): Boolean {
-            return this.id == WHITELIST.id
+        fun byPassAppRules(): Boolean {
+            return this.id == BYPASS_APP_RULES.id
+        }
+
+        fun byPassUniversalRules(): Boolean {
+            return this.id == BYPASS_UNIVERSAL.id
         }
 
         fun noRule(): Boolean {
@@ -77,13 +81,15 @@ object IpRulesManager : KoinComponent {
 
             // labels for spinner / toggle ui
             fun getLabel(): Array<String> {
-                return arrayOf("Allow", "Block", "Whitelist")
+                return arrayOf("No Rule", "Block", "Bypass App Rules")
             }
 
             fun getStatus(id: Int): IpRuleStatus {
                 return when (id) {
+                    NONE.id -> NONE
                     BLOCK.id -> BLOCK
-                    WHITELIST.id -> WHITELIST
+                    BYPASS_UNIVERSAL.id -> BYPASS_UNIVERSAL
+                    BYPASS_APP_RULES.id -> BYPASS_APP_RULES
                     else -> NONE
                 }
             }
@@ -128,11 +134,22 @@ object IpRulesManager : KoinComponent {
         }
     }
 
-    fun whitelistIp(customIp: CustomIp) {
+    fun byPassUniversal(customIp: CustomIp) {
         Log.i(LOG_TAG_FIREWALL,
-              "IP Rules, whitelist ip: ${customIp.ipAddress} for uid: ${customIp.uid} with previous status id: ${customIp.status}")
+              "IP Rules, by-pass univ rules, ip: ${customIp.ipAddress} for uid: ${customIp.uid} with previous status id: ${customIp.status}")
         io {
-            customIp.status = IpRuleStatus.WHITELIST.id
+            customIp.status = IpRuleStatus.BYPASS_UNIVERSAL.id
+            customIpRepository.update(customIp)
+            updateLocalCache(customIp)
+            ipRulesLookupCache.invalidateAll()
+        }
+    }
+
+    fun byPassAppRules(customIp: CustomIp) {
+        Log.i(LOG_TAG_FIREWALL,
+              "IP Rules, by-pass app rules, ip: ${customIp.ipAddress} for uid: ${customIp.uid} with previous status id: ${customIp.status}")
+        io {
+            customIp.status = IpRuleStatus.BYPASS_APP_RULES.id
             customIpRepository.update(customIp)
             updateLocalCache(customIp)
             ipRulesLookupCache.invalidateAll()
@@ -186,7 +203,7 @@ object IpRulesManager : KoinComponent {
         // check if the ip address is already available in the cache
         ipRulesLookupCache.getIfPresent(ip)?.let {
             // return only if both ip and app(uid) matches
-            if (uid == UID_EVERYBODY || uid == it.uid) {
+            if (uid == it.uid) {
                 return it.status
             } else {
                 // no-op, continue
@@ -196,8 +213,7 @@ object IpRulesManager : KoinComponent {
         if (appIpRules.contains(ip)) {
             val customIp = appIpRules[ip] ?: return IpRuleStatus.NONE
 
-            // only if the uid is either global or same uid
-            if (customIp.uid == UID_EVERYBODY || customIp.uid == uid) {
+            if (customIp.uid == uid) {
                 val status = IpRuleStatus.getStatus(customIp.status)
                 ipRulesLookupCache.put(ip, IpCache(customIp.uid, status))
                 return status
@@ -236,13 +252,13 @@ object IpRulesManager : KoinComponent {
 
     fun getStatus(uid: Int, ip: String): IpRuleStatus {
         val ipAddress = IPAddressString(ip).address
+
         if (!appIpRules.contains(ipAddress)) return IpRuleStatus.NONE
 
         // get the status of the ipAddress from local list if available.
-        // status will be retrieved for uid matching either UID_EVERYBODY or specific uid
         return appIpRules[ipAddress]?.status?.let {
             val ruleUid = appIpRules[ipAddress]?.uid
-            if (ruleUid == UID_EVERYBODY || uid == ruleUid) {
+            if (uid == ruleUid) {
                 IpRuleStatus.getStatus(it)
             } else {
                 IpRuleStatus.NONE
@@ -309,7 +325,7 @@ object IpRulesManager : KoinComponent {
         wildCards.keys.forEach { wc ->
             if (wc.contains(ipAddress)) {
                 val rule = wildCards[wc]
-                if (rule?.uid == UID_EVERYBODY || rule?.uid == uid) {
+                if (rule?.uid == uid) {
                     return IpRuleStatus.getStatus(rule.status)
                 } else {
                     // no-op

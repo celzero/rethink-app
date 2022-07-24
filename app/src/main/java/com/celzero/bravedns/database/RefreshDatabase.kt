@@ -388,7 +388,7 @@ class RefreshDatabase internal constructor(private var context: Context,
 
         val pendingIntent = getActivityPendingIntent(context, intent,
                                                      PendingIntent.FLAG_UPDATE_CURRENT,
-                                                     mutable = true)
+                                                     mutable = false)
 
         val builder: NotificationCompat.Builder
         if (isAtleastO()) {
@@ -448,7 +448,7 @@ class RefreshDatabase internal constructor(private var context: Context,
 
         return Utilities.getBroadcastPendingIntent(context, (uid or requestCode), intent,
                                                    PendingIntent.FLAG_UPDATE_CURRENT,
-                                                   mutable = true)
+                                                   mutable = false)
     }
 
     private fun isSystemApp(ai: ApplicationInfo): Boolean {

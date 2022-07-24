@@ -16,9 +16,11 @@
 package com.celzero.bravedns.adapter
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -79,12 +81,24 @@ class RethinkRemoteAdvancedViewAdapter(val context: Context) :
             b.crpCard.setOnClickListener {
                 toggleCheckbox(!b.crpCheckBox.isChecked, filetag)
             }
+
+            b.crpDescEntriesTv.setOnClickListener {
+                val intent = Intent(Intent.ACTION_VIEW, filetag.url.toUri())
+                context.startActivity(intent)
+            }
         }
 
         private fun displayMetaData(filetag: RethinkRemoteFileTag) {
             b.crpLabelTv.text = filetag.vname
-            b.crpDescGroupTv.text = filetag.group
-            b.crpDescSubgTv.text = filetag.subg
+
+            if (filetag.subg.isEmpty()) {
+                b.crpDescGroupTv.text = filetag.group
+            } else {
+                b.crpDescGroupTv.text = filetag.subg
+            }
+            b.crpDescEntriesTv.text = context.getString(R.string.dc_entries,
+                                                        filetag.entries.toString())
+
             b.crpCheckBox.isChecked = filetag.isSelected
             setCardBackground(filetag.isSelected)
         }
@@ -149,12 +163,12 @@ class RethinkRemoteAdvancedViewAdapter(val context: Context) :
 
         // fixme: remove this method, add it in strings.xml
         private fun getGroupName(group: String): String {
-            if (group.equals("parentalcontrol")) {
-                return "Parental Control"
-            } else if (group.equals("privacy")) {
-                return "Privacy"
-            } else if (group.equals("security")) {
-                return "Security"
+            if (group == "parentalcontrol") {
+                return context.getString(R.string.rbl_parental_control)
+            } else if (group == "privacy") {
+                return context.getString(R.string.rbl_privacy)
+            } else if (group == "security") {
+                return context.getString(R.string.rbl_security)
             } else {
                 return ""
             }

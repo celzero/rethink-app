@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
+import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppConnectionAdapter
 import com.celzero.bravedns.automaton.IpRulesManager
 import com.celzero.bravedns.databinding.BottomSheetAppConnectionsBinding
@@ -84,30 +85,38 @@ class AppConnectionBottomSheet(private val adapter: AppConnectionAdapter?, val u
     private fun initView() {
         b.bsacHeading.text = ipAddress
 
+        // btm sheet called from network logs adapter, no need to show delete btn
+        if (adapter != null) {
+            b.bsacDelete.visibility = View.GONE
+        }
+
         when (ipRuleStatus) {
             IpRulesManager.IpRuleStatus.NONE -> showButtonsForStatusNone()
-            IpRulesManager.IpRuleStatus.WHITELIST -> showButtonsForStatusWhitelist()
+            IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
+                // no-op, bypass universal rules don't apply in app specific list
+            }
+            IpRulesManager.IpRuleStatus.BYPASS_APP_RULES -> showByPassAppRulesUi()
             IpRulesManager.IpRuleStatus.BLOCK -> showButtonForStatusBlock()
         }
     }
 
     private fun showButtonForStatusBlock() {
         b.bsacUnblock.visibility = View.VISIBLE
-        b.bsacWhitelist.visibility = View.VISIBLE
+        b.bsacBypassAppRules.visibility = View.VISIBLE
         //b.bsacBlockAll.visibility = View.VISIBLE
         //b.bsacWhitelistAll.visibility = View.VISIBLE
     }
 
-    private fun showButtonsForStatusWhitelist() {
+    private fun showByPassAppRulesUi() {
         b.bsacBlock.visibility = View.VISIBLE
-        b.bsacWhitelistRemove.visibility = View.VISIBLE
+        b.bsacGopassAppRules.visibility = View.VISIBLE
         //b.bsacBlockAll.visibility = View.VISIBLE
         //b.bsacWhitelistAll.visibility = View.VISIBLE
     }
 
     private fun showButtonsForStatusNone() {
         b.bsacBlock.visibility = View.VISIBLE
-        b.bsacWhitelist.visibility = View.VISIBLE
+        b.bsacBypassAppRules.visibility = View.VISIBLE
         //b.bsacBlockAll.visibility = View.VISIBLE
         //b.bsacWhitelistAll.visibility = View.VISIBLE
     }
@@ -115,7 +124,7 @@ class AppConnectionBottomSheet(private val adapter: AppConnectionAdapter?, val u
     private fun initializeClickListeners() {
         b.bsacBlock.setOnClickListener {
             applyRule(uid, ipAddress, IpRulesManager.IpRuleStatus.BLOCK,
-                      "Blocking $ipAddress for this apps")
+                      getString(R.string.bsac_block_toast, ipAddress))
         }
 
         // introduce this when IP firewall becomes uid-wise
@@ -126,12 +135,12 @@ class AppConnectionBottomSheet(private val adapter: AppConnectionAdapter?, val u
 
         b.bsacUnblock.setOnClickListener {
             applyRule(uid, ipAddress, IpRulesManager.IpRuleStatus.NONE,
-                      "Unblocked $ipAddress for this app")
+                      getString(R.string.bsac_unblock_toast, ipAddress))
         }
 
-        b.bsacWhitelist.setOnClickListener {
-            applyRule(uid, ipAddress, IpRulesManager.IpRuleStatus.WHITELIST,
-                      "Whitelisted $ipAddress for this apps")
+        b.bsacBypassAppRules.setOnClickListener {
+            applyRule(uid, ipAddress, IpRulesManager.IpRuleStatus.BYPASS_APP_RULES,
+                      getString(R.string.bsac_whitelist_toast, ipAddress))
         }
 
         // introduce this when IP firewall becomes uid-wise
@@ -140,9 +149,14 @@ class AppConnectionBottomSheet(private val adapter: AppConnectionAdapter?, val u
                        "Whitelisted $ipAddress for all apps")
          }*/
 
-        b.bsacWhitelistRemove.setOnClickListener {
+        b.bsacGopassAppRules.setOnClickListener {
             applyRule(uid, ipAddress, IpRulesManager.IpRuleStatus.NONE,
-                      "Removed $ipAddress from whitelist")
+                      getString(R.string.bsac_whitelist_remove_toast, ipAddress))
+        }
+
+        b.bsacDelete.setOnClickListener {
+            deleteRule(uid, ipAddress, getString(R.string.bsac_delete_toast, ipAddress))
+            return@setOnClickListener
         }
     }
 
@@ -150,6 +164,14 @@ class AppConnectionBottomSheet(private val adapter: AppConnectionAdapter?, val u
                           toastMsg: String) {
         io {
             IpRulesManager.addIpRule(uid, ipAddress, status)
+        }
+        Utilities.showToastUiCentered(requireContext(), toastMsg, Toast.LENGTH_SHORT)
+        this.dismiss()
+    }
+
+    private fun deleteRule(uid: Int, ipAddress: String, toastMsg: String) {
+        io {
+            IpRulesManager.removeFirewallRules(uid, ipAddress)
         }
         Utilities.showToastUiCentered(requireContext(), toastMsg, Toast.LENGTH_SHORT)
         this.dismiss()

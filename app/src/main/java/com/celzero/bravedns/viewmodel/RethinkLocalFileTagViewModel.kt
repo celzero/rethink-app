@@ -59,13 +59,6 @@ class RethinkLocalFileTagViewModel(private val rethinkLocalDao: RethinkLocalFile
             rethinkLocalDao.getLocalFileTagsWithFilter("%$input%").toLiveData(
                 pageSize = LIVEDATA_PAGE_SIZE)
         }
-
-        if (input.isBlank()) {
-            rethinkLocalDao.getLocalFileTags().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
-        } else {
-            rethinkLocalDao.getLocalFileTagsWithFilter("%$input%").toLiveData(
-                pageSize = LIVEDATA_PAGE_SIZE)
-        }
     }))
 
     suspend fun allFileTags(): List<FileTag> {

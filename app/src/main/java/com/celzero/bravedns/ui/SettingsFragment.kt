@@ -201,7 +201,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         when (persistentState.internetProtocolType) {
             InternetProtocol.IPv4.id -> {
                 b.genSettingsIpDesc.text = getString(R.string.settings_selected_ip_desc,
-                                                     getString(R.string.settings_ip_text_ipv4))
+                                                     getString(R.string.settings_ip_dialog_ipv4))
                 b.settingsActivityPtransRl.visibility = View.GONE
             }
             InternetProtocol.IPv6.id -> {
@@ -216,7 +216,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             }
             else -> {
                 b.genSettingsIpDesc.text = getString(R.string.settings_selected_ip_desc,
-                                                     getString(R.string.settings_ip_text_ipv4))
+                                                     getString(R.string.settings_ip_text_ipv46))
                 b.settingsActivityPtransRl.visibility = View.GONE
             }
         }

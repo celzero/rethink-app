@@ -33,13 +33,13 @@
             android:layout_margin="5dp"
             android:padding="5dp"
             android:layout_weight="0.3"
+            android:layout_gravity="center"
             android:background="@drawable/rectangle_border_background"
             android:drawableEnd="@drawable/ic_arrow_down_small"
             android:drawablePadding="-5dp"
             android:minHeight="0dp"
             android:minWidth="0dp"
             android:fontFamily="sans-serif-medium"
-            android:text="Allow"
             android:visibility="visible"
             android:textAllCaps="false" />
 

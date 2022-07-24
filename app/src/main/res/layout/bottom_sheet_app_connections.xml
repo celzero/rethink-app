@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/bsac_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -20,8 +21,10 @@
         android:id="@+id/bsac_heading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
         android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:padding="5dp"
         android:textColor="?attr/primaryLightColorText"
         android:textIsSelectable="true"
@@ -29,29 +32,15 @@
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/bsac_desc"
-        style="@style/TextAppearance.AppCompat.Subhead"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="20dp"
-        android:text="@string/bsac_title_desc"
-        android:textColor="?attr/primaryTextColor"
-        android:textSize="@dimen/default_font_text_view" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginBottom="10dp"
-        android:background="?attr/border" />
-
-    <TextView
         android:id="@+id/bsac_unblock"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        android:background="?android:attr/selectableItemBackground"
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
         android:text="@string/bsac_unblock"
+        app:drawableEndCompat="@drawable/ic_tick_normal"
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/extra_large_font_text_view"
         android:visibility="gone" />
@@ -61,9 +50,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        android:background="?android:attr/selectableItemBackground"
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
         android:text="@string/bsac_block"
+        app:drawableEndCompat="@drawable/ic_disallowed_16"
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/extra_large_font_text_view"
         android:visibility="gone" />
@@ -73,6 +64,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        android:background="?android:attr/selectableItemBackground"
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
         android:text="@string/bsac_block_all"
@@ -81,13 +73,15 @@
         android:visibility="gone" />
 
     <TextView
-        android:id="@+id/bsac_whitelist"
+        android:id="@+id/bsac_bypass_app_rules"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        android:background="?android:attr/selectableItemBackground"
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
-        android:text="@string/bsac_whitelist"
+        android:text="@string/bsac_bypass_app_rules"
+        app:drawableEndCompat="@drawable/ic_bypass"
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/extra_large_font_text_view"
         android:visibility="gone" />
@@ -97,6 +91,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        android:background="?android:attr/selectableItemBackground"
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
         android:text="@string/bsac_whitelist_all"
@@ -106,16 +101,42 @@
 
 
     <TextView
-        android:id="@+id/bsac_whitelist_remove"
+        android:id="@+id/bsac_gopass_app_rules"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        android:background="?android:attr/selectableItemBackground"
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
-        android:text="@string/bsac_whitelist_remove"
+        android:text="@string/bsac_go_pass_app_rules"
         android:textColor="?attr/primaryTextColor"
+        app:drawableEndCompat="@drawable/ic_bypass"
         android:textSize="@dimen/extra_large_font_text_view"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/bsac_delete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:fontFamily="sans-serif-medium"
+        android:padding="10dp"
+        android:text="@string/bsac_delete"
+        android:textColor="?attr/primaryTextColor"
+        android:textSize="@dimen/extra_large_font_text_view"
+        app:drawableEndCompat="@drawable/ic_delete_16" />
 
+    <TextView
+        android:id="@+id/bsac_desc"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:padding="5dp"
+        android:alpha="0.7"
+        android:text="@string/bsac_title_desc"
+        android:textColor="?attr/primaryLightColorText"
+        android:textSize="@dimen/default_font_text_view" />
 </LinearLayout>

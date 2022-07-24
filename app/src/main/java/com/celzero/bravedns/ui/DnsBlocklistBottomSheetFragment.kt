@@ -187,7 +187,7 @@ class DnsBlocklistBottomSheetFragment(private var contextVal: Context,
     private fun displayDnsTransactionDetails() {
         displayDescription()
 
-        if (transaction.isBlocked) {
+        if (transaction.groundedQuery()) {
             handleBlocklistChip()
             b.dnsBlockIpsChip.visibility = View.GONE
             return
@@ -224,6 +224,12 @@ class DnsBlocklistBottomSheetFragment(private var contextVal: Context,
         b.dnsBlockBlocklistChip.visibility = View.VISIBLE
         lightenUpChip(b.dnsBlockBlocklistChip, false)
 
+        // show no-answer chip
+        if (transaction.unansweredQuery()) {
+            b.dnsBlockBlocklistChip.text = getString(R.string.dns_btm_sheet_chip_no_answer)
+            return
+        }
+
         if (!transaction.hasBlocklists()) {
             b.dnsBlockBlocklistChip.text = getString(R.string.dns_btm_sheet_chip_blocked)
             return
@@ -250,6 +256,8 @@ class DnsBlocklistBottomSheetFragment(private var contextVal: Context,
         }
     }
 
+    // ref chip transparency: https://github.com/material-components/material-components-android/issues/367
+    // Chips also have a chipSurfaceColor attribute that you can set to change that surface color.
     private fun lightenUpChip(chip: Chip, isPositive: Boolean) {
         if (isPositive) {
             chip.setTextColor(fetchColor(requireContext(), R.attr.chipTextPositive))

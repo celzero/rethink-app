@@ -76,6 +76,8 @@ import kotlinx.coroutines.launch
 import xdns.Xdns
 import java.io.File
 import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import java.net.InetAddress
 import java.text.SimpleDateFormat
 import java.util.*
@@ -363,6 +365,20 @@ class Utilities {
             }
 
             return true
+        }
+
+        // ref: https://stackoverflow.com/a/41818556
+        fun copyWithStream(readStream: InputStream, writeStream: OutputStream) {
+            val length = 256
+            val buffer = ByteArray(length)
+            var bytesRead: Int = readStream.read(buffer, 0, length)
+            // write the required bytes
+            while (bytesRead > 0) {
+                writeStream.write(buffer, 0, bytesRead)
+                bytesRead = readStream.read(buffer, 0, length)
+            }
+            readStream.close()
+            writeStream.close()
         }
 
         fun isAlwaysOnEnabled(context: Context, vpnService: BraveVPNService?): Boolean {

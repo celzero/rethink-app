@@ -611,7 +611,7 @@ class AppConfig internal constructor(private val context: Context,
     }
 
     fun isRethinkDnsConnectedv053x(): Boolean {
-        return connectedDns.value == context.getString(R.string.rethink_plus)
+        return persistentState.connectedDnsName == context.getString(R.string.rethink_plus)
     }
 
     suspend fun updateRethinkPlusCountv053x(count: Int) {

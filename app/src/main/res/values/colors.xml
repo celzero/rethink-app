@@ -65,9 +65,9 @@
     <color name="switchNormal">#959595</color>
     <color name="colorSurface">#444444</color>
 
-    <color name="chipBgPositive">#80CBC4</color>
-    <color name="chipTextPositive">#00796B</color>
-    <color name="chipBgNegative">#F48FB1</color>
+    <color name="chipBgPositive">#3380CBC4</color>
+    <color name="chipTextPositive">#18ffff</color>
+    <color name="chipBgNegative">#33F48FB1</color>
     <color name="chipTextNegative">#C51162</color>
     <color name="chipColorBgNormal">#90444444</color>
     <color name="chipColorBgHighlight">#9005dfd7</color>
@@ -122,11 +122,11 @@
     <color name="colorSwitchThumbNormalLight">#1B1B1E</color>
     <color name="colorSurfaceLight">#FFFFFF</color>
 
-    <color name="chipBackgroundColorLight">#C5E1A5</color>
-    <color name="chipBgPositiveLight">#C5E1A5</color>
-    <color name="chipTextPositiveLight">#33691E</color>
-    <color name="chipBgNegativeLight">#F48FB1</color>
-    <color name="chipTextNegativeLight">#C51162</color>
+    <color name="chipBackgroundColorLight">#CCC5E1A5</color>
+    <color name="chipBgPositiveLight">#33C5E1A5</color>
+    <color name="chipTextPositiveLight">#CC33691E</color>
+    <color name="chipBgNegativeLight">#33F48FB1</color>
+    <color name="chipTextNegativeLight">#CCC51162</color>
     <color name="chipColorBgNormalLight">#FFe1e1e1</color>
     <color name="chipColorBgHighlightLight">#901e88e5</color>
 
@@ -203,13 +203,13 @@
 
     <color name="selectedCardBgBlack">#383838</color>
 
-    <color name="firewallNoRuleToggleBtnTxtBlack">#33004D40</color>
-    <color name="firewallNoRuleToggleBtnBgBlack">#4fc3f7</color>
-    <color name="firewallBlockToggleBtnTxtBlack">#33B71C1C</color>
-    <color name="firewallBlockToggleBtnBgBlack">#CCFF5252</color>
-    <color name="firewallWhiteListToggleBtnTxtBlack">#33c17900</color>
-    <color name="firewallWhiteListToggleBtnBgBlack">#CCffd149</color>
-    <color name="firewallExcludeToggleBtnTxtBlack">#33ffbcd7</color>
+    <color name="firewallNoRuleToggleBtnTxtBlack">#C5E1A5</color>
+    <color name="firewallNoRuleToggleBtnBgBlack">#33691E</color>
+    <color name="firewallBlockToggleBtnTxtBlack">#C51162</color>
+    <color name="firewallBlockToggleBtnBgBlack">#F48FB1</color>
+    <color name="firewallWhiteListToggleBtnTxtBlack">#c17900</color>
+    <color name="firewallWhiteListToggleBtnBgBlack">#ffd149</color>
+    <color name="firewallExcludeToggleBtnTxtBlack">#ffbcd7</color>
     <color name="firewallExcludeToggleBtnBgBlack">#CCffbcd7</color>
     <color name="defaultToggleBtnTxtBlack">#FDFDFD</color>
     <color name="defaultToggleBtnBgBlack">#000000</color>

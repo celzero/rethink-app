@@ -3,6 +3,39 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/bs_firewall_home_screen.xml" value="0.2475" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/dis_allowed.xml" value="0.2475" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_app_info.xml" value="0.2475" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_bypass.xml" value="0.2405" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_copy.xml" value="0.2475" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_cross.xml" value="0.2475" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_custom_allow_deny.xml" value="0.2405" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_delete.xml" value="0.2475" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_delete_16.xml" value="0.2405" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_disallowed_16.xml" value="0.2405" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_filter.xml" value="0.2475" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_filter_error.xml" value="0.2405" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_firewall_data_on_grey.xml" value="0.2475" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_firewall_data_on_grey_alpha.xml" value="0.2405" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_firewall_wifi_on_grey.xml" value="0.2475" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_heart.xml" value="0.2475" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_http.xml" value="0.2405" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_info_white.xml" value="0.2405" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_ipv6.xml" value="0.2475" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_local_blocklist.xml" value="0.2475" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_logs.xml" value="0.2475" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_prevent_dns_leaks.xml" value="0.2475" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_refresh_white.xml" value="0.2475" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_right_arrow_white.xml" value="0.2475" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_search.xml" value="0.2405" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_tick.xml" value="0.2475" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_tick_normal.xml" value="0.2405" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_univ_metered.xml" value="0.2405" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/ic_whats_new.xml" value="0.2475" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/rounded_corners_button_accent.xml" value="0.2405" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/rounded_corners_button_primary.xml" value="0.2475" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/spinner_outline.xml" value="0.2475" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/drawable/spinner_outline_with_bg.xml" value="0.2475" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/activity_app_details.xml" value="0.19837537409149208" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/activity_connection_tracker.xml" value="0.19837537409149208" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/activity_dns_detail.xml" value="0.19837537409149208" />
@@ -13,8 +46,10 @@
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/bottom_sheet_app_connections.xml" value="0.19837537409149208" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/bottom_sheet_conn_track.xml" value="0.24166666666666667" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/bottom_sheet_dns_log.xml" value="0.19837537409149208" />
-        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/bottom_sheet_firewall_sort_filter.xml" value="0.19837537409149208" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/bottom_sheet_firewall_sort_filter.xml" value="0.268" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/bottom_sheet_home_screen.xml" value="0.19837537409149208" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/bottom_sheet_local_blocklists.xml" value="0.268" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/bottom_sheet_orbot.xml" value="0.19837537409149208" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/bottom_sheet_rethink_list.xml" value="0.19837537409149208" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/bottom_sheet_rethink_plus_filter.xml" value="0.19837537409149208" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/connection_transaction_row.xml" value="0.19837537409149208" />
@@ -30,23 +65,33 @@
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/dialog_ip_details_layout.xml" value="0.1" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/dialog_set_custom_doh.xml" value="0.1" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/dialog_set_dns_crypt.xml" value="0.19837537409149208" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/dialog_whitelist_apps.xml" value="0.19837537409149208" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/fragment_about.xml" value="0.19837537409149208" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/fragment_blocked_domain.xml" value="0.19837537409149208" />
-        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/fragment_dns_configure.xml" value="0.19837537409149208" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/fragment_dns_configure.xml" value="0.268" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/fragment_dns_crypt_list.xml" value="0.19837537409149208" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/fragment_dns_proxy_list.xml" value="0.19837537409149208" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/fragment_doh_list.xml" value="0.19837537409149208" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/fragment_firewall_all_apps.xml" value="0.19837537409149208" />
-        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/fragment_firewall_app_list.xml" value="0.19837537409149208" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/fragment_firewall_app_list.xml" value="0.3" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/fragment_home_screen.xml" value="0.19837537409149208" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/fragment_rethink_basic.xml" value="0.19837537409149208" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/fragment_rethink_blocklist.xml" value="0.19837537409149208" />
-        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/fragment_rethink_list.xml" value="0.19837537409149208" />
-        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/fragment_universal_firewall.xml" value="0.24166666666666667" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/fragment_rethink_list.xml" value="0.4" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/fragment_settings_screen.xml" value="0.19837537409149208" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/fragment_universal_firewall.xml" value="0.44000000000000006" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/header_layout.xml" value="0.19837537409149208" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/list_item_app_conn_details.xml" value="0.19837537409149208" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/list_item_app_ip_rules.xml" value="0.19837537409149208" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/list_item_custom_ip.xml" value="0.19837537409149208" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/list_item_firewall_app.xml" value="0.19837537409149208" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/list_item_rethink_blocklist_adv.xml" value="0.19837537409149208" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/list_item_rethink_blocklist_simple.xml" value="0.19837537409149208" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/query_list_scroll_list.xml" value="0.19837537409149208" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/rethink_endpoint_list_item.xml" value="0.19837537409149208" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/spinner_item_firewall_status.xml" value="0.19837537409149208" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/transaction_row.xml" value="0.24166666666666667" />
+        <entry key="..\:/Celzero/Workspace/hussainmohd_a/http_fix/rethink-app/app/src/main/res/layout/universal_fragement_container.xml" value="0.19837537409149208" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/v053g/rethink-app/app/src/main/res/drawable/accent_btn_bg.xml" value="0.2185" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/v053g/rethink-app/app/src/main/res/drawable/allowed.xml" value="0.2578125" />
         <entry key="..\:/Celzero/Workspace/hussainmohd_a/v053g/rethink-app/app/src/main/res/drawable/allowed_accent.xml" value="0.16722972972972974" />

@@ -254,18 +254,18 @@ object RethinkBlocklistManager : KoinComponent {
         val file = Utilities.blocklistFile(dir.absolutePath,
                                            ONDEVICE_BLOCKLIST_FILE_TAG) ?: return null
 
-        try {
+        braveDnsRemote = try {
             if (file.exists()) {
-                braveDnsRemote = Dnsx.newBraveDNSRemote(file.absolutePath)
+                Dnsx.newBraveDNSRemote(file.absolutePath)
             } else {
                 Log.e(LoggerConstants.LOG_TAG_VPN,
                       "File does not exist in path: ${file.absolutePath}")
-                braveDnsRemote = null
+                null
             }
         } catch (e: Exception) {
             Log.e(LoggerConstants.LOG_TAG_VPN,
                   "Exception creating BraveDNS object, ${e.message}, $e ")
-            braveDnsRemote = null
+            null
         }
         return braveDnsRemote
     }

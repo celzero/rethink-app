@@ -74,9 +74,11 @@
                     android:layout_marginStart="5dp"
                     android:padding="5dp"
                     android:text="@string/ci_header"
+                    android:focusable="true"
                     android:textColor="?attr/accentGood"
                     android:textSize="@dimen/large_font_text_view" />
 
+                <requestFocus/>
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cip_search_container"
                     android:layout_width="match_parent"
@@ -151,7 +153,7 @@
                         android:gravity="center"
                         android:minWidth="25dp"
                         android:padding="5dp"
-                        android:text="@string/ci_whitelist_initial"
+                        android:text="@string/ci_bypass_universal_initial"
                         android:textSize="@dimen/default_font_text_view" />
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -159,7 +161,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="10dp"
                         android:padding="5dp"
-                        android:text="@string/ci_whitelist_desc"
+                        android:text="@string/ci_bypass_universal_desc"
                         android:textSize="@dimen/default_font_text_view" />
 
                     <androidx.appcompat.widget.AppCompatTextView

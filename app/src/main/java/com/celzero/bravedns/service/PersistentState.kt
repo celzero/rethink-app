@@ -92,7 +92,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var blocklistEnabled by booleanPref("enable_local_list", false)
 
     // the version (which is a unix timestamp) of the current rethinkdns+ remote blocklist files
-    var remoteBlocklistTimestamp by longPref("remote_block_list_downloaded_time", 0)
+    var remoteBlocklistTimestamp by longPref("remote_block_list_downloaded_time", INIT_TIME_MS)
 
     // the version (which is a unix timestamp) of the current on-device blocklist files
     var localBlocklistTimestamp by longPref("local_block_list_downloaded_time", 0)
@@ -189,16 +189,19 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var periodicallyCheckBlocklistUpdate by booleanPref("check_blocklist_update", false)
 
     // user-preferred Internet Protocol type, default IPv4
-    var internetProtocolType by intPref(INTERNET_PROTOCOL, InternetProtocol.IPv4.id)
+    var internetProtocolType by intPref(INTERNET_PROTOCOL, InternetProtocol.IPv46.id)
 
     // user-preferred Protocol translation, on IPv6 mode (default: PTMODEAUTO)
     var protocolTranslationType by booleanPref(PROTOCOL_TRANSLATION, false)
 
     // filter IPv6 compatible IPv4 address in custom ips
-    var filterIpv4inIpv6 by booleanPref("filter_ip4_ipv6", false)
+    var filterIpv4inIpv6 by booleanPref("filter_ip4_ipv6", true)
 
     // universal firewall settings to block all http connections
     var blockHttpConnections by booleanPref("block_http_connections", false)
+
+    // universal firewall settings to block all metered connections
+    var blockMeteredConnections by booleanPref("block_metered_connections", false)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()

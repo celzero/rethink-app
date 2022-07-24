@@ -20,73 +20,83 @@
             android:focusable="true"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/lb_heading"
-                style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="match_parent"
+            <com.google.android.material.chip.Chip
+                android:id="@+id/lb_version"
+                style="@style/ThinnerChip.Action"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="10dp"
+                android:enabled="false"
                 android:layout_marginTop="10dp"
+                android:backgroundTint="?attr/chipBgColorPositive"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
                 android:padding="5dp"
-                android:text="@string/rt_rethink_heading"
-                android:textColor="?attr/secondaryTextColor"
-                android:textSize="@dimen/extra_large_font_text_view" />
+                android:textColor="?attr/chipTextPositive"
+                android:textSize="@dimen/large_font_text_view" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/bslb_update_available_btn"
-                style="@style/ThinnerChip.Action"
+            <LinearLayout
+                android:id="@+id/bslb_update_chips_ll"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginBottom="10dp"
-                android:backgroundTint="?attr/chipBgColorPositive"
-                android:text="@string/rt_chip_update_available"
-                android:textColor="?attr/chipTextPositive"
-                android:textSize="@dimen/large_font_text_view"
-                android:visibility="gone"
-                app:chipEndPadding="5dp"
-                app:chipStartPadding="5dp"
-                app:shapeAppearance="@style/ShapeAppearance.LargeComponent" />
+                android:layout_alignParentEnd="true">
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/bslb_check_update_btn"
-                style="@style/ThinnerChip.Action"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginBottom="10dp"
-                android:backgroundTint="?attr/chipBgColorPositive"
-                android:text="@string/rt_chip_check_update"
-                android:textColor="?attr/chipTextPositive"
-                android:textSize="@dimen/large_font_text_view"
-                android:visibility="gone"
-                app:chipEndPadding="5dp"
-                app:chipStartPadding="5dp"
-                app:shapeAppearance="@style/ShapeAppearance.LargeComponent" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/bslb_update_available_btn"
+                    style="@style/ThinnerChip.Action"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:backgroundTint="?attr/chipBgColorPositive"
+                    android:text="@string/rt_chip_update_available"
+                    android:textColor="?attr/chipTextPositive"
+                    android:textSize="@dimen/large_font_text_view"
+                    android:visibility="visible"
+                    app:chipEndPadding="5dp"
+                    app:chipStartPadding="5dp"
+                    app:shapeAppearance="@style/ShapeAppearance.LargeComponent" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/bslb_redownload_btn"
-                style="@style/ThinnerChip.Action"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginBottom="10dp"
-                android:backgroundTint="?attr/chipBgColorPositive"
-                android:text="@string/rt_re_download"
-                android:textColor="?attr/chipTextPositive"
-                android:textSize="@dimen/large_font_text_view"
-                android:visibility="gone"
-                app:chipEndPadding="5dp"
-                app:chipStartPadding="5dp"
-                app:shapeAppearance="@style/ShapeAppearance.LargeComponent" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/bslb_check_update_btn"
+                    style="@style/ThinnerChip.Action"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:backgroundTint="?attr/chipBgColorPositive"
+                    android:text="@string/rt_chip_check_update"
+                    android:textColor="?attr/chipTextPositive"
+                    android:textSize="@dimen/large_font_text_view"
+                    android:visibility="gone"
+                    app:chipEndPadding="5dp"
+                    app:chipStartPadding="5dp"
+                    app:shapeAppearance="@style/ShapeAppearance.LargeComponent" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/bslb_redownload_btn"
+                    style="@style/ThinnerChip.Action"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:backgroundTint="?attr/chipBgColorPositive"
+                    android:text="@string/rt_re_download"
+                    android:textColor="?attr/chipTextPositive"
+                    android:textSize="@dimen/large_font_text_view"
+                    android:visibility="gone"
+                    app:chipEndPadding="5dp"
+                    app:chipStartPadding="5dp"
+                    app:shapeAppearance="@style/ShapeAppearance.LargeComponent" />
+            </LinearLayout>
 
         </RelativeLayout>
 
@@ -133,8 +143,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_above="@id/lb_apply_container"
-                android:orientation="vertical"
-                android:layout_below="@id/lb_list_toggle_group">
+                android:layout_below="@id/lb_list_toggle_group"
+                android:orientation="vertical">
 
                 <ProgressBar
                     android:id="@+id/lb_simple_progress"
@@ -273,6 +283,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|center"
+                android:layout_marginTop="20dp"
                 android:background="@drawable/accent_btn_bg">
 
                 <ProgressBar
@@ -296,7 +307,7 @@
                     android:layout_toEndOf="@id/lb_download_progress"
                     android:maxHeight="40dp"
                     android:minHeight="40dp"
-                    android:text="@string/bslb_download_btn"
+                    android:text="@string/rt_download"
                     android:textColor="?attr/chipTextColor" />
             </RelativeLayout>
         </LinearLayout>

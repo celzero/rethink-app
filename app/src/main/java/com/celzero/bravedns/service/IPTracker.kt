@@ -71,9 +71,7 @@ class IPTracker internal constructor(
         connTracker.blockedByRule = ipDetails.blockedByRule
 
         val serverAddress = convertIpV6ToIpv4IfNeeded(ipDetails.destIP)
-
-        connTracker.dnsQuery = FirewallManager.ipDomainLookup.getIfPresent(
-            connTracker.ipAddress)?.fqdn
+        connTracker.dnsQuery = ipDetails.query
 
         val countryCode: String? = getCountryCode(serverAddress, context)
         connTracker.flag = getFlag(countryCode)

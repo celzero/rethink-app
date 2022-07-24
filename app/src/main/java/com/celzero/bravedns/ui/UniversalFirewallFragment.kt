@@ -1,18 +1,18 @@
 /*
-Copyright 2020 RethinkDNS and its authors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2020 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.celzero.bravedns.ui
 
 import android.content.ActivityNotFoundException
@@ -109,7 +109,11 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         includeView.firewallUnknownConnectionModeCheck.isChecked = persistentState.blockUnknownConnections
         includeView.firewallDisallowDnsBypassModeCheck.isChecked = persistentState.disallowDnsBypass
         includeView.firewallBlockNewAppCheck.isChecked = persistentState.blockNewlyInstalledApp
-        includeView.firewallCheckIpv4Check.isChecked = persistentState.filterIpv4inIpv6
+        includeView.firewallBlockMeteredCheck.isChecked = persistentState.blockMeteredConnections
+        // now, the firewall rule (block ipv4 in ipv6) is hidden from user action.
+        // decide whether we need to add this back in universal settings
+        // uncomment the below code if enabled
+        //includeView.firewallCheckIpv4Check.isChecked = persistentState.filterIpv4inIpv6
         includeView.firewallBlockHttpCheck.isChecked = persistentState.blockHttpConnections
 
         setupClickListeners(includeView)
@@ -173,20 +177,30 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
             toggle(includeView.firewallBlockNewAppCheck, persistentState::blockNewlyInstalledApp)
         }
 
-        includeView.firewallCheckIpv4Check.setOnCheckedChangeListener { _, b ->
+        // now, the firewall rule (block ipv4 in ipv6) is hidden from user action.
+        // decide whether we need to add this back in universal settings
+        // uncomment the below code if enabled
+        /* includeView.firewallCheckIpv4Check.setOnCheckedChangeListener { _, b ->
             persistentState.filterIpv4inIpv6 = b
         }
 
         includeView.firewallCheckIpv4Txt.setOnClickListener {
             toggle(includeView.firewallCheckIpv4Check, persistentState::filterIpv4inIpv6)
-        }
-
+        } */
         includeView.firewallBlockHttpCheck.setOnCheckedChangeListener { _, b ->
             persistentState.blockHttpConnections = b
         }
 
         includeView.firewallBlockHttpTxt.setOnClickListener {
             toggle(includeView.firewallBlockHttpCheck, persistentState::blockHttpConnections)
+        }
+
+        includeView.firewallBlockMeteredCheck.setOnCheckedChangeListener { _, b ->
+            persistentState.blockMeteredConnections = b
+        }
+
+        includeView.firewallBlockMeteredTxt.setOnClickListener {
+            toggle(includeView.firewallBlockMeteredCheck, persistentState::blockMeteredConnections)
         }
     }
 

@@ -46,6 +46,7 @@ import com.celzero.bravedns.scheduler.BugReportZipper.getZipFilePath
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Utilities
@@ -84,6 +85,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.aboutAppUpdate.visibility = View.GONE
         }
 
+        b.aboutSponsor.setOnClickListener(this)
         b.aboutWebsite.setOnClickListener(this)
         b.aboutTwitter.setOnClickListener(this)
         b.aboutGithub.setOnClickListener(this)
@@ -163,6 +165,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.aboutWebsite -> {
                 val intent = Intent(Intent.ACTION_VIEW,
                                     getString(R.string.about_website_link).toUri())
+                startActivity(intent)
+            }
+            b.aboutSponsor -> {
+                val intent = Intent(Intent.ACTION_VIEW, RETHINKDNS_SPONSOR_LINK.toUri())
                 startActivity(intent)
             }
             b.mozillaImg -> {

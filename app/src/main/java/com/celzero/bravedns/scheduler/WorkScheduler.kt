@@ -61,6 +61,32 @@ class WorkScheduler(val context: Context) {
                 false
             }
         }
+
+        // Check if the job is already scheduled.
+        // It will be in either running or enqueued state.
+        fun isWorkScheduled(context: Context, tag: String): Boolean {
+            val instance = WorkManager.getInstance(context)
+            val statuses: ListenableFuture<List<WorkInfo>> = instance.getWorkInfosByTag(tag)
+            if (DEBUG) Log.d(LOG_TAG_SCHEDULER, "Job $tag already scheduled check")
+            return try {
+                var running = false
+                val workInfos = statuses.get()
+
+                if (workInfos.isNullOrEmpty()) return false
+
+                for (workStatus in workInfos) {
+                    running = workStatus.state == WorkInfo.State.RUNNING || workStatus.state == WorkInfo.State.ENQUEUED
+                }
+                Log.i(LOG_TAG_SCHEDULER, "Job $tag already scheduled? $running")
+                running
+            } catch (e: ExecutionException) {
+                Log.e(LOG_TAG_SCHEDULER, "error on status check ${e.message}", e)
+                false
+            } catch (e: InterruptedException) {
+                Log.e(LOG_TAG_SCHEDULER, "error on status check ${e.message}", e)
+                false
+            }
+        }
     }
 
     // Schedule AppExitInfo every APP_EXIT_INFO_JOB_TIME_INTERVAL_DAYS
@@ -120,32 +146,6 @@ class WorkScheduler(val context: Context) {
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(BLOCKLIST_UPDATE_CHECK_JOB_TAG,
                                                                    ExistingPeriodicWorkPolicy.REPLACE,
                                                                    blocklistUpdateCheck)
-    }
-
-    // Check if the job is already scheduled.
-    // It will be in either running or enqueued state.
-    private fun isWorkScheduled(context: Context, tag: String): Boolean {
-        val instance = WorkManager.getInstance(context)
-        val statuses: ListenableFuture<List<WorkInfo>> = instance.getWorkInfosByTag(tag)
-        if (DEBUG) Log.d(LOG_TAG_SCHEDULER, "Job $tag already scheduled check")
-        return try {
-            var running = false
-            val workInfos = statuses.get()
-
-            if (workInfos.isNullOrEmpty()) return false
-
-            for (workStatus in workInfos) {
-                running = workStatus.state == WorkInfo.State.RUNNING || workStatus.state == WorkInfo.State.ENQUEUED
-            }
-            Log.i(LOG_TAG_SCHEDULER, "Job $tag already scheduled? $running")
-            running
-        } catch (e: ExecutionException) {
-            Log.e(LOG_TAG_SCHEDULER, "error on status check ${e.message}", e)
-            false
-        } catch (e: InterruptedException) {
-            Log.e(LOG_TAG_SCHEDULER, "error on status check ${e.message}", e)
-            false
-        }
     }
 
 }

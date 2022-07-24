@@ -15,7 +15,7 @@
         android:layout_marginBottom="20dp"
         android:background="?attr/border" />
 
-    <androidx.appcompat.widget.AppCompatTextView
+    <!--<androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/fs_sort_heading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -37,12 +37,12 @@
         android:paddingBottom="2dp"
         android:visibility="visible"
         app:selectionRequired="true"
-        app:singleSelection="true" />
+        app:singleSelection="true" />-->
 
-    <View
+   <!-- <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="?attr/border" />
+        android:background="?attr/border" />-->
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/fs_filter_heading"
@@ -88,7 +88,6 @@
         android:visibility="visible"
         app:singleSelection="false" />
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -102,7 +101,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:layout_weight="0.5"
+            android:layout_weight="0.3"
             android:background="@drawable/rectangle_border_background"
             android:padding="5dp"
             android:maxHeight="40dp"
@@ -116,13 +115,13 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:layout_weight="0.5"
+            android:layout_weight="0.7"
             android:maxHeight="40dp"
             android:minHeight="40dp"
-            android:background="@drawable/rounded_corners_button_primary"
+            android:background="@drawable/rounded_corners_button_accent"
             android:padding="5dp"
             android:text="@string/fapps_filter_apply_btn"
-            android:textColor="?attr/primaryTextColor" />
+            android:textColor="?attr/chipTextColor" />
     </LinearLayout>
 
 </LinearLayout>

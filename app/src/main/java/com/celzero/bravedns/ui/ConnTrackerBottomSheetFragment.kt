@@ -38,7 +38,6 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.automaton.IpRulesManager
-import com.celzero.bravedns.automaton.IpRulesManager.UID_EVERYBODY
 import com.celzero.bravedns.data.ConnectionRules
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
@@ -97,15 +96,12 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
         b.bsConnConnectionFlag.text = ipDetails.flag
 
         b.bsConnBlockAppTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block))
-        b.bsConnBlockConnAllTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block_all))
+        b.bsConnBlockConnAllTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block_app))
 
         // updates the application name and other details
         updateAppDetails()
         // setup click and item selected listeners
         setupClickListeners()
-        // updates the app firewall's button
-        updateFirewallRulesUi(FirewallManager.appStatus(ipDetails.uid),
-                              FirewallManager.connectionStatus(ipDetails.uid))
         // updates the ip rules button
         updateIpRulesUi(ipDetails.uid, ipDetails.ipAddress)
         // updates the blocked rules chip
@@ -116,6 +112,13 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
         lightenUpChip()
         // updates the value from dns request cache if available
         updateDnsIfAvailable()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // updates the app firewall's button
+        updateFirewallRulesUi(FirewallManager.appStatus(ipDetails.uid),
+                              FirewallManager.connectionStatus(ipDetails.uid))
     }
 
     private fun updateDnsIfAvailable() {
@@ -164,7 +167,8 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
         if (appCount >= 1) {
             b.bsConnBlockedRule2HeaderLl.visibility = View.GONE
             b.bsConnTrackAppName.text = if (appCount >= 2) {
-                getString(R.string.ctbs_app_other_apps, appNames[0], appCount.minus(1).toString())
+                getString(R.string.ctbs_app_other_apps, appNames[0],
+                          appCount.minus(1).toString()) + "      ❯"
             } else {
                 appNames[0] + "      ❯"
             }
@@ -303,7 +307,7 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
                     b.bsConnFirewallSpinner.setSelection(3, true)
                 }
             }
-            FirewallManager.FirewallStatus.WHITELIST -> {
+            FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> {
                 b.bsConnFirewallSpinner.setSelection(4, true)
             }
             FirewallManager.FirewallStatus.EXCLUDE -> {
@@ -369,7 +373,7 @@ class ConnTrackerBottomSheetFragment(private var ipDetails: ConnectionTracker) :
 
         Log.d(LOG_TAG_FIREWALL,
               "Apply ip rule for ${connRules.ipAddress}, ${FirewallRuleset.RULE2.name}")
-        IpRulesManager.updateRule(UID_EVERYBODY, connRules.ipAddress, ipRuleStatus)
+        IpRulesManager.updateRule(ipDetails.uid, connRules.ipAddress, ipRuleStatus)
     }
 
     private fun getAppName(): String {

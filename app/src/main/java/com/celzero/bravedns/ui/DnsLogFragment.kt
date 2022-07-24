@@ -15,6 +15,8 @@
  */
 package com.celzero.bravedns.ui
 
+import android.icu.text.CompactDecimalFormat
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
@@ -40,6 +42,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.*
 
 class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQueryTextListener {
     private val b by viewBinding(ActivityQueryDetailBinding::bind)
@@ -65,6 +68,7 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
+        observeDnsStats()
     }
 
     private fun initView() {
@@ -73,12 +77,36 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         if (!persistentState.logsEnabled) {
             includeView.queryListLogsDisabledTv.visibility = View.VISIBLE
             includeView.queryListCardViewTop.visibility = View.GONE
+            includeView.queryDetailsLl.visibility = View.GONE
             return
         }
 
         displayPerDnsUi(includeView)
         setupClickListeners(includeView)
         remakeFilterChipsUi()
+    }
+
+    private fun observeDnsStats() {
+        persistentState.dnsRequestsCountLiveData.observe(viewLifecycleOwner) {
+            val lifeTimeConversion = formatDecimal(it)
+            includeView.totalQueriesTxt.text = getString(R.string.dns_logs_lifetime_queries,
+                                                         lifeTimeConversion)
+        }
+
+        persistentState.dnsBlockedCountLiveData.observe(viewLifecycleOwner) {
+            val blocked = formatDecimal(it)
+            includeView.latencyTxt.text = getString(R.string.dns_logs_blocked_queries, blocked)
+        }
+
+    }
+
+    private fun formatDecimal(i: Long?): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            CompactDecimalFormat.getInstance(Locale.US,
+                                             CompactDecimalFormat.CompactStyle.SHORT).format(i)
+        } else {
+            i.toString()
+        }
     }
 
     private fun setupClickListeners(includeView: QueryListScrollListBinding) {
@@ -101,6 +129,8 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     private fun displayPerDnsUi(includeView: QueryListScrollListBinding) {
         includeView.queryListLogsDisabledTv.visibility = View.GONE
         includeView.queryListCardViewTop.visibility = View.VISIBLE
+        includeView.queryDetailsLl.visibility = View.VISIBLE
+
         includeView.recyclerQuery.setHasFixedSize(true)
         layoutManager = CustomLinearLayoutManager(requireContext())
         includeView.recyclerQuery.layoutManager = layoutManager

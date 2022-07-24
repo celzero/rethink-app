@@ -44,6 +44,7 @@ import com.celzero.bravedns.automaton.DomainRulesManager
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.automaton.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.automaton.IpRulesManager
+import com.celzero.bravedns.automaton.IpRulesManager.UID_EVERYBODY
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.IPDetails
 import com.celzero.bravedns.database.AppInfo
@@ -158,7 +159,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
 
     private var userInitiatedStop: Boolean = false
 
-    private var underlyingNetworks: ConnectionMonitor.UnderlyingNetworks? = null
+    var underlyingNetworks: ConnectionMonitor.UnderlyingNetworks? = null
 
     private var accessibilityListener: AccessibilityManager.AccessibilityStateChangeListener? = null
 
@@ -255,13 +256,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
         // FIXME: replace currentTimeMillis with elapsed-time
         val connInfo = IPDetails(uid, srcIp, srcPort, dstIp, dstPort,
                                  System.currentTimeMillis(), /*blocked?*/ false, /*rule*/ "",
-                                 protocol)
+                                 protocol, "" /*query*/)
 
         val rule = firewall(connInfo)
         val blocked = FirewallRuleset.ground(rule)
 
         connInfo.blockedByRule = rule.id
         connInfo.isBlocked = blocked
+
+        connInfo.query = getDomainName(dstIp)
 
         if (DEBUG) Log.i(LOG_TAG_VPN, "firewall-rule $rule on conn $connInfo")
 
@@ -272,6 +275,17 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
         }
 
         return blocked
+    }
+
+    private fun getDomainName(ip: String): String {
+        val now = System.currentTimeMillis()
+        val domain = FirewallManager.ipDomainLookup.getIfPresent(ip) ?: return ""
+
+        return if (domain.ttl >= now) {
+            domain.fqdn
+        } else {
+            ""
+        }
     }
 
     /**
@@ -302,11 +316,20 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
                 }
             }
 
-            if (FirewallManager.FirewallStatus.WHITELIST == appStatus) {
-                return if (dnsProxied(connInfo.destPort)) {
-                    FirewallRuleset.RULE9
-                } else {
-                    FirewallRuleset.RULE8
+            // IP rules
+            when (ipStatus(uid, connInfo.destIP)) {
+                IpRulesManager.IpRuleStatus.BLOCK -> {
+                    return FirewallRuleset.RULE2
+                }
+                IpRulesManager.IpRuleStatus.BYPASS_APP_RULES -> {
+                    return FirewallRuleset.RULE2B
+                }
+                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
+                    // no-op; pass-through
+                    // By-pass universal should be validated after app-firewall rules
+                }
+                IpRulesManager.IpRuleStatus.NONE -> {
+                    // no-op; pass-through
                 }
             }
 
@@ -318,19 +341,28 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
                 return appRuleset
             }
 
-            // ip status should be considered only if the app is not blocked.
-            // earlier the ip rules had only block so checking ips before app is valid
-            // case: when the ip is whitelisted and the app is blocked, the
-            // connections are going through.
-            when (ipStatus(uid, connInfo.destIP)) {
+            // should ip rules by-pass or block universal firewall rules
+            when (globalIpStatus(connInfo.destIP)) {
                 IpRulesManager.IpRuleStatus.BLOCK -> {
                     return FirewallRuleset.RULE2
                 }
-                IpRulesManager.IpRuleStatus.WHITELIST -> {
-                    return FirewallRuleset.RULE2B
+                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
+                    return FirewallRuleset.RULE2C
+                }
+                IpRulesManager.IpRuleStatus.BYPASS_APP_RULES -> {
+                    // no-op; pass-through
                 }
                 IpRulesManager.IpRuleStatus.NONE -> {
                     // no-op; pass-through
+                }
+            }
+
+            // should firewall rules by-pass universal firewall rules (previously whitelist)
+            if (FirewallManager.FirewallStatus.BYPASS_UNIVERSAL == appStatus) {
+                return if (dnsProxied(connInfo.destPort)) {
+                    FirewallRuleset.RULE9
+                } else {
+                    FirewallRuleset.RULE8
                 }
             }
 
@@ -413,6 +445,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
 
     private fun ipStatus(uid: Int, destIp: String): IpRulesManager.IpRuleStatus {
         return IpRulesManager.hasRule(uid, destIp)
+    }
+
+    private fun globalIpStatus(destIp: String): IpRulesManager.IpRuleStatus {
+        return IpRulesManager.hasRule(UID_EVERYBODY, destIp)
     }
 
     private fun unknownAppBlocked(uid: Int): Boolean {
@@ -517,6 +553,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
             return FirewallRuleset.RULE1D
         }
 
+        // block all metered connections (Universal firewall setting)
+        if (persistentState.blockMeteredConnections && isConnectionMetered()) {
+            return FirewallRuleset.RULE1F
+        }
+
         if (isMobileDataBlockedForUid(firewallStatus, connectionStatus) && isConnectionMetered()) {
             return FirewallRuleset.RULE1E
         }
@@ -595,7 +636,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
         val pendingIntent = Utilities.getActivityPendingIntent(this, Intent(this,
                                                                             HomeScreenActivity::class.java),
                                                                PendingIntent.FLAG_UPDATE_CURRENT,
-                                                               mutable = true)
+                                                               mutable = false)
 
         var builder: NotificationCompat.Builder
         if (isAtleastO()) {
@@ -653,7 +694,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
 
         val pendingIntent = Utilities.getActivityPendingIntent(this, intent,
                                                                PendingIntent.FLAG_UPDATE_CURRENT,
-                                                               mutable = true)
+                                                               mutable = false)
         if (isAtleastO()) {
             val name: CharSequence = getString(R.string.notif_channel_firewall_alerts)
             val description = resources.getString(R.string.notif_channel_desc_firewall_alerts)
@@ -850,7 +891,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
     override fun onCreate() {
         connTracer = ConnectionTracer(this)
         VpnController.onVpnCreated(this)
-        netLogTracker.startLogger()
+
+        vpnScope.launch(Dispatchers.IO) {
+            netLogTracker.startLogger(this)
+        }
 
         notificationManager = this.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         activityManager = this.getSystemService(ACTIVITY_SERVICE) as ActivityManager
@@ -922,7 +966,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
         val pendingIntent = Utilities.getActivityPendingIntent(this, Intent(this,
                                                                             HomeScreenActivity::class.java),
                                                                PendingIntent.FLAG_UPDATE_CURRENT,
-                                                               mutable = true)
+                                                               mutable = false)
         var builder: NotificationCompat.Builder
         if (isAtleastO()) {
             val name: CharSequence = resources.getString(R.string.notif_channel_vpn_notification)
@@ -948,8 +992,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
             contentTitle = resources.getString(R.string.pause_mode_notification_title)
         }
 
-        builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(
-            pendingIntent)
+        builder.setSmallIcon(R.drawable.dns_icon).setContentIntent(pendingIntent)
 
         // New action button options in the notification
         // 1. Pause / Resume, Stop action button.
@@ -967,6 +1010,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
                 val notificationAction1 = NotificationCompat.Action(0, resources.getString(
                     R.string.notification_action_stop_vpn), openIntent1)
                 builder.addAction(notificationAction1)
+                // set content title for notifications which has actions
+                builder.setContentTitle(contentTitle)
 
                 if (isAppPaused()) {
                     val openIntent2 = makeVpnIntent(NOTIF_ACTION_MODE_RESUME,
@@ -997,6 +1042,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
                                                                                                openIntent2)
                 builder.addAction(notificationAction)
                 builder.addAction(notificationAction2)
+                // set content title for notifications which has actions
+                builder.setContentTitle(contentTitle)
             }
             NotificationActionType.NONE -> {
                 Log.i(LOG_TAG_VPN, "No notification action")
@@ -1015,7 +1062,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
         intent.putExtra(Constants.NOTIFICATION_ACTION, intentExtra)
         return Utilities.getBroadcastPendingIntent(this, notificationID, intent,
                                                    PendingIntent.FLAG_UPDATE_CURRENT,
-                                                   mutable = true)
+                                                   mutable = false)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -1047,6 +1094,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
 
             if (!isNewVpn) {
                 io("tunUpdate") {
+                    // may call signalStopService(userInitiated=false) if go-vpn-adapter is missing
+                    // which is the inverse of actually starting the vpn! But that's okay, since
+                    // it indicates that something is out of whack (as in, connection monitor
+                    // exists, vpn service exists, but the underlying adapter doesn't...
                     updateTun(opts)
                 }
             } else {
@@ -1062,7 +1113,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
                 }
 
                 startForeground(SERVICE_ID, updateNotificationBuilder().build())
-
                 persistentState.setVpnEnabled(true)
 
                 updateQuickSettingsTile()
@@ -1115,6 +1165,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
             if (connectionMonitor == null) {
                 Log.w(LOG_TAG_VPN, "skip update-tun, connection-monitor missing")
                 return@withLock
+            }
+            if (!persistentState.getVpnEnabled()) {
+                // when persistent-state "thinks" vpn is disabled, stop the service, especially when
+                // we could be here via onStartCommand -> updateTun -> handleVpnAdapterChange while
+                // conn-monitor and go-vpn-adapter exist, but persistent-state tracking vpn goes out of sync
+                signalStopService(userInitiated = false)
             }
             vpnAdapter?.updateTun(tunnelOptions)
             handleVpnAdapterChange()
@@ -1310,8 +1366,17 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
     private suspend fun restartVpn(tunnelOptions: AppConfig.TunnelOptions) {
         VpnController.mutex.withLock {
             // connectionMonitor = null indicates onStartCommand has not yet been called
-            if (connectionMonitor == null) return@withLock
-
+            if (connectionMonitor == null) {
+                Log.e(LOG_TAG_VPN,
+                      "Cannot restart-vpn, unexpectedly connection monitor null! Was vpn-service start command called?")
+                return@withLock
+            }
+            if (!persistentState.getVpnEnabled()) {
+                // when persistent-state "thinks" vpn is disabled, stop the service, especially when
+                // we could be here via onStartCommand -> isNewVpn -> restartVpn while both, vpn-service
+                // and connection-monitor exist, and persistent-state tracking vpn goes out of sync
+                signalStopService(userInitiated = false)
+            }
             // attempt seamless hand-off as described in VpnService.Builder.establish() docs
             val oldAdapter: GoVpnAdapter? = vpnAdapter
             vpnAdapter = makeVpnAdapter()
@@ -1322,6 +1387,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
         }
     }
 
+    // always called with vpn-controller mutex held
     private fun handleVpnAdapterChange() {
         // edge-case: mark connection-state as 'failing' when underlying tunnel does not exist
         // TODO: like Intra, call VpnController#stop instead? (see VpnController#onStartComplete)
@@ -1330,8 +1396,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
             return
         }
 
-        // Case: Set state to working in case of Firewall mode / dns proxy mode
-        if (appConfig.getBraveMode().isFirewallMode() || appConfig.isDnsProxyActive()) {
+        // Case: Set state to working in case of Firewall mode
+        if (appConfig.getBraveMode().isFirewallMode()) {
             return VpnController.onConnectionStateChanged(State.WORKING)
         }
     }
@@ -1464,7 +1530,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
             val pendingIntent = Utilities.getActivityPendingIntent(this, Intent(this,
                                                                                 HomeScreenActivity::class.java),
                                                                    PendingIntent.FLAG_UPDATE_CURRENT,
-                                                                   mutable = true)
+                                                                   mutable = false)
             builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(
                 resources.getText(R.string.warning_title)).setContentText(
                 resources.getText(R.string.notification_content)).setContentIntent(pendingIntent)
@@ -1488,7 +1554,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
         unobserveAppInfos()
         persistentState.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
 
-        netLogTracker.stopLogger()
         connectionMonitor?.onVpnStop()
         VpnController.onVpnDestroyed()
         vpnScope.cancel("VpnService onDestroy")

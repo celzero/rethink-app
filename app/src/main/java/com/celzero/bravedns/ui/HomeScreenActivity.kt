@@ -32,20 +32,24 @@ import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.IpRulesManager
+import com.celzero.bravedns.automaton.RethinkBlocklistManager
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
+import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.RemoteFileTagUtil
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getPackageMetadata
@@ -98,7 +102,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             launchOnboardActivity()
             return
         }
-
         updateNewVersion()
 
         if (savedInstanceState == null) {
@@ -129,16 +132,38 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun removeThisMethod() {
+        // for version v054
+        updateIfRethinkConnectedv053x()
+        moveRemoteBlocklistFileFromAsset()
+
         io {
             moveLocalBlocklistFiles()
 
             // path: /data/data/com.celzero.bravedns/files
             val oldFolder = File(this.filesDir.canonicalPath)
             deleteUnwantedFolders(oldFolder)
+
+            // already there is a local blocklist file available, complete the initial filetag read
+            if (persistentState.localBlocklistTimestamp != INIT_TIME_MS) {
+                RethinkBlocklistManager.readJson(this, AppDownloadManager.DownloadType.LOCAL,
+                                                 persistentState.localBlocklistTimestamp)
+            }
         }
 
-        // for version v054
-        updateIfRethinkConnectedv053x()
+    }
+
+    // fixme: find a cleaner way to implement this, move this to some other place
+    private fun moveRemoteBlocklistFileFromAsset() {
+        io {
+            // already there is a remote blocklist file available
+            if (persistentState.remoteBlocklistTimestamp != INIT_TIME_MS) {
+                RethinkBlocklistManager.readJson(this, AppDownloadManager.DownloadType.REMOTE,
+                                                 persistentState.remoteBlocklistTimestamp)
+                return@io
+            }
+
+            RemoteFileTagUtil.moveFileToLocalDir(this.applicationContext, persistentState)
+        }
     }
 
     private fun updateIfRethinkConnectedv053x() {
@@ -146,8 +171,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         io {
             appConfig.updateRethinkPlusCountv053x(persistentState.getRemoteBlocklistCount())
+            persistentState.dnsType = AppConfig.DnsType.RETHINK_REMOTE.type
+            appConfig.enableRethinkDnsPlus()
         }
-        persistentState.dnsType = AppConfig.DnsType.RETHINK_REMOTE.type
     }
 
     private fun moveLocalBlocklistFiles() {

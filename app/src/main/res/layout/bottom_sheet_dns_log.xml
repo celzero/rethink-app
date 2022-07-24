@@ -33,7 +33,7 @@
             android:layout_toStartOf="@id/dns_block_chip_group"
             android:padding="5dp"
             android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/small_font_text_view"
+            android:textSize="@dimen/default_font_text_view"
             android:visibility="visible" />
 
         <LinearLayout
@@ -53,6 +53,7 @@
                 android:layout_gravity="end"
                 android:layout_marginEnd="15dp"
                 android:padding="5dp"
+                app:chipSurfaceColor="@null"
                 android:textColor="?attr/chipTextColor"
                 android:textSize="@dimen/large_font_text_view"
                 android:visibility="gone" />
@@ -65,6 +66,7 @@
                 android:layout_gravity="end"
                 android:layout_marginEnd="15dp"
                 android:padding="5dp"
+                app:chipSurfaceColor="@null"
                 android:textColor="?attr/chipTextColor"
                 android:textSize="@dimen/large_font_text_view"
                 android:visibility="gone" />

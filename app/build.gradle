@@ -142,7 +142,7 @@ dependencies {
     implementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.6'
 
     // Tun2socks (https://jitpack.io/#celzero/firestack)
-    implementation 'com.github.celzero:firestack:a7c083f2f2'
+    implementation 'com.github.celzero:firestack:21d9d25754'
 
     // Work manager
     implementation 'androidx.work:work-runtime-ktx:2.7.1'

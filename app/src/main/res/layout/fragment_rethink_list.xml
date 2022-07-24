@@ -3,18 +3,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/background">
+    android:background="?attr/background"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/frl_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:alpha="0.7"
+        android:nestedScrollingEnabled="true"
+        android:padding="10dp"
+        android:text="@string/rethink_desc"
+        android:textColor="?attr/primaryLightColorText"
+        android:textSize="@dimen/default_font_text_view"
+        android:textStyle="normal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_doh_connections"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="50dp"
         android:clipToPadding="false"
         android:nestedScrollingEnabled="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:paddingBottom="50dp"
+        app:layout_constraintTop_toBottomOf="@id/frl_desc" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/doh_fab_add_server_icon"
@@ -22,13 +36,13 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="20dp"
-        android:src="@drawable/ic_fab_without_border"
+        android:contentDescription="New"
         android:padding="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:src="@drawable/ic_fab_without_border"
         android:visibility="gone"
         app:fabSize="mini"
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
-        android:contentDescription="New" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
