@@ -62,7 +62,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
 
     companion object {
         fun newInstance() = RethinkListFragment()
-        var modifiedStamp: MutableLiveData<ModifiedStamp> = MutableLiveData()
+        var modifiedStamp: MutableLiveData<ModifiedStamp?> = MutableLiveData()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
