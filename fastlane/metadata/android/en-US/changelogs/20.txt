@@ -1,11 +1,11 @@
-Internet Protocol Version 6
-        1. IPv6 support.
-        2. Per app IP blocklists.
-        3. New firewall rule: Block port 80 (insecure HTTP) traffic.
-        4. New firewall rule: Block connections on metered (mobile) network.
-        5. New feature: Connect to System or Network provided DNS.
-        6. New feature: Block connections over metered (mobile) and unmetered (wifi) networks.
-        7. New feature: Per app network report card.
-        8. New feature: Add IP addresses or IP subnet ranges as firewall rules.
-        9. UI overhaul for Firewall and DNS screens.
-        10. All-new network engine.
+** v053i: Internet Protocol Version 6 ** 
+1. IPv6 support.
+2. Per app IP blocklists.
+3. New firewall rule: Block port 80 (insecure HTTP) traffic.
+4. New firewall rule: Block connections on metered (mobile) network.
+5. New feature: Connect to System or Network provided DNS.
+6. New feature: Block connections over metered (mobile) and unmetered (wifi) networks.
+7. New feature: Per app network report card.
+8. New feature: Add IP addresses or IP subnet ranges as firewall rules.
+9. UI overhaul for Firewall and DNS screens.
+10. All-new network engine.
