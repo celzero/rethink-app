@@ -128,7 +128,12 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
         dnsLog.serverIP = transaction.serverIp
         dnsLog.status = transaction.status.name
         dnsLog.time = transaction.responseCalendar.timeInMillis
-        dnsLog.typeName = ResourceRecordTypes.getTypeName(transaction.type.toInt()).desc
+        val typeName = ResourceRecordTypes.getTypeName(transaction.type.toInt())
+        if (typeName == ResourceRecordTypes.UNKNOWN) {
+            dnsLog.typeName = transaction.type.toString()
+        } else {
+            dnsLog.typeName = typeName.desc
+        }
         val serverAddress = IpManager.getIpAddress(transaction.serverIp)
 
         if (serverAddress?.toInetAddress()?.hostAddress != null) {

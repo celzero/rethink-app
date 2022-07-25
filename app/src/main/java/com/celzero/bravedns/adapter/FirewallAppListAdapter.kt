@@ -109,13 +109,12 @@ class FirewallAppListAdapter(private val context: Context,
                     R.string.firewall_status_allow)
                 FirewallManager.FirewallStatus.EXCLUDE -> context.getString(
                     R.string.firewall_status_excluded)
-                FirewallManager.FirewallStatus.WHITELIST -> context.getString(
+                FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> context.getString(
                     R.string.firewall_status_whitelisted)
                 FirewallManager.FirewallStatus.BLOCK -> {
                     when {
-                        cStat.mobileData() -> context.getString(
-                            R.string.firewall_status_allow_unmetered)
-                        cStat.wifi() -> context.getString(R.string.firewall_status_allow_metered)
+                        cStat.mobileData() -> context.getString(R.string.firewall_status_block_metered)
+                        cStat.wifi() -> context.getString(R.string.firewall_status_block_unmetered)
                         else -> context.getString(R.string.firewall_status_blocked)
                     }
                 }
@@ -151,7 +150,7 @@ class FirewallAppListAdapter(private val context: Context,
                     showMobileDataUnused()
                     showWifiUnused()
                 }
-                FirewallManager.FirewallStatus.WHITELIST -> {
+                FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> {
                     showMobileDataUnused()
                     showWifiUnused()
                 }
@@ -201,7 +200,7 @@ class FirewallAppListAdapter(private val context: Context,
                     mIconIndicator.setBackgroundColor(
                         context.getColor(R.color.primaryLightColorText))
                 }
-                FirewallManager.FirewallStatus.WHITELIST -> {
+                FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> {
                     mIconIndicator.setBackgroundColor(
                         context.getColor(R.color.primaryLightColorText))
                 }
@@ -226,6 +225,11 @@ class FirewallAppListAdapter(private val context: Context,
             }
 
             b.firewallAppIconIv.setOnClickListener {
+                enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.firewallAppIconIv)
+                openAppDetailActivity(appInfo.uid)
+            }
+
+            b.firewallAppDetailsLl.setOnClickListener {
                 enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.firewallAppIconIv)
                 openAppDetailActivity(appInfo.uid)
             }

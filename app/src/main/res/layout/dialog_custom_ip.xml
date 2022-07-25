@@ -42,9 +42,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/custom_dialog_heading_no_ui"
-                    android:layout_margin="30dp"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginBottom="30dp"
                     android:padding="10dp"
-                    android:text="No Rules found. Added IP rules will be shown here"
+                    android:text="@string/ci_no_rules_text"
                     android:textAlignment="center"
                     android:textSize="@dimen/heading_font_text_view" />
 
@@ -60,7 +63,8 @@
                 android:id="@+id/custom_dialog_show_rules_rl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="visible">
 
                 <TextView
                     android:id="@+id/custom_dialog_heading"
@@ -69,10 +73,12 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
                     android:padding="5dp"
-                    android:text="Custom IP(s)"
+                    android:text="@string/ci_header"
+                    android:focusable="true"
                     android:textColor="?attr/accentGood"
                     android:textSize="@dimen/large_font_text_view" />
 
+                <requestFocus/>
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cip_search_container"
                     android:layout_width="match_parent"
@@ -147,7 +153,7 @@
                         android:gravity="center"
                         android:minWidth="25dp"
                         android:padding="5dp"
-                        android:text="W"
+                        android:text="@string/ci_bypass_universal_initial"
                         android:textSize="@dimen/default_font_text_view" />
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -155,7 +161,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="10dp"
                         android:padding="5dp"
-                        android:text="@string/ci_whitelist_desc"
+                        android:text="@string/ci_bypass_universal_desc"
                         android:textSize="@dimen/default_font_text_view" />
 
                     <androidx.appcompat.widget.AppCompatTextView

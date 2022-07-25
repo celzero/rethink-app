@@ -20,7 +20,6 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.toLiveData
 import com.celzero.bravedns.database.CustomIpDao
-import com.celzero.bravedns.util.Constants.Companion.FILTER_IS_FILTER
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class CustomIpViewModel(private val customIpDao: CustomIpDao) : ViewModel() {
@@ -33,9 +32,6 @@ class CustomIpViewModel(private val customIpDao: CustomIpDao) : ViewModel() {
 
     val customIpDetails = Transformations.switchMap(filteredList) { input ->
         if (input.isNullOrBlank()) {
-            customIpDao.getUnivBlockedConnectionsLiveData().toLiveData(
-                pageSize = LIVEDATA_PAGE_SIZE)
-        } else if (FILTER_IS_FILTER == input) {
             customIpDao.getUnivBlockedConnectionsLiveData().toLiveData(
                 pageSize = LIVEDATA_PAGE_SIZE)
         } else {

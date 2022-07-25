@@ -112,11 +112,15 @@ object VpnController : KoinComponent {
         connectionStatus.postValue(state)
     }
 
+    // lock(VpnController.mutex) should not be held
     fun start(context: Context) {
-        if (braveVpnService != null) {
-            Log.i(LOG_TAG_VPN, "braveVPNService is not null")
+        // if the tunnel has the go-adapter then there's nothing to do
+        if (braveVpnService?.isOn() == true) {
+            Log.w(LOG_TAG_VPN, "braveVPNService is already on, resending vpn enabled state")
             return
         }
+        // else: resend/send the start-command to the vpn service which handles both false-start
+        // and actual-start scenarios just fine; ref: isNewVpn bool in vpnService.onStartCommand
 
         val startServiceIntent = Intent(context, BraveVPNService::class.java)
         if (isAtleastO()) {
@@ -202,6 +206,22 @@ object VpnController : KoinComponent {
 
     fun decreasePauseDuration(durationMs: Long) {
         braveVpnService?.decreasePauseDuration(durationMs)
+    }
+
+    fun protocols(): String {
+        var protoString = ""
+        val ipv4Size = braveVpnService?.underlyingNetworks?.ipv4Net?.size ?: 0
+        val ipv6Size = braveVpnService?.underlyingNetworks?.ipv6Net?.size ?: 0
+        if (ipv4Size >= 1 && ipv6Size >= 1) {
+            protoString = "IPv4, IPv6"
+        } else if (ipv4Size >= 1) {
+            protoString = "IPv4"
+        }else if (ipv6Size >= 1) {
+            protoString = "IPv6"
+        } else {
+            // no-op
+        }
+        return protoString
     }
 
 }

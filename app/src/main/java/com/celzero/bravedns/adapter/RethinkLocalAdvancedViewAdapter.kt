@@ -16,10 +16,11 @@
 package com.celzero.bravedns.adapter
 
 import android.content.Context
-import android.util.Log
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -80,19 +81,43 @@ class RethinkLocalAdvancedViewAdapter(val context: Context) :
             b.crpCard.setOnClickListener {
                 toggleCheckbox(!b.crpCheckBox.isChecked, filetag)
             }
+
+            b.crpDescEntriesTv.setOnClickListener {
+                val intent = Intent(Intent.ACTION_VIEW, filetag.url.toUri())
+                context.startActivity(intent)
+            }
         }
 
         private fun displayMetaData(filetag: RethinkLocalFileTag) {
             b.crpLabelTv.text = filetag.vname
-            b.crpDescGroupTv.text = filetag.group
-            b.crpDescSubgTv.text = filetag.subg
+            if (filetag.subg.isEmpty()) {
+                b.crpDescGroupTv.text = filetag.group
+            } else {
+                b.crpDescGroupTv.text = filetag.subg
+            }
+
+            b.crpDescEntriesTv.text = context.getString(R.string.dc_entries,
+                                                        filetag.entries.toString())
             b.crpCheckBox.isChecked = filetag.isSelected
-            setChipBackground(filetag.isSelected)
+            setCardBackground(filetag.isSelected)
         }
 
-        private fun setChipBackground(isSelected: Boolean) {
+        // fixme: remove this method, add it in strings.xml
+        private fun getGroupName(group: String): String {
+            if (group == "parentalcontrol") {
+                return context.getString(R.string.rbl_parental_control)
+            } else if (group == "privacy") {
+                return context.getString(R.string.rbl_privacy)
+            } else if (group == "security") {
+                return context.getString(R.string.rbl_security)
+            } else {
+                return ""
+            }
+        }
+
+        private fun setCardBackground(isSelected: Boolean) {
             if (isSelected) {
-                b.crpCard.setCardBackgroundColor(fetchColor(context, R.attr.border))
+                b.crpCard.setCardBackgroundColor(fetchColor(context, R.attr.selectedCardBg))
             } else {
                 b.crpCard.setCardBackgroundColor(fetchColor(context, R.attr.background))
             }
@@ -100,7 +125,7 @@ class RethinkLocalAdvancedViewAdapter(val context: Context) :
 
         private fun toggleCheckbox(isSelected: Boolean, filetag: RethinkLocalFileTag) {
             b.crpCheckBox.isChecked = isSelected
-            setChipBackground(isSelected)
+            setCardBackground(isSelected)
 
             io {
                 if (isSelected) {
@@ -141,7 +166,7 @@ class RethinkLocalAdvancedViewAdapter(val context: Context) :
         private fun displayHeaderIfNeeded(filetag: RethinkLocalFileTag, position: Int) {
             if (position == 0 || getItem(position - 1)?.group != filetag.group) {
                 b.crpTitleLl.visibility = View.VISIBLE
-                b.crpBlocktypeHeadingTv.text = filetag.group
+                b.crpBlocktypeHeadingTv.text = getGroupName(filetag.group)
                 return
             }
 

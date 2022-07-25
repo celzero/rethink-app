@@ -28,7 +28,6 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DnsQueryAdapter
-import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.databinding.ActivityQueryDetailBinding
 import com.celzero.bravedns.databinding.QueryListScrollListBinding
@@ -57,7 +56,6 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
 
     private val dnsLogRepository by inject<DnsLogRepository>()
     private val persistentState by inject<PersistentState>()
-    private val appConfig by inject<AppConfig>()
 
     companion object {
         fun newInstance() = DnsLogFragment()
@@ -70,6 +68,7 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
+        observeDnsStats()
     }
 
     private fun initView() {
@@ -78,16 +77,36 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         if (!persistentState.logsEnabled) {
             includeView.queryListLogsDisabledTv.visibility = View.VISIBLE
             includeView.queryListCardViewTop.visibility = View.GONE
-            b.latencyTxt.visibility = View.GONE
-            b.totalQueriesTxt.visibility = View.GONE
+            includeView.queryDetailsLl.visibility = View.GONE
             return
         }
 
         displayPerDnsUi(includeView)
         setupClickListeners(includeView)
         remakeFilterChipsUi()
-        observeDnscryptStatus()
-        observeDnsStats()
+    }
+
+    private fun observeDnsStats() {
+        persistentState.dnsRequestsCountLiveData.observe(viewLifecycleOwner) {
+            val lifeTimeConversion = formatDecimal(it)
+            includeView.totalQueriesTxt.text = getString(R.string.dns_logs_lifetime_queries,
+                                                         lifeTimeConversion)
+        }
+
+        persistentState.dnsBlockedCountLiveData.observe(viewLifecycleOwner) {
+            val blocked = formatDecimal(it)
+            includeView.latencyTxt.text = getString(R.string.dns_logs_blocked_queries, blocked)
+        }
+
+    }
+
+    private fun formatDecimal(i: Long?): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            CompactDecimalFormat.getInstance(Locale.US,
+                                             CompactDecimalFormat.CompactStyle.SHORT).format(i)
+        } else {
+            i.toString()
+        }
     }
 
     private fun setupClickListeners(includeView: QueryListScrollListBinding) {
@@ -110,6 +129,8 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     private fun displayPerDnsUi(includeView: QueryListScrollListBinding) {
         includeView.queryListLogsDisabledTv.visibility = View.GONE
         includeView.queryListCardViewTop.visibility = View.VISIBLE
+        includeView.queryDetailsLl.visibility = View.VISIBLE
+
         includeView.recyclerQuery.setHasFixedSize(true)
         layoutManager = CustomLinearLayoutManager(requireContext())
         includeView.recyclerQuery.layoutManager = layoutManager
@@ -145,78 +166,6 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         }
         includeView.recyclerQuery.addOnScrollListener(scrollListener)
 
-    }
-
-    private fun observeDnsStats() {
-        persistentState.dnsRequestsCountLiveData.observe(viewLifecycleOwner) {
-            val lifeTimeConversion = formatDecimal(it)
-            b.totalQueriesTxt.text = getString(R.string.dns_logs_lifetime_queries,
-                                               lifeTimeConversion)
-        }
-
-        persistentState.dnsBlockedCountLiveData.observe(viewLifecycleOwner) {
-            val blocked = formatDecimal(it)
-            b.latencyTxt.text = getString(R.string.dns_logs_blocked_queries, blocked)
-        }
-
-    }
-
-    private fun formatDecimal(i: Long?): String {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            CompactDecimalFormat.getInstance(Locale.US,
-                                             CompactDecimalFormat.CompactStyle.SHORT).format(i)
-        } else {
-            i.toString()
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        updateConnectedStatus()
-    }
-
-    private fun updateConnectedStatus() {
-        when (appConfig.getDnsType()) {
-            AppConfig.DnsType.DOH -> {
-                b.connectedStatusTitleUrl.text = resources.getString(
-                    R.string.configure_dns_connected_doh_status)
-                b.connectedStatusTitle.text = resources.getString(
-                    R.string.configure_dns_connection_name, appConfig.getConnectedDns())
-            }
-            AppConfig.DnsType.DNSCRYPT -> {
-                b.connectedStatusTitleUrl.text = resources.getString(
-                    R.string.configure_dns_connected_dns_crypt_status)
-                b.queryListScrollView.recyclerQuery.visibility = View.VISIBLE
-            }
-            AppConfig.DnsType.DNS_PROXY -> {
-                b.connectedStatusTitleUrl.text = resources.getString(
-                    R.string.configure_dns_connected_dns_proxy_status)
-                b.connectedStatusTitle.text = resources.getString(
-                    R.string.configure_dns_connection_name, appConfig.getConnectedDns())
-            }
-            AppConfig.DnsType.RETHINK_REMOTE -> {
-                b.connectedStatusTitleUrl.text = resources.getString(
-                    R.string.configure_dns_connected_doh_status)
-                b.connectedStatusTitle.text = resources.getString(
-                    R.string.configure_dns_connection_name, appConfig.getConnectedDns())
-            }
-            AppConfig.DnsType.NETWORK_DNS -> {
-                b.connectedStatusTitleUrl.text = resources.getString(
-                    R.string.configure_dns_connected_dns_proxy_status)
-                b.connectedStatusTitle.text = resources.getString(
-                    R.string.configure_dns_connection_name, appConfig.getConnectedDns())
-            }
-        }
-    }
-
-    // FIXME: Create common observer for dns instead of separate observers
-    private fun observeDnscryptStatus() {
-        appConfig.getDnscryptCountObserver().observe(viewLifecycleOwner) {
-            if (appConfig.getDnsType() != AppConfig.DnsType.DNSCRYPT) return@observe
-
-            val connectedCrypt = getString(R.string.configure_dns_crypt, it.toString())
-            b.connectedStatusTitle.text = connectedCrypt
-        }
     }
 
     private fun remakeFilterChipsUi() {

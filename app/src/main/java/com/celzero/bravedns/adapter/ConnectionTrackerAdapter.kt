@@ -158,7 +158,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
                         ContextCompat.getColor(context, R.color.colorRed_A400))
                 }
                 // hint white when whitelisted
-                (FirewallRuleset.RULE8.id == ruleName || FirewallRuleset.RULE9.id == ruleName) -> {
+                (FirewallRuleset.shouldShowHint(ruleName)) -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
                     b.connectionStatusIndicator.setBackgroundColor(
                         ContextCompat.getColor(context, R.color.primaryLightColorText))

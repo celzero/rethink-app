@@ -7,44 +7,9 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <LinearLayout
-        android:id="@+id/top_header_ll"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="2dp"
-        android:layout_marginRight="2dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:orientation="horizontal"
-        android:padding="10dp"
-        android:weightSum="1">
-
-        <TextView
-            android:id="@+id/ffa_explain_txt"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.9"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:text="@string/settings_explanation_text"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/default_font_text_view" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ffa_refresh_list"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_weight="0.1"
-            android:padding="5dp"
-            android:src="@drawable/ic_refresh_white" />
-
-    </LinearLayout>
-
-    <LinearLayout
         android:id="@+id/ffa_search_view_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/top_header_ll"
         android:orientation="vertical">
 
         <androidx.cardview.widget.CardView
@@ -77,24 +42,21 @@
                         app:queryHint="@string/search_firewall_all_apps" />
 
                     <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/ffa_sort_icon"
+                        android:id="@+id/ffa_refresh_list"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
-                        android:layout_margin="5dp"
                         android:layout_weight="0.1"
-                        android:padding="5dp"
-                        android:src="@drawable/ic_sort"
-                        android:visibility="visible" />
+                        android:padding="7dp"
+                        android:src="@drawable/ic_refresh_white" />
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/ffa_filter_icon"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
-                        android:layout_margin="5dp"
                         android:layout_weight="0.1"
-                        android:padding="5dp"
+                        android:padding="7dp"
                         android:src="@drawable/ic_filter"
                         android:visibility="visible" />
                 </LinearLayout>
@@ -106,22 +68,10 @@
                     android:gravity="start"
                     android:orientation="horizontal"
                     android:padding="5dp"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:focusable="true"
-                        android:focusableInTouchMode="true"
-                        android:padding="5dp"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:text="@string/fapps_sort_by"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/default_font_text_view" />
+                    android:visibility="visible">
 
                     <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/ffa_sort_chip_group"
+                        android:id="@+id/ffa_firewall_chip_group"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -178,6 +128,7 @@
         android:id="@+id/ffa_toggle_all_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:layout_below="@id/ffa_search_view_top"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp">
@@ -187,7 +138,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_centerVertical="true"
-            android:src="@drawable/ic_info" />
+            android:src="@drawable/ic_info_white" />
 
         <TextView
             android:id="@+id/firewall_app_label_tv"
@@ -247,11 +198,11 @@
         android:layout_marginEnd="5dp"
         android:fontFamily="sans-serif"
         android:padding="5dp"
-        android:visibility="gone"
         android:text="@string/fapps_all_network_hint"
         android:textColor="?attr/accentBad"
         android:textSize="@dimen/default_font_text_view"
-        android:textStyle="italic" />
+        android:textStyle="italic"
+        android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ffa_app_list"

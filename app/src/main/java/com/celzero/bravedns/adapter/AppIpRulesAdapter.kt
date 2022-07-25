@@ -69,14 +69,6 @@ class AppIpRulesAdapter(private val context: Context, val uid: Int) :
         private fun setupClickListeners(customIp: CustomIp, position: Int) {
             b.aipStatusButton.setOnClickListener {
                 val ipRuleStatus = IpRulesManager.IpRuleStatus.getStatus(customIp.status)
-                // TODO: now we are showing delete button when the IP status is set as NONE,
-                // maybe we should again show bottom sheet to add the rules back?
-                if (ipRuleStatus.noRule()) {
-                    // delete option is loaded when the ip rules is set as none
-                    IpRulesManager.removeFirewallRules(uid, customIp.ipAddress)
-                    return@setOnClickListener
-                }
-
                 // open bottom sheet for options
                 openBottomSheet(customIp.ipAddress, ipRuleStatus, position)
             }
@@ -98,9 +90,10 @@ class AppIpRulesAdapter(private val context: Context, val uid: Int) :
             b.aipIpAddress.text = customIp.ipAddress
 
             when (IpRulesManager.getStatus(uid, customIp.ipAddress)) {
-                IpRulesManager.IpRuleStatus.NONE -> showDeleteBtn()
-                IpRulesManager.IpRuleStatus.WHITELIST -> showWhitelistBtn()
+                IpRulesManager.IpRuleStatus.NONE -> showNoRuleBtn()
+                IpRulesManager.IpRuleStatus.BYPASS_APP_RULES -> showBypassAppRulesBtn()
                 IpRulesManager.IpRuleStatus.BLOCK -> showBlockedBtn()
+                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL ->  { /* no-op */}
             }
         }
 
@@ -117,8 +110,8 @@ class AppIpRulesAdapter(private val context: Context, val uid: Int) :
                 R.string.ada_ip_rules_status_blocked)
         }
 
-        private fun showWhitelistBtn() {
-            b.aipStatusButton.tag = IpRulesManager.IpRuleStatus.WHITELIST.id
+        private fun showBypassAppRulesBtn() {
+            b.aipStatusButton.tag = IpRulesManager.IpRuleStatus.BYPASS_APP_RULES.id
             b.aipStatusButton.setBackgroundResource(R.drawable.rectangle_border_background)
             b.aipStatusButton.setTextColor(fetchColor(context, R.attr.primaryTextColor))
             b.aipStatusButton.setCompoundDrawablesWithIntrinsicBounds(null, null,
@@ -127,15 +120,19 @@ class AppIpRulesAdapter(private val context: Context, val uid: Int) :
                                                                           R.drawable.ic_arrow_down_small),
                                                                       null)
             b.aipStatusButton.text = context.resources.getString(
-                R.string.ada_ip_rules_status_whitelist)
+                R.string.ada_ip_rules_status_bypass_app_rules)
         }
 
-        private fun showDeleteBtn() {
+        private fun showNoRuleBtn() {
             b.aipStatusButton.tag = IpRulesManager.IpRuleStatus.NONE.id
-            b.aipStatusButton.setBackgroundResource(R.drawable.rounded_corners_button_primary)
-            b.aipStatusButton.setTextColor(fetchColor(context, R.attr.chipTextColor))
-            b.aipStatusButton.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null)
-            b.aipStatusButton.text = context.resources.getString(R.string.ada_ip_rules_delete)
+            b.aipStatusButton.setBackgroundResource(R.drawable.rectangle_border_background)
+            b.aipStatusButton.setTextColor(fetchColor(context, R.attr.primaryTextColor))
+            b.aipStatusButton.setCompoundDrawablesWithIntrinsicBounds(null, null,
+                                                                      ContextCompat.getDrawable(
+                                                                          context,
+                                                                          R.drawable.ic_arrow_down_small),
+                                                                      null)
+            b.aipStatusButton.text = context.resources.getString(R.string.ada_ip_rules_status_allowed)
         }
     }
 }

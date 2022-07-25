@@ -17,13 +17,14 @@
 package com.celzero.bravedns.util
 
 import android.util.Log
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 
 // channel buffer receives batched entries of batchsize or once every waitms from a batching
 // producer or a time-based monitor (signal) running in a single-threaded co-routine context.
-class NetLogBatcher<T>(val scope: CoroutineScope, val processor: suspend (List<T>) -> Unit) {
+class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
     // i keeps track of currently in-use buffer
     var lsn = 0
 
@@ -50,22 +51,28 @@ class NetLogBatcher<T>(val scope: CoroutineScope, val processor: suspend (List<T
     // signal channel, holds at most 1 signal, and drops the oldest
     private val signal = Channel<Int>(Channel.Factory.CONFLATED)
 
-    // batches[0] and batches[1] take turns at batching
     var batches = mutableListOf<T>()
 
-    init {
-        begin()
-        monitorCancellation()
+    fun begin(scope: CoroutineScope) {
+        scope.launch(Dispatchers.IO) {
+            golooper(scope) {
+                sig()
+            }
+            golooper(scope) {
+                consume()
+            }
+            monitorCancellation()
+        }
     }
 
-    private fun begin() = scope.launch {
-        // init sig
-        sig()
-        consume()
+    private suspend fun golooper(s: CoroutineScope, f: suspend () -> Unit): Deferred<Unit> {
+        return s.async(s.coroutineContext + looper + n2, CoroutineStart.DEFAULT) {
+            f()
+        }
     }
 
     // stackoverflow.com/a/68905423
-    private fun monitorCancellation() = scope.launch {
+    private suspend fun monitorCancellation() {
         try {
             awaitCancellation()
         } finally {
@@ -77,7 +84,7 @@ class NetLogBatcher<T>(val scope: CoroutineScope, val processor: suspend (List<T
         }
     }
 
-    private fun consume() = scope.launch(Dispatchers.IO) {
+    private suspend fun consume() {
         for (y in buffers) {
             processor(y)
         }
@@ -85,40 +92,39 @@ class NetLogBatcher<T>(val scope: CoroutineScope, val processor: suspend (List<T
 
     private suspend fun txswap() {
         val b = batches
-        batches = mutableListOf<T>()
-        Log.i(LoggerConstants.LOG_TAG_VPN, "transfer and swap (${lsn}) ${b.size}")
-        lsn = (lsn + 1) // swap buffers
+        batches = mutableListOf<T>() // swap buffers
+        if (DEBUG) Log.d(LoggerConstants.LOG_TAG_VPN, "transfer and swap (${lsn}) ${b.size}")
+        lsn = (lsn + 1)
         buffers.send(b)
     }
 
-    fun add(payload: T) = scope.launch(looper + n1) {
+    suspend fun add(payload: T) = withContext(looper + n1) {
         batches.add(payload)
         // if the batch size is met, dispatch it to the consumer
         if (batches.size >= batchSize) {
             txswap()
         } else if (batches.size == 1) {
-            signal.send(lsn) // start tracking 'i'
+            signal.send(lsn) // start tracking 'lsn'
         }
     }
 
-    private fun sig() = scope.launch(looper + n2) {
+    private suspend fun sig() {
         // consume all signals
         for (tracklsn in signal) {
             // do not honor the signal for 'l' if a[l] is empty
             // this can happen if the signal for 'l' is processed
             // after the fact that 'l' has been swapped out by 'batch'
             if (batches.size <= 0) {
-                Log.d(LoggerConstants.LOG_TAG_VPN, "signal continue for buffer")
-                println("signal continue for buffer")
+                if (DEBUG) Log.d(LoggerConstants.LOG_TAG_VPN, "signal continue for buffer")
                 continue
             } else {
-                Log.d(LoggerConstants.LOG_TAG_VPN, "signal sleep for $waitms for buffer")
+                if (DEBUG) Log.d(LoggerConstants.LOG_TAG_VPN, "signal sleep for $waitms for buffer")
             }
 
             // wait for 'batch' to dispatch
             delay(waitms)
-            Log.d(LoggerConstants.LOG_TAG_VPN,
-                  "signal wait over for buf, sz(${batches.size}) / cur-buf(${lsn})")
+            if (DEBUG) Log.d(LoggerConstants.LOG_TAG_VPN,
+                             "signal wait over for buf, sz(${batches.size}) / cur-buf(${lsn})")
 
             // 'l' is the current buffer, that is, 'l == i',
             // and 'batch' hasn't dispatched it,

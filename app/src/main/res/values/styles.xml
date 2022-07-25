@@ -57,6 +57,8 @@
         <item name="svgStrokeColor">@color/stroke</item>
         <item name="svgFillColor">@color/fill</item>
 
+        <item name="selectedCardBg">@color/selectedCardBg</item>
+
         <item name="chipBackgroundColor">@color/chipBackgroundColor</item>
         <item name="chipBgColorPositive">@color/chipBgPositive</item>
         <item name="chipTextPositive">@color/chipTextPositive</item>
@@ -131,6 +133,7 @@
         <item name="chipColorBgHighlight">@color/chipColorBgHighlightLight</item>
 
         <item name="fabBackgroundColor">@color/fabBackgroundLight</item>
+        <item name="selectedCardBg">@color/selectedCardBgLight</item>
 
         <item name="firewallNoRuleToggleBtnTxt">@color/firewallNoRuleToggleBtnTxtLight</item>
         <item name="firewallNoRuleToggleBtnBg">@color/firewallNoRuleToggleBtnBgLight</item>
@@ -197,6 +200,7 @@
         <item name="chipColorBgHighlight">@color/chipColorBgHighlightBlack</item>
 
         <item name="fabBackgroundColor">@color/fabBackgroundBlack</item>
+        <item name="selectedCardBg">@color/selectedCardBgBlack</item>
 
         <item name="firewallNoRuleToggleBtnTxt">@color/firewallNoRuleToggleBtnTxtBlack</item>
         <item name="firewallNoRuleToggleBtnBg">@color/firewallNoRuleToggleBtnBgBlack</item>

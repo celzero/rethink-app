@@ -192,6 +192,7 @@
             android:id="@+id/settings_activity_ip_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
             android:paddingTop="15dp"
             android:paddingBottom="15dp">
 
@@ -388,8 +389,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_margin="5dp"
-                android:alpha="0.5"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
                 android:padding="10dp"
                 android:src="@drawable/ic_http" />
 
@@ -444,6 +447,7 @@
             android:id="@+id/settings_activity_orbot_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
             android:paddingTop="15dp"
             android:paddingBottom="20dp"
             android:visibility="visible">
@@ -525,8 +529,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_margin="5dp"
-                android:alpha="0.5"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
                 android:padding="10dp"
                 android:src="@drawable/ic_logs" />
 
@@ -570,6 +576,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="15dp"
+            android:background="?android:attr/selectableItemBackground"
             android:paddingBottom="15dp">
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -677,6 +684,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="15dp"
+            android:background="?android:attr/selectableItemBackground"
             android:paddingBottom="15dp">
 
             <androidx.appcompat.widget.AppCompatImageView

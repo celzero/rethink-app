@@ -120,14 +120,6 @@
                     android:textColor="?primaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
 
-                <TextView
-                    android:id="@+id/aad_firewall_status"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:text="@string/ada_firewall_status"
-                    android:textColor="?primaryTextColor"
-                    android:textSize="@dimen/large_font_text_view" />
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -174,7 +166,7 @@
                     <TextView
                         android:id="@+id/aad_app_settings_block"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:layout_weight="0.25"
                         android:drawablePadding="5dp"
@@ -189,7 +181,7 @@
                     <TextView
                         android:id="@+id/aad_app_settings_block_md"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:layout_weight="0.25"
                         android:drawablePadding="5dp"
@@ -204,7 +196,7 @@
                     <TextView
                         android:id="@+id/aad_app_settings_whitelist"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:layout_weight="0.25"
                         android:drawablePadding="5dp"
@@ -219,7 +211,7 @@
                     <TextView
                         android:id="@+id/aad_app_settings_exclude"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:layout_weight="0.25"
                         android:drawablePadding="5dp"
@@ -233,13 +225,20 @@
 
                 </LinearLayout>
 
-                <androidx.appcompat.widget.AppCompatTextView
+                <TextView
+                    android:id="@+id/aad_firewall_status"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/aad_app_settings_ll"
-                    android:textSize="@dimen/default_font_text_view"
-                    android:text=""
-                    />
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:paddingTop="5dp"
+                    android:layout_marginBottom="10dp"
+                    android:paddingBottom="20dp"
+                    android:text="@string/ada_firewall_status"
+                    android:textColor="?primaryTextColor"
+                    android:textSize="@dimen/large_font_text_view" />
+
             </RelativeLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -249,8 +248,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/aad_aap_firewall_card"
             android:layout_margin="8dp"
-            app:cardCornerRadius="8dp"
             android:visibility="gone"
+            app:cardCornerRadius="8dp"
             app:cardElevation="8dp">
 
             <RelativeLayout
@@ -269,7 +268,7 @@
                     android:paddingTop="10dp"
                     android:paddingEnd="20dp"
                     android:paddingBottom="10dp"
-                    android:text="DNS Settings"
+                    android:text="@string/ada_app_dns_settings"
                     android:textColor="?attr/secondaryTextColor"
                     android:textSize="@dimen/large_font_text_view"
                     android:textStyle="bold" />
@@ -293,7 +292,6 @@
                         android:drawablePadding="20dp"
                         android:gravity="center"
                         android:padding="10dp"
-                        android:text="https://basic.rethinkdns.com/1:IAAQAA=="
                         android:textColor="?attr/primaryLightColorText"
                         android:visibility="visible" />
 
@@ -358,7 +356,8 @@
                         android:layout_marginStart="10dp"
                         android:layout_toStartOf="@id/aad_ip_block_indicator"
                         android:layout_toEndOf="@id/aad_ip_block_icon"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:paddingBottom="10dp">
 
                         <TextView
                             android:id="@+id/aad_ip_block_header"
@@ -369,7 +368,7 @@
                             android:gravity="center_vertical"
                             android:paddingTop="5dp"
                             android:paddingBottom="5dp"
-                            android:text="@string/ada_ip_block_title"
+                            android:text="@string/ada_ip_rules_title"
                             android:textColor="?attr/secondaryTextColor"
                             android:textSize="@dimen/large_font_text_view"
                             android:textStyle="bold" />
@@ -405,6 +404,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
                         android:layout_marginBottom="10dp"
+                        android:paddingBottom="10dp"
                         android:paddingStart="20dp"
                         android:paddingEnd="20dp"
                         android:text="@string/ada_ip_block_no_rules"
@@ -418,6 +418,7 @@
                         android:layout_marginTop="5dp"
                         android:layout_marginBottom="10dp"
                         android:background="?android:attr/selectableItemBackground"
+                        android:paddingBottom="10dp"
                         android:scrollIndicators="right"
                         android:scrollbarStyle="outsideOverlay"
                         android:visibility="visible"
@@ -465,7 +466,8 @@
                         android:layout_marginStart="10dp"
                         android:layout_toStartOf="@id/aad_conn_detail_indicator"
                         android:layout_toEndOf="@id/aad_conn_detail_icon"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:paddingBottom="10dp">
 
                         <TextView
                             android:id="@+id/aad_conn_detail_header"
@@ -476,7 +478,7 @@
                             android:gravity="center_vertical"
                             android:paddingTop="5dp"
                             android:paddingBottom="5dp"
-                            android:text="@string/univ_view_blocked_ip"
+                            android:text="@string/ada_network_log_title"
                             android:textColor="?attr/secondaryTextColor"
                             android:textSize="@dimen/large_font_text_view"
                             android:textStyle="bold" />
@@ -487,7 +489,7 @@
                             android:layout_height="wrap_content"
                             android:paddingTop="2dp"
                             android:paddingBottom="2dp"
-                            android:text="@string/ada_ip_connection_count_zero"
+                            android:text="@string/ada_ip_no_connection"
                             android:textSize="@dimen/default_font_text_view" />
 
                     </LinearLayout>
@@ -551,6 +553,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
                         android:layout_marginBottom="10dp"
+                        android:paddingBottom="10dp"
                         android:paddingStart="20dp"
                         android:paddingEnd="20dp"
                         android:text="@string/ada_ip_no_connection"

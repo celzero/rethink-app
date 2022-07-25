@@ -28,7 +28,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -173,7 +172,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             FirewallManager.FirewallStatus.EXCLUDE -> {
                 enableAppExcludedUi()
             }
-            FirewallManager.FirewallStatus.WHITELIST -> {
+            FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> {
                 enableAppWhitelistedUi()
             }
             FirewallManager.FirewallStatus.UNTRACKED -> {
@@ -198,7 +197,14 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         }
 
         b.aadAppSettingsWhitelist.setOnClickListener {
-            updateFirewallStatus(FirewallManager.FirewallStatus.WHITELIST,
+            // change the status to allowed if already app is whitelisted
+            if (appStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL) {
+                updateFirewallStatus(FirewallManager.FirewallStatus.ALLOW,
+                                     FirewallManager.ConnectionStatus.BOTH)
+                return@setOnClickListener
+            }
+
+            updateFirewallStatus(FirewallManager.FirewallStatus.BYPASS_UNIVERSAL,
                                  FirewallManager.ConnectionStatus.BOTH)
         }
 
@@ -206,6 +212,13 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             if (VpnController.isVpnLockdown()) {
                 Utilities.showToastUiCentered(this, getString(R.string.hsf_exclude_error),
                                               Toast.LENGTH_SHORT)
+                return@setOnClickListener
+            }
+
+            // change the status to allowed if already app is excluded
+            if (appStatus == FirewallManager.FirewallStatus.EXCLUDE) {
+                updateFirewallStatus(FirewallManager.FirewallStatus.ALLOW,
+                                     FirewallManager.ConnectionStatus.BOTH)
                 return@setOnClickListener
             }
 
@@ -399,9 +412,6 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 b.aadConnDetailRecycler.layoutManager = layoutManager
                 val recyclerAdapter = AppConnectionAdapter(this, list, uid)
                 b.aadConnDetailRecycler.adapter = recyclerAdapter
-                val dividerItemDecoration = DividerItemDecoration(b.aadConnDetailRecycler.context,
-                                                                  layoutManager.orientation)
-                b.aadConnDetailRecycler.addItemDecoration(dividerItemDecoration)
             }
         }
     }
@@ -501,7 +511,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         return when (aStat) {
             FirewallManager.FirewallStatus.ALLOW -> getString(R.string.ada_app_status_allow)
             FirewallManager.FirewallStatus.EXCLUDE -> getString(R.string.ada_app_status_exclude)
-            FirewallManager.FirewallStatus.WHITELIST -> getString(R.string.ada_app_status_whitelist)
+            FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> getString(R.string.ada_app_status_whitelist)
             FirewallManager.FirewallStatus.BLOCK -> {
                 when {
                     cStat.mobileData() -> getString(R.string.ada_app_status_block_md)

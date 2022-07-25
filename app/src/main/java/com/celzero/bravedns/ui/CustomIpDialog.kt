@@ -54,9 +54,12 @@ class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, t
         window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT,
                           WindowManager.LayoutParams.MATCH_PARENT)
 
+        b.cipSearchView.setOnQueryTextListener(this)
         observeCustomRules()
         setupRecyclerView()
         setupClickListeners()
+
+        b.cipRecycler.requestFocus()
     }
 
     private fun observeCustomRules() {
@@ -127,7 +130,7 @@ class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, t
     private fun showAddIpDialog() {
         val dialog = Dialog(activity)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setTitle(activity.getString(R.string.cd_dialog_title))
+        dialog.setTitle(activity.getString(R.string.ci_dialog_title))
         val dBind = DialogAddCustomIpBinding.inflate(layoutInflater)
         dialog.setContentView(dBind.root)
 
@@ -140,7 +143,7 @@ class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, t
         dialog.setCanceledOnTouchOutside(false)
         dialog.window?.attributes = lp
 
-        dBind.daciIpTitle.text = activity.getString(R.string.cd_dialog_title)
+        dBind.daciIpTitle.text = activity.getString(R.string.ci_dialog_title)
 
         dBind.daciIpEditText.addTextChangedListener {
             if (dBind.daciFailureTextView.isVisible) {

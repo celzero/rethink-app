@@ -25,7 +25,7 @@
                 android:layout_height="wrap_content"
                 android:padding="5dp"
                 android:layout_marginStart="5dp"
-                android:text="Custom domain(s)"
+                android:text="@string/cd_dialog_header"
                 android:textColor="?attr/accentGood"
                 android:textSize="@dimen/large_font_text_view" />
 

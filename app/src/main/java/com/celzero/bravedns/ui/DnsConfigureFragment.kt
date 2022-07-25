@@ -22,7 +22,6 @@ import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.Toast
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
@@ -33,13 +32,16 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.FragmentDnsConfigureBinding
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.scheduler.WorkScheduler.Companion.BLOCKLIST_UPDATE_CHECK_JOB_TAG
+import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
-import com.celzero.bravedns.util.Utilities.Companion.hasLocalBlocklists
 import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
+import com.celzero.bravedns.util.Utilities.Companion.openPauseActivityAndFinish
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -49,7 +51,9 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.concurrent.TimeUnit
 
-class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
+
+class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
+                             LocalBlocklistsBottomSheet.OnBottomSheetDialogFragmentDismiss {
     private val b by viewBinding(FragmentDnsConfigureBinding::bind)
 
     private val persistentState by inject<PersistentState>()
@@ -71,7 +75,7 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
     override fun onResume() {
         super.onResume()
         // update selected dns values
-        updateSelectedDns(appConfig.getConnectedDns())
+        updateSelectedDns()
         // update local blocklist ui
         updateLocalBlocklistUi()
     }
@@ -83,6 +87,8 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
         b.dcPreventDnsLeaksSwitch.isChecked = persistentState.preventDnsLeaks
         // periodically check for blocklist update
         b.dcCheckUpdateSwitch.isChecked = persistentState.periodicallyCheckBlocklistUpdate
+
+        b.connectedStatusTitle.text = getConnectedDnsType()
     }
 
     private fun updateLocalBlocklistUi() {
@@ -92,7 +98,6 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
         }
 
         if (persistentState.blocklistEnabled) {
-            b.dcLocalBlocklistEnableBtn.text = getString(R.string.dc_local_block_enabled)
             b.dcLocalBlocklistCount.text = getString(R.string.dc_local_block_enabled)
             b.dcLocalBlocklistDesc.text = getString(R.string.settings_local_blocklist_in_use,
                                                     persistentState.numberOfLocalBlocklists.toString())
@@ -101,8 +106,6 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
             return
         }
 
-        b.dcLocalBlocklistEnableBtn.text = getString(R.string.dc_local_block_enable)
-
         b.dcLocalBlocklistCount.setTextColor(fetchColor(requireContext(), R.attr.accentBad))
         b.dcLocalBlocklistCount.text = getString(R.string.dc_local_block_disabled)
     }
@@ -110,6 +113,63 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
     private fun initObservers() {
         observeBraveMode()
         observeWorkManager()
+        observeDnscryptStatus()
+        observeAppState()
+    }
+
+    private fun observeAppState() {
+        VpnController.connectionStatus.observe(viewLifecycleOwner) {
+            if (it == BraveVPNService.State.PAUSED) {
+                openPauseActivityAndFinish(requireActivity())
+            }
+        }
+
+        appConfig.getConnectedDnsObservable().observe(viewLifecycleOwner) {
+            updateConnectedStatus(it)
+        }
+    }
+
+    private fun updateConnectedStatus(connectedDns: String) {
+        when (appConfig.getDnsType()) {
+            AppConfig.DnsType.DOH -> {
+                b.connectedStatusTitleUrl.text = resources.getString(
+                    R.string.configure_dns_connected_doh_status)
+                b.connectedStatusTitle.text = resources.getString(
+                    R.string.configure_dns_connection_name, connectedDns)
+            }
+            AppConfig.DnsType.DNSCRYPT -> {
+                b.connectedStatusTitleUrl.text = resources.getString(
+                    R.string.configure_dns_connected_dns_crypt_status)
+            }
+            AppConfig.DnsType.DNS_PROXY -> {
+                b.connectedStatusTitleUrl.text = resources.getString(
+                    R.string.configure_dns_connected_dns_proxy_status)
+                b.connectedStatusTitle.text = resources.getString(
+                    R.string.configure_dns_connection_name, connectedDns)
+            }
+            AppConfig.DnsType.RETHINK_REMOTE -> {
+                b.connectedStatusTitleUrl.text = resources.getString(
+                    R.string.configure_dns_connected_doh_status)
+                b.connectedStatusTitle.text = resources.getString(
+                    R.string.configure_dns_connection_name, connectedDns)
+            }
+            AppConfig.DnsType.NETWORK_DNS -> {
+                b.connectedStatusTitleUrl.text = resources.getString(
+                    R.string.configure_dns_connected_dns_proxy_status)
+                b.connectedStatusTitle.text = resources.getString(
+                    R.string.configure_dns_connection_name, connectedDns)
+            }
+        }
+    }
+
+    // FIXME: Create common observer for dns instead of separate observers
+    private fun observeDnscryptStatus() {
+        appConfig.getDnscryptCountObserver().observe(viewLifecycleOwner) {
+            if (appConfig.getDnsType() != AppConfig.DnsType.DNSCRYPT) return@observe
+
+            val connectedCrypt = getString(R.string.configure_dns_crypt, it.toString())
+            b.connectedStatusTitle.text = connectedCrypt
+        }
     }
 
     private fun isSystemDns(): Boolean {
@@ -120,9 +180,7 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
         return appConfig.isRethinkDnsConnected()
     }
 
-    private fun updateSelectedDns(name: String) {
-        b.connectedDnsDetailsTv.text = getString(R.string.dc_connected_dns_text, name,
-                                                 getConnectedDnsType())
+    private fun updateSelectedDns() {
 
         if (isSystemDns()) {
             b.networkDnsRb.isChecked = true
@@ -183,18 +241,16 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
         }
 
         appConfig.getConnectedDnsObservable().observe(viewLifecycleOwner) {
-            updateSelectedDns(it)
+            updateSelectedDns()
         }
     }
 
     private fun updateDnsOnlyModeUi() {
         // disable local-blocklist for dns-only mode
-        b.dcLocalBlocklistEnableBtn.isEnabled = false
         b.dcLocalBlocklistIcon.isEnabled = false
         b.dcLocalBlocklistRl.isEnabled = false
 
         b.dcLocalBlocklistRl.isClickable = false
-        b.dcLocalBlocklistEnableBtn.isClickable = false
         b.dcLocalBlocklistIcon.isClickable = false
 
         // disable prevent dns leaks in dns-only mode
@@ -213,41 +269,11 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
         }
 
         b.dcLocalBlocklistRl.setOnClickListener {
-            toggleLocalBlocklistActionUi()
+            openLocalBlocklist()
         }
 
         b.dcLocalBlocklistImg.setOnClickListener {
-            toggleLocalBlocklistActionUi()
-        }
-
-        b.dcLocalBlocklistConfigureBtn.setOnClickListener {
-            invokeRethinkActivity(ConfigureRethinkBasicActivity.FragmentLoader.LOCAL)
-        }
-
-        b.dcLocalBlocklistEnableBtn.setOnClickListener {
-            if (persistentState.blocklistEnabled) {
-                removeBraveDnsLocal()
-                updateLocalBlocklistUi()
-                return@setOnClickListener
-            }
-
-            go {
-                uiCtx {
-                    val blocklistsExist = withContext(Dispatchers.Default) {
-                        hasLocalBlocklists(requireContext(),
-                                           persistentState.localBlocklistTimestamp)
-                    }
-                    if (blocklistsExist && isLocalBlocklistStampAvailable()) {
-                        setBraveDnsLocal()
-                        updateLocalBlocklistUi()
-                        b.dcLocalBlocklistDesc.text = getString(
-                            R.string.settings_local_blocklist_in_use,
-                            persistentState.numberOfLocalBlocklists.toString())
-                    } else {
-                        invokeRethinkActivity(ConfigureRethinkBasicActivity.FragmentLoader.LOCAL)
-                    }
-                }
-            }
+            openLocalBlocklist()
         }
 
         b.dcCheckUpdateSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
@@ -279,7 +305,7 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
 
         b.customDnsRb.setOnClickListener {
             // custom dns
-            setCustomDns()
+            showCustomDns()
         }
 
         b.networkDnsRb.setOnClickListener {
@@ -288,22 +314,10 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
         }
     }
 
-    // toggle the local blocklist action button ui
-    private fun toggleLocalBlocklistActionUi() {
-        if (b.dcLocalBlocklistActionContainer.isVisible) {
-            b.dcLocalBlocklistActionContainer.visibility = View.GONE
-            return
-        }
-
-        b.dcLocalBlocklistActionContainer.visibility = View.VISIBLE
-    }
-
-    private fun isLocalBlocklistStampAvailable(): Boolean {
-        if (persistentState.localBlocklistStamp.isEmpty()) {
-            return false
-        }
-
-        return true
+    // open local blocklist bottom sheet
+    private fun openLocalBlocklist() {
+        val bottomSheetFragment = LocalBlocklistsBottomSheet(this)
+        bottomSheetFragment.show(requireActivity().supportFragmentManager, bottomSheetFragment.tag)
     }
 
     private fun invokeRethinkActivity(type: ConfigureRethinkBasicActivity.FragmentLoader) {
@@ -312,10 +326,31 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
         requireContext().startActivity(intent)
     }
 
-    private fun setCustomDns() {
+    private fun showCustomDns() {
         val intent = Intent(requireContext(), DnsListActivity::class.java)
+        intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, customDnsScreenToLoad())
         intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         startActivity(intent)
+    }
+
+    private fun customDnsScreenToLoad(): Int {
+        return when (appConfig.getDnsType()) {
+            AppConfig.DnsType.RETHINK_REMOTE -> {
+                DnsListActivity.Tabs.DOH.screen
+            }
+            AppConfig.DnsType.DOH -> {
+                DnsListActivity.Tabs.DOH.screen
+            }
+            AppConfig.DnsType.DNSCRYPT -> {
+                DnsListActivity.Tabs.DNSCRYPT.screen
+            }
+            AppConfig.DnsType.DNS_PROXY -> {
+                DnsListActivity.Tabs.DNSPROXY.screen
+            }
+            AppConfig.DnsType.NETWORK_DNS -> {
+                DnsListActivity.Tabs.DOH.screen
+            }
+        }
     }
 
     private fun setNetworkDns() {
@@ -325,16 +360,6 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
             appConfig.setSystemDns(sysDns.ipAddress, sysDns.port)
         }
     }
-
-    // FIXME: Verification of BraveDns object should be added in future.
-    private fun setBraveDnsLocal() {
-        persistentState.blocklistEnabled = true
-    }
-
-    private fun removeBraveDnsLocal() {
-        persistentState.blocklistEnabled = false
-    }
-
 
     private fun openCustomDomainDialog() {
         val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
@@ -358,23 +383,15 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure) {
         }
     }
 
-    private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) {
-            f()
-        }
-    }
-
-    private fun go(f: suspend () -> Unit) {
-        lifecycleScope.launch {
-            f()
-        }
-    }
-
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
                 f()
             }
         }
+    }
+
+    override fun onBtmSheetDismiss() {
+        updateLocalBlocklistUi()
     }
 }

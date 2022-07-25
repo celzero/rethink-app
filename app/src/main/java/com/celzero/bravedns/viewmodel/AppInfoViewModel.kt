@@ -6,7 +6,6 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.PagedList
 import androidx.paging.toLiveData
-import androidx.sqlite.db.SimpleSQLiteQuery
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoDAO
@@ -18,8 +17,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     private var filter: MutableLiveData<String> = MutableLiveData()
     private var category: MutableSet<String> = mutableSetOf()
     private var topLevelFilter = FirewallAppFragment.TopLevelFilter.ALL
-    private var firewallFilter = FirewallAppFragment.FirewallFilter.NONE
-    private var orderBy: String = " lower(appName)"
+    private var firewallFilter = FirewallAppFragment.FirewallFilter.ALL
     private var search: String = ""
 
     init {
@@ -36,7 +34,6 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
         this.firewallFilter = filters.firewallFilter
         this.topLevelFilter = filters.topLevelFilter
-        this.orderBy = filters.sortType.getSortByQuery()
 
         this.search = filters.searchString
         this.filter.value = filters.searchString
@@ -59,60 +56,34 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
     private fun allApps(searchString: String): LiveData<PagedList<AppInfo>> {
         return if (category.isEmpty()) {
-            val query = SimpleSQLiteQuery(
-                "select * from AppInfo where (appName like '%$searchString%' or uid like '%$searchString%') and firewallStatus in (${getFirewallStatusFilter()}) order by $orderBy")
-            appInfoDAO.getQuery(query).toLiveData(pageSize = Constants.LIVEDATA_PAGE_SIZE)
-            // using SimpleSQLiteQuery instead of @Dao query
-            // issue: values passed for the order by parameter is not working as expected
-            // https://developer.android.com/reference/androidx/room/RawQuery
-            /*appInfoDAO.getAppInfo("%$searchString%", orderBy).toLiveData(
-                pageSize = Constants.LIVEDATA_PAGE_SIZE)*/
+            appInfoDAO.getAppInfos("%$searchString%", firewallFilter.getFilter()).toLiveData(
+                pageSize = Constants.LIVEDATA_PAGE_SIZE)
         } else {
-            val cat = category.joinToString { c -> "'$c'" }
-            val query = SimpleSQLiteQuery(
-                "select * from AppInfo where (appName like '%$searchString%' or uid like '%$searchString%')  and firewallStatus in (${getFirewallStatusFilter()}) and appCategory in ($cat) order by $orderBy")
-            appInfoDAO.getQuery(query).toLiveData(pageSize = Constants.LIVEDATA_PAGE_SIZE)
-            /*appInfoDAO.getAppInfo("%$searchString%", category, orderBy).toLiveData(
-                pageSize = Constants.LIVEDATA_PAGE_SIZE)*/
+            appInfoDAO.getAppInfos("%$searchString%", category,
+                                   firewallFilter.getFilter()).toLiveData(
+                pageSize = Constants.LIVEDATA_PAGE_SIZE)
         }
     }
 
     private fun installedApps(search: String): LiveData<PagedList<AppInfo>> {
         return if (category.isEmpty()) {
-            val query = SimpleSQLiteQuery(
-                "select * from AppInfo where isSystemApp = 0 and (appName like '%$search%' or uid like '%$search%')  and firewallStatus in (${getFirewallStatusFilter()}) order by $orderBy")
-            appInfoDAO.getQuery(query).toLiveData(pageSize = Constants.LIVEDATA_PAGE_SIZE)
-            /*appInfoDAO.getInstalledApps("%$searchString%", orderBy).toLiveData(
-                pageSize = Constants.LIVEDATA_PAGE_SIZE)*/
+            appInfoDAO.getInstalledApps("%$search%", firewallFilter.getFilter()).toLiveData(
+                pageSize = Constants.LIVEDATA_PAGE_SIZE)
         } else {
-            val cat = category.joinToString { c -> "'$c'" }
-            val query = SimpleSQLiteQuery(
-                "select * from AppInfo where isSystemApp = 0 and (appName like '%$search%' or uid like '%$search%') and appCategory in ($cat)  and firewallStatus in (${getFirewallStatusFilter()}) order by $orderBy")
-            appInfoDAO.getQuery(query).toLiveData(pageSize = Constants.LIVEDATA_PAGE_SIZE)
-            /*appInfoDAO.getInstalledApps("%$searchString%", category, orderBy).toLiveData(
-                pageSize = Constants.LIVEDATA_PAGE_SIZE)*/
+            appInfoDAO.getInstalledApps("%search%", category,
+                                        firewallFilter.getFilter()).toLiveData(
+                pageSize = Constants.LIVEDATA_PAGE_SIZE)
         }
     }
 
     private fun systemApps(search: String): LiveData<PagedList<AppInfo>> {
         return if (category.isEmpty()) {
-            val query = SimpleSQLiteQuery(
-                "select * from AppInfo where isSystemApp = 1 and (appName like '%$search%' or uid like '%$search%')  and firewallStatus in (${getFirewallStatusFilter()}) order by $orderBy")
-            appInfoDAO.getQuery(query).toLiveData(pageSize = Constants.LIVEDATA_PAGE_SIZE)
-            /*appInfoDAO.getSystemApps("%$searchString%", orderBy).toLiveData(
-                pageSize = Constants.LIVEDATA_PAGE_SIZE)*/
+            appInfoDAO.getSystemApps("%$search%", firewallFilter.getFilter()).toLiveData(
+                pageSize = Constants.LIVEDATA_PAGE_SIZE)
         } else {
-            val cat = category.joinToString { c -> "'$c'" }
-            val query = SimpleSQLiteQuery(
-                "select * from AppInfo where isSystemApp = 1 and (appName like '%$search%' or uid like '%$search%') and appCategory in ($cat) and firewallStatus in (${getFirewallStatusFilter()}) order by $orderBy")
-            appInfoDAO.getQuery(query).toLiveData(pageSize = Constants.LIVEDATA_PAGE_SIZE)
-            /*appInfoDAO.getSystemApps("%$searchString%", category, orderBy).toLiveData(
-                pageSize = Constants.LIVEDATA_PAGE_SIZE)*/
+            appInfoDAO.getSystemApps("%$search%", category, firewallFilter.getFilter()).toLiveData(
+                pageSize = Constants.LIVEDATA_PAGE_SIZE)
         }
-    }
-
-    private fun getFirewallStatusFilter(): String {
-        return firewallFilter.getFilterString()
     }
 
     fun updateWifiStatus(blocked: Boolean) {
@@ -217,9 +188,9 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
     private fun getFilteredApps(): List<AppInfo> {
         return if (category.isEmpty()) {
-            appInfoDAO.getFilteredApps("%$search%")
+            appInfoDAO.getFilteredApps("%$search%", firewallFilter.getFilter())
         } else {
-            appInfoDAO.getFilteredApps("%$search%", category)
+            appInfoDAO.getFilteredApps("%$search%", category, firewallFilter.getFilter())
         }
     }
 }

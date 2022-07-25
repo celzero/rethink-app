@@ -67,7 +67,7 @@ object FirewallManager : KoinComponent {
     // blocked    |    mobile         |  mobile-data-block
     // blocked    |    both           |  block
     enum class FirewallStatus(val id: Int) {
-        ALLOW(0), BLOCK(1), WHITELIST(2), EXCLUDE(3), UNTRACKED(4);
+        ALLOW(0), BLOCK(1), BYPASS_UNIVERSAL(2), EXCLUDE(3), UNTRACKED(4);
 
         companion object {
 
@@ -84,8 +84,8 @@ object FirewallManager : KoinComponent {
                     BLOCK.id -> {
                         BLOCK
                     }
-                    WHITELIST.id -> {
-                        WHITELIST
+                    BYPASS_UNIVERSAL.id -> {
+                        BYPASS_UNIVERSAL
                     }
                     EXCLUDE.id -> {
                         EXCLUDE
@@ -111,7 +111,7 @@ object FirewallManager : KoinComponent {
                         BLOCK
                     }
                     4 -> {
-                        WHITELIST
+                        BYPASS_UNIVERSAL
                     }
                     5 -> {
                         EXCLUDE
@@ -124,7 +124,7 @@ object FirewallManager : KoinComponent {
         }
 
         fun whitelisted(): Boolean {
-            return this == WHITELIST
+            return this == BYPASS_UNIVERSAL
         }
 
         fun excluded(): Boolean {
@@ -232,7 +232,7 @@ object FirewallManager : KoinComponent {
     }
 
     fun isUidWhitelisted(uid: Int): Boolean {
-        return appStatus(uid) == FirewallStatus.WHITELIST
+        return appStatus(uid) == FirewallStatus.BYPASS_UNIVERSAL
     }
 
     fun isUidExcluded(uid: Int): Boolean {
@@ -285,7 +285,7 @@ object FirewallManager : KoinComponent {
         val appInfo = getAppInfoByUid(uid) ?: return FirewallStatus.UNTRACKED
 
         return when (appInfo.firewallStatus) {
-            FirewallStatus.WHITELIST.id -> FirewallStatus.WHITELIST
+            FirewallStatus.BYPASS_UNIVERSAL.id -> FirewallStatus.BYPASS_UNIVERSAL
             FirewallStatus.BLOCK.id -> FirewallStatus.BLOCK
             FirewallStatus.ALLOW.id -> FirewallStatus.ALLOW
             FirewallStatus.EXCLUDE.id -> FirewallStatus.EXCLUDE
@@ -471,7 +471,7 @@ object FirewallManager : KoinComponent {
     fun updateWhitelistedApps(appInfo: AppInfo, isWhitelisted: Boolean) {
         io {
             val firewallStatus: FirewallStatus = if (isWhitelisted) {
-                FirewallStatus.WHITELIST
+                FirewallStatus.BYPASS_UNIVERSAL
             } else {
                 FirewallStatus.ALLOW
             }

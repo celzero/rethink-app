@@ -5,7 +5,7 @@
     android:background="@android:color/transparent"
     android:layout_height="wrap_content">
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/crp_title_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,7 +22,7 @@
             android:textSize="@dimen/heading_font_text_view"
             android:textStyle="bold" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/crp_card"
@@ -87,7 +87,7 @@
                     android:textSize="@dimen/large_font_text_view" />
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/crp_desc_subg_tv"
+                    android:id="@+id/crp_desc_entries_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/rectangle_border_background"

@@ -27,7 +27,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp"
         android:padding="10dp"
-        android:text="Group"
+        android:text="@string/bsrf_group_heading"
         android:textColor="?attr/secondaryTextColor"
         android:textSize="@dimen/large_font_text_view" />
 
@@ -39,7 +39,7 @@
         android:layout_marginEnd="10dp"
         android:paddingTop="5dp"
         android:paddingBottom="2dp"
-        app:selectionRequired="false"
+        app:selectionRequired="true"
         app:singleSelection="false" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -49,7 +49,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp"
         android:padding="10dp"
-        android:text="Sub Group"
+        android:text="@string/bsrf_sub_group_heading"
         android:textColor="?attr/secondaryTextColor"
         android:textSize="@dimen/large_font_text_view" />
 
@@ -77,12 +77,12 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
-            android:layout_weight="0.5"
+            android:layout_weight="0.3"
             android:background="@drawable/rectangle_border_background"
             android:maxHeight="40dp"
             android:minHeight="40dp"
             android:padding="5dp"
-            android:text="Clear"
+            android:text="@string/bsrf_clear_filter"
             android:textColor="?attr/primaryTextColor" />
 
         <androidx.appcompat.widget.AppCompatButton
@@ -91,12 +91,12 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
-            android:layout_weight="0.5"
-            android:background="@drawable/rounded_corners_button_primary"
+            android:layout_weight="0.7"
+            android:background="@drawable/rounded_corners_button_accent"
             android:maxHeight="40dp"
             android:minHeight="40dp"
             android:padding="5dp"
-            android:text="Apply"
+            android:text="@string/bsrf_apply_filter"
             android:textColor="?attr/primaryTextColor" />
     </LinearLayout>
 

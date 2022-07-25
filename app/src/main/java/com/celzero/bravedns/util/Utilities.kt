@@ -1,18 +1,18 @@
 /*
-Copyright 2020 RethinkDNS and its authors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2020 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.celzero.bravedns.util
 
 
@@ -76,6 +76,8 @@ import kotlinx.coroutines.launch
 import xdns.Xdns
 import java.io.File
 import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import java.net.InetAddress
 import java.text.SimpleDateFormat
 import java.util.*
@@ -365,6 +367,20 @@ class Utilities {
             return true
         }
 
+        // ref: https://stackoverflow.com/a/41818556
+        fun copyWithStream(readStream: InputStream, writeStream: OutputStream) {
+            val length = 256
+            val buffer = ByteArray(length)
+            var bytesRead: Int = readStream.read(buffer, 0, length)
+            // write the required bytes
+            while (bytesRead > 0) {
+                writeStream.write(buffer, 0, bytesRead)
+                bytesRead = readStream.read(buffer, 0, length)
+            }
+            readStream.close()
+            writeStream.close()
+        }
+
         fun isAlwaysOnEnabled(context: Context, vpnService: BraveVPNService?): Boolean {
             // Introduced as part of issue fix #325
             // From android version 12+(R) Settings keys annotated with @hide are restricted to
@@ -545,7 +561,8 @@ class Utilities {
 
         fun localBlocklistFile(ctx: Context, which: String, timestamp: Long): File? {
             return try {
-                val localBlocklist = localBlocklistDownloadPath(ctx, which, timestamp) ?: return null
+                val localBlocklist = localBlocklistDownloadPath(ctx, which,
+                                                                timestamp) ?: return null
 
                 return File(localBlocklist)
             } catch (e: IOException) {
@@ -668,6 +685,7 @@ class Utilities {
             return color
         }
 
+        // https://medium.com/androiddevelopers/all-about-pendingintents-748c8eb8619
         fun getActivityPendingIntent(context: Context, intent: Intent, flag: Int,
                                      mutable: Boolean): PendingIntent {
             return if (isAtleastS()) {

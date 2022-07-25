@@ -250,7 +250,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
         val pendingIntent = getActivityPendingIntent(context, Intent(context,
                                                                      HomeScreenActivity::class.java),
                                                      PendingIntent.FLAG_UPDATE_CURRENT,
-                                                     mutable = true)
+                                                     mutable = false)
 
         var builder: NotificationCompat.Builder
         if (isAtleastO()) {
@@ -291,7 +291,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
         val intent = Intent(context, NotificationActionReceiver::class.java)
         intent.putExtra(Constants.NOTIFICATION_ACTION, ORBOT_NOTIFICATION_ACTION_TEXT)
         return getBroadcastPendingIntent(context, ORBOT_REQUEST_CODE, intent,
-                                         PendingIntent.FLAG_UPDATE_CURRENT, mutable = true)
+                                         PendingIntent.FLAG_UPDATE_CURRENT, mutable = false)
     }
 
     private fun setOrbotMode() {

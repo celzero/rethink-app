@@ -71,8 +71,7 @@
                         android:singleLine="false"
                         android:textAppearance="@android:style/TextAppearance.Material.Body1"
                         android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view"
-                        tools:text="longlongonsdadasdasdasdasdasdasdasdasdasdgexaasdsa" />
+                        android:textSize="@dimen/default_font_text_view" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -92,9 +91,9 @@
                         android:gravity="center"
                         android:padding="5dp"
                         android:singleLine="true"
-                        android:textStyle="bold"
                         android:textAppearance="@android:style/TextAppearance.Material.Subhead"
                         android:textSize="@dimen/mini_font_text_view"
+                        android:textStyle="bold"
                         tools:text="17:54:11" />
 
 
@@ -113,8 +112,8 @@
                         android:layout_gravity="center"
                         android:ellipsize="none"
                         android:gravity="center"
-                        android:minWidth="20dp"
                         android:maxHeight="20dp"
+                        android:minWidth="20dp"
                         android:singleLine="true"
                         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                         android:textSize="26sp"
@@ -135,34 +134,23 @@
                     android:layout_weight="1"
                     android:orientation="horizontal"
                     android:weightSum="1">
-
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/connection_ip_address"
+                        style="@style/TextAppearance.AppCompat.Subhead"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_weight="0.65"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/connection_ip_address"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_weight="0.65"
-                            android:maxLines="1"
-                            android:ellipsize="end"
-                            android:focusable="true"
-                            android:typeface="monospace"
-                            android:focusableInTouchMode="true"
-                            android:marqueeRepeatLimit="marquee_forever"
-                            android:paddingStart="8dp"
-                            android:paddingEnd="10dp"
-                            android:text="?attr/primaryTextColor"
-                            android:textSize="@dimen/large_font_text_view"
-                            style="@style/TextAppearance.AppCompat.Subhead"
-                            tools:text="sdadasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdss" />
-
-                    </LinearLayout>
+                        android:ellipsize="end"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:maxLines="1"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="10dp"
+                        android:text="?attr/primaryTextColor"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:typeface="monospace" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -176,11 +164,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
+                            android:fontFamily="sans-serif-condensed"
                             android:singleLine="true"
                             android:text="?attr/primaryTextColor"
-                            android:fontFamily="sans-serif-condensed"
-                            android:textSize="@dimen/default_font_text_view"
-                            tools:text="10(ms)" />
+                            android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -202,8 +189,9 @@
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="?attr/divider"/>
+        android:background="?attr/divider" />
 </LinearLayout>

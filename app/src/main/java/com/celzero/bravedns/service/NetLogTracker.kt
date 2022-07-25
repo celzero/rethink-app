@@ -24,7 +24,8 @@ import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.util.NetLogBatcher
 import dnsx.Summary
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.*
@@ -35,10 +36,10 @@ class NetLogTracker internal constructor(private val context: Context,
                                          private val persistentState: PersistentState) :
         KoinComponent {
 
+    private val dnsLatencyTracker by inject<QueryTracker>()
+
     var scope: CoroutineScope? = null
         private set
-
-    private val dnsLatencyTracker by inject<QueryTracker>()
 
     private var dnsLogTracker: DnsLogTracker? = null
     private var ipTracker: IPTracker? = null
@@ -46,7 +47,7 @@ class NetLogTracker internal constructor(private val context: Context,
     private var dnsNetLogBatcher: NetLogBatcher<DnsLog>? = null
     private var ipNetLogBatcher: NetLogBatcher<ConnectionTracker>? = null
 
-    fun startLogger() {
+    suspend fun startLogger(s: CoroutineScope) {
         if (ipTracker == null) {
             ipTracker = IPTracker(connectionTrackerRepository, context)
         }
@@ -55,32 +56,24 @@ class NetLogTracker internal constructor(private val context: Context,
             dnsLogTracker = DnsLogTracker(dnsLogRepository, persistentState, context)
         }
 
-        this.scope = CoroutineScope(Dispatchers.IO)
+        this.scope = s
 
         // asserting, created object above
-        ipNetLogBatcher = NetLogBatcher(scope!!) {
-            ipTracker!!.insertBatch(it)
-        }
+        ipNetLogBatcher = NetLogBatcher(ipTracker!!::insertBatch)
+        ipNetLogBatcher!!.begin(scope!!)
 
-        dnsNetLogBatcher = NetLogBatcher(scope!!) {
-            dnsLogTracker!!.insertBatch(it)
-        }
-    }
-
-    fun stopLogger() {
-        // TODO: perform stop actions
-        this.scope?.cancel("stop")
-
+        dnsNetLogBatcher = NetLogBatcher(dnsLogTracker!!::insertBatch)
+        dnsNetLogBatcher!!.begin(scope!!)
     }
 
     fun writeIpLog(info: IPDetails) {
         if (!persistentState.logsEnabled) return
 
-        io("NetIpLogger") {
-            val connTracker = ipTracker?.makeConnectionTracker(info) ?: return@io
-
+        scope?.launch {
+            val connTracker = ipTracker?.makeConnectionTracker(info) ?: return@launch
             ipNetLogBatcher?.add(connTracker)
         }
+
     }
 
     // now, this method is doing multiple things which should be removed.
@@ -92,25 +85,19 @@ class NetLogTracker internal constructor(private val context: Context,
         // quantile estimator
         dnsLatencyTracker.recordTransaction(transaction)
 
-        io("NetDnsLogger") {
-            val dnsLog = dnsLogTracker?.makeDnsLogObj(transaction) ?: return@io
+        val dnsLog = dnsLogTracker?.makeDnsLogObj(transaction) ?: return
 
-            // ideally this check should be carried out before processing the dns object.
-            // Now, the ipDomain cache is adding while making the dnsLog object.
-            // TODO: move ipDomain cache out of DnsLog object creation
-            if (!persistentState.logsEnabled) return@io
+        // ideally this check should be carried out before processing the dns object.
+        // Now, the ipDomain cache is adding while making the dnsLog object.
+        // TODO: move ipDomain cache out of DnsLog object creation
+        if (!persistentState.logsEnabled) return
 
-            dnsLogTracker?.updateDnsRequestCount(dnsLog)
+        dnsLogTracker?.updateDnsRequestCount(dnsLog)
+        scope?.launch {
             dnsNetLogBatcher?.add(dnsLog)
         }
         // TODO: This method should be part of BraveVPNService
         dnsLogTracker?.updateVpnConnectionState(transaction)
-    }
-
-    private fun io(s: String, f: suspend () -> Unit) = scope?.launch(CoroutineName(s)) {
-        withContext(Dispatchers.IO) {
-            f()
-        }
     }
 
 }

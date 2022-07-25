@@ -61,6 +61,7 @@ class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainView
         window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT,
                           WindowManager.LayoutParams.MATCH_PARENT)
 
+        b.cdfSearchView.setOnQueryTextListener(this)
         setupRecyclerView()
         remakeParentFilterChipsUi()
         setupClickListeners()
@@ -74,8 +75,6 @@ class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainView
 
         viewModel.customDomainList.observe(activity as LifecycleOwner,
                                            androidx.lifecycle.Observer(adapter::submitList))
-
-        b.cdfSearchView.setOnQueryTextListener(this)
     }
 
     private fun setupClickListeners() {

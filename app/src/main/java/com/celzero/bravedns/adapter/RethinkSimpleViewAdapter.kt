@@ -15,19 +15,24 @@
  */
 package com.celzero.bravedns.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.RethinkBlocklistManager
 import com.celzero.bravedns.databinding.ListItemRethinkBlocklistSimpleBinding
 import com.celzero.bravedns.ui.RethinkBlocklistFragment
 import com.celzero.bravedns.ui.RethinkBlocklistFragment.Companion.selectedFileTags
+import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class RethinkSimpleViewAdapter(var fileTags: List<RethinkBlocklistManager.SimpleViewTag>,
+class RethinkSimpleViewAdapter(val context: Context,
+                               var fileTags: List<RethinkBlocklistManager.SimpleViewTag>,
                                val type: RethinkBlocklistFragment.RethinkBlocklistType) :
         RecyclerView.Adapter<RethinkSimpleViewAdapter.RethinkSimpleViewHolder>() {
 
@@ -63,9 +68,21 @@ class RethinkSimpleViewAdapter(var fileTags: List<RethinkBlocklistManager.Simple
             }
         }
 
+        private fun setCardBackground(card: CardView, isSelected: Boolean) {
+            if (isSelected) {
+                card.setCardBackgroundColor(Utilities.fetchColor(context, R.attr.selectedCardBg))
+            } else {
+                card.setCardBackgroundColor(Utilities.fetchColor(context, R.attr.background))
+            }
+        }
+
+
         private fun toggleCheckbox(isSelected: Boolean, position: Int) {
             b.crpCheckBox.isChecked = isSelected
+            setCardBackground(b.crpCard, isSelected)
+
             if (isSelected) {
+
                 addBlocklistTag(fileTags[position].tags)
                 return
             }
@@ -113,6 +130,7 @@ class RethinkSimpleViewAdapter(var fileTags: List<RethinkBlocklistManager.Simple
 
         private fun displayMetaData(position: Int) {
             val simpleView = fileTags[position]
+            setCardBackground(b.crpCard, false)
 
             // check to show the title and desc, as of now these values are predefined so checking
             // with those pre defined values.
@@ -133,6 +151,7 @@ class RethinkSimpleViewAdapter(var fileTags: List<RethinkBlocklistManager.Simple
 
             if (selectedFileTags.value!!.containsAll(simpleView.tags)) {
                 b.crpCheckBox.isChecked = true
+                setCardBackground(b.crpCard, true)
             }
         }
 

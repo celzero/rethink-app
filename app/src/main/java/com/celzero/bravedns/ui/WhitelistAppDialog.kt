@@ -74,7 +74,7 @@ class WhitelistAppDialog(val activity: Activity, val adapter: RecyclerView.Adapt
         }
 
         FirewallManager.getApplistObserver().observe(activity as LifecycleOwner) {
-            val blockedCount = it.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.WHITELIST.id }.count()
+            val blockedCount = it.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL.id }.count()
             b.customSelectAllOptionCount.text = context.getString(
                 R.string.whitelist_dialog_apps_in_use, blockedCount.toString())
         }

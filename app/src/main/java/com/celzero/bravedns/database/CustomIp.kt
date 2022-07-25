@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.database
 
+import android.util.Log
 import androidx.room.Entity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import inet.ipaddr.IPAddress
@@ -63,6 +64,22 @@ class CustomIp {
     }
 
     fun setCustomIpAddress(ipAddress: String) {
-        this.ipAddress = IPAddressString(ipAddress).address.toNormalizedString()
+        var ip = ipAddress
+        if (IPAddressString(ipAddress).isIPv4) {
+            if (ipAddress.count { it == '.' } < 3) {
+                ip = getPaddedIp(ip)
+            }
+        }
+
+        this.ipAddress = IPAddressString(ip).address.toNormalizedString()
+    }
+
+    private fun getPaddedIp(ip: String): String {
+        return if (ip.contains("/")) {
+            val index = ip.indexOf("/")
+            ip.substring(0, index) + ".*" + ip.substring(index)
+        } else {
+            "$ip.*"
+        }
     }
 }

@@ -60,7 +60,6 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
 
     private fun initView() {
         remakeParentFilterChipsUi()
-        remakeFirewallChipsUi()
 
         val filters = FirewallAppFragment.filters.value
         if (filters == null) {
@@ -70,7 +69,6 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
 
         applyParentFilter(filters.topLevelFilter.id)
         setFilter(filters.topLevelFilter, filters.categoryFilters)
-        setFirewallFilter(filters.firewallFilter)
     }
 
     private fun initClickListeners() {
@@ -87,20 +85,14 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
 
     private fun setFilter(topLevelFilter: FirewallAppFragment.TopLevelFilter,
                           categories: MutableSet<String>) {
-        val topView: Chip = b.ffaParentChipGroup.findViewWithTag(topLevelFilter.id)
+        val topView: Chip = b.ffaParentChipGroup.findViewWithTag(topLevelFilter.id) ?: return
         b.ffaParentChipGroup.check(topView.id)
         colorUpChipIcon(topView)
 
         categories.forEach {
-            val childCategory: Chip = b.ffaChipGroup.findViewWithTag(it)
+            val childCategory: Chip = b.ffaChipGroup.findViewWithTag(it) ?: return
             b.ffaChipGroup.check(childCategory.id)
         }
-    }
-
-    private fun setFirewallFilter(sortType: FirewallAppFragment.FirewallFilter) {
-        val view: Chip = b.ffaFirewallChipGroup.findViewWithTag(sortType.id)
-        b.ffaFirewallChipGroup.check(view.id)
-        colorUpChipIcon(view)
     }
 
     private fun isDarkThemeOn(): Boolean {
@@ -146,28 +138,6 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
         return chip
     }
 
-    private fun remakeFirewallChipsUi() {
-        b.ffaFirewallChipGroup.removeAllViews()
-
-        val none = makeFirewallChip(FirewallAppFragment.SortFilter.NONE.id,
-                                    getString(R.string.fapps_firewall_filter_none), true)
-        val allowed = makeFirewallChip(FirewallAppFragment.FirewallFilter.ALLOWED.id,
-                                       getString(R.string.fapps_firewall_filter_allowed), false)
-        val blocked = makeFirewallChip(FirewallAppFragment.SortFilter.BLOCKED.id,
-                                       getString(R.string.fapps_firewall_filter_blocked), false)
-        val whitelisted = makeFirewallChip(FirewallAppFragment.SortFilter.WHITELISTED.id,
-                                           getString(R.string.fapps_firewall_filter_whitelisted),
-                                           false)
-        val excluded = makeFirewallChip(FirewallAppFragment.SortFilter.EXCLUDED.id,
-                                        getString(R.string.fapps_firewall_filter_excluded), false)
-
-        b.ffaFirewallChipGroup.addView(none)
-        b.ffaFirewallChipGroup.addView(allowed)
-        b.ffaFirewallChipGroup.addView(blocked)
-        b.ffaFirewallChipGroup.addView(whitelisted)
-        b.ffaFirewallChipGroup.addView(excluded)
-    }
-
     private fun colorUpChipIcon(chip: Chip) {
         val colorFilter = PorterDuffColorFilter(
             ContextCompat.getColor(requireContext(), R.color.primaryText), PorterDuff.Mode.SRC_IN)
@@ -175,24 +145,6 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
         chip.chipIcon?.colorFilter = colorFilter
     }
 
-    private fun makeFirewallChip(id: Int, label: String, checked: Boolean): Chip {
-        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
-        chip.tag = id
-        chip.text = label
-        chip.isChecked = checked
-
-        chip.setOnCheckedChangeListener { button: CompoundButton, isSelected: Boolean ->
-            if (isSelected) {
-                applyFirewallFilter(button.tag)
-                colorUpChipIcon(chip)
-            } else {
-                // no-op
-                // no action needed for checkState: false
-            }
-        }
-
-        return chip
-    }
 
     private fun applyParentFilter(tag: Any) {
         when (tag) {
@@ -209,10 +161,6 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
                 remakeChildFilterChipsUi(FirewallManager.getCategoriesForSystemApps())
             }
         }
-    }
-
-    private fun setFirewallFilter() {
-
     }
 
     private fun remakeChildFilterChipsUi(categories: List<String>) {
@@ -240,9 +188,5 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
         } else {
             sortValues.categoryFilters.remove(tag.toString())
         }
-    }
-
-    private fun applyFirewallFilter(tag: Any) {
-        sortValues.firewallFilter = FirewallAppFragment.FirewallFilter.filter(tag as Int)
     }
 }

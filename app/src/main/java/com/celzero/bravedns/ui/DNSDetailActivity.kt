@@ -1,18 +1,18 @@
 /*
-Copyright 2020 RethinkDNS and its authors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2020 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.celzero.bravedns.ui
 
 import android.content.Context
@@ -24,17 +24,15 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityDnsDetailBinding
-import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.Utilities.Companion.openPauseActivityAndFinish
 import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.android.ext.android.inject
 
 class DnsDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
     private val b by viewBinding(ActivityDnsDetailBinding::bind)
+
     private var fragmentIndex = 0
     private val persistentState by inject<PersistentState>()
 
@@ -56,6 +54,7 @@ class DnsDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
     }
 
     private fun init() {
+
         b.dnsDetailActViewpager.adapter = object : FragmentStateAdapter(this) {
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
@@ -81,15 +80,6 @@ class DnsDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
 
         b.dnsDetailActViewpager.setCurrentItem(fragmentIndex, true)
 
-        observeAppState()
-    }
-
-    private fun observeAppState() {
-        VpnController.connectionStatus.observe(this) {
-            if (it == BraveVPNService.State.PAUSED) {
-                openPauseActivityAndFinish(this)
-            }
-        }
     }
 
     private fun Context.isDarkThemeOn(): Boolean {

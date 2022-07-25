@@ -21,6 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="2dp"
             android:layout_marginRight="2dp"
+            android:alpha="0.7"
             android:padding="10dp"
             android:text="@string/universal_firewall_explanation"
             android:textColor="?attr/primaryLightColorText"
@@ -195,8 +196,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="2dp"
             android:layout_marginTop="2dp"
-            android:layout_marginRight="2dp"
-            android:layout_marginBottom="10dp">
+            android:layout_marginRight="2dp">
 
             <TextView
                 android:id="@+id/firewall_block_new_app_txt"
@@ -229,7 +229,7 @@
             android:layout_marginLeft="2dp"
             android:layout_marginTop="2dp"
             android:layout_marginRight="2dp"
-            android:layout_marginBottom="10dp">
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/firewall_check_ipv4_txt"
@@ -243,10 +243,43 @@
                 android:text="@string/univ_firewall_rule_7"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view"
-                app:drawableStartCompat="@drawable/ic_app_info" />
+                app:drawableStartCompat="@drawable/ic_ipv6" />
 
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/firewall_check_ipv4_check"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="15dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/firewall_block_metered_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginBottom="2dp">
+
+            <TextView
+                android:id="@+id/firewall_block_metered_txt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.9"
+                android:drawablePadding="10dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="start|center"
+                android:padding="10dp"
+                android:text="@string/univ_firewall_rule_9"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view"
+                app:drawableStartCompat="@drawable/ic_univ_metered" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/firewall_block_metered_check"
                 style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -276,7 +309,7 @@
                 android:text="@string/univ_firewall_rule_8"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view"
-                app:drawableStartCompat="@drawable/ic_app_info" />
+                app:drawableStartCompat="@drawable/ic_http" />
 
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/firewall_block_http_check"
@@ -300,7 +333,8 @@
             android:layout_marginStart="2dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="2dp"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="10dp"
+            android:background="?android:attr/selectableItemBackground">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/firewall_univ_ip_icon"

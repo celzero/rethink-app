@@ -74,6 +74,10 @@ class DnsLog {
         return (this.status != Transaction.Status.COMPLETE.toString() || this.response == Constants.NXDOMAIN || this.isBlocked)
     }
 
+    fun unansweredQuery(): Boolean {
+        return (this.status != Transaction.Status.COMPLETE.toString() || this.response == Constants.NXDOMAIN)
+    }
+
     fun isAnonymized(): Boolean {
         return this.relayIP.isNotEmpty()
     }
