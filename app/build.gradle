@@ -16,7 +16,7 @@ try {
 
 android {
     compileSdkVersion 32
-    buildToolsVersion '30.0.3'
+    buildToolsVersion '33.0.0'
 
     signingConfigs {
         config {
