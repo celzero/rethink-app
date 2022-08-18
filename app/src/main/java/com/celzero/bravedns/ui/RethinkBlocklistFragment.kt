@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
@@ -47,6 +48,7 @@ import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.RETHINK_B
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_STAMP
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_TYPE
 import com.celzero.bravedns.ui.RethinkBlocklistFragment.RethinkBlocklistType.Companion.getType
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_2
 import com.celzero.bravedns.util.CustomLinearLayoutManager
@@ -260,6 +262,18 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         // be default, select the simple blocklist view
         selectToggleBtnUi(b.lbSimpleToggleBtn)
         unselectToggleBtnUi(b.lbAdvToggleBtn)
+
+        // choose whether to show chips
+        showChipsIfNeeded()
+    }
+
+    private fun showChipsIfNeeded() {
+        // show chips only on remote blocklists
+        if (getDownloadType().isLocal()) {
+            b.lbHeaderLayout.visibility = View.GONE
+        } else {
+            b.lbHeaderLayout.visibility = View.VISIBLE
+        }
     }
 
     private fun showBlocklistVersionUi() {
@@ -296,9 +310,9 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
 
     private fun isBlocklistUpdateAvailable(): Boolean {
         return if (type.isLocal()) {
-            persistentState.isLocalBlocklistUpdateAvailable
+            persistentState.updatableTimestampLocal != INIT_TIME_MS
         } else {
-            persistentState.isRemoteBlocklistUpdateAvailable
+            persistentState.updatableTimestampRemote != INIT_TIME_MS
         }
     }
 
@@ -417,13 +431,33 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         b.bslbUpdateAvailableBtn.setOnClickListener {
             isDownloadInitiated = true
             b.bslbUpdateAvailableBtn.isEnabled = false
-            isBlocklistUpdateAvailable(getDownloadType())
+            val timestamp = if (type.isLocal()) {
+                persistentState.updatableTimestampLocal
+            } else {
+                persistentState.updatableTimestampRemote
+            }
+
+            Log.d("TEST","TEST: Updatable timestamp: $timestamp, download: ${getDownloadTimeStamp()}")
+
+            if (getDownloadTimeStamp() < timestamp) {
+                // show dialog if the download type is local
+                if (type.isLocal()) {
+                    showDownloadDialog(timestamp, isRedownload = false)
+                } else {
+                    download(timestamp)
+                }
+            } else {
+                showUpdateCheckUi()
+                showToastUiCentered(requireContext(),
+                                    getString(R.string.blocklist_update_check_failure),
+                                    Toast.LENGTH_SHORT)
+            }
         }
 
         b.bslbRedownloadBtn.setOnClickListener {
             isDownloadInitiated = true
             b.bslbRedownloadBtn.isEnabled = false
-            download(getDownloadTimeStamp())
+            showDownloadDialog(getDownloadTimeStamp(), isRedownload = true)
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
@@ -437,6 +471,31 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
 
             showApplyChangesDialog()
         }
+    }
+
+    private fun showDownloadDialog(timestamp: Long, isRedownload: Boolean) {
+        val builder = AlertDialog.Builder(requireContext())
+        if (isRedownload) {
+            builder.setTitle(R.string.local_blocklist_redownload)
+            builder.setMessage(getString(R.string.local_blocklist_redownload_desc,
+                                         Utilities.convertLongToTime(timestamp,
+                                                                     Constants.TIME_FORMAT_2)))
+        } else {
+            builder.setTitle(R.string.local_blocklist_download)
+            builder.setMessage(R.string.local_blocklist_download_desc)
+        }
+        builder.setCancelable(false)
+        builder.setPositiveButton(
+            getString(R.string.settings_local_blocklist_dialog_positive)) { _, _ ->
+            download(timestamp)
+        }
+        builder.setNegativeButton(
+            getString(R.string.settings_local_blocklist_dialog_negative)) { dialog, _ ->
+            enableChips()
+            dialog.dismiss()
+        }
+        val alertDialog: AlertDialog = builder.create()
+        alertDialog.show()
     }
 
     private fun isLocalBlocklistDownloadInitiated(): Boolean {
@@ -461,7 +520,7 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
     }
 
     private fun showApplyChangesDialog() {
-        val builder = androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        val builder = AlertDialog.Builder(requireContext())
         builder.setTitle(getString(R.string.rt_dialog_title))
         builder.setMessage(getString(R.string.rt_dialog_message))
         builder.setCancelable(true)
@@ -562,8 +621,6 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         val list = RethinkBlocklistManager.getSelectedFileTags(requireContext(), timestamp,
                                                                getStamp(), type)
 
-        if (list.isEmpty()) return
-
         if (selectedFileTags.value.isNullOrEmpty()) {
             selectedFileTags.value = list.toMutableSet()
         } else {
@@ -574,9 +631,17 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
     }
 
     private fun updateSelectedFileTags(selectedTags: MutableSet<Int>) {
-        if (selectedTags.isEmpty()) return
-
         io {
+            // if the list is empty clear if there is residual selections
+            if (selectedTags.isEmpty()) {
+                if (type.isLocal()) {
+                    RethinkBlocklistManager.clearSelectedTagsLocal()
+                } else {
+                    RethinkBlocklistManager.clearSelectedTagsRemote()
+                }
+                return@io
+            }
+
             if (type.isLocal()) {
                 RethinkBlocklistManager.updateSelectedFiletagsLocal(selectedTags,
                                                                     1 /* isSelected: true */)

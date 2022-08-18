@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/dns_detail_container"
     android:layout_width="match_parent"
@@ -9,103 +8,11 @@
     android:orientation="vertical"
     tools:context=".ui.DnsDetailActivity">
 
-    <!--<com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@null"
-        android:fitsSystemWindows="true"
-        android:visibility="gone"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/toolbar_layout1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fitsSystemWindows="true"
-            app:collapsedTitleGravity="center_vertical"
-            app:contentScrim="?attr/colorPrimary"
-            app:expandedTitleTextAppearance="@style/TextAppearance.AppCompat.Headline"
-            app:layout_scrollFlags="scroll|snap|enterAlwaysCollapsed">
-
-
-            <LinearLayout
-                android:id="@+id/query_card_view_top"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:paddingTop="20dp"
-                android:paddingBottom="10dp">
-
-                <TextView
-                    android:id="@+id/connected_status_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
-                    android:gravity="center"
-                    android:text="@string/configure_dns_connected_doh_status"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/large_font_text_view" />
-
-                <TextView
-                    android:id="@+id/connected_status_title_url"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:gravity="center"
-                    android:padding="5dp"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:textSize="@dimen/default_font_text_view" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginEnd="10dp"
-                    android:orientation="horizontal"
-                    android:weightSum="1">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/latency_txt"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="start|center"
-                        android:layout_weight="0.45"
-                        android:fontFamily="sans-serif"
-                        android:paddingStart="5dp"
-                        android:paddingEnd="5dp"
-                        android:text="@string/dns_logs_blocked_queries"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/large_font_text_view" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/total_queries_txt"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.55"
-                        android:fontFamily="sans-serif"
-                        android:gravity="end"
-                        android:paddingStart="5dp"
-                        android:paddingEnd="5dp"
-                        android:text="@string/dns_logs_lifetime_queries"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/large_font_text_view" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-    </com.google.android.material.appbar.AppBarLayout>-->
-
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:visibility="gone"
-        android:background="?attr/border" />
+        android:background="?attr/border"
+        android:visibility="gone" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/dns_detail_act_tabLayout"

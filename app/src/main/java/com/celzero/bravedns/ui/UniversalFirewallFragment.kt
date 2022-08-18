@@ -26,8 +26,11 @@ import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.adapter.CustomIpAdapter
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.FragmentUniversalFirewallBinding
 import com.celzero.bravedns.databinding.UniversalFragementContainerBinding
@@ -42,6 +45,7 @@ import com.celzero.bravedns.viewmodel.CustomIpViewModel
 import com.google.android.material.switchmaterial.SwitchMaterial
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.concurrent.TimeUnit
 import kotlin.reflect.KMutableProperty0
 
 class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_container) {
@@ -157,6 +161,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         }
 
         includeView.firewallAppsShowTxt.setOnClickListener {
+            enableAfterDelay(TimeUnit.SECONDS.toMillis(2L), includeView.firewallAppsShowTxt)
             openCustomIpDialog()
         }
 
@@ -205,8 +210,11 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
     }
 
     private fun openCustomIpDialog() {
+        val adapter = CustomIpAdapter(requireContext())
+        customIpViewModel.customIpDetails.observe(activity as LifecycleOwner,
+                                          androidx.lifecycle.Observer(adapter::submitList))
         val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-        val customDialog = CustomIpDialog(requireActivity(), customIpViewModel, themeId)
+        val customDialog = CustomIpDialog(requireActivity(), customIpViewModel, adapter, themeId)
         customDialog.show()
     }
 
@@ -306,6 +314,16 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
     private fun toggle(v: SwitchMaterial, pref: KMutableProperty0<Boolean>) {
         pref.set(!pref.get())
         v.isChecked = pref.get()
+    }
+
+    private fun enableAfterDelay(ms: Long, vararg views: View) {
+        for (v in views) v.isEnabled = false
+
+        Utilities.delay(ms, lifecycleScope) {
+            if (!isAdded) return@delay
+
+            for (v in views) v.isEnabled = true
+        }
     }
 
 }

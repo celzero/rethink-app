@@ -104,6 +104,10 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
         updateNewVersion()
 
+        // remove
+        persistentState.localBlocklistTimestamp =  1635754946983
+        persistentState.remoteBlocklistTimestamp = 1635754946983
+
         if (savedInstanceState == null) {
             homeScreenFragment = HomeScreenFragment()
             supportFragmentManager.beginTransaction().replace(R.id.fragment_container,

@@ -71,13 +71,17 @@ class BlocklistUpdateCheckJob(val context: Context, workerParameters: WorkerPara
                 }
 
                 val shouldUpdate = json.optBoolean(Constants.JSON_UPDATE, false)
+                val timestamp = json.optLong(Constants.JSON_LATEST, Constants.INIT_TIME_MS)
                 Log.i(LOG_TAG_SCHEDULER,
-                      "Response for update check for blocklist: version? $version, update? $shouldUpdate")
+                      "Response for update check for blocklist: version? $version, update? $shouldUpdate, download type: ${type.name}")
                 if (type == AppDownloadManager.DownloadType.LOCAL) {
                     persistentState.isLocalBlocklistUpdateAvailable = shouldUpdate
-                } else {
-                    persistentState.isRemoteBlocklistUpdateAvailable = shouldUpdate
+                    if (shouldUpdate) persistentState.updatableTimestampLocal = timestamp
+                    return
                 }
+
+                persistentState.isRemoteBlocklistUpdateAvailable = shouldUpdate
+                if (shouldUpdate) persistentState.updatableTimestampRemote = timestamp
             }
         })
     }

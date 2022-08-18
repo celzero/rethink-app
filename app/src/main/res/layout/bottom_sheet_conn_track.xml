@@ -87,7 +87,6 @@
             android:layout_marginBottom="2dp"
             android:layout_toEndOf="@id/bs_conn_track_app_icon"
             android:gravity="center"
-            android:text="@string/action_automatic"
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/extra_large_font_text_view" />
     </RelativeLayout>

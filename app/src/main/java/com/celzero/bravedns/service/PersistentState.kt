@@ -181,8 +181,16 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // custom download manager's last generated id
     var customDownloaderLastGeneratedId by longPref("custom_downloader_last_generated_id", 0)
 
+    // remove this var in 054
     var isLocalBlocklistUpdateAvailable by booleanPref("local_blocklist_update_check", false)
 
+    // local timestamp for which the update is available
+    var updatableTimestampLocal by longPref("local_blocklist_update_ts", INIT_TIME_MS)
+
+    // remote timestamp for which the update is available
+    var updatableTimestampRemote by longPref("remote_blocklist_update_ts", INIT_TIME_MS)
+
+    // remove this var in 054
     var isRemoteBlocklistUpdateAvailable by booleanPref("remote_blocklist_update_check", false)
 
     // auto-check for blocklist update periodically (once in a day)

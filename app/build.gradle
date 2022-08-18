@@ -35,7 +35,7 @@ android {
         applicationId "com.celzero.bravedns"
         minSdkVersion 23
         targetSdkVersion 32
-        versionCode 20 // for version name 053i
+        versionCode 21 // for version name 053j
         versionName "053i"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -78,7 +78,7 @@ android {
 dependencies {
     androidTestImplementation 'androidx.test:rules:1.4.0'
     def koin_version = '3.2.0'
-    def room_version = "2.4.2"
+    def room_version = "2.4.3"
     def paging_version = "3.1.1"
 
     implementation "com.google.guava:guava:31.1-android"
@@ -93,7 +93,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
 
     // For liveData implementation
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
 
     implementation 'com.google.code.gson:gson:2.9.0'
 
@@ -102,12 +102,12 @@ dependencies {
     implementation "androidx.room:room-ktx:$room_version"
 
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.0'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
 
     // For paging - connection tracker
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-    implementation "androidx.fragment:fragment-ktx:1.5.0"
+    implementation "androidx.fragment:fragment-ktx:1.5.1"
     implementation 'com.google.android.material:material:1.6.1'
     implementation "androidx.viewpager2:viewpager2:1.0.0"
 

@@ -922,15 +922,17 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
 
     private fun makeAppInfoObserver(): Observer<Collection<AppInfo>> {
         return Observer<Collection<AppInfo>> { t ->
-            val copy: MutableList<AppInfo>
+            val copy: List<AppInfo>
+            var latestExcludedApps: Set<String>
             // adding synchronized block, found a case of concurrent modification
             // exception that happened once when trying to filter the received object (t).
             // creating a copy of the received value in a synchronized block.
             synchronized(t) {
                 copy = mutableListOf<AppInfo>().apply { addAll(t) }
+                latestExcludedApps = copy.filter { it.firewallStatus == FirewallManager.FirewallStatus.EXCLUDE.id }.map(
+                    AppInfo::packageInfo).toSet()
             }
-            val latestExcludedApps = copy.filter { it.firewallStatus == FirewallManager.FirewallStatus.EXCLUDE.id }.map(
-                AppInfo::packageInfo).toSet()
+
             if (Sets.symmetricDifference(excludedApps,
                                          latestExcludedApps).isEmpty()) return@Observer
 

@@ -38,11 +38,10 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
 import inet.ipaddr.IPAddressString
 
-class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, themeId: Int) :
+class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, internal var adapter: RecyclerView.Adapter<*>, themeId: Int) :
         Dialog(activity, themeId), SearchView.OnQueryTextListener {
     private var layoutManager: RecyclerView.LayoutManager? = null
     private lateinit var b: DialogCustomIpBinding
-    private lateinit var adapter: CustomIpAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,13 +102,9 @@ class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, t
 
     private fun setupRecyclerView() {
         layoutManager = LinearLayoutManager(activity)
-        adapter = CustomIpAdapter(activity)
 
         b.cipRecycler.layoutManager = layoutManager
         b.cipRecycler.adapter = adapter
-
-        viewModel.customIpDetails.observe(activity as LifecycleOwner,
-                                          androidx.lifecycle.Observer(adapter::submitList))
     }
 
     private fun setupClickListeners() {

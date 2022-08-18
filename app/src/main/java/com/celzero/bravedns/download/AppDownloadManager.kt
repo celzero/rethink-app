@@ -118,6 +118,7 @@ class AppDownloadManager(private val context: Context,
 
                     // post timestamp if there is update available or re-download request
                     if (shouldUpdate) {
+                        setUpdatableTimestamp(timestamp, type)
                         timeStampToDownload.postValue(timestamp)
                         return
                     }
@@ -133,6 +134,14 @@ class AppDownloadManager(private val context: Context,
                 }
             }
         })
+    }
+
+    private fun setUpdatableTimestamp(timestamp: Long, type: DownloadType) {
+        if (type.isLocal()) {
+            persistentState.updatableTimestampLocal = timestamp
+        } else {
+            persistentState.updatableTimestampRemote = timestamp
+        }
     }
 
     private fun constructDownloadCheckUrl(type: DownloadType): String {
@@ -178,6 +187,8 @@ class AppDownloadManager(private val context: Context,
                                     response: retrofit2.Response<JsonObject?>) {
                 if (response.isSuccessful) {
                     saveFileTag(response.body(), timestamp)
+                    // reset updatable time stamp
+                    setUpdatableTimestamp(INIT_TIME_MS, DownloadType.REMOTE)
                     remoteDownloadStatus.postValue(DownloadManagerStatus.SUCCESS.id)
                 } else {
                     Log.i(LOG_TAG_DOWNLOAD,

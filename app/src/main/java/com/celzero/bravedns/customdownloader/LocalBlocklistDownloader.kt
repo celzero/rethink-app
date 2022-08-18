@@ -23,6 +23,7 @@ import com.celzero.bravedns.automaton.RethinkBlocklistManager
 import com.celzero.bravedns.customdownloader.ConnectivityHelper.downloadIds
 import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -94,6 +95,8 @@ class LocalBlocklistDownloader(val context: Context, workerParams: WorkerParamet
     private fun updatePersistenceOnCopySuccess(timestamp: Long) {
         persistentState.localBlocklistTimestamp = timestamp
         persistentState.blocklistEnabled = true
+        // reset updatable time stamp
+        persistentState.updatableTimestampLocal = INIT_TIME_MS
         // write the file tag json file into database
         io {
             RethinkBlocklistManager.readJson(context, AppDownloadManager.DownloadType.LOCAL,
