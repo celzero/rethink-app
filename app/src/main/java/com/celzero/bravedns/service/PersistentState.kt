@@ -197,7 +197,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var periodicallyCheckBlocklistUpdate by booleanPref("check_blocklist_update", false)
 
     // user-preferred Internet Protocol type, default IPv4
-    var internetProtocolType by intPref(INTERNET_PROTOCOL, InternetProtocol.IPv46.id)
+    var internetProtocolType by intPref(INTERNET_PROTOCOL, InternetProtocol.IPv4.id)
 
     // user-preferred Protocol translation, on IPv6 mode (default: PTMODEAUTO)
     var protocolTranslationType by booleanPref(PROTOCOL_TRANSLATION, false)
