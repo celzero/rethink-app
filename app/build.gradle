@@ -132,7 +132,7 @@ dependencies {
     // Koin main features for Android (Scope,ViewModel ...)
     implementation "io.insert-koin:koin-android:$koin_version"
 
-    implementation 'hu.autsoft:krate:1.0.0'
+    implementation 'hu.autsoft:krate:2.0.0'
 
     // To use only without reflection variants of viewBinding
     implementation 'com.github.kirich1409:viewbindingpropertydelegate:1.5.6'
