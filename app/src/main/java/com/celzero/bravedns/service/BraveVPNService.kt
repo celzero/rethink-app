@@ -229,8 +229,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
         }
     }
 
-    override fun block(protocol: Int, _uid: Long, sourceAddress: String,
-                       destAddress: String): Boolean {
+    override fun block(protocol: Int, _uid: Long, sourceAddress: String?,
+                       destAddress: String?): Boolean {
         handleVpnLockdownStateAsync()
 
         // Ref: ipaddress doc: https://seancfoley.github.io/IPAddress/ipaddress.html#host-name-or-address-with-port-or-service-name

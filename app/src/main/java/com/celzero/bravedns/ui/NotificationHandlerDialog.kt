@@ -44,9 +44,9 @@ class NotificationHandlerDialog : AppCompatActivity() {
         handleNotificationIntent(intent)
     }
 
-    override fun onNewIntent(intent: Intent) {
+    override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        handleNotificationIntent(intent)
+        intent?.let { handleNotificationIntent(it) }
     }
 
     // In two-cases (accessibility failure/new app install action), the app directly launches

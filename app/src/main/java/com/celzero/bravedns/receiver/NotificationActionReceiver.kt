@@ -41,7 +41,8 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
     private val appConfig by inject<AppConfig>()
     private val orbotHelper by inject<OrbotHelper>()
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(context: Context?, intent: Intent) {
+        context ?: return
         // TODO - Move the NOTIFICATION_ACTIONs value to enum
         val action: String? = intent.getStringExtra(Constants.NOTIFICATION_ACTION)
         Log.i(LOG_TAG_VPN, "Received notification action: $action")

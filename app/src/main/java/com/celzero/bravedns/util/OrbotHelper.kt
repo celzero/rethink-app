@@ -189,7 +189,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
      * Orbot will be sending the status of the non-vpn mode of the app(ON, OFF, STARTING, STOPPING).
      */
     private val orbotStatusReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
+        override fun onReceive(context: Context?, intent: Intent) {
             Log.d(LOG_TAG_VPN, "received status from orbot, action: ${intent.action}")
             if (ACTION_STATUS != intent.action) {
                 return
@@ -209,7 +209,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
                 }
                 STATUS_OFF -> {
                     stopOrbot(isInteractive = false)
-                    context.unregisterReceiver(this)
+                    context?.unregisterReceiver(this)
                 }
                 STATUS_STARTING -> {
                     updateOrbotProxyData(intent)

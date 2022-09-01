@@ -245,14 +245,18 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         builder.create().show()
     }
 
-    override fun onQueryTextSubmit(query: String): Boolean {
-        this.filterValue = query
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        if (query != null) {
+            this.filterValue = query
+        }
         viewModel.setFilter(filterValue, filterType)
         return true
     }
 
-    override fun onQueryTextChange(query: String): Boolean {
-        this.filterValue = query
+    override fun onQueryTextChange(query: String?): Boolean {
+        if (query != null) {
+            this.filterValue = query
+        }
         viewModel.setFilter(filterValue, filterType)
         return true
     }

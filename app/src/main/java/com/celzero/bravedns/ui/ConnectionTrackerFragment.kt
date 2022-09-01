@@ -234,15 +234,19 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         }
     }
 
-    override fun onQueryTextSubmit(query: String): Boolean {
-        this.filterQuery = query
-        viewModel.setFilter(query, filterCategories, filterType)
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        query?.let {
+            this.filterQuery = it
+            viewModel.setFilter(it, filterCategories, filterType)
+        }
         return true
     }
 
-    override fun onQueryTextChange(query: String): Boolean {
-        this.filterQuery = query
-        viewModel.setFilter(query, filterCategories, filterType)
+    override fun onQueryTextChange(query: String?): Boolean {
+        query?.let {
+            this.filterQuery = it
+            viewModel.setFilter(it, filterCategories, filterType)
+        }
         return true
     }
 

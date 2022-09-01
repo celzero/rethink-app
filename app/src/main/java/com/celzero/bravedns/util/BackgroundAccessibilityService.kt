@@ -45,7 +45,7 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
         super.onServiceConnected()
     }
 
-    override fun onAccessibilityEvent(event: AccessibilityEvent) {
+    override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         // Commenting out the below code - warning during the build process
         /*
         if(DEBUG) {
@@ -101,6 +101,7 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
         Log.w(LOG_TAG_FIREWALL, "onAccessibilityEvent: sourcePkg? " + event.source?.packageName +
                 " text? " + eventText + " class? " + event.className + " eventPkg? " + event.packageName)
         */
+        event ?: return
         handleAccessibilityEvent(event)
     }
 

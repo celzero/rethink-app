@@ -157,15 +157,15 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
         super.onDetach()
     }
 
-    override fun onQueryTextSubmit(query: String): Boolean {
-        addQueryToFilters(query)
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        query?.let { addQueryToFilters(it) }
         return true
     }
 
-    override fun onQueryTextChange(query: String): Boolean {
+    override fun onQueryTextChange(query: String?): Boolean {
         Utilities.delay(QUERY_TEXT_TIMEOUT, lifecycleScope) {
             if (isAdded) {
-                addQueryToFilters(query)
+                query?.let { addQueryToFilters(it) }
             }
         }
         return true

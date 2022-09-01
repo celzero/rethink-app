@@ -32,8 +32,8 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
 
     val persistentState by inject<PersistentState>()
 
-    override fun onReceive(context: Context, intent: Intent) {
-
+    override fun onReceive(context: Context?, intent: Intent) {
+        context ?: return
         if (!persistentState.prefAutoStartBootUp) {
             Log.w(LOG_TAG_VPN, "Auto start is not enabled: ${persistentState.prefAutoStartBootUp}")
             return

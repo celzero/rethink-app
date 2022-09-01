@@ -47,7 +47,7 @@ class MyAccessibilityService : AccessibilityService() {
         }
     }
 
-    override fun onAccessibilityEvent(event: AccessibilityEvent) {
+    override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         /*val eventText = when (event.eventType) {
             AccessibilityEvent.TYPE_VIEW_CLICKED -> "Clicked: "
             AccessibilityEvent.TYPE_WINDOWS_CHANGED -> "WindowsChanged: "
@@ -105,6 +105,7 @@ class MyAccessibilityService : AccessibilityService() {
              //Log.w("PermissionsManager", "_____ record record $$$$ ______ ${r.source} ${r.className} ${r.contentDescription}")
          }
          */
+        event ?: return
         if (isPrivateDnsMode()) {
             privateDnsManager.onAccessibilityEvent(event)
         } else {

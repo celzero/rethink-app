@@ -38,7 +38,7 @@ class ViewAnimation {
             v.translationY = v.height.toFloat()
             v.animate().setDuration(200).translationY(0f).setListener(object :
                                                                               AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
+                override fun onAnimationEnd(animation: Animator?) {
                     super.onAnimationEnd(animation)
                 }
             }).alpha(1f).start()
@@ -50,7 +50,7 @@ class ViewAnimation {
             v.translationY = 0f
             v.animate().setDuration(200).translationY(v.height.toFloat()).setListener(object :
                                                                                               AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
+                override fun onAnimationEnd(animation: Animator?) {
                     v.visibility = View.GONE
                     super.onAnimationEnd(animation)
                 }

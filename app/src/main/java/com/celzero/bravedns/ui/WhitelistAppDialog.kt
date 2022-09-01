@@ -102,8 +102,8 @@ class WhitelistAppDialog(val activity: Activity, val adapter: RecyclerView.Adapt
         setCategoryChips(category)
     }
 
-    override fun onClick(v: View) {
-        when (v.id) {
+    override fun onClick(v: View?) {
+        when (v?.id) {
             R.id.custom_dialog_ok_button -> {
                 filterCategories.clear()
                 viewModel.setFilter("")

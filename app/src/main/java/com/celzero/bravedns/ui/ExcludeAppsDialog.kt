@@ -103,8 +103,8 @@ class ExcludeAppsDialog(private var activity: Activity,
         setupCategoryChips("")
     }
 
-    override fun onClick(v: View) {
-        when (v.id) {
+    override fun onClick(v: View?) {
+        when (v?.id) {
             R.id.exclude_app_dialog_ok_button -> {
                 clearSearch()
                 dismiss()
@@ -135,15 +135,19 @@ class ExcludeAppsDialog(private var activity: Activity,
         }
     }
 
-    override fun onQueryTextSubmit(query: String): Boolean {
-        setupCategoryChips(query)
-        viewModel.setFilter(query)
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        query?.let {
+            setupCategoryChips(it)
+            viewModel.setFilter(it)
+        }
         return true
     }
 
-    override fun onQueryTextChange(query: String): Boolean {
-        setupCategoryChips(query)
-        viewModel.setFilter(query)
+    override fun onQueryTextChange(query: String?): Boolean {
+        query?.let {
+            setupCategoryChips(it)
+            viewModel.setFilter(it)
+        }
         return true
     }
 

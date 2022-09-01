@@ -33,7 +33,8 @@ class DownloadFile() : Parcelable {
         totalFileSize = parcel.readDouble()
     }
 
-    override fun writeToParcel(dest: Parcel, flags: Int) {
+    override fun writeToParcel(dest: Parcel?, flags: Int) {
+        dest ?: return
         dest.writeInt(progress)
         dest.writeDouble(currentFileSize)
         dest.writeDouble(totalFileSize)

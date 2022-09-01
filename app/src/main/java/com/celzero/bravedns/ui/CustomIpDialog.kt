@@ -91,13 +91,13 @@ class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, t
         b.customDialogNoRulesRl.visibility = View.VISIBLE
     }
 
-    override fun onQueryTextSubmit(query: String): Boolean {
-        viewModel.setFilter(query)
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        query?.let { viewModel.setFilter(it) }
         return true
     }
 
-    override fun onQueryTextChange(query: String): Boolean {
-        viewModel.setFilter(query)
+    override fun onQueryTextChange(query: String?): Boolean {
+        query?.let { viewModel.setFilter(it) }
         return true
     }
 

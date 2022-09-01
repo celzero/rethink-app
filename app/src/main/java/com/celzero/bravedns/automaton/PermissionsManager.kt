@@ -261,8 +261,7 @@ class PermissionsManager(service: MyAccessibilityService) {
 
         val source = event.source
 
-        val listItems: List<AccessibilityNodeInfo>? = source.findAccessibilityNodeInfosByViewId(
-            permissionsListId)
+        val listItems: List<AccessibilityNodeInfo>? = source?.findAccessibilityNodeInfosByViewId(permissionsListId)
 
         val togglesRequired: ArrayList<AccessibilityNodeInfo> = ArrayList()
 
