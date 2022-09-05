@@ -25,7 +25,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
@@ -40,7 +40,7 @@ import kotlinx.coroutines.withContext
 
 class DnsProxyEndpointAdapter(private val context: Context, val lifecycleOwner: LifecycleOwner,
                               private val appConfig: AppConfig) :
-        PagedListAdapter<DnsProxyEndpoint, DnsProxyEndpointAdapter.DnsProxyEndpointViewHolder>(
+        PagingDataAdapter<DnsProxyEndpoint, DnsProxyEndpointAdapter.DnsProxyEndpointViewHolder>(
             DIFF_CALLBACK) {
 
 

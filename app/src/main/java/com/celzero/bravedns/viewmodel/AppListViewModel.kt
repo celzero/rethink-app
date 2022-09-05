@@ -18,7 +18,9 @@ package com.celzero.bravedns.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import androidx.paging.toLiveData
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.liveData
 import com.celzero.bravedns.database.AppInfoDAO
 import com.celzero.bravedns.util.Constants.Companion.FILTER_CATEGORY
 import com.celzero.bravedns.util.Constants.Companion.FILTER_IS_SYSTEM
@@ -34,16 +36,26 @@ class AppListViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
     val appDetailsList = Transformations.switchMap(filteredList) { input: String ->
         if (input.isBlank()) {
-            appInfoDAO.getWhitelistedApps("%$input%").toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                appInfoDAO.getWhitelistedApps("%$input%")
+            }.liveData
+
         } else if (input == FILTER_IS_SYSTEM) {
-            appInfoDAO.getWhitelistedSystemApps().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                appInfoDAO.getWhitelistedSystemApps()
+            }.liveData
+
         } else if (input.contains(FILTER_CATEGORY)) {
             val filterVal = input.split(":")[1]
             val result = filterVal.split(",").map { it.trim() }
-            appInfoDAO.getWhitelistedAppsByCategory(result).toLiveData(
-                pageSize = LIVEDATA_PAGE_SIZE)
+            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                appInfoDAO.getWhitelistedAppsByCategory(result)
+            }.liveData
+
         } else {
-            appInfoDAO.getWhitelistedApps("%$input%").toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                appInfoDAO.getWhitelistedApps("%$input%")
+            }.liveData
         }
     }
 

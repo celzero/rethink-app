@@ -4,8 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import androidx.paging.PagedList
-import androidx.paging.toLiveData
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.liveData
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoDAO
@@ -40,49 +42,57 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
     }
 
-    private fun getAppInfo(searchString: String): LiveData<PagedList<AppInfo>> {
+    private fun getAppInfo(searchString: String): LiveData<PagingData<AppInfo>> {
         return when (topLevelFilter) {
             FirewallAppFragment.TopLevelFilter.ALL -> {
                 allApps(searchString)
             }
+
             FirewallAppFragment.TopLevelFilter.INSTALLED -> {
                 installedApps(searchString)
             }
+
             FirewallAppFragment.TopLevelFilter.SYSTEM -> {
                 systemApps(searchString)
             }
         }
     }
 
-    private fun allApps(searchString: String): LiveData<PagedList<AppInfo>> {
+    private fun allApps(searchString: String): LiveData<PagingData<AppInfo>> {
         return if (category.isEmpty()) {
-            appInfoDAO.getAppInfos("%$searchString%", firewallFilter.getFilter()).toLiveData(
-                pageSize = Constants.LIVEDATA_PAGE_SIZE)
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                appInfoDAO.getAppInfos("%$searchString%", firewallFilter.getFilter())
+            }.liveData
         } else {
-            appInfoDAO.getAppInfos("%$searchString%", category,
-                                   firewallFilter.getFilter()).toLiveData(
-                pageSize = Constants.LIVEDATA_PAGE_SIZE)
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                appInfoDAO.getAppInfos("%$searchString%", category, firewallFilter.getFilter())
+            }.liveData
+
         }
     }
 
-    private fun installedApps(search: String): LiveData<PagedList<AppInfo>> {
+    private fun installedApps(search: String): LiveData<PagingData<AppInfo>> {
         return if (category.isEmpty()) {
-            appInfoDAO.getInstalledApps("%$search%", firewallFilter.getFilter()).toLiveData(
-                pageSize = Constants.LIVEDATA_PAGE_SIZE)
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                appInfoDAO.getInstalledApps("%$search%", firewallFilter.getFilter())
+            }.liveData
         } else {
-            appInfoDAO.getInstalledApps("%search%", category,
-                                        firewallFilter.getFilter()).toLiveData(
-                pageSize = Constants.LIVEDATA_PAGE_SIZE)
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                appInfoDAO.getInstalledApps("%search%", category, firewallFilter.getFilter())
+            }.liveData
         }
     }
 
-    private fun systemApps(search: String): LiveData<PagedList<AppInfo>> {
+    private fun systemApps(search: String): LiveData<PagingData<AppInfo>> {
         return if (category.isEmpty()) {
-            appInfoDAO.getSystemApps("%$search%", firewallFilter.getFilter()).toLiveData(
-                pageSize = Constants.LIVEDATA_PAGE_SIZE)
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                appInfoDAO.getSystemApps("%$search%", firewallFilter.getFilter())
+            }.liveData
+
         } else {
-            appInfoDAO.getSystemApps("%$search%", category, firewallFilter.getFilter()).toLiveData(
-                pageSize = Constants.LIVEDATA_PAGE_SIZE)
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                appInfoDAO.getSystemApps("%$search%", category, firewallFilter.getFilter())
+            }.liveData
         }
     }
 
@@ -97,8 +107,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         }
     }
 
-    private fun getAppStatusForWifi(blocked: Boolean, firewall: Int,
-                                    metered: Int): FirewallManager.FirewallStatus {
+    private fun getAppStatusForWifi(blocked: Boolean, firewall: Int, metered: Int): FirewallManager.FirewallStatus {
         var appStatus = FirewallManager.FirewallStatus.ALLOW
         if (blocked) {
             appStatus = FirewallManager.FirewallStatus.BLOCK
@@ -113,8 +122,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         return appStatus
     }
 
-    private fun getConnStatusForWifi(blocked: Boolean, firewall: Int,
-                                     metered: Int): FirewallManager.ConnectionStatus {
+    private fun getConnStatusForWifi(blocked: Boolean, firewall: Int, metered: Int): FirewallManager.ConnectionStatus {
         var connStatus = FirewallManager.ConnectionStatus.BOTH
 
         if (blocked) {

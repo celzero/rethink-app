@@ -15,7 +15,7 @@
  */
 package com.celzero.bravedns.database
 
-import androidx.paging.DataSource
+import androidx.paging.PagingSource
 import androidx.room.*
 
 @Dao
@@ -36,16 +36,14 @@ interface CustomDomainDAO {
 
     @Transaction
     @Query("select * from CustomDomain where domain like :query order by createdTs desc")
-    fun getAllDomainsLiveData(query: String): DataSource.Factory<Int, CustomDomain>
+    fun getAllDomainsLiveData(query: String): PagingSource<Int, CustomDomain>
 
     @Transaction
-    @Query(
-        "select * from CustomDomain where domain like :query and status == :stat  order by createdTs desc")
-    fun getWhitelistedDomains(query: String, stat: Int): DataSource.Factory<Int, CustomDomain>
+    @Query("select * from CustomDomain where domain like :query and status == :stat  order by createdTs desc")
+    fun getWhitelistedDomains(query: String, stat: Int): PagingSource<Int, CustomDomain>
 
     @Transaction
-    @Query(
-        "select * from CustomDomain where domain like :query and  status == :stat  order by createdTs desc")
-    fun getBlockedDomains(query: String, stat: Int): DataSource.Factory<Int, CustomDomain>
+    @Query("select * from CustomDomain where domain like :query and  status == :stat  order by createdTs desc")
+    fun getBlockedDomains(query: String, stat: Int): PagingSource<Int, CustomDomain>
 
 }

@@ -16,7 +16,7 @@ limitations under the License.
 
 package com.celzero.bravedns.database
 
-import androidx.paging.DataSource
+import androidx.paging.PagingSource
 import androidx.room.*
 
 
@@ -37,12 +37,12 @@ interface DoHEndpointDAO {
 
     @Transaction
     @Query("select * from DoHEndpoint order by isSelected desc")
-    fun getDoHEndpointLiveData(): DataSource.Factory<Int, DoHEndpoint>
+    fun getDoHEndpointLiveData(): PagingSource<Int, DoHEndpoint>
 
     @Transaction
     @Query(
         "select * from DoHEndpoint where dohURL like :query or dohName like :query order by isSelected desc")
-    fun getDoHEndpointLiveDataByName(query: String): DataSource.Factory<Int, DoHEndpoint>
+    fun getDoHEndpointLiveDataByName(query: String): PagingSource<Int, DoHEndpoint>
 
     @Query("delete from DoHEndpoint where modifiedDataTime < :date")
     fun deleteOlderData(date: Long)

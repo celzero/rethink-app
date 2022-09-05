@@ -16,7 +16,7 @@ limitations under the License.
 
 package com.celzero.bravedns.database
 
-import androidx.paging.DataSource
+import androidx.paging.PagingSource
 import androidx.room.*
 
 
@@ -33,10 +33,10 @@ interface ProxyEndpointDAO {
     fun delete(proxyEndpoint: ProxyEndpoint)
 
     @Query("select * from ProxyEndpoint where proxyMode = 1 order by isSelected desc")
-    fun getDNSProxyEndpointLiveData(): DataSource.Factory<Int, ProxyEndpoint>
+    fun getDNSProxyEndpointLiveData(): PagingSource<Int, ProxyEndpoint>
 
     @Query("select * from ProxyEndpoint where proxyName like :query order by isSelected desc")
-    fun getDNSProxyEndpointLiveDataByType(query: String): DataSource.Factory<Int, ProxyEndpoint>
+    fun getDNSProxyEndpointLiveDataByType(query: String): PagingSource<Int, ProxyEndpoint>
 
     @Query("delete from ProxyEndpoint where modifiedDataTime < :date")
     fun deleteOlderData(date: Long)
@@ -47,8 +47,7 @@ interface ProxyEndpointDAO {
     @Query("delete from ProxyEndpoint where proxyName = 'ORBOT'")
     fun clearOrbotData()
 
-    @Query(
-        "delete from ProxyEndpoint where proxyIP like :proxyIP or proxyAppName like :proxyIP and proxyPort = :port")
+    @Query("delete from ProxyEndpoint where proxyIP like :proxyIP or proxyAppName like :proxyIP and proxyPort = :port")
     fun deleteDNSProxyEndpoint(proxyIP: String, port: Int)
 
     @Query("update ProxyEndpoint set isSelected = 0 where isSelected = 1")

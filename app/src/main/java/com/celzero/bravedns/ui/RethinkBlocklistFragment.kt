@@ -666,9 +666,9 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         val layoutManager = CustomLinearLayoutManager(requireContext())
         b.lbAdvancedRecycler.layoutManager = layoutManager
 
-        remoteFileTagViewModel.remoteFileTags.observe(viewLifecycleOwner,
-                                                      androidx.lifecycle.Observer(
-                                                          advanceRemoteListAdapter!!::submitList))
+        remoteFileTagViewModel.remoteFileTags.observe(viewLifecycleOwner) {
+            advanceRemoteListAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
+        }
         b.lbAdvancedRecycler.adapter = advanceRemoteListAdapter
 
         // implement sticky headers
@@ -685,8 +685,9 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         val layoutManager = CustomLinearLayoutManager(requireContext())
         b.lbAdvancedRecycler.layoutManager = layoutManager
 
-        localFileTagViewModel.localFiletags.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
-            advanceLocalListAdapter!!::submitList))
+        localFileTagViewModel.localFiletags.observe(viewLifecycleOwner) {
+            advanceLocalListAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
+        }
         b.lbAdvancedRecycler.adapter = advanceLocalListAdapter
     }
 

@@ -98,8 +98,9 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
 
         recyclerAdapter = RethinkEndpointAdapter(requireContext(), viewLifecycleOwner, get())
         viewModel.setFilter(uid)
-        viewModel.rethinkEndpointList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
-            recyclerAdapter!!::submitList))
+        viewModel.rethinkEndpointList.observe(viewLifecycleOwner) {
+            recyclerAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
+        }
         b.recyclerDohConnections.adapter = recyclerAdapter
     }
 

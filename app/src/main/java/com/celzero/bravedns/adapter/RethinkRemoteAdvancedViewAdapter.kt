@@ -21,7 +21,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.net.toUri
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
@@ -35,7 +35,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class RethinkRemoteAdvancedViewAdapter(val context: Context) :
-        PagedListAdapter<RethinkRemoteFileTag, RethinkRemoteAdvancedViewAdapter.RethinkRemoteFileTagViewHolder>(
+        PagingDataAdapter<RethinkRemoteFileTag, RethinkRemoteAdvancedViewAdapter.RethinkRemoteFileTagViewHolder>(
             DIFF_CALLBACK) {
 
     companion object {

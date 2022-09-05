@@ -73,8 +73,9 @@ class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainView
         b.cdfRecycler.layoutManager = layoutManager
         b.cdfRecycler.adapter = adapter
 
-        viewModel.customDomainList.observe(activity as LifecycleOwner,
-                                           androidx.lifecycle.Observer(adapter::submitList))
+        viewModel.customDomainList.observe(activity as LifecycleOwner) {
+            adapter.submitData(activity.lifecycle, it)
+        }
     }
 
     private fun setupClickListeners() {

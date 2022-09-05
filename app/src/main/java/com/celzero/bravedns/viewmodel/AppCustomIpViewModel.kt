@@ -19,7 +19,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import androidx.paging.toLiveData
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.liveData
 import com.celzero.bravedns.automaton.IpRulesManager.UID_EVERYBODY
 import com.celzero.bravedns.database.CustomIpDao
 import com.celzero.bravedns.util.Constants
@@ -35,9 +37,14 @@ class AppCustomIpViewModel(private val customIpDao: CustomIpDao) : ViewModel() {
 
     val customIpDetails = Transformations.switchMap(filteredList) { input ->
         if (input.isNullOrBlank()) {
-            customIpDao.getAppWiseCustomIp(uid).toLiveData(pageSize = Constants.LIVEDATA_PAGE_SIZE)
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                customIpDao.getAppWiseCustomIp(uid)
+            }.liveData
         } else {
-            customIpDao.getAppWiseCustomIp("%$input%", uid).toLiveData(Constants.LIVEDATA_PAGE_SIZE)
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                customIpDao.getAppWiseCustomIp("%$input%", uid)
+            }.liveData
+
         }
     }
 

@@ -347,8 +347,9 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
         b.ffaAppList.layoutManager = layoutManager
         val recyclerAdapter = FirewallAppListAdapter(requireContext(), viewLifecycleOwner,
                                                      persistentState)
-        appInfoViewModel.appInfo.observe(viewLifecycleOwner,
-                                         androidx.lifecycle.Observer(recyclerAdapter::submitList))
+        appInfoViewModel.appInfo.observe(viewLifecycleOwner) {
+            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+        }
         b.ffaAppList.adapter = recyclerAdapter
 
     }

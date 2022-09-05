@@ -17,7 +17,7 @@
 package com.celzero.bravedns.database
 
 import androidx.lifecycle.LiveData
-import androidx.paging.DataSource
+import androidx.paging.PagingSource
 import androidx.room.*
 import com.celzero.bravedns.automaton.IpRulesManager.UID_EVERYBODY
 
@@ -48,14 +48,13 @@ interface CustomIpDao {
     fun clearIpRuleByUid(uid: Int)
 
     @Transaction
-    @Query(
-        "select * from CustomIp where isActive = 1 and uid = $UID_EVERYBODY order by modifiedDateTime desc")
-    fun getUnivBlockedConnectionsLiveData(): DataSource.Factory<Int, CustomIp>
+    @Query("select * from CustomIp where isActive = 1 and uid = $UID_EVERYBODY order by modifiedDateTime desc")
+    fun getUnivBlockedConnectionsLiveData(): PagingSource<Int, CustomIp>
 
     @Transaction
     @Query(
         "select * from CustomIp where ipAddress like :query and uid = $UID_EVERYBODY and  isActive = 1 order by modifiedDateTime desc")
-    fun getUnivBlockedConnectionsByIP(query: String): DataSource.Factory<Int, CustomIp>
+    fun getUnivBlockedConnectionsByIP(query: String): PagingSource<Int, CustomIp>
 
     @Query("delete from CustomIp where ipAddress = :ipAddress and uid = $UID_EVERYBODY")
     fun deleteIPRulesUniversal(ipAddress: String)
@@ -76,11 +75,10 @@ interface CustomIpDao {
     @Query("select count(*) from CustomIp where uid = :uid")
     fun getBlockedConnectionCountForUid(uid: Int): LiveData<Int>
 
-    @Query(
-        "select * from CustomIp where uid = :uid and isActive = 1 order by modifiedDateTime desc")
-    fun getAppWiseCustomIp(uid: Int): DataSource.Factory<Int, CustomIp>
+    @Query("select * from CustomIp where uid = :uid and isActive = 1 order by modifiedDateTime desc")
+    fun getAppWiseCustomIp(uid: Int): PagingSource<Int, CustomIp>
 
     @Query(
         "select * from CustomIp where ipAddress like :query and uid = :uid and  isActive = 1 order by modifiedDateTime desc")
-    fun getAppWiseCustomIp(query: String, uid: Int): DataSource.Factory<Int, CustomIp>
+    fun getAppWiseCustomIp(query: String, uid: Int): PagingSource<Int, CustomIp>
 }

@@ -23,7 +23,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
@@ -38,7 +38,7 @@ import com.celzero.bravedns.util.Utilities.Companion.getIcon
 // TODO: This class shares common functionality with ExcludeApplistAdapter.
 // Consider creating an appropriate abstraction between the two classes.
 class WhitelistedAppsAdapter(private val context: Context) :
-        PagedListAdapter<AppInfo, WhitelistedAppsAdapter.WhitelistAppInfoViewHolder>(
+        PagingDataAdapter<AppInfo, WhitelistedAppsAdapter.WhitelistAppInfoViewHolder>(
             DIFF_CALLBACK) {
 
     companion object {

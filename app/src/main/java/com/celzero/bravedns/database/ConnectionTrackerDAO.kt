@@ -15,7 +15,7 @@
  */
 package com.celzero.bravedns.database
 
-import androidx.paging.DataSource
+import androidx.paging.PagingSource
 import androidx.room.*
 import com.celzero.bravedns.data.AppConnections
 
@@ -36,18 +36,18 @@ interface ConnectionTrackerDAO {
     fun delete(connectionTracker: ConnectionTracker)
 
     @Query("select * from ConnectionTracker order by timeStamp desc")
-    fun getConnectionTrackerLiveData(): DataSource.Factory<Int, ConnectionTracker>
+    fun getConnectionTrackerLiveData(): PagingSource<Int, ConnectionTracker>
 
     @Query(
         "select * from ConnectionTracker where (appName like :query or ipAddress like :query or dnsQuery like :query) order by timeStamp desc")
-    fun getConnectionTrackerByName(query: String): DataSource.Factory<Int, ConnectionTracker>
+    fun getConnectionTrackerByName(query: String): PagingSource<Int, ConnectionTracker>
 
     @Query("select * from ConnectionTracker where isBlocked = 1 order by timeStamp desc")
-    fun getConnectionBlockedConnections(): DataSource.Factory<Int, ConnectionTracker>
+    fun getConnectionBlockedConnections(): PagingSource<Int, ConnectionTracker>
 
     @Query(
         "select * from ConnectionTracker where  (appName like :query or ipAddress like :query or dnsQuery like :query) and isBlocked = 1 order by timeStamp desc")
-    fun getBlockedConnections(query: String): DataSource.Factory<Int, ConnectionTracker>
+    fun getBlockedConnections(query: String): PagingSource<Int, ConnectionTracker>
 
     @Query(
         "select ipAddress as ipAddress, count(ipAddress) as count, flag, dnsQuery from ConnectionTracker where uid = :uid group by ipAddress, flag order by count desc")
@@ -55,13 +55,11 @@ interface ConnectionTrackerDAO {
 
     @Query(
         "select * from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 and (appName like :query or ipAddress like :query or dnsQuery like :query) order by timeStamp desc")
-    fun getBlockedConnectionsFiltered(query: String,
-                                      filter: Set<String>): DataSource.Factory<Int, ConnectionTracker>
+    fun getBlockedConnectionsFiltered(query: String, filter: Set<String>): PagingSource<Int, ConnectionTracker>
 
     @Query(
         "select * from ConnectionTracker where  (appName like :query or ipAddress like :query or dnsQuery like :query) and blockedByRule in (:filter) order by timeStamp desc")
-    fun getConnectionsFiltered(query: String,
-                               filter: List<String>): DataSource.Factory<Int, ConnectionTracker>
+    fun getConnectionsFiltered(query: String, filter: List<String>): PagingSource<Int, ConnectionTracker>
 
     @Query("delete from ConnectionTracker where timeStamp < :date")
     fun deleteOlderData(date: Long)
@@ -69,17 +67,15 @@ interface ConnectionTrackerDAO {
     @Query("delete from ConnectionTracker")
     fun clearAllData()
 
-    @Query(
-        "delete from ConnectionTracker where id < ((select max(id) from ConnectionTracker) - :count)")
+    @Query("delete from ConnectionTracker where id < ((select max(id) from ConnectionTracker) - :count)")
     fun deleteOlderDataCount(count: Int)
 
     @Query(
         "select * from ConnectionTracker where isBlocked = 0 and  (appName like :query or ipAddress like :query or dnsQuery like :query)  order by timeStamp desc")
-    fun getAllowedConnections(query: String): DataSource.Factory<Int, ConnectionTracker>
+    fun getAllowedConnections(query: String): PagingSource<Int, ConnectionTracker>
 
     @Query(
         "select * from ConnectionTracker where isBlocked = 0 and  (appName like :query or ipAddress like :query or dnsQuery like :query) and blockedByRule in (:filter) order by timeStamp desc")
-    fun getAllowedConnectionsFiltered(query: String,
-                                      filter: Set<String>): DataSource.Factory<Int, ConnectionTracker>
+    fun getAllowedConnectionsFiltered(query: String, filter: Set<String>): PagingSource<Int, ConnectionTracker>
 
 }

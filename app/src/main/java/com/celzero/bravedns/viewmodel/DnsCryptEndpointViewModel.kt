@@ -18,12 +18,13 @@ package com.celzero.bravedns.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import androidx.paging.toLiveData
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.liveData
 import com.celzero.bravedns.database.DnsCryptEndpointDAO
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
-class DnsCryptEndpointViewModel(private val dnsCryptEndpointDAO: DnsCryptEndpointDAO) :
-        ViewModel() {
+class DnsCryptEndpointViewModel(private val dnsCryptEndpointDAO: DnsCryptEndpointDAO) : ViewModel() {
 
     private var filteredList: MutableLiveData<String> = MutableLiveData()
 
@@ -33,11 +34,13 @@ class DnsCryptEndpointViewModel(private val dnsCryptEndpointDAO: DnsCryptEndpoin
 
     val dnsCryptEndpointList = Transformations.switchMap(filteredList) { input ->
         if (input.isBlank()) {
-            dnsCryptEndpointDAO.getDNSCryptEndpointLiveData().toLiveData(
-                pageSize = LIVEDATA_PAGE_SIZE)
+            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                dnsCryptEndpointDAO.getDNSCryptEndpointLiveData()
+            }.liveData
         } else {
-            dnsCryptEndpointDAO.getDNSCryptEndpointLiveDataByName("%$input%").toLiveData(
-                pageSize = LIVEDATA_PAGE_SIZE)
+            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                dnsCryptEndpointDAO.getDNSCryptEndpointLiveDataByName("%$input%")
+            }.liveData
         }
     }
 

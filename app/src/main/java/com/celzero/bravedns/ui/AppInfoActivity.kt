@@ -386,8 +386,9 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         val layoutManager = CustomLinearLayoutManager(this)
         b.aadIpBlockRecycler.layoutManager = layoutManager
         val recyclerAdapter = AppIpRulesAdapter(this, uid)
-        appCustomIpViewModel.customIpDetails.observe(this, androidx.lifecycle.Observer(
-            recyclerAdapter::submitList))
+        appCustomIpViewModel.customIpDetails.observe(this) {
+            recyclerAdapter.submitData(this.lifecycle, it)
+        }
         b.aadIpBlockRecycler.adapter = recyclerAdapter
     }
 

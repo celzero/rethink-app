@@ -108,8 +108,9 @@ class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, t
         b.cipRecycler.layoutManager = layoutManager
         b.cipRecycler.adapter = adapter
 
-        viewModel.customIpDetails.observe(activity as LifecycleOwner,
-                                          androidx.lifecycle.Observer(adapter::submitList))
+        viewModel.customIpDetails.observe(activity as LifecycleOwner) {
+            adapter.submitData(activity.lifecycle, it)
+        }
     }
 
     private fun setupClickListeners() {

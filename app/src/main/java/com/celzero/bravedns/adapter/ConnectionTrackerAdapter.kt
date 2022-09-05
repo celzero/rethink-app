@@ -24,7 +24,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
+
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
@@ -43,7 +44,7 @@ import com.celzero.bravedns.util.Utilities.Companion.getIcon
 import java.util.*
 
 class ConnectionTrackerAdapter(private val context: Context) :
-        PagedListAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(
+        PagingDataAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(
             DIFF_CALLBACK) {
 
     companion object {

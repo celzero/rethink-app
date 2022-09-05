@@ -21,7 +21,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
@@ -33,7 +33,7 @@ import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
 
 class AppIpRulesAdapter(private val context: Context, val uid: Int) :
-        PagedListAdapter<CustomIp, AppIpRulesAdapter.CustomIpViewHolder>(DIFF_CALLBACK) {
+        PagingDataAdapter<CustomIp, AppIpRulesAdapter.CustomIpViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<CustomIp>() {
