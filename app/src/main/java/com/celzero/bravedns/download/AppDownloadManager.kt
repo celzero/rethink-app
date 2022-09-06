@@ -87,53 +87,72 @@ class AppDownloadManager(private val context: Context,
         }
     }
 
-    fun isDownloadRequired(type: DownloadType) {
+    fun isDownloadRequired(type: DownloadType, retryCount: Int) {
         timeStampToDownload.postValue(DownloadManagerStatus.IN_PROGRESS.id)
         val url = constructDownloadCheckUrl(type)
         val request = Request.Builder().url(url).build()
 
-        RetrofitManager.okHttpClient().newCall(request).enqueue(object : Callback {
+        RetrofitManager.okHttpClient(getDnsTypeOnRetryCount(retryCount)).newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.i(LOG_TAG_DOWNLOAD,
-                      "onFailure, cancelled? ${call.isCanceled()}, exec? ${call.isExecuted()} with exception: ${e.message}")
-                timeStampToDownload.postValue(DownloadManagerStatus.FAILURE.id)
+                      "onFailure attempt to retry($retryCount), cancelled? ${call.isCanceled()}, exec? ${call.isExecuted()} with exception: ${e.message}")
+
+                if (retryCount > 3) {
+                    timeStampToDownload.postValue(DownloadManagerStatus.FAILURE.id)
+                    return
+                }
+
+                isDownloadRequired(type, retryCount + 1)
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val stringResponse = response.body?.string() ?: return
-                response.body?.close()
-                try {
-                    val json = JSONObject(stringResponse)
-                    val version = json.optInt(Constants.JSON_VERSION, 0)
-                    if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                                     "client onResponse for refresh blocklist files:  $version")
-                    if (version != Constants.UPDATE_CHECK_RESPONSE_VERSION) {
-                        timeStampToDownload.postValue(DownloadManagerStatus.NOT_REQUIRED.id)
-                        return
-                    }
-
-                    val shouldUpdate = json.optBoolean(Constants.JSON_UPDATE, false)
-                    val timestamp = json.optLong(Constants.JSON_LATEST, INIT_TIME_MS)
-                    if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "onResponse:  update? $shouldUpdate")
-
-                    // post timestamp if there is update available or re-download request
-                    if (shouldUpdate) {
-                        setUpdatableTimestamp(timestamp, type)
-                        timeStampToDownload.postValue(timestamp)
-                        return
-                    }
-
-                    if (type.isLocal()) {
-                        persistentState.isLocalBlocklistUpdateAvailable = false
-                    } else {
-                        persistentState.isRemoteBlocklistUpdateAvailable = false
-                    }
-                    timeStampToDownload.postValue(DownloadManagerStatus.NOT_REQUIRED.id)
-                } catch (e: JSONException) {
-                    timeStampToDownload.postValue(DownloadManagerStatus.FAILURE.id)
-                }
+                processCheckDownloadResponse(type, response)
             }
         })
+    }
+
+    private fun getDnsTypeOnRetryCount(retryCount: Int): RetrofitManager.Companion.OkHttpDnsType {
+        return when (retryCount) {
+            0 -> RetrofitManager.Companion.OkHttpDnsType.DEFAULT
+            1 -> RetrofitManager.Companion.OkHttpDnsType.CLOUDFLARE
+            2 -> RetrofitManager.Companion.OkHttpDnsType.GOOGLE
+            else -> RetrofitManager.Companion.OkHttpDnsType.SYSTEM_DNS
+        }
+    }
+
+    private fun processCheckDownloadResponse(type: DownloadType, response: Response) {
+        val stringResponse = response.body?.string() ?: return
+        response.body?.close()
+        try {
+            val json = JSONObject(stringResponse)
+            val version = json.optInt(Constants.JSON_VERSION, 0)
+            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
+                             "client onResponse for refresh blocklist files:  $version")
+            if (version != Constants.UPDATE_CHECK_RESPONSE_VERSION) {
+                timeStampToDownload.postValue(DownloadManagerStatus.NOT_REQUIRED.id)
+                return
+            }
+
+            val shouldUpdate = json.optBoolean(Constants.JSON_UPDATE, false)
+            val timestamp = json.optLong(Constants.JSON_LATEST, INIT_TIME_MS)
+            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "onResponse:  update? $shouldUpdate")
+
+            // post timestamp if there is update available or re-download request
+            if (shouldUpdate) {
+                setUpdatableTimestamp(timestamp, type)
+                timeStampToDownload.postValue(timestamp)
+                return
+            }
+
+            if (type.isLocal()) {
+                persistentState.isLocalBlocklistUpdateAvailable = false
+            } else {
+                persistentState.isRemoteBlocklistUpdateAvailable = false
+            }
+            timeStampToDownload.postValue(DownloadManagerStatus.NOT_REQUIRED.id)
+        } catch (e: JSONException) {
+            timeStampToDownload.postValue(DownloadManagerStatus.FAILURE.id)
+        }
     }
 
     private fun setUpdatableTimestamp(timestamp: Long, type: DownloadType) {
@@ -152,7 +171,7 @@ class AppDownloadManager(private val context: Context,
         }
         val appVersionCode = persistentState.appVersion
         val url = "${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_URL}$timestamp&${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_PARAMETER_VCODE}$appVersionCode"
-        Log.d(LOG_TAG_DOWNLOAD, "Check for download 1, download type ${type.name} url: $url")
+        Log.d(LOG_TAG_DOWNLOAD, "Check for download, download type ${type.name} url: $url")
         return url
     }
 
@@ -173,7 +192,7 @@ class AppDownloadManager(private val context: Context,
         remoteDownloadStatus.postValue(DownloadManagerStatus.IN_PROGRESS.id)
         purge(context, timestamp, DownloadType.REMOTE)
 
-        val retrofit = RetrofitManager.getBlocklistBaseBuilder().addConverterFactory(
+        val retrofit = RetrofitManager.getBlocklistBaseBuilder(RetrofitManager.Companion.OkHttpDnsType.DEFAULT).addConverterFactory(
             GsonConverterFactory.create()).build()
         val retrofitInterface = retrofit.create(IBlocklistDownload::class.java)
         val request = retrofitInterface.downloadRemoteBlocklistFile(

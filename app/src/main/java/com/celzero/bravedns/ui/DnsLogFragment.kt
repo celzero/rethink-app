@@ -136,8 +136,9 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         includeView.recyclerQuery.layoutManager = layoutManager
 
         val recyclerAdapter = DnsQueryAdapter(requireContext(), persistentState.fetchFavIcon)
-        viewModel.dnsLogsList.observe(viewLifecycleOwner,
-                                      androidx.lifecycle.Observer(recyclerAdapter::submitList))
+        viewModel.dnsLogsList.observe(viewLifecycleOwner) {
+            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+        }
         includeView.recyclerQuery.adapter = recyclerAdapter
 
         val scrollListener = object : RecyclerView.OnScrollListener() {

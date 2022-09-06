@@ -28,6 +28,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
@@ -47,7 +48,7 @@ import kotlinx.coroutines.withContext
 class RethinkEndpointAdapter(private val context: Context,
                              private val lifecycleOwner: LifecycleOwner,
                              private val appConfig: AppConfig) :
-        PagedListAdapter<RethinkDnsEndpoint, RethinkEndpointAdapter.RethinkEndpointViewHolder>(
+        PagingDataAdapter<RethinkDnsEndpoint, RethinkEndpointAdapter.RethinkEndpointViewHolder>(
             DIFF_CALLBACK) {
 
     companion object {

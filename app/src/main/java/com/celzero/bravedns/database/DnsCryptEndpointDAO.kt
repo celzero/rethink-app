@@ -17,6 +17,7 @@ package com.celzero.bravedns.database
 
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
+import androidx.paging.PagingSource
 import androidx.room.*
 
 
@@ -34,12 +35,12 @@ interface DnsCryptEndpointDAO {
 
     @Transaction
     @Query("select * from DNSCryptEndpoint order by isSelected desc")
-    fun getDNSCryptEndpointLiveData(): DataSource.Factory<Int, DnsCryptEndpoint>
+    fun getDNSCryptEndpointLiveData(): PagingSource<Int, DnsCryptEndpoint>
 
     @Transaction
     @Query(
         "select * from DNSCryptEndpoint where dnsCryptURL like :query or dnsCryptName like :query order by isSelected desc")
-    fun getDNSCryptEndpointLiveDataByName(query: String): DataSource.Factory<Int, DnsCryptEndpoint>
+    fun getDNSCryptEndpointLiveDataByName(query: String): PagingSource<Int, DnsCryptEndpoint>
 
     @Query("delete from DNSCryptEndpoint where modifiedDataTime < :date")
     fun deleteOlderData(date: Long)

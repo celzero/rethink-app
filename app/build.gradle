@@ -84,7 +84,7 @@ dependencies {
     implementation "com.google.guava:guava:31.1-android"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'androidx.appcompat:appcompat:1.5.0'
     implementation 'androidx.core:core-ktx:1.8.0'
     implementation 'androidx.preference:preference-ktx:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
@@ -100,6 +100,7 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
+    implementation "androidx.room:room-paging:$room_version"
 
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
@@ -107,7 +108,7 @@ dependencies {
 
     // For paging - connection tracker
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-    implementation "androidx.fragment:fragment-ktx:1.5.1"
+    implementation "androidx.fragment:fragment-ktx:1.5.2"
     implementation 'com.google.android.material:material:1.6.1'
     implementation "androidx.viewpager2:viewpager2:1.0.0"
 
@@ -132,14 +133,14 @@ dependencies {
     // Koin main features for Android (Scope,ViewModel ...)
     implementation "io.insert-koin:koin-android:$koin_version"
 
-    implementation 'hu.autsoft:krate:1.0.0'
+    implementation 'hu.autsoft:krate:2.0.0'
 
     // To use only without reflection variants of viewBinding
     implementation 'com.github.kirich1409:viewbindingpropertydelegate:1.5.6'
     implementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.6'
 
     // Tun2socks (https://jitpack.io/#celzero/firestack)
-    implementation 'com.github.celzero:firestack:21d9d25754'
+    implementation 'com.github.celzero:firestack:34ee72663a'
 
     // Work manager
     implementation 'androidx.work:work-runtime-ktx:2.7.1'

@@ -15,12 +15,8 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import androidx.paging.PagedList
-import androidx.paging.toLiveData
+import androidx.lifecycle.*
+import androidx.paging.*
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogDAO
 import com.celzero.bravedns.ui.DnsLogFragment
@@ -39,7 +35,7 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
         fetchDnsLogs(input)
     }
 
-    private fun fetchDnsLogs(filter: String): LiveData<PagedList<DnsLog>> {
+    private fun fetchDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
         return when (filterType) {
             DnsLogFragment.DnsLogFilter.ALL -> {
                 getAllDnsLogs(filter)
@@ -53,18 +49,22 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
         }
     }
 
-    private fun getAllDnsLogs(filter: String): LiveData<PagedList<DnsLog>> {
-        return dnsLogDAO.getDnsLogsByName("%$filter%").toLiveData(pageSize = DNS_LIVEDATA_PAGE_SIZE)
+    private fun getAllDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
+        return Pager(PagingConfig(DNS_LIVEDATA_PAGE_SIZE)) {
+            dnsLogDAO.getDnsLogsByName("%$filter%")
+        }.liveData.cachedIn(viewModelScope)
     }
 
-    private fun getAllowedDnsLogs(filter: String): LiveData<PagedList<DnsLog>> {
-        return dnsLogDAO.getAllowedDnsLogsByName("%$filter%").toLiveData(
-            pageSize = DNS_LIVEDATA_PAGE_SIZE)
+    private fun getAllowedDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
+        return Pager(PagingConfig(DNS_LIVEDATA_PAGE_SIZE)) {
+            dnsLogDAO.getAllowedDnsLogsByName("%$filter%")
+        }.liveData.cachedIn(viewModelScope)
     }
 
-    private fun getBlockedDnsLogs(filter: String): LiveData<PagedList<DnsLog>> {
-        return dnsLogDAO.getBlockedDnsLogsByName("%$filter%").toLiveData(
-            pageSize = DNS_LIVEDATA_PAGE_SIZE)
+    private fun getBlockedDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
+        return Pager(PagingConfig(DNS_LIVEDATA_PAGE_SIZE)) {
+            dnsLogDAO.getBlockedDnsLogsByName("%$filter%")
+        }.liveData.cachedIn(viewModelScope)
     }
 
     fun setFilter(searchString: String, type: DnsLogFragment.DnsLogFilter) {

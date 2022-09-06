@@ -17,7 +17,6 @@ package com.celzero.bravedns.ui
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
@@ -26,11 +25,9 @@ import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.CustomIpAdapter
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.FragmentUniversalFirewallBinding
 import com.celzero.bravedns.databinding.UniversalFragementContainerBinding
@@ -39,7 +36,6 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.BackgroundAccessibilityService
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
-import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -162,7 +158,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
 
         includeView.firewallAppsShowTxt.setOnClickListener {
             enableAfterDelay(TimeUnit.SECONDS.toMillis(2L), includeView.firewallAppsShowTxt)
-            openCustomIpDialog()
+            openCustomIpScreen()
         }
 
         includeView.firewallDisallowDnsBypassModeCheck.setOnCheckedChangeListener { _, b ->
@@ -209,17 +205,10 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         }
     }
 
-    private fun openCustomIpDialog() {
-        val adapter = CustomIpAdapter(requireContext())
-        customIpViewModel.customIpDetails.observe(activity as LifecycleOwner,
-                                          androidx.lifecycle.Observer(adapter::submitList))
-        val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-        val customDialog = CustomIpDialog(requireActivity(), customIpViewModel, adapter, themeId)
-        customDialog.show()
-    }
-
-    private fun isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+    private fun openCustomIpScreen() {
+        val intent = Intent(requireContext(), CustomIpActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+        startActivity(intent)
     }
 
     private fun recheckFirewallBackgroundMode(isChecked: Boolean) {

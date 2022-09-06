@@ -17,6 +17,7 @@ limitations under the License.
 package com.celzero.bravedns.database
 
 import androidx.paging.DataSource
+import androidx.paging.PagingSource
 import androidx.room.*
 
 
@@ -36,10 +37,10 @@ interface DnsProxyEndpointDAO {
     fun delete(dnsProxyEndpoint: DnsProxyEndpoint)
 
     @Query("select * from DNSProxyEndpoint order by isSelected desc")
-    fun getDnsProxyEndpointLiveData(): DataSource.Factory<Int, DnsProxyEndpoint>
+    fun getDnsProxyEndpointLiveData(): PagingSource<Int, DnsProxyEndpoint>
 
     @Query("select * from DNSProxyEndpoint where proxyName like :query order by isSelected desc")
-    fun getDnsProxyEndpointLiveDataByType(query: String): DataSource.Factory<Int, DnsProxyEndpoint>
+    fun getDnsProxyEndpointLiveDataByType(query: String): PagingSource<Int, DnsProxyEndpoint>
 
     @Query("delete from DNSProxyEndpoint where modifiedDataTime < :date")
     fun deleteOlderData(date: Long)
@@ -58,5 +59,8 @@ interface DnsProxyEndpointDAO {
 
     @Query("select * from DNSProxyEndpoint where isSelected = 1")
     fun getConnectedProxy(): DnsProxyEndpoint?
+
+    @Query("select * from DNSProxyEndpoint where proxyName = 'Orbot' and isCustom = 0 LIMIT 1")
+    fun getOrbotDnsDetail(): DnsProxyEndpoint?
 
 }

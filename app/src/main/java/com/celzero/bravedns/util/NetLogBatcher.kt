@@ -93,7 +93,7 @@ class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
     private suspend fun txswap() {
         val b = batches
         batches = mutableListOf<T>() // swap buffers
-        if (DEBUG) Log.d(LoggerConstants.LOG_TAG_VPN, "transfer and swap (${lsn}) ${b.size}")
+        if (DEBUG) Log.d(LoggerConstants.LOG_BATCH_LOGGER, "transfer and swap (${lsn}) ${b.size}")
         lsn = (lsn + 1)
         buffers.send(b)
     }
@@ -115,15 +115,15 @@ class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
             // this can happen if the signal for 'l' is processed
             // after the fact that 'l' has been swapped out by 'batch'
             if (batches.size <= 0) {
-                if (DEBUG) Log.d(LoggerConstants.LOG_TAG_VPN, "signal continue for buffer")
+                if (DEBUG) Log.d(LoggerConstants.LOG_BATCH_LOGGER, "signal continue for buffer")
                 continue
             } else {
-                if (DEBUG) Log.d(LoggerConstants.LOG_TAG_VPN, "signal sleep for $waitms for buffer")
+                if (DEBUG) Log.d(LoggerConstants.LOG_BATCH_LOGGER, "signal sleep for $waitms for buffer")
             }
 
             // wait for 'batch' to dispatch
             delay(waitms)
-            if (DEBUG) Log.d(LoggerConstants.LOG_TAG_VPN,
+            if (DEBUG) Log.d(LoggerConstants.LOG_BATCH_LOGGER,
                              "signal wait over for buf, sz(${batches.size}) / cur-buf(${lsn})")
 
             // 'l' is the current buffer, that is, 'l == i',

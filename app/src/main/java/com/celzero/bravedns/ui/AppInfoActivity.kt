@@ -26,6 +26,7 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -36,6 +37,7 @@ import com.celzero.bravedns.adapter.AppIpRulesAdapter
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.automaton.FirewallManager.updateFirewallStatus
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.data.AppConnections
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.RethinkDnsEndpoint
@@ -57,7 +59,8 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
+class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
+                        SearchView.OnQueryTextListener {
     private val b by viewBinding(ActivityAppDetailsBinding::bind)
 
     private val persistentState by inject<PersistentState>()
@@ -68,6 +71,9 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
     private var uid: Int = 0
     private lateinit var appInfo: AppInfo
+
+    private var connIpList: List<AppConnections>? = null
+    private var appConnAdapter: AppConnectionAdapter? = null
 
     private var ipListState: Boolean = false
     private var ipRulesState: Boolean = false
@@ -182,6 +188,9 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     }
 
     private fun setupClickListeners() {
+
+        b.aadConnDetailSearch.setOnQueryTextListener(this)
+
         b.aadAppInfoIcon.setOnClickListener {
             Utilities.openAndroidAppInfo(this, appInfo.packageInfo)
         }
@@ -386,17 +395,18 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         val layoutManager = CustomLinearLayoutManager(this)
         b.aadIpBlockRecycler.layoutManager = layoutManager
         val recyclerAdapter = AppIpRulesAdapter(this, uid)
-        appCustomIpViewModel.customIpDetails.observe(this, androidx.lifecycle.Observer(
-            recyclerAdapter::submitList))
+        appCustomIpViewModel.customIpDetails.observe(this) {
+            recyclerAdapter.submitData(this.lifecycle, it)
+        }
         b.aadIpBlockRecycler.adapter = recyclerAdapter
     }
 
     private fun displayNetworkLogsIfAny(uid: Int) {
         io {
-            val list = connectionTrackerRepository.getLogsForApp(uid)
+            connIpList = connectionTrackerRepository.getLogsForApp(uid)
 
             uiCtx {
-                if (list.isNullOrEmpty()) {
+                if (connIpList.isNullOrEmpty()) {
                     b.aadConnDetailDesc.text = getString(R.string.ada_ip_connection_count_zero)
                     b.aadConnDetailSearchContainer.visibility = View.GONE
                     b.aadConnDetailEmptyTxt.visibility = View.VISIBLE
@@ -404,14 +414,15 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                     return@uiCtx
                 }
 
+                // asserting as the null check is above
                 b.aadConnDetailDesc.text = getString(R.string.ada_ip_connection_count,
-                                                     list.size.toString())
+                                                     connIpList!!.size.toString())
                 // set listview adapter
                 b.aadConnDetailRecycler.setHasFixedSize(true)
                 val layoutManager = LinearLayoutManager(this)
                 b.aadConnDetailRecycler.layoutManager = layoutManager
-                val recyclerAdapter = AppConnectionAdapter(this, list, uid)
-                b.aadConnDetailRecycler.adapter = recyclerAdapter
+                appConnAdapter = AppConnectionAdapter(this, connIpList!!, uid)
+                b.aadConnDetailRecycler.adapter = appConnAdapter
             }
         }
     }
@@ -511,7 +522,8 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         return when (aStat) {
             FirewallManager.FirewallStatus.ALLOW -> getString(R.string.ada_app_status_allow)
             FirewallManager.FirewallStatus.EXCLUDE -> getString(R.string.ada_app_status_exclude)
-            FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> getString(R.string.ada_app_status_whitelist)
+            FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> getString(
+                R.string.ada_app_status_whitelist)
             FirewallManager.FirewallStatus.BLOCK -> {
                 when {
                     cStat.mobileData() -> getString(R.string.ada_app_status_block_md)
@@ -636,5 +648,21 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         withContext(Dispatchers.Main) {
             f()
         }
+    }
+
+    override fun onQueryTextSubmit(query: String): Boolean {
+        if (appConnAdapter == null) return true
+
+        val filter = connIpList?.filter { it.ipAddress.contains(query) }
+        appConnAdapter?.filter(filter)
+        return true
+    }
+
+    override fun onQueryTextChange(query: String): Boolean {
+        if (appConnAdapter == null) return true
+
+        val filter = connIpList?.filter { it.ipAddress.contains(query) }
+        appConnAdapter?.filter(filter)
+        return true
     }
 }

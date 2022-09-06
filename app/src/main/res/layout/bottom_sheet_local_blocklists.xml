@@ -60,9 +60,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        android:background="?android:attr/selectableItemBackground"
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
-        android:background="?android:attr/selectableItemBackground"
         android:text="@string/lbbs_enable"
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/extra_large_font_text_view"
@@ -76,48 +76,189 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        android:background="?android:attr/selectableItemBackground"
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
         android:text="@string/lbbs_configure"
         android:textColor="?attr/primaryTextColor"
-        android:background="?android:attr/selectableItemBackground"
         android:textSize="@dimen/extra_large_font_text_view"
         app:drawableEndCompat="@drawable/ic_right_arrow_white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/lbbs_enable" />
 
+    <LinearLayout
+        android:id="@+id/lbbs_download_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lbbs_configure">
+
+        <LinearLayout
+            android:id="@+id/lbbs_check_download"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.9"
+                android:background="?android:attr/selectableItemBackground"
+                android:fontFamily="sans-serif-medium"
+                android:padding="10dp"
+                android:text="@string/lbbs_update_check"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/extra_large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/lbbs_check_download_img"
+                android:layout_width="0dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:layout_weight="0.1"
+                android:src="@drawable/ic_update_small" />
+
+            <ProgressBar
+                android:id="@+id/lbbs_check_download_progress"
+                style="@android:style/Widget.DeviceDefault.ProgressBar.Small"
+                android:layout_width="0dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:layout_weight="0.1"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/lbbs_download"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.9"
+                android:background="?android:attr/selectableItemBackground"
+                android:fontFamily="sans-serif-medium"
+                android:padding="10dp"
+                android:text="@string/lbbs_download"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/extra_large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/lbbs_download_img"
+                android:layout_width="0dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:layout_weight="0.1"
+                android:src="@drawable/ic_update_small" />
+
+            <ProgressBar
+                android:id="@+id/lbbs_download_progress"
+                style="@android:style/Widget.DeviceDefault.ProgressBar.Small"
+                android:layout_width="0dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:layout_weight="0.1"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/lbbs_redownload"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.9"
+                android:background="?android:attr/selectableItemBackground"
+                android:fontFamily="sans-serif-medium"
+                android:padding="10dp"
+                android:text="@string/lbbs_redownload"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/extra_large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/lbbs_redownload_img"
+                android:layout_width="0dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:layout_weight="0.1"
+                android:src="@drawable/ic_update_small" />
+
+            <ProgressBar
+                android:id="@+id/lbbs_redownload_progress"
+                style="@android:style/Widget.DeviceDefault.ProgressBar.Small"
+                android:layout_width="0dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:layout_weight="0.1"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/lbbs_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        android:background="?android:attr/selectableItemBackground"
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
         android:text="@string/lbbs_search"
-        android:background="?android:attr/selectableItemBackground"
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/extra_large_font_text_view"
         app:drawableEndCompat="@drawable/ic_search"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/lbbs_configure" />
+        app:layout_constraintTop_toBottomOf="@id/lbbs_download_ll" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/lbbs_copy"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        android:background="?android:attr/selectableItemBackground"
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
         android:text="@string/lbbs_copy"
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/extra_large_font_text_view"
-        android:background="?android:attr/selectableItemBackground"
         app:drawableEndCompat="@drawable/ic_copy"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/lbbs_search" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/lbbs_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:padding="5dp"
+        android:text="@string/lbbs_heading"
+        android:textColor="?attr/primaryLightColorText"
+        android:textIsSelectable="true"
+        android:textSize="@dimen/small_font_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lbbs_copy" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

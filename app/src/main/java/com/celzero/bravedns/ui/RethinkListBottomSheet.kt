@@ -72,8 +72,9 @@ class RethinkListBottomSheet : BottomSheetDialogFragment() {
 
         recyclerAdapter = RethinkEndpointAdapter(requireContext(), viewLifecycleOwner, get())
         viewModel.setFilter(filter)
-        viewModel.rethinkEndpointList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
-            recyclerAdapter!!::submitList))
+        viewModel.rethinkEndpointList.observe(viewLifecycleOwner) {
+            recyclerAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
+        }
         b.bsrRethinkListRecycler.adapter = recyclerAdapter
     }
 

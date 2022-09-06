@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
@@ -40,7 +41,7 @@ import kotlinx.coroutines.withContext
 
 class DnsCryptRelayEndpointAdapter(private val context: Context, val lifecycleOwner: LifecycleOwner,
                                    private val appConfig: AppConfig) :
-        PagedListAdapter<DnsCryptRelayEndpoint, DnsCryptRelayEndpointAdapter.DnsCryptRelayEndpointViewHolder>(
+        PagingDataAdapter<DnsCryptRelayEndpoint, DnsCryptRelayEndpointAdapter.DnsCryptRelayEndpointViewHolder>(
             DIFF_CALLBACK) {
 
     companion object {

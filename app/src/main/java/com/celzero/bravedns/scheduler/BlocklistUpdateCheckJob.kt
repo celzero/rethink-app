@@ -49,7 +49,7 @@ class BlocklistUpdateCheckJob(val context: Context, workerParameters: WorkerPara
     private fun isDownloadRequired(type: AppDownloadManager.DownloadType) {
         val url = constructDownloadCheckUrl(type)
         val request = Request.Builder().url(url).build()
-        val client = RetrofitManager.okHttpClient()
+        val client = RetrofitManager.okHttpClient(RetrofitManager.Companion.OkHttpDnsType.DEFAULT)
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {

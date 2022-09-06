@@ -21,9 +21,6 @@ import org.koin.dsl.module
 object ViewModelModule {
     private val viewModelModule = module {
         viewModel {
-            AppListViewModel(get())
-        }
-        viewModel {
             ConnectionTrackerViewModel(get())
         }
         viewModel {
@@ -40,9 +37,6 @@ object ViewModelModule {
         }
         viewModel {
             DoHEndpointViewModel(get())
-        }
-        viewModel {
-            ExcludedAppViewModel(get())
         }
         viewModel {
             AppInfoViewModel(get())

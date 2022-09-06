@@ -367,7 +367,7 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
 
     private fun showConfigureUi() {
         b.lbConfigureLayout.visibility = View.VISIBLE
-        b.lbHeaderLayout.visibility = View.VISIBLE
+        showChipsIfNeeded()
     }
 
     private fun hideDownloadUi() {
@@ -436,8 +436,6 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
             } else {
                 persistentState.updatableTimestampRemote
             }
-
-            Log.d("TEST","TEST: Updatable timestamp: $timestamp, download: ${getDownloadTimeStamp()}")
 
             if (getDownloadTimeStamp() < timestamp) {
                 // show dialog if the download type is local
@@ -731,9 +729,9 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         val layoutManager = CustomLinearLayoutManager(requireContext())
         b.lbAdvancedRecycler.layoutManager = layoutManager
 
-        remoteFileTagViewModel.remoteFileTags.observe(viewLifecycleOwner,
-                                                      androidx.lifecycle.Observer(
-                                                          advanceRemoteListAdapter!!::submitList))
+        remoteFileTagViewModel.remoteFileTags.observe(viewLifecycleOwner) {
+            advanceRemoteListAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
+        }
         b.lbAdvancedRecycler.adapter = advanceRemoteListAdapter
 
         // implement sticky headers
@@ -750,13 +748,14 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         val layoutManager = CustomLinearLayoutManager(requireContext())
         b.lbAdvancedRecycler.layoutManager = layoutManager
 
-        localFileTagViewModel.localFiletags.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
-            advanceLocalListAdapter!!::submitList))
+        localFileTagViewModel.localFiletags.observe(viewLifecycleOwner) {
+            advanceLocalListAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
+        }
         b.lbAdvancedRecycler.adapter = advanceLocalListAdapter
     }
 
     private fun isBlocklistUpdateAvailable(downloadType: AppDownloadManager.DownloadType) {
-        appDownloadManager.isDownloadRequired(downloadType)
+        appDownloadManager.isDownloadRequired(downloadType, retryCount = 0)
     }
 
     private fun download(timestamp: Long) {

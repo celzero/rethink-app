@@ -60,6 +60,9 @@
             android:name=".ui.DnsListActivity"
             android:finishOnTaskLaunch="true" />
         <activity
+            android:name=".ui.CustomIpActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
             android:name=".ui.ConfigureRethinkBasicActivity"
             android:finishOnTaskLaunch="true" />
         <activity

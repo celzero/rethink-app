@@ -16,6 +16,7 @@
 package com.celzero.bravedns.adapter
 
 import android.content.Context
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -28,12 +29,17 @@ import com.celzero.bravedns.databinding.ListItemAppConnDetailsBinding
 import com.celzero.bravedns.ui.AppConnectionBottomSheet
 import com.celzero.bravedns.util.LoggerConstants
 
-class AppConnectionAdapter(val context: Context, val connLists: List<AppConnections>,
+class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>,
                            val uid: Int) :
         RecyclerView.Adapter<AppConnectionAdapter.ConnectionDetailsViewHolder>(),
         AppConnectionBottomSheet.OnBottomSheetDialogFragmentDismiss {
 
     private lateinit var adapter: AppConnectionAdapter
+    private var ips: List<AppConnections>
+
+    init {
+        ips = connLists
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup,
                                     viewType: Int): AppConnectionAdapter.ConnectionDetailsViewHolder {
@@ -50,18 +56,25 @@ class AppConnectionAdapter(val context: Context, val connLists: List<AppConnecti
     }
 
     override fun getItemCount(): Int {
-        return connLists.size
+        return ips.size
     }
 
     override fun notifyDataset(position: Int) {
         this.notifyItemChanged(position)
     }
 
+    fun filter(filtered: List<AppConnections>?) {
+        if (filtered == null) return
+
+        ips = filtered
+        notifyDataSetChanged()
+    }
+
     inner class ConnectionDetailsViewHolder(private val b: ListItemAppConnDetailsBinding) :
             RecyclerView.ViewHolder(b.root) {
         fun update(position: Int) {
             displayTransactionDetails(position)
-            setupClickListeners(connLists[position], position)
+            setupClickListeners(ips[position], position)
         }
 
         private fun setupClickListeners(appConn: AppConnections, position: Int) {
@@ -79,13 +92,18 @@ class AppConnectionAdapter(val context: Context, val connLists: List<AppConnecti
                 return
             }
 
-            val bottomSheetFragment = AppConnectionBottomSheet(adapter, uid, ipAddress,
-                                                               ipRuleStatus, position)
+            val bottomSheetFragment = AppConnectionBottomSheet()
+            val bundle = Bundle()
+            bundle.putInt(AppConnectionBottomSheet.UID, uid)
+            bundle.putString(AppConnectionBottomSheet.IPADDRESS, ipAddress)
+            bundle.putInt(AppConnectionBottomSheet.IPRULESTATUS, ipRuleStatus.id)
+            bottomSheetFragment.arguments = bundle
+            bottomSheetFragment.dismissListener(adapter, position)
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
 
         private fun displayTransactionDetails(position: Int) {
-            val conn = connLists[position]
+            val conn = ips[position]
 
             b.acdCount.text = conn.count.toString()
             b.acdFlag.text = conn.flag

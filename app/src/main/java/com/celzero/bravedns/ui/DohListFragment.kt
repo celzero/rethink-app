@@ -67,8 +67,9 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
         b.recyclerDohConnections.layoutManager = layoutManager
 
         dohRecyclerAdapter = DohEndpointAdapter(requireContext(), viewLifecycleOwner, get())
-        viewModel.dohEndpointList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
-            dohRecyclerAdapter!!::submitList))
+        viewModel.dohEndpointList.observe(viewLifecycleOwner) {
+            dohRecyclerAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
+        }
         b.recyclerDohConnections.adapter = dohRecyclerAdapter
     }
 

@@ -36,10 +36,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class AppConnectionBottomSheet(private val adapter: AppConnectionAdapter?, val uid: Int,
-                               val ipAddress: String,
-                               private val ipRuleStatus: IpRulesManager.IpRuleStatus,
-                               val position: Int) : BottomSheetDialogFragment() {
+class AppConnectionBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetAppConnectionsBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
@@ -55,8 +52,25 @@ class AppConnectionBottomSheet(private val adapter: AppConnectionAdapter?, val u
         fun notifyDataset(position: Int)
     }
 
+    private var adapter: AppConnectionAdapter? = null
+    private var position: Int = -1
+    private var uid: Int = -1
+    private var ipAddress: String = ""
+    private var ipRuleStatus: IpRulesManager.IpRuleStatus = IpRulesManager.IpRuleStatus.NONE
+
+    companion object {
+        const val UID = "UID"
+        const val IPADDRESS = "IPADDRESS"
+        const val IPRULESTATUS = "IPRULESTATUS"
+    }
+
     private fun isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+    }
+
+    fun dismissListener(aca: AppConnectionAdapter?, pos: Int) {
+        adapter = aca
+        position = pos
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -78,11 +92,20 @@ class AppConnectionBottomSheet(private val adapter: AppConnectionAdapter?, val u
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        uid = arguments?.getInt(UID) ?: -1
+        ipAddress = arguments?.getString(IPADDRESS) ?: ""
+        val status = arguments?.getInt(IPRULESTATUS) ?: IpRulesManager.IpRuleStatus.NONE.id
+        ipRuleStatus = IpRulesManager.IpRuleStatus.getStatus(status)
+
         initView()
         initializeClickListeners()
     }
 
     private fun initView() {
+        if (uid == -1) {
+            this.dismiss()
+            return
+        }
         b.bsacHeading.text = ipAddress
 
         // btm sheet called from network logs adapter, no need to show delete btn
@@ -97,6 +120,14 @@ class AppConnectionBottomSheet(private val adapter: AppConnectionAdapter?, val u
             }
             IpRulesManager.IpRuleStatus.BYPASS_APP_RULES -> showByPassAppRulesUi()
             IpRulesManager.IpRuleStatus.BLOCK -> showButtonForStatusBlock()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (uid == -1) {
+            this.dismiss()
+            return
         }
     }
 
@@ -127,7 +158,7 @@ class AppConnectionBottomSheet(private val adapter: AppConnectionAdapter?, val u
                       getString(R.string.bsac_block_toast, ipAddress))
         }
 
-        // introduce this when IP firewall becomes uid-wise
+        // introduce this when IP firewall has universal rules in-app
         /*b.bsacBlockAll.setOnClickListener {
             applyRule(IpRulesManager.UID_EVERYBODY, ipAddress, IpRulesManager.IpRuleStatus.BLOCK,
                       "Blocking $ipAddress for all apps")
@@ -143,7 +174,7 @@ class AppConnectionBottomSheet(private val adapter: AppConnectionAdapter?, val u
                       getString(R.string.bsac_whitelist_toast, ipAddress))
         }
 
-        // introduce this when IP firewall becomes uid-wise
+        // introduce this when IP firewall has universal rules in-app
         /* b.bsacWhitelistAll.setOnClickListener {
              applyRule(IpRulesManager.UID_EVERYBODY, ipAddress, IpRulesManager.IpRuleStatus.WHITELIST,
                        "Whitelisted $ipAddress for all apps")

@@ -18,13 +18,14 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
@@ -40,13 +41,16 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getIcon
+import com.google.gson.Gson
 import java.util.*
 
 class ConnectionTrackerAdapter(private val context: Context) :
-        PagedListAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(
+        PagingDataAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(
             DIFF_CALLBACK) {
 
     companion object {
+        const val HTTP3: String = "HTTP3"
+
         private val DIFF_CALLBACK = object :
 
                 DiffUtil.ItemCallback<ConnectionTracker>() {
@@ -97,7 +101,10 @@ class ConnectionTrackerAdapter(private val context: Context) :
                 return
             }
 
-            val bottomSheetFragment = ConnTrackerBottomSheetFragment(ct)
+            val bottomSheetFragment = ConnTrackerBottomSheetFragment()
+            val bundle = Bundle()
+            bundle.putString(ConnTrackerBottomSheetFragment.IPDETAILS, Gson().toJson(ct))
+            bottomSheetFragment.arguments = bundle
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
 
@@ -142,7 +149,10 @@ class ConnectionTrackerAdapter(private val context: Context) :
             // known ports(reserved port and protocol identifiers).
             // https://github.com/celzero/rethink-app/issues/42 - #3 - transport + protocol.
             val resolvedPort = KnownPorts.resolvePort(port)
-            b.connLatencyTxt.text = if (resolvedPort != KnownPorts.PORT_VAL_UNKNOWN) {
+            // case: for UDP/443 label it as HTTP3 instead of HTTPS
+            b.connLatencyTxt.text = if (port == KnownPorts.HTTPS_PORT && proto == Protocol.UDP.protocolType) {
+                HTTP3
+            } else if (resolvedPort != KnownPorts.PORT_VAL_UNKNOWN) {
                 resolvedPort.uppercase(Locale.ROOT)
             } else {
                 Protocol.getProtocolName(proto).name

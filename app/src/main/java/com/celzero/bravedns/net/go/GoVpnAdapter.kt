@@ -84,7 +84,7 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
 
         try {
             if (DEBUG) {
-                // Tun2socks.enableDebugLog()
+                Tun2socks.enableDebugLog()
             }
 
             // TODO : #321 As of now the app fallback on an unmaintained url. Requires a rewrite as
@@ -272,7 +272,7 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
     private fun setProxyMode(userName: String?, password: String?, ipAddress: String?, port: Int) {
         try {
             tunnel?.startProxy(userName, password, ipAddress, port.toString())
-            Log.i(LOG_TAG_VPN, "Proxy mode set: $userName$ipAddress$port")
+            Log.i(LOG_TAG_VPN, "Proxy mode set: $userName$ipAddress$port with tunnel proxyoptions: ${tunnel?.proxyOptions}")
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "connect-tunnel: could not start proxy $userName@$ipAddress:$port",
                   e)

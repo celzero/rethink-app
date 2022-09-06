@@ -98,8 +98,9 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
 
         recyclerAdapter = RethinkEndpointAdapter(requireContext(), viewLifecycleOwner, get())
         viewModel.setFilter(uid)
-        viewModel.rethinkEndpointList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
-            recyclerAdapter!!::submitList))
+        viewModel.rethinkEndpointList.observe(viewLifecycleOwner) {
+            recyclerAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
+        }
         b.recyclerDohConnections.adapter = recyclerAdapter
     }
 
@@ -148,7 +149,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
         // fetch the count from repository and increment by 1 to show the
         // next doh name in the dialog
         io {
-            val nextIndex = appConfig.getRethinkCount().plus(1)
+            val nextIndex = appConfig.getRethinkCount().plus(1).toString()
             uiCtx {
                 val name = getString(R.string.rethink_dns_txt, nextIndex)
                 dialogBinding.dialogCustomNameEditText.setText(name, TextView.BufferType.EDITABLE)

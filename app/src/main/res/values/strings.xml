@@ -160,7 +160,7 @@
     <string name="dns_query_clear_logs_title">Delete all DNS logs?</string>
     <string name="dns_query_clear_logs_message">This deletes on-device DNS logs. This operation is not reversible. Do you want to proceed?</string>
 
-    <string name="filter_dns_all_connections">All connections</string>
+
 
     <string name="bsct_app_info">App Info</string>
     <string name="bsct_block_app">Block, bypass &lt;u>this IP&lt;/u> for &lt;u>this app&lt;/u></string>
@@ -222,11 +222,6 @@
     <string name="local_blocklist_download">Download Blocklists</string>
     <string name="local_blocklist_download_desc">Download blocklists (around 60MB) to use this feature?</string>
 
-    <string name="download_lockdown_dialog_heading">Action required</string>
-    <string name="download_lockdown_dialog_desc">Cannot download or update blocklists when VPN is in Lockdown Mode. Disable it from VPN settings.</string>
-    <string name="download_lockdown_dialog_positive">VPN settings</string>
-    <string name="download_lockdown_dialog_negative">Cancel</string>
-
     <string name="local_blocklist_lockdown_redownload">Up-to-date!</string>
     <string name="local_blocklist_lockdown_redownload_desc">On-device blocklists are already at the latest version v%1$s.</string>
     <string name="local_blocklist_lockdown_positive">Okay</string>
@@ -235,11 +230,6 @@
     <string name="local_blocklist_redownload_desc">On-device blocklists are already at the latest version v%1$s.</string>
     <string name="local_blocklist_positive">Okay</string>
     <string name="local_blocklist_neutral">Download again</string>
-
-    <string name="local_blocklist_corrupt">Re-download blocklists</string>
-    <string name="local_blocklist_corrupt_desc">Something went wrong! Please download blocklists (around 60 mb in size) again.</string>
-    <string name="local_blocklist_corrupt_positive">Re-download</string>
-    <string name="local_blocklist_corrupt_negative">Cancel</string>
 
     <string name="blocklist_update_check_failure">Something went wrong. Try again later!</string>
     <string name="blocklist_update_check_not_required_local">On-device blocklists are already at latest version.</string>
@@ -264,6 +254,7 @@
     <string name="download_update_dialog_message">A new version of the app is available for download from the website. Do you want to proceed?</string>
     <string name="download_update_dialog_message_ok_title">Up-to-date!</string>
     <string name="download_update_dialog_message_ok">You are already on the latest version.</string>
+    <string name="download_update_dialog_message_success">Blocklist download successful.</string>
     <string name="download_update_dialog_failure_title">Something went wrong!</string>
     <string name="download_update_dialog_failure_message">Either our servers are down or connection could not be established. Please try again after sometime.</string>
     <string name="download_update_dialog_trylater_title">Can\'t update right now</string>
@@ -330,10 +321,14 @@
     <string name="orbot_none">None (default)</string>
     <string name="orbot_none_desc">None of the above.</string>
 
-    <string name="orbot_bs_status_1">Forwarding TCP connections to Orbot.</string>
+    <string name="orbot_bs_status_1">Forwarding %1$s connections to Orbot.</string>
     <string name="orbot_bs_status_2">HTTP Proxy is set (apps may ignore it).</string>
-    <string name="orbot_bs_status_3">Forwarding TCP to Orbot, HTTP Proxy also set.</string>
+    <string name="orbot_bs_status_3">Forwarding %1$s to Orbot, HTTP Proxy also set.</string>
     <string name="orbot_bs_status_4">One-click Tor-as-a-Proxy (Orbot) setup.</string>
+
+    <string name="orbot_status_arg_1">DNS</string>
+    <string name="orbot_status_arg_2">TCP</string>
+    <string name="orbot_status_arg_3">DNS and TCP</string>
 
     <string name="orbot_app_issue">Could not launch Orbot. Is it installed?</string>
     <string name="orbot_bs_status_trying_connect">Setting up Orbot…</string>
@@ -341,6 +336,7 @@
     <string name="orbot_stop_dialog_title">Manually Stop Orbot</string>
     <string name="orbot_stop_dialog_message">RethinkDNS has stopped forwarding connections to Orbot, but Orbot maybe running in the background.</string>
     <string name="orbot_stop_dialog_negative">Stop Orbot</string>
+    <string name="orbot_stop_dialog_neutral">Change DNS</string>
     <string name="orbot_stop_dialog_positive">Dismiss</string>
 
     <string name="orbot_title">Orbot and Proxies</string>
@@ -550,7 +546,7 @@
     <string name="dc_custom_block_desc">Coming soon</string>
 
     <string name="dc_dns_website_heading">Show website icon in DNS logs (experimental)</string>
-    <string name="dc_dns_website_desc">Fetches website icons from <i>duckduckgo.com</i></string>
+    <string name="dc_dns_website_desc">Fetches website icons from <i>duckduckgo.com</i>. Consumes up to 350 mb in disk space</string>
 
     <string name="dc_dns_leaks_heading">Prevent DNS leaks</string>
     <string name="dc_dns_leaks_desc">When enabled, RethinkDNS captures all packets on port 53 and forwards it to a user-set DNS endpoint</string>
@@ -812,7 +808,7 @@
     <string name="socks5_proxy_toast_parameter">SOCKS5 Proxy</string>
     <string name="orbot_toast_parameter">Tor-as-a-proxy</string>
 
-    <string name="system_dns_connection_failure">Failed retrieving System DNS</string>
+    <string name="system_dns_connection_failure">Cannot determine the current DNS server</string>
 
     <string name="copy_clipboard_label">URL</string>
 
@@ -1124,5 +1120,9 @@
     <string name="lbbs_configure">Configure</string>
     <string name="lbbs_copy">Copy as RDNS+ URL</string>
     <string name="lbbs_search">Search domains in blocklists</string>
+    <string name="lbbs_update_check">Check for update</string>
+    <string name="lbbs_redownload">Redownload blocklists</string>
+    <string name="lbbs_download">Update blocklists</string>
     <string name="lbbs_heading">Configure 185+ blocklists</string>
+    <string name="lbbs_version">version: %1$s</string>
 </resources>

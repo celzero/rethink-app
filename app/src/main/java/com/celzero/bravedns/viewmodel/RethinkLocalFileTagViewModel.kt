@@ -18,7 +18,11 @@ package com.celzero.bravedns.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import androidx.paging.toLiveData
+import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
+import androidx.paging.liveData
 import com.celzero.bravedns.data.FileTag
 import com.celzero.bravedns.database.RethinkLocalFileTagDao
 import com.celzero.bravedns.ui.RethinkBlocklistFragment
@@ -41,23 +45,30 @@ class RethinkLocalFileTagViewModel(private val rethinkLocalDao: RethinkLocalFile
             val subg = blocklistFilter?.subGroups ?: mutableSetOf()
 
             if (groups.isNotEmpty() && subg.isNotEmpty()) {
-                rethinkLocalDao.getLocalFileTags(query, groups, subg).toLiveData(
-                    pageSize = LIVEDATA_PAGE_SIZE)
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                    rethinkLocalDao.getLocalFileTags(query, groups, subg)
+                }.liveData.cachedIn(viewModelScope)
             } else if (groups.isNotEmpty()) {
-                rethinkLocalDao.getLocalFileTagsGroup(query, groups).toLiveData(
-                    pageSize = LIVEDATA_PAGE_SIZE)
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                    rethinkLocalDao.getLocalFileTagsGroup(query, groups)
+                }.liveData.cachedIn(viewModelScope)
             } else if (subg.isNotEmpty()) {
-                rethinkLocalDao.getLocalFileTagsSubg(query, subg).toLiveData(
-                    pageSize = LIVEDATA_PAGE_SIZE)
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                    rethinkLocalDao.getLocalFileTagsSubg(query, subg)
+                }.liveData.cachedIn(viewModelScope)
             } else {
-                rethinkLocalDao.getLocalFileTagsWithFilter(query).toLiveData(
-                    pageSize = LIVEDATA_PAGE_SIZE)
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                    rethinkLocalDao.getLocalFileTagsWithFilter(query)
+                }.liveData.cachedIn(viewModelScope)
             }
         } else if (input.isBlank()) {
-            rethinkLocalDao.getLocalFileTags().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                rethinkLocalDao.getLocalFileTags()
+            }.liveData.cachedIn(viewModelScope)
         } else {
-            rethinkLocalDao.getLocalFileTagsWithFilter("%$input%").toLiveData(
-                pageSize = LIVEDATA_PAGE_SIZE)
+            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                rethinkLocalDao.getLocalFileTagsWithFilter("%$input%")
+            }.liveData.cachedIn(viewModelScope)
         }
     }))
 

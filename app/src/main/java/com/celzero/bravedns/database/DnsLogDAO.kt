@@ -16,7 +16,9 @@
 
 package com.celzero.bravedns.database
 
+import android.database.Cursor
 import androidx.paging.DataSource
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -33,15 +35,15 @@ interface DnsLogDAO {
 
     @Query(
         "select * from DNSLogs where (queryStr like :searchString or resolver like :searchString or response like :searchString) order by time desc")
-    fun getDnsLogsByName(searchString: String): DataSource.Factory<Int, DnsLog>
+    fun getDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
     @Query(
         "select * from DNSLogs where (queryStr like :searchString or resolver like :searchString or response like :searchString) and isBlocked = 0 order by time desc")
-    fun getAllowedDnsLogsByName(searchString: String): DataSource.Factory<Int, DnsLog>
+    fun getAllowedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
     @Query(
         "select * from DNSLogs where (queryStr like :searchString or resolver like :searchString or response like :searchString) and isBlocked = 1 order by time desc")
-    fun getBlockedDnsLogsByName(searchString: String): DataSource.Factory<Int, DnsLog>
+    fun getBlockedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
 
     @Query("delete from DNSLogs")
@@ -52,5 +54,8 @@ interface DnsLogDAO {
 
     @Query("delete from DNSLogs where id < ((select max(id) from DNSLogs) - :count)")
     fun deleteOlderDataCount(count: Int)
+
+    @Query("select * from DNSLogs order by time desc")
+    fun dnsLogs(): Cursor
 
 }

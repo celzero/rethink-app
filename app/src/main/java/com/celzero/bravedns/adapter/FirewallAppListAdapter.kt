@@ -32,6 +32,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
@@ -53,7 +54,7 @@ import java.util.concurrent.TimeUnit
 class FirewallAppListAdapter(private val context: Context,
                              private val lifecycleOwner: LifecycleOwner,
                              private val persistentState: PersistentState) :
-        PagedListAdapter<AppInfo, FirewallAppListAdapter.AppListViewHolder>(DIFF_CALLBACK) {
+        PagingDataAdapter<AppInfo, FirewallAppListAdapter.AppListViewHolder>(DIFF_CALLBACK) {
 
     private var activityManager: ActivityManager = context.getSystemService(
         VpnService.ACTIVITY_SERVICE) as ActivityManager

@@ -18,7 +18,11 @@ package com.celzero.bravedns.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import androidx.paging.toLiveData
+import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
+import androidx.paging.liveData
 import com.celzero.bravedns.database.RethinkDnsEndpointDao
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
@@ -36,14 +40,18 @@ class RethinkEndpointViewModel(private val rethinkDnsEndpointDao: RethinkDnsEndp
     val rethinkEndpointList = Transformations.switchMap(list, ({ input: String ->
         if (uid == Constants.MISSING_UID) {
             if (input.isBlank()) {
-                rethinkDnsEndpointDao.getRethinkEndpoints().toLiveData(
-                    pageSize = LIVEDATA_PAGE_SIZE)
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                    rethinkDnsEndpointDao.getRethinkEndpoints()
+                }.liveData.cachedIn(viewModelScope)
             } else {
-                rethinkDnsEndpointDao.getRethinkEndpointsByName("%$input%").toLiveData(
-                    pageSize = LIVEDATA_PAGE_SIZE)
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                    rethinkDnsEndpointDao.getRethinkEndpointsByName("%$input%")
+                }.liveData.cachedIn(viewModelScope)
             }
         } else {
-            rethinkDnsEndpointDao.getAllRethinkEndpoints().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                rethinkDnsEndpointDao.getAllRethinkEndpoints()
+            }.liveData.cachedIn(viewModelScope)
         }
 
     }))
