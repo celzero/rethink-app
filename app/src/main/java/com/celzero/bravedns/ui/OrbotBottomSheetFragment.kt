@@ -21,7 +21,6 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.os.Bundle
-import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -29,7 +28,6 @@ import android.view.ViewGroup
 import android.view.Window
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
-import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
@@ -133,7 +131,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
 
         b.bsOrbotRadioSocks5.setOnCheckedChangeListener(null)
         b.bsOrbotRadioSocks5.setOnClickListener {
-            if (b.bsOrbotRadioSocks5.isSelected) {
+            if (!b.bsOrbotRadioSocks5.isSelected) {
                 persistentState.orbotConnectionStatus.postValue(true)
                 enableSocks5Orbot()
             }
@@ -149,7 +147,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
 
         b.bsOrbotRadioHttp.setOnCheckedChangeListener(null)
         b.bsOrbotRadioHttp.setOnClickListener {
-            if (b.bsOrbotRadioHttp.isSelected) {
+            if (!b.bsOrbotRadioHttp.isSelected) {
                 persistentState.orbotConnectionStatus.postValue(true)
                 enableHttpOrbot()
             }
@@ -165,7 +163,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
 
         b.bsOrbotRadioBoth.setOnCheckedChangeListener(null)
         b.bsOrbotRadioBoth.setOnClickListener {
-            if ( b.bsOrbotRadioBoth.isSelected) {
+            if (!b.bsOrbotRadioBoth.isSelected) {
                 persistentState.orbotConnectionStatus.postValue(true)
                 enableSocks5HttpOrbot()
             }
@@ -384,7 +382,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
     private fun showStopOrbotDialog(isOrbotDns: Boolean) {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle(getString(R.string.orbot_stop_dialog_title))
-        builder.setMessage(getString(R.string.orbot_stop_dialog_message))
+
         builder.setCancelable(true)
         builder.setPositiveButton(
             getString(R.string.orbot_stop_dialog_positive)) { dialogInterface, _ ->
@@ -396,11 +394,16 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
             orbotHelper.openOrbotApp()
         }
         if (isOrbotDns) {
+            builder.setMessage(getString(R.string.orbot_stop_dialog_message_combo,
+                                         getString(R.string.orbot_stop_dialog_message),
+                                         getString(R.string.orbot_stop_dialog_dns_message)))
             builder.setNeutralButton(
                 getString(R.string.orbot_stop_dialog_neutral)) { dialogInterface, _ ->
                 dialogInterface.dismiss()
                 gotoDnsConfigureScreen()
             }
+        } else {
+            builder.setMessage(getString(R.string.orbot_stop_dialog_message))
         }
         builder.create().show()
     }

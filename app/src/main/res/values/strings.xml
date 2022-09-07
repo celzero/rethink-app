@@ -12,7 +12,6 @@
     <string name="admin_receiver_status_enabled">Ready to set dns based content blocker.</string>
     <string name="admin_receiver_status_disabled">Content blocker no longer in effect.</string>
 
-    <!-- Permission Manager -->
     <string name="accessibility_service_description">
         RethinkDNS uses accessibility service to detect and firewall background applications.
         RethinkDNS does not collect or sell any information.
@@ -160,8 +159,6 @@
     <string name="dns_query_clear_logs_title">Delete all DNS logs?</string>
     <string name="dns_query_clear_logs_message">This deletes on-device DNS logs. This operation is not reversible. Do you want to proceed?</string>
 
-
-
     <string name="bsct_app_info">App Info</string>
     <string name="bsct_block_app">Block, bypass &lt;u>this IP&lt;/u> for &lt;u>this app&lt;/u></string>
     <string name="bsct_block">Block, bypass, exclude &lt;u>this app&lt;/u></string>
@@ -285,9 +282,13 @@
     <string name="app_mode_choose">Choose mode</string>
 
     <string name="whats_dialog_title">What\'s new in v053j</string>
-    <string name="whats_new_version_name">🌎&#128330; International Day of Friendship (30 July) &#128330;🌎</string>
-    <string name="whats_new_version_update"><b>Minor bug fixes and improvements</b>\n\n
-        Due to recent download manager changes, a bug was found that prevented users from updating the latest on-device blocklists.
+    <string name="whats_new_version_name">🌎&#128330; International Day of Peace (21 Sept) &#128330;🌎</string>
+    <string name="whats_new_version_update"><b>Make IPv6 Work... Again</b>\n\n
+        1. Fixes for connectivity issues seen by Meta apps (Facebook, Messenger, Instagram, etc).\n
+        2. Improved Orbot integration.\n
+        3. Overhaul SOCKS5 Proxy implementation.\n
+        4. A few Download Manager changes.\n
+        5. Other critical Firewall related bug fixes.
     </string>
 
     <!-- Settings Fragment strings -->
@@ -333,8 +334,10 @@
     <string name="orbot_app_issue">Could not launch Orbot. Is it installed?</string>
     <string name="orbot_bs_status_trying_connect">Setting up Orbot…</string>
 
-    <string name="orbot_stop_dialog_title">Manually Stop Orbot</string>
+    <string name="orbot_stop_dialog_title">Manual intervention required</string>
+    <string name="orbot_stop_dialog_message_combo">%1$s\n\n%2$s</string>
     <string name="orbot_stop_dialog_message">RethinkDNS has stopped forwarding connections to Orbot, but Orbot maybe running in the background.</string>
+    <string name="orbot_stop_dialog_dns_message">RethinkDNS is setup to forward DNS queries to Orbot. Change as required.</string>
     <string name="orbot_stop_dialog_negative">Stop Orbot</string>
     <string name="orbot_stop_dialog_neutral">Change DNS</string>
     <string name="orbot_stop_dialog_positive">Dismiss</string>
@@ -496,7 +499,7 @@
     <string name="hsf_vpn_dialog_positive">Proceed</string>
     <string name="hsf_vpn_dialog_negative">Cancel</string>
 
-    <string name="hsf_vpn_prepare_failure">VPN connection cancelled. Did you configure another VPN to be an always-on VPN?</string>
+    <string name="hsf_vpn_prepare_failure">Either VPN permission missing, or another app is in Always-on VPN mode.</string>
 
     <string name="hsf_start_dialog_header">Start %1$s</string>
     <string name="hsf_start_dialog_message">You are one step away from safe and secure Android: Instantly see network activity, block websites, IPs, and badly behaving apps.</string>

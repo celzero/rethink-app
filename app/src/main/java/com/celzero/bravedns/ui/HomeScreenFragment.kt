@@ -18,6 +18,7 @@ package com.celzero.bravedns.ui
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Configuration
 import android.content.res.TypedArray
@@ -276,16 +277,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         b.fhsProxyChip.setOnCloseIconClickListener {
-            b.fhsProxyChip.isEnabled = false
-            appConfig.removeAllProxies()
-            b.fhsProxyChip.text = getString(R.string.hsf_proxy_chip_remove_text)
-            syncDnsStatus()
-            delay(TimeUnit.SECONDS.toMillis(2), lifecycleScope) {
-                b.fhsProxyChip.visibility = View.GONE
-                b.fhsProxyChip.isEnabled = true
-                showToastUiCentered(requireContext(),
-                                    getString(R.string.hsf_proxy_chip_removed_toast),
-                                    Toast.LENGTH_SHORT)
+            removeProxy()
+            io {
+                if(appConfig.isOrbotDns()) {
+                    uiCtx { showStopOrbotDialog() }
+                } else {
+                    // no-op
+                }
             }
         }
 
@@ -308,6 +306,36 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsSponsor.setOnClickListener {
             val intent = Intent(Intent.ACTION_VIEW, RETHINKDNS_SPONSOR_LINK.toUri())
             startActivity(intent)
+        }
+    }
+
+    private fun showStopOrbotDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle(getString(R.string.orbot_stop_dialog_title))
+        builder.setMessage(getString(R.string.orbot_stop_dialog_dns_message))
+        builder.setCancelable(true)
+        builder.setPositiveButton(
+            getString(R.string.orbot_stop_dialog_positive)) { dialogInterface, _ ->
+            dialogInterface.dismiss()
+        }
+        builder.setNegativeButton(getString(
+            R.string.orbot_stop_dialog_neutral)) { dialogInterface: DialogInterface, _: Int ->
+            dialogInterface.dismiss()
+            startDnsActivity(DnsDetailActivity.Tabs.CONFIGURE.screen)
+        }
+        builder.create().show()
+    }
+
+    private fun removeProxy() {
+        b.fhsProxyChip.isEnabled = false
+        appConfig.removeAllProxies()
+        b.fhsProxyChip.text = getString(R.string.hsf_proxy_chip_remove_text)
+        syncDnsStatus()
+        delay(TimeUnit.SECONDS.toMillis(2), lifecycleScope) {
+            b.fhsProxyChip.visibility = View.GONE
+            b.fhsProxyChip.isEnabled = true
+            showToastUiCentered(requireContext(), getString(R.string.hsf_proxy_chip_removed_toast),
+                                Toast.LENGTH_SHORT)
         }
     }
 
@@ -1025,6 +1053,12 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             withContext(Dispatchers.IO) {
                 f()
             }
+        }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) {
+            f()
         }
     }
 }

@@ -6,6 +6,97 @@
     android:background="?attr/background"
     android:orientation="vertical">
 
+    <RelativeLayout
+        android:id="@+id/lb_header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/lb_version"
+            style="@style/ThinnerChip.Action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            app:chipBackgroundColor="?attr/chipBgColorPositive"
+            android:enabled="false"
+            android:padding="5dp"
+            android:textColor="?attr/chipTextPositive"
+            android:textSize="@dimen/large_font_text_view" />
+
+        <LinearLayout
+            android:id="@+id/bslb_update_chips_ll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/bslb_update_available_btn"
+                style="@style/ThinnerChip.Action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                app:chipBackgroundColor="?attr/chipBgColorPositive"
+                android:text="@string/rt_chip_update_available"
+                android:textColor="?attr/chipTextPositive"
+                android:textSize="@dimen/large_font_text_view"
+                android:visibility="visible"
+                app:chipEndPadding="5dp"
+                app:chipStartPadding="5dp"
+                app:shapeAppearance="@style/ShapeAppearance.LargeComponent" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/bslb_check_update_btn"
+                style="@style/ThinnerChip.Action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                app:chipBackgroundColor="?attr/chipBgColorPositive"
+                android:text="@string/rt_chip_check_update"
+                android:textColor="?attr/chipTextPositive"
+                android:textSize="@dimen/large_font_text_view"
+                android:visibility="gone"
+                app:chipEndPadding="5dp"
+                app:chipStartPadding="5dp"
+                app:shapeAppearance="@style/ShapeAppearance.LargeComponent" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/bslb_redownload_btn"
+                style="@style/ThinnerChip.Action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                app:chipBackgroundColor="?attr/chipBgColorPositive"
+                android:text="@string/rt_re_download"
+                android:textColor="?attr/chipTextPositive"
+                android:textSize="@dimen/large_font_text_view"
+                android:visibility="gone"
+                app:chipEndPadding="5dp"
+                app:chipStartPadding="5dp"
+                app:shapeAppearance="@style/ShapeAppearance.LargeComponent" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/frl_desc"
         android:layout_width="match_parent"
@@ -17,9 +108,7 @@
         android:textColor="?attr/primaryLightColorText"
         android:textSize="@dimen/default_font_text_view"
         android:textStyle="normal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/lb_header_layout" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_doh_connections"
