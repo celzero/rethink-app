@@ -18,7 +18,11 @@ package com.celzero.bravedns.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import androidx.paging.toLiveData
+import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
+import androidx.paging.liveData
 import com.celzero.bravedns.data.FileTag
 import com.celzero.bravedns.database.RethinkRemoteFileTagDao
 import com.celzero.bravedns.ui.RethinkBlocklistFragment
@@ -41,23 +45,30 @@ class RethinkRemoteFileTagViewModel(private val rethinkRemoteDao: RethinkRemoteF
             val subg = blocklistFilter?.subGroups ?: mutableSetOf()
 
             if (groups.isNotEmpty() && subg.isNotEmpty()) {
-                rethinkRemoteDao.getRemoteFileTags(query, groups, subg).toLiveData(
-                    pageSize = LIVEDATA_PAGE_SIZE)
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                    rethinkRemoteDao.getRemoteFileTags(query, groups, subg)
+                }.liveData.cachedIn(viewModelScope)
             } else if (groups.isNotEmpty()) {
-                rethinkRemoteDao.getRemoteFileTagsGroup(query, groups).toLiveData(
-                    pageSize = LIVEDATA_PAGE_SIZE)
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                    rethinkRemoteDao.getRemoteFileTagsGroup(query, groups)
+                }.liveData.cachedIn(viewModelScope)
             } else if (subg.isNotEmpty()) {
-                rethinkRemoteDao.getRemoteFileTagsSubg(query, subg).toLiveData(
-                    pageSize = LIVEDATA_PAGE_SIZE)
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                    rethinkRemoteDao.getRemoteFileTagsSubg(query, subg)
+                }.liveData.cachedIn(viewModelScope)
             } else {
-                rethinkRemoteDao.getRemoteFileTagsWithFilter(query).toLiveData(
-                    pageSize = LIVEDATA_PAGE_SIZE)
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                    rethinkRemoteDao.getRemoteFileTagsWithFilter(query)
+                }.liveData.cachedIn(viewModelScope)
             }
         } else if (input.isBlank()) {
-            rethinkRemoteDao.getRemoteFileTags().toLiveData(pageSize = LIVEDATA_PAGE_SIZE)
+            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                rethinkRemoteDao.getRemoteFileTags()
+            }.liveData.cachedIn(viewModelScope)
         } else {
-            rethinkRemoteDao.getRemoteFileTagsWithFilter("%$input%").toLiveData(
-                pageSize = LIVEDATA_PAGE_SIZE)
+            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                rethinkRemoteDao.getRemoteFileTagsWithFilter("%$input%")
+            }.liveData.cachedIn(viewModelScope)
         }
     }))
 

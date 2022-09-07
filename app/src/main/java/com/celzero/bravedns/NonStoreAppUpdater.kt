@@ -41,10 +41,10 @@ class NonStoreAppUpdater(private val baseUrl: String,
         Log.i(LOG_TAG_APP_UPDATE, "Beginning update check")
         val url = baseUrl + BuildConfig.VERSION_CODE
 
-        val client = RetrofitManager.okHttpClient()
+        val client = RetrofitManager.okHttpClient(RetrofitManager.Companion.OkHttpDnsType.DEFAULT)
         val request = Request.Builder().url(url).build()
 
-        RetrofitManager.okHttpClient().newCall(request).enqueue(object : Callback {
+        client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.i(LOG_TAG_APP_UPDATE, "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
                 listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER, isInteractive)

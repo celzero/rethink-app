@@ -59,7 +59,6 @@ class RethinkPlusFilterBottomSheetFragment(val activity: RethinkBlocklistFragmen
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()

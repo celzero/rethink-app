@@ -15,44 +15,46 @@
  */
 package com.celzero.bravedns.ui
 
-import android.app.Activity
 import android.app.Dialog
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.LifecycleOwner
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.CustomIpAdapter
 import com.celzero.bravedns.automaton.IpRulesManager
+import com.celzero.bravedns.databinding.ActivityCustomIpBinding
 import com.celzero.bravedns.databinding.DialogAddCustomIpBinding
-import com.celzero.bravedns.databinding.DialogCustomIpBinding
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.CustomLinearLayoutManager
+import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
 import inet.ipaddr.IPAddressString
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, themeId: Int) :
-        Dialog(activity, themeId), SearchView.OnQueryTextListener {
+class CustomIpActivity : AppCompatActivity(R.layout.activity_custom_ip),
+                         SearchView.OnQueryTextListener {
+
     private var layoutManager: RecyclerView.LayoutManager? = null
-    private lateinit var b: DialogCustomIpBinding
-    private lateinit var adapter: CustomIpAdapter
+    private val b by viewBinding(ActivityCustomIpBinding::bind)
+    private val viewModel: CustomIpViewModel by viewModel()
+    private val persistentState by inject<PersistentState>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-        setCancelable(true)
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
-        b = DialogCustomIpBinding.inflate(layoutInflater)
-        setContentView(b.root)
-
-        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT,
-                          WindowManager.LayoutParams.MATCH_PARENT)
 
         b.cipSearchView.setOnQueryTextListener(this)
         observeCustomRules()
@@ -62,8 +64,13 @@ class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, t
         b.cipRecycler.requestFocus()
     }
 
+    private fun Context.isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+    }
+
+
     private fun observeCustomRules() {
-        viewModel.customIpSize.observe(activity as LifecycleOwner) {
+        viewModel.customIpSize.observe(this) {
             if (it <= 0) {
                 showNoRulesUi()
                 hideRulesUi()
@@ -102,14 +109,15 @@ class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, t
     }
 
     private fun setupRecyclerView() {
-        layoutManager = LinearLayoutManager(activity)
-        adapter = CustomIpAdapter(activity)
-
+        layoutManager = CustomLinearLayoutManager(this)
+        b.cipRecycler.setHasFixedSize(true)
         b.cipRecycler.layoutManager = layoutManager
-        b.cipRecycler.adapter = adapter
+        val adapter = CustomIpAdapter(this)
 
-        viewModel.customIpDetails.observe(activity as LifecycleOwner,
-                                          androidx.lifecycle.Observer(adapter::submitList))
+        viewModel.customIpDetails.observe(this) {
+            adapter.submitData(this.lifecycle, it)
+        }
+        b.cipRecycler.adapter = adapter
     }
 
     private fun setupClickListeners() {
@@ -128,9 +136,9 @@ class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, t
      * database table.
      */
     private fun showAddIpDialog() {
-        val dialog = Dialog(activity)
+        val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setTitle(activity.getString(R.string.ci_dialog_title))
+        dialog.setTitle(getString(R.string.ci_dialog_title))
         val dBind = DialogAddCustomIpBinding.inflate(layoutInflater)
         dialog.setContentView(dBind.root)
 
@@ -143,7 +151,7 @@ class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, t
         dialog.setCanceledOnTouchOutside(false)
         dialog.window?.attributes = lp
 
-        dBind.daciIpTitle.text = activity.getString(R.string.ci_dialog_title)
+        dBind.daciIpTitle.text = getString(R.string.ci_dialog_title)
 
         dBind.daciIpEditText.addTextChangedListener {
             if (dBind.daciFailureTextView.isVisible) {
@@ -157,14 +165,13 @@ class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, t
             val ipString = Utilities.removeLeadingAndTrailingDots(input)
             val ip = IPAddressString(ipString).address
             if (ip == null || ipString.isEmpty()) {
-                dBind.daciFailureTextView.text = activity.resources.getString(
-                    R.string.ci_dialog_error_invalid_ip)
+                dBind.daciFailureTextView.text = getString(R.string.ci_dialog_error_invalid_ip)
                 dBind.daciFailureTextView.visibility = View.VISIBLE
                 return@setOnClickListener
             }
 
             dBind.daciIpEditText.text.clear()
-            insertCustomIpv4(input)
+            insertCustomIp(input)
 
         }
 
@@ -174,28 +181,24 @@ class CustomIpDialog(val activity: Activity, val viewModel: CustomIpViewModel, t
         dialog.show()
     }
 
-    private fun insertCustomIpv4(ipv4: String) {
-        IpRulesManager.addIpRule(IpRulesManager.UID_EVERYBODY, ipv4,
+    private fun insertCustomIp(ip: String) {
+        IpRulesManager.addIpRule(IpRulesManager.UID_EVERYBODY, ip,
                                  IpRulesManager.IpRuleStatus.BLOCK)
-        Utilities.showToastUiCentered(activity,
-                                      activity.getString(R.string.ci_dialog_added_success),
+        Utilities.showToastUiCentered(this, getString(R.string.ci_dialog_added_success),
                                       Toast.LENGTH_SHORT)
     }
 
     private fun showIpRulesDeleteDialog() {
-        val builder = AlertDialog.Builder(activity)
+        val builder = AlertDialog.Builder(this)
         builder.setTitle(R.string.univ_delete_firewall_dialog_title)
         builder.setMessage(R.string.univ_delete_firewall_dialog_message)
-        builder.setPositiveButton(
-            activity.getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->
+        builder.setPositiveButton(getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->
             IpRulesManager.clearAllIpRules()
-            Utilities.showToastUiCentered(activity,
-                                          activity.getString(R.string.univ_ip_delete_toast_success),
+            Utilities.showToastUiCentered(this, getString(R.string.univ_ip_delete_toast_success),
                                           Toast.LENGTH_SHORT)
         }
 
-        builder.setNegativeButton(
-            activity.getString(R.string.univ_ip_delete_dialog_negative)) { _, _ ->
+        builder.setNegativeButton(getString(R.string.univ_ip_delete_dialog_negative)) { _, _ ->
             // no-op
         }
 

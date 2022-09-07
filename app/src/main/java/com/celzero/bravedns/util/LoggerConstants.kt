@@ -25,7 +25,7 @@ class LoggerConstants {
         const val LOG_TAG_CONNECTION = "ConnectivityEvents"
         const val LOG_TAG_DNS = "DnsManager"
         const val LOG_TAG_FIREWALL = "FirewallManager"
-        const val LOG_TAG_PERMISSION = "PermissionManager"
+        const val LOG_BATCH_LOGGER = "BatchLogger"
         const val LOG_TAG_APP_DB = "AppDatabase"
         const val LOG_TAG_DOWNLOAD = "DownloadManager"
         const val LOG_TAG_UI = "ActivityManager"

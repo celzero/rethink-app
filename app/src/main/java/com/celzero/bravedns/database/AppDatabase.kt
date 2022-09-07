@@ -26,7 +26,7 @@ import com.celzero.bravedns.util.Constants
 
 @Database(
     entities = [AppInfo::class, ConnectionTracker::class, CustomIp::class, DoHEndpoint::class, DnsCryptEndpoint::class, DnsProxyEndpoint::class, DnsCryptRelayEndpoint::class, ProxyEndpoint::class, DnsLog::class, CustomDomain::class, RethinkDnsEndpoint::class, RethinkRemoteFileTag::class, RethinkLocalFileTag::class],
-    version = 12, exportSchema = false)
+    version = 13, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
@@ -42,7 +42,7 @@ abstract class AppDatabase : RoomDatabase() {
             MIGRATION_1_2).addMigrations(MIGRATION_2_3).addMigrations(MIGRATION_3_4).addMigrations(
             MIGRATION_4_5).addMigrations(MIGRATION_5_6).addMigrations(MIGRATION_6_7).addMigrations(
             MIGRATION_7_8).addMigrations(MIGRATION_8_9).addMigrations(MIGRATION_9_10).addMigrations(
-            MIGRATION_10_11).addMigrations(MIGRATION_11_12).build()
+            MIGRATION_10_11).addMigrations(MIGRATION_11_12).addMigrations(MIGRATION_12_13).build()
 
         private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
@@ -52,7 +52,6 @@ abstract class AppDatabase : RoomDatabase() {
                     "CREATE TABLE 'CategoryInfo' ( 'categoryName' TEXT NOT NULL, 'numberOFApps' INTEGER NOT NULL,'numOfAppsBlocked' INTEGER NOT NULL, 'isInternetBlocked' INTEGER NOT NULL, PRIMARY KEY (categoryName)) ")
             }
         }
-
 
         private val MIGRATION_2_3: Migration = object : Migration(2, 3) {
             override fun migrate(database: SupportSQLiteDatabase) {
@@ -357,6 +356,13 @@ abstract class AppDatabase : RoomDatabase() {
                     execSQL(
                         "INSERT OR REPLACE INTO DNSProxyEndpoint(proxyName, proxyType, proxyAppName, proxyIP, proxyPort, isSelected, isCustom, modifiedDataTime,latency) values ('Quad9 IPv6','External','Nobody','2620:fe::fe',53,0,0,0,0)")
                 }
+            }
+        }
+
+        private val MIGRATION_12_13: Migration = object : Migration(12, 13) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "INSERT OR REPLACE INTO DNSProxyEndpoint(proxyName, proxyType, proxyAppName, proxyIP, proxyPort, isSelected, isCustom, modifiedDataTime,latency) values ('Orbot','External','org.torproject.android','127.0.0.1',5400,0,0,0,0)")
             }
         }
 

@@ -196,7 +196,7 @@
                         <LinearLayout
                             android:id="@+id/dc_local_blocklist_container"
                             android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:layout_toStartOf="@id/dc_local_blocklist_img"
                             android:layout_toEndOf="@id/dc_local_blocklist_icon"
@@ -206,7 +206,7 @@
                                 android:id="@+id/dc_local_blocklist_heading"
                                 style="@style/TextAppearance.AppCompat.Subhead"
                                 android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
+                                android:layout_height="wrap_content"
                                 android:layout_gravity="center_vertical"
                                 android:layout_marginEnd="5dp"
                                 android:text="@string/dc_local_block_heading"

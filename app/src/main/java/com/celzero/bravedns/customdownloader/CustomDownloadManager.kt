@@ -74,7 +74,9 @@ class CustomDownloadManager(private val context: Context) : CoroutineScope {
             if (DEBUG) OkHttpDebugLogging.enableTaskRunner()
 
             // create okhttp client with base url as https://download.rethinkdns.com
-            val retrofit = getBlocklistBaseBuilder().build().create(IBlocklistDownload::class.java)
+            val retrofit = getBlocklistBaseBuilder(
+                RetrofitManager.Companion.OkHttpDnsType.DEFAULT).build().create(
+                IBlocklistDownload::class.java)
             val request = retrofit.downloadLocalBlocklistFile(url)
 
             var status: ConnectivityHelper.DownloadStatus

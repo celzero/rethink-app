@@ -316,7 +316,8 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
 
     // open local blocklist bottom sheet
     private fun openLocalBlocklist() {
-        val bottomSheetFragment = LocalBlocklistsBottomSheet(this)
+        val bottomSheetFragment = LocalBlocklistsBottomSheet()
+        bottomSheetFragment.setDismissListener(this)
         bottomSheetFragment.show(requireActivity().supportFragmentManager, bottomSheetFragment.tag)
     }
 
@@ -392,6 +393,8 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
     }
 
     override fun onBtmSheetDismiss() {
+        if (!isAdded) return
+
         updateLocalBlocklistUi()
     }
 }

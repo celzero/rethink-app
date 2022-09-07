@@ -17,6 +17,7 @@ package com.celzero.bravedns.database
 
 import android.util.Log
 import androidx.room.Entity
+import androidx.room.Index
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
@@ -49,6 +50,7 @@ class CustomIp {
 
     override fun equals(other: Any?): Boolean {
         if (other !is CustomIp) return false
+        if (ipAddress != other.ipAddress && uid != other.uid) return false
         return true
     }
 

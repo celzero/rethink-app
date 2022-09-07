@@ -27,11 +27,15 @@ import java.util.concurrent.TimeUnit
 class RetrofitManager {
 
     companion object {
-        fun getBlocklistBaseBuilder(): Retrofit.Builder {
-            return Retrofit.Builder().baseUrl(Constants.DOWNLOAD_BASE_URL).client(okHttpClient())
+        enum class OkHttpDnsType {
+            DEFAULT, CLOUDFLARE, GOOGLE, SYSTEM_DNS;
         }
 
-        fun okHttpClient(): OkHttpClient {
+        fun getBlocklistBaseBuilder(dnsType: OkHttpDnsType): Retrofit.Builder {
+            return Retrofit.Builder().baseUrl(Constants.DOWNLOAD_BASE_URL).client(okHttpClient(dnsType))
+        }
+
+        fun okHttpClient(dnsType: OkHttpDnsType): OkHttpClient {
             val okhttpClientBuilder = OkHttpClient.Builder()
             okhttpClientBuilder.callTimeout(5, TimeUnit.MINUTES)
             okhttpClientBuilder.connectTimeout(5, TimeUnit.MINUTES)
@@ -39,17 +43,38 @@ class RetrofitManager {
             okhttpClientBuilder.writeTimeout(20, TimeUnit.MINUTES)
             okhttpClientBuilder.retryOnConnectionFailure(true)
             okhttpClientBuilder.addInterceptor(NetworkConnectionInterceptor())
-            okhttpClientBuilder.dns(customDns())
+            okhttpClientBuilder.dns(customDns(dnsType))
             return okhttpClientBuilder.build()
         }
 
         // As of now, quad9 is used as default dns in okhttp client.
-        // TODO: Make this as user-set doh.
-        private fun customDns(): Dns {
-            return DnsOverHttps.Builder().client(OkHttpClient()).url(
-                "https://dns.quad9.net/dns-query".toHttpUrl()).bootstrapDnsHosts(
-                InetAddress.getByName("9.9.9.9"), InetAddress.getByName("149.112.112.112"),
-                InetAddress.getByName("2620:fe::9"), InetAddress.getByName("2620:fe::fe")).build()
+        private fun customDns(dnsType: OkHttpDnsType): Dns {
+            when (dnsType) {
+                OkHttpDnsType.DEFAULT -> {
+                    return DnsOverHttps.Builder().client(OkHttpClient()).url(
+                        "https://dns.quad9.net/dns-query".toHttpUrl()).bootstrapDnsHosts(
+                        InetAddress.getByName("9.9.9.9"), InetAddress.getByName("149.112.112.112"),
+                        InetAddress.getByName("2620:fe::9"),
+                        InetAddress.getByName("2620:fe::fe")).build()
+                }
+                OkHttpDnsType.CLOUDFLARE -> {
+                    return DnsOverHttps.Builder().client(OkHttpClient()).url(
+                        "https://cloudflare-dns.com/dns-query".toHttpUrl()).bootstrapDnsHosts(
+                        InetAddress.getByName("1.1.1.1"), InetAddress.getByName("1.0.0.1"),
+                        InetAddress.getByName("2606:4700:4700::1111"),
+                        InetAddress.getByName("2606:4700:4700::1001")).build()
+                }
+                OkHttpDnsType.GOOGLE -> {
+                    return DnsOverHttps.Builder().client(OkHttpClient()).url(
+                        "https://dns.google/dns-query".toHttpUrl()).bootstrapDnsHosts(
+                        InetAddress.getByName("8.8.8.8"), InetAddress.getByName("8.8.4.4"),
+                        InetAddress.getByName("2001:4860:4860:0:0:0:0:8888"),
+                        InetAddress.getByName("2001:4860:4860:0:0:0:0:8844")).build()
+                }
+                OkHttpDnsType.SYSTEM_DNS -> {
+                    return DnsOverHttps.Builder().build()
+                }
+            }
         }
     }
 

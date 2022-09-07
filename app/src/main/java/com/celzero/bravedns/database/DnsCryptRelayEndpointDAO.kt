@@ -16,6 +16,7 @@ limitations under the License.
 package com.celzero.bravedns.database
 
 import androidx.paging.DataSource
+import androidx.paging.PagingSource
 import androidx.room.*
 
 
@@ -33,13 +34,13 @@ interface DnsCryptRelayEndpointDAO {
 
     @Transaction
     @Query("select * from DNSCryptRelayEndpoint order by isSelected desc")
-    fun getDnsCryptRelayEndpointLiveData(): DataSource.Factory<Int, DnsCryptRelayEndpoint>
+    fun getDnsCryptRelayEndpointLiveData(): PagingSource<Int, DnsCryptRelayEndpoint>
 
     @Transaction
     @Query(
         "select * from DNSCryptRelayEndpoint where dnsCryptRelayURL like :query or dnsCryptRelayName like :query order by isSelected desc")
     fun getDnsCryptRelayEndpointLiveDataByName(
-            query: String): DataSource.Factory<Int, DnsCryptRelayEndpoint>
+            query: String): PagingSource<Int, DnsCryptRelayEndpoint>
 
     @Query("delete from DNSCryptRelayEndpoint where modifiedDataTime < :date")
     fun deleteOlderData(date: Long)

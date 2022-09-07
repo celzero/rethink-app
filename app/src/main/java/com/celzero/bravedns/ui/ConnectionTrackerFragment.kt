@@ -86,8 +86,9 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         layoutManager = CustomLinearLayoutManager(requireContext())
         b.recyclerConnection.layoutManager = layoutManager
         val recyclerAdapter = ConnectionTrackerAdapter(requireContext())
-        viewModel.connectionTrackerList.observe(viewLifecycleOwner, androidx.lifecycle.Observer(
-            recyclerAdapter::submitList))
+        viewModel.connectionTrackerList.observe(viewLifecycleOwner) {
+            recyclerAdapter.submitData(this.lifecycle, it)
+        }
         b.recyclerConnection.adapter = recyclerAdapter
 
         setupRecyclerScrollListener()

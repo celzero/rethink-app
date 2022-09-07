@@ -17,10 +17,7 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import android.net.*
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.Looper
-import android.os.Message
+import android.os.*
 import android.system.OsConstants.RT_SCOPE_UNIVERSE
 import android.util.Log
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -164,7 +161,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
     data class UnderlyingNetworks(val allNet: Set<Network>?, val ipv4Net: Set<Network>,
                                   val ipv6Net: Set<Network>, val useActive: Boolean,
-                                  var isActiveNetworkMetered: Boolean)
+                                                      var `isActiveNetworkMetered`: Boolean, var lastUpdated: Long)
 
     // Handles the network messages from the callback from the connectivity manager
     private class NetworkRequestHandler(context: Context, looper: Looper,
@@ -254,7 +251,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 val underlyingNetworks = UnderlyingNetworks(currentNetworks, trackedIpv4Networks,
                                                             trackedIpv6Networks,
                                                             !requireAllNetworks,
-                                                            isActiveNetworkMetered)
+                                                            isActiveNetworkMetered, SystemClock.elapsedRealtime())
                 networkListener.onNetworkConnected(underlyingNetworks)
             } else {
                 networkListener.onNetworkDisconnected()

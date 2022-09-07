@@ -57,6 +57,7 @@ class AppConfig internal constructor(private val context: Context,
         var dnscryptRelaysToRemove: String = ""
 
         private const val PROXY_MODE_ORBOT = 10L
+        private const val ORBOT_DNS = "Orbot"
     }
 
     init {
@@ -359,6 +360,10 @@ class AppConfig internal constructor(private val context: Context,
         }
     }
 
+    fun preventDnsLeaks(): Boolean {
+        return persistentState.preventDnsLeaks
+    }
+
     fun isDnsProxyActive(): Boolean {
         return DnsType.DNS_PROXY == getDnsType()
     }
@@ -557,6 +562,24 @@ class AppConfig internal constructor(private val context: Context,
         onDnsChange(DnsType.DNS_PROXY)
     }
 
+    suspend fun handleOrbotDnsChange(dnsProxyEndpoint: DnsProxyEndpoint) {
+        // if the prev connection was not dns proxy, then remove the connection status from database
+        if (getDnsType() != DnsType.DNS_PROXY) {
+            removeConnectionStatus()
+        }
+
+        dnsProxyEndpointRepository.update(dnsProxyEndpoint)
+        onDnsChange(DnsType.DNS_PROXY)
+    }
+
+    suspend fun isOrbotDns(): Boolean {
+        if (!getDnsType().isDnsProxy()) return false
+
+        val dnsProxy = dnsProxyEndpointRepository.getConnectedProxy() ?: return false
+
+        return dnsProxy.proxyName == ORBOT_DNS
+    }
+
     suspend fun handleDnscryptChanges(dnsCryptEndpoint: DnsCryptEndpoint) {
         // if the prev connection was not dnscrypt, then remove the connection status from database
         if (getDnsType() != DnsType.DNSCRYPT) {
@@ -565,6 +588,10 @@ class AppConfig internal constructor(private val context: Context,
 
         dnsCryptEndpointRepository.update(dnsCryptEndpoint)
         onDnsChange(DnsType.DNSCRYPT)
+    }
+
+    suspend fun getOrbotDnsProxyDetails(): DnsProxyEndpoint? {
+        return dnsProxyEndpointRepository.getOrbotDnsDetail()
     }
 
     suspend fun canRemoveDnscrypt(dnsCryptEndpoint: DnsCryptEndpoint): Boolean {

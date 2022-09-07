@@ -85,6 +85,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
         private const val EXTRA_SOCKS_PROXY_PORT = "org.torproject.android.intent.extra.SOCKS_PROXY_PORT"
         private const val EXTRA_HTTP_PROXY_HOST = "org.torproject.android.intent.extra.HTTP_PROXY_HOST"
         private const val EXTRA_HTTP_PROXY_PORT = "org.torproject.android.intent.extra.HTTP_PROXY_PORT"
+        private const val EXTRA_DNS_PORT = "org.torproject.android.intent.extra.DNS_PORT"
 
         private const val EXTRA_STATUS = "org.torproject.android.intent.extra.STATUS"
 
@@ -101,6 +102,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
     var httpsPort: Int? = null
     var socks5Ip: String? = null
     var httpsIp: String? = null
+    var dnsPort: Int? = null
 
     @Volatile private var isResponseReceivedFromOrbot: Boolean = false
 
@@ -202,7 +204,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
             when (status) {
                 STATUS_ON -> {
                     isResponseReceivedFromOrbot = true
-                    if (socks5Ip == null || httpsIp == null || socks5Ip == null || httpsIp == null) {
+                    if (socks5Ip == null || httpsIp == null || socks5Ip == null || httpsIp == null || dnsPort == null) {
                         updateOrbotProxyData(intent)
                     }
                     setOrbotMode()
@@ -299,10 +301,12 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
             Log.i(LOG_TAG_VPN, "Initiate orbot start with type: $selectedProxyType")
 
             if (isTypeSocks5() && handleOrbotSocks5Update()) {
+                enableOrbotDns()
                 appConfig.addProxy(AppConfig.ProxyType.SOCKS5, AppConfig.ProxyProvider.ORBOT)
             } else if (isTypeHttp() && handleOrbotHttpUpdate()) {
                 appConfig.addProxy(AppConfig.ProxyType.HTTP, AppConfig.ProxyProvider.ORBOT)
             } else if (isTypeHttpSocks5() && handleOrbotSocks5Update() && handleOrbotHttpUpdate()) {
+                enableOrbotDns()
                 appConfig.addProxy(AppConfig.ProxyType.HTTP_SOCKS5, AppConfig.ProxyProvider.ORBOT)
             } else {
                 uiCtx {
@@ -310,6 +314,17 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
                 }
             }
             persistentState.orbotConnectionStatus.postValue(false)
+        }
+    }
+
+    private fun enableOrbotDns() {
+        if (dnsPort == null) return
+
+        io {
+            val endpoint = appConfig.getOrbotDnsProxyDetails() ?: return@io
+            endpoint.proxyPort = dnsPort!!
+            endpoint.isSelected = true
+            appConfig.handleOrbotDnsChange(endpoint)
         }
     }
 
@@ -368,14 +383,16 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
         val socks5ProxyPort = data?.extras?.get(EXTRA_SOCKS_PROXY_PORT)
         val httpsProxyHost = data?.extras?.get(EXTRA_HTTP_PROXY_HOST)
         val httpsProxyPort = data?.extras?.get(EXTRA_HTTP_PROXY_PORT)
+        val dnsProxyPort = data?.extras?.get(EXTRA_DNS_PORT)
 
         socks5Port = socks5ProxyPort as Int?
         httpsPort = httpsProxyPort as Int?
         socks5Ip = socks5ProxyHost as String?
         httpsIp = httpsProxyHost as String?
+        dnsPort = dnsProxyPort as Int?
 
         if (DEBUG) Log.d(LOG_TAG_VPN,
-                         "OrbotHelper - Orbot - $socks5Port, $httpsPort, $socks5Ip, $httpsIp")
+                         "OrbotHelper - Orbot - socks5:$socks5Ip($socks5Port), http: $httpsIp($httpsPort), dns port: $dnsPort")
     }
 
     /**

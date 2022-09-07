@@ -81,9 +81,9 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
 
         dnsCryptRecyclerAdapter = DnsCryptEndpointAdapter(requireContext(), viewLifecycleOwner,
                                                           get())
-        dnsCryptViewModel.dnsCryptEndpointList.observe(viewLifecycleOwner,
-                                                       androidx.lifecycle.Observer(
-                                                           dnsCryptRecyclerAdapter::submitList))
+        dnsCryptViewModel.dnsCryptEndpointList.observe(viewLifecycleOwner) {
+                    dnsCryptRecyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+                }
         b.recyclerDnsCryptConnections.adapter = dnsCryptRecyclerAdapter
     }
 
@@ -100,9 +100,9 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
     private fun openDnsCryptRelaysDialog() {
         dnsCryptRelayRecyclerAdapter = DnsCryptRelayEndpointAdapter(requireContext(),
                                                                     viewLifecycleOwner, get())
-        dnsCryptRelayViewModel.dnsCryptRelayEndpointList.observe(viewLifecycleOwner,
-                                                                 androidx.lifecycle.Observer(
-                                                                     dnsCryptRelayRecyclerAdapter::submitList))
+        dnsCryptRelayViewModel.dnsCryptRelayEndpointList.observe(viewLifecycleOwner) {
+            dnsCryptRelayRecyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+        }
 
         val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         val customDialog = DnsCryptRelaysDialog(requireActivity(), dnsCryptRelayRecyclerAdapter,

@@ -39,11 +39,11 @@ class RethinkGlideModule : AppGlideModule() {
         val memoryCacheSizeBytes = 1024 * 1024 * 30 // 30 MB
         builder.setMemoryCache(LruResourceCache(memoryCacheSizeBytes.toLong()))
 
-        val diskCacheSizeBytes = 1024 * 1024 * 30 // 30 MB
+        val diskCacheSizeBytes = 1024 * 1024 * 350 // 350 MB
         builder.setDiskCache(InternalCacheDiskCacheFactory(context, diskCacheSizeBytes.toLong()))
 
         if (DEBUG) {
-            builder.setLogLevel(Log.DEBUG)
+            builder.setLogLevel(Log.ERROR)
         } else {
             builder.setLogLevel(Log.ERROR)
         }

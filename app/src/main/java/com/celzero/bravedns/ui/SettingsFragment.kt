@@ -211,7 +211,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             }
             InternetProtocol.IPv46.id -> {
                 b.genSettingsIpDesc.text = getString(R.string.settings_selected_ip_desc,
-                                                     getString(R.string.settings_ip_dialog_ipv46))
+                                                     getString(R.string.settings_ip_text_ipv46))
                 b.settingsActivityPtransRl.visibility = View.GONE
             }
             else -> {
@@ -248,20 +248,40 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             return
         }
 
-        when (appConfig.getProxyType()) {
-            AppConfig.ProxyType.HTTP.name -> {
-                b.settingsActivityHttpOrbotDesc.text = getString(R.string.orbot_bs_status_2)
-            }
-            AppConfig.ProxyType.SOCKS5.name -> {
-                b.settingsActivityHttpOrbotDesc.text = getString(R.string.orbot_bs_status_1)
-            }
-            AppConfig.ProxyType.HTTP_SOCKS5.name -> {
-                b.settingsActivityHttpOrbotDesc.text = getString(R.string.orbot_bs_status_3)
-            }
-            else -> {
-                b.settingsActivityHttpOrbotDesc.text = getString(R.string.orbot_bs_status_4)
+        io {
+            val isOrbotDns = appConfig.isOrbotDns()
+
+            uiCtx {
+
+                when (appConfig.getProxyType()) {
+                    AppConfig.ProxyType.HTTP.name -> {
+                        b.settingsActivityHttpOrbotDesc.text = getString(R.string.orbot_bs_status_2)
+                    }
+                    AppConfig.ProxyType.SOCKS5.name -> {
+                        if (isOrbotDns) {
+                            b.settingsActivityHttpOrbotDesc.text = getString(
+                                R.string.orbot_bs_status_1, getString(R.string.orbot_status_arg_3))
+                        } else {
+                            b.settingsActivityHttpOrbotDesc.text = getString(
+                                R.string.orbot_bs_status_1, getString(R.string.orbot_status_arg_2))
+                        }
+                    }
+                    AppConfig.ProxyType.HTTP_SOCKS5.name -> {
+                        if (isOrbotDns) {
+                            b.settingsActivityHttpOrbotDesc.text = getString(
+                                R.string.orbot_bs_status_3, getString(R.string.orbot_status_arg_3))
+                        } else {
+                            b.settingsActivityHttpOrbotDesc.text = getString(
+                                R.string.orbot_bs_status_3, getString(R.string.orbot_status_arg_2))
+                        }
+                    }
+                    else -> {
+                        b.settingsActivityHttpOrbotDesc.text = getString(R.string.orbot_bs_status_4)
+                    }
+                }
             }
         }
+
     }
 
     private fun setupClickListeners() {
@@ -810,8 +830,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             if (isValid && isIPValid) {
                 //Do the Socks5 Proxy setting there
                 persistentState.udpBlockedSettings = udpBlockCheckBox.isChecked
-                insertProxyEndpointDB(mode, Constants.SOCKS, appPackageName, ip, port, userName,
-                                      password, isUDPBlock)
+                insertProxyEndpointDB(mode, appPackageName, ip, port, userName, password,
+                                      isUDPBlock)
                 b.settingsActivitySocks5Desc.text = getString(
                     R.string.settings_socks_forwarding_desc, ip, port.toString(), appName)
                 dialog.dismiss()
@@ -831,9 +851,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
     }
 
 
-    private fun insertProxyEndpointDB(mode: String, name: String, appName: String?, ip: String,
-                                      port: Int, userName: String, password: String,
-                                      isUDPBlock: Boolean) {
+    private fun insertProxyEndpointDB(mode: String, appName: String?, ip: String, port: Int,
+                                      userName: String, password: String, isUDPBlock: Boolean) {
         if (appName == null) return
 
         b.settingsActivitySocks5Switch.isEnabled = false
@@ -847,7 +866,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             }
         }
         io {
-            var proxyName = name
+            var proxyName = Constants.SOCKS
             if (proxyName.isBlank()) {
                 proxyName = if (mode == getString(R.string.cd_dns_proxy_mode_internal)) {
                     appName
@@ -872,12 +891,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         }
     }
 
-    private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) {
-            f()
-        }
-    }
-
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
@@ -886,9 +899,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         }
     }
 
-    private fun go(f: suspend () -> Unit) {
-        lifecycleScope.launch {
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) {
             f()
         }
     }
+
 }

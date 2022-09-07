@@ -18,6 +18,7 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -25,6 +26,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.FragmentActivity
 import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -41,9 +43,10 @@ import com.celzero.bravedns.ui.DnsBlocklistBottomSheetFragment
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
+import com.google.gson.Gson
 
 class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
-        PagedListAdapter<DnsLog, DnsQueryAdapter.TransactionViewHolder>(DIFF_CALLBACK) {
+        PagingDataAdapter<DnsLog, DnsQueryAdapter.TransactionViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         const val TYPE_TRANSACTION: Int = 1
@@ -136,7 +139,10 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
                 return
             }
 
-            val bottomSheetFragment = DnsBlocklistBottomSheetFragment(context, dnsLog)
+            val bottomSheetFragment = DnsBlocklistBottomSheetFragment()
+            val bundle = Bundle()
+            bundle.putString(DnsBlocklistBottomSheetFragment.DNSLOG, Gson().toJson(dnsLog))
+            bottomSheetFragment.arguments = bundle
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
 

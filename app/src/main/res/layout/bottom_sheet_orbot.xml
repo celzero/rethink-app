@@ -28,9 +28,9 @@
             android:id="@+id/orbot_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:layout_centerVertical="true"
             android:layout_toStartOf="@id/bs_orbot_app"
             android:padding="5dp"
-            android:layout_centerVertical="true"
             android:src="@drawable/orbot_enabled" />
 
         <com.google.android.material.chip.Chip
@@ -48,8 +48,8 @@
 
         <ImageView
             android:id="@+id/orbot_info_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_centerVertical="true"
             android:layout_gravity="end"
             android:layout_marginStart="10dp"

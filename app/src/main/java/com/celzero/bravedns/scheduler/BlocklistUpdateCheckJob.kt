@@ -49,7 +49,7 @@ class BlocklistUpdateCheckJob(val context: Context, workerParameters: WorkerPara
     private fun isDownloadRequired(type: AppDownloadManager.DownloadType) {
         val url = constructDownloadCheckUrl(type)
         val request = Request.Builder().url(url).build()
-        val client = RetrofitManager.okHttpClient()
+        val client = RetrofitManager.okHttpClient(RetrofitManager.Companion.OkHttpDnsType.DEFAULT)
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -71,13 +71,17 @@ class BlocklistUpdateCheckJob(val context: Context, workerParameters: WorkerPara
                 }
 
                 val shouldUpdate = json.optBoolean(Constants.JSON_UPDATE, false)
+                val timestamp = json.optLong(Constants.JSON_LATEST, Constants.INIT_TIME_MS)
                 Log.i(LOG_TAG_SCHEDULER,
-                      "Response for update check for blocklist: version? $version, update? $shouldUpdate")
+                      "Response for update check for blocklist: version? $version, update? $shouldUpdate, download type: ${type.name}")
                 if (type == AppDownloadManager.DownloadType.LOCAL) {
                     persistentState.isLocalBlocklistUpdateAvailable = shouldUpdate
-                } else {
-                    persistentState.isRemoteBlocklistUpdateAvailable = shouldUpdate
+                    if (shouldUpdate) persistentState.updatableTimestampLocal = timestamp
+                    return
                 }
+
+                persistentState.isRemoteBlocklistUpdateAvailable = shouldUpdate
+                if (shouldUpdate) persistentState.updatableTimestampRemote = timestamp
             }
         })
     }

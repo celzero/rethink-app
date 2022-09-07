@@ -17,6 +17,7 @@ limitations under the License.
 package com.celzero.bravedns.database
 
 import androidx.paging.DataSource
+import androidx.paging.PagingSource
 import androidx.room.*
 import com.celzero.bravedns.automaton.RethinkBlocklistManager
 import com.celzero.bravedns.data.FileTag
@@ -49,26 +50,26 @@ interface RethinkLocalFileTagDao {
     fun getAllTags(): List<FileTag>
 
     @Query("select * from RethinkLocalFileTag order by `group`")
-    fun getLocalFileTags(): DataSource.Factory<Int, RethinkLocalFileTag>
+    fun getLocalFileTags(): PagingSource<Int, RethinkLocalFileTag>
 
     @Query(
         "select * from RethinkLocalFileTag where `group` in (:group) and subg in (:subg) and (vname like :query or `group` like :query or subg like :query) order by `group`")
     fun getLocalFileTags(query: String, group: Set<String>,
-                         subg: Set<String>): DataSource.Factory<Int, RethinkLocalFileTag>
+                         subg: Set<String>): PagingSource<Int, RethinkLocalFileTag>
 
     @Query(
         "select * from RethinkLocalFileTag where `group` in (:group) and (vname like :query or `group` like :query or subg like :query) order by `group`")
     fun getLocalFileTagsGroup(query: String,
-                              group: Set<String>): DataSource.Factory<Int, RethinkLocalFileTag>
+                              group: Set<String>): PagingSource<Int, RethinkLocalFileTag>
 
     @Query(
         "select * from RethinkLocalFileTag where subg in (:subg) and (vname like :query or `group` like :query or subg like :query) order by `group`")
     fun getLocalFileTagsSubg(query: String,
-                             subg: Set<String>): DataSource.Factory<Int, RethinkLocalFileTag>
+                             subg: Set<String>): PagingSource<Int, RethinkLocalFileTag>
 
     @Query(
         "select * from RethinkLocalFileTag where (vname like :input or `group` like :input or subg like :input) order by `group`")
-    fun getLocalFileTagsWithFilter(input: String): DataSource.Factory<Int, RethinkLocalFileTag>
+    fun getLocalFileTagsWithFilter(input: String): PagingSource<Int, RethinkLocalFileTag>
 
     @Query("select value, simpleTagId from RethinkLocalFileTag order by simpleTagId")
     fun getSimpleViewTags(): List<RethinkBlocklistManager.SimpleViewMapping>

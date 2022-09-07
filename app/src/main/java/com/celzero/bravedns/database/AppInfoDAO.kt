@@ -17,6 +17,7 @@ package com.celzero.bravedns.database
 
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
+import androidx.paging.PagingSource
 import androidx.room.*
 
 @Dao
@@ -61,57 +62,57 @@ interface AppInfoDAO {
     fun getBlockedCountForCategory(categoryName: String, status: Int): Int
 
     @Query("select * from AppInfo where isSystemApp = 1 order by lower(appName)")
-    fun getWhitelistedSystemApps(): DataSource.Factory<Int, AppInfo>
+    fun getWhitelistedSystemApps(): PagingSource<Int, AppInfo>
 
     @Query("select * from AppInfo where appName like :filter order by lower(appName)")
-    fun getWhitelistedApps(filter: String): DataSource.Factory<Int, AppInfo>
+    fun getWhitelistedApps(filter: String): PagingSource<Int, AppInfo>
 
     @Transaction
     @Query("select * from AppInfo where appCategory in (:filter) order by lower(appName)")
-    fun getWhitelistedAppsByCategory(filter: List<String>): DataSource.Factory<Int, AppInfo>
+    fun getWhitelistedAppsByCategory(filter: List<String>): PagingSource<Int, AppInfo>
 
     @Query("select * from AppInfo where appCategory != 'Non-App System' order by lower(appName)")
-    fun getExcludedAppDetails(): DataSource.Factory<Int, AppInfo>
+    fun getExcludedAppDetails(): PagingSource<Int, AppInfo>
 
     @Query(
         "select * from AppInfo where isSystemApp = 1 and appCategory != 'Non-App System' order by lower(appName)")
-    fun getExcludedAAppSystemApps(): DataSource.Factory<Int, AppInfo>
+    fun getExcludedAAppSystemApps(): PagingSource<Int, AppInfo>
 
     @Query(
         "select * from AppInfo where appCategory in (:filter) and appCategory != 'Non-App System' order by lower(appName)")
     fun getExcludedAppDetailsFilterForCategory(
-            filter: List<String>): DataSource.Factory<Int, AppInfo>
+            filter: List<String>): PagingSource<Int, AppInfo>
 
     @Query(
         "select * from AppInfo where appName like :filter and appCategory != 'Non-App System' order by lower(appName)")
-    fun getExcludedAppDetailsFilterLiveData(filter: String): DataSource.Factory<Int, AppInfo>
+    fun getExcludedAppDetailsFilterLiveData(filter: String): PagingSource<Int, AppInfo>
 
     @Query(
         "select * from AppInfo where isSystemApp = 1 and appName like :name and firewallStatus in (:firewall) order by lower(appName)")
-    fun getSystemApps(name: String, firewall: Set<Int>): DataSource.Factory<Int, AppInfo>
+    fun getSystemApps(name: String, firewall: Set<Int>): PagingSource<Int, AppInfo>
 
     @Query(
         "select * from AppInfo where isSystemApp = 1 and appName like :name and appCategory in (:filter) and firewallStatus in (:firewall)  order by lower(appName)")
     fun getSystemApps(name: String, filter: Set<String>,
-                      firewall: Set<Int>): DataSource.Factory<Int, AppInfo>
+                      firewall: Set<Int>): PagingSource<Int, AppInfo>
 
     @Query(
         "select * from AppInfo where isSystemApp = 0 and appName like :name and firewallStatus in (:firewall) order by lower(appName)")
-    fun getInstalledApps(name: String, firewall: Set<Int>): DataSource.Factory<Int, AppInfo>
+    fun getInstalledApps(name: String, firewall: Set<Int>): PagingSource<Int, AppInfo>
 
     @Query(
         "select * from AppInfo where isSystemApp = 0 and appName like :name and appCategory in (:filter) and firewallStatus in (:firewall) order by lower(appName)")
     fun getInstalledApps(name: String, filter: Set<String>,
-                         firewall: Set<Int>): DataSource.Factory<Int, AppInfo>
+                         firewall: Set<Int>): PagingSource<Int, AppInfo>
 
     @Query(
         "select * from AppInfo where appName like :name and firewallStatus in (:firewall) order by lower(appName)")
-    fun getAppInfos(name: String, firewall: Set<Int>): DataSource.Factory<Int, AppInfo>
+    fun getAppInfos(name: String, firewall: Set<Int>): PagingSource<Int, AppInfo>
 
     @Query(
         "select * from AppInfo where appName like :name and appCategory in (:filter)  and firewallStatus in (:firewall)  order by lower(appName)")
     fun getAppInfos(name: String, filter: Set<String>,
-                    firewall: Set<Int>): DataSource.Factory<Int, AppInfo>
+                    firewall: Set<Int>): PagingSource<Int, AppInfo>
 
     @Query(
         "select * from AppInfo where appName like :name and appCategory in (:cat)  and firewallStatus in (:firewall) ")

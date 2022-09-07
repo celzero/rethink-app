@@ -72,9 +72,9 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
 
         dnsProxyRecyclerAdapter = DnsProxyEndpointAdapter(requireContext(), viewLifecycleOwner,
                                                           get())
-        dnsProxyViewModel.dnsProxyEndpointList.observe(viewLifecycleOwner,
-                                                       androidx.lifecycle.Observer(
-                                                           dnsProxyRecyclerAdapter::submitList))
+        dnsProxyViewModel.dnsProxyEndpointList.observe(viewLifecycleOwner) {
+            dnsProxyRecyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+        }
         b.recyclerDnsProxyConnections.adapter = dnsProxyRecyclerAdapter
     }
 

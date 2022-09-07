@@ -17,6 +17,7 @@ limitations under the License.
 package com.celzero.bravedns.database
 
 import androidx.paging.DataSource
+import androidx.paging.PagingSource
 import androidx.room.*
 import com.celzero.bravedns.database.RethinkDnsEndpoint.Companion.RETHINK_DEFAULT
 import com.celzero.bravedns.database.RethinkDnsEndpoint.Companion.RETHINK_PLUS
@@ -53,11 +54,11 @@ interface RethinkDnsEndpointDao {
 
     @Transaction
     @Query("select * from RethinkDnsEndpoint where uid =  $MISSING_UID order by isActive desc")
-    fun getRethinkEndpoints(): DataSource.Factory<Int, RethinkDnsEndpoint>
+    fun getRethinkEndpoints(): PagingSource<Int, RethinkDnsEndpoint>
 
     @Transaction
     @Query("select * from RethinkDnsEndpoint order by isActive desc")
-    fun getAllRethinkEndpoints(): DataSource.Factory<Int, RethinkDnsEndpoint>
+    fun getAllRethinkEndpoints(): PagingSource<Int, RethinkDnsEndpoint>
 
     @Query("select isActive from RethinkDnsEndpoint where uid = :uid")
     fun isAppWiseDnsEnabled(uid: Int): Boolean?
@@ -65,7 +66,7 @@ interface RethinkDnsEndpointDao {
     @Transaction
     @Query(
         "select * from RethinkDnsEndpoint where name like :query or url like :query and uid = $MISSING_UID order by isActive desc")
-    fun getRethinkEndpointsByName(query: String): DataSource.Factory<Int, RethinkDnsEndpoint>
+    fun getRethinkEndpointsByName(query: String): PagingSource<Int, RethinkDnsEndpoint>
 
     @Query("select * from RethinkDnsEndpoint where isActive = 1 and uid = $MISSING_UID LIMIT 1")
     fun getConnectedEndpoint(): RethinkDnsEndpoint?
